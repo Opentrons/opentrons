@@ -151,7 +151,7 @@ class LLDWMAD(LLDAlgoABC):
     running_samples_wmad: numpy.ndarray[Any, numpy.dtype[numpy.float32]]
     derivative_threshold_wmad: float
 
-    def __init__(self, samples: int = 10, thresh: float = -2) -> None:
+    def __init__(self, samples: int = 10, thresh: float = -4) -> None:
         """Init."""
         self.samples_n_wmad = samples
         self.derivative_threshold_wmad = thresh
