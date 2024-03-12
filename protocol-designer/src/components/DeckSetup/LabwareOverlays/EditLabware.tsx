@@ -7,7 +7,6 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
 import { NameThisLabware } from './NameThisLabware'
 import { DND_TYPES } from '../../../constants'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import {
   deleteContainer,
   duplicateLabware,
@@ -39,10 +38,7 @@ export const EditLabware = (props: Props): JSX.Element | null => {
   const savedLabware = useSelector(labwareIngredSelectors.getSavedLabware)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('deck')
-  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const labware = activeDeckSetup.labware
   const ref = React.useRef(null)
-  const [newSlot, setSlot] = React.useState<string | null>(null)
 
   const { isTiprack } = labwareOnDeck.def.parameters
   const hasName = savedLabware[labwareOnDeck.id]
@@ -52,47 +48,46 @@ export const EditLabware = (props: Props): JSX.Element | null => {
     dispatch(openIngredientSelector(labwareOnDeck.id))
   }
 
-  const [, drag] = useDrag({
-    type: DND_TYPES.LABWARE,
-    item: { labwareOnDeck },
-  })
-
-  const [{ draggedLabware, isOver }, drop] = useDrop(() => ({
-    accept: DND_TYPES.LABWARE,
-    canDrop: (item: DroppedItem) => {
-      const draggedLabware = item?.labwareOnDeck
-      const isDifferentSlot =
-        draggedLabware && draggedLabware.slot !== labwareOnDeck.slot
-      return isDifferentSlot && !swapBlocked
-    },
-    drop: (item: DroppedItem) => {
-      const draggedLabware = item?.labwareOnDeck
-      if (newSlot != null) {
-        dispatch(moveDeckItem(newSlot, labwareOnDeck.slot))
-      } else if (draggedLabware != null) {
-        dispatch(moveDeckItem(draggedLabware.slot, labwareOnDeck.slot))
-      }
-    },
-
-    hover: (item: DroppedItem, monitor: DropTargetMonitor) => {
-      if (monitor.canDrop()) {
-        setHoveredLabware(labwareOnDeck)
-      }
-    },
-    collect: (monitor: DropTargetMonitor) => ({
-      isOver: monitor.isOver(),
-      draggedLabware: monitor.getItem() as DroppedItem,
+  const [, drag] = useDrag(
+    () => ({
+      type: DND_TYPES.LABWARE,
+      item: { labwareOnDeck },
     }),
-  }))
+    [labwareOnDeck]
+  )
 
-  const draggedItem = Object.values(labware).find(
-    l => l.id === draggedLabware?.labwareOnDeck?.id
+  const [{ draggedLabware, isOver }, drop] = useDrop(
+    () => ({
+      accept: DND_TYPES.LABWARE,
+      canDrop: (item: DroppedItem) => {
+        const draggedLabware = item?.labwareOnDeck
+        const isDifferentSlot =
+          draggedLabware && draggedLabware.slot !== labwareOnDeck.slot
+        return isDifferentSlot && !swapBlocked
+      },
+      drop: (item: DroppedItem) => {
+        const draggedLabware = item?.labwareOnDeck
+        if (draggedLabware != null) {
+          dispatch(moveDeckItem(draggedLabware.slot, labwareOnDeck.slot))
+        }
+      },
+
+      hover: (item: DroppedItem, monitor: DropTargetMonitor) => {
+        if (monitor.canDrop()) {
+          setHoveredLabware(labwareOnDeck)
+        }
+      },
+      collect: (monitor: DropTargetMonitor) => ({
+        isOver: monitor.isOver(),
+        draggedLabware: monitor.getItem() as DroppedItem,
+      }),
+    }),
+    [labwareOnDeck]
   )
 
   React.useEffect(() => {
-    if (draggedItem != null) {
-      setSlot(draggedItem.slot)
-      setDraggedLabware(draggedItem)
+    if (draggedLabware?.labwareOnDeck != null) {
+      setDraggedLabware(draggedLabware?.labwareOnDeck)
     } else {
       setHoveredLabware(null)
       setDraggedLabware(null)
@@ -107,7 +102,8 @@ export const EditLabware = (props: Props): JSX.Element | null => {
       />
     )
   } else {
-    const isBeingDragged = draggedItem?.slot === labwareOnDeck.slot
+    const isBeingDragged =
+      draggedLabware?.labwareOnDeck?.slot === labwareOnDeck.slot
 
     let contents: React.ReactNode | null = null
 
