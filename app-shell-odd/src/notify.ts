@@ -257,6 +257,8 @@ function unsubscribe(notifyParams: NotifyParams): Promise<void> {
           client?.unsubscribe(topic, {}, (error, result) => {
             if (error == null) {
               handleDecrementSubscriptionCount(hostname, topic)
+            } else {
+              log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
             }
           })
         } else {
