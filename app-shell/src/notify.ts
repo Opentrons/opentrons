@@ -3,6 +3,7 @@ import mqtt from 'mqtt'
 import isEqual from 'lodash/isEqual'
 
 import { createLogger } from './log'
+import { HEALTH_STATUS_OK, FAILURE_STATUSES } from './constants'
 
 import type { BrowserWindow } from 'electron'
 import type {
@@ -13,30 +14,24 @@ import type {
   NotifyNetworkError,
 } from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch } from './types'
+import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
 
-// TODO(jh, 2024-03-01): after refactoring notify connectivity and subscription logic, uncomment logs.
+// Manages MQTT broker connections through a connection store. Broker connections are added or removed based on
+// health status changes reported by discovery-client. Subscriptions are handled "lazily", in which a component must
+// express interest in a topic before a subscription request is made. Unsubscribe requests only occur if an "unsubscribe"
+// flag is received from the broker.
 
-// Manages MQTT broker connections via a connection store, establishing a connection to the broker only if a connection does not
-// already exist, and disconnects from the broker when the app is not subscribed to any topics for the given broker.
-// A redundant connection to the same broker results in the older connection forcibly closing, which we want to avoid.
-// However, redundant subscriptions are permitted and result in the broker sending the retained message for that topic.
-// To mitigate redundant connections, the connection manager eagerly adds the host, removing the host if the connection fails.
-
-const FAILURE_STATUSES = {
-  ECONNREFUSED: 'ECONNREFUSED',
-  ECONNFAILED: 'ECONNFAILED',
-} as const
-
-interface ConnectionStore {
-  [hostname: string]: {
-    client: mqtt.MqttClient | null
-    subscriptions: Record<NotifyTopic, number>
-    pendingSubs: Set<NotifyTopic>
-  }
+interface HostnameInfo {
+  client: mqtt.MqttClient | null
+  subscriptions: Set<NotifyTopic>
+  pendingSubs: Set<NotifyTopic>
 }
+type ConnectionStore = Record<string, HostnameInfo>
 
 const connectionStore: ConnectionStore = {}
 const unreachableHosts = new Set<string>()
+const pendingUnsubs = new Set<NotifyTopic>()
+
 const log = createLogger('notify')
 // MQTT is somewhat particular about the clientId format and will connect erratically if an unexpected string is supplied.
 // This clientId is derived from the mqttjs library.
@@ -55,128 +50,144 @@ const connectOptions: mqtt.IClientOptions = {
 
 /**
  * @property {number} qos: "Quality of Service", "at least once". Because we use React Query, which does not trigger
-  a render update event if duplicate data is received, we can avoid the additional overhead
-  to guarantee "exactly once" delivery.
+  a render update event if duplicate data is received, we can avoid the additional overhead of guaranteeing "exactly once" delivery.
  */
 const subscribeOptions: mqtt.IClientSubscribeOptions = {
   qos: 1,
 }
 
+// Because of the app's start sequence, the browser window will always be defined before relevant actions occur.
+let browserWindow: BrowserWindow
+
 export function registerNotify(
   dispatch: Dispatch,
   mainWindow: BrowserWindow
 ): (action: Action) => unknown {
+  if (browserWindow == null) {
+    browserWindow = mainWindow
+  }
+
   return function handleAction(action: Action) {
     switch (action.type) {
       case 'shell:NOTIFY_SUBSCRIBE':
         return subscribe({
           ...action.payload,
-          browserWindow: mainWindow,
-        })
-
-      case 'shell:NOTIFY_UNSUBSCRIBE':
-        return unsubscribe({
-          ...action.payload,
-          browserWindow: mainWindow,
         })
     }
   }
 }
 
+export function handleNotificationConnectionsFor(
+  robots: DiscoveryClientRobot[]
+): string[] {
+  const reachableRobotIPs = getHealthyRobotIPsForNotifications(robots)
+  cleanUpUnreachableRobots(reachableRobotIPs)
+  addNewRobotsToConnectionStore(reachableRobotIPs)
+
+  return reachableRobotIPs
+
+  // This is the discovery-client equivalent of "available" robots when viewing the Devices page in the app.
+  function getHealthyRobotIPsForNotifications(
+    robots: DiscoveryClientRobot[]
+  ): string[] {
+    return robots.flatMap(robot =>
+      robot.addresses
+        .filter(address => address.healthStatus === HEALTH_STATUS_OK)
+        .map(address => address.ip)
+    )
+  }
+
+  function cleanUpUnreachableRobots(healthyRobotIPs: string[]): void {
+    const healthyRobotIPsSet = new Set(healthyRobotIPs)
+    const unreachableRobots = Object.keys(connectionStore).filter(hostname => {
+      // The connection is forcefully closed, so remove from the connection store immediately to reduce disconnect packets.
+      if (hostname in connectionStore && !healthyRobotIPsSet.has(hostname)) {
+        delete connectionStore[hostname]
+        unreachableHosts.delete(hostname)
+        return true
+      }
+      return false
+    })
+    void closeConnectionsForcefullyFor(unreachableRobots)
+  }
+
+  function addNewRobotsToConnectionStore(robots: string[]): void {
+    const newRobots = robots.filter(hostname => {
+      const isRobotInConnectionStore = Object.prototype.hasOwnProperty.call(
+        connectionStore,
+        hostname
+      )
+      return !isRobotInConnectionStore && !unreachableHosts.has(hostname)
+    })
+    newRobots.forEach(hostname => {
+      connectAsync(`mqtt://${hostname}`)
+        .then(client => {
+          log.debug(`Successfully connected to ${hostname}`)
+          connectionStore[hostname] = {
+            client,
+            subscriptions: new Set(),
+            pendingSubs: new Set(),
+          }
+          establishListeners({ client, browserWindow, hostname })
+        })
+        .catch((error: Error) => {
+          log.warn(
+            `Failed to connect to ${hostname} - ${error.name}: ${error.message} `
+          )
+          unreachableHosts.add(hostname)
+        })
+    })
+  }
+}
+
 const CHECK_CONNECTION_INTERVAL = 500
-let hasReportedAPortBlockEvent = false
+const robotsWithReportedPortBlockEvent = new Set<string>()
 
 interface NotifyParams {
-  browserWindow: BrowserWindow
   hostname: string
   topic: NotifyTopic
 }
 
 function subscribe(notifyParams: NotifyParams): Promise<void> {
-  const { hostname, topic, browserWindow } = notifyParams
+  const { hostname, topic } = notifyParams
   if (unreachableHosts.has(hostname)) {
+    const errorMessage = determineErrorMessageFor(hostname)
     sendToBrowserDeserialized({
       browserWindow,
       hostname,
       topic,
-      message: FAILURE_STATUSES.ECONNFAILED,
+      message: errorMessage,
     })
-    return Promise.resolve()
-  }
-  // true if no subscription (and therefore connection) to host exists
-  else if (connectionStore[hostname] == null) {
-    connectionStore[hostname] = {
-      client: null,
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      subscriptions: { [topic]: 1 } as Record<NotifyTopic, number>,
-      pendingSubs: new Set(),
-    }
-    return connectAsync(`mqtt://${hostname}`)
-      .then(client => {
-        const { pendingSubs } = connectionStore[hostname]
-        log.info(`Successfully connected to ${hostname}`)
-        connectionStore[hostname].client = client
-        pendingSubs.add(topic)
-        establishListeners({ ...notifyParams, client })
-        return new Promise<void>(() => {
-          client.subscribe(topic, subscribeOptions, subscribeCb)
-          pendingSubs.delete(topic)
-        })
-      })
-      .catch((error: Error) => {
-        log.warn(
-          `Failed to connect to ${hostname} - ${error.name}: ${error.message} `
-        )
-        let failureMessage: NotifyNetworkError = FAILURE_STATUSES.ECONNFAILED
-        if (connectionStore[hostname]?.client == null) {
-          unreachableHosts.add(hostname)
-          if (
-            error.message.includes(FAILURE_STATUSES.ECONNREFUSED) &&
-            !hasReportedAPortBlockEvent
-          ) {
-            failureMessage = FAILURE_STATUSES.ECONNREFUSED
-            hasReportedAPortBlockEvent = true
-          }
-        }
 
-        sendToBrowserDeserialized({
-          browserWindow,
-          hostname,
-          topic,
-          message: failureMessage,
-        })
-        if (hostname in connectionStore) delete connectionStore[hostname]
-      })
-  }
-  // true if the connection store has an entry for the hostname.
-  else {
+    return Promise.resolve()
+  } else {
     return waitUntilActiveOrErrored('client')
       .then(() => {
         const { client, subscriptions, pendingSubs } = connectionStore[hostname]
-        const activeClient = client as mqtt.Client
-        const isNotActiveSubscription = (subscriptions[topic] ?? 0) <= 0
-        if (!pendingSubs.has(topic) && isNotActiveSubscription) {
-          pendingSubs.add(topic)
-          return new Promise<void>(() => {
-            activeClient.subscribe(topic, subscribeOptions, subscribeCb)
-            pendingSubs.delete(topic)
-          })
-        } else {
-          void waitUntilActiveOrErrored('subscription')
-            .then(() => {
-              subscriptions[topic] += 1
+        if (!subscriptions.has(topic)) {
+          if (!pendingSubs.has(topic)) {
+            pendingSubs.add(topic)
+            return new Promise<void>(() => {
+              client?.subscribe(topic, subscribeOptions, subscribeCb)
+              pendingSubs.delete(topic)
             })
-            .catch(() => {
-              sendToBrowserDeserialized({
-                browserWindow,
-                hostname,
-                topic,
-                message: FAILURE_STATUSES.ECONNFAILED,
-              })
-            })
+          } else {
+            void waitUntilActiveOrErrored('subscription').catch(
+              (error: Error) => {
+                log.debug(error.message)
+                sendToBrowserDeserialized({
+                  browserWindow,
+                  hostname,
+                  topic,
+                  message: FAILURE_STATUSES.ECONNFAILED,
+                })
+              }
+            )
+          }
         }
       })
-      .catch(() => {
+      .catch((error: Error) => {
+        log.debug(error.message)
         sendToBrowserDeserialized({
           browserWindow,
           hostname,
@@ -185,6 +196,18 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         })
       })
   }
+  // Only send one ECONNREFUSED per robot per app session.
+  function determineErrorMessageFor(hostname: string): NotifyNetworkError {
+    let message: NotifyNetworkError
+    if (!robotsWithReportedPortBlockEvent.has(hostname)) {
+      message = FAILURE_STATUSES.ECONNREFUSED
+      robotsWithReportedPortBlockEvent.add(hostname)
+    } else {
+      message = FAILURE_STATUSES.ECONNFAILED
+    }
+    return message
+  }
+
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
     const { subscriptions } = connectionStore[hostname]
     if (error != null) {
@@ -194,17 +217,9 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         topic,
         message: FAILURE_STATUSES.ECONNFAILED,
       })
-      setTimeout(() => {
-        if (Object.keys(connectionStore[hostname].subscriptions).length <= 0) {
-          connectionStore[hostname].client?.end()
-        }
-      }, RENDER_TIMEOUT)
     } else {
-      if (subscriptions[topic] > 0) {
-        subscriptions[topic] += 1
-      } else {
-        subscriptions[topic] = 1
-      }
+      log.debug(`Successfully subscribed on ${hostname} to topic: ${topic}`)
+      subscriptions.add(topic)
     }
   }
 
@@ -219,8 +234,8 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         const host = connectionStore[hostname]
         const hasReceivedAck =
           connection === 'client'
-            ? host?.client != null
-            : host?.subscriptions[topic] > 0
+            ? host.client != null
+            : host.subscriptions.has(topic)
         if (hasReceivedAck) {
           clearInterval(intervalId)
           resolve()
@@ -229,41 +244,51 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
         counter++
         if (counter === MAX_RETRIES) {
           clearInterval(intervalId)
-          reject(new Error('Maximum subscription retries exceeded.'))
+          reject(new Error('Maximum number of retries exceeded.'))
         }
       }, CHECK_CONNECTION_INTERVAL)
     })
   }
 }
 
-// Because subscription logic is directly tied to the component lifecycle, it is possible
-// for a component to trigger an unsubscribe event on dismount while a new component mounts and
-// triggers a subscribe event. For the connection store and MQTT to reflect correct topic subscriptions,
-// do not unsubscribe and close connections before newly mounted components have had time to update the connection store.
-const RENDER_TIMEOUT = 10000 // 10 seconds
+function checkForUnsubscribeFlag(
+  deserializedMessage: NotifyResponseData,
+  hostname: string,
+  topic: NotifyTopic
+): void {
+  const messageContainsUnsubFlag =
+    typeof deserializedMessage !== 'string' &&
+    'unsubscribe' in deserializedMessage
 
-function unsubscribe(notifyParams: NotifyParams): Promise<void> {
-  const { hostname, topic } = notifyParams
+  if (messageContainsUnsubFlag) void unsubscribe(hostname, topic)
+}
+
+function unsubscribe(hostname: string, topic: NotifyTopic): Promise<void> {
   return new Promise<void>(() => {
-    setTimeout(() => {
-      if (hostname in connectionStore) {
+    if (!pendingUnsubs.has(topic)) {
+      if (connectionStore[hostname].subscriptions.has(topic)) {
+        pendingUnsubs.add(topic)
         const { client } = connectionStore[hostname]
-        const subscriptions = connectionStore[hostname]?.subscriptions
-        const isLastSubscription = subscriptions[topic] <= 1
-
-        if (isLastSubscription) {
-          client?.unsubscribe(topic, {}, (error, result) => {
-            if (error == null) {
-              handleDecrementSubscriptionCount(hostname, topic)
-            } else {
-              log.warn(`Failed to subscribe on ${hostname} to topic: ${topic}`)
-            }
-          })
-        } else {
-          subscriptions[topic] -= 1
-        }
+        client?.unsubscribe(topic, {}, (error, result) => {
+          if (error != null) {
+            log.debug(
+              `Failed to unsubscribe on ${hostname} from topic: ${topic}`
+            )
+          } else {
+            log.debug(
+              `Successfully unsubscribed on ${hostname} from topic: ${topic}`
+            )
+            const { subscriptions } = connectionStore[hostname]
+            subscriptions.delete(topic)
+            pendingUnsubs.delete(topic)
+          }
+        })
+      } else {
+        log.debug(
+          `Host ${hostname} to unsubscribe from unsubscribed topic: ${topic}`
+        )
       }
-    }, RENDER_TIMEOUT)
+    }
   })
 }
 
@@ -302,47 +327,24 @@ function connectAsync(brokerURL: string): Promise<mqtt.Client> {
   })
 }
 
-function handleDecrementSubscriptionCount(
-  hostname: string,
-  topic: NotifyTopic
-): void {
-  const host = connectionStore[hostname]
-  if (host) {
-    const { client, subscriptions } = host
-    if (topic in subscriptions) {
-      subscriptions[topic] -= 1
-      if (subscriptions[topic] <= 0) {
-        delete subscriptions[topic]
-      }
-    }
-
-    if (Object.keys(subscriptions).length <= 0) {
-      client?.end()
-    }
-  }
-}
-
 interface ListenerParams {
   client: mqtt.MqttClient
   browserWindow: BrowserWindow
   hostname: string
 }
 
-function establishListeners({
-  client,
-  browserWindow,
-  hostname,
-}: ListenerParams): void {
+function establishListeners({ client, hostname }: ListenerParams): void {
   client.on(
     'message',
     (topic: NotifyTopic, message: Buffer, packet: mqtt.IPublishPacket) => {
       deserialize(message.toString())
         .then(deserializedMessage => {
+          checkForUnsubscribeFlag(deserializedMessage, hostname, topic)
+
           log.debug('Received notification data from main via IPC', {
             hostname,
             topic,
           })
-
           browserWindow.webContents.send(
             'notify',
             hostname,
@@ -355,7 +357,7 @@ function establishListeners({
   )
 
   client.on('reconnect', () => {
-    log.info(`Attempting to reconnect to ${hostname}`)
+    log.debug(`Attempting to reconnect to ${hostname}`)
   })
   // handles transport layer errors only
   client.on('error', error => {
@@ -370,8 +372,13 @@ function establishListeners({
   })
 
   client.on('end', () => {
-    log.info(`Closed connection to ${hostname}`)
-    if (hostname in connectionStore) delete connectionStore[hostname]
+    log.debug(`Closed connection to ${hostname}`)
+    sendToBrowserDeserialized({
+      browserWindow,
+      hostname,
+      topic: 'ALL_TOPICS',
+      message: FAILURE_STATUSES.ECONNFAILED,
+    })
   })
 
   client.on('disconnect', packet => {
@@ -396,14 +403,19 @@ export function closeAllNotifyConnections(): Promise<unknown[]> {
     }, 2000)
 
     log.debug('Stopping notify service connections')
-    const closeConnections = Object.values(connectionStore).map(
-      ({ client }) => {
-        return new Promise((resolve, reject) => {
-          client?.end(true, {}, () => resolve(null))
-        })
-      }
+    const closeConnections = closeConnectionsForcefullyFor(
+      Object.keys(connectionStore)
     )
     Promise.all(closeConnections).then(resolve).catch(reject)
+  })
+}
+
+function closeConnectionsForcefullyFor(hosts: string[]): Array<Promise<void>> {
+  return hosts.map(hostname => {
+    const client = connectionStore[hostname].client
+    return new Promise<void>((resolve, reject) =>
+      client?.end(true, {}, () => resolve())
+    )
   })
 }
 
@@ -423,7 +435,7 @@ function sendToBrowserDeserialized({
   browserWindow.webContents.send('notify', hostname, topic, message)
 }
 
-const VALID_MODELS: [NotifyRefetchData, NotifyUnsubscribeData] = [
+const VALID_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
   { refetchUsingHTTP: true },
   { unsubscribe: true },
 ]
@@ -441,7 +453,7 @@ function deserialize(message: string): Promise<NotifyResponseData> {
       reject(error)
     }
 
-    const isValidNotifyResponse = VALID_MODELS.some(model =>
+    const isValidNotifyResponse = VALID_RESPONSES.some(model =>
       isEqual(model, deserializedMessage)
     )
     if (!isValidNotifyResponse) {
