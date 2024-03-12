@@ -837,3 +837,60 @@ class TipPresenceStatus(str, Enum):
             HwTipStateType.PRESENT: TipPresenceStatus.PRESENT,
             HwTipStateType.ABSENT: TipPresenceStatus.ABSENT,
         }[state]
+
+
+class RTPBase(BaseModel):
+    """Parameters defined in a protocol."""
+
+    displayLabel: str = Field(..., description="Display string for the parameter.")
+    variableName: str = Field(..., description="Python variable name of the parameter.")
+    description: str = Field(..., description="Detailed description of the parameter.")
+    suffix: Optional[str] = Field(
+        None,
+        description="Units (like mL, mm/sec, etc) or a custom suffix for the parameter.",
+    )
+
+
+class IntParameter(RTPBase):
+    """An integer parameter defined in a protocol."""
+
+    min: int = Field(
+        ..., description="Minimum value that the integer param is allowed to have."
+    )
+    max: int = Field(
+        ..., description="Maximum value that the integer param is allowed to have."
+    )
+    default: int = Field(
+        ...,
+        description="Default value of the parameter, to be used when there is no client-specified value.",
+    )
+
+
+class FloatParameter(RTPBase):
+    """A float parameter defined in a protocol."""
+
+    min: float = Field(
+        ..., description="Minimum value that the float param is allowed to have."
+    )
+    max: float = Field(
+        ..., description="Maximum value that the float param is allowed to have."
+    )
+    default: float = Field(
+        ...,
+        description="Default value of the parameter, to be used when there is no client-specified value.",
+    )
+
+
+class EnumParameter(RTPBase):
+    """A string enum defined in a protocol."""
+
+    choices: List[str] = Field(
+        ..., description="List of valid values for this parameter."
+    )
+    default: str = Field(
+        ...,
+        description="Default value of the parameter, to be used when there is no client-specified value.",
+    )
+
+
+RunTimeParameter = Union[IntParameter, FloatParameter, EnumParameter]
