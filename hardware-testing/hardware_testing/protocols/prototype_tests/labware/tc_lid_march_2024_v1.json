@@ -1,4 +1,5 @@
 {
+  "allowedRoles": ["adapter"],
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
@@ -21,7 +22,7 @@
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
-    "z": 0
+    "z": -0.71
   },
   "parameters": {
     "format": "96Standard",
@@ -33,12 +34,14 @@
   "namespace": "custom_beta",
   "version": 1,
   "schemaVersion": 2,
-  "stackingOffsetWithLabware": {
-    "deck": {
+  "stackingOffsetWithModule": {
+    "thermocyclerModuleV2": {
       "x": 0,
       "y": 0,
-      "z": 0.71
-    },
+      "z": 0
+    }
+  },
+  "stackingOffsetWithLabware": {
     "tc_lid_march_2024_v1": {
       "x": 0,
       "y": 0,
@@ -71,4 +74,4 @@
       }
     }
   }
-}
+},
