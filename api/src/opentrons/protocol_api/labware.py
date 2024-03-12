@@ -887,6 +887,7 @@ class Labware:
         self,
         num_tips: int = 1,
         starting_tip: Optional[Well] = None,
+        *,
         nozzle_map: Optional[NozzleMap] = None,
     ) -> Optional[Well]:
         """
@@ -1069,6 +1070,7 @@ def select_tiprack_from_list(
     tip_racks: List[Labware],
     num_channels: int,
     starting_point: Optional[Well] = None,
+    *,
     nozzle_map: Optional[NozzleMap] = None,
 ) -> Tuple[Labware, Well]:
     try:
@@ -1087,11 +1089,11 @@ def select_tiprack_from_list(
     else:
         first_well = first.wells()[0]
 
-    next_tip = first.next_tip(num_channels, first_well, nozzle_map)
+    next_tip = first.next_tip(num_channels, first_well, nozzle_map=nozzle_map)
     if next_tip:
         return first, next_tip
     else:
-        return select_tiprack_from_list(rest, num_channels, None, nozzle_map)
+        return select_tiprack_from_list(rest, num_channels, None, nozzle_map=nozzle_map)
 
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
@@ -1106,14 +1108,20 @@ def next_available_tip(
     starting_tip: Optional[Well],
     tip_racks: List[Labware],
     channels: int,
+    *,
     nozzle_map: Optional[NozzleMap] = None,
 ) -> Tuple[Labware, Well]:
     start = starting_tip
     if start is None:
-        return select_tiprack_from_list(tip_racks, channels, None, nozzle_map)
+        return select_tiprack_from_list(
+            tip_racks, channels, None, nozzle_map=nozzle_map
+        )
     else:
         return select_tiprack_from_list(
-            filter_tipracks_to_start(start, tip_racks), channels, start, nozzle_map
+            filter_tipracks_to_start(start, tip_racks),
+            channels,
+            start,
+            nozzle_map=nozzle_map,
         )
 
 

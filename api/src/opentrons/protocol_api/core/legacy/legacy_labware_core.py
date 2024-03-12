@@ -159,6 +159,10 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
         starting_tip: Optional[LegacyWellCore],
         nozzle_map: Optional[NozzleMap],
     ) -> Optional[str]:
+        if nozzle_map is not None:
+            raise ValueError(
+                "Nozzle Map cannot be provided to calls for next tip in legacy protocols."
+            )
         next_well = self._tip_tracker.next_tip(num_tips, starting_tip)
         return next_well.get_name() if next_well else None
 
