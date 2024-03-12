@@ -53,6 +53,49 @@ class LLDPresThresh(LLDAlgoABC):
         pass
 
 
+class LLDSMAT(LLDAlgoABC):
+    """Simple moving average threshold."""
+
+    samples_n_smat: int
+    running_samples_smat: List[float]
+    threshold_smat: float
+
+    def __init__(self, samples: int = 10, thresh: float = -15) -> None:
+        """Init."""
+        self.samples_n_smat = samples
+        self.threshold_smat = thresh
+        self.reset()
+
+    @staticmethod
+    def name() -> str:
+        """Name of this algorithm."""
+        return "{:<30}".format("simple moving avg thresh")
+
+    def reset(self) -> None:
+        """Reset simulator between runs."""
+        self.running_samples_smat = [impossible_pressure] * self.samples_n_smat
+
+    def tick(self, pressure: float) -> Tuple[bool, float]:
+        """Simulate firmware motor interrupt tick."""
+        try:
+            next_ind = self.running_samples_smat.index(impossible_pressure)
+            # if no exception we're still filling the minimum samples
+            self.running_samples_smat[next_ind] = pressure
+            return (False, impossible_pressure)
+        except ValueError:  # the array has been filled
+            pass
+        # store old running average
+        prev_running_avg = sum(self.running_samples_smat) / self.samples_n_smat
+        # left shift old samples
+        for i in range(self.samples_n_smat - 1):
+            self.running_samples_smat[i] = self.running_samples_smat[i + 1]
+        self.running_samples_smat[self.samples_n_smat - 1] = pressure
+        new_running_avg = sum(self.running_samples_smat) / self.samples_n_smat
+        return (
+            new_running_avg < self.threshold_smat,
+            new_running_avg,
+        )
+
 class LLDSMAD(LLDAlgoABC):
     """Simple moving average derivative."""
 
@@ -334,6 +377,7 @@ def main() -> None:
         LLDSMAD(),
         LLDWMAD(),
         LLDEMAD(),
+        LLDSMAT(),
     ]
     for algorithm in algorithms:
         print(f"Algorithm {algorithm.name()}")
