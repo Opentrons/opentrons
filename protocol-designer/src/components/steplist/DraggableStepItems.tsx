@@ -26,6 +26,7 @@ interface DragDropStepItemProps extends ConnectedStepItemProps {
   moveStep: (stepId: StepIdType, value: number) => void
   setIsOver: React.Dispatch<React.SetStateAction<boolean>>
   findStepIndex: (stepId: StepIdType) => number
+  orderedStepIds: string[]
 }
 
 interface DropType {
@@ -33,37 +34,50 @@ interface DropType {
 }
 
 const DragDropStepItem = (props: DragDropStepItemProps): JSX.Element => {
-  const { stepId, moveStep, clickDrop, setIsOver, findStepIndex } = props
+  const {
+    stepId,
+    moveStep,
+    clickDrop,
+    setIsOver,
+    findStepIndex,
+    orderedStepIds,
+  } = props
   const ref = React.useRef<HTMLDivElement>(null)
 
-  const [{ isDragging }, drag] = useDrag({
-    type: DND_TYPES.STEP_ITEM,
-    item: { stepId },
-    collect: (monitor: DragLayerMonitor) => ({
-      isDragging: monitor.isDragging(),
+  const [{ isDragging }, drag] = useDrag(
+    () => ({
+      type: DND_TYPES.STEP_ITEM,
+      item: { stepId },
+      collect: (monitor: DragLayerMonitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
     }),
-  })
+    [orderedStepIds]
+  )
 
-  const [{ isOver, handlerId }, drop] = useDrop(() => ({
-    accept: DND_TYPES.STEP_ITEM,
-    canDrop: () => {
-      return true
-    },
-    drop: () => {
-      clickDrop()
-    },
-    hover: (item: DropType) => {
-      const draggedId = item.stepId
-      if (draggedId !== stepId) {
-        const overIndex = findStepIndex(stepId)
-        moveStep(draggedId, overIndex)
-      }
-    },
-    collect: (monitor: DropTargetOptions) => ({
-      isOver: monitor.isOver(),
-      handlerId: monitor.getHandlerId(),
+  const [{ isOver, handlerId }, drop] = useDrop(
+    () => ({
+      accept: DND_TYPES.STEP_ITEM,
+      canDrop: () => {
+        return true
+      },
+      drop: () => {
+        clickDrop()
+      },
+      hover: (item: DropType) => {
+        const draggedId = item.stepId
+        if (draggedId !== stepId) {
+          const overIndex = findStepIndex(stepId)
+          moveStep(draggedId, overIndex)
+        }
+      },
+      collect: (monitor: DropTargetOptions) => ({
+        isOver: monitor.isOver(),
+        handlerId: monitor.getHandlerId(),
+      }),
     }),
-  }))
+    [orderedStepIds]
+  )
 
   React.useEffect(() => {
     setIsOver(isOver)
@@ -136,6 +150,7 @@ export const DraggableStepItems = (
               clickDrop={clickDrop}
               setIsOver={setIsOver}
               findStepIndex={findStepIndex}
+              orderedStepIds={orderedStepIds}
             />
           ))
         }
