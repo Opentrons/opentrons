@@ -331,7 +331,7 @@ def get_default_nozzle_map(pipette_type: PipetteNameType) -> NozzleMap:
             physical_columns=EIGHT_CHANNEL_COLS,
             starting_nozzle="A1",
             back_left_nozzle="A1",
-            front_right_nozzle="A1",
+            front_right_nozzle="H1",
         )
     elif "96" in pipette_type.value:
         return NozzleMap.build(
@@ -340,7 +340,7 @@ def get_default_nozzle_map(pipette_type: PipetteNameType) -> NozzleMap:
             physical_columns=NINETY_SIX_COLS,
             starting_nozzle="A1",
             back_left_nozzle="A1",
-            front_right_nozzle="A1",
+            front_right_nozzle="H12",
         )
     else:
         return NozzleMap.build(
