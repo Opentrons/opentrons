@@ -1,5 +1,4 @@
 import * as React from 'react'
-import assert from 'assert'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import noop from 'lodash/noop'

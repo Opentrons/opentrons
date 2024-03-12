@@ -1,5 +1,4 @@
 import * as React from 'react'
-import assert from 'assert'
 import { useDispatch, useSelector } from 'react-redux'
 import { DropTargetMonitor, useDrop } from 'react-dnd'
 import cx from 'classnames'
@@ -15,7 +14,6 @@ import {
   moveDeckItem,
   openAddLabwareModal,
 } from '../../../labware-ingred/actions'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
@@ -67,7 +65,7 @@ export const AdapterControls = (
       accept: DND_TYPES.LABWARE,
       canDrop: (item: DroppedItem) => {
         const draggedDef = item.labwareOnDeck?.def
-        assert(
+        console.assert(
           draggedDef,
           'no labware def of dragged item, expected it on drop'
         )
