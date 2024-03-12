@@ -23,7 +23,7 @@ import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices
 import {
   useChainMaintenanceCommands,
   useCreateTargetedMaintenanceRunMutation,
-} from '../../resources/runs/hooks'
+} from '../../resources/runs'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { getModuleCalibrationSteps } from './getModuleCalibrationSteps'

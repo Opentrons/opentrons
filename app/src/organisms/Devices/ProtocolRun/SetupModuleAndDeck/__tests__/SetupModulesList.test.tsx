@@ -14,7 +14,7 @@ import {
   mockMagneticModuleGen2,
   mockThermocycler,
 } from '../../../../../redux/modules/__fixtures__'
-import { useChainLiveCommands } from '../../../../../resources/runs/hooks'
+import { useChainLiveCommands } from '../../../../../resources/runs'
 import { ModuleSetupModal } from '../../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
 import {
@@ -38,7 +38,7 @@ vi.mock('../UnMatchedModuleWarning')
 vi.mock('../../../../ModuleCard/ModuleSetupModal')
 vi.mock('../../../../ModuleWizardFlows')
 vi.mock('../MultipleModulesModal')
-vi.mock('../../../../../resources/runs/hooks')
+vi.mock('../../../../../resources/runs')
 vi.mock('../../../../../redux/config')
 
 const ROBOT_NAME = 'otie'

@@ -16,13 +16,13 @@ import { useDashboardCalibrateTipLength } from '../hooks/useDashboardCalibrateTi
 import { useDashboardCalibrateDeck } from '../hooks/useDashboardCalibrateDeck'
 import { expectedTaskList } from '../../../../organisms/Devices/hooks/__fixtures__/taskListFixtures'
 import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
-import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../hooks/useDashboardCalibratePipOffset')
 vi.mock('../hooks/useDashboardCalibrateTipLength')
 vi.mock('../hooks/useDashboardCalibrateDeck')
-vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+vi.mock('../../../../resources/runs')
 
 const render = (path = '/') => {
   return renderWithProviders(

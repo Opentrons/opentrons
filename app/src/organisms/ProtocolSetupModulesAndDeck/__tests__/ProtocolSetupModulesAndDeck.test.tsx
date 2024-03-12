@@ -14,7 +14,7 @@ import {
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { useChainLiveCommands } from '../../../resources/runs/hooks'
+import { useChainLiveCommands } from '../../../resources/runs'
 import { mockRobotSideAnalysis } from '../../CommandText/__fixtures__'
 import {
   useAttachedModules,
@@ -40,7 +40,7 @@ import { ProtocolSetupModulesAndDeck } from '..'
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../resources/runs/hooks')
+vi.mock('../../../resources/runs')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../organisms/Devices/hooks')
 vi.mock(

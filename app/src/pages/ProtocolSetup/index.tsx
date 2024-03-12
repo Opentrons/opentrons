@@ -54,7 +54,7 @@ import {
 import {
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
-} from '../../pages/Protocols/hooks'
+} from '../Protocols/hooks'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModulesAndDeck } from '../../organisms/ProtocolSetupModulesAndDeck'
@@ -74,7 +74,7 @@ import {
 } from '../../organisms/RunTimeControl/hooks'
 import { useToaster } from '../../organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '../../organisms/ModuleCard/hooks'
-import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { getLabwareSetupItemGroups } from '../Protocols/utils'
 import { getLocalRobot, getRobotSerialNumber } from '../../redux/discovery'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -82,12 +82,12 @@ import {
   useTrackEvent,
 } from '../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../redux/config'
-import { ConfirmAttachedModal } from '../../pages/ProtocolSetup/ConfirmAttachedModal'
+import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
-import { CloseButton, PlayButton } from '../../pages/ProtocolSetup/Buttons'
+import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../resources/runs'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'

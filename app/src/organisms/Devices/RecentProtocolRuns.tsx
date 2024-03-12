@@ -19,7 +19,7 @@ import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
 import { useIsRobotViewable, useRunStatuses } from './hooks'
-import { useNotifyAllRunsQuery } from '../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../resources/runs'
 
 interface RecentProtocolRunsProps {
   robotName: string

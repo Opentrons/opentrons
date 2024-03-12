@@ -22,8 +22,7 @@ import {
 
 import { checkShellUpdate } from '../redux/shell'
 import { useToaster } from '../organisms/ToasterOven'
-import { useNotifyAllRunsQuery } from '../resources/runs/useNotifyAllRunsQuery'
-import { useNotifyRunQuery } from '../resources/runs/useNotifyRunQuery'
+import { useNotifyAllRunsQuery, useNotifyRunQuery } from '../resources/runs'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '../redux/types'

@@ -25,7 +25,7 @@ import {
   getTotalVolumePerLiquidLabwarePair,
 } from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
-import { useNotifyRunQuery } from '../../../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../../../resources/runs'
 
 import type { Mock } from 'vitest'
 
@@ -61,7 +61,7 @@ vi.mock('../../utils/getLocationInfoNames')
 vi.mock('../LiquidsLabwareDetailsModal')
 vi.mock('@opentrons/api-client')
 vi.mock('../../../../../redux/analytics')
-vi.mock('../../../../../resources/runs/useNotifyRunQuery')
+vi.mock('../../../../../resources/runs')
 
 const render = (props: React.ComponentProps<typeof SetupLiquidsList>) => {
   return renderWithProviders(<SetupLiquidsList {...props} />, {

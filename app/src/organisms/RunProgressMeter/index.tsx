@@ -42,7 +42,7 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import { isInterventionCommand } from '../InterventionModal/utils'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../resources/runs'
 
 import type { RunStatus } from '@opentrons/api-client'
 
