@@ -42,7 +42,7 @@ class LLDPresThresh(LLDAlgoABC):
     @staticmethod
     def name() -> str:
         """Name of this algorithm."""
-        return "threshold"
+        return "{:<30}".format("simple threshold")
 
     def tick(self, pressure: float) -> Tuple[bool, float]:
         """Simulate firmware motor interrupt tick."""
@@ -112,7 +112,7 @@ class LLDSMAD(LLDAlgoABC):
     @staticmethod
     def name() -> str:
         """Name of this algorithm."""
-        return "simple moving avg der"
+        return "{:<30}".format("simple moving avg der")
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -159,7 +159,7 @@ class LLDWMAD(LLDAlgoABC):
     @staticmethod
     def name() -> str:
         """Name of this algorithm."""
-        return "weighted moving avg der"
+        return "{:<30}".format("weighted moving avg der")
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -208,7 +208,7 @@ class LLDEMAD(LLDAlgoABC):
     @staticmethod
     def name() -> str:
         """Name of this algorithm."""
-        return "exponential moving avg der"
+        return "{:<30}".format("exponential moving avg der")
 
     def reset(self) -> None:
         """Reset simulator between runs."""
