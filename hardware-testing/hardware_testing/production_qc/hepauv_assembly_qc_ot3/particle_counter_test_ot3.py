@@ -104,10 +104,17 @@ async def _main(simulating: bool) -> None:
             
         
         GRIP_SLOT = [[8,5,"home"],[5,9,"home"],[9,"A4",1]["A4",1,"home"],[1,"D4","home"]]
+        slot_loc = {
+        "A4": (13.42, 394.92, 110),
+        "D4": (177.32, 394.92, 110)
+        }
 
         #test uv
         await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R,Axis.Z_G,Axis.G])
         for slot in  GRIP_SLOT:
+            attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot[0])
+            current_pos = await api.gantry_position(OT3Mount.LEFT)
+            await api.move_to(OT3Mount.LEFT, attach_pos._replace(z=current_pos.z),)
 
             await api.ungrip()
             for sl in slot:
