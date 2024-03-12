@@ -13,7 +13,7 @@ Welcome to the v7.2.1 release of the Opentrons robot software!
 ### Bug Fixes
 
 - Fixed an issue where OT-2 tip length calibrations created before v4.1.0 would cause a "missing calibration data" error that you could only resolve by resetting calibration.
-- Fixed collision detection being too conservative in certain conditions on Flex, leading to errors even when collisions wouldn't take place.
+- Fixed collision prediction being too conservative in certain conditions on Flex, leading to errors even when collisions wouldn't take place.
 
 ---
 
