@@ -19,8 +19,13 @@ export type IpcListener = (
   ...args: unknown[]
 ) => void
 
+<<<<<<< HEAD
 export interface NotifyRefetchData {
   refetch: boolean
+=======
+interface NotifyRefetchData {
+  refetchUsingHTTP: boolean
+>>>>>>> fbfa607dac (refactor(app-shell, app-shell-odd): Refactor app to use unsubscribe flags (#14640))
 }
 
 export interface NotifyUnsubscribeData {

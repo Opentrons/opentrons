@@ -85,8 +85,13 @@ export function useNotifyService<TData, TError = Error>({
           properties: {},
         })
       }
+<<<<<<< HEAD
     } else if ('refetch' in data || 'unsubscribe' in data) {
       setRefetch('once')
+=======
+    } else if ('refetchUsingHTTP' in data || 'unsubscribe' in data) {
+      setRefetchUsingHTTP('once')
+>>>>>>> fbfa607dac (refactor(app-shell, app-shell-odd): Refactor app to use unsubscribe flags (#14640))
     }
   }
 }
