@@ -35,7 +35,7 @@ const pendingUnsubs = new Set<NotifyTopic>()
 const log = createLogger('notify')
 // MQTT is somewhat particular about the clientId format and will connect erratically if an unexpected string is supplied.
 // This clientId is derived from the mqttjs library.
-const CLIENT_ID = 'app-' + Math.random().toString(16).slice(2, 8)
+const CLIENT_ID = 'odd-' + Math.random().toString(16).slice(2, 8)
 
 const connectOptions: mqtt.IClientOptions = {
   clientId: CLIENT_ID,
