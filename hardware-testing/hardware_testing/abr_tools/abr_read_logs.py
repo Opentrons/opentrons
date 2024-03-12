@@ -189,9 +189,9 @@ def write_to_abr_sheet(
             row = runs_and_robots[list_of_runs[run]].values()
             row_list = list(row)
             writer.writerow(row_list)
-            # google_sheet.update_row_index()
-            # google_sheet.write_to_row(row_list)
-            # t.sleep(5)
+            google_sheet.update_row_index()
+            google_sheet.write_to_row(row_list)
+            t.sleep(5)
     
 
 
