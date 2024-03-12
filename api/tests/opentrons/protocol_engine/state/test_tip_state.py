@@ -172,7 +172,6 @@ def test_get_next_tip_returns_first_tip(
     input_tip_amount: int,
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
-    # single channel is right, 8 channel is wrong, 96 ch is wrong?
     """It should start at the first tip in the labware."""
     subject.handle_action(
         actions.UpdateCommandAction(private_result=None, command=load_labware_command)
@@ -215,9 +214,6 @@ def test_get_next_tip_returns_first_tip(
             private_result=load_pipette_private_result, command=load_pipette_command
         )
     )
-    # subject.handle_action(
-    #     actions.UpdateCommandAction(command=pick_up_tip_command, private_result=None)
-    # )
 
     result = TipView(subject.state).get_next_tip(
         labware_id="cool-labware",
