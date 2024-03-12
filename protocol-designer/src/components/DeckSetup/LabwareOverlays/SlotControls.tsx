@@ -14,7 +14,6 @@ import {
   moveDeckItem,
   openAddLabwareModal,
 } from '../../../labware-ingred/actions'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
@@ -53,10 +52,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
-  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const labware = activeDeckSetup.labware
   const ref = React.useRef(null)
-  const [newSlot, setSlot] = React.useState<string | null>(null)
   const dispatch = useDispatch()
 
   const { t } = useTranslation('deck')
@@ -66,56 +62,49 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
     item: { labwareOnDeck: null },
   })
 
-  const [{ draggedItem, itemType, isOver }, drop] = useDrop({
-    accept: DND_TYPES.LABWARE,
-    canDrop: (item: DroppedItem) => {
-      const draggedDef = item?.labwareOnDeck?.def
-      console.assert(
-        draggedDef,
-        'no labware def of dragged item, expected it on drop'
-      )
-
-      if (moduleType != null && draggedDef != null) {
-        // this is a module slot, prevent drop if the dragged labware is not compatible
-        const isCustomLabware = getLabwareIsCustom(
-          customLabwareDefs,
-          item.labwareOnDeck
+  const [{ draggedItem, itemType, isOver }, drop] = useDrop(
+    () => ({
+      accept: DND_TYPES.LABWARE,
+      canDrop: (item: DroppedItem) => {
+        const draggedDef = item?.labwareOnDeck?.def
+        console.assert(
+          draggedDef,
+          'no labware def of dragged item, expected it on drop'
         )
 
-        return getLabwareIsCompatible(draggedDef, moduleType) || isCustomLabware
-      }
-      return true
-    },
-    drop: (item: DroppedItem) => {
-      const droppedLabware = item
-      if (newSlot != null) {
-        dispatch(moveDeckItem(newSlot, slotId))
-      } else if (droppedLabware.labwareOnDeck != null) {
-        const droppedSlot = droppedLabware.labwareOnDeck.slot
-        dispatch(moveDeckItem(droppedSlot, slotId))
-      }
-    },
-    hover: () => {
-      if (handleDragHover != null) {
-        handleDragHover()
-      }
-    },
-    collect: (monitor: DropTargetMonitor) => ({
-      itemType: monitor.getItemType(),
-      isOver: !!monitor.isOver(),
-      draggedItem: monitor.getItem() as DroppedItem,
+        if (moduleType != null && draggedDef != null) {
+          // this is a module slot, prevent drop if the dragged labware is not compatible
+          const isCustomLabware = getLabwareIsCustom(
+            customLabwareDefs,
+            item.labwareOnDeck
+          )
+
+          return (
+            getLabwareIsCompatible(draggedDef, moduleType) || isCustomLabware
+          )
+        }
+        return true
+      },
+      drop: (item: DroppedItem) => {
+        const droppedLabware = item
+        if (droppedLabware.labwareOnDeck != null) {
+          const droppedSlot = droppedLabware.labwareOnDeck.slot
+          dispatch(moveDeckItem(droppedSlot, slotId))
+        }
+      },
+      hover: () => {
+        if (handleDragHover != null) {
+          handleDragHover()
+        }
+      },
+      collect: (monitor: DropTargetMonitor) => ({
+        itemType: monitor.getItemType(),
+        isOver: !!monitor.isOver(),
+        draggedItem: monitor.getItem() as DroppedItem,
+      }),
     }),
-  })
-
-  const draggedLabware = Object.values(labware).find(
-    l => l.id === draggedItem?.labwareOnDeck?.id
+    []
   )
-
-  React.useEffect(() => {
-    if (draggedLabware != null) {
-      setSlot(draggedLabware.slot)
-    }
-  })
 
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
