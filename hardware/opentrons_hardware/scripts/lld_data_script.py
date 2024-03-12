@@ -8,6 +8,7 @@ import numpy
 from abc import ABC, abstractmethod
 
 impossible_pressure = 9001.0
+accepted_error = 0.1
 
 
 class LLDAlgoABC(ABC):
@@ -290,12 +291,13 @@ def _running_avg(
 def run(
     args: argparse.Namespace,
     algorithm: LLDAlgoABC,
-) -> None:
+) -> List[Tuple[float, List[float], str, str]]:
     """Run the test with a given algorithm on all the data."""
     path = args.filepath + "/"
     report_files = [
         file for file in os.listdir(args.filepath) if "final_report" in file
     ]
+    final_results: List[Tuple[float, List[float], str, str]] = []
     for report_file in report_files:
         with open(path + report_file, "r") as file:
             reader = csv.reader(file)
@@ -350,13 +352,26 @@ def run(
                 results.append(float(threshold_z_pos))
             else:
                 print("No threshold found")
-        max_v = max(results)
-        min_v = min(results)
-        print(
-            f"expected {expected_height}\n min {min_v} max {max_v} average {sum(results)/len(results)}, range {max_v - min_v}"
+        print(f"{algorithm.name()}, expected {expected_height} max {max(results)} min{min(results)}, avg {sum(results)/len(results)}")
+        final_results.append(
+            (float(expected_height), results, f"{algorithm.name()}", f"{report_file}")
         )
-        print()
+    return final_results
 
+
+def _check_for_failure(expected_height: float, results: List[float]) -> bool:
+    for result in results:
+        if abs(expected_height - result) > accepted_error:
+            return True
+    return False
+
+def _score(algorithms: List[LLDAlgoABC], analysis: List[Tuple[float, List[float], str, str]]) -> Dict[str, int]:
+    algorithm_score: Dict[str, int] = {algo.name(): 0 for algo in algorithms}
+    a_score = len(analysis)
+    for a in analysis:
+        algorithm_score[a[2]] += a_score
+        a_score -= 2
+    return dict(sorted(algorithm_score.items(), key=lambda item: item[1], reverse=True))
 
 def main() -> None:
     """Main function."""
@@ -379,9 +394,16 @@ def main() -> None:
         LLDEMAD(),
         LLDSMAT(),
     ]
+    analysis: List[Tuple[float, List[float], str, str]] = []
     for algorithm in algorithms:
-        print(f"Algorithm {algorithm.name()}")
-        run(args, algorithm)
+        algorithm_results = run(args, algorithm)
+        analysis.extend(algorithm_results)
+    print("\n\n")
+    for result in analysis:
+        res_string = (
+            "FAILURE" if _check_for_failure(result[0], result[1]) else "success"
+        )
+        print(f"Algorithm {result[2]} {res_string}")
 
 
 if __name__ == "__main__":
