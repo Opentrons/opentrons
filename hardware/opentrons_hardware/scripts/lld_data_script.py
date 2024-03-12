@@ -2,12 +2,13 @@
 import csv
 import os
 import argparse
-from typing import List, Optional, Tuple, Any
+from typing import List, Optional, Tuple, Any, Dict
 import matplotlib.pyplot as plot
 import numpy
 from abc import ABC, abstractmethod
 
 impossible_pressure = 9001.0
+accepted_error = 0.1
 
 
 class LLDAlgoABC(ABC):
@@ -42,7 +43,7 @@ class LLDPresThresh(LLDAlgoABC):
     @staticmethod
     def name() -> str:
         """Name of this algorithm."""
-        return "threshold"
+        return "{:<30}".format("simple threshold")
 
     def tick(self, pressure: float) -> Tuple[bool, float]:
         """Simulate firmware motor interrupt tick."""
@@ -51,6 +52,48 @@ class LLDPresThresh(LLDAlgoABC):
     def reset(self) -> None:
         """Reset simulator between runs."""
         pass
+
+
+class LLDSMAT(LLDAlgoABC):
+    """Simple moving average threshold."""
+
+    samples_n_smat: int
+    running_samples_smat: List[float]
+    threshold_smat: float
+
+    def __init__(self, samples: int = 10, thresh: float = -15) -> None:
+        """Init."""
+        self.samples_n_smat = samples
+        self.threshold_smat = thresh
+        self.reset()
+
+    @staticmethod
+    def name() -> str:
+        """Name of this algorithm."""
+        return "{:<30}".format("simple moving avg thresh")
+
+    def reset(self) -> None:
+        """Reset simulator between runs."""
+        self.running_samples_smat = [impossible_pressure] * self.samples_n_smat
+
+    def tick(self, pressure: float) -> Tuple[bool, float]:
+        """Simulate firmware motor interrupt tick."""
+        try:
+            next_ind = self.running_samples_smat.index(impossible_pressure)
+            # if no exception we're still filling the minimum samples
+            self.running_samples_smat[next_ind] = pressure
+            return (False, impossible_pressure)
+        except ValueError:  # the array has been filled
+            pass
+        # left shift old samples
+        for i in range(self.samples_n_smat - 1):
+            self.running_samples_smat[i] = self.running_samples_smat[i + 1]
+        self.running_samples_smat[self.samples_n_smat - 1] = pressure
+        new_running_avg = sum(self.running_samples_smat) / self.samples_n_smat
+        return (
+            new_running_avg < self.threshold_smat,
+            new_running_avg,
+        )
 
 
 class LLDSMAD(LLDAlgoABC):
@@ -69,7 +112,7 @@ class LLDSMAD(LLDAlgoABC):
     @staticmethod
     def name() -> str:
         """Name of this algorithm."""
-        return "simple moving avg der"
+        return "{:<30}".format("simple moving avg der")
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -107,7 +150,7 @@ class LLDWMAD(LLDAlgoABC):
     running_samples_wmad: numpy.ndarray[Any, numpy.dtype[numpy.float32]]
     derivative_threshold_wmad: float
 
-    def __init__(self, samples: int = 10, thresh: float = -2) -> None:
+    def __init__(self, samples: int = 10, thresh: float = -4) -> None:
         """Init."""
         self.samples_n_wmad = samples
         self.derivative_threshold_wmad = thresh
@@ -116,7 +159,7 @@ class LLDWMAD(LLDAlgoABC):
     @staticmethod
     def name() -> str:
         """Name of this algorithm."""
-        return "weighted moving avg der"
+        return "{:<30}".format("weighted moving avg der")
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -165,7 +208,7 @@ class LLDEMAD(LLDAlgoABC):
     @staticmethod
     def name() -> str:
         """Name of this algorithm."""
-        return "exponential moving avg der"
+        return "{:<30}".format("exponential moving avg der")
 
     def reset(self) -> None:
         """Reset simulator between runs."""
@@ -247,12 +290,13 @@ def _running_avg(
 def run(
     args: argparse.Namespace,
     algorithm: LLDAlgoABC,
-) -> None:
+) -> List[Tuple[float, List[float], str, str]]:
     """Run the test with a given algorithm on all the data."""
     path = args.filepath + "/"
     report_files = [
-        file for file in os.listdir(args.filepath) if file == "final_report.csv"
+        file for file in os.listdir(args.filepath) if "final_report" in file
     ]
+    final_results: List[Tuple[float, List[float], str, str]] = []
     for report_file in report_files:
         with open(path + report_file, "r") as file:
             reader = csv.reader(file)
@@ -307,12 +351,31 @@ def run(
                 results.append(float(threshold_z_pos))
             else:
                 print("No threshold found")
-        max_v = max(results)
-        min_v = min(results)
         print(
-            f"expected {expected_height}\n min {min_v} max {max_v} average {sum(results)/len(results)}, range {max_v - min_v}"
+            f"{algorithm.name()}, expected {expected_height} max {max(results)} min{min(results)}, avg {sum(results)/len(results)}"
         )
-        print()
+        final_results.append(
+            (float(expected_height), results, f"{algorithm.name()}", f"{report_file}")
+        )
+    return final_results
+
+
+def _check_for_failure(expected_height: float, results: List[float]) -> bool:
+    for result in results:
+        if abs(expected_height - result) > accepted_error:
+            return True
+    return False
+
+
+def _score(
+    algorithms: List[LLDAlgoABC], analysis: List[Tuple[float, List[float], str, str]]
+) -> Dict[str, int]:
+    algorithm_score: Dict[str, int] = {algo.name(): 0 for algo in algorithms}
+    a_score = len(analysis)
+    for a in analysis:
+        algorithm_score[a[2]] += a_score
+        a_score -= 2
+    return dict(sorted(algorithm_score.items(), key=lambda item: item[1], reverse=True))
 
 
 def main() -> None:
@@ -334,10 +397,44 @@ def main() -> None:
         LLDSMAD(),
         LLDWMAD(),
         LLDEMAD(),
+        LLDSMAT(),
     ]
+    analysis: List[Tuple[float, List[float], str, str]] = []
     for algorithm in algorithms:
-        print(f"Algorithm {algorithm.name()}")
-        run(args, algorithm)
+        algorithm_results = run(args, algorithm)
+        analysis.extend(algorithm_results)
+    print("\n\n")
+    for result in analysis:
+        res_string = (
+            "FAILURE" if _check_for_failure(result[0], result[1]) else "success"
+        )
+        print(f"Algorithm {result[2]} {res_string}")
+
+    accuracy = sorted(
+        analysis, key=lambda acc: abs((sum(acc[1]) / len(acc[1])) - acc[0])
+    )
+    precision = sorted(analysis, key=lambda per: (max(per[1]) - min(per[1])))
+
+    accuracy_score: Dict[str, int] = _score(algorithms, accuracy)
+    precision_score: Dict[str, int] = _score(algorithms, precision)
+    algorithm_score: Dict[str, int] = {algo.name(): 0 for algo in algorithms}
+
+    print("Accuracy Scores")
+    for a_name in accuracy_score.keys():
+        print(f"{a_name} {accuracy_score[a_name]}")
+
+    print("Precision Scores")
+    for a_name in precision_score.keys():
+        print(f"{a_name} {precision_score[a_name]}")
+        # add the two scores together for final score so we can sort before printing
+        algorithm_score[a_name] = precision_score[a_name] + accuracy_score[a_name]
+
+    algorithm_score = dict(
+        sorted(algorithm_score.items(), key=lambda item: item[1], reverse=True)
+    )
+    print("Total Scores")
+    for a_name in algorithm_score.keys():
+        print(f"{a_name} {algorithm_score[a_name]}")
 
 
 if __name__ == "__main__":
