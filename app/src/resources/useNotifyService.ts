@@ -62,14 +62,13 @@ export function useNotifyService<TData, TError = Error>({
       })
       dispatch(notifySubscribeAction(hostname, topic))
       hasUsedNotifyService.current = true
-    } else setRefetchUsingHTTP('always')
+    } else {
+        setRefetchUsingHTTP('always')
+    }
 
     return () => {
       if (hasUsedNotifyService.current) {
-        if (hostname != null) {
-          dispatch(notifyUnsubscribeAction(hostname, topic))
-        }
-        appShellListener({
+       appShellListener({
           hostname: hostname as string,
           topic,
           callback: onDataEvent,
