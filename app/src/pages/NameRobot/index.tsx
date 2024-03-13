@@ -42,14 +42,6 @@ import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'
 
-const INPUT_FIELD_ODD_STYLE = css`
-  padding-top: ${SPACING.spacing32};
-  padding-bottom: ${SPACING.spacing32};
-  font-size: 2.5rem;
-  line-height: 3.25rem;
-  text-align: center;
-`
-
 interface FormValues {
   newRobotName: string
 }

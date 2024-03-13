@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
   SPACING,
   COLORS,
   PrimaryButton,

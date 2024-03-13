@@ -217,13 +217,6 @@ function Input(props: InputFieldProps): JSX.Element {
     }
   `
 
-  const StyledInput = styled.input`
-    margin: ${SPACING.spacing8};
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      margin-x: ${SPACING.spacing24};
-    }
-  `
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       {props.title != null && <Flex css={TITLE_STYLE}>{props.title}</Flex>}
