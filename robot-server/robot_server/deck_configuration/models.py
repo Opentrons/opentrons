@@ -33,6 +33,13 @@ class CutoutFixture(pydantic.BaseModel):
             " [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck)."
         )
     )
+    opentronsModuleSerialNumber: Optional[str] = pydantic.Field(
+        description=(
+            "The serial number of a module loaded as a fixture."
+            " [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck)."
+        ),
+        default=None
+    )
 
 
 class DeckConfigurationRequest(pydantic.BaseModel):

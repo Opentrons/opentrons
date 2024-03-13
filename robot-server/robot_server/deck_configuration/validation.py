@@ -3,7 +3,7 @@
 
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import DefaultDict, FrozenSet, List, Set, Tuple, Union
+from typing import DefaultDict, FrozenSet, List, Set, Tuple, Union, Optional
 
 from opentrons_shared_data.deck import dev_types as deck_types
 
@@ -14,6 +14,7 @@ class Placement:
 
     cutout_id: str
     cutout_fixture_id: str
+    opentrons_modules_serial_number: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -49,6 +50,13 @@ class UnrecognizedCutoutFixtureError:
     allowed_cutout_fixture_ids: FrozenSet[str]
 
 
+@dataclass(frozen=True)
+class InvalidSerialNumberError:
+    """When a module cutout fixture has been mounted but not given a serial number."""
+
+    cutout_id: str
+    cutout_fixture_id: str
+
 ConfigurationError = Union[
     UnoccupiedCutoutError,
     OvercrowdedCutoutError,
@@ -58,7 +66,7 @@ ConfigurationError = Union[
 
 
 def get_configuration_errors(
-    deck_definition: deck_types.DeckDefinitionV4,
+    deck_definition: deck_types.DeckDefinitionV5,
     placements: List[Placement],
 ) -> Set[ConfigurationError]:
     """Return all the problems with the given deck configration.
@@ -98,12 +106,31 @@ def get_configuration_errors(
                         allowed_cutout_ids=allowed_cutout_ids,
                     )
                 )
+            # replace this with a serial number check set instead
+            # if serial number in def is null, we expect nothing from the put statement, raise if there is something
+            #if it is not null, we expect something from the put statement! if theres nothing then raise an error
+            if found_cutout_fixture["opentronsModuleSerialNumber"] == "":
+                if len(placement.opentrons_modules_serial_number) == 0:
+                    errors.add(
+                        InvalidSerialNumberError(
+                            cutout_id=placement.cutout_id,
+                            cutout_fixture_id=placement.cutout_fixture_id,
+                        )
+                    )
+            else:
+                if len(placement.opentrons_modules_serial_number) == 0:
+                    errors.add(
+                        InvalidSerialNumberError(
+                            cutout_id=placement.cutout_id,
+                            cutout_fixture_id=placement.cutout_fixture_id,
+                        )
+                    )
 
     return errors
 
 
 def _find_cutout_fixture(
-    deck_definition: deck_types.DeckDefinitionV4, cutout_fixture_id: str
+    deck_definition: deck_types.DeckDefinitionV5, cutout_fixture_id: str
 ) -> Union[deck_types.CutoutFixture, UnrecognizedCutoutFixtureError]:
     cutout_fixtures = deck_definition["cutoutFixtures"]
     try:

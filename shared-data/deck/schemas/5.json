@@ -69,7 +69,7 @@
     },
     "schemaVersion": {
       "description": "Schema version of a deck is a single integer",
-      "enum": [4]
+      "enum": [5]
     },
     "cornerOffsetFromOrigin": {
       "$ref": "#/definitions/xyzArray",

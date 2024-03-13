@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Set, Union
 
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.deck.dev_types import (
-    DeckDefinitionV4,
+    DeckDefinitionV5,
     SlotDefV3,
     CutoutFixture,
 )
@@ -56,7 +56,7 @@ class AddressableAreaState:
 
     potential_cutout_fixtures_by_cutout_id: Dict[str, Set[PotentialCutoutFixture]]
 
-    deck_definition: DeckDefinitionV4
+    deck_definition: DeckDefinitionV5
 
     deck_configuration: Optional[DeckConfigurationType]
     """The host robot's full deck configuration.
@@ -94,7 +94,7 @@ _FLEX_ORDERED_STAGING_SLOTS = ["D4", "C4", "B4", "A4"]
 def _get_conflicting_addressable_areas_error_string(
     potential_cutout_fixtures: Set[PotentialCutoutFixture],
     loaded_addressable_areas: Dict[str, AddressableArea],
-    deck_definition: DeckDefinitionV4,
+    deck_definition: DeckDefinitionV5,
 ) -> str:
     loaded_areas_on_cutout = set()
     for fixture in potential_cutout_fixtures:
@@ -158,7 +158,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         self,
         deck_configuration: DeckConfigurationType,
         config: Config,
-        deck_definition: DeckDefinitionV4,
+        deck_definition: DeckDefinitionV5,
     ) -> None:
         """Initialize an addressable area store and its state."""
         if config.use_simulated_deck_config:
@@ -224,11 +224,11 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
 
     @staticmethod
     def _get_addressable_areas_from_deck_configuration(
-        deck_config: DeckConfigurationType, deck_definition: DeckDefinitionV4
+        deck_config: DeckConfigurationType, deck_definition: DeckDefinitionV5
     ) -> Dict[str, AddressableArea]:
         """Return all addressable areas provided by the given deck configuration."""
         addressable_areas = []
-        for cutout_id, cutout_fixture_id in deck_config:
+        for cutout_id, cutout_fixture_id, opentrons_module_serial_number in deck_config:
             provided_addressable_areas = (
                 deck_configuration_provider.get_provided_addressable_area_names(
                     cutout_fixture_id, cutout_id, deck_definition
