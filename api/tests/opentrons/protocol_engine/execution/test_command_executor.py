@@ -40,8 +40,12 @@ from opentrons.protocol_engine.execution import (
     RailLightsHandler,
     StatusBarHandler,
 )
+from opentrons.protocol_engine.execution.command_executor import (
+    CommandNoteTrackerProvider,
+)
 
 from opentrons_shared_data.errors.exceptions import EStopActivatedError, PythonException
+from opentrons.protocol_engine.notes import CommandNoteTracker
 
 
 @pytest.fixture
@@ -123,6 +127,33 @@ def status_bar(decoy: Decoy) -> StatusBarHandler:
 
 
 @pytest.fixture
+def command_note_tracker_provider(decoy: Decoy) -> CommandNoteTrackerProvider:
+    """Get a mock tracker provider."""
+    return decoy.mock(cls=CommandNoteTrackerProvider)
+
+
+def get_next_tracker(
+    decoy: Decoy, provider: CommandNoteTrackerProvider
+) -> CommandNoteTracker:
+    """Get the next tracker provided by a provider, in code without being a fixture.
+
+    This is useful for testing the execution of multiple commands, each of which will get
+    a different tracker instance.
+    """
+    new_tracker = decoy.mock(cls=CommandNoteTracker)
+    decoy.when(provider()).then_return(new_tracker)
+    return new_tracker
+
+
+@pytest.fixture
+def command_note_tracker(
+    decoy: Decoy, command_note_tracker_provider: CommandNoteTrackerProvider
+) -> CommandNoteTracker:
+    """Get the tracker that the provider will provide."""
+    return get_next_tracker(decoy, command_note_tracker_provider)
+
+
+@pytest.fixture
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
@@ -137,6 +168,7 @@ def subject(
     rail_lights: RailLightsHandler,
     status_bar: StatusBarHandler,
     model_utils: ModelUtils,
+    command_note_tracker_provider: CommandNoteTrackerProvider,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
     return CommandExecutor(
@@ -153,6 +185,7 @@ def subject(
         model_utils=model_utils,
         rail_lights=rail_lights,
         status_bar=status_bar,
+        command_note_tracker_provider=command_note_tracker_provider,
     )
 
 
@@ -184,6 +217,7 @@ async def test_execute(
     rail_lights: RailLightsHandler,
     status_bar: StatusBarHandler,
     model_utils: ModelUtils,
+    command_note_tracker: CommandNoteTracker,
     subject: CommandExecutor,
 ) -> None:
     """It should be able to execute a command."""
@@ -256,6 +290,7 @@ async def test_execute(
             run_control=run_control,
             rail_lights=rail_lights,
             status_bar=status_bar,
+            command_note_adder=command_note_tracker,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]
@@ -321,6 +356,7 @@ async def test_execute_raises_protocol_engine_error(
     status_bar: StatusBarHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
+    command_note_tracker: CommandNoteTracker,
     command_error: Exception,
     expected_error: Any,
     unexpected_error: bool,
@@ -380,6 +416,7 @@ async def test_execute_raises_protocol_engine_error(
             run_control=run_control,
             rail_lights=rail_lights,
             status_bar=status_bar,
+            command_note_adder=command_note_tracker,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]

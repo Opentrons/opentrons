@@ -8,6 +8,7 @@ from opentrons.protocol_engine import (
     CommandSlice,
     CurrentCommand,
     ProtocolEngine,
+    CommandNote,
     commands as pe_commands,
     errors as pe_errors,
 )
@@ -249,7 +250,7 @@ async def test_get_run_commands(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
     """It should return a list of all commands in a run."""
-    long_note = pe_commands.CommandNote(
+    long_note = CommandNote(
         noteKind="warning",
         shortMessage="this is a warning.",
         longMessage="""
@@ -261,7 +262,7 @@ async def test_get_run_commands(
             """,
         source="test",
     )
-    unenumed_note = pe_commands.CommandNote(
+    unenumed_note = CommandNote(
         noteKind="lahsdlasd",
         shortMessage="Oh no",
         longMessage="its a notekind not in the enum",

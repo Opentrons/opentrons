@@ -13,6 +13,7 @@ from .create_protocol_engine import (
 )
 from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError, ErrorOccurrence
+from .notes import CommandNote
 from .commands import (
     Command,
     CommandParams,
@@ -20,7 +21,6 @@ from .commands import (
     CommandStatus,
     CommandType,
     CommandIntent,
-    CommandNote,
 )
 from .state import State, StateView, StateSummary, CommandSlice, CurrentCommand, Config
 from .plugins import AbstractPlugin
