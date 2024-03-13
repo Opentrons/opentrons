@@ -52,7 +52,6 @@ export function SetWifiSsid({
           onChange={e => setInputSsid(e.target.value)}
           type="text"
           error={errorMessage}
-          textAlign="center"
           onBlur={e => e.target.focus()}
           autoFocus={true}
         />

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -91,12 +91,16 @@ export function InputField(props: InputFieldProps): JSX.Element {
 }
 
 function Input(props: InputFieldProps): JSX.Element {
+  const {
+    placeholder,
+    textAlign = 'left',
+    size = 'small',
+    title,
+    ...inputProps
+  } = props
   const error = props.error != null
   const value = props.isIndeterminate ?? false ? '' : props.value ?? ''
   const placeHolder = props.isIndeterminate ?? false ? '-' : props.placeholder
-  const textAlign = props.textAlign ?? 'left'
-  const size = props.size ?? 'small'
-  console.log(error)
 
   const OUTER_CSS = css`
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -213,6 +217,13 @@ function Input(props: InputFieldProps): JSX.Element {
     }
   `
 
+  const StyledInput = styled.input`
+    margin: ${SPACING.spacing8};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      margin-x: ${SPACING.spacing24};
+    }
+  `
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       {props.title != null && <Flex css={TITLE_STYLE}>{props.title}</Flex>}
@@ -226,7 +237,7 @@ function Input(props: InputFieldProps): JSX.Element {
       >
         <Flex css={INPUT_FIELD} padding alignItems={ALIGN_CENTER}>
           <input
-            {...props}
+            {...inputProps}
             data-testid={props.id}
             value={value}
             placeholder={placeHolder}
