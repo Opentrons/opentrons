@@ -69,8 +69,8 @@ OFFSET_FOR_1_WELL_LABWARE = Point(x=9 * -11 * 0.5, y=9 * 7 * 0.5)
 TEMP_DECK_LABWARE = "nest_12_reservoir_15ml"
 TEMP_DECK_SLOT = 1
 # OFFSET_FOR_TEMP_DECK = Point(x=23, y=9 * 7 * 0.5, z=-4.5) #ultima
-OFFSET_FOR_TEMP_DECK = Point(x=1, y=9 * 7 * 0.5, z=-9) #nest 12 well
-# OFFSET_FOR_TEMP_DECK = Point(x=1, y=9 * 7 * 0.5, z=-25) #nest 12 well no temp
+# OFFSET_FOR_TEMP_DECK = Point(x=1, y=9 * 7 * 0.5, z=-9) #nest 12 well
+OFFSET_FOR_TEMP_DECK = Point(x=1, y=9 * 7 * 0.5, z=-25) #nest 12 well no temp
 # Temp deck temp of 36C keeps fluid at ~32
 
 # DISPENSE_OFFSET = 18 #ultima
@@ -239,14 +239,14 @@ async def test_cycle(
     for i in range(cycles):
         if not single:
             await move_twin_plunger_absolute_ot3(api, positions[0], speed=speed)
-            # await twin_z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
+            await twin_z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
             await move_twin_plunger_absolute_ot3(api, positions[1], speed=speed)
-            # await twin_z_move(api, bottom_position)
+            await twin_z_move(api, bottom_position)
         else:
             await move_plunger_absolute_ot3(api, positions[0], speed=speed)
-            # await z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
+            await z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
             await move_plunger_absolute_ot3(api, positions[1], speed=speed)
-            # await z_move(api, bottom_position)
+            await z_move(api, bottom_position)
         starting_cycle += 1
 
 
@@ -470,12 +470,14 @@ async def _main(is_simulating: bool, trials: int, flow: float,
                              total_cycles, cycles_per_trial,
                              temp_reservoir_a1_nominal,
                              single)
-            # if t%blow_inc == 0:
-            #     print("Blow Out")
-            #     await test_cycle(api, [pip_blow, pip_bot], flow,
-            #                      0, 1,
-            #                      temp_reservoir_a1_nominal,
-            #                      single)
+
+            if t%blow_inc == 0:
+                print("Blow Out")
+                await test_cycle(api, [pip_blow, pip_bot], flow,
+                                 0, 1,
+                                 temp_reservoir_a1_nominal,
+                                 single)
+
             total_cycles += cycles_per_trial
             print(total_cycles)
             report(OT3Mount.LEFT.name, _get_test_tag(flow, t), [total_cycles])
