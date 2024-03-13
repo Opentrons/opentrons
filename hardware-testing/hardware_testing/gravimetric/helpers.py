@@ -2,7 +2,7 @@
 import asyncio
 from random import random, randint
 from types import MethodType
-from typing import Any, List, Dict, Optional, Tuple
+from typing import Any, List, Dict, Optional, Tuple, Union
 from statistics import stdev
 from . import config
 from .liquid_class.defaults import get_liquid_class
@@ -34,7 +34,13 @@ from .workarounds import get_sync_hw_api
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 import opentrons.protocol_engine.execution.pipetting as PE_pipetting
-from opentrons.protocol_engine.state import StateView
+
+from opentrons.protocol_engine import (
+    StateView,
+    WellLocation,
+    DropTipWellLocation,
+)
+from opentrons.protocol_api.core.engine import deck_conflict as DeckConflit
 
 
 def _add_fake_simulate(
@@ -237,6 +243,16 @@ def _override_validate_asp_vol(
     return aspirate_volume
 
 
+def _override_check_safe_for_pipette_movement(
+    engine_state: StateView,
+    pipette_id: str,
+    labware_id: str,
+    well_name: str,
+    well_location: Union[WellLocation, DropTipWellLocation],
+) -> None:
+    pass
+
+
 def _override_software_supports_high_volumes() -> None:
     # yea so ok this is pretty ugly but this is super helpful for us
     # with this we don't need to apply patches, and can run the testing scripts
@@ -415,6 +431,10 @@ def _load_pipette(
     #       so we need to decrease the pick-up current to work with 1 tip.
     if pipette.channels == 8 and not increment and not photometric:
         pipette.configure_nozzle_layout(NozzleLayout.SINGLE, "A1")
+        # override deck conflict checking cause we specially lay out our tipracks
+        DeckConflit.check_safe_for_pipette_movement = (
+            _override_check_safe_for_pipette_movement
+        )
     pipette.trash_container = trash
     return pipette
 
