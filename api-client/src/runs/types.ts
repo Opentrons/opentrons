@@ -18,6 +18,7 @@ export const RUN_STATUS_FAILED = 'failed' as const
 export const RUN_STATUS_FINISHING = 'finishing' as const
 export const RUN_STATUS_SUCCEEDED = 'succeeded' as const
 export const RUN_STATUS_BLOCKED_BY_OPEN_DOOR = 'blocked-by-open-door' as const
+export const RUN_STATUS_AWAITING_RECOVERY = 'awaiting-recovery' as const
 
 export type RunStatus =
   | typeof RUN_STATUS_IDLE
@@ -30,6 +31,7 @@ export type RunStatus =
   | typeof RUN_STATUS_FINISHING
   | typeof RUN_STATUS_SUCCEEDED
   | typeof RUN_STATUS_BLOCKED_BY_OPEN_DOOR
+  | typeof RUN_STATUS_AWAITING_RECOVERY
 
 export interface RunData {
   id: string
