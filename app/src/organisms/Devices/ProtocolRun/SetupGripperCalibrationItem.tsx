@@ -26,7 +26,7 @@ export function SetupGripperCalibrationItem({
   gripperData,
   runId,
 }: SetupGripperCalibrationItemProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const [
     openWizardFlowType,
     setOpenWizardFlowType,
@@ -47,7 +47,7 @@ export function SetupGripperCalibrationItem({
             setOpenWizardFlowType(GRIPPER_FLOW_TYPES.ATTACH)
           }}
         >
-          {t('attach_gripper')}
+          {i18n.format(t('attach_gripper'), 'capitalize')}
         </TertiaryButton>
       </Flex>
     )
