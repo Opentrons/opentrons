@@ -250,3 +250,8 @@ export const HTTP_API_VERSION: 3 = 3
 
 export const SEND_READY_STATUS: 'shell:SEND_READY_STATUS' =
   'shell:SEND_READY_STATUS'
+
+export const FAILURE_STATUSES = {
+  ECONNREFUSED: 'ECONNREFUSED',
+  ECONNFAILED: 'ECONNFAILED',
+} as const
