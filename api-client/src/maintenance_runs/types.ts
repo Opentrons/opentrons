@@ -4,7 +4,11 @@ import type {
   LoadedModule,
   LoadedPipette,
 } from '@opentrons/shared-data'
-import type { RunCommandSummary, LabwareOffsetCreateData, RunStatus } from '../runs'
+import type {
+  RunCommandSummary,
+  LabwareOffsetCreateData,
+  RunStatus,
+} from '../runs'
 
 export interface MaintenanceRunData {
   id: string
