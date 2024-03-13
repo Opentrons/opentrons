@@ -129,7 +129,7 @@ export function handleNotificationConnectionsFor(
             subscriptions: new Set(),
             pendingSubs: new Set(),
           }
-          establishListeners({ client, browserWindow, hostname })
+          establishListeners({ client, hostname })
         })
         .catch((error: Error) => {
           log.warn(
@@ -154,7 +154,6 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
   if (unreachableHosts.has(hostname)) {
     const errorMessage = determineErrorMessageFor(hostname)
     sendToBrowserDeserialized({
-      browserWindow,
       hostname,
       topic,
       message: errorMessage,
@@ -177,7 +176,6 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
               (error: Error) => {
                 log.debug(error.message)
                 sendToBrowserDeserialized({
-                  browserWindow,
                   hostname,
                   topic,
                   message: FAILURE_STATUSES.ECONNFAILED,
@@ -190,7 +188,6 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
       .catch((error: Error) => {
         log.debug(error.message)
         sendToBrowserDeserialized({
-          browserWindow,
           hostname,
           topic,
           message: FAILURE_STATUSES.ECONNFAILED,
@@ -213,7 +210,6 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
     const { subscriptions } = connectionStore[hostname]
     if (error != null) {
       sendToBrowserDeserialized({
-        browserWindow,
         hostname,
         topic,
         message: FAILURE_STATUSES.ECONNFAILED,
@@ -329,7 +325,6 @@ function connectAsync(brokerURL: string): Promise<mqtt.Client> {
 
 interface ListenerParams {
   client: mqtt.MqttClient
-  browserWindow: BrowserWindow
   hostname: string
 }
 
@@ -345,12 +340,14 @@ function establishListeners({ client, hostname }: ListenerParams): void {
             hostname,
             topic,
           })
-          browserWindow.webContents.send(
-            'notify',
-            hostname,
-            topic,
-            deserializedMessage
-          )
+          try {
+            browserWindow.webContents.send(
+              'notify',
+              hostname,
+              topic,
+              deserializedMessage
+            )
+          } catch {}
         })
         .catch(error => log.debug(`${error.message}`))
     }
@@ -363,7 +360,6 @@ function establishListeners({ client, hostname }: ListenerParams): void {
   client.on('error', error => {
     log.warn(`Error - ${error.name}: ${error.message}`)
     sendToBrowserDeserialized({
-      browserWindow,
       hostname,
       topic: 'ALL_TOPICS',
       message: FAILURE_STATUSES.ECONNFAILED,
@@ -374,7 +370,6 @@ function establishListeners({ client, hostname }: ListenerParams): void {
   client.on('end', () => {
     log.debug(`Closed connection to ${hostname}`)
     sendToBrowserDeserialized({
-      browserWindow,
       hostname,
       topic: 'ALL_TOPICS',
       message: FAILURE_STATUSES.ECONNFAILED,
@@ -388,7 +383,6 @@ function establishListeners({ client, hostname }: ListenerParams): void {
       }`
     )
     sendToBrowserDeserialized({
-      browserWindow,
       hostname,
       topic: 'ALL_TOPICS',
       message: FAILURE_STATUSES.ECONNFAILED,
@@ -420,14 +414,12 @@ function closeConnectionsForcefullyFor(hosts: string[]): Array<Promise<void>> {
 }
 
 interface SendToBrowserParams {
-  browserWindow: BrowserWindow
   hostname: string
   topic: NotifyTopic
   message: NotifyResponseData
 }
 
 function sendToBrowserDeserialized({
-  browserWindow,
   hostname,
   topic,
   message,
