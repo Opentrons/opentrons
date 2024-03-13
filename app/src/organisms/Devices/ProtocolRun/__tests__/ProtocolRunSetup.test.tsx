@@ -40,7 +40,7 @@ import { SetupLiquids } from '../SetupLiquids'
 import { SetupModuleAndDeck } from '../SetupModuleAndDeck'
 import { EmptySetupStep } from '../EmptySetupStep'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
-import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../../resources/runs'
 
 import type * as SharedData from '@opentrons/shared-data'
 

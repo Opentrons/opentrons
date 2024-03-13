@@ -39,7 +39,7 @@ import {
   useTipLengthCalibrations,
   useRobot,
 } from '../../../hooks'
-import { useNotifyAllRunsQuery } from '../../../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../../../resources/runs'
 
 import type { State, Dispatch } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'

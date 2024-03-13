@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference types="cypress" />
 // ***********************************************************
 // This example plugins/index.js can be used to load plugins
 //
@@ -7,15 +9,15 @@
 // You can read more here:
 // https://on.cypress.io/plugins-guide
 // ***********************************************************
-const webpackPreprocessor = require('@cypress/webpack-preprocessor')
-const createWebpackConfig = require('../../webpack.config')
 
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
-module.exports = async (on, config) => {
+/**
+ * @type {Cypress.PluginConfig}
+ */
+// eslint-disable-next-line no-unused-vars
+module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
-  const webpackOptions = await createWebpackConfig()
-  on('file:preprocessor', webpackPreprocessor({ webpackOptions }))
 }

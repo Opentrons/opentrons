@@ -21,8 +21,8 @@ import {
 import {
   useCreateTargetedMaintenanceRunMutation,
   useChainMaintenanceCommands,
-} from '../../resources/runs/hooks'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+} from '../../resources/runs'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'

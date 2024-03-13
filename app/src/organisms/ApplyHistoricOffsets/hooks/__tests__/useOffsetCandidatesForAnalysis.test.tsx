@@ -19,6 +19,8 @@ import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
 vi.mock('../useAllHistoricOffsets')
 vi.mock('../getLabwareLocationCombos')
 vi.mock('@opentrons/shared-data')
+vi.mock('../../../../resources/runs')
+vi.mock('../../../../resources/useNotifyService')
 
 const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
 

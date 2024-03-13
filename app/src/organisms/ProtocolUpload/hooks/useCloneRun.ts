@@ -2,7 +2,7 @@ import { useQueryClient } from 'react-query'
 
 import { useHost, useCreateRunMutation } from '@opentrons/react-api-client'
 
-import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../resources/runs'
 
 import type { Run } from '@opentrons/api-client'
 

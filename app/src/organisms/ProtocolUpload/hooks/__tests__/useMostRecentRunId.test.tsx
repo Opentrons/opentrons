@@ -2,10 +2,10 @@ import { when } from 'vitest-when'
 import { renderHook } from '@testing-library/react'
 import { describe, it, afterEach, vi, expect } from 'vitest'
 
-import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 import { useMostRecentRunId } from '../useMostRecentRunId'
 
-vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+vi.mock('../../../../resources/runs')
 
 describe('useMostRecentRunId hook', () => {
   afterEach(() => {

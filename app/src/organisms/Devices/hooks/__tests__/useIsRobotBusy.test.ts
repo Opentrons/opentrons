@@ -14,8 +14,8 @@ import {
 } from '../../../EmergencyStop'
 import { useIsRobotBusy } from '../useIsRobotBusy'
 import { useIsFlex } from '../useIsFlex'
-import { useNotifyCurrentMaintenanceRun } from '../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
-import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyCurrentMaintenanceRun } from '../../../../resources/maintenance_runs'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 
 import type { Sessions, Runs } from '@opentrons/api-client'
 import type { AxiosError } from 'axios'
@@ -23,8 +23,8 @@ import type { AxiosError } from 'axios'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../ProtocolUpload/hooks')
 vi.mock('../useIsFlex')
-vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
-vi.mock('../../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+vi.mock('../../../../resources/runs')
+vi.mock('../../../../resources/maintenance_runs')
 
 const mockEstopStatus = {
   data: {

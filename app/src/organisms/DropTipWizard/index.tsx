@@ -18,7 +18,7 @@ import {
   useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -27,7 +27,7 @@ import { getIsOnDevice } from '../../redux/config'
 import {
   useChainMaintenanceCommands,
   useCreateTargetedMaintenanceRunMutation,
-} from '../../resources/runs/hooks'
+} from '../../resources/runs'
 import { StyledText } from '../../atoms/text'
 import { Jog } from '../../molecules/JogControls'
 import { ExitConfirmation } from './ExitConfirmation'

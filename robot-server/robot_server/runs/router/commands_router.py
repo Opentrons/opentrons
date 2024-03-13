@@ -296,6 +296,7 @@ async def get_run_commands(
             completedAt=c.completedAt,
             params=c.params,
             error=c.error,
+            notes=c.notes,
         )
         for c in command_slice.commands
     ]

@@ -80,11 +80,11 @@ export function getSimplestDeckConfigForProtocol(
         ({ cutoutId }) => cutoutId === cutoutIdForAddressableArea
       )
       const previousRequiredAAs = acc[accIndex]?.requiredAddressableAreas
-      const allNextRequiredAddressableAreas = previousRequiredAAs.includes(
-        addressableArea
-      )
-        ? previousRequiredAAs
-        : [...previousRequiredAAs, addressableArea]
+      const allNextRequiredAddressableAreas =
+        previousRequiredAAs != null &&
+        previousRequiredAAs.includes(addressableArea)
+          ? previousRequiredAAs
+          : [...previousRequiredAAs, addressableArea]
       const nextCompatibleCutoutFixture = getSimplestFixtureForAddressableAreas(
         cutoutIdForAddressableArea,
         allNextRequiredAddressableAreas,

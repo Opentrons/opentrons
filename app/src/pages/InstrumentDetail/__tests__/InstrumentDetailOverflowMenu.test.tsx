@@ -8,7 +8,7 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowMenu'
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { DropTipWizard } from '../../../organisms/DropTipWizard'
@@ -27,7 +27,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getPipetteModelSpecs: vi.fn(),
   }
 })
-vi.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+vi.mock('../../../resources/maintenance_runs')
 vi.mock('../../../organisms/PipetteWizardFlows')
 vi.mock('../../../organisms/GripperWizardFlows')
 vi.mock('../../../organisms/DropTipWizard')

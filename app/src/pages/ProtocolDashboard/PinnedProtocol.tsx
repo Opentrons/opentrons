@@ -20,7 +20,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { LongPressModal } from './LongPressModal'
-import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { formatTimeWithUtcLabel } from '../../resources/runs'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'

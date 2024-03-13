@@ -7,7 +7,7 @@ import {
   getLabwareDefURI,
   getIsTiprack,
   OPENTRONS_LABWARE_NAMESPACE,
-  protocolSchemaV2,
+  labwareSchemaV2,
 } from '@opentrons/shared-data'
 import { getAllWellSetsForLabware } from '../utils'
 import * as labwareDefSelectors from './selectors'
@@ -55,8 +55,7 @@ const ajv = new Ajv({
   allErrors: true,
   jsonPointers: true,
 })
-const validate = ajv.compile(protocolSchemaV2)
-
+const validate = ajv.compile(labwareSchemaV2)
 const _labwareDefsMatchingLoadName = (
   labwareDefs: LabwareDefinition2[],
   loadName: string
