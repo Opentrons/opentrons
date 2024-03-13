@@ -177,7 +177,9 @@ function establishListeners({
   })
 }
 
-function closeConnectionsForcefullyFor(hosts: string[]): Array<Promise<void>> {
+export function closeConnectionsForcefullyFor(
+  hosts: string[]
+): Array<Promise<void>> {
   return hosts.map(hostname => {
     const client = connectionStore[hostname].client
     return new Promise<void>((resolve, reject) =>

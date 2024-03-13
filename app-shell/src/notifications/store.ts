@@ -14,6 +14,12 @@ interface ConnectionStore {
   hostnames: Record<string, HostnameInfo>
   browserWindow: BrowserWindow | null
 }
+
+// Correct and make sure everything can work. What are the transitiions I actually need?
+// Subscribing. If host IS UNREACHABLE, then return. Otherwise, HANDLE SUBSCRIPTION.
+// HANDLE SUB-> If IS CONNECTED, IS SUBSCRIBED (do subscribe pending logic here if not).
+// Pretty much same flow for unsubscribe. The key is to implictly move stuff between states.
+// Any state transition should be encapsulated.
 export const connectionStore: ConnectionStore = {
   unreachableHosts: new Set(),
   pendingUnsubs: new Set(),
