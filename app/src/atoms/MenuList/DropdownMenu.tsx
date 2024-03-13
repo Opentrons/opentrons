@@ -41,10 +41,14 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     dropdownType = 'rounded',
   } = props
   const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
-  const toggleSetShowDropdownMenu = (): void =>
+  const toggleSetShowDropdownMenu = (): void => {
     setShowDropdownMenu(!showDropdownMenu)
+  }
   const dropDownMenuWrapperRef = useOnClickOutside<HTMLDivElement>({
-    onClickOutside: () => setShowDropdownMenu(false),
+    onClickOutside: () => {
+      setShowDropdownMenu(false)
+      console.log('DROPDOWN CLICKED')
+    },
   })
 
   const DROPDOWN_STYLE = css`
@@ -90,6 +94,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           toggleSetShowDropdownMenu()
         }}
         css={DROPDOWN_STYLE}
+        ref={dropDownMenuWrapperRef}
       >
         <StyledText css={TYPOGRAPHY.pSemiBold}>{currentOption.name}</StyledText>
         {showDropdownMenu ? (
@@ -104,7 +109,6 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       </Flex>
       {showDropdownMenu && (
         <Flex
-          ref={dropDownMenuWrapperRef}
           zIndex={2}
           borderRadius={BORDERS.borderRadiusSize2}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
