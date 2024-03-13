@@ -96,7 +96,7 @@ class AttachedModulesControl:
             hw_control_loop=self._api.loop,
             execution_manager=self._api._execution_manager,
             sim_model=sim_model,
-            serial_number=serial_number,
+            sim_serial_number=sim_serial_number,
         )
 
     async def unregister_modules(
@@ -158,7 +158,7 @@ class AttachedModulesControl:
                 port=mod.port,
                 usb_port=mod.usb_port,
                 type=modules.MODULE_TYPE_BY_NAME[mod.name],
-                serial_number=mod.serial_number
+                sim_serial_number=mod.serial_number
                 if isinstance(mod, SimulatingModuleAtPort)
                 else None,
             )

@@ -72,7 +72,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             driver = await HeaterShakerDriver.create(port=port, loop=hw_control_loop)
             poll_interval_seconds = poll_interval_seconds or POLL_PERIOD
         else:
-            driver = SimulatingDriver(serial_number=serial_number)
+            driver = SimulatingDriver(serial_number=sim_serial_number)
             poll_interval_seconds = poll_interval_seconds or SIMULATING_POLL_PERIOD
 
         reader = HeaterShakerReader(driver=driver)

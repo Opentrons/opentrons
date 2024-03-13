@@ -132,10 +132,13 @@ async def create_simulator_thread_manager(
     await thread_manager.managed_thread_ready_async()
 
     for attached_module in thread_manager.wrapped().attached_modules:
-        calls = setup.attached_modules[attached_module.name()]
-        for call in calls:
-            f = getattr(attached_module, call.function_name)
-            await f(*call.args, **call.kwargs)
+        modules = setup.attached_modules[attached_module.name()]
+        print(modules)
+        for module in modules:
+            print(module)
+            for call in module.items:
+                f = getattr(attached_module, call.function_name)
+                await f(*call.args, **call.kwargs)
 
     return thread_manager
 
