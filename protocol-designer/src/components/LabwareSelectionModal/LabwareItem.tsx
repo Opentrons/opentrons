@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { Icon, IconName } from '@opentrons/components'
 import { PDListItem } from '../lists'
-import styles from './styles.css'
+import styles from './styles.module.css'
 import {
   getLabwareDefURI,
   getLabwareDefIsStandard,

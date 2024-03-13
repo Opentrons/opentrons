@@ -1,18 +1,19 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { mockRobotSideAnalysis } from '../../../CommandText/__fixtures__'
 import { CurrentRunningProtocolCommand } from '../CurrentRunningProtocolCommand'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-const mockPlayRun = jest.fn()
-const mockPauseRun = jest.fn()
-const mockShowModal = jest.fn()
-const mockUpdateLastAnimatedCommand = jest.fn()
+const mockPlayRun = vi.fn()
+const mockPauseRun = vi.fn()
+const mockShowModal = vi.fn()
+const mockUpdateLastAnimatedCommand = vi.fn()
 
 const mockRunTimer = {
   runStatus: RUN_STATUS_RUNNING,
@@ -40,7 +41,7 @@ describe('CurrentRunningProtocolCommand', () => {
       playRun: mockPlayRun,
       pauseRun: mockPauseRun,
       setShowConfirmCancelRunModal: mockShowModal,
-      trackProtocolRunEvent: jest.fn(), // temporary
+      trackProtocolRunEvent: vi.fn(), // temporary
       robotAnalyticsData: {} as any,
       protocolName: 'mockRunningProtocolName',
       currentRunCommandIndex: 0,
@@ -51,17 +52,17 @@ describe('CurrentRunningProtocolCommand', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should render text and buttons', () => {
-    const [{ getByText, getByLabelText }] = render(props)
-    getByText('Running')
-    getByText('mockRunningProtocolName')
-    getByText('00:00:01')
-    getByText('Load P300 Single-Channel GEN1 in Left Mount')
-    getByLabelText('stop')
-    getByLabelText('pause')
+    render(props)
+    screen.getByText('Running')
+    screen.getByText('mockRunningProtocolName')
+    screen.getByText('00:00:01')
+    screen.getByText('Load P300 Single-Channel GEN1 in Left Mount')
+    screen.getByLabelText('stop')
+    screen.getByLabelText('pause')
   })
 
   it('should render play button when runStatus is idle', () => {
@@ -69,13 +70,13 @@ describe('CurrentRunningProtocolCommand', () => {
       ...props,
       runStatus: RUN_STATUS_IDLE,
     }
-    const [{ getByLabelText }] = render(props)
-    getByLabelText('play')
+    render(props)
+    screen.getByLabelText('play')
   })
 
   it('when tapping stop button, the modal is showing up', () => {
-    const [{ getByLabelText }] = render(props)
-    const button = getByLabelText('stop')
+    render(props)
+    const button = screen.getByLabelText('stop')
     fireEvent.click(button)
     expect(mockShowModal).toHaveBeenCalled()
   })

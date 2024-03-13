@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ClickableIcon } from '../ui'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { MobileNavProps } from './types'
 

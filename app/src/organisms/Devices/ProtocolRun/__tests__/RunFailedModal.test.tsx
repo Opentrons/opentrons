@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { useDownloadRunLog } from '../../hooks'
 import { RunFailedModal } from '../RunFailedModal'
@@ -9,11 +9,7 @@ import { RunFailedModal } from '../RunFailedModal'
 import type { RunError } from '@opentrons/api-client'
 import { fireEvent, screen } from '@testing-library/react'
 
-jest.mock('../../hooks')
-
-const mockUseDownloadRunLog = useDownloadRunLog as jest.MockedFunction<
-  typeof useDownloadRunLog
->
+vi.mock('../../hooks')
 
 const RUN_ID = '1'
 const ROBOT_NAME = 'mockRobotName'
@@ -40,17 +36,17 @@ describe('RunFailedModal - DesktopApp', () => {
     props = {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
-      setShowRunFailedModal: jest.fn(),
+      setShowRunFailedModal: vi.fn(),
       highestPriorityError: mockError,
     }
-    mockUseDownloadRunLog.mockReturnValue({
-      downloadRunLog: jest.fn(),
+    vi.mocked(useDownloadRunLog).mockReturnValue({
+      downloadRunLog: vi.fn(),
       isRunLogLoading: false,
     })
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should render text, link and button', () => {
@@ -80,6 +76,6 @@ describe('RunFailedModal - DesktopApp', () => {
   it('should call a mock function when clicking download run log button', () => {
     render(props)
     fireEvent.click(screen.getByText('Download Run Log'))
-    expect(mockUseDownloadRunLog).toHaveBeenCalled()
+    expect(vi.mocked(useDownloadRunLog)).toHaveBeenCalled()
   })
 })

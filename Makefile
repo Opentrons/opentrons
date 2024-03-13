@@ -47,7 +47,7 @@ endif
 
 # run at usage (=), not on makefile parse (:=)
 # todo(mm, 2021-03-17): Deduplicate with scripts/python.mk.
-usb_host=$(shell yarn run -s discovery find -i 169.254)
+usb_host=$(shell yarn -s discovery find -i 169.254)
 
 # install all project dependencies
 .PHONY: setup
@@ -62,6 +62,7 @@ setup-py-toolchain:
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
+setup-js:
 setup-js: setup-py-toolchain
 	yarn config set network-timeout 60000
 	yarn
@@ -263,7 +264,7 @@ circular-dependencies-js:
 
 .PHONY: test-js-internal
 test-js-internal:
-	yarn jest $(tests) $(test_opts) $(cov_opts)
+	yarn vitest $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-js-%
 test-js-%: 

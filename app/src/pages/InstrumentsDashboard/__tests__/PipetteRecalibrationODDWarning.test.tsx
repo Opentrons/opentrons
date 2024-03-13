@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
+import { describe, it } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { PipetteRecalibrationODDWarning } from '../PipetteRecalibrationODDWarning'

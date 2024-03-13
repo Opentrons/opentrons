@@ -1,6 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { it, describe, beforeEach } from 'vitest'
+
 import { GEN1, GEN2, LEFT, RIGHT } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { InstructionStep } from '../InstructionStep'
 

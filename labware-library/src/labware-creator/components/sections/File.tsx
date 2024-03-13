@@ -8,7 +8,7 @@ import { FormAlerts } from '../alerts/FormAlerts'
 import { TextField } from '../TextField'
 import { SectionBody } from './SectionBody'
 
-import styles from '../../styles.css'
+import styles from '../../styles.module.css'
 
 const Content = (props: { values: LabwareFields }): JSX.Element => (
   <div className={styles.flex_row}>

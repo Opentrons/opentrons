@@ -29,5 +29,4 @@ const render = (Component: any): void => {
     </Provider>
   )
 }
-
 render(App)

@@ -1,36 +1,40 @@
 import * as React from 'react'
-import { when } from 'jest-when'
 import { screen, fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../i18n'
 import * as Shell from '../../../redux/shell'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { useRemoveActiveAppUpdateToast } from '../../Alerts'
 import { UpdateAppModal, UpdateAppModalProps, RELEASE_NOTES_URL_BASE } from '..'
 
 import type { State } from '../../../redux/types'
 import type { ShellUpdateState } from '../../../redux/shell/types'
+import type * as ShellState from '../../../redux/shell'
+import type * as Dom from 'react-router-dom'
 
-jest.mock('../../../redux/shell/update', () => ({
-  ...jest.requireActual<{}>('../../../redux/shell/update'),
-  getShellUpdateState: jest.fn(),
-}))
+vi.mock('../../../redux/shell/update', async importOriginal => {
+  const actual = await importOriginal<typeof ShellState>()
+  return {
+    ...actual,
+    getShellUpdateState: vi.fn(),
+  }
+})
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    push: jest.fn(),
-  }),
-}))
-jest.mock('../../Alerts')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof Dom>()
+  return {
+    ...actual,
+    useHistory: () => ({
+      push: vi.fn(),
+    }),
+  }
+})
 
-const getShellUpdateState = Shell.getShellUpdateState as jest.MockedFunction<
-  typeof Shell.getShellUpdateState
->
-const mockUseRemoveActiveAppUpdateToast = useRemoveActiveAppUpdateToast as jest.MockedFunction<
-  typeof useRemoveActiveAppUpdateToast
->
+vi.mock('../../Alerts')
+
+const getShellUpdateState = Shell.getShellUpdateState
 
 const render = (props: React.ComponentProps<typeof UpdateAppModal>) => {
   return renderWithProviders(<UpdateAppModal {...props} />, {
@@ -46,9 +50,9 @@ describe('UpdateAppModal', () => {
 
   beforeEach(() => {
     props = {
-      closeModal: jest.fn(),
+      closeModal: vi.fn(),
     } as UpdateAppModalProps
-    getShellUpdateState.mockImplementation((state: State) => {
+    vi.mocked(getShellUpdateState).mockImplementation((state: State) => {
       return {
         downloading: false,
         available: true,
@@ -61,13 +65,9 @@ describe('UpdateAppModal', () => {
         },
       } as ShellUpdateState
     })
-    when(mockUseRemoveActiveAppUpdateToast).calledWith().mockReturnValue({
-      removeActiveAppUpdateToast: jest.fn(),
+    vi.mocked(useRemoveActiveAppUpdateToast).mockReturnValue({
+      removeActiveAppUpdateToast: vi.fn(),
     })
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   it('renders update available title and release notes when update is available', () => {
@@ -78,7 +78,7 @@ describe('UpdateAppModal', () => {
     expect(screen.getByText('this is a release')).toBeInTheDocument()
   })
   it('closes modal when "remind me later" button is clicked', () => {
-    const closeModal = jest.fn()
+    const closeModal = vi.fn()
     render({ ...props, closeModal })
     fireEvent.click(screen.getByText('Remind me later'))
     expect(closeModal).toHaveBeenCalled()
@@ -92,7 +92,7 @@ describe('UpdateAppModal', () => {
   })
 
   it('shows error modal on error', () => {
-    getShellUpdateState.mockReturnValue({
+    vi.mocked(getShellUpdateState).mockReturnValue({
       error: {
         message: 'Could not get code signature for running application',
         name: 'Error',
@@ -102,7 +102,7 @@ describe('UpdateAppModal', () => {
     expect(screen.getByText('Update Error')).toBeInTheDocument()
   })
   it('shows a download progress bar when downloading', () => {
-    getShellUpdateState.mockReturnValue({
+    vi.mocked(getShellUpdateState).mockReturnValue({
       downloading: true,
       downloadPercentage: 50,
     } as ShellUpdateState)
@@ -111,7 +111,7 @@ describe('UpdateAppModal', () => {
     expect(screen.getByRole('progressbar')).toBeInTheDocument()
   })
   it('renders download complete text when download is finished', () => {
-    getShellUpdateState.mockReturnValue({
+    vi.mocked(getShellUpdateState).mockReturnValue({
       downloading: false,
       downloaded: true,
     } as ShellUpdateState)
@@ -125,7 +125,7 @@ describe('UpdateAppModal', () => {
     )
   })
   it('renders an error message when an error occurs', () => {
-    getShellUpdateState.mockReturnValue({
+    vi.mocked(getShellUpdateState).mockReturnValue({
       error: { name: 'Update Error' },
     } as ShellUpdateState)
     render(props)

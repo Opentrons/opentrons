@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { vi, describe, it, expect, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
 import { getIsHidden } from '../../formSelectors'
 import {
@@ -8,25 +10,21 @@ import {
   LABWARE_TOO_LARGE_ERROR,
 } from '../../fields'
 import { FormAlerts, Props as FormAlertProps } from '../alerts/FormAlerts'
-import { when, resetAllWhenMocks } from 'jest-when'
 
-jest.mock('../../formSelectors')
-
-const getIsHiddenMock = getIsHidden as jest.MockedFunction<typeof getIsHidden>
+vi.mock('../../formSelectors')
 
 describe('FormAlerts', () => {
   afterEach(() => {
-    jest.restoreAllMocks()
-    resetAllWhenMocks()
+    vi.restoreAllMocks()
   })
   it('should render a warning when an input is not valid', () => {
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
     const props: FormAlertProps = {
       values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
@@ -42,13 +40,13 @@ describe('FormAlerts', () => {
     expect(alertItem).toHaveTextContent('some warning')
   })
   it('should render an incompatible labware error when the labware is not compatible with labware creator', () => {
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
     const props: FormAlertProps = {
       values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
@@ -67,12 +65,12 @@ describe('FormAlerts', () => {
   })
 
   it('should render a loose tip fit error when hand placed fit is loose', () => {
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
-      .mockReturnValue(false)
-    when(getIsHiddenMock)
+      .thenReturn(false)
+    when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
     const props: FormAlertProps = {
       values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
@@ -91,12 +89,12 @@ describe('FormAlerts', () => {
   })
 
   it('should render labware too small error when labware footprint is too small', () => {
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
-      .mockReturnValue(false)
-    when(getIsHiddenMock)
+      .thenReturn(false)
+    when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
     const props: FormAlertProps = {
       values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,
@@ -115,12 +113,12 @@ describe('FormAlerts', () => {
   })
 
   it('should render labware too large error when labware footprint is too large', () => {
-    when(getIsHiddenMock)
+    when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
-      .mockReturnValue(false)
-    when(getIsHiddenMock)
+      .thenReturn(false)
+    when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
     const props: FormAlertProps = {
       values: { labwareType: 'wellPlate', tubeRackInsertLoadName: null } as any,

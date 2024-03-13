@@ -1,7 +1,10 @@
 import * as React from 'react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 import { ODDBackButton } from '..'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 const render = (props: React.ComponentProps<typeof ODDBackButton>) => {
   return renderWithProviders(<ODDBackButton {...props} />)[0]
@@ -13,12 +16,8 @@ describe('ODDBackButton', () => {
   beforeEach(() => {
     props = {
       label: 'button label',
-      onClick: jest.fn(),
+      onClick: vi.fn(),
     }
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
   })
 
   it('should render text and icon', () => {

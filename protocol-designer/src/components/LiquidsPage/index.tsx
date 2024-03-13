@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import assert from 'assert'
 
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
@@ -45,7 +44,7 @@ export function LiquidsPage(): JSX.Element {
       })
     )
   }
-  assert(
+  console.assert(
     !(liquidGroupId && !selectedIngredFields),
     `Expected selected liquid group "${String(
       liquidGroupId

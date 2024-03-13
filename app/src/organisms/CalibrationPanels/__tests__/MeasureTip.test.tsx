@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, expect } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   mockTipLengthCalBlock,
@@ -11,8 +13,8 @@ import * as Sessions from '../../../redux/sessions'
 import { MeasureTip } from '../MeasureTip'
 
 describe('MeasureTip', () => {
-  const mockSendCommands = jest.fn()
-  const mockDeleteSession = jest.fn()
+  const mockSendCommands = vi.fn()
+  const mockDeleteSession = vi.fn()
   const render = (
     props: Partial<React.ComponentProps<typeof MeasureTip>> = {}
   ) => {
@@ -40,10 +42,6 @@ describe('MeasureTip', () => {
       { i18nInstance: i18n }
     )
   }
-
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('renders the confirm crash modal when invoked', () => {
     render()

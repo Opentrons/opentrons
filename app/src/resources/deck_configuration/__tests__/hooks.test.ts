@@ -1,4 +1,5 @@
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, vi, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
@@ -12,11 +13,7 @@ import {
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
->
+vi.mock('@opentrons/react-api-client')
 
 const MOCK_DECK_CONFIG: DeckConfiguration = [
   {
@@ -55,13 +52,12 @@ const MOCK_DECK_CONFIG: DeckConfiguration = [
 
 describe('useDeckConfigurationCompatibility', () => {
   beforeEach(() => {
-    when(mockUseDeckConfigurationQuery)
+    when(useDeckConfigurationQuery)
       .calledWith()
-      .mockReturnValue({
+      .thenReturn({
         data: MOCK_DECK_CONFIG,
       } as UseQueryResult<DeckConfiguration>)
   })
-  afterEach(() => resetAllWhenMocks())
 
   it('returns configured status if fixture is configured at location', () => {})
 })

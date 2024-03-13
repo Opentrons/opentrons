@@ -36,6 +36,7 @@ class LabwareCalibrationEndpointsRemoved(ErrorDetails):
         "This endpoint has been removed."
         " Use the `/runs` endpoints to manage labware offsets."
     ),
+    deprecated=True,
     response_model=None,
     responses={
         status.HTTP_200_OK: {"model": lw_models.MultipleCalibrationsResponse},
@@ -62,6 +63,7 @@ async def get_all_labware_calibrations(
         "This endpoint has been removed."
         " Use the `/runs` endpoints to manage labware offsets."
     ),
+    deprecated=True,
     response_model=None,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody},
@@ -89,6 +91,7 @@ async def get_specific_labware_calibration(
         "This endpoint has been removed."
         " Use the `/runs` endpoints to manage labware offsets."
     ),
+    deprecated=True,
     response_model=None,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody},

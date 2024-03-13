@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import isEqual from 'lodash/isEqual'
@@ -25,7 +26,7 @@ import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { AddFixtureModal } from '../../organisms/DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 
 import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
 
@@ -109,27 +110,30 @@ export function DeckConfigurationEditor(): JSX.Element {
 
   return (
     <>
-      <Portal level="top">
-        {showDiscardChangeModal ? (
-          <DeckConfigurationDiscardChangesModal
-            setShowConfirmationModal={setShowDiscardChangeModal}
-          />
-        ) : null}
-        {showSetupInstructionsModal ? (
-          <DeckFixtureSetupInstructionsModal
-            setShowSetupInstructionsModal={setShowSetupInstructionsModal}
-            isOnDevice
-          />
-        ) : null}
-        {showConfigurationModal && targetCutoutId != null ? (
-          <AddFixtureModal
-            cutoutId={targetCutoutId}
-            setShowAddFixtureModal={setShowConfigurationModal}
-            setCurrentDeckConfig={setCurrentDeckConfig}
-            isOnDevice
-          />
-        ) : null}
-      </Portal>
+      {createPortal(
+        <>
+          {showDiscardChangeModal ? (
+            <DeckConfigurationDiscardChangesModal
+              setShowConfirmationModal={setShowDiscardChangeModal}
+            />
+          ) : null}
+          {showSetupInstructionsModal ? (
+            <DeckFixtureSetupInstructionsModal
+              setShowSetupInstructionsModal={setShowSetupInstructionsModal}
+              isOnDevice
+            />
+          ) : null}
+          {showConfigurationModal && targetCutoutId != null ? (
+            <AddFixtureModal
+              cutoutId={targetCutoutId}
+              setShowAddFixtureModal={setShowConfigurationModal}
+              setCurrentDeckConfig={setCurrentDeckConfig}
+              isOnDevice
+            />
+          ) : null}
+        </>,
+        getTopPortalEl()
+      )}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_SPACE_AROUND}

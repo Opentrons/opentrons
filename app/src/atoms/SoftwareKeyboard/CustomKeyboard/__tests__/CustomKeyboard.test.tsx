@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { fireEvent, renderHook } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, vi } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, renderHook, screen } from '@testing-library/react'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { CustomKeyboard } from '..'
 
 const render = (props: React.ComponentProps<typeof CustomKeyboard>) => {
@@ -11,11 +13,11 @@ describe('CustomKeyboard', () => {
   it('should render the custom keyboards lower case', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
-      onChange: jest.fn(),
+      onChange: vi.fn(),
       keyboardRef: result.current,
     }
-    const { getAllByRole } = render(props)
-    const buttons = getAllByRole('button')
+    render(props)
+    const buttons = screen.getAllByRole('button')
     const expectedButtonNames = [
       'q',
       'w',
@@ -55,14 +57,14 @@ describe('CustomKeyboard', () => {
   it('should render the custom keyboards upper case, when clicking shift key', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
-      onChange: jest.fn(),
+      onChange: vi.fn(),
       keyboardRef: result.current,
     }
-    const { getByRole, getAllByRole } = render(props)
-    const shiftKey = getByRole('button', { name: 'SHIFT' })
+    render(props)
+    const shiftKey = screen.getByRole('button', { name: 'SHIFT' })
     fireEvent.click(shiftKey)
 
-    const buttons = getAllByRole('button')
+    const buttons = screen.getAllByRole('button')
     const expectedButtonNames = [
       'Q',
       'W',
@@ -103,13 +105,13 @@ describe('CustomKeyboard', () => {
   it('should render the custom keyboards numbers, when clicking number key', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
-      onChange: jest.fn(),
+      onChange: vi.fn(),
       keyboardRef: result.current,
     }
-    const { getByRole, getAllByRole } = render(props)
-    const numberKey = getByRole('button', { name: '123' })
+    render(props)
+    const numberKey = screen.getByRole('button', { name: '123' })
     fireEvent.click(numberKey)
-    const buttons = getAllByRole('button')
+    const buttons = screen.getAllByRole('button')
     const expectedButtonNames = [
       '1',
       '2',
@@ -133,16 +135,16 @@ describe('CustomKeyboard', () => {
   it('should render the custom keyboards lower case, when clicking number key then abc key', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
-      onChange: jest.fn(),
+      onChange: vi.fn(),
       keyboardRef: result.current,
     }
-    const { getByRole } = render(props)
-    const numberKey = getByRole('button', { name: '123' })
-    getByRole('button', { name: 'a' })
+    render(props)
+    const numberKey = screen.getByRole('button', { name: '123' })
+    screen.getByRole('button', { name: 'a' })
     fireEvent.click(numberKey)
-    getByRole('button', { name: '1' })
-    const abcKey = getByRole('button', { name: 'abc' })
+    screen.getByRole('button', { name: '1' })
+    const abcKey = screen.getByRole('button', { name: 'abc' })
     fireEvent.click(abcKey)
-    getByRole('button', { name: 'a' })
+    screen.getByRole('button', { name: 'a' })
   })
 })

@@ -4,7 +4,7 @@ import { LabwareGuide } from './LabwareGuide'
 import { FilterManufacturer } from './FilterManufacturer'
 import { FilterCategory } from './FilterCategory'
 import { FilterReset } from './FilterReset'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { FilterParams } from '../../types'
 

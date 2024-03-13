@@ -7,8 +7,8 @@ import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
 } from '../../../analytics'
-import settingsStyles from '../../SettingsPage/SettingsPage.css'
-import modalStyles from '../modal.css'
+import settingsStyles from '../../SettingsPage/SettingsPage.module.css'
+import modalStyles from '../modal.module.css'
 
 export function GateModal(): JSX.Element | null {
   const { t } = useTranslation(['card', 'button'])

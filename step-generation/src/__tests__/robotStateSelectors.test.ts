@@ -1,9 +1,10 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import {
   getLabwareDefURI,
   MAGNETIC_MODULE_TYPE,
   LabwareDefinition2,
+  fixtureTiprack300ul as _fixtureTiprack300ul,
 } from '@opentrons/shared-data'
-import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   makeContext,
   makeState,

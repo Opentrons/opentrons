@@ -1,11 +1,17 @@
 import * as React from 'react'
-import { render } from '@testing-library/react'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { cleanup, screen } from '@testing-library/react'
 import { CrashInfoBox } from '../CrashInfoBox'
+import { i18n } from '../../../localization'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 describe('CrashInfoBox', () => {
   let props: React.ComponentProps<typeof CrashInfoBox>
   beforeEach(() => {
     props = {}
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('should render PipetteModuleCollisions, ModuleLabwareCollisions, and ModuleModuleCollisions when a heater shaker is on deck', () => {
     props = {
@@ -16,29 +22,29 @@ describe('CrashInfoBox', () => {
       showMagPipetteCollisons: true,
       showTempPipetteCollisons: true,
     }
-    const { getByText } = render(<CrashInfoBox {...props} />)
-    getByText('Potential pipette-module collisions')
-    getByText('Potential module-labware collisions')
-    getByText('Potential module-module collisions')
+    renderWithProviders(<CrashInfoBox {...props} />, { i18nInstance: i18n })
+    screen.getByText('Potential pipette-module collisions')
+    screen.getByText('Potential module-labware collisions')
+    screen.getByText('Potential module-module collisions')
   })
   it('should only render PipetteModuleCollisions when a mag mod is on deck', () => {
     props = {
       ...props,
       showMagPipetteCollisons: true,
     }
-    const { getByText, queryByText } = render(<CrashInfoBox {...props} />)
-    getByText('Potential pipette-module collisions')
-    expect(queryByText('Potential module-labware collisions')).toBeNull()
-    expect(queryByText('Potential module-module collisions')).toBeNull()
+    renderWithProviders(<CrashInfoBox {...props} />, { i18nInstance: i18n })
+    screen.getByText('Potential pipette-module collisions')
+    expect(screen.queryByText('Potential module-labware collisions')).toBeNull()
+    expect(screen.queryByText('Potential module-module collisions')).toBeNull()
   })
   it('should only render PipetteModuleCollisions when a temp mod is on deck', () => {
     props = {
       ...props,
       showTempPipetteCollisons: true,
     }
-    const { getByText, queryByText } = render(<CrashInfoBox {...props} />)
-    getByText('Potential pipette-module collisions')
-    expect(queryByText('Potential module-labware collisions')).toBeNull()
-    expect(queryByText('Potential module-module collisions')).toBeNull()
+    renderWithProviders(<CrashInfoBox {...props} />, { i18nInstance: i18n })
+    screen.getByText('Potential pipette-module collisions')
+    expect(screen.queryByText('Potential module-labware collisions')).toBeNull()
+    expect(screen.queryByText('Potential module-module collisions')).toBeNull()
   })
 })

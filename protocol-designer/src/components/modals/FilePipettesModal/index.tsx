@@ -1,5 +1,5 @@
 import * as React from 'react'
-import assert from 'assert'
+
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import reduce from 'lodash/reduce'
@@ -28,6 +28,11 @@ import {
   MAGNETIC_BLOCK_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
+import { PipetteFields } from './PipetteFields'
+import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
+import styles from './FilePipettesModal.module.css'
+import modalStyles from '../modal.module.css'
 import {
   actions as stepFormActions,
   selectors as stepFormSelectors,
@@ -46,12 +51,6 @@ import { getRobotType } from '../../../file-data/selectors'
 import { uuid } from '../../../utils'
 import { actions as steplistActions } from '../../../steplist'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
-import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
-import { PipetteFields } from './PipetteFields'
-
-import styles from './FilePipettesModal.css'
-import modalStyles from '../modal.css'
 
 import type { DeckSlot, ThunkDispatch } from '../../../types'
 import type { NormalizedPipette } from '@opentrons/step-generation'
@@ -355,7 +354,10 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
-        assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
+        console.assert(
+          mount === 'left' || mount === 'right',
+          `invalid mount: ${mount}`
+        ) // this is mostly for flow
         // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
         return formPipette &&
           formPipette.pipetteName &&

@@ -1,14 +1,12 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, beforeEach } from 'vitest'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { RenderResult } from '../RenderResult'
 import { CalibrationResult } from '../CalibrationResult'
 
-jest.mock('../RenderResult')
-
-const mockRenderResult = RenderResult as jest.MockedFunction<
-  typeof RenderResult
->
+vi.mock('../RenderResult')
 
 const render = (props: React.ComponentProps<typeof CalibrationResult>) => {
   return renderWithProviders(<CalibrationResult {...props} />, {
@@ -24,7 +22,7 @@ describe('PipetteCalibrationResult', () => {
       calType: 'pipetteOffset',
       isBadCal: false,
     }
-    mockRenderResult.mockReturnValue(<div>render result</div>)
+    vi.mocked(RenderResult).mockReturnValue(<div>render result</div>)
   })
 
   it('should render pipette offset calibration title and RenderResult - isBadCal: false', () => {

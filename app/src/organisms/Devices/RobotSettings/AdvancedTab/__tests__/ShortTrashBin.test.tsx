@@ -1,19 +1,16 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 
 import { i18n } from '../../../../../i18n'
 import { getRobotSettings } from '../../../../../redux/robot-settings'
 
 import { ShortTrashBin } from '../ShortTrashBin'
 
-jest.mock('../../../../../redux/robot-settings/selectors')
-
-const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
-  typeof getRobotSettings
->
+vi.mock('../../../../../redux/robot-settings/selectors')
 
 const mockSettings = {
   id: 'shortFixedTrash',
@@ -34,20 +31,16 @@ const render = (isRobotBusy = false) => {
 
 describe('RobotSettings ShortTrashBin', () => {
   beforeEach(() => {
-    mockGetRobotSettings.mockReturnValue([mockSettings])
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(getRobotSettings).mockReturnValue([mockSettings])
   })
 
   it('should render title, description and toggle button', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Short trash bin')
-    getByText(
+    render()
+    screen.getByText('Short trash bin')
+    screen.getByText(
       'For pre-2019 robots with trash bins that are 55mm tall (instead of 77mm default)'
     )
-    const toggleButton = getByRole('switch', { name: 'short_trash_bin' })
+    const toggleButton = screen.getByRole('switch', { name: 'short_trash_bin' })
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
   })
 
@@ -56,9 +49,9 @@ describe('RobotSettings ShortTrashBin', () => {
       ...mockSettings,
       value: false,
     }
-    mockGetRobotSettings.mockReturnValue([tempMockSettings])
-    const [{ getByRole }] = render()
-    const toggleButton = getByRole('switch', {
+    vi.mocked(getRobotSettings).mockReturnValue([tempMockSettings])
+    render()
+    const toggleButton = screen.getByRole('switch', {
       name: 'short_trash_bin',
     })
     fireEvent.click(toggleButton)
@@ -66,8 +59,8 @@ describe('RobotSettings ShortTrashBin', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    const [{ getByRole }] = render(true)
-    const toggleButton = getByRole('switch', {
+    render(true)
+    const toggleButton = screen.getByRole('switch', {
       name: 'short_trash_bin',
     })
     expect(toggleButton).toBeDisabled()

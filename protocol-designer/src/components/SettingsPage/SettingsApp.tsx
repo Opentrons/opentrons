@@ -16,9 +16,8 @@ import {
   selectors as tutorialSelectors,
 } from '../../tutorial'
 import { OLDEST_MIGRATEABLE_VERSION } from '../../load-file/migration'
+import styles from './SettingsPage.module.css'
 import { FeatureFlagCard } from './FeatureFlagCard/FeatureFlagCard'
-
-import styles from './SettingsPage.css'
 
 export function SettingsApp(): JSX.Element {
   const dispatch = useDispatch()

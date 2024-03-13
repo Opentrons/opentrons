@@ -1,4 +1,4 @@
-"""Read ABR run logs and save data to ABR testing csv."""
+"""Read ABR run logs and save data to ABR testing csv and google sheet."""
 from .abr_run_logs import get_run_ids_from_storage, get_unseen_run_ids
 from .error_levels import ERROR_LEVELS_PATH
 from typing import Set, Dict, Tuple, Any, List
@@ -6,7 +6,9 @@ import argparse
 import os
 import csv
 import json
-from datetime import datetime
+import sys
+from datetime import datetime, timedelta
+import time as t
 
 
 def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
@@ -17,10 +19,14 @@ def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
         "magneticBlockV1",
         "thermocyclerModuleV2",
     )
-    all_modules = {key: None for key in modList}
+    all_modules = {key: "" for key in modList}
     for module in file_results.get("modules", []):
         if isinstance(module, dict) and module.get("model") in modList:
-            all_modules[module["model"]] = module.get("serialNumber", "")
+            try:
+                all_modules[module["model"]] = module["serialNumber"]
+            except KeyError:
+                all_modules[module["model"]] = "EMPTYSN"
+
     return all_modules
 
 
@@ -41,18 +47,24 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
     run_command_error: Dict[str, Any] = commands_of_run[-1]
     error_str: int = len(run_command_error.get("error", ""))
     if error_str > 1:
-        error_type = run_command_error["error"].get("errorType", None)
-        error_code = run_command_error["error"].get("errorCode", None)
+        error_type = run_command_error["error"].get("errorType", "")
+        error_code = run_command_error["error"].get("errorCode", "")
         try:
             # Instrument Error
             error_instrument = run_command_error["error"]["errorInfo"]["node"]
         except KeyError:
             # Module Error
-            error_instrument = run_command_error["error"]["errorInfo"].get("port", None)
-        for error in error_levels:
-            code_error = error[1]
-            if code_error == error_code:
-                error_level = error[4]
+            error_instrument = run_command_error["error"]["errorInfo"].get("port", "")
+    else:
+        error_type = file_results["errors"][0]["errorType"]
+        print(error_type)
+        error_code = file_results["errors"][0]["errorCode"]
+        error_instrument = file_results["errors"][0]["detail"]
+    for error in error_levels:
+        code_error = error[1]
+        if code_error == error_code:
+            error_level = error[4]
+
     return num_of_errors, error_type, error_code, error_instrument, error_level
 
 
@@ -97,13 +109,11 @@ def create_data_dictionary(
     runs_and_robots = {}
     for filename in os.listdir(storage_directory):
         file_path = os.path.join(storage_directory, filename)
-        try:
+        if file_path.endswith(".json"):
             with open(file_path) as file:
                 file_results = json.load(file)
-        except (json.JSONDecodeError, KeyError):
-            print(f"Ignoring unparsable file {file_path}.")
+        else:
             continue
-
         run_id = file_results.get("run_id")
         if run_id in runs_to_save:
             robot = file_results.get("robot_name")
@@ -131,12 +141,14 @@ def create_data_dictionary(
                 start_time = datetime.strptime(
                     file_results.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
                 )
-                start_date = str(start_time.date())
-                start_time_str = str(start_time).split("+")[0]
+                adjusted_start_time = start_time - timedelta(hours=5)
+                start_date = str(adjusted_start_time.date())
+                start_time_str = str(adjusted_start_time).split("+")[0]
                 complete_time = datetime.strptime(
                     file_results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
                 )
-                complete_time_str = str(complete_time).split("+")[0]
+                adjusted_complete_time = complete_time - timedelta(hours=5)
+                complete_time_str = str(adjusted_complete_time).split("+")[0]
                 run_time = complete_time - start_time
                 run_time_min = run_time.total_seconds() / 60
             except ValueError:
@@ -164,9 +176,8 @@ def create_data_dictionary(
                 row_2 = {**row, **all_modules}
                 runs_and_robots[run_id] = row_2
             else:
-                print(
-                    f"Run ID: {run_id} has a run time of 0 minutes. Run not recorded."
-                )
+                os.remove(file_path)
+                print(f"Run ID: {run_id} has a run time of 0 minutes. Run removed.")
     return runs_and_robots
 
 
@@ -183,6 +194,9 @@ def read_abr_data_sheet(storage_directory: str) -> Set[str]:
                 run_id = row[headers[1]]
                 runs_in_sheet.add(run_id)
         print(f"There are {str(len(runs_in_sheet))} runs documented in the ABR sheet.")
+    # Read Google Sheet
+    google_sheet.write_header(headers)
+    google_sheet.update_row_index()
     return runs_in_sheet
 
 
@@ -196,7 +210,11 @@ def write_to_abr_sheet(
         writer = csv.writer(f)
         for run in range(len(list_of_runs)):
             row = runs_and_robots[list_of_runs[run]].values()
-            writer.writerow(row)
+            row_list = list(row)
+            writer.writerow(row_list)
+            google_sheet.update_row_index()
+            google_sheet.write_to_row(row_list)
+            t.sleep(5)
 
 
 if __name__ == "__main__":
@@ -210,6 +228,20 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
+    try:
+        sys.path.insert(0, storage_directory)
+        import google_sheets_tool  # type: ignore[import]
+
+        credentials_path = os.path.join(storage_directory, "abr.json")
+    except ImportError:
+        raise ImportError("Make sure google_sheets_tool.py is in storage directory.")
+    try:
+        google_sheet = google_sheets_tool.google_sheet(
+            credentials_path, "ABR Run Data", tab_number=0
+        )
+        print("Connected to google sheet.")
+    except FileNotFoundError:
+        print("No google sheets credentials. Add credentials to storage notebook.")
     runs_from_storage = get_run_ids_from_storage(storage_directory)
     create_abr_data_sheet(storage_directory)
     runs_in_sheet = read_abr_data_sheet(storage_directory)

@@ -1,16 +1,20 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 
-import { renderWithProviders } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE } from '@opentrons/shared-data'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
+import {
+  FLEX_ROBOT_TYPE,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  getDeckDefFromRobotType,
+} from '@opentrons/shared-data'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { useChainLiveCommands } from '../../../resources/runs/hooks'
+import { useChainLiveCommands } from '../../../resources/runs'
 import { mockRobotSideAnalysis } from '../../CommandText/__fixtures__'
 import {
   useAttachedModules,
@@ -35,69 +39,26 @@ import { ProtocolSetupModulesAndDeck } from '..'
 
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../resources/runs/hooks')
-jest.mock('../../../redux/discovery')
-jest.mock('../../../organisms/Devices/hooks')
-jest.mock(
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../resources/runs')
+vi.mock('../../../redux/discovery')
+vi.mock('../../../organisms/Devices/hooks')
+vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
-jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
-jest.mock('../utils')
-jest.mock('../SetupInstructionsModal')
-jest.mock('../../ModuleWizardFlows')
-jest.mock('../FixtureTable')
-jest.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
-jest.mock('../ModulesAndDeckMapViewModal')
-
-const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
-  typeof useAttachedModules
->
-const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
-  typeof getProtocolModulesInfo
->
-const mockGetAttachedProtocolModuleMatches = getAttachedProtocolModuleMatches as jest.MockedFunction<
-  typeof getAttachedProtocolModuleMatches
->
-const mockGetUnmatchedModulesForProtocol = getUnmatchedModulesForProtocol as jest.MockedFunction<
-  typeof getUnmatchedModulesForProtocol
->
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockSetupInstructionsModal = SetupInstructionsModal as jest.MockedFunction<
-  typeof SetupInstructionsModal
->
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
-const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
-  typeof useRunCalibrationStatus
->
-const mockModuleWizardFlows = ModuleWizardFlows as jest.MockedFunction<
-  typeof ModuleWizardFlows
->
-const mockUseChainLiveCommands = useChainLiveCommands as jest.MockedFunction<
-  typeof useChainLiveCommands
->
-const mockFixtureTable = FixtureTable as jest.MockedFunction<
-  typeof FixtureTable
->
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
->
-const mockLocationConflictModal = LocationConflictModal as jest.MockedFunction<
-  typeof LocationConflictModal
->
-const mockModulesAndDeckMapViewModal = ModulesAndDeckMapViewModal as jest.MockedFunction<
-  typeof ModulesAndDeckMapViewModal
->
+vi.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
+vi.mock('../utils')
+vi.mock('../SetupInstructionsModal')
+vi.mock('../../ModuleWizardFlows')
+vi.mock('../FixtureTable')
+vi.mock('../../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal')
+vi.mock('../ModulesAndDeckMapViewModal')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
-const mockSetSetupScreen = jest.fn()
-const mockSetCutoutId = jest.fn()
-const mockSetProvidedFixtureOptions = jest.fn()
+const mockSetSetupScreen = vi.fn()
+const mockSetCutoutId = vi.fn()
+const mockSetProvidedFixtureOptions = vi.fn()
 
 const calibratedMockApiHeaterShaker = {
   ...mockApiHeaterShaker,
@@ -131,61 +92,56 @@ const render = () => {
     }
   )
 }
-
+const flexDeckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 describe('ProtocolSetupModulesAndDeck', () => {
-  let mockChainLiveCommands = jest.fn()
+  let mockChainLiveCommands = vi.fn()
 
   beforeEach(() => {
-    mockChainLiveCommands = jest.fn()
+    mockChainLiveCommands = vi.fn()
     mockChainLiveCommands.mockResolvedValue(null)
-    when(mockUseAttachedModules).calledWith().mockReturnValue([])
-    when(mockUseMostRecentCompletedAnalysis)
+    when(vi.mocked(useAttachedModules)).calledWith().thenReturn([])
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
-      .mockReturnValue(mockRobotSideAnalysis)
-    when(mockGetProtocolModulesInfo)
-      .calledWith(mockRobotSideAnalysis, ot3StandardDeckDef as any)
-      .mockReturnValue([])
-    when(mockGetAttachedProtocolModuleMatches)
+      .thenReturn(mockRobotSideAnalysis)
+    when(vi.mocked(getProtocolModulesInfo))
+      .calledWith(mockRobotSideAnalysis, flexDeckDef)
+      .thenReturn([])
+    when(vi.mocked(getAttachedProtocolModuleMatches))
       .calledWith([], [])
-      .mockReturnValue([])
-    when(mockGetUnmatchedModulesForProtocol)
+      .thenReturn([])
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], [])
-      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
-    mockSetupInstructionsModal.mockReturnValue(
-      <div>mock SetupInstructionsModal</div>
-    )
-    mockGetLocalRobot.mockReturnValue({
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
+    vi.mocked(getLocalRobot).mockReturnValue({
       ...mockConnectedRobot,
       name: ROBOT_NAME,
     })
-    mockLocationConflictModal.mockReturnValue(
+    vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
-    mockUseDeckConfigurationQuery.mockReturnValue(({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
-    when(mockUseRunCalibrationStatus)
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         complete: true,
       })
-    mockModuleWizardFlows.mockReturnValue(<div>mock ModuleWizardFlows</div>)
-    mockUseChainLiveCommands.mockReturnValue({
+    vi.mocked(ModuleWizardFlows).mockReturnValue(
+      <div>mock ModuleWizardFlows</div>
+    )
+    vi.mocked(useChainLiveCommands).mockReturnValue({
       chainLiveCommands: mockChainLiveCommands,
     } as any)
-    mockFixtureTable.mockReturnValue(<div>mock FixtureTable</div>)
-    mockModulesAndDeckMapViewModal.mockReturnValue(
-      <div>mock ModulesAndDeckMapViewModal</div>
-    )
+    vi.mocked(FixtureTable).mockReturnValue(<div>mock FixtureTable</div>)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render text and buttons', () => {
-    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         ...mockProtocolModuleInfo[0],
         attachedModuleMatch: calibratedMockApiHeaterShaker,
@@ -209,18 +165,18 @@ describe('ProtocolSetupModulesAndDeck', () => {
     render()
 
     fireEvent.click(screen.getByText('Setup Instructions'))
-    screen.getByText('mock SetupInstructionsModal')
+    expect(vi.mocked(SetupInstructionsModal)).toHaveBeenCalled()
   })
 
   it('should render module information when a protocol has module - connected', () => {
     // TODO: connected not location conflict
-    when(mockGetUnmatchedModulesForProtocol)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith(calibratedMockApiHeaterShaker as any, mockProtocolModuleInfo)
-      .mockReturnValue({
+      .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: mockApiHeaterShaker as any,
       })
-    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         ...mockProtocolModuleInfo[0],
         attachedModuleMatch: calibratedMockApiHeaterShaker,
@@ -233,13 +189,13 @@ describe('ProtocolSetupModulesAndDeck', () => {
 
   it('should render module information when a protocol has module - disconnected', () => {
     // TODO: disconnected not location conflict
-    when(mockGetUnmatchedModulesForProtocol)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
-      .mockReturnValue({
+      .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: mockApiHeaterShaker as any,
       })
-    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         ...mockProtocolModuleInfo[0],
       },
@@ -251,13 +207,13 @@ describe('ProtocolSetupModulesAndDeck', () => {
 
   it('should render module information with calibrate button when a protocol has module', async () => {
     // TODO: not location conflict
-    when(mockGetUnmatchedModulesForProtocol)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
-      .mockReturnValue({
+      .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: mockApiHeaterShaker as any,
       })
-    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         ...mockProtocolModuleInfo[0],
         attachedModuleMatch: mockApiHeaterShaker,
@@ -305,16 +261,16 @@ describe('ProtocolSetupModulesAndDeck', () => {
       complete: false,
       reason: 'attach_pipette_failure_reason',
     }
-    when(mockUseRunCalibrationStatus)
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue(ATTACH_FIRST as any)
-    when(mockGetUnmatchedModulesForProtocol)
+      .thenReturn(ATTACH_FIRST as any)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
-      .mockReturnValue({
+      .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: mockApiHeaterShaker as any,
       })
-    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         ...mockProtocolModuleInfo[0],
         attachedModuleMatch: mockApiHeaterShaker,
@@ -330,16 +286,16 @@ describe('ProtocolSetupModulesAndDeck', () => {
       complete: false,
       reason: 'calibrate_pipette_failure_reason',
     }
-    when(mockUseRunCalibrationStatus)
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue(CALIBRATE_FIRST as any)
-    when(mockGetUnmatchedModulesForProtocol)
+      .thenReturn(CALIBRATE_FIRST as any)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith(mockApiHeaterShaker as any, mockProtocolModuleInfo)
-      .mockReturnValue({
+      .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: mockApiHeaterShaker as any,
       })
-    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         ...mockProtocolModuleInfo[0],
         attachedModuleMatch: mockApiHeaterShaker,
@@ -351,10 +307,10 @@ describe('ProtocolSetupModulesAndDeck', () => {
   })
 
   it('should render mock Fixture table and module location conflict', () => {
-    mockUseDeckConfigurationQuery.mockReturnValue({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<DeckConfiguration>)
-    mockGetAttachedProtocolModuleMatches.mockReturnValue([
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         ...mockProtocolModuleInfo[0],
         attachedModuleMatch: calibratedMockApiHeaterShaker,
@@ -370,6 +326,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
   it('should render ModulesAndDeckMapViewModal when tapping map view button', () => {
     render()
     fireEvent.click(screen.getByText('Map View'))
-    screen.getByText('mock ModulesAndDeckMapViewModal')
+    screen.debug()
+    expect(vi.mocked(ModulesAndDeckMapViewModal)).toHaveBeenCalled()
   })
 })

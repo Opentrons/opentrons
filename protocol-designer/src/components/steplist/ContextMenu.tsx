@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
@@ -8,9 +9,9 @@ import {
 } from '../modals/ConfirmDeleteModal'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
+import { getTopPortalEl } from '../portals/TopPortal'
+import styles from './StepItem.module.css'
 import { getSavedStepForms } from '../../step-forms/selectors'
-import { Portal } from '../portals/TopPortal'
-import styles from './StepItem.css'
 
 import type { StepIdType } from '../../form-types'
 import type { ThunkDispatch } from 'redux-thunk'
@@ -131,8 +132,9 @@ export const ContextMenu = (props: Props): JSX.Element => {
       {props.children({
         makeStepOnContextMenu: makeHandleContextMenu,
       })}
-      {!showDeleteConfirmation && visible && (
-        <Portal>
+      {!showDeleteConfirmation &&
+        visible &&
+        createPortal(
           <div
             ref={menuRoot}
             // @ts-expect-error(sa, 2021-7-5): position cannot be null, cast to undefined
@@ -150,9 +152,9 @@ export const ContextMenu = (props: Props): JSX.Element => {
             <div onClick={confirmDelete} className={styles.context_menu_item}>
               {t('delete')}
             </div>
-          </div>
-        </Portal>
-      )}
+          </div>,
+          getTopPortalEl()
+        )}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useDispatch } from 'react-redux'
 import { renderHook } from '@testing-library/react'
+import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
 
 import { useHost } from '@opentrons/react-api-client'
 
@@ -12,16 +13,17 @@ import {
 } from '../../redux/shell'
 import { useIsFlex } from '../../organisms/Devices/hooks/useIsFlex'
 
+import type { Mock } from 'vitest'
 import type { HostConfig } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyService'
 
-jest.mock('react-redux')
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../redux/analytics')
-jest.mock('../../redux/shell/remote', () => ({
-  appShellListener: jest.fn(),
+vi.mock('react-redux')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../redux/analytics')
+vi.mock('../../redux/shell/remote', () => ({
+  appShellListener: vi.fn(),
 }))
-jest.mock('../../organisms/Devices/hooks/useIsFlex')
+vi.mock('../../organisms/Devices/hooks/useIsFlex')
 
 const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
 const MOCK_TOPIC = '/test/topic' as any
@@ -29,34 +31,24 @@ const MOCK_OPTIONS: QueryOptionsWithPolling<any, any> = {
   forceHttpPolling: false,
 }
 
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
-const mockUseDispatch = useDispatch as jest.MockedFunction<typeof useDispatch>
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockAppShellListener = appShellListener as jest.MockedFunction<
-  typeof appShellListener
->
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-
 describe('useNotifyService', () => {
-  let mockDispatch: jest.Mock
-  let mockTrackEvent: jest.Mock
-  let mockHTTPRefetch: jest.Mock
+  let mockDispatch: Mock
+  let mockTrackEvent: Mock
+  let mockHTTPRefetch: Mock
 
   beforeEach(() => {
-    mockDispatch = jest.fn()
-    mockHTTPRefetch = jest.fn()
-    mockTrackEvent = jest.fn()
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockUseDispatch.mockReturnValue(mockDispatch)
-    mockUseHost.mockReturnValue(MOCK_HOST_CONFIG)
-    mockUseIsFlex.mockReturnValue(true)
+    mockDispatch = vi.fn()
+    mockHTTPRefetch = vi.fn()
+    mockTrackEvent = vi.fn()
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+    vi.mocked(useDispatch).mockReturnValue(mockDispatch)
+    vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
+    vi.mocked(useIsFlex).mockReturnValue(true)
   })
 
   afterEach(() => {
-    mockUseDispatch.mockClear()
-    jest.clearAllMocks()
+    vi.mocked(useDispatch).mockClear()
+    vi.clearAllMocks()
   })
 
   it('should trigger an HTTP refetch and subscribe action on a successful initial mount', () => {
@@ -131,7 +123,9 @@ describe('useNotifyService', () => {
   })
 
   it('should set HTTP refetch to always if there is an error', () => {
-    mockUseHost.mockReturnValue({ hostname: null } as any)
+    vi.mocked(useHost).mockReturnValue({ hostname: null } as any)
+    const errorSpy = vi.spyOn(console, 'error')
+    errorSpy.mockImplementation(() => {})
 
     renderHook(() =>
       useNotifyService({
@@ -144,9 +138,11 @@ describe('useNotifyService', () => {
   })
 
   it('should return set HTTP refetch to always and fire an analytics reporting event if the connection was refused', () => {
-    mockAppShellListener.mockImplementation((_: any, __: any, mockCb: any) => {
-      mockCb('ECONNREFUSED')
-    })
+    vi.mocked(appShellListener).mockImplementation(
+      (_: any, __: any, mockCb: any) => {
+        mockCb('ECONNREFUSED')
+      }
+    )
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
@@ -160,9 +156,28 @@ describe('useNotifyService', () => {
   })
 
   it('should trigger a single HTTP refetch if the refetch flag was returned', () => {
-    mockAppShellListener.mockImplementation((_: any, __: any, mockCb: any) => {
-      mockCb({ refetchUsingHTTP: true })
-    })
+    vi.mocked(appShellListener).mockImplementation(
+      (_: any, __: any, mockCb: any) => {
+        mockCb({ refetchUsingHTTP: true })
+      }
+    )
+    const { rerender } = renderHook(() =>
+      useNotifyService({
+        topic: MOCK_TOPIC,
+        setRefetchUsingHTTP: mockHTTPRefetch,
+        options: MOCK_OPTIONS,
+      } as any)
+    )
+    rerender()
+    expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
+  })
+
+  it('should trigger a single HTTP refetch if the unsubscribe flag was returned', () => {
+    vi.mocked(appShellListener).mockImplementation(
+      (_: any, __: any, mockCb: any) => {
+        mockCb({ unsubscribe: true })
+      }
+    )
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,

@@ -1,8 +1,9 @@
 import React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { FormikConfig } from 'formik'
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
 import {
   getDefaultFormState,
   getInitialStatus,
@@ -12,11 +13,7 @@ import { Description } from '../../sections/Description'
 import { isEveryFieldHidden } from '../../../utils/isEveryFieldHidden'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils/isEveryFieldHidden')
-
-const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
-  typeof isEveryFieldHidden
->
+vi.mock('../../../utils/isEveryFieldHidden')
 
 let formikConfig: FormikConfig<LabwareFields>
 
@@ -25,20 +22,19 @@ describe('Description', () => {
     formikConfig = {
       initialValues: getDefaultFormState(),
       initialStatus: getInitialStatus(),
-      onSubmit: jest.fn(),
+      onSubmit: vi.fn(),
     }
 
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['brand', 'brandId', 'groupBrand', 'groupBrandId'],
         formikConfig.initialValues
       )
-      .mockReturnValue(false)
+      .thenReturn(false)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    resetAllWhenMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render fields when fields are visible', () => {
@@ -85,12 +81,12 @@ describe('Description', () => {
   })
 
   it('should not render when all of the fields are hidden', () => {
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['brand', 'brandId', 'groupBrand', 'groupBrandId'],
         formikConfig.initialValues
       )
-      .mockReturnValue(true)
+      .thenReturn(true)
 
     const { container } = render(wrapInFormik(<Description />, formikConfig))
     expect(container.firstChild).toBe(null)

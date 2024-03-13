@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
 import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -9,11 +10,7 @@ import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
 
 import type { InvariantContext, RobotState, HeaterShakerArgs } from '../types'
 
-jest.mock('../robotStateSelectors')
-
-const mockGetModuleState = getModuleState as jest.MockedFunction<
-  typeof getModuleState
->
+vi.mock('../robotStateSelectors')
 
 describe('heaterShaker compound command creator', () => {
   let heaterShakerArgs: HeaterShakerArgs
@@ -52,12 +49,12 @@ describe('heaterShaker compound command creator', () => {
         } as any,
       },
     }
-    mockGetModuleState.mockReturnValue({
+    vi.mocked(getModuleState).mockReturnValue({
       type: HEATERSHAKER_MODULE_TYPE,
     } as any)
   })
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
   it('should return an error when there is no module id', () => {
     heaterShakerArgs = {

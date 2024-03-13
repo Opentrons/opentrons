@@ -6,7 +6,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { useNotifyAllRunsQuery } from '../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../resources/runs'
 import { PinnedProtocol } from './PinnedProtocol'
 
 import type { ProtocolResource } from '@opentrons/shared-data'

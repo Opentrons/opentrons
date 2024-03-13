@@ -1,14 +1,13 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
-
+import { screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { InterventionTicks } from '../InterventionTicks'
 import { Tick } from '../Tick'
 
-jest.mock('../Tick')
-
-const mockTick = Tick as jest.MockedFunction<typeof Tick>
+vi.mock('../Tick')
 
 const render = (props: React.ComponentProps<typeof InterventionTicks>) => {
   return renderWithProviders(<InterventionTicks {...props} />, {
@@ -19,22 +18,17 @@ const render = (props: React.ComponentProps<typeof InterventionTicks>) => {
 describe('InterventionTicks', () => {
   let props: React.ComponentProps<typeof InterventionTicks>
   beforeEach(() => {
-    mockTick.mockImplementation(({ index }) => (
+    vi.mocked(Tick).mockImplementation(({ index }) => (
       <div>MOCK TICK at index: {index}</div>
     ))
     props = {
       analysisCommands: [],
-      makeHandleJumpToStep: jest.fn(),
+      makeHandleJumpToStep: vi.fn(),
     }
   })
 
-  afterEach(() => {
-    resetAllWhenMocks()
-    jest.restoreAllMocks()
-  })
-
   it('should show one tick for waitForResume command', () => {
-    const { getByText } = render({
+    render({
       ...props,
       analysisCommands: [
         {
@@ -59,10 +53,10 @@ describe('InterventionTicks', () => {
         },
       ],
     })
-    expect(getByText('MOCK TICK at index: 1')).toBeTruthy()
+    expect(screen.getByText('MOCK TICK at index: 1')).toBeTruthy()
   })
   it('should show tick only for moveLabware commands if strategy is moveManualWithPause', () => {
-    const { getByText } = render({
+    render({
       ...props,
       analysisCommands: [
         {
@@ -109,6 +103,6 @@ describe('InterventionTicks', () => {
         },
       ],
     })
-    expect(getByText('MOCK TICK at index: 2')).toBeTruthy()
+    expect(screen.getByText('MOCK TICK at index: 2')).toBeTruthy()
   })
 })

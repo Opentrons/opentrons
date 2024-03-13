@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import styles from './navbar.css'
+import styles from './navbar.module.css'
 import { Button } from '../buttons'
 import { NotificationIcon } from '../icons'
 

@@ -1,8 +1,9 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
 import {
   getDefaultFormState,
   getInitialStatus,
@@ -13,15 +14,11 @@ import { Preview } from '../../sections/Preview'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 import { FORM_LEVEL_ERRORS } from '../../../formLevelValidation'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils')
 
 // NOTE(IL, 2021-05-18): eventual dependency on definitions.tsx which uses require.context
 // would break this test (though it's not directly used)
-jest.mock('../../../../definitions')
-
-const getLabwareNameMock = getLabwareName as jest.MockedFunction<
-  typeof getLabwareName
->
+vi.mock('../../../../definitions')
 
 let formikConfig: FormikConfig<LabwareFields>
 
@@ -30,17 +27,16 @@ describe('Preview', () => {
     formikConfig = {
       initialValues: getDefaultFormState(),
       initialStatus: getInitialStatus(),
-      onSubmit: jest.fn(),
+      onSubmit: vi.fn(),
     }
 
-    when(getLabwareNameMock)
+    when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, true)
-      .mockReturnValue('FAKE LABWARE NAME PLURAL')
+      .thenReturn('FAKE LABWARE NAME PLURAL')
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    resetAllWhenMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render the preview section telling user to check their tubes/tips/wells/etc', () => {

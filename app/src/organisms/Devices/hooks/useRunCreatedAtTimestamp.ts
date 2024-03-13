@@ -1,6 +1,6 @@
 import { formatTimestamp } from '../utils'
 import { EMPTY_TIMESTAMP } from '../constants'
-import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../resources/runs'
 
 export function useRunCreatedAtTimestamp(runId: string | null): string {
   const runRecord = useNotifyRunQuery(runId)

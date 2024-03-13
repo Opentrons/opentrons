@@ -1,3 +1,4 @@
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
 
 import { mockRobot } from '../../../robot-api/__fixtures__'
@@ -11,29 +12,19 @@ import { robotControlsEpic } from '..'
 
 import type { Action, State } from '../../../types'
 
-jest.mock('../../../robot-api/http')
-jest.mock('../../../discovery/selectors')
-jest.mock('../../../pipettes/selectors')
+vi.mock('../../../robot-api/http')
+vi.mock('../../../discovery/selectors')
+vi.mock('../../../pipettes/selectors')
 
 const mockState: State = { state: true } as any
-
-const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
-  typeof RobotApiHttp.fetchRobotApi
->
-
-const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
-  typeof DiscoverySelectors.getRobotByName
->
-
-const mockGetAttachedPipettes = PipettesSelectors.getAttachedPipettes as jest.MockedFunction<
-  typeof PipettesSelectors.getAttachedPipettes
->
 
 describe('moveEpic', () => {
   let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot as any)
+    vi.mocked(DiscoverySelectors.getRobotByName).mockReturnValue(
+      mockRobot as any
+    )
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
@@ -41,7 +32,7 @@ describe('moveEpic', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   const meta = { requestId: '1234' }
@@ -53,7 +44,7 @@ describe('moveEpic', () => {
     }
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi
+      vi.mocked(RobotApiHttp.fetchRobotApi)
         .mockReturnValueOnce(
           cold('p', { p: Fixtures.mockFetchPositionsSuccess })
         )
@@ -66,12 +57,15 @@ describe('moveEpic', () => {
       expectObservable(output$)
       flush()
 
-      expect(mockGetRobotByName).toHaveBeenCalledWith(mockState, mockRobot.name)
-      expect(mockFetchRobotApi).toHaveBeenNthCalledWith(1, mockRobot, {
+      expect(DiscoverySelectors.getRobotByName).toHaveBeenCalledWith(
+        mockState,
+        mockRobot.name
+      )
+      expect(RobotApiHttp.fetchRobotApi).toHaveBeenNthCalledWith(1, mockRobot, {
         method: 'GET',
         path: '/robot/positions',
       })
-      expect(mockFetchRobotApi).toHaveBeenNthCalledWith(2, mockRobot, {
+      expect(RobotApiHttp.fetchRobotApi).toHaveBeenNthCalledWith(2, mockRobot, {
         method: 'POST',
         path: '/robot/move',
         body: {
@@ -90,13 +84,13 @@ describe('moveEpic', () => {
     }
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi
+      vi.mocked(RobotApiHttp.fetchRobotApi)
         .mockReturnValueOnce(
           cold('p', { p: Fixtures.mockFetchPositionsSuccess })
         )
         .mockReturnValueOnce(cold('m', { m: Fixtures.mockMoveSuccess }))
 
-      mockGetAttachedPipettes.mockReturnValue({
+      vi.mocked(PipettesSelectors.getAttachedPipettes).mockReturnValue({
         left: null,
         right: { model: 'p300_single_v2.0' } as any,
       })
@@ -108,12 +102,15 @@ describe('moveEpic', () => {
       expectObservable(output$)
       flush()
 
-      expect(mockGetRobotByName).toHaveBeenCalledWith(mockState, mockRobot.name)
-      expect(mockFetchRobotApi).toHaveBeenNthCalledWith(1, mockRobot, {
+      expect(DiscoverySelectors.getRobotByName).toHaveBeenCalledWith(
+        mockState,
+        mockRobot.name
+      )
+      expect(RobotApiHttp.fetchRobotApi).toHaveBeenNthCalledWith(1, mockRobot, {
         method: 'GET',
         path: '/robot/positions',
       })
-      expect(mockFetchRobotApi).toHaveBeenNthCalledWith(2, mockRobot, {
+      expect(RobotApiHttp.fetchRobotApi).toHaveBeenNthCalledWith(2, mockRobot, {
         method: 'POST',
         path: '/robot/move',
         body: {
@@ -133,7 +130,7 @@ describe('moveEpic', () => {
     }
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi
+      vi.mocked(RobotApiHttp.fetchRobotApi)
         .mockReturnValueOnce(
           cold('p', { p: Fixtures.mockFetchPositionsSuccess })
         )
@@ -149,8 +146,11 @@ describe('moveEpic', () => {
       expectObservable(output$)
       flush()
 
-      expect(mockGetRobotByName).toHaveBeenCalledWith(mockState, mockRobot.name)
-      expect(mockFetchRobotApi).toHaveBeenNthCalledWith(3, mockRobot, {
+      expect(DiscoverySelectors.getRobotByName).toHaveBeenCalledWith(
+        mockState,
+        mockRobot.name
+      )
+      expect(RobotApiHttp.fetchRobotApi).toHaveBeenNthCalledWith(3, mockRobot, {
         method: 'POST',
         path: '/motors/disengage',
         body: { axes: ['a', 'b', 'c', 'z'] },
@@ -165,7 +165,7 @@ describe('moveEpic', () => {
     }
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi
+      vi.mocked(RobotApiHttp.fetchRobotApi)
         .mockReturnValueOnce(
           cold('p', { p: Fixtures.mockFetchPositionsSuccess })
         )
@@ -194,7 +194,7 @@ describe('moveEpic', () => {
     }
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi
+      vi.mocked(RobotApiHttp.fetchRobotApi)
         .mockReturnValueOnce(
           cold('p', { p: Fixtures.mockFetchPositionsSuccess })
         )
@@ -223,7 +223,7 @@ describe('moveEpic', () => {
     }
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValueOnce(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValueOnce(
         cold('r', { r: Fixtures.mockFetchPositionsFailure })
       )
 
@@ -248,7 +248,7 @@ describe('moveEpic', () => {
     }
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi
+      vi.mocked(RobotApiHttp.fetchRobotApi)
         .mockReturnValueOnce(
           cold('p', { p: Fixtures.mockFetchPositionsSuccess })
         )
@@ -275,7 +275,7 @@ describe('moveEpic', () => {
     }
 
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi
+      vi.mocked(RobotApiHttp.fetchRobotApi)
         .mockReturnValueOnce(
           cold('p', { p: Fixtures.mockFetchPositionsSuccess })
         )

@@ -1,9 +1,11 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
+import { getDeckDefinitions } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import * as Sessions from '../../../redux/sessions'
 import { mockCalibrationCheckSessionAttributes } from '../../../redux/sessions/__fixtures__'
@@ -11,21 +13,23 @@ import { mockCalibrationCheckSessionAttributes } from '../../../redux/sessions/_
 import { CheckCalibration } from '../index'
 import type { RobotCalibrationCheckStep } from '../../../redux/sessions/types'
 
-jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
-jest.mock('../../../redux/calibration/selectors')
-jest.mock('../../../redux/config')
+vi.mock('../../../redux/calibration/selectors')
+vi.mock('../../../redux/config')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getDeckDefinitions>()
+  return {
+    ...actual,
+    getDeckDefinitions: vi.fn(),
+  }
+})
 
 interface CheckCalibrationSpec {
   heading: string
   currentStep: RobotCalibrationCheckStep
 }
 
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
-  typeof getDeckDefinitions
->
-
 describe('CheckCalibration', () => {
-  const dispatchRequests = jest.fn()
+  const dispatchRequests = vi.fn()
   const mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
     id: 'fake_check_session_id',
     ...mockCalibrationCheckSessionAttributes,
@@ -84,12 +88,11 @@ describe('CheckCalibration', () => {
   ]
 
   beforeEach(() => {
-    when(mockGetDeckDefinitions).calledWith().mockReturnValue({})
+    when(vi.mocked(getDeckDefinitions)).calledWith().thenReturn({})
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.clearAllMocks()
   })
 
   SPECS.forEach(spec => {

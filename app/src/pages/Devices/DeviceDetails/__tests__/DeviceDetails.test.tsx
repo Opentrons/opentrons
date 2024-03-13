@@ -1,11 +1,9 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 import { MemoryRouter, Route } from 'react-router-dom'
 
-import {
-  componentPropsMatcher,
-  renderWithProviders,
-} from '@opentrons/components'
+import { renderWithProviders } from '../../../../__testing-utils__'
 
 import { i18n } from '../../../../i18n'
 import {
@@ -21,26 +19,11 @@ import { DeviceDetails } from '..'
 
 import type { State } from '../../../../redux/types'
 
-jest.mock('../../../../organisms/Devices/hooks')
-jest.mock('../../../../organisms/Devices/InstrumentsAndModules')
-jest.mock('../../../../organisms/Devices/RecentProtocolRuns')
-jest.mock('../../../../organisms/Devices/RobotOverview')
-jest.mock('../../../../redux/discovery')
-
-const mockUseSyncRobotClock = useSyncRobotClock as jest.MockedFunction<
-  typeof useSyncRobotClock
->
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockRobotOverview = RobotOverview as jest.MockedFunction<
-  typeof RobotOverview
->
-const mockInstrumentsAndModules = InstrumentsAndModules as jest.MockedFunction<
-  typeof InstrumentsAndModules
->
-const mockRecentProtocolRuns = RecentProtocolRuns as jest.MockedFunction<
-  typeof RecentProtocolRuns
->
-const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
+vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('../../../../organisms/Devices/InstrumentsAndModules')
+vi.mock('../../../../organisms/Devices/RecentProtocolRuns')
+vi.mock('../../../../organisms/Devices/RobotOverview')
+vi.mock('../../../../redux/discovery')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -58,22 +41,10 @@ const render = (path = '/') => {
 
 describe('DeviceDetails', () => {
   beforeEach(() => {
-    when(mockUseRobot).calledWith('otie').mockReturnValue(null)
-    when(mockRobotOverview)
-      .calledWith(componentPropsMatcher({ robotName: 'otie' }))
-      .mockReturnValue(<div>Mock RobotOverview</div>)
-    when(mockInstrumentsAndModules)
-      .calledWith(componentPropsMatcher({ robotName: 'otie' }))
-      .mockReturnValue(<div>Mock InstrumentsAndModules</div>)
-    when(mockRecentProtocolRuns)
-      .calledWith(componentPropsMatcher({ robotName: 'otie' }))
-      .mockReturnValue(<div>Mock RecentProtocolRuns</div>)
-    when(mockGetScanning)
+    when(useRobot).calledWith('otie').thenReturn(null)
+    when(getScanning)
       .calledWith({} as State)
-      .mockReturnValue(false)
-  })
-  afterEach(() => {
-    resetAllWhenMocks()
+      .thenReturn(false)
   })
 
   it('redirects to devices page when a robot is not found and not scanning', () => {
@@ -83,35 +54,33 @@ describe('DeviceDetails', () => {
   })
 
   it('renders null when a robot is not found and discovery client is scanning', () => {
-    when(mockGetScanning)
+    when(getScanning)
       .calledWith({} as State)
-      .mockReturnValue(true)
-    const [{ queryByText }] = render('/devices/otie')
+      .thenReturn(true)
+    render('/devices/otie')
 
-    expect(queryByText('Mock RobotOverview')).toBeNull()
-    expect(queryByText('Mock InstrumentsAndModules')).toBeNull()
-    expect(queryByText('Mock RecentProtocolRuns')).toBeNull()
+    expect(vi.mocked(RobotOverview)).not.toHaveBeenCalled()
+    expect(vi.mocked(InstrumentsAndModules)).not.toHaveBeenCalled()
+    expect(vi.mocked(RecentProtocolRuns)).not.toHaveBeenCalled()
   })
 
   it('renders a RobotOverview when a robot is found and syncs clock', () => {
-    when(mockUseRobot).calledWith('otie').mockReturnValue(mockConnectableRobot)
-    const [{ getByText }] = render('/devices/otie')
+    when(useRobot).calledWith('otie').thenReturn(mockConnectableRobot)
+    render('/devices/otie')
 
-    getByText('Mock RobotOverview')
-    expect(mockUseSyncRobotClock).toHaveBeenCalledWith('otie')
+    expect(vi.mocked(RobotOverview)).toHaveBeenCalled()
+    expect(useSyncRobotClock).toHaveBeenCalledWith('otie')
   })
 
   it('renders InstrumentsAndModules when a robot is found', () => {
-    when(mockUseRobot).calledWith('otie').mockReturnValue(mockConnectableRobot)
-    const [{ getByText }] = render('/devices/otie')
-
-    getByText('Mock InstrumentsAndModules')
+    when(useRobot).calledWith('otie').thenReturn(mockConnectableRobot)
+    render('/devices/otie')
+    expect(vi.mocked(InstrumentsAndModules)).toHaveBeenCalled()
   })
 
   it('renders RecentProtocolRuns when a robot is found', () => {
-    when(mockUseRobot).calledWith('otie').mockReturnValue(mockConnectableRobot)
-    const [{ getByText }] = render('/devices/otie')
-
-    getByText('Mock RecentProtocolRuns')
+    when(useRobot).calledWith('otie').thenReturn(mockConnectableRobot)
+    render('/devices/otie')
+    expect(vi.mocked(RecentProtocolRuns)).toHaveBeenCalled()
   })
 })

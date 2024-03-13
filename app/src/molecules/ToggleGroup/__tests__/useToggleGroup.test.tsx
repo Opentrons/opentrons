@@ -1,29 +1,25 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import { renderHook, render, fireEvent } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderHook, render, fireEvent, screen } from '@testing-library/react'
 import { useTrackEvent } from '../../../redux/analytics'
 import { useToggleGroup } from '../useToggleGroup'
 
 import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../redux/analytics')
+vi.mock('../../../redux/analytics')
 
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-let mockTrackEvent: jest.Mock
+let mockTrackEvent: any
 
 describe('useToggleGroup', () => {
-  const store: Store<State> = createStore(jest.fn(), {})
+  const store: Store<State> = createStore(vi.fn(), {})
   beforeEach(() => {
-    mockTrackEvent = jest.fn()
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    store.dispatch = jest.fn()
-  })
-  afterEach(() => {
-    jest.restoreAllMocks()
+    mockTrackEvent = vi.fn()
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+    store.dispatch = vi.fn()
   })
 
   it('should return default selectedValue and toggle buttons', () => {
@@ -48,8 +44,8 @@ describe('useToggleGroup', () => {
       { wrapper }
     )
 
-    const { getByText } = render(result.current[1] as any)
-    const listViewButton = getByText('List View')
+    render(result.current[1] as any)
+    const listViewButton = screen.getByText('List View')
     fireEvent.click(listViewButton)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'fake event',
@@ -66,8 +62,8 @@ describe('useToggleGroup', () => {
       { wrapper }
     )
 
-    const { getByText } = render(result.current[1] as any)
-    const mapViewButton = getByText('Map View')
+    render(result.current[1] as any)
+    const mapViewButton = screen.getByText('Map View')
     fireEvent.click(mapViewButton)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'fake event',

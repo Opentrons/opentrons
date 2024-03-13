@@ -15,13 +15,11 @@ def get_run_ids_from_storage(storage_directory: str) -> Set[str]:
     run_ids = set()
     for this_file in list_of_files:
         read_file = os.path.join(storage_directory, this_file)
-        try:
+        if read_file.endswith(".json"):
             file_results = json.load(open(read_file))
-        except json.JSONDecodeError:
-            print(f"Ignoring unparsable file {read_file}.")
-            continue
-        run_id = file_results["run_id"]
-        run_ids.add(run_id)
+        run_id = file_results.get("run_id", "")
+        if len(run_id) > 0:
+            run_ids.add(run_id)
     return run_ids
 
 
@@ -94,9 +92,7 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
     )
     instrument_data = response.json()
     for instrument in instrument_data["data"]:
-        run[instrument["mount"]] = (
-            instrument["serialNumber"] + "_" + instrument["instrumentModel"]
-        )
+        run[instrument["mount"]] = instrument["serialNumber"]
     return run
 
 

@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { getModuleDef2 } from '@opentrons/shared-data'
 
 import { mockTemperatureModule } from '../../../redux/modules/__fixtures__'

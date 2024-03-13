@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import cx from 'classnames'
 import { useTranslation } from 'react-i18next'
-import { Portal } from '../../../portals/MainPageModalPortal'
+import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import {
   Modal,
   OutlineButton,
@@ -9,12 +10,12 @@ import {
   FormGroup,
   DropdownField,
 } from '@opentrons/components'
+import modalStyles from '../../../modals/modal.module.css'
+
+import styles from './WellOrderInput.module.css'
+import stepEditStyles from '../../StepEditForm.module.css'
 import { WellOrderViz } from './WellOrderViz'
 import type { WellOrderOption } from '../../../../form-types'
-
-import modalStyles from '../../../modals/modal.css'
-import stepEditStyles from '../../StepEditForm.css'
-import styles from './WellOrderInput.css'
 
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'
@@ -185,61 +186,60 @@ export const WellOrderModal = (
 
   if (!isOpen) return null
 
-  return (
-    <Portal>
-      <Modal
-        className={modalStyles.modal}
-        contentsClassName={cx(modalStyles.modal_contents)}
-        onCloseClick={handleCancel}
-      >
-        <div className={styles.modal_header}>
-          <h4>{t('modal:well_order.title')}</h4>
-          <p>{t('modal:well_order.body')}</p>
-        </div>
-        <div className={styles.main_row}>
-          <FormGroup label={t('modal:well_order.field_label')}>
-            <div className={styles.field_row}>
-              <DropdownField
-                name={firstName}
-                value={wellOrder.firstValue}
-                className={cx(stepEditStyles.field, styles.well_order_dropdown)}
-                onChange={makeOnChange('first')}
-                options={WELL_ORDER_VALUES.map(value => ({
-                  value,
-                  name: t(`step_edit_form.field.well_order.option.${value}`),
-                }))}
-              />
-              <span className={styles.field_spacer}>
-                {t('modal:well_order.then')}
-              </span>
-              <DropdownField
-                name={secondName}
-                value={wellOrder.secondValue}
-                className={cx(stepEditStyles.field, styles.well_order_dropdown)}
-                onChange={makeOnChange('second')}
-                options={WELL_ORDER_VALUES.map(value => ({
-                  value,
-                  name: t(`step_edit_form.field.well_order.option.${value}`),
-                  disabled: isSecondOptionDisabled(value),
-                }))}
-              />
-            </div>
-          </FormGroup>
-          <FormGroup label={t('well_order.viz_label')}>
-            <WellOrderViz
-              firstValue={wellOrder.firstValue}
-              secondValue={wellOrder.secondValue}
+  return createPortal(
+    <Modal
+      className={modalStyles.modal}
+      contentsClassName={cx(modalStyles.modal_contents)}
+      onCloseClick={handleCancel}
+    >
+      <div className={styles.modal_header}>
+        <h4>{t('modal:well_order.title')}</h4>
+        <p>{t('modal:well_order.body')}</p>
+      </div>
+      <div className={styles.main_row}>
+        <FormGroup label={t('modal:well_order.field_label')}>
+          <div className={styles.field_row}>
+            <DropdownField
+              name={firstName}
+              value={wellOrder.firstValue}
+              className={cx(stepEditStyles.field, styles.well_order_dropdown)}
+              onChange={makeOnChange('first')}
+              options={WELL_ORDER_VALUES.map(value => ({
+                value,
+                name: t(`step_edit_form.field.well_order.option.${value}`),
+              }))}
             />
-          </FormGroup>
-        </div>
-        <div className={modalStyles.button_row_divided}>
-          <ResetButton onClick={handleReset} />
-          <div>
-            <CancelButton onClick={handleCancel} />
-            <DoneButton onClick={handleDone} />
+            <span className={styles.field_spacer}>
+              {t('modal:well_order.then')}
+            </span>
+            <DropdownField
+              name={secondName}
+              value={wellOrder.secondValue}
+              className={cx(stepEditStyles.field, styles.well_order_dropdown)}
+              onChange={makeOnChange('second')}
+              options={WELL_ORDER_VALUES.map(value => ({
+                value,
+                name: t(`step_edit_form.field.well_order.option.${value}`),
+                disabled: isSecondOptionDisabled(value),
+              }))}
+            />
           </div>
+        </FormGroup>
+        <FormGroup label={t('well_order.viz_label')}>
+          <WellOrderViz
+            firstValue={wellOrder.firstValue}
+            secondValue={wellOrder.secondValue}
+          />
+        </FormGroup>
+      </div>
+      <div className={modalStyles.button_row_divided}>
+        <ResetButton onClick={handleReset} />
+        <div>
+          <CancelButton onClick={handleCancel} />
+          <DoneButton onClick={handleDone} />
         </div>
-      </Modal>
-    </Portal>
+      </div>
+    </Modal>,
+    getMainPagePortalEl()
   )
 }

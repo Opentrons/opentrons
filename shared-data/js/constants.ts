@@ -50,6 +50,7 @@ export const GRIPPER_V1_2: 'gripperV1.2' = 'gripperV1.2'
 export const GRIPPER_MODELS = [GRIPPER_V1, GRIPPER_V1_1, GRIPPER_V1_2]
 
 // robot display name
+export const OT2_DISPLAY_NAME: 'Opentrons OT-2' = 'Opentrons OT-2'
 export const FLEX_DISPLAY_NAME: 'Opentrons Flex' = 'Opentrons Flex'
 
 // pipette display categories
@@ -403,3 +404,8 @@ export const DEFAULT_LIQUID_COLORS = [
   tartRed,
 ]
 export const DEPRECATED_WHALE_GREY = '#9395a0'
+
+// this can't go in @opentrons/components because its used in a utility
+// method in PD (not react code) and we do not want non react code loading
+// react code because the web worker context does not play nicely with react
+export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'

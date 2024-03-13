@@ -1,18 +1,16 @@
 import * as React from 'react'
-import { when } from 'jest-when'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { UpdateBanner } from '..'
 import { useIsFlex } from '../../../organisms/Devices/hooks'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { UpdateBanner } from '..'
+import { renderWithProviders } from '../../../__testing-utils__'
 
-jest.mock('../../../organisms/Devices/hooks')
-jest.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
-  typeof useIsEstopNotDisengaged
->
+vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const render = (props: React.ComponentProps<typeof UpdateBanner>) => {
   return renderWithProviders(<UpdateBanner {...props} />, {
@@ -28,15 +26,13 @@ describe('Module Update Banner', () => {
     props = {
       robotName: 'testRobot',
       updateType: 'calibration',
-      setShowBanner: jest.fn(),
-      handleUpdateClick: jest.fn(),
+      setShowBanner: vi.fn(),
+      handleUpdateClick: vi.fn(),
       serialNumber: 'test_number',
       isTooHot: false,
     }
-    when(mockUseIsFlex).calledWith(props.robotName).mockReturnValue(true)
-    when(mockUseIsEstopNotDisengaged)
-      .calledWith(props.robotName)
-      .mockReturnValue(false)
+    when(useIsFlex).calledWith(props.robotName).thenReturn(true)
+    when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(false)
   })
 
   it('enables the updateType and serialNumber to be used as the test ID', () => {
@@ -117,9 +113,7 @@ describe('Module Update Banner', () => {
   })
 
   it('should not render a calibrate link when e-stop is pressed', () => {
-    when(mockUseIsEstopNotDisengaged)
-      .calledWith(props.robotName)
-      .mockReturnValue(true)
+    when(useIsEstopNotDisengaged).calledWith(props.robotName).thenReturn(true)
     render(props)
     expect(screen.queryByText('Calibrate now')).not.toBeInTheDocument()
   })
@@ -137,7 +131,7 @@ describe('Module Update Banner', () => {
   })
 
   it('should not render a calibrate update link if the robot is an OT-2', () => {
-    when(mockUseIsFlex).calledWith(props.robotName).mockReturnValue(false)
+    when(useIsFlex).calledWith(props.robotName).thenReturn(false)
     render(props)
     expect(screen.queryByText('Calibrate now')).not.toBeInTheDocument()
   })

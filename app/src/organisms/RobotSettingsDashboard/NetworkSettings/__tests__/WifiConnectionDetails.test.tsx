@@ -1,40 +1,32 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
+import { when } from 'vitest-when'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../../i18n'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { getLocalRobot } from '../../../../redux/discovery'
 import * as Networking from '../../../../redux/networking'
 import { NetworkDetailsModal } from '../NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
-
+import type * as Dom from 'react-router-dom'
 import type { State } from '../../../../redux/types'
 
-jest.mock('../../../../redux/discovery')
-jest.mock('../../../../redux/networking')
-jest.mock('../NetworkDetailsModal')
+vi.mock('../../../../redux/discovery')
+vi.mock('../../../../redux/networking')
+vi.mock('../NetworkDetailsModal')
 
-const mockPush = jest.fn()
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+const mockPush = vi.fn()
+vi.mock('react-router-dom', async importOriginal => {
+  const reactRouterDom = await importOriginal<typeof Dom>()
   return {
     ...reactRouterDom,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
 
-const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
-  typeof Networking.getNetworkInterfaces
->
-const mockNetworkDetailsModal = NetworkDetailsModal as jest.MockedFunction<
-  typeof NetworkDetailsModal
->
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
-
+const getNetworkInterfaces = Networking.getNetworkInterfaces
 const ROBOT_NAME = 'otie'
 
 const initialMockWifi = {
@@ -56,23 +48,21 @@ describe('WifiConnectionDetails', () => {
     props = {
       activeSsid: 'mock wifi ssid',
       connectedWifiAuthType: 'none',
-      handleNetworkPress: jest.fn(),
-      handleJoinAnotherNetwork: jest.fn(),
+      handleNetworkPress: vi.fn(),
+      handleJoinAnotherNetwork: vi.fn(),
     }
-    mockGetLocalRobot.mockReturnValue({
+    vi.mocked(getLocalRobot).mockReturnValue({
       name: ROBOT_NAME,
     } as any)
-    when(mockGetNetworkInterfaces)
+    when(getNetworkInterfaces)
       .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue({
+      .thenReturn({
         wifi: initialMockWifi,
         ethernet: null,
       })
-    mockNetworkDetailsModal.mockReturnValue(<div>mock NetworkDetailsModal</div>)
-  })
-  afterEach(() => {
-    resetAllWhenMocks()
-    jest.clearAllMocks()
+    vi.mocked(NetworkDetailsModal).mockReturnValue(
+      <div>mock NetworkDetailsModal</div>
+    )
   })
 
   it('should render text and button with icon when connected to a network', () => {

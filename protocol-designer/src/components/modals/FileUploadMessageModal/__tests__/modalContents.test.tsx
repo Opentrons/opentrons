@@ -1,14 +1,5 @@
-import * as React from 'react'
+import { it, describe, expect } from 'vitest'
 import { getMigrationMessage } from '../modalContents'
-
-jest.mock('react-i18next', () => ({
-  useTranslation: jest.fn().mockReturnValue({
-    t: (key: string) => key,
-    Trans: ({ children }: { children: React.ReactNode }) => (
-      <div>{children}</div>
-    ),
-  }),
-}))
 
 const tMock = (key: string) => key
 

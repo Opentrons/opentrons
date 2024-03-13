@@ -20,6 +20,7 @@ from .commands import (
     CommandStatus,
     CommandType,
     CommandIntent,
+    CommandNote,
 )
 from .state import State, StateView, StateSummary, CommandSlice, CurrentCommand, Config
 from .plugins import AbstractPlugin
@@ -79,6 +80,7 @@ __all__ = [
     "CommandStatus",
     "CommandType",
     "CommandIntent",
+    "CommandNote",
     # state interfaces and models
     "State",
     "StateView",

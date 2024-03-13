@@ -1,27 +1,29 @@
 import * as React from 'react'
-import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach } from 'vitest'
+import {
+  renderWithProviders,
+  nestedTextMatcher,
+} from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useAllLabware } from '../../../pages/Labware/hooks'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 import { LabwareCard } from '..'
 
-jest.mock('../../../pages/Labware/hooks')
-jest.mock('../CustomLabwareOverflowMenu')
-jest.mock('@opentrons/components', () => {
-  const actualComponents = jest.requireActual('@opentrons/components')
+import type * as OpentronsComponents from '@opentrons/components'
+
+vi.mock('../../../pages/Labware/hooks')
+vi.mock('../CustomLabwareOverflowMenu')
+
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof OpentronsComponents>()
   return {
-    ...actualComponents,
-    RobotWorkSpace: jest.fn(() => <div>mock RobotWorkSpace</div>),
+    ...actual,
+    RobotWorkSpace: vi.fn(() => <div>mock RobotWorkSpace</div>),
   }
 })
 
-const mockCustomLabwareOverflowMenu = CustomLabwareOverflowMenu as jest.MockedFunction<
-  typeof CustomLabwareOverflowMenu
->
-const mockUseAllLabware = useAllLabware as jest.MockedFunction<
-  typeof useAllLabware
->
 const render = (props: React.ComponentProps<typeof LabwareCard>) => {
   return renderWithProviders(<LabwareCard {...props} />, {
     i18nInstance: i18n,
@@ -31,34 +33,34 @@ const render = (props: React.ComponentProps<typeof LabwareCard>) => {
 describe('LabwareCard', () => {
   let props: React.ComponentProps<typeof LabwareCard>
   beforeEach(() => {
-    mockCustomLabwareOverflowMenu.mockReturnValue(
+    vi.mocked(CustomLabwareOverflowMenu).mockReturnValue(
       <div>Mock CustomLabwareOverflowMenu</div>
     )
-    mockUseAllLabware.mockReturnValue([{ definition: mockDefinition }])
+    vi.mocked(useAllLabware).mockReturnValue([{ definition: mockDefinition }])
     props = {
       labware: {
         definition: mockDefinition,
       },
-      onClick: jest.fn(),
+      onClick: vi.fn(),
     }
   })
 
   it('renders correct info for opentrons labware card', () => {
     props.labware.definition.namespace = 'opentrons'
-    const [{ getByText }] = render(props)
-    getByText('mock RobotWorkSpace')
-    getByText('Well Plate')
-    getByText('Mock Definition')
-    getByText(`Opentrons Definition`)
-    getByText('API Name')
+    render(props)
+    screen.getByText('mock RobotWorkSpace')
+    screen.getByText('Well Plate')
+    screen.getByText('Mock Definition')
+    screen.getByText(`Opentrons Definition`)
+    screen.getByText('API Name')
   })
 
   it('renders additional info for custom labware card', () => {
     props.labware.modified = 123
     props.labware.filename = 'mock/filename'
     props.labware.definition.namespace = 'custom'
-    const [{ getByText }] = render(props)
-    getByText('Custom Definition')
-    getByText(nestedTextMatcher('Added'))
+    render(props)
+    screen.getByText('Custom Definition')
+    screen.getByText(nestedTextMatcher('Added'))
   })
 })

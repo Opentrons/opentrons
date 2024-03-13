@@ -1,21 +1,19 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useRequiredProtocolHardware } from '../../Protocols/hooks'
 import { Hardware } from '../Hardware'
 
-jest.mock('../../Protocols/hooks')
-jest.mock('../../../redux/config')
+vi.mock('../../Protocols/hooks')
+vi.mock('../../../redux/config')
 
-const mockUseRequiredProtocolHardware = useRequiredProtocolHardware as jest.MockedFunction<
-  typeof useRequiredProtocolHardware
->
 const MOCK_PROTOCOL_ID = 'mock_protocol_id'
 
 const render = (props: React.ComponentProps<typeof Hardware>) => {
@@ -30,9 +28,9 @@ describe('Hardware', () => {
     props = {
       protocolId: MOCK_PROTOCOL_ID,
     }
-    when(mockUseRequiredProtocolHardware)
+    when(vi.mocked(useRequiredProtocolHardware))
       .calledWith(MOCK_PROTOCOL_ID)
-      .mockReturnValue({
+      .thenReturn({
         requiredProtocolHardware: [
           {
             hardwareType: 'pipette',
@@ -77,7 +75,7 @@ describe('Hardware', () => {
       })
   })
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render column headers that indicate where the hardware is, what is called, and whether it is connected', () => {

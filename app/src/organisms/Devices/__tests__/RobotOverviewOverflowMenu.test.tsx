@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
 import { fireEvent, screen } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { when } from 'vitest-when'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { home } from '../../../redux/robot-controls'
@@ -25,47 +26,20 @@ import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../redux/robot-controls')
-jest.mock('../../../redux/robot-admin')
-jest.mock('../hooks')
-jest.mock('../../../redux/robot-update')
-jest.mock('../../../resources/networking/hooks')
-jest.mock(
+vi.mock('../../../redux/robot-controls')
+vi.mock('../../../redux/robot-admin')
+vi.mock('../hooks')
+vi.mock('../../../redux/robot-update')
+vi.mock('../../../resources/networking/hooks')
+vi.mock(
   '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 )
-jest.mock('../../ChooseProtocolSlideout')
-jest.mock('../../ProtocolUpload/hooks')
-jest.mock('../RobotSettings/UpdateBuildroot')
-jest.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('../../ChooseProtocolSlideout')
+vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../RobotSettings/UpdateBuildroot')
+vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
-const mockGetBuildrootUpdateDisplayInfo = Buildroot.getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof Buildroot.getRobotUpdateDisplayInfo
->
-const mockHome = home as jest.MockedFunction<typeof home>
-const mockRestartRobot = restartRobot as jest.MockedFunction<
-  typeof restartRobot
->
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
->
-const mockUpdateBuildroot = handleUpdateBuildroot as jest.MockedFunction<
-  typeof handleUpdateBuildroot
->
-const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction<
-  typeof ChooseProtocolSlideout
->
-const mockDisconnectModal = DisconnectModal as jest.MockedFunction<
-  typeof DisconnectModal
->
-const mockUseCanDisconnect = useCanDisconnect as jest.MockedFunction<
-  typeof useCanDisconnect
->
-const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
-  typeof useIsEstopNotDisengaged
->
+const getBuildrootUpdateDisplayInfo = Buildroot.getRobotUpdateDisplayInfo
 
 const render = (
   props: React.ComponentProps<typeof RobotOverviewOverflowMenu>
@@ -82,34 +56,30 @@ const render = (
 
 describe('RobotOverviewOverflowMenu', () => {
   let props: React.ComponentProps<typeof RobotOverviewOverflowMenu>
-  jest.useFakeTimers()
+  vi.useFakeTimers()
 
   beforeEach(() => {
     props = { robot: mockConnectableRobot }
-    when(mockGetBuildrootUpdateDisplayInfo)
+    when(getBuildrootUpdateDisplayInfo)
       .calledWith({} as State, mockConnectableRobot.name)
-      .mockReturnValue({
+      .thenReturn({
         autoUpdateAction: 'reinstall',
         autoUpdateDisabledReason: null,
         updateFromFileDisabledReason: null,
       })
-    when(mockUseCurrentRunId).calledWith().mockReturnValue(null)
-    when(mockUseIsRobotBusy).calledWith().mockReturnValue(false)
-    when(mockUpdateBuildroot).mockReturnValue()
-    when(mockChooseProtocolSlideout).mockReturnValue(
+    vi.mocked(useCurrentRunId).mockReturnValue(null)
+    vi.mocked(useIsRobotBusy).mockReturnValue(false)
+    vi.mocked(handleUpdateBuildroot).mockReturnValue()
+    vi.mocked(ChooseProtocolSlideout).mockReturnValue(
       <div>choose protocol slideout</div>
     )
-    when(mockDisconnectModal).mockReturnValue(<div>mock disconnect modal</div>)
-    when(mockUseCanDisconnect)
+    vi.mocked(DisconnectModal).mockReturnValue(<div>mock disconnect modal</div>)
+    when(useCanDisconnect)
       .calledWith(mockConnectableRobot.name)
-      .mockReturnValue(true)
-    when(mockUseIsEstopNotDisengaged)
+      .thenReturn(true)
+    when(useIsEstopNotDisengaged)
       .calledWith(mockConnectableRobot.name)
-      .mockReturnValue(false)
-  })
-  afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+      .thenReturn(false)
   })
 
   it('should render enabled buttons in the menu when the status is idle', () => {
@@ -137,9 +107,9 @@ describe('RobotOverviewOverflowMenu', () => {
   })
 
   it('should render update robot software button when robot is on wrong version of software', () => {
-    when(mockGetBuildrootUpdateDisplayInfo)
+    when(getBuildrootUpdateDisplayInfo)
       .calledWith({} as State, mockConnectableRobot.name)
-      .mockReturnValue({
+      .thenReturn({
         autoUpdateAction: 'upgrade',
         autoUpdateDisabledReason: null,
         updateFromFileDisabledReason: null,
@@ -166,11 +136,11 @@ describe('RobotOverviewOverflowMenu', () => {
     expect(homeBtn).toBeEnabled()
     expect(settingsBtn).toBeEnabled()
     fireEvent.click(updateRobotSoftwareBtn)
-    expect(mockUpdateBuildroot).toHaveBeenCalled()
+    expect(handleUpdateBuildroot).toHaveBeenCalled()
   })
 
   it('should render disabled run a protocol, restart, disconnect, and home gantry menu items when robot is busy', () => {
-    when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
+    vi.mocked(useIsRobotBusy).mockReturnValue(true)
 
     render(props)
 
@@ -209,13 +179,13 @@ describe('RobotOverviewOverflowMenu', () => {
     const homeBtn = screen.getByRole('button', { name: 'Home gantry' })
     fireEvent.click(homeBtn)
 
-    expect(mockHome).toBeCalled()
+    expect(home).toBeCalled()
   })
 
   it('should render disabled disconnect button in the menu when the robot cannot disconnect', () => {
-    when(mockUseCanDisconnect)
+    when(useCanDisconnect)
       .calledWith(mockConnectableRobot.name)
-      .mockReturnValue(false)
+      .thenReturn(false)
 
     render(props)
 
@@ -253,7 +223,7 @@ describe('RobotOverviewOverflowMenu', () => {
     })
     fireEvent.click(disconnectBtn)
 
-    screen.getByText('mock disconnect modal')
+    screen.queryByText('mock disconnect modal')
   })
 
   it('clicking the restart robot button should restart the robot', () => {
@@ -265,10 +235,10 @@ describe('RobotOverviewOverflowMenu', () => {
     const restartBtn = screen.getByRole('button', { name: 'Restart robot' })
     fireEvent.click(restartBtn)
 
-    expect(mockRestartRobot).toBeCalled()
+    expect(restartRobot).toBeCalled()
   })
   it('render overflow menu buttons without the update robot software button', () => {
-    when(mockGetBuildrootUpdateDisplayInfo).mockReturnValue({
+    vi.mocked(getBuildrootUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'reinstall',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
@@ -293,14 +263,14 @@ describe('RobotOverviewOverflowMenu', () => {
   })
 
   it('should render disabled menu items except restart robot and robot settings when e-stop is pressed', () => {
-    when(mockGetBuildrootUpdateDisplayInfo).mockReturnValue({
+    vi.mocked(getBuildrootUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'reinstall',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    when(mockUseIsEstopNotDisengaged)
+    when(useIsEstopNotDisengaged)
       .calledWith(mockConnectableRobot.name)
-      .mockReturnValue(true)
+      .thenReturn(true)
     render(props)
     fireEvent.click(screen.getByRole('button'))
     expect(

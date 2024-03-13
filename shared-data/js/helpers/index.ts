@@ -1,4 +1,3 @@
-import assert from 'assert'
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
@@ -82,7 +81,7 @@ export const getLabwareDisplayName = (
 }
 
 export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
-  assert(
+  console.assert(
     labwareDef.parameters.isTiprack,
     `getTiprackVolume expected a tiprack labware ${getLabwareDefURI(
       labwareDef
@@ -90,7 +89,7 @@ export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
   )
   // NOTE: Ian 2019-04-16 assuming all tips are the same volume across the rack
   const volume = labwareDef.wells.A1.totalLiquidVolume
-  assert(
+  console.assert(
     volume >= 0,
     `getTiprackVolume expected tip volume to be at least 0, got ${volume}`
   )

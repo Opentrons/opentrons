@@ -1,3 +1,5 @@
+import { vi, describe, it, expect } from 'vitest'
+
 import * as Fixtures from '../__fixtures__'
 import * as Selectors from '../selectors'
 import * as Utils from '../utils'
@@ -6,10 +8,6 @@ import * as Constants from '../constants'
 import type { State } from '../../types'
 
 describe('robot controls selectors', () => {
-  afterEach(() => {
-    jest.restoreAllMocks()
-  })
-
   it('should return null by default with getU2EAdapterDevice', () => {
     const state: State = {
       systemInfo: { usbDevices: [], networkInterfaces: [] },
@@ -46,7 +44,7 @@ describe('robot controls selectors', () => {
     })
 
     it('should return status from utils.getDriverStatus if Windows Realtek device', () => {
-      const getDriverStatus = jest.spyOn(Utils, 'getDriverStatus')
+      const getDriverStatus = vi.spyOn(Utils, 'getDriverStatus')
 
       getDriverStatus.mockImplementation(d => {
         return d === Fixtures.mockWindowsRealtekDevice

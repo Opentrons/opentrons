@@ -19,6 +19,7 @@ from opentrons.protocol_reader import (
     FileHasher,
 )
 from opentrons_shared_data.robot.dev_types import RobotType
+
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.hardware import get_robot_type
 from robot_server.service.task_runner import TaskRunner, get_task_runner
@@ -154,7 +155,16 @@ async def create_protocol(
     files: List[UploadFile] = File(...),
     # use Form because request is multipart/form-data
     # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
-    key: Optional[str] = Form(None),
+    key: Optional[str] = Form(
+        default=None,
+        description=(
+            "An arbitrary client-defined string to attach to the new protocol resource."
+            " This should be no longer than ~100 characters or so."
+            " It's intended to store something like a UUID, to help clients that store"
+            " protocols locally keep track of which local files correspond to which"
+            " protocol resources on the robot."
+        ),
+    ),
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),

@@ -26,7 +26,7 @@ import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { StyledText } from '../../../../atoms/text'
 import { getLatestCurrentOffsets } from './utils'
-import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../../resources/runs'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 

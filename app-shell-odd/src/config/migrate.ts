@@ -1,7 +1,6 @@
 import path from 'path'
 import { app } from 'electron'
 import uuid from 'uuid/v4'
-import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/redux/config'
 
 import type {
   Config,
@@ -20,6 +19,8 @@ import type {
 // base config v12 defaults
 // any default values for later config versions are specified in the migration
 // functions for those version below
+
+const CONFIG_VERSION_LATEST = 21 // update this after each config version bump
 
 export const DEFAULTS_V12: ConfigV12 = {
   version: 12,

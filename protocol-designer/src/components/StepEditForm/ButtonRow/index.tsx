@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { OutlineButton, DeprecatedPrimaryButton } from '@opentrons/components'
 
-import modalStyles from '../../modals/modal.css'
-import styles from './styles.css'
+import modalStyles from '../../modals/modal.module.css'
+import styles from './styles.module.css'
 
 interface ButtonRowProps {
   handleClickMoreOptions: () => unknown

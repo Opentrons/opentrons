@@ -188,6 +188,13 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
 }
 
+export interface LabwareDefByDefURI {
+  [defUri: string]: LabwareDefinition2
+}
+export interface LegacyLabwareDefByName {
+  [name: string]: LabwareDefinition1
+}
+
 export type ModuleType =
   | typeof MAGNETIC_MODULE_TYPE
   | typeof TEMPERATURE_MODULE_TYPE
@@ -385,6 +392,124 @@ export interface FlowRateSpec {
   value: number
   min: number
   max: number
+}
+
+export interface PipetteV2GeneralSpecs {
+  displayName: string
+  model: string
+  displayCategory: PipetteDisplayCategory
+  pickUpTipConfigurations: {
+    pressFit: {
+      speedByTipCount: Record<number, string>
+      presses: number
+      increment: number
+      distanceByTipCount: Record<number, string>
+      currentByTipCount: Record<number, string>
+    }
+  }
+  dropTipConfigurations: {
+    plungerEject: {
+      current: number
+      speed: number
+    }
+  }
+  plungerMotorConfigurations: {
+    idle: number
+    run: number
+  }
+  plungerPositionsConfigurations: {
+    default: {
+      top: number
+      bottom: number
+      blowout: number
+      drop: number
+    }
+  }
+  availableSensors: {
+    sensors: string[]
+    capacitive?: { count: number }
+    environment?: { count: number }
+    pressure?: { count: number }
+  }
+  partialTipConfigurations: {
+    partialTipSupported: boolean
+    availableConfigurations: number[] | null
+  }
+  channels: number
+  shaftDiameter: number
+  shaftULperMM: number
+  backCompatNames: string[]
+  backlashDistance: number
+  quirks: string[]
+  plungerHomingConfigurations: {
+    current: number
+    speed: number
+  }
+}
+
+interface NozzleInfo {
+  key: string
+  orderedNozzles: string[]
+}
+export interface PipetteV2GeometrySpecs {
+  nozzleOffset: number[]
+  pipetteBoundingBoxOffsets: {
+    backLeftCorner: number[]
+    frontRightCorner: number[]
+  }
+  pathTo3D: string
+  orderedRows: Record<number, NozzleInfo>
+  orderedColumns: Record<number, NozzleInfo>
+  nozzleMap: Record<string, number[]>
+}
+
+type TipData = [number, number, number]
+interface SupportedTips {
+  [tipType: string]: {
+    aspirate: {
+      default: {
+        1: TipData
+      }
+    }
+    defaultAspirateFlowRate: {
+      default: number
+      valuesByApiLevel: Record<string, number>
+    }
+    defaultBlowOutFlowRate: {
+      default: number
+      valuesByApiLevel: Record<string, number>
+    }
+    defaultDispenseFlowRate: {
+      default: number
+      valuesByApiLevel: Record<string, number>
+    }
+    defaultFlowAcceleration: number
+    defaultPushOutVolume: number
+    defaultReturnTipHeight: number
+    defaultTipLength: number
+    dispense: {
+      default: {
+        1: TipData
+      }
+    }
+  }
+}
+
+export interface PipetteV2LiquidSpecs {
+  $otSharedSchema: string
+  supportedTips: SupportedTips
+  defaultTipOverlapDictionary: Record<string, number>
+  maxVolume: number
+  minVolume: number
+  defaultTipracks: string[]
+}
+
+export type GenericAndGeometrySpecs = PipetteV2GeneralSpecs &
+  PipetteV2GeometrySpecs
+
+export interface PipetteV2Specs extends GenericAndGeometrySpecs {
+  $otSharedSchema: string
+  liquids: Record<string, PipetteV2LiquidSpecs>
 }
 
 export interface PipetteNameSpecs {

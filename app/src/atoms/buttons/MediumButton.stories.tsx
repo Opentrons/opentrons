@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ICON_DATA_BY_NAME } from '@opentrons/components/src/icons/icon-data'
+import { ICON_DATA_BY_NAME } from '@opentrons/components'
 import { touchScreenViewport } from '../../DesignTokens/constants'
 import { MediumButton } from './'
 import type { Story, Meta } from '@storybook/react'

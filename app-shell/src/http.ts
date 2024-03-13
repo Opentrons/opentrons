@@ -6,8 +6,6 @@ import pump from 'pump'
 import _fetch from 'node-fetch'
 import FormData from 'form-data'
 
-import { HTTP_API_VERSION } from '@opentrons/app/src/redux/robot-api/constants'
-
 import type { Request, RequestInit, Response } from 'node-fetch'
 
 type RequestInput = Request | string
@@ -22,7 +20,7 @@ export function fetch(
   init?: RequestInit
 ): Promise<Response> {
   const opts = init ?? {}
-  opts.headers = { ...opts.headers, 'Opentrons-Version': `${HTTP_API_VERSION}` }
+  opts.headers = { ...opts.headers, 'Opentrons-Version': '3' }
 
   return _fetch(input, opts).then(response => {
     if (!response.ok) {

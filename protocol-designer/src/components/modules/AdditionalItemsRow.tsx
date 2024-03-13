@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
@@ -21,11 +22,11 @@ import {
 import gripperImage from '../../images/flex_gripper.png'
 import wasteChuteImage from '../../images/waste_chute.png'
 import trashBinImage from '../../images/flex_trash_bin.png'
-import { Portal } from '../portals/TopPortal'
+import { getTopPortalEl } from '../portals/TopPortal'
 import { TrashModal } from './TrashModal'
 import { FlexSlotMap } from './FlexSlotMap'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { CutoutId } from '@opentrons/shared-data'
 
@@ -66,15 +67,18 @@ export function AdditionalItemsRow(
 
   return (
     <>
-      {trashModal && name !== 'gripper' ? (
-        <Portal>
-          <TrashModal
-            onCloseClick={() => openTrashModal(false)}
-            trashName={name}
-            trashBinId={trashBinId}
-          />
-        </Portal>
-      ) : null}
+      {trashModal && name !== 'gripper'
+        ? createPortal(
+            <TrashModal
+              onCloseClick={() => {
+                openTrashModal(false)
+              }}
+              trashName={name}
+              trashBinId={trashBinId}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <h4 className={styles.row_title}>
           {t(`additional_equipment_display_names.${name}`)}

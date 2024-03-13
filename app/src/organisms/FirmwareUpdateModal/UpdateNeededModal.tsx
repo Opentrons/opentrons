@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation, Trans } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
 import { COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
@@ -8,7 +9,7 @@ import {
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
@@ -116,5 +117,5 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     )
   }
 
-  return <Portal level="top">{modalContent}</Portal>
+  return createPortal(modalContent, getTopPortalEl())
 }

@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import { Icon } from '@opentrons/components'
 import { drillDownOnLabware } from '../../../labware-ingred/actions'
 import { resetScrollElements } from '../../../ui/steps/utils'
-import styles from './LabwareOverlays.css'
+import styles from './LabwareOverlays.module.css'
 
 import type { LabwareEntity } from '@opentrons/step-generation'
 import type { LabwareOnDeck } from '../../../step-forms'
