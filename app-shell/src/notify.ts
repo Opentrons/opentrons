@@ -15,6 +15,7 @@ import type {
 } from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch } from './types'
 import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
+import { NotifyBrokerResponses } from '@opentrons/app/lib/redux/shell/types'
 
 // Manages MQTT broker connections through a connection store. Broker connections are added or removed based on
 // health status changes reported by discovery-client. Subscriptions are handled "lazily", in which a component must
@@ -252,15 +253,14 @@ function subscribe(notifyParams: NotifyParams): Promise<void> {
 }
 
 function checkForUnsubscribeFlag(
-  deserializedMessage: NotifyResponseData,
+  deserializedMessage: NotifyBrokerResponses,
   hostname: string,
   topic: NotifyTopic
 ): void {
-  const messageContainsUnsubFlag =
-    typeof deserializedMessage !== 'string' &&
-    'unsubscribe' in deserializedMessage
-
-  if (messageContainsUnsubFlag) void unsubscribe(hostname, topic)
+  const messageContainsUnsubFlag = 'unsubscribe' in deserializedMessage
+  if (messageContainsUnsubFlag) {
+    void unsubscribe(hostname, topic)
+  }
 }
 
 function unsubscribe(hostname: string, topic: NotifyTopic): Promise<void> {
@@ -440,7 +440,7 @@ const VALID_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
   { unsubscribe: true },
 ]
 
-function deserialize(message: string): Promise<NotifyResponseData> {
+function deserialize(message: string): Promise<NotifyBrokerResponses> {
   return new Promise((resolve, reject) => {
     let deserializedMessage: NotifyResponseData | Record<string, unknown>
     const error = new Error(
