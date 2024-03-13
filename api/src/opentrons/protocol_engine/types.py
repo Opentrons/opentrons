@@ -35,6 +35,14 @@ class EngineStatus(str, Enum):
     FAILED = "failed"
     SUCCEEDED = "succeeded"
 
+    AWAITING_RECOVERY = "awaiting-recovery"
+    """The engine is waiting for external input to recover from a nonfatal error.
+
+    New fixup commands may be enqueued, which will run immediately.
+    The run can't be paused in this state, but it can be canceled, or resumed from the
+    next protocol command if recovery is complete.
+    """
+
 
 class DeckSlotLocation(BaseModel):
     """The location of something placed in a single deck slot."""
