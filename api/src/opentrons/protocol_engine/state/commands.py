@@ -281,18 +281,14 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.failed_command = self._state.commands_by_id[action.command_id]
 
             if prev_entry.command.intent == CommandIntent.SETUP:
-                other_command_ids_to_fail = [
-                    *[i for i in self._state.queued_setup_command_ids],
-                ]
+                other_command_ids_to_fail = self._state.queued_setup_command_ids
                 for id in other_command_ids_to_fail:
                     self._update_to_failed(
                         command_id=id, failed_at=action.failed_at, error_occurrence=None
                     )
                 self._state.queued_setup_command_ids.clear()
             else:
-                other_command_ids_to_fail = [
-                    *[i for i in self._state.queued_command_ids],
-                ]
+                other_command_ids_to_fail = self._state.queued_command_ids
                 for id in other_command_ids_to_fail:
                     self._update_to_failed(
                         command_id=id, failed_at=action.failed_at, error_occurrence=None
