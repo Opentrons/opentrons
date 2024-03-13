@@ -81,7 +81,6 @@ export function Chip({
     background === false && type !== 'basic'
       ? COLORS.transparent
       : CHIP_PROPS_BY_TYPE[type].backgroundColor
-  console.log('backgroundColor', backgroundColor)
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
   return (
     <Flex

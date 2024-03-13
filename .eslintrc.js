@@ -107,10 +107,6 @@ module.exports = {
         '**/fixtures/**.@(js|ts|tsx)',
         'scripts/*.@(js|ts|tsx)',
       ],
-      // env: {
-      //   jest: true,
-      // },
-      // extends: ['plugin:jest/recommended'],
       rules: {
         '@typescript-eslint/consistent-type-assertions': 'off',
         '@typescript-eslint/no-var-requires': 'off',
@@ -121,7 +117,6 @@ module.exports = {
     },
     {
       files: ['**/__tests__/**test.tsx'],
-      // env: { jest: true },
       extends: ['plugin:testing-library/react'],
       rules: {
         'testing-library/no-manual-cleanup': 'off',
