@@ -49,7 +49,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
-        serial_number: Optional[str] = None,
+        sim_serial_number: Optional[str] = None,
     ) -> "HeaterShaker":
         """
         Build a HeaterShaker
