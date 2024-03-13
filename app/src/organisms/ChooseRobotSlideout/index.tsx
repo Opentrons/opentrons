@@ -35,6 +35,7 @@ import {
 } from '../../redux/discovery'
 import { Banner } from '../../atoms/Banner'
 import { Slideout } from '../../atoms/Slideout'
+import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
 import { StyledText } from '../../atoms/text'
 import { AvailableRobotOption } from './AvailableRobotOption'
 
@@ -90,6 +91,7 @@ interface ChooseRobotSlideoutProps
   isAnalysisError?: boolean
   isAnalysisStale?: boolean
   showIdleOnly?: boolean
+  multiSlideout?: { currentPage: number }
 }
 
 export function ChooseRobotSlideout(
@@ -112,6 +114,7 @@ export function ChooseRobotSlideout(
     setSelectedRobot,
     robotType,
     showIdleOnly = false,
+    multiSlideout,
   } = props
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
@@ -171,145 +174,157 @@ export function ChooseRobotSlideout(
   const unavailableCount =
     unhealthyReachableRobots.length + unreachableRobots.length
 
-  return (
+  const pageOneBody = (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+      {isAnalysisError ? (
+        <Banner type="warning">{t('protocol_failed_app_analysis')}</Banner>
+      ) : null}
+      {isAnalysisStale ? (
+        <Banner type="warning">{t('protocol_outdated_app_analysis')}</Banner>
+      ) : null}
+      <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing4}>
+        {isScanning ? (
+          <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+            <StyledText
+              as="p"
+              color={COLORS.grey60}
+              marginRight={SPACING.spacing12}
+            >
+              {t('app_settings:searching')}
+            </StyledText>
+            <Icon name="ot-spinner" spin size="1.25rem" color={COLORS.grey60} />
+          </Flex>
+        ) : (
+          <Link
+            onClick={() => dispatch(startDiscovery())}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            role="button"
+            css={TYPOGRAPHY.linkPSemiBold}
+          >
+            {t('shared:refresh')}
+          </Link>
+        )}
+      </Flex>
+      {!isScanning && healthyReachableRobots.length === 0 ? (
+        <Flex
+          css={css`
+            ${BORDERS.cardOutlineBorder}
+            &:hover {
+              border-color: ${COLORS.grey30};
+            }
+          `}
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_CENTER}
+          height={SIZE_4}
+          gridGap={SPACING.spacing8}
+        >
+          <Icon name="alert-circle" size={SIZE_1} />
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('no_available_robots_found')}
+          </StyledText>
+        </Flex>
+      ) : (
+        healthyReachableRobots.map(robot => {
+          const isSelected =
+            selectedRobot != null && selectedRobot.ip === robot.ip
+          return (
+            <React.Fragment key={robot.ip}>
+              <AvailableRobotOption
+                robot={robot}
+                onClick={() => {
+                  if (!isCreatingRun) {
+                    resetCreateRun?.()
+                    setSelectedRobot(robot)
+                  }
+                }}
+                isError={runCreationError != null}
+                isSelected={isSelected}
+                isSelectedRobotOnDifferentSoftwareVersion={
+                  isSelectedRobotOnDifferentSoftwareVersion
+                }
+                showIdleOnly={showIdleOnly}
+                registerRobotBusyStatus={registerRobotBusyStatus}
+              />
+              {runCreationError != null && isSelected && (
+                <StyledText
+                  as="label"
+                  color={COLORS.red60}
+                  overflowWrap={OVERFLOW_WRAP_ANYWHERE}
+                  display={DISPLAY_INLINE_BLOCK}
+                  marginTop={`-${SPACING.spacing8}`}
+                  marginBottom={SPACING.spacing8}
+                >
+                  {runCreationErrorCode === 409 ? (
+                    <Trans
+                      t={t}
+                      i18nKey="shared:robot_is_busy_no_protocol_run_allowed"
+                      components={{
+                        robotLink: (
+                          <NavLink
+                            css={css`
+                              color: ${COLORS.red60};
+                              text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+                            `}
+                            to={`/devices/${robot.name}`}
+                          />
+                        ),
+                      }}
+                    />
+                  ) : (
+                    runCreationError
+                  )}
+                </StyledText>
+              )}
+            </React.Fragment>
+          )
+        })
+      )}
+      {!isScanning && unavailableCount > 0 ? (
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          alignItems={ALIGN_CENTER}
+          textAlign={TYPOGRAPHY.textAlignCenter}
+          marginTop={SPACING.spacing24}
+        >
+          <StyledText as="p" color={COLORS.grey50}>
+            {showIdleOnly
+              ? t('unavailable_or_busy_robot_not_listed', {
+                  count: unavailableCount + reducerBusyCount,
+                })
+              : t('unavailable_robot_not_listed', {
+                  count: unavailableCount,
+                })}
+          </StyledText>
+          <NavLink to="/devices" css={TYPOGRAPHY.linkPSemiBold}>
+            {t('view_unavailable_robots')}
+          </NavLink>
+        </Flex>
+      ) : null}
+    </Flex>
+  )
+
+  const pageTwoBody = <Flex>TODO</Flex>
+
+  return multiSlideout != null ? (
+    <MultiSlideout
+      isExpanded={isExpanded}
+      onCloseClick={onCloseClick}
+      title={title}
+      footer={footer}
+      currentStep={multiSlideout.currentPage}
+      maxSteps={2}
+    >
+      {multiSlideout.currentPage === 1 ? pageOneBody : pageTwoBody}
+    </MultiSlideout>
+  ) : (
     <Slideout
       isExpanded={isExpanded}
       onCloseClick={onCloseClick}
       title={title}
       footer={footer}
     >
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        {isAnalysisError ? (
-          <Banner type="warning">{t('protocol_failed_app_analysis')}</Banner>
-        ) : null}
-        {isAnalysisStale ? (
-          <Banner type="warning">{t('protocol_outdated_app_analysis')}</Banner>
-        ) : null}
-        <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing4}>
-          {isScanning ? (
-            <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-              <StyledText
-                as="p"
-                color={COLORS.grey60}
-                marginRight={SPACING.spacing12}
-              >
-                {t('app_settings:searching')}
-              </StyledText>
-              <Icon
-                name="ot-spinner"
-                spin
-                size="1.25rem"
-                color={COLORS.grey60}
-              />
-            </Flex>
-          ) : (
-            <Link
-              onClick={() => dispatch(startDiscovery())}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              role="button"
-              css={TYPOGRAPHY.linkPSemiBold}
-            >
-              {t('shared:refresh')}
-            </Link>
-          )}
-        </Flex>
-        {!isScanning && healthyReachableRobots.length === 0 ? (
-          <Flex
-            css={css`
-              ${BORDERS.cardOutlineBorder}
-              &:hover {
-                border-color: ${COLORS.grey30};
-              }
-            `}
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_CENTER}
-            alignItems={ALIGN_CENTER}
-            height={SIZE_4}
-            gridGap={SPACING.spacing8}
-          >
-            <Icon name="alert-circle" size={SIZE_1} />
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {t('no_available_robots_found')}
-            </StyledText>
-          </Flex>
-        ) : (
-          healthyReachableRobots.map(robot => {
-            const isSelected =
-              selectedRobot != null && selectedRobot.ip === robot.ip
-            return (
-              <React.Fragment key={robot.ip}>
-                <AvailableRobotOption
-                  robot={robot}
-                  onClick={() => {
-                    if (!isCreatingRun) {
-                      resetCreateRun?.()
-                      setSelectedRobot(robot)
-                    }
-                  }}
-                  isError={runCreationError != null}
-                  isSelected={isSelected}
-                  isSelectedRobotOnDifferentSoftwareVersion={
-                    isSelectedRobotOnDifferentSoftwareVersion
-                  }
-                  showIdleOnly={showIdleOnly}
-                  registerRobotBusyStatus={registerRobotBusyStatus}
-                />
-                {runCreationError != null && isSelected && (
-                  <StyledText
-                    as="label"
-                    color={COLORS.red60}
-                    overflowWrap={OVERFLOW_WRAP_ANYWHERE}
-                    display={DISPLAY_INLINE_BLOCK}
-                    marginTop={`-${SPACING.spacing8}`}
-                    marginBottom={SPACING.spacing8}
-                  >
-                    {runCreationErrorCode === 409 ? (
-                      <Trans
-                        t={t}
-                        i18nKey="shared:robot_is_busy_no_protocol_run_allowed"
-                        components={{
-                          robotLink: (
-                            <NavLink
-                              css={css`
-                                color: ${COLORS.red60};
-                                text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
-                              `}
-                              to={`/devices/${robot.name}`}
-                            />
-                          ),
-                        }}
-                      />
-                    ) : (
-                      runCreationError
-                    )}
-                  </StyledText>
-                )}
-              </React.Fragment>
-            )
-          })
-        )}
-        {!isScanning && unavailableCount > 0 ? (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            alignItems={ALIGN_CENTER}
-            textAlign={TYPOGRAPHY.textAlignCenter}
-            marginTop={SPACING.spacing24}
-          >
-            <StyledText as="p" color={COLORS.grey50}>
-              {showIdleOnly
-                ? t('unavailable_or_busy_robot_not_listed', {
-                    count: unavailableCount + reducerBusyCount,
-                  })
-                : t('unavailable_robot_not_listed', {
-                    count: unavailableCount,
-                  })}
-            </StyledText>
-            <NavLink to="/devices" css={TYPOGRAPHY.linkPSemiBold}>
-              {t('view_unavailable_robots')}
-            </NavLink>
-          </Flex>
-        ) : null}
-      </Flex>
+      {pageOneBody}
     </Slideout>
   )
 }

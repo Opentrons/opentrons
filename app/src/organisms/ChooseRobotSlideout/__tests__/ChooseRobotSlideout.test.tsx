@@ -127,6 +127,32 @@ describe('ChooseRobotSlideout', () => {
     expect(vi.mocked(startDiscovery)).toHaveBeenCalled()
     expect(dispatch).toHaveBeenCalledWith({ type: 'mockStartDiscovery' })
   })
+  it('renders the multi slideout page 1', () => {
+    render({
+      onCloseClick: vi.fn(),
+      isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
+      selectedRobot: null,
+      setSelectedRobot: mockSetSelectedRobot,
+      title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
+      multiSlideout: { currentPage: 1 },
+    })
+    screen.getByText('Step 1 / 2')
+  })
+  it('renders the multi slideout page 2', () => {
+    render({
+      onCloseClick: vi.fn(),
+      isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
+      selectedRobot: null,
+      setSelectedRobot: mockSetSelectedRobot,
+      title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
+      multiSlideout: { currentPage: 2 },
+    })
+    screen.getByText('Step 2 / 2')
+  })
   it('defaults to first available robot and allows an available robot to be selected', () => {
     vi.mocked(getConnectableRobots).mockReturnValue([
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
