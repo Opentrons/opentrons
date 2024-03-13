@@ -7,8 +7,12 @@ from typing import Any, Dict
 
 from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
 from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_api.parameters import Parameters
+from opentrons.protocol_reader.parameter_parser import ParameterParser
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import PythonProtocol, MalformedPythonProtocolError
+
+
 from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -29,6 +33,14 @@ def _runfunc_ok(run_func: Any):
                 )
 
 
+def _add_parameters_func_ok(add_parameters_func: Any) -> None:
+    if not callable(add_parameters_func):
+        raise SyntaxError("'add_parameters' must be a function.")
+    sig = inspect.Signature.from_callable(add_parameters_func)
+    if len(sig.parameters) != 1:
+        raise SyntaxError("Function 'add_parameters' must take exactly one argument.")
+
+
 def _find_protocol_error(tb, proto_name):
     """Return the FrameInfo for the lowest frame in the traceback from the
     protocol.
@@ -39,6 +51,26 @@ def _find_protocol_error(tb, proto_name):
             return frame
     else:
         raise KeyError
+
+
+def _parse_and_set_parameters(new_globs: Dict[Any, Any], filename: str) -> Parameters:
+    try:
+        _add_parameters_func_ok(new_globs.get("add_parameters"))
+    except SyntaxError as se:
+        raise MalformedPythonProtocolError(str(se))
+    parser = ParameterParser()
+    new_globs["__parser"] = parser
+    try:
+        exec("add_parameters(__parser)", new_globs)
+    except Exception as e:
+        exc_type, exc_value, tb = sys.exc_info()
+        try:
+            frame = _find_protocol_error(tb, filename)
+        except KeyError:
+            # No pretty names, just raise it
+            raise e
+        raise ExceptionInProtocolError(e, tb, str(e), frame.lineno) from e
+    return Parameters(parameters=parser.get_variable_names_and_values())
 
 
 def run_python(proto: PythonProtocol, context: ProtocolContext):
@@ -59,6 +91,9 @@ def run_python(proto: PythonProtocol, context: ProtocolContext):
         # "<protocol>" needs to match what opentrons.protocols.parse sets as the fallback
         # AST filename.
         filename = proto.filename or "<protocol>"
+
+    if new_globs.get("add_parameters"):
+        context._params = _parse_and_set_parameters(new_globs, filename)
 
     try:
         _runfunc_ok(new_globs.get("run"))

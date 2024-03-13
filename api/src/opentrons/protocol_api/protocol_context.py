@@ -64,6 +64,7 @@ from .module_contexts import (
     MagneticBlockContext,
     ModuleContext,
 )
+from .parameters import Parameters
 
 
 logger = logging.getLogger(__name__)
@@ -167,6 +168,7 @@ class ProtocolContext(CommandPublisher):
             self._core.load_ot2_fixed_trash_bin()
 
         self._commands: List[str] = []
+        self._params: Parameters = Parameters()
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
 
@@ -214,6 +216,10 @@ class ProtocolContext(CommandPublisher):
         representing the contents of the files.
         """
         return self._bundled_data
+
+    @property
+    def params(self) -> Parameters:
+        return self._params
 
     def cleanup(self) -> None:
         """Finalize and clean up the protocol context."""

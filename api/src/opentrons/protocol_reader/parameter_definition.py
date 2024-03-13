@@ -112,7 +112,7 @@ class ParameterDefinition(Generic[ParamType]):
 
         Arguments:
             display_name: The display name of the parameter as it would show up on the frontend.
-            variable_name: The variable name the protocol will be referred to in the run context.
+            variable_name: The variable name the parameter will be referred to in the run context.
             parameter_type: Can be bool, int, float or str. Must match the type of default and all choices or
                 min and max values
             default: The default value the parameter is set to. This will be used in initial analysis.
@@ -153,7 +153,7 @@ class ParameterDefinition(Generic[ParamType]):
                 self._maximum = maximum
 
         self._default: ParamType = default
-        self._value: ParamType = default
+        self.value: ParamType = default
 
     @property
     def value(self) -> ParamType:
@@ -180,3 +180,8 @@ class ParameterDefinition(Generic[ParamType]):
                 f"Parameter must be between {self._minimum} and {self._maximum} inclusive."
             )
         self._value = new_value
+
+    @property
+    def variable_name(self) -> str:
+        """The in-protocol variable name of the parameter."""
+        return self._variable_name
