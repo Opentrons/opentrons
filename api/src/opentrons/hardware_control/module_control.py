@@ -86,7 +86,7 @@ class AttachedModulesControl:
         usb_port: types.USBPort,
         type: modules.ModuleType,
         sim_model: Optional[str] = None,
-        serial_number: Optional[str] = None,
+        sim_serial_number: Optional[str] = None,
     ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
