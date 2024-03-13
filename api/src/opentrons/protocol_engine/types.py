@@ -842,7 +842,7 @@ class TipPresenceStatus(str, Enum):
 class RTPBase(BaseModel):
     """Parameters defined in a protocol."""
 
-    displayLabel: str = Field(..., description="Display string for the parameter.")
+    displayName: str = Field(..., description="Display string for the parameter.")
     variableName: str = Field(..., description="Python variable name of the parameter.")
     description: str = Field(..., description="Detailed description of the parameter.")
     suffix: Optional[str] = Field(
@@ -881,11 +881,18 @@ class FloatParameter(RTPBase):
     )
 
 
+class EnumChoice(BaseModel):
+    """Components of choices used in RTP Enum Parameters."""
+
+    displayName: str = Field(..., description="Display string for the param's choice.")
+    value: str = Field(..., description="Enum value of the param's choice.")
+
+
 class EnumParameter(RTPBase):
     """A string enum defined in a protocol."""
 
-    choices: List[str] = Field(
-        ..., description="List of valid values for this parameter."
+    choices: List[EnumChoice] = Field(
+        ..., description="List of valid choices for this parameter."
     )
     default: str = Field(
         ...,

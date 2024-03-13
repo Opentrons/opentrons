@@ -105,7 +105,7 @@ class CompletedAnalysis(BaseModel):
         ),
     )
     runTimeParameters: Optional[List[RunTimeParameter]] = Field(
-        default_factory=list,  # Should this be None?
+        default=None,
         description=(
             "Run time parameters used during analysis."
             " These are the parameters that are defined in the protocol, with values"
