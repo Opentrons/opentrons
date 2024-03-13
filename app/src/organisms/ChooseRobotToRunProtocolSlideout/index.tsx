@@ -8,7 +8,6 @@ import {
   Icon,
   Flex,
   DIRECTION_COLUMN,
-  SIZE_1,
   PrimaryButton,
   DIRECTION_ROW,
   SecondaryButton,
@@ -145,7 +144,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       ? mostRecentAnalysis?.robotType ?? null
       : null
 
-  const singlePageButtonWithoutFF = (
+  const SinglePageButtonWithoutFF = (
     <PrimaryButton
       disabled={
         isCreatingRun ||
@@ -156,7 +155,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       onClick={handleProceed}
     >
       {isCreatingRun ? (
-        <Icon name="ot-spinner" spin size={SIZE_1} />
+        <Icon name="ot-spinner" spin size="1rem" />
       ) : (
         t('shared:proceed_to_setup')
       )}
@@ -206,7 +205,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
                 </SecondaryButton>
                 <PrimaryButton width="50%" onClick={handleProceed}>
                   {isCreatingRun ? (
-                    <Icon name="ot-spinner" spin size={SIZE_1} />
+                    <Icon name="ot-spinner" spin size="1rem" />
                   ) : (
                     t('shared:confirm_values')
                   )}
@@ -214,7 +213,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
               </Flex>
             )
           ) : (
-            singlePageButtonWithoutFF
+            SinglePageButtonWithoutFF
           )}
         </Flex>
       }

@@ -14,16 +14,13 @@ export default {
 const Template: Story<React.ComponentProps<typeof MultiSlideout>> = args => {
   const [firstPage, setFirstPage] = React.useState<boolean>(false)
 
-  const togglePage = () => {
+  const togglePage = (): void => {
     setFirstPage(prevState => !prevState)
   }
 
-  const Children = (
-    <React.Fragment>
-      <StyledText
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        fontSize={TYPOGRAPHY.fontSizeP}
-      >
+  const children = (
+    <>
+      <StyledText as="p">
         {firstPage ? 'first page body' : 'second page body'}
       </StyledText>
 
@@ -33,22 +30,17 @@ const Template: Story<React.ComponentProps<typeof MultiSlideout>> = args => {
         backgroundColor={COLORS.blue50}
         textTransform={TYPOGRAPHY.textTransformNone}
       >
-        <StyledText
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          fontSize={TYPOGRAPHY.fontSizeP}
-        >
+        <StyledText as="p">
           {firstPage ? 'Go to Second Page' : 'Go to First Page'}
         </StyledText>
       </PrimaryBtn>
-    </React.Fragment>
+    </>
   )
 
   return (
-    <MultiSlideout
-      {...args}
-      children={Children}
-      currentStep={firstPage ? 1 : 2}
-    />
+    <MultiSlideout {...args} currentStep={firstPage ? 1 : 2}>
+      {children}
+    </MultiSlideout>
   )
 }
 

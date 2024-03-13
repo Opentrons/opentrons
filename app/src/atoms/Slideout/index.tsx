@@ -179,7 +179,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          {multiSlideoutSpecs == null ? null : (
+          {multiSlideoutSpecs === undefined ? null : (
             <StyledText
               as="p"
               color={COLORS.grey60}
