@@ -128,6 +128,13 @@ export const getSlotIsEmpty = (
   includeStagingAreas?: boolean
 ): boolean => {
   if (
+    slot === 'cutoutA1' &&
+    Object.values(initialDeckSetup.modules).find(
+      module => module.type === 'thermocyclerModuleType'
+    )
+  ) {
+    return false
+  } else if (
     slot === SPAN7_8_10_11_SLOT &&
     TC_SPAN_SLOTS.some(slot => !getSlotIsEmpty(initialDeckSetup, slot))
   ) {
@@ -157,11 +164,10 @@ export const getSlotIsEmpty = (
       return additionalEquipment.location?.includes(slot) && includeStaging
     }
   })
-
   return (
     [
-      ...values(initialDeckSetup.modules).filter(
-        (moduleOnDeck: ModuleOnDeck) => moduleOnDeck.slot === slot
+      ...values(initialDeckSetup.modules).filter((moduleOnDeck: ModuleOnDeck) =>
+        slot.includes(moduleOnDeck.slot)
       ),
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot
