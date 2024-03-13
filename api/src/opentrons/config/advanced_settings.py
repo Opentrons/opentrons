@@ -219,6 +219,20 @@ settings = [
         description="When this setting is on, Flex will continue its activities regardless of pressure changes inside the pipette. Do not turn this setting on unless you are intentionally causing pressures over 8 kPa inside the pipette air channel.",
         robot_type=[RobotTypeEnum.FLEX],
     ),
+    SettingDefinition(
+        _id="enableErrorRecoveryExperiments",
+        title="Enable error recovery experiments",
+        description=(
+            "Do not enable."
+            " This is an Opentrons internal setting to experiment with"
+            " in-development error recovery features."
+            " This will interfere with your protocol runs,"
+            " corrupt your robot's storage,"
+            " bring misfortune and pestilence upon you and your livestock, etc."
+        ),
+        robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
+    ),
 ]
 
 if (
@@ -668,6 +682,16 @@ def _migrate29to30(previous: SettingsMap) -> SettingsMap:
     return {k: v for k, v in previous.items() if "disableTipPresenceDetection" != k}
 
 
+def _migrate30to31(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 31 of the feature flags file.
+
+    - Adds the enableErrorRecoveryExperiments config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableErrorRecoveryExperiments"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -699,6 +723,7 @@ _MIGRATIONS = [
     _migrate27to28,
     _migrate28to29,
     _migrate29to30,
+    _migrate30to31,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
