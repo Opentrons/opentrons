@@ -1,5 +1,7 @@
-import type { NotifyTopic } from '@opentrons/app/lib/redux/shell/types'
 import { connectionStore } from './store'
+import { notifyLog } from './log'
+
+import type { NotifyTopic } from '@opentrons/app/lib/redux/shell/types'
 
 export function unsubscribe(
   hostname: string,
@@ -12,11 +14,11 @@ export function unsubscribe(
         const { client } = connectionStore[hostname]
         client?.unsubscribe(topic, {}, (error, result) => {
           if (error != null) {
-            log.debug(
+            notifyLog.debug(
               `Failed to unsubscribe on ${hostname} from topic: ${topic}`
             )
           } else {
-            log.debug(
+            notifyLog.debug(
               `Successfully unsubscribed on ${hostname} from topic: ${topic}`
             )
             const { subscriptions } = connectionStore[hostname]
@@ -25,7 +27,7 @@ export function unsubscribe(
           }
         })
       } else {
-        log.debug(
+        notifyLog.debug(
           `Host ${hostname} to unsubscribe from unsubscribed topic: ${topic}`
         )
       }

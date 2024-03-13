@@ -1,4 +1,5 @@
 import mqtt from 'mqtt'
+
 import type { NotifyTopic } from '@opentrons/app/lib/redux/shell/types'
 import type { BrowserWindow } from 'electron'
 
