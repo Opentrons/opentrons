@@ -13,6 +13,7 @@ import type {
   NotifyNetworkError,
 } from '@opentrons/app/src/redux/shell/types'
 import type { Action, Dispatch } from './types'
+import { NotifyBrokerResponses } from '@opentrons/app/lib/redux/shell/types'
 
 // TODO(jh, 2024-03-01): after refactoring notify connectivity and subscription logic, uncomment logs.
 
@@ -418,12 +419,12 @@ function sendToBrowserDeserialized({
   browserWindow.webContents.send('notify', hostname, topic, message)
 }
 
-const VALID_MODELS: [NotifyRefetchData, NotifyUnsubscribeData] = [
+const VALID_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
   { refetchUsingHTTP: true },
   { unsubscribe: true },
 ]
 
-function deserialize(message: string): Promise<NotifyResponseData> {
+function deserialize(message: string): Promise<NotifyBrokerResponses> {
   return new Promise((resolve, reject) => {
     let deserializedMessage: NotifyResponseData | Record<string, unknown>
     const error = new Error(
@@ -436,7 +437,7 @@ function deserialize(message: string): Promise<NotifyResponseData> {
       reject(error)
     }
 
-    const isValidNotifyResponse = VALID_MODELS.some(model =>
+    const isValidNotifyResponse = VALID_RESPONSES.some(model =>
       isEqual(model, deserializedMessage)
     )
     if (!isValidNotifyResponse) {
