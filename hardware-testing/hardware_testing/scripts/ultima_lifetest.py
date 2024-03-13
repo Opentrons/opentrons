@@ -79,7 +79,8 @@ DISPENSE_OFFSET = 18 #nest 12 well
 NUM_PRESSURE_READINGS = 10
 SECONDS_BETWEEN_READINGS = 0.25
 
-DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P]
+# DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P]
+DEFAULT_SPEED = 91
 FLOW_ACCELERATION = 24000.0/15.9
 
 def _get_test_tag(flow: float, trial: int) -> str:
@@ -179,6 +180,27 @@ async def move_twin_plunger_absolute_ot3(
         ):
             await _move_coro
 
+async def move_plunger_absolute_ot3(
+    api: OT3API,
+    position: List[float],
+    motor_current: Optional[float] = None,
+    speed: Optional[float] = None,
+    expect_stalls: bool = False,
+) -> None:
+    """Move OT3 plunger position to an absolute position."""
+    _move_coro = api._move(
+        target_position={Axis.P_L: position[0]},  # type: ignore[arg-type]
+        speed=speed,
+        expect_stalls=expect_stalls,
+    )
+    if motor_current is None:
+        await _move_coro
+    else:
+        async with api._backend.motor_current(
+            run_currents={Axis.P_L: motor_current}
+        ):
+            await _move_coro
+
 
 async def twin_z_move(
     api: OT3API,
@@ -193,6 +215,14 @@ async def twin_z_move(
                      Axis.Y:api._current_position[Axis.Y],
                      Axis.Z_R:api._current_position[Axis.Z_L]})
 
+async def z_move(
+    api: OT3API,
+    position: List[float]
+) -> None:
+    await helpers_ot3.move_to_arched_ot3(
+        api, OT3Mount.LEFT, position
+    )
+
 
 async def test_cycle(
     api: OT3API,
@@ -201,15 +231,22 @@ async def test_cycle(
     starting_cycle: int,
     cycles: int,
     bottom_position: List[float],
+    single: bool,
 ) -> None:
 
     speed = flow * FLOW_TO_SPEED
 
     for i in range(cycles):
-        await move_twin_plunger_absolute_ot3(api, positions[0], speed=speed)
-        await twin_z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
-        await move_twin_plunger_absolute_ot3(api, positions[1], speed=speed)
-        await twin_z_move(api, bottom_position)
+        if not single:
+            await move_twin_plunger_absolute_ot3(api, positions[0], speed=speed)
+            # await twin_z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
+            await move_twin_plunger_absolute_ot3(api, positions[1], speed=speed)
+            # await twin_z_move(api, bottom_position)
+        else:
+            await move_plunger_absolute_ot3(api, positions[0], speed=speed)
+            # await z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
+            await move_plunger_absolute_ot3(api, positions[1], speed=speed)
+            # await z_move(api, bottom_position)
         starting_cycle += 1
 
 
@@ -239,7 +276,8 @@ async def _read_from_sensor(
 
 
 async def _main(is_simulating: bool, trials: int, flow: float,
-                liquid_probe: bool, continue_after_stall: bool) -> None:
+                liquid_probe: bool, continue_after_stall: bool,
+                single: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating,
         pipette_left="p1000_multi_v3.4",
@@ -269,13 +307,17 @@ async def _main(is_simulating: bool, trials: int, flow: float,
 
     sn = helpers_ot3.get_pipette_serial_ot3(api.hardware_pipettes[OT3Mount.LEFT.to_mount()])
     print(f"Serial Left: {sn}")
-    sn = helpers_ot3.get_pipette_serial_ot3(api.hardware_pipettes[OT3Mount.RIGHT.to_mount()])
-    print(f"Serial Right: {sn}")
+    if not single:
+        sn = helpers_ot3.get_pipette_serial_ot3(api.hardware_pipettes[OT3Mount.RIGHT.to_mount()])
+        print(f"Serial Right: {sn}")
 
     try:
         # home and move to a safe position
         await _reset_gantry(api)
-        await api.home([Axis.P_L, Axis.P_R])
+        if single:
+            await api.home([Axis.P_L])
+        else:
+            await api.home([Axis.P_L, Axis.P_R])
 
 
 
@@ -287,9 +329,10 @@ async def _main(is_simulating: bool, trials: int, flow: float,
         await api.pick_up_tip(OT3Mount.LEFT, tip_length=tip_len)
 
         right_tips = left_tips + Point(x=9)
-        await helpers_ot3.move_to_arched_ot3(api, OT3Mount.RIGHT, right_tips)
-        # input("Pick up tip? Press Enter" )
-        await api.pick_up_tip(OT3Mount.RIGHT, tip_length=tip_len)
+        if not single:
+            await helpers_ot3.move_to_arched_ot3(api, OT3Mount.RIGHT, right_tips)
+            # input("Pick up tip? Press Enter" )
+            await api.pick_up_tip(OT3Mount.RIGHT, tip_length=tip_len)
 
         # Move to reservoir
         await api.home([Axis.Z_L, Axis.Z_R])
@@ -297,14 +340,24 @@ async def _main(is_simulating: bool, trials: int, flow: float,
 
 
         mounts = [OT3Mount.LEFT, OT3Mount.RIGHT]
-        pip_top = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[0] + VOLUME_OFFSET,
-                   helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[0] + VOLUME_OFFSET]
-        pip_bot = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[1],
-                   helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[1]]
-        pip_blow = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[2],
-                   helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[2]]
-        pip_drop = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[3],
-                   helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[3]]
+        if not single:
+            pip_top = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[0] + VOLUME_OFFSET,
+                       helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[0] + VOLUME_OFFSET]
+            pip_bot = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[1],
+                       helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[1]]
+            pip_blow = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[2],
+                       helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[2]]
+            pip_drop = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[3],
+                       helpers_ot3.get_plunger_positions_ot3(api, mounts[1])[3]]
+        else:
+            pip_top = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[0] + VOLUME_OFFSET,
+                       0]
+            pip_bot = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[1],
+                       0]
+            pip_blow = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[2],
+                       0]
+            pip_drop = [helpers_ot3.get_plunger_positions_ot3(api, mounts[0])[3],
+                       0]
 
         # print(pip_top)
         # print(pip_bot)
@@ -379,7 +432,10 @@ async def _main(is_simulating: bool, trials: int, flow: float,
         # input("Descend?")
 
         # await api.home([Axis.P_L, Axis.P_R])
-        await move_twin_plunger_absolute_ot3(api, pip_bot)
+        if not single:
+            await move_twin_plunger_absolute_ot3(api, pip_bot)
+        else:
+            await move_plunger_absolute_ot3(api, pip_bot)
 
         # await helpers_ot3.move_to_arched_ot3(
         #     api, OT3Mount.LEFT, temp_reservoir_a1_nominal
@@ -412,12 +468,14 @@ async def _main(is_simulating: bool, trials: int, flow: float,
             )
             await test_cycle(api, [pip_top, pip_bot], flow,
                              total_cycles, cycles_per_trial,
-                             temp_reservoir_a1_nominal)
-            if t%blow_inc == 0:
-                print("Blow Out")
-                await test_cycle(api, [pip_blow, pip_bot], flow,
-                                 0, 1,
-                                 temp_reservoir_a1_nominal)
+                             temp_reservoir_a1_nominal,
+                             single)
+            # if t%blow_inc == 0:
+            #     print("Blow Out")
+            #     await test_cycle(api, [pip_blow, pip_bot], flow,
+            #                      0, 1,
+            #                      temp_reservoir_a1_nominal,
+            #                      single)
             total_cycles += cycles_per_trial
             print(total_cycles)
             report(OT3Mount.LEFT.name, _get_test_tag(flow, t), [total_cycles])
@@ -453,6 +511,8 @@ if __name__ == "__main__":
     parser.add_argument("--flow", type=float, default=DEFAULT_FLOW)
     parser.add_argument("--probe", action="store_true")
     parser.add_argument("--continue-after-stall", action="store_true")
+    parser.add_argument("--single", action="store_true")
     args = parser.parse_args()
     asyncio.run(_main(args.simulate, args.trials, args.flow,
-                      args.probe, args.continue_after_stall))
+                      args.probe, args.continue_after_stall,
+                      args.single))
