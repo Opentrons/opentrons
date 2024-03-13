@@ -44,6 +44,7 @@ import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
+import { useFeatureFlag } from '../../redux/config'
 
 interface RobotIsBusyAction {
   type: 'robotIsBusy'
@@ -116,6 +117,7 @@ export function ChooseRobotSlideout(
     showIdleOnly = false,
     multiSlideout,
   } = props
+  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
 
@@ -306,7 +308,7 @@ export function ChooseRobotSlideout(
 
   const pageTwoBody = <Flex>TODO</Flex>
 
-  return multiSlideout != null ? (
+  return multiSlideout != null && enableRunTimeParametersFF ? (
     <MultiSlideout
       isExpanded={isExpanded}
       onCloseClick={onCloseClick}
