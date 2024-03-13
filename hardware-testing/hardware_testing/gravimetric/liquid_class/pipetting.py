@@ -258,7 +258,8 @@ def _pipette_with_liquid_settings(  # noqa: C901
 
     def _dispense_on_approach() -> None:
         # remove trailing-air-gap
-        pipette.dispense(liquid_class.aspirate.trailing_air_gap)
+        if not blank:
+            pipette.dispense(liquid_class.aspirate.trailing_air_gap)
 
     def _dispense_on_submerge() -> None:
         callbacks.on_dispensing()
