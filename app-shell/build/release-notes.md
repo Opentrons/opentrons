@@ -13,7 +13,6 @@ Welcome to the v7.2.1 release of the Opentrons App!
 ### Bug Fixes
 
 - Fixed a memory leak that could cause the app to crash.
-- The app no longer makes lots of extra requests when retrieving runs from a robot.
 
 ---
 
