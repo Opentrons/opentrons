@@ -53,6 +53,18 @@ def _find_protocol_error(tb, proto_name):
         raise KeyError
 
 
+def _raise_pretty_protocol_error(exception: Exception, filename: str) -> None:
+    exc_type, exc_value, tb = sys.exc_info()
+    try:
+        frame = _find_protocol_error(tb, filename)
+    except KeyError:
+        # No pretty names, just raise it
+        raise exception
+    raise ExceptionInProtocolError(
+        exception, tb, str(exception), frame.lineno
+    ) from exception
+
+
 def _parse_and_set_parameters(new_globs: Dict[Any, Any], filename: str) -> Parameters:
     try:
         _add_parameters_func_ok(new_globs.get("add_parameters"))
@@ -63,13 +75,7 @@ def _parse_and_set_parameters(new_globs: Dict[Any, Any], filename: str) -> Param
     try:
         exec("add_parameters(__parser)", new_globs)
     except Exception as e:
-        exc_type, exc_value, tb = sys.exc_info()
-        try:
-            frame = _find_protocol_error(tb, filename)
-        except KeyError:
-            # No pretty names, just raise it
-            raise e
-        raise ExceptionInProtocolError(e, tb, str(e), frame.lineno) from e
+        _raise_pretty_protocol_error(exception=e, filename=filename)
     return Parameters(parameters=parser.get_variable_names_and_values())
 
 
@@ -99,6 +105,7 @@ def run_python(proto: PythonProtocol, context: ProtocolContext):
         _runfunc_ok(new_globs.get("run"))
     except SyntaxError as se:
         raise MalformedPythonProtocolError(str(se))
+
     new_globs["__context"] = context
     try:
         exec("run(__context)", new_globs)
@@ -110,10 +117,4 @@ def run_python(proto: PythonProtocol, context: ProtocolContext):
         # this is a protocol cancel and shouldn't have special logging
         raise
     except Exception as e:
-        exc_type, exc_value, tb = sys.exc_info()
-        try:
-            frame = _find_protocol_error(tb, filename)
-        except KeyError:
-            # No pretty names, just raise it
-            raise e
-        raise ExceptionInProtocolError(e, tb, str(e), frame.lineno) from e
+        _raise_pretty_protocol_error(exception=e, filename=filename)
