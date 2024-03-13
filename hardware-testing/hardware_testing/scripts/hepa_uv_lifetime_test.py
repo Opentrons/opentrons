@@ -95,6 +95,7 @@ async def run_hepa_fan(
 
     fan_on: bool = False
     cycle: int = 1
+    sleep_time: int = 0
     while not event.is_set():
         try:
             if not run_forever and cycle > cycles:
@@ -131,6 +132,14 @@ async def run_hepa_fan(
             if not run_forever:
                 # record result
                 cycle += 1
+            else:
+                sleep_time += 1
+            
+            # report elasped time every 10 minutes
+            if sleep_time == 600:
+                elapsed_time = datetime.datetime.now() - start_time
+                log.info(f"Hepa Task: Elapsed time={elapsed_time}")
+                sleep_time = 0
         except asyncio.CancelledError:
             break
 
