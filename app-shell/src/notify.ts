@@ -432,7 +432,9 @@ function sendToBrowserDeserialized({
   topic,
   message,
 }: SendToBrowserParams): void {
-  browserWindow.webContents.send('notify', hostname, topic, message)
+  try {
+    browserWindow.webContents.send('notify', hostname, topic, message)
+  } catch {}
 }
 
 const VALID_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
