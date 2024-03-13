@@ -34,7 +34,7 @@ class OT2SimulatorSetup:
     attached_instruments: Dict[Mount, Dict[str, Optional[str]]] = field(
         default_factory=dict
     )
-    attached_modules: Dict[str, List[ModuleCall]] = field(default_factory=dict)
+    attached_modules: Dict[str, List[ModuleItem]] = field(default_factory=dict)
     config: Optional[RobotConfig] = None
     strict_attached_instruments: bool = True
 
@@ -45,7 +45,7 @@ class OT3SimulatorSetup:
     attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]] = field(
         default_factory=dict
     )
-    attached_modules: Dict[str, List[ModuleCall]] = field(default_factory=dict)
+    attached_modules: Dict[str, List[ModuleItem]] = field(default_factory=dict)
     config: Optional[OT3Config] = None
     strict_attached_instruments: bool = True
 
@@ -70,7 +70,10 @@ async def _simulator_for_setup(
 
         return await OT3API.build_hardware_simulator(
             attached_instruments=setup.attached_instruments,
-            attached_modules=list(setup.attached_modules.keys()),
+            attached_modules={
+                k: [m.serial_number for m in v]
+                for k, v in setup.attached_modules.items()
+            },
             config=setup.config,
             strict_attached_instruments=setup.strict_attached_instruments,
             loop=loop,
@@ -117,7 +120,10 @@ def _thread_manager_for_setup(
         return ThreadManager(
             OT3API.build_hardware_simulator,
             attached_instruments=setup.attached_instruments,
-            attached_modules=list(setup.attached_modules.keys()),
+            attached_modules={
+                k: [m.serial_number for m in v]
+                for k, v in setup.attached_modules.items()
+            },
             config=setup.config,
             strict_attached_instruments=setup.strict_attached_instruments,
             feature_flags=HardwareFeatureFlags.build_from_ff(),
@@ -133,9 +139,7 @@ async def create_simulator_thread_manager(
 
     for attached_module in thread_manager.wrapped().attached_modules:
         modules = setup.attached_modules[attached_module.name()]
-        print(modules)
         for module in modules:
-            print(module)
             for call in module.items:
                 f = getattr(attached_module, call.function_name)
                 await f(*call.args, **call.kwargs)

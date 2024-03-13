@@ -100,7 +100,7 @@ class OT3Simulator(FlexBackend):
     async def build(
         cls,
         attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
-        attached_modules: List[str],
+        attached_modules: Dict[str, List[str]],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
@@ -126,7 +126,7 @@ class OT3Simulator(FlexBackend):
     def __init__(
         self,
         attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
-        attached_modules: List[str],
+        attached_modules: Dict[str, List[str]],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
