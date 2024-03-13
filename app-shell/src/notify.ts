@@ -3,18 +3,17 @@ import mqtt from 'mqtt'
 import isEqual from 'lodash/isEqual'
 
 import { createLogger } from './log'
-import { HEALTH_STATUS_OK, FAILURE_STATUSES } from './constants'
+import { FAILURE_STATUSES, HEALTH_STATUS_OK } from './constants'
 
 import type { BrowserWindow } from 'electron'
 import type {
-  NotifyTopic,
-  NotifyResponseData,
-  NotifyRefetchData,
-  NotifyUnsubscribeData,
-  NotifyNetworkError,
   NotifyBrokerResponses,
+  NotifyNetworkError,
+  NotifyRefetchData,
+  NotifyResponseData,
+  NotifyTopic,
+  NotifyUnsubscribeData,
 } from '@opentrons/app/lib/redux/shell/types'
-import type { Action, Dispatch } from './types'
 import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
 
 // Manages MQTT broker connections through a connection store. Broker connections are added or removed based on
@@ -34,7 +33,7 @@ interface ConnectionStore {
   hostnames: Record<string, HostnameInfo>
   browserWindow: BrowserWindow | null
 }
-const connectionStore: ConnectionStore = {
+export const connectionStore: ConnectionStore = {
   unreachableHosts: new Set(),
   pendingUnsubs: new Set(),
   robotsWithReportedPortBlockEvent: new Set(),
@@ -70,23 +69,6 @@ const subscribeOptions: mqtt.IClientSubscribeOptions = {
 
 const log = createLogger('notify')
 
-export function registerNotify(
-  dispatch: Dispatch,
-  mainWindow: BrowserWindow
-): (action: Action) => unknown {
-  if (connectionStore.browserWindow == null) {
-    connectionStore.browserWindow = mainWindow
-  }
-
-  return function handleAction(action: Action) {
-    switch (action.type) {
-      case 'shell:NOTIFY_SUBSCRIBE':
-        return subscribe({
-          ...action.payload,
-        })
-    }
-  }
-}
 // Correct and make sure everything can work. What are the transitiions I actually need?
 // Subscribing. If host IS UNREACHABLE, then return. Otherwise, HANDLE SUBSCRIPTION.
 // HANDLE SUB-> If IS CONNECTED, IS SUBSCRIBED (do subscribe pending logic here if not).
