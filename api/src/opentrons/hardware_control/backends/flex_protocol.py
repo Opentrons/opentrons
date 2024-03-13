@@ -442,6 +442,3 @@ class FlexBackend(Protocol):
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         ...
-
-    def _update_tip_state(self, mount: OT3Mount, status: bool) -> None:
-        ...
