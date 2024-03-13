@@ -120,6 +120,7 @@ export const getSlotIdsBlockedBySpanning = (
 
   return []
 }
+//  TODO(jr, 3/13/24): refactor this util it is messy and confusing
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string,
@@ -127,6 +128,7 @@ export const getSlotIsEmpty = (
      since labware/wasteChute can still go on top of staging areas  **/
   includeStagingAreas?: boolean
 ): boolean => {
+  //   special-casing the TC's slot A1 for the Flex
   if (
     slot === 'cutoutA1' &&
     Object.values(initialDeckSetup.modules).find(
@@ -166,8 +168,13 @@ export const getSlotIsEmpty = (
   })
   return (
     [
-      ...values(initialDeckSetup.modules).filter((moduleOnDeck: ModuleOnDeck) =>
-        slot.includes(moduleOnDeck.slot)
+      ...values(initialDeckSetup.modules).filter(
+        (moduleOnDeck: ModuleOnDeck) => {
+          const cutoutForSlotOt2 = slotToCutoutOt2Map[slot]
+          return cutoutForSlotOt2 != null
+            ? moduleOnDeck.slot === slot
+            : slot.includes(moduleOnDeck.slot)
+        }
       ),
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot

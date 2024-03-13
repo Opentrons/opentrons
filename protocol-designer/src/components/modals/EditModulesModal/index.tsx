@@ -395,7 +395,11 @@ const EditModulesModalComponent = (
             {slotIssue ? (
               <PDAlert
                 alertType="warning"
-                title={validation.selectedSlot}
+                title={
+                  robotType === OT2_ROBOT_TYPE
+                    ? t('alert:module_placement.SLOT_OCCUPIED.title')
+                    : validation.selectedSlot
+                }
                 description={''}
               />
             ) : null}
