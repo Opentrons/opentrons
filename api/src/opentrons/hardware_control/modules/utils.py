@@ -42,7 +42,7 @@ async def build(
     hw_control_loop: asyncio.AbstractEventLoop,
     execution_manager: ExecutionManager,
     sim_model: Optional[str] = None,
-    serial_number: Optional[str] = None,
+    sim_serial_number: Optional[str] = None,
 ) -> AbstractModule:
     return await _MODULE_CLS_BY_TYPE[type].build(
         port=port,
