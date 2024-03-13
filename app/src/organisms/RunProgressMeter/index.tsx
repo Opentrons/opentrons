@@ -83,8 +83,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const runCommandsLength = allCommandsQueryData?.meta.totalLength
 
   const downloadIsDisabled =
-    // todo(mm, 2024-03-13): Given that this includes RUN_STATUS_RUNNING, does this
-    // intentionally exclude RUN_STATUS_PAUSED, RUN_STATUS_BLOCKED_BY_OPEN_DOOR, etc.?
     runStatus === RUN_STATUS_RUNNING ||
     runStatus === RUN_STATUS_IDLE ||
     runStatus === RUN_STATUS_FINISHING
