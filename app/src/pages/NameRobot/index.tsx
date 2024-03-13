@@ -273,10 +273,10 @@ export function NameRobot(): JSX.Element {
                     id="newRobotName"
                     name="newRobotName"
                     type="text"
-                    readOnly
                     value={field.value}
                     error={fieldState.error?.message && ''}
-                    css={INPUT_FIELD_ODD_STYLE}
+                    textAlign="center"
+                    onBlur={e => e.target.focus()}
                   />
                 )}
               />

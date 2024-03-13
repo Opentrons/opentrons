@@ -253,6 +253,7 @@ export const TestShakeSlideout = (
           >
             <InputField
               data-testid="TestShakeSlideout_shake_input"
+              id="TestShakeSlideout_shake_input"
               autoFocus
               units={RPM}
               value={shakeValue != null ? Math.round(shakeValue) : null}
