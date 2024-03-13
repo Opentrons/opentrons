@@ -1,4 +1,6 @@
-// Rename this.
+import isEqual from 'lodash/isEqual'
+
+import { connectionStore } from './store'
 
 import type {
   NotifyBrokerResponses,
@@ -7,7 +9,6 @@ import type {
   NotifyTopic,
   NotifyUnsubscribeData,
 } from '@opentrons/app/lib/redux/shell/types'
-import isEqual from 'lodash/isEqual'
 
 interface SendToBrowserParams {
   hostname: string
@@ -20,17 +21,18 @@ const VALID_NOTIFY_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
   { unsubscribe: true },
 ]
 
-function sendToBrowserDeserialized({
+export function sendToBrowserDeserialized({
   hostname,
   topic,
   message,
 }: SendToBrowserParams): void {
   try {
-    browserWindow.webContents.send('notify', hostname, topic, message)
+    const { browserWindow } = connectionStore
+    browserWindow?.webContents.send('notify', hostname, topic, message)
   } catch {}
 }
 
-function deserialize(message: string): Promise<NotifyBrokerResponses> {
+export function deserialize(message: string): Promise<NotifyBrokerResponses> {
   return new Promise((resolve, reject) => {
     let deserializedMessage: NotifyResponseData | Record<string, unknown>
     const error = new Error(
