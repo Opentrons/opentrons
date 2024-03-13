@@ -11,7 +11,7 @@ import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
 import { LabwareDefByDefURI } from '../../labware-defs'
 import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
-import {
+import type {
   AdditionalEquipmentOnDeck,
   InitialDeckSetup,
   ModuleOnDeck,
@@ -132,7 +132,7 @@ export const getSlotIsEmpty = (
   if (
     slot === 'cutoutA1' &&
     Object.values(initialDeckSetup.modules).find(
-      module => module.type === 'thermocyclerModuleType'
+      module => module.type === THERMOCYCLER_MODULE_TYPE
     )
   ) {
     return false
