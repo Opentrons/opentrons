@@ -104,8 +104,8 @@ class CompletedAnalysis(BaseModel):
             " in analyses that were originally created on older versions."
         ),
     )
-    runTimeParameters: Optional[List[RunTimeParameter]] = Field(
-        default=None,
+    runTimeParameters: List[RunTimeParameter] = Field(
+        default_factory=list,
         description=(
             "Run time parameters used during analysis."
             " These are the parameters that are defined in the protocol, with values"
