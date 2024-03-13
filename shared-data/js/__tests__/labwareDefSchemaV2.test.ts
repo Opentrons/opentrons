@@ -1,4 +1,3 @@
-/* eslint-disable jest/consistent-test-it */
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'
@@ -169,7 +168,6 @@ const expectGroupsFollowConvention = (
 
     if (noGroupsMetadataAllowed) {
       labwareDef.groups.forEach(group => {
-        /* eslint-disable jest/no-conditional-expect */
         expect(group.brand).toBe(undefined)
         expect(group.metadata.displayName).toBe(undefined)
         expect(group.metadata.displayCategory).toBe(undefined)
