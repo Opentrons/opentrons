@@ -3,6 +3,8 @@ import mqtt from 'mqtt'
 import { FAILURE_STATUSES, HEALTH_STATUS_OK } from '../constants'
 import { connectionStore } from './store'
 import { notifyLog } from './log'
+import { sendToBrowserDeserialized, deserialize } from './deserialize'
+import { unsubscribe } from './subscribe'
 
 import type { NotifyTopic } from '@opentrons/app/lib/redux/shell/types'
 import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
@@ -121,7 +123,11 @@ function establishListeners({
     (topic: NotifyTopic, message: Buffer, packet: mqtt.IPublishPacket) => {
       deserialize(message.toString())
         .then(deserializedMessage => {
-          checkForUnsubscribeFlag(deserializedMessage, hostname, topic)
+          // Could consider breaking this into a handleDeserializedMessage().
+          const messageContainsUnsubFlag = 'unsubscribe' in deserializedMessage
+          if (messageContainsUnsubFlag) {
+            void unsubscribe(hostname, topic)
+          }
 
           notifyLog.debug('Received notification data from main via IPC', {
             hostname,

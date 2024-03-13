@@ -123,18 +123,10 @@ function waitUntilActiveOrErrored(
   })
 }
 
-function checkForUnsubscribeFlag(
-  deserializedMessage: NotifyBrokerResponses,
+export function unsubscribe(
   hostname: string,
   topic: NotifyTopic
-): void {
-  const messageContainsUnsubFlag = 'unsubscribe' in deserializedMessage
-  if (messageContainsUnsubFlag) {
-    void unsubscribe(hostname, topic)
-  }
-}
-
-function unsubscribe(hostname: string, topic: NotifyTopic): Promise<void> {
+): Promise<void> {
   return new Promise<void>(() => {
     if (!pendingUnsubs.has(topic)) {
       if (connectionStore[hostname].subscriptions.has(topic)) {
