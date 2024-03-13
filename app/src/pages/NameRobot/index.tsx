@@ -2,7 +2,6 @@ import * as React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { css } from 'styled-components'
 import { useHistory } from 'react-router-dom'
 
 import {
