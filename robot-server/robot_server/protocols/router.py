@@ -238,6 +238,7 @@ async def create_protocol(
         )
 
     try:
+        # Can make the passed in RTPs as part of protocolSource returned here
         source = await protocol_reader.save(
             files=buffered_files,
             directory=protocol_directory / protocol_id,
