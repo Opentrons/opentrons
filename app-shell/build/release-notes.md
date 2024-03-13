@@ -6,6 +6,17 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons App Changes in 7.2.1
+
+Welcome to the v7.2.1 release of the Opentrons App!
+
+### Bug Fixes
+
+- Fixed a memory leak that could cause the app to crash.
+- The app no longer makes lots of extra requests when retrieving runs from a robot.
+
+---
+
 ## Opentrons App Changes in 7.2.0
 
 Welcome to the v7.2.0 release of the Opentrons App!

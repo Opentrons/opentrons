@@ -14,6 +14,8 @@ Welcome to the v7.2.1 release of the Opentrons robot software!
 
 - Fixed an issue where OT-2 tip length calibrations created before v4.1.0 would cause a "missing calibration data" error that you could only resolve by resetting calibration.
 - Fixed collision prediction being too conservative in certain conditions on Flex, leading to errors even when collisions wouldn't take place.
+- Flex now properly homes after an instrument collision.
+- `opentrons_simulate` now outputs entries for commands that drop tips in the default trash container in protocols that specify Python API version 2.16 or newer.
 
 ---
 
