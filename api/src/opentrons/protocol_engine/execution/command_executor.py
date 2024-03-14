@@ -184,10 +184,8 @@ class CommandExecutor:
                 "result": result,
                 "status": CommandStatus.SUCCEEDED,
                 "completedAt": self._model_utils.get_timestamp(),
+                **_append_notes_if_notes(running_command, note_tracker.get_notes())
             }
-            update.update(
-                _append_notes_if_notes(running_command, note_tracker.get_notes())
-            )
             completed_command = running_command.copy(update=update)
             self._action_dispatcher.dispatch(
                 UpdateCommandAction(
