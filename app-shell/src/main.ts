@@ -19,11 +19,10 @@ import { registerProtocolStorage } from './protocol-storage'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import { registerUsb } from './usb'
 import { createUsbDeviceMonitor } from './system-info/usb-devices'
-import { closeAllNotifyConnections } from './notify'
+import { registerNotify, closeAllNotifyConnections } from './notifications'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
-import { registerNotify } from './notifications'
 
 /**
  * node 17 introduced a change to default IP resolving to prefer IPv6 which causes localhost requests to fail

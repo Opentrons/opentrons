@@ -21,8 +21,8 @@ export function registerNotify(
   dispatch: Dispatch,
   mainWindow: BrowserWindow
 ): (action: Action) => unknown {
-  if (connectionStore.browserWindow == null) {
-    connectionStore.browserWindow = mainWindow
+  if (connectionStore.getBrowserWindow() == null) {
+    connectionStore.setBrowserWindow(mainWindow)
   }
 
   return function handleAction(action: Action) {

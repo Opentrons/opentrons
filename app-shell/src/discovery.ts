@@ -24,6 +24,7 @@ import { OPENTRONS_USB } from '@opentrons/app/src/redux/discovery/constants'
 import { getFullConfig, handleConfigChange } from './config'
 import { createLogger } from './log'
 import { getSerialPortHttpAgent } from './usb'
+import { handleNotificationConnectionsFor } from './notifications'
 
 import type {
   Address,
@@ -31,10 +32,8 @@ import type {
   LegacyService,
   DiscoveryClient,
 } from '@opentrons/discovery-client'
-
 import type { Action, Dispatch } from './types'
 import type { ConfigV1 } from '@opentrons/app/src/redux/config/schema-types'
-import { handleNotificationConnectionsFor } from './notifications'
 
 const log = createLogger('discovery')
 
