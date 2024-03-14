@@ -49,7 +49,6 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   const dropDownMenuWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       setShowDropdownMenu(false)
-      console.log('DROPDOWN CLICKED')
     },
   })
 
