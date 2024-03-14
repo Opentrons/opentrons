@@ -11,8 +11,6 @@ import {
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
-  TEXT_ALIGN_LEFT,
-  TEXT_ALIGN_CENTER,
   TEXT_ALIGN_RIGHT,
 } from '@opentrons/components'
 
@@ -67,9 +65,8 @@ export interface InputFieldProps {
   min?: number
   /** horizontal text alignment for title, input, and (sub)captions */
   textAlign?:
-    | typeof TEXT_ALIGN_LEFT
-    | typeof TEXT_ALIGN_CENTER
-    | typeof TEXT_ALIGN_RIGHT
+    | typeof TYPOGRAPHY.textAlignLeft
+    | typeof TYPOGRAPHY.textAlignCenter
   /** small or medium input field height, relevant only */
   size?: 'medium' | 'small'
 }
@@ -92,7 +89,7 @@ export function InputField(props: InputFieldProps): JSX.Element {
 function Input(props: InputFieldProps): JSX.Element {
   const {
     placeholder,
-    textAlign = 'left',
+    textAlign = TYPOGRAPHY.textAlignLeft,
     size = 'small',
     title,
     ...inputProps
@@ -165,8 +162,8 @@ function Input(props: InputFieldProps): JSX.Element {
       height: ${size === 'small' ? '4.25rem' : '5rem'};
       box-shadow: ${error ? BORDERS.shadowBig : 'none'};
       font-size: ${TYPOGRAPHY.fontSize28};
-      padding-left: ${SPACING.spacing24};
-      border: 2px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.black90};
+      padding: ${SPACING.spacing16} ${SPACING.spacing24};
+      border: 2px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey50};
 
       &:focus-within {
         box-shadow: none;
@@ -181,8 +178,6 @@ function Input(props: InputFieldProps): JSX.Element {
         height: 100%;
         font-size: ${TYPOGRAPHY.fontSize28};
         line-height: ${TYPOGRAPHY.lineHeight36};
-        font-weight: ${TYPOGRAPHY.fontWeightRegular};
-        color: ${COLORS.black90};
       }
     }
   `
@@ -234,11 +229,12 @@ function Input(props: InputFieldProps): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-      {props.title != null && <Flex css={TITLE_STYLE}>{props.title}</Flex>}
+      {props.title != null ? (
+        <Flex css={TITLE_STYLE}>{props.title}</Flex>
+      ) : null}
       <Flex width="100%" flexDirection={DIRECTION_COLUMN} css={OUTER_CSS}>
         <Flex
           css={INPUT_FIELD}
-          padding
           alignItems={ALIGN_CENTER}
           as="label"
           for={inputProps.id}
@@ -249,7 +245,9 @@ function Input(props: InputFieldProps): JSX.Element {
             value={value}
             placeholder={placeHolder}
           />
-          {props.units != null && <Flex css={UNITS_STYLE}>{props.units}</Flex>}
+          {props.units != null ? (
+            <Flex css={UNITS_STYLE}>{props.units}</Flex>
+          ) : null}
         </Flex>
         <Flex
           color={COLORS.grey60}

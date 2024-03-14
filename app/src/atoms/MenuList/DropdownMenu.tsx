@@ -56,7 +56,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     flex-direction: ${DIRECTION_ROW};
     background-color: ${COLORS.white};
     cursor: pointer;
-    padding: ${SPACING.spacing8};
+    padding: ${SPACING.spacing8} ${SPACING.spacing12};
     border: 1px ${BORDERS.styleSolid}
       ${showDropdownMenu ? COLORS.blue50 : COLORS.grey50};
     border-radius: ${dropdownType === 'rounded'
@@ -89,11 +89,11 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      {title !== undefined && (
+      {title !== undefined ? (
         <StyledText as="labelSemiBold" paddingBottom={SPACING.spacing8}>
           {title}
         </StyledText>
-      )}
+      ) : null}
       <Flex
         onClick={(e: MouseEvent) => {
           e.preventDefault()
@@ -104,13 +104,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       >
         <StyledText css={TYPOGRAPHY.pSemiBold}>{currentOption.name}</StyledText>
         {showDropdownMenu ? (
-          <Icon
-            height={TYPOGRAPHY.lineHeight16}
-            name="menu-down"
-            transform="rotate(180deg)"
-          />
+          <Icon height="0.75rem" name="menu-down" transform="rotate(180deg)" />
         ) : (
-          <Icon height={TYPOGRAPHY.lineHeight16} name="menu-down" />
+          <Icon height="0.75rem" name="menu-down" />
         )}
       </Flex>
       {showDropdownMenu && (

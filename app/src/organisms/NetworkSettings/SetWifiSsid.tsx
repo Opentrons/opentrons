@@ -59,7 +59,7 @@ export function SetWifiSsid({
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
         <NormalKeyboard
           onChange={e => {
-            e != null && setInputSsid(String(e))
+            e != null && setInputSsid(e)
           }}
           keyboardRef={keyboardRef}
         />
