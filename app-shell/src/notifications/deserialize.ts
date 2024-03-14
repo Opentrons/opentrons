@@ -27,9 +27,9 @@ export function sendToBrowserDeserialized({
   message,
 }: SendToBrowserParams): void {
   try {
-    const { browserWindow } = connectionStore
+    const browserWindow = connectionStore.getBrowserWindow()
     browserWindow?.webContents.send('notify', hostname, topic, message)
-  } catch {}
+  } catch {} // Prevents shell error messages during app shutdown event.
 }
 
 export function deserialize(message: string): Promise<NotifyBrokerResponses> {
