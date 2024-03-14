@@ -7,7 +7,6 @@ import {
   COLOR_WARNING_DARK,
   COLORS,
   DIRECTION_COLUMN,
-  DISPLAY_INLINE_BLOCK,
   Flex,
   RESPONSIVENESS,
   SPACING,
@@ -164,7 +163,7 @@ function Input(props: InputFieldProps): JSX.Element {
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       height: ${size === 'small' ? '4.25rem' : '5rem'};
-      box-shadow: ${BORDERS.shadowBig};
+      box-shadow: ${error ? BORDERS.shadowBig : 'none'};
       font-size: ${TYPOGRAPHY.fontSize28};
       padding-left: ${SPACING.spacing24};
       border: 2px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.black90};
@@ -174,6 +173,7 @@ function Input(props: InputFieldProps): JSX.Element {
         border: ${error ? '2px' : '3px'} ${BORDERS.styleSolid}
           ${error ? COLORS.red50 : COLORS.blue50};
       }
+
       & input {
         color: ${COLORS.black90};
         flex: 1 1 auto;
@@ -217,34 +217,39 @@ function Input(props: InputFieldProps): JSX.Element {
     }
   `
 
+  const UNITS_STYLE = css`
+    color: ${props.disabled ? COLORS.grey40 : COLORS.grey50};
+    font-size: ${TYPOGRAPHY.fontSizeLabel};
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+    line-height: ${TYPOGRAPHY.lineHeight12};
+    align-text: ${TEXT_ALIGN_RIGHT};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      color: ${props.disabled ? COLORS.grey40 : COLORS.grey50};
+      font-size: ${TYPOGRAPHY.fontSize22};
+      font-weight: ${TYPOGRAPHY.fontWeightRegular};
+      line-height: ${TYPOGRAPHY.lineHeight28};
+      justify-content: ${textAlign};
+    }
+  `
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       {props.title != null && <Flex css={TITLE_STYLE}>{props.title}</Flex>}
-      <Flex
-        width="100%"
-        flexDirection={DIRECTION_COLUMN}
-        onClick={() =>
-          props.id !== undefined && document.getElementById(props.id)?.focus()
-        }
-        css={OUTER_CSS}
-      >
-        <Flex css={INPUT_FIELD} padding alignItems={ALIGN_CENTER}>
+      <Flex width="100%" flexDirection={DIRECTION_COLUMN} css={OUTER_CSS}>
+        <Flex
+          css={INPUT_FIELD}
+          padding
+          alignItems={ALIGN_CENTER}
+          as="label"
+          for={inputProps.id}
+        >
           <input
             {...inputProps}
             data-testid={props.id}
             value={value}
             placeholder={placeHolder}
           />
-          {props.units != null && (
-            <Flex
-              display={DISPLAY_INLINE_BLOCK}
-              textAlign={TEXT_ALIGN_RIGHT}
-              color={props.disabled ? COLORS.grey40 : COLORS.grey50}
-              fontSize={TYPOGRAPHY.fontSizeLabel}
-            >
-              {props.units}
-            </Flex>
-          )}
+          {props.units != null && <Flex css={UNITS_STYLE}>{props.units}</Flex>}
         </Flex>
         <Flex
           color={COLORS.grey60}
