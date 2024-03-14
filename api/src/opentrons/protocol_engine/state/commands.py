@@ -109,8 +109,8 @@ class CommandState:
     queued_setup_command_ids: OrderedSet[str]
     """The IDs of queued setup commands, in FIFO order"""
 
-    running_command_id: Optional[str]
-    """The ID of the currently running command, if any"""
+    last_running_command_id: Optional[str]
+    """The command that was most recently running, or is running right now."""
 
     commands_by_id: Dict[str, CommandEntry]
     """All command resources, in insertion order, mapped by their unique IDs."""
@@ -152,9 +152,6 @@ class CommandState:
     are stored on the individual commands themselves.
     """
 
-    failed_command: Optional[CommandEntry]
-    """The command, if any, that made the run fail and the index in the command list."""
-
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
 
@@ -185,14 +182,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
             queue_status=QueueStatus.SETUP,
             is_door_blocking=is_door_open and config.block_on_door_open,
             run_result=None,
-            running_command_id=None,
+            last_running_command_id=None,
             all_command_ids=[],
             queued_command_ids=OrderedSet(),
             queued_setup_command_ids=OrderedSet(),
             commands_by_id=OrderedDict(),
             run_error=None,
             finish_error=None,
-            failed_command=None,
             run_completed_at=None,
             run_started_at=None,
             latest_command_hash=None,
@@ -259,10 +255,17 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.queued_command_ids.discard(command.id)
             self._state.queued_setup_command_ids.discard(command.id)
 
-            if command.status == CommandStatus.RUNNING:
-                self._state.running_command_id = command.id
-            elif self._state.running_command_id == command.id:
-                self._state.running_command_id = None
+            if command.status in {
+                CommandStatus.RUNNING,
+                # Make sure that if a command skips straight to succeeded or failed,
+                # without explicitly going through the running state first, we count it
+                # as being "the last one to have run." This is currently necessary for
+                # LegacyContextPlugin, which appends certain commands like that during
+                # the normal course of run execution.
+                CommandStatus.SUCCEEDED,
+                CommandStatus.FAILED,
+            }:
+                self._state.last_running_command_id = command.id
 
         elif isinstance(action, FailCommandAction):
             error_occurrence = ErrorOccurrence.from_failed(
@@ -278,8 +281,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 error_occurrence=error_occurrence,
             )
 
-            self._state.failed_command = self._state.commands_by_id[action.command_id]
-
             if prev_entry.command.intent == CommandIntent.SETUP:
                 other_command_ids_to_fail = self._state.queued_setup_command_ids
                 for id in other_command_ids_to_fail:
@@ -294,9 +295,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         command_id=id, failed_at=action.failed_at, error_occurrence=None
                     )
                 self._state.queued_command_ids.clear()
-
-            if self._state.running_command_id == action.command_id:
-                self._state.running_command_id = None
 
         elif isinstance(action, PlayAction):
             if not self._state.run_result:
@@ -462,22 +460,13 @@ class CommandView(HasState[CommandState]):
         # this; if this becomes a problem, change or the underlying data structure
         # to something that isn't just an OrderedDict
         all_command_ids = self._state.all_command_ids
+        last_running_command_id = self._state.last_running_command_id
         commands_by_id = self._state.commands_by_id
-        running_command_id = self._state.running_command_id
-        queued_command_ids = self._state.queued_command_ids
         total_length = len(all_command_ids)
 
         if cursor is None:
-            if running_command_id is not None:
-                cursor = commands_by_id[running_command_id].index
-            elif len(queued_command_ids) > 0:
-                cursor = commands_by_id[queued_command_ids.head()].index - 1
-            elif (
-                self._state.run_result
-                and self._state.run_result == RunResult.FAILED
-                and self._state.failed_command
-            ):
-                cursor = self._state.failed_command.index
+            if last_running_command_id is not None:
+                cursor = commands_by_id[last_running_command_id].index
             else:
                 cursor = total_length - length
 
@@ -521,7 +510,14 @@ class CommandView(HasState[CommandState]):
 
     def get_running_command_id(self) -> Optional[str]:
         """Return the ID of the command that's currently running, if there is one."""
-        return self._state.running_command_id
+        current = self.get_current()
+        if (
+            current is not None
+            and self.get(current.command_id).status == CommandStatus.RUNNING
+        ):
+            return current.command_id
+        else:
+            return None
 
     def get_current(self) -> Optional[CurrentCommand]:
         """Return the "current" command, if any.
@@ -529,26 +525,14 @@ class CommandView(HasState[CommandState]):
         The "current" command is the command that is currently executing,
         or the most recent command to have completed.
         """
-        if self._state.running_command_id:
-            entry = self._state.commands_by_id[self._state.running_command_id]
+        if self._state.last_running_command_id is not None:
+            entry = self._state.commands_by_id[self._state.last_running_command_id]
             return CurrentCommand(
                 command_id=entry.command.id,
                 command_key=entry.command.key,
                 created_at=entry.command.createdAt,
                 index=entry.index,
             )
-
-        # TODO(mc, 2022-02-07): this is O(n) in the worst case for no good reason.
-        # Resolve prior to JSONv6 support, where this will matter.
-        for reverse_index, cid in enumerate(reversed(self._state.all_command_ids)):
-            if self.get_command_is_final(cid):
-                entry = self._state.commands_by_id[cid]
-                return CurrentCommand(
-                    command_id=entry.command.id,
-                    command_key=entry.command.key,
-                    created_at=entry.command.createdAt,
-                    index=len(self._state.all_command_ids) - reverse_index - 1,
-                )
 
         return None
 
@@ -583,7 +567,7 @@ class CommandView(HasState[CommandState]):
             return True
         elif (
             self.get_status() == EngineStatus.IDLE
-            and self._state.running_command_id is None
+            and self.get_running_command_id() is None
             and len(self._state.queued_setup_command_ids) == 0
         ):
             return True
@@ -632,7 +616,7 @@ class CommandView(HasState[CommandState]):
             CommandExecutionFailedError: if any added command failed, and its `intent` wasn't
             `setup`.
         """
-        no_command_running = self._state.running_command_id is None
+        no_command_running = self.get_running_command_id() is None
         no_command_to_execute = (
             self._state.run_result is not None
             or len(self._state.queued_command_ids) == 0
