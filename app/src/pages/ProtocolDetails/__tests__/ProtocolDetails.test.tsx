@@ -21,6 +21,7 @@ import { i18n } from '../../../i18n'
 import { useHardwareStatusText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../../Protocols/hooks'
+import { useFeatureFlag } from '../../../redux/config'
 import { formatTimeWithUtcLabel } from '../../../resources/runs'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
@@ -52,6 +53,7 @@ vi.mock('../Deck')
 vi.mock('../Hardware')
 vi.mock('../Labware')
 vi.mock('../Parameters')
+vi.mock('../../../redux/config')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})
@@ -90,6 +92,7 @@ const render = (path = '/protocols/fakeProtocolId') => {
 
 describe('ODDProtocolDetails', () => {
   beforeEach(() => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)

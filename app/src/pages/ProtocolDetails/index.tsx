@@ -44,6 +44,7 @@ import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
+  useFeatureFlag,
 } from '../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../Protocols/hooks'
@@ -163,8 +164,17 @@ const protocolSectionTabOptions = [
   'Liquids',
   'Deck',
 ] as const
+const protocolSectionTabOptionsWithoutParameters = [
+  'Summary',
+  'Hardware',
+  'Labware',
+  'Liquids',
+  'Deck',
+] as const
 
-type TabOption = typeof protocolSectionTabOptions[number]
+type TabOption =
+  | typeof protocolSectionTabOptions[number]
+  | typeof protocolSectionTabOptionsWithoutParameters[number]
 
 interface ProtocolSectionTabsProps {
   currentOption: TabOption
@@ -175,9 +185,13 @@ const ProtocolSectionTabs = ({
   currentOption,
   setCurrentOption,
 }: ProtocolSectionTabsProps): JSX.Element => {
+  const enableRtpFF = useFeatureFlag('enableRunTimeParameters')
+  const options = enableRtpFF
+    ? protocolSectionTabOptions
+    : protocolSectionTabOptionsWithoutParameters
   return (
     <Flex gridGap={SPACING.spacing8}>
-      {protocolSectionTabOptions.map(option => {
+      {options.map(option => {
         return (
           <TabbedButton
             isSelected={option === currentOption}
@@ -290,6 +304,7 @@ export function ProtocolDetails(): JSX.Element | null {
     'protocol_info',
     'shared',
   ])
+  const enableRtpFF = useFeatureFlag('enableRunTimeParameters')
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const {
     missingProtocolHardware,
@@ -305,8 +320,11 @@ export function ProtocolDetails(): JSX.Element | null {
   const { makeSnackbar } = useToaster()
   const queryClient = useQueryClient()
   const [currentOption, setCurrentOption] = React.useState<TabOption>(
-    protocolSectionTabOptions[0]
+    enableRtpFF
+      ? protocolSectionTabOptions[0]
+      : protocolSectionTabOptionsWithoutParameters[0]
   )
+
   const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)
   const {
     data: protocolRecord,
