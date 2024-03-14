@@ -4,8 +4,8 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, RESPONSIVENESS } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
+import { RESPONSIVENESS } from '../../ui-style-constants'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_X_ADJUSTMENT,

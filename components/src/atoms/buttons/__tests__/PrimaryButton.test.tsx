@@ -3,8 +3,8 @@ import { describe, it, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../testing/utils'
-import { COLORS } from '../../../helix-design-system'
-import { BORDERS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
 import { PrimaryButton } from '../PrimaryButton'
 
 const render = (props: React.ComponentProps<typeof PrimaryButton>) => {

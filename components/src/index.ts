@@ -30,7 +30,6 @@ export * from './ui-style-constants'
 
 // helix design system
 export * from './helix-design-system'
-export { BORDERS } from './helix-design-system'
 
 // Pure Types
 export * from './robot-types'

@@ -1,12 +1,11 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import { borderRadius4 } from '../ui-style-constants/borders'
+import { BORDERS, COLORS } from '../helix-design-system'
 import { fontSizeH4 } from '../ui-style-constants/typography'
 import { spacing8 } from '../ui-style-constants/spacing'
 import { ARROW_SIZE_PX } from './styles'
 import { Box } from '../primitives'
-import { COLORS } from '../helix-design-system'
 
 import type { CSSProperties } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
@@ -63,7 +62,7 @@ export const Tooltip = React.forwardRef(function TooltipComponent(
     filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.2));
     cursor: pointer;
     font-size: ${fontSize};
-    border-radius: ${borderRadius4};
+    border-radius: ${BORDERS.borderRadius4};
   `
 
   return visible ? (

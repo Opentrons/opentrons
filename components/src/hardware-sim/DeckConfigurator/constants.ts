@@ -1,8 +1,8 @@
 import { css } from 'styled-components'
 
-import { COLORS } from '../../helix-design-system'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 /**
  * These are Flex deck configurator-only values to position a foreign object
