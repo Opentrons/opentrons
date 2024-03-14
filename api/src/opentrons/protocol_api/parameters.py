@@ -1,6 +1,6 @@
 from typing import Dict, Optional
 
-from opentrons.protocol_api.parameter_definition import AllowedTypes
+from opentrons.protocol_api.parameter_validation_and_errors import AllowedTypes
 
 
 class Parameters:

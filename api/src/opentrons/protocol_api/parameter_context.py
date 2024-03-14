@@ -2,7 +2,8 @@
 
 from typing import List, Dict
 
-from opentrons.protocol_api.parameter_definition import ParameterDefinition, AllowedTypes
+from .parameter_definition import ParameterDefinition
+from .parameter_validation_and_errors import AllowedTypes
 
 
 class ParameterContext:
