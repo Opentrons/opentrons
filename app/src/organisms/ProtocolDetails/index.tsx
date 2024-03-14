@@ -73,6 +73,7 @@ import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 import { ProtocolParameters } from './ProtocolParameters'
+import { useRunTimeParameters } from '../../pages/Protocols/hooks'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -216,6 +217,9 @@ export function ProtocolDetails(
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
+
+  const runTimeParameters = useRunTimeParameters(protocolKey)
+
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
   if (analysisStatus === 'stale') {
@@ -330,7 +334,7 @@ export function ProtocolDetails(
       <ProtocolStats analysis={mostRecentAnalysis} />
     ) : null,
     parameters: enableRunTimeParameters ? (
-      <ProtocolParameters analysis={mostRecentAnalysis} />
+      <ProtocolParameters runTimeParameters={runTimeParameters} />
     ) : null,
   }
 

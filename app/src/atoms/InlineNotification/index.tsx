@@ -94,7 +94,7 @@ export function InlineNotification(
           >
             {fullHeading}
           </span>
-          {message !=null && fullmessage}
+          {message != null && fullmessage}
         </StyledText>
       </Flex>
       {onCloseClick && (

@@ -12,7 +12,7 @@ import {
   SINGLE_SLOT_FIXTURES,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
-  RunTimeParameters,
+  RunTimeParameter,
 } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
@@ -192,7 +192,7 @@ export const useRequiredProtocolHardwareFromAnalysis = (
 
 export const useRunTimeParameters = (
   protocolId: string
-): RunTimeParameters[] => {
+): RunTimeParameter[] => {
   const { data: protocolData } = useProtocolQuery(protocolId)
   const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
@@ -200,7 +200,7 @@ export const useRunTimeParameters = (
     { enabled: protocolData != null }
   )
 
-  const mockData: RunTimeParameters[] = [
+  const mockData: RunTimeParameter[] = [
     {
       displayName: 'Dry Run',
       variableName: 'DRYRUN',
@@ -265,7 +265,7 @@ export const useRunTimeParameters = (
       type: 'str',
       choices: [
         {
-          displayName: 'no offsets',
+          displayName: 'No offsets',
           value: 'none',
         },
         {
@@ -278,6 +278,23 @@ export const useRunTimeParameters = (
         },
       ],
       default: 'none',
+    },
+    {
+      displayName: 'pipette mount',
+      variableName: 'mont',
+      description: 'pipette mount',
+      type: 'str',
+      choices: [
+        {
+          displayName: 'Left',
+          value: 'left',
+        },
+        {
+          displayName: 'Right',
+          value: 'right',
+        },
+      ],
+      default: 'left',
     },
   ]
   //  TODO(jr, 3/14/24): remove the mockData

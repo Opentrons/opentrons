@@ -15,44 +15,16 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-
-// Note (03/13/2024: kk) this will be replaced with custom hooks return
-import exampleRunTimeParameters from './exampleRunTimeParameters.json'
-
-// Note (03/13/2024: kk) probably the following if/type will be moved more better place later
-interface Choice {
-  displayName: string
-  value: string
-}
-
-type DefaultValueType = string | number | boolean
-
-interface RunTimeParameter {
-  displayName: string
-  variableName: string
-  description: string
-  suffix: string | null
-  min?: number
-  max?: number
-  choices?: Choice[]
-  default: DefaultValueType
-}
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 interface ProtocolParametersProps {
-  analysis: ProtocolAnalysisOutput | null
+  runTimeParameters: RunTimeParameter[]
 }
 
 export function ProtocolParameters({
-  analysis,
+  runTimeParameters,
 }: ProtocolParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_details')
-
-  // ToDo (03/13/2024:kk) the sample data will be replaces analysis data
-  const isUsingSampleData = true
-  const { runTimeParameters } = isUsingSampleData
-    ? exampleRunTimeParameters
-    : { runTimeParameters: [] }
 
   return (
     <Flex>
@@ -90,40 +62,49 @@ function ProtocolParameterItems({
 }: ProtocolParameterItemsProps): JSX.Element {
   const { t } = useTranslation('protocol_details')
 
-  const formattedValue = (parameter: RunTimeParameter): string => {
-    if (typeof parameter.default === 'boolean') {
-      return parameter.default ? 'On' : 'Off'
-    }
-
-    if (typeof parameter.default === 'number') {
-      return parameter.default.toString()
-    }
-
-    if (parameter.choices != null) {
-      const choice = parameter.choices.find(
-        choice => choice.value === parameter.default
-      )
-      if (choice != null) {
-        return choice.displayName
-      }
+  const formattedValue = (runTimeParameter: RunTimeParameter): string => {
+    const { type, default: defaultValue } = runTimeParameter
+    switch (type) {
+      case 'int':
+      case 'float':
+        return defaultValue.toString()
+      case 'boolean':
+        return Boolean(defaultValue) ? 'On' : 'Off'
+      case 'str':
+        if ('choices' in runTimeParameter && runTimeParameter.choices != null) {
+          const choice = runTimeParameter.choices.find(
+            choice => choice.value === defaultValue
+          )
+          if (choice != null) {
+            return choice.displayName
+          }
+        }
+        break
     }
     return ''
   }
 
-  const formatRange = (obj: RunTimeParameter): string => {
-    if (
-      Object.prototype.hasOwnProperty.call(obj, 'min') &&
-      Object.prototype.hasOwnProperty.call(obj, 'max')
-    ) {
-      return `${obj.min}-${obj.max}`
+  const formatRange = (
+    runTimeParameter: RunTimeParameter,
+    minMax: string
+  ): string => {
+    const { type, default: defaultValue } = runTimeParameter
+
+    switch (type) {
+      case 'int':
+      case 'float':
+        return minMax
+      case 'boolean':
+        return 'On, off'
+      case 'str':
+        if (defaultValue === 'left' || defaultValue === 'right') {
+          return 'Left, right'
+        } else {
+          return 'Multi'
+        }
+      default:
+        return ''
     }
-    if (typeof obj.default === 'boolean') {
-      return 'On, off'
-    }
-    if (Object.prototype.hasOwnProperty.call(obj, 'choices')) {
-      return 'Multi'
-    }
-    return ''
   }
 
   return (
@@ -134,22 +115,28 @@ function ProtocolParameterItems({
         <StyledTableHeader>{t('range')}</StyledTableHeader>
       </thead>
       <tbody>
-        {runTimeParameters.map((parameter: RunTimeParameter, index: number) => (
-          <StyledTableRow
-            isLast={index === runTimeParameters.length - 1}
-            key={`runTimeParameter-${index}`}
-          >
-            <StyledTableCell isLast={index === runTimeParameters.length - 1}>
-              <StyledText as="p">{parameter.displayName}</StyledText>
-            </StyledTableCell>
-            <StyledTableCell isLast={index === runTimeParameters.length - 1}>
-              <StyledText as="p">{formattedValue(parameter)}</StyledText>
-            </StyledTableCell>
-            <StyledTableCell isLast={index === runTimeParameters.length - 1}>
-              <StyledText as="p">{formatRange(parameter)}</StyledText>
-            </StyledTableCell>
-          </StyledTableRow>
-        ))}
+        {runTimeParameters.map((parameter: RunTimeParameter, index: number) => {
+          const min = 'min' in parameter ? parameter.min : 0
+          const max = 'max' in parameter ? parameter.max : 0
+          return (
+            <StyledTableRow
+              isLast={index === runTimeParameters.length - 1}
+              key={`runTimeParameter-${index}`}
+            >
+              <StyledTableCell isLast={index === runTimeParameters.length - 1}>
+                <StyledText as="p">{parameter.displayName}</StyledText>
+              </StyledTableCell>
+              <StyledTableCell isLast={index === runTimeParameters.length - 1}>
+                <StyledText as="p">{formattedValue(parameter)}</StyledText>
+              </StyledTableCell>
+              <StyledTableCell isLast={index === runTimeParameters.length - 1}>
+                <StyledText as="p">
+                  {formatRange(parameter, `${min}-${max}`)}
+                </StyledText>
+              </StyledTableCell>
+            </StyledTableRow>
+          )
+        })}
       </tbody>
     </StyledTable>
   )
