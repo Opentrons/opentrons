@@ -204,36 +204,36 @@ export const useRunTimeParameters = (
     {
       displayName: 'Dry Run',
       variableName: 'DRYRUN',
-      description: 'a dry run description',
+      description: 'Is this a dry or wet run? Wet is true, dry is false',
       type: 'boolean',
       default: false,
     },
     {
       displayName: 'Use Gripper',
       variableName: 'USE_GRIPPER',
-      description: '',
+      description: 'For using the gripper.',
       type: 'boolean',
       default: true,
     },
     {
       displayName: 'Trash Tips',
       variableName: 'TIP_TRASH',
-      description: 'throw tip in trash',
+      description:
+        'to throw tip into the trash or to not throw tip into the trash',
       type: 'boolean',
       default: true,
     },
     {
       displayName: 'Deactivate Temperatures',
       variableName: 'DEACTIVATE_TEMP',
-      description: 'deactivate temperature?',
+      description: 'deactivate temperature on the module',
       type: 'boolean',
       default: true,
     },
     {
       displayName: 'Columns of Samples',
       variableName: 'COLUMNS',
-      description: '',
-      suffix: 'mL',
+      description: 'How many columns do you want?',
       type: 'int',
       min: 1,
       max: 14,
@@ -242,7 +242,7 @@ export const useRunTimeParameters = (
     {
       displayName: 'PCR Cycles',
       variableName: 'PCR_CYCLES',
-      description: '',
+      description: 'number of PCR cycles on a thermocycler',
       type: 'int',
       min: 1,
       max: 10,
@@ -251,8 +251,9 @@ export const useRunTimeParameters = (
     {
       displayName: 'EtoH Volume',
       variableName: 'ETOH_VOLUME',
-      description: '',
+      description: '70% ethanol volume',
       type: 'float',
+      suffix: 'mL',
       min: 1.5,
       max: 10.0,
       default: 6.5,
@@ -260,7 +261,7 @@ export const useRunTimeParameters = (
     {
       displayName: 'Default Module Offsets',
       variableName: 'DEFAULT_OFFSETS',
-      description: '',
+      description: 'default module offsets for temp, H-S, and none',
       type: 'str',
       choices: [
         {

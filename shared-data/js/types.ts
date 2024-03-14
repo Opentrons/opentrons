@@ -613,14 +613,14 @@ interface BooleanParameter {
   default: boolean
 }
 
-type RunTimeParamterTypes = 'int' | 'float' | 'str' | 'boolean'
+type RunTimeParameterTypes = 'int' | 'float' | 'str' | 'boolean'
 
 type RunTimeParameter = IntParameter | ChoiceParameter | BooleanParameter
 interface BaseRunTimeParameters {
   displayName: string
   variableName: string
   description: string
-  type: RunTimeParamterTypes
+  type: RunTimeParameterTypes
   suffix?: string
 }
 
