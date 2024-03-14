@@ -284,7 +284,8 @@ sync-ot3: sync-sw-ot3 sync-fw-ot3
 .PHONY: push-ot3-gravimetric
 push-ot3-gravimetric:
 	$(MAKE) push-ot3
-	scp $(ssh_helper_ot3) -r hardware_testing/labware root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	ssh $(ssh_helper_ot3) root@$(host) "mkdir -p /data/labware/v2/custom_definitions/custom_beta"
+	scp $(ssh_helper_ot3) -r hardware_testing/labware/* root@$(host):/data/labware/v2/custom_definitions/custom_beta/
 
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:
