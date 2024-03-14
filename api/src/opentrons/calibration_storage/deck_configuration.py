@@ -27,7 +27,9 @@ def serialize_deck_configuration(
     data = _DeckConfigurationModel.construct(
         cutoutFixtures=[
             _CutoutFixturePlacementModel.construct(
-                cutoutId=e.cutout_id, cutoutFixtureId=e.cutout_fixture_id, opentronsModuleSerialNumber=e.opentrons_modules_serial_number
+                cutoutId=e.cutout_id,
+                cutoutFixtureId=e.cutout_fixture_id,
+                opentronsModuleSerialNumber=e.opentrons_modules_serial_number,
             )
             for e in cutout_fixture_placements
         ],
@@ -51,7 +53,9 @@ def deserialize_deck_configuration(
     else:
         cutout_fixture_placements = [
             CutoutFixturePlacement(
-                cutout_id=e.cutoutId, cutout_fixture_id=e.cutoutFixtureId, opentrons_modules_serial_number=e.opentronsModuleSerialNumber
+                cutout_id=e.cutoutId,
+                cutout_fixture_id=e.cutoutFixtureId,
+                opentrons_modules_serial_number=e.opentronsModuleSerialNumber,
             )
             for e in parsed.cutoutFixtures
         ]

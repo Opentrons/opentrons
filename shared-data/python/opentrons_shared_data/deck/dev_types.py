@@ -4,7 +4,7 @@ opentrons_shared_data.deck.dev_types: types for deck defs
 This should only be imported if typing.TYPE_CHECKING is True
 """
 
-from typing import Any, Dict, List, NewType, Union
+from typing import Any, Dict, List, NewType, Union, Optional
 from typing_extensions import Literal, TypedDict
 
 from ..module.dev_types import ModuleType
@@ -112,7 +112,7 @@ class Cutout(TypedDict):
 
 class CutoutFixture(TypedDict):
     id: str
-    opentronsModuleSerialNumber: str
+    opentronsModuleSerialNumber: Optional[str]
     mayMountTo: List[str]
     displayName: str
     providesAddressableAreas: Dict[str, List[str]]
@@ -177,6 +177,7 @@ class _RequiredDeckDefinitionV4(TypedDict):
 class DeckDefinitionV4(_RequiredDeckDefinitionV4, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
 
+
 class _RequiredDeckDefinitionV5(TypedDict):
     otId: str
     schemaVersion: Literal[5]
@@ -190,5 +191,6 @@ class _RequiredDeckDefinitionV5(TypedDict):
 
 class DeckDefinitionV5(_RequiredDeckDefinitionV5, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
+
 
 DeckDefinition = Union[DeckDefinitionV3, DeckDefinitionV4, DeckDefinitionV5]

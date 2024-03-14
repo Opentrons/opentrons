@@ -54,7 +54,9 @@ class DeckConfigurationStore:  # noqa: D101
                 path=self._path,
                 cutout_fixture_placements=[
                     calibration_storage_types.CutoutFixturePlacement(
-                        cutout_fixture_id=e.cutoutFixtureId, cutout_id=e.cutoutId, opentrons_modules_serial_number=e.opentronsModuleSerialNumber
+                        cutout_fixture_id=e.cutoutFixtureId,
+                        cutout_id=e.cutoutId,
+                        opentrons_modules_serial_number=e.opentronsModuleSerialNumber,
                     )
                     for e in request.cutoutFixtures
                 ],
@@ -71,7 +73,8 @@ class DeckConfigurationStore:  # noqa: D101
         """Get the robot's current deck configuration in an expected typing."""
         to_convert = await self.get()
         converted = [
-            (item.cutoutId, item.cutoutFixtureId, item.opentronsModuleSerialNumber) for item in to_convert.cutoutFixtures
+            (item.cutoutId, item.cutoutFixtureId, item.opentronsModuleSerialNumber)
+            for item in to_convert.cutoutFixtures
         ]
         return converted
 

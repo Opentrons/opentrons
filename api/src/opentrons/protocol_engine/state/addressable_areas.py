@@ -351,7 +351,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             assert self._state.deck_configuration is not None
             return [
                 cutout_fixture_id
-                for _, cutout_fixture_id in self._state.deck_configuration
+                for _, cutout_fixture_id, _serial in self._state.deck_configuration
             ]
 
     def _get_loaded_addressable_area(
@@ -508,7 +508,11 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             slot_cutout_id = DECK_SLOT_TO_CUTOUT_MAP[slot_name]
             slot_cutout_fixture = None
             # This will only ever be one under current assumptions
-            for cutout_id, cutout_fixture_id in deck_config:
+            for (
+                cutout_id,
+                cutout_fixture_id,
+                opentrons_module_serial_number,
+            ) in deck_config:
                 if cutout_id == slot_cutout_id:
                     slot_cutout_fixture = (
                         deck_configuration_provider.get_cutout_fixture(

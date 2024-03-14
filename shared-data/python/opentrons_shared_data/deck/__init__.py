@@ -39,9 +39,11 @@ CALIBRATION_SQUARE_EDGES: Dict[str, Offset] = {
     "bottom": Offset(y=-CALIBRATION_SQUARE_SIZE * 0.5),
 }
 
+
 @overload
 def load(name: str, version: "DeckSchemaVersion5") -> "DeckDefinitionV5":
     ...
+
 
 @overload
 def load(name: str, version: "DeckSchemaVersion4") -> "DeckDefinitionV4":

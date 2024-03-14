@@ -44,7 +44,7 @@ class InvalidLocationError:
 
 @dataclass(frozen=True)
 class UnrecognizedCutoutFixtureError:
-    """When an cutout fixture has been mounted that's not defined by the deck definition."""
+    """When a cutout fixture has been mounted that's not defined by the deck definition."""
 
     cutout_fixture_id: str
     allowed_cutout_fixture_ids: FrozenSet[str]
@@ -57,11 +57,23 @@ class InvalidSerialNumberError:
     cutout_id: str
     cutout_fixture_id: str
 
+
+@dataclass(frozen=True)
+class UnexpectedSerialNumberError:
+    """When a cutout fixture that is not a module has been provided a serial number."""
+
+    cutout_id: str
+    cutout_fixture_id: str
+    opentrons_module_serial_number: str
+
+
 ConfigurationError = Union[
     UnoccupiedCutoutError,
     OvercrowdedCutoutError,
     InvalidLocationError,
     UnrecognizedCutoutFixtureError,
+    InvalidSerialNumberError,
+    UnexpectedSerialNumberError,
 ]
 
 
@@ -108,23 +120,27 @@ def get_configuration_errors(
                 )
             # replace this with a serial number check set instead
             # if serial number in def is null, we expect nothing from the put statement, raise if there is something
-            #if it is not null, we expect something from the put statement! if theres nothing then raise an error
-            if found_cutout_fixture["opentronsModuleSerialNumber"] == "":
-                if len(placement.opentrons_modules_serial_number) == 0:
-                    errors.add(
-                        InvalidSerialNumberError(
-                            cutout_id=placement.cutout_id,
-                            cutout_fixture_id=placement.cutout_fixture_id,
-                        )
+            # if it is not null, we expect something from the put statement! if theres nothing then raise an error
+            if found_cutout_fixture[
+                "opentronsModuleSerialNumber"
+            ] is None and isinstance(placement.opentrons_modules_serial_number, str):
+                errors.add(
+                    UnexpectedSerialNumberError(
+                        cutout_id=placement.cutout_id,
+                        cutout_fixture_id=placement.cutout_fixture_id,
+                        opentrons_module_serial_number=placement.opentrons_modules_serial_number,
                     )
-            else:
-                if len(placement.opentrons_modules_serial_number) == 0:
-                    errors.add(
-                        InvalidSerialNumberError(
-                            cutout_id=placement.cutout_id,
-                            cutout_fixture_id=placement.cutout_fixture_id,
-                        )
+                )
+            elif (
+                isinstance(found_cutout_fixture["opentronsModuleSerialNumber"], str)
+                and placement.opentrons_modules_serial_number is None
+            ):
+                errors.add(
+                    InvalidSerialNumberError(
+                        cutout_id=placement.cutout_id,
+                        cutout_fixture_id=placement.cutout_fixture_id,
                     )
+                )
 
     return errors
 

@@ -38,7 +38,7 @@ class CutoutFixture(pydantic.BaseModel):
             "The serial number of a module loaded as a fixture."
             " [deck definition](https://github.com/Opentrons/opentrons/tree/edge/shared-data/deck)."
         ),
-        default=None
+        default=None,
     )
 
 

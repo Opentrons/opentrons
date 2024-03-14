@@ -567,8 +567,8 @@
       "height": 124.5
     },
     {
-      "id": "thermocyclerRear",
-      "opentronsModuleSerialNumber": null,
+      "id": "thermocyclerModuleRear",
+      "opentronsModuleSerialNumber": "",
       "mayMountTo": ["cutoutA1"],
       "displayName": "Rear Slot portion of the Thermocycler Moduler",
       "providesAddressableAreas": {},
@@ -576,7 +576,7 @@
     },
     {
       "id": "thermocyclerModuleFront",
-      "opentronsModuleSerialNumber": null,
+      "opentronsModuleSerialNumber": "",
       "mayMountTo": ["cutoutB1"],
       "displayName": "Front Slot portion of the Thermocycler Moduler",
       "providesAddressableAreas": {
@@ -586,7 +586,7 @@
     },
     {
       "id": "heaterShakerModule",
-      "opentronsModuleSerialNumber": null,
+      "opentronsModuleSerialNumber": "",
       "mayMountTo": [
         "cutoutD1",
         "cutoutC1",
@@ -612,7 +612,7 @@
     },
     {
       "id": "temperatureModule",
-      "opentronsModuleSerialNumber": null,
+      "opentronsModuleSerialNumber": "",
       "mayMountTo": [
         "cutoutD1",
         "cutoutC1",
@@ -638,7 +638,7 @@
     },
     {
       "id": "magneticBlockModule",
-      "opentronsModuleSerialNumber": null,
+      "opentronsModuleSerialNumber": "",
       "mayMountTo": [
         "cutoutD1",
         "cutoutC1",
