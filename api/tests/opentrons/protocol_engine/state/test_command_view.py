@@ -860,7 +860,7 @@ def test_get_slice_default_cursor_running() -> None:
 
 
 def test_get_slice_default_cursor_queued() -> None:
-    """It should select a cursor based on the next queued command, if present."""
+    """It should select a cursor automatically."""
     command_1 = create_succeeded_command(command_id="command-id-1")
     command_2 = create_succeeded_command(command_id="command-id-2")
     command_3 = create_succeeded_command(command_id="command-id-3")
@@ -870,7 +870,7 @@ def test_get_slice_default_cursor_queued() -> None:
     subject = get_command_view(
         commands=[command_1, command_2, command_3, command_4, command_5],
         running_command_id=None,
-        queued_command_ids=["command-id-4", "command-id-4", "command-id-5"],
+        queued_command_ids=[command_4.id, command_5.id],
     )
 
     result = subject.get_slice(cursor=None, length=2)
