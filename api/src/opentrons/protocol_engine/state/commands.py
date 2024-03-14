@@ -516,6 +516,10 @@ class CommandView(HasState[CommandState]):
         else:
             return run_error or finish_error
 
+    def get_running_command_id(self) -> Optional[str]:
+        """Return the ID of the command that's currently running, if there is one."""
+        return self._state.running_command_id
+
     def get_current(self) -> Optional[CurrentCommand]:
         """Return the "current" command, if any.
 
