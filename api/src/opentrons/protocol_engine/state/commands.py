@@ -451,6 +451,7 @@ class CommandView(HasState[CommandState]):
         cursor: Optional[int],
         length: int,
     ) -> CommandSlice:
+        # todo
         """Get a subset of commands around a given cursor.
 
         If the cursor is omitted, a cursor will be selected automatically
@@ -520,6 +521,7 @@ class CommandView(HasState[CommandState]):
             return None
 
     def get_current(self) -> Optional[CurrentCommand]:
+        # todo
         """Return the "current" command, if any.
 
         The "current" command is the command that is currently executing,

@@ -90,6 +90,7 @@ class CommandLink(BaseModel):
 class CommandCollectionLinks(BaseModel):
     """Links returned along with a collection of commands."""
 
+    # todo
     current: Optional[CommandLink] = Field(
         None,
         description="Path to the currently running or next queued command.",
@@ -226,6 +227,7 @@ async def get_run_commands(
     cursor: Optional[int] = Query(
         None,
         description=(
+            # todo
             "The starting index of the desired first command in the list."
             " If unspecified, a cursor will be selected automatically"
             " based on the currently running or most recently executed command."
