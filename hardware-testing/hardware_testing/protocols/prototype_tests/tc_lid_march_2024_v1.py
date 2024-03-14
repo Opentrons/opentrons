@@ -25,6 +25,7 @@ LID_STARTING_SLOT = "D2"
 LID_ENDING_SLOT = "C2"
 LID_COUNT = 2
 LID_DEFINITION = "tc_lid_march_2024_v1"
+LID_BOTTOM_DEFINITION = "tc_lid_march_2024_v1"
 
 USING_THERMOCYCLER = True
 
@@ -64,7 +65,7 @@ def _move_labware_with_offset_and_pause(
 
 def run(protocol: ProtocolContext):
     # SETUP
-    lids: List[Labware] = [protocol.load_labware(LID_DEFINITION, LID_STARTING_SLOT)]
+    lids: List[Labware] = [protocol.load_labware(LID_BOTTOM_DEFINITION, LID_STARTING_SLOT)]
     for i in range(LID_COUNT - 1):
         lids.append(lids[-1].load_labware(LID_DEFINITION))
     lids.reverse()  # NOTE: reversing to more easily loop through lids from top-to-bottom

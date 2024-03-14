@@ -22,7 +22,7 @@ Run:
 """
 
 TIPS_DECK_SLOTS = ["C2", "C3"]
-GUIDES_SLOT = "C4"
+GUIDES_SLOT = "D3"
 TIPS_DEFINITION = "opentrons_flex_96_tiprack_1000ul_stacking_v1"
 
 START_UNSTACKED = True

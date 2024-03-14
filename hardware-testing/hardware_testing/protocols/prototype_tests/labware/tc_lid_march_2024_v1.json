@@ -1,12 +1,12 @@
 {
-  "allowedRoles": ["labware","adapter"],
+  "allowedRoles": ["labware"],
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
     "brandId": []
   },
   "metadata": {
-    "displayName": "Opentrons Thermocycler Lid - BOTTOM",
+    "displayName": "Opentrons Thermocycler Lid",
     "displayCategory": "other",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
@@ -29,7 +29,7 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "tc_lid_bottom_march_2024_v1"
+    "loadName": "tc_lid_march_2024_v1"
   },
   "namespace": "custom_beta",
   "version": 1,
@@ -74,4 +74,4 @@
       }
     }
   }
-},
+}
