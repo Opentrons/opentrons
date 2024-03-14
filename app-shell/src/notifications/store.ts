@@ -3,7 +3,7 @@ import mqtt from 'mqtt'
 
 import { FAILURE_STATUSES } from '../constants'
 
-import type { NotifyTopic } from '@opentrons/app/lib/redux/shell/types'
+import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 import type { BrowserWindow } from 'electron'
 
 type FailedConnStatus = typeof FAILURE_STATUSES[keyof typeof FAILURE_STATUSES]

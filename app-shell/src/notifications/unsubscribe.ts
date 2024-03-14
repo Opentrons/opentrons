@@ -1,7 +1,7 @@
 import { connectionStore } from './store'
 import { notifyLog } from './log'
 
-import type { NotifyTopic } from '@opentrons/app/lib/redux/shell/types'
+import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 
 export function unsubscribe(
   hostname: string,

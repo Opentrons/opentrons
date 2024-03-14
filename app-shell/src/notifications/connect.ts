@@ -6,7 +6,7 @@ import { unsubscribe } from './unsubscribe'
 import { notifyLog } from './log'
 import { FAILURE_STATUSES, HEALTH_STATUS_OK } from '../constants'
 
-import type { NotifyTopic } from '@opentrons/app/lib/redux/shell/types'
+import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
 
 // MQTT is somewhat particular about the clientId format and will connect erratically if an unexpected string is supplied.

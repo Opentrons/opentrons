@@ -8,7 +8,7 @@ import type {
   NotifyResponseData,
   NotifyTopic,
   NotifyUnsubscribeData,
-} from '@opentrons/app/lib/redux/shell/types'
+} from '@opentrons/app/src/redux/shell/types'
 
 interface SendToBrowserParams {
   hostname: string

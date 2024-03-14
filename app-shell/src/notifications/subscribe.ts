@@ -8,7 +8,7 @@ import { FAILURE_STATUSES } from '../constants'
 import type {
   NotifyNetworkError,
   NotifyTopic,
-} from '@opentrons/app/lib/redux/shell/types'
+} from '@opentrons/app/src/redux/shell/types'
 
 /**
  * @property {number} qos: "Quality of Service", "at least once". Because we use React Query, which does not trigger
