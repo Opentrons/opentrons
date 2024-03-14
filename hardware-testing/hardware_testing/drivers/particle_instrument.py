@@ -246,6 +246,7 @@ if __name__ == '__main__':
     PARTICLE_COUNTER.clear_data()
     PARTICLE_COUNTER.set_number_of_samples(6)
     PARTICLE_COUNTER.start_sampling()
+    time.sleep(5)
     operation = True
     while operation:
         stats = PARTICLE_COUNTER.operation_status()
@@ -254,13 +255,43 @@ if __name__ == '__main__':
             operation = False
         elif stats == "Running":
             print(stats, end='')
-            print('\r', end='')
         elif stats == "Hold":
             print(stats, end='')
-            print('\r', end='')
     header, data = PARTICLE_COUNTER.available_records()
     print(header)
     print(data)
+    test_data={
+                    'Time(Date Time)': None,
+                    'Size1(um)': None,
+                    'Count1(M3)': None,
+                    'Size2(um)': None,
+                    'Count2(M3)': None,
+                    'Location': None,
+                    'Sample Time(sec)': None,
+                    'PASS/FAIL': None,
+                        }
+    #Record to designated columns using a sorting loop
+    record_dict = {}
+    for number in range(6):
+        for key, value in zip(header.items(), data[number]):
+            for element in key:
+                record_dict[element]= value
+        particle_count_1 = int(record_dict['Count1(M3)'])
+        particle_count_2 = int(record_dict['Count2(M3)'])
+        test_result = "pass"
+        print(record_dict)
+        test_data['Time(Date Time)']=record_dict['Time']
+        test_data['Size1(um)']=record_dict['Size1']
+        test_data['Count1(M3)']=record_dict['Count1(M3)']
+        test_data['Size2(um)']=record_dict['Size2']
+        test_data['Count2(M3)']=record_dict['Count2(M3)']
+        test_data['Location']=record_dict['Location']
+        test_data['Sample Time(sec)']=record_dict['Sample Time']
+        test_data['PASS/FAIL'] = test_result
+        print(test_data)
+
+
+
     new_dict = {}
     for key, value in zip(header.items(), data[0]):
         for x in key:
