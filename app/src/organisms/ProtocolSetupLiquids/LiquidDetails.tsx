@@ -23,7 +23,7 @@ import type { LabwareByLiquidId, ParsedLiquid } from '@opentrons/api-client'
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
-  border-spacing: 0 ${BORDERS.borderRadiusSize2};
+  border-spacing: 0 ${BORDERS.borderRadius8};
   text-align: ${TYPOGRAPHY.textAlignLeft};
   color: ${COLORS.grey60};
 `
@@ -46,13 +46,13 @@ const TableDatum = styled('td')`
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
-    border-top-left-radius: ${BORDERS.borderRadiusSize3};
-    border-bottom-left-radius: ${BORDERS.borderRadiusSize3};
+    border-top-left-radius: ${BORDERS.borderRadius12};
+    border-bottom-left-radius: ${BORDERS.borderRadius12};
     width: 20%;
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.borderRadiusSize3};
-    border-bottom-right-radius: ${BORDERS.borderRadiusSize3};
+    border-top-right-radius: ${BORDERS.borderRadius12};
+    border-bottom-right-radius: ${BORDERS.borderRadius12};
   }
 `
 

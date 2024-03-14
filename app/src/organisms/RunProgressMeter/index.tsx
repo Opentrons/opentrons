@@ -259,14 +259,14 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             outerStyles={css`
               height: 0.375rem;
               background-color: ${COLORS.grey30};
-              border-radius: ${BORDERS.radiusSoftCorners};
+              border-radius: ${BORDERS.borderRadius4};
               position: relative;
               overflow: initial;
             `}
             innerStyles={css`
               height: 0.375rem;
               background-color: ${COLORS.grey60};
-              border-radius: ${BORDERS.radiusSoftCorners};
+              border-radius: ${BORDERS.borderRadius4};
             `}
           >
             <InterventionTicks

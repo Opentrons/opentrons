@@ -185,7 +185,7 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 alignItems={ALIGN_CENTER}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                borderRadius={BORDERS.borderRadiusSize3}
+                borderRadius={BORDERS.borderRadius12}
               >
                 <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                   {t('protocol_specifies')}
@@ -201,7 +201,7 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 alignItems={ALIGN_CENTER}
-                borderRadius={BORDERS.borderRadiusSize3}
+                borderRadius={BORDERS.borderRadius12}
               >
                 <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                   {t('currently_configured')}

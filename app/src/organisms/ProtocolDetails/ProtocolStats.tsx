@@ -196,7 +196,7 @@ export const StatRow = (props: StatRowProps): JSX.Element => {
       </Flex>
       <Flex
         backgroundColor={COLORS.black90 + '1A'}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         height="max-content"
         paddingY={SPACING.spacing4}
         paddingX={SPACING.spacing8}

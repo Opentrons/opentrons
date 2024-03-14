@@ -30,7 +30,7 @@ describe('Unselected TabbedButton', () => {
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize22}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight28}`)
-    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize4}`)
+    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadius16}`)
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )
@@ -75,7 +75,7 @@ describe('Selected TabbedButton', () => {
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize22}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight28}`)
-    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadiusSize4}`)
+    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadius16}`)
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )

@@ -55,10 +55,10 @@ const LABWARE_DESCRIPTION_STYLE = css`
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing16};
   background-color: ${COLORS.grey20};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     background-color: ${COLORS.grey35};
-    border-radius: ${BORDERS.borderRadiusSize3};
+    border-radius: ${BORDERS.borderRadius12};
   }
 `
 

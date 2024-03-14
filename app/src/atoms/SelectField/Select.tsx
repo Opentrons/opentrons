@@ -41,7 +41,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     clearIndicator: NO_STYLE_FN,
     control: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      borderRadius: BORDERS.radiusRoundEdge,
+      borderRadius: BORDERS.borderRadiusFull,
       border: BORDERS.lineBorder,
       width: props.width != null ? props.width : 'auto',
       height: SPACING.spacing16,

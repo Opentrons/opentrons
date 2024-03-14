@@ -3,8 +3,8 @@ import { describe, it, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../testing/utils'
-import { BORDERS, TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
-import { COLORS } from '../../../helix-design-system'
+import { TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
+import { BORDERS, COLORS } from '../../../helix-design-system'
 
 import { SecondaryButton } from '../SecondaryButton'
 
@@ -31,7 +31,7 @@ describe('SecondaryButton', () => {
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeP}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight20}`)
-    expect(button).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)
+    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadius4}`)
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )

@@ -184,7 +184,7 @@ interface InfoItemProps extends StyleProps {
 function InfoItem(props: InfoItemProps): JSX.Element {
   return (
     <Flex
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
       backgroundColor={COLORS.grey35}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       justifyContent={JUSTIFY_SPACE_BETWEEN}

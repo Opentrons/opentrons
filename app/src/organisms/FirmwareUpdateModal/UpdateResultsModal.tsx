@@ -76,7 +76,7 @@ export function UpdateResultsModal(
               height="11.5rem"
               width="100%"
               backgroundColor={COLORS.green35}
-              borderRadius={BORDERS.borderRadiusSize3}
+              borderRadius={BORDERS.borderRadius12}
               flexDirection={DIRECTION_COLUMN}
               color={COLORS.grey60}
               padding={SPACING.spacing24}

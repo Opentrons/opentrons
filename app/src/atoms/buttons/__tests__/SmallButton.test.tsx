@@ -28,7 +28,7 @@ describe('SmallButton', () => {
       `background-color: ${COLORS.blue60}`
     )
     expect(screen.getByRole('button')).toHaveStyle(
-      `border-radius: ${BORDERS.borderRadiusSize4}`
+      `border-radius: ${BORDERS.borderRadius16}`
     )
   })
   it('renders the alert button', () => {
@@ -82,7 +82,7 @@ describe('SmallButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `border-radius: ${BORDERS.borderRadiusSize5}`
+      `border-radius: ${BORDERS.borderRadius40}`
     )
   })
   it('renders an icon with start placement', () => {
