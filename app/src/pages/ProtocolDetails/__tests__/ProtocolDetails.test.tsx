@@ -26,6 +26,7 @@ import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
+import { Parameters } from '../Parameters'
 
 // Mock IntersectionObserver
 class IntersectionObserver {
@@ -50,6 +51,7 @@ vi.mock('../../Protocols/hooks')
 vi.mock('../Deck')
 vi.mock('../Hardware')
 vi.mock('../Labware')
+vi.mock('../Parameters')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})
@@ -181,7 +183,11 @@ describe('ODDProtocolDetails', () => {
     vi.mocked(Hardware).mockReturnValue(<div>Mock Hardware</div>)
     vi.mocked(Labware).mockReturnValue(<div>Mock Labware</div>)
     vi.mocked(Deck).mockReturnValue(<div>Mock Initial Deck Layout</div>)
+    vi.mocked(Parameters).mockReturnValue(<div>Mock Parameters</div>)
+
     render()
+    const parametersButton = screen.getByRole('button', { name: 'Parameters' })
+    fireEvent.click(parametersButton)
     const hardwareButton = screen.getByRole('button', { name: 'Hardware' })
     fireEvent.click(hardwareButton)
     screen.getByText('Mock Hardware')

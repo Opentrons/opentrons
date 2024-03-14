@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { it, describe } from 'vitest'
+import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { EmptySection } from '../EmptySection'
@@ -17,22 +18,29 @@ describe('EmptySection', () => {
     props = {
       section: 'labware',
     }
-    const { getByText, getByLabelText } = render(props)
-    getByLabelText('EmptySection_ot-alert')
-    getByText('No labware is specified for this protocol')
+    render(props)
+    screen.getByLabelText('EmptySection_ot-alert')
+    screen.getByText('No labware is specified for this protocol')
   })
   it('should render text for liquid', () => {
     props = {
       section: 'liquids',
     }
-    const { getByText } = render(props)
-    getByText('No liquids are specified for this protocol')
+    render(props)
+    screen.getByText('No liquids are specified for this protocol')
   })
   it('should render text for hardware', () => {
     props = {
       section: 'hardware',
     }
-    const { getByText } = render(props)
-    getByText('No hardware is specified for this protocol')
+    render(props)
+    screen.getByText('No hardware is specified for this protocol')
+  })
+  it('should render text for paramters', () => {
+    props = {
+      section: 'parameters',
+    }
+    render(props)
+    screen.getByText('No parameters are specified in this protocol')
   })
 })

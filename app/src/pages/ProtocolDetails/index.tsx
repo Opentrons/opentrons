@@ -45,7 +45,9 @@ import {
   getPinnedProtocolIds,
   updateConfigValue,
 } from '../../redux/config'
+import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../Protocols/hooks'
+import { Parameters } from './Parameters'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
@@ -56,7 +58,6 @@ import type { Protocol } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { Dispatch } from '../../redux/types'
 import type { OnDeviceRouteParams } from '../../App/types'
-import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
 interface ProtocolHeaderProps {
   title?: string | null
@@ -156,6 +157,7 @@ const ProtocolHeader = ({
 
 const protocolSectionTabOptions = [
   'Summary',
+  'Parameters',
   'Hardware',
   'Labware',
   'Liquids',
@@ -255,6 +257,9 @@ const ProtocolSectionContent = ({
           description={protocolData.data.metadata.description ?? null}
         />
       )
+      break
+    case 'Parameters':
+      protocolSection = <Parameters protocolId={protocolId} />
       break
     case 'Hardware':
       protocolSection = <Hardware protocolId={protocolId} />
