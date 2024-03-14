@@ -114,7 +114,7 @@ async def _main(simulating: bool) -> None:
         header, data = instrument.available_records()
         #Record to designated columns using a sorting loop
         record_dict = {}
-        csv_cb.write(test_data.keys())
+        csv_cb.write(list(test_data.keys()))
         for number in range(6):
             for key, value in zip(header.items(), data[number]):
                 for element in key:
@@ -132,17 +132,18 @@ async def _main(simulating: bool) -> None:
             test_data['Location']=record_dict['Location']
             test_data['Sample Time(sec)']=record_dict['Sample Time']
             test_data['PASS/FAIL'] = test_result
-            csv_cb.write(test_data.values())
+            csv_cb.write(list(test_data.values()))
         
 
         
         #UV
-        test_data={
+        await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+        test_data2={
                     'SLOT': None,
                     'uvdata': None,
                     
                         }
-        csv_cb.write(test_data.keys())
+        csv_cb.write(list(test_data2.keys()))
         sleppp = input("Press Enter to continue...")
         #GRIP_SLOT = [[8,5,"home"],[5,10,"home"],[10,"A4",1],["A4",1,"home"],[1,"D4","home"]]
         GRIP_SLOT_DICIT = {"GRIP":(8,5,10,"A4",1),
@@ -218,9 +219,9 @@ async def _main(simulating: bool) -> None:
 
             
 
-            test_data['SLOT']=grip_slot2
-            test_data['uvdata']=intdatadict['uvdata']
-            csv_cb.write(test_data.values())
+            test_data2['SLOT']=grip_slot2
+            test_data2['uvdata']=intdatadict['uvdata']
+            csv_cb.write(list(test_data2.values()))
 
             # LOOP THROUGH FORCES
     except Exception as err:
