@@ -27,8 +27,18 @@ import {
 import { getIsOnDevice } from '../../../../redux/config'
 import { getWellRangeForLiquidLabwarePair } from './utils'
 
+export const CARD_OUTLINE_BORDER_STYLE = css`
+  border-style: ${BORDERS.styleSolid};
+  border-width: 1px;
+  border-color: ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius4};
+  &:hover {
+    border-color: ${COLORS.grey55};
+  }
+`
+
 const LIQUID_CARD_STYLE = css`
-  ${BORDERS.cardOutlineBorder}
+  ${CARD_OUTLINE_BORDER_STYLE}
   &:hover {
     border: 1px solid ${COLORS.grey60};
     border-radius: ${BORDERS.borderRadius4};
@@ -98,7 +108,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     >
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
         <Flex
-          css={BORDERS.cardOutlineBorder}
+          css={CARD_OUTLINE_BORDER_STYLE}
           padding={SPACING.spacing8}
           height="3rem"
           width="3rem"
@@ -198,7 +208,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex
-          css={BORDERS.cardOutlineBorder}
+          css={CARD_OUTLINE_BORDER_STYLE}
           padding={SPACING.spacing8}
           height="max-content"
           width="max-content"

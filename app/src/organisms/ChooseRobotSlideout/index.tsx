@@ -46,6 +46,16 @@ import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 import { useFeatureFlag } from '../../redux/config'
 
+export const CARD_OUTLINE_BORDER_STYLE = css`
+  border-style: ${BORDERS.styleSolid};
+  border-width: 1px;
+  border-color: ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius4};
+  &:hover {
+    border-color: ${COLORS.grey55};
+  }
+`
+
 interface RobotIsBusyAction {
   type: 'robotIsBusy'
   robotName: string
@@ -210,7 +220,7 @@ export function ChooseRobotSlideout(
       {!isScanning && healthyReachableRobots.length === 0 ? (
         <Flex
           css={css`
-            ${BORDERS.cardOutlineBorder}
+            ${CARD_OUTLINE_BORDER_STYLE}
             &:hover {
               border-color: ${COLORS.grey30};
             }

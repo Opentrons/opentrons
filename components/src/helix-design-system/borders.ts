@@ -23,15 +23,6 @@ export const styleSolid = 'solid'
  */
 export const activeLineBorder = `1px ${styleSolid} ${COLORS.blue50}`
 export const lineBorder = `1px ${styleSolid} ${COLORS.grey30}`
-export const cardOutlineBorder = css`
-  border-style: ${styleSolid};
-  border-width: 1px;
-  border-color: ${COLORS.grey30};
-  border-radius: ${borderRadius4};
-  &:hover {
-    border-color: ${COLORS.grey55};
-  }
-`
 
 /**
  * Shadows

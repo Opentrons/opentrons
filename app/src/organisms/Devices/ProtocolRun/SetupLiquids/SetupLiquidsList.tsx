@@ -56,6 +56,16 @@ const LIQUID_BORDER_STYLE = css`
   border-radius: ${BORDERS.borderRadius4};
 `
 
+export const CARD_OUTLINE_BORDER_STYLE = css`
+  border-style: ${BORDERS.styleSolid};
+  border-width: 1px;
+  border-color: ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius4};
+  &:hover {
+    border-color: ${COLORS.grey55};
+  }
+`
+
 export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
   const { runId } = props
   const protocolData = useMostRecentCompletedAnalysis(runId)
@@ -109,7 +119,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   const trackEvent = useTrackEvent()
 
   const LIQUID_CARD_STYLE = css`
-    ${BORDERS.cardOutlineBorder}
+    ${CARD_OUTLINE_BORDER_STYLE}
 
     &:hover {
       cursor: pointer;
