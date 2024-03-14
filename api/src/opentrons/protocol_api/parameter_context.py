@@ -1,15 +1,15 @@
-"""Parameter parser for python protocols."""
+"""Parameter context for python protocols."""
 
 from typing import List, Dict
 
-from .parameter_definition import ParameterDefinition, AllowedTypes
+from opentrons.protocol_api.parameter_definition import ParameterDefinition, AllowedTypes
 
 
-class ParameterParser:
-    """Parser for parameters defined in a python protocol."""
+class ParameterContext:
+    """Public context for adding parameters to a protocol."""
 
     def __init__(self) -> None:
-        """Initializes a parser for user-set parameters."""
+        """Initializes a parameter context for user-set parameters."""
         self._parameters: List[ParameterDefinition[AllowedTypes]] = []
 
     def add_int(
@@ -37,6 +37,21 @@ class ParameterParser:
                 default=default,
                 minimum=minimum,
                 maximum=maximum,
+            )
+        )
+
+    def add_bool(
+        self,
+        display_name: str,
+        variable_name: str,
+        default: bool,
+    ) -> None:
+        self._parameters.append(
+            ParameterDefinition(
+                parameter_type=bool,
+                display_name=display_name,
+                variable_name=variable_name,
+                default=default,
             )
         )
 

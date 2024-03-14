@@ -8,7 +8,7 @@ from typing import Any, Dict
 from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.parameters import Parameters
-from opentrons.protocol_reader.parameter_parser import ParameterParser
+from opentrons.protocol_api.parameter_context import ParameterContext
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import PythonProtocol, MalformedPythonProtocolError
 
@@ -70,13 +70,13 @@ def _parse_and_set_parameters(new_globs: Dict[Any, Any], filename: str) -> Param
         _add_parameters_func_ok(new_globs.get("add_parameters"))
     except SyntaxError as se:
         raise MalformedPythonProtocolError(str(se))
-    parser = ParameterParser()
-    new_globs["__parser"] = parser
+    parameter_context = ParameterContext()
+    new_globs["__param_context"] = parameter_context
     try:
-        exec("add_parameters(__parser)", new_globs)
+        exec("add_parameters(__param_context)", new_globs)
     except Exception as e:
         _raise_pretty_protocol_error(exception=e, filename=filename)
-    return Parameters(parameters=parser.get_variable_names_and_values())
+    return Parameters(parameters=parameter_context.get_variable_names_and_values())
 
 
 def run_python(proto: PythonProtocol, context: ProtocolContext):
