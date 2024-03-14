@@ -55,11 +55,7 @@ export const ProtocolLabwareDetails = (
       : []
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      width="100%"
-      marginBottom={SPACING.spacing8}
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex flexDirection={DIRECTION_ROW}>
         <StyledText
           as="label"

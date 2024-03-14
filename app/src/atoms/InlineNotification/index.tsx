@@ -1,16 +1,16 @@
 import * as React from 'react'
 import {
-  Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  IconProps,
-  Flex,
-  DIRECTION_ROW,
   ALIGN_CENTER,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
   BORDERS,
   Btn,
+  COLORS,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  IconProps,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../text'
 
@@ -94,7 +94,7 @@ export function InlineNotification(
           >
             {fullHeading}
           </span>
-          {message && fullmessage}
+          {message !=null && fullmessage}
         </StyledText>
       </Flex>
       {onCloseClick && (

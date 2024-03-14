@@ -1,0 +1,129 @@
+{
+  "runTimeParameters": [
+    {
+      "displayName": "sample number",
+      "variableName": "number_of_samples",
+      "description": "",
+      "suffix": null,
+      "min": 0,
+      "max": 100,
+      "default": 96
+    },
+    {
+      "displayName": "right pipette type",
+      "variableName": "right_pipette",
+      "description": "",
+      "suffix": null,
+      "choices": [
+        {
+          "displayName": "GEN2 P300 Multi",
+          "value": "p300_multi_gen2"
+        },
+        {
+          "displayName": "GEN2 P20 Multi",
+          "value": "p20_multi_gen2"
+        },
+        {
+          "displayName": "GEN1 P1000 Multi",
+          "value": "p1000_multi"
+        },
+        {
+          "displayName": "GEN1 P300 Multi",
+          "value": "p300_multi"
+        },
+        {
+          "displayName": "GEN1 P50 Multi",
+          "value": "p50_multi"
+        },
+        {
+          "displayName": "GEN1 P10 Multi",
+          "value": "p10_multi"
+        },
+        {
+          "displayName": "none",
+          "value": "NONE"
+        }
+      ],
+      "default": "p300_multi_gen2"
+    },
+    {
+      "displayName": "left pipette type",
+      "variableName": "left_pipette",
+      "description": "",
+      "suffix": null,
+      "choices": [
+        {
+          "displayName": "GEN2 P300 Multi",
+          "value": "p300_multi_gen2"
+        },
+        {
+          "displayName": "GEN2 P20 Multi",
+          "value": "p20_multi_gen2"
+        },
+        {
+          "displayName": "GEN1 P1000 Multi",
+          "value": "p1000_multi"
+        },
+        {
+          "displayName": "GEN1 P300 Multi",
+          "value": "p300_multi"
+        },
+        {
+          "displayName": "GEN1 P50 Multi",
+          "value": "p50_multi"
+        },
+        {
+          "displayName": "GEN1 P10 Multi",
+          "value": "p10_multi"
+        },
+        {
+          "displayName": "none",
+          "value": "NONE"
+        }
+      ],
+      "default": "p300_multi_gen2"
+    },
+    {
+      "displayName": "mastermix volume (in ul)",
+      "variableName": "mastermix_volume",
+      "description": "",
+      "suffix": null,
+      "min": 0.0,
+      "max": 100.0,
+      "default": 18.0
+    },
+    {
+      "displayName": "DNA volume (in ul)",
+      "variableName": "DNA_volume",
+      "description": "",
+      "suffix": null,
+      "min": 0.0,
+      "max": 100.0,
+      "default": 2.0
+    },
+    {
+      "displayName": "Additional mix for reagent 2?",
+      "variableName": "extra_mix",
+      "description": "Will we do an extra mix for reagent 2.",
+      "suffix": null,
+      "default": false
+    },
+    {
+      "displayName": "pipette mount",
+      "variableName": "mont",
+      "description": "pipette mount",
+      "suffix": null,
+      "choices": [
+        {
+          "displayName": "Left",
+          "value": "left"
+        },
+        {
+          "displayName": "Right",
+          "value": "right"
+        }
+      ],
+      "default": "left"
+    }
+  ]
+}

@@ -72,6 +72,7 @@ import { ProtocolStats } from './ProtocolStats'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
+import { ProtocolParameters } from './ProtocolParameters'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -198,8 +199,9 @@ export function ProtocolDetails(
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const enableProtocolStats = useFeatureFlag('protocolStats')
+  const enableRunTimeParameters = useFeatureFlag('enableRunTimeParameters')
   const [currentTab, setCurrentTab] = React.useState<
-    'robot_config' | 'labware' | 'liquids' | 'stats'
+    'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
   >('robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
@@ -326,6 +328,9 @@ export function ProtocolDetails(
     ),
     stats: enableProtocolStats ? (
       <ProtocolStats analysis={mostRecentAnalysis} />
+    ) : null,
+    parameters: enableRunTimeParameters ? (
+      <ProtocolParameters analysis={mostRecentAnalysis} />
     ) : null,
   }
 
@@ -587,10 +592,25 @@ export function ProtocolDetails(
               gridGap={SPACING.spacing8}
             >
               <Flex gridGap={SPACING.spacing8}>
+                {enableRunTimeParameters && mostRecentAnalysis != null && (
+                  <RoundTab
+                    data-testid="ProtocolDetails_parameters"
+                    isCurrent={currentTab === 'parameters'}
+                    onClick={() => {
+                      setCurrentTab('parameters')
+                    }}
+                  >
+                    <StyledText>
+                      {i18n.format(t('parameters'), 'capitalize')}
+                    </StyledText>
+                  </RoundTab>
+                )}
                 <RoundTab
                   data-testid="ProtocolDetails_robotConfig"
                   isCurrent={currentTab === 'robot_config'}
-                  onClick={() => setCurrentTab('robot_config')}
+                  onClick={() => {
+                    setCurrentTab('robot_config')
+                  }}
                 >
                   <StyledText>
                     {i18n.format(t('hardware'), 'capitalize')}
@@ -599,7 +619,9 @@ export function ProtocolDetails(
                 <RoundTab
                   data-testid="ProtocolDetails_labware"
                   isCurrent={currentTab === 'labware'}
-                  onClick={() => setCurrentTab('labware')}
+                  onClick={() => {
+                    setCurrentTab('labware')
+                  }}
                 >
                   <StyledText>
                     {i18n.format(t('labware'), 'capitalize')}
@@ -609,7 +631,9 @@ export function ProtocolDetails(
                   <RoundTab
                     data-testid="ProtocolDetails_liquids"
                     isCurrent={currentTab === 'liquids'}
-                    onClick={() => setCurrentTab('liquids')}
+                    onClick={() => {
+                      setCurrentTab('liquids')
+                    }}
                   >
                     <StyledText>
                       {i18n.format(t('liquids'), 'capitalize')}
@@ -620,7 +644,9 @@ export function ProtocolDetails(
                   <RoundTab
                     data-testid="ProtocolDetails_stats"
                     isCurrent={currentTab === 'stats'}
-                    onClick={() => setCurrentTab('stats')}
+                    onClick={() => {
+                      setCurrentTab('stats')
+                    }}
                   >
                     <StyledText>
                       {i18n.format(t('stats'), 'capitalize')}
@@ -638,7 +664,7 @@ export function ProtocolDetails(
                 } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
                   BORDERS.radiusSoftCorners
                 }`}
-                padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
+                padding={SPACING.spacing16}
               >
                 {contentsByTabName[currentTab]}
               </Box>
