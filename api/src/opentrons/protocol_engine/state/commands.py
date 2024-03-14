@@ -632,6 +632,9 @@ class CommandView(HasState[CommandState]):
         )
 
         if no_command_running and no_command_to_execute:
+            # TODO(mm, 2024-03-14): This is a slow O(n) scan. When a long run ends and
+            # we reach this loop, it can disrupt the robot server.
+            # https://opentrons.atlassian.net/browse/EXEC-55
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
