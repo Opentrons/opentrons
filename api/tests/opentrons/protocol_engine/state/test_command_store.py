@@ -75,14 +75,13 @@ def test_initial_state(
         run_started_at=None,
         is_door_blocking=expected_is_door_blocking,
         run_result=None,
-        running_command_id=None,
+        last_running_command_id=None,
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         all_command_ids=[],
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
-        failed_command=None,
         latest_command_hash=None,
         stopped_by_estop=False,
     )
@@ -384,8 +383,8 @@ def test_setup_queue_action_updates_command_intent() -> None:
     )
 
 
-def test_running_command_id() -> None:
-    """It should update the running command ID through a command's lifecycle."""
+def test_last_running_command_id() -> None:
+    """It should update the last-running command ID through a command's lifecycle."""
     queue = QueueCommandAction(
         request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         request_hash=None,
@@ -404,13 +403,13 @@ def test_running_command_id() -> None:
     subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(queue)
-    assert subject.state.running_command_id is None
+    assert subject.state.last_running_command_id is None
 
     subject.handle_action(running_update)
-    assert subject.state.running_command_id == "command-id-1"
+    assert subject.state.last_running_command_id == "command-id-1"
 
     subject.handle_action(completed_update)
-    assert subject.state.running_command_id is None
+    assert subject.state.last_running_command_id == "command-id-1"
 
 
 def test_running_command_no_queue() -> None:
@@ -428,11 +427,31 @@ def test_running_command_no_queue() -> None:
 
     subject.handle_action(running_update)
     assert subject.state.all_command_ids == ["command-id-1"]
-    assert subject.state.running_command_id == "command-id-1"
+    assert subject.state.last_running_command_id == "command-id-1"
 
     subject.handle_action(completed_update)
     assert subject.state.all_command_ids == ["command-id-1"]
-    assert subject.state.running_command_id is None
+    assert subject.state.last_running_command_id == "command-id-1"
+
+
+@pytest.mark.parametrize(
+    "completed_command",
+    [
+        create_succeeded_command("command-id-1"),
+        create_failed_command("command-id-1"),
+    ],
+)
+def test_completed_command_no_queue(completed_command: commands.Command) -> None:
+    """It should add a completed command to state, even if there was no queue action."""
+    completed_update = UpdateCommandAction(
+        private_result=None, command=completed_command
+    )
+
+    subject = CommandStore(is_door_open=False, config=_make_config())
+
+    subject.handle_action(completed_update)
+    assert subject.state.all_command_ids == ["command-id-1"]
+    assert subject.state.last_running_command_id == "command-id-1"
 
 
 def test_command_failure_clears_queues() -> None:
@@ -504,7 +523,7 @@ def test_command_failure_clears_queues() -> None:
     subject.handle_action(running_1)
     subject.handle_action(fail_1)
 
-    assert subject.state.running_command_id is None
+    assert subject.state.last_running_command_id == "command-id-1"
     assert subject.state.queued_command_ids == OrderedSet()
     assert subject.state.all_command_ids == ["command-id-1", "command-id-2"]
     assert subject.state.commands_by_id == {
@@ -609,7 +628,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
     subject.handle_action(running_cmd_2)
     subject.handle_action(failed_action_cmd_2)
 
-    assert subject.state.running_command_id is None
+    assert subject.state.last_running_command_id == "command-id-2"
     assert subject.state.queued_setup_command_ids == OrderedSet()
     assert subject.state.queued_command_ids == OrderedSet(["command-id-1"])
     assert subject.state.all_command_ids == [
@@ -666,14 +685,13 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         run_completed_at=None,
         run_started_at=None,
         is_door_blocking=False,
-        running_command_id=None,
+        last_running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
-        failed_command=None,
         latest_command_hash=None,
         stopped_by_estop=False,
     )
@@ -694,14 +712,13 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         run_result=None,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
+        last_running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
-        failed_command=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -724,14 +741,13 @@ def test_command_store_handles_finish_action() -> None:
         run_result=RunResult.SUCCEEDED,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
+        last_running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
-        failed_command=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -769,14 +785,13 @@ def test_command_store_handles_stop_action(from_estop: bool) -> None:
         run_result=RunResult.STOPPED,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
+        last_running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
-        failed_command=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
         stopped_by_estop=from_estop,
@@ -798,14 +813,13 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         run_result=RunResult.SUCCEEDED,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
+        last_running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
-        failed_command=None,
         run_started_at=None,
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -890,7 +904,7 @@ def test_command_store_wraps_unknown_errors() -> None:
         run_result=RunResult.FAILED,
         run_completed_at=datetime(year=2022, month=2, day=2),
         is_door_blocking=False,
-        running_command_id=None,
+        last_running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
@@ -936,7 +950,6 @@ def test_command_store_wraps_unknown_errors() -> None:
             },
         ),
         run_started_at=None,
-        failed_command=None,
         latest_command_hash=None,
         stopped_by_estop=False,
     )
@@ -977,7 +990,7 @@ def test_command_store_preserves_enumerated_errors() -> None:
         run_result=RunResult.FAILED,
         run_completed_at=datetime(year=2022, month=2, day=2),
         is_door_blocking=False,
-        running_command_id=None,
+        last_running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
@@ -996,7 +1009,6 @@ def test_command_store_preserves_enumerated_errors() -> None:
             detail="yikes",
             errorCode=ErrorCodes.PIPETTE_NOT_PRESENT.value.code,
         ),
-        failed_command=None,
         run_started_at=None,
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -1020,14 +1032,13 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         run_result=RunResult.SUCCEEDED,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
+        last_running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
-        failed_command=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -1051,14 +1062,13 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         run_result=RunResult.STOPPED,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
+        last_running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
-        failed_command=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -1099,7 +1109,7 @@ def test_command_store_handles_command_failed() -> None:
         run_result=None,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
+        last_running_command_id=expected_failed_command.id,
         all_command_ids=["command-id"],
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
@@ -1108,7 +1118,6 @@ def test_command_store_handles_command_failed() -> None:
         },
         run_error=None,
         finish_error=None,
-        failed_command=CommandEntry(index=0, command=expected_failed_command),
         run_started_at=None,
         latest_command_hash=None,
         stopped_by_estop=False,
@@ -1128,14 +1137,13 @@ def test_handles_hardware_stopped() -> None:
         run_result=RunResult.STOPPED,
         run_completed_at=completed_at,
         is_door_blocking=False,
-        running_command_id=None,
+        last_running_command_id=None,
         all_command_ids=[],
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
-        failed_command=None,
         run_started_at=None,
         latest_command_hash=None,
         stopped_by_estop=False,

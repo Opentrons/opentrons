@@ -42,11 +42,10 @@ def get_command_view(
     run_started_at: Optional[datetime] = None,
     is_door_blocking: bool = False,
     run_result: Optional[RunResult] = None,
-    running_command_id: Optional[str] = None,
+    last_running_command_id: Optional[str] = None,
     queued_command_ids: Sequence[str] = (),
     queued_setup_command_ids: Sequence[str] = (),
     run_error: Optional[errors.ErrorOccurrence] = None,
-    failed_command: Optional[CommandEntry] = None,
     finish_error: Optional[errors.ErrorOccurrence] = None,
     commands: Sequence[cmd.Command] = (),
     latest_command_hash: Optional[str] = None,
@@ -63,12 +62,11 @@ def get_command_view(
         run_completed_at=run_completed_at,
         is_door_blocking=is_door_blocking,
         run_result=run_result,
-        running_command_id=running_command_id,
+        last_running_command_id=last_running_command_id,
         queued_command_ids=OrderedSet(queued_command_ids),
         queued_setup_command_ids=OrderedSet(queued_setup_command_ids),
         run_error=run_error,
         finish_error=finish_error,
-        failed_command=failed_command,
         all_command_ids=all_command_ids,
         commands_by_id=commands_by_id,
         run_started_at=run_started_at,
@@ -230,14 +228,21 @@ def test_get_command_is_final_when_run_has_result(run_result: RunResult) -> None
 
 def test_get_all_commands_final() -> None:
     """It should return True if no commands queued or running."""
-    subject = get_command_view(queued_command_ids=[])
+    subject = get_command_view()
     assert subject.get_all_commands_final() is True
 
     subject = get_command_view(queued_command_ids=["queued-command-id"])
     assert subject.get_all_commands_final() is False
 
     subject = get_command_view(
-        queued_command_ids=[], running_command_id="running-command-id"
+        commands=[create_succeeded_command(command_id="command-id")],
+        last_running_command_id="command-id",
+    )
+    assert subject.get_all_commands_final() is True
+
+    subject = get_command_view(
+        commands=[create_running_command(command_id="command-id")],
+        last_running_command_id="command-id",
     )
     assert subject.get_all_commands_final() is False
 
@@ -258,7 +263,7 @@ def test_get_all_complete_fatal_command_failure() -> None:
 
     subject = get_command_view(
         queued_command_ids=[],
-        running_command_id=None,
+        last_running_command_id=None,
         commands=[completed_command, failed_command],
     )
 
@@ -283,7 +288,7 @@ def test_get_all_complete_setup_not_fatal() -> None:
 
     subject = get_command_view(
         queued_command_ids=[],
-        running_command_id=None,
+        last_running_command_id=None,
         commands=[completed_command, failed_command],
     )
 
@@ -519,7 +524,7 @@ get_status_specs: List[GetStatusSpec] = [
     GetStatusSpec(
         subject=get_command_view(
             queue_status=QueueStatus.RUNNING,
-            running_command_id=None,
+            last_running_command_id=None,
             queued_command_ids=[],
         ),
         expected_status=EngineStatus.RUNNING,
@@ -612,7 +617,7 @@ get_status_specs: List[GetStatusSpec] = [
     GetStatusSpec(
         subject=get_command_view(
             queue_status=QueueStatus.SETUP,
-            running_command_id="command-id",
+            last_running_command_id="command-id",
             queued_command_ids=["command-id-1"],
             queued_setup_command_ids=["command-id-2"],
         ),
@@ -639,7 +644,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
         # Protocol not played yet, no commands queued or ran yet
         subject=get_command_view(
             queue_status=QueueStatus.SETUP,
-            running_command_id=None,
+            last_running_command_id=None,
             queued_command_ids=[],
             queued_setup_command_ids=[],
         ),
@@ -650,7 +655,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
         # no setup commands queued or running
         subject=get_command_view(
             queue_status=QueueStatus.SETUP,
-            running_command_id=None,
+            last_running_command_id=None,
             queued_setup_command_ids=[],
             queued_command_ids=["command-id"],
             commands=[create_queued_command(command_id="command-id")],
@@ -661,7 +666,7 @@ get_okay_to_clear_specs: List[GetOkayToClearSpec] = [
         # Protocol not played yet, setup commands are queued
         subject=get_command_view(
             queue_status=QueueStatus.SETUP,
-            running_command_id=None,
+            last_running_command_id=None,
             queued_setup_command_ids=["command-id"],
             commands=[create_queued_command(command_id="command-id")],
         ),
@@ -685,17 +690,28 @@ def test_get_okay_to_clear(subject: CommandView, expected_is_okay: bool) -> None
 
 def test_get_running_command_id() -> None:
     """It should return the running command ID."""
-    subject_with_running = get_command_view(running_command_id="command-id")
+    subject_with_only_queued = get_command_view(
+        commands=[create_queued_command("command-id")], last_running_command_id=None
+    )
+    assert subject_with_only_queued.get_running_command_id() is None
+
+    subject_with_running = get_command_view(
+        commands=[create_running_command("command-id")],
+        last_running_command_id="command-id",
+    )
     assert subject_with_running.get_running_command_id() == "command-id"
 
-    subject_without_running = get_command_view(running_command_id=None)
-    assert subject_without_running.get_running_command_id() is None
+    subject_with_completed = get_command_view(
+        commands=[create_succeeded_command("command-id")],
+        last_running_command_id="command-id",
+    )
+    assert subject_with_completed.get_running_command_id() is None
 
 
 def test_get_current() -> None:
     """It should return the "current" command."""
     subject = get_command_view(
-        running_command_id=None,
+        last_running_command_id=None,
         queued_command_ids=[],
     )
     assert subject.get_current() is None
@@ -706,7 +722,7 @@ def test_get_current() -> None:
         created_at=datetime(year=2021, month=1, day=1),
     )
     subject = get_command_view(
-        running_command_id="command-id",
+        last_running_command_id="command-id",
         queued_command_ids=[],
         commands=[command],
     )
@@ -727,7 +743,9 @@ def test_get_current() -> None:
         command_key="key-2",
         created_at=datetime(year=2022, month=2, day=2),
     )
-    subject = get_command_view(commands=[command_1, command_2])
+    subject = get_command_view(
+        commands=[command_1, command_2], last_running_command_id=command_2.id
+    )
     assert subject.get_current() == CurrentCommand(
         index=1,
         command_id="command-id-2",
@@ -745,7 +763,9 @@ def test_get_current() -> None:
         command_key="key-2",
         created_at=datetime(year=2022, month=2, day=2),
     )
-    subject = get_command_view(commands=[command_1, command_2])
+    subject = get_command_view(
+        commands=[command_1, command_2], last_running_command_id=command_2.id
+    )
     assert subject.get_current() == CurrentCommand(
         index=1,
         command_id="command-id-2",
@@ -795,7 +815,10 @@ def test_get_slice_default_cursor_no_current() -> None:
     command_3 = create_succeeded_command(command_id="command-id-3")
     command_4 = create_succeeded_command(command_id="command-id-4")
 
-    subject = get_command_view(commands=[command_1, command_2, command_3, command_4])
+    subject = get_command_view(
+        commands=[command_1, command_2, command_3, command_4],
+        last_running_command_id=command_4.id,
+    )
 
     result = subject.get_slice(cursor=None, length=3)
 
@@ -825,7 +848,7 @@ def test_get_slice_default_cursor_failed_command() -> None:
     subject = get_command_view(
         commands=[command_1, command_2, command_3, command_4],
         run_result=RunResult.FAILED,
-        failed_command=CommandEntry(index=2, command=command_3),
+        last_running_command_id=command_3.id,
     )
 
     result = subject.get_slice(cursor=None, length=3)
@@ -847,7 +870,7 @@ def test_get_slice_default_cursor_running() -> None:
 
     subject = get_command_view(
         commands=[command_1, command_2, command_3, command_4, command_5],
-        running_command_id="command-id-3",
+        last_running_command_id="command-id-3",
     )
 
     result = subject.get_slice(cursor=None, length=2)
@@ -869,7 +892,7 @@ def test_get_slice_default_cursor_queued() -> None:
 
     subject = get_command_view(
         commands=[command_1, command_2, command_3, command_4, command_5],
-        running_command_id=None,
+        last_running_command_id=command_3.id,
         queued_command_ids=[command_4.id, command_5.id],
     )
 
