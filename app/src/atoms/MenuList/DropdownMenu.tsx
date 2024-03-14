@@ -28,6 +28,7 @@ export interface DropdownMenuProps {
   currentOption: DropdownOption
   width?: string
   dropdownType?: 'rounded' | 'neutral'
+  title?: string
 }
 
 // TODO: (smb: 4/15/22) refactor this to use html select for accessibility
@@ -39,6 +40,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     currentOption,
     width = '9.125rem',
     dropdownType = 'rounded',
+    title,
   } = props
   const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
   const toggleSetShowDropdownMenu = (): void => {
@@ -67,7 +69,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
 
     &:hover {
       border: 1px ${BORDERS.styleSolid}
-        ${showDropdownMenu ? COLORS.blue50 : COLORS.grey50};
+        ${showDropdownMenu ? COLORS.blue50 : COLORS.grey55};
     }
 
     &:active {
@@ -87,7 +89,12 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   `
 
   return (
-    <>
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      {title !== undefined && (
+        <StyledText as="labelSemiBold" paddingBottom={SPACING.spacing8}>
+          {title}
+        </StyledText>
+      )}
       <Flex
         onClick={(e: MouseEvent) => {
           e.preventDefault()
@@ -132,6 +139,6 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           ))}
         </Flex>
       )}
-    </>
+    </Flex>
   )
 }
