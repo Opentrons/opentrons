@@ -155,7 +155,12 @@ function NoParameter(): JSX.Element {
       borderRadius={BORDERS.borderRadiusSize2}
       padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
     >
-      <Icon name="ot-alert" size="1.25rem" color={COLORS.grey60} />
+      <Icon
+        name="ot-alert"
+        size="1.25rem"
+        color={COLORS.grey60}
+        aria-label="alert"
+      />
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('no_parameters')}
       </StyledText>

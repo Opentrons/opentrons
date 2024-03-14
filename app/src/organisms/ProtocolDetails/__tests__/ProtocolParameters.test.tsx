@@ -123,6 +123,7 @@ describe('ProtocolParameters', () => {
       runTimeParameters: [],
     }
     render(props)
+    screen.getByLabelText('alert')
     screen.getByText('No parameters specified in this protocol')
   })
 })
