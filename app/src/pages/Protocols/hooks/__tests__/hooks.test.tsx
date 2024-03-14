@@ -37,76 +37,32 @@ const mockRTPData = [
   {
     displayName: 'Dry Run',
     variableName: 'DRYRUN',
-    description: '',
-
-    choices: [
-      {
-        displayName: 'no',
-        value: 'False',
-      },
-      {
-        displayName: 'yes',
-        value: 'True',
-      },
-    ],
-    default: 'False',
+    description: 'a dry run description',
+    default: false,
   },
   {
     displayName: 'Use Gripper',
     variableName: 'USE_GRIPPER',
     description: '',
-
-    choices: [
-      {
-        displayName: 'yes',
-        value: 'True',
-      },
-      {
-        displayName: 'no',
-        value: 'False',
-      },
-    ],
-    default: 'True',
+    default: true,
   },
   {
     displayName: 'Trash Tips',
     variableName: 'TIP_TRASH',
-    description: '',
-
-    choices: [
-      {
-        displayName: 'yes',
-        value: 'True',
-      },
-      {
-        displayName: 'no',
-        value: 'False',
-      },
-    ],
-    default: 'True',
+    description: 'throw tip in trash',
+    default: true,
   },
   {
     displayName: 'Deactivate Temperatures',
     variableName: 'DEACTIVATE_TEMP',
-    description: '',
-
-    choices: [
-      {
-        displayName: 'yes',
-        value: 'True',
-      },
-      {
-        displayName: 'no',
-        value: 'False',
-      },
-    ],
-    default: 'True',
+    description: 'deactivate temperature?',
+    default: true,
   },
   {
     displayName: 'Columns of Samples',
     variableName: 'COLUMNS',
     description: '',
-
+    suffix: 'mL',
     min: 1,
     max: 14,
     default: 4,
@@ -115,7 +71,6 @@ const mockRTPData = [
     displayName: 'PCR Cycles',
     variableName: 'PCRCYCLES',
     description: '',
-
     min: 1,
     max: 10,
     default: 6,
@@ -124,18 +79,21 @@ const mockRTPData = [
     displayName: 'Default Module Offsets',
     variableName: 'DEFAULT_OFFSETS',
     description: '',
-    suffix: 'mL',
     choices: [
       {
-        displayName: 'yes',
-        value: 'True',
+        displayName: 'no offsets',
+        value: 'none',
       },
       {
-        displayName: 'no',
-        value: 'False',
+        displayName: 'temp offset',
+        value: '1',
+      },
+      {
+        displayName: 'heater-shaker offset',
+        value: '2',
       },
     ],
-    default: 'True',
+    default: 'none',
   },
 ]
 const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2

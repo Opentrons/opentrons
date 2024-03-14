@@ -609,7 +609,11 @@ interface EnumParameter {
   default: string
 }
 
-type RunTimeParameter = IntParameter | EnumParameter
+interface BooleanParameter {
+  default: boolean
+}
+
+type RunTimeParameter = IntParameter | EnumParameter | BooleanParameter
 interface BaseRunTimeParameters {
   displayName: string
   variableName: string
