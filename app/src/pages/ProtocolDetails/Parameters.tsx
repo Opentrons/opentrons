@@ -78,7 +78,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
         return `${props.min}-${props.max}`
       }
       case 'str': {
-        return ''
+        return t('multi')
       }
     }
   }
