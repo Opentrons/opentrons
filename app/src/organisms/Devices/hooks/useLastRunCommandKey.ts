@@ -1,6 +1,7 @@
 import { useAllCommandsQuery } from '@opentrons/react-api-client'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import {
+  RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_FINISHING,
   RUN_STATUS_IDLE,
@@ -21,6 +22,7 @@ const LIVE_RUN_STATUSES = [
   RUN_STATUS_RUNNING,
   RUN_STATUS_FINISHING,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY,
 ]
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
 
