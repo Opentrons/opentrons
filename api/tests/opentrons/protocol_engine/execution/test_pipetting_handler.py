@@ -502,17 +502,6 @@ async def test_aspirate_volume_validation(
     not_ok_volume = 1.01
     expected_adjusted_volume = 1
 
-    decoy.when(
-        mock_command_note_adder(
-            cast(
-                CommandNote,
-                CommandNoteMatcher(
-                    matching_noteKind_regex="warning",
-                    matching_shortMessage_regex="Aspirate clamped to 1 µL",
-                ),
-            )
-        )
-    ).then_return(None)
     for subject in [virtual_subject, hardware_subject]:
         assert (
             await subject.aspirate_in_place(
@@ -522,6 +511,17 @@ async def test_aspirate_volume_validation(
                 command_note_adder=mock_command_note_adder,
             )
             == expected_adjusted_volume
+        )
+        decoy.verify(
+            mock_command_note_adder(
+                cast(
+                    CommandNote,
+                    CommandNoteMatcher(
+                        matching_noteKind_regex="warning",
+                        matching_shortMessage_regex="Aspirate clamped to 1 µL",
+                    ),
+                )
+            )
         )
         with pytest.raises(InvalidAspirateVolumeError):
             await subject.aspirate_in_place(
