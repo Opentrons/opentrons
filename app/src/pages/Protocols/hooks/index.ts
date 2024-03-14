@@ -12,6 +12,7 @@ import {
   SINGLE_SLOT_FIXTURES,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
+  RunTimeParameters,
 } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
@@ -180,6 +181,107 @@ export const useRequiredProtocolHardwareFromAnalysis = (
     ],
     isLoading: isLoadingInstruments || isLoadingModules,
   }
+}
+
+/**
+ * Returns an array of RunTimeParameters objects that are optional by the given protocol ID.
+ *
+ * @param {string} protocolId The ID of the protocol for which required hardware is being retrieved.
+ * @returns {RunTimeParameters[]} An array of RunTimeParameters objects that are required by the given protocol ID.
+ */
+
+export const useRunTimeParameters = (
+  protocolId: string
+): RunTimeParameters[] => {
+  const { data: protocolData } = useProtocolQuery(protocolId)
+  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
+  )
+
+  const mockData: RunTimeParameters[] = [
+    {
+      displayName: 'Dry Run',
+      variableName: 'DRYRUN',
+      description: 'Is this a dry or wet run? Wet is true, dry is false',
+      type: 'boolean',
+      default: false,
+    },
+    {
+      displayName: 'Use Gripper',
+      variableName: 'USE_GRIPPER',
+      description: 'For using the gripper.',
+      type: 'boolean',
+      default: true,
+    },
+    {
+      displayName: 'Trash Tips',
+      variableName: 'TIP_TRASH',
+      description:
+        'to throw tip into the trash or to not throw tip into the trash',
+      type: 'boolean',
+      default: true,
+    },
+    {
+      displayName: 'Deactivate Temperatures',
+      variableName: 'DEACTIVATE_TEMP',
+      description: 'deactivate temperature on the module',
+      type: 'boolean',
+      default: true,
+    },
+    {
+      displayName: 'Columns of Samples',
+      variableName: 'COLUMNS',
+      description: 'How many columns do you want?',
+      type: 'int',
+      min: 1,
+      max: 14,
+      default: 4,
+    },
+    {
+      displayName: 'PCR Cycles',
+      variableName: 'PCR_CYCLES',
+      description: 'number of PCR cycles on a thermocycler',
+      type: 'int',
+      min: 1,
+      max: 10,
+      default: 6,
+    },
+    {
+      displayName: 'EtoH Volume',
+      variableName: 'ETOH_VOLUME',
+      description: '70% ethanol volume',
+      type: 'float',
+      suffix: 'mL',
+      min: 1.5,
+      max: 10.0,
+      default: 6.5,
+    },
+    {
+      displayName: 'Default Module Offsets',
+      variableName: 'DEFAULT_OFFSETS',
+      description: 'default module offsets for temp, H-S, and none',
+      type: 'str',
+      choices: [
+        {
+          displayName: 'no offsets',
+          value: 'none',
+        },
+        {
+          displayName: 'temp offset',
+          value: '1',
+        },
+        {
+          displayName: 'heater-shaker offset',
+          value: '2',
+        },
+      ],
+      default: 'none',
+    },
+  ]
+  //  TODO(jr, 3/14/24): remove the mockData
+  return analysis?.runTimeParameters ?? mockData
 }
 
 /**
