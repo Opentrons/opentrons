@@ -74,7 +74,7 @@ export const FirmwareUpdateModal = (
     isOnDevice,
   } = props
   const [updateId, setUpdateId] = React.useState<string | null>(null)
-  const [firmwareText, setFirmwareText] = React.useState('')
+  const [firmwareText, setFirmwareText] = React.useState<string | null>(null)
   const {
     data: attachedInstruments,
     refetch: refetchInstruments,
@@ -132,17 +132,26 @@ export const FirmwareUpdateModal = (
 
   return (
     <Flex css={MODAL_STYLE}>
-      {status != null || updateNeeded || firmwareText.length === 0 ? (
+      {status != null || updateNeeded || !firmwareText ? (
         <Icon
           name="ot-spinner"
           aria-label="spinner"
           size={isOnDevice ? '6.25rem' : '5.125rem'}
+          marginBottom={SPACING.spacing12}
           css={SPINNER_STYLE}
           spin
         />
-      ) : null}
+      ) : (
+        <Icon
+          name="ot-check"
+          aria-label="check"
+          size={isOnDevice ? '6.25rem' : '5.125rem'}
+          marginBottom={SPACING.spacing12}
+          color={COLORS.green60}
+        />
+      )}
       <StyledText css={DESCRIPTION_STYLE}>
-        {firmwareText.length ? firmwareText : 'Checking for updates...'}
+        {firmwareText ?? 'Checking for updates...'}
       </StyledText>
     </Flex>
   )
