@@ -570,6 +570,7 @@ async def test_executor_forwards_notes_on_command_success(
         ),
     )
 
+
 async def test_executor_forwards_notes_on_command_failure(
     decoy: Decoy,
     hardware_api: HardwareControlAPI,
@@ -591,7 +592,6 @@ async def test_executor_forwards_notes_on_command_failure(
     """It should handle an error occuring during execution."""
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
     command_impl = decoy.mock(cls=_TestCommandImpl)
-
 
     class _TestCommand(BaseCommand[_TestCommandParams, _TestCommandResult]):
         commandType: str = "testCommand"
@@ -634,7 +634,7 @@ async def test_executor_forwards_notes_on_command_failure(
             params=command_params,
         ),
     )
-    running_command_with_notes = running_command.copy(update={'notes': command_notes})
+    running_command_with_notes = running_command.copy(update={"notes": command_notes})
 
     decoy.when(state_store.commands.get(command_id="command-id")).then_return(
         queued_command
@@ -659,7 +659,9 @@ async def test_executor_forwards_notes_on_command_failure(
         command_impl  # type: ignore[arg-type]
     )
 
-    decoy.when(await command_impl.execute(command_params)).then_raise(RuntimeError("oh no"))
+    decoy.when(await command_impl.execute(command_params)).then_raise(
+        RuntimeError("oh no")
+    )
 
     decoy.when(model_utils.generate_id()).then_return("error-id")
     decoy.when(model_utils.get_timestamp()).then_return(
