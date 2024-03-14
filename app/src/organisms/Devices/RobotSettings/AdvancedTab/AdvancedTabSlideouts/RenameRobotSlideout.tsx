@@ -201,7 +201,6 @@ export function RenameRobotSlideout({
               error={fieldState.error?.message && ' '}
               onBlur={field.onBlur}
               title={t('robot_name')}
-              units="shmegels"
             />
           )}
         />
