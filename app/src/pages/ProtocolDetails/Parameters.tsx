@@ -10,6 +10,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { useToaster } from '../../organisms/ToasterOven'
 import { useRequiredProtocolHardware } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'
 
@@ -37,12 +38,12 @@ const TableDatum = styled('td')`
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
-    border-top-left-radius: ${BORDERS.borderRadiusSize4};
-    border-bottom-left-radius: ${BORDERS.borderRadiusSize4};
+    border-top-left-radius: ${BORDERS.borderRadius4};
+    border-bottom-left-radius: ${BORDERS.borderRadius4};
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.borderRadiusSize4};
-    border-bottom-right-radius: ${BORDERS.borderRadiusSize4};
+    border-top-right-radius: ${BORDERS.borderRadius4};
+    border-bottom-right-radius: ${BORDERS.borderRadius4};
   }
 `
 
@@ -51,12 +52,16 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
   const { requiredProtocolHardware } = useRequiredProtocolHardware(
     props.protocolId
   )
+  const { makeSnackbar } = useToaster()
   const { t, i18n } = useTranslation('protocol_details')
 
+  const makeSnack = (): void => {
+    makeSnackbar(t('start_setup_customize_values'))
+  }
   return requiredProtocolHardware.length === 0 ? (
     <EmptySection section="parameters" />
   ) : (
-    <Table>
+    <Table onClick={makeSnack}>
       <thead>
         <tr>
           <TableHeader>
