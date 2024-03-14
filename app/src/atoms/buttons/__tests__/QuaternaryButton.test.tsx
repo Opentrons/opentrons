@@ -24,7 +24,7 @@ describe('QuaternaryButton', () => {
     render(props)
     const button = screen.getByText('secondary tertiary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.white}`)
-    expect(button).toHaveStyle(`border-radius: ${BORDERS.radiusRoundEdge}`)
+    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadiusFull}`)
     expect(button).toHaveStyle('box-shadow: 0 0 0')
     expect(button).toHaveStyle(`color: ${COLORS.blue50}`)
     expect(button).toHaveStyle(

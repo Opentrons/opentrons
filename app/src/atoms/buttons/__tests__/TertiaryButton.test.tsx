@@ -29,7 +29,7 @@ describe('TertiaryButton', () => {
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeLabel}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight12}`)
-    expect(button).toHaveStyle(`border-radius: ${BORDERS.radiusRoundEdge}`)
+    expect(button).toHaveStyle(`border-radius: ${BORDERS.borderRadiusFull}`)
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`
     )

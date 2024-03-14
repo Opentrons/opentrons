@@ -48,7 +48,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         width="9.125rem"
         onClick={toggleSetShowDropdownMenu}
         border={BORDERS.lineBorder}
-        borderRadius={BORDERS.radiusRoundEdge}
+        borderRadius={BORDERS.borderRadiusFull}
         padding={SPACING.spacing8}
         backgroundColor={COLORS.white}
         css={css`

@@ -106,7 +106,7 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
 
 const INPUT_STYLE = css`
   background-color: ${COLORS.blue50};
-  border-radius: ${BORDERS.radiusRoundEdge};
+  border-radius: ${BORDERS.borderRadiusFull};
   box-shadow: none;
   color: ${COLORS.grey10};
   overflow: no-wrap;

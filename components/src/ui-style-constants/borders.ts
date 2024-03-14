@@ -1,7 +1,6 @@
 import { css } from 'styled-components'
 import { COLORS, BORDERS } from '../helix-design-system'
 
-export const radiusRoundEdge = '20px'
 export const styleSolid = 'solid'
 
 export const tabBorder = css`
