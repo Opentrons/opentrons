@@ -141,7 +141,7 @@ async def test_labware_offsets_on_compatible_modules(
     await poll_until_run_succeeds(robot_client=robot_client, run_id=run_id)
 
     # Retrieve details about the protocol's completed commands.
-    commands = (await robot_client.get_run_commands(run_id=run_id)).json()
+    commands = (await robot_client.get_run_commands(run_id=run_id, cursor=0)).json()
     [_, load_module_command_summary, load_labware_command_summary] = commands["data"]
     assert load_module_command_summary["commandType"] == "loadModule"
     load_module_command = (
