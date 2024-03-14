@@ -19,7 +19,11 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   fixtureTiprack300ul,
 } from '@opentrons/shared-data'
-import { useMissingProtocolHardware, useRequiredProtocolLabware } from '..'
+import {
+  useMissingProtocolHardware,
+  useRequiredProtocolLabware,
+  useRunTimeParameters,
+} from '../index'
 
 import type { Protocol } from '@opentrons/api-client'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
@@ -29,7 +33,111 @@ vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../../../../redux/config')
 
 const PROTOCOL_ID = 'fake_protocol_id'
+const mockRTPData = [
+  {
+    displayName: 'Dry Run',
+    variableName: 'DRYRUN',
+    description: '',
 
+    choices: [
+      {
+        displayName: 'no',
+        value: 'False',
+      },
+      {
+        displayName: 'yes',
+        value: 'True',
+      },
+    ],
+    default: 'False',
+  },
+  {
+    displayName: 'Use Gripper',
+    variableName: 'USE_GRIPPER',
+    description: '',
+
+    choices: [
+      {
+        displayName: 'yes',
+        value: 'True',
+      },
+      {
+        displayName: 'no',
+        value: 'False',
+      },
+    ],
+    default: 'True',
+  },
+  {
+    displayName: 'Trash Tips',
+    variableName: 'TIP_TRASH',
+    description: '',
+
+    choices: [
+      {
+        displayName: 'yes',
+        value: 'True',
+      },
+      {
+        displayName: 'no',
+        value: 'False',
+      },
+    ],
+    default: 'True',
+  },
+  {
+    displayName: 'Deactivate Temperatures',
+    variableName: 'DEACTIVATE_TEMP',
+    description: '',
+
+    choices: [
+      {
+        displayName: 'yes',
+        value: 'True',
+      },
+      {
+        displayName: 'no',
+        value: 'False',
+      },
+    ],
+    default: 'True',
+  },
+  {
+    displayName: 'Columns of Samples',
+    variableName: 'COLUMNS',
+    description: '',
+
+    min: 1,
+    max: 14,
+    default: 4,
+  },
+  {
+    displayName: 'PCR Cycles',
+    variableName: 'PCRCYCLES',
+    description: '',
+
+    min: 1,
+    max: 10,
+    default: 6,
+  },
+  {
+    displayName: 'Default Module Offsets',
+    variableName: 'DEFAULT_OFFSETS',
+    description: '',
+    suffix: 'mL',
+    choices: [
+      {
+        displayName: 'yes',
+        value: 'True',
+      },
+      {
+        displayName: 'no',
+        value: 'False',
+      },
+    ],
+    default: 'True',
+  },
+]
 const mockLabwareDef = fixtureTiprack300ul as LabwareDefinition2
 const PROTOCOL_ANALYSIS = {
   id: 'fake analysis',
@@ -83,6 +191,7 @@ const PROTOCOL_ANALYSIS = {
       completedAt: 'fakeCompletedAtTimestamp',
     },
   ],
+  runTimeParameters: mockRTPData,
 } as any
 
 const NULL_COMMAND = {
@@ -108,6 +217,26 @@ const NULL_PROTOCOL_ANALYSIS = {
   commands: [NULL_COMMAND],
 } as any
 
+describe('useRunTimeParameters', () => {
+  beforeEach(() => {
+    when(vi.mocked(useProtocolQuery))
+      .calledWith(PROTOCOL_ID)
+      .thenReturn({
+        data: {
+          data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id } as any] },
+        },
+      } as UseQueryResult<Protocol>)
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+      .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, { enabled: true })
+      .thenReturn({
+        data: PROTOCOL_ANALYSIS,
+      } as UseQueryResult<CompletedProtocolAnalysis>)
+  })
+  it('return RTP', () => {
+    const { result } = renderHook(() => useRunTimeParameters(PROTOCOL_ID))
+    expect(result.current).toBe(mockRTPData)
+  })
+})
 describe('useRequiredProtocolLabware', () => {
   beforeEach(() => {
     when(vi.mocked(useProtocolQuery))

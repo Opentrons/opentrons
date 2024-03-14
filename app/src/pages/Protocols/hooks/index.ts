@@ -12,6 +12,7 @@ import {
   SINGLE_SLOT_FIXTURES,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
+  RunTimeParameters,
 } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
@@ -180,6 +181,132 @@ export const useRequiredProtocolHardwareFromAnalysis = (
     ],
     isLoading: isLoadingInstruments || isLoadingModules,
   }
+}
+
+/**
+ * Returns an array of RunTimeParameters objects that are optional by the given protocol ID.
+ *
+ * @param {string} protocolId The ID of the protocol for which required hardware is being retrieved.
+ * @returns {RunTimeParameters[]} An array of RunTimeParameters objects that are required by the given protocol ID.
+ */
+
+export const useRunTimeParameters = (
+  protocolId: string
+): RunTimeParameters[] => {
+  const { data: protocolData } = useProtocolQuery(protocolId)
+  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
+  )
+
+  const mockData: RunTimeParameters[] = [
+    {
+      displayName: 'Dry Run',
+      variableName: 'DRYRUN',
+      description: '',
+
+      choices: [
+        {
+          displayName: 'no',
+          value: 'False',
+        },
+        {
+          displayName: 'yes',
+          value: 'True',
+        },
+      ],
+      default: 'False',
+    },
+    {
+      displayName: 'Use Gripper',
+      variableName: 'USE_GRIPPER',
+      description: '',
+
+      choices: [
+        {
+          displayName: 'yes',
+          value: 'True',
+        },
+        {
+          displayName: 'no',
+          value: 'False',
+        },
+      ],
+      default: 'True',
+    },
+    {
+      displayName: 'Trash Tips',
+      variableName: 'TIP_TRASH',
+      description: '',
+
+      choices: [
+        {
+          displayName: 'yes',
+          value: 'True',
+        },
+        {
+          displayName: 'no',
+          value: 'False',
+        },
+      ],
+      default: 'True',
+    },
+    {
+      displayName: 'Deactivate Temperatures',
+      variableName: 'DEACTIVATE_TEMP',
+      description: '',
+
+      choices: [
+        {
+          displayName: 'yes',
+          value: 'True',
+        },
+        {
+          displayName: 'no',
+          value: 'False',
+        },
+      ],
+      default: 'True',
+    },
+    {
+      displayName: 'Columns of Samples',
+      variableName: 'COLUMNS',
+      description: '',
+
+      min: 1,
+      max: 14,
+      default: 4,
+    },
+    {
+      displayName: 'PCR Cycles',
+      variableName: 'PCRCYCLES',
+      description: '',
+
+      min: 1,
+      max: 10,
+      default: 6,
+    },
+    {
+      displayName: 'Default Module Offsets',
+      variableName: 'DEFAULT_OFFSETS',
+      description: '',
+      suffix: 'mL',
+      choices: [
+        {
+          displayName: 'yes',
+          value: 'True',
+        },
+        {
+          displayName: 'no',
+          value: 'False',
+        },
+      ],
+      default: 'True',
+    },
+  ]
+  //  TODO(jr, 3/14/24): remove the mockData
+  return analysis?.runTimeParameters ?? mockData
 }
 
 /**

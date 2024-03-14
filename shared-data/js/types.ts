@@ -593,6 +593,32 @@ export interface AnalysisError {
   createdAt: string
 }
 
+interface IntParameter {
+  min: number
+  max: number
+  default: number
+}
+
+interface EnumChoice {
+  displayName: string
+  value: string
+}
+
+interface EnumParameter {
+  choices: EnumChoice[]
+  default: string
+}
+
+type RunTimeParameter = IntParameter | EnumParameter
+interface BaseRunTimeParameters {
+  displayName: string
+  variableName: string
+  description: string
+  suffix?: string
+}
+
+export type RunTimeParameters = BaseRunTimeParameters & RunTimeParameter
+
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
   id: string
@@ -605,6 +631,7 @@ export interface CompletedProtocolAnalysis {
   commands: RunTimeCommand[]
   errors: AnalysisError[]
   robotType?: RobotType | null
+  runTimeParameters?: RunTimeParameters[]
 }
 
 export interface ResourceFile {
