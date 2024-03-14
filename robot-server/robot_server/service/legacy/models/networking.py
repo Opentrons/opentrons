@@ -98,11 +98,11 @@ class WifiNetworkFull(WifiNetwork):
 
     signal: int = Field(
         ...,
-        description="A unitless signal strength; a higher number is a " "better signal",
+        description="A unitless signal strength; a higher number is a better signal",
     )
     active: bool = Field(..., description="Whether there is a connection active")
     security: str = Field(
-        ..., description="The raw NetworkManager output about the wifi " "security"
+        ..., description="The raw NetworkManager output about the Wi-Fi security"
     )
     securityType: NetworkingSecurityType
 
@@ -133,32 +133,32 @@ class WifiConfiguration(BaseModel):
         ...,
         description="The SSID to connect to. If this isn't an SSID that "
         "is being broadcast by a network, you "
-        "should also set hidden to true.",
+        "should also set `hidden` to `true`.",
     )
     hidden: typing.Optional[bool] = Field(
         False,
-        description="True if the network is hidden (not broadcasting an "
-        "ssid). False (default if key is not "
-        "present) otherwise",
+        description="`true` if the network is hidden (not broadcasting an SSID). "
+        "`false` (default if key is not "
+        "present) otherwise.",
     )
     securityType: typing.Optional[NetworkingSecurityType]
 
     psk: typing.Optional[SecretStr] = Field(
         None,
-        description="If this is a PSK-secured network (securityType is "
-        "wpa-psk), the PSK",
+        description="If this is a PSK-secured network (`securityType` is "
+        '`"wpa-psk"`), the PSK',
     )
     eapConfig: typing.Optional[typing.Dict[str, str]] = Field(
         None,
         description="All options required to configure EAP access to the"
-        " wifi. All options should match one of the cases "
-        "described in /wifi/eap-options; for instance, "
+        " Wi-Fi. All options should match one of the cases "
+        "described in `/wifi/eap-options`; for instance, "
         "configuring for peap/mschapv2 should have "
-        '"peap/mschapv2" as the eapType; it should have '
-        '"identity" and "password" props, both of which '
-        "are identified as mandatory in /wifi/eap-options; "
-        'and it may also have "anonymousIdentity" and '
-        '"caCert" properties, both of which are identified'
+        '`"peap/mschapv2"` as the `eapType`; it should have '
+        '`"identity"` and `"password"` props, both of which '
+        "are identified as mandatory in `/wifi/eap-options`; "
+        'and it may also have `"anonymousIdentity"` and '
+        '`"caCert"` properties, both of which are identified'
         " as present but not required.",
         required=["eapType"],
     )

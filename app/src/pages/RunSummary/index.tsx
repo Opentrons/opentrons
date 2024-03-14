@@ -59,12 +59,11 @@ import {
 } from '../../redux/analytics'
 import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
-import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { formatTimeWithUtcLabel, useNotifyRunQuery } from '../../resources/runs'
 import { handleTipsAttachedModal } from '../../organisms/DropTipWizard/TipsAttachedModal'
 import { getPipettesWithTipAttached } from '../../organisms/DropTipWizard/getPipettesWithTipAttached'
 import { getPipetteModelSpecs, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -117,6 +116,7 @@ export function RunSummary(): JSX.Element {
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
     false
   )
+
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipettesWithTip[]
   >([])
@@ -142,6 +142,7 @@ export function RunSummary(): JSX.Element {
         mount,
         specs,
         FLEX_ROBOT_TYPE,
+        host,
         setPipettesWithTip
       ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
     } else {
@@ -157,6 +158,7 @@ export function RunSummary(): JSX.Element {
         mount,
         specs,
         FLEX_ROBOT_TYPE,
+        host,
         setPipettesWithTip
       ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
     } else {

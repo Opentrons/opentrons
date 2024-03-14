@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -14,7 +15,7 @@ import {
   useMountEffect,
 } from '@opentrons/components'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -98,27 +99,28 @@ export const RobotOverviewOverflowMenu = (
 
   return (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
-      <Portal level="top">
-        {showDisconnectModal ? (
-          <DisconnectModal
-            onCancel={() => setShowDisconnectModal(false)}
-            robotName={robot.name}
-          />
-        ) : null}
-      </Portal>
+      {showDisconnectModal
+        ? createPortal(
+            <DisconnectModal
+              onCancel={() => setShowDisconnectModal(false)}
+              robotName={robot.name}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       {showOverflowMenu ? (
         <Flex
           whiteSpace="nowrap"
           zIndex={10}
-          borderRadius={BORDERS.radiusSoftCorners}
+          borderRadius={BORDERS.borderRadius4}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
           top="2.25rem"
           right={0}
           flexDirection={DIRECTION_COLUMN}
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             e.preventDefault()
             e.stopPropagation()
             setShowOverflowMenu(false)

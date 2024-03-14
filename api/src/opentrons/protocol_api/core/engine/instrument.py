@@ -33,13 +33,13 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from . import deck_conflict
 
 from ..instrument import AbstractInstrument
 from .well import WellCore
 
-from ..._trash_bin import TrashBin
-from ..._waste_chute import WasteChute
+from ...disposal_locations import TrashBin, WasteChute
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore
@@ -478,13 +478,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def drop_tip_in_disposal_location(
-        self, disposal_location: Union[TrashBin, WasteChute], home_after: Optional[bool]
+        self,
+        disposal_location: Union[TrashBin, WasteChute],
+        home_after: Optional[bool],
+        alternate_tip_drop: bool = False,
     ) -> None:
         self._move_to_disposal_location(
             disposal_location,
             force_direct=False,
             speed=None,
-            alternate_tip_drop=True,
+            alternate_tip_drop=alternate_tip_drop,
         )
         self._drop_tip_in_place(home_after=home_after)
         self._protocol_core.set_last_location(location=None, mount=self.get_mount())
@@ -498,10 +501,14 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     ) -> None:
         # TODO (nd, 2023-11-30): give appropriate offset when finalized
         # https://opentrons.atlassian.net/browse/RSS-391
-        offset = AddressableOffsetVector(x=0, y=0, z=0)
+
+        disposal_offset = disposal_location.offset
+        offset = AddressableOffsetVector(
+            x=disposal_offset.x, y=disposal_offset.y, z=disposal_offset.z
+        )
 
         if isinstance(disposal_location, TrashBin):
-            addressable_area_name = disposal_location._addressable_area_name
+            addressable_area_name = disposal_location.area_name
             self._engine_client.move_to_addressable_area_for_drop_tip(
                 pipette_id=self._pipette_id,
                 addressable_area_name=addressable_area_name,
@@ -669,6 +676,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             self._pipette_id
         )
 
+    def get_nozzle_map(self) -> NozzleMap:
+        return self._engine_client.state.tips.get_pipette_nozzle_map(self._pipette_id)
+
     def has_tip(self) -> bool:
         return (
             self._engine_client.state.pipettes.get_attached_tip(self._pipette_id)
@@ -703,14 +713,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             return True
         else:
             if self.get_channels() == 96:
-                # SINGLE configuration with H12 nozzle is technically supported by the
-                # current tip tracking implementation but we don't do any deck conflict
-                # checks for it, so we won't provide full support for it yet.
-                return (
-                    self.get_nozzle_configuration() == NozzleConfigurationType.COLUMN
-                    and primary_nozzle == "A12"
-                )
+                return True
             if self.get_channels() == 8:
+                # TODO: (cb, 03/06/24): Enable automatic tip tracking on the 8 channel pipettes once PAPI support exists
                 return (
                     self.get_nozzle_configuration() == NozzleConfigurationType.SINGLE
                     and primary_nozzle == "H1"

@@ -9,17 +9,23 @@ import MULTI_DISPENSE_IMAGE from '../../../../images/path_multi_dispense.svg'
 import MULTI_ASPIRATE_IMAGE from '../../../../images/path_multi_aspirate.svg'
 import { PathOption } from '../../../../form-types'
 import { FieldProps } from '../../types'
+import styles from '../../StepEditForm.module.css'
 import {
   DisabledPathMap,
   getDisabledPathMap,
   ValuesForPath,
 } from './getDisabledPathMap'
-import styles from '../../StepEditForm.css'
 
 const PATH_ANIMATION_IMAGES = {
-  single: require('../../../../images/path_single.gif'),
-  multiAspirate: require('../../../../images/path_multiAspirate.gif'),
-  multiDispense: require('../../../../images/path_multiDispense.gif'),
+  single: new URL('../../../../images/path_single.gif', import.meta.url).href,
+  multiAspirate: new URL(
+    '../../../../images/path_multiAspirate.gif',
+    import.meta.url
+  ).href,
+  multiDispense: new URL(
+    '../../../../images/path_multiDispense.gif',
+    import.meta.url
+  ).href,
 }
 
 const ALL_PATH_OPTIONS: Array<{ name: PathOption; image: string }> = [

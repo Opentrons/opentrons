@@ -1,15 +1,16 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
+import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 
 import {
   useCreateLiveCommandMutation,
   useModulesQuery,
 } from '@opentrons/react-api-client'
-import { renderWithProviders } from '@opentrons/components'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
+import { ot3StandardDeckV4 as ot3StandardDeckDef } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
@@ -24,29 +25,26 @@ import {
   mockUseModulesQueryUnknown,
 } from '../__fixtures__'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock(
+import type * as ReactApiClient from '@opentrons/react-api-client'
+
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ReactApiClient>()
+  return {
+    ...actual,
+    useCreateLiveCommandMutation: vi.fn(),
+    useModulesQuery: vi.fn(),
+  }
+})
+
+vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
-jest.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
-
-const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
-  typeof useCreateLiveCommandMutation
->
-const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
-  typeof useModulesQuery
->
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
-  typeof getProtocolModulesInfo
->
+vi.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 
 const RUN_ID = "otie's run"
-const mockSetSetupScreen = jest.fn()
-const mockRefetch = jest.fn()
-const mockCreateLiveCommand = jest.fn()
+const mockSetSetupScreen = vi.fn()
+const mockRefetch = vi.fn()
+const mockCreateLiveCommand = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -65,23 +63,22 @@ const render = () => {
 describe('ProtocolSetupLabware', () => {
   beforeEach(() => {
     mockCreateLiveCommand.mockResolvedValue(null)
-    when(mockUseMostRecentCompletedAnalysis)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
-      .mockReturnValue(mockRecentAnalysis)
-    when(mockGetProtocolModulesInfo)
+      .thenReturn(mockRecentAnalysis)
+    when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockRecentAnalysis, ot3StandardDeckDef as any)
-      .mockReturnValue(mockProtocolModuleInfo)
-    mockUseModulesQuery.mockReturnValue({
+      .thenReturn(mockProtocolModuleInfo)
+    vi.mocked(useModulesQuery).mockReturnValue({
       ...mockUseModulesQueryOpen,
       refetch: mockRefetch,
     } as any)
-    mockUseCreateLiveCommandMutation.mockReturnValue({
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
   })
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the Labware Setup page', () => {
@@ -120,7 +117,7 @@ describe('ProtocolSetupLabware', () => {
   })
 
   it('sends a latch-open command when the labware latch is closed and the button is clicked', () => {
-    mockUseModulesQuery.mockReturnValue({
+    vi.mocked(useModulesQuery).mockReturnValue({
       ...mockUseModulesQueryClosed,
       refetch: mockRefetch,
     } as any)
@@ -138,21 +135,27 @@ describe('ProtocolSetupLabware', () => {
   })
 
   it('shows opening transition states of the labware latch button', () => {
-    mockUseModulesQuery.mockReturnValue(mockUseModulesQueryOpening as any)
+    vi.mocked(useModulesQuery).mockReturnValue(
+      mockUseModulesQueryOpening as any
+    )
 
     render()
     screen.getByText('Opening...')
   })
 
   it('shows closing transition state of the labware latch button', () => {
-    mockUseModulesQuery.mockReturnValue(mockUseModulesQueryClosing as any)
+    vi.mocked(useModulesQuery).mockReturnValue(
+      mockUseModulesQueryClosing as any
+    )
 
     render()
     screen.getByText('Closing...')
   })
 
   it('defaults to open when latch status is unknown', () => {
-    mockUseModulesQuery.mockReturnValue(mockUseModulesQueryUnknown as any)
+    vi.mocked(useModulesQuery).mockReturnValue(
+      mockUseModulesQueryUnknown as any
+    )
 
     render()
     screen.getByText('Open')

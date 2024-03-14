@@ -26,7 +26,8 @@ from opentrons.commands.publisher import CommandPublisher, publish, publish_cont
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.deck_type import (
     NoTrashDefinedError,
-    should_load_fixed_trash_for_python_protocol,
+    should_load_fixed_trash_labware_for_python_protocol,
+    should_load_fixed_trash_area_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
@@ -51,8 +52,7 @@ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 
 from . import validation
 from ._liquid import Liquid
-from ._trash_bin import TrashBin
-from ._waste_chute import WasteChute
+from .disposal_locations import TrashBin, WasteChute
 from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware
@@ -159,22 +159,12 @@ class ProtocolContext(CommandPublisher):
         # protocols after 2.16 expect trash to exist as either a TrashBin or WasteChute object.
 
         self._load_fixed_trash()
-        if should_load_fixed_trash_for_python_protocol(self._api_version):
+        if should_load_fixed_trash_labware_for_python_protocol(self._api_version):
             self._core.append_disposal_location(self.fixed_trash)
-        elif (
-            self._api_version >= APIVersion(2, 16)
-            and self._core.robot_type == "OT-2 Standard"
+        elif should_load_fixed_trash_area_for_python_protocol(
+            self._api_version, self._core.robot_type
         ):
-            _fixed_trash_trashbin = TrashBin(
-                location=DeckSlotName.FIXED_TRASH, addressable_area_name="fixedTrash"
-            )
-            # We have to skip adding this fixed trash bin to engine because this __init__ is called in the main thread
-            # and any calls to sync client will cause a deadlock. This means that OT-2 fixed trashes are not added to
-            # the engine store until one is first referenced. This should have minimal consequences for OT-2 given that
-            # we do not need to worry about the 96 channel pipette and partial tip configuration with that pipette.
-            self._core.append_disposal_location(
-                _fixed_trash_trashbin, skip_add_to_engine=True
-            )
+            self._core.load_ot2_fixed_trash_bin()
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
@@ -514,10 +504,7 @@ class ProtocolContext(CommandPublisher):
             api_version=self._api_version,
             robot_type=self._core.robot_type,
         )
-        trash_bin = TrashBin(
-            location=slot_name, addressable_area_name=addressable_area_name
-        )
-        self._core.append_disposal_location(trash_bin)
+        trash_bin = self._core.load_trash_bin(slot_name, addressable_area_name)
         return trash_bin
 
     @requires_version(2, 16)
@@ -533,9 +520,7 @@ class ProtocolContext(CommandPublisher):
         load another item in slot D3 after loading the waste chute, or vice versa, the
         API will raise an error.
         """
-        waste_chute = WasteChute()
-        self._core.append_disposal_location(waste_chute)
-        return waste_chute
+        return self._core.load_waste_chute()
 
     @requires_version(2, 15)
     def load_adapter(
@@ -981,9 +966,9 @@ class ProtocolContext(CommandPublisher):
 
         A human can resume the protocol in the Opentrons App or on the touchscreen.
 
-        This function returns immediately, but the next function call that
-        is blocked by a paused robot (anything that involves moving) will
-        not return until the protocol is resumed.
+        .. note::
+            In Python Protocol API version 2.13 and earlier, the pause will only
+            take effect on the next function call that involves moving the robot.
 
         :param str msg: An optional message to show in the run log entry for the pause step.
         """
@@ -1068,9 +1053,17 @@ class ProtocolContext(CommandPublisher):
         For instance, ``deck[1]``, ``deck["1"]``, and ``deck["D1"]``
         will all return the object loaded in the front-left slot.
 
-        The value will be a :py:obj:`~opentrons.protocol_api.Labware` if the slot contains a
-        labware, a module context if the slot contains a hardware
-        module, or ``None`` if the slot doesn't contain anything.
+        The value for each key depends on what is loaded in the slot:
+          - A :py:obj:`~opentrons.protocol_api.Labware` if the slot contains a labware.
+          - A module context if the slot contains a hardware module.
+          - ``None`` if the slot doesn't contain anything.
+
+        A module that occupies multiple slots is set as the value for all of the
+        relevant slots. Currently, the only multiple-slot module is the Thermocycler.
+        When loaded, the :py:class:`ThermocyclerContext` object is the value for
+        ``deck`` keys ``"A1"`` and ``"B1"`` on Flex, and ``7``, ``8``, ``10``, and
+        ``11`` on OT-2. In API version 2.13 and earlier, only slot 7 keyed to the
+        Thermocycler object, and slots 8, 10, and 11 keyed to ``None``.
 
         Rather than filtering the objects in the deck map yourself,
         you can also use :py:attr:`loaded_labwares` to get a dict of labwares
@@ -1086,6 +1079,9 @@ class ProtocolContext(CommandPublisher):
             commands continue immediately. If you need to physically move the labware to
             reflect the new deck state, add a :py:meth:`.pause` or use
             :py:meth:`.move_labware` instead.
+
+        .. versionchanged:: 2.14
+           Includes the Thermocycler in all of the slots it occupies.
 
         .. versionchanged:: 2.15
            ``del`` sets the corresponding labware's location to ``OFF_DECK``.

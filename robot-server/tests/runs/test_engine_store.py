@@ -18,7 +18,7 @@ from opentrons.protocol_runner import (
 )
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 
-from robot_server.protocols import ProtocolResource
+from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs.engine_store import (
     EngineStore,
     EngineConflictError,

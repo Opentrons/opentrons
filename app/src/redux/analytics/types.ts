@@ -3,9 +3,9 @@ import {
   ANALYTICS_TIP_LENGTH_STARTED,
 } from './constants'
 
+import type { PipetteMount as Mount } from '@opentrons/shared-data'
 import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
 import type { DeckCalibrationStatus } from '../calibration/types'
-import type { Mount } from '@opentrons/components'
 import type { ConfigV0 } from '../config/types'
 
 export type AnalyticsConfig = ConfigV0['analytics']

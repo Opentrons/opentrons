@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import map from 'lodash/map'
 import omit from 'lodash/omit'
 import isEmpty from 'lodash/isEmpty'
@@ -45,7 +46,7 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -83,7 +84,7 @@ const GRID_STYLE = css`
 `
 
 const ZOOM_ICON_STYLE = css`
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   &:hover {
     background: ${COLORS.grey30};
   }
@@ -363,16 +364,17 @@ export function ProtocolDetails(
 
   return (
     <>
-      <Portal level="top">
-        {showDeckViewModal ? (
-          <LegacyModal
-            title={t('deck_view')}
-            onClose={() => setShowDeckViewModal(false)}
-          >
-            {deckMap}
-          </LegacyModal>
-        ) : null}
-      </Portal>
+      {showDeckViewModal
+        ? createPortal(
+            <LegacyModal
+              title={t('deck_view')}
+              onClose={() => setShowDeckViewModal(false)}
+            >
+              {deckMap}
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing16}
@@ -392,7 +394,7 @@ export function ProtocolDetails(
 
           <Flex
             backgroundColor={COLORS.white}
-            borderRadius={BORDERS.radiusSoftCorners}
+            borderRadius={BORDERS.borderRadius4}
             position={POSITION_RELATIVE}
             flexDirection={DIRECTION_ROW}
             width="100%"
@@ -425,7 +427,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
                 >
-                  <StyledText as="h6" color={COLORS.grey50}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('creation_method')}
                   </StyledText>
                   <StyledText as="p">
@@ -438,7 +440,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastUpdated"
                 >
-                  <StyledText as="h6" color={COLORS.grey50}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('last_updated')}
                   </StyledText>
                   <StyledText as="p">
@@ -451,7 +453,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastAnalyzed"
                 >
-                  <StyledText as="h6" color={COLORS.grey50}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('last_analyzed')}
                   </StyledText>
                   <StyledText as="p">
@@ -481,7 +483,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
                 >
-                  <StyledText as="h6" color={COLORS.grey50}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('org_or_author')}
                   </StyledText>
                   <StyledText
@@ -498,7 +500,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_description"
                 >
-                  <StyledText as="h6" color={COLORS.grey50}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('description')}
                   </StyledText>
                   {analysisStatus === 'loading' ? (
@@ -539,7 +541,7 @@ export function ProtocolDetails(
               flex={`0 0 ${String(SIZE_5)}`}
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.white}
-              borderRadius={BORDERS.borderRadiusSize2}
+              borderRadius={BORDERS.borderRadius8}
               height="100%"
               data-testid="ProtocolDetails_deckMap"
             >
@@ -567,7 +569,7 @@ export function ProtocolDetails(
                     color={
                       analysisStatus !== 'complete'
                         ? COLORS.grey40
-                        : COLORS.grey50
+                        : COLORS.grey60
                     }
                   />
                 </Btn>
@@ -591,7 +593,7 @@ export function ProtocolDetails(
                   onClick={() => setCurrentTab('robot_config')}
                 >
                   <StyledText>
-                    {i18n.format(t('robot_configuration'), 'capitalize')}
+                    {i18n.format(t('hardware'), 'capitalize')}
                   </StyledText>
                 </RoundTab>
                 <RoundTab
@@ -630,11 +632,9 @@ export function ProtocolDetails(
                 backgroundColor={COLORS.white}
                 // remove left upper corner border radius when first tab is active
                 borderRadius={`${
-                  currentTab === 'robot_config'
-                    ? '0'
-                    : BORDERS.radiusSoftCorners
-                } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
-                  BORDERS.radiusSoftCorners
+                  currentTab === 'robot_config' ? '0' : BORDERS.borderRadius4
+                } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
+                  BORDERS.borderRadius4
                 }`}
                 padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
               >

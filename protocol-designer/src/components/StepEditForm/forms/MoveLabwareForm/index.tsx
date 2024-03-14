@@ -16,7 +16,7 @@ import {
   LabwareLocationField,
   CheckboxRowField,
 } from '../../fields'
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { getRobotType } from '../../../../file-data/selectors'
 import {

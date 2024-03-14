@@ -28,6 +28,7 @@ from .command import (
     BaseCommandCreate,
     CommandStatus,
     CommandIntent,
+    CommandNote,
 )
 
 from .command_unions import (
@@ -332,6 +333,7 @@ __all__ = [
     "BaseCommandCreate",
     "CommandStatus",
     "CommandIntent",
+    "CommandNote",
     # command parameter hashing
     "hash_command_params",
     # command schema generation

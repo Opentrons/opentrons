@@ -153,7 +153,7 @@ export function ProtocolWithLastRun({
       height="24.5rem"
       width="25.8125rem"
       backgroundSize="64rem"
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
     />
   ) : (
     <Flex
@@ -165,7 +165,7 @@ export function ProtocolWithLastRun({
       backgroundColor={isReadyToBeReRun ? COLORS.green35 : COLORS.yellow35}
       width="25.8125rem"
       height="24.5rem"
-      borderRadius={BORDERS.borderRadiusSize4}
+      borderRadius={BORDERS.borderRadius16}
       onClick={handleCardClick}
     >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>

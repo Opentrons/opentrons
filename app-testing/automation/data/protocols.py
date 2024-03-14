@@ -126,6 +126,16 @@ class Protocols:
         robot_error=False,
     )
 
+    Flex_P1000_96_Gripper_TC_TM_HS_AnalysisError_GripperCollisionWithTips: Protocol = Protocol(
+        file_name="Flex_P1000_96_Gripper_TC_TM_HS_AnalysisError_GripperCollisionWithTips",
+        file_extension="json",
+        protocol_name="Gripper Collision with Tips",
+        robot="Flex",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="Gripper collision with tips",
+    )
+
     ############################################################################################################
     # Begin Python Protocols ###################################################################################
     ############################################################################################################
@@ -226,6 +236,15 @@ class Protocols:
         custom_labware=["cpx_4_tuberack_100ul"],
     )
 
+    OT2_P300M_P20S_TC_HS_TM_2_17_SmokeTestV3: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_TC_HS_TM_2_17_SmokeTestV3",
+        file_extension="py",
+        protocol_name="🛠️ 2.17 Smoke Test V3 🪄",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
     OT2_P300M_P20S_TC_MM_TM_2_13_Smoke620Release: Protocol = Protocol(
         file_name="OT2_P300M_P20S_TC_MM_TM_2_13_Smoke620Release",
         file_extension="py",
@@ -289,6 +308,108 @@ class Protocols:
         file_name="OT2_P300M_P20S_TC_HS_TM_2_16_aspirateDispenseMix0Volume",
         file_extension="py",
         protocol_name="OT2_P300M_P20S_TC_HS_TM_2_16_aspirateDispenseMix0Volume.py",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_P300M_P20S_TC_HS_TM_2_15_dispense_changes: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_TC_HS_TM_2_15_dispense_changes",
+        file_extension="py",
+        protocol_name="OT2_P300M_P20S_TC_HS_TM_2_15_dispense_changes.py",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_P300M_P20S_TC_HS_TM_2_16_dispense_changes: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_TC_HS_TM_2_16_dispense_changes",
+        file_extension="py",
+        protocol_name="OT2_P300M_P20S_TC_HS_TM_2_16_dispense_changes.py",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_P300M_P20S_TC_HS_TM_2_17_dispense_changes: Protocol = Protocol(
+        file_name="OT2_P300M_P20S_TC_HS_TM_2_17_dispense_changes",
+        file_extension="py",
+        protocol_name="OT2_P300M_P20S_TC_HS_TM_2_17_dispense_changes.py",
+        robot="OT-2",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="ValueError [line 15]: Cannot dispense more than pipette max volume",  # noqa: E501
+    )
+
+    OT2_None_None_TC_2_14_VerifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_name="OT2_None_None_TC_2_14_VerifyThermocyclerLoadedSlots",
+        file_extension="py",
+        protocol_name="OT2_None_None_TC_2_14_VerifyThermocyclerLoadedSlots.py",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_None_None_TC_2_15_VerifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_name="OT2_None_None_TC_2_15_VerifyThermocyclerLoadedSlots",
+        file_extension="py",
+        protocol_name="OT2_None_None_TC_2_15_VerifyThermocyclerLoadedSlots.py",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_None_None_TC_2_16_VerifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_name="OT2_None_None_TC_2_16_VerifyThermocyclerLoadedSlots",
+        file_extension="py",
+        protocol_name="OT2_None_None_TC_2_16_VerifyThermocyclerLoadedSlots.py",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_None_None_TC_2_17_VerifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_name="OT2_None_None_TC_2_17_VerifyThermocyclerLoadedSlots",
+        file_extension="py",
+        protocol_name="OT2_None_None_TC_2_17_VerifyThermocyclerLoadedSlots.py",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_None_None_HS_2_16_AnalysisError_HeaterShakerConflictWithTrashBin1: Protocol = Protocol(
+        file_name="OT2_None_None_HS_2_16_AnalysisError_HeaterShakerConflictWithTrashBin1",
+        file_extension="py",
+        protocol_name="OT2_None_None_HS_2_16_AnalysisError_HeaterShakerConflictWithTrashBin1.py",
+        robot="OT-2",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="DeckConflictError [line 19]: trash_bin in slot 12 prevents heater_shaker in slot 11 from using slot 11.",  # noqa: E501
+    )
+
+    OT2_None_None_HS_2_16_AnalysisError_HeaterShakerConflictWithTrashBin2: Protocol = Protocol(
+        file_name="OT2_None_None_HS_2_16_AnalysisError_HeaterShakerConflictWithTrashBin2",
+        file_extension="py",
+        protocol_name="OT2_None_None_HS_2_16_AnalysisError_HeaterShakerConflictWithTrashBin2.py",
+        robot="OT-2",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="DeckConflictError [line 19]: trash_bin in slot 12 prevents heater_shaker in slot 11 from using slot 11.",  # noqa: E501
+    )
+
+    OT2_None_None_2_16_verifyDoesNotDeadlock: Protocol = Protocol(
+        file_name="OT2_None_None_2_16_verifyDoesNotDeadlock",
+        file_extension="py",
+        protocol_name="OT2_None_None_2_16_verifyDoesNotDeadlock.py",
+        robot="OT-2",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT2_P300S_None_2_16_verifyNoFloatingPointErrorInPipetting: Protocol = Protocol(
+        file_name="OT2_P300S_None_2_16_verifyNoFloatingPointErrorInPipetting",
+        file_extension="py",
+        protocol_name="OT2_P300S_None_2_16_verifyNoFloatingPointErrorInPipetting.py",
         robot="OT-2",
         app_error=False,
         robot_error=False,
@@ -545,6 +666,119 @@ class Protocols:
         file_name="Flex_P1000_96_GRIPPER_HS_TM_TC_MB_2_16_Smoke",
         file_extension="py",
         protocol_name="QA Protocol - MEGAAA PROTOCOL - LETS BREAK, I MEAN TEST, EVERYTHING!!!!!",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_None_None_TC_2_14_verifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_name="Flex_None_None_TC_2_14_verifyThermocyclerLoadedSlots",
+        file_extension="py",
+        protocol_name="QA Protocol - Verify Thermocycler Loaded Slots",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_None_None_TC_2_15_verifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_name="Flex_None_None_TC_2_15_verifyThermocyclerLoadedSlots",
+        file_extension="py",
+        protocol_name="QA Protocol - Verify Thermocycler Loaded Slots",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_None_None_TC_2_16_verifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_name="Flex_None_None_TC_2_16_verifyThermocyclerLoadedSlots",
+        file_extension="py",
+        protocol_name="QA Protocol - Verify Thermocycler Loaded Slots",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_None_None_TC_2_17_verifyThermocyclerLoadedSlots: Protocol = Protocol(
+        file_name="Flex_None_None_TC_2_17_verifyThermocyclerLoadedSlots",
+        file_extension="py",
+        protocol_name="QA Protocol - Verify Thermocycler Loaded Slots",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_None_None_TC_2_16_AnalysisError_TrashBinAndThermocyclerConflict: Protocol = Protocol(
+        file_name="Flex_None_None_TC_2_16_AnalysisError_TrashBinAndThermocyclerConflict",
+        file_extension="py",
+        protocol_name="Flex_None_None_TC_2_16_AnalysisError_TrashBinAndThermocyclerConflict",
+        robot="Flex",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="IncompatibleAddressableAreaError [line 15]: Cannot use Trash Bin in C3, not compatible with one or more of the following fixtures: Thermocycler in C3",  # noqa: E501
+    )
+
+    Flex_P1000_96_None_TC_2_16_AnalysisError_pipetteCollisionWithThermocyclerLidClips: Protocol = Protocol(
+        file_name="Flex_P1000_96_None_TC_2_16_AnalysisError_pipetteCollisionWithThermocyclerLidClips",
+        file_extension="py",
+        protocol_name="Flex_P1000_96_None_TC_2_16_AnalysisError_pipetteCollisionWithThermocyclerLidClips",
+        robot="Flex",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="IncompatibleAddressableAreaError [line 15]: Cannot use Slot C3, not compatible with one or more of the following fixtures: Thermocycler in C3",  # noqa: E501
+    )
+
+    Flex_P1000_96_None_TC_2_16_AnalysisError_pipetteCollisionWithThermocyclerLid: Protocol = Protocol(
+        file_name="Flex_P1000_96_None_TC_2_16_AnalysisError_pipetteCollisionWithThermocyclerLid",
+        file_extension="py",
+        protocol_name="Flex_P1000_96_None_TC_2_16_AnalysisError_pipetteCollisionWithThermocyclerLid",
+        robot="Flex",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="IncompatibleAddressableAreaError [line 15]: Cannot use Slot C3, not compatible with one or more of the following fixtures: Thermocycler in C3",  # noqa: E501
+    )
+
+    Flex_P1000_96_TC_2_16_PartialTipPickupSingle: Protocol = Protocol(
+        file_name="Flex_P1000_96_TC_2_16_PartialTipPickupSingle",
+        file_extension="py",
+        protocol_name="Partial Tip Pickup Single",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_P1000_96_TC_2_16_PartialTipPickupColumn: Protocol = Protocol(
+        file_name="Flex_P1000_96_TC_2_16_PartialTipPickupColumn",
+        file_extension="py",
+        protocol_name="Partial Tip Pickup Column",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    Flex_P1000_96_TC_2_16_AnalysisError_PartialTipPickupTryToReturnTip: Protocol = Protocol(
+        file_name="Flex_P1000_96_TC_2_16_AnalysisError_PartialTipPickupTryToReturnTip",
+        file_extension="py",
+        protocol_name="Partial Tip Pickup Try to Return Tip",
+        robot="Flex",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="ValueError [line 15]: Cannot return tip in partial tip pickup mode.",  # noqa: E501
+    )
+
+    Flex_P1000_96_TC_2_16_AnalysisError_PartialTipPickupThermocyclerLidConflict: Protocol = Protocol(
+        file_name="Flex_P1000_96_TC_2_16_AnalysisError_PartialTipPickupThermocyclerLidConflict",
+        file_extension="py",
+        protocol_name="Partial Tip Pickup Thermocycler Lid Conflict",
+        robot="Flex",
+        app_error=True,
+        robot_error=False,
+        app_analysis_error="IncompatibleAddressableAreaError [line 15]: Cannot use Slot C3, not compatible with one or more of the following fixtures: Thermocycler in C3",  # noqa: E501
+    )
+
+    Flex_P1000_96_Gripper_2_16_TriggerPrepareForMountMovement: Protocol = Protocol(
+        file_name="Flex_P1000_96_Gripper_2_16_TriggerPrepareForMountMovement",
+        file_extension="py",
+        protocol_name="96ch protocol with modules gripper moves and pipette aspirations",
         robot="Flex",
         app_error=False,
         robot_error=False,

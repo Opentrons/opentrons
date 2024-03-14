@@ -51,8 +51,7 @@ from opentrons.protocol_engine.errors import (
 from ... import validation
 from ..._types import OffDeckType
 from ..._liquid import Liquid
-from ..._trash_bin import TrashBin
-from ..._waste_chute import WasteChute
+from ...disposal_locations import TrashBin, WasteChute
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
@@ -134,13 +133,18 @@ class ProtocolCore(
     def append_disposal_location(
         self,
         disposal_location: Union[Labware, TrashBin, WasteChute],
-        skip_add_to_engine: bool = False,
     ) -> None:
-        """Append a disposal location object to the core"""
+        """Append a disposal location object to the core."""
+        self._disposal_locations.append(disposal_location)
+
+    def _add_disposal_location_to_engine(
+        self, disposal_location: Union[TrashBin, WasteChute]
+    ) -> None:
+        """Verify and add disposal location to engine store and append it to the core."""
+        self._engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
+            disposal_location.area_name
+        )
         if isinstance(disposal_location, TrashBin):
-            self._engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
-                disposal_location.area_name
-            )
             deck_conflict.check(
                 engine_state=self._engine_client.state,
                 new_trash_bin=disposal_location,
@@ -152,23 +156,8 @@ class ProtocolCore(
                 existing_labware_ids=list(self._labware_cores_by_id.keys()),
                 existing_module_ids=list(self._module_cores_by_id.keys()),
             )
-            if not skip_add_to_engine:
-                self._engine_client.add_addressable_area(disposal_location.area_name)
-        elif isinstance(disposal_location, WasteChute):
-            # TODO(jbl 2024-01-25) hardcoding this specific addressable area should be refactored
-            #   when analysis is fixed up
-            #
-            # We want to tell Protocol Engine that there's a waste chute in the waste chute location when it's loaded,
-            # so analysis can prevent the user from doing anything that would collide with it. At the same time, we
-            # do not want to create a false negative when it comes to addressable area conflict. We therefore use the
-            # addressable area `1ChannelWasteChute` because every waste chute cutout fixture provides it and it will
-            # provide the engine with the information it needs.
-            self._engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
-                "1ChannelWasteChute"
-            )
-            if not skip_add_to_engine:
-                self._engine_client.add_addressable_area("1ChannelWasteChute")
-        self._disposal_locations.append(disposal_location)
+        self._engine_client.add_addressable_area(disposal_location.area_name)
+        self.append_disposal_location(disposal_location)
 
     def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
         """Get disposal locations."""
@@ -520,6 +509,51 @@ class ProtocolCore(
             # TODO(mm, 2022-11-10): Deduplicate "400" with legacy core.
             default_movement_speed=400,
         )
+
+    def load_trash_bin(self, slot_name: DeckSlotName, area_name: str) -> TrashBin:
+        """Load a deck configuration based trash bin.
+
+        Args:
+            slot_name: the slot the trash is being loaded into.
+            area_name: the addressable area name of the trash.
+
+        Returns:
+            A trash bin object.
+        """
+        trash_bin = TrashBin(
+            location=slot_name,
+            addressable_area_name=area_name,
+            api_version=self._api_version,
+            engine_client=self._engine_client,
+        )
+        self._add_disposal_location_to_engine(trash_bin)
+        return trash_bin
+
+    def load_ot2_fixed_trash_bin(self) -> None:
+        """Load a deck configured OT-2 fixed trash in Slot 12."""
+        _fixed_trash_trash_bin = TrashBin(
+            location=DeckSlotName.FIXED_TRASH,
+            addressable_area_name="fixedTrash",
+            api_version=self._api_version,
+            engine_client=self._engine_client,
+        )
+        # We are just appending the fixed trash to the core's internal list here, not adding it to the engine via
+        # the core, since that method works through the SyncClient and if called from here, will cause protocols
+        # to deadlock. Instead, that method is called in protocol engine directly in create_protocol_context after
+        # ProtocolContext is initialized.
+        self.append_disposal_location(_fixed_trash_trash_bin)
+
+    def load_waste_chute(self) -> WasteChute:
+        """Load a deck configured waste chute into Slot D3.
+
+        Returns:
+            A waste chute object.
+        """
+        waste_chute = WasteChute(
+            engine_client=self._engine_client, api_version=self._api_version
+        )
+        self._add_disposal_location_to_engine(waste_chute)
+        return waste_chute
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""

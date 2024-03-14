@@ -202,7 +202,7 @@
     }
   },
   "gate": {
-    "sign_up_below": "Sign Up For Opentrons Protocol Designer Beta",
+    "sign_up_below": "Sign Up For Opentrons Protocol Designer",
     "failed_verification": "Something Went Wrong",
     "sign_up_success": "Please confirm your email address to continue",
     "check_email": "We've sent a confirmation URL to your email that will take you to the Protocol Designer. Keep an eye out for a follow up email which contains links to resources such as our help documents."

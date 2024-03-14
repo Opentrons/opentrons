@@ -15,7 +15,7 @@ from server_utils.fastapi_utils.app_state import (
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.hardware import get_deck_type
-from robot_server.persistence import (
+from robot_server.persistence.fastapi_dependencies import (
     get_active_persistence_directory,
     get_active_persistence_directory_failsafe,
 )

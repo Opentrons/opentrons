@@ -19,7 +19,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyLastRunCommandKey } from '../../resources/runs/useNotifyLastRunCommandKey'
+import { useNotifyLastRunCommandKey } from '../../resources/runs'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
@@ -95,9 +95,8 @@ export const RunPreviewComponent = (
       >
         {(command, index) => {
           const isCurrent = index === currentRunCommandIndex
-          const borderColor = isCurrent ? COLORS.blue50 : COLORS.transparent
-          const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey10
-          const contentColor = isCurrent ? COLORS.blue60 : COLORS.grey50
+          const backgroundColor = isCurrent ? COLORS.blue30 : COLORS.grey20
+          const iconColor = isCurrent ? COLORS.blue60 : COLORS.grey50
           return (
             <Flex
               key={command.id}
@@ -114,14 +113,11 @@ export const RunPreviewComponent = (
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
                 width="100%"
-                border={`solid 1px ${
-                  index === jumpedIndex ? COLORS.purple40 : borderColor
-                }`}
                 backgroundColor={
                   index === jumpedIndex ? '#F5E3FF' : backgroundColor
                 }
                 color={COLORS.black90}
-                borderRadius={BORDERS.radiusSoftCorners}
+                borderRadius={BORDERS.borderRadius4}
                 padding={SPACING.spacing8}
                 css={css`
                   transition: background-color ${COLOR_FADE_MS}ms ease-out,
@@ -129,12 +125,12 @@ export const RunPreviewComponent = (
                 `}
               >
                 <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-                  <CommandIcon command={command} color={contentColor} />
+                  <CommandIcon command={command} color={iconColor} />
                   <CommandText
                     command={command}
                     robotSideAnalysis={robotSideAnalysis}
                     robotType={robotType}
-                    color={contentColor}
+                    color={COLORS.black90}
                   />
                 </Flex>
               </Flex>

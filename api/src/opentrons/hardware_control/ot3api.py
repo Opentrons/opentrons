@@ -33,9 +33,6 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.errors.exceptions import (
-    StallOrCollisionDetectedError,
-)
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs
@@ -79,6 +76,8 @@ from .types import (
     HardwareEvent,
     HardwareEventHandler,
     HardwareAction,
+    HepaFanState,
+    HepaUVState,
     MotionChecks,
     SubSystem,
     PauseType,
@@ -244,6 +243,7 @@ class OT3API(
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
         self._gantry_load = GantryLoad.LOW_THROUGHPUT
+        self._configured_since_update = True
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
@@ -506,6 +506,10 @@ class OT3API(
     ) -> AsyncIterator[UpdateStatus]:
         """Start the firmware update for one or more subsystems and return update progress iterator."""
         subsystems = subsystems or set()
+        if SubSystem.head in subsystems:
+            await self.disengage_axes([Axis.Z_L, Axis.Z_R])
+        if SubSystem.gripper in subsystems:
+            await self.disengage_axes([Axis.Z_G])
         # start the updates and yield the progress
         async with self._motion_lock:
             try:
@@ -523,6 +527,8 @@ class OT3API(
                     message="Update failed because of uncaught error",
                     wrapping=[PythonException(e)],
                 ) from e
+            finally:
+                self._configured_since_update = False
 
     # Incidentals (i.e. not motion) API
 
@@ -644,16 +650,21 @@ class OT3API(
 
     # TODO (spp, 2023-01-31): add unit tests
     async def cache_instruments(
-        self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
+        self,
+        require: Optional[Dict[top_types.Mount, PipetteName]] = None,
+        skip_if_would_block: bool = False,
     ) -> None:
         """
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
-        skip_configure = await self._cache_instruments(require)
-        if not skip_configure:
-            self._log.info("Instrument model cache updated, reconfiguring")
-            await self._configure_instruments()
+        if skip_if_would_block and self._motion_lock.locked():
+            return
+        async with self._motion_lock:
+            skip_configure = await self._cache_instruments(require)
+            if not skip_configure or not self._configured_since_update:
+                self._log.info("Reconfiguring instrument cache")
+                await self._configure_instruments()
 
     async def _cache_instruments(  # noqa: C901
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
@@ -673,11 +684,11 @@ class OT3API(
             # We should also check version here once we're comfortable.
             if not pipette_load_name.supported_pipette(name):
                 raise RuntimeError(f"{name} is not a valid pipette name")
-        async with self._motion_lock:
-            # we're not actually checking the required instrument except in the context
-            # of simulation and it feels like a lot of work for this function
-            # actually be doing.
-            found = await self._backend.get_attached_instruments(checked_require)
+
+        # we're not actually checking the required instrument except in the context
+        # of simulation and it feels like a lot of work for this function
+        # actually be doing.
+        found = await self._backend.get_attached_instruments(checked_require)
 
         if OT3Mount.GRIPPER in found.keys():
             # Is now a gripper, ask if it's ok to skip
@@ -723,8 +734,9 @@ class OT3API(
     async def _configure_instruments(self) -> None:
         """Configure instruments"""
         await self.set_gantry_load(self._gantry_load_from_instruments())
-        await self.refresh_positions()
+        await self.refresh_positions(acquire_lock=False)
         await self.reset_tip_detectors(False)
+        self._configured_since_update = True
 
     async def reset_tip_detectors(
         self,
@@ -979,9 +991,11 @@ class OT3API(
             OT3Mount.from_mount(mount), self._current_position, critical_point
         )
 
-    async def refresh_positions(self) -> None:
+    async def refresh_positions(self, acquire_lock: bool = True) -> None:
         """Request and update both the motor and encoder positions from backend."""
-        async with self._motion_lock:
+        async with contextlib.AsyncExitStack() as stack:
+            if acquire_lock:
+                await stack.enter_async_context(self._motion_lock)
             await self._backend.update_motor_status()
             await self._cache_current_position()
             await self._cache_encoder_position()
@@ -1302,24 +1316,25 @@ class OT3API(
         Disengage the 96-channel and gripper mount if retracted. Re-engage
         the 96-channel or gripper mount if it is about to move.
         """
+        last_moved = self._last_moved_mount
         if self.is_idle_mount(mount):
             # home the left/gripper mount if it is current disengaged
             await self.home_z(mount)
 
-        if mount != self._last_moved_mount and self._last_moved_mount:
-            await self.retract(self._last_moved_mount, 10)
+        if mount != last_moved and last_moved:
+            await self.retract(last_moved, 10)
 
             # disengage Axis.Z_L motor and engage the brake to lower power
             # consumption and reduce the chance of the 96-channel pipette dropping
             if (
                 self.gantry_load == GantryLoad.HIGH_THROUGHPUT
-                and self._last_moved_mount == OT3Mount.LEFT
+                and last_moved == OT3Mount.LEFT
             ):
                 await self.disengage_axes([Axis.Z_L])
 
             # disegnage Axis.Z_G when we can to reduce the chance of
             # the gripper dropping
-            if self._last_moved_mount == OT3Mount.GRIPPER:
+            if last_moved == OT3Mount.GRIPPER:
                 await self.disengage_axes([Axis.Z_G])
 
         if mount != OT3Mount.GRIPPER:
@@ -1519,19 +1534,12 @@ class OT3API(
                 axis_home_dist = 20.0
             if origin[axis] - target_pos[axis] > axis_home_dist:
                 target_pos[axis] += axis_home_dist
-                try:
-                    await self._backend.move(
-                        origin,
-                        target_pos,
-                        speed=400,
-                        stop_condition=HWStopCondition.none,
-                    )
-                except StallOrCollisionDetectedError:
-                    self._log.warning(
-                        f"Stall on {axis} during fast home, encoder may have missed an overflow"
-                    )
-                    await self.refresh_positions()
-
+                await self._backend.move(
+                    origin,
+                    target_pos,
+                    speed=400,
+                    stop_condition=HWStopCondition.none,
+                )
             await self._backend.home([axis], self.gantry_load)
         else:
             # both stepper and encoder positions are invalid, must home
@@ -2685,3 +2693,21 @@ class OT3API(
 
     def get_estop_state(self) -> EstopState:
         return self._backend.get_estop_state()
+
+    async def set_hepa_fan_state(
+        self, turn_on: bool = False, duty_cycle: int = 75
+    ) -> bool:
+        """Sets the state and duty cycle of the Hepa/UV module."""
+        return await self._backend.set_hepa_fan_state(turn_on, duty_cycle)
+
+    async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
+        return await self._backend.get_hepa_fan_state()
+
+    async def set_hepa_uv_state(
+        self, turn_on: bool = False, uv_duration_s: int = 900
+    ) -> bool:
+        """Sets the state and duration (seconds) of the UV light for the Hepa/UV module."""
+        return await self._backend.set_hepa_uv_state(turn_on, uv_duration_s)
+
+    async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
+        return await self._backend.get_hepa_uv_state()

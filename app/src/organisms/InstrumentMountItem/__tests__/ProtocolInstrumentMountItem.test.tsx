@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { LEFT } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
@@ -7,16 +8,9 @@ import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { GripperWizardFlows } from '../../GripperWizardFlows'
 import { ProtocolInstrumentMountItem } from '..'
 
-jest.mock('../../PipetteWizardFlows')
-jest.mock('../../GripperWizardFlows')
-jest.mock('../../TakeoverModal')
-
-const mockPipetteWizardFlows = PipetteWizardFlows as jest.MockedFunction<
-  typeof PipetteWizardFlows
->
-const mockGripperWizardFlows = GripperWizardFlows as jest.MockedFunction<
-  typeof GripperWizardFlows
->
+vi.mock('../../PipetteWizardFlows')
+vi.mock('../../GripperWizardFlows')
+vi.mock('../../TakeoverModal')
 
 const mockGripperData = {
   instrumentModel: 'gripper_v1',
@@ -73,8 +67,12 @@ describe('ProtocolInstrumentMountItem', () => {
       attachedInstrument: null,
       speccedName: 'p1000_multi_flex',
     }
-    mockPipetteWizardFlows.mockReturnValue(<div>pipette wizard flow</div>)
-    mockGripperWizardFlows.mockReturnValue(<div>gripper wizard flow</div>)
+    vi.mocked(PipetteWizardFlows).mockReturnValue(
+      <div>pipette wizard flow</div>
+    )
+    vi.mocked(GripperWizardFlows).mockReturnValue(
+      <div>gripper wizard flow</div>
+    )
   })
 
   it('renders the correct information when there is no pipette attached', () => {
@@ -176,11 +174,11 @@ describe('ProtocolInstrumentMountItem', () => {
         ...mockLeftPipetteData,
       } as any,
     }
-    const { getByText } = render(props)
-    getByText('Left Mount')
-    getByText('Calibrated')
-    const button = getByText('Recalibrate')
+    render(props)
+    screen.getByText('Left Mount')
+    screen.getByText('Calibrated')
+    const button = screen.getByText('Recalibrate')
     fireEvent.click(button)
-    getByText('pipette wizard flow')
+    screen.getByText('pipette wizard flow')
   })
 })

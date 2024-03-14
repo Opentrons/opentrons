@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 
 import {
@@ -9,13 +10,13 @@ import {
   getRobotUpdateAvailable,
 } from '../../../../redux/robot-update'
 import { getAvailableShellUpdate } from '../../../../redux/shell'
-import { Portal } from '../../../../App/portal'
+import { getModalPortalEl } from '../../../../App/portal'
 import { UpdateAppModal } from '../../../../organisms/UpdateAppModal'
 import { MigrationWarningModal } from './MigrationWarningModal'
 import { UpdateRobotModal } from './UpdateRobotModal'
 
 import type { State } from '../../../../redux/types'
-import { ReachableRobot, Robot } from '../../../../redux/discovery/types'
+import type { ReachableRobot, Robot } from '../../../../redux/discovery/types'
 
 export interface ViewUpdateModalProps {
   robotName: string
@@ -57,10 +58,9 @@ export function ViewUpdateModal(
   if (updateInfo?.releaseNotes != null) releaseNotes = updateInfo.releaseNotes
 
   if (availableAppUpdateVersion && showAppUpdateModal)
-    return (
-      <Portal>
-        <UpdateAppModal closeModal={() => setShowAppUpdateModal(false)} />
-      </Portal>
+    return createPortal(
+      <UpdateAppModal closeModal={() => setShowAppUpdateModal(false)} />,
+      getModalPortalEl()
     )
 
   if (showMigrationWarning) {

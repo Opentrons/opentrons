@@ -23,10 +23,10 @@ export function DeckConfigurationDiscardChangesModal({
   setShowConfirmationModal,
 }: DeckConfigurationDiscardChangesModalProps): JSX.Element {
   const { t } = useTranslation('device_details')
+  const history = useHistory()
   const modalHeader: ModalHeaderBaseProps = {
     title: t('changes_will_be_lost'),
   }
-  const history = useHistory()
 
   const handleDiscard = (): void => {
     setShowConfirmationModal(false)

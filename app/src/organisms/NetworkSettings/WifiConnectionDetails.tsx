@@ -117,7 +117,7 @@ const DisplayConnectionStatus = ({
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing32}
       backgroundColor={COLORS.green35}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
     >

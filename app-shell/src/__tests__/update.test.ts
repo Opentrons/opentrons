@@ -1,45 +1,44 @@
 // app-shell self-update tests
 import * as ElectronUpdater from 'electron-updater'
+import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import { UPDATE_VALUE } from '@opentrons/app/src/redux/config'
 import { registerUpdate } from '../update'
 import * as Cfg from '../config'
 
 import type { Dispatch } from '../types'
 
-jest.unmock('electron-updater')
-jest.mock('electron-updater')
-jest.mock('../log')
-jest.mock('../config')
-
-const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
-
-const autoUpdater = ElectronUpdater.autoUpdater as jest.Mocked<
-  typeof ElectronUpdater.autoUpdater
->
+vi.unmock('electron-updater')
+vi.mock('electron-updater')
+vi.mock('../log')
+vi.mock('../config')
 
 describe('update', () => {
   let dispatch: Dispatch
   let handleAction: Dispatch
 
   beforeEach(() => {
-    dispatch = jest.fn()
+    dispatch = vi.fn()
     handleAction = registerUpdate(dispatch)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     ;(ElectronUpdater as any).__mockReset()
   })
 
   it('handles shell:CHECK_UPDATE with available update', () => {
-    getConfig.mockReturnValue('dev' as any)
+    vi.mocked(Cfg.getConfig).mockReturnValue('dev' as any)
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
 
-    expect(getConfig).toHaveBeenCalledWith('update.channel')
-    expect(autoUpdater.channel).toEqual('dev')
-    expect(autoUpdater.checkForUpdates).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(Cfg.getConfig)).toHaveBeenCalledWith('update.channel')
+    expect(vi.mocked(ElectronUpdater.autoUpdater).channel).toEqual('dev')
+    expect(
+      vi.mocked(ElectronUpdater.autoUpdater).checkForUpdates
+    ).toHaveBeenCalledTimes(1)
 
-    autoUpdater.emit('update-available', { version: '1.0.0' })
+    vi.mocked(ElectronUpdater.autoUpdater).emit('update-available', {
+      version: '1.0.0',
+    })
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:CHECK_UPDATE_RESULT',
@@ -49,7 +48,9 @@ describe('update', () => {
 
   it('handles shell:CHECK_UPDATE with no available update', () => {
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
-    autoUpdater.emit('update-not-available', { version: '1.0.0' })
+    vi.mocked(ElectronUpdater.autoUpdater).emit('update-not-available', {
+      version: '1.0.0',
+    })
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:CHECK_UPDATE_RESULT',
@@ -59,7 +60,7 @@ describe('update', () => {
 
   it('handles shell:CHECK_UPDATE with error', () => {
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
-    autoUpdater.emit('error', new Error('AH'))
+    vi.mocked(ElectronUpdater.autoUpdater).emit('error', new Error('AH'))
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:CHECK_UPDATE_RESULT',
@@ -77,13 +78,15 @@ describe('update', () => {
       meta: { shell: true },
     })
 
-    expect(autoUpdater.downloadUpdate).toHaveBeenCalledTimes(1)
+    expect(
+      vi.mocked(ElectronUpdater.autoUpdater).downloadUpdate
+    ).toHaveBeenCalledTimes(1)
 
     const progress = {
       percent: 20,
     }
 
-    autoUpdater.emit('download-progress', progress)
+    vi.mocked(ElectronUpdater.autoUpdater).emit('download-progress', progress)
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:DOWNLOAD_PERCENTAGE',
@@ -92,7 +95,9 @@ describe('update', () => {
       },
     })
 
-    autoUpdater.emit('update-downloaded', { version: '1.0.0' })
+    vi.mocked(ElectronUpdater.autoUpdater).emit('update-downloaded', {
+      version: '1.0.0',
+    })
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:DOWNLOAD_UPDATE_RESULT',
@@ -110,7 +115,7 @@ describe('update', () => {
       type: 'shell:DOWNLOAD_UPDATE',
       meta: { shell: true },
     })
-    autoUpdater.emit('error', new Error('AH'))
+    vi.mocked(ElectronUpdater.autoUpdater).emit('error', new Error('AH'))
 
     expect(dispatch).toHaveBeenCalledWith({
       type: 'shell:DOWNLOAD_UPDATE_RESULT',
@@ -120,6 +125,8 @@ describe('update', () => {
 
   it('handles shell:APPLY_UPDATE', () => {
     handleAction({ type: 'shell:APPLY_UPDATE', meta: { shell: true } })
-    expect(autoUpdater.quitAndInstall).toHaveBeenCalledTimes(1)
+    expect(
+      vi.mocked(ElectronUpdater.autoUpdater).quitAndInstall
+    ).toHaveBeenCalledTimes(1)
   })
 })

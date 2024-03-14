@@ -29,7 +29,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
-from robot_server.errors import LegacyErrorResponse
+from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import (
     get_hardware,
     get_robot_type,
@@ -53,7 +53,10 @@ from robot_server.service.legacy.models.settings import (
     Links,
     AdvancedSetting,
 )
-from robot_server.persistence import PersistenceResetter, get_persistence_resetter
+from robot_server.persistence.fastapi_dependencies import (
+    get_persistence_resetter,
+)
+from robot_server.persistence.persistence_directory import PersistenceResetter
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 
 log = logging.getLogger(__name__)
@@ -63,6 +66,7 @@ router = APIRouter()
 
 @router.post(
     path="/settings",
+    summary="Change a setting",
     description="Change an advanced setting (feature flag)",
     response_model=AdvancedSettingsResponse,
     response_model_exclude_unset=True,
@@ -93,6 +97,7 @@ async def post_settings(
 
 @router.get(
     "/settings",
+    summary="Get settings",
     description="Get a list of available advanced settings (feature "
     "flags) and their values",
     response_model=AdvancedSettingsResponse,
@@ -139,6 +144,7 @@ def _create_settings_response(robot_type: str) -> AdvancedSettingsResponse:
 
 @router.post(
     path="/settings/log_level/local",
+    summary="Set the local log level",
     description="Set the minimum level of logs saved locally",
     response_model=V1BasicResponse,
     responses={
@@ -169,6 +175,7 @@ async def post_log_level_local(
 
 @router.post(
     path="/settings/log_level/upstream",
+    summary="Set the upstream log level",
     description=(
         "Set the minimum level of logs sent upstream via"
         " syslog-ng to Opentrons."
@@ -186,7 +193,8 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
 
 @router.get(
     "/settings/reset/options",
-    description="Get the settings that can be reset as part of factory reset",
+    summary="Get the things that can be reset",
+    description="Get the robot settings and data that can be reset through `POST /settings/reset`.",
     response_model=FactoryResetOptions,
 )
 async def get_settings_reset_options(
@@ -203,7 +211,15 @@ async def get_settings_reset_options(
 
 @router.post(
     "/settings/reset",
-    description="Perform a factory reset of some robot data",
+    summary="Reset specific settings or data",
+    description=(
+        "Perform a reset of the requested robot settings or data."
+        "\n\n"
+        "The valid properties are given by `GET /settings/reset/options`."
+        "\n\n"
+        "You should always restart the robot after using this endpoint to"
+        " reset something."
+    ),
     responses={
         status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": LegacyErrorResponse},

@@ -1,5 +1,8 @@
 import React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, beforeEach } from 'vitest'
+import { screen } from '@testing-library/react'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { EmptySetupStep } from '../EmptySetupStep'
 
@@ -20,9 +23,9 @@ describe('EmptySetupStep', () => {
   })
 
   it('should render the title, description, and label', () => {
-    const { getByText } = render(props)
-    getByText('mockTitle')
-    getByText('mockDescription')
-    getByText('mockLabel')
+    render(props)
+    screen.getByText('mockTitle')
+    screen.getByText('mockDescription')
+    screen.getByText('mockLabel')
   })
 })

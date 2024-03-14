@@ -18,7 +18,6 @@ import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Navigation } from '../../organisms/Navigation'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
   getPinnedProtocolIds,
   getProtocolsOnDeviceSortKey,
@@ -29,7 +28,7 @@ import { sortProtocols } from './utils'
 import { ProtocolCard } from './ProtocolCard'
 import { NoProtocols } from './NoProtocols'
 import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
-import { useNotifyAllRunsQuery } from '../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../resources/runs'
 
 import type { Dispatch } from '../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../redux/config/types'
@@ -148,7 +147,6 @@ export function ProtocolDashboard(): JSX.Element {
         paddingBottom={SPACING.spacing40}
       >
         <Navigation
-          routes={onDeviceDisplayRoutes}
           setNavMenuIsOpened={setNavMenuIsOpened}
           longPressModalIsOpened={longPressModalIsOpened}
         />

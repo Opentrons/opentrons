@@ -1,6 +1,6 @@
 import * as React from 'react'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import {
+  fixture96Plate,
   FLEX_ROBOT_TYPE,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_SLOT_FIXTURE,
@@ -77,7 +77,7 @@ const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
 export const MoveLabwareOnDeck: Story = {
   render: args => (
     <MoveLabwareOnDeckComponent
-      movedLabwareDef={fixture_96_plate as LabwareDefinition2}
+      movedLabwareDef={fixture96Plate as LabwareDefinition2}
       initialLabwareLocation={args.initialLabwareLocation}
       finalLabwareLocation={args.finalLabwareLocation}
       loadedModules={[]}

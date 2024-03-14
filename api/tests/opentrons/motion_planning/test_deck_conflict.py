@@ -214,7 +214,7 @@ def test_flex_trash_bin_blocks_thermocycler() -> None:
         highest_z_including_labware=123,
         is_semi_configuration=False,
     )
-    trash = deck_conflict.TrashBin(name_for_errors="some_trash_bin")
+    trash = deck_conflict.TrashBin(name_for_errors="some_trash_bin", highest_z=1.23)
 
     with pytest.raises(
         deck_conflict.DeckConflictError,
@@ -539,7 +539,7 @@ def test_heater_shaker_restrictions_trash_bin_addressable_area() -> None:
     heater_shaker = deck_conflict.HeaterShakerModule(
         highest_z_including_labware=123, name_for_errors="some_heater_shaker"
     )
-    trash = deck_conflict.TrashBin(name_for_errors="some_trash_bin")
+    trash = deck_conflict.TrashBin(name_for_errors="some_trash_bin", highest_z=456)
 
     with pytest.raises(
         deck_conflict.DeckConflictError,

@@ -1,13 +1,14 @@
 import * as React from 'react'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttachedModal'
 
-const mockOnCloseClick = jest.fn()
-const mockOnConfirmClick = jest.fn()
+const mockOnCloseClick = vi.fn()
+const mockOnConfirmClick = vi.fn()
 
 const render = (props: React.ComponentProps<typeof ConfirmAttachedModal>) => {
   return renderWithProviders(<ConfirmAttachedModal {...props} />, {

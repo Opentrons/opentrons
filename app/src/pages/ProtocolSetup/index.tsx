@@ -54,7 +54,7 @@ import {
 import {
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
-} from '../../pages/Protocols/hooks'
+} from '../Protocols/hooks'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModulesAndDeck } from '../../organisms/ProtocolSetupModulesAndDeck'
@@ -74,20 +74,20 @@ import {
 } from '../../organisms/RunTimeControl/hooks'
 import { useToaster } from '../../organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '../../organisms/ModuleCard/hooks'
-import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
-import { getLocalRobot } from '../../redux/discovery'
+import { getLabwareSetupItemGroups } from '../Protocols/utils'
+import { getLocalRobot, getRobotSerialNumber } from '../../redux/discovery'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_START,
   useTrackEvent,
 } from '../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../redux/config'
-import { ConfirmAttachedModal } from '../../pages/ProtocolSetup/ConfirmAttachedModal'
+import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
-import { CloseButton, PlayButton } from '../../pages/ProtocolSetup/Buttons'
+import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../resources/runs'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
@@ -166,7 +166,7 @@ export function ProtocolSetupStep({
         backgroundColor={
           disabled ? COLORS.grey35 : backgroundColorByStepStatus[status]
         }
-        borderRadius={BORDERS.borderRadiusSize4}
+        borderRadius={BORDERS.borderRadius16}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
         css={PUSHED_STATE_STYLE}
@@ -216,6 +216,7 @@ interface PrepareToRunProps {
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   confirmAttachment: () => void
   play: () => void
+  robotName: string
 }
 
 function PrepareToRun({
@@ -223,12 +224,11 @@ function PrepareToRun({
   setSetupScreen,
   confirmAttachment,
   play,
+  robotName,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
-  const localRobot = useSelector(getLocalRobot)
-  const robotName = localRobot?.name != null ? localRobot.name : 'no name'
 
   // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
@@ -269,6 +269,11 @@ function PrepareToRun({
     }
   )
 
+  const runStatus = useRunStatus(runId)
+  if (runStatus === RUN_STATUS_STOPPED) {
+    history.push('/protocols')
+  }
+
   React.useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
       setIsPollingForCompletedAnalysis(false)
@@ -305,7 +310,6 @@ function PrepareToRun({
 
   const protocolHasFixtures = requiredFixtures.length > 0
 
-  const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
 
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -450,7 +454,7 @@ function PrepareToRun({
       if (
         isHeaterShakerInProtocol &&
         isReadyToRun &&
-        (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
+        runStatus === RUN_STATUS_IDLE
       ) {
         confirmAttachment()
       } else {
@@ -740,10 +744,17 @@ export type SetupScreens =
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
+  const localRobot = useSelector(getLocalRobot)
+  const robotSerialNumber =
+    localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
+
   const handleProceedToRunClick = (): void => {
-    trackEvent({ name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN, properties: {} })
+    trackEvent({
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+      properties: { robotSerialNumber },
+    })
     play()
   }
   const configBypassHeaterShakerAttachmentConfirmation = useSelector(
@@ -773,6 +784,7 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         confirmAttachment={confirmAttachment}
         play={play}
+        robotName={localRobot?.name != null ? localRobot.name : 'no name'}
       />
     ),
     instruments: (

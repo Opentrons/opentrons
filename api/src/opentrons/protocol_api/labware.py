@@ -7,6 +7,7 @@ and labware calibration offsets. It contains all the code necessary to
 transform from labware symbolic points (such as "well a1 of an opentrons
 tiprack") to points in deck coordinates.
 """
+
 from __future__ import annotations
 
 import logging
@@ -19,6 +20,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwarePa
 from opentrons.types import Location, Point
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version, APIVersionError
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
@@ -296,29 +298,22 @@ class Well:
 
 class Labware:
     """
-    This class represents a labware, such as a PCR plate, a tube rack,
-    reservoir, tip rack, etc. It defines the physical geometry of the labware,
-    and provides methods for accessing wells within the labware.
+    This class represents a piece of labware.
 
-    It is commonly created by calling ``ProtocolContext.load_labware()``.
+    Labware available in the API generally fall under two categories.
 
-    To access a labware's wells, you can use its well accessor methods:
-    :py:meth:`wells_by_name`, :py:meth:`wells`, :py:meth:`columns`,
-    :py:meth:`rows`, :py:meth:`rows_by_name`, and :py:meth:`columns_by_name`.
-    You can also use an instance of a labware as a Python dictionary, accessing
-    wells by their names. The following example shows how to use all of these
-    methods to access well A1:
+      - Consumable labware: well plates, tubes in racks, reservoirs, tip racks, etc.
+      - Adapters: durable items that hold other labware, either on modules or directly
+        on the deck.
 
-    .. code-block :: python
+    The ``Labware`` class defines the physical geometry of the labware
+    and provides methods for :ref:`accessing wells <new-well-access>` within the labware.
 
-       labware = context.load_labware('corning_96_wellplate_360ul_flat', 1)
-       labware['A1']
-       labware.wells_by_name()['A1']
-       labware.wells()[0]
-       labware.rows()[0][0]
-       labware.columns()[0][0]
-       labware.rows_by_name()['A'][0]
-       labware.columns_by_name()[0][0]
+    Create ``Labware`` objects by calling the appropriate ``load_labware()`` method,
+    depending on where you are loading the labware. For example, to load labware on a
+    Thermocycler Module, use :py:meth:`.ThermocyclerContext.load_labware`. To load
+    labware directly on the deck, use :py:meth:`.ProtocolContext.load_labware`. See
+    :ref:`loading-labware`.
 
     """
 
@@ -370,6 +365,7 @@ class Labware:
     @property
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
+        """See :py:obj:`.ProtocolContext.api_version`."""
         return self._api_version
 
     def __getitem__(self, key: str) -> Well:
@@ -380,14 +376,17 @@ class Labware:
     def uri(self) -> str:
         """A string fully identifying the labware.
 
-        :returns: The URI, ``"namespace/loadname/version"``
+        The URI has three parts and follows the pattern ``"namespace/load_name/version"``.
+        For example, ``opentrons/corning_96_wellplate_360ul_flat/2``.
         """
         return self._core.get_uri()
 
     @property
     @requires_version(2, 0)
     def parent(self) -> Union[str, Labware, ModuleTypes, OffDeckType]:
-        """The parent of this labware---where this labware is loaded.
+        """Where the labware is loaded.
+
+        This corresponds to the physical object that the labware *directly* rests upon.
 
         Returns:
             If the labware is directly on the robot's deck, the ``str`` name of the deck slot,
@@ -401,10 +400,10 @@ class Labware:
 
         .. versionchanged:: 2.14
             Return type for module parent changed.
-            Prior to this version, an internal geometry interface was returned.
+            Formerly, the API returned an internal geometry interface.
         .. versionchanged:: 2.15
-            Will return a :py:class:`Labware` if the labware is loaded onto a labware/adapter.
-            Will now return :py:obj:`OFF_DECK` if the labware is off-deck.
+            Returns a :py:class:`Labware` if the labware is loaded onto a labware/adapter.
+            Returns :py:obj:`OFF_DECK` if the labware is off-deck.
             Formerly, if the labware was removed by using ``del`` on :py:obj:`.deck`,
             this would return where it was before its removal.
         """
@@ -424,8 +423,13 @@ class Labware:
     @property
     @requires_version(2, 0)
     def name(self) -> str:
-        """Can either be the canonical name of the labware, which is used to
-        load it, or the label of the labware specified by a user."""
+        """The display name of the labware.
+
+        If you specified a value for ``label`` when loading the labware, ``name`` is
+        that value.
+
+        Otherwise, it is the :py:obj:`~.Labware.load_name` of the labware.
+        """
         return self._core.get_name()
 
     @name.setter
@@ -536,13 +540,13 @@ class Labware:
     def load_labware_from_definition(
         self, definition: LabwareDefinition, label: Optional[str] = None
     ) -> Labware:
-        """Load a labware onto the module using an inline definition.
+        """Load a compatible labware onto the labware using an inline definition.
 
         :param definition: The labware definition.
-        :param str label: An optional special name to give the labware. If
-                          specified, this is the name the labware will appear
-                          as in the run log and the calibration view in the
-                          Opentrons App.
+        :param str label: An optional special name to give the labware. If specified,
+            this is how the labware will appear in the run log, Labware Position
+            Check, and elsewhere in the Opentrons App and on the touchscreen.
+
         :returns: The initialized and loaded labware object.
         """
         load_params = self._protocol_core.add_labware_definition(definition)
@@ -556,7 +560,7 @@ class Labware:
 
     def set_calibration(self, delta: Point) -> None:
         """
-        An internal, deprecated method used for updating the offset on the object.
+        An internal, deprecated method used for updating the labware offset.
 
         .. deprecated:: 2.14
         """
@@ -576,21 +580,19 @@ class Labware:
         (see :ref:`protocol-api-deck-coords`) that the motion system
         will add to any movement targeting this labware instance.
 
-        The offset *will not* apply to any other labware instances,
+        The offset *will not apply* to any other labware instances,
         even if those labware are of the same type.
 
-        .. caution::
-            This method is *only* for use with mechanisms like
-            :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
-            to adjust labware offsets. (See :ref:`advanced-control`.)
+        This method is *only* for use with mechanisms like
+        :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
+        to adjust labware offsets. (See :ref:`advanced-control`.)
+
+        .. warning::
 
             If you're uploading a protocol via the Opentrons App, don't use this method,
             because it will produce undefined behavior.
-            Instead, use Labware Position Check in the app.
+            Instead, use Labware Position Check in the app or on the touchscreen.
 
-            Because protocols using :ref:`API version <v2-versioning>` 2.14 or higher
-            can currently *only* be uploaded via the Opentrons App, it doesn't make
-            sense to use this method with them. Trying to do so will raise an exception.
         """
         if self._api_version >= ENGINE_CORE_API_VERSION:
             # TODO(mm, 2023-02-13): See Jira RCORE-535.
@@ -610,6 +612,11 @@ class Labware:
     @property
     @requires_version(2, 0)
     def calibrated_offset(self) -> Point:
+        """The front-left-bottom corner of the labware, including its labware offset.
+
+        When running a protocol in the Opentrons App or on the touchscreen, Labware
+        Position Check sets the labware offset.
+        """
         return self._core.get_calibrated_offset()
 
     @requires_version(2, 0)
@@ -627,14 +634,19 @@ class Labware:
     @requires_version(2, 0)
     def wells(self, *args: Union[str, int]) -> List[Well]:
         """
-        Accessor function that generates a list of wells in a top down,
-        left to right order. This is representative of moving down rows and
-        across columns (i.e., A1, B1, C1…A2, B2, C2…).
+        Accessor function to navigate a labware top to bottom, left to right.
 
-        With indexing one can treat it as a typical python
-        list. For example, access well A1 with ``labware.wells()[0]``.
+        i.e., this method returns a list ordered A1, B1, C1…A2, B2, C2….
 
-        Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args can be either strings or integers, but must all be the same type. For example, ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but ``self.columns('1', 4)`` is not.
+        Use indexing to access individual wells contained in the list.
+        For example, access well A1 with ``labware.wells()[0]``.
+
+        .. note::
+            Using args with this method is deprecated. Use indexing instead.
+
+            If your code uses args, they can be either strings or integers, but not a
+            mix of the two. For example, ``.wells(1, 4)`` or ``.wells("1", "4")`` is
+            valid, but ``.wells("1", 4)`` is not.
 
         :return: Ordered list of all wells in a labware.
         """
@@ -658,11 +670,10 @@ class Labware:
     @requires_version(2, 0)
     def wells_by_name(self) -> Dict[str, Well]:
         """
-        Accessor function used to create a look-up table of wells by name.
+        Accessor function used to navigate through a labware by well name.
 
-        With indexing one can treat it as a typical Python
-        dictionary whose keys are well names. For example, access well A1
-        with ``labware.wells_by_name()['A1']``.
+        Use indexing to access individual wells contained in the dictionary.
+        For example, access well A1 with ``labware.wells_by_name()["A1"]``.
 
         :return: Dictionary of :py:class:`.Well` objects keyed by well name.
         """
@@ -682,13 +693,18 @@ class Labware:
     @requires_version(2, 0)
     def rows(self, *args: Union[int, str]) -> List[List[Well]]:
         """
-        Accessor function used to navigate through a labware by row.
+        Accessor function to navigate through a labware by row.
 
-        With indexing one can treat it as a typical python nested list.
-        For example, access row A with ``labware.rows()[0]``. This
-        will output ``['A1', 'A2', 'A3', 'A4'...]``.
+        Use indexing to access individual rows or wells contained in the nested list.
+        On a standard 96-well plate, this will output a list of :py:class:`.Well`
+        objects containing A1 through A12.
 
-        Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args can be either strings or integers, but must all be the same type. For example, ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but ``self.columns('1', 4)`` is not.
+        .. note::
+            Using args with this method is deprecated. Use indexing instead.
+
+            If your code uses args, they can be either strings or integers, but not a
+            mix of the two. For example, ``.rows(1, 4)`` or ``.rows("1", "4")`` is
+            valid, but ``.rows("1", 4)`` is not.
 
         :return: A list of row lists.
         """
@@ -715,11 +731,12 @@ class Labware:
     @requires_version(2, 0)
     def rows_by_name(self) -> Dict[str, List[Well]]:
         """
-        Accessor function used to navigate through a labware by row name.
+        Accessor function to navigate through a labware by row name.
 
-        With indexing one can treat it as a typical python dictionary.
-        For example, access row A with ``labware.rows_by_name()['A']``.
-        This will output ``['A1', 'A2', 'A3', 'A4'...]``.
+        Use indexing to access individual rows or wells contained in the dictionary.
+        For example, access row A with ``labware.rows_by_name()["A"]``.
+        On a standard 96-well plate, this will output a list of :py:class:`.Well`
+        objects containing A1 through A12.
 
         :return: Dictionary of :py:class:`.Well` lists keyed by row name.
         """
@@ -740,16 +757,19 @@ class Labware:
     @requires_version(2, 0)
     def columns(self, *args: Union[int, str]) -> List[List[Well]]:
         """
-        Accessor function used to navigate through a labware by column.
+        Accessor function to navigate through a labware by column.
 
-        With indexing one can treat it as a typical python nested list.
-        For example, access row A with ``labware.columns()[0]``.
-        This will output ``['A1', 'B1', 'C1', 'D1'...]``.
+        Use indexing to access individual columns or wells contained in the nested list.
+        For example, access column 1 with ``labware.columns()[0]``.
+        On a standard 96-well plate, this will output a list of :py:class:`.Well`
+        objects containing A1 through H1.
 
-        Note that this method takes args for backward-compatibility. But using args is deprecated and will be removed in future versions. Args
-        can be either strings or integers, but must all be the same type. For example,
-        ``self.columns(1, 4, 8)`` or ``self.columns('1', '2')`` are valid, but
-        ``self.columns('1', 4)`` is not.
+        .. note::
+            Using args with this method is deprecated. Use indexing instead.
+
+            If your code uses args, they can be either strings or integers, but not a
+            mix of the two. For example, ``.columns(1, 4)`` or ``.columns("1", "4")`` is
+            valid, but ``.columns("1", 4)`` is not.
 
         :return: A list of column lists.
         """
@@ -776,11 +796,12 @@ class Labware:
     @requires_version(2, 0)
     def columns_by_name(self) -> Dict[str, List[Well]]:
         """
-        Accessor function used to navigate through a labware by column name.
+        Accessor function to navigate through a labware by column name.
 
-        With indexing one can treat it as a typical python dictionary.
-        For example, access row A with ``labware.columns_by_name()['1']``.
-        This will output ``['A1', 'B1', 'C1', 'D1'...]``.
+        Use indexing to access individual columns or wells contained in the dictionary.
+        For example, access column 1 with ``labware.columns_by_name()["1"]``.
+        On a standard 96-well plate, this will output a list of :py:class:`.Well`
+        objects containing A1 through H1.
 
         :return: Dictionary of :py:class:`.Well` lists keyed by column name.
         """
@@ -805,7 +826,7 @@ class Labware:
         The z-coordinate of the highest single point anywhere on the labware.
 
         This is taken from the ``zDimension`` property of the ``dimensions`` object in the
-        labware definition and takes into account the calibration offset.
+        labware definition and takes into account the labware offset.
         """
         return self._core.highest_z
 
@@ -817,16 +838,31 @@ class Labware:
     @property
     @requires_version(2, 0)
     def is_tiprack(self) -> bool:
+        """Whether the labware behaves as a tip rack.
+
+        Returns ``True`` if the labware definition specifies ``isTiprack`` as ``True``.
+        """
         return self._is_tiprack
 
     @property
     @requires_version(2, 15)
     def is_adapter(self) -> bool:
+        """Whether the labware behaves as an adapter.
+
+        Returns ``True`` if the labware definition specifies ``adapter`` as one of the
+        labware's ``allowedRoles``.
+        """
         return self._core.is_adapter()
 
     @property
     @requires_version(2, 0)
     def tip_length(self) -> float:
+        """For a tip rack labware, the length of the tips it holds, in mm.
+
+        This is taken from the ``tipLength`` property of the ``parameters`` object in the labware definition.
+
+        This method will raise an exception if you call it on a labware that isn’t a tip rack.
+        """
         return self._core.get_tip_length()
 
     @tip_length.setter
@@ -848,7 +884,11 @@ class Labware:
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def next_tip(
-        self, num_tips: int = 1, starting_tip: Optional[Well] = None
+        self,
+        num_tips: int = 1,
+        starting_tip: Optional[Well] = None,
+        *,
+        nozzle_map: Optional[NozzleMap] = None,
     ) -> Optional[Well]:
         """
         Find the next valid well for pick-up.
@@ -869,6 +909,7 @@ class Labware:
         well_name = self._core.get_next_tip(
             num_tips=num_tips,
             starting_tip=starting_tip._core if starting_tip else None,
+            nozzle_map=nozzle_map,
         )
 
         return self._wells_by_name[well_name] if well_name is not None else None
@@ -1000,7 +1041,13 @@ class Labware:
 
     @requires_version(2, 0)
     def reset(self) -> None:
-        """Reset all tips in a tip rack.
+        """Reset tip tracking for a tip rack.
+
+        After resetting, the API treats all wells on the rack as if they contain unused tips.
+        This is useful if you want to reuse tips after calling :py:meth:`.return_tip()`.
+
+        If you need to physically replace an empty tip rack in the middle of your protocol,
+        use :py:meth:`.move_labware()` instead. See :ref:`off-deck-location` for an example.
 
         .. versionchanged:: 2.14
             This method will raise an exception if you call it on a labware that isn't
@@ -1020,7 +1067,11 @@ def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
 def select_tiprack_from_list(
-    tip_racks: List[Labware], num_channels: int, starting_point: Optional[Well] = None
+    tip_racks: List[Labware],
+    num_channels: int,
+    starting_point: Optional[Well] = None,
+    *,
+    nozzle_map: Optional[NozzleMap] = None,
 ) -> Tuple[Labware, Well]:
     try:
         first, rest = split_tipracks(tip_racks)
@@ -1033,14 +1084,16 @@ def select_tiprack_from_list(
         )
     elif starting_point:
         first_well = starting_point
+    elif nozzle_map:
+        first_well = None
     else:
         first_well = first.wells()[0]
 
-    next_tip = first.next_tip(num_channels, first_well)
+    next_tip = first.next_tip(num_channels, first_well, nozzle_map=nozzle_map)
     if next_tip:
         return first, next_tip
     else:
-        return select_tiprack_from_list(rest, num_channels)
+        return select_tiprack_from_list(rest, num_channels, None, nozzle_map=nozzle_map)
 
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
@@ -1052,14 +1105,23 @@ def filter_tipracks_to_start(
 
 # TODO(mc, 2022-11-09): implementation detail, move to core
 def next_available_tip(
-    starting_tip: Optional[Well], tip_racks: List[Labware], channels: int
+    starting_tip: Optional[Well],
+    tip_racks: List[Labware],
+    channels: int,
+    *,
+    nozzle_map: Optional[NozzleMap] = None,
 ) -> Tuple[Labware, Well]:
     start = starting_tip
     if start is None:
-        return select_tiprack_from_list(tip_racks, channels)
+        return select_tiprack_from_list(
+            tip_racks, channels, None, nozzle_map=nozzle_map
+        )
     else:
         return select_tiprack_from_list(
-            filter_tipracks_to_start(start, tip_racks), channels, start
+            filter_tipracks_to_start(start, tip_racks),
+            channels,
+            start,
+            nozzle_map=nozzle_map,
         )
 
 

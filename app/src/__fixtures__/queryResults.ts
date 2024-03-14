@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import type { UseQueryResult } from 'react-query'
 
 export function mockSuccessQueryResults<Result>(
@@ -23,7 +24,7 @@ export function mockSuccessQueryResults<Result>(
     isPlaceholderData: false,
     isPreviousData: false,
     isStale: false,
-    refetch: jest.fn(),
-    remove: jest.fn(),
+    refetch: vi.fn(),
+    remove: vi.fn(),
   }
 }

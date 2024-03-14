@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { fireEvent, waitFor } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { when } from 'vitest-when'
+import { fireEvent, waitFor, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import {
   useHost,
   useUpdatePipetteSettingsMutation,
@@ -14,12 +16,9 @@ import {
   mockPipetteSettingsFieldsMap,
 } from '../../../../redux/pipettes/__fixtures__'
 
-jest.mock('@opentrons/react-api-client')
+import type { Mock } from 'vitest'
 
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
-const mockUseUpdatePipetteSettingsMutation = useUpdatePipetteSettingsMutation as jest.MockedFunction<
-  typeof useUpdatePipetteSettingsMutation
->
+vi.mock('@opentrons/react-api-client')
 
 const render = (
   props: React.ComponentProps<typeof PipetteSettingsSlideout>
@@ -33,7 +32,7 @@ const mockRobotName = 'mockRobotName'
 
 describe('PipetteSettingsSlideout', () => {
   let props: React.ComponentProps<typeof PipetteSettingsSlideout>
-  let mockUpdatePipetteSettings: jest.Mock
+  let mockUpdatePipetteSettings: Mock
 
   beforeEach(() => {
     props = {
@@ -42,46 +41,40 @@ describe('PipetteSettingsSlideout', () => {
       robotName: mockRobotName,
       pipetteName: mockLeftSpecs.displayName,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    when(mockUseHost)
-      .calledWith()
-      .mockReturnValue({} as any)
+    vi.mocked(useHost).mockReturnValue({} as any)
 
-    mockUpdatePipetteSettings = jest.fn()
+    mockUpdatePipetteSettings = vi.fn()
 
-    when(mockUseUpdatePipetteSettingsMutation)
+    when(useUpdatePipetteSettingsMutation)
       .calledWith(props.pipetteId, expect.anything())
-      .mockReturnValue({
+      .thenReturn({
         updatePipetteSettings: mockUpdatePipetteSettings,
         isLoading: false,
         error: null,
       } as any)
   })
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
-  })
 
   it('renders correct heading and number of text boxes', () => {
-    const { getByRole, getAllByRole } = render(props)
+    render(props)
 
-    getByRole('heading', { name: 'Left Pipette Settings' })
-    const inputs = getAllByRole('textbox')
+    screen.getByRole('heading', { name: 'Left Pipette Settings' })
+    const inputs = screen.getAllByRole('textbox')
     expect(inputs.length).toBe(13)
   })
 
   it('renders close button that calls props.onCloseClick when clicked', () => {
-    const { getByRole } = render(props)
+    render(props)
 
-    const button = getByRole('button', { name: /exit/i })
+    const button = screen.getByRole('button', { name: /exit/i })
     fireEvent.click(button)
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 
   it('renders confirm button and calls dispatchApiRequest with updatePipetteSettings action object when clicked', async () => {
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: 'Confirm' })
+    render(props)
+    const button = screen.getByRole('button', { name: 'Confirm' })
 
     fireEvent.click(button)
     await waitFor(() => {

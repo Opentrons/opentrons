@@ -1,0 +1,16 @@
+@import '@opentrons/components/styles';
+
+.select_field.error {
+  & :global(.ot_select__control) {
+    background-color: var(--c-warning-light);
+  }
+}
+
+.select_caption {
+  font-size: var(--fs-caption);
+
+  &.error {
+    color: var(--c-warning-dark);
+    font-weight: var(--fw-semibold);
+  }
+}

@@ -187,17 +187,17 @@ export const BeforeBeginning = (
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
   border: 1px solid ${COLORS.grey30};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   height: 12.5625rem;
   width: 14.5625rem;
   cursor: pointer;
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  grid-gap: ${SPACING.spacing8}
+  grid-gap: ${SPACING.spacing8};
 
   &:hover {
-    border: 1px solid ${COLORS.grey60};
+    border: 1px solid ${COLORS.grey35};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -205,7 +205,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     justify-content: ${JUSTIFY_FLEX_START};
     background-color: ${COLORS.blue35};
     border-width: 0;
-    border-radius: ${BORDERS.borderRadiusSize4};
+    border-radius: ${BORDERS.borderRadius16};
     padding: ${SPACING.spacing24};
     height: 5.25rem;
     width: 57.8125rem;
@@ -218,10 +218,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
   border: 1px solid ${COLORS.blue50};
-
-  &:hover {
-    border: 1px solid ${COLORS.blue50};
-  }
+  background-color: ${COLORS.blue30};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;

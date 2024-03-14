@@ -1,4 +1,3 @@
-import assert from 'assert'
 import isEqual from 'lodash/isEqual'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
@@ -105,7 +104,7 @@ function _hydrateLabwareEntity(
   defsByURI: LabwareDefByDefURI
 ): LabwareEntity {
   const def = defsByURI[l.labwareDefURI]
-  assert(
+  console.assert(
     def,
     `could not hydrate labware ${labwareId}, missing def for URI ${l.labwareDefURI}`
   )
@@ -215,7 +214,7 @@ const _getInitialDeckSetup = (
   moduleEntities: ModuleEntities,
   additionalEquipmentEntities: AdditionalEquipmentEntities
 ): InitialDeckSetup => {
-  assert(
+  console.assert(
     initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
     'expected initial deck setup step to be "manualIntervention" step'
   )

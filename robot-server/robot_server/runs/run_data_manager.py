@@ -13,7 +13,7 @@ from opentrons.protocol_engine import (
     Command,
 )
 
-from robot_server.protocols import ProtocolResource
+from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
 
@@ -112,11 +112,6 @@ class RunDataManager:
             EngineConflictError: There is a currently active run that cannot
                 be superceded by this new run.
         """
-        await self._runs_publisher.begin_polling_engine_store(
-            get_current_command=self.get_current_command,
-            get_state_summary=self._get_state_summary,
-            run_id=run_id,
-        )
         prev_run_id = self._engine_store.current_run_id
         if prev_run_id is not None:
             prev_run_result = await self._engine_store.clear()
@@ -135,6 +130,11 @@ class RunDataManager:
             run_id=run_id,
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
+        )
+        await self._runs_publisher.begin_polling_engine_store(
+            get_current_command=self.get_current_command,
+            get_state_summary=self._get_state_summary,
+            run_id=run_id,
         )
 
         return _build_run(
@@ -195,8 +195,10 @@ class RunDataManager:
     def get_all(self, length: Optional[int]) -> List[Run]:
         """Get current and stored run resources.
 
-        Returns:
-            All run resources.
+        Results are ordered from oldest to newest.
+
+        Params:
+            length: If `None`, return all runs. Otherwise, return the newest n runs.
         """
         return [
             _build_run(

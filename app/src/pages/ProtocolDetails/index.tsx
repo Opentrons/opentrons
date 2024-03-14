@@ -50,7 +50,7 @@ import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
-import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { formatTimeWithUtcLabel } from '../../resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
@@ -220,7 +220,7 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
       </StyledText>
       <Flex
         backgroundColor={COLORS.grey35}
-        borderRadius={BORDERS.borderRadiusSize1}
+        borderRadius={BORDERS.borderRadius4}
         marginTop={SPACING.spacing24}
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}

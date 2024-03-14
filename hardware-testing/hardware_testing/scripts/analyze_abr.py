@@ -31,36 +31,39 @@ if __name__ == "__main__":
     dir_2 = os.path.join(current_dir, folder_of_interest)
     new_csv_file_path = os.path.join(current_dir, results_file_name)
     file_list_2 = os.listdir(dir_2)  # LIST OF individual run folders
+    # WRITE HEADER
+    with open(new_csv_file_path, "w", newline="") as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(header)
     for file2 in file_list_2:
         raw_data_folder = os.path.join(dir_2, file2)
         raw_data_file_csv = os.listdir(raw_data_folder)[0]
         plate_state = raw_data_file_csv.split("_")[-1].split("-")[1].split(".")[0]
         sample = raw_data_file_csv.split("_")[-1].split("-")[0]
         raw_data_file_csv_path = os.path.join(raw_data_folder, raw_data_file_csv)
+        results_list = []
         try:
             with open(raw_data_file_csv_path, "r") as f:
-                for line in f:
-                    # Process the file here
-                    columns = line.split(",")
-                    if len(columns) >= 2:
-                        stable_value = columns[4]
-                        date_of_measurement = columns[0]
-                        date = str(date_of_measurement).split(" ")[0]
-                        row_data = (
-                            date,
-                            raw_data_file_csv,
-                            plate_state,
-                            robot,
-                            stable_value,
-                            sample,
-                        )
-                pass
+                csvreader = csv.reader(f)
+                rows = list(csvreader)
         except Exception as e:
             print(f"Error opening file: {e}")
-        # WRITE HEADER
-        with open(new_csv_file_path, "w", newline="") as csv_file:
-            csv_writer = csv.writer(csv_file)
-            csv_writer.writerow(header)
+        last_row = rows[-1]
+        # Process the file here
+        stable_value = last_row[-2]
+        print(stable_value)
+        date_of_measurement = last_row[0]
+        date = str(date_of_measurement).split(" ")[0]
+        row_data = (
+            date,
+            raw_data_file_csv,
+            plate_state,
+            robot,
+            stable_value,
+            sample,
+        )
+        results_list.append(row_data)
+
         with open(new_csv_file_path, "a", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
             # Write data

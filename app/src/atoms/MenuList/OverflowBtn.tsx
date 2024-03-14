@@ -2,7 +2,10 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { Btn, COLORS, SPACING } from '@opentrons/components'
 
-export const OverflowBtn = React.forwardRef(
+export const OverflowBtn: (
+  props: React.ComponentProps<typeof Btn>,
+  ref: React.ForwardedRef<HTMLInputElement>
+) => React.ReactNode = React.forwardRef(
   (
     props: React.ComponentProps<typeof Btn>,
     ref: React.ForwardedRef<HTMLInputElement>
@@ -17,7 +20,7 @@ export const OverflowBtn = React.forwardRef(
             background-color: ${COLORS.grey30};
           }
           &:hover circle {
-            fill: ${COLORS.black90};
+            fill: ${COLORS.grey55};
           }
 
           &:active,
@@ -31,7 +34,7 @@ export const OverflowBtn = React.forwardRef(
           }
 
           &:focus-visible {
-            box-shadow: ${`0 0 0 3px ${COLORS.blue50}`};
+            box-shadow: ${`0 0 0 3px ${COLORS.yellow50}`};
             background-color: ${'transparent'};
           }
 

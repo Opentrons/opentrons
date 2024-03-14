@@ -1,19 +1,22 @@
 import * as React from 'react'
+import { vi, it, describe, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { Welcome } from '..'
 
+import type * as ReactRouterDom from 'react-router-dom'
+
 const PNG_FILE_NAME = 'welcome_background.png'
 
-const mockPush = jest.fn()
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+const mockPush = vi.fn()
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof ReactRouterDom>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
@@ -38,7 +41,7 @@ describe('Welcome', () => {
     )
     screen.getByRole('button', { name: 'Get started' })
     const image = screen.getByRole('img')
-    expect(image.getAttribute('src')).toEqual(PNG_FILE_NAME)
+    expect(image.getAttribute('src')).toContain(PNG_FILE_NAME)
   })
 
   it('should call mockPush when tapping Get started', () => {

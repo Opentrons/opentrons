@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { FormGroup, DropdownField } from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../../step-forms'
-import styles from '../StepEditForm.css'
-import { FieldProps } from '../types'
+import styles from '../StepEditForm.module.css'
+import type { FieldProps } from '../types'
 
 export const PipetteField = (props: FieldProps): JSX.Element => {
   const { onFieldBlur, onFieldFocus, updateValue, value } = props

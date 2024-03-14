@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { createLiveCommand } from '@opentrons/api-client'
@@ -10,13 +10,8 @@ import { mockAnonLoadCommand } from '../__fixtures__'
 
 import type { HostConfig } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockCreateLiveCommand = createLiveCommand as jest.MockedFunction<
-  typeof createLiveCommand
->
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
@@ -32,15 +27,10 @@ describe('useCreateLiveCommandMutation hook', () => {
     )
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should issue the given live command when callback is called', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateLiveCommand)
-      .calledWith(HOST_CONFIG, mockAnonLoadCommand, {})
-      .mockResolvedValue({ data: 'something' } as any)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createLiveCommand).mockResolvedValue({ data: 'something' } as any)
 
     const { result } = renderHook(() => useCreateLiveCommandMutation(), {
       wrapper,
@@ -59,13 +49,8 @@ describe('useCreateLiveCommandMutation hook', () => {
   it('should pass waitUntilComplete and timeout through if given command', async () => {
     const waitUntilComplete = true
     const timeout = 2000
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateLiveCommand)
-      .calledWith(HOST_CONFIG, mockAnonLoadCommand, {
-        waitUntilComplete,
-        timeout,
-      })
-      .mockResolvedValue({ data: 'something' } as any)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createLiveCommand).mockResolvedValue({ data: 'something' } as any)
 
     const { result } = renderHook(() => useCreateLiveCommandMutation(), {
       wrapper,

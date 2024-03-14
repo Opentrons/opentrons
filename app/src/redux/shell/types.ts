@@ -12,12 +12,24 @@ export interface Remote {
         event: IpcMainEvent,
         hostname: string,
         topic: NotifyTopic,
-        message: string | Object,
+        message: NotifyResponseData | NotifyNetworkError,
         ...args: unknown[]
       ) => void
     ) => void
   }
 }
+
+export interface NotifyRefetchData {
+  refetchUsingHTTP: boolean
+}
+
+export interface NotifyUnsubscribeData {
+  unsubscribe: boolean
+}
+
+export type NotifyBrokerResponses = NotifyRefetchData | NotifyUnsubscribeData
+export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
+export type NotifyResponseData = NotifyBrokerResponses | NotifyNetworkError
 
 interface File {
   sha512: string
@@ -124,6 +136,7 @@ export interface RobotMassStorageDeviceRemoved {
 }
 
 export type NotifyTopic =
+  | 'ALL_TOPICS'
   | 'robot-server/maintenance_runs/current_run'
   | 'robot-server/runs/current_command'
   | 'robot-server/runs'

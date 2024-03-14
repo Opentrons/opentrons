@@ -2,6 +2,7 @@ import {
   FLEX_ROBOT_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { it, describe, expect } from 'vitest'
 import {
   FLEX_TRASH_DEFAULT_SLOT,
   getLastCheckedEquipment,

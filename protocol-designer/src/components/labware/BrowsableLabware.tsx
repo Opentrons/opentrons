@@ -1,4 +1,3 @@
-import assert from 'assert'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
@@ -23,7 +22,7 @@ export function BrowsableLabware(props: Props): JSX.Element | null {
   const { definition, ingredNames, wellContents } = props
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
   if (!definition) {
-    assert(definition, 'BrowseLabwareModal expected definition')
+    console.assert(definition, 'BrowseLabwareModal expected definition')
     return null
   }
 

@@ -26,6 +26,7 @@ from opentrons.protocol_engine.state.pipettes import (
     HardwarePipette,
     StaticPipetteConfig,
     BoundingNozzlesOffsets,
+    PipetteBoundingBoxOffsets,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleMap, NozzleConfigurationType
 from opentrons.protocol_engine.errors import TipNotAttachedError, PipetteNotLoadedError
@@ -37,10 +38,14 @@ from ..pipette_fixtures import (
     EIGHT_CHANNEL_ROWS,
     EIGHT_CHANNEL_COLS,
     EIGHT_CHANNEL_MAP,
+    get_default_nozzle_map,
 )
 
 _SAMPLE_NOZZLE_BOUNDS_OFFSETS = BoundingNozzlesOffsets(
     back_left_offset=Point(x=10, y=20, z=30), front_right_offset=Point(x=40, y=50, z=60)
+)
+_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS = PipetteBoundingBoxOffsets(
+    back_left_corner=Point(x=10, y=20, z=30), front_right_corner=Point(x=40, y=50, z=60)
 )
 
 
@@ -268,6 +273,8 @@ def test_get_pipette_working_volume(
                 home_position=0,
                 nozzle_offset_z=0,
                 bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+                default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
+                pipette_bounding_box_offsets=_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS,
             )
         },
     )
@@ -296,6 +303,8 @@ def test_get_pipette_working_volume_raises_if_tip_volume_is_none(
                 home_position=0,
                 nozzle_offset_z=0,
                 bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+                default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
+                pipette_bounding_box_offsets=_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS,
             )
         },
     )
@@ -333,6 +342,8 @@ def test_get_pipette_available_volume(
                 home_position=0,
                 nozzle_offset_z=0,
                 bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+                default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
+                pipette_bounding_box_offsets=_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS,
             ),
             "pipette-id-none": StaticPipetteConfig(
                 min_volume=1,
@@ -346,6 +357,8 @@ def test_get_pipette_available_volume(
                 home_position=0,
                 nozzle_offset_z=0,
                 bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+                default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
+                pipette_bounding_box_offsets=_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS,
             ),
         },
     )
@@ -455,6 +468,8 @@ def test_get_static_config(
         home_position=10.12,
         nozzle_offset_z=12.13,
         bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+        default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
+        pipette_bounding_box_offsets=_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS,
     )
 
     subject = get_pipette_view(
@@ -503,6 +518,8 @@ def test_get_nominal_tip_overlap(
         home_position=0,
         nozzle_offset_z=0,
         bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+        default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
+        pipette_bounding_box_offsets=_SAMPLE_PIPETTE_BOUNDING_BOX_OFFSETS,
     )
 
     subject = get_pipette_view(static_config_by_id={"pipette-id": config})
@@ -554,7 +571,7 @@ def test_nozzle_configuration_getters() -> None:
 
 class _PipetteSpecs(NamedTuple):
     tip_length: float
-    bounding_nozzle_offsets: BoundingNozzlesOffsets
+    bounding_box_offsets: PipetteBoundingBoxOffsets
     nozzle_map: NozzleMap
     destination_position: Point
     nozzle_bounds_result: Tuple[Point, Point, Point, Point]
@@ -564,9 +581,9 @@ _pipette_spec_cases = [
     _PipetteSpecs(
         # 8-channel P300, full configuration
         tip_length=42,
-        bounding_nozzle_offsets=BoundingNozzlesOffsets(
-            back_left_offset=Point(0.0, 31.5, 35.52),
-            front_right_offset=Point(0.0, -31.5, 35.52),
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(0.0, 31.5, 35.52),
+            front_right_corner=Point(0.0, -31.5, 35.52),
         ),
         nozzle_map=NozzleMap.build(
             physical_nozzles=EIGHT_CHANNEL_MAP,
@@ -589,9 +606,9 @@ _pipette_spec_cases = [
     _PipetteSpecs(
         # 8-channel P300, single configuration
         tip_length=42,
-        bounding_nozzle_offsets=BoundingNozzlesOffsets(
-            back_left_offset=Point(0.0, 31.5, 35.52),
-            front_right_offset=Point(0.0, -31.5, 35.52),
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(0.0, 31.5, 35.52),
+            front_right_corner=Point(0.0, -31.5, 35.52),
         ),
         nozzle_map=NozzleMap.build(
             physical_nozzles=EIGHT_CHANNEL_MAP,
@@ -614,9 +631,9 @@ _pipette_spec_cases = [
     _PipetteSpecs(
         # 96-channel P1000, full configuration
         tip_length=42,
-        bounding_nozzle_offsets=BoundingNozzlesOffsets(
-            back_left_offset=Point(-36.0, -25.5, -259.15),
-            front_right_offset=Point(63.0, -88.5, -259.15),
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(-36.0, -25.5, -259.15),
+            front_right_corner=Point(63.0, -88.5, -259.15),
         ),
         nozzle_map=NozzleMap.build(
             physical_nozzles=NINETY_SIX_MAP,
@@ -639,9 +656,9 @@ _pipette_spec_cases = [
     _PipetteSpecs(
         # 96-channel P1000, A1 COLUMN configuration
         tip_length=42,
-        bounding_nozzle_offsets=BoundingNozzlesOffsets(
-            back_left_offset=Point(-36.0, -25.5, -259.15),
-            front_right_offset=Point(63.0, -88.5, -259.15),
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(-36.0, -25.5, -259.15),
+            front_right_corner=Point(63.0, -88.5, -259.15),
         ),
         nozzle_map=NozzleMap.build(
             physical_nozzles=NINETY_SIX_MAP,
@@ -662,9 +679,9 @@ _pipette_spec_cases = [
     _PipetteSpecs(
         # 96-channel P1000, A12 COLUMN configuration
         tip_length=42,
-        bounding_nozzle_offsets=BoundingNozzlesOffsets(
-            back_left_offset=Point(-36.0, -25.5, -259.15),
-            front_right_offset=Point(63.0, -88.5, -259.15),
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(-36.0, -25.5, -259.15),
+            front_right_corner=Point(63.0, -88.5, -259.15),
         ),
         nozzle_map=NozzleMap.build(
             physical_nozzles=NINETY_SIX_MAP,
@@ -685,9 +702,9 @@ _pipette_spec_cases = [
     _PipetteSpecs(
         # 96-channel P1000, ROW configuration
         tip_length=42,
-        bounding_nozzle_offsets=BoundingNozzlesOffsets(
-            back_left_offset=Point(-36.0, -25.5, -259.15),
-            front_right_offset=Point(63.0, -88.5, -259.15),
+        bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(-36.0, -25.5, -259.15),
+            front_right_corner=Point(63.0, -88.5, -259.15),
         ),
         nozzle_map=NozzleMap.build(
             physical_nozzles=NINETY_SIX_MAP,
@@ -714,7 +731,7 @@ _pipette_spec_cases = [
 )
 def test_get_nozzle_bounds_at_location(
     tip_length: float,
-    bounding_nozzle_offsets: BoundingNozzlesOffsets,
+    bounding_box_offsets: PipetteBoundingBoxOffsets,
     nozzle_map: NozzleMap,
     destination_position: Point,
     nozzle_bounds_result: Tuple[Point, Point, Point, Point],
@@ -737,14 +754,15 @@ def test_get_nozzle_bounds_at_location(
                 nominal_tip_overlap={},
                 home_position=0,
                 nozzle_offset_z=0,
-                bounding_nozzle_offsets=bounding_nozzle_offsets,
+                default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
+                bounding_nozzle_offsets=_SAMPLE_NOZZLE_BOUNDS_OFFSETS,
+                pipette_bounding_box_offsets=bounding_box_offsets,
             )
         },
     )
     assert (
-        subject.get_nozzle_bounds_at_specified_move_to_position(
-            pipette_id="pipette-id",
-            destination_position=destination_position,
+        subject.get_pipette_bounds_at_specified_move_to_position(
+            pipette_id="pipette-id", destination_position=destination_position
         )
         == nozzle_bounds_result
     )

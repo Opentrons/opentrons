@@ -39,7 +39,7 @@ import {
   useTipLengthCalibrations,
   useRobot,
 } from '../../../hooks'
-import { useNotifyAllRunsQuery } from '../../../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../../../resources/runs'
 
 import type { State, Dispatch } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
@@ -168,17 +168,16 @@ export function DeviceResetSlideout({
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.yellow20}
-          borderRadius={BORDERS.borderRadiusSize1}
+          backgroundColor={COLORS.yellow30}
+          borderRadius={BORDERS.borderRadius4}
           padding={SPACING.spacing8}
-          border={`1px solid ${COLORS.yellow50}`}
           marginBottom={SPACING.spacing24}
         >
           <Icon
             name="alert-circle"
             size="1rem"
             marginRight={SPACING.spacing8}
-            color={COLORS.yellow50}
+            color={COLORS.yellow60}
           />
           <StyledText as="p">{t('resets_cannot_be_undone')}</StyledText>
         </Flex>

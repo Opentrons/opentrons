@@ -22,7 +22,7 @@ from .firmware_update_manager import (
     SubsystemNotFound as _SubsystemNotFound,
 )
 
-from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.errors.robot_errors import NotSupportedOnOT2
 from robot_server.errors.global_errors import IDNotFound
 from robot_server.hardware import (
@@ -109,8 +109,8 @@ class NoOngoingUpdate(ErrorDetails):
 @PydanticResponse.wrap_route(
     subsystems_router.get,
     path="/subsystems/status",
-    summary="Get attached subsystems.",
-    description="Get a list of subsystems currently attached to the robot.",
+    summary="Get all attached subsystems",
+    description="Get the details of all hardware subsystems attached to the robot.",
     responses={
         status.HTTP_200_OK: {"model": SimpleMultiBody[PresentSubsystem]},
         status.HTTP_403_FORBIDDEN: {"model": ErrorBody[NotSupportedOnOT2]},
@@ -141,6 +141,8 @@ async def get_attached_subsystems(
 @PydanticResponse.wrap_route(
     subsystems_router.get,
     path="/subsystems/status/{subsystem}",
+    summary="Get a specific attached subsystem",
+    description="Get the details of a single hardware subsystem attached to the robot.",
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[PresentSubsystem]},
         status.HTTP_403_FORBIDDEN: {"model": ErrorBody[NotSupportedOnOT2]},
@@ -178,8 +180,13 @@ async def get_attached_subsystem(
 @PydanticResponse.wrap_route(
     subsystems_router.get,
     path="/subsystems/updates/current",
-    summary="Get a list of currently-ongoing subsystem updates.",
-    description="Get a list of currently-running subsystem firmware updates. This is a good snapshot of what, if anything, is currently being updated and may block other robot work. To guarantee data about an update you were previously interested in, get its id using /subsystems/updates/all.",
+    summary="Get all ongoing subsystem updates",
+    description=(
+        "Get a list of currently-running subsystem firmware updates."
+        " This is a good snapshot of what, if anything, is currently being updated"
+        " and may block other robot work. To guarantee data about an update you were"
+        " previously interested in, get its `id` using `/subsystems/updates/all`."
+    ),
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressSummary]}},
 )
 async def get_subsystem_updates(
@@ -205,8 +212,8 @@ async def get_subsystem_updates(
 @PydanticResponse.wrap_route(
     subsystems_router.get,
     path="/subsystems/updates/current/{subsystem}",
-    summary="Get any currently-ongoing update for a specific subsystem.",
-    description="As /subsystems/updates/current but filtered by the route parameter.",
+    summary="Get the ongoing update for a specific subsystem",
+    description="As `/subsystems/updates/current`, but filtered by the route parameter.",
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[UpdateProgressData]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[NoOngoingUpdate]},
@@ -243,8 +250,15 @@ async def get_subsystem_update(
 @PydanticResponse.wrap_route(
     subsystems_router.get,
     path="/subsystems/updates/all",
-    summary="Get a list of all updates by id.",
-    description="Get a list of all updates, including both current updates and updates that started since the last boot but are now complete. Response includes each update's final status and whether it succeeded or failed. While an update might complete and therefore disappear from /subsystems/updates/current, you can always find that update in the response to this endpoint by its update id.",
+    summary="Get all subsystem updates",
+    description=(
+        "Get a list of all updates, including both ongoing updates and updates that"
+        " started since the last boot but are now complete."
+        "\n\n"
+        " While an update might complete and therefore disappear from"
+        "`/subsystems/updates/current`, you can always find that update in the response"
+        " to this endpoint by its `id`."
+    ),
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressData]}},
 )
 async def get_update_processes(
@@ -269,8 +283,8 @@ async def get_update_processes(
 @PydanticResponse.wrap_route(
     subsystems_router.get,
     path="/subsystems/updates/all/{id}",
-    summary="Get the details of a specific update by its id.",
-    description="As /subsystems/updates/all but returning only one resource: the one with the id matching the route parameter (if it exists).",
+    summary="Get a specific subsystem update",
+    description="As `/subsystems/updates/all`, but returning only one resource: the one with the `id` matching the route parameter (if it exists).",
     responses={status.HTTP_200_OK: {"model": SimpleBody[UpdateProgressData]}},
 )
 async def get_update_process(
@@ -300,7 +314,7 @@ async def get_update_process(
 @PydanticResponse.wrap_route(
     subsystems_router.post,
     path="/subsystems/updates/{subsystem}",
-    summary="Start an update for a subsystem.",
+    summary="Start an update for a subsystem",
     description="Begin a firmware update for a given subsystem.",
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[UpdateProgressData]},

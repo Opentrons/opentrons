@@ -1,0 +1,137 @@
+/* scoped styles for Sidebar */
+@import '@opentrons/components/styles';
+@import '../../styles/breakpoints.module.css';
+@import '../../styles/spacing.module.css';
+
+.sidebar {
+  width: 100%;
+  height: 100%;
+}
+
+.labware_guide {
+  border-bottom: var(--bd-light);
+  padding-bottom: var(--spacing-7);
+}
+
+.labware_guide_container {
+  border: var(--bd-light);
+  border-radius: 3px;
+  padding: var(--spacing-5);
+}
+
+.labware_guide_title {
+  font-size: var(--fs-body-2); /* from legacy --font-body-2-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-2-dark */
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-5);
+  font-weight: var(--fw-semibold);
+}
+
+.labware_guide_icon {
+  flex: none;
+  width: var(--size-1);
+  margin-right: var(--spacing-5);
+}
+
+.labware_guide_link {
+  display: block;
+  line-height: var(--lh-copy);
+  font-size: var(--fs-body-1);
+  margin-top: var(--spacing-2);
+  color: var(--c-blue);
+}
+
+.filter_manufacturer {
+  display: block;
+  margin: var(--spacing-7) 0;
+}
+
+.filter_label {
+  text-transform: uppercase;
+  padding: 0 0 var(--spacing-3) 0;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--c-dark-gray);
+}
+
+.filter_manufacturer_select {
+  font-size: var(--fs-body-1); /* from legacy --font-body-1-dark */
+  font-weight: var(--fw-regular); /* from legacy --font-body-1-dark */
+  color: var(--c-font-dark); /* from legacy --font-body-1-dark */
+  line-height: var(--lh-title);
+
+  /* react-select adds background: white on its <input> for some reason */
+  & input {
+    background-color: inherit;
+  }
+}
+
+.filter_category {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 var(--spacing-3);
+}
+
+.filter_category_item {
+  width: var(--size-third);
+  margin-bottom: var(--spacing-4);
+}
+
+.filter_category_link {
+  font-size: var(--fs-default); /* from legacy --font-default-dark */
+  color: var(--c-font-dark); /* from legacy --font-default-dark */
+
+  /* pulled from legacy --transition-color */
+  transition: color 0.15s ease-in-out;
+  cursor: pointer;
+  line-height: var(--lh-title);
+  font-weight: var(--fw-semibold);
+
+  &:hover {
+    color: var(--c-blue);
+  }
+
+  &.selected {
+    color: var(--c-blue);
+  }
+}
+
+.filter_reset_link {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--bd-radius-default);
+  margin-top: var(--spacing-3);
+  padding: var(--spacing-1);
+  padding-right: var(--spacing-2);
+  color: var(--c-blue);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-title);
+  text-transform: uppercase;
+
+  &:hover {
+    background-color: color-mod(var(--c-med-gray) alpha(25%));
+  }
+}
+
+.filter_reset_icon {
+  width: 0.875rem;
+  margin-right: var(--spacing-1);
+}
+
+@media (--medium) {
+  .filter_category {
+    display: block;
+    padding: 0;
+  }
+
+  .filter_category_item {
+    display: block;
+    width: 100%;
+  }
+
+  .filter_reset_link {
+    margin-left: calc(var(--spacing-2) * -1);
+  }
+}

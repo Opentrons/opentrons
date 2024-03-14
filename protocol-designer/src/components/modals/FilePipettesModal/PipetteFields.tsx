@@ -31,8 +31,8 @@ import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { getTiprackOptions } from '../utils'
 import { PipetteDiagram } from './PipetteDiagram'
 
-import styles from './FilePipettesModal.css'
-import formStyles from '../../forms/forms.css'
+import styles from './FilePipettesModal.module.css'
+import formStyles from '../../forms/forms.module.css'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { ThunkDispatch } from 'redux-thunk'

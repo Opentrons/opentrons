@@ -27,7 +27,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
-  SlotMap,
+  OT2SlotMap,
   usePrevious,
 } from '@opentrons/components'
 import {
@@ -68,8 +68,7 @@ import { PDAlert } from '../../alerts/PDAlert'
 import { isModuleWithCollisionIssue } from '../../modules'
 import { ModelDropdown } from './ModelDropdown'
 import { SlotDropdown } from './SlotDropdown'
-import { ConnectedSlotMap } from './ConnectedSlotMap'
-import styles from './EditModules.css'
+import styles from './EditModules.module.css'
 
 import type { ModuleOnDeck } from '../../../step-forms/types'
 import type { ModelModuleInfo } from '../../EditModules'
@@ -396,7 +395,11 @@ const EditModulesModalComponent = (
             {slotIssue ? (
               <PDAlert
                 alertType="warning"
-                title={validation.selectedSlot}
+                title={
+                  robotType === OT2_ROBOT_TYPE
+                    ? t('alert:module_placement.SLOT_OCCUPIED.title')
+                    : validation.selectedSlot
+                }
                 description={''}
               />
             ) : null}
@@ -407,24 +410,23 @@ const EditModulesModalComponent = (
           <Controller
             name="selectedSlot"
             control={control}
-            render={({ field, fieldState }) =>
-              moduleType === THERMOCYCLER_MODULE_TYPE ? (
-                <Flex
-                  height="16rem"
-                  justifyContent={JUSTIFY_CENTER}
-                  paddingY={SPACING.spacing16}
-                >
-                  <SlotMap occupiedSlots={['7', '8', '10', '11']} />
-                </Flex>
-              ) : (
-                <ConnectedSlotMap
-                  robotType={OT2_ROBOT_TYPE}
-                  field={field}
-                  hasFieldError={!fieldState.error}
-                />
-              )
-            }
-          ></Controller>
+            render={({ field, fieldState }) => (
+              <Flex
+                height="16rem"
+                justifyContent={JUSTIFY_CENTER}
+                paddingY={SPACING.spacing16}
+              >
+                {moduleType === THERMOCYCLER_MODULE_TYPE ? (
+                  <OT2SlotMap occupiedSlots={['7', '8', '10', '11']} />
+                ) : (
+                  <OT2SlotMap
+                    occupiedSlots={[`${field.value}`]}
+                    isError={!fieldState.error}
+                  />
+                )}
+              </Flex>
+            )}
+          />
         ) : (
           <Flex height="20rem" justifyContent={JUSTIFY_CENTER}>
             <DeckLocationSelect

@@ -1,12 +1,9 @@
-import 'jest-styled-components'
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import {
-  renderWithProviders,
-  COLORS,
-  SPACING,
-  BORDERS,
-} from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { COLORS, SPACING, BORDERS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { MiniCard } from '../'
 
 const render = (props: React.ComponentProps<typeof MiniCard>) => {
@@ -18,7 +15,7 @@ describe('MiniCard', () => {
 
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       isSelected: false,
       children: 'mock mini card',
       isError: false,
@@ -26,13 +23,11 @@ describe('MiniCard', () => {
   })
 
   it('renders the correct style unselectedOptionStyles', () => {
-    const { getByText } = render(props)
-    const miniCard = getByText('mock mini card')
-    expect(miniCard).toHaveStyle(`background-color: ${String(COLORS.white)}`)
-    expect(miniCard).toHaveStyle(`border: 1px solid ${String(COLORS.grey30)}`)
-    expect(miniCard).toHaveStyle(
-      `border-radius: ${String(BORDERS.radiusSoftCorners)}`
-    )
+    render(props)
+    const miniCard = screen.getByText('mock mini card')
+    expect(miniCard).toHaveStyle(`background-color: ${COLORS.grey10}`)
+    expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.grey35}`)
+    expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.borderRadius4}`)
     expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing8}`)
     expect(miniCard).toHaveStyle(`width: 100%`)
     expect(miniCard).toHaveStyle(`cursor: pointer`)
@@ -40,64 +35,32 @@ describe('MiniCard', () => {
 
   it('renders the correct style selectedOptionStyles', () => {
     props.isSelected = true
-    const { getByText } = render(props)
-    const miniCard = getByText('mock mini card')
-    expect(miniCard).toHaveStyle(`background-color: ${String(COLORS.blue10)}`)
-    expect(miniCard).toHaveStyle(`border: 1px solid ${String(COLORS.blue50)}`)
-    expect(miniCard).toHaveStyle(
-      `border-radius: ${String(BORDERS.radiusSoftCorners)}`
-    )
+    render(props)
+    const miniCard = screen.getByText('mock mini card')
+    expect(miniCard).toHaveStyle(`background-color: ${COLORS.blue10}`)
+    expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.blue50}`)
+    expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.borderRadius4}`)
     expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing8}`)
     expect(miniCard).toHaveStyle(`width: 100%`)
     expect(miniCard).toHaveStyle(`cursor: pointer`)
-    expect(miniCard).toHaveStyleRule(
-      'border',
-      `1px solid ${String(COLORS.blue50)}`,
-      {
-        modifier: ':hover',
-      }
-    )
-    expect(miniCard).toHaveStyleRule(
-      'background-color',
-      `${String(COLORS.blue10)}`,
-      {
-        modifier: ':hover',
-      }
-    )
   })
 
   it('renders the correct style errorOptionStyles', () => {
     props.isError = true
     props.isSelected = true
-    const { getByText } = render(props)
-    const miniCard = getByText('mock mini card')
-    expect(miniCard).toHaveStyle(`background-color: ${String(COLORS.red20)}`)
-    expect(miniCard).toHaveStyle(`border: 1px solid ${String(COLORS.red50)}`)
-    expect(miniCard).toHaveStyle(
-      `border-radius: ${String(BORDERS.radiusSoftCorners)}`
-    )
+    render(props)
+    const miniCard = screen.getByText('mock mini card')
+    expect(miniCard).toHaveStyle(`background-color: ${COLORS.red20}`)
+    expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.red50}`)
+    expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.borderRadius4}`)
     expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing8}`)
     expect(miniCard).toHaveStyle(`width: 100%`)
     expect(miniCard).toHaveStyle(`cursor: pointer`)
-    expect(miniCard).toHaveStyleRule(
-      'border',
-      `1px solid ${String(COLORS.red50)}`,
-      {
-        modifier: ':hover',
-      }
-    )
-    expect(miniCard).toHaveStyleRule(
-      'background-color',
-      `${String(COLORS.red20)}`,
-      {
-        modifier: ':hover',
-      }
-    )
   })
 
   it('calls mock function when clicking mini card', () => {
-    const { getByText } = render(props)
-    const miniCard = getByText('mock mini card')
+    render(props)
+    const miniCard = screen.getByText('mock mini card')
     fireEvent.click(miniCard)
     expect(props.onClick).toHaveBeenCalled()
   })

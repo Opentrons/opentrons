@@ -1,7 +1,7 @@
 """Test configure nozzle layout commands."""
 import pytest
 from decoy import Decoy
-from typing import Union, Optional, Dict
+from typing import Union, Dict
 from collections import OrderedDict
 
 from opentrons.protocol_engine.execution import (
@@ -73,11 +73,6 @@ from ..pipette_fixtures import (
             ),
             {"primary_nozzle": "A1", "front_right_nozzle": "E1"},
         ],
-        [
-            AllNozzleLayoutConfiguration(),
-            None,
-            {},
-        ],
     ],
 )
 async def test_configure_nozzle_layout_implementation(
@@ -90,7 +85,7 @@ async def test_configure_nozzle_layout_implementation(
         QuadrantNozzleLayoutConfiguration,
         SingleNozzleLayoutConfiguration,
     ],
-    expected_nozzlemap: Optional[NozzleMap],
+    expected_nozzlemap: NozzleMap,
     nozzle_params: Dict[str, str],
 ) -> None:
     """A ConfigureForVolume command should have an execution implementation."""

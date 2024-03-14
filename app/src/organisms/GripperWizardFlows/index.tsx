@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { UseMutateFunction } from 'react-query'
@@ -14,16 +15,16 @@ import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
 import {
   useChainMaintenanceCommands,
   useCreateTargetedMaintenanceRunMutation,
-} from '../../resources/runs/hooks'
+} from '../../resources/runs'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -346,29 +347,28 @@ export const GripperWizard = (
     />
   )
 
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          width="992px"
-          height="568px"
-          left="14.5px"
-          top="16px"
-          border={BORDERS.lineBorder}
-          boxShadow={BORDERS.shadowSmall}
-          borderRadius={BORDERS.borderRadiusSize4}
-          position={POSITION_ABSOLUTE}
-          backgroundColor={COLORS.white}
-        >
-          {wizardHeader}
-          {modalContent}
-        </Flex>
-      ) : (
-        <LegacyModalShell width="48rem" header={wizardHeader}>
-          {modalContent}
-        </LegacyModalShell>
-      )}
-    </Portal>
+  return createPortal(
+    isOnDevice ? (
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        width="992px"
+        height="568px"
+        left="14.5px"
+        top="16px"
+        border={BORDERS.lineBorder}
+        boxShadow={BORDERS.shadowSmall}
+        borderRadius={BORDERS.borderRadius16}
+        position={POSITION_ABSOLUTE}
+        backgroundColor={COLORS.white}
+      >
+        {wizardHeader}
+        {modalContent}
+      </Flex>
+    ) : (
+      <LegacyModalShell width="48rem" header={wizardHeader}>
+        {modalContent}
+      </LegacyModalShell>
+    ),
+    getTopPortalEl()
   )
 }

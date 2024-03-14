@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { getRobotSettings } from '../../../redux/robot-settings'
@@ -15,6 +16,7 @@ import {
   TouchScreenSleep,
   TouchscreenBrightness,
   NetworkSettings,
+  Privacy,
   RobotSystemVersion,
   UpdateChannel,
 } from '../../../organisms/RobotSettingsDashboard'
@@ -24,60 +26,22 @@ import { useLEDLights } from '../../../organisms/Devices/hooks'
 
 import { RobotSettingsDashboard } from '../../../pages/RobotSettingsDashboard'
 
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/robot-update')
-jest.mock('../../../redux/config')
-jest.mock('../../../redux/robot-settings')
-jest.mock('../../../resources/networking/hooks/useNetworkConnection')
-jest.mock('../../../organisms/Navigation')
-jest.mock('../../../organisms/RobotSettingsDashboard/TouchScreenSleep')
-jest.mock('../../../organisms/RobotSettingsDashboard/NetworkSettings')
-jest.mock('../../../organisms/RobotSettingsDashboard/DeviceReset')
-jest.mock('../../../organisms/RobotSettingsDashboard/RobotSystemVersion')
-jest.mock('../../../organisms/RobotSettingsDashboard/TouchscreenBrightness')
-jest.mock('../../../organisms/RobotSettingsDashboard/UpdateChannel')
-jest.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../redux/discovery')
+vi.mock('../../../redux/robot-update')
+vi.mock('../../../redux/config')
+vi.mock('../../../redux/robot-settings')
+vi.mock('../../../resources/networking/hooks/useNetworkConnection')
+vi.mock('../../../organisms/Navigation')
+vi.mock('../../../organisms/RobotSettingsDashboard/TouchScreenSleep')
+vi.mock('../../../organisms/RobotSettingsDashboard/NetworkSettings')
+vi.mock('../../../organisms/RobotSettingsDashboard/DeviceReset')
+vi.mock('../../../organisms/RobotSettingsDashboard/RobotSystemVersion')
+vi.mock('../../../organisms/RobotSettingsDashboard/TouchscreenBrightness')
+vi.mock('../../../organisms/RobotSettingsDashboard/UpdateChannel')
+vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../organisms/RobotSettingsDashboard/Privacy')
 
-const mockToggleLights = jest.fn()
-
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
-const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
-  typeof getRobotSettings
->
-const mockToggleDevtools = toggleDevtools as jest.MockedFunction<
-  typeof toggleDevtools
->
-const mockToggleHistoricOffsets = toggleHistoricOffsets as jest.MockedFunction<
-  typeof toggleHistoricOffsets
->
-const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
-const mockTouchScreenSleep = TouchScreenSleep as jest.MockedFunction<
-  typeof TouchScreenSleep
->
-const mockNetworkSettings = NetworkSettings as jest.MockedFunction<
-  typeof NetworkSettings
->
-const mockDeviceReset = DeviceReset as jest.MockedFunction<typeof DeviceReset>
-const mockRobotSystemVersion = RobotSystemVersion as jest.MockedFunction<
-  typeof RobotSystemVersion
->
-const mockTouchscreenBrightness = TouchscreenBrightness as jest.MockedFunction<
-  typeof TouchscreenBrightness
->
-const mockUpdateChannel = UpdateChannel as jest.MockedFunction<
-  typeof UpdateChannel
->
-const mockUseLEDLights = useLEDLights as jest.MockedFunction<
-  typeof useLEDLights
->
-const mockGetBuildrootUpdateAvailable = getRobotUpdateAvailable as jest.MockedFunction<
-  typeof getRobotUpdateAvailable
->
-const mockUseNetworkConnection = useNetworkConnection as jest.MockedFunction<
-  typeof useNetworkConnection
->
+const mockToggleLights = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -93,13 +57,8 @@ const render = () => {
 // Note kj 01/25/2023 Currently test cases only check text since this PR is bare-bones for RobotSettings Dashboard
 describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
-    mockGetLocalRobot.mockReturnValue(mockConnectedRobot)
-    mockNavigation.mockReturnValue(<div>Mock Navigation</div>)
-    mockTouchScreenSleep.mockReturnValue(<div>Mock Touchscreen Sleep</div>)
-    mockNetworkSettings.mockReturnValue(<div>Mock Network Settings</div>)
-    mockDeviceReset.mockReturnValue(<div>Mock Device Reset</div>)
-    mockRobotSystemVersion.mockReturnValue(<div>Mock Robot System Version</div>)
-    mockGetRobotSettings.mockReturnValue([
+    vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+    vi.mocked(getRobotSettings).mockReturnValue([
       {
         id: 'disableHomeOnBoot',
         title: 'Disable home on boot',
@@ -108,20 +67,20 @@ describe('RobotSettingsDashboard', () => {
         value: true,
       },
     ])
-    mockTouchscreenBrightness.mockReturnValue(
-      <div>Mock Touchscreen Brightness</div>
-    )
-    mockUpdateChannel.mockReturnValue(<div>Mock Update Channel</div>)
-    mockUseLEDLights.mockReturnValue({
+    vi.mocked(useLEDLights).mockReturnValue({
       lightsEnabled: false,
       toggleLights: mockToggleLights,
     })
-    mockUseNetworkConnection.mockReturnValue({} as any)
+    vi.mocked(useNetworkConnection).mockReturnValue({} as any)
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('should render Navigation', () => {
-    const [{ getByText }] = render()
-    getByText('Mock Navigation')
+    render()
+    expect(vi.mocked(Navigation)).toHaveBeenCalled()
   })
 
   it('should render setting buttons', () => {
@@ -134,6 +93,8 @@ describe('RobotSettingsDashboard', () => {
     getByText('Control the strip of color lights on the front of the robot.')
     getByText('Touchscreen Sleep')
     getByText('Touchscreen Brightness')
+    getByText('Privacy')
+    getByText('Choose what data to share with Opentrons.')
     getByText('Device Reset')
     getByText('Update Channel')
     getByText('Apply Labware Offsets')
@@ -153,7 +114,7 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Robot System Version')
     fireEvent.click(button)
-    getByText('Mock Robot System Version')
+    expect(vi.mocked(RobotSystemVersion)).toHaveBeenCalled()
   })
 
   it('should render text with lights off and clicking it, calls useLEDLights', () => {
@@ -164,7 +125,7 @@ describe('RobotSettingsDashboard', () => {
   })
 
   it('should render text with lights on', () => {
-    mockUseLEDLights.mockReturnValue({
+    vi.mocked(useLEDLights).mockReturnValue({
       lightsEnabled: true,
       toggleLights: mockToggleLights,
     })
@@ -178,39 +139,46 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Network Settings')
     fireEvent.click(button)
-    getByText('Mock Network Settings')
+    expect(vi.mocked(NetworkSettings)).toHaveBeenCalled()
   })
 
   it('should render component when tapping display touchscreen sleep', () => {
     const [{ getByText }] = render()
     const button = getByText('Touchscreen Sleep')
     fireEvent.click(button)
-    getByText('Mock Touchscreen Sleep')
+    expect(vi.mocked(TouchScreenSleep)).toHaveBeenCalled()
   })
 
   it('should render component when tapping touchscreen brightness', () => {
     const [{ getByText }] = render()
     const button = getByText('Touchscreen Brightness')
     fireEvent.click(button)
-    getByText('Mock Touchscreen Brightness')
+    expect(vi.mocked(TouchscreenBrightness)).toHaveBeenCalled()
+  })
+
+  it('should render component when tapping privacy', () => {
+    const [{ getByText }] = render()
+    const button = getByText('Privacy')
+    fireEvent.click(button)
+    expect(vi.mocked(Privacy)).toHaveBeenCalled()
   })
 
   it('should render component when tapping device rest', () => {
     const [{ getByText }] = render()
     const button = getByText('Device Reset')
     fireEvent.click(button)
-    getByText('Mock Device Reset')
+    expect(vi.mocked(DeviceReset)).toHaveBeenCalled()
   })
 
   it('should render component when tapping update channel', () => {
     const [{ getByText }] = render()
     const button = getByText('Update Channel')
     fireEvent.click(button)
-    getByText('Mock Update Channel')
+    expect(vi.mocked(UpdateChannel)).toHaveBeenCalled()
   })
 
   it('should render text with home gantry off', () => {
-    mockGetRobotSettings.mockReturnValue([
+    vi.mocked(getRobotSettings).mockReturnValue([
       {
         id: 'disableHomeOnBoot',
         title: 'Disable home on boot',
@@ -229,18 +197,18 @@ describe('RobotSettingsDashboard', () => {
     const [{ getByText }] = render()
     const button = getByText('Apply Labware Offsets')
     fireEvent.click(button)
-    expect(mockToggleHistoricOffsets).toHaveBeenCalled()
+    expect(vi.mocked(toggleHistoricOffsets)).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping enable dev tools', () => {
     const [{ getByText }] = render()
     const button = getByText('Developer Tools')
     fireEvent.click(button)
-    expect(mockToggleDevtools).toHaveBeenCalled()
+    expect(vi.mocked(toggleDevtools)).toHaveBeenCalled()
   })
 
   it('should return an update available with correct text', () => {
-    mockGetBuildrootUpdateAvailable.mockReturnValue('upgrade')
+    vi.mocked(getRobotUpdateAvailable).mockReturnValue('upgrade')
     const [{ getByText }] = render()
     getByText('Update available')
   })

@@ -62,7 +62,7 @@ import type {
 import type { Selector } from '../../types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
-// assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
+// console.assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
   console.warn('Could not find application version!')
 const applicationVersion: string = process.env.OT_PD_VERSION || ''

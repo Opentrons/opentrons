@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { it, expect, describe, beforeEach } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ConfigFormSubmitButton } from '../ConfigFormSubmitButton'
 
@@ -16,9 +18,6 @@ describe('ConfigFormSubmitButton', () => {
       disabled: false,
       formId: 'id',
     }
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   it('renders bottom button text and is not disabled', () => {

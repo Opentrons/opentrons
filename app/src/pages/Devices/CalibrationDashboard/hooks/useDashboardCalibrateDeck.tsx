@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { Portal } from '../../../../App/portal'
+import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModalShell } from '../../../../molecules/LegacyModal'
 import { WizardHeader } from '../../../../molecules/WizardHeader'
 import { CalibrateDeck } from '../../../../organisms/CalibrateDeck'
@@ -103,27 +104,26 @@ export function useDashboardCalibrateDeck(
     )
   }
 
-  let Wizard: JSX.Element | null = (
-    <Portal level="top">
-      {startingSession ? (
-        <LegacyModalShell
-          width="47rem"
-          header={<WizardHeader title={t('deck_calibration')} />}
-        >
-          <LoadingState />
-        </LegacyModalShell>
-      ) : (
-        <CalibrateDeck
-          session={deckCalSession}
-          robotName={robotName}
-          showSpinner={showSpinner}
-          dispatchRequests={dispatchRequests}
-          isJogging={isJogging}
-          exitBeforeDeckConfigCompletion={exitBeforeDeckConfigCompletion}
-          offsetInvalidationHandler={invalidateHandlerRef.current}
-        />
-      )}
-    </Portal>
+  let Wizard: JSX.Element | null = createPortal(
+    startingSession ? (
+      <LegacyModalShell
+        width="47rem"
+        header={<WizardHeader title={t('deck_calibration')} />}
+      >
+        <LoadingState />
+      </LegacyModalShell>
+    ) : (
+      <CalibrateDeck
+        session={deckCalSession}
+        robotName={robotName}
+        showSpinner={showSpinner}
+        dispatchRequests={dispatchRequests}
+        isJogging={isJogging}
+        exitBeforeDeckConfigCompletion={exitBeforeDeckConfigCompletion}
+        offsetInvalidationHandler={invalidateHandlerRef.current}
+      />
+    ),
+    getTopPortalEl()
   )
 
   if (!(startingSession || deckCalSession != null)) Wizard = null

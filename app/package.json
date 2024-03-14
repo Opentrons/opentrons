@@ -1,5 +1,6 @@
 {
   "name": "@opentrons/app",
+  "type": "module",
   "version": "0.0.0-dev",
   "description": "Opentrons desktop application UI",
   "source": "src/index.tsx",
@@ -33,7 +34,6 @@
     "date-fns": "2.25.0",
     "events": "3.0.0",
     "file-saver": "2.0.1",
-    "formik": "2.1.4",
     "history": "4.7.2",
     "i18next": "^19.8.3",
     "is-ip": "3.1.0",
@@ -41,6 +41,8 @@
     "lodash": "4.17.21",
     "mixpanel-browser": "2.22.1",
     "netmask": "2.0.2",
+    "node-fetch": "2.6.7",
+    "react-hook-form": "7.50.1",
     "path-to-regexp": "3.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -62,6 +64,19 @@
     "semver": "5.5.0",
     "styled-components": "5.3.6",
     "typeface-open-sans": "0.0.75",
-    "uuid": "8.3.2"
+    "uuid": "3.2.1"
+  },
+  "devDependencies": {
+    "@types/classnames": "2.2.5",
+    "@types/file-saver": "2.0.1",
+    "@types/jszip": "3.1.7",
+    "@types/mixpanel-browser": "^2.35.6",
+    "@types/node-fetch": "2.6.11",
+    "@types/styled-components": "^5.1.26",
+    "axios": "^0.21.1",
+    "postcss-apply": "0.12.0",
+    "postcss-color-mod-function": "3.0.3",
+    "postcss-import": "16.0.0",
+    "postcss-preset-env": "9.3.0"
   }
 }

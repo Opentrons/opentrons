@@ -20,8 +20,8 @@ class MaintenanceRunsPublisher:
         self,
     ) -> None:
         """Publishes the equivalent of GET /maintenance_run/current_run"""
-        await self._client.publish_async(
-            topic=Topics.MAINTENANCE_RUNS_CURRENT_RUN.value
+        await self._client.publish_advise_refetch_async(
+            topic=Topics.MAINTENANCE_RUNS_CURRENT_RUN
         )
 
 

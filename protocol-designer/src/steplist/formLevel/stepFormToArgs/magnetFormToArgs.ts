@@ -1,4 +1,3 @@
-import assert from 'assert'
 import {
   EngageMagnetArgs,
   DisengageMagnetArgs,
@@ -11,7 +10,7 @@ export const magnetFormToArgs = (
   const { magnetAction, moduleId } = hydratedFormData
   // @ts-expect-error(sa, 2021-6-14): null check engageHeight
   const engageHeight = parseFloat(hydratedFormData.engageHeight)
-  assert(
+  console.assert(
     magnetAction === 'engage' ? !Number.isNaN(engageHeight) : true,
     'magnetFormToArgs expected (hydrated) engageHeight to be non-NaN if magnetAction is "engage"'
   )

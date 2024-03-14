@@ -1,20 +1,17 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, expect, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 
 import { i18n } from '../../../../../i18n'
 import { useLEDLights } from '../../../hooks'
 import { EnableStatusLight } from '../EnableStatusLight'
 
-jest.mock('../../../hooks')
-
-const mockUseLEDLights = useLEDLights as jest.MockedFunction<
-  typeof useLEDLights
->
+vi.mock('../../../hooks')
 
 const ROBOT_NAME = 'otie'
-const mockToggleLights = jest.fn()
+const mockToggleLights = vi.fn()
 const render = (props: React.ComponentProps<typeof EnableStatusLight>) => {
   return renderWithProviders(<EnableStatusLight {...props} />, {
     i18nInstance: i18n,
@@ -29,24 +26,24 @@ describe('EnableStatusLight', () => {
       robotName: ROBOT_NAME,
       isEstopNotDisengaged: false,
     }
-    mockUseLEDLights.mockReturnValue({
+    vi.mocked(useLEDLights).mockReturnValue({
       lightsEnabled: false,
       toggleLights: mockToggleLights,
     })
   })
 
   it('should render text and toggle button', () => {
-    const [{ getByText, getByLabelText }] = render(props)
-    getByText('Enable status light')
-    getByText(
+    render(props)
+    screen.getByText('Enable status light')
+    screen.getByText(
       'Turn on or off the strip of color LEDs on the front of the robot.'
     )
-    expect(getByLabelText('enable_status_light')).toBeInTheDocument()
+    expect(screen.getByLabelText('enable_status_light')).toBeInTheDocument()
   })
 
   it('should call a mock function when clicking toggle button', () => {
-    const [{ getByLabelText }] = render(props)
-    fireEvent.click(getByLabelText('enable_status_light'))
+    render(props)
+    fireEvent.click(screen.getByLabelText('enable_status_light'))
     expect(mockToggleLights).toHaveBeenCalled()
   })
 
@@ -55,7 +52,7 @@ describe('EnableStatusLight', () => {
       ...props,
       isEstopNotDisengaged: true,
     }
-    const [{ getByLabelText }] = render(props)
-    expect(getByLabelText('enable_status_light')).toBeDisabled()
+    render(props)
+    expect(screen.getByLabelText('enable_status_light')).toBeDisabled()
   })
 })

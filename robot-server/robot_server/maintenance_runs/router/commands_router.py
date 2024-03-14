@@ -14,7 +14,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
-from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,

@@ -1,4 +1,5 @@
 // config migration tests
+import { describe, it, expect } from 'vitest'
 import {
   MOCK_CONFIG_V12,
   MOCK_CONFIG_V13,

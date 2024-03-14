@@ -7,8 +7,7 @@ import {
   DeckFromLayers,
   FlexTrash,
   Module,
-  RobotCoordinateSpaceWithDOMCoords,
-  RobotWorkSpaceRenderProps,
+  RobotCoordinateSpaceWithRef,
   SingleSlotFixture,
   StagingAreaFixture,
   StagingAreaLocation,
@@ -64,7 +63,6 @@ import {
   AdapterControls,
   SlotControls,
   LabwareControls,
-  DragPreview,
 } from './LabwareOverlays'
 import { FlexModuleTag } from './FlexModuleTag'
 import { Ot2ModuleTag } from './Ot2ModuleTag'
@@ -79,7 +77,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 
-import styles from './DeckSetup.css'
+import styles from './DeckSetup.module.css'
 
 export const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -102,7 +100,6 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 ]
 
 interface ContentsProps {
-  getRobotCoordsFromDOMCoords: RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
   activeDeckSetup: InitialDeckSetup
   selectedTerminalItemId?: TerminalItemId | null
   showGen1MultichannelCollisionWarnings: boolean
@@ -118,7 +115,6 @@ const darkFill = COLORS.grey60
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
     activeDeckSetup,
-    getRobotCoordsFromDOMCoords,
     showGen1MultichannelCollisionWarnings,
     deckDef,
     robotType,
@@ -265,7 +261,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                   labwareOnDeck={labwareLoadedOnModule}
                 />
                 {isAdapter ? (
-                  // @ts-expect-error
                   <AdapterControls
                     allLabware={allLabware}
                     onDeck={false}
@@ -296,7 +291,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             {labwareLoadedOnModule == null &&
             !shouldHideChildren &&
             !isAdapter ? (
-              // @ts-expect-error
               <SlotControls
                 key={moduleOnDeck.slot}
                 slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
@@ -359,7 +353,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         })
         .map(addressableArea => {
           return (
-            // @ts-expect-error
             <SlotControls
               key={addressableArea.id}
               slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
@@ -404,7 +397,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             />
             <g>
               {labwareIsAdapter ? (
-                //  @ts-expect-error
                 <AdapterControls
                   allLabware={allLabware}
                   onDeck={true}
@@ -486,7 +478,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           </React.Fragment>
         )
       })}
-      <DragPreview getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords} />
     </>
   )
 }
@@ -560,8 +551,9 @@ export const DeckSetup = (): JSX.Element => {
   return (
     <div className={styles.deck_row}>
       {drilledDown && <BrowseLabwareModal />}
+
       <div ref={wrapperRef} className={styles.deck_wrapper}>
-        <RobotCoordinateSpaceWithDOMCoords
+        <RobotCoordinateSpaceWithRef
           height="100%"
           deckDef={deckDef}
           viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
@@ -570,7 +562,7 @@ export const DeckSetup = (): JSX.Element => {
               : deckDef.cornerOffsetFromOrigin[1]
           } ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
         >
-          {({ getRobotCoordsFromDOMCoords }) => (
+          {() => (
             <>
               {robotType === OT2_ROBOT_TYPE ? (
                 <DeckFromLayers
@@ -655,7 +647,7 @@ export const DeckSetup = (): JSX.Element => {
                 )}
                 {...{
                   deckDef,
-                  getRobotCoordsFromDOMCoords,
+
                   showGen1MultichannelCollisionWarnings,
                 }}
               />
@@ -666,7 +658,7 @@ export const DeckSetup = (): JSX.Element => {
               />
             </>
           )}
-        </RobotCoordinateSpaceWithDOMCoords>
+        </RobotCoordinateSpaceWithRef>
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, beforeEach, afterEach } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import * as Networking from '../../../redux/networking'
@@ -8,10 +9,10 @@ import { TitleHeader } from '../../../pages/ConnectViaEthernet/TitleHeader'
 import { DisplayConnectionStatus } from '../../../pages/ConnectViaEthernet/DisplayConnectionStatus'
 import { ConnectViaEthernet } from '../../../pages/ConnectViaEthernet'
 
-jest.mock('../../../redux/networking')
-jest.mock('../../../redux/discovery')
-jest.mock('../TitleHeader')
-jest.mock('../DisplayConnectionStatus')
+vi.mock('../../../redux/networking')
+vi.mock('../../../redux/discovery')
+vi.mock('../TitleHeader')
+vi.mock('../DisplayConnectionStatus')
 
 const initialMockEthernet = {
   ipAddress: '127.0.0.101',
@@ -19,14 +20,6 @@ const initialMockEthernet = {
   macAddress: 'ET:NT:00:00:00:00',
   type: Networking.INTERFACE_ETHERNET,
 }
-
-const mockTitleHeader = TitleHeader as jest.MockedFunction<typeof TitleHeader>
-const mockDisplayConnectionStatus = DisplayConnectionStatus as jest.MockedFunction<
-  typeof DisplayConnectionStatus
->
-const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
-  typeof Networking.getNetworkInterfaces
->
 
 const render = () => {
   return renderWithProviders(
@@ -41,19 +34,19 @@ const render = () => {
 
 describe('ConnectViaEthernet', () => {
   beforeEach(() => {
-    mockGetNetworkInterfaces.mockReturnValue({
+    vi.mocked(Networking.getNetworkInterfaces).mockReturnValue({
       wifi: null,
       ethernet: initialMockEthernet,
     })
 
-    mockTitleHeader.mockReturnValue(<div>mock TitleHeader</div>)
-    mockDisplayConnectionStatus.mockReturnValue(
+    vi.mocked(TitleHeader).mockReturnValue(<div>mock TitleHeader</div>)
+    vi.mocked(DisplayConnectionStatus).mockReturnValue(
       <div>mock DisplayConnectionStatus</div>
     )
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should render TitleHeader component and DisplayConnectionStatus component', () => {

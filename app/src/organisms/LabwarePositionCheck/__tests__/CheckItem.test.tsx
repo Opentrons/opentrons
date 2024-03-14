@@ -1,20 +1,27 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
+import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
+
 import {
   FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_V1,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+
+import {
+  nestedTextMatcher,
+  renderWithProviders,
+} from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { CheckItem } from '../CheckItem'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 
-jest.mock('../../../redux/config')
-jest.mock('../../Devices/hooks')
+import type { Mock } from 'vitest'
+
+vi.mock('../../../redux/config')
+vi.mock('../../Devices/hooks')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
 const mockEndPosition = { x: 9, y: 19, z: 29 }
@@ -27,12 +34,10 @@ const render = (props: React.ComponentProps<typeof CheckItem>) => {
 
 describe('CheckItem', () => {
   let props: React.ComponentProps<typeof CheckItem>
-  let mockChainRunCommands: jest.Mock
+  let mockChainRunCommands: Mock
 
   beforeEach(() => {
-    mockChainRunCommands = jest
-      .fn()
-      .mockImplementation(() => Promise.resolve([]))
+    mockChainRunCommands = vi.fn().mockImplementation(() => Promise.resolve([]))
     props = {
       section: SECTIONS.CHECK_LABWARE,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
@@ -40,11 +45,11 @@ describe('CheckItem', () => {
       definitionUri: mockCompletedAnalysis.labware[0].definitionUri,
       location: { slotName: 'D1' },
       protocolData: mockCompletedAnalysis,
-      proceed: jest.fn(),
+      proceed: vi.fn(),
       chainRunCommands: mockChainRunCommands,
-      handleJog: jest.fn(),
-      registerPosition: jest.fn(),
-      setFatalError: jest.fn(),
+      handleJog: vi.fn(),
+      registerPosition: vi.fn(),
+      setFatalError: vi.fn(),
       workingOffsets: [],
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
@@ -53,8 +58,7 @@ describe('CheckItem', () => {
     }
   })
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
   it('renders correct copy when preparing space with tip rack', () => {
     render(props)
@@ -89,45 +93,22 @@ describe('CheckItem', () => {
     screen.getByRole('button', { name: 'Confirm placement' })
   })
   it('executes correct chained commands when confirm placement CTA is clicked then go back', async () => {
-    when(mockChainRunCommands)
-      .calledWith(
-        [
-          {
-            commandType: 'moveLabware',
-            params: {
-              labwareId: 'labwareId1',
-              newLocation: { slotName: 'D1' },
-              strategy: 'manualMoveWithoutPause',
-            },
+    vi.mocked(mockChainRunCommands).mockImplementation(() =>
+      Promise.resolve([
+        {},
+        {},
+        {
+          data: {
+            commandType: 'savePosition',
+            result: { position: mockStartPosition },
           },
-          {
-            commandType: 'moveToWell',
-            params: {
-              pipetteId: 'pipetteId1',
-              labwareId: 'labwareId1',
-              wellName: 'A1',
-              wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 44.5 } },
-            },
-          },
-          { commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } },
-        ],
-        false
-      )
-      .mockImplementation(() =>
-        Promise.resolve([
-          {},
-          {},
-          {
-            data: {
-              commandType: 'savePosition',
-              result: { position: mockStartPosition },
-            },
-          },
-        ])
-      )
+        },
+      ])
+    )
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
-    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+    await new Promise((resolve, reject) => setTimeout(resolve))
+    expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
         {
@@ -154,7 +135,7 @@ describe('CheckItem', () => {
       ],
       false
     )
-    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+    expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'initialPosition',
       labwareId: 'labwareId1',
       location: { slotName: 'D1' },
@@ -167,45 +148,23 @@ describe('CheckItem', () => {
       robotType: OT2_ROBOT_TYPE,
       location: { slotName: '1' },
     }
-    when(mockChainRunCommands)
-      .calledWith(
-        [
-          {
-            commandType: 'moveLabware',
-            params: {
-              labwareId: 'labwareId1',
-              newLocation: { slotName: '1' },
-              strategy: 'manualMoveWithoutPause',
-            },
+    vi.mocked(mockChainRunCommands).mockImplementation(() =>
+      Promise.resolve([
+        {},
+        {},
+        {
+          data: {
+            commandType: 'savePosition',
+            result: { position: mockStartPosition },
           },
-          {
-            commandType: 'moveToWell',
-            params: {
-              pipetteId: 'pipetteId1',
-              labwareId: 'labwareId1',
-              wellName: 'A1',
-              wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 0 } },
-            },
-          },
-          { commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } },
-        ],
-        false
-      )
-      .mockImplementation(() =>
-        Promise.resolve([
-          {},
-          {},
-          {
-            data: {
-              commandType: 'savePosition',
-              result: { position: mockStartPosition },
-            },
-          },
-        ])
-      )
+        },
+      ])
+    )
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
-    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
+    expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
         {
@@ -232,7 +191,7 @@ describe('CheckItem', () => {
       ],
       false
     )
-    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+    expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'initialPosition',
       labwareId: 'labwareId1',
       location: { slotName: '1' },
@@ -242,45 +201,23 @@ describe('CheckItem', () => {
 
   it('executes correct chained commands when confirm placement CTA is clicked then go back on Flex', async () => {
     props = { ...props, robotType: FLEX_ROBOT_TYPE }
-    when(mockChainRunCommands)
-      .calledWith(
-        [
-          {
-            commandType: 'moveLabware',
-            params: {
-              labwareId: 'labwareId1',
-              newLocation: { slotName: 'D1' },
-              strategy: 'manualMoveWithoutPause',
-            },
+    vi.mocked(mockChainRunCommands).mockImplementation(() =>
+      Promise.resolve([
+        {},
+        {},
+        {
+          data: {
+            commandType: 'savePosition',
+            result: { position: mockStartPosition },
           },
-          {
-            commandType: 'moveToWell',
-            params: {
-              pipetteId: 'pipetteId1',
-              labwareId: 'labwareId1',
-              wellName: 'A1',
-              wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 44.5 } },
-            },
-          },
-          { commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } },
-        ],
-        false
-      )
-      .mockImplementation(() =>
-        Promise.resolve([
-          {},
-          {},
-          {
-            data: {
-              commandType: 'savePosition',
-              result: { position: mockStartPosition },
-            },
-          },
-        ])
-      )
+        },
+      ])
+    )
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
-    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
+    expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
         {
@@ -307,7 +244,7 @@ describe('CheckItem', () => {
       ],
       false
     )
-    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+    expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'initialPosition',
       labwareId: 'labwareId1',
       location: { slotName: 'D1' },
@@ -334,53 +271,23 @@ describe('CheckItem', () => {
       ...props,
       adapterId: 'labwareId2',
     }
-    when(mockChainRunCommands)
-      .calledWith(
-        [
-          {
-            commandType: 'moveLabware',
-            params: {
-              labwareId: 'labwareId2',
-              newLocation: { slotName: 'D1' },
-              strategy: 'manualMoveWithoutPause',
-            },
+    vi.mocked(mockChainRunCommands).mockImplementation(() =>
+      Promise.resolve([
+        {},
+        {},
+        {
+          data: {
+            commandType: 'savePosition',
+            result: { position: mockStartPosition },
           },
-          {
-            commandType: 'moveLabware',
-            params: {
-              labwareId: 'labwareId1',
-              newLocation: { labwareId: 'labwareId2' },
-              strategy: 'manualMoveWithoutPause',
-            },
-          },
-          {
-            commandType: 'moveToWell',
-            params: {
-              pipetteId: 'pipetteId1',
-              labwareId: 'labwareId1',
-              wellName: 'A1',
-              wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 44.5 } },
-            },
-          },
-          { commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } },
-        ],
-        false
-      )
-      .mockImplementation(() =>
-        Promise.resolve([
-          {},
-          {},
-          {
-            data: {
-              commandType: 'savePosition',
-              result: { position: mockStartPosition },
-            },
-          },
-        ])
-      )
+        },
+      ])
+    )
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
-    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
+    expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
         {
@@ -415,7 +322,7 @@ describe('CheckItem', () => {
       ],
       false
     )
-    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+    expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'initialPosition',
       labwareId: 'labwareId1',
       location: { slotName: 'D1' },
@@ -436,8 +343,9 @@ describe('CheckItem', () => {
     }
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Go back' }))
+    await new Promise((resolve, reject) => setTimeout(resolve))
 
-    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+    expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
         { commandType: 'home', params: {} },
@@ -452,7 +360,7 @@ describe('CheckItem', () => {
       ],
       false
     )
-    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+    expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'initialPosition',
       labwareId: 'labwareId1',
       location: { slotName: 'D1' },
@@ -460,54 +368,18 @@ describe('CheckItem', () => {
     })
   })
   it('executes correct chained commands when confirm position clicked', async () => {
-    when(mockChainRunCommands)
-      .calledWith(
-        [
-          {
+    vi.mocked(mockChainRunCommands).mockImplementation(() =>
+      Promise.resolve([
+        {
+          data: {
             commandType: 'savePosition',
-            params: { pipetteId: 'pipetteId1' },
+            result: { position: mockEndPosition },
           },
-          {
-            commandType: 'retractAxis' as const,
-            params: {
-              axis: 'leftZ',
-            },
-          },
-          {
-            commandType: 'retractAxis' as const,
-            params: {
-              axis: 'x',
-            },
-          },
-          {
-            commandType: 'retractAxis' as const,
-            params: {
-              axis: 'y',
-            },
-          },
-          {
-            commandType: 'moveLabware',
-            params: {
-              labwareId: 'labwareId1',
-              newLocation: 'offDeck',
-              strategy: 'manualMoveWithoutPause',
-            },
-          },
-        ],
-        false
-      )
-      .mockImplementation(() =>
-        Promise.resolve([
-          {
-            data: {
-              commandType: 'savePosition',
-              result: { position: mockEndPosition },
-            },
-          },
-          {},
-          {},
-        ])
-      )
+        },
+        {},
+        {},
+      ])
+    )
     props = {
       ...props,
       workingOffsets: [
@@ -521,8 +393,9 @@ describe('CheckItem', () => {
     }
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm position' }))
+    await new Promise((resolve, reject) => setTimeout(resolve))
 
-    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+    expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
         {
@@ -554,7 +427,7 @@ describe('CheckItem', () => {
       ],
       false
     )
-    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+    expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'finalPosition',
       labwareId: 'labwareId1',
       location: { slotName: 'D1' },
@@ -587,7 +460,9 @@ describe('CheckItem', () => {
       },
     }
     const { getByRole } = render(props)
-    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
+    expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
         {
@@ -607,7 +482,7 @@ describe('CheckItem', () => {
     )
     fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
 
-    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+    expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       2,
       [
         {
@@ -670,75 +545,28 @@ describe('CheckItem', () => {
         },
       ],
     }
-    when(mockChainRunCommands)
-      .calledWith(
-        [
-          {
+    vi.mocked(mockChainRunCommands).mockImplementation(() =>
+      Promise.resolve([
+        {
+          data: {
             commandType: 'savePosition',
-            params: { pipetteId: 'pipetteId1' },
+            result: { position: mockEndPosition },
           },
-          {
-            commandType: 'retractAxis' as const,
-            params: {
-              axis: 'leftZ',
-            },
-          },
-          {
-            commandType: 'retractAxis' as const,
-            params: {
-              axis: 'x',
-            },
-          },
-          {
-            commandType: 'retractAxis' as const,
-            params: {
-              axis: 'y',
-            },
-          },
-          {
-            commandType: 'heaterShaker/openLabwareLatch',
-            params: { moduleId: 'heaterShakerId' },
-          },
-          {
-            commandType: 'moveLabware',
-            params: {
-              labwareId: 'labwareId1',
-              newLocation: 'offDeck',
-              strategy: 'manualMoveWithoutPause',
-            },
-          },
-          {
-            commandType: 'moveLabware',
-            params: {
-              labwareId: 'adapterId',
-              newLocation: 'offDeck',
-              strategy: 'manualMoveWithoutPause',
-            },
-          },
-        ],
-        false
-      )
-      .mockImplementation(() =>
-        Promise.resolve([
-          {
-            data: {
-              commandType: 'savePosition',
-              result: { position: mockEndPosition },
-            },
-          },
-          {},
-          {},
-          {},
-          {},
-          {},
-          {},
-        ])
-      )
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+      ])
+    )
 
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm position' }))
+    await new Promise((resolve, reject) => setTimeout(resolve))
 
-    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+    expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
         {
@@ -782,7 +610,7 @@ describe('CheckItem', () => {
       ],
       false
     )
-    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+    expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'finalPosition',
       labwareId: 'labwareId1',
       location: { slotName: 'D1', moduleModel: HEATERSHAKER_MODULE_V1 },
@@ -824,45 +652,23 @@ describe('CheckItem', () => {
       ...props,
       robotType: FLEX_ROBOT_TYPE,
     }
-    when(mockChainRunCommands)
-      .calledWith(
-        [
-          {
-            commandType: 'moveLabware',
-            params: {
-              labwareId: 'labwareId1',
-              newLocation: { slotName: 'D1' },
-              strategy: 'manualMoveWithoutPause',
-            },
+    vi.mocked(mockChainRunCommands).mockImplementation(() =>
+      Promise.resolve([
+        {},
+        {},
+        {
+          data: {
+            commandType: 'savePosition',
+            result: { position: mockStartPosition },
           },
-          {
-            commandType: 'moveToWell',
-            params: {
-              pipetteId: 'pipetteId1',
-              labwareId: 'labwareId1',
-              wellName: 'A1',
-              wellLocation: { origin: 'top', offset: { x: 0, y: 0, z: 44.5 } },
-            },
-          },
-          { commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } },
-        ],
-        false
-      )
-      .mockImplementation(() =>
-        Promise.resolve([
-          {},
-          {},
-          {
-            data: {
-              commandType: 'savePosition',
-              result: { position: mockStartPosition },
-            },
-          },
-        ])
-      )
+        },
+      ])
+    )
     const { getByRole } = render(props)
     fireEvent.click(getByRole('button', { name: 'Confirm placement' }))
-    await expect(props.chainRunCommands).toHaveBeenNthCalledWith(
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
+    expect(props.chainRunCommands).toHaveBeenNthCalledWith(
       1,
       [
         {
@@ -889,7 +695,7 @@ describe('CheckItem', () => {
       ],
       false
     )
-    await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
+    expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'initialPosition',
       labwareId: 'labwareId1',
       location: { slotName: 'D1' },

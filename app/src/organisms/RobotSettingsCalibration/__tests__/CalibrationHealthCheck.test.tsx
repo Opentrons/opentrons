@@ -1,9 +1,10 @@
 import * as React from 'react'
 import userEvent from '@testing-library/user-event'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   useTrackEvent,
@@ -31,10 +32,10 @@ import type {
   PipetteCalibrationsByMount,
 } from '../../../redux/pipettes/types'
 
-jest.mock('../../../redux/analytics')
-jest.mock('../../../redux/config')
-jest.mock('../../../redux/pipettes')
-jest.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../redux/analytics')
+vi.mock('../../../redux/config')
+vi.mock('../../../redux/pipettes')
+vi.mock('../../../organisms/Devices/hooks')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
@@ -50,18 +51,6 @@ const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
     tipLength: mockTipLengthCalibration2,
   },
 } as any
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
->
-const mockUseAttachedPipetteCalibrations = useAttachedPipetteCalibrations as jest.MockedFunction<
-  typeof useAttachedPipetteCalibrations
->
-const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
-  typeof useRunStatuses
->
 
 const RUN_STATUSES = {
   isRunRunning: false,
@@ -70,8 +59,8 @@ const RUN_STATUSES = {
   isRunIdle: false,
 }
 
-let mockTrackEvent: jest.Mock
-const mockDispatchRequests = jest.fn()
+let mockTrackEvent: any
+const mockDispatchRequests = vi.fn()
 
 const render = (
   props?: Partial<React.ComponentProps<typeof CalibrationHealthCheck>>
@@ -92,14 +81,10 @@ const render = (
 
 describe('CalibrationHealthCheck', () => {
   beforeEach(() => {
-    mockTrackEvent = jest.fn()
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
-    mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    mockTrackEvent = vi.fn()
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+    vi.mocked(useAttachedPipettes).mockReturnValue(mockAttachedPipettes)
+    vi.mocked(useRunStatuses).mockReturnValue(RUN_STATUSES)
   })
 
   it('renders a title and description - Calibration Health Check section', () => {
@@ -130,7 +115,7 @@ describe('CalibrationHealthCheck', () => {
   })
 
   it('Health check button is disabled when a robot is running', () => {
-    mockUseRunStatuses.mockReturnValue({
+    vi.mocked(useRunStatuses).mockReturnValue({
       ...RUN_STATUSES,
       isRunRunning: true,
     })
@@ -140,14 +125,14 @@ describe('CalibrationHealthCheck', () => {
   })
 
   it('Health check button is disabled when pipette are not set', () => {
-    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
+    vi.mocked(useAttachedPipettes).mockReturnValue({ left: null, right: null })
     render()
     const button = screen.getByRole('button', { name: 'Check health' })
     expect(button).toBeDisabled()
   })
 
   it('Health check button shows Tooltip when pipette are not set', async () => {
-    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
+    vi.mocked(useAttachedPipettes).mockReturnValue({ left: null, right: null })
     render()
     const button = screen.getByRole('button', { name: 'Check health' })
     await userEvent.hover(button)
@@ -161,11 +146,11 @@ describe('CalibrationHealthCheck', () => {
   })
 
   it('health check button should be disabled if there is a running protocol', () => {
-    mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
-    mockUseAttachedPipetteCalibrations.mockReturnValue(
+    vi.mocked(useAttachedPipettes).mockReturnValue(mockAttachedPipettes)
+    vi.mocked(useAttachedPipetteCalibrations).mockReturnValue(
       mockAttachedPipetteCalibrations
     )
-    mockUseRunStatuses.mockReturnValue({
+    vi.mocked(useRunStatuses).mockReturnValue({
       ...RUN_STATUSES,
       isRunRunning: true,
     })

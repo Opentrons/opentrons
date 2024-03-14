@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { renderHook } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
@@ -12,17 +13,9 @@ import { useIsUnboxingFlowOngoing } from '../hooks'
 import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
 
-jest.mock('../../../../redux/config')
+vi.mock('../../../../redux/config')
 
-const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
-  typeof getOnDeviceDisplaySettings
->
-
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
-
-const store: Store<State> = createStore(jest.fn(), {})
+const store: Store<State> = createStore(vi.fn(), {})
 
 const mockDisplaySettings = {
   sleepMs: 604800000,
@@ -35,16 +28,12 @@ describe('useIsUnboxingFlowOngoing', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     wrapper = ({ children }) => <Provider store={store}>{children}</Provider>
-    mockGetOnDeviceDisplaySettings.mockReturnValue(mockDisplaySettings)
-    mockGetIsOnDevice.mockReturnValue(true)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(getOnDeviceDisplaySettings).mockReturnValue(mockDisplaySettings)
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
   })
 
   it('should return true if unfinishedUnboxingFlowRoute is /welcome', () => {
-    mockGetOnDeviceDisplaySettings.mockReturnValue({
+    vi.mocked(getOnDeviceDisplaySettings).mockReturnValue({
       ...mockDisplaySettings,
       unfinishedUnboxingFlowRoute: '/welcome',
     })
@@ -55,7 +44,7 @@ describe('useIsUnboxingFlowOngoing', () => {
   })
 
   it('should return true if unfinishedUnboxingFlowRoute is /emergency-stop', () => {
-    mockGetOnDeviceDisplaySettings.mockReturnValue({
+    vi.mocked(getOnDeviceDisplaySettings).mockReturnValue({
       ...mockDisplaySettings,
       unfinishedUnboxingFlowRoute: '/emergency-stop',
     })

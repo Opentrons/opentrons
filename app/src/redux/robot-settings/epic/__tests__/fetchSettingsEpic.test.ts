@@ -1,3 +1,4 @@
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
 
 import { mockRobot } from '../../../robot-api/__fixtures__'
@@ -12,38 +13,24 @@ import { robotSettingsEpic } from '..'
 import type { Action, State } from '../../../types'
 import type { RobotApiRequestMeta } from '../../../robot-api/types'
 
-jest.mock('../../../robot-api/http')
-jest.mock('../../../discovery/selectors')
-jest.mock('../../selectors')
+vi.mock('../../../robot-api/http')
+vi.mock('../../../discovery/selectors')
+vi.mock('../../selectors')
 
 const mockState: State = { state: true } as any
-
-const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
-  typeof RobotApiHttp.fetchRobotApi
->
-
-const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
-  typeof DiscoverySelectors.getRobotByName
->
-
-const mockGetAllRestartRequiredRobots = Selectors.getAllRestartRequiredRobots as jest.MockedFunction<
-  typeof Selectors.getAllRestartRequiredRobots
->
 
 describe('fetchSettingsEpic', () => {
   let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot as any)
-    mockGetAllRestartRequiredRobots.mockReturnValue([])
+    vi.mocked(DiscoverySelectors.getRobotByName).mockReturnValue(
+      mockRobot as any
+    )
+    vi.mocked(Selectors.getAllRestartRequiredRobots).mockReturnValue([])
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
     })
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   const meta: RobotApiRequestMeta = { requestId: '1234' } as any
@@ -54,7 +41,7 @@ describe('fetchSettingsEpic', () => {
 
   it('calls GET /settings', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
         cold('r', { r: Fixtures.mockFetchSettingsSuccess })
       )
 
@@ -65,8 +52,11 @@ describe('fetchSettingsEpic', () => {
       expectObservable(output$)
       flush()
 
-      expect(mockGetRobotByName).toHaveBeenCalledWith(mockState, mockRobot.name)
-      expect(mockFetchRobotApi).toHaveBeenCalledWith(mockRobot, {
+      expect(DiscoverySelectors.getRobotByName).toHaveBeenCalledWith(
+        mockState,
+        mockRobot.name
+      )
+      expect(RobotApiHttp.fetchRobotApi).toHaveBeenCalledWith(mockRobot, {
         method: 'GET',
         path: '/settings',
       })
@@ -75,7 +65,7 @@ describe('fetchSettingsEpic', () => {
 
   it('maps successful response to FETCH_SETTINGS_SUCCESS', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
         cold('r', { r: Fixtures.mockFetchSettingsSuccess })
       )
 
@@ -96,7 +86,7 @@ describe('fetchSettingsEpic', () => {
 
   it('maps failed response to FETCH_SETTINGS_FAILURE', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
         cold('r', { r: Fixtures.mockFetchSettingsFailure })
       )
 

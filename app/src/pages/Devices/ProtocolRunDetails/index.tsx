@@ -50,7 +50,7 @@ const baseRoundTabStyling = css`
   color: ${COLORS.black90};
   background-color: ${COLORS.purple30};
   border: 0px ${BORDERS.styleSolid} ${COLORS.purple30};
-  border-radius: ${BORDERS.borderRadiusSize2};
+  border-radius: ${BORDERS.borderRadius8};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   position: ${POSITION_RELATIVE};
 
@@ -75,7 +75,7 @@ const disabledRoundTabStyling = css`
 
 const RoundNavLink = styled(NavLink)`
   ${baseRoundTabStyling}
-  color: ${COLORS.grey60};
+  color: ${COLORS.black90};
 
   &:hover {
     background-color: ${COLORS.purple35};
@@ -239,9 +239,9 @@ function PageContents(props: PageContentsProps): JSX.Element {
         backgroundColor={COLORS.white}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${
-          protocolRunDetailsTab === 'setup' ? '0' : BORDERS.radiusSoftCorners
-        } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
-          BORDERS.radiusSoftCorners
+          protocolRunDetailsTab === 'setup' ? '0' : BORDERS.borderRadius4
+        } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
+          BORDERS.borderRadius4
         }`}
       >
         {protocolRunDetailsContent}

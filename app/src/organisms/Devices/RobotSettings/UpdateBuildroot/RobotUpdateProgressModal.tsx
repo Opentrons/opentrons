@@ -41,7 +41,7 @@ import type { RobotInitializationStatus } from '../../../../resources/health/hoo
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
   margin-bottom: ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius12};
   background: ${COLORS.grey30};
   width: 17.12rem;
 `

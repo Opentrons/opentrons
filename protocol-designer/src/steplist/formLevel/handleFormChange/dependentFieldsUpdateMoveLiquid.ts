@@ -1,4 +1,3 @@
-import assert from 'assert'
 import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
@@ -401,7 +400,7 @@ const clampDisposalVolume = (
   )
 
   if (maxDisposalVolume == null) {
-    assert(
+    console.assert(
       false,
       `clampDisposalVolume got null maxDisposalVolume for pipette, something weird happened`
     )

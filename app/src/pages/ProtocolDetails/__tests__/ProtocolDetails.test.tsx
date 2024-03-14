@@ -1,10 +1,10 @@
 import * as React from 'react'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { Route } from 'react-router'
-import { MemoryRouter } from 'react-router-dom'
-import '@testing-library/jest-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { when } from 'vitest-when'
+import { Route, MemoryRouter } from 'react-router-dom'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import {
   deleteProtocol,
   deleteRun,
@@ -21,7 +21,7 @@ import { i18n } from '../../../i18n'
 import { useHardwareStatusText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../../Protocols/hooks'
-import { formatTimeWithUtcLabel } from '../../../resources/runs/utils'
+import { formatTimeWithUtcLabel } from '../../../resources/runs'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
@@ -29,9 +29,9 @@ import { Labware } from '../Labware'
 
 // Mock IntersectionObserver
 class IntersectionObserver {
-  observe = jest.fn()
-  disconnect = jest.fn()
-  unobserve = jest.fn()
+  observe = vi.fn()
+  disconnect = vi.fn()
+  unobserve = vi.fn()
 }
 
 Object.defineProperty(window, 'IntersectionObserver', {
@@ -40,47 +40,19 @@ Object.defineProperty(window, 'IntersectionObserver', {
   value: IntersectionObserver,
 })
 
-jest.mock('@opentrons/api-client')
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
-jest.mock(
+vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
+vi.mock(
   '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 )
-jest.mock('../../Protocols/hooks')
-jest.mock('../Deck')
-jest.mock('../Hardware')
-jest.mock('../Labware')
+vi.mock('../../Protocols/hooks')
+vi.mock('../Deck')
+vi.mock('../Hardware')
+vi.mock('../Labware')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
-const mockCreateRun = jest.fn((id: string) => {})
-const mockHardware = Hardware as jest.MockedFunction<typeof Hardware>
-const mockLabware = Labware as jest.MockedFunction<typeof Labware>
-const mockDeck = Deck as jest.MockedFunction<typeof Deck>
-const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
-  typeof useCreateRunMutation
->
-const mockuseHost = useHost as jest.MockedFunction<typeof useHost>
-const mockGetProtocol = getProtocol as jest.MockedFunction<typeof getProtocol>
-const mockDeleteProtocol = deleteProtocol as jest.MockedFunction<
-  typeof deleteProtocol
->
-const mockDeleteRun = deleteRun as jest.MockedFunction<typeof deleteRun>
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
->
-const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
-  typeof useProtocolAnalysisAsDocumentQuery
->
-const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
-  typeof useMissingProtocolHardware
->
-const mockUseOffsetCandidatesForAnalysis = useOffsetCandidatesForAnalysis as jest.MockedFunction<
-  typeof useOffsetCandidatesForAnalysis
->
-
-const mockUseHardwareStatusText = useHardwareStatusText as jest.MockedFunction<
-  typeof useHardwareStatusText
->
+const mockCreateRun = vi.fn((id: string) => {})
 
 const MOCK_DATA = {
   data: {
@@ -116,30 +88,35 @@ const render = (path = '/protocols/fakeProtocolId') => {
 
 describe('ODDProtocolDetails', () => {
   beforeEach(() => {
-    mockUseCreateRunMutation.mockReturnValue({
+    vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
-    mockUseHardwareStatusText.mockReturnValue('mock missing hardware chip text')
-    mockUseOffsetCandidatesForAnalysis.mockReturnValue([])
-    mockUseMissingProtocolHardware.mockReturnValue({
+    vi.mocked(useHardwareStatusText).mockReturnValue(
+      'mock missing hardware chip text'
+    )
+    vi.mocked(useOffsetCandidatesForAnalysis).mockReturnValue([])
+    vi.mocked(useMissingProtocolHardware).mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
       conflictedSlots: [],
     })
-    mockUseProtocolQuery.mockReturnValue({
+    vi.mocked(useProtocolQuery).mockReturnValue({
       data: MOCK_DATA,
       isLoading: false,
     } as any)
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: {
         id: 'mockAnalysisId',
         status: 'completed',
       },
     } as any)
-    when(mockuseHost).calledWith().mockReturnValue(MOCK_HOST_CONFIG)
+    when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
+    vi.mocked(getProtocol).mockResolvedValue({
+      data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
+    } as any)
   })
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('renders protocol truncated name that expands when clicked', () => {
@@ -177,9 +154,9 @@ describe('ODDProtocolDetails', () => {
     screen.getByText('Pin protocol')
   })
   it('renders the delete protocol button', async () => {
-    when(mockGetProtocol)
+    when(vi.mocked(getProtocol))
       .calledWith(MOCK_HOST_CONFIG, 'fakeProtocolId')
-      .mockResolvedValue({
+      .thenResolve({
         data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
       } as any)
     render()
@@ -188,22 +165,22 @@ describe('ODDProtocolDetails', () => {
     const confirmDeleteButton = screen.getByText('Delete')
     fireEvent.click(confirmDeleteButton)
     await waitFor(() =>
-      expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
+      expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
     )
     await waitFor(() =>
-      expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
+      expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
     )
     await waitFor(() =>
-      expect(mockDeleteProtocol).toHaveBeenCalledWith(
+      expect(vi.mocked(deleteProtocol)).toHaveBeenCalledWith(
         MOCK_HOST_CONFIG,
         'fakeProtocolId'
       )
     )
   })
   it('renders the navigation buttons', () => {
-    mockHardware.mockReturnValue(<div>Mock Hardware</div>)
-    mockLabware.mockReturnValue(<div>Mock Labware</div>)
-    mockDeck.mockReturnValue(<div>Mock Initial Deck Layout</div>)
+    vi.mocked(Hardware).mockReturnValue(<div>Mock Hardware</div>)
+    vi.mocked(Labware).mockReturnValue(<div>Mock Labware</div>)
+    vi.mocked(Deck).mockReturnValue(<div>Mock Initial Deck Layout</div>)
     render()
     const hardwareButton = screen.getByRole('button', { name: 'Hardware' })
     fireEvent.click(hardwareButton)
@@ -221,7 +198,7 @@ describe('ODDProtocolDetails', () => {
     screen.getByText('A short mock protocol')
   })
   it('should render a loading skeleton while awaiting a response from the server', () => {
-    mockUseProtocolQuery.mockReturnValue({
+    vi.mocked(useProtocolQuery).mockReturnValue({
       data: MOCK_DATA,
       isLoading: true,
     } as any)

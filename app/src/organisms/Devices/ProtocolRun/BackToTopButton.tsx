@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-
+import { useRobot } from '../hooks'
+import { getRobotSerialNumber } from '../../../redux/discovery'
 import { SecondaryButton } from '@opentrons/components'
 
 import {
@@ -24,14 +25,16 @@ export function BackToTopButton({
 }: BackToTopButtonProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
   const trackEvent = useTrackEvent()
-
+  const robot = useRobot(robotName)
+  const robotSerialNumber =
+    robot?.status != null ? getRobotSerialNumber(robot) : null
   return (
     <Link
       to={`/devices/${robotName}/protocol-runs/${runId}/setup`}
       onClick={() => {
         trackEvent({
           name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-          properties: { sourceLocation },
+          properties: { sourceLocation, robotSerialNumber },
         })
         protocolRunHeaderRef?.current?.scrollIntoView({
           behavior: 'smooth',

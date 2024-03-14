@@ -18,7 +18,7 @@ import { TextField } from './TextField'
 import type { FieldProps, FieldPropsByName } from '../types'
 import type { PathOption, StepType } from '../../../form-types'
 
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 interface DropdownFormFieldProps extends FieldProps {
   className?: string

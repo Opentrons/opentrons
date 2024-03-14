@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { screen, fireEvent } from '@testing-library/react'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { InterstitialTitleBar } from '../InterstitiallTitleBar'
 
 const render = (props: React.ComponentProps<typeof InterstitialTitleBar>) => {
@@ -9,24 +10,22 @@ const render = (props: React.ComponentProps<typeof InterstitialTitleBar>) => {
 
 describe('TitleBar', () => {
   let props: React.ComponentProps<typeof InterstitialTitleBar>
-  const EXIT = { title: 'EXIT', onClick: jest.fn(), children: 'EXIT' }
+  const EXIT = { title: 'EXIT', onClick: vi.fn(), children: 'EXIT' }
+
   beforeEach(() => {
     props = {
       title: 'TITLE',
       exit: EXIT,
     }
   })
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('should render everything when back is defined and clicks button', () => {
-    const { getByText, getByLabelText, getByRole } = render(props)
-    getByText('TITLE')
-    getByLabelText('ot-logo')
-    getByLabelText('close')
-    getByText('EXIT')
-    const button = getByRole('button', { name: /close_btn/i })
+    render(props)
+    screen.getByText('TITLE')
+    screen.getByLabelText('ot-logo')
+    screen.getByLabelText('close')
+    screen.getByText('EXIT')
+    const button = screen.getByRole('button', { name: /close_btn/i })
     expect(button).toBeEnabled()
     fireEvent.click(button)
     expect(EXIT.onClick).toBeCalled()

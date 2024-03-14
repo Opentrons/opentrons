@@ -19,6 +19,9 @@ export interface LegacyModalProps extends StyleProps {
   footer?: React.ReactNode
 }
 
+/**
+ * For Desktop app use only.
+ */
 export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
   const {
     type = 'info',
@@ -67,8 +70,8 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
       header={modalHeader}
       onOutsideClick={closeOnOutsideClick ?? false ? onClose : undefined}
       // center within viewport aside from nav
-      marginLeft={styleProps.marginLeft ?? '7.125rem'}
-      {...props}
+      marginLeft={styleProps.marginLeft ?? '5.656rem'}
+      {...styleProps}
       footer={footer}
     >
       <Box padding={childrenPadding}>{children}</Box>

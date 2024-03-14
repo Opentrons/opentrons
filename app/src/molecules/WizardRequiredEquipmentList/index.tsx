@@ -53,7 +53,7 @@ export function WizardRequiredEquipmentList(
           <Flex
             backgroundColor="#16212D33"
             flexDirection={DIRECTION_COLUMN}
-            borderRadius={BORDERS.borderRadiusSize3}
+            borderRadius={BORDERS.borderRadius12}
             width="428px"
           >
             {equipmentList.map((requiredEquipmentProps, index) => (
@@ -99,7 +99,7 @@ export function WizardRequiredEquipmentList(
             <StyledText
               marginTop={SPACING.spacing8}
               as="label"
-              color={COLORS.grey50}
+              color={COLORS.grey60}
             >
               {footer}
             </StyledText>

@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { getLatestCurrentOffsets } from '../utils'
 import type { LabwareOffset } from '@opentrons/api-client'
 

@@ -12,7 +12,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 
-from robot_server.errors import ApiError
+from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import MultiBodyMeta
 
 from robot_server.runs.run_store import RunStore, CommandNotFoundError
@@ -249,6 +249,24 @@ async def test_get_run_commands(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
     """It should return a list of all commands in a run."""
+    long_note = pe_commands.CommandNote(
+        noteKind="warning",
+        shortMessage="this is a warning.",
+        longMessage="""
+            hello, friends. I bring a warning....
+
+
+
+            FROM THE FUTURE!
+            """,
+        source="test",
+    )
+    unenumed_note = pe_commands.CommandNote(
+        noteKind="lahsdlasd",
+        shortMessage="Oh no",
+        longMessage="its a notekind not in the enum",
+        source="test2",
+    )
     command = pe_commands.WaitForResume(
         id="command-id",
         key="command-key",
@@ -264,6 +282,7 @@ async def test_get_run_commands(
             createdAt=datetime(year=2024, month=4, day=4),
             detail="Things are not looking good.",
         ),
+        notes=[long_note, unenumed_note],
     )
 
     decoy.when(mock_run_data_manager.get_current_command("run-id")).then_return(
@@ -306,6 +325,7 @@ async def test_get_run_commands(
                 createdAt=datetime(year=2024, month=4, day=4),
                 detail="Things are not looking good.",
             ),
+            notes=[long_note, unenumed_note],
         )
     ]
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)

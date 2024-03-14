@@ -11,7 +11,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
@@ -36,7 +35,7 @@ import { TertiaryButton } from '../../../../atoms/buttons'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { StyledText } from '../../../../atoms/text'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useChainLiveCommands } from '../../../../resources/runs/hooks'
+import { useChainLiveCommands } from '../../../../resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { getModulePrepCommands } from '../../getModulePrepCommands'
@@ -283,14 +282,7 @@ export function ModulesListItem({
         onClick={() => setShowModuleSetupModal(true)}
       >
         <Flex flexDirection={DIRECTION_ROW}>
-          <Icon
-            name="information"
-            size="0.75rem"
-            marginTop={SPACING.spacing4}
-          />
-          <StyledText marginLeft={SPACING.spacing4} as="p">
-            {t('view_setup_instructions')}
-          </StyledText>
+          <StyledText as="p">{t('view_setup_instructions')}</StyledText>
         </Flex>
       </Btn>
     )
@@ -381,7 +373,7 @@ export function ModulesListItem({
         border={BORDERS.styleSolid}
         borderColor={COLORS.grey30}
         borderWidth="1px"
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         padding={SPACING.spacing16}
         backgroundColor={COLORS.white}
       >
@@ -446,7 +438,7 @@ export function ModulesListItem({
               <StatusLabel
                 status={t('n_a')}
                 backgroundColor={COLORS.grey30}
-                textColor={COLORS.grey50}
+                textColor={COLORS.grey60}
                 showIcon={false}
                 capitalizeStatus={false}
               />

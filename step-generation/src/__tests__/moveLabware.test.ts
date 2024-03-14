@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
 import {
   HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
@@ -38,7 +39,7 @@ describe('moveLabware', () => {
     }
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   it('should return a moveLabware command for manualMoveWithPause given only the required params', () => {
     const params = {
@@ -308,6 +309,9 @@ describe('moveLabware', () => {
         tipracks: {
           tiprack1Id: { A1: true },
         },
+        pipettes: {
+          p10SingleId: false,
+        },
       },
     } as any) as RobotState
     const params = {
@@ -411,6 +415,32 @@ describe('moveLabware', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'GRIPPER_REQUIRED',
+    })
+  })
+  it('should return an error when trying to move a labware with the gripper when a pipette has a tip on it still', () => {
+    const robotStateWithTipOnPip = ({
+      ...robotState,
+      tipState: {
+        tipracks: {
+          tiprack1Id: { A1: true },
+        },
+        pipettes: {
+          p10SingleId: true,
+        },
+      },
+    } as any) as RobotState
+
+    const params = {
+      commandCreatorFnName: 'moveLabware',
+      labware: SOURCE_LABWARE,
+      useGripper: true,
+      newLocation: { addressableAreaName: 'gripperWasteChute' },
+    } as MoveLabwareArgs
+
+    const result = moveLabware(params, invariantContext, robotStateWithTipOnPip)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'PIPETTE_HAS_TIP',
     })
   })
 })

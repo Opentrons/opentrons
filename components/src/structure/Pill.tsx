@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import styles from './Pill.css'
+import styles from './Pill.module.css'
 
 import type { UseHoverTooltipTargetProps } from '../tooltips'
 

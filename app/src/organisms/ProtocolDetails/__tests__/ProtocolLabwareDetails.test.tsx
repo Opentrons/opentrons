@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, beforeEach } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolLabwareDetails } from '../ProtocolLabwareDetails'
 
@@ -128,10 +130,10 @@ describe('ProtocolLabwareDetails', () => {
       completedAt: '2022-04-18T19:16:57.403198+00:00',
     } as LoadLabwareRunTimeCommand)
 
-    const { getByText } = render(props)
-    getByText('Labware name')
-    getByText('NEST 96 Well Plate 100 µL PCR Full Skirt')
-    getByText('Quantity')
-    getByText('2')
+    render(props)
+    screen.getByText('Labware name')
+    screen.getByText('NEST 96 Well Plate 100 µL PCR Full Skirt')
+    screen.getByText('Quantity')
+    screen.getByText('2')
   })
 })

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 // application menu
-import { Menu } from 'electron'
+import { Menu, shell } from 'electron'
 import type { MenuItemConstructorOptions } from 'electron'
 
 import { LOG_DIR } from './log'
@@ -23,20 +23,22 @@ const helpMenu: MenuItemConstructorOptions = {
       label: 'Learn More',
       click: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        require('electron').shell.openExternal('https://opentrons.com/')
+        shell.openExternal('https://opentrons.com/')
       },
     },
     {
-      label: `View ${_PKG_PRODUCT_NAME_} App Logs`,
+      // @ts-expect-error can't get TS to recognize global.d.ts
+      label: `View ${global._PKG_PRODUCT_NAME_} App Logs`,
       click: () => {
-        require('electron').shell.openPath(LOG_DIR)
+        shell.openPath(LOG_DIR)
       },
     },
     {
       label: 'Report an Issue',
       click: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        require('electron').shell.openExternal(_PKG_BUGS_URL_)
+        // @ts-expect-error can't get TS to recognize global.d.ts
+        shell.openExternal(global._PKG_BUGS_URL_)
       },
     },
   ],

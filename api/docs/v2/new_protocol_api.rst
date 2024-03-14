@@ -38,7 +38,6 @@ Labware
 
 .. autoclass:: opentrons.protocol_api.WasteChute()
 
-
 Wells and Liquids
 =================
 .. autoclass:: opentrons.protocol_api.Well

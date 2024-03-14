@@ -41,7 +41,7 @@ from opentrons.protocols import parse
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
     should_load_fixed_trash,
-    should_load_fixed_trash_for_python_protocol,
+    should_load_fixed_trash_labware_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.execution import execute as execute_apiv2
@@ -540,7 +540,9 @@ def _create_live_context_pe(
             config=_get_protocol_engine_config(),
             drop_tips_after_run=False,
             post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
-            load_fixed_trash=should_load_fixed_trash_for_python_protocol(api_version),
+            load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
+                api_version
+            ),
         )
     )
 

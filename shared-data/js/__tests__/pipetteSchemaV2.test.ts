@@ -1,6 +1,7 @@
 import Ajv from 'ajv'
 import glob from 'glob'
 import path from 'path'
+import { describe, expect, it } from 'vitest'
 
 import liquidSpecsSchema from '../../pipette/schemas/2/pipetteLiquidPropertiesSchema.json'
 import geometrySpecsSchema from '../../pipette/schemas/2/pipetteGeometrySchema.json'

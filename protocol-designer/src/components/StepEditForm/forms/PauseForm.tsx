@@ -18,10 +18,9 @@ import {
 } from '../../../constants'
 import { TextField, RadioGroupField, StepFormDropdown } from '../fields'
 import { getSingleSelectDisabledTooltip } from '../utils'
+import styles from '../StepEditForm.module.css'
 
 import type { StepFormProps } from '../types'
-
-import styles from '../StepEditForm.css'
 
 export const PauseForm = (props: StepFormProps): JSX.Element => {
   const tempModuleLabwareOptions = useSelector(

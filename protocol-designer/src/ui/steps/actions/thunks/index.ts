@@ -1,4 +1,3 @@
-import assert from 'assert'
 import last from 'lodash/last'
 import {
   getUnsavedForm,
@@ -167,7 +166,7 @@ export const saveStepForm: () => ThunkAction<any> = () => (
 
   // this check is only for Flow. At this point, unsavedForm should always be populated
   if (!unsavedForm) {
-    assert(
+    console.assert(
       false,
       'Tried to saveStepForm with falsey unsavedForm. This should never be able to happen.'
     )
@@ -204,7 +203,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
 
   // this check is only for Flow. At this point, unsavedForm should always be populated
   if (!unsavedSetTemperatureForm) {
-    assert(
+    console.assert(
       false,
       'Tried to saveSetTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
     )
@@ -215,7 +214,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
 
   if (!isPristineSetTempForm) {
     // this check should happen upstream (before dispatching saveSetTempFormWithAddedPauseUntilTemp in the first place)
-    assert(
+    console.assert(
       false,
       `tried to saveSetTempFormWithAddedPauseUntilTemp but form ${id} is not a pristine set temp form`
     )
@@ -224,7 +223,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
 
   const temperature = unsavedSetTemperatureForm?.targetTemperature
 
-  assert(
+  console.assert(
     temperature != null && temperature !== '',
     `tried to auto-add a pause until temp, but targetTemperature is missing: ${temperature}`
   )
@@ -268,7 +267,10 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> = ()
   if (unsavedPauseForm != null) {
     dispatch(_saveStepForm(unsavedPauseForm))
   } else {
-    assert(false, 'could not auto-save pause form, getUnsavedForm returned')
+    console.assert(
+      false,
+      'could not auto-save pause form, getUnsavedForm returned'
+    )
   }
 }
 
@@ -283,7 +285,7 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
   )
 
   if (!unsavedHeaterShakerForm) {
-    assert(
+    console.assert(
       false,
       'Tried to saveSetHeaterShakerTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
     )
@@ -293,7 +295,7 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
   const { id } = unsavedHeaterShakerForm
 
   if (!isPristineSetHeaterShakerTempForm) {
-    assert(
+    console.assert(
       false,
       `tried to saveSetHeaterShakerTempFormWithAddedPauseUntilTemp but form ${id} is not a pristine set heater shaker temp form`
     )
@@ -302,7 +304,7 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
 
   const temperature = unsavedHeaterShakerForm?.targetHeaterShakerTemperature
 
-  assert(
+  console.assert(
     temperature != null && temperature !== '',
     `tried to auto-add a pause until temp, but targetHeaterShakerTemperature is missing: ${temperature}`
   )
@@ -341,6 +343,9 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
   if (unsavedPauseForm != null) {
     dispatch(_saveStepForm(unsavedPauseForm))
   } else {
-    assert(false, 'could not auto-save pause form, getUnsavedForm returned')
+    console.assert(
+      false,
+      'could not auto-save pause form, getUnsavedForm returned'
+    )
   }
 }
