@@ -599,13 +599,13 @@ interface IntParameter {
   default: number
 }
 
-interface EnumChoice {
+interface Choice {
   displayName: string
-  value: string
+  value: unknown
 }
 
-interface EnumParameter {
-  choices: EnumChoice[]
+interface ChoiceParameter {
+  choices: Choice[]
   default: string
 }
 
@@ -613,11 +613,14 @@ interface BooleanParameter {
   default: boolean
 }
 
-type RunTimeParameter = IntParameter | EnumParameter | BooleanParameter
+type RunTimeParamterTypes = 'int' | 'float' | 'str' | 'boolean'
+
+type RunTimeParameter = IntParameter | ChoiceParameter | BooleanParameter
 interface BaseRunTimeParameters {
   displayName: string
   variableName: string
   description: string
+  type: RunTimeParamterTypes
   suffix?: string
 }
 
