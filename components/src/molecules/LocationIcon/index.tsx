@@ -33,7 +33,7 @@ const LOCATION_ICON_STYLE = css<{
 }>`
   align-items: ${ALIGN_CENTER};
   border: 2px solid ${props => props.color ?? COLORS.black90};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius12};
   height: ${props => props.height ?? SPACING.spacing32};
   width: ${props => props.width ?? 'max-content'};
   padding: ${SPACING.spacing4}

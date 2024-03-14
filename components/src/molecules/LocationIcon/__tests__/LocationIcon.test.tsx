@@ -27,9 +27,7 @@ describe('LocationIcon', () => {
     expect(locationIcon).toHaveStyle('height: 2rem')
     expect(locationIcon).toHaveStyle('width: max-content')
     expect(locationIcon).toHaveStyle(`border: 2px solid ${COLORS.black90}`)
-    expect(locationIcon).toHaveStyle(
-      `border-radius: ${BORDERS.borderRadiusSize3}`
-    )
+    expect(locationIcon).toHaveStyle(`border-radius: ${BORDERS.borderRadius12}`)
   })
 
   it('should render slot name', () => {

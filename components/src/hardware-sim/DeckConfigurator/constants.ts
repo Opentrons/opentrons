@@ -25,7 +25,7 @@ export const CONFIG_STYLE_READ_ONLY = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.grey50};
-  border-radius: ${BORDERS.borderRadiusSize1};
+  border-radius: ${BORDERS.borderRadius4};
   color: ${COLORS.white};
   grid-gap: ${SPACING.spacing8};
   justify-content: ${JUSTIFY_CENTER};

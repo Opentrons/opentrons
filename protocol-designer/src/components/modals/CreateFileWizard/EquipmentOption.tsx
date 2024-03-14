@@ -18,7 +18,7 @@ import type { StyleProps } from '@opentrons/components'
 
 const EQUIPMENT_OPTION_STYLE = css`
   background-color: ${COLORS.white};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius12};
   border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
 
   &:hover {
@@ -93,7 +93,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             ? BORDERS.activeLineBorder
             : BORDERS.lineBorder
         }
-        borderRadius={BORDERS.borderRadiusSize2}
+        borderRadius={BORDERS.borderRadius8}
         cursor={disabled ? 'auto' : 'pointer'}
         backgroundColor={disabled ? COLORS.grey30 : COLORS.transparent}
         onClick={disabled ? undefined : onClick}

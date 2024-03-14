@@ -24,7 +24,7 @@ export function ServerInitializing(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       height="27.25rem"
       justifyContent={JUSTIFY_CENTER}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
       gridGap={SPACING.spacing32}
     >
       <Icon name="ot-spinner" spin size="6rem" color={COLORS.grey60} />

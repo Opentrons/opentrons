@@ -10,7 +10,7 @@ const defaultTabStyle = css`
   color: ${COLORS.black90};
   background-color: ${COLORS.purple30};
   border: 0px ${BORDERS.styleSolid} ${COLORS.purple30};
-  border-radius: ${BORDERS.borderRadiusSize2};
+  border-radius: ${BORDERS.borderRadius8};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   position: ${POSITION_RELATIVE};
 

@@ -94,7 +94,7 @@ export const FlexTrash = ({
         <Flex
           alignItems={ALIGN_CENTER}
           backgroundColor={backgroundColor}
-          borderRadius={BORDERS.radiusSoftCorners}
+          borderRadius={BORDERS.borderRadius4}
           justifyContent={JUSTIFY_CENTER}
           gridGap={SPACING.spacing8}
           width="100%"

@@ -77,7 +77,7 @@ const EMPTY_CONFIG_STYLE = css`
   justify-content: ${JUSTIFY_CENTER};
   background-color: ${COLORS.blue30};
   border: 3px dashed ${COLORS.blue50};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   width: 100%;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

@@ -33,7 +33,7 @@ const SettingButton = styled.input`
 
 const SettingButtonLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize4};
+  border-radius: ${BORDERS.borderRadius16};
   cursor: pointer;
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.blue50 : COLORS.blue35};

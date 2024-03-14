@@ -53,7 +53,7 @@ const LIQUID_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
   border-color: ${COLORS.grey30};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
 `
 
 export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
@@ -319,7 +319,7 @@ export const LiquidsListItemDetails = (
       </Flex>
       <Flex
         backgroundColor={COLORS.black90 + '1A'}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         height="max-content"
         paddingY={SPACING.spacing4}
         paddingX={SPACING.spacing8}

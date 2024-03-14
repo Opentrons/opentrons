@@ -11,13 +11,13 @@ export function ProtocolSetupTitleSkeleton(): JSX.Element {
         height="2.25rem"
         width="11.937rem"
         backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
       />
       <Skeleton
         height="2.25rem"
         width="28rem"
         backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
       />
     </>
   )
@@ -29,7 +29,7 @@ const SetupSkeleton = (): JSX.Element => {
       height="5.5rem"
       width="100%"
       backgroundSize="99rem"
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
     />
   )
 }

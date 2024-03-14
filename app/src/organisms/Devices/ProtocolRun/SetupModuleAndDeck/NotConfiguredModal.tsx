@@ -62,7 +62,7 @@ export const NotConfiguredModal = (
           <Flex
             padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
             backgroundColor={COLORS.grey30}
-            borderRadius={BORDERS.radiusSoftCorners}
+            borderRadius={BORDERS.borderRadius4}
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >

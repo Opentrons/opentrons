@@ -105,7 +105,7 @@ export function Banner(props: BannerProps): JSX.Element {
       font-size: 1.25rem;
       font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
       background-color: ${COLORS.yellow35};
-      border-radius: ${BORDERS.borderRadiusSize3};
+      border-radius: ${BORDERS.borderRadius12};
       line-height: 1.5rem;
     }
   `

@@ -169,7 +169,7 @@ export function DeviceResetSlideout({
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.yellow30}
-          borderRadius={BORDERS.borderRadiusSize1}
+          borderRadius={BORDERS.borderRadius4}
           padding={SPACING.spacing8}
           marginBottom={SPACING.spacing24}
         >

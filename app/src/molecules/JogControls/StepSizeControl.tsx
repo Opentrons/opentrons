@@ -174,7 +174,7 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
       flex="3"
       flexDirection={DIRECTION_COLUMN}
       border={`1px solid ${COLORS.grey50}`}
-      borderRadius={BORDERS.borderRadiusSize4}
+      borderRadius={BORDERS.borderRadius16}
       padding={SPACING.spacing16}
       gridGap={SPACING.spacing16}
     >

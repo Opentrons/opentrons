@@ -93,7 +93,7 @@ describe('MediumButton', () => {
     }
     render(props)
     expect(screen.getByRole('button')).toHaveStyle(
-      `border-radius: ${BORDERS.borderRadiusSize5}`
+      `border-radius: ${BORDERS.borderRadius40}`
     )
   })
 })

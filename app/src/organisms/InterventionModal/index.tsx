@@ -59,7 +59,7 @@ const MODAL_STYLE = {
   maxHeight: '100%',
   width: '47rem',
   border: `6px ${BORDERS.styleSolid} ${COLORS.blue50}`,
-  borderRadius: BORDERS.radiusSoftCorners,
+  borderRadius: BORDERS.borderRadius4,
   boxShadow: BORDERS.smallDropShadow,
 } as const
 
@@ -79,8 +79,8 @@ const CONTENT_STYLE = {
   alignItems: ALIGN_FLEX_START,
   gridGap: SPACING.spacing24,
   padding: `${SPACING.spacing32}`,
-  borderRadius: `0px 0px ${String(BORDERS.radiusSoftCorners)} ${String(
-    BORDERS.radiusSoftCorners
+  borderRadius: `0px 0px ${String(BORDERS.borderRadius4)} ${String(
+    BORDERS.borderRadius4
   )}`,
 } as const
 
