@@ -37,7 +37,7 @@ export const MountItem = styled.div<{ isReady: boolean }>`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadius12};
+  border-radius: ${BORDERS.borderRadius8};
   background-color: ${({ isReady }) =>
     isReady ? COLORS.green35 : COLORS.yellow35};
   &:active {
