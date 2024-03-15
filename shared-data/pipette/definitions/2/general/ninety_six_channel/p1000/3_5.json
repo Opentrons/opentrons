@@ -47,7 +47,7 @@
   "channels": 96,
   "shaftDiameter": 4.5,
   "shaftULperMM": 15.904,
-  "backlashDistance": 0.3,
+  "backlashDistance": 0.5,
   "quirks": [],
   "plungerHomingConfigurations": {
     "current": 0.8,
