@@ -69,7 +69,7 @@ function ProtocolParameterItems({
       case 'float':
         return defaultValue.toString()
       case 'boolean':
-        return Boolean(defaultValue) ? 'On' : 'Off'
+        return Boolean(defaultValue) ? t('on') : t('off')
       case 'str':
         if ('choices' in runTimeParameter && runTimeParameter.choices != null) {
           const choice = runTimeParameter.choices.find(
@@ -89,22 +89,23 @@ function ProtocolParameterItems({
     minMax: string
   ): string => {
     const { type, default: defaultValue } = runTimeParameter
+    const count =
+      'choices' in runTimeParameter ? runTimeParameter.choices.length : 0
 
     switch (type) {
       case 'int':
       case 'float':
         return minMax
       case 'boolean':
-        return 'On, off'
+        return t('on_off')
       case 'str':
         if (defaultValue === 'left' || defaultValue === 'right') {
-          return 'Left, right'
-        } else {
-          return 'Multi'
+          return t('left_right')
+        } else if (count > 1) {
+          return t('choices', { count })
         }
-      default:
-        return ''
     }
+    return ''
   }
 
   return (

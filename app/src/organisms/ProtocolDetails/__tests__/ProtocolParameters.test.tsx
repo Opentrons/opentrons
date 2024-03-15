@@ -115,7 +115,7 @@ describe('ProtocolParameters', () => {
 
     screen.getByText('pipette mount')
     screen.getByText('Left')
-    screen.getByText('Left, right')
+    screen.getByText('Left, Right')
   })
 
   it('should render empty display when protocol does not have any parameter', () => {
