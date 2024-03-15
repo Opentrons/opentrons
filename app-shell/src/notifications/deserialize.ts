@@ -37,15 +37,11 @@ export function sendDeserializedGenericError({
   hostname,
   topic,
 }: Omit<SendToBrowserParams, 'message'>): void {
-  try {
-    const browserWindow = connectionStore.getBrowserWindow()
-    browserWindow?.webContents.send(
-      'notify',
-      hostname,
-      topic,
-      FAILURE_STATUSES.ECONNFAILED
-    )
-  } catch {} // Prevents shell erroring during app shutdown event.
+  sendDeserialized({
+    hostname,
+    topic,
+    message: FAILURE_STATUSES.ECONNFAILED,
+  })
 }
 
 export function deserializeExpectedMessages(

@@ -42,14 +42,16 @@ export function cleanUpUnreachableRobots(
 ): Promise<void> {
   return new Promise(() => {
     const healthyRobotIPsSet = new Set(healthyRobotIPs)
-    const unreachableRobots = Object.keys(connectionStore).filter(hostname => {
-      // The connection is forcefully closed, so remove from the connection store immediately to reduce disconnect packets.
-      if (!healthyRobotIPsSet.has(hostname)) {
-        connectionStore.deleteHost(hostname)
-        return true
-      }
-      return false
-    })
+    const unreachableRobots = connectionStore
+      .getUnreachableHosts()
+      .filter(hostname => {
+        // The connection is forcefully closed, so remove from the connection store immediately to reduce disconnect packets.
+        if (!healthyRobotIPsSet.has(hostname)) {
+          connectionStore.deleteHost(hostname)
+          return true
+        }
+        return false
+      })
     void closeConnectionsForcefullyFor(unreachableRobots)
   })
 }
@@ -162,10 +164,7 @@ function establishListeners({
 
   client.on('end', () => {
     notifyLog.debug(`Closed connection to ${hostname}`)
-    sendDeserializedGenericError({
-      hostname,
-      topic: 'ALL_TOPICS',
-    })
+    connectionStore.deleteHost(hostname)
   })
 
   client.on('disconnect', packet => {

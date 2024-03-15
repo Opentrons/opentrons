@@ -54,6 +54,10 @@ class ConnectionStore {
     }
   }
 
+  public getUnreachableHosts(): string[] {
+    return Object.keys(this.unreachableHosts)
+  }
+
   public setBrowserWindow(window: BrowserWindow): void {
     this.browserWindow = window
   }
