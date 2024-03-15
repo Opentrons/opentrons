@@ -111,7 +111,7 @@ describe('ProtocolParameters', () => {
 
     screen.getByText('Default Module Offsets')
     screen.getByText('No offsets')
-    screen.getByText('Multi')
+    screen.getByText('3 choices')
 
     screen.getByText('pipette mount')
     screen.getByText('Left')
