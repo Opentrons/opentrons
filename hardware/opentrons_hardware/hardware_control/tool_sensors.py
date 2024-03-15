@@ -32,19 +32,6 @@ from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
 )
-from opentrons_hardware.firmware_bindings.messages.payloads import (
-    BindSensorOutputRequestPayload,
-    SendAccumulatedPressureDataPayload,
-)
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    BindSensorOutputRequest,
-    SendAccumulatedPressureDataRequest,
-)
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    SensorOutputBindingField,
-    SensorTypeField,
-    SensorIdField,
-)
 from opentrons_hardware.sensors.sensor_types import SensorInformation, PressureSensor
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.sensors.utils import SensorThresholdInformation
@@ -115,7 +102,10 @@ async def run_pass_output_to_csv(
     threshold_pascals: float,
     head_node: NodeId,
     move_group: MoveGroupRunner,
+    data_file: Optional[str] = None,
 ) -> Dict[NodeId, MotorPositionStatus]:
+    """Runs the sensor pass move group and creates a csv file with the results."""
+    log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
     file_heading = [
         "time(s)",
         "Pressure(pascals)",
@@ -126,7 +116,7 @@ async def run_pass_output_to_csv(
     sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold_pascals]
     sensor_capturer = LogListener(
         mount=head_node,
-        data_file="/var/pressure_sensor_data.csv",
+        data_file=log_file,
         file_heading=file_heading,
         sensor_metadata=sensor_metadata,
     )
@@ -143,6 +133,8 @@ async def run_pass_output_to_csv(
 
 
 class OutputOptions(Enum):
+    """Specifies where we should report sensor data to during a sensor pass."""
+
     write_to_csv = auto()
     can_bus_only = auto()
     none = auto()
@@ -161,10 +153,8 @@ async def liquid_probe(
     auto_zero_sensor: bool = True,
     num_baseline_reads: int = 10,
     sensor_id: SensorId = SensorId.S0,
-    canbus_output: bool = True,
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""
-    log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     pressure_sensor = PressureSensor.build(
@@ -200,6 +190,7 @@ async def liquid_probe(
             threshold_pascals,
             head_node,
             sensor_runner,
+            data_file,
         )
 
     elif output_format == OutputOptions.can_bus_only:

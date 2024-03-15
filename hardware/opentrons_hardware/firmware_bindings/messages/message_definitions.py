@@ -205,7 +205,7 @@ class AddLinearMoveRequest(BaseMessage):  # noqa: D101
 
 
 @dataclass
-class AddSensorLinearMoveRequest(BaseMessage):  # noqa: D101
+class AddSensorLinearMoveRequest(BaseMessage):
     """Sensor Linear Move Request."""
 
     payload: payloads.AddSensorLinearMoveBasePayload

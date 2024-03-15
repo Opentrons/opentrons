@@ -41,6 +41,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     check_overpressure,
     InstrumentProbeTarget,
     PipetteProbeTarget,
+    OutputOptions,
 )
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -180,7 +181,7 @@ async def test_liquid_probe(
         mount_speed=10,
         plunger_speed=8,
         threshold_pascals=threshold_pascals,
-        log_pressure=False,
+        output_format=OutputOptions.none,
         auto_zero_sensor=True,
         num_baseline_reads=8,
         sensor_id=SensorId.S0,
@@ -209,7 +210,7 @@ async def test_liquid_probe(
             mount_speed=10,
             plunger_speed=8,
             threshold_pascals=threshold_pascals,
-            log_pressure=True,
+            output_format=OutputOptions.none,
             auto_zero_sensor=True,
             num_baseline_reads=8,
             sensor_id=SensorId.S0,
