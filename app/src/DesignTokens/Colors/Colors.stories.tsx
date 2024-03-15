@@ -74,7 +74,7 @@ const Template: Story<ColorsStorybookProps> = args => {
           gridGap={SPACING.spacing4}
           width="20rem"
           height="6rem"
-          borderRadius={BORDERS.borderRadiusSize2}
+          borderRadius={BORDERS.borderRadius8}
           onClick={() => handleClick(color[0])}
           style={{ cursor: 'pointer' }}
           border={`2px solid ${COLORS.black90}`}

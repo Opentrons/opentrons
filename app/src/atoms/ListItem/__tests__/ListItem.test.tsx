@@ -28,7 +28,7 @@ describe('ListItem', () => {
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
-    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadiusSize3}`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
   })
   it('should render correct style - noActive', () => {
     props.type = 'noActive'
@@ -39,7 +39,7 @@ describe('ListItem', () => {
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
-    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadiusSize3}`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
   })
   it('should render correct style - success', () => {
     props.type = 'success'
@@ -50,7 +50,7 @@ describe('ListItem', () => {
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
-    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadiusSize3}`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
   })
   it('should render correct style - warning', () => {
     props.type = 'warning'
@@ -61,6 +61,6 @@ describe('ListItem', () => {
     expect(listItem).toHaveStyle(
       `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
-    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadiusSize3}`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius12}`)
   })
 })

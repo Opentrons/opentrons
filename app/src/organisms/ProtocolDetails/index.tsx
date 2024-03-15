@@ -86,7 +86,7 @@ const GRID_STYLE = css`
 `
 
 const ZOOM_ICON_STYLE = css`
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   &:hover {
     background: ${COLORS.grey30};
   }
@@ -403,7 +403,7 @@ export function ProtocolDetails(
 
           <Flex
             backgroundColor={COLORS.white}
-            borderRadius={BORDERS.radiusSoftCorners}
+            borderRadius={BORDERS.borderRadius4}
             position={POSITION_RELATIVE}
             flexDirection={DIRECTION_ROW}
             width="100%"
@@ -550,7 +550,7 @@ export function ProtocolDetails(
               flex={`0 0 ${String(SIZE_5)}`}
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.white}
-              borderRadius={BORDERS.borderRadiusSize2}
+              borderRadius={BORDERS.borderRadius8}
               height="100%"
               data-testid="ProtocolDetails_deckMap"
             >
@@ -662,11 +662,9 @@ export function ProtocolDetails(
                 backgroundColor={COLORS.white}
                 // remove left upper corner border radius when first tab is active
                 borderRadius={`${
-                  currentTab === 'robot_config'
-                    ? '0'
-                    : BORDERS.radiusSoftCorners
-                } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
-                  BORDERS.radiusSoftCorners
+                  currentTab === 'robot_config' ? '0' : BORDERS.borderRadius4
+                } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
+                  BORDERS.borderRadius4
                 }`}
                 padding={SPACING.spacing16}
               >

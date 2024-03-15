@@ -157,7 +157,7 @@ export function ProtocolCard(props: {
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
       backgroundColor={isFailedAnalysis ? COLORS.red35 : COLORS.grey35}
-      borderRadius={BORDERS.borderRadiusSize4}
+      borderRadius={BORDERS.borderRadius16}
       marginBottom={SPACING.spacing8}
       gridGap={SPACING.spacing48}
       onClick={() => handleProtocolClick(longpress, protocol.id)}

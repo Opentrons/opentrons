@@ -45,7 +45,7 @@ interface TabbedButtonProps extends React.ComponentProps<typeof Btn> {
 export const TabbedButton = styled(Btn)<TabbedButtonProps>`
   ${props =>
     css`
-      border-radius: ${BORDERS.borderRadiusSize4};
+      border-radius: ${BORDERS.borderRadius16};
       box-shadow: none;
       font-size: ${TYPOGRAPHY.fontSize22};
       font-weight: ${TYPOGRAPHY.fontWeightSemiBold};

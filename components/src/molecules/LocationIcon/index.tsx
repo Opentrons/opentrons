@@ -4,8 +4,8 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER } from '../../styles'
-import { BORDERS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { BORDERS, COLORS } from '../../helix-design-system'
 
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
@@ -33,7 +33,7 @@ const LOCATION_ICON_STYLE = css<{
 }>`
   align-items: ${ALIGN_CENTER};
   border: 2px solid ${props => props.color ?? COLORS.black90};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius12};
   height: ${props => props.height ?? SPACING.spacing32};
   width: ${props => props.width ?? 'max-content'};
   padding: ${SPACING.spacing4}

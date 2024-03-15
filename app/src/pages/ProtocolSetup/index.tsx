@@ -166,7 +166,7 @@ export function ProtocolSetupStep({
         backgroundColor={
           disabled ? COLORS.grey35 : backgroundColorByStepStatus[status]
         }
-        borderRadius={BORDERS.borderRadiusSize4}
+        borderRadius={BORDERS.borderRadius16}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
         css={PUSHED_STATE_STYLE}

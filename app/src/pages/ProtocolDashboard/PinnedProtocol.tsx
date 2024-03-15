@@ -104,7 +104,7 @@ export function PinnedProtocol(props: {
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.grey35}
-      borderRadius={BORDERS.borderRadiusSize4}
+      borderRadius={BORDERS.borderRadius16}
       css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing24}

@@ -117,7 +117,7 @@ export const RunPreviewComponent = (
                   index === jumpedIndex ? '#F5E3FF' : backgroundColor
                 }
                 color={COLORS.black90}
-                borderRadius={BORDERS.radiusSoftCorners}
+                borderRadius={BORDERS.borderRadius4}
                 padding={SPACING.spacing8}
                 css={css`
                   transition: background-color ${COLOR_FADE_MS}ms ease-out,

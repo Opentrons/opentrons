@@ -1,8 +1,14 @@
 import * as React from 'react'
+import styled, { css } from 'styled-components'
 import { NavLink } from 'react-router-dom'
-import styled from 'styled-components'
 
 import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+
+export const TAB_BORDER_STYLE = css`
+  border-bottom-style: ${BORDERS.styleSolid};
+  border-bottom-width: 2px;
+  border-bottom-color: ${COLORS.purple50};
+`
 
 interface NavTabProps {
   to: string
@@ -17,7 +23,7 @@ const StyledNavLink = styled(NavLink)<React.ComponentProps<typeof NavLink>>`
 
   &.active {
     color: ${COLORS.black90};
-    ${BORDERS.tabBorder}
+    ${TAB_BORDER_STYLE}
   }
 `
 const DisabledNavLink = styled.span`

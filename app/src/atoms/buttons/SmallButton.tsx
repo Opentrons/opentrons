@@ -100,8 +100,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       .defaultBackgroundColor};
     cursor: default;
     border-radius: ${buttonCategory === 'rounded'
-      ? BORDERS.borderRadiusSize5
-      : BORDERS.borderRadiusSize4};
+      ? BORDERS.borderRadius40
+      : BORDERS.borderRadius16};
     box-shadow: none;
     ${TYPOGRAPHY.pSemiBold}
 

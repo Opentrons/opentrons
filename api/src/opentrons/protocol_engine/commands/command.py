@@ -12,8 +12,6 @@ from typing import (
     Optional,
     TypeVar,
     Tuple,
-    Union,
-    Literal,
     List,
 )
 
@@ -23,6 +21,7 @@ from pydantic.generics import GenericModel
 from opentrons.hardware_control import HardwareControlAPI
 
 from ..errors import ErrorOccurrence
+from ..notes import CommandNote, CommandNoteAdder
 
 # Work around type-only circular dependencies.
 if TYPE_CHECKING:
@@ -35,29 +34,6 @@ CommandParamsT = TypeVar("CommandParamsT", bound=BaseModel)
 CommandResultT = TypeVar("CommandResultT", bound=BaseModel)
 
 CommandPrivateResultT = TypeVar("CommandPrivateResultT")
-
-NoteKind = Union[Literal["warning", "information"], str]
-
-
-class CommandNote(BaseModel):
-    """A note about a command's execution or dispatch."""
-
-    noteKind: NoteKind = Field(
-        ...,
-        description="The kind of note this is. Only the literal possibilities should be"
-        " relied upon programmatically.",
-    )
-    shortMessage: str = Field(
-        ...,
-        description="The accompanying human-readable short message (suitable for display in a single line)",
-    )
-    longMessage: str = Field(
-        ...,
-        description="A longer message that may contain newlines and formatting characters describing the note.",
-    )
-    source: str = Field(
-        ..., description="An identifier for the party that created the note"
-    )
 
 
 class CommandStatus(str, Enum):
@@ -215,6 +191,7 @@ class AbstractCommandImpl(
         run_control: execution.RunControlHandler,
         rail_lights: execution.RailLightsHandler,
         status_bar: execution.StatusBarHandler,
+        command_note_adder: CommandNoteAdder,
     ) -> None:
         """Initialize the command implementation with execution handlers."""
         pass
@@ -256,6 +233,7 @@ class AbstractCommandWithPrivateResultImpl(
         run_control: execution.RunControlHandler,
         rail_lights: execution.RailLightsHandler,
         status_bar: execution.StatusBarHandler,
+        command_note_adder: CommandNoteAdder,
     ) -> None:
         """Initialize the command implementation with execution handlers."""
         pass

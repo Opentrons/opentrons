@@ -14,7 +14,7 @@ import {
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RunStatus,
+  RUN_STATUS_AWAITING_RECOVERY,
 } from '@opentrons/api-client'
 import {
   useModulesQuery,
@@ -109,7 +109,7 @@ import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMo
 import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
 import { useNotifyRunQuery } from '../../../resources/runs'
 
-import type { Run, RunError } from '@opentrons/api-client'
+import type { Run, RunError, RunStatus } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -126,6 +126,7 @@ const CANCELLABLE_STATUSES = [
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
+  RUN_STATUS_AWAITING_RECOVERY,
 ]
 const RUN_OVER_STATUSES: RunStatus[] = [
   RUN_STATUS_FAILED,
@@ -325,7 +326,7 @@ export function ProtocolRunHeader({
       <Flex
         ref={protocolRunHeaderRef}
         backgroundColor={COLORS.white}
-        borderRadius={BORDERS.borderRadiusSize2}
+        borderRadius={BORDERS.borderRadius8}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
         marginBottom={SPACING.spacing16}

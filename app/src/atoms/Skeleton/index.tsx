@@ -12,7 +12,7 @@ interface SkeletonProps {
 export const Skeleton = (props: SkeletonProps): JSX.Element => {
   const { width, height, backgroundSize, borderRadius } = props
   const SKELETON_STYLE = css`
-    border-radius: ${borderRadius ?? BORDERS.radiusSoftCorners};
+    border-radius: ${borderRadius ?? BORDERS.borderRadius4};
     animation: shimmer 2s infinite linear;
     background: linear-gradient(
       to right,

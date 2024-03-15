@@ -62,7 +62,7 @@ export function CalibrationStatusCard({
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       border={BORDERS.lineBorder}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadius4}
       padding={SPACING.spacing16}
     >
       <Flex

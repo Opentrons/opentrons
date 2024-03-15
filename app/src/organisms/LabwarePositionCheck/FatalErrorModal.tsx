@@ -102,7 +102,7 @@ const ErrorTextArea = styled.textarea`
   width: 30rem;
   background-color: #f8f8f8;
   border: ${BORDERS.lineBorder};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   padding: ${SPACING.spacing8};
   margin: ${SPACING.spacing16} 0;
   font-size: ${TYPOGRAPHY.fontSizeCaption};
