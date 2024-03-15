@@ -218,7 +218,6 @@ async def test_liquid_probe(
         mock_bind_output.assert_called()
         assert mock_bind_output.call_args_list[1][0][3] == [
             SensorOutputBinding.sync,
-            SensorOutputBinding.report,
         ]
 
 
