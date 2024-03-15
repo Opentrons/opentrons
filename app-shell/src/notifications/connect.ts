@@ -39,8 +39,7 @@ export function cleanUpUnreachableRobots(healthyRobotIPs: string[]): void {
   const unreachableRobots = Object.keys(connectionStore).filter(hostname => {
     // The connection is forcefully closed, so remove from the connection store immediately to reduce disconnect packets.
     if (hostname in connectionStore && !healthyRobotIPsSet.has(hostname)) {
-      delete connectionStore[hostname]
-      unreachableHosts.delete(hostname)
+      connectionStore.removeHost(hostname)
       return true
     }
     return false
@@ -49,29 +48,22 @@ export function cleanUpUnreachableRobots(healthyRobotIPs: string[]): void {
 }
 
 export function addNewRobotsToConnectionStore(robots: string[]): void {
-  const newRobots = robots.filter(hostname => {
-    const isRobotInConnectionStore = Object.prototype.hasOwnProperty.call(
-      connectionStore,
-      hostname
-    )
-    return !isRobotInConnectionStore && !unreachableHosts.has(hostname)
-  })
+  const newRobots = robots.filter(hostname =>
+    connectionStore.isHostNewlyDiscovered(hostname)
+  )
   newRobots.forEach(hostname => {
+    connectionStore.addPendingHost(hostname)
     connectAsync(`mqtt://${hostname}`)
       .then(client => {
         notifyLog.debug(`Successfully connected to ${hostname}`)
-        connectionStore[hostname] = {
-          client,
-          subscriptions: new Set(),
-          pendingSubs: new Set(),
-        }
+        connectionStore.addConnectedHost(hostname, client)
         establishListeners({ client, hostname })
       })
       .catch((error: Error) => {
         notifyLog.warn(
           `Failed to connect to ${hostname} - ${error.name}: ${error.message} `
         )
-        unreachableHosts.add(hostname)
+        connectionStore.addFailedToConnectHost(hostname, error)
       })
   })
 }
@@ -123,7 +115,6 @@ function establishListeners({
     (topic: NotifyTopic, message: Buffer, packet: mqtt.IPublishPacket) => {
       deserialize(message.toString())
         .then(deserializedMessage => {
-          // Could consider breaking this into a handleDeserializedMessage().
           const messageContainsUnsubFlag = 'unsubscribe' in deserializedMessage
           if (messageContainsUnsubFlag) {
             void unsubscribe(hostname, topic)
@@ -134,13 +125,14 @@ function establishListeners({
             topic,
           })
           try {
-            browserWindow.webContents.send(
+            const browserWindow = connectionStore.getBrowserWindow()
+            browserWindow?.webContents.send(
               'notify',
               hostname,
               topic,
               deserializedMessage
             )
-          } catch {}
+          } catch {} // Prevents shell erroring during app shutdown event.
         })
         .catch(error => notifyLog.debug(`${error.message}`))
     }
@@ -187,7 +179,7 @@ export function closeConnectionsForcefullyFor(
   hosts: string[]
 ): Array<Promise<void>> {
   return hosts.map(hostname => {
-    const client = connectionStore[hostname].client
+    const { client } = connectionStore.getHostInfo(hostname) ?? {}
     return new Promise<void>((resolve, reject) =>
       client?.end(true, {}, () => resolve())
     )

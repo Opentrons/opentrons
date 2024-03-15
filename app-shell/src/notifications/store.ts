@@ -38,46 +38,6 @@ class ConnectionStore {
     }
   }
 
-  public getIsHostConnected(hostname: string): boolean {
-    if (hostname in this.hosts) {
-      return this.hosts[hostname].client != null
-    } else {
-      return false
-    }
-  }
-
-  public getIsSubscriptionPendingOrActive(
-    hostname: string,
-    topic: NotifyTopic
-  ): boolean {
-    if (hostname in this.hosts) {
-      const { pendingSubs, subscriptions } = this.hosts[hostname]
-      return pendingSubs.has(topic) || subscriptions.has(topic)
-    } else {
-      return false
-    }
-  }
-
-  public getIsUnsubscriptionPending(
-    hostname: string,
-    topic: NotifyTopic
-  ): boolean {
-    if (hostname in this.hosts) {
-      const { pendingUnsubs } = this.hosts[hostname]
-      return pendingUnsubs.has(topic)
-    } else {
-      return false
-    }
-  }
-
-  public getIsHostReachable(hostname: string): boolean {
-    if (hostname in this.unreachableHosts) {
-      return false
-    } else {
-      return hostname in this.hosts
-    }
-  }
-
   /**
    *
    * @returns {FailedConnStatus} "ECONNREFUSED" is a proxy for a port block error and is only returned once
@@ -92,6 +52,56 @@ class ConnectionStore {
       return failureStatus
     } else {
       return null
+    }
+  }
+
+  public isHostNewlyDiscovered(hostname: string): boolean {
+    if (hostname in this.hosts) {
+      return true
+    } else if (hostname in this.unreachableHosts) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  public isHostConnected(hostname: string): boolean {
+    if (hostname in this.hosts) {
+      return this.hosts[hostname].client != null
+    } else {
+      return false
+    }
+  }
+
+  public isSubscriptionPendingOrActive(
+    hostname: string,
+    topic: NotifyTopic
+  ): boolean {
+    if (hostname in this.hosts) {
+      const { pendingSubs, subscriptions } = this.hosts[hostname]
+      return pendingSubs.has(topic) || subscriptions.has(topic)
+    } else {
+      return false
+    }
+  }
+
+  public isUnsubscriptionPending(
+    hostname: string,
+    topic: NotifyTopic
+  ): boolean {
+    if (hostname in this.hosts) {
+      const { pendingUnsubs } = this.hosts[hostname]
+      return pendingUnsubs.has(topic)
+    } else {
+      return false
+    }
+  }
+
+  public isHostReachable(hostname: string): boolean {
+    if (hostname in this.unreachableHosts) {
+      return false
+    } else {
+      return hostname in this.hosts
     }
   }
 
@@ -111,22 +121,31 @@ class ConnectionStore {
       if (this.hosts[hostname].client == null) {
         this.hosts[hostname].client = client
       }
+    } else {
+      this.addPendingHost(hostname)
+      this.hosts[hostname].client = client
     }
   }
 
+  /**
+   *
+   * @description Adds the host as unreachable with an error status derived from the MQTT returned error object.
+   */
   public addFailedToConnectHost(hostname: string, error: Error): void {
     if (!(hostname in this.unreachableHosts)) {
-      const errorMessage = error.message.includes(FAILURE_STATUSES.ECONNREFUSED)
+      const errorStatus = error.message.includes(FAILURE_STATUSES.ECONNREFUSED)
         ? FAILURE_STATUSES.ECONNREFUSED
         : FAILURE_STATUSES.ECONNFAILED
 
-      this.unreachableHosts[hostname] = errorMessage
+      this.unreachableHosts[hostname] = errorStatus
     }
   }
 
   public removeHost(hostname: string): void {
     if (hostname in this.hosts) {
       delete this.hosts[hostname]
+    }
+    if (hostname in this.unreachableHosts) {
       delete this.unreachableHosts[hostname]
     }
   }
