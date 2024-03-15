@@ -14,7 +14,6 @@ export default {
       },
       defaultValue: 'basic',
     },
-
   },
   component: Chip,
   parameters: touchScreenViewport,
