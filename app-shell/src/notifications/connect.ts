@@ -37,37 +37,43 @@ export function getHealthyRobotIPsForNotifications(
   )
 }
 
-export function cleanUpUnreachableRobots(healthyRobotIPs: string[]): void {
-  const healthyRobotIPsSet = new Set(healthyRobotIPs)
-  const unreachableRobots = Object.keys(connectionStore).filter(hostname => {
-    // The connection is forcefully closed, so remove from the connection store immediately to reduce disconnect packets.
-    if (!healthyRobotIPsSet.has(hostname)) {
-      connectionStore.deleteHost(hostname)
-      return true
-    }
-    return false
+export function cleanUpUnreachableRobots(
+  healthyRobotIPs: string[]
+): Promise<void> {
+  return new Promise(() => {
+    const healthyRobotIPsSet = new Set(healthyRobotIPs)
+    const unreachableRobots = Object.keys(connectionStore).filter(hostname => {
+      // The connection is forcefully closed, so remove from the connection store immediately to reduce disconnect packets.
+      if (!healthyRobotIPsSet.has(hostname)) {
+        connectionStore.deleteHost(hostname)
+        return true
+      }
+      return false
+    })
+    void closeConnectionsForcefullyFor(unreachableRobots)
   })
-  void closeConnectionsForcefullyFor(unreachableRobots)
 }
 
-export function addNewRobotsToConnectionStore(robots: string[]): void {
-  const newRobots = robots.filter(hostname =>
-    connectionStore.isHostNewlyDiscovered(hostname)
-  )
-  newRobots.forEach(hostname => {
-    connectionStore.setPendingHost(hostname)
-    connectAsync(`mqtt://${hostname}`)
-      .then(client => {
-        notifyLog.debug(`Successfully connected to ${hostname}`)
-        connectionStore.setConnectedHost(hostname, client)
-        establishListeners({ client, hostname })
-      })
-      .catch((error: Error) => {
-        notifyLog.warn(
-          `Failed to connect to ${hostname} - ${error.name}: ${error.message} `
-        )
-        connectionStore.setFailedToConnectHost(hostname, error)
-      })
+export function addNewRobotsToConnectionStore(robots: string[]): Promise<void> {
+  return new Promise(() => {
+    const newRobots = robots.filter(hostname =>
+      connectionStore.isHostNewlyDiscovered(hostname)
+    )
+    newRobots.forEach(hostname => {
+      connectionStore.setPendingHost(hostname)
+      connectAsync(`mqtt://${hostname}`)
+        .then(client => {
+          notifyLog.debug(`Successfully connected to ${hostname}`)
+          connectionStore.setConnectedHost(hostname, client)
+          establishListeners({ client, hostname })
+        })
+        .catch((error: Error) => {
+          notifyLog.warn(
+            `Failed to connect to ${hostname} - ${error.name}: ${error.message} `
+          )
+          connectionStore.setFailedToConnectHost(hostname, error)
+        })
+    })
   })
 }
 
