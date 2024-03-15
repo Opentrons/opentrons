@@ -77,6 +77,7 @@ class ErrorCodes(Enum):
     INVALID_INSTRUMENT_DATA = _code_from_dict_entry("3016")
     INVALID_LIQUID_CLASS_NAME = _code_from_dict_entry("3017")
     TIP_DETECTOR_NOT_FOUND = _code_from_dict_entry("3018")
+    HEPA_UV_FAILED = _code_from_dict_entry("3019")
     GENERAL_ERROR = _code_from_dict_entry("4000")
     ROBOT_IN_USE = _code_from_dict_entry("4001")
     API_REMOVED = _code_from_dict_entry("4002")
