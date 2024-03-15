@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import pick from 'lodash/pick'
@@ -37,25 +37,21 @@ const OffsetTable = styled('table')`
   table-layout: auto;
   width: 100%;
   border-spacing: 0 ${SPACING.spacing2};
-  border-radius: ${BORDERS.borderRadius8};
   margin: ${SPACING.spacing16} 0;
   text-align: left;
 `
 const OffsetTableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  border-radius: ${BORDERS.borderRadius8};
   padding: ${SPACING.spacing4};
 `
 const OffsetTableRow = styled('tr')`
   background-color: ${COLORS.grey10};
   padding: ${SPACING.spacing8};
-  border-radius: ${BORDERS.borderRadius8};
 `
 
 const OffsetTableDatum = styled('td')`
   padding: ${SPACING.spacing8};
-  border-radius: ${BORDERS.borderRadius8};
   white-space: break-spaces;
   text-overflow: wrap;
 `
@@ -93,7 +89,12 @@ export function CurrentOffsetsTable(
               : offset.definitionUri
           return (
             <OffsetTableRow key={offset.id}>
-              <OffsetTableDatum>
+              <OffsetTableDatum
+                css={css`
+                  border-radius: ${BORDERS.borderRadius8} 0 0
+                    ${BORDERS.borderRadius8};
+                `}
+              >
                 {getDisplayLocation(
                   offset.location,
                   getLabwareDefinitionsFromCommands(commands),
@@ -102,7 +103,12 @@ export function CurrentOffsetsTable(
                 )}
               </OffsetTableDatum>
               <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
-              <OffsetTableDatum>
+              <OffsetTableDatum
+                css={css`
+                  border-radius: 0 ${BORDERS.borderRadius8}
+                    ${BORDERS.borderRadius8} 0;
+                `}
+              >
                 <OffsetVector {...offset.vector} />
               </OffsetTableDatum>
             </OffsetTableRow>
@@ -139,7 +145,6 @@ export function CurrentOffsetsTable(
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={SPACING.spacing16}
-      borderRadius={BORDERS.borderRadius8}
     >
       <StyledText as="label">
         {i18n.format(t('applied_offset_data'), 'upperCase')}
