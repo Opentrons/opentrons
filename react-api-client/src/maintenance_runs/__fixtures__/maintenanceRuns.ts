@@ -1,4 +1,4 @@
-import { MAINTENANCE_RUN_ACTION_TYPE_PLAY } from '@opentrons/api-client'
+import { RUN_ACTION_TYPE_PLAY } from '@opentrons/api-client'
 import type { MaintenanceRun, MaintenanceRunData } from '@opentrons/api-client'
 
 export const MAINTENANCE_RUN_ID = '1'
@@ -12,7 +12,7 @@ export const mockRunningMaintenanceRun: MaintenanceRunData = {
     {
       id: '1',
       createdAt: '2021-10-25T12:54:53.366581+00:00',
-      actionType: MAINTENANCE_RUN_ACTION_TYPE_PLAY,
+      actionType: RUN_ACTION_TYPE_PLAY,
     },
   ],
   errors: [],
