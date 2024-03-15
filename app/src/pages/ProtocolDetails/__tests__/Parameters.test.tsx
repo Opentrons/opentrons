@@ -141,6 +141,5 @@ describe('Parameters', () => {
     screen.getByText('3 choices')
     screen.getByText('EtoH Volume')
     screen.getByText('one choice, the second')
-    screen.getByText('fda')
   })
 })

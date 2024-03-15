@@ -36,11 +36,11 @@ describe('EmptySection', () => {
     render(props)
     screen.getByText('No hardware is specified for this protocol')
   })
-  it('should render text for paramters', () => {
+  it('should render text for parameters', () => {
     props = {
       section: 'parameters',
     }
     render(props)
-    screen.getByText('No parameters are specified in this protocol')
+    screen.getByText('No parameters specified in this protocol')
   })
 })
