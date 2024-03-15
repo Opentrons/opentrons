@@ -19,7 +19,7 @@ export const SubmitPrimaryButton = (
 ): JSX.Element => {
   const SUBMIT_INPUT_STYLE = css`
     background-color: ${COLORS.blue50};
-    border-radius: ${BORDERS.borderRadius4};
+    border-radius: ${BORDERS.borderRadius8};
     padding: ${SPACING.spacing8} ${SPACING.spacing16};
     color: ${COLORS.white};
     ${TYPOGRAPHY.pSemiBold}

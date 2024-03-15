@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import {
   SPACING,
+  BORDERS,
   COLORS,
   TYPOGRAPHY,
   ALIGN_CENTER,

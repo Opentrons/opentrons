@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 
 import {
   Flex,
+  BORDERS,
   COLORS,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
@@ -121,7 +122,7 @@ export function ProtocolOverflowMenu(
         <Flex
           whiteSpace="nowrap"
           zIndex={10}
-          borderRadius="4px 4px 0px 0px"
+          borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
