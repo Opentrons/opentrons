@@ -112,6 +112,9 @@ def raise_from_error_message(  # noqa: C901
             message="Motor busy when operation requested", detail=detail_dict
         )
 
+    if error_code in (ErrorCode.door_open, ErrorCode.reed_open):
+        raise RoboticsInteractionError(message="", detail=detail_dict)
+
     if error_code in (ErrorCode.timeout,):
         raise CommandTimedOutError(
             message="Command timeout from hardware", detail=detail_dict
