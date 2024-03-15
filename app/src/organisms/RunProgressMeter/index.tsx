@@ -42,7 +42,7 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import { isInterventionCommand } from '../InterventionModal/utils'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../resources/runs'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -259,14 +259,14 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             outerStyles={css`
               height: 0.375rem;
               background-color: ${COLORS.grey30};
-              border-radius: ${BORDERS.radiusSoftCorners};
+              border-radius: ${BORDERS.borderRadius4};
               position: relative;
               overflow: initial;
             `}
             innerStyles={css`
               height: 0.375rem;
               background-color: ${COLORS.grey60};
-              border-radius: ${BORDERS.radiusSoftCorners};
+              border-radius: ${BORDERS.borderRadius4};
             `}
           >
             <InterventionTicks

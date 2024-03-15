@@ -18,7 +18,7 @@ from ..errors.exceptions import PipetteNotReadyToAspirateError
 if TYPE_CHECKING:
     from ..execution import PipettingHandler
     from ..state import StateView
-
+    from ..notes import CommandNoteAdder
 
 AspirateInPlaceCommandType = Literal["aspirateInPlace"]
 
@@ -45,11 +45,13 @@ class AspirateInPlaceImplementation(
         pipetting: PipettingHandler,
         hardware_api: HardwareControlAPI,
         state_view: StateView,
+        command_note_adder: CommandNoteAdder,
         **kwargs: object,
     ) -> None:
         self._pipetting = pipetting
         self._state_view = state_view
         self._hardware_api = hardware_api
+        self._command_note_adder = command_note_adder
 
     async def execute(self, params: AspirateInPlaceParams) -> AspirateInPlaceResult:
         """Aspirate without moving the pipette.
@@ -69,7 +71,10 @@ class AspirateInPlaceImplementation(
                 " so the plunger can be reset in a known safe position."
             )
         volume = await self._pipetting.aspirate_in_place(
-            pipette_id=params.pipetteId, volume=params.volume, flow_rate=params.flowRate
+            pipette_id=params.pipetteId,
+            volume=params.volume,
+            flow_rate=params.flowRate,
+            command_note_adder=self._command_note_adder,
         )
 
         return AspirateInPlaceResult(volume=volume)

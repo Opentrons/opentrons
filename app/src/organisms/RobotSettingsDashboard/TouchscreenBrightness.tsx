@@ -35,7 +35,7 @@ interface BrightnessTileProps {
 const BrightnessTile = styled(Box)`
   width: 100%;
   height: 8.75rem;
-  border-radius: ${BORDERS.borderRadiusSize2};
+  border-radius: ${BORDERS.borderRadius8};
   background: ${(props: BrightnessTileProps) =>
     props.isActive ? COLORS.blue50 : COLORS.blue35};
 `

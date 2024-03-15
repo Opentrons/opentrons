@@ -15,7 +15,7 @@ import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -24,7 +24,7 @@ import { getIsOnDevice } from '../../redux/config'
 import {
   useChainMaintenanceCommands,
   useCreateTargetedMaintenanceRunMutation,
-} from '../../resources/runs/hooks'
+} from '../../resources/runs'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
@@ -357,7 +357,7 @@ export const GripperWizard = (
         top="16px"
         border={BORDERS.lineBorder}
         boxShadow={BORDERS.shadowSmall}
-        borderRadius={BORDERS.borderRadiusSize4}
+        borderRadius={BORDERS.borderRadius16}
         position={POSITION_ABSOLUTE}
         backgroundColor={COLORS.white}
       >

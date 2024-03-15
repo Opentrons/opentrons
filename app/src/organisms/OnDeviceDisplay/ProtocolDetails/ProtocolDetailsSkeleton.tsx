@@ -10,7 +10,7 @@ export function ProtocolDetailsHeaderChipSkeleton(): JSX.Element {
       width="12.17875rem"
       height="2.75rem"
       backgroundSize="99rem"
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
     />
   )
 }
@@ -21,7 +21,7 @@ export function ProcotolDetailsHeaderTitleSkeleton(): JSX.Element {
       width="42rem"
       height="3rem"
       backgroundSize="99rem"
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
     />
   )
 }
@@ -34,28 +34,28 @@ export function ProtocolDetailsSectionContentSkeleton(): JSX.Element {
           width="12rem"
           height="1.75rem"
           backgroundSize="99rem"
-          borderRadius={BORDERS.borderRadiusSize5}
+          borderRadius={BORDERS.borderRadius40}
         />
         <Skeleton
           width="58rem"
           height="1.75rem"
           backgroundSize="99rem"
-          borderRadius={BORDERS.borderRadiusSize5}
+          borderRadius={BORDERS.borderRadius40}
         />
         <Skeleton
           width="58rem"
           height="1.75rem"
           backgroundSize="99rem"
-          borderRadius={BORDERS.borderRadiusSize5}
+          borderRadius={BORDERS.borderRadius40}
         />
         <Skeleton
           width="39rem"
           height="1.75rem"
           backgroundSize="99rem"
-          borderRadius={BORDERS.borderRadiusSize5}
+          borderRadius={BORDERS.borderRadius40}
         />
         <Flex
-          borderRadius={BORDERS.borderRadiusSize1}
+          borderRadius={BORDERS.borderRadius4}
           marginTop={SPACING.spacing24}
           width="max-content"
         >
@@ -63,7 +63,7 @@ export function ProtocolDetailsSectionContentSkeleton(): JSX.Element {
             width="18rem"
             height="2.25rem"
             backgroundSize="99rem"
-            borderRadius={BORDERS.borderRadiusSize3}
+            borderRadius={BORDERS.borderRadius12}
           />
         </Flex>
       </Flex>

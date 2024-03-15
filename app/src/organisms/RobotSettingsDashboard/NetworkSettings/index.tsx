@@ -113,7 +113,7 @@ function NetworkSettingButton({
       paddingX={SPACING.spacing24}
       paddingY={SPACING.spacing20}
       backgroundColor={backgroundColor}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
       css={PUSHED_STATE_STYLE}
       onClick={onClick}
     >

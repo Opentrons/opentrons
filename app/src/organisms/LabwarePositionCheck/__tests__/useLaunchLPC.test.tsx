@@ -19,9 +19,11 @@ import {
 import { FLEX_ROBOT_TYPE, fixtureTiprack300ul } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { useCreateTargetedMaintenanceRunMutation } from '../../../resources/runs/hooks'
+import {
+  useCreateTargetedMaintenanceRunMutation,
+  useNotifyRunQuery,
+} from '../../../resources/runs'
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
-import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
 import { useLaunchLPC } from '../useLaunchLPC'
 import { LabwarePositionCheck } from '..'
 
@@ -31,9 +33,8 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../resources/runs/hooks')
 vi.mock('../useMostRecentCompletedAnalysis')
-vi.mock('../../../resources/runs/useNotifyRunQuery')
+vi.mock('../../../resources/runs')
 
 const MOCK_RUN_ID = 'mockRunId'
 const MOCK_MAINTENANCE_RUN_ID = 'mockMaintenanceRunId'

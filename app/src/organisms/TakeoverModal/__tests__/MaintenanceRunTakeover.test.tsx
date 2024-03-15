@@ -6,12 +6,12 @@ import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { useMaintenanceRunTakeover } from '../useMaintenanceRunTakeover'
 import { MaintenanceRunTakeover } from '../MaintenanceRunTakeover'
-import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
 
 import type { MaintenanceRunStatus } from '../MaintenanceRunStatusProvider'
 
 vi.mock('../useMaintenanceRunTakeover')
-vi.mock('../../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun')
+vi.mock('../../../resources/maintenance_runs')
 
 const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {
   getRunIds: () => ({

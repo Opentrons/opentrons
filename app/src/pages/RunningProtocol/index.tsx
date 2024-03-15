@@ -29,7 +29,10 @@ import {
 
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyLastRunCommandKey } from '../../resources/runs/useNotifyLastRunCommandKey'
+import {
+  useNotifyLastRunCommandKey,
+  useNotifyRunQuery,
+} from '../../resources/runs'
 import { InterventionModal } from '../../organisms/InterventionModal'
 import { isInterventionCommand } from '../../organisms/InterventionModal/utils'
 import {
@@ -50,7 +53,6 @@ import { CancelingRunModal } from '../../organisms/OnDeviceDisplay/RunningProtoc
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '../../redux/discovery'
 import { OpenDoorAlertModal } from '../../organisms/OpenDoorAlertModal'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 

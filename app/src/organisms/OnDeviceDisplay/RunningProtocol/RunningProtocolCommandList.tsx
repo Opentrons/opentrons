@@ -232,7 +232,7 @@ export function RunningProtocolCommandList({
                     fontSize="1.375rem"
                     lineHeight="1.75rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    borderRadius={BORDERS.borderRadiusSize2}
+                    borderRadius={BORDERS.borderRadius8}
                     gridGap="0.875rem"
                   >
                     <CommandIcon command={command} size="2rem" />

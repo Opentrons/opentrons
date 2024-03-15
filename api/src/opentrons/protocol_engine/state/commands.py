@@ -691,6 +691,13 @@ class CommandView(HasState[CommandState]):
                     "Setup commands are not allowed after run has started."
                 )
 
+        elif self.get_status() == EngineStatus.AWAITING_RECOVERY:
+            # While we're developing error recovery, we'll conservatively disallow
+            # all actions, to avoid putting the engine in weird undefined states.
+            # We'll allow specific actions here as we flesh things out and add support
+            # for them.
+            raise NotImplementedError()
+
         return action
 
     def get_status(self) -> EngineStatus:

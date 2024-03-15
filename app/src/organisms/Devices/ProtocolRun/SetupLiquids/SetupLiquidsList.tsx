@@ -53,7 +53,17 @@ const LIQUID_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
   border-color: ${COLORS.grey30};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
+`
+
+export const CARD_OUTLINE_BORDER_STYLE = css`
+  border-style: ${BORDERS.styleSolid};
+  border-width: 1px;
+  border-color: ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius4};
+  &:hover {
+    border-color: ${COLORS.grey55};
+  }
 `
 
 export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
@@ -109,7 +119,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   const trackEvent = useTrackEvent()
 
   const LIQUID_CARD_STYLE = css`
-    ${BORDERS.cardOutlineBorder}
+    ${CARD_OUTLINE_BORDER_STYLE}
 
     &:hover {
       cursor: pointer;
@@ -319,7 +329,7 @@ export const LiquidsListItemDetails = (
       </Flex>
       <Flex
         backgroundColor={COLORS.black90 + '1A'}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         height="max-content"
         paddingY={SPACING.spacing4}
         paddingX={SPACING.spacing8}

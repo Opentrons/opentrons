@@ -1,6 +1,10 @@
 import type { DevInternalFlag } from './types'
 
-export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = ['protocolStats']
+export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
+  'protocolStats',
+  'enableRunTimeParameters',
+  'enableRunNotes',
+]
 
 // action type constants
 export const INITIALIZED: 'config:INITIALIZED' = 'config:INITIALIZED'

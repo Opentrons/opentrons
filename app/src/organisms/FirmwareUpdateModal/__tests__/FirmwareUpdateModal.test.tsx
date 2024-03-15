@@ -119,12 +119,13 @@ describe('FirmwareUpdateModal', () => {
       vi.advanceTimersByTime(3000)
     })
     screen.getByText('Firmware is up to date.')
+    screen.getByLabelText('check')
     act(() => {
       vi.advanceTimersByTime(3000)
     })
     await waitFor(() => expect(props.proceed).toHaveBeenCalled())
   })
-  it('does not render text or a progress bar until instrument update status is known', () => {
+  it('does not render text until instrument update status is known', () => {
     vi.mocked(useSubsystemUpdateQuery).mockReturnValue({
       data: {
         data: {
@@ -159,6 +160,7 @@ describe('FirmwareUpdateModal', () => {
       vi.advanceTimersByTime(3000)
     })
     screen.getByText('A firmware update is required, instrument is updating')
+    screen.getByLabelText('spinner')
     expect(updateSubsystem).toHaveBeenCalled()
   })
   it('calls refetch instruments and then proceed once update is complete', async () => {

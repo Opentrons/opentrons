@@ -12,7 +12,7 @@ import {
 } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { UnorderedList } from '../../molecules/UnorderedList'
-import { useChainRunCommands } from '../../resources/runs/hooks'
+import { useChainRunCommands } from '../../resources/runs'
 import {
   getLabwareDef,
   getLabwareDefinitionsFromCommands,

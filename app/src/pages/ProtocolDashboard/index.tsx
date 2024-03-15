@@ -28,7 +28,7 @@ import { sortProtocols } from './utils'
 import { ProtocolCard } from './ProtocolCard'
 import { NoProtocols } from './NoProtocols'
 import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
-import { useNotifyAllRunsQuery } from '../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../resources/runs'
 
 import type { Dispatch } from '../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../redux/config/types'

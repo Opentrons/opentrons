@@ -20,7 +20,7 @@ import {
   useCurrentRunId,
   useRunCommands,
 } from '../ProtocolUpload/hooks'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../resources/runs'
 
 import type { UseQueryOptions } from 'react-query'
 import type { RunAction, RunStatus, Run, RunData } from '@opentrons/api-client'

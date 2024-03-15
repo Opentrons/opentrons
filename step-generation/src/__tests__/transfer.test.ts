@@ -1,4 +1,3 @@
-/* eslint-disable jest/consistent-test-it */
 import { beforeEach, describe, it, expect, test } from 'vitest'
 import {
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,

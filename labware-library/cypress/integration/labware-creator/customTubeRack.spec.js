@@ -24,9 +24,7 @@ context('Tubes and Rack', () => {
         .children()
         .first()
         .trigger('mousedown')
-      cy.get('*[class^="Dropdown__option_label"]')
-        .contains('Tubes + Tube Rack')
-        .click()
+      cy.get('*[class^="_option_label"]').contains('Tubes + Tube Rack').click()
 
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
@@ -34,7 +32,7 @@ context('Tubes and Rack', () => {
         .children()
         .first()
         .trigger('mousedown')
-      cy.get('*[class^="Dropdown__option_label"]')
+      cy.get('*[class^="_option_label"]')
         .contains('Non-Opentrons tube rack')
         .click()
 
@@ -198,7 +196,7 @@ context('Tubes and Rack', () => {
         .children()
         .first()
         .trigger('mousedown')
-      cy.get('*[class^="Dropdown__option_label"]')
+      cy.get('*[class^="_option_label"]')
         .contains(/P20.*Single-Channel.*GEN2/)
         .click()
       cy.contains('Test Pipette is a required field').should('not.exist')

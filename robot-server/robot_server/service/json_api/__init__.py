@@ -16,6 +16,7 @@ from .response import (
     PydanticResponse,
     ResponseList,
     NotifyRefetchBody,
+    NotifyUnsubscribeBody,
 )
 
 
@@ -46,4 +47,5 @@ __all__ = [
     "ResponseList",
     # notify models
     "NotifyRefetchBody",
+    "NotifyUnsubscribeBody",
 ]

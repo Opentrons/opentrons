@@ -90,7 +90,7 @@ export function RunFailedModal({
             gridGap={SPACING.spacing8}
             maxHeight="11rem"
             backgroundColor={COLORS.grey35}
-            borderRadius={BORDERS.borderRadiusSize3}
+            borderRadius={BORDERS.borderRadius12}
             padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
           >
             <Flex flexDirection={DIRECTION_COLUMN} css={SCROLL_BAR_STYLE}>

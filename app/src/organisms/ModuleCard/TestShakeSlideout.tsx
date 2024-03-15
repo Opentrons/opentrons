@@ -168,7 +168,7 @@ export const TestShakeSlideout = (
           )
         : null}
       <Flex
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         marginBottom={SPACING.spacing8}
         backgroundColor={COLORS.blue30}
         paddingY={SPACING.spacing16}

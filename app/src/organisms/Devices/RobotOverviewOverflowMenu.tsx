@@ -113,7 +113,7 @@ export const RobotOverviewOverflowMenu = (
         <Flex
           whiteSpace="nowrap"
           zIndex={10}
-          borderRadius={BORDERS.radiusSoftCorners}
+          borderRadius={BORDERS.borderRadius4}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}

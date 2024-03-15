@@ -158,6 +158,7 @@ async def test_analyze(
         await analysis_store.update(
             analysis_id="analysis-id",
             robot_type=robot_type,
+            run_time_parameters=[],
             commands=[analysis_command],
             labware=[analysis_labware],
             modules=[],
@@ -237,6 +238,7 @@ async def test_analyze_updates_pending_on_error(
         await analysis_store.update(
             analysis_id="analysis-id",
             robot_type=robot_type,
+            run_time_parameters=[],
             commands=[],
             labware=[],
             modules=[],

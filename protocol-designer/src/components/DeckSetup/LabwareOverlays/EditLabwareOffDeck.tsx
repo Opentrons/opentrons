@@ -46,7 +46,7 @@ const REGULAR_OVERLAY_STYLE = css`
   display: flex;
   align-items: ${ALIGN_FLEX_START};
   justify-content: ${JUSTIFY_SPACE_AROUND};
-  border-radius: ${BORDERS.borderRadiusSize4};
+  border-radius: ${BORDERS.borderRadius16};
   bottom: 0;
   font-size: 0.7rem;
   position: ${POSITION_ABSOLUTE};

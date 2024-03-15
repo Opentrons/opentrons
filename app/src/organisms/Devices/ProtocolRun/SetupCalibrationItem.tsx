@@ -55,7 +55,7 @@ export function SetupCalibrationItem({
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadius4}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="2.5rem" // 40px

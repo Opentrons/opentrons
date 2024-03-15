@@ -192,7 +192,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      borderRadius={BORDERS.borderRadiusSize2}
+      borderRadius={BORDERS.borderRadius8}
       width="100%"
       data-testid={`PipetteCard_${String(pipetteDisplayName)}`}
     >

@@ -33,7 +33,7 @@ const NETWORK_ROW_STYLE = css`
 
   background-color: ${COLORS.grey35};
   margin-bottom: ${SPACING.spacing8};
-  border-radius: ${BORDERS.borderRadiusSize4};
+  border-radius: ${BORDERS.borderRadius16};
 
   &:hover {
     border: none;
@@ -107,7 +107,7 @@ export function DisplayWifiList({
           onClick={handleJoinAnotherNetwork}
           height="5rem"
           backgroundColor={COLORS.grey35}
-          borderRadius={BORDERS.borderRadiusSize4}
+          borderRadius={BORDERS.borderRadius16}
           color={COLORS.black90}
           css={NETWORK_ROW_STYLE}
           padding={`${SPACING.spacing20} ${SPACING.spacing32}`}

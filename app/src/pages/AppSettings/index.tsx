@@ -50,7 +50,7 @@ export function AppSettings(): JSX.Element {
         backgroundColor={COLORS.white}
         height="100%"
         width="100%"
-        borderRadius={BORDERS.borderRadiusSize2}
+        borderRadius={BORDERS.borderRadius8}
         minHeight="95%"
       >
         <Box padding={SPACING.spacing16} paddingBottom="0">
