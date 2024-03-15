@@ -17,6 +17,14 @@ from opentrons.hardware_control.types import (
     HepaUVState,
     DoorState,
 )
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    ErrorMessage,
+)
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+
+from opentrons_hardware.errors import raise_from_error_message
+from opentrons_shared_data.errors.exceptions import HepaUVFailedError
 
 
 # Default constants
@@ -40,7 +48,7 @@ log = logging.getLogger(ROBOT_NAME)
 async def _turn_off_fan(api: OT3API) -> None:
     """Turn off fan if on."""
     hepa_fan_state: Optional[HepaFanState] = await api.get_hepa_fan_state()
-    if hepa_fan_state or hepa_fan_state.fan_on:
+    if not hepa_fan_state or hepa_fan_state.fan_on:
         log.info("Turning off Hepa Fan.")
         await api.set_hepa_fan_state(turn_on=False)
 
@@ -228,25 +236,38 @@ async def _control_task(
     event: asyncio.Event,
 ) -> None:
     """Checks robot status and cancels tasks."""
-    while not event.is_set():
-        # Make sure the door is closed
-        if api.door_state == DoorState.OPEN:
-            if not uv_task.done():
-                log.warning("Control Task: Flex Door Opened, stopping UV task")
+
+    def _handle_hepa_error(message: MessageDefinition, arbitration_id: ArbitrationId):
+        if isinstance(message, ErrorMessage):
+            try:
+                raise_from_error_message(message)
+            except HepaUVFailedError as e:
+                log.info(f"HepaUV Failed, stopping UV task: {e}")
                 uv_task.cancel()
 
-        if uv_task.done():
-            if hepa_task.done():
-                log.info("Control Task: No more running tasks")
-                event.set()
-                return
-            elif run_forever:
-                log.info(f"Leave FAN on for {MAX_RUN_TIME} before ending script")
-                await asyncio.sleep(MAX_RUN_TIME)
-                event.set()
-                return
+    try:
+        api._backend._messenger.add_listener(_handle_hepa_error)
+        while not event.is_set():
+            # Make sure the door is closed
+            if api.door_state == DoorState.OPEN:
+                if not uv_task.done():
+                    log.warning("Control Task: Flex Door Opened, stopping UV task")
+                    uv_task.cancel()
 
-        await asyncio.sleep(1)
+            if uv_task.done():
+                if hepa_task.done():
+                    log.info("Control Task: No more running tasks")
+                    event.set()
+                    return
+                elif run_forever:
+                    log.info(f"Leave FAN on for {MAX_RUN_TIME} before ending script")
+                    await asyncio.sleep(MAX_RUN_TIME)
+                    event.set()
+                    return
+
+            await asyncio.sleep(1)
+    finally:
+        api._backend._messenger.remove_listener(_handle_hepa_error)
 
 
 async def _main(args: argparse.Namespace) -> None:
