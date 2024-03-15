@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -133,6 +134,10 @@ export function ProtocolOverflowMenu(
           <MenuItem
             onClick={handleClickRun}
             data-testid="ProtocolOverflowMenu_run"
+            css={css`
+              border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8} 0
+                0;
+            `}
           >
             {t('start_setup')}
           </MenuItem>
@@ -161,6 +166,10 @@ export function ProtocolOverflowMenu(
           <MenuItem
             onClick={handleClickDelete}
             data-testid="ProtocolOverflowMenu_deleteProtocol"
+            css={css`
+              border-radius: 0 0 ${BORDERS.borderRadius8}
+                ${BORDERS.borderRadius8};
+            `}
           >
             {t('shared:delete')}
           </MenuItem>

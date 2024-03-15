@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { Btn, BORDERS, COLORS, SPACING } from '@opentrons/components'
+import { Btn, COLORS, SPACING } from '@opentrons/components'
 
 export const OverflowBtn: (
   props: React.ComponentProps<typeof Btn>,
@@ -13,7 +13,7 @@ export const OverflowBtn: (
     return (
       <Btn
         css={css`
-          border-radius: ${BORDERS.borderRadius8};
+          border-radius: ${SPACING.spacing4};
           max-height: ${SPACING.spacing32};
 
           &:hover {

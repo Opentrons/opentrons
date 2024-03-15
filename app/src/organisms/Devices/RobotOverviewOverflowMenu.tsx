@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
@@ -96,6 +97,10 @@ export const RobotOverviewOverflowMenu = (
   const isRobotOnWrongVersionOfSoftware =
     autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
   const isRobotUnavailable = isRobotBusy || robot?.status !== CONNECTABLE
+  const isUpdateSoftwareItemVisible =
+    isRobotOnWrongVersionOfSoftware &&
+    !isRobotUnavailable &&
+    !isEstopNotDisengaged
 
   return (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
@@ -113,7 +118,7 @@ export const RobotOverviewOverflowMenu = (
         <Flex
           whiteSpace="nowrap"
           zIndex={10}
-          borderRadius={BORDERS.borderRadius4}
+          borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
@@ -126,14 +131,16 @@ export const RobotOverviewOverflowMenu = (
             setShowOverflowMenu(false)
           }}
         >
-          {isRobotOnWrongVersionOfSoftware &&
-          !isRobotUnavailable &&
-          !isEstopNotDisengaged ? (
+          {isUpdateSoftwareItemVisible ? (
             <MenuItem
               onClick={() => handleUpdateBuildroot(robot)}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${String(
                 robot.name
               )}`}
+              css={css`
+                border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8}
+                  0 0;
+              `}
             >
               {t('update_robot_software')}
             </MenuItem>
@@ -149,6 +156,14 @@ export const RobotOverviewOverflowMenu = (
                   isEstopNotDisengaged
                 }
                 data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
+                css={
+                  !isUpdateSoftwareItemVisible
+                    ? css`
+                        border-radius: ${BORDERS.borderRadius8}
+                          ${BORDERS.borderRadius8} 0 0;
+                      `
+                    : undefined
+                }
               >
                 {t('run_a_protocol')}
               </MenuItem>
@@ -199,6 +214,10 @@ export const RobotOverviewOverflowMenu = (
             data-testid={`RobotOverviewOverflowMenu_robotSettings_${String(
               robot.name
             )}`}
+            css={css`
+              border-radius: 0 0 ${BORDERS.borderRadius8}
+                ${BORDERS.borderRadius8};
+            `}
           >
             {t('robot_settings')}
           </MenuItem>
