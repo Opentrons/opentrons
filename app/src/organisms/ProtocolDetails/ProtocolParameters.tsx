@@ -34,7 +34,11 @@ export function ProtocolParameters({
           gridGap={SPACING.spacing12}
           width="100%"
         >
-          <Banner type="informing" width="100%">
+          <Banner
+            type="informing"
+            width="100%"
+            iconMarginRight={SPACING.spacing12}
+          >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('listed_values_are_view_only')}
