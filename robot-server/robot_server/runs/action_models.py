@@ -12,11 +12,15 @@ class RunActionType(str, Enum):
     * `"play"`: Start or resume a run.
     * `"pause"`: Pause a run.
     * `"stop"`: Stop (cancel) a run.
+    * `"complete-recovery"`: Resume normal protocol execution after a command failed,
+      the run was placed in `awaiting-recovery` mode, and manual recovery steps
+      were taken.
     """
 
     PLAY = "play"
     PAUSE = "pause"
     STOP = "stop"
+    COMPLETE_RECOVERY = "complete-recovery"
 
 
 class RunActionCreate(BaseModel):
