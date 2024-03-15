@@ -678,7 +678,7 @@ class UnexpectedTipAttachError(RoboticsInteractionError):
         super().__init__(ErrorCodes.UNEXPECTED_TIP_ATTACH, message, detail, wrapping)
 
 
-class HepaUVFailedError(RoboticsControlError):
+class HepaUVFailedError(RoboticsInteractionError):
     """An error indicating that the HEPA UV module has errored."""
 
     def __init__(

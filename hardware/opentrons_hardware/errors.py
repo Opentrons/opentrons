@@ -12,6 +12,7 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     LabwareDroppedError,
     PythonException,
+    HepaUVFailedError,
 )
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -113,7 +114,7 @@ def raise_from_error_message(  # noqa: C901
         )
 
     if error_code in (ErrorCode.door_open, ErrorCode.reed_open):
-        raise RoboticsInteractionError(message="", detail=detail_dict)
+        raise HepaUVFailedError(message="Hepa UV failed", detail=detail_dict)
 
     if error_code in (ErrorCode.timeout,):
         raise CommandTimedOutError(
