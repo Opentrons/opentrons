@@ -332,9 +332,7 @@ export const useRunTimeParameters = (
     },
   ]
   //  TODO(jr, 3/14/24): remove the mockData
-  return analysis?.runTimeParameters?.length === 0
-    ? mockData
-    : analysis?.runTimeParameters ?? []
+  return  analysis?.runTimeParameters ?? mockData
 }
 
 /**

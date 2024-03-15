@@ -7,12 +7,12 @@ import { useToaster } from '../../../organisms/ToasterOven'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { useRunTimeParameters } from '../../Protocols/hooks'
 import { Parameters } from '../Parameters'
-import type { RunTimeParameters } from '@opentrons/shared-data'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../Protocols/hooks')
 
-const mockRTPData: RunTimeParameters[] = [
+const mockRTPData: RunTimeParameter[] = [
   {
     displayName: 'Dry Run',
     variableName: 'DRYRUN',
@@ -141,5 +141,6 @@ describe('Parameters', () => {
     screen.getByText('3 choices')
     screen.getByText('EtoH Volume')
     screen.getByText('one choice, the second')
+    screen.getByText('fda')
   })
 })

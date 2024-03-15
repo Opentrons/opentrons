@@ -13,7 +13,7 @@ import { StyledText } from '../../atoms/text'
 import { useToaster } from '../../organisms/ToasterOven'
 import { useRunTimeParameters } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'
-import type { RunTimeParameters } from '@opentrons/shared-data'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const Table = styled('table')`
   font-size: ${TYPOGRAPHY.fontSize22};
@@ -58,7 +58,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
     makeSnackbar(t('start_setup_customize_values'))
   }
 
-  const getRange = (parameter: RunTimeParameters): string => {
+  const getRange = (parameter: RunTimeParameter): string => {
     const { type } = parameter
     const min = 'min' in parameter ? parameter.min : 0
     const max = 'max' in parameter ? parameter.max : 0
@@ -85,7 +85,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
     }
   }
 
-  const getDefault = (parameter: RunTimeParameters): string => {
+  const getDefault = (parameter: RunTimeParameter): string => {
     const { type, default: defaultValue } = parameter
     const suffix =
       'suffix' in parameter && parameter.suffix != null ? parameter.suffix : ''
@@ -109,9 +109,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
     return ''
   }
 
-  return runTimeParameters.length === 0 ? (
-    <EmptySection section="parameters" />
-  ) : (
+  return runTimeParameters.length > 0 ? (
     <Table onClick={makeSnack} data-testid="Parameters_table">
       <thead>
         <tr>
@@ -156,5 +154,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
         })}
       </tbody>
     </Table>
+  ) : (
+    <EmptySection section="parameters" />
   )
 }
