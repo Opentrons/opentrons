@@ -1,7 +1,8 @@
 """Protocol engine commands sub-state."""
 from __future__ import annotations
+
+import enum
 from collections import OrderedDict
-from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional, Union
@@ -43,27 +44,43 @@ from .abstract_store import HasState, HandlesActions
 from .config import Config
 
 
-class QueueStatus(str, Enum):
-    """Execution status of the command queue.
+class QueueStatus(enum.Enum):
+    """Execution status of the command queue."""
 
-    Properties:
-        SETUP: The engine has been created, but the run has not yet started.
-            New protocol commands may be enqueued but will wait to execute.
-            New setup commands may be enqueued and will execute immediately.
-        RUNNING: The queue is running though protocol commands.
-            New protocol commands may be enqueued and will execute immediately.
-            New setup commands may not be enqueued.
-        PAUSED: Execution of protocol commands has been paused.
-            New protocol commands may be enqueued but wait to execute.
-            New setup commands may not be enqueued.
+    SETUP = enum.auto()
+    """The engine has been created, but the run has not yet started.
+
+    New protocol commands may be enqueued, but will wait to execute.
+    New setup commands may be enqueued and will execute immediately.
+    New fixup commands may not be enqueued.
     """
 
-    SETUP = "setup"
-    RUNNING = "running"
-    PAUSED = "paused"
+    RUNNING = enum.auto()
+    """The queue is running through protocol commands.
+
+    New protocol commands may be enqueued and will execute immediately.
+    New setup commands may not be enqueued.
+    New fixup commands may not be enqueued.
+    """
+
+    PAUSED = enum.auto()
+    """Execution of protocol commands has been paused.
+
+    New protocol commands may be enqueued, but will wait to execute.
+    New setup commands may not be enqueued.
+    New fixup commands may not be enqueued.
+    """
+
+    AWAITING_RECOVERY = enum.auto()
+    """A protocol command has encountered a recoverable error.
+
+    New protocol commands may be enqueued, but will wait to execute.
+    New setup commands may not be enqueued.
+    New fixup commands may be enqueued and will execute immediately.
+    """
 
 
-class RunResult(str, Enum):
+class RunResult(str, enum.Enum):
     """Result of the run."""
 
     SUCCEEDED = "succeeded"
