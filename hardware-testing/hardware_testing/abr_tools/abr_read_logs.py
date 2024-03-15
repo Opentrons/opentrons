@@ -68,9 +68,10 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
     return num_of_errors, error_type, error_code, error_instrument, error_level
 
 
-def create_abr_data_sheet(storage_directory: str) -> None:
+def create_abr_data_sheet(storage_directory: str, file_name: str) -> str:
     """Creates csv file to log ABR data."""
-    sheet_location = os.path.join(storage_directory, "ABR-run-data.csv")
+    file_name_csv = file_name + ".csv"
+    sheet_location = os.path.join(storage_directory, file_name_csv)
     if os.path.exists(sheet_location):
         print(f"File {sheet_location} located. Not overwriting.")
     else:
@@ -100,6 +101,7 @@ def create_abr_data_sheet(storage_directory: str) -> None:
             writer = csv.DictWriter(csvfile, fieldnames=headers)
             writer.writeheader()
             print(f"Created file. Located: {sheet_location}.")
+    return file_name_csv
 
 
 def create_data_dictionary(
@@ -181,9 +183,9 @@ def create_data_dictionary(
     return runs_and_robots
 
 
-def read_abr_data_sheet(storage_directory: str) -> Set[str]:
+def read_abr_data_sheet(storage_directory: str, file_name_csv: str) -> Set[str]:
     """Reads current run sheet to determine what new run data should be added."""
-    sheet_location = os.path.join(storage_directory, "ABR-run-data.csv")
+    sheet_location = os.path.join(storage_directory, file_name_csv)
     runs_in_sheet = set()
     # Read the CSV file
     with open(sheet_location, "r") as csv_start:
@@ -201,10 +203,12 @@ def read_abr_data_sheet(storage_directory: str) -> Set[str]:
 
 
 def write_to_abr_sheet(
-    runs_and_robots: Dict[Any, Dict[str, Any]], storage_directory: str
+    runs_and_robots: Dict[Any, Dict[str, Any]],
+    storage_directory: str,
+    file_name_csv: str,
 ) -> None:
     """Write dict of data to abr csv."""
-    sheet_location = os.path.join(storage_directory, "ABR-run-data.csv")
+    sheet_location = os.path.join(storage_directory, file_name_csv)
     list_of_runs = list(runs_and_robots.keys())
     with open(sheet_location, "a", newline="") as f:
         writer = csv.writer(f)
@@ -226,25 +230,44 @@ if __name__ == "__main__":
         nargs=1,
         help="Path to long term storage directory for run logs.",
     )
+    parser.add_argument(
+        "file_name",
+        metavar="FILE_NAME",
+        type=str,
+        nargs=1,
+        help="Name of google sheet and local csv to save data to.",
+    )
+    parser.add_argument(
+        "google_sheet_tab_number",
+        metavar="GOOGLE_SHEET_TAB_NUMBER",
+        type=int,
+        nargs=1,
+        help="Google sheet tab number.",
+    )
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
+    file_name = args.file_name[0]
+    tab_number = args.google_sheet_tab_number[0]
     try:
         sys.path.insert(0, storage_directory)
         import google_sheets_tool  # type: ignore[import]
 
-        credentials_path = os.path.join(storage_directory, "abr.json")
+        credentials_path = os.path.join(storage_directory, "credentials.json")
     except ImportError:
-        raise ImportError("Make sure google_sheets_tool.py is in storage directory.")
+        raise ImportError(
+            "Check for google_sheets_tool.py and credentials.json in storage directory."
+        )
     try:
         google_sheet = google_sheets_tool.google_sheet(
-            credentials_path, "ABR Run Data", tab_number=0
+            credentials_path, file_name, tab_number=tab_number
         )
         print("Connected to google sheet.")
     except FileNotFoundError:
         print("No google sheets credentials. Add credentials to storage notebook.")
+
     runs_from_storage = get_run_ids_from_storage(storage_directory)
-    create_abr_data_sheet(storage_directory)
-    runs_in_sheet = read_abr_data_sheet(storage_directory)
+    file_name_csv = create_abr_data_sheet(storage_directory, file_name)
+    runs_in_sheet = read_abr_data_sheet(storage_directory, file_name_csv)
     runs_to_save = get_unseen_run_ids(runs_from_storage, runs_in_sheet)
     runs_and_robots = create_data_dictionary(runs_to_save, storage_directory)
-    write_to_abr_sheet(runs_and_robots, storage_directory)
+    write_to_abr_sheet(runs_and_robots, storage_directory, file_name_csv)
