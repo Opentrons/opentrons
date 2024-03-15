@@ -414,7 +414,7 @@ function LabwareLatch({
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.blue35}
-      borderRadius={BORDERS.borderRadius12}
+      borderRadius={BORDERS.borderRadius16}
       css={labwareLatchStyles}
       color={isLatchLoading ? COLORS.grey60 : COLORS.black90}
       height="6.5rem"
@@ -547,7 +547,7 @@ function RowLabware({
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.grey35}
-      borderRadius={BORDERS.borderRadius12}
+      borderRadius={BORDERS.borderRadius16}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       gridGap={SPACING.spacing32}
     >
