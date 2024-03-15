@@ -285,6 +285,8 @@ class ErrorCode(int, Enum):
     motor_busy = 0x0B
     stop_requested = 0x0C
     over_pressure = 0x0D
+    door_open = 0x0E
+    reed_open = 0x0F
 
 
 @unique
