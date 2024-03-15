@@ -35,28 +35,32 @@ const Table = styled('table')`
   border-spacing: 0 ${SPACING.spacing8};
   margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
+  border-radius: ${BORDERS.borderRadius8};
 `
 const TableHeader = styled('th')`
   padding: ${SPACING.spacing4};
+  border-radius: ${BORDERS.borderRadius8};
 `
 
 const TableRow = styled('tr')`
   background-color: ${COLORS.grey35};
   border: 1px ${COLORS.white} solid;
   height: 4.75rem;
+  border-radius: ${BORDERS.borderRadius8};
 `
 
 const TableDatum = styled('td')`
   padding: ${SPACING.spacing4};
   white-space: break-spaces;
   text-overflow: ${WRAP};
+  border-radius: ${BORDERS.borderRadius8};
   &:first-child {
-    border-top-left-radius: ${BORDERS.borderRadius16};
-    border-bottom-left-radius: ${BORDERS.borderRadius16};
+    border-top-left-radius: ${BORDERS.borderRadius8};
+    border-bottom-left-radius: ${BORDERS.borderRadius8};
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.borderRadius16};
-    border-bottom-right-radius: ${BORDERS.borderRadius16};
+    border-top-right-radius: ${BORDERS.borderRadius8};
+    border-bottom-right-radius: ${BORDERS.borderRadius8};
   }
 `
 

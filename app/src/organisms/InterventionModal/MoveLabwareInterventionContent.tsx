@@ -58,7 +58,7 @@ const LABWARE_DESCRIPTION_STYLE = css`
   border-radius: ${BORDERS.borderRadius4};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     background-color: ${COLORS.grey35};
-    border-radius: ${BORDERS.borderRadius12};
+    border-radius: ${BORDERS.borderRadius8};
   }
 `
 
