@@ -1,10 +1,13 @@
 import mqtt from 'mqtt'
 
 import { connectionStore } from './store'
-import { sendToBrowserDeserialized, deserialize } from './deserialize'
+import {
+  sendDeserializedGenericError,
+  deserializeExpectedMessages,
+} from './deserialize'
 import { unsubscribe } from './unsubscribe'
 import { notifyLog } from './log'
-import { FAILURE_STATUSES, HEALTH_STATUS_OK } from '../constants'
+import { HEALTH_STATUS_OK } from '../constants'
 
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
@@ -38,7 +41,7 @@ export function cleanUpUnreachableRobots(healthyRobotIPs: string[]): void {
   const healthyRobotIPsSet = new Set(healthyRobotIPs)
   const unreachableRobots = Object.keys(connectionStore).filter(hostname => {
     // The connection is forcefully closed, so remove from the connection store immediately to reduce disconnect packets.
-    if (hostname in connectionStore && !healthyRobotIPsSet.has(hostname)) {
+    if (!healthyRobotIPsSet.has(hostname)) {
       connectionStore.deleteHost(hostname)
       return true
     }
@@ -113,7 +116,7 @@ function establishListeners({
   client.on(
     'message',
     (topic: NotifyTopic, message: Buffer, packet: mqtt.IPublishPacket) => {
-      deserialize(message.toString())
+      deserializeExpectedMessages(message.toString())
         .then(deserializedMessage => {
           const messageContainsUnsubFlag = 'unsubscribe' in deserializedMessage
           if (messageContainsUnsubFlag) {
@@ -144,20 +147,18 @@ function establishListeners({
   // handles transport layer errors only
   client.on('error', error => {
     notifyLog.warn(`Error - ${error.name}: ${error.message}`)
-    sendToBrowserDeserialized({
+    sendDeserializedGenericError({
       hostname,
       topic: 'ALL_TOPICS',
-      message: FAILURE_STATUSES.ECONNFAILED,
     })
     client.end()
   })
 
   client.on('end', () => {
     notifyLog.debug(`Closed connection to ${hostname}`)
-    sendToBrowserDeserialized({
+    sendDeserializedGenericError({
       hostname,
       topic: 'ALL_TOPICS',
-      message: FAILURE_STATUSES.ECONNFAILED,
     })
   })
 
@@ -167,10 +168,9 @@ function establishListeners({
         packet.reasonCode ?? 'undefined'
       }`
     )
-    sendToBrowserDeserialized({
+    sendDeserializedGenericError({
       hostname,
       topic: 'ALL_TOPICS',
-      message: FAILURE_STATUSES.ECONNFAILED,
     })
   })
 }

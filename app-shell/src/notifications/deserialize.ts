@@ -9,6 +9,7 @@ import type {
   NotifyTopic,
   NotifyUnsubscribeData,
 } from '@opentrons/app/src/redux/shell/types'
+import { FAILURE_STATUSES } from '../constants'
 
 interface SendToBrowserParams {
   hostname: string
@@ -21,7 +22,7 @@ const VALID_NOTIFY_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
   { unsubscribe: true },
 ]
 
-export function sendToBrowserDeserialized({
+export function sendDeserialized({
   hostname,
   topic,
   message,
@@ -32,7 +33,24 @@ export function sendToBrowserDeserialized({
   } catch {} // Prevents shell erroring during app shutdown event.
 }
 
-export function deserialize(message: string): Promise<NotifyBrokerResponses> {
+export function sendDeserializedGenericError({
+  hostname,
+  topic,
+}: Omit<SendToBrowserParams, 'message'>): void {
+  try {
+    const browserWindow = connectionStore.getBrowserWindow()
+    browserWindow?.webContents.send(
+      'notify',
+      hostname,
+      topic,
+      FAILURE_STATUSES.ECONNFAILED
+    )
+  } catch {} // Prevents shell erroring during app shutdown event.
+}
+
+export function deserializeExpectedMessages(
+  message: string
+): Promise<NotifyBrokerResponses> {
   return new Promise((resolve, reject) => {
     let deserializedMessage: NotifyResponseData | Record<string, unknown>
     const error = new Error(

@@ -1,9 +1,8 @@
 import mqtt from 'mqtt'
 
 import { connectionStore } from './store'
-import { sendToBrowserDeserialized } from './deserialize'
+import { sendDeserialized, sendDeserializedGenericError } from './deserialize'
 import { notifyLog } from './log'
-import { FAILURE_STATUSES } from '../constants'
 
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 
@@ -27,13 +26,12 @@ export function subscribe({
   if (!connectionStore.isHostReachable(hostname)) {
     const errorMessage = connectionStore.getFailedConnectionStatus(hostname)
     if (errorMessage != null) {
-      sendToBrowserDeserialized({
+      sendDeserialized({
         hostname,
         topic,
         message: errorMessage,
       })
     }
-
     return Promise.resolve()
   } else {
     return waitUntilActiveOrErrored('client')
@@ -44,22 +42,20 @@ export function subscribe({
         }
 
         if (
-          !connectionStore.isActiveSub(hostname, topic) ||
+          !connectionStore.isActiveSub(hostname, topic) &&
           !connectionStore.isPendingSub(hostname, topic)
         ) {
           connectionStore.setSubStatus(hostname, topic, 'pending')
           return new Promise<void>(() => {
             client.subscribe(topic, subscribeOptions, subscribeCb)
-            connectionStore.setSubStatus(hostname, topic, 'subscribed')
           })
         } else {
           void waitUntilActiveOrErrored('subscription').catch(
             (error: Error) => {
               notifyLog.debug(error.message)
-              sendToBrowserDeserialized({
+              sendDeserializedGenericError({
                 hostname,
                 topic,
-                message: FAILURE_STATUSES.ECONNFAILED,
               })
             }
           )
@@ -67,20 +63,18 @@ export function subscribe({
       })
       .catch((error: Error) => {
         notifyLog.debug(error.message)
-        sendToBrowserDeserialized({
+        sendDeserializedGenericError({
           hostname,
           topic,
-          message: FAILURE_STATUSES.ECONNFAILED,
         })
       })
   }
 
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
     if (error != null) {
-      sendToBrowserDeserialized({
+      sendDeserializedGenericError({
         hostname,
         topic,
-        message: FAILURE_STATUSES.ECONNFAILED,
       })
     } else {
       notifyLog.debug(

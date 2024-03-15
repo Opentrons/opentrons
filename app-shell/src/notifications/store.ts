@@ -14,7 +14,10 @@ interface IHosts {
   pendingSubs: Set<NotifyTopic>
   pendingUnsubs: Set<NotifyTopic>
 }
-// Need a description here. You really want to highlight this manages internal state. It does not perform MQTT actions.
+
+/**
+ * Manages the internal state of MQTT connections to various robot hosts.
+ */
 class ConnectionStore {
   private unreachableHosts: Record<string, FailedConnStatus> = {}
 
@@ -82,6 +85,9 @@ class ConnectionStore {
    * @description Adds the host as unreachable with an error status derived from the MQTT returned error object.
    */
   public setFailedToConnectHost(hostname: string, error: Error): void {
+    if (hostname in this.hosts) {
+      delete this.hosts[hostname]
+    }
     if (!(hostname in this.unreachableHosts)) {
       const errorStatus = error.message.includes(FAILURE_STATUSES.ECONNREFUSED)
         ? FAILURE_STATUSES.ECONNREFUSED
@@ -101,8 +107,8 @@ class ConnectionStore {
       if (status === 'pending') {
         pendingSubs.add(topic)
       } else {
-        pendingSubs.delete(topic)
         subscriptions.add(topic)
+        pendingSubs.delete(topic)
       }
     }
   }
@@ -136,11 +142,11 @@ class ConnectionStore {
 
   public isHostNewlyDiscovered(hostname: string): boolean {
     if (hostname in this.hosts) {
-      return true
-    } else if (hostname in this.unreachableHosts) {
-      return true
-    } else {
       return false
+    } else if (hostname in this.unreachableHosts) {
+      return false
+    } else {
+      return true
     }
   }
 
