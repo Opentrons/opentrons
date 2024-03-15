@@ -31,7 +31,7 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
@@ -118,7 +118,7 @@ export function DeviceDetailsDeckConfiguration({
       <Flex
         alignItems={ALIGN_FLEX_START}
         backgroundColor={COLORS.white}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius8}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
         width="100%"

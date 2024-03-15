@@ -19,13 +19,17 @@ export interface Remote {
   }
 }
 
-interface NotifyRefetchData {
+export interface NotifyRefetchData {
   refetchUsingHTTP: boolean
-  statusCode: never
 }
 
+export interface NotifyUnsubscribeData {
+  unsubscribe: boolean
+}
+
+export type NotifyBrokerResponses = NotifyRefetchData | NotifyUnsubscribeData
 export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
-export type NotifyResponseData = NotifyRefetchData | NotifyNetworkError
+export type NotifyResponseData = NotifyBrokerResponses | NotifyNetworkError
 
 interface File {
   sha512: string

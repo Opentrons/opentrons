@@ -544,7 +544,10 @@ def test_tiprack_list():
         core_map=None,  # type: ignore[arg-type]
     )
 
-    assert labware.select_tiprack_from_list([tiprack], 1) == (tiprack, tiprack["A1"])
+    assert labware.select_tiprack_from_list([tiprack], 1) == (
+        tiprack,
+        tiprack["A1"],
+    )
 
     assert labware.select_tiprack_from_list([tiprack], 1, tiprack.wells()[1]) == (
         tiprack,

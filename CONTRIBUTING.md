@@ -291,7 +291,7 @@ JavaScript dependencies are installed by [yarn][]. When calling yarn, you should
 A development dependency is any dependency that is used only to help manage the project. Examples of development dependencies would be:
 
 - Build tools (webpack, babel)
-- Testing/linting/checking tools (jest, typescript, eslint)
+- Testing/linting/checking tools (vitest, typescript, eslint)
 - Libraries used only in support scripts (aws, express)
 
 To add a development dependency:

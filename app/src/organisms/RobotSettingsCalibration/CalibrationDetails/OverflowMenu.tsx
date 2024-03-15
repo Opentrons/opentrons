@@ -4,6 +4,7 @@ import { saveAs } from 'file-saver'
 
 import {
   Flex,
+  BORDERS,
   COLORS,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
@@ -38,6 +39,7 @@ import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsE
 import type { PipetteName } from '@opentrons/shared-data'
 import type { DeleteCalRequestParams } from '@opentrons/api-client'
 import type { SelectablePipettes } from '../../PipetteWizardFlows/types'
+import { css } from 'styled-components'
 
 interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'
@@ -194,7 +196,7 @@ export function OverflowMenu({
           ref={calsOverflowWrapperRef}
           whiteSpace="nowrap"
           zIndex={10}
-          borderRadius="4px 4px 0px 0px"
+          borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
@@ -203,7 +205,12 @@ export function OverflowMenu({
           flexDirection={DIRECTION_COLUMN}
         >
           {isPipetteForFlex ? (
-            <MenuItem onClick={handleRecalibrate}>
+            <MenuItem
+              onClick={handleRecalibrate}
+              css={css`
+                border-radius: ${BORDERS.borderRadius8};
+              `}
+            >
               {t(
                 ot3PipCal == null
                   ? 'robot_calibration:calibrate_pipette'
@@ -212,13 +219,24 @@ export function OverflowMenu({
             </MenuItem>
           ) : (
             <>
-              <MenuItem onClick={handleDownload} disabled={!calibrationPresent}>
+              <MenuItem
+                onClick={handleDownload}
+                disabled={!calibrationPresent}
+                css={css`
+                  border-radius: ${BORDERS.borderRadius8}
+                    ${BORDERS.borderRadius8} 0 0;
+                `}
+              >
                 {t('download_calibration_data')}
               </MenuItem>
               <Divider />
               <MenuItem
                 onClick={handleDeleteCalibration}
                 disabled={!calibrationPresent}
+                css={css`
+                  border-radius: 0 0 ${BORDERS.borderRadius8}
+                    ${BORDERS.borderRadius8};
+                `}
               >
                 {t('robot_calibration:delete_calibration_data')}
               </MenuItem>

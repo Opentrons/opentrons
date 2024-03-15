@@ -28,7 +28,7 @@ export function ConnectingNetwork({
         backgroundColor={COLORS.grey35}
         flex="1"
         justifyContent={JUSTIFY_CENTER}
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
       >
         <Flex
           justifyContent={JUSTIFY_CENTER}

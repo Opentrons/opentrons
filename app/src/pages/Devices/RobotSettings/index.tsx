@@ -107,7 +107,7 @@ export function RobotSettings(): JSX.Element | null {
     <Box minWidth={SIZE_6} height="max-content" padding={SPACING.spacing16}>
       <Flex
         backgroundColor={COLORS.white}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         flexDirection={DIRECTION_COLUMN}
         marginBottom={SPACING.spacing16}
         minHeight="calc(100vh - 3.5rem)"

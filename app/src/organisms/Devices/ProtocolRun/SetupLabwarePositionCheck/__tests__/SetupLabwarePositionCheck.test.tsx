@@ -24,7 +24,7 @@ import {
   useRobotType,
 } from '../../../hooks'
 import { SetupLabwarePositionCheck } from '..'
-import { useNotifyRunQuery } from '../../../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../../../resources/runs'
 
 import type { Mock } from 'vitest'
 
@@ -35,7 +35,7 @@ vi.mock('../../../../../redux/config')
 vi.mock('../../../hooks')
 vi.mock('../../../hooks/useLPCSuccessToast')
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../../resources/runs/useNotifyRunQuery')
+vi.mock('../../../../../resources/runs')
 
 const DISABLED_REASON = 'MOCK_DISABLED_REASON'
 const ROBOT_NAME = 'otie'

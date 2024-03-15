@@ -271,44 +271,29 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 error=action.error,
             )
             prev_entry = self._state.commands_by_id[action.command_id]
-            self._state.commands_by_id[action.command_id] = CommandEntry(
-                index=prev_entry.index,
-                # TODO(mc, 2022-06-06): add new "cancelled" status or similar
-                # and don't set `completedAt` in commands other than the
-                # specific one that failed
-                command=prev_entry.command.copy(
-                    update={
-                        "error": error_occurrence,
-                        "completedAt": action.failed_at,
-                        "status": CommandStatus.FAILED,
-                    }
-                ),
+            # TODO(mc, 2022-06-06): add new "cancelled" status or similar
+            self._update_to_failed(
+                command_id=action.command_id,
+                failed_at=action.failed_at,
+                error_occurrence=error_occurrence,
             )
 
             self._state.failed_command = self._state.commands_by_id[action.command_id]
+
             if prev_entry.command.intent == CommandIntent.SETUP:
-                other_command_ids_to_fail = [
-                    *[i for i in self._state.queued_setup_command_ids],
-                ]
+                other_command_ids_to_fail = self._state.queued_setup_command_ids
+                for id in other_command_ids_to_fail:
+                    self._update_to_failed(
+                        command_id=id, failed_at=action.failed_at, error_occurrence=None
+                    )
                 self._state.queued_setup_command_ids.clear()
             else:
-                other_command_ids_to_fail = [
-                    *[i for i in self._state.queued_command_ids],
-                ]
+                other_command_ids_to_fail = self._state.queued_command_ids
+                for id in other_command_ids_to_fail:
+                    self._update_to_failed(
+                        command_id=id, failed_at=action.failed_at, error_occurrence=None
+                    )
                 self._state.queued_command_ids.clear()
-
-            for command_id in other_command_ids_to_fail:
-                prev_entry = self._state.commands_by_id[command_id]
-
-                self._state.commands_by_id[command_id] = CommandEntry(
-                    index=prev_entry.index,
-                    command=prev_entry.command.copy(
-                        update={
-                            "completedAt": action.failed_at,
-                            "status": CommandStatus.FAILED,
-                        }
-                    ),
-                )
 
             if self._state.running_command_id == action.command_id:
                 self._state.running_command_id = None
@@ -377,6 +362,24 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         self._state.queue_status = QueueStatus.PAUSED
                 elif action.door_state == DoorState.CLOSED:
                     self._state.is_door_blocking = False
+
+    def _update_to_failed(
+        self,
+        command_id: str,
+        failed_at: datetime,
+        error_occurrence: Optional[ErrorOccurrence],
+    ) -> None:
+        prev_entry = self._state.commands_by_id[command_id]
+        updated_command = prev_entry.command.copy(
+            update={
+                "completedAt": failed_at,
+                "status": CommandStatus.FAILED,
+                **({"error": error_occurrence} if error_occurrence else {}),
+            }
+        )
+        self._state.commands_by_id[command_id] = CommandEntry(
+            index=prev_entry.index, command=updated_command
+        )
 
     @staticmethod
     def _map_run_exception_to_error_occurrence(
@@ -516,6 +519,10 @@ class CommandView(HasState[CommandState]):
         else:
             return run_error or finish_error
 
+    def get_running_command_id(self) -> Optional[str]:
+        """Return the ID of the command that's currently running, if there is one."""
+        return self._state.running_command_id
+
     def get_current(self) -> Optional[CurrentCommand]:
         """Return the "current" command, if any.
 
@@ -632,6 +639,9 @@ class CommandView(HasState[CommandState]):
         )
 
         if no_command_running and no_command_to_execute:
+            # TODO(mm, 2024-03-14): This is a slow O(n) scan. When a long run ends and
+            # we reach this loop, it can disrupt the robot server.
+            # https://opentrons.atlassian.net/browse/EXEC-55
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
@@ -690,6 +700,13 @@ class CommandView(HasState[CommandState]):
                 raise SetupCommandNotAllowedError(
                     "Setup commands are not allowed after run has started."
                 )
+
+        elif self.get_status() == EngineStatus.AWAITING_RECOVERY:
+            # While we're developing error recovery, we'll conservatively disallow
+            # all actions, to avoid putting the engine in weird undefined states.
+            # We'll allow specific actions here as we flesh things out and add support
+            # for them.
+            raise NotImplementedError()
 
         return action
 

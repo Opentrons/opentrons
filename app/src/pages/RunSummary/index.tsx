@@ -9,6 +9,7 @@ import {
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
   Btn,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -59,12 +60,11 @@ import {
 } from '../../redux/analytics'
 import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
-import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { formatTimeWithUtcLabel, useNotifyRunQuery } from '../../resources/runs'
 import { handleTipsAttachedModal } from '../../organisms/DropTipWizard/TipsAttachedModal'
 import { getPipettesWithTipAttached } from '../../organisms/DropTipWizard/getPipettesWithTipAttached'
 import { getPipetteModelSpecs, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { useMostRecentRunId } from '../../organisms/ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -391,6 +391,7 @@ const SplashFrame = styled(Flex)`
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing40};
+  border-radius: ${BORDERS.borderRadius8};
 `
 
 const ProtocolName = styled.h4`

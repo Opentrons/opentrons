@@ -25,14 +25,14 @@ import {
   PIPETTE_ENTITY,
   STORED_PROTOCOL_ANALYSIS,
 } from '../__fixtures__/storedProtocolAnalysis'
-import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../../resources/runs'
 
 import type { Protocol, Run } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../redux/protocol-storage/selectors')
-vi.mock('../../../../resources/runs/useNotifyRunQuery')
+vi.mock('../../../../resources/runs')
 
 const store: Store<any> = createStore(vi.fn(), {})
 

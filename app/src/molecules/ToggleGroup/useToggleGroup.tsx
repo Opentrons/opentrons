@@ -10,7 +10,7 @@ import {
 import { useTrackEvent } from '../../redux/analytics'
 
 const BUTTON_GROUP_STYLES = css`
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius8};
   margin-top: -1px;
   width: fit-content;
 
@@ -47,12 +47,12 @@ const BUTTON_GROUP_STYLES = css`
   }
 
   button:first-child {
-    border-radius: ${BORDERS.radiusSoftCorners} 0 0 ${BORDERS.radiusSoftCorners};
+    border-radius: ${BORDERS.borderRadius4} 0 0 ${BORDERS.borderRadius8};
     border-right: none;
   }
 
   button:last-child {
-    border-radius: 0 ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} 0;
+    border-radius: 0 ${BORDERS.borderRadius4} ${BORDERS.borderRadius8} 0;
     border-left: none;
   }
 `

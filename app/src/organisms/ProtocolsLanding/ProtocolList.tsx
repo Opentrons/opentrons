@@ -168,7 +168,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              borderRadius={BORDERS.radiusSoftCorners}
+              borderRadius={BORDERS.borderRadius8}
               marginLeft={SPACING.spacing8}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
@@ -195,7 +195,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           {showSortByMenu && (
             <Flex
               zIndex={2}
-              borderRadius={BORDERS.radiusSoftCorners}
+              borderRadius={BORDERS.borderRadius4}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}

@@ -106,7 +106,7 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
 
 const INPUT_STYLE = css`
   background-color: ${COLORS.blue50};
-  border-radius: ${BORDERS.radiusRoundEdge};
+  border-radius: ${BORDERS.borderRadius8};
   box-shadow: none;
   color: ${COLORS.grey10};
   overflow: no-wrap;
@@ -276,7 +276,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               backgroundColor={COLORS.grey35}
               padding={SPACING.spacing8}
               border={BORDERS.lineBorder}
-              borderRadius={BORDERS.borderRadiusSize2}
+              borderRadius={BORDERS.borderRadius8}
             >
               <Text
                 as="h4"

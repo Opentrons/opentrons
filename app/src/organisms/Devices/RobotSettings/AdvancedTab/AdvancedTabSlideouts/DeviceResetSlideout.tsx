@@ -39,7 +39,7 @@ import {
   useTipLengthCalibrations,
   useRobot,
 } from '../../../hooks'
-import { useNotifyAllRunsQuery } from '../../../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../../../resources/runs'
 
 import type { State, Dispatch } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
@@ -169,7 +169,7 @@ export function DeviceResetSlideout({
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.yellow30}
-          borderRadius={BORDERS.borderRadiusSize1}
+          borderRadius={BORDERS.borderRadius4}
           padding={SPACING.spacing8}
           marginBottom={SPACING.spacing24}
         >

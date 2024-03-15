@@ -123,7 +123,6 @@ describe('findLabwareDefWithCustom', () => {
   SPECS.forEach(spec => {
     // TODO(mc, 2021-05-19): these tests are failing due to bug in code under test
     // see: https://github.com/Opentrons/opentrons/issues/7823
-    // eslint-disable-next-line jest/no-disabled-tests
     it.skip(`should ${spec.should}`, () => {
       expect(
         findLabwareDefWithCustom(

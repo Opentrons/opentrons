@@ -35,6 +35,14 @@ class EngineStatus(str, Enum):
     FAILED = "failed"
     SUCCEEDED = "succeeded"
 
+    AWAITING_RECOVERY = "awaiting-recovery"
+    """The engine is waiting for external input to recover from a nonfatal error.
+
+    New fixup commands may be enqueued, which will run immediately.
+    The run can't be paused in this state, but it can be canceled, or resumed from the
+    next protocol command if recovery is complete.
+    """
+
 
 class DeckSlotLocation(BaseModel):
     """The location of something placed in a single deck slot."""
@@ -748,7 +756,7 @@ class PostRunHardwareState(Enum):
     DISENGAGE_IN_PLACE = "disengageInPlace"
 
 
-NOZZLE_NAME_REGEX = "[A-Z][0-100]"
+NOZZLE_NAME_REGEX = r"[A-Z]\d{1,2}"
 PRIMARY_NOZZLE_LITERAL = Literal["A1", "H1", "A12", "H12"]
 
 
@@ -837,3 +845,67 @@ class TipPresenceStatus(str, Enum):
             HwTipStateType.PRESENT: TipPresenceStatus.PRESENT,
             HwTipStateType.ABSENT: TipPresenceStatus.ABSENT,
         }[state]
+
+
+class RTPBase(BaseModel):
+    """Parameters defined in a protocol."""
+
+    displayName: str = Field(..., description="Display string for the parameter.")
+    variableName: str = Field(..., description="Python variable name of the parameter.")
+    description: str = Field(..., description="Detailed description of the parameter.")
+    suffix: Optional[str] = Field(
+        None,
+        description="Units (like mL, mm/sec, etc) or a custom suffix for the parameter.",
+    )
+
+
+class IntParameter(RTPBase):
+    """An integer parameter defined in a protocol."""
+
+    min: int = Field(
+        ..., description="Minimum value that the integer param is allowed to have."
+    )
+    max: int = Field(
+        ..., description="Maximum value that the integer param is allowed to have."
+    )
+    default: int = Field(
+        ...,
+        description="Default value of the parameter, to be used when there is no client-specified value.",
+    )
+
+
+class FloatParameter(RTPBase):
+    """A float parameter defined in a protocol."""
+
+    min: float = Field(
+        ..., description="Minimum value that the float param is allowed to have."
+    )
+    max: float = Field(
+        ..., description="Maximum value that the float param is allowed to have."
+    )
+    default: float = Field(
+        ...,
+        description="Default value of the parameter, to be used when there is no client-specified value.",
+    )
+
+
+class EnumChoice(BaseModel):
+    """Components of choices used in RTP Enum Parameters."""
+
+    displayName: str = Field(..., description="Display string for the param's choice.")
+    value: str = Field(..., description="Enum value of the param's choice.")
+
+
+class EnumParameter(RTPBase):
+    """A string enum defined in a protocol."""
+
+    choices: List[EnumChoice] = Field(
+        ..., description="List of valid choices for this parameter."
+    )
+    default: str = Field(
+        ...,
+        description="Default value of the parameter, to be used when there is no client-specified value.",
+    )
+
+
+RunTimeParameter = Union[IntParameter, FloatParameter, EnumParameter]

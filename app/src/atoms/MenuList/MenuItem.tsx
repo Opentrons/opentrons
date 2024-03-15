@@ -21,11 +21,7 @@ export const MenuItem = styled.button<ButtonProps>`
     ${SPACING.spacing12};
 
   &:hover {
-    background-color: ${COLORS.grey10};
-  }
-
-  &:active {
-    background-color: ${COLORS.grey30};
+    background-color: ${COLORS.blue10};
   }
 
   &:disabled {

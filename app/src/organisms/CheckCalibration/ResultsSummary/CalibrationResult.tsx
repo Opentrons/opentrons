@@ -17,7 +17,7 @@ import { RenderResult } from './RenderResult'
 
 export const RESULT_SUMMARY_STYLE = css`
   border: 1px solid ${COLORS.grey30};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
 `
 
 type CalibrationType = 'deck' | 'pipetteOffset' | 'tipLength'

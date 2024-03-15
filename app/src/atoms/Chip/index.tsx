@@ -40,12 +40,12 @@ const CHIP_PROPS_BY_TYPE: Record<
 > = {
   basic: {
     backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
-    borderRadius: BORDERS.borderRadiusSize1,
+    borderRadius: BORDERS.borderRadius4,
     textColor: COLORS.grey60,
   },
   error: {
     backgroundColor: COLORS.red35,
-    borderRadius: BORDERS.borderRadiusSize5,
+    borderRadius: BORDERS.borderRadius40,
     iconColor: COLORS.red60,
     textColor: COLORS.red60,
   },
@@ -57,20 +57,20 @@ const CHIP_PROPS_BY_TYPE: Record<
   },
   neutral: {
     backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
-    borderRadius: BORDERS.borderRadiusSize5,
+    borderRadius: BORDERS.borderRadius40,
     iconColor: COLORS.grey60,
     textColor: COLORS.grey60,
   },
   success: {
     backgroundColor: COLORS.green35,
-    borderRadius: BORDERS.borderRadiusSize5,
+    borderRadius: BORDERS.borderRadius40,
     iconColor: COLORS.green60,
     iconName: 'ot-check',
     textColor: COLORS.green60,
   },
   warning: {
     backgroundColor: COLORS.yellow35,
-    borderRadius: BORDERS.borderRadiusSize5,
+    borderRadius: BORDERS.borderRadius40,
     iconColor: COLORS.yellow60,
     textColor: COLORS.yellow60,
   },
