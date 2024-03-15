@@ -91,7 +91,6 @@ class ConnectionStore {
     }
   }
 
-  // I think you have to do this for unsubscribing?
   public setSubStatus(
     hostname: string,
     topic: NotifyTopic,
@@ -104,6 +103,24 @@ class ConnectionStore {
       } else {
         pendingSubs.delete(topic)
         subscriptions.add(topic)
+      }
+    }
+  }
+
+  public setUnubStatus(
+    hostname: string,
+    topic: NotifyTopic,
+    status: 'pending' | 'unsubscribed'
+  ): void {
+    if (hostname in this.hosts) {
+      const { pendingUnsubs, subscriptions } = this.hosts[hostname]
+      if (subscriptions.has(topic)) {
+        if (status === 'pending') {
+          pendingUnsubs.add(topic)
+        } else {
+          pendingUnsubs.delete(topic)
+          subscriptions.delete(topic)
+        }
       }
     }
   }
