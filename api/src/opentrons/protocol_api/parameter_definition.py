@@ -108,3 +108,87 @@ class ParameterDefinition(Generic[ParamType]):
     def variable_name(self) -> str:
         """The in-protocol variable name of the parameter."""
         return self._variable_name
+
+
+def create_int_parameter(
+    display_name: str,
+    variable_name: str,
+    default: int,
+    minimum: Optional[int] = None,
+    maximum: Optional[int] = None,
+    choices: Optional[List[ParameterChoices]] = None,
+    description: Optional[str] = None,
+    unit: Optional[str] = None,
+) -> ParameterDefinition[int]:
+    """Creates an integer parameter."""
+    return ParameterDefinition(
+        parameter_type=int,
+        display_name=display_name,
+        variable_name=variable_name,
+        default=default,
+        minimum=minimum,
+        maximum=maximum,
+        choices=choices,
+        description=description,
+        unit=unit,
+    )
+
+
+def create_float_parameter(
+    display_name: str,
+    variable_name: str,
+    default: float,
+    minimum: Optional[float] = None,
+    maximum: Optional[float] = None,
+    choices: Optional[List[ParameterChoices]] = None,
+    description: Optional[str] = None,
+    unit: Optional[str] = None,
+) -> ParameterDefinition[float]:
+    """Creates a float parameter."""
+    return ParameterDefinition(
+        parameter_type=float,
+        display_name=display_name,
+        variable_name=variable_name,
+        default=default,
+        minimum=minimum,
+        maximum=maximum,
+        choices=choices,
+        description=description,
+        unit=unit,
+    )
+
+
+def create_bool_parameter(
+    display_name: str,
+    variable_name: str,
+    default: bool,
+    choices: List[ParameterChoices],
+    description: Optional[str] = None,
+) -> ParameterDefinition[bool]:
+    """Creates a boolean parameter."""
+    return ParameterDefinition(
+        parameter_type=bool,
+        display_name=display_name,
+        variable_name=variable_name,
+        default=default,
+        choices=choices,
+        description=description,
+    )
+
+
+def create_str_parameter(
+    display_name: str,
+    variable_name: str,
+    default: str,
+    choices: Optional[List[ParameterChoices]] = None,
+    description: Optional[str] = None,
+) -> ParameterDefinition[str]:
+    """Creates a string parameter."""
+    return ParameterDefinition(
+        parameter_type=str,
+        display_name=display_name,
+        variable_name=variable_name,
+        default=default,
+        choices=choices,
+        description=description,
+    )

@@ -65,18 +65,20 @@ def _raise_pretty_protocol_error(exception: Exception, filename: str) -> None:
     ) from exception
 
 
-def _parse_and_set_parameters(new_globs: Dict[Any, Any], filename: str) -> Parameters:
+def _parse_and_set_parameters(
+    protocol: PythonProtocol, new_globs: Dict[Any, Any], filename: str
+) -> Parameters:
     try:
         _add_parameters_func_ok(new_globs.get("add_parameters"))
     except SyntaxError as se:
         raise MalformedPythonProtocolError(str(se))
-    parameter_context = ParameterContext()
+    parameter_context = ParameterContext(api_version=protocol.api_level)
     new_globs["__param_context"] = parameter_context
     try:
         exec("add_parameters(__param_context)", new_globs)
     except Exception as e:
         _raise_pretty_protocol_error(exception=e, filename=filename)
-    return Parameters(parameters=parameter_context.get_variable_names_and_values())
+    return parameter_context.export_parameters()
 
 
 def run_python(proto: PythonProtocol, context: ProtocolContext):
@@ -99,7 +101,7 @@ def run_python(proto: PythonProtocol, context: ProtocolContext):
         filename = proto.filename or "<protocol>"
 
     if new_globs.get("add_parameters"):
-        context._params = _parse_and_set_parameters(new_globs, filename)
+        context._params = _parse_and_set_parameters(proto, new_globs, filename)
 
     try:
         _runfunc_ok(new_globs.get("run"))
