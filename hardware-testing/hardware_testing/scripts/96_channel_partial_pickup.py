@@ -42,7 +42,6 @@ retract_dist = 100
 retract_speed = 60
 
 leak_test_time = 30
-test_volume = 50
 
 def dict_keys_to_line(dict):
     return str.join(",", list(dict.keys())) + "\n"
@@ -334,7 +333,7 @@ async def _main() -> None:
         # hw_api.clamp_tip_speed = float(input("clamp pick up Speed: "))
         # pick_up_distance = float(input("pick up distance in mm: "))
         await update_pick_up_current(hw_api, mount, args.nozzles, m_current)
-        await update_pick_up_speed(hw_api, mount, pick_up_speed)
+        await update_pick_up_speed(hw_api, mount, pick_up_speed, args.nozzles)
         # await update_pick_up_distance(hw_api, mount, pick_up_distance)
         if (args.measure_nozzles):
             cp = CriticalPoint.NOZZLE
@@ -451,8 +450,7 @@ async def _main() -> None:
                     await move_to_point(hw_api, mount, tip_position, cp)
                     await asyncio.sleep(1)
                     tip_measurement = gauge.read()
-                    print("tip-",tip_count, "(mm): " ,tip_measurement, end="")
-                    print("\r", end="")
+                    print("tip-",tip_count, "(mm): " ,tip_measurement,"\r", end="")
                     measurements.append(tip_measurement)
                     if tip_count % num_of_columns == 0:
                         d_str = ''
@@ -474,7 +472,7 @@ async def _main() -> None:
             if args.trough:
                 await hw_api.prepare_for_aspirate(mount)
                 await move_to_point(hw_api, mount, trough_loc, cp)
-                await hw_api.aspirate(mount, test_volume)
+                await hw_api.aspirate(mount, args.test_volume)
                 await hw_api.home_z(mount)
                 await countdown(leak_test_time)
                 await move_to_point(hw_api, mount, trough_loc, cp)
@@ -569,6 +567,7 @@ if __name__ == "__main__":
     parser.add_argument("--min_z_distance", type=float, default=5)
     parser.add_argument("--mount_speed", type=float, default=5)
     parser.add_argument("--plunger_speed", type=float, default=10)
+    parser.add_argument("--test_volume", type=float, default=50)
     parser.add_argument(
         "--sensor_threshold", type=float, default=100, help="Threshold in Pascals"
     )
