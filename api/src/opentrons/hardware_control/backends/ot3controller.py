@@ -161,6 +161,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_pass,
     liquid_probe,
     check_overpressure,
+    OutputOptions,
 )
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
@@ -1365,7 +1366,8 @@ class OT3Controller(FlexBackend):
             plunger_speed,
             mount_speed,
             threshold_pascals,
-            log_pressure,
+            OutputOptions.none,
+            None,
             auto_zero_sensor,
             num_baseline_reads,
             sensor_id_for_instrument(probe),
