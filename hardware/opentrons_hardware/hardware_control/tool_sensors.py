@@ -222,8 +222,6 @@ async def liquid_probe(
         ):
             return await sensor_runner.run(can_messenger=messenger)
 
-    return positions
-
 
 async def check_overpressure(
     messenger: CanMessenger,

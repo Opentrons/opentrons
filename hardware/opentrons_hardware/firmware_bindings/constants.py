@@ -173,6 +173,7 @@ class MessageId(int, Enum):
     execute_move_group_request = 0x18
     clear_all_move_groups_request = 0x19
     home_request = 0x20
+    add_sensor_move_request = 0x23
     move_completed = 0x13
 
     motor_position_request = 0x12
@@ -250,6 +251,7 @@ class MessageId(int, Enum):
     peripheral_status_request = 0x8C
     peripheral_status_response = 0x8D
     baseline_sensor_response = 0x8E
+    send_accumulated_pressure_data = 0x8F
 
     set_hepa_fan_state_request = 0x90
     get_hepa_fan_state_request = 0x91
@@ -405,6 +407,7 @@ class MoveStopCondition(int, Enum):
     stall = 0x10
     ignore_stalls = 0x20
     limit_switch_backoff = 0x40
+    sensor_report = 0x80
 
 
 @unique
