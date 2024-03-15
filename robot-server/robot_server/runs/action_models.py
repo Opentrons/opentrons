@@ -7,12 +7,11 @@ from robot_server.service.json_api import ResourceModel
 
 
 class RunActionType(str, Enum):
-    """Types of run control actions.
+    """The type of the run control action.
 
-    Args:
-        PLAY: Start or resume a protocol run.
-        PAUSE: Pause a run.
-        STOP: Stop (cancel) a run.
+    * `"play"`: Start or resume a run.
+    * `"pause"`: Pause a run.
+    * `"stop"`: Stop (cancel) a run.
     """
 
     PLAY = "play"
