@@ -30,206 +30,208 @@ async def _main(simulating: bool) -> None:
 
 
     #andy 调试
-    # mount = OT3Mount.GRIPPER
+    mount = OT3Mount.GRIPPER
+    api = await helpers_ot3.build_async_ot3_hardware_api(
+        is_simulating=simulating, use_defaults=True
+    )
+    # home and move to attach position
+    for i in [1,2,4,5,6,7,8,9,10,11,12]:
+        await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+        hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(i)
+        # MOVE TO SLOT
+        #aa = input("1 Press Enter to continue...")
+        await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 35))
+        await api.grip(30)
+        await api.home([Axis.Z_G])
+        hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(3)
+        current_pos = await api.gantry_position(mount)
+        hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1]-28,z=current_pos[2])
+        # MOVE TO SLOT
+        #aa = input("1 Press Enter to continue...")
+        await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
+        aa = input("1 Press Enter to continue...")
+        await api.ungrip()
+        input("end")
+
+    
+    # operator = input("Enter Operator Name:: ").strip()
+    # HEPASN = input("Enter HEPA/UV Barcode Number:: ").strip()
     # api = await helpers_ot3.build_async_ot3_hardware_api(
     #     is_simulating=simulating, use_defaults=True
     # )
     # # home and move to attach position
     # await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
-    # hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
-    # # MOVE TO SLOT
-    # #aa = input("1 Press Enter to continue...")
-    # await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 35))
-    # await api.grip(30)
-    # await api.home([Axis.Z_G])
-    # hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(3)
-    # current_pos = await api.gantry_position(mount)
-    # hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1]-30,z=current_pos[2])
-    # # MOVE TO SLOT
-    # #aa = input("1 Press Enter to continue...")
-    # await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
-    # aa = input("1 Press Enter to continue...")
-    # await api.ungrip()
-    # input("return")
+    
+    # slotc2 = (229.71,196.32,291.17)
+    # await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, Point(slotc2[0], slotc2[1], slotc2[2]))
+    
+    # instrument = BuildAsairGT521S()
+    # uvinstrument = BuildAsairUV()
+    # INTSN = instrument.serial_number().strip("SS").replace(' ', '')
+    # csv_props, csv_cb = _create_csv_and_get_callbacks(HEPASN)
+    
+    # csv_cb.write(["operator:", operator])
+    # csv_cb.write(["test_time:", datetime.utcnow().strftime("%Y/%m/%d-%H:%M:%S")])
+    # csv_cb.write(["INSTRUMENT SN:", INTSN])
+    # csv_cb.write(["HEPA SN:" , HEPASN])
 
-    
-    operator = input("Enter Operator Name:: ").strip()
-    HEPASN = input("Enter HEPA/UV Barcode Number:: ").strip()
-    api = await helpers_ot3.build_async_ot3_hardware_api(
-        is_simulating=simulating, use_defaults=True
-    )
-    # home and move to attach position
-    await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
-    
-    slotc2 = (229.71,196.32,291.17)
-    await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, Point(slotc2[0], slotc2[1], slotc2[2]))
-    
-    instrument = BuildAsairGT521S()
-    uvinstrument = BuildAsairUV()
-    INTSN = instrument.serial_number().strip("SS").replace(' ', '')
-    csv_props, csv_cb = _create_csv_and_get_callbacks(HEPASN)
-    
-    csv_cb.write(["operator:", operator])
-    csv_cb.write(["test_time:", datetime.utcnow().strftime("%Y/%m/%d-%H:%M:%S")])
-    csv_cb.write(["INSTRUMENT SN:", INTSN])
-    csv_cb.write(["HEPA SN:" , HEPASN])
-
-    test_data={
-                    'Time(Date Time)': None,
-                    'Size1(um)': None,
-                    'Count1(M3)': None,
-                    'Size2(um)': None,
-                    'Count2(M3)': None,
-                    'Location': None,
-                    'Sample Time(sec)': None,
-                    'PASS/FAIL': None,
-                        }
+    # test_data={
+    #                 'Time(Date Time)': None,
+    #                 'Size1(um)': None,
+    #                 'Count1(M3)': None,
+    #                 'Size2(um)': None,
+    #                 'Count2(M3)': None,
+    #                 'Location': None,
+    #                 'Sample Time(sec)': None,
+    #                 'PASS/FAIL': None,
+    #                     }
                         
    
-    print("TURN ON FAN")
-    input("PRESS ENTER TO CONTINUE")
-    instrument.initialize_connection()
-    instrument.clear_data()
-    instrument.set_number_of_samples(6)
-    instrument.start_sampling()
-    await asyncio.sleep(3)
-    #Determines if the MetOne Device is running
-    operation = True
-    try:
-        while operation:
-            stats = instrument.operation_status()
-            if stats == "Stop":
-                operation = False
-            print(stats)
-            print('\r', end='')
-            await asyncio.sleep(1)
-    except Exception as errval:
-        print("errval",errval)
-    #print out the data
-    print("TURN OFF FAN")
-    input("PRESS ENTER TO CONTINUE")
+    # print("TURN ON FAN")
+    # input("PRESS ENTER TO CONTINUE")
+    # instrument.initialize_connection()
+    # instrument.clear_data()
+    # instrument.set_number_of_samples(6)
+    # instrument.start_sampling()
+    # await asyncio.sleep(3)
+    # #Determines if the MetOne Device is running
+    # operation = True
+    # try:
+    #     while operation:
+    #         stats = instrument.operation_status()
+    #         if stats == "Stop":
+    #             operation = False
+    #         print(stats)
+    #         print('\r', end='')
+    #         await asyncio.sleep(1)
+    # except Exception as errval:
+    #     print("errval",errval)
+    # #print out the data
+    # print("TURN OFF FAN")
+    # input("PRESS ENTER TO CONTINUE")
 
 
     try:
-        header, data = instrument.available_records()
-        #Record to designated columns using a sorting loop
-        record_dict = {}
-        csv_cb.write(list(test_data.keys()))
-        for number in range(6):
-            for key, value in zip(header.items(), data[number]):
-                for element in key:
-                    record_dict[element]= value
-            particle_count_1 = int(record_dict['Count1(M3)'])
-            particle_count_2 = int(record_dict['Count2(M3)'])
-            test_result = \
-                    determine_criterion(particle_count_1, particle_count_2)
-            print(record_dict)
-            test_data['Time(Date Time)']=record_dict['Time']
-            test_data['Size1(um)']=record_dict['Size1']
-            test_data['Count1(M3)']=record_dict['Count1(M3)']
-            test_data['Size2(um)']=record_dict['Size2']
-            test_data['Count2(M3)']=record_dict['Count2(M3)']
-            test_data['Location']=record_dict['Location']
-            test_data['Sample Time(sec)']=record_dict['Sample Time']
-            test_data['PASS/FAIL'] = test_result
-            csv_cb.write(list(test_data.values()))
+        pass
+        # header, data = instrument.available_records()
+        # #Record to designated columns using a sorting loop
+        # record_dict = {}
+        # csv_cb.write(list(test_data.keys()))
+        # for number in range(6):
+        #     for key, value in zip(header.items(), data[number]):
+        #         for element in key:
+        #             record_dict[element]= value
+        #     particle_count_1 = int(record_dict['Count1(M3)'])
+        #     particle_count_2 = int(record_dict['Count2(M3)'])
+        #     test_result = \
+        #             determine_criterion(particle_count_1, particle_count_2)
+        #     print(record_dict)
+        #     test_data['Time(Date Time)']=record_dict['Time']
+        #     test_data['Size1(um)']=record_dict['Size1']
+        #     test_data['Count1(M3)']=record_dict['Count1(M3)']
+        #     test_data['Size2(um)']=record_dict['Size2']
+        #     test_data['Count2(M3)']=record_dict['Count2(M3)']
+        #     test_data['Location']=record_dict['Location']
+        #     test_data['Sample Time(sec)']=record_dict['Sample Time']
+        #     test_data['PASS/FAIL'] = test_result
+        #     csv_cb.write(list(test_data.values()))
         
 
         
-        #UV
-        await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
-        test_data2={
-                    'SLOT': None,
-                    'uvdata': None,
+        # #UV
+        # await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+        # test_data2={
+        #             'SLOT': None,
+        #             'uvdata': None,
                     
-                        }
-        csv_cb.write(list(test_data2.keys()))
-        sleppp = input("Press Enter to continue...")
-        #GRIP_SLOT = [[8,5,"home"],[5,10,"home"],[10,"A4",1],["A4",1,"home"],[1,"D4","home"]]
-        GRIP_SLOT_DICIT = {"GRIP":(8,5,10,"A4",1),
-        "UNGRIP":(5,10,"A4",1,"D4"),
-        "HOME":("home","home",1,"home","home")
-        }
-        slot_loc = {
-        "A4": (554.2, 363.72, 27.04),
-        "D4": (554.21, 41.77, 27.04)
-        }
+        #                 }
+        # csv_cb.write(list(test_data2.keys()))
+        # sleppp = input("Press Enter to continue...")
+        # #GRIP_SLOT = [[8,5,"home"],[5,10,"home"],[10,"A4",1],["A4",1,"home"],[1,"D4","home"]]
+        # GRIP_SLOT_DICIT = {"GRIP":(8,5,10,"A4",1),
+        # "UNGRIP":(5,10,"A4",1,"D4"),
+        # "HOME":("home","home",1,"home","home")
+        # }
+        # slot_loc = {
+        # "A4": (554.2, 363.72, 27.04),
+        # "D4": (554.21, 41.77, 27.04)
+        # }
 
-        slot_name = {
-            1:"D1",
-            8:"B2",
-            5:"C2",
-            10:"A1"
+        # slot_name = {
+        #     1:"D1",
+        #     8:"B2",
+        #     5:"C2",
+        #     10:"A1"
         
-        }
-        mount = OT3Mount.GRIPPER
-        for iii in range(5):
+        # }
+        # mount = OT3Mount.GRIPPER
+        # for iii in range(5):
 
-            grip_slot1 = GRIP_SLOT_DICIT["GRIP"][iii]
-            print(grip_slot1)
-            hover_pos = (0, 0, 0)
-            if grip_slot1 == "A4" or grip_slot1 == "D4":
+        #     grip_slot1 = GRIP_SLOT_DICIT["GRIP"][iii]
+        #     print(grip_slot1)
+        #     hover_pos = (0, 0, 0)
+        #     if grip_slot1 == "A4" or grip_slot1 == "D4":
                 
-                hover_pos = slot_loc[grip_slot1]
-                print("1",hover_pos)
-                hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2])
-                print("3",hover_over_slot_3)
-                await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
+        #         hover_pos = slot_loc[grip_slot1]
+        #         print("1",hover_pos)
+        #         hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2])
+        #         print("3",hover_over_slot_3)
+        #         await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
 
                    
-            else:
-                hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(grip_slot1)
-                # MOVE TO SLOT
-                #aa = input("1 Press Enter to continue...")
-                await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 10))
-            print("hover_pos",hover_pos)
-            await api.grip(30)
-            await api.home([Axis.Z_G])
+        #     else:
+        #         hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(grip_slot1)
+        #         # MOVE TO SLOT
+        #         #aa = input("1 Press Enter to continue...")
+        #         await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 10))
+        #     print("hover_pos",hover_pos)
+        #     await api.grip(30)
+        #     await api.home([Axis.Z_G])
 
 
 
-            grip_slot2 = GRIP_SLOT_DICIT["UNGRIP"][iii]
-            print(grip_slot2)
-            if grip_slot2 == "A4" or grip_slot2 == "D4":
-                hover_pos = slot_loc[grip_slot2]
-                print("1",hover_pos)
-                hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2])
-                await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
+        #     grip_slot2 = GRIP_SLOT_DICIT["UNGRIP"][iii]
+        #     print(grip_slot2)
+        #     if grip_slot2 == "A4" or grip_slot2 == "D4":
+        #         hover_pos = slot_loc[grip_slot2]
+        #         print("1",hover_pos)
+        #         hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2])
+        #         await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
                  
-            else:
-                hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(grip_slot2)
-                # MOVE TO SLOT
-                #aa = input("2 Press Enter to continue...")
-                await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 10))
-            await api.ungrip()
+        #     else:
+        #         hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(grip_slot2)
+        #         # MOVE TO SLOT
+        #         #aa = input("2 Press Enter to continue...")
+        #         await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 10))
+        #     await api.ungrip()
             
-            #print("hover_pos end",hover_pos) 
-            #aa = input("3 Press Enter to continue...")
+        #     #print("hover_pos end",hover_pos) 
+        #     #aa = input("3 Press Enter to continue...")
 
-            grip_slot = GRIP_SLOT_DICIT["HOME"][iii]
-            print(grip_slot)
-            if grip_slot == 1:
-                await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
-                hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(grip_slot)
-                current_pos = await api.gantry_position(mount)
-                hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=current_pos[2])
-                await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
-            else:
-                await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+        #     grip_slot = GRIP_SLOT_DICIT["HOME"][iii]
+        #     print(grip_slot)
+        #     if grip_slot == 1:
+        #         await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+        #         hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(grip_slot)
+        #         current_pos = await api.gantry_position(mount)
+        #         hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=current_pos[2])
+        #         await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
+        #     else:
+        #         await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
 
-            #获取数据UV
-            #aa = input("Press open UV to continue...(打开UV灯回车继续)")
-            await asyncio.sleep(11)
-            alldata = uvinstrument.get_uv_()
-            intdatadict = uvinstrument.parse_modbus_data(alldata)
-            print(intdatadict)
+        #     #获取数据UV
+        #     #aa = input("Press open UV to continue...(打开UV灯回车继续)")
+        #     await asyncio.sleep(11)
+        #     alldata = uvinstrument.get_uv_()
+        #     intdatadict = uvinstrument.parse_modbus_data(alldata)
+        #     print(intdatadict)
 
 
             
 
-            test_data2['SLOT']=slot_name[grip_slot2]
-            test_data2['uvdata']=intdatadict['uvdata']
-            csv_cb.write(list(test_data2.values()))
+        #     test_data2['SLOT']=slot_name[grip_slot2]
+        #     test_data2['uvdata']=intdatadict['uvdata']
+        #     csv_cb.write(list(test_data2.values()))
 
             # LOOP THROUGH FORCES
     except Exception as err:
