@@ -56,13 +56,11 @@ These are all versioned and released together. These assets are produced in 2 po
 - Release (External facing releases - stable, beta, alpha)
 - Internal Release (Internal facing releases - stable, beta, alpha)
 
-> [!TIP]
-> these instructions assume that your remote is named `origin`
-> git config remote.origin.tagOpt --tags ensures that when you fetch and pull, you get all the tags from the remote.
+> [!TIP] > `git config remote.origin.tagOpt --tags` ensures that when you fetch and pull, you get all the tags from the origin remote.
 
 ### Steps to release the changes in `edge`
 
-1. Checkout `edge` and make a chore release branch, without any new changes. The branch name should match `chore_release-*`.
+1. Checkout `edge` and make a chore release branch, without any new changes. The branch name should match `chore_release-${version}`.
 
    ```shell
    git switch edge
@@ -71,11 +69,11 @@ These are all versioned and released together. These assets are produced in 2 po
    git push --set-upstream origin chore_release-${version}
    ```
 
-2. Open a PR targeting `release` from chore_release-${version}; this should contain all the changes that were in `edge` and not yet in `release`. This PR will not be merged in GitHub. Apply the `DO NOT MERGE` label. Approval on the PR allows bypass of the branch protection on `release` preventing direct pushes when we are ready. Step 8 will resolve this PR.
+2. Open a PR targeting `release` from `chore_release-${version}`; this should contain all the changes that were in `edge` and not yet in `release`. This PR will not be merged in GitHub. Apply the `DO NOT MERGE` label. When we are ready, approval and passing checks on this PR allows the bypass of the branch protection on `release` that prevents direct pushes. Step 8 will resolve this PR.
 
-3. Evaluate changes on our dependent repositories. If there have been changes to `opentrons-modules`, `oe-core`, `ot3-firmware`, or `buildroot`, ensure that the changes are in the correct branches. Tags will need to be pushed to repositories with changes to include those changes in the release being created here. Further exact tagging instructions for each of the repositories are TODO.
+3. Evaluate changes on our dependent repositories. If there have been changes to `opentrons-modules`, `oe-core`, `ot3-firmware`, or `buildroot`, ensure that the changes are in the correct branches. Tags will need to be pushed to repositories with changes. Further exact tagging instructions for each of the repositories are TODO.
 
-4. Check out and pull `chore_release-${version}` locally. Create a tag for a new alpha version. The alpha versions end with an `-alpha.N` prerelease tag, where `N` increments + from 0 over the course of the QA process. You don't need a PR or a commit to create a new version. Pushing tags in the formats prescribed here are the triggers of the release process. Let's call the alpha version you're about to create `${alphaVersion}`:
+4. Check out and pull `chore_release-${version}` locally. Create a tag for a new alpha version. The alpha versions end with an `-alpha.N` prerelease tag, where `N` increments by 1 from 0 over the course of the QA process. You don't need a PR or a commit to create a new version. Pushing tags in the formats prescribed here are the triggers of the release process. Let's call the alpha version you're about to create `${alphaVersion}`:
 
    > [!IMPORTANT]
    > Use annotated tag (`-a`) with a message (`-m`) for all tags.
@@ -94,15 +92,16 @@ These are all versioned and released together. These assets are produced in 2 po
 
 6. Run QA on this release. If issues are found, create PRs targeting `chore_release-${version}`. To create a new alpha releases, repeat steps 4-6.
 
-7. Once QA is complete, do a final check that the release notes are good order.
+7. Once QA is complete, do a final check that the release notes are complete and proof-read.
 
 8. We are ready to `merge -ff-only` the `chore_release-${version}` into `release`.
 
    > [!CAUTION]
-   > Do **NOT** squash or rebase
-   > Do **NOT** yet push a tag.
+   >
+   > - Do **NOT** squash or rebase
+   > - Do **NOT** yet push a tag
 
-   This should be done from your local command line. Here we make use of the PR is step 2 to bypass the branch protection on `release`. The PR checks must be passing and the PR must have approval:
+   This should be done from your local command line. Here we make use of the PR in step 2 to bypass the branch protection on `release`. The PR checks must be passing and the PR must have approval:
 
    ```shell
    git switch chore_release-${version}
@@ -132,7 +131,7 @@ These are all versioned and released together. These assets are produced in 2 po
    git push origin v${version}
    ```
 
-10. Ensure package deployments succeed by validating the version. Below are for the release channel. Internal Release channel looks a little different but are similar and documented elsewhere.
+10. Ensure package deployments succeed by validating the version in our release dockets. The examples below are for the release channel. Internal Release channel looks a little different but are similar and documented elsewhere.
 
 - Flex <https://builds.opentrons.com/ot3-oe/releases.json>
 - OT-2 <https://builds.opentrons.com/ot2-br/releases.json>
@@ -144,13 +143,13 @@ These are all versioned and released together. These assets are produced in 2 po
   - <https://builds.opentrons.com/app/alpha.yml> Windows
   - <https://builds.opentrons.com/app/alpha-mac.yml>
   - <https://builds.opentrons.com/app/alpha-linux.yml>
-- Python `opentrons package` <https://pypi.org/project/opentrons>
+- Python `opentrons` package <https://pypi.org/project/opentrons>
 - Python `opentrons-shared-data` package <https://pypi.org/project/opentrons-shared-data>
 - The Opentrons App should be prompting people to update to the new version given their current channel.
 
 11. Release the Python Protocol API docs for this version (see below under Releasing Web Projects).
 
-12. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
+12. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes and has approval, on the command line merge it into `edge`:
 
     ```shell
     git checkout edge
@@ -162,7 +161,7 @@ These are all versioned and released together. These assets are produced in 2 po
 
 ## Releasing Robot Software Stack Isolated changes
 
-If critical bugfixes or isolated features need to be released, the process is the same as above, but the `chore_release-${version}` branch is not created from `edge`. We would likely base the `chore_release-${version}` branch on `release` then create bug fix PRs targeting `chore_release-${version}`. Or we might cherry pick in commits into or merge in a feature branch to `chore_release-${version}`.
+If critical bugfixes or isolated features need to be released, the process is the same as above, but the `chore_release-${version}` branch is not created from `edge`. We would likely base the `chore_release-${version}` branch on `release` then create bug fix PRs targeting `chore_release-${version}`. Or we might cherry pick in commits and/or merge in a feature branch to `chore_release-${version}`.
 
 ### tag usage
 
