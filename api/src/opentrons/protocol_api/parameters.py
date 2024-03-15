@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 from opentrons.protocol_api.parameter_validation_and_errors import AllowedTypes
 
@@ -8,12 +8,19 @@ class Parameters:
         self._values: Dict[str, AllowedTypes] = {}
         if parameters is not None:
             for name, value in parameters.items():
-                self._set_parameter(name, value)
+                self._initialize_parameter(name, value)
 
-    def _set_parameter(self, variable_name: str, value: AllowedTypes) -> None:
+    def _getparam(self, variable_name: str) -> Any:
+        return getattr(self, f"_{variable_name}")
+
+    def _initialize_parameter(self, variable_name: str, value: AllowedTypes) -> None:
         # TODO raise an error if the variable name already exists to prevent overwriting anything important
-        if not hasattr(self, variable_name):
-            setattr(self, variable_name, value)
+        if not hasattr(self, variable_name) and not hasattr(self, f"_{variable_name}"):
+            setattr(self, f"_{variable_name}", value)
+            prop = property(
+                fget=lambda s, v=variable_name: Parameters._getparam(s, v)  # type: ignore[misc]
+            )
+            setattr(Parameters, variable_name, prop)
             self._values[variable_name] = value
 
     def get_all(self) -> Dict[str, AllowedTypes]:
