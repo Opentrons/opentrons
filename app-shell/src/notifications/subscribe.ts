@@ -5,10 +5,7 @@ import { sendToBrowserDeserialized } from './deserialize'
 import { notifyLog } from './log'
 import { FAILURE_STATUSES } from '../constants'
 
-import type {
-  NotifyNetworkError,
-  NotifyTopic,
-} from '@opentrons/app/src/redux/shell/types'
+import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 
 /**
  * @property {number} qos: "Quality of Service", "at least once". Because we use React Query, which does not trigger
@@ -27,39 +24,45 @@ export function subscribe({
   hostname: string
   topic: NotifyTopic
 }): Promise<void> {
-  if (unreachableHosts.has(hostname)) {
-    const errorMessage = determineErrorMessageFor(hostname)
-    sendToBrowserDeserialized({
-      hostname,
-      topic,
-      message: errorMessage,
-    })
+  if (!connectionStore.isHostReachable(hostname)) {
+    const errorMessage = connectionStore.getFailedConnectionStatus(hostname)
+    if (errorMessage != null) {
+      sendToBrowserDeserialized({
+        hostname,
+        topic,
+        message: errorMessage,
+      })
+    }
 
     return Promise.resolve()
   } else {
     return waitUntilActiveOrErrored('client')
       .then(() => {
-        // Break this guy out into a function IMO.
-        const { client, subscriptions, pendingSubs } = connectionStore[hostname]
-        if (!subscriptions.has(topic)) {
-          if (!pendingSubs.has(topic)) {
-            pendingSubs.add(topic)
-            return new Promise<void>(() => {
-              client?.subscribe(topic, subscribeOptions, subscribeCb)
-              pendingSubs.delete(topic)
-            })
-          } else {
-            void waitUntilActiveOrErrored('subscription').catch(
-              (error: Error) => {
-                notifyLog.debug(error.message)
-                sendToBrowserDeserialized({
-                  hostname,
-                  topic,
-                  message: FAILURE_STATUSES.ECONNFAILED,
-                })
-              }
-            )
-          }
+        const client = connectionStore.getClient(hostname)
+        if (client == null) {
+          return Promise.reject(new Error('Expected hostData, received null.'))
+        }
+
+        if (
+          !connectionStore.isActiveSub(hostname, topic) ||
+          !connectionStore.isPendingSub(hostname, topic)
+        ) {
+          connectionStore.setSubStatus(hostname, topic, 'pending')
+          return new Promise<void>(() => {
+            client.subscribe(topic, subscribeOptions, subscribeCb)
+            connectionStore.setSubStatus(hostname, topic, 'subscribed')
+          })
+        } else {
+          void waitUntilActiveOrErrored('subscription').catch(
+            (error: Error) => {
+              notifyLog.debug(error.message)
+              sendToBrowserDeserialized({
+                hostname,
+                topic,
+                message: FAILURE_STATUSES.ECONNFAILED,
+              })
+            }
+          )
         }
       })
       .catch((error: Error) => {
@@ -73,7 +76,6 @@ export function subscribe({
   }
 
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
-    const { subscriptions } = connectionStore[hostname]
     if (error != null) {
       sendToBrowserDeserialized({
         hostname,
@@ -84,7 +86,7 @@ export function subscribe({
       notifyLog.debug(
         `Successfully subscribed on ${hostname} to topic: ${topic}`
       )
-      subscriptions.add(topic)
+      connectionStore.setSubStatus(hostname, topic, 'subscribed')
     }
   }
   // Check every 500ms for 2 seconds before failing.
@@ -95,11 +97,10 @@ export function subscribe({
       const MAX_RETRIES = 4
       let counter = 0
       const intervalId = setInterval(() => {
-        const host = connectionStore[hostname]
         const hasReceivedAck =
           connection === 'client'
-            ? host.client != null
-            : host.subscriptions.has(topic)
+            ? connectionStore.isHostConnected(hostname)
+            : connectionStore.isActiveSub(hostname, topic)
         if (hasReceivedAck) {
           clearInterval(intervalId)
           resolve()
@@ -113,16 +114,4 @@ export function subscribe({
       }, CHECK_CONNECTION_INTERVAL)
     })
   }
-}
-
-// Only send one ECONNREFUSED per robot per app session.
-function determineErrorMessageFor(hostname: string): NotifyNetworkError {
-  let message: NotifyNetworkError
-  if (!robotsWithReportedPortBlockEvent.has(hostname)) {
-    message = FAILURE_STATUSES.ECONNREFUSED
-    robotsWithReportedPortBlockEvent.add(hostname)
-  } else {
-    message = FAILURE_STATUSES.ECONNFAILED
-  }
-  return message
 }

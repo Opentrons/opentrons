@@ -14,7 +14,7 @@ interface IHosts {
   pendingSubs: Set<NotifyTopic>
   pendingUnsubs: Set<NotifyTopic>
 }
-
+// Need a description here. You really want to highlight this manages internal state. It does not perform MQTT actions.
 class ConnectionStore {
   private unreachableHosts: Record<string, FailedConnStatus> = {}
 
@@ -26,13 +26,9 @@ class ConnectionStore {
     return this.browserWindow
   }
 
-  public setBrowserWindow(window: BrowserWindow): void {
-    this.browserWindow = window
-  }
-
-  public getHostInfo(hostname: string): IHosts | null {
+  public getClient(hostname: string): mqtt.MqttClient | null {
     if (hostname in this.hosts) {
-      return this.hosts[hostname]
+      return this.hosts[hostname].client
     } else {
       return null
     }
@@ -55,6 +51,72 @@ class ConnectionStore {
     }
   }
 
+  public setBrowserWindow(window: BrowserWindow): void {
+    this.browserWindow = window
+  }
+
+  public setPendingHost(hostname: string): void {
+    if (!(hostname in this.hosts)) {
+      this.hosts[hostname] = {
+        client: null,
+        subscriptions: new Set(),
+        pendingSubs: new Set(),
+        pendingUnsubs: new Set(),
+      }
+    }
+  }
+
+  public setConnectedHost(hostname: string, client: mqtt.MqttClient): void {
+    if (hostname in this.hosts) {
+      if (this.hosts[hostname].client == null) {
+        this.hosts[hostname].client = client
+      }
+    } else {
+      this.setPendingHost(hostname)
+      this.hosts[hostname].client = client
+    }
+  }
+
+  /**
+   *
+   * @description Adds the host as unreachable with an error status derived from the MQTT returned error object.
+   */
+  public setFailedToConnectHost(hostname: string, error: Error): void {
+    if (!(hostname in this.unreachableHosts)) {
+      const errorStatus = error.message.includes(FAILURE_STATUSES.ECONNREFUSED)
+        ? FAILURE_STATUSES.ECONNREFUSED
+        : FAILURE_STATUSES.ECONNFAILED
+
+      this.unreachableHosts[hostname] = errorStatus
+    }
+  }
+
+  // I think you have to do this for unsubscribing?
+  public setSubStatus(
+    hostname: string,
+    topic: NotifyTopic,
+    status: 'pending' | 'subscribed'
+  ): void {
+    if (hostname in this.hosts) {
+      const { pendingSubs, subscriptions } = this.hosts[hostname]
+      if (status === 'pending') {
+        pendingSubs.add(topic)
+      } else {
+        pendingSubs.delete(topic)
+        subscriptions.add(topic)
+      }
+    }
+  }
+
+  public deleteHost(hostname: string): void {
+    if (hostname in this.hosts) {
+      delete this.hosts[hostname]
+    }
+    if (hostname in this.unreachableHosts) {
+      delete this.unreachableHosts[hostname]
+    }
+  }
+
   public isHostNewlyDiscovered(hostname: string): boolean {
     if (hostname in this.hosts) {
       return true
@@ -73,22 +135,25 @@ class ConnectionStore {
     }
   }
 
-  public isSubscriptionPendingOrActive(
-    hostname: string,
-    topic: NotifyTopic
-  ): boolean {
+  public isPendingSub(hostname: string, topic: NotifyTopic): boolean {
     if (hostname in this.hosts) {
-      const { pendingSubs, subscriptions } = this.hosts[hostname]
-      return pendingSubs.has(topic) || subscriptions.has(topic)
+      const { pendingSubs } = this.hosts[hostname]
+      return pendingSubs.has(topic)
     } else {
       return false
     }
   }
 
-  public isUnsubscriptionPending(
-    hostname: string,
-    topic: NotifyTopic
-  ): boolean {
+  public isActiveSub(hostname: string, topic: NotifyTopic): boolean {
+    if (hostname in this.hosts) {
+      const { subscriptions } = this.hosts[hostname]
+      return subscriptions.has(topic)
+    } else {
+      return false
+    }
+  }
+
+  public isPendingUnsub(hostname: string, topic: NotifyTopic): boolean {
     if (hostname in this.hosts) {
       const { pendingUnsubs } = this.hosts[hostname]
       return pendingUnsubs.has(topic)
@@ -102,67 +167,6 @@ class ConnectionStore {
       return false
     } else {
       return hostname in this.hosts
-    }
-  }
-
-  public addPendingHost(hostname: string): void {
-    if (!(hostname in this.hosts)) {
-      this.hosts[hostname] = {
-        client: null,
-        subscriptions: new Set(),
-        pendingSubs: new Set(),
-        pendingUnsubs: new Set(),
-      }
-    }
-  }
-
-  public addConnectedHost(hostname: string, client: mqtt.MqttClient): void {
-    if (hostname in this.hosts) {
-      if (this.hosts[hostname].client == null) {
-        this.hosts[hostname].client = client
-      }
-    } else {
-      this.addPendingHost(hostname)
-      this.hosts[hostname].client = client
-    }
-  }
-
-  /**
-   *
-   * @description Adds the host as unreachable with an error status derived from the MQTT returned error object.
-   */
-  public addFailedToConnectHost(hostname: string, error: Error): void {
-    if (!(hostname in this.unreachableHosts)) {
-      const errorStatus = error.message.includes(FAILURE_STATUSES.ECONNREFUSED)
-        ? FAILURE_STATUSES.ECONNREFUSED
-        : FAILURE_STATUSES.ECONNFAILED
-
-      this.unreachableHosts[hostname] = errorStatus
-    }
-  }
-
-  public removeHost(hostname: string): void {
-    if (hostname in this.hosts) {
-      delete this.hosts[hostname]
-    }
-    if (hostname in this.unreachableHosts) {
-      delete this.unreachableHosts[hostname]
-    }
-  }
-
-  public updateSubsciptionStatus(
-    hostname: string,
-    topic: NotifyTopic,
-    status: 'pending' | 'subscribed'
-  ): void {
-    if (hostname in this.hosts) {
-      const { pendingSubs, subscriptions } = this.hosts[hostname]
-      if (status === 'pending') {
-        pendingSubs.add(topic)
-      } else {
-        pendingSubs.delete(topic)
-        subscriptions.add(topic)
-      }
     }
   }
 }

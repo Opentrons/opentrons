@@ -39,7 +39,7 @@ export function cleanUpUnreachableRobots(healthyRobotIPs: string[]): void {
   const unreachableRobots = Object.keys(connectionStore).filter(hostname => {
     // The connection is forcefully closed, so remove from the connection store immediately to reduce disconnect packets.
     if (hostname in connectionStore && !healthyRobotIPsSet.has(hostname)) {
-      connectionStore.removeHost(hostname)
+      connectionStore.deleteHost(hostname)
       return true
     }
     return false
@@ -52,18 +52,18 @@ export function addNewRobotsToConnectionStore(robots: string[]): void {
     connectionStore.isHostNewlyDiscovered(hostname)
   )
   newRobots.forEach(hostname => {
-    connectionStore.addPendingHost(hostname)
+    connectionStore.setPendingHost(hostname)
     connectAsync(`mqtt://${hostname}`)
       .then(client => {
         notifyLog.debug(`Successfully connected to ${hostname}`)
-        connectionStore.addConnectedHost(hostname, client)
+        connectionStore.setConnectedHost(hostname, client)
         establishListeners({ client, hostname })
       })
       .catch((error: Error) => {
         notifyLog.warn(
           `Failed to connect to ${hostname} - ${error.name}: ${error.message} `
         )
-        connectionStore.addFailedToConnectHost(hostname, error)
+        connectionStore.setFailedToConnectHost(hostname, error)
       })
   })
 }
@@ -179,7 +179,7 @@ export function closeConnectionsForcefullyFor(
   hosts: string[]
 ): Array<Promise<void>> {
   return hosts.map(hostname => {
-    const { client } = connectionStore.getHostInfo(hostname) ?? {}
+    const client = connectionStore.getClient(hostname)
     return new Promise<void>((resolve, reject) =>
       client?.end(true, {}, () => resolve())
     )
