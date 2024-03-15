@@ -120,7 +120,7 @@ class CommandState:
     """Whether the engine is currently pulling new commands off the queue to execute.
 
     A command may still be executing, and the robot may still be in motion,
-    even if INACTIVE.
+    even if PAUSED.
     """
 
     run_started_at: Optional[datetime]
