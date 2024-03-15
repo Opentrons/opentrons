@@ -13,11 +13,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  getPipetteNameSpecs,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 interface ProtocolStatsProps {
   analysis: ProtocolAnalysisOutput | null
