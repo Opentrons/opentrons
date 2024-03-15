@@ -2,11 +2,14 @@ import * as React from 'react'
 import { describe, it, vi, beforeEach, afterEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../i18n'
-import { ProtocolParameters } from '../ProtocolParameters'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../i18n'
+import { NoParameter } from '../NoParameter'
+import { ProtocolParameters } from '..'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
+
+vi.mock('../NoParameter')
 
 const mockRunTimeParameter: RunTimeParameter[] = [
   {
@@ -80,6 +83,7 @@ describe('ProtocolParameters', () => {
     props = {
       runTimeParameters: mockRunTimeParameter,
     }
+    vi.mocked(NoParameter).mockReturnValue(<div>mock NoParameter</div>)
   })
 
   afterEach(() => {
@@ -106,7 +110,7 @@ describe('ProtocolParameters', () => {
     screen.getByText('On, off')
 
     screen.getByText('EtoH Volume')
-    screen.getByText('6.5')
+    screen.getByText('6.5 mL')
     screen.getByText('1.5-10')
 
     screen.getByText('Default Module Offsets')
@@ -123,7 +127,6 @@ describe('ProtocolParameters', () => {
       runTimeParameters: [],
     }
     render(props)
-    screen.getByLabelText('alert')
-    screen.getByText('No parameters specified in this protocol')
+    screen.getByText('mock NoParameter')
   })
 })

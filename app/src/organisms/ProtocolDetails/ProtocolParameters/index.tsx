@@ -3,17 +3,15 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import {
-  ALIGN_CENTER,
   BORDERS,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
-  Icon,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { Banner } from '../../atoms/Banner'
+import { StyledText } from '../../../atoms/text'
+import { Banner } from '../../../atoms/Banner'
+import { NoParameter } from './NoParameter'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -68,10 +66,14 @@ function ProtocolParameterItems({
 
   const formattedValue = (runTimeParameter: RunTimeParameter): string => {
     const { type, default: defaultValue } = runTimeParameter
+    const suffix =
+      'suffix' in runTimeParameter && runTimeParameter.suffix != null
+        ? runTimeParameter.suffix
+        : ''
     switch (type) {
       case 'int':
       case 'float':
-        return defaultValue.toString()
+        return `${defaultValue.toString()} ${suffix}`
       case 'boolean':
         return Boolean(defaultValue) ? t('on') : t('off')
       case 'str':
@@ -144,32 +146,6 @@ function ProtocolParameterItems({
         })}
       </tbody>
     </StyledTable>
-  )
-}
-
-function NoParameter(): JSX.Element {
-  const { t } = useTranslation('protocol_details')
-
-  return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      width="100%"
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing12}
-      backgroundColor={COLORS.grey30}
-      borderRadius={BORDERS.borderRadius8}
-      padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
-    >
-      <Icon
-        name="ot-alert"
-        size="1.25rem"
-        color={COLORS.grey60}
-        aria-label="alert"
-      />
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {t('no_parameters')}
-      </StyledText>
-    </Flex>
   )
 }
 
