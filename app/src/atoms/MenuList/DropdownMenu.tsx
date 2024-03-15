@@ -48,7 +48,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         width="9.125rem"
         onClick={toggleSetShowDropdownMenu}
         border={BORDERS.lineBorder}
-        borderRadius={BORDERS.borderRadiusFull}
+        borderRadius={BORDERS.borderRadius8}
         padding={SPACING.spacing8}
         backgroundColor={COLORS.white}
         css={css`
@@ -65,7 +65,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         <Flex
           ref={dropDownMenuWrapperRef}
           zIndex={2}
-          borderRadius={BORDERS.borderRadius4}
+          borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}

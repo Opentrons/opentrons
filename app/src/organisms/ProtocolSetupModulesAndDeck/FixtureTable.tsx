@@ -191,7 +191,7 @@ function FixtureTableItem({
         backgroundColor={
           isCurrentFixtureCompatible ? COLORS.green35 : COLORS.yellow35
         }
-        borderRadius={BORDERS.borderRadius12}
+        borderRadius={BORDERS.borderRadius8}
         gridGap={SPACING.spacing24}
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
         marginBottom={lastItem ? SPACING.spacing68 : 'none'}

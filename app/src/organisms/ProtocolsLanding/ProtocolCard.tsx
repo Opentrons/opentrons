@@ -94,7 +94,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   return (
     <Box
       backgroundColor={COLORS.white}
-      borderRadius={BORDERS.borderRadius4}
+      borderRadius={BORDERS.borderRadius8}
       cursor="pointer"
       minWidth="36rem"
       padding={SPACING.spacing16}

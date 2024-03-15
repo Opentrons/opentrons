@@ -57,7 +57,7 @@ export function EmergencyStop(): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
           backgroundColor={isEstopConnected ? COLORS.green35 : COLORS.grey35}
-          borderRadius={BORDERS.borderRadius12}
+          borderRadius={BORDERS.borderRadius8}
           alignItems={ALIGN_CENTER}
         >
           <Flex
