@@ -238,11 +238,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
       <Box
         backgroundColor={COLORS.white}
         // remove left upper corner border radius when first tab is active
-        borderRadius={`${
-          protocolRunDetailsTab === 'setup' ? '0' : BORDERS.borderRadius4
-        } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
-          BORDERS.borderRadius4
-        }`}
+        borderRadius={BORDERS.borderRadius8}
       >
         {protocolRunDetailsContent}
       </Box>

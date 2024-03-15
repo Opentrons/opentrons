@@ -118,7 +118,7 @@ export function DeviceDetailsDeckConfiguration({
       <Flex
         alignItems={ALIGN_FLEX_START}
         backgroundColor={COLORS.white}
-        borderRadius={BORDERS.borderRadius4}
+        borderRadius={BORDERS.borderRadius8}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
         width="100%"
