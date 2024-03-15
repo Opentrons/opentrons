@@ -73,7 +73,7 @@ export const ProtocolLiquidsDetails = (
           gridGap={SPACING.spacing12}
           flexDirection={DIRECTION_COLUMN}
           backgroundColor={COLORS.grey30}
-          borderRadius={BORDERS.borderRadiusSize2}
+          borderRadius={BORDERS.borderRadius8}
         >
           <Icon
             color={COLORS.grey50}

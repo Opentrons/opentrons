@@ -153,7 +153,7 @@ function NoParameter(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing12}
       backgroundColor={COLORS.grey30}
-      borderRadius={BORDERS.borderRadiusSize2}
+      borderRadius={BORDERS.borderRadius8}
       padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
     >
       <Icon
