@@ -53,14 +53,14 @@ const LIQUID_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
   border-color: ${COLORS.grey30};
-  border-radius: ${BORDERS.borderRadius4};
+  border-radius: ${BORDERS.borderRadius8};
 `
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
   border-color: ${COLORS.grey30};
-  border-radius: ${BORDERS.borderRadius4};
+  border-radius: ${BORDERS.borderRadius8};
   &:hover {
     border-color: ${COLORS.grey55};
   }
@@ -329,7 +329,7 @@ export const LiquidsListItemDetails = (
       </Flex>
       <Flex
         backgroundColor={COLORS.black90 + '1A'}
-        borderRadius={BORDERS.borderRadius4}
+        borderRadius={BORDERS.borderRadius8}
         height="max-content"
         paddingY={SPACING.spacing4}
         paddingX={SPACING.spacing8}
