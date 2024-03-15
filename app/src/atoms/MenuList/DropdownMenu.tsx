@@ -60,8 +60,8 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     border: 1px ${BORDERS.styleSolid}
       ${showDropdownMenu ? COLORS.blue50 : COLORS.grey50};
     border-radius: ${dropdownType === 'rounded'
-      ? BORDERS.radiusRoundEdge
-      : BORDERS.radiusSoftCorners};
+      ? BORDERS.borderRadiusFull
+      : BORDERS.borderRadius4};
     align-items: ${ALIGN_CENTER};
     justify-content: ${JUSTIFY_SPACE_BETWEEN};
     width: ${width};
@@ -112,7 +112,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       {showDropdownMenu && (
         <Flex
           zIndex={2}
-          borderRadius={BORDERS.borderRadiusSize2}
+          borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}

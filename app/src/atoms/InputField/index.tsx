@@ -111,7 +111,7 @@ function Input(props: InputFieldProps): JSX.Element {
   const INPUT_FIELD = css`
     display: flex;
     background-color: ${COLORS.white};
-    border-radius: ${BORDERS.borderRadiusSize1};
+    border-radius: ${BORDERS.borderRadius4};
     padding: ${SPACING.spacing8};
     border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey50};
     font-size: ${TYPOGRAPHY.fontSizeP};
