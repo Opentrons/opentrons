@@ -8,6 +8,7 @@ import type {
   RunCommandSummary,
   LabwareOffsetCreateData,
   RunStatus,
+  RunAction,
 } from '../runs'
 
 export interface MaintenanceRunData {
@@ -15,7 +16,7 @@ export interface MaintenanceRunData {
   createdAt: string
   status: RunStatus
   current: boolean
-  actions: MaintenanceRunAction[]
+  actions: RunAction[]
   errors: MaintenanceRunError[]
   pipettes: LoadedPipette[]
   modules: LoadedModule[]
@@ -27,25 +28,6 @@ export interface MaintenanceRunData {
 
 export interface MaintenanceRun {
   data: MaintenanceRunData
-}
-
-export const MAINTENANCE_RUN_ACTION_TYPE_PLAY: 'play' = 'play'
-export const MAINTENANCE_RUN_ACTION_TYPE_PAUSE: 'pause' = 'pause'
-export const MAINTENANCE_RUN_ACTION_TYPE_STOP: 'stop' = 'stop'
-
-export type MaintenanceRunActionType =
-  | typeof MAINTENANCE_RUN_ACTION_TYPE_PLAY
-  | typeof MAINTENANCE_RUN_ACTION_TYPE_PAUSE
-  | typeof MAINTENANCE_RUN_ACTION_TYPE_STOP
-
-export interface MaintenanceRunAction {
-  id: string
-  createdAt: string
-  actionType: MaintenanceRunActionType
-}
-
-export interface MaintenanceCreateRunActionData {
-  actionType: MaintenanceRunActionType
 }
 
 export interface MaintenanceCommandData {
