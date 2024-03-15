@@ -104,7 +104,7 @@ export const RobotConfigurationDetails = (
   )
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} paddingBottom={SPACING.spacing24}>
+    <Flex flexDirection={DIRECTION_COLUMN}>
       <RobotConfigurationDetailsItem
         label={t('robot')}
         item={

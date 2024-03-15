@@ -31,7 +31,7 @@ export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
   border-color: ${COLORS.grey30};
-  border-radius: ${BORDERS.borderRadius4};
+  border-radius: ${BORDERS.borderRadius8};
   &:hover {
     border-color: ${COLORS.grey55};
   }
@@ -41,7 +41,7 @@ const LIQUID_CARD_STYLE = css`
   ${CARD_OUTLINE_BORDER_STYLE}
   &:hover {
     border: 1px solid ${COLORS.grey60};
-    border-radius: ${BORDERS.borderRadius4};
+    border-radius: ${BORDERS.borderRadius8};
     cursor: pointer;
   }
 `
@@ -81,7 +81,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     border: ${isOnDevice ? SPACING.spacing4 : `1px`} solid ${COLORS.blue50};
     border-radius: ${isOnDevice
       ? BORDERS.borderRadius12
-      : BORDERS.borderRadius4};
+      : BORDERS.borderRadius8};
   `
   const volumePerWellRange = getWellRangeForLiquidLabwarePair(
     volumeByWell,
@@ -99,7 +99,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   return isOnDevice ? (
     <Box
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_ODD_STYLE}
-      borderRadius={BORDERS.borderRadius4}
+      borderRadius={BORDERS.borderRadius8}
       backgroundColor={COLORS.white}
       onClick={() => setSelectedValue(liquidId)}
       width="19.875rem"
@@ -109,7 +109,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
         <Flex
           css={CARD_OUTLINE_BORDER_STYLE}
-          padding={SPACING.spacing8}
+          padding={SPACING.spacing4}
           height="3rem"
           width="3rem"
           backgroundColor={COLORS.white}
@@ -195,7 +195,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   ) : (
     <Box
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_STYLE}
-      borderRadius={BORDERS.borderRadius4}
+      borderRadius={BORDERS.borderRadius8}
       padding={SPACING.spacing16}
       backgroundColor={COLORS.white}
       onClick={handleSelectedValue}
@@ -229,7 +229,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
 
         <Flex
           backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
-          borderRadius={BORDERS.borderRadius4}
+          borderRadius={BORDERS.borderRadius8}
           height="max-content"
           width="max-content"
           paddingY={SPACING.spacing4}

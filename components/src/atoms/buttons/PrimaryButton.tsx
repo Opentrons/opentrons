@@ -5,7 +5,7 @@ import { NewPrimaryBtn, styleProps } from '../../primitives'
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue50};
-  border-radius: ${BORDERS.borderRadius4};
+  border-radius: ${BORDERS.borderRadius8};
   box-shadow: none;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};

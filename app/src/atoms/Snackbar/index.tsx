@@ -77,7 +77,7 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
     <Flex
       css={animationStyle}
       alignItems={ALIGN_CENTER}
-      borderRadius={BORDERS.borderRadius12}
+      borderRadius={BORDERS.borderRadius8}
       boxShadow={BORDERS.shadowSmall}
       backgroundColor={COLORS.black90}
       maxWidth="max-content"

@@ -18,7 +18,7 @@ import type { StyleProps } from '@opentrons/components'
 
 const EQUIPMENT_OPTION_STYLE = css`
   background-color: ${COLORS.white};
-  border-radius: ${BORDERS.borderRadius12};
+  border-radius: ${BORDERS.borderRadius8};
   border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
 
   &:hover {

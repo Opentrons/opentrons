@@ -71,11 +71,8 @@ export const EditLabware = (props: Props): JSX.Element | null => {
           dispatch(moveDeckItem(draggedLabware.slot, labwareOnDeck.slot))
         }
       },
-
-      hover: (item: DroppedItem, monitor: DropTargetMonitor) => {
-        if (monitor.canDrop()) {
-          setHoveredLabware(labwareOnDeck)
-        }
+      hover: () => {
+        setHoveredLabware(labwareOnDeck)
       },
       collect: (monitor: DropTargetMonitor) => ({
         isOver: monitor.isOver(),
@@ -92,75 +89,71 @@ export const EditLabware = (props: Props): JSX.Element | null => {
       setHoveredLabware(null)
       setDraggedLabware(null)
     }
-  })
+  }, [draggedLabware])
+
+  let contents: React.ReactNode | null = null
+
+  const isBeingDragged =
+    draggedLabware?.labwareOnDeck?.slot === labwareOnDeck.slot
 
   if (isYetUnnamed && !isTiprack) {
-    return (
+    contents = (
       <NameThisLabware
         labwareOnDeck={labwareOnDeck}
         editLiquids={editLiquids}
       />
     )
+  } else if (swapBlocked) {
+    contents = null
+  } else if (draggedLabware != null) {
+    contents = null
   } else {
-    const isBeingDragged =
-      draggedLabware?.labwareOnDeck?.slot === labwareOnDeck.slot
-
-    let contents: React.ReactNode | null = null
-
-    if (swapBlocked) {
-      contents = null
-    } else if (draggedLabware != null) {
-      contents = null
-    } else {
-      contents = (
-        <>
-          {!isTiprack ? (
-            <a className={styles.overlay_button} onClick={editLiquids}>
-              <Icon className={styles.overlay_icon} name="pencil" />
-              {t('overlay.edit.name_and_liquids')}
-            </a>
-          ) : (
-            <div className={styles.button_spacer} />
-          )}
-          <a
-            className={styles.overlay_button}
-            onClick={() => dispatch(duplicateLabware(labwareOnDeck.id))}
-          >
-            <Icon className={styles.overlay_icon} name="content-copy" />
-            {t('overlay.edit.duplicate')}
+    contents = (
+      <>
+        {!isTiprack ? (
+          <a className={styles.overlay_button} onClick={editLiquids}>
+            <Icon className={styles.overlay_icon} name="pencil" />
+            {t('overlay.edit.name_and_liquids')}
           </a>
-          <a
-            className={styles.overlay_button}
-            onClick={() => {
-              window.confirm(
-                `Are you sure you want to permanently delete this ${getLabwareDisplayName(
-                  labwareOnDeck.def
-                )}?`
-              ) && dispatch(deleteContainer({ labwareId: labwareOnDeck.id }))
-            }}
-          >
-            <Icon className={styles.overlay_icon} name="close" />
-            {t('overlay.edit.delete')}
-          </a>
-        </>
-      )
-    }
-
-    drag(drop(ref))
-
-    const dragResult = (
-      <div
-        ref={ref}
-        className={cx(styles.slot_overlay, {
-          [styles.appear_on_mouseover]: !isBeingDragged && !isYetUnnamed,
-          [styles.appear]: isOver,
-          [styles.disabled]: isBeingDragged,
-        })}
-      >
-        {contents}
-      </div>
+        ) : (
+          <div className={styles.button_spacer} />
+        )}
+        <a
+          className={styles.overlay_button}
+          onClick={() => dispatch(duplicateLabware(labwareOnDeck.id))}
+        >
+          <Icon className={styles.overlay_icon} name="content-copy" />
+          {t('overlay.edit.duplicate')}
+        </a>
+        <a
+          className={styles.overlay_button}
+          onClick={() => {
+            window.confirm(
+              `Are you sure you want to permanently delete this ${getLabwareDisplayName(
+                labwareOnDeck.def
+              )}?`
+            ) && dispatch(deleteContainer({ labwareId: labwareOnDeck.id }))
+          }}
+        >
+          <Icon className={styles.overlay_icon} name="close" />
+          {t('overlay.edit.delete')}
+        </a>
+      </>
     )
-
-    return dragResult !== null ? dragResult : null
   }
+
+  drag(drop(ref))
+
+  return (
+    <div
+      ref={ref}
+      className={cx(styles.slot_overlay, {
+        [styles.appear_on_mouseover]: !isBeingDragged && !isYetUnnamed,
+        [styles.appear]: isOver,
+        [styles.disabled]: isBeingDragged,
+      })}
+    >
+      {contents}
+    </div>
+  )
 }

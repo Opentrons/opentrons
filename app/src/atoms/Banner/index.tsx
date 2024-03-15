@@ -11,7 +11,6 @@ import {
   IconProps,
   JUSTIFY_SPACE_BETWEEN,
   RESPONSIVENESS,
-  SIZE_1,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -91,7 +90,7 @@ export function Banner(props: BannerProps): JSX.Element {
   const bannerProps = BANNER_PROPS_BY_TYPE[type]
   const iconProps = {
     ...(icon ?? bannerProps.icon),
-    size: size ?? SIZE_1,
+    size: size ?? '1rem',
     marginRight: iconMarginRight ?? SPACING.spacing8,
     marginLeft: iconMarginLeft ?? '0rem',
     color: BANNER_PROPS_BY_TYPE[type].color,
@@ -143,7 +142,7 @@ export function Banner(props: BannerProps): JSX.Element {
         </Btn>
       ) : null}
       {(isCloseActionLoading ?? false) && (
-        <Icon name="ot-spinner" size={SIZE_1} aria-label="ot-spinner" spin />
+        <Icon name="ot-spinner" size="1rem" aria-label="ot-spinner" spin />
       )}
     </Flex>
   )

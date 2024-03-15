@@ -9,6 +9,7 @@ import {
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
   Btn,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -390,6 +391,7 @@ const SplashFrame = styled(Flex)`
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing40};
+  border-radius: ${BORDERS.borderRadius8};
 `
 
 const ProtocolName = styled.h4`
