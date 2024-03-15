@@ -6,7 +6,7 @@ import {
   closeConnectionsForcefullyFor,
 } from './connect'
 import { subscribe } from './subscribe'
-import { notifyLog } from './log'
+import { notifyLog } from './notifyLog'
 
 import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
 import type { BrowserWindow } from 'electron'

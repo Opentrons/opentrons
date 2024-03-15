@@ -6,7 +6,7 @@ import {
   deserializeExpectedMessages,
 } from './deserialize'
 import { unsubscribe } from './unsubscribe'
-import { notifyLog } from './log'
+import { notifyLog } from './notifyLog'
 import { HEALTH_STATUS_OK } from '../constants'
 
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
