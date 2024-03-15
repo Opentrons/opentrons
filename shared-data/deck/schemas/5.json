@@ -256,8 +256,7 @@
         "type": "object",
         "required": [
           "id",
-          "opentronsModuleSerialNumber",
-          "expectRobotConnection",
+          "expectOpentronsModuleSerialNumber",
           "mayMountTo",
           "displayName",
           "providesAddressableAreas",
@@ -268,12 +267,8 @@
             "description": "Unique identifier for the cutout fixture.",
             "type": "string"
           },
-          "opentronsModuleSerialNumber": {
+          "expectOpentronsModuleSerialNumber": {
             "description": "Serial number identified for a connected Opentrons Module.",
-            "type": "string"
-          },
-          "expectRobotConnection": {
-            "description": "Indicates whether or not this fixture is expected to provide a connection to robotics hardware.",
             "type": "boolean"
           },
           "mayMountTo": {

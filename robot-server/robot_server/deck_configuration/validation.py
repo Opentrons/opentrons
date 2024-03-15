@@ -118,12 +118,9 @@ def get_configuration_errors(
                         allowed_cutout_ids=allowed_cutout_ids,
                     )
                 )
-            # replace this with a serial number check set instead
-            # if serial number in def is null, we expect nothing from the put statement, raise if there is something
-            # if it is not null, we expect something from the put statement! if theres nothing then raise an error
             if found_cutout_fixture[
-                "opentronsModuleSerialNumber"
-            ] is None and isinstance(placement.opentrons_modules_serial_number, str):
+                "expectOpentronsModuleSerialNumber"
+            ] == False and isinstance(placement.opentrons_modules_serial_number, str):
                 errors.add(
                     UnexpectedSerialNumberError(
                         cutout_id=placement.cutout_id,
@@ -132,7 +129,7 @@ def get_configuration_errors(
                     )
                 )
             elif (
-                isinstance(found_cutout_fixture["opentronsModuleSerialNumber"], str)
+                found_cutout_fixture["expectOpentronsModuleSerialNumber"] == True
                 and placement.opentrons_modules_serial_number is None
             ):
                 errors.add(

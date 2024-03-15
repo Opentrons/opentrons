@@ -112,7 +112,7 @@ class Cutout(TypedDict):
 
 class CutoutFixture(TypedDict):
     id: str
-    opentronsModuleSerialNumber: Optional[str]
+    expectOpentronsModuleSerialNumber: bool
     mayMountTo: List[str]
     displayName: str
     providesAddressableAreas: Dict[str, List[str]]

@@ -706,6 +706,10 @@ class AreaType(Enum):
     MOVABLE_TRASH = "movableTrash"
     FIXED_TRASH = "fixedTrash"
     WASTE_CHUTE = "wasteChute"
+    THERMOCYCLER = "thermocycler"
+    HEATER_SHAKER = "heaterShaker"
+    TEMPERATURE = "temperatureModule"
+
 
 
 @dataclass(frozen=True)

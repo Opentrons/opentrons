@@ -362,7 +362,212 @@
         },
         "displayName": "Waste Chute",
         "ableToDropLabware": true
-      }
+      },
+      {
+        "id": "thermocyclerModule",
+        "areaType": "thermocycler",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Thermocycler Module Slot",
+        "compatibleModuleTypes": []
+      },
+      {
+        "id": "heaterShakerD1",
+        "areaType": "heaterShaker",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Heater Shaker in D1",
+        "ableToDropTips": true
+      },
+      {
+        "id": "heaterShakerC1",
+        "areaType": "heaterShaker",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Heater Shaker in C1",
+        "ableToDropTips": true
+      },
+      {
+        "id": "heaterShakerB1",
+        "areaType": "heaterShaker",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Heater Shaker in B1",
+        "ableToDropTips": true
+      },
+      {
+        "id": "heaterShakerA1",
+        "areaType": "heaterShaker",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Heater Shaker in A1",
+        "ableToDropTips": true
+      },
+      {
+        "id": "heaterShakerD3",
+        "areaType": "heaterShaker",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Heater Shaker in D3",
+        "ableToDropTips": true
+      },
+      {
+        "id": "heaterShakerC3",
+        "areaType": "heaterShaker",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Heater Shaker in C3",
+        "ableToDropTips": true
+      },
+      {
+        "id": "heaterShakerB3",
+        "areaType": "heaterShaker",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Heater Shaker in B3",
+        "ableToDropTips": true
+      },
+      {
+        "id": "heaterShakerA3",
+        "areaType": "heaterShaker",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Heater Shaker in A3",
+        "ableToDropTips": true
+      },
+      {
+        "id": "temperatureModuleD1",
+        "areaType": "temperatureModule",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Temperature Module in D1",
+        "ableToDropTips": true
+      },
+      {
+        "id": "temperatureModuleC1",
+        "areaType": "temperatureModule",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Temperature Module in C1",
+        "ableToDropTips": true
+      },
+      {
+        "id": "temperatureModuleB1",
+        "areaType": "temperatureModule",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Temperature Module in B1",
+        "ableToDropTips": true
+      },
+      {
+        "id": "temperatureModuleA1",
+        "areaType": "temperatureModule",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Temperature Module in A1",
+        "ableToDropTips": true
+      },
+      {
+        "id": "temperatureModuleD3",
+        "areaType": "temperatureModule",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Temperature Module in D3",
+        "ableToDropTips": true
+      },
+      {
+        "id": "temperatureModuleC3",
+        "areaType": "temperatureModule",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Temperature Module in C3",
+        "ableToDropTips": true
+      },
+      {
+        "id": "temperatureModuleB3",
+        "areaType": "temperatureModule",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Temperature Module in B3",
+        "ableToDropTips": true
+      },
+      {
+        "id": "temperatureModuleA3",
+        "areaType": "temperatureModule",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Temperature Module in A3",
+        "ableToDropTips": true
+      },
     ],
     "cutouts": [
       {
@@ -439,7 +644,7 @@
   "cutoutFixtures": [
     {
       "id": "singleLeftSlot",
-      "opentronsModuleSerialNumber": null,
+      "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": ["cutoutD1", "cutoutC1", "cutoutB1", "cutoutA1"],
       "displayName": "Standard Slot Left",
       "providesAddressableAreas": {
@@ -452,7 +657,7 @@
     },
     {
       "id": "singleCenterSlot",
-      "opentronsModuleSerialNumber": null,
+      "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": ["cutoutD2", "cutoutC2", "cutoutB2", "cutoutA2"],
       "displayName": "Standard Slot Center",
       "providesAddressableAreas": {
@@ -465,7 +670,7 @@
     },
     {
       "id": "singleRightSlot",
-      "opentronsModuleSerialNumber": null,
+      "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": ["cutoutD3", "cutoutC3", "cutoutB3", "cutoutA3"],
       "displayName": "Standard Slot Right",
       "providesAddressableAreas": {
@@ -478,7 +683,7 @@
     },
     {
       "id": "stagingAreaRightSlot",
-      "opentronsModuleSerialNumber": null,
+      "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": ["cutoutD3", "cutoutC3", "cutoutB3", "cutoutA3"],
       "displayName": "Staging Area Slot",
       "providesAddressableAreas": {
@@ -491,7 +696,7 @@
     },
     {
       "id": "trashBinAdapter",
-      "opentronsModuleSerialNumber": null,
+      "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": [
         "cutoutD1",
         "cutoutC1",
@@ -517,7 +722,7 @@
     },
     {
       "id": "wasteChuteRightAdapterCovered",
-      "opentronsModuleSerialNumber": null,
+      "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": ["cutoutD3"],
       "displayName": "Waste Chute Adapter for 1 or 8 Channel Pipettes",
       "providesAddressableAreas": {
@@ -527,7 +732,7 @@
     },
     {
       "id": "wasteChuteRightAdapterNoCover",
-      "opentronsModuleSerialNumber": null,
+      "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": ["cutoutD3"],
       "displayName": "Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
@@ -542,7 +747,7 @@
     },
     {
       "id": "stagingAreaSlotWithWasteChuteRightAdapterCovered",
-      "opentronsModuleSerialNumber": null,
+      "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": ["cutoutD3"],
       "displayName": "Staging Slot With Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
@@ -552,7 +757,7 @@
     },
     {
       "id": "stagingAreaSlotWithWasteChuteRightAdapterNoCover",
-      "opentronsModuleSerialNumber": null,
+      "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": ["cutoutD3"],
       "displayName": "Staging Slot With Waste Chute Adapter and Staging Area Slot",
       "providesAddressableAreas": {
@@ -568,7 +773,7 @@
     },
     {
       "id": "thermocyclerModuleRear",
-      "opentronsModuleSerialNumber": "",
+      "expectOpentronsModuleSerialNumber": true,
       "mayMountTo": ["cutoutA1"],
       "displayName": "Rear Slot portion of the Thermocycler Moduler",
       "providesAddressableAreas": {},
@@ -576,7 +781,7 @@
     },
     {
       "id": "thermocyclerModuleFront",
-      "opentronsModuleSerialNumber": "",
+      "expectOpentronsModuleSerialNumber": true,
       "mayMountTo": ["cutoutB1"],
       "displayName": "Front Slot portion of the Thermocycler Moduler",
       "providesAddressableAreas": {
@@ -586,7 +791,7 @@
     },
     {
       "id": "heaterShakerModule",
-      "opentronsModuleSerialNumber": "",
+      "expectOpentronsModuleSerialNumber": true,
       "mayMountTo": [
         "cutoutD1",
         "cutoutC1",
@@ -612,7 +817,7 @@
     },
     {
       "id": "temperatureModule",
-      "opentronsModuleSerialNumber": "",
+      "expectOpentronsModuleSerialNumber": true,
       "mayMountTo": [
         "cutoutD1",
         "cutoutC1",
@@ -638,7 +843,7 @@
     },
     {
       "id": "magneticBlockModule",
-      "opentronsModuleSerialNumber": "",
+      "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": [
         "cutoutD1",
         "cutoutC1",

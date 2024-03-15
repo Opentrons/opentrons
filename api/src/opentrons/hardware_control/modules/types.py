@@ -9,6 +9,7 @@ from typing import (
     Tuple,
     Awaitable,
     Union,
+    Set,
     cast,
     TYPE_CHECKING,
 )
@@ -63,6 +64,22 @@ class ModuleType(str, Enum):
             return cls.HEATER_SHAKER
         if isinstance(model, MagneticBlockModel):
             return cls.MAGNETIC_BLOCK
+
+    @classmethod
+    def to_module_fixture_id(cls, module_type: ModuleType) -> str:
+        if module_type == ModuleType.THERMOCYCLER:
+            # Thermocyclers are "loaded" in B1 only
+            return "thermocyclerModuleFront"
+        if module_type == ModuleType.TEMPERATURE:
+            return "temperatureModule"
+        if module_type == ModuleType.HEATER_SHAKER:
+            return "heaterShakerModule"
+        if module_type == ModuleType.MAGNETIC_BLOCK:
+            return "magneticBlockModule"
+        else:
+            raise ValueError(
+                f"Module Type {module_type} does not have a related fixture ID."
+            )
 
 
 class MagneticModuleModel(str, Enum):
