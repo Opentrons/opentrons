@@ -89,7 +89,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      {title !== undefined ? (
+      {title !== null ? (
         <StyledText as="labelSemiBold" paddingBottom={SPACING.spacing8}>
           {title}
         </StyledText>
@@ -120,6 +120,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           left={SPACING.spacing16}
           flexDirection={DIRECTION_COLUMN}
           width={width}
+          ref={dropDownMenuWrapperRef}
         >
           {filterOptions.map((option, index) => (
             <MenuItem

@@ -53,7 +53,7 @@ export function SetWifiSsid({
           type="text"
           error={errorMessage}
           onBlur={e => e.target.focus()}
-          autoFocus={true}
+          autoFocus
         />
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">

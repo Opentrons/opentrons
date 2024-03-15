@@ -255,7 +255,9 @@ function Input(props: InputFieldProps): JSX.Element {
           paddingTop={SPACING.spacing4}
           flexDirection={DIRECTION_COLUMN}
         >
-          <Flex css={FORM_BOTTOM_SPACE_STYLE}>{props.caption}</Flex>
+          {props.caption != null ? (
+            <Flex css={FORM_BOTTOM_SPACE_STYLE}>{props.caption}</Flex>
+          ) : null}
           {props.secondaryCaption != null ? (
             <Flex css={FORM_BOTTOM_SPACE_STYLE}>{props.secondaryCaption}</Flex>
           ) : null}

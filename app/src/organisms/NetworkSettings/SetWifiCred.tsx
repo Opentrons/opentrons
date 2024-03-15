@@ -57,7 +57,7 @@ export function SetWifiCred({
               onChange={e => setPassword(e.target.value)}
               type={showPassword ? 'text' : 'password'}
               onBlur={e => e.target.focus()}
-              autoFocus={true}
+              autoFocus
             />
           </Box>
           <Btn
