@@ -296,6 +296,40 @@ export const useRunTimeParameters = (
       ],
       default: 'left',
     },
+    {
+      displayName: 'short test case',
+      variableName: 'short 2 options',
+      description: 'this play 2 short options',
+      type: 'str',
+      choices: [
+        {
+          displayName: 'OT-2',
+          value: 'ot2',
+        },
+        {
+          displayName: 'Flex',
+          value: 'flex',
+        },
+      ],
+      default: 'flex',
+    },
+    {
+      displayName: 'long test case',
+      variableName: 'long 2 options',
+      description: 'this play 2 long options',
+      type: 'str',
+      choices: [
+        {
+          displayName: 'I am kind of long text version',
+          value: 'ot2',
+        },
+        {
+          displayName: 'I am kind of long text version. Today is 3/15',
+          value: 'flex',
+        },
+      ],
+      default: 'flex',
+    },
   ]
   //  TODO(jr, 3/14/24): remove the mockData
   return analysis?.runTimeParameters ?? mockData
