@@ -5,10 +5,9 @@ import { Provider } from 'react-redux'
 
 import { ConnectedRouter } from 'connected-react-router'
 
-import { I18nextProvider } from 'react-i18next'
 import { ApiClientProvider } from '@opentrons/react-api-client'
 
-import { i18n } from './i18n'
+import { LocalizationProvider } from './LocalizationProvider'
 import { createLogger } from './logger'
 
 import { uiInitialized } from './redux/shell'
@@ -38,9 +37,9 @@ root.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
       <ApiClientProvider>
-        <I18nextProvider i18n={i18n}>
+        <LocalizationProvider>
           <App />
-        </I18nextProvider>
+        </LocalizationProvider>
       </ApiClientProvider>
     </ConnectedRouter>
   </Provider>
