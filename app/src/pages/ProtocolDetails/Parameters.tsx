@@ -15,16 +15,6 @@ import { useRunTimeParameters } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'
 import type { RunTimeParameters } from '@opentrons/shared-data'
 
-interface RangeProps {
-  type: RunTimeParameters['type']
-  max: number
-  min: number
-}
-interface DefaultProps {
-  default: unknown
-  suffix?: string
-}
-
 const Table = styled('table')`
   font-size: ${TYPOGRAPHY.fontSize22};
   width: 100%;
@@ -68,31 +58,55 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
     makeSnackbar(t('start_setup_customize_values'))
   }
 
-  const getRange = (props: RangeProps): string => {
-    switch (props.type) {
+  const getRange = (parameter: RunTimeParameters): string => {
+    const { type } = parameter
+    const min = 'min' in parameter ? parameter.min : 0
+    const max = 'max' in parameter ? parameter.max : 0
+    const numChoices = 'choices' in parameter ? parameter.choices.length : 0
+    let range: string | null = null
+    if (numChoices === 2 && 'choices' in parameter) {
+      range = `${parameter.choices[0].displayName}, ${parameter.choices[1].displayName}`
+    }
+
+    switch (type) {
       case 'boolean': {
         return t('on_off')
       }
       case 'float':
       case 'int': {
-        return `${props.min}-${props.max}`
+        return `${min}-${max}`
       }
       case 'str': {
-        return t('multi')
+        return range ?? t('num_choices', { num: numChoices })
       }
+      default:
+        //  Should never hit this case
+        return ''
     }
   }
 
-  const getDefault = (props: DefaultProps): string => {
-    if (props.suffix != null) {
-      return `${props.default} ${props.suffix}`
-    } else if (props.default === false) {
-      return t('off')
-    } else if (props.default === true) {
-      return t('on')
-    } else {
-      return `${props.default}`
+  const getDefault = (parameter: RunTimeParameters): string => {
+    const { type, default: defaultValue } = parameter
+    const suffix =
+      'suffix' in parameter && parameter.suffix != null ? parameter.suffix : ''
+    switch (type) {
+      case 'int':
+      case 'float':
+        return `${defaultValue.toString()} ${suffix}`
+      case 'boolean':
+        return Boolean(defaultValue) ? t('on') : t('off')
+      case 'str':
+        if ('choices' in parameter && parameter.choices != null) {
+          const choice = parameter.choices.find(
+            choice => choice.value === defaultValue
+          )
+          if (choice != null) {
+            return choice.displayName
+          }
+        }
+        break
     }
+    return ''
   }
 
   return runTimeParameters.length === 0 ? (
@@ -120,8 +134,6 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
       </thead>
       <tbody>
         {runTimeParameters.map((parameter, index) => {
-          const min = 'min' in parameter ? parameter.min : 0
-          const max = 'max' in parameter ? parameter.max : 0
           return (
             <TableRow key={index}>
               <TableDatum>
@@ -131,15 +143,12 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
               </TableDatum>
               <TableDatum>
                 <Flex paddingLeft={SPACING.spacing24} color={COLORS.grey60}>
-                  {getDefault({
-                    default: parameter.default,
-                    suffix: parameter.suffix,
-                  })}
+                  {getDefault(parameter)}
                 </Flex>
               </TableDatum>
               <TableDatum>
                 <Flex paddingLeft={SPACING.spacing24} color={COLORS.grey60}>
-                  {getRange({ type: parameter.type, max, min })}
+                  {getRange(parameter)}
                 </Flex>
               </TableDatum>
             </TableRow>

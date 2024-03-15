@@ -90,6 +90,23 @@ const mockRTPData: RunTimeParameters[] = [
     ],
     default: 'none',
   },
+  {
+    displayName: '2 choices',
+    variableName: 'TWO',
+    description: '',
+    type: 'str',
+    choices: [
+      {
+        displayName: 'one choice',
+        value: '1',
+      },
+      {
+        displayName: 'the second',
+        value: '2',
+      },
+    ],
+    default: '2',
+  },
 ]
 
 const render = (props: React.ComponentProps<typeof Parameters>) => {
@@ -118,6 +135,11 @@ describe('Parameters', () => {
     screen.getByText('Default value')
     screen.getByText('Range')
     screen.getByText('Dry Run')
+    screen.getByText('6.5')
     screen.getByText('Use Gripper')
+    screen.getByText('Default Module Offsets')
+    screen.getByText('3 choices')
+    screen.getByText('EtoH Volume')
+    screen.getByText('one choice, the second')
   })
 })
