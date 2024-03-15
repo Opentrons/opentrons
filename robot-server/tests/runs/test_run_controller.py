@@ -168,7 +168,7 @@ async def test_create_play_action_to_start(
     )
 
 
-async def test_create_pause_action(
+def test_create_pause_action(
     decoy: Decoy,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
@@ -193,7 +193,7 @@ async def test_create_pause_action(
     decoy.verify(mock_engine_store.runner.pause(), times=1)
 
 
-async def test_create_stop_action(
+def test_create_stop_action(
     decoy: Decoy,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
@@ -217,6 +217,32 @@ async def test_create_stop_action(
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
     decoy.verify(mock_task_runner.run(mock_engine_store.runner.stop), times=1)
+
+
+def test_create_complete_recovery_action(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    mock_run_store: RunStore,
+    mock_task_runner: TaskRunner,
+    run_id: str,
+    subject: RunController,
+) -> None:
+    """It should call `complete_recovery()` on the underlying engine store."""
+    result = subject.create_action(
+        action_id="some-action-id",
+        action_type=RunActionType.COMPLETE_RECOVERY,
+        created_at=datetime(year=2021, month=1, day=1),
+        action_payload=[],
+    )
+
+    assert result == RunAction(
+        id="some-action-id",
+        actionType=RunActionType.COMPLETE_RECOVERY,
+        createdAt=datetime(year=2021, month=1, day=1),
+    )
+
+    decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
+    decoy.verify(mock_engine_store.runner.complete_recovery())
 
 
 @pytest.mark.parametrize(
