@@ -8,6 +8,7 @@ from decoy import Decoy
 
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.ordered_set import OrderedSet
+from opentrons.protocol_engine.actions.actions import CompleteRecoveryAction
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
@@ -425,6 +426,24 @@ def test_pause(
         action_dispatcher.dispatch(expected_action),
         hardware_api.pause(HardwarePauseType.PAUSE),
     )
+
+
+def test_complete_recovery(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should dispatch a CompleteRecoveryAction."""
+    expected_action = CompleteRecoveryAction()
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_action)
+    ).then_return(expected_action)
+
+    subject.complete_recovery()
+
+    decoy.verify(action_dispatcher.dispatch(expected_action))
 
 
 @pytest.mark.parametrize("drop_tips_after_run", [True, False])
