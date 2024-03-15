@@ -16,18 +16,21 @@ export const MenuItem = styled.button<ButtonProps>`
   text-align: ${TYPOGRAPHY.textAlignLeft};
   font-size: ${TYPOGRAPHY.fontSizeP};
   background-color: ${COLORS.transparent};
-  color: ${COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
   padding: ${SPACING.spacing8} ${SPACING.spacing12} ${SPACING.spacing8}
     ${SPACING.spacing12};
 
-  &:hover,
+  &:hover {
+    background-color: ${COLORS.grey10};
+  }
+
   &:active {
-    background-color: ${COLORS.lightBlue};
+    background-color: ${COLORS.grey30};
   }
 
   &:disabled {
     background-color: ${COLORS.transparent};
-    color: ${COLORS.black}${COLORS.opacity50HexCode};
+    color: ${COLORS.grey40};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -35,22 +38,21 @@ export const MenuItem = styled.button<ButtonProps>`
     text-align: ${TYPOGRAPHY.textAlignCenter};
     font-size: ${TYPOGRAPHY.fontSize28};
     background-color: ${({ isAlert }) =>
-      isAlert ? COLORS.errorEnabled : COLORS.transparent};
-    color: ${({ isAlert }) =>
-      isAlert ? COLORS.white : COLORS.darkBlackEnabled};
+      isAlert ? COLORS.red50 : COLORS.transparent};
+    color: ${({ isAlert }) => (isAlert ? COLORS.white : COLORS.black90)};
     padding: ${SPACING.spacing24};
     height: 5.5rem;
     line-height: ${TYPOGRAPHY.lineHeight36};
     &:hover,
     &:active {
       background-color: ${({ isAlert }) =>
-        isAlert ? COLORS.errorEnabled : COLORS.darkBlack20};
+        isAlert ? COLORS.red50 : COLORS.grey35};
     }
 
     &:disabled {
       background-color: ${({ isAlert }) =>
-        isAlert ? COLORS.errorEnabled : COLORS.transparent};
-      color: ${({ isAlert }) => (isAlert ? COLORS.white : COLORS.darkBlack60)};
+        isAlert ? COLORS.red50 : COLORS.transparent};
+      color: ${({ isAlert }) => (isAlert ? COLORS.white : COLORS.grey50)};
     }
   }
 `

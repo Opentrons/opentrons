@@ -43,14 +43,14 @@ export function UpdateSoftware({
 
   return (
     <Flex
-      backgroundColor={COLORS.darkBlack20}
+      backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       width="100%"
       height="33rem"
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -63,7 +63,7 @@ export function UpdateSoftware({
         <StyledText
           as="h3"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkBlack70}
+          color={COLORS.grey60}
         >
           {renderText()}
         </StyledText>

@@ -1,32 +1,30 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { UseQueryResult } from 'react-query'
 import { useProtocolAnalysisAsDocumentQuery } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolCard } from '../ProtocolCard'
+import type * as ReactRouterDom from 'react-router-dom'
 
 import type {
   CompletedProtocolAnalysis,
   ProtocolResource,
 } from '@opentrons/shared-data'
 
-const mockPush = jest.fn()
+const mockPush = vi.fn()
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof ReactRouterDom>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
-jest.mock('@opentrons/react-api-client')
-
-const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
-  typeof useProtocolAnalysisAsDocumentQuery
->
+vi.mock('@opentrons/react-api-client')
 
 const mockProtocol: ProtocolResource = {
   id: 'mockProtocol1',
@@ -47,10 +45,10 @@ const mockProtocol: ProtocolResource = {
 
 const props = {
   protocol: mockProtocol,
-  longPress: jest.fn(),
-  setTargetProtocol: jest.fn(),
-  setShowDeleteConfirmationModal: jest.fn(),
-  setTargetProtocolId: jest.fn(),
+  longPress: vi.fn(),
+  setTargetProtocol: vi.fn(),
+  setShowDeleteConfirmationModal: vi.fn(),
+  setTargetProtocolId: vi.fn(),
 }
 
 const render = () => {
@@ -65,83 +63,87 @@ const render = () => {
 }
 
 describe('ProtocolCard', () => {
-  jest.useFakeTimers()
+  vi.useFakeTimers()
 
   beforeEach(() => {
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'ok' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
   })
   it('should redirect to protocol details after short click', () => {
-    const [{ getByText }] = render()
-    const name = getByText('yay mock protocol')
+    render()
+    const name = screen.getByText('yay mock protocol')
     fireEvent.click(name)
     expect(mockPush).toHaveBeenCalledWith('/protocols/mockProtocol1')
   })
 
   it('should display the analysis failed error modal when clicking on the protocol', () => {
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'error' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
-    const [{ getByText, getByLabelText, queryByText }] = render()
-    getByLabelText('failedAnalysis_icon')
-    getByText('Failed analysis')
-    getByText('yay mock protocol').click()
-    getByText('Protocol analysis failed')
-    getByText(
+    render()
+    screen.getByLabelText('failedAnalysis_icon')
+    screen.getByText('Failed analysis')
+    fireEvent.click(screen.getByText('yay mock protocol'))
+    screen.getByText('Protocol analysis failed')
+    screen.getByText(
       'Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons App.'
     )
-    getByText('Delete protocol')
-    getByLabelText('closeIcon').click()
-    expect(queryByText('Protocol analysis failed')).not.toBeInTheDocument()
+    screen.getByText('Delete protocol')
+    fireEvent.click(screen.getByLabelText('closeIcon'))
+    expect(
+      screen.queryByText('Protocol analysis failed')
+    ).not.toBeInTheDocument()
   })
 
   it('should display modal after long click', async () => {
-    const [{ getByText }] = render()
-    const name = getByText('yay mock protocol')
+    vi.useFakeTimers()
+    render()
+    const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
-    jest.advanceTimersByTime(1005)
+    act(() => {
+      vi.advanceTimersByTime(1005)
+    })
     expect(props.longPress).toHaveBeenCalled()
-    getByText('Run protocol')
-    getByText('Pin protocol')
-    getByText('Delete protocol')
+    screen.getByText('Run protocol')
+    screen.getByText('Pin protocol')
+    screen.getByText('Delete protocol')
   })
 
   it('should display the analysis failed error modal when clicking on the protocol when doing a long pressing', async () => {
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    vi.useFakeTimers()
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'error' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
-    const [{ getByText, getByLabelText }] = render()
-    const name = getByText('yay mock protocol')
+    render()
+    const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
-    jest.advanceTimersByTime(1005)
+    act(() => {
+      vi.advanceTimersByTime(1005)
+    })
     expect(props.longPress).toHaveBeenCalled()
-    getByLabelText('failedAnalysis_icon')
-    getByText('Failed analysis')
-    getByText('yay mock protocol').click()
-    getByText('Protocol analysis failed')
-    getByText(
+    screen.getByLabelText('failedAnalysis_icon')
+    screen.getByText('Failed analysis')
+    fireEvent.click(screen.getByText('yay mock protocol'))
+    screen.getByText('Protocol analysis failed')
+    screen.getByText(
       'Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons App.'
     )
-    getByText('Delete protocol')
+    screen.getByText('Delete protocol')
   })
 
-  it('should display the analysis failed error modal when clicking on the protocol when doing a long pressing - undefined case', async () => {
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
-      data: undefined as any,
+  it('should display a loading spinner when analysis is pending', async () => {
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: null as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
-    const [{ getByText, getByLabelText }] = render()
-    const name = getByText('yay mock protocol')
+    render()
+    const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
-    jest.advanceTimersByTime(1005)
+    act(() => {
+      vi.advanceTimersByTime(1005)
+    })
     expect(props.longPress).toHaveBeenCalled()
-    getByLabelText('failedAnalysis_icon')
-    getByText('Failed analysis')
-    getByText('yay mock protocol').click()
-    getByText('Protocol analysis failed')
-    getByText(
-      'Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons App.'
-    )
-    getByText('Delete protocol')
+    screen.getByLabelText('Protocol is loading')
+    fireEvent.click(screen.getByText('yay mock protocol'))
   })
 })

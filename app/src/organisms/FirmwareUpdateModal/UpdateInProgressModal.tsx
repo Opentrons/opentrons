@@ -6,29 +6,33 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  Icon,
   Flex,
   SPACING,
   TYPOGRAPHY,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-import { ProgressBar } from '../../atoms/ProgressBar'
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
-import { Subsystem } from '@opentrons/api-client'
+import type { Subsystem } from '@opentrons/api-client'
 
 interface UpdateInProgressModalProps {
-  percentComplete: number
   subsystem: Subsystem
 }
 
-const OUTER_STYLES = css`
-  background: ${COLORS.medGreyEnabled};
-  width: 100%;
+const SPINNER_STYLE = css`
+  color: ${COLORS.grey50};
+  opacity: 100%;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    color: ${COLORS.black90};
+    opacity: 70%;
+  }
 `
 
 export function UpdateInProgressModal(
   props: UpdateInProgressModalProps
 ): JSX.Element {
-  const { percentComplete, subsystem } = props
+  const { subsystem } = props
   const { t } = useTranslation('firmware_update')
 
   return (
@@ -36,8 +40,8 @@ export function UpdateInProgressModal(
       <Flex
         height="17.25rem"
         width="100%"
-        backgroundColor={COLORS.darkBlack20}
-        borderRadius={BORDERS.borderRadiusSize3}
+        backgroundColor={COLORS.grey35}
+        borderRadius={BORDERS.borderRadius12}
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing32}
         justifyContent={ALIGN_CENTER}
@@ -51,9 +55,12 @@ export function UpdateInProgressModal(
         >
           {t('updating_firmware', { subsystem: t(subsystem) })}
         </StyledText>
-        <ProgressBar
-          percentComplete={percentComplete}
-          outerStyles={OUTER_STYLES}
+        <Icon
+          name="ot-spinner"
+          aria-label="spinner"
+          size="6.25rem"
+          css={SPINNER_STYLE}
+          spin
         />
       </Flex>
     </Modal>

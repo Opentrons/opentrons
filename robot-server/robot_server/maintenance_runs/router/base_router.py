@@ -11,7 +11,7 @@ from typing_extensions import Literal
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel, Field
 
-from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 
@@ -121,7 +121,8 @@ async def get_run_data_from_url(
     return run_data
 
 
-@base_router.post(
+@PydanticResponse.wrap_route(
+    base_router.post,
     path="/maintenance_runs",
     summary="Create a maintenance run",
     description=dedent(
@@ -188,7 +189,8 @@ async def create_run(
     )
 
 
-@base_router.get(
+@PydanticResponse.wrap_route(
+    base_router.get,
     path="/maintenance_runs/current_run",
     summary="Get the current maintenance run",
     description="Get the currently active maintenance run, if any",
@@ -224,7 +226,8 @@ async def get_current_run(
     )
 
 
-@base_router.get(
+@PydanticResponse.wrap_route(
+    base_router.get,
     path="/maintenance_runs/{runId}",
     summary="Get a maintenance run",
     description="Get a specific run by its unique identifier.",
@@ -247,7 +250,8 @@ async def get_run(
     )
 
 
-@base_router.delete(
+@PydanticResponse.wrap_route(
+    base_router.delete,
     path="/maintenance_runs/{runId}",
     summary="Delete a run",
     description="Delete a specific run by its unique identifier.",

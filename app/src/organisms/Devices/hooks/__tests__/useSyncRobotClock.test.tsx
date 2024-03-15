@@ -1,21 +1,21 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { syncSystemTime } from '../../../../redux/robot-admin'
 import { useSyncRobotClock } from '..'
 
-jest.mock('../../../../redux/discovery')
+vi.mock('../../../../redux/discovery')
 
-const store: Store<any> = createStore(jest.fn(), {})
+const store: Store<any> = createStore(vi.fn(), {})
 
 describe('useSyncRobotClock hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
-    store.dispatch = jest.fn()
+    store.dispatch = vi.fn()
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
       <Provider store={store}>
@@ -26,8 +26,7 @@ describe('useSyncRobotClock hook', () => {
     )
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('dispatches action to sync robot system time on mount and then not again on subsequent renders', () => {

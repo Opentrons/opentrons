@@ -54,10 +54,10 @@ export function StagingAreaFixture(
         <SlotClip d="M326,329.8v-10.5h10.6" stroke={slotClipColor} />,
         <SlotClip d="M457.8,398.9V409H447" stroke={slotClipColor} />,
         <SlotClip d="M457.8,329.8v-10.7H447" stroke={slotClipColor} />
-        <SlotClip d="M488,398.9v10.1h10.8" stroke={slotClipColor} />,
-        <SlotClip d="M488,329.8v-10.5h10.6" stroke={slotClipColor} />,
-        <SlotClip d="M619.8,398.9v10.1H609" stroke={slotClipColor} />,
-        <SlotClip d="M619.8,329.8v-10.7H609" stroke={slotClipColor} />
+        <SlotClip d="M490,398.9v10.1h10.8" stroke={slotClipColor} />,
+        <SlotClip d="M490,329.8v-10.5h10.6" stroke={slotClipColor} />,
+        <SlotClip d="M621.8,398.9v10.1h-10.8" stroke={slotClipColor} />,
+        <SlotClip d="M621.8,329.8v-10.7h-10.8" stroke={slotClipColor} />
       </>
     ),
     cutoutB3: (
@@ -70,10 +70,10 @@ export function StagingAreaFixture(
         <SlotClip d="M326,222.8v-10.5h10.6" stroke={slotClipColor} />,
         <SlotClip d="M457.8,291.9V302H447" stroke={slotClipColor} />,
         <SlotClip d="M457.8,222.8v-10.7H447" stroke={slotClipColor} />
-        <SlotClip d="M488,291.9v10.1h10.8" stroke={slotClipColor} />,
-        <SlotClip d="M488,222.8v-10.5h10.6" stroke={slotClipColor} />,
-        <SlotClip d="M619.8,291.9v10.1H609" stroke={slotClipColor} />,
-        <SlotClip d="M619.8,222.8v-10.7H609" stroke={slotClipColor} />
+        <SlotClip d="M490,291.9v10.1h10.8" stroke={slotClipColor} />,
+        <SlotClip d="M490,222.8v-10.5h10.6" stroke={slotClipColor} />,
+        <SlotClip d="M621.8,291.9v10.1h-10.8" stroke={slotClipColor} />,
+        <SlotClip d="M621.8,222.8v-10.7h-10.8" stroke={slotClipColor} />
       </>
     ),
     cutoutC3: (
@@ -86,10 +86,10 @@ export function StagingAreaFixture(
         <SlotClip d="M326,115.8v-10.5h10.6" stroke={slotClipColor} />,
         <SlotClip d="M457.8,185v10.1H447" stroke={slotClipColor} />,
         <SlotClip d="M457.8,115.8v-10.7H447" stroke={slotClipColor} />
-        <SlotClip d="M488,185v10.1h10.8" stroke={slotClipColor} />,
-        <SlotClip d="M488,115.8v-10.5h10.6" stroke={slotClipColor} />,
-        <SlotClip d="M619.8,185v10.1H609" stroke={slotClipColor} />,
-        <SlotClip d="M619.8,115.8v-10.7H609" stroke={slotClipColor} />
+        <SlotClip d="M490,185v10.1h10.8" stroke={slotClipColor} />,
+        <SlotClip d="M490,115.8v-10.5h10.6" stroke={slotClipColor} />,
+        <SlotClip d="M621.8,185v10.1h-10.8" stroke={slotClipColor} />,
+        <SlotClip d="M621.8,115.8v-10.7h-10.8" stroke={slotClipColor} />
       </>
     ),
     cutoutD3: (
@@ -102,10 +102,10 @@ export function StagingAreaFixture(
         <SlotClip d="M326,8.8V-1.7h10.6" stroke={slotClipColor} />
         <SlotClip d="M457.8,77.9V88H447" stroke={slotClipColor} />
         <SlotClip d="M457.8,8.8V-1.9H447" stroke={slotClipColor} />
-        <SlotClip d="M488,77.9v10.1h10.8" stroke={slotClipColor} />,
-        <SlotClip d="M488,8.8v-10.5h10.6" stroke={slotClipColor} />,
-        <SlotClip d="M619.8,77.9v10.1H609" stroke={slotClipColor} />,
-        <SlotClip d="M619.8,8.8v-10.7H609" stroke={slotClipColor} />
+        <SlotClip d="M490,77.9v10.1h10.8" stroke={slotClipColor} />,
+        <SlotClip d="M490,8.8v-10.5h10.6" stroke={slotClipColor} />,
+        <SlotClip d="M621.8,77.9v10.1h-10.8" stroke={slotClipColor} />,
+        <SlotClip d="M621.8,8.8v-10.7h-10.8" stroke={slotClipColor} />
       </>
     ),
   }

@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { LargeButton } from '../LargeButton'
 
@@ -11,17 +15,17 @@ describe('LargeButton', () => {
   let props: React.ComponentProps<typeof LargeButton>
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       buttonText: 'large button',
       iconName: 'play-round-corners',
     }
   })
   it('renders the default button and it works as expected', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('large button').click()
+    render(props)
+    fireEvent.click(screen.getByText('large button'))
     expect(props.onClick).toHaveBeenCalled()
-    expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.blueEnabled}`
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.blue60}`
     )
   })
   it('renders the alert button', () => {
@@ -29,17 +33,19 @@ describe('LargeButton', () => {
       ...props,
       buttonType: 'alert',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`background-color: ${COLORS.red3}`)
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.red40}`
+    )
   })
   it('renders the secondary button', () => {
     props = {
       ...props,
       buttonType: 'secondary',
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(
-      `background-color: ${COLORS.mediumBlueEnabled}`
+    render(props)
+    expect(screen.getByRole('button')).toHaveStyle(
+      `background-color: ${COLORS.blue40}`
     )
   })
   it('renders the button as disabled', () => {
@@ -47,7 +53,7 @@ describe('LargeButton', () => {
       ...props,
       disabled: true,
     }
-    const { getByRole } = render(props)
-    expect(getByRole('button')).toBeDisabled()
+    render(props)
+    expect(screen.getByRole('button')).toBeDisabled()
   })
 })

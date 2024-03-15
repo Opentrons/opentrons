@@ -1,9 +1,10 @@
 """Tests for module state accessors in the protocol engine state store."""
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from math import isclose
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union, Any
+from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union, Any, List
 
 from opentrons_shared_data import load_shared_data
 from opentrons.types import DeckSlotName, MountType
@@ -39,19 +40,26 @@ from opentrons.protocol_engine.state.module_substates import (
 
 
 def make_module_view(
+    deck_type: Optional[DeckType] = None,
     slot_by_module_id: Optional[Dict[str, Optional[DeckSlotName]]] = None,
     requested_model_by_module_id: Optional[Dict[str, Optional[ModuleModel]]] = None,
     hardware_by_module_id: Optional[Dict[str, HardwareModule]] = None,
     substate_by_module_id: Optional[Dict[str, ModuleSubStateType]] = None,
     module_offset_by_serial: Optional[Dict[str, ModuleOffsetData]] = None,
+    additional_slots_occupied_by_module_id: Optional[
+        Dict[str, List[DeckSlotName]]
+    ] = None,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
+        deck_type=deck_type or DeckType.OT2_STANDARD,
         slot_by_module_id=slot_by_module_id or {},
         requested_model_by_id=requested_model_by_module_id or {},
         hardware_by_module_id=hardware_by_module_id or {},
         substate_by_module_id=substate_by_module_id or {},
         module_offset_by_serial=module_offset_by_serial or {},
+        additional_slots_occupied_by_module_id=additional_slots_occupied_by_module_id
+        or {},
     )
 
     return ModuleView(state=state)
@@ -315,6 +323,7 @@ def test_get_module_offset_for_ot2_standard(
 ) -> None:
     """It should return the correct labware offset for module in specified slot."""
     subject = make_module_view(
+        deck_type=DeckType.OT2_STANDARD,
         slot_by_module_id={"module-id": slot},
         hardware_by_module_id={
             "module-id": HardwareModule(
@@ -323,10 +332,7 @@ def test_get_module_offset_for_ot2_standard(
             )
         },
     )
-    assert (
-        subject.get_nominal_module_offset("module-id", DeckType.OT2_STANDARD)
-        == expected_offset
-    )
+    assert subject.get_nominal_module_offset("module-id") == expected_offset
 
 
 @pytest.mark.parametrize(
@@ -371,6 +377,7 @@ def test_get_module_offset_for_ot3_standard(
 ) -> None:
     """It should return the correct labware offset for module in specified slot."""
     subject = make_module_view(
+        deck_type=DeckType.OT3_STANDARD,
         slot_by_module_id={"module-id": slot},
         hardware_by_module_id={
             "module-id": HardwareModule(
@@ -379,9 +386,7 @@ def test_get_module_offset_for_ot3_standard(
             )
         },
     )
-    result_offset = subject.get_nominal_module_offset(
-        "module-id", DeckType.OT3_STANDARD
-    )
+    result_offset = subject.get_nominal_module_offset("module-id")
     assert (result_offset.x, result_offset.y, result_offset.z) == pytest.approx(
         (expected_offset.x, expected_offset.y, expected_offset.z)
     )
@@ -1759,3 +1764,110 @@ def test_get_default_gripper_offsets(
         },
     )
     assert subject.get_default_gripper_offsets("module-1") == expected_offset_data
+
+
+@pytest.mark.parametrize(
+    argnames=["deck_type", "slot_name", "expected_highest_z"],
+    argvalues=[
+        (DeckType.OT2_STANDARD, DeckSlotName.SLOT_1, 84),
+        (DeckType.OT3_STANDARD, DeckSlotName.SLOT_D1, 12.91),
+    ],
+)
+def test_get_module_highest_z(
+    tempdeck_v2_def: ModuleDefinition,
+    deck_type: DeckType,
+    slot_name: DeckSlotName,
+    expected_highest_z: float,
+) -> None:
+    """It should get the highest z point of the module."""
+    subject = make_module_view(
+        deck_type=deck_type,
+        slot_by_module_id={"module-id": slot_name},
+        requested_model_by_module_id={
+            "module-id": ModuleModel.TEMPERATURE_MODULE_V2,
+        },
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="module-serial",
+                definition=tempdeck_v2_def,
+            )
+        },
+    )
+    assert isclose(
+        subject.get_module_highest_z(module_id="module-id"),
+        expected_highest_z,
+    )
+
+
+def test_get_overflowed_module_in_slot(tempdeck_v1_def: ModuleDefinition) -> None:
+    """It should return the module occupying but not loaded in the given slot."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=tempdeck_v1_def,
+            )
+        },
+        additional_slots_occupied_by_module_id={
+            "module-id": [DeckSlotName.SLOT_6, DeckSlotName.SLOT_A1],
+        },
+    )
+    assert subject.get_overflowed_module_in_slot(DeckSlotName.SLOT_6) == LoadedModule(
+        id="module-id",
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        serialNumber="serial-number",
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["deck_type", "module_def", "module_slot", "expected_result"],
+    argvalues=[
+        (
+            DeckType.OT3_STANDARD,
+            lazy_fixture("thermocycler_v2_def"),
+            DeckSlotName.SLOT_A1,
+            True,
+        ),
+        (
+            DeckType.OT3_STANDARD,
+            lazy_fixture("tempdeck_v1_def"),
+            DeckSlotName.SLOT_A1,
+            False,
+        ),
+        (
+            DeckType.OT3_STANDARD,
+            lazy_fixture("thermocycler_v2_def"),
+            DeckSlotName.SLOT_1,
+            False,
+        ),
+        (
+            DeckType.OT2_STANDARD,
+            lazy_fixture("thermocycler_v2_def"),
+            DeckSlotName.SLOT_A1,
+            False,
+        ),
+    ],
+)
+def test_is_flex_deck_with_thermocycler(
+    deck_type: DeckType,
+    module_def: ModuleDefinition,
+    module_slot: DeckSlotName,
+    expected_result: bool,
+) -> None:
+    """It should return True if there is a thermocycler on Flex."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_B1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=module_def,
+            )
+        },
+        additional_slots_occupied_by_module_id={
+            "module-id": [module_slot, DeckSlotName.SLOT_C1],
+        },
+        deck_type=deck_type,
+    )
+    assert subject.is_flex_deck_with_thermocycler() == expected_result

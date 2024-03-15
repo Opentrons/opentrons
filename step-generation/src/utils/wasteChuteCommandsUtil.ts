@@ -6,6 +6,7 @@ import {
   moveToAddressableArea,
 } from '../commandCreators/atomic'
 import { curryCommandCreator } from './curryCommandCreator'
+import type { AddressableAreaName } from '@opentrons/shared-data'
 import type { RobotState, CurriedCommandCreator } from '../types'
 
 export type WasteChuteCommandsTypes =
@@ -17,7 +18,7 @@ export type WasteChuteCommandsTypes =
 interface WasteChuteCommandArgs {
   type: WasteChuteCommandsTypes
   pipetteId: string
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
   prevRobotState: RobotState
   volume?: number
   flowRate?: number

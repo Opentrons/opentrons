@@ -52,7 +52,7 @@ def get_unit_vector(
     for i in range(len(displacement)):
         if abs(displacement[i]) < MINIMUM_DISPLACEMENT:
             displacement[i] = 0
-    distance = np.linalg.norm(displacement)  # type: ignore[no-untyped-call]
+    distance = np.linalg.norm(displacement)
     if not distance or np.array_equal(initial_vectorized, target_vectorized):
         raise ZeroLengthMoveError(initial, target)
     unit_vector_ndarray = displacement / distance
@@ -432,19 +432,19 @@ def build_blocks(
         abs(final_speed), max_speed
     ), f"final speed {final_speed} exceeds max speed {max_speed}"
 
-    max_acc = np.array(
+    max_acc: np.typing.NDArray[np.float64] = np.array(
         [
             constraints[axis].max_acceleration if unit_vector[axis] else 0.0
             for axis in unit_vector.keys()
         ]
     )
-    max_acc_magnitude = np.linalg.norm(max_acc)  # type: ignore[no-untyped-call]
+    max_acc_magnitude = np.linalg.norm(max_acc)
     acc_v = max_acc_magnitude * vectorize(unit_vector)
 
     for a_i, max_acc_i in zip(acc_v, max_acc):
         if abs(a_i) > max_acc_i:
             acc_v *= max_acc_i / a_i
-    max_acceleration = np.linalg.norm(acc_v)  # type: ignore[no-untyped-call]
+    max_acceleration = np.linalg.norm(acc_v)
 
     initial_speed_sq = initial_speed**2
     final_speed_sq = final_speed**2
@@ -517,6 +517,10 @@ def build_move(
     """Build a move."""
     log = logging.getLogger("build_move")
 
+    # TODO: We need to limit the initial speed and the final speed based on the directions
+    # of this and the bounding moves - if the directions are not the same, and I mean exact
+    # unit vector equivalence, we need to limit the junction speed to the max speed discontinuity
+    # because we can only instantly change speed below that value.
     initial_speed = find_initial_speed(constraints, move, prev_move)
     final_speed = find_final_speed(constraints, move, next_move)
     final_speed = achievable_final(constraints, move, initial_speed, final_speed)

@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderHook } from '@testing-library/react-hooks'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, vi } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, renderHook, screen } from '@testing-library/react'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { Numpad } from '..'
 
 const render = (props: React.ComponentProps<typeof Numpad>) => {
@@ -9,18 +10,14 @@ const render = (props: React.ComponentProps<typeof Numpad>) => {
 }
 
 describe('Numpad', () => {
-  let props: React.ComponentProps<typeof Numpad>
-
-  beforeEach(() => {
+  it('should render the numpad keys', () => {
     const { result } = renderHook(() => React.useRef(null))
-    props = {
-      onChange: jest.fn(),
+    const props = {
+      onChange: vi.fn(),
       keyboardRef: result.current,
     }
-  })
-  it('should render the numpad keys', () => {
-    const { getAllByRole } = render(props)
-    const buttons = getAllByRole('button')
+    render(props)
+    const buttons = screen.getAllByRole('button')
     const expectedButtonNames = [
       '7',
       '8',
@@ -43,8 +40,13 @@ describe('Numpad', () => {
   })
 
   it('should call mock function when clicking num key', () => {
-    const { getByRole } = render(props)
-    const numKey = getByRole('button', { name: '1' })
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: vi.fn(),
+      keyboardRef: result.current,
+    }
+    render(props)
+    const numKey = screen.getByRole('button', { name: '1' })
     fireEvent.click(numKey)
     expect(props.onChange).toHaveBeenCalled()
   })

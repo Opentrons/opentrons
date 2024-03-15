@@ -1,8 +1,10 @@
 {
+  "all_protocols": "All Protocols",
   "attached_pipettes_do_not_match": "Attached pipettes do not match pipettes specified in loaded protocol",
   "calibrate_deck_to_proceed": "Calibrate your deck to proceed",
   "deck_setup": "Deck Setup",
   "devices": "Devices",
+  "instruments": "Instruments",
   "labware": "Labware",
   "modules": "modules",
   "pipettes_not_calibrated": "Please calibrate all pipettes specified in loaded protocol to proceed",
@@ -12,5 +14,6 @@
   "protocol_runs": "Protocol Runs",
   "protocols": "Protocols",
   "robot_settings": "Robot Settings",
-  "run": "run"
+  "run": "run",
+  "settings": "Settings"
 }

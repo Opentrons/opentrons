@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { i18n } from '../../localization'
+import { useTranslation } from 'react-i18next'
 import { START_TERMINAL_ITEM_ID } from '../../steplist'
-import { AlertLevel } from './types'
 import { TerminalItemLink } from '../steplist/TerminalItem'
 
+import type { AlertLevel } from './types'
 interface WarningContentsProps {
   warningType: string
   level: AlertLevel
@@ -11,21 +11,22 @@ interface WarningContentsProps {
 export const WarningContents = (
   props: WarningContentsProps
 ): JSX.Element | null => {
+  const { t } = useTranslation('alert')
   if (props.level === 'timeline') {
     switch (props.warningType) {
       case 'ASPIRATE_FROM_PRISTINE_WELL':
         return (
-          <React.Fragment>
-            {i18n.t(`alert.timeline.warning.${props.warningType}.body`, {
+          <>
+            {t(`timeline.warning.${props.warningType}.body`, {
               defaultValue: '',
             })}
             <TerminalItemLink terminalId={START_TERMINAL_ITEM_ID} />
-          </React.Fragment>
+          </>
         )
       default:
         return (
           <React.Fragment>
-            {i18n.t(`alert.timeline.warning.${props.warningType}.body`, {
+            {t(`timeline.warning.${props.warningType}.body`, {
               defaultValue: '',
             })}
           </React.Fragment>
@@ -34,7 +35,7 @@ export const WarningContents = (
   } else if (props.level === 'form') {
     return (
       <React.Fragment>
-        {i18n.t(`alert.form.warning.${props.warningType}.body`, {
+        {t(`form.warning.${props.warningType}.body`, {
           defaultValue: '',
         })}
       </React.Fragment>

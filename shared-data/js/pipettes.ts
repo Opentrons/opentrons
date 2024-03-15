@@ -1,9 +1,38 @@
 import pipetteNameSpecs from '../pipette/definitions/1/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/1/pipetteModelSpecs.json'
 import { OT3_PIPETTES } from './constants'
+import type {
+  PipetteV2Specs,
+  PipetteV2GeneralSpecs,
+  PipetteV2GeometrySpecs,
+  PipetteV2LiquidSpecs,
+  PipetteNameSpecs,
+  PipetteModelSpecs,
+} from './types'
 
-import type { PipetteNameSpecs, PipetteModelSpecs } from './types'
+type GeneralGeometricModules = PipetteV2GeneralSpecs | PipetteV2GeometrySpecs
+interface GeneralGeometricSpecs {
+  default: GeneralGeometricModules
+}
+interface LiquidSpecs {
+  default: PipetteV2LiquidSpecs
+}
 
+const generalGeometric: Record<
+  string,
+  GeneralGeometricSpecs
+> = import.meta.glob('../pipette/definitions/2/*/*/*/*.json', { eager: true })
+
+const liquid: Record<string, LiquidSpecs> = import.meta.glob(
+  '../pipette/definitions/2/liquid/*/*/*/*.json',
+  {
+    eager: true,
+  }
+)
+
+type PipChannelString = 'single' | 'multi' | '96'
+type Channels = 'eight_channel' | 'single_channel' | 'ninety_six_channel'
+type Gen = 'gen1' | 'gen2' | 'gen3' | 'flex'
 type SortableProps = 'maxVolume' | 'channels'
 
 // TODO(mc, 2021-04-30): use these types, pulled directly from the JSON,
@@ -86,4 +115,118 @@ export const getIncompatiblePipetteNames = (
   } else {
     return []
   }
+}
+
+export * from '../pipette/fixtures/name'
+
+const getChannelsFromString = (
+  pipChannelString: PipChannelString
+): Channels | null => {
+  switch (pipChannelString) {
+    case 'single': {
+      return 'single_channel'
+    }
+    case 'multi': {
+      return 'eight_channel'
+    }
+    case '96': {
+      return 'ninety_six_channel'
+    }
+    default: {
+      console.error(`invalid number of channels from ${pipChannelString}`)
+      return null
+    }
+  }
+}
+const getVersionFromGen = (gen: Gen): string | null => {
+  switch (gen) {
+    case 'gen1': {
+      return '1_0'
+    }
+    case 'gen2': {
+      return '2_0'
+    }
+    case 'gen3':
+    case 'flex': {
+      return '3_0'
+    }
+    default: {
+      return null
+    }
+  }
+}
+
+const V2_DEFINITION_TYPES = ['general', 'geometry']
+
+/* takes in pipetteName such as 'p300_single' or 'p300_single_gen1' 
+or PipetteModel such as 'p300_single_v1.3' and converts it to channels,
+model, and version in order to return the correct pipette schema v2 json files. 
+**/
+export const getPipetteSpecsV2 = (
+  name: PipetteName | PipetteModel
+): PipetteV2Specs | null => {
+  const nameSplit = name.split('_')
+  const pipetteModel = nameSplit[0] // ex: p300
+  const channels = getChannelsFromString(nameSplit[1] as PipChannelString) //  ex: single -> single_channel
+  const gen = getVersionFromGen(nameSplit[2] as Gen)
+
+  let version: string
+  //  the first 2 conditions are to accommodate version from the pipetteName
+  if (nameSplit.length === 2) {
+    version = '1_0'
+  } else if (gen != null) {
+    version = gen //  ex: gen1 -> 1_0
+    //  the 'else' is to accommodate the exact version if PipetteModel was added
+  } else {
+    const versionNumber = nameSplit[2].split('v')[1]
+    if (versionNumber.includes('.')) {
+      version = versionNumber.replace('.', '_') // ex: 1.0 -> 1_0
+    } else {
+      version = `${versionNumber}_0` //  ex: 1 -> 1_0
+    }
+  }
+
+  const generalGeometricMatchingJsons = Object.entries(generalGeometric).reduce(
+    (genericGeometricModules: GeneralGeometricModules[], [path, module]) => {
+      V2_DEFINITION_TYPES.forEach(type => {
+        if (
+          `../pipette/definitions/2/${type}/${channels}/${pipetteModel}/${version}.json` ===
+          path
+        ) {
+          genericGeometricModules.push(module.default)
+        }
+      })
+      return genericGeometricModules
+    },
+    []
+  )
+
+  const liquidTypes: string[] = []
+  const liquidMatchingJsons: {
+    liquids: Record<string, PipetteV2LiquidSpecs>
+  } = { liquids: {} }
+
+  Object.entries(liquid).forEach(([path, module]) => {
+    const type = path.split('/')[7]
+    //  dynamically check the different liquid types and store unique types
+    //  into an array to parse through
+    if (!liquidTypes.includes(type)) {
+      liquidTypes.push(type)
+    }
+    if (
+      `../pipette/definitions/2/liquid/${channels}/${pipetteModel}/${type}/${version}.json` ===
+      path
+    ) {
+      const index = liquidTypes.indexOf(type)
+      const newKeyName = index !== -1 ? liquidTypes[index] : path
+      liquidMatchingJsons.liquids[newKeyName] = module.default
+    }
+  })
+
+  const pipetteV2Specs: PipetteV2Specs = {
+    ...Object.assign({}, ...generalGeometricMatchingJsons),
+    ...liquidMatchingJsons,
+  }
+
+  return pipetteV2Specs
 }

@@ -1,20 +1,15 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, waitFor } from '@testing-library/react'
 import { getProtocols } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useAllProtocolsQuery } from '..'
 
 import type { HostConfig, Response, Protocols } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockGetProtocols = getProtocols as jest.MockedFunction<
-  typeof getProtocols
->
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const PROTOCOLS_RESPONSE = {
@@ -37,22 +32,21 @@ const PROTOCOLS_RESPONSE = {
 } as Protocols
 
 describe('useAllProtocolsQuery hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data if no host', () => {
-    when(mockUseHost).calledWith().mockReturnValue(null)
+    vi.mocked(useHost).mockReturnValue(null)
 
     const { result } = renderHook(useAllProtocolsQuery, { wrapper })
 
@@ -60,23 +54,23 @@ describe('useAllProtocolsQuery hook', () => {
   })
 
   it('should return no data if the getProtocols request fails', () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetProtocols).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getProtocols).mockRejectedValue('oh no')
 
     const { result } = renderHook(useAllProtocolsQuery, { wrapper })
     expect(result.current.data).toBeUndefined()
   })
 
   it('should return all current protocols', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetProtocols)
-      .calledWith(HOST_CONFIG)
-      .mockResolvedValue({ data: PROTOCOLS_RESPONSE } as Response<Protocols>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getProtocols).mockResolvedValue({
+      data: PROTOCOLS_RESPONSE,
+    } as Response<Protocols>)
 
-    const { result, waitFor } = renderHook(useAllProtocolsQuery, { wrapper })
+    const { result } = renderHook(useAllProtocolsQuery, { wrapper })
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(PROTOCOLS_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(PROTOCOLS_RESPONSE)
+    })
   })
 })

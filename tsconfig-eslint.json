@@ -22,6 +22,7 @@
     "shared-data/deck",
     "shared-data/js",
     "shared-data/protocol",
+    "shared-data/labware",
     "shared-data/pipette",
     "shared-data/liquid",
     "shared-data/commandAnnotations",
@@ -29,10 +30,13 @@
     "step-generation/typings",
     "protocol-designer/src",
     "protocol-designer/typings",
-    "protocol-library-kludge/src",
-    "protocol-library-kludge/typings",
     "api-client/src",
     "react-api-client/src",
-    "usb-bridge/node-client/src"
+    "usb-bridge/node-client/src",
+    "**/*.js",
+    "**/*.ts",
+    "*.js",
+    ".*.js",
+    "**/*.json"
   ]
 }

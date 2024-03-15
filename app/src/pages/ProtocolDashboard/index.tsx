@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   COLORS,
@@ -12,14 +13,11 @@ import {
   POSITION_STATIC,
   Box,
 } from '@opentrons/components'
-import {
-  useAllProtocolsQuery,
-  useAllRunsQuery,
-} from '@opentrons/react-api-client'
+import { useAllProtocolsQuery } from '@opentrons/react-api-client'
+
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Navigation } from '../../organisms/Navigation'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
   getPinnedProtocolIds,
   getProtocolsOnDeviceSortKey,
@@ -30,6 +28,7 @@ import { sortProtocols } from './utils'
 import { ProtocolCard } from './ProtocolCard'
 import { NoProtocols } from './NoProtocols'
 import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
+import { useNotifyAllRunsQuery } from '../../resources/runs'
 
 import type { Dispatch } from '../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../redux/config/types'
@@ -37,7 +36,7 @@ import type { ProtocolResource } from '@opentrons/shared-data'
 
 export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
-  const runs = useAllRunsQuery()
+  const runs = useNotifyAllRunsQuery()
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
   const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
@@ -148,7 +147,6 @@ export function ProtocolDashboard(): JSX.Element {
         paddingBottom={SPACING.spacing40}
       >
         <Navigation
-          routes={onDeviceDisplayRoutes}
           setNavMenuIsOpened={setNavMenuIsOpened}
           longPressModalIsOpened={longPressModalIsOpened}
         />
@@ -161,7 +159,7 @@ export function ProtocolDashboard(): JSX.Element {
               <StyledText
                 as="p"
                 marginBottom={SPACING.spacing8}
-                color={COLORS.darkBlack70}
+                color={COLORS.grey60}
               >
                 {t('pinned_protocols')}
               </StyledText>

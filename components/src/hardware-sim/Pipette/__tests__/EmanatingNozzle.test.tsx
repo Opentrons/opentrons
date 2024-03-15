@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
 import { C_SELECTED_DARK, C_TRANSPARENT } from '../../../styles'
 import { EmanatingNozzle } from '../EmanatingNozzle'
@@ -37,8 +38,7 @@ describe('EmanatingNozzle', () => {
         <EmanatingNozzle cx={5} cy={10} />
       </svg>
     )
-    const animations = getByTestId('emanating_circle').children
-    const radiusAnimation = animations[0]
+    const radiusAnimation = getByTestId('radius_animation')
     expect(radiusAnimation).toHaveAttribute('attributeName', 'r')
     expect(radiusAnimation).toHaveAttribute('from', '5')
     expect(radiusAnimation).toHaveAttribute(
@@ -56,8 +56,7 @@ describe('EmanatingNozzle', () => {
         <EmanatingNozzle cx={5} cy={10} />
       </svg>
     )
-    const animations = getByTestId('emanating_circle').children
-    const opacityAnimation = animations[1]
+    const opacityAnimation = getByTestId('opacity_animation')
     expect(opacityAnimation).toHaveAttribute('attributeName', 'opacity')
     expect(opacityAnimation).toHaveAttribute('from', '0.7')
     expect(opacityAnimation).toHaveAttribute('to', '0')

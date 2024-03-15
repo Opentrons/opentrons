@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders, COLORS, TYPOGRAPHY } from '@opentrons/components'
+import { it, describe, expect, beforeEach } from 'vitest'
+
+import { COLORS, TYPOGRAPHY } from '@opentrons/components'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { CalibrationHealthCheckResults } from '../CalibrationHealthCheckResults'
 
@@ -23,12 +27,12 @@ describe('CalibrationHealthCheckResults', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Calibration Health Check Results')
     const statusLabel = getByText('Calibration complete')
-    expect(statusLabel).toHaveStyle(`color: ${String(COLORS.darkBlackEnabled)}`)
+    expect(statusLabel).toHaveStyle(`color: ${String(COLORS.black90)}`)
     expect(statusLabel).toHaveStyle(
       `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
     )
     expect(getByTestId('status_circle')).toHaveStyle(
-      `color: ${String(COLORS.successEnabled)}`
+      `color: ${String(COLORS.green50)}`
     )
     expect(getByTestId('status_circle')).toHaveStyle(`height: 0.3125rem`)
     expect(getByTestId('status_circle')).toHaveStyle(`width: 0.3125rem`)
@@ -39,7 +43,7 @@ describe('CalibrationHealthCheckResults', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Calibration recommended')
     expect(getByTestId('status_circle')).toHaveStyle(
-      `color: ${String(COLORS.warningEnabled)}`
+      `color: ${String(COLORS.yellow50)}`
     )
   })
 })

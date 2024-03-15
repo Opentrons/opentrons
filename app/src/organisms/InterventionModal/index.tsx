@@ -58,8 +58,8 @@ const MODAL_STYLE = {
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
   width: '47rem',
-  border: `6px ${BORDERS.styleSolid} ${COLORS.blueEnabled}`,
-  borderRadius: BORDERS.radiusSoftCorners,
+  border: `6px ${BORDERS.styleSolid} ${COLORS.blue50}`,
+  borderRadius: BORDERS.borderRadius4,
   boxShadow: BORDERS.smallDropShadow,
 } as const
 
@@ -68,7 +68,7 @@ const HEADER_STYLE = {
   gridGap: SPACING.spacing12,
   padding: `${SPACING.spacing20} ${SPACING.spacing32}`,
   color: COLORS.white,
-  backgroundColor: COLORS.blueEnabled,
+  backgroundColor: COLORS.blue50,
   position: POSITION_STICKY,
   top: 0,
 } as const
@@ -79,8 +79,8 @@ const CONTENT_STYLE = {
   alignItems: ALIGN_FLEX_START,
   gridGap: SPACING.spacing24,
   padding: `${SPACING.spacing32}`,
-  borderRadius: `0px 0px ${String(BORDERS.radiusSoftCorners)} ${String(
-    BORDERS.radiusSoftCorners
+  borderRadius: `0px 0px ${String(BORDERS.borderRadius4)} ${String(
+    BORDERS.borderRadius4
   )}`,
 } as const
 
@@ -158,10 +158,10 @@ export function InterventionModal({
   // reimplement when design system shares a modal component between desktop/ODD
   return isOnDevice ? (
     <Modal
-      border={`8px ${BORDERS.styleSolid} ${COLORS.blueEnabled}`}
+      border={`8px ${BORDERS.styleSolid} ${COLORS.blue50}`}
       modalSize="large"
       header={{
-        backgroundColor: COLORS.blueEnabled,
+        backgroundColor: COLORS.blue50,
         color: COLORS.white,
         iconColor: COLORS.white,
         iconName: iconName ?? undefined,
@@ -190,13 +190,13 @@ export function InterventionModal({
       top="0"
       bottom="0"
       zIndex="1"
-      backgroundColor={COLORS.backgroundOverlay}
+      backgroundColor={`${COLORS.black90}${COLORS.opacity40HexCode}`}
       cursor="default"
     >
       <Flex {...BASE_STYLE} zIndex={10}>
         <Box
           {...MODAL_STYLE}
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation()
           }}
         >

@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import {
   deleteCalibration,
   DeleteCalRequestParams,
@@ -10,13 +10,8 @@ import { useHost } from '../../api'
 import { useDeleteCalibrationMutation } from '..'
 import type { HostConfig, Response, EmptyResponse } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockDeleteCalibration = deleteCalibration as jest.MockedFunction<
-  typeof deleteCalibration
->
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const DELETE_CAL_DATA_RESPONSE = {
@@ -24,7 +19,7 @@ const DELETE_CAL_DATA_RESPONSE = {
 } as EmptyResponse
 
 describe('useDeleteCalibrationMutation hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   const requestParams = {
     calType: 'pipetteOffset',
     mount: 'left',
@@ -33,31 +28,25 @@ describe('useDeleteCalibrationMutation hook', () => {
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data when calling deleteProtocol if the request fails', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockDeleteCalibration)
-      .calledWith(HOST_CONFIG, requestParams)
-      .mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(deleteCalibration).mockRejectedValue('oh no')
 
-    const { result, waitFor } = renderHook(
-      () => useDeleteCalibrationMutation(),
-      {
-        wrapper,
-      }
-    )
+    const { result } = renderHook(() => useDeleteCalibrationMutation(), {
+      wrapper,
+    })
 
     expect(result.current.data).toBeUndefined()
-    result.current.deleteCalibration(requestParams)
+    await act(() => result.current.deleteCalibration(requestParams))
     await waitFor(() => {
       return result.current.status !== 'loading'
     })
@@ -65,22 +54,18 @@ describe('useDeleteCalibrationMutation hook', () => {
   })
 
   it('should delete calibration data when calling the deleteCalibration callback', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockDeleteCalibration)
-      .calledWith(HOST_CONFIG, requestParams)
-      .mockResolvedValue({
-        data: DELETE_CAL_DATA_RESPONSE,
-      } as Response<EmptyResponse>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(deleteCalibration).mockResolvedValue({
+      data: DELETE_CAL_DATA_RESPONSE,
+    } as Response<EmptyResponse>)
 
-    const { result, waitFor } = renderHook(
-      () => useDeleteCalibrationMutation(),
-      {
-        wrapper,
-      }
-    )
-    act(() => result.current.deleteCalibration(requestParams))
-
-    await waitFor(() => result.current.data != null)
+    const { result } = renderHook(() => useDeleteCalibrationMutation(), {
+      wrapper,
+    })
+    await act(() => result.current.deleteCalibration(requestParams))
+    await waitFor(() => {
+      expect(result.current.data).not.toBeNull()
+    })
 
     expect(result.current.data).toEqual(DELETE_CAL_DATA_RESPONSE)
   })

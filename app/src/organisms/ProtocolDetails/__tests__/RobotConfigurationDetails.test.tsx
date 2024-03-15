@@ -1,6 +1,10 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, afterEach, vi } from 'vitest'
+import { screen } from '@testing-library/react'
+
 import { OT2_STANDARD_MODEL, FLEX_STANDARD_MODEL } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data'
@@ -65,7 +69,7 @@ describe('RobotConfigurationDetails', () => {
   let props: React.ComponentProps<typeof RobotConfigurationDetails>
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders a robot section showing the intended robot model for an OT-2 protocol', () => {
@@ -78,12 +82,12 @@ describe('RobotConfigurationDetails', () => {
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
     }
-    const { getByText } = render(props)
-    getByText('robot')
-    getByText('OT-2')
+    render(props)
+    screen.getByText('robot')
+    screen.getByText('OT-2')
   })
 
-  it('renders a robot section showing the intended robot model for an OT-3 protocol', () => {
+  it('renders a robot section showing the intended robot model for a Flex protocol', () => {
     props = {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
@@ -93,9 +97,9 @@ describe('RobotConfigurationDetails', () => {
       isLoading: false,
       robotType: FLEX_STANDARD_MODEL,
     }
-    const { getByText } = render(props)
-    getByText('robot')
-    getByText('Opentrons Flex')
+    render(props)
+    screen.getByText('robot')
+    screen.getByText('Opentrons Flex')
   })
 
   it('renders left mount pipette when there is a pipette only in the left mount', () => {
@@ -108,11 +112,11 @@ describe('RobotConfigurationDetails', () => {
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
     }
-    const { getByText } = render(props)
-    getByText('left mount')
-    getByText('P10 Single-Channel GEN1')
-    getByText('right mount')
-    getByText('empty')
+    render(props)
+    screen.getByText('left mount')
+    screen.getByText('P10 Single-Channel GEN1')
+    screen.getByText('right mount')
+    screen.getByText('empty')
   })
 
   it('renders right mount pipette when there is a pipette only in the right mount', () => {
@@ -125,11 +129,11 @@ describe('RobotConfigurationDetails', () => {
       isLoading: false,
       robotType: OT2_STANDARD_MODEL,
     }
-    const { getByText } = render(props)
-    getByText('left mount')
-    getByText('P10 Single-Channel GEN1')
-    getByText('right mount')
-    getByText('empty')
+    render(props)
+    screen.getByText('left mount')
+    screen.getByText('P10 Single-Channel GEN1')
+    screen.getByText('right mount')
+    screen.getByText('empty')
   })
 
   it('renders extension mount section when extended hardware feature flag is on', () => {
@@ -142,8 +146,8 @@ describe('RobotConfigurationDetails', () => {
       isLoading: false,
       robotType: FLEX_STANDARD_MODEL,
     }
-    const { getByText } = render(props)
-    getByText('extension mount')
+    render(props)
+    screen.getByText('extension mount')
   })
 
   it('should not render extension mount section when robotType is OT-2', () => {
@@ -171,9 +175,9 @@ describe('RobotConfigurationDetails', () => {
       robotType: OT2_STANDARD_MODEL,
     }
 
-    const { getByText } = render(props)
-    getByText('1')
-    getByText('Magnetic Module GEN2')
+    render(props)
+    screen.getByText('1')
+    screen.getByText('Magnetic Module GEN2')
   })
 
   it('renders loading for both pipettes when it is in a loading state', () => {
@@ -186,8 +190,8 @@ describe('RobotConfigurationDetails', () => {
       isLoading: true,
       robotType: OT2_STANDARD_MODEL,
     }
-    const { getAllByText, getByText } = render(props)
-    getByText('right mount')
-    getAllByText('Loading...')
+    render(props)
+    screen.getByText('right mount')
+    screen.getAllByText('Loading...')
   })
 })

@@ -1,16 +1,19 @@
 import * as React from 'react'
+import { screen, fireEvent } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import {
   ALIGN_CENTER,
   COLORS,
   JUSTIFY_CENTER,
-  renderWithProviders,
   SPACING,
 } from '@opentrons/components'
 
 import { LegacyModalHeader } from '../LegacyModalHeader'
 
-const mockClose = jest.fn()
+const mockClose = vi.fn()
 
 const render = (props: React.ComponentProps<typeof LegacyModalHeader>) => {
   return renderWithProviders(<LegacyModalHeader {...props} />)
@@ -24,38 +27,42 @@ describe('LegacyModalHeader', () => {
       onClose: mockClose,
       title: 'mock modal header title',
       backgroundColor: COLORS.white,
-      color: COLORS.darkBlackEnabled,
+      color: COLORS.black90,
     }
   })
 
   it('should render text and close icon', () => {
-    const [{ getByText, getByTestId }] = render(props)
-    const title = getByText('mock modal header title')
-    expect(title).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
-    getByTestId('ModalHeader_icon_close_mock modal header title')
+    render(props)
+    const title = screen.getByText('mock modal header title')
+    expect(title).toHaveStyle(`color: ${COLORS.black90}`)
+    screen.getByTestId('ModalHeader_icon_close_mock modal header title')
   })
 
   it('should render text, icon, and close icon', () => {
     props.icon = {
       name: 'ot-alert',
-      color: COLORS.darkBlackEnabled,
+      color: COLORS.black90,
       size: '1.25rem',
       marginRight: SPACING.spacing8,
     }
-    const [{ getByTestId }] = render(props)
-    expect(getByTestId('Modal_header_icon')).toHaveStyle(
-      `color: ${COLORS.darkBlackEnabled}`
+    render(props)
+    expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
+      `color: ${COLORS.black90}`
     )
-    expect(getByTestId('Modal_header_icon')).toHaveStyle(`width: 1.25rem`)
-    expect(getByTestId('Modal_header_icon')).toHaveStyle(`height: 1.25rem`)
-    expect(getByTestId('Modal_header_icon')).toHaveStyle(
+    expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
+      `width: 1.25rem`
+    )
+    expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
+      `height: 1.25rem`
+    )
+    expect(screen.getByTestId('Modal_header_icon')).toHaveStyle(
       `margin-right: ${SPACING.spacing8}`
     )
   })
 
   it('should call a mock function when clicking close icon', () => {
-    const [{ getByTestId }] = render(props)
-    const closeIcon = getByTestId(
+    render(props)
+    const closeIcon = screen.getByTestId(
       'ModalHeader_icon_close_mock modal header title'
     )
     expect(closeIcon).toHaveStyle('width: 1.625rem')
@@ -64,21 +71,7 @@ describe('LegacyModalHeader', () => {
     expect(closeIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
     expect(closeIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
     expect(closeIcon).toHaveStyle('border-radius: 0.875rem')
-    expect(closeIcon).toHaveStyleRule(
-      'background-color',
-      COLORS.lightGreyHover,
-      {
-        modifier: ':hover',
-      }
-    )
-    expect(closeIcon).toHaveStyleRule(
-      'background-color',
-      COLORS.lightGreyPressed,
-      {
-        modifier: ':active',
-      }
-    )
-    closeIcon.click()
+    fireEvent.click(closeIcon)
     expect(mockClose).toHaveBeenCalled()
   })
 })

@@ -3,7 +3,7 @@ import inspect
 from typing import Optional, Type, cast, Tuple
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 
 from opentrons_shared_data.deck import load as load_deck
@@ -16,7 +16,7 @@ from opentrons_shared_data.labware.dev_types import (
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Mount, MountType, Point
+from opentrons.types import DeckSlotName, StagingSlotName, Mount, MountType, Point
 from opentrons.protocol_api import OFF_DECK
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleType
@@ -66,7 +66,7 @@ from opentrons.protocol_api.core.engine import (
     load_labware_params,
 )
 from opentrons.protocol_api._liquid import Liquid
-from opentrons.protocol_api._types import StagingSlotName
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api.core.engine.exceptions import InvalidModuleLocationError
 from opentrons.protocol_api.core.engine.module_core import (
     TemperatureModuleCore,
@@ -146,6 +146,8 @@ def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
 
 
 @pytest.fixture
+# APIv2.15 because we're expecting a fixed trash.
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def subject(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -177,15 +179,34 @@ def test_api_version(
     assert subject.api_version == api_version
 
 
-# def test_get_slot_definition(ot2_standard_deck_def: DeckDefinitionV3, subject: ProtocolCore, decoy: Decoy) -> None:
-#     """It should return a deck slot's definition."""
-#     decoy.when(subject._engine_client.state.labware.get_slot_definition(5))
-#     result = subject.get_slot_definition(DeckSlotName.SLOT_6)
-#
-#     assert result["id"] == "6"
-#     assert result == ot2_standard_deck_def["locations"]["orderedSlots"][5]
+def test_get_slot_definition(
+    ot2_standard_deck_def: DeckDefinitionV4, subject: ProtocolCore, decoy: Decoy
+) -> None:
+    """It should return a deck slot's definition."""
+    expected_slot_def = cast(
+        SlotDefV3,
+        {
+            "id": "abc",
+            "position": [1, 2, 3],
+            "boundingBox": {
+                "xDimension": 4,
+                "yDimension": 5,
+                "zDimension": 6,
+            },
+            "displayName": "xyz",
+            "compatibleModuleTypes": [],
+        },
+    )
+    decoy.when(
+        subject._engine_client.state.addressable_areas.get_slot_definition(
+            DeckSlotName.SLOT_6.id
+        )
+    ).then_return(expected_slot_def)
+    assert subject.get_slot_definition(DeckSlotName.SLOT_6) == expected_slot_def
 
 
+# APIv2.15 because we're expecting a fixed trash.
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def test_fixed_trash(subject: ProtocolCore) -> None:
     """It should have a single labware core for the fixed trash."""
     result = subject.fixed_trash
@@ -291,13 +312,14 @@ def test_load_labware(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
-    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+    assert subject.get_labware_cores() == [result]
 
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -362,29 +384,27 @@ def test_load_labware_on_staging_slot(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
-    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+    assert subject.get_labware_cores() == [result]
 
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
 
-    # TODO(jbl 11-17-2023) this is not hooked up yet to staging slots/addressable areas
-    # decoy.when(
-    #     mock_engine_client.state.geometry.get_slot_item(
-    #         slot_name=StagingSlotName.SLOT_B4,
-    #         allowed_labware_ids={"fixed-trash-123", "abc123"},
-    #         allowed_module_ids=set(),
-    #     )
-    # ).then_return(
-    #     LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
-    # )
-    #
-    # assert subject.get_slot_item(StagingSlotName.SLOT_B4) is result
+    decoy.when(
+        mock_engine_client.state.geometry.get_slot_item(
+            slot_name=StagingSlotName.SLOT_B4,
+        )
+    ).then_return(
+        LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
+    )
+
+    assert subject.get_slot_item(StagingSlotName.SLOT_B4) is result
 
 
 def test_load_labware_on_labware(
@@ -443,13 +463,14 @@ def test_load_labware_on_labware(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
-    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+    assert subject.get_labware_cores() == [result]
 
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -506,13 +527,14 @@ def test_load_labware_off_deck(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
-    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+    assert subject.get_labware_cores() == [result]
 
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -565,13 +587,14 @@ def test_load_adapter(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
-    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+    assert subject.get_labware_cores() == [result]
 
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -634,29 +657,101 @@ def test_load_adapter_on_staging_slot(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
-    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+    assert subject.get_labware_cores() == [result]
 
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
 
-    # TODO(jbl 11-17-2023) this is not hooked up yet to staging slots/addressable areas
-    # decoy.when(
-    #     mock_engine_client.state.geometry.get_slot_item(
-    #         slot_name=StagingSlotName.SLOT_B4,
-    #         allowed_labware_ids={"fixed-trash-123", "abc123"},
-    #         allowed_module_ids=set(),
-    #     )
-    # ).then_return(
-    #     LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
-    # )
-    #
-    # assert subject.get_slot_item(StagingSlotName.SLOT_B4) is result
+    decoy.when(
+        mock_engine_client.state.geometry.get_slot_item(
+            slot_name=StagingSlotName.SLOT_B4,
+        )
+    ).then_return(
+        LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
+    )
+
+    assert subject.get_slot_item(StagingSlotName.SLOT_B4) is result
+
+
+def test_load_trash_bin(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should load a trash bin."""
+    prior_disposal_locations = subject.get_disposal_locations()
+    trash = subject.load_trash_bin(
+        slot_name=DeckSlotName.SLOT_D2, area_name="my trendy area"
+    )
+    assert isinstance(trash, TrashBin)
+    decoy.verify(
+        mock_engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
+            "my trendy area"
+        ),
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            new_trash_bin=trash,
+            existing_disposal_locations=prior_disposal_locations,
+            existing_labware_ids=[],
+            existing_module_ids=[],
+        ),
+        mock_engine_client.add_addressable_area("my trendy area"),
+    )
+
+    assert trash in subject.get_disposal_locations()
+
+
+def test_load_ot2_fixed_trash_bin(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+) -> None:
+    """It should load a fixed trash bin for the OT-2."""
+    prior_disposal_locations = subject.get_disposal_locations()
+    subject.load_ot2_fixed_trash_bin()
+    fixed_trash = subject.get_disposal_locations()[-1]
+    assert isinstance(fixed_trash, TrashBin)
+    assert fixed_trash.area_name == "fixedTrash"
+    decoy.verify(
+        mock_engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
+            "fixedTrash"
+        ),
+        times=0,
+    )
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            new_trash_bin=fixed_trash,
+            existing_disposal_locations=prior_disposal_locations,
+            existing_labware_ids=[],
+            existing_module_ids=[],
+        ),
+        times=0,
+    )
+    decoy.verify(mock_engine_client.add_addressable_area("fixedTrash"), times=0)
+
+
+def test_load_waste_chute(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should load a waste chute."""
+    waste_chute = subject.load_waste_chute()
+    assert isinstance(waste_chute, WasteChute)
+    decoy.verify(
+        mock_engine_client.state.addressable_areas.raise_if_area_not_in_deck_configuration(
+            "1ChannelWasteChute"
+        ),
+        mock_engine_client.add_addressable_area("1ChannelWasteChute"),
+    )
+
+    assert waste_chute in subject.get_disposal_locations()
 
 
 @pytest.mark.parametrize(
@@ -710,7 +805,14 @@ def test_move_labware(
             if pick_up_offset
             else None,
             drop_offset=LabwareOffsetVector(x=4, y=5, z=6) if drop_offset else None,
-        )
+        ),
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=[],
+            existing_module_ids=[],
+            existing_disposal_locations=[],
+            new_labware_id="labware-id",
+        ),
     )
 
 
@@ -742,7 +844,14 @@ def test_move_labware_on_staging_slot(
             strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
             pick_up_offset=None,
             drop_offset=None,
-        )
+        ),
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=[],
+            existing_module_ids=[],
+            existing_disposal_locations=[],
+            new_labware_id="labware-id",
+        ),
     )
 
 
@@ -779,7 +888,14 @@ def test_move_labware_on_non_connected_module(
             strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
             pick_up_offset=None,
             drop_offset=None,
-        )
+        ),
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=[],
+            existing_module_ids=[],
+            existing_disposal_locations=[],
+            new_labware_id="labware-id",
+        ),
     )
 
 
@@ -812,11 +928,17 @@ def test_move_labware_off_deck(
             strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
             pick_up_offset=None,
             drop_offset=None,
-        )
+        ),
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=[],
+            existing_module_ids=[],
+            existing_disposal_locations=[],
+            new_labware_id="labware-id",
+        ),
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_load_labware_on_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -879,8 +1001,9 @@ def test_load_labware_on_module(
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -952,8 +1075,9 @@ def test_load_labware_on_non_connected_module(
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_labware_id="abc123",
         )
     )
@@ -1043,6 +1167,8 @@ def test_add_labware_definition(
         ),
     ],
 )
+# APIv2.15 because we're expecting a fixed trash.
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def test_load_module(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -1105,6 +1231,7 @@ def test_load_module(
             engine_state=mock_engine_client.state,
             existing_labware_ids=["fixed-trash-123"],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_module_id="abc123",
         )
     )
@@ -1215,6 +1342,8 @@ def test_load_module_raises_wrong_location(
         )
 
 
+# APIv2.15 because we're expecting a fixed trash.
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def test_load_mag_block(
     decoy: Decoy,
     mock_engine_client: EngineClient,
@@ -1267,6 +1396,7 @@ def test_load_mag_block(
             engine_state=mock_engine_client.state,
             existing_labware_ids=["fixed-trash-123"],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_module_id="abc123",
         )
     )
@@ -1350,8 +1480,9 @@ def test_load_module_thermocycler_with_no_location(
     decoy.verify(
         deck_conflict.check(
             engine_state=mock_engine_client.state,
-            existing_labware_ids=["fixed-trash-123"],
+            existing_labware_ids=[],
             existing_module_ids=[],
+            existing_disposal_locations=[],
             new_module_id="abc123",
         )
     )
@@ -1552,7 +1683,7 @@ def test_get_highest_z(
 ) -> None:
     """It should return a slot center from engine state."""
     decoy.when(
-        mock_engine_client.state.geometry.get_all_labware_highest_z()
+        mock_engine_client.state.geometry.get_all_obstacle_highest_z()
     ).then_return(9001)
 
     result = subject.get_highest_z()

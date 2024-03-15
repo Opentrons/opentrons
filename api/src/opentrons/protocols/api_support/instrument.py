@@ -73,11 +73,14 @@ def tip_length_for(
 
 
 VALID_PIP_TIPRACK_VOL = {
-    "p10": [10, 20],
-    "p20": [10, 20],
-    "p50": [50, 200, 300],
-    "p300": [200, 300],
-    "p1000": [1000],
+    "FLEX": {"p50": [50], "p1000": [50, 200, 1000]},
+    "OT2": {
+        "p10": [10, 20],
+        "p20": [10, 20],
+        "p50": [50, 200, 300],
+        "p300": [200, 300],
+        "p1000": [1000],
+    },
 }
 
 
@@ -92,7 +95,11 @@ def validate_tiprack(
     #  tipracks to the pipette as a refactor
     if tip_rack.uri.startswith("opentrons/"):
         tiprack_vol = tip_rack.wells()[0].max_volume
-        valid_vols = VALID_PIP_TIPRACK_VOL[instrument_name.split("_")[0]]
+        instr_metadata = instrument_name.split("_")
+        gen_lookup = (
+            "FLEX" if ("flex" in instr_metadata or "96" in instr_metadata) else "OT2"
+        )
+        valid_vols = VALID_PIP_TIPRACK_VOL[gen_lookup][instrument_name.split("_")[0]]
         if tiprack_vol not in valid_vols:
             log.warning(
                 f"The pipette {instrument_name} and its tip rack {tip_rack.load_name}"

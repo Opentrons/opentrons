@@ -40,32 +40,32 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   `
 
   const AVAILABLE_BUTTON_STYLE = css`
-    background: ${COLORS.mediumBlueEnabled};
+    background: ${COLORS.blue35};
 
     &:active {
-      background-color: ${COLORS.mediumBluePressed};
+      background-color: ${COLORS.blue40};
     }
   `
 
   const SELECTED_BUTTON_STYLE = css`
-    background: ${COLORS.blueEnabled};
+    background: ${COLORS.blue50};
     color: ${COLORS.white};
 
     &:active {
-      background-color: ${COLORS.bluePressed};
+      background-color: ${COLORS.blue60};
     }
   `
 
   const DISABLED_BUTTON_STYLE = css`
-    background-color: ${COLORS.darkBlack20};
-    color: ${COLORS.darkBlack60};
+    background-color: ${COLORS.grey35};
+    color: ${COLORS.grey50};
     cursor: not-allowed;
   `
 
   // TODO: (ew, 2023-04-21): button is not tabbable, so focus state
   // is not possible on ODD. It's testable in storybook but not in real life.
   const SettingButtonLabel = styled.label`
-    border-radius: ${BORDERS.borderRadiusSize4};
+    border-radius: ${BORDERS.borderRadius16};
     cursor: pointer;
     padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
     width: 100%;

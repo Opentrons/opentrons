@@ -1,23 +1,21 @@
+/* eslint-disable testing-library/no-node-access */
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-
-import { renderWithProviders } from '@opentrons/components'
-
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { getRobotUpdateDisplayInfo } from '../../../../../redux/robot-update'
 
 import { UpdateRobotSoftware } from '../UpdateRobotSoftware'
 
-jest.mock('../../../../../redux/robot-settings/selectors')
-jest.mock('../../../../../redux/discovery')
-jest.mock('../../../../../redux/robot-update/selectors')
-jest.mock('../../../hooks')
+vi.mock('../../../../../redux/robot-settings/selectors')
+vi.mock('../../../../../redux/discovery')
+vi.mock('../../../../../redux/robot-update/selectors')
+vi.mock('../../../hooks')
 
-const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof getRobotUpdateDisplayInfo
->
-
-const mockOnUpdateStart = jest.fn()
+const mockOnUpdateStart = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -34,42 +32,38 @@ const render = () => {
 
 describe('RobotSettings UpdateRobotSoftware', () => {
   beforeEach(() => {
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'update',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('should render title, description and toggle button', () => {
-    const [{ getByText }] = render()
-    getByText('Update robot software manually with a local file (.zip)')
-    getByText(
+    render()
+    screen.getByText('Update robot software manually with a local file (.zip)')
+    screen.getByText(
       'Bypass the Opentrons App auto-update process and update the robot software manually.'
     )
-    getByText('Browse file system')
-    getByText('Launch Opentrons software update page')
+    screen.getByText('Browse file system')
+    screen.getByText('Launch Opentrons software update page')
   })
 
   it('should the link has the correct attribute', () => {
-    const [{ getByText }] = render()
+    render()
     const targetLink = 'https://opentrons.com/ot-app/'
-    const link = getByText('Launch Opentrons software update page')
+    const link = screen.getByText('Launch Opentrons software update page')
     expect(link.closest('a')).toHaveAttribute('href', targetLink)
   })
 
   it('should be disabled if updateFromFileDisabledReason is not null', () => {
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'update',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: 'mock reason',
     })
-    const [{ getByText }] = render()
-    const button = getByText('Browse file system')
+    render()
+    const button = screen.getByText('Browse file system')
     expect(button).toBeDisabled()
   })
 })

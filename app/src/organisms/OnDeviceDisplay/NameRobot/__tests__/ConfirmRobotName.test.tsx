@@ -1,17 +1,20 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { ConfirmRobotName } from '../ConfirmRobotName'
 
-const mockPush = jest.fn()
+import type { useHistory } from 'react-router-dom'
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+const mockPush = vi.fn()
+
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof useHistory>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
@@ -36,16 +39,16 @@ describe('ConfirmRobotName', () => {
   })
 
   it('should render text, an image and a button', () => {
-    const [{ getByText }] = render(props)
-    getByText('otie, love it!')
-    getByText('Your robot is ready to go.')
-    getByText('Finish setup')
+    render(props)
+    screen.getByText('otie, love it!')
+    screen.getByText('Your robot is ready to go.')
+    screen.getByText('Finish setup')
   })
 
   it('when tapping a button, call a mock function', () => {
-    const [{ getByText }] = render(props)
-    const button = getByText('Finish setup')
-    button.click()
+    render(props)
+    const button = screen.getByText('Finish setup')
+    fireEvent.click(button)
     expect(mockPush).toBeCalledWith('/dashboard')
   })
 })

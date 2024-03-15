@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect, vi } from 'vitest'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import { curryCommandCreator } from '../utils'
@@ -11,21 +12,17 @@ import {
   moveToAddressableArea,
 } from '../commandCreators/atomic'
 
-jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
-jest.mock('../utils/curryCommandCreator')
-
-const curryCommandCreatorMock = curryCommandCreator as jest.MockedFunction<
-  typeof curryCommandCreator
->
+vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
+vi.mock('../utils/curryCommandCreator')
 
 const mockWasteChuteId = 'mockWasteChuteId'
-const mockAddressableAreaName = 'mockName'
+const mockAddressableAreaName: 'A3' = 'A3'
 const mockId = 'mockId'
 
 let invariantContext = makeContext()
 const args = {
   pipetteId: mockId,
-  addressableAreaName: 'mockName',
+  addressableAreaName: mockAddressableAreaName,
   volume: 10,
   flowRate: 10,
   prevRobotState: getInitialRobotStateStandard(invariantContext),
@@ -58,11 +55,11 @@ describe('wasteChuteCommandsUtil', () => {
   })
   it('returns correct commands for dispensing', () => {
     wasteChuteCommandsUtil({ ...args, type: 'dispense' })
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
+    expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
       mockMoveToAddressableAreaParams
     )
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(dispenseInPlace, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(dispenseInPlace, {
       pipetteId: mockId,
       volume: 10,
       flowRate: 10,
@@ -73,11 +70,11 @@ describe('wasteChuteCommandsUtil', () => {
       ...args,
       type: 'blowOut',
     })
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
+    expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
       mockMoveToAddressableAreaParams
     )
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(blowOutInPlace, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInPlace, {
       pipetteId: mockId,
       flowRate: 10,
     })
@@ -91,11 +88,11 @@ describe('wasteChuteCommandsUtil', () => {
         tipState: { pipettes: { [mockId]: true } } as any,
       },
     })
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
+    expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
       mockMoveToAddressableAreaParams
     )
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(dropTipInPlace, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(dropTipInPlace, {
       pipetteId: mockId,
     })
   })
@@ -108,11 +105,11 @@ describe('wasteChuteCommandsUtil', () => {
         tipState: { pipettes: { [mockId]: true } } as any,
       },
     })
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
+    expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
       mockMoveToAddressableAreaParams
     )
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(aspirateInPlace, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(aspirateInPlace, {
       pipetteId: mockId,
       volume: 10,
       flowRate: 10,

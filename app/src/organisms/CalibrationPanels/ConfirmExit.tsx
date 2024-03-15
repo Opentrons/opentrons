@@ -43,7 +43,7 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
         <Icon
           name="ot-alert"
           size="2.5rem"
-          color={COLORS.warningEnabled}
+          color={COLORS.yellow50}
           marginBottom={SPACING.spacing24}
         />
         {heading != null ? (

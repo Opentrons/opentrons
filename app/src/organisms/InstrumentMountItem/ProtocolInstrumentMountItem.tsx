@@ -14,12 +14,12 @@ import {
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import {
-  CompletedProtocolAnalysis,
   getGripperDisplayName,
   getPipetteNameSpecs,
   NINETY_SIX_CHANNEL,
   PipetteName,
   SINGLE_MOUNT_PIPETTES,
+  LoadedPipette,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -37,26 +37,26 @@ export const MountItem = styled.div<{ isReady: boolean }>`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius12};
   background-color: ${({ isReady }) =>
-    isReady ? COLORS.green3 : COLORS.yellow3};
+    isReady ? COLORS.green35 : COLORS.yellow35};
   &:active {
     background-color: ${({ isReady }) =>
-      isReady ? COLORS.green3Pressed : COLORS.yellow3Pressed};
+      isReady ? COLORS.green40 : COLORS.yellow40};
   }
 `
 interface ProtocolInstrumentMountItemProps {
   mount: Mount | 'extension'
-  mostRecentAnalysis?: CompletedProtocolAnalysis | null
   attachedInstrument: InstrumentData | null
   speccedName: PipetteName | GripperModel
   instrumentsRefetch?: () => void
+  pipetteInfo?: LoadedPipette[]
 }
 export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
 ): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
-  const { mount, attachedInstrument, speccedName, mostRecentAnalysis } = props
+  const { mount, attachedInstrument, speccedName } = props
   const [
     showPipetteWizardFlow,
     setShowPipetteWizardFlow,
@@ -106,7 +106,7 @@ export function ProtocolInstrumentMountItem(
           gridGap={SPACING.spacing24}
         >
           <Flex
-            flex={isAttachedWithCal ? 1 : 2}
+            flex="2"
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing4}
           >
@@ -132,10 +132,10 @@ export function ProtocolInstrumentMountItem(
             <Icon
               size="1.5rem"
               name={isAttachedWithCal ? 'ot-check' : 'ot-alert'}
-              color={isAttachedWithCal ? COLORS.green1 : COLORS.yellow1}
+              color={isAttachedWithCal ? COLORS.green60 : COLORS.yellow60}
             />
             <CalibrationStatus
-              color={isAttachedWithCal ? COLORS.green1 : COLORS.yellow1}
+              color={isAttachedWithCal ? COLORS.green60 : COLORS.yellow60}
             >
               {i18n.format(
                 t(isAttachedWithCal ? 'calibrated' : 'no_data'),
@@ -157,6 +157,15 @@ export function ProtocolInstrumentMountItem(
               />
             </Flex>
           )}
+          {isAttachedWithCal && (
+            <Flex flex="1">
+              <SmallButton
+                onClick={handleCalibrate}
+                buttonText={i18n.format(t('recalibrate'), 'capitalize')}
+                buttonCategory="rounded"
+              />
+            </Flex>
+          )}
         </Flex>
       </MountItem>
       {showPipetteWizardFlow ? (
@@ -165,7 +174,7 @@ export function ProtocolInstrumentMountItem(
           closeFlow={() => setShowPipetteWizardFlow(false)}
           selectedPipette={selectedPipette}
           mount={mount as Mount}
-          pipetteInfo={mostRecentAnalysis?.pipettes}
+          pipetteInfo={props.pipetteInfo}
           onComplete={props.instrumentsRefetch}
         />
       ) : null}

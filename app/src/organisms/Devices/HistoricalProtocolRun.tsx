@@ -4,14 +4,15 @@ import { css } from 'styled-components'
 import { useHistory } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {
-  Flex,
-  Box,
-  Icon,
-  SPACING,
-  COLORS,
-  JUSTIFY_SPACE_AROUND,
   ALIGN_CENTER,
   BORDERS,
+  Box,
+  COLORS,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_AROUND,
+  OVERFLOW_WRAP_ANYWHERE,
+  SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { getStoredProtocols } from '../../redux/protocol-storage'
@@ -25,7 +26,7 @@ import type { State } from '../../redux/types'
 
 const CLICK_STYLE = css`
   cursor: pointer;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
 `
 
 interface HistoricalProtocolRunProps {
@@ -68,7 +69,7 @@ export function HistoricalProtocolRun(
         padding={SPACING.spacing8}
         borderTop={BORDERS.lineBorder}
         backgroundColor={
-          run.status === 'running' ? COLORS.lightBlue : COLORS.white
+          run.status === 'running' ? COLORS.blue10 : COLORS.white
         }
         width="100%"
       >
@@ -95,6 +96,7 @@ export function HistoricalProtocolRun(
           css={css`
             cursor: pointer;
           `}
+          color={COLORS.grey60}
         >
           {runDisplayName}
         </StyledText>
@@ -106,6 +108,7 @@ export function HistoricalProtocolRun(
             onClick={() => history.push(`/protocols/${protocolKey}`)}
             css={CLICK_STYLE}
             marginRight={SPACING.spacing16}
+            color={COLORS.grey60}
           >
             {protocolName}
           </StyledText>
@@ -114,8 +117,9 @@ export function HistoricalProtocolRun(
             as="p"
             width="35%"
             data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
-            overflowWrap="anywhere"
+            overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             marginRight={SPACING.spacing16}
+            color={COLORS.grey60}
           >
             {protocolName}
           </StyledText>
@@ -125,11 +129,12 @@ export function HistoricalProtocolRun(
           width="20%"
           textTransform="capitalize"
           data-testid={`RecentProtocolRuns_Status_${String(protocolKey)}`}
+          color={COLORS.grey60}
         >
           {runStatus === 'running' && (
             <Icon
               name="circle"
-              color={COLORS.blueEnabled}
+              color={COLORS.blue50}
               size={SPACING.spacing4}
               marginX={SPACING.spacing4}
               marginBottom={SPACING.spacing4}

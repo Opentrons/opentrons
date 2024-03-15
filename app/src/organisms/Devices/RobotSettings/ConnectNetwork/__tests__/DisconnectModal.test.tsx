@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
+import { when } from 'vitest-when'
 
 import { i18n } from '../../../../../i18n'
 import { useRobot } from '../../../../../organisms/Devices/hooks'
@@ -31,35 +33,14 @@ import type { DispatchApiRequestType } from '../../../../../redux/robot-api'
 import type { RequestState } from '../../../../../redux/robot-api/types'
 import type { State } from '../../../../../redux/types'
 
-jest.mock('../../../../../resources/networking/hooks')
-jest.mock('../../../../../organisms/Devices/hooks')
-jest.mock('../../../../../redux/networking')
-jest.mock('../../../../../redux/robot-api')
-
-const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
-const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
-  typeof useDispatchApiRequest
->
-const mockGetRequestById = getRequestById as jest.MockedFunction<
-  typeof getRequestById
->
-const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
-  typeof getNetworkInterfaces
->
-const mockPostWifiDisconnect = postWifiDisconnect as jest.MockedFunction<
-  typeof postWifiDisconnect
->
-const mockDismissRequest = dismissRequest as jest.MockedFunction<
-  typeof dismissRequest
->
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockClearWifiStatus = clearWifiStatus as jest.MockedFunction<
-  typeof clearWifiStatus
->
+vi.mock('../../../../../resources/networking/hooks')
+vi.mock('../../../../../organisms/Devices/hooks')
+vi.mock('../../../../../redux/networking')
+vi.mock('../../../../../redux/robot-api')
 
 const ROBOT_NAME = 'otie'
 const LAST_ID = 'a request id'
-const mockOnCancel = jest.fn()
+const mockOnCancel = vi.fn()
 const MOCK_WIFI = {
   ipAddress: '127.0.0.100',
   subnetMask: '255.255.255.230',
@@ -80,133 +61,126 @@ describe('DisconnectModal', () => {
   let dispatchApiRequest: DispatchApiRequestType
 
   beforeEach(() => {
-    dispatchApiRequest = jest.fn()
-    when(mockUseWifiList)
+    dispatchApiRequest = vi.fn()
+    when(useWifiList)
       .calledWith(ROBOT_NAME)
-      .mockReturnValue([{ ...mockWifiNetwork, ssid: 'foo', active: true }])
-    when(mockUseDispatchApiRequest)
-      .calledWith()
-      .mockReturnValue([dispatchApiRequest, [LAST_ID]])
-    when(mockGetRequestById)
+      .thenReturn([{ ...mockWifiNetwork, ssid: 'foo', active: true }])
+    vi.mocked(useDispatchApiRequest).mockReturnValue([
+      dispatchApiRequest,
+      [LAST_ID],
+    ])
+    when(getRequestById)
       .calledWith({} as State, LAST_ID)
-      .mockReturnValue({} as RequestState)
-    when(mockGetNetworkInterfaces)
+      .thenReturn({} as RequestState)
+    when(getNetworkInterfaces)
       .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue({ wifi: MOCK_WIFI, ethernet: null })
-    when(mockUseRobot)
-      .calledWith(ROBOT_NAME)
-      .mockReturnValue(mockConnectableRobot)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+      .thenReturn({ wifi: MOCK_WIFI, ethernet: null })
+    when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockConnectableRobot)
   })
 
   it('renders disconnect modal title, body, and buttons', () => {
-    const { getByRole, getByText } = render()
+    render()
 
-    getByText('Disconnect from foo')
-    getByText('Are you sure you want to disconnect from foo?')
-    getByRole('button', { name: 'cancel' })
-    getByRole('button', { name: 'Disconnect' })
+    screen.getByText('Disconnect from foo')
+    screen.getByText('Are you sure you want to disconnect from foo?')
+    screen.getByRole('button', { name: 'cancel' })
+    screen.getByRole('button', { name: 'Disconnect' })
   })
 
   it('renders pending body when request is pending', () => {
-    when(mockGetRequestById)
+    when(getRequestById)
       .calledWith({} as State, LAST_ID)
-      .mockReturnValue({ status: PENDING } as RequestState)
-    const { getByRole, getByText } = render()
+      .thenReturn({ status: PENDING } as RequestState)
+    render()
 
-    getByText('Disconnect from foo')
-    getByText('Disconnecting from Wi-Fi network foo')
-    getByRole('button', { name: 'cancel' })
-    expect(mockClearWifiStatus).not.toHaveBeenCalled()
+    screen.getByText('Disconnect from foo')
+    screen.getByText('Disconnecting from Wi-Fi network foo')
+    screen.getByRole('button', { name: 'cancel' })
+    expect(clearWifiStatus).not.toHaveBeenCalled()
   })
 
   it('renders success body when request is pending and robot is not connectable', () => {
-    when(mockGetRequestById)
+    when(getRequestById)
       .calledWith({} as State, LAST_ID)
-      .mockReturnValue({ status: PENDING } as RequestState)
-    when(mockUseRobot)
-      .calledWith(ROBOT_NAME)
-      .mockReturnValue(mockReachableRobot)
-    const { getByRole, getByText } = render()
+      .thenReturn({ status: PENDING } as RequestState)
+    when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockReachableRobot)
+    render()
 
-    getByText('Disconnected from Wi-Fi')
-    getByText(
+    screen.getByText('Disconnected from Wi-Fi')
+    screen.getByText(
       'Your robot has successfully disconnected from the Wi-Fi network.'
     )
-    getByRole('button', { name: 'Done' })
-    expect(mockClearWifiStatus).toHaveBeenCalled()
+    screen.getByRole('button', { name: 'Done' })
+    expect(clearWifiStatus).toHaveBeenCalled()
   })
 
   it('renders success body when request is successful', () => {
-    when(mockGetRequestById)
+    when(getRequestById)
       .calledWith({} as State, LAST_ID)
-      .mockReturnValue({ status: SUCCESS } as RequestState)
-    const { getByRole, getByText } = render()
+      .thenReturn({ status: SUCCESS } as RequestState)
+    render()
 
-    getByText('Disconnected from Wi-Fi')
-    getByText(
+    screen.getByText('Disconnected from Wi-Fi')
+    screen.getByText(
       'Your robot has successfully disconnected from the Wi-Fi network.'
     )
-    getByRole('button', { name: 'Done' })
-    expect(mockClearWifiStatus).toHaveBeenCalled()
+    screen.getByRole('button', { name: 'Done' })
+    expect(clearWifiStatus).toHaveBeenCalled()
   })
 
   it('renders success body when wifi is not connected', () => {
-    when(mockGetNetworkInterfaces)
+    when(getNetworkInterfaces)
       .calledWith({} as State, ROBOT_NAME)
-      .mockReturnValue({
+      .thenReturn({
         wifi: { ...MOCK_WIFI, ipAddress: null },
         ethernet: null,
       })
-    const { getByRole, getByText } = render()
+    render()
 
-    getByText('Disconnected from Wi-Fi')
-    getByText(
+    screen.getByText('Disconnected from Wi-Fi')
+    screen.getByText(
       'Your robot has successfully disconnected from the Wi-Fi network.'
     )
-    getByRole('button', { name: 'Done' })
-    expect(mockClearWifiStatus).toHaveBeenCalled()
+    screen.getByRole('button', { name: 'Done' })
+    expect(clearWifiStatus).toHaveBeenCalled()
   })
 
   it('renders error body when request is unsuccessful', () => {
-    when(mockGetRequestById)
+    when(getRequestById)
       .calledWith({} as State, LAST_ID)
-      .mockReturnValue({
+      .thenReturn({
         status: FAILURE,
         error: { message: 'it errored' },
       } as RequestState)
-    const { getByRole, getByText } = render()
+    render()
 
-    getByText('Disconnect from foo')
-    getByText('it errored')
-    getByText('Your robot was unable to disconnect from Wi-Fi network foo.')
-    getByText(
+    screen.getByText('Disconnect from foo')
+    screen.getByText('it errored')
+    screen.getByText(
+      'Your robot was unable to disconnect from Wi-Fi network foo.'
+    )
+    screen.getByText(
       'If you keep getting this message, try restarting your app and/or robot. If this does not resolve the issue please contact Opentrons Support.'
     )
-    getByRole('button', { name: 'cancel' })
-    getByRole('button', { name: 'Disconnect' })
-    expect(mockClearWifiStatus).not.toHaveBeenCalled()
+    screen.getByRole('button', { name: 'cancel' })
+    screen.getByRole('button', { name: 'Disconnect' })
   })
 
   it('dispatches postWifiDisconnect on click Disconnect', () => {
-    const { getByRole } = render()
+    render()
 
-    expect(mockPostWifiDisconnect).not.toHaveBeenCalled()
-    getByRole('button', { name: 'Disconnect' }).click()
-    expect(mockPostWifiDisconnect).toHaveBeenCalledWith(ROBOT_NAME, 'foo')
+    expect(postWifiDisconnect).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Disconnect' }))
+    expect(postWifiDisconnect).toHaveBeenCalledWith(ROBOT_NAME, 'foo')
   })
 
   it('dismisses last request and calls onCancel on cancel', () => {
-    const { getByRole } = render()
+    render()
 
-    expect(mockDismissRequest).not.toHaveBeenCalled()
+    expect(dismissRequest).not.toHaveBeenCalled()
     expect(mockOnCancel).not.toHaveBeenCalled()
-    getByRole('button', { name: 'cancel' }).click()
-    expect(mockDismissRequest).toHaveBeenCalledWith(LAST_ID)
+    fireEvent.click(screen.getByRole('button', { name: 'cancel' }))
+    expect(dismissRequest).toHaveBeenCalledWith(LAST_ID)
     expect(mockOnCancel).toHaveBeenCalledWith()
   })
 })

@@ -15,7 +15,13 @@ from opentrons.hardware_control.modules import LiveData
 from opentrons_shared_data.errors import EnumeratedError
 
 from ..commands import Command, CommandCreate, CommandPrivateResult
-from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid, DeckConfigurationType
+from ..types import (
+    LabwareOffsetCreate,
+    ModuleDefinition,
+    Liquid,
+    DeckConfigurationType,
+    AddressableAreaLocation,
+)
 
 
 @dataclass(frozen=True)
@@ -154,6 +160,18 @@ class AddLiquidAction:
 
 
 @dataclass(frozen=True)
+class AddAddressableAreaAction:
+    """Add a single addressable area to state.
+
+    This differs from the deck configuration in PlayAction which sends over a mapping of cutout fixtures.
+    This action will only load one addressable area and that should be pre-validated before being sent via
+    the action.
+    """
+
+    addressable_area: AddressableAreaLocation
+
+
+@dataclass(frozen=True)
 class AddModuleAction:
     """Add an attached module directly to state without a location."""
 
@@ -194,6 +212,7 @@ Action = Union[
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddModuleAction,
+    AddAddressableAreaAction,
     AddLiquidAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,

@@ -6,7 +6,7 @@ port ?= 6060
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
 tests ?=
-cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='components/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true
 test_opts ?=
 
 # standard targets
@@ -17,21 +17,26 @@ all: clean dist
 
 .PHONY: clean
 clean:
-	yarn --cwd .. shx rm -rf storybook-static
+	cd .. && yarn shx rm -rf storybook-static
 
 # artifacts
 #####################################################################
 
 .PHONY: dist
 dist:
-	yarn --cwd .. build-storybook
+	cd .. && yarn sb build
+
+.PHONY: lib
+lib: export NODE_ENV := production
+lib:
+	yarn vite build
 
 # development
 #####################################################################
 
 .PHONY: dev
 dev:
-	yarn --cwd .. start-storybook --port $(port)
+	cd .. && yarn sb dev --port $(port)
 
 .PHONY: test
 test:

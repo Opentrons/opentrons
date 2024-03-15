@@ -101,8 +101,6 @@ class AddressableArea(_RequiredAddressableArea, total=False):
     matingSurfaceUnitVector: List[Union[Literal[1], Literal[-1]]]
     ableToDropTips: bool
     ableToDropLabware: bool
-    dropTipsOffset: List[float]
-    dropLabwareOffset: List[float]
 
 
 class Cutout(TypedDict):
@@ -116,6 +114,7 @@ class CutoutFixture(TypedDict):
     mayMountTo: List[str]
     displayName: str
     providesAddressableAreas: Dict[str, List[str]]
+    height: float
 
 
 Fixture = Union[

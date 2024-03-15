@@ -1,17 +1,15 @@
 import React from 'react'
-import '@testing-library/jest-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { when } from 'vitest-when'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { ModuleInfo } from '../ModuleInfo'
 import { useRunHasStarted } from '../hooks'
 
-jest.mock('../hooks')
-
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
->
+vi.mock('../hooks')
 
 const render = (props: React.ComponentProps<typeof ModuleInfo>) => {
   return renderWithProviders(<ModuleInfo {...props} />, {
@@ -35,23 +33,19 @@ describe('ModuleInfo', () => {
       isAttached: false,
       physicalPort: null,
     }
-    when(mockUseRunHasStarted).calledWith(MOCK_RUN_ID).mockReturnValue(false)
-  })
-
-  afterEach(() => {
-    resetAllWhenMocks()
+    when(useRunHasStarted).calledWith(MOCK_RUN_ID).thenReturn(false)
   })
 
   it('should show module not connected', () => {
-    const { getByText } = render(props)
-    getByText('Not connected')
+    render(props)
+    screen.getByText('Not connected')
   })
 
   it('should show module connected and no USB number', () => {
     props = { ...props, isAttached: true }
-    const { getByText } = render(props)
-    getByText('Connected')
-    getByText('USB Port Connected')
+    render(props)
+    screen.getByText('Connected')
+    screen.getByText('USB Port Connected')
   })
 
   it('should show module connected and USB number', () => {
@@ -60,9 +54,9 @@ describe('ModuleInfo', () => {
       physicalPort: { port: 1, hub: false, portGroup: 'unknown', path: '' },
       isAttached: true,
     }
-    const { getByText } = render(props)
-    getByText('Connected')
-    getByText('USB Port 1')
+    render(props)
+    screen.getByText('Connected')
+    screen.getByText('USB Port 1')
   })
 
   it('should not show module connected when run has started', () => {
@@ -72,10 +66,10 @@ describe('ModuleInfo', () => {
       isAttached: true,
       runId: MOCK_RUN_ID,
     }
-    when(mockUseRunHasStarted).calledWith(MOCK_RUN_ID).mockReturnValue(true)
-    const { getByText, queryByText } = render(props)
-    expect(queryByText('Connected')).toBeNull()
-    getByText('Connection info not available once run has started')
+    when(useRunHasStarted).calledWith(MOCK_RUN_ID).thenReturn(true)
+    render(props)
+    expect(screen.queryByText('Connected')).toBeNull()
+    screen.getByText('Connection info not available once run has started')
   })
 
   it('should show the correct information when the magnetic block is in the protocol', () => {
@@ -83,8 +77,8 @@ describe('ModuleInfo', () => {
       ...props,
       moduleModel: 'magneticBlockV1',
     }
-    const { getByText, queryByText } = render(props)
-    getByText('No USB required')
-    expect(queryByText('Connected')).toBeNull()
+    render(props)
+    screen.getByText('No USB required')
+    expect(screen.queryByText('Connected')).toBeNull()
   })
 })

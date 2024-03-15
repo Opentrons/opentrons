@@ -4,8 +4,10 @@ import { useHost } from '../api'
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
 import type { HostConfig, Modules } from '@opentrons/api-client'
 
+export type UseModulesQueryOptions = UseQueryOptions<Modules>
+
 export function useModulesQuery(
-  options: UseQueryOptions<Modules> = {}
+  options: UseModulesQueryOptions = {}
 ): UseQueryResult<Modules> {
   const host = useHost()
   const query = useQuery<Modules>(

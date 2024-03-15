@@ -7,8 +7,7 @@ import {
   DeckFromLayers,
   FlexTrash,
   Module,
-  RobotCoordinateSpaceWithDOMCoords,
-  RobotWorkSpaceRenderProps,
+  RobotCoordinateSpaceWithRef,
   SingleSlotFixture,
   StagingAreaFixture,
   StagingAreaLocation,
@@ -39,6 +38,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { SPAN7_8_10_11_SLOT } from '../../constants'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
@@ -63,7 +63,6 @@ import {
   AdapterControls,
   SlotControls,
   LabwareControls,
-  DragPreview,
 } from './LabwareOverlays'
 import { FlexModuleTag } from './FlexModuleTag'
 import { Ot2ModuleTag } from './Ot2ModuleTag'
@@ -78,7 +77,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 
-import styles from './DeckSetup.css'
+import styles from './DeckSetup.module.css'
 
 export const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -101,7 +100,6 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 ]
 
 interface ContentsProps {
-  getRobotCoordsFromDOMCoords: RobotWorkSpaceRenderProps['getRobotCoordsFromDOMCoords']
   activeDeckSetup: InitialDeckSetup
   selectedTerminalItemId?: TerminalItemId | null
   showGen1MultichannelCollisionWarnings: boolean
@@ -111,13 +109,12 @@ interface ContentsProps {
   trashSlot: string | null
 }
 
-const lightFill = COLORS.light1
-const darkFill = COLORS.darkGreyEnabled
+const lightFill = COLORS.grey35
+const darkFill = COLORS.grey60
 
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
     activeDeckSetup,
-    getRobotCoordsFromDOMCoords,
     showGen1MultichannelCollisionWarnings,
     deckDef,
     robotType,
@@ -190,16 +187,12 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     <>
       {/* all modules */}
       {allModules.map(moduleOnDeck => {
-        // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
-        // const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
-        // const slot = moduleParentSlots.find(
-        //   slot => slot.id === moduleOnDeck.slot
-        // )
-        const slotPosition = getPositionFromSlotId(moduleOnDeck.slot, deckDef)
+        const slotId =
+          moduleOnDeck.slot === SPAN7_8_10_11_SLOT ? '7' : moduleOnDeck.slot
+
+        const slotPosition = getPositionFromSlotId(slotId, deckDef)
         if (slotPosition == null) {
-          console.warn(
-            `no slot ${moduleOnDeck.slot} for module ${moduleOnDeck.id}`
-          )
+          console.warn(`no slot ${slotId} for module ${moduleOnDeck.id}`)
           return null
         }
         const moduleDef = getModuleDef2(moduleOnDeck.model)
@@ -257,7 +250,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             def={moduleDef}
             orientation={inferModuleOrientationFromXCoordinate(slotPosition[0])}
             innerProps={getModuleInnerProps(moduleOnDeck.moduleState)}
-            targetSlotId={moduleOnDeck.slot}
+            targetSlotId={slotId}
             targetDeckId={deckDef.otId}
           >
             {labwareLoadedOnModule != null && !shouldHideChildren ? (
@@ -268,7 +261,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                   labwareOnDeck={labwareLoadedOnModule}
                 />
                 {isAdapter ? (
-                  // @ts-expect-error
                   <AdapterControls
                     allLabware={allLabware}
                     onDeck={false}
@@ -299,7 +291,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             {labwareLoadedOnModule == null &&
             !shouldHideChildren &&
             !isAdapter ? (
-              // @ts-expect-error
               <SlotControls
                 key={moduleOnDeck.slot}
                 slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
@@ -362,7 +353,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         })
         .map(addressableArea => {
           return (
-            // @ts-expect-error
             <SlotControls
               key={addressableArea.id}
               slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
@@ -407,7 +397,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             />
             <g>
               {labwareIsAdapter ? (
-                //  @ts-expect-error
                 <AdapterControls
                   allLabware={allLabware}
                   onDeck={true}
@@ -489,7 +478,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           </React.Fragment>
         )
       })}
-      <DragPreview getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords} />
     </>
   )
 }
@@ -550,7 +538,8 @@ export const DeckSetup = (): JSX.Element => {
     aE =>
       STAGING_AREA_CUTOUTS.includes(aE.location as CutoutId) &&
       aE.name === 'stagingArea' &&
-      aE.location === WASTE_CHUTE_CUTOUT
+      aE.location === WASTE_CHUTE_CUTOUT &&
+      wasteChuteFixtures.length > 0
   )
 
   const hasWasteChute =
@@ -562,8 +551,9 @@ export const DeckSetup = (): JSX.Element => {
   return (
     <div className={styles.deck_row}>
       {drilledDown && <BrowseLabwareModal />}
+
       <div ref={wrapperRef} className={styles.deck_wrapper}>
-        <RobotCoordinateSpaceWithDOMCoords
+        <RobotCoordinateSpaceWithRef
           height="100%"
           deckDef={deckDef}
           viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
@@ -572,7 +562,7 @@ export const DeckSetup = (): JSX.Element => {
               : deckDef.cornerOffsetFromOrigin[1]
           } ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
         >
-          {({ getRobotCoordsFromDOMCoords }) => (
+          {() => (
             <>
               {robotType === OT2_ROBOT_TYPE ? (
                 <DeckFromLayers
@@ -620,7 +610,7 @@ export const DeckSetup = (): JSX.Element => {
                               robotType={robotType}
                               trashIconColor={lightFill}
                               trashCutoutId={cutoutId as TrashCutoutId}
-                              backgroundColor={darkFill}
+                              backgroundColor={COLORS.grey50}
                             />
                           </React.Fragment>
                         ) : null
@@ -631,7 +621,6 @@ export const DeckSetup = (): JSX.Element => {
                       key={fixture.id}
                       cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
                       deckDefinition={deckDef}
-                      slotClipColor={darkFill}
                       fixtureBaseColor={lightFill}
                     />
                   ))}
@@ -658,7 +647,7 @@ export const DeckSetup = (): JSX.Element => {
                 )}
                 {...{
                   deckDef,
-                  getRobotCoordsFromDOMCoords,
+
                   showGen1MultichannelCollisionWarnings,
                 }}
               />
@@ -669,7 +658,7 @@ export const DeckSetup = (): JSX.Element => {
               />
             </>
           )}
-        </RobotCoordinateSpaceWithDOMCoords>
+        </RobotCoordinateSpaceWithRef>
       </div>
     </div>
   )

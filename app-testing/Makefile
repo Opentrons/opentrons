@@ -1,22 +1,22 @@
 .PHONY: black
 black:
-	pipenv run python -m black .
+	python -m pipenv run python -m black .
 
 .PHONY: black-check
 black-check:
-	pipenv run python -m black . --check
+	python -m pipenv run python -m black . --check
 
 .PHONY: ruff
 ruff:
-	pipenv run python -m ruff . --fix
+	python -m pipenv run python -m ruff . --fix --unsafe-fixes
 
 .PHONY: ruff-check
 ruff-check:
-	pipenv run python -m ruff .
+	python -m pipenv run python -m ruff .
 
 .PHONY: mypy
 mypy:
-	pipenv run python -m mypy conftest.py automation tests
+	python -m pipenv run python -m mypy conftest.py automation tests citools
 
 .PHONY: lint
 lint:
@@ -32,15 +32,19 @@ format:
 
 .PHONY: test-ci
 test-ci:
-	pipenv run python -m pytest -m "emulated_alpha"
+	python -m pipenv run python -m pytest -m "emulated_alpha"
+
+.PHONY: test-protocol-analysis
+test-protocol-analysis:
+	pipenv run python -m pytest -v tests/protocol_analyze_test.py
 
 .PHONY: setup
-setup:
-	pipenv install
+setup: install-pipenv
+	python -m pipenv install
 
 .PHONY: teardown
 teardown:
-	pipenv --rm
+	python -m pipenv --rm
 
 .PHONY: format-readme
 format-readme:
@@ -48,4 +52,24 @@ format-readme:
 
 .PHONY: print-protocols
 print-protocols:
-	pipenv run python print_protocols.py
+	python -m pipenv run python print_protocols.py
+
+.PHONY: install-pipenv
+install-pipenv:
+	python -m pip install -U pipenv
+
+.PHONY: snapshot-test
+snapshot-test:
+	python -m pipenv run pytest -k analyses_snapshot_test -vv
+
+.PHONY: snapshot-test-update
+snapshot-test-update:
+	python -m pipenv run pytest -k analyses_snapshot_test --snapshot-update
+
+TARGET ?= edge
+
+.PHONY: build-opentrons-analysis
+build-opentrons-analysis:
+	@echo "Building docker image for $(TARGET)"
+	@echo "If you want to build a different version, run 'make build-docker TARGET=<version>'"
+	docker build --build-arg OPENTRONS_VERSION=$(TARGET) -t opentrons-analysis:$(TARGET) citools/.

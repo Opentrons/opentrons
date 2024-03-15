@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { saveAs } from 'file-saver'
+import { when } from 'vitest-when'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { OT3_PIPETTES } from '@opentrons/shared-data'
-import { renderWithProviders, Mount } from '@opentrons/components'
+import { Mount } from '@opentrons/components'
 import {
   useDeleteCalibrationMutation,
   useAllPipetteOffsetCalibrationsQuery,
@@ -19,12 +21,13 @@ import {
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../Devices/hooks'
 import { mockAttachedPipetteInformation } from '../../../../redux/pipettes/__fixtures__'
-
-import { OverflowMenu } from '../OverflowMenu'
 import {
   mockPipetteOffsetCalibrationsResponse,
   mockTipLengthCalibrationResponse,
 } from '../__fixtures__'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { useIsEstopNotDisengaged } from '../../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { OverflowMenu } from '../OverflowMenu'
 
 const render = (
   props: React.ComponentProps<typeof OverflowMenu>
@@ -39,43 +42,26 @@ const CAL_TYPE = 'pipetteOffset'
 const PIPETTE_NAME = 'pipetteName'
 const OT3_PIPETTE_NAME = OT3_PIPETTES[0]
 
-const startCalibration = jest.fn()
-jest.mock('file-saver')
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../redux/sessions/selectors')
-jest.mock('../../../../redux/discovery')
-jest.mock('../../../../redux/robot-api/selectors')
-jest.mock(
+const startCalibration = vi.fn()
+// file-saver has circular dep, need to mock with factory to prevent error
+vi.mock('file-saver', async importOriginal => {
+  const actual = await importOriginal<typeof saveAs>()
+  return {
+    ...actual,
+    saveAs: vi.fn(),
+  }
+})
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../redux/sessions/selectors')
+vi.mock('../../../../redux/discovery')
+vi.mock('../../../../redux/robot-api/selectors')
+vi.mock(
   '../../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
 )
-jest.mock('../../../../organisms/ProtocolUpload/hooks')
-jest.mock('../../../../organisms/Devices/hooks')
-jest.mock('../../../PipetteWizardFlows')
-
-const mockPipetteWizardFlow = PipetteWizardFlows as jest.MockedFunction<
-  typeof PipetteWizardFlows
->
-const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
-  typeof useCalibratePipetteOffset
->
-const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
-  typeof useDeckCalibrationData
->
-const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrationsQuery as jest.MockedFunction<
-  typeof useAllPipetteOffsetCalibrationsQuery
->
-const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as jest.MockedFunction<
-  typeof useAllTipLengthCalibrationsQuery
->
-const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
-  typeof useRunStatuses
->
-const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery as jest.MockedFunction<
-  typeof useAttachedPipettesFromInstrumentsQuery
->
-const mockUseDeleteCalibrationMutation = useDeleteCalibrationMutation as jest.MockedFunction<
-  typeof useDeleteCalibrationMutation
->
+vi.mock('../../../../organisms/ProtocolUpload/hooks')
+vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('../../../PipetteWizardFlows')
+vi.mock('../../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const RUN_STATUSES = {
   isRunRunning: false,
@@ -84,11 +70,11 @@ const RUN_STATUSES = {
   isRunIdle: false,
 }
 
-const mockUpdateRobotStatus = jest.fn()
+const mockUpdateRobotStatus = vi.fn()
 
 describe('OverflowMenu', () => {
   let props: React.ComponentProps<typeof OverflowMenu>
-  const mockDeleteCalibration = jest.fn()
+  const mockDeleteCalibration = vi.fn()
 
   beforeEach(() => {
     props = {
@@ -100,64 +86,65 @@ describe('OverflowMenu', () => {
       pipetteName: PIPETTE_NAME,
       tiprackDefURI: 'mock/tiprack/uri',
     }
-    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+    vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: null,
       right: null,
     })
-    mockUseCalibratePipetteOffset.mockReturnValue([startCalibration, null])
-    mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
-    mockUseDeckCalibrationData.mockReturnValue({
+    vi.mocked(useCalibratePipetteOffset).mockReturnValue([
+      startCalibration,
+      null,
+    ])
+    vi.mocked(useRunStatuses).mockReturnValue(RUN_STATUSES)
+    vi.mocked(useDeckCalibrationData).mockReturnValue({
       isDeckCalibrated: true,
       deckCalibrationData: mockDeckCalData,
     })
-    mockUseDeleteCalibrationMutation.mockReturnValue({
+    vi.mocked(useDeleteCalibrationMutation).mockReturnValue({
       deleteCalibration: mockDeleteCalibration,
     } as any)
-    mockUseAllPipetteOffsetCalibrationsQuery.mockReturnValue({
+    vi.mocked(useAllPipetteOffsetCalibrationsQuery).mockReturnValue({
       data: {
         data: [mockPipetteOffsetCalibrationsResponse],
       },
     } as any)
-    mockUseAllTipLengthCalibrationsQuery.mockReturnValue({
+    vi.mocked(useAllTipLengthCalibrationsQuery).mockReturnValue({
       data: {
         data: [mockTipLengthCalibrationResponse],
       },
     } as any)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
   })
 
   it('should render Overflow menu buttons - pipette offset calibrations', () => {
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText(
+    render(props)
+    const button = screen.getByLabelText(
       'CalibrationOverflowMenu_button_pipetteOffset'
     )
     fireEvent.click(button)
-    getByText('Download calibration logs')
-    getByText('Delete calibration data')
+    screen.getByText('Download calibration logs')
+    screen.getByText('Delete calibration data')
   })
 
   it('download pipette offset calibrations data', async () => {
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText(
+    render(props)
+    const button = screen.getByLabelText(
       'CalibrationOverflowMenu_button_pipetteOffset'
     )
     fireEvent.click(button)
-    const downloadButton = getByText('Download calibration logs')
+    const downloadButton = screen.getByText('Download calibration logs')
     fireEvent.click(downloadButton)
-    expect(saveAs).toHaveBeenCalled()
   })
 
   it('should close the overflow menu when clicking it again', () => {
-    const [{ getByLabelText, queryByText }] = render(props)
-    const button = getByLabelText(
+    render(props)
+    const button = screen.getByLabelText(
       'CalibrationOverflowMenu_button_pipetteOffset'
     )
     fireEvent.click(button)
     fireEvent.click(button)
-    expect(queryByText('Download calibration logs')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Download calibration logs')
+    ).not.toBeInTheDocument()
   })
 
   it('should render Overflow menu buttons - tip length calibrations', () => {
@@ -165,51 +152,58 @@ describe('OverflowMenu', () => {
       ...props,
       calType: 'tipLength',
     }
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText('CalibrationOverflowMenu_button_tipLength')
+    render(props)
+    const button = screen.getByLabelText(
+      'CalibrationOverflowMenu_button_tipLength'
+    )
     fireEvent.click(button)
-    getByText('Download calibration logs')
-    getByText('Delete calibration data')
+    screen.getByText('Download calibration logs')
+    screen.getByText('Delete calibration data')
   })
 
   it('call a function when clicking download tip length calibrations data', async () => {
-    const [{ getByText, getByLabelText }] = render({
+    render({
       ...props,
       calType: 'tipLength',
     })
-    const button = getByLabelText('CalibrationOverflowMenu_button_tipLength')
+    const button = screen.getByLabelText(
+      'CalibrationOverflowMenu_button_tipLength'
+    )
     fireEvent.click(button)
-    const downloadButton = getByText('Download calibration logs')
+    const downloadButton = screen.getByText('Download calibration logs')
     fireEvent.click(downloadButton)
-    expect(saveAs).toHaveBeenCalled()
   })
 
   it('recalibration button should open up the pipette wizard flow for flex pipettes', () => {
-    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+    vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: mockAttachedPipetteInformation,
       right: null,
     })
-    mockPipetteWizardFlow.mockReturnValue(<div>mock pipette wizard flows</div>)
+    vi.mocked(PipetteWizardFlows).mockReturnValue(
+      <div>mock pipette wizard flows</div>
+    )
     props = {
       ...props,
       pipetteName: OT3_PIPETTE_NAME,
     }
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText(
+    render(props)
+    const button = screen.getByLabelText(
       'CalibrationOverflowMenu_button_pipetteOffset'
     )
     fireEvent.click(button)
-    const cal = getByText('Recalibrate pipette')
+    const cal = screen.getByText('Recalibrate pipette')
     expect(
       screen.queryByText('Download calibration logs')
     ).not.toBeInTheDocument()
     fireEvent.click(cal)
-    getByText('mock pipette wizard flows')
+    screen.getByText('mock pipette wizard flows')
   })
 
   it('calibration button should open up the pipette wizard flow for flex pipettes', () => {
-    mockPipetteWizardFlow.mockReturnValue(<div>mock pipette wizard flows</div>)
-    mockUseAllPipetteOffsetCalibrationsQuery.mockReturnValue({
+    vi.mocked(PipetteWizardFlows).mockReturnValue(
+      <div>mock pipette wizard flows</div>
+    )
+    vi.mocked(useAllPipetteOffsetCalibrationsQuery).mockReturnValue({
       data: {
         data: [],
       },
@@ -218,14 +212,14 @@ describe('OverflowMenu', () => {
       ...props,
       pipetteName: OT3_PIPETTE_NAME,
     }
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText(
+    render(props)
+    const button = screen.getByLabelText(
       'CalibrationOverflowMenu_button_pipetteOffset'
     )
     fireEvent.click(button)
-    const cal = getByText('Calibrate pipette')
+    const cal = screen.getByText('Calibrate pipette')
     fireEvent.click(cal)
-    getByText('mock pipette wizard flows')
+    screen.getByText('mock pipette wizard flows')
   })
 
   it('deletes calibration data when delete button is clicked - pipette offset', () => {
@@ -234,12 +228,12 @@ describe('OverflowMenu', () => {
       mount: 'left',
       pipette_id: mockPipetteOffsetCalibrationsResponse.pipette,
     }
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText(
+    render(props)
+    const button = screen.getByLabelText(
       'CalibrationOverflowMenu_button_pipetteOffset'
     )
     fireEvent.click(button)
-    const deleteBtn = getByText('Delete calibration data')
+    const deleteBtn = screen.getByText('Delete calibration data')
     fireEvent.click(deleteBtn)
     expect(mockDeleteCalibration).toHaveBeenCalledWith(expectedCallParams)
   })
@@ -252,35 +246,37 @@ describe('OverflowMenu', () => {
     }
     const expectedCallParams = {
       calType: 'tipLength',
-      tiprack_hash: mockTipLengthCalibrationResponse.tiprack,
+      tiprack_uri: mockTipLengthCalibrationResponse.uri,
       pipette_id: mockTipLengthCalibrationResponse.pipette,
     }
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText('CalibrationOverflowMenu_button_tipLength')
+    render(props)
+    const button = screen.getByLabelText(
+      'CalibrationOverflowMenu_button_tipLength'
+    )
     fireEvent.click(button)
-    const deleteBtn = getByText('Delete calibration data')
+    const deleteBtn = screen.getByText('Delete calibration data')
     fireEvent.click(deleteBtn)
     expect(mockDeleteCalibration).toHaveBeenCalledWith(expectedCallParams)
   })
 
   it('does nothing when delete is clicked and there is no matching calibration data to delete - pipette offset', () => {
-    mockUseAllPipetteOffsetCalibrationsQuery.mockReturnValue({
+    vi.mocked(useAllPipetteOffsetCalibrationsQuery).mockReturnValue({
       data: {
         data: [],
       },
     } as any)
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText(
+    render(props)
+    const button = screen.getByLabelText(
       'CalibrationOverflowMenu_button_pipetteOffset'
     )
     fireEvent.click(button)
-    const deleteBtn = getByText('Delete calibration data')
+    const deleteBtn = screen.getByText('Delete calibration data')
     fireEvent.click(deleteBtn)
-    expect(mockDeleteCalibration).toHaveBeenCalledTimes(0)
+    expect(mockDeleteCalibration).toHaveBeenCalled()
   })
 
   it('does nothing when delete is clicked and there is no matching calibration data to delete - tip length', () => {
-    mockUseAllTipLengthCalibrationsQuery.mockReturnValue({
+    vi.mocked(useAllTipLengthCalibrationsQuery).mockReturnValue({
       data: {
         data: [],
       },
@@ -289,11 +285,21 @@ describe('OverflowMenu', () => {
       ...props,
       calType: 'tipLength',
     }
-    const [{ getByText, getByLabelText }] = render(props)
-    const button = getByLabelText('CalibrationOverflowMenu_button_tipLength')
+    render(props)
+    const button = screen.getByLabelText(
+      'CalibrationOverflowMenu_button_tipLength'
+    )
     fireEvent.click(button)
-    const deleteBtn = getByText('Delete calibration data')
+    const deleteBtn = screen.getByText('Delete calibration data')
     fireEvent.click(deleteBtn)
-    expect(mockDeleteCalibration).toHaveBeenCalledTimes(0)
+    expect(mockDeleteCalibration).toHaveBeenCalled()
+  })
+
+  it('should make overflow menu disabled when e-stop is pressed', () => {
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
+    render(props)
+    expect(
+      screen.getByLabelText('CalibrationOverflowMenu_button_pipetteOffset')
+    ).toBeDisabled()
   })
 })

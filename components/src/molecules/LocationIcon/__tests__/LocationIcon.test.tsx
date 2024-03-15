@@ -1,7 +1,9 @@
 import * as React from 'react'
-
+import { describe, it, beforeEach, expect } from 'vitest'
 import { renderWithProviders } from '../../../testing/utils'
-import { BORDERS, COLORS, SPACING } from '../../../ui-style-constants'
+import { screen } from '@testing-library/react'
+import { SPACING } from '../../../ui-style-constants'
+import { BORDERS, COLORS } from '../../../helix-design-system'
 
 import { LocationIcon } from '..'
 
@@ -19,27 +21,25 @@ describe('LocationIcon', () => {
   })
 
   it('should render the proper styles', () => {
-    const [{ getByTestId }] = render(props)
-    const locationIcon = getByTestId('LocationIcon_A1')
-    expect(locationIcon).toHaveStyle(`padding: ${SPACING.spacing2} 0.375rem`)
+    render(props)
+    const locationIcon = screen.getByTestId('LocationIcon_A1')
+    expect(locationIcon).toHaveStyle(`padding: ${SPACING.spacing4} 0.375rem`)
     expect(locationIcon).toHaveStyle('height: 2rem')
     expect(locationIcon).toHaveStyle('width: max-content')
-    expect(locationIcon).toHaveStyle(`border: 2px solid ${COLORS.darkBlack100}`)
-    expect(locationIcon).toHaveStyle(
-      `border-radius: ${BORDERS.borderRadiusSize3}`
-    )
+    expect(locationIcon).toHaveStyle(`border: 2px solid ${COLORS.black90}`)
+    expect(locationIcon).toHaveStyle(`border-radius: ${BORDERS.borderRadius12}`)
   })
 
   it('should render slot name', () => {
-    const [{ getByText }] = render(props)
-    getByText('A1')
+    render(props)
+    screen.getByText('A1')
   })
 
   it('should render an icon', () => {
     props = {
       iconName: 'ot-temperature-v2',
     }
-    const [{ getByLabelText }] = render(props)
-    getByLabelText(props.iconName as string)
+    render(props)
+    screen.getByLabelText(props.iconName as string)
   })
 })

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import path from 'path'
 import first from 'lodash/first'
 import { Trans, useTranslation } from 'react-i18next'
 import { Link, NavLink, useHistory } from 'react-router-dom'
@@ -8,20 +7,21 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  SPACING,
-  SIZE_1,
-  TYPOGRAPHY,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  Box,
-  Flex,
   BORDERS,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
   DISPLAY_BLOCK,
+  Flex,
   Icon,
+  JUSTIFY_CENTER,
+  OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
-  COLORS,
   ProtocolDeck,
+  SIZE_1,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
@@ -35,10 +35,24 @@ import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-
+import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
+
+export const CARD_OUTLINE_BORDER_STYLE = css`
+  border-style: ${BORDERS.styleSolid};
+  border-width: 1px;
+  border-color: ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius4};
+  &:hover {
+    border-color: ${COLORS.grey55};
+  }
+`
+
+const _getFileBaseName = (filePath: string): string => {
+  return filePath.split('/').reverse()[0]
+}
 
 interface ChooseProtocolSlideoutProps {
   robot: Robot
@@ -50,7 +64,7 @@ export function ChooseProtocolSlideoutComponent(
 ): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
   const history = useHistory()
-  const logger = useLogger(__filename)
+  const logger = useLogger(new URL('', import.meta.url).pathname)
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
 
@@ -58,9 +72,17 @@ export function ChooseProtocolSlideoutComponent(
     selectedProtocol,
     setSelectedProtocol,
   ] = React.useState<StoredProtocolData | null>(null)
+  const analysisStatus = getAnalysisStatus(
+    false,
+    selectedProtocol?.mostRecentAnalysis
+  )
+  const missingAnalysisData =
+    analysisStatus === 'error' || analysisStatus === 'stale'
+
   const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState(true)
   const offsetCandidates = useOffsetCandidatesForAnalysis(
-    selectedProtocol?.mostRecentAnalysis ?? null,
+    (!missingAnalysisData ? selectedProtocol?.mostRecentAnalysis : null) ??
+      null,
     robot.ip
   )
 
@@ -68,12 +90,13 @@ export function ChooseProtocolSlideoutComponent(
     selectedProtocol != null
       ? selectedProtocol.srcFiles.map((srcFileBuffer, index) => {
           const srcFilePath = selectedProtocol.srcFileNames[index]
-          return new File([srcFileBuffer], path.basename(srcFilePath))
+          return new File([srcFileBuffer], _getFileBaseName(srcFilePath))
         })
       : []
 
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
-    selectedProtocol
+    selectedProtocol,
+    name
   )
 
   const {
@@ -134,9 +157,21 @@ export function ChooseProtocolSlideoutComponent(
             offsetCandidates={offsetCandidates}
             shouldApplyOffsets={shouldApplyOffsets}
             setShouldApplyOffsets={setShouldApplyOffsets}
-            commands={selectedProtocol?.mostRecentAnalysis?.commands ?? []}
-            labware={selectedProtocol?.mostRecentAnalysis?.labware ?? []}
-            modules={selectedProtocol?.mostRecentAnalysis?.modules ?? []}
+            commands={
+              (!missingAnalysisData
+                ? selectedProtocol?.mostRecentAnalysis?.commands
+                : []) ?? []
+            }
+            labware={
+              (!missingAnalysisData
+                ? selectedProtocol?.mostRecentAnalysis?.labware
+                : []) ?? []
+            }
+            modules={
+              (!missingAnalysisData
+                ? selectedProtocol?.mostRecentAnalysis?.modules
+                : []) ?? []
+            }
           />
           <PrimaryButton
             onClick={handleProceed}
@@ -204,15 +239,19 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         const isSelected =
           selectedProtocol != null &&
           storedProtocol.protocolKey === selectedProtocol.protocolKey
+        const analysisStatus = getAnalysisStatus(
+          false,
+          storedProtocol.mostRecentAnalysis
+        )
+        const missingAnalysisData =
+          analysisStatus === 'error' || analysisStatus === 'stale'
         return (
-          <>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              key={storedProtocol.protocolKey}
-            >
+          <React.Fragment key={storedProtocol.protocolKey}>
+            <Flex flexDirection={DIRECTION_COLUMN}>
               <MiniCard
                 isSelected={isSelected}
                 isError={runCreationError != null}
+                isWarning={missingAnalysisData}
                 onClick={() => handleSelectProtocol(storedProtocol)}
               >
                 <Box display="grid" gridTemplateColumns="1fr 3fr">
@@ -223,7 +262,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                     height="4.25rem"
                     width="4.75rem"
                   >
-                    {storedProtocol.mostRecentAnalysis != null ? (
+                    {!missingAnalysisData ? (
                       <ProtocolDeck
                         protocolAnalysis={storedProtocol.mostRecentAnalysis}
                       />
@@ -232,7 +271,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    overflowWrap="anywhere"
+                    overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   >
                     {storedProtocol.mostRecentAnalysis?.metadata
                       ?.protocolName ??
@@ -240,13 +279,18 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       storedProtocol.protocolKey}
                   </StyledText>
                 </Box>
-                {runCreationError != null && isSelected ? (
+                {(runCreationError != null || missingAnalysisData) &&
+                isSelected ? (
                   <>
                     <Box flex="1 1 auto" />
                     <Icon
                       name="alert-circle"
                       size="1.25rem"
-                      color={COLORS.errorEnabled}
+                      color={
+                        runCreationError != null
+                          ? COLORS.red50
+                          : COLORS.yellow50
+                      }
                     />
                   </>
                 ) : null}
@@ -255,8 +299,8 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
             {runCreationError != null && isSelected ? (
               <StyledText
                 as="label"
-                color={COLORS.errorText}
-                overflowWrap="anywhere"
+                color={COLORS.red60}
+                overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 display={DISPLAY_BLOCK}
                 marginTop={`-${SPACING.spacing8}`}
                 marginBottom={SPACING.spacing8}
@@ -269,7 +313,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       robotLink: (
                         <NavLink
                           css={css`
-                            color: ${COLORS.errorText};
+                            color: ${COLORS.red60};
                             text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
                           `}
                           to={`/devices/${robotName}`}
@@ -282,7 +326,38 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 )}
               </StyledText>
             ) : null}
-          </>
+            {missingAnalysisData && isSelected ? (
+              <StyledText
+                as="label"
+                color={COLORS.yellow60}
+                overflowWrap="anywhere"
+                display={DISPLAY_BLOCK}
+                marginTop={`-${SPACING.spacing8}`}
+                marginBottom={SPACING.spacing8}
+              >
+                {analysisStatus === 'stale'
+                  ? t('protocol_analysis_stale')
+                  : t('protocol_analysis_failed')}
+                {
+                  <Trans
+                    t={t}
+                    i18nKey="protocol_details_page_reanalyze"
+                    components={{
+                      navlink: (
+                        <Link
+                          to="/protocols"
+                          css={css`
+                            color: ${COLORS.yellow60};
+                            text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+                          `}
+                        />
+                      ),
+                    }}
+                  />
+                }
+              </StyledText>
+            ) : null}
+          </React.Fragment>
         )
       })}
     </Flex>
@@ -295,13 +370,13 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
       minHeight="11rem"
       padding={SPACING.spacing16}
       css={css`
-        ${BORDERS.cardOutlineBorder}
+        ${CARD_OUTLINE_BORDER_STYLE}
         &:hover {
-          border-color: ${COLORS.medGreyEnabled};
+          border-color: ${COLORS.grey30};
         }
       `}
     >
-      <Icon size="1.25rem" name="alert-circle" color={COLORS.medGreyEnabled} />
+      <Icon size="1.25rem" name="alert-circle" color={COLORS.grey30} />
       <StyledText
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

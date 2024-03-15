@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   useTrackEvent,
@@ -17,28 +18,20 @@ import {
 
 import { ProtocolOverflowMenu } from '../ProtocolOverflowMenu'
 
-jest.mock('../../../redux/analytics')
-jest.mock('../../../redux/protocol-storage')
+import type { Mock } from 'vitest'
 
-const mockHandleRunProtocol = jest.fn()
-const mockHandleSendProtocolToOT3 = jest.fn()
+vi.mock('../../../redux/analytics')
+vi.mock('../../../redux/protocol-storage')
 
-const mockViewProtocolSourceFolder = viewProtocolSourceFolder as jest.MockedFunction<
-  typeof viewProtocolSourceFolder
->
-const mockRemoveProtocol = removeProtocol as jest.MockedFunction<
-  typeof removeProtocol
->
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
+const mockHandleRunProtocol = vi.fn()
+const mockHandleSendProtocolToFlex = vi.fn()
 
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
       <ProtocolOverflowMenu
         handleRunProtocol={mockHandleRunProtocol}
-        handleSendProtocolToOT3={mockHandleSendProtocolToOT3}
+        handleSendProtocolToFlex={mockHandleSendProtocolToFlex}
         storedProtocolData={storedProtocolData}
       />
     </MemoryRouter>,
@@ -46,32 +39,32 @@ const render = () => {
   )
 }
 
-let mockTrackEvent: jest.Mock
+let mockTrackEvent: Mock
 
 describe('ProtocolOverflowMenu', () => {
   beforeEach(() => {
-    mockTrackEvent = jest.fn()
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+    mockTrackEvent = vi.fn()
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should render label when clicking overflowMenu', () => {
-    const [{ getByTestId, getByText }] = render()
-    const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
+    render()
+    const button = screen.getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    getByText('Show in folder')
-    getByText('Start setup')
-    getByText('Delete')
+    screen.getByText('Show in folder')
+    screen.getByText('Start setup')
+    screen.getByText('Delete')
   })
 
   it('should call run protocol when clicking Start setup button', () => {
-    const [{ getByTestId, getByText }] = render()
-    const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
+    render()
+    const button = screen.getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const runButton = getByText('Start setup')
+    const runButton = screen.getByText('Start setup')
     fireEvent.click(runButton)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -93,47 +86,49 @@ describe('ProtocolOverflowMenu', () => {
   })
 
   it('should call folder open function when clicking show in folder', () => {
-    const [{ getByTestId, getByText }] = render()
-    const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
+    render()
+    const button = screen.getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const folderButton = getByText('Show in folder')
+    const folderButton = screen.getByText('Show in folder')
     fireEvent.click(folderButton)
-    expect(mockViewProtocolSourceFolder).toHaveBeenCalled()
+    expect(vi.mocked(viewProtocolSourceFolder)).toHaveBeenCalled()
   })
 
   it('should render modal when clicking delete button', () => {
-    const [{ getByTestId, getByText, getByRole }] = render()
-    const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
+    render()
+    const button = screen.getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const deleteButton = getByText('Delete')
+    const deleteButton = screen.getByText('Delete')
     fireEvent.click(deleteButton)
-    getByText('Delete this protocol?')
-    getByText(
+    screen.getByText('Delete this protocol?')
+    screen.getByText(
       'This protocol will be moved to this computer’s trash and may be unrecoverable.'
     )
-    getByRole('button', { name: 'Yes, delete protocol' })
-    getByRole('button', { name: 'cancel' })
+    screen.getByRole('button', { name: 'Yes, delete protocol' })
+    screen.getByRole('button', { name: 'cancel' })
   })
 
   it('should call delete function when clicking yes button', () => {
-    const [{ getByTestId, getByText, getByRole }] = render()
-    const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
+    render()
+    const button = screen.getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const deleteButton = getByText('Delete')
+    const deleteButton = screen.getByText('Delete')
     fireEvent.click(deleteButton)
-    const yesButton = getByRole('button', { name: 'Yes, delete protocol' })
+    const yesButton = screen.getByRole('button', {
+      name: 'Yes, delete protocol',
+    })
     fireEvent.click(yesButton)
-    expect(mockRemoveProtocol).toHaveBeenCalled()
+    expect(vi.mocked(removeProtocol)).toHaveBeenCalled()
   })
 
   it('should close modal when clicking cancel button', () => {
-    const [{ getByTestId, getByText, getByRole, queryByText }] = render()
-    const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
+    render()
+    const button = screen.getByTestId('ProtocolOverflowMenu_overflowBtn')
     fireEvent.click(button)
-    const deleteButton = getByText('Delete')
+    const deleteButton = screen.getByText('Delete')
     fireEvent.click(deleteButton)
-    const cancelButton = getByRole('button', { name: 'cancel' })
+    const cancelButton = screen.getByRole('button', { name: 'cancel' })
     fireEvent.click(cancelButton)
-    expect(queryByText('Delete this protocol?')).not.toBeInTheDocument()
+    expect(screen.queryByText('Delete this protocol?')).not.toBeInTheDocument()
   })
 })

@@ -239,7 +239,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
           <Divider marginY={SPACING.spacing8} width="100%" />
           <ChosenTipRackRender selectedValue={selectedValue as SelectOption} />
           <Divider marginY={SPACING.spacing8} width="100%" />
-          <StyledText as="label" color={COLORS.darkGreyEnabled}>
+          <StyledText as="label" color={COLORS.grey50}>
             {t('calibration_on_opentrons_tips_is_important')}
           </StyledText>
         </Flex>

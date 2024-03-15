@@ -1,4 +1,5 @@
 import Ajv from 'ajv'
+import { describe, expect, it, beforeAll } from 'vitest'
 import moduleSpecsSchemaV1 from '../../module/schemas/1.json'
 import moduleSpecsV1 from '../../module/definitions/1.json'
 import moduleSpecsSchemaV2 from '../../module/schemas/2.json'

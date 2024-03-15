@@ -30,7 +30,7 @@ export function SetupInstructionsModal({
   const modalHeader: ModalHeaderBaseProps = {
     title: i18n.format(t('setup_instructions'), 'capitalize'),
     iconName: 'information',
-    iconColor: COLORS.darkBlack100,
+    iconColor: COLORS.black90,
     hasExitIcon: true,
   }
 
@@ -47,8 +47,8 @@ export function SetupInstructionsModal({
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
           <StyledText as="p">{t('setup_instructions_description')}</StyledText>
           <Flex
-            backgroundColor={COLORS.light1}
-            borderRadius={BORDERS.borderRadiusSize3}
+            backgroundColor={COLORS.grey35}
+            borderRadius={BORDERS.borderRadius12}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

@@ -220,13 +220,13 @@ const Table = styled('table')`
 `
 const TableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformUppercase};
-  color: ${COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing4};
 `
 const TableRow = styled('tr')`
-  background-color: ${COLORS.fundamentalsBackground};
+  background-color: ${COLORS.grey20};
 `
 
 const TableDatum = styled('td')`
@@ -388,13 +388,13 @@ const TerseTable = styled('table')`
   margin: ${SPACING.spacing16} 0;
   text-align: left;
   tr td:first-child {
-    border-top-left-radius: ${BORDERS.borderRadiusSize3};
-    border-bottom-left-radius: ${BORDERS.borderRadiusSize3};
+    border-top-left-radius: ${BORDERS.borderRadius12};
+    border-bottom-left-radius: ${BORDERS.borderRadius12};
     padding-left: ${SPACING.spacing12};
   }
   tr td:last-child {
-    border-top-right-radius: ${BORDERS.borderRadiusSize3};
-    border-bottom-right-radius: ${BORDERS.borderRadiusSize3};
+    border-top-right-radius: ${BORDERS.borderRadius12};
+    border-bottom-right-radius: ${BORDERS.borderRadius12};
     padding-right: ${SPACING.spacing12};
   }
 `
@@ -404,7 +404,7 @@ const TerseHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
 `
 const TerseTableRow = styled('tr')`
-  background-color: ${COLORS.light1};
+  background-color: ${COLORS.grey35};
 `
 
 const TerseTableDatum = styled('td')`

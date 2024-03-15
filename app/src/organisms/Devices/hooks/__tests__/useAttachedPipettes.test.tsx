@@ -1,42 +1,33 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { usePipettesQuery } from '@opentrons/react-api-client'
-import { getPipetteModelSpecs, PipetteModelSpecs } from '@opentrons/shared-data'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { useAttachedPipettes } from '../useAttachedPipettes'
 import {
   pipetteResponseFixtureLeft,
   pipetteResponseFixtureRight,
 } from '@opentrons/api-client'
 import type { FetchPipettesResponseBody } from '@opentrons/api-client'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('@opentrons/shared-data')
-
-const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
-  typeof usePipettesQuery
->
-const mockGetPipetteModelSpecs = getPipetteModelSpecs as jest.MockedFunction<
-  typeof getPipetteModelSpecs
->
+vi.mock('@opentrons/react-api-client')
+vi.mock('@opentrons/shared-data')
 
 describe('useAttachedPipettes hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
-    mockGetPipetteModelSpecs.mockReturnValue({
+    vi.mocked(getPipetteModelSpecs).mockReturnValue({
       name: 'mockName',
     } as PipetteModelSpecs)
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
-  })
 
   it('returns attached pipettes', () => {
-    when(mockUsePipettesQuery)
+    when(vi.mocked(usePipettesQuery))
       .calledWith({}, {})
-      .mockReturnValue({
+      .thenReturn({
         data: {
           left: pipetteResponseFixtureLeft,
           right: pipetteResponseFixtureRight,
@@ -57,9 +48,9 @@ describe('useAttachedPipettes hook', () => {
   })
 
   it('returns attached pipettes polled every 5 seconds if poll true', () => {
-    when(mockUsePipettesQuery)
+    when(vi.mocked(usePipettesQuery))
       .calledWith({}, { refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: {
           left: pipetteResponseFixtureLeft,
           right: pipetteResponseFixtureRight,

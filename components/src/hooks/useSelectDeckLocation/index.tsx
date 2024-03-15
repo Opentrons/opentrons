@@ -1,14 +1,25 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
-
+import { useTranslation } from 'react-i18next'
 import {
+  CutoutConfig,
   FLEX_CUTOUT_BY_SLOT_ID,
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getPositionFromSlotId,
+  getFixtureDisplayName,
   isAddressableAreaStandardSlot,
+  OT2_ROBOT_TYPE,
+  AddressableArea,
+  CoordinateTuple,
+  CutoutFixtureId,
 } from '@opentrons/shared-data'
-
 import {
+  DeckFromLayers,
+  LegacyDeckSlotLocation,
+  OT2_FIXED_TRASH_X_DIMENSION,
+  OT2_FIXED_TRASH_Y_DIMENSION,
   RobotCoordinateSpace,
   RobotCoordsForeignDiv,
   SingleSlotFixture,
@@ -17,7 +28,8 @@ import {
 import { Icon } from '../../icons'
 import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { COLORS, SPACING } from '../../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 
 import type {
   DeckDefinition,
@@ -30,6 +42,17 @@ export type DeckLocationSelectThemes = 'default' | 'grey'
 const X_CROP_MM = 0
 const X_ADJUSTMENT_FOR_TC = '-50'
 const Y_ADJUSTMENT_FOR_TC = '214'
+
+const OT2_DECK_LOCATION_SELECT_LAYER_BLOCK_LIST: string[] = [
+  'calibrationMarkings',
+  'fixedBase',
+  'doorStops',
+  'metalFrame',
+  'removalHandle',
+  'removableDeckOutline',
+  'screwHoles',
+  'slotNumbers',
+]
 
 export function useDeckLocationSelect(
   robotType: RobotType,
@@ -57,17 +80,55 @@ interface DeckLocationSelectProps {
   selectedLocation: ModuleLocation
   theme?: DeckLocationSelectThemes
   setSelectedLocation?: (loc: ModuleLocation) => void
-  disabledLocations?: ModuleLocation[]
+  availableSlotNames?: string[]
+  occupiedCutouts?: CutoutConfig[]
   isThermocycler?: boolean
+  showTooltipOnDisabled?: boolean
 }
+
 export function DeckLocationSelect({
   deckDef,
   selectedLocation,
   setSelectedLocation,
-  disabledLocations = [],
+  availableSlotNames,
+  occupiedCutouts = [],
   theme = 'default',
   isThermocycler = false,
+  showTooltipOnDisabled = false,
 }: DeckLocationSelectProps): JSX.Element {
+  const robotType = deckDef.robot.model
+
+  const { t } = useTranslation('module_wizard_flows')
+
+  const [hoveredData, setHoveredData] = React.useState<{
+    slot: AddressableArea
+    slotPosition: CoordinateTuple | null
+    isDisabled: boolean
+    disabledReason?: CutoutFixtureId | null
+  } | null>(null)
+
+  const handleMouseEnter = (
+    slot: AddressableArea,
+    slotPosition: CoordinateTuple | null,
+    isDisabled: boolean,
+    disabledReason?: CutoutFixtureId | null
+  ): void => {
+    if (isDisabled) {
+      setHoveredData({
+        slot: slot,
+        slotPosition: slotPosition,
+        isDisabled: isDisabled,
+        disabledReason: disabledReason,
+      })
+    } else {
+      setHoveredData(null)
+    }
+  }
+
+  const handleMouseLeave = (): void => {
+    setHoveredData(null)
+  }
+
   return (
     <RobotCoordinateSpace
       viewBox={`${deckDef.cornerOffsetFromOrigin[0] + X_CROP_MM} ${
@@ -76,26 +137,29 @@ export function DeckLocationSelect({
     >
       {deckDef.locations.addressableAreas
         // only render standard slot fixture components
-        .filter(addressableArea =>
-          isAddressableAreaStandardSlot(addressableArea.id, deckDef)
+        .filter(
+          addressableArea =>
+            isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
+            // special case the OT-2 trash addressable area
+            addressableArea.id === 'fixedTrash'
         )
         .map(slot => {
           const slotLocation = { slotName: slot.id }
-          const isDisabled = disabledLocations.some(
-            l =>
-              typeof l === 'object' && 'slotName' in l && l.slotName === slot.id
-          )
+          const isDisabled =
+            availableSlotNames !== undefined
+              ? !availableSlotNames.some(slotName => slotName === slot.id)
+              : false
+
+          const disabledReason =
+            occupiedCutouts.find(
+              cutout =>
+                FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutout.cutoutId] === slot.id
+            )?.cutoutFixtureId ?? null
           const isSelected = isEqual(selectedLocation, slotLocation)
-          let fill =
-            theme === 'default'
-              ? COLORS.highlightPurple2
-              : COLORS.lightGreyPressed
+          let fill = theme === 'default' ? COLORS.purple35 : COLORS.grey35
           if (isSelected)
-            fill =
-              theme === 'default'
-                ? COLORS.highlightPurple1
-                : COLORS.darkGreyEnabled
-          if (isDisabled) fill = COLORS.darkGreyDisabled
+            fill = theme === 'default' ? COLORS.purple50 : COLORS.grey50
+          if (isDisabled) fill = COLORS.grey30
           if (isSelected && slot.id === 'B1' && isThermocycler) {
             return (
               <g key="thermocyclerSelectionArea">
@@ -129,37 +193,77 @@ export function DeckLocationSelect({
           const cutoutId = FLEX_CUTOUT_BY_SLOT_ID[slot.id]
 
           return (
-            <React.Fragment key={cutoutId}>
-              <SingleSlotFixture
-                cutoutId={cutoutId}
-                fixtureBaseColor={fill}
-                slotClipColor={COLORS.white}
-                onClick={() =>
-                  !isDisabled &&
-                  setSelectedLocation != null &&
-                  setSelectedLocation(slotLocation)
-                }
-                cursor={
-                  setSelectedLocation == null || isDisabled || isSelected
-                    ? 'default'
-                    : 'pointer'
-                }
-                deckDefinition={deckDef}
-              />
+            <React.Fragment key={slot.id}>
+              {robotType === FLEX_ROBOT_TYPE ? (
+                <>
+                  <SingleSlotFixture
+                    cutoutId={cutoutId}
+                    fixtureBaseColor={fill}
+                    slotClipColor={COLORS.white}
+                    onClick={() =>
+                      !isDisabled &&
+                      setSelectedLocation != null &&
+                      setSelectedLocation(slotLocation)
+                    }
+                    cursor={
+                      setSelectedLocation == null || isDisabled || isSelected
+                        ? 'default'
+                        : 'pointer'
+                    }
+                    deckDefinition={deckDef}
+                    onMouseEnter={() =>
+                      handleMouseEnter(
+                        slot,
+                        slotPosition,
+                        isDisabled,
+                        disabledReason
+                      )
+                    }
+                    onMouseLeave={handleMouseLeave}
+                  />
+                </>
+              ) : (
+                <LegacyDeckSlotLocation
+                  robotType={robotType}
+                  slotBaseColor={fill}
+                  slotName={slot.id}
+                  slotClipColor={COLORS.white}
+                  onClick={() =>
+                    !isDisabled &&
+                    setSelectedLocation != null &&
+                    setSelectedLocation(slotLocation)
+                  }
+                  cursor={
+                    setSelectedLocation == null || isDisabled || isSelected
+                      ? 'default'
+                      : 'pointer'
+                  }
+                />
+              )}
               {isSelected && slotPosition != null ? (
                 <RobotCoordsForeignDiv
-                  x={slotPosition[0]}
-                  y={slotPosition[1]}
-                  width={slot.boundingBox.xDimension}
-                  height={slot.boundingBox.yDimension}
+                  x={slotPosition[0] - slot.offsetFromCutoutFixture[0]}
+                  y={slotPosition[1] - slot.offsetFromCutoutFixture[1]}
+                  width={
+                    slot.id === 'fixedTrash'
+                      ? OT2_FIXED_TRASH_X_DIMENSION
+                      : slot.boundingBox.xDimension
+                  }
+                  height={
+                    slot.id === 'fixedTrash'
+                      ? OT2_FIXED_TRASH_Y_DIMENSION
+                      : slot.boundingBox.yDimension
+                  }
                   innerDivProps={INNER_DIV_PROPS}
                 >
-                  <Icon
-                    name="check-circle"
-                    size="1.5rem"
+                  <Text
                     color={COLORS.white}
-                  />
-                  <Text color={COLORS.white} fontSize="1.5rem">
+                    css={
+                      robotType === FLEX_ROBOT_TYPE
+                        ? TYPOGRAPHY.level4HeaderSemiBold
+                        : TYPOGRAPHY.bodyTextSemiBold
+                    }
+                  >
                     Selected
                   </Text>
                 </RobotCoordsForeignDiv>
@@ -167,10 +271,58 @@ export function DeckLocationSelect({
             </React.Fragment>
           )
         })}
-      <SlotLabels
-        robotType={deckDef.robot.model}
-        color={COLORS.darkGreyEnabled}
-      />
+      {robotType === OT2_ROBOT_TYPE ? (
+        <DeckFromLayers
+          robotType={robotType}
+          layerBlocklist={OT2_DECK_LOCATION_SELECT_LAYER_BLOCK_LIST}
+        />
+      ) : null}
+      <SlotLabels robotType={robotType} color={COLORS.grey50} />
+      {hoveredData != null &&
+        hoveredData.isDisabled &&
+        hoveredData.slotPosition != null &&
+        showTooltipOnDisabled && (
+          <RobotCoordsForeignDiv
+            x={
+              hoveredData.slot.id === 'A3'
+                ? hoveredData.slotPosition[0] - 50
+                : hoveredData.slotPosition[0] - 20
+            }
+            y={
+              hoveredData.slotPosition[1] +
+              hoveredData.slot.boundingBox.yDimension +
+              10
+            }
+            innerDivProps={
+              hoveredData.slot.id[0] === 'A'
+                ? {
+                    maxWidth: '25rem',
+                    maxHeight: '10rem',
+                    width: 'fit-content',
+                  }
+                : {
+                    maxWidth: '20rem',
+                    width: 'fit-content',
+                  }
+            }
+          >
+            <Text
+              color={COLORS.white}
+              fontSize="1.5rem"
+              backgroundColor={COLORS.black90}
+              padding={SPACING.spacing8}
+              borderRadius="3px"
+            >
+              {hoveredData.disabledReason != null
+                ? t('location_occupied', {
+                    fixture: getFixtureDisplayName(
+                      hoveredData.disabledReason
+                    ).toLowerCase(),
+                  })
+                : 'Slot unavailable'}
+            </Text>
+          </RobotCoordsForeignDiv>
+        )}
     </RobotCoordinateSpace>
   )
 }

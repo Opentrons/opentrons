@@ -188,15 +188,15 @@ export const StatRow = (props: StatRowProps): JSX.Element => {
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkGreyEnabled}
+          color={COLORS.grey50}
           marginX={SPACING.spacing16}
         >
           {description}
         </StyledText>
       </Flex>
       <Flex
-        backgroundColor={COLORS.darkBlackEnabled + '1A'}
-        borderRadius={BORDERS.radiusSoftCorners}
+        backgroundColor={COLORS.black90 + '1A'}
+        borderRadius={BORDERS.borderRadius4}
         height="max-content"
         paddingY={SPACING.spacing4}
         paddingX={SPACING.spacing8}

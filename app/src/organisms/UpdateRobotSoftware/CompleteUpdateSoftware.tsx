@@ -28,17 +28,17 @@ export function CompleteUpdateSoftware({
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.darkBlack20}
+        backgroundColor={COLORS.grey35}
         height="33rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
       >
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightBold}
-          color={COLORS.black}
+          color={COLORS.black90}
         >
           {t('update_complete')}
         </StyledText>

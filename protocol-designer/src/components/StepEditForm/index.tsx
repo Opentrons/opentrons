@@ -1,6 +1,7 @@
-import { useConditionalConfirm } from '@opentrons/components'
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
+import { useConditionalConfirm } from '@opentrons/components'
 import { actions } from '../../steplist'
 import { actions as stepsActions } from '../../ui/steps'
 import { resetScrollElements } from '../../ui/steps/utils'
@@ -63,7 +64,7 @@ const StepEditFormManager = (
     saveStepForm,
     invariantContext,
   } = props
-
+  const { t } = useTranslation('tooltip')
   const [
     showMoreOptionsModal,
     setShowMoreOptionsModal,
@@ -72,14 +73,11 @@ const StepEditFormManager = (
   const [dirtyFields, setDirtyFields] = React.useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
   )
-
   const toggleMoreOptionsModal = (): void => {
     resetScrollElements()
     setShowMoreOptionsModal(!showMoreOptionsModal)
   }
-
   const focus = setFocusedField
-
   const blur = (fieldName: StepFieldName): void => {
     if (fieldName === focusedField) {
       setFocusedField(null)
@@ -88,7 +86,6 @@ const StepEditFormManager = (
       setDirtyFields([...dirtyFields, fieldName])
     }
   }
-
   const stepId = formData?.id
   const handleDelete = (): void => {
     if (stepId != null) {
@@ -99,19 +96,16 @@ const StepEditFormManager = (
       )
     }
   }
-
   const {
     confirm: confirmDelete,
     showConfirmation: showConfirmDeleteModal,
     cancel: cancelDelete,
   } = useConditionalConfirm(handleDelete, true)
-
   const {
     confirm: confirmClose,
     showConfirmation: showConfirmCancelModal,
     cancel: cancelClose,
   } = useConditionalConfirm(handleClose, isNewStep || formHasChanges)
-
   const {
     confirm: confirmAddPauseUntilTempStep,
     showConfirmation: showAddPauseUntilTempStepModal,
@@ -119,7 +113,6 @@ const StepEditFormManager = (
     saveSetTempFormWithAddedPauseUntilTemp,
     isPristineSetTempForm
   )
-
   const {
     confirm: confirmAddPauseUntilHeaterShakerTempStep,
     showConfirmation: showAddPauseUntilHeaterShakerTempStepModal,
@@ -127,26 +120,23 @@ const StepEditFormManager = (
     saveHeaterShakerFormWithAddedPauseUntilTemp,
     isPristineSetHeaterShakerTempForm
   )
-
   // no form selected
   if (formData == null) {
     return null
   }
-
   const hydratedForm = getHydratedForm(formData, invariantContext)
-
   const focusHandlers = {
     focusedField,
     dirtyFields,
     focus,
     blur,
   }
-
   const propsForFields = makeSingleEditFieldProps(
     focusHandlers,
     formData,
     handleChangeFormInput,
-    hydratedForm
+    hydratedForm,
+    t
   )
   let handleSave = saveStepForm
   if (isPristineSetTempForm) {

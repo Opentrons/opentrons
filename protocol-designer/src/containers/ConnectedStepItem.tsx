@@ -41,10 +41,11 @@ import {
 
 import { SubstepIdentifier } from '../steplist/types'
 import { StepIdType } from '../form-types'
-import { ThunkAction } from '../types'
+import { BaseState, ThunkAction } from '../types'
 import { getAdditionalEquipmentEntities } from '../step-forms/selectors'
+import { ThunkDispatch } from 'redux-thunk'
 
-interface Props {
+export interface ConnectedStepItemProps {
   stepId: StepIdType
   stepNumber: number
   onStepContextMenu?: () => void
@@ -65,7 +66,9 @@ const getMouseClickKeyInfo = (
   return { isShiftKeyPressed, isMetaKeyPressed }
 }
 
-export const ConnectedStepItem = (props: Props): JSX.Element => {
+export const ConnectedStepItem = (
+  props: ConnectedStepItemProps
+): JSX.Element => {
   const { stepId, stepNumber } = props
 
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
@@ -116,7 +119,7 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
   )
 
   // Actions
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
 
   const highlightSubstep = (payload: SubstepIdentifier): HoverOnSubstepAction =>
     dispatch(stepsActions.hoverOnSubstep(payload))
@@ -244,7 +247,6 @@ export const ConnectedStepItem = (props: Props): JSX.Element => {
         />
       )}
       <StepItem {...stepItemProps} onStepContextMenu={props.onStepContextMenu}>
-        {/* @ts-expect-error(sa, 2021-6-21): StepItemContents might return a list of JSX elements */}
         <StepItemContents {...stepItemContentsProps} />
       </StepItem>
     </>

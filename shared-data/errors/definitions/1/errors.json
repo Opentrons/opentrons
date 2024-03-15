@@ -114,6 +114,10 @@
       "detail": "Execution Cancelled",
       "category": "roboticsControlError"
     },
+    "2015": {
+      "detail": "Gripper Pickup Failed",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"

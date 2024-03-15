@@ -1,0 +1,72 @@
+name: Analyses Snapshot Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      TARGET:
+        description: 'Target branch or tag'
+        required: true
+        default: 'edge'
+      TEST_SOURCE:
+        description: 'Target for the test code'
+        required: true
+        default: 'edge'
+  schedule:
+    - cron:  '26 7 * * *' # 7:26 AM UTC
+
+jobs:
+  build-and-test:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    env:
+      TARGET: ${{ github.event.inputs.TARGET || 'edge' }}
+      TEST_SOURCE: ${{ github.event.inputs.TEST_SOURCE || 'edge' }}
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ env.TEST_SOURCE }}
+
+    - name: Docker Build
+      working-directory: app-testing
+      run: make build-opentrons-analysis
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pipenv'
+        cache-dependency-path: app-testing/Pipfile.lock
+
+    - name: Setup Python Dependencies
+      working-directory: app-testing
+      run: make setup
+
+    - name: Run Test
+      id: run_test
+      working-directory: app-testing
+      run: make snapshot-test
+
+    - name: Upload Report
+      if: '!cancelled()'
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report
+        path: app-testing/results/
+
+    - name: Handle Test Failure
+      if: failure()
+      working-directory: app-testing
+      run: make snapshot-test-update
+
+    - name: Create Snapshot update Request
+      if: failure()
+      uses: peter-evans/create-pull-request@v5
+      with:
+          commit-message: 'fix(app-testing): snapshot failure capture'
+          title: 'Evaluate Analyses Snapshot Update ${{ env.TARGET }}'
+          body: 'This PR is an automated snapshot update request. Please review the changes and merge if they are acceptable or find you bug and fix it.'
+          branch: 'app-testing/${{ env.TARGET }}-from-${{ env.TEST_SOURCE}}'
+          base: ${{ env.TEST_SOURCE}}
+

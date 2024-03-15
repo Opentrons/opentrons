@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { RunTimeCommand } from '@opentrons/shared-data'
 import {
   Flex,
@@ -12,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { Tooltip } from '../../atoms/Tooltip'
-import { Portal } from '../../App/portal'
+import { getModalPortalEl } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { useTranslation } from 'react-i18next'
 import type { IconName } from '@opentrons/components'
@@ -71,7 +72,7 @@ export function Tick(props: TickProps): JSX.Element {
       backgroundColor={COLORS.white}
       fontSize="9px"
       borderRadius="4px"
-      border={`${COLORS.blueEnabled} 1px solid`}
+      border={`${COLORS.blue50} 1px solid`}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       height="0.75rem"
@@ -82,7 +83,7 @@ export function Tick(props: TickProps): JSX.Element {
       transform={`translateX(-${percent}%)`}
     >
       <StyledText as="h6">{isAggregatedTick ? count : null}</StyledText>
-      <Portal>
+      {createPortal(
         <Tooltip tooltipProps={tooltipProps}>
           <Flex
             padding={SPACING.spacing2}
@@ -108,8 +109,9 @@ export function Tick(props: TickProps): JSX.Element {
               ) : null}
             </Flex>
           </Flex>
-        </Tooltip>
-      </Portal>
+        </Tooltip>,
+        getModalPortalEl()
+      )}
     </Flex>
   )
 }

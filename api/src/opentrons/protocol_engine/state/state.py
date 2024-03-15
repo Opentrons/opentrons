@@ -174,7 +174,8 @@ class StateStore(StateView, ActionHandler):
             deck_definition=deck_definition,
         )
         self._module_store = ModuleStore(
-            module_calibration_offsets=module_calibration_offsets
+            config=config,
+            module_calibration_offsets=module_calibration_offsets,
         )
         self._liquid_store = LiquidStore()
         self._tip_store = TipStore()

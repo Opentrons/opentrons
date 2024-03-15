@@ -86,6 +86,7 @@ stages:
             status: completed
             result: ok
             robotType: OT-3 Standard
+            runTimeParameters: []
             pipettes:
               - id: pipetteId
                 pipetteName: p1000_96
@@ -542,6 +543,7 @@ stages:
                 status: succeeded
                 params:
                   pipetteId: pipetteId
+                  failOnNotHomed: true
                 result:
                   positionId: !anystr
                   position:
@@ -574,6 +576,7 @@ stages:
                 params:
                   pipetteId: pipetteId
                   positionId: positionId
+                  failOnNotHomed: true
                 result:
                   positionId: positionId
                   position:

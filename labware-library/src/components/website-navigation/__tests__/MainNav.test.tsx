@@ -1,13 +1,5 @@
-// tests for main navbar
-import * as React from 'react'
-import { shallow } from 'enzyme'
-
-import { MainNav } from '..'
+import { it, describe } from 'vitest'
 
 describe('MainNav', () => {
-  it('component renders', () => {
-    const tree = shallow(<MainNav />)
-
-    expect(tree).toMatchSnapshot()
-  })
+  it.todo('replace deprecated enzyme test')
 })

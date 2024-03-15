@@ -24,6 +24,9 @@ interface ModalProps extends StyleProps {
   /** see ModalHeader component for more details */
   header?: ModalHeaderBaseProps
 }
+/**
+ * For ODD use only.
+ */
 export function Modal(props: ModalProps): JSX.Element {
   const {
     modalSize = 'medium',
@@ -58,12 +61,12 @@ export function Modal(props: ModalProps): JSX.Element {
         width={modalWidth}
         height="max-content"
         maxHeight="36.875rem"
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
         boxShadow={BORDERS.shadowSmall}
         margin={SPACING.spacing32}
         flexDirection={DIRECTION_COLUMN}
         aria-label={`modal_${modalSize}`}
-        onClick={e => {
+        onClick={(e: React.MouseEvent) => {
           e.stopPropagation()
         }}
       >
@@ -77,8 +80,8 @@ export function Modal(props: ModalProps): JSX.Element {
           paddingTop={header != null ? '0rem' : SPACING.spacing32}
           borderRadius={
             header != null
-              ? `0px 0px ${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3}`
-              : BORDERS.borderRadiusSize3
+              ? `0px 0px ${BORDERS.borderRadius12} ${BORDERS.borderRadius12}`
+              : BORDERS.borderRadius12
           }
           maxHeight="30.625rem"
           {...styleProps}

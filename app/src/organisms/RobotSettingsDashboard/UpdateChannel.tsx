@@ -33,10 +33,10 @@ const SettingButton = styled.input`
 
 const SettingButtonLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize4};
+  border-radius: ${BORDERS.borderRadius16};
   cursor: pointer;
   background: ${({ isSelected }) =>
-    isSelected === true ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
+    isSelected === true ? COLORS.blue50 : COLORS.blue35};
   color: ${({ isSelected }) => isSelected === true && COLORS.white};
 `
 
@@ -112,9 +112,7 @@ export function UpdateChannel({
                     lineHeight={TYPOGRAPHY.lineHeight36}
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                     color={
-                      radio.value === channel
-                        ? COLORS.white
-                        : COLORS.darkBlack70
+                      radio.value === channel ? COLORS.white : COLORS.grey60
                     }
                   >
                     {t('alpha_description')}

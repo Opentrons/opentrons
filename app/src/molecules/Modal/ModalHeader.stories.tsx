@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { COLORS } from '@opentrons/components/src/ui-style-constants'
+import { COLORS } from '@opentrons/components'
 import { touchScreenViewport } from '../../DesignTokens/constants'
 import { ModalHeader } from './ModalHeader'
 import type { Story, Meta } from '@storybook/react'
@@ -15,10 +15,10 @@ export default {
       control: {
         type: 'color',
         presetColors: [
-          COLORS.black,
-          COLORS.fundamentalsFocus,
-          COLORS.red2,
-          COLORS.successText,
+          COLORS.black90,
+          COLORS.blue50,
+          COLORS.red50,
+          COLORS.green60,
         ],
       },
     },
@@ -35,5 +35,5 @@ Default.args = {
   title: 'Header',
   hasExitIcon: true,
   iconName: 'information',
-  iconColor: COLORS.black,
+  iconColor: COLORS.black90,
 }

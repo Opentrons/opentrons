@@ -109,16 +109,24 @@ def test_liquid_height() -> None:
     # set height, get volumes
     tracker.set_start_volume_from_liquid_height(well, liquid_height=0)
     assert round(tracker.get_volume(well), 2) == 0
-    tracker.set_start_volume_from_liquid_height(well, liquid_height=1)
-    assert round(tracker.get_volume(well), 2) == 36.96
+    tracker.set_start_volume_from_liquid_height(well, liquid_height=0.3)
+    assert round(tracker.get_volume(well), 2) == 10
+    tracker.set_start_volume_from_liquid_height(well, liquid_height=0.6)
+    assert round(tracker.get_volume(well), 2) == 20
+    tracker.set_start_volume_from_liquid_height(well, liquid_height=0.95)
+    assert round(tracker.get_volume(well), 2) == 30
+    tracker.set_start_volume_from_liquid_height(well, liquid_height=1.3)
+    assert round(tracker.get_volume(well), 2) == 40
     tracker.set_start_volume_from_liquid_height(well, liquid_height=10)
-    assert round(tracker.get_volume(well), 2) == 369.61
+    assert round(tracker.get_volume(well), 2) == 340.0
+    tracker.set_start_volume_from_liquid_height(well, liquid_height=10.5)
+    assert round(tracker.get_volume(well), 2) == 360.0
 
     # get height
-    assert round(tracker.get_liquid_height(well), 2) == 10
-    tracker.update_well_volume(well, after_aspirate=(369.61 - 36.96))
-    assert round(tracker.get_volume(well), 2) == 36.96
-    assert round(tracker.get_liquid_height(well), 2) == 1
+    assert round(tracker.get_liquid_height(well), 2) == 10.5
+    tracker.update_well_volume(well, after_aspirate=(360 - 41.777))
+    assert round(tracker.get_volume(well), 2) == 41.78
+    assert round(tracker.get_liquid_height(well), 2) == 1.35
     tracker.update_well_volume(well, after_aspirate=tracker.get_volume(well))
     assert round(tracker.get_volume(well), 2) == 0
     assert round(tracker.get_liquid_height(well), 2) == 0
@@ -129,15 +137,17 @@ def test_liquid_height() -> None:
     tracker.set_start_volume_from_liquid_height(well, liquid_height=0)
     assert round(tracker.get_volume(well), 2) == 0
     tracker.set_start_volume_from_liquid_height(well, liquid_height=1)
-    assert round(tracker.get_volume(well), 2) == 583.84
+    assert round(tracker.get_volume(well), 2) == 300
     tracker.set_start_volume_from_liquid_height(well, liquid_height=10)
-    assert round(tracker.get_volume(well), 2) == 5838.4
+    assert round(tracker.get_volume(well), 2) == 4802
+    tracker.set_start_volume_from_liquid_height(well, liquid_height=10.5)
+    assert round(tracker.get_volume(well), 2) == ((5378 - 4802) / 2) + 4802
 
     # get height
-    assert round(tracker.get_liquid_height(well), 2) == 10
-    tracker.update_well_volume(well, after_aspirate=(5838.4 - 583.84))
+    assert round(tracker.get_liquid_height(well), 2) == 10.5
+    tracker.update_well_volume(well, after_aspirate=(tracker.get_volume(well) - 583.84))
     assert round(tracker.get_volume(well), 2) == 583.84
-    assert round(tracker.get_liquid_height(well), 2) == 1
+    assert round(tracker.get_liquid_height(well), 2) == 1.95
     tracker.update_well_volume(well, after_aspirate=tracker.get_volume(well))
     assert round(tracker.get_volume(well), 2) == 0
     assert round(tracker.get_liquid_height(well), 2) == 0

@@ -6518,6 +6518,123 @@
       "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
+    "p1000_single_v3.6": {
+      "name": "p1000_single_flex",
+      "backCompatNames": [],
+      "top": {
+        "value": 0.5,
+        "min": 0,
+        "max": 45,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 71.5,
+        "min": 10,
+        "max": 65,
+        "type": "float",
+        "units": "mm"
+      },
+      "blowout": {
+        "value": 76.5,
+        "min": 20,
+        "max": 75,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": 90.5,
+        "min": 30,
+        "max": 80,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpCurrent": {
+        "value": 0.15,
+        "min": 0.05,
+        "max": 2.0,
+        "units": "amps",
+        "type": "float"
+      },
+      "pickUpDistance": {
+        "value": 13,
+        "min": 1,
+        "max": 30,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 0.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 1,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 5,
+        "min": 1,
+        "max": 30,
+        "units": "mm/s",
+        "type": "float"
+      },
+      "nozzleOffset": [-8.0, -22.0, -259.15],
+      "modelOffset": [0.0, 0.0, 25.14],
+      "ulPerMm": [
+        {
+          "aspirate": [
+            [0.7511, 3.9556, 6.455],
+            [1051.4648, 0.00006824, 15.391]
+          ],
+          "dispense": [
+            [0.7511, 3.9556, 6.455],
+            [1051.4648, 0.00006824, 15.391]
+          ]
+        }
+      ],
+      "plungerCurrent": {
+        "value": 1.0,
+        "min": 0.1,
+        "max": 1.5,
+        "units": "amps",
+        "type": "float"
+      },
+      "dropTipCurrent": {
+        "value": 1.0,
+        "min": 0.1,
+        "max": 1.25,
+        "units": "amps",
+        "type": "float"
+      },
+      "dropTipSpeed": {
+        "value": 7,
+        "min": 0.001,
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
+      },
+      "tipOverlap": {
+        "default": 10.5,
+        "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5
+      },
+      "tipLength": {
+        "value": 78.3,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      },
+      "quirks": [],
+      "returnTipHeight": 0.71,
+      "idleCurrent": 0.3
+    },
     "p50_single_v3.0": {
       "name": "p50_single_flex",
       "backCompatNames": [],

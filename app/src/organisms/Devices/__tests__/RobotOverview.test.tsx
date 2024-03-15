@@ -1,12 +1,11 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
-import {
-  mockOT3HealthResponse,
-  mockOT3ServerHealthResponse,
-} from '@opentrons/discovery-client/src/__fixtures__'
+import { when } from 'vitest-when'
+import { screen, fireEvent } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
+import * as DiscoveryClientFixtures from '../../../../../discovery-client/src/fixtures'
 import { useAuthorization } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
@@ -49,20 +48,27 @@ import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import type { Config } from '../../../redux/config/types'
 import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
 import type { State } from '../../../redux/types'
+import type * as ReactApiClient from '@opentrons/react-api-client'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../redux/robot-controls')
-jest.mock('../../../redux/robot-update/selectors')
-jest.mock('../../../redux/config')
-jest.mock('../../../redux/discovery/selectors')
-jest.mock('../../ProtocolUpload/hooks')
-jest.mock('../hooks')
-jest.mock('../RobotStatusHeader')
-jest.mock('../../UpdateRobotBanner')
-jest.mock('../RobotOverviewOverflowMenu')
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = importOriginal<typeof ReactApiClient>()
+  return await {
+    ...actual,
+    useAuthorization: vi.fn(),
+  }
+})
+vi.mock('../../../redux/robot-controls')
+vi.mock('../../../redux/robot-update/selectors')
+vi.mock('../../../redux/config')
+vi.mock('../../../redux/discovery/selectors')
+vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../hooks')
+vi.mock('../RobotStatusHeader')
+vi.mock('../../UpdateRobotBanner')
+vi.mock('../RobotOverviewOverflowMenu')
 
-const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
-const FLEX_PNG_FILE_NAME = 'FLEX.png'
+const OT2_PNG_FILE_NAME = '/app/src/assets/images/OT2-R_HERO.png'
+const FLEX_PNG_FILE_NAME = '/app/src/assets/images/FLEX.png'
 
 const MOCK_STATE: State = {
   discovery: {
@@ -71,8 +77,8 @@ const MOCK_STATE: State = {
       [mockConnectableRobot.name]: mockConnectableRobot,
       buzz: {
         name: 'buzz',
-        health: mockOT3HealthResponse,
-        serverHealth: mockOT3ServerHealthResponse,
+        health: DiscoveryClientFixtures.mockOT3HealthResponse,
+        serverHealth: DiscoveryClientFixtures.mockOT3ServerHealthResponse,
         addresses: [
           {
             ip: '10.0.0.4',
@@ -90,50 +96,7 @@ const MOCK_STATE: State = {
   },
 } as any
 
-const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction<
-  typeof useCalibrationTaskList
->
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
->
-const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
-const mockRobotStatusHeader = RobotStatusHeader as jest.MockedFunction<
-  typeof RobotStatusHeader
->
-const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
-  typeof UpdateRobotBanner
->
-const mockRobotOverviewOverflowMenu = RobotOverviewOverflowMenu as jest.MockedFunction<
-  typeof RobotOverviewOverflowMenu
->
-const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
-  typeof useRunStatuses
->
-const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof getRobotUpdateDisplayInfo
->
-const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
-  typeof getRobotModelByName
->
-const mockGetRobotAddressesByName = getRobotAddressesByName as jest.MockedFunction<
-  typeof getRobotAddressesByName
->
-const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
-const mockUseAuthorization = useAuthorization as jest.MockedFunction<
-  typeof useAuthorization
->
-const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
-  typeof useIsRobotViewable
->
-
-const mockToggleLights = jest.fn()
+const mockToggleLights = vi.fn()
 
 const render = (props: React.ComponentProps<typeof RobotOverview>) => {
   return renderWithProviders(
@@ -152,102 +115,100 @@ describe('RobotOverview', () => {
 
   beforeEach(() => {
     props = { robotName: mockConnectableRobot.name }
-    mockUseRunStatuses.mockReturnValue({
+    vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,
     })
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'reinstall',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
-    mockUseFeatureFlag.mockReturnValue(false)
-    mockUseIsRobotBusy.mockReturnValue(false)
-    mockUseLights.mockReturnValue({
+    vi.mocked(useCalibrationTaskList).mockReturnValue(expectedTaskList)
+    vi.mocked(useFeatureFlag).mockReturnValue(false)
+    vi.mocked(useIsRobotBusy).mockReturnValue(false)
+    vi.mocked(useLights).mockReturnValue({
       lightsOn: false,
       toggleLights: mockToggleLights,
     })
-    mockUseRobot.mockReturnValue(mockConnectableRobot)
-    mockRobotStatusHeader.mockReturnValue(<div>Mock RobotStatusHeader</div>)
-    mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
-    mockUseCurrentRunId.mockReturnValue(null)
-    mockRobotOverviewOverflowMenu.mockReturnValue(
+    vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
+    vi.mocked(RobotStatusHeader).mockReturnValue(
+      <div>Mock RobotStatusHeader</div>
+    )
+    vi.mocked(UpdateRobotBanner).mockReturnValue(
+      <div>Mock UpdateRobotBanner</div>
+    )
+    vi.mocked(useCurrentRunId).mockReturnValue(null)
+    vi.mocked(RobotOverviewOverflowMenu).mockReturnValue(
       <div>mock RobotOverviewOverflowMenu</div>
     )
-    when(mockGetRobotModelByName)
+    when(getRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
-      .mockReturnValue('OT-2')
-    when(mockGetRobotAddressesByName)
+      .thenReturn('OT-2')
+    when(getRobotAddressesByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
-      .mockReturnValue([])
-    when(mockGetConfig)
-      .calledWith(MOCK_STATE)
-      .mockReturnValue({
-        support: { userId: 'opentrons-robot-user' },
-      } as Config)
-    when(mockUseAuthorization)
+      .thenReturn([])
+    vi.mocked(getConfig).mockReturnValue({
+      support: { userId: 'opentrons-robot-user' },
+    } as Config)
+    when(useAuthorization)
       .calledWith({
         subject: 'Opentrons',
         agent: 'com.opentrons.app',
         agentId: 'opentrons-robot-user',
       })
-      .mockReturnValue({
+      .thenReturn({
         authorizationToken: { token: 'my.authorization.jwt' },
         registrationToken: { token: 'my.registration.jwt' },
       })
-    when(mockUseIsRobotViewable).mockReturnValue(true)
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.mocked(useIsRobotViewable).mockReturnValue(true)
   })
 
   it('renders an OT-2 image', () => {
-    const [{ getByRole }] = render(props)
-    const image = getByRole('img')
+    render(props)
+    const image = screen.getByRole('img')
     expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
   })
 
-  it('renders an OT-3 image', () => {
-    when(mockGetRobotModelByName)
+  it('renders a Flex image', () => {
+    when(getRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
-      .mockReturnValue('Opentrons Flex')
-    const [{ getByRole }] = render(props)
-    const image = getByRole('img')
+      .thenReturn('Opentrons Flex')
+    render(props)
+    const image = screen.getByRole('img')
     expect(image.getAttribute('src')).toEqual(FLEX_PNG_FILE_NAME)
   })
 
   it('renders a RobotStatusHeader component', () => {
-    const [{ getByText }] = render(props)
-    getByText('Mock RobotStatusHeader')
+    render(props)
+    screen.getByText('Mock RobotStatusHeader')
   })
 
   it('renders a UpdateRobotBanner component', () => {
-    const [{ getByText }] = render(props)
-    getByText('Mock UpdateRobotBanner')
+    render(props)
+    screen.getByText('Mock UpdateRobotBanner')
   })
 
   it('does not render a calibration status label when calibration is good and the calibration wizard feature flag is set', () => {
-    mockUseFeatureFlag.mockReturnValue(true)
-    const [{ queryByRole }] = render(props)
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
     expect(
-      queryByRole('link', {
+      screen.queryByRole('link', {
         name: 'Go to calibration',
       })
     ).not.toBeInTheDocument()
   })
 
   it('renders a missing calibration status label when the calibration wizard feature flag is set', () => {
-    mockUseCalibrationTaskList.mockReturnValue(
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
       expectedIncompleteDeckCalTaskList
     )
-    mockUseFeatureFlag.mockReturnValue(true)
-    const [{ getByRole, getByText }] = render(props)
-    getByText('Robot is missing calibration data')
-    const calibrationDashboardLink = getByRole('link', {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
+    screen.getByText('Robot is missing calibration data')
+    const calibrationDashboardLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
     expect(calibrationDashboardLink.getAttribute('href')).toEqual(
@@ -256,23 +217,23 @@ describe('RobotOverview', () => {
   })
 
   it('does not render a missing calibration status label when the robot is not viewable', () => {
-    mockUseCalibrationTaskList.mockReturnValue(
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
       expectedIncompleteDeckCalTaskList
     )
-    mockUseFeatureFlag.mockReturnValue(true)
-    when(mockUseIsRobotViewable).mockReturnValue(false)
-    const [{ queryByText }] = render(props)
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    vi.mocked(useIsRobotViewable).mockReturnValue(false)
+    render(props)
     expect(
-      queryByText('Robot is missing calibration data')
+      screen.queryByText('Robot is missing calibration data')
     ).not.toBeInTheDocument()
   })
 
   it('renders a recommended recalibration status label when the deck is bad and calibration wizard feature flag is set', () => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedBadDeckTaskList)
-    mockUseFeatureFlag.mockReturnValue(true)
-    const [{ getByRole, getByText }] = render(props)
-    getByText('Recalibration recommended')
-    const calibrationDashboardLink = getByRole('link', {
+    vi.mocked(useCalibrationTaskList).mockReturnValue(expectedBadDeckTaskList)
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
+    screen.getByText('Recalibration recommended')
+    const calibrationDashboardLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
     expect(calibrationDashboardLink.getAttribute('href')).toEqual(
@@ -281,13 +242,13 @@ describe('RobotOverview', () => {
   })
 
   it('renders a recommended recalibration status label when both the deck and offset is bad and the calibration wizard feature flag is set', () => {
-    mockUseCalibrationTaskList.mockReturnValue(
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
       expectedBadDeckAndPipetteOffsetTaskList
     )
-    mockUseFeatureFlag.mockReturnValue(true)
-    const [{ getByRole, getByText }] = render(props)
-    getByText('Recalibration recommended')
-    const calibrationDashboardLink = getByRole('link', {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
+    screen.getByText('Recalibration recommended')
+    const calibrationDashboardLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
     expect(calibrationDashboardLink.getAttribute('href')).toEqual(
@@ -296,11 +257,13 @@ describe('RobotOverview', () => {
   })
 
   it('renders a recommended recalibration status label when everything is bad and the calibration wizard feature flag is set', () => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedBadEverythingTaskList)
-    mockUseFeatureFlag.mockReturnValue(true)
-    const [{ getByRole, getByText }] = render(props)
-    getByText('Recalibration recommended')
-    const calibrationDashboardLink = getByRole('link', {
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
+      expectedBadEverythingTaskList
+    )
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
+    screen.getByText('Recalibration recommended')
+    const calibrationDashboardLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
     expect(calibrationDashboardLink.getAttribute('href')).toEqual(
@@ -309,11 +272,13 @@ describe('RobotOverview', () => {
   })
 
   it('renders a recommended recalibration status label when the offset is bad and calibration wizard feature flag is set', () => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedBadPipetteOffsetTaskList)
-    mockUseFeatureFlag.mockReturnValue(true)
-    const [{ getByRole, getByText }] = render(props)
-    getByText('Recalibration recommended')
-    const calibrationDashboardLink = getByRole('link', {
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
+      expectedBadPipetteOffsetTaskList
+    )
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
+    screen.getByText('Recalibration recommended')
+    const calibrationDashboardLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
     expect(calibrationDashboardLink.getAttribute('href')).toEqual(
@@ -322,11 +287,13 @@ describe('RobotOverview', () => {
   })
 
   it('renders a recommended recalibration status label when the tip length is bad and calibration wizard feature flag is set', () => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedBadTipLengthTaskList)
-    mockUseFeatureFlag.mockReturnValue(true)
-    const [{ getByRole, getByText }] = render(props)
-    getByText('Recalibration recommended')
-    const calibrationDashboardLink = getByRole('link', {
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
+      expectedBadTipLengthTaskList
+    )
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
+    screen.getByText('Recalibration recommended')
+    const calibrationDashboardLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
     expect(calibrationDashboardLink.getAttribute('href')).toEqual(
@@ -335,13 +302,13 @@ describe('RobotOverview', () => {
   })
 
   it('renders a recommended recalibration status label when both the tip length and offset is bad and the calibration wizard feature flag is set', () => {
-    mockUseCalibrationTaskList.mockReturnValue(
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
       expectedBadTipLengthAndOffsetTaskList
     )
-    mockUseFeatureFlag.mockReturnValue(true)
-    const [{ getByRole, getByText }] = render(props)
-    getByText('Recalibration recommended')
-    const calibrationDashboardLink = getByRole('link', {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
+    screen.getByText('Recalibration recommended')
+    const calibrationDashboardLink = screen.getByRole('link', {
       name: 'Go to calibration',
     })
     expect(calibrationDashboardLink.getAttribute('href')).toEqual(
@@ -350,51 +317,51 @@ describe('RobotOverview', () => {
   })
 
   it('does not render a calibration status label when robot is busy and the calibration wizard feature flag is set', () => {
-    mockUseCalibrationTaskList.mockReturnValue(
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
       expectedIncompleteDeckCalTaskList
     )
-    mockUseIsRobotBusy.mockReturnValue(true)
-    mockUseFeatureFlag.mockReturnValue(true)
-    const [{ queryByRole }] = render(props)
+    vi.mocked(useIsRobotBusy).mockReturnValue(true)
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(props)
     expect(
-      queryByRole('link', {
+      screen.queryByRole('link', {
         name: 'Go to calibration',
       })
     ).not.toBeInTheDocument()
   })
 
   it('fetches lights status', async () => {
-    mockUseLights.mockReturnValue({
+    vi.mocked(useLights).mockReturnValue({
       lightsOn: true,
       toggleLights: mockToggleLights,
     })
-    const [{ getByRole }] = render(props)
-    const toggle = getByRole('switch', { name: 'Lights' })
+    render(props)
+    const toggle = screen.getByRole('switch', { name: 'Lights' })
     expect(toggle.getAttribute('aria-checked')).toBe('true')
   })
 
   it('renders a lights toggle button', () => {
-    const [{ getByRole, getByText }] = render(props)
+    render(props)
 
-    getByText('Controls')
-    getByText('Lights')
-    const toggle = getByRole('switch', { name: 'Lights' })
-    toggle.click()
+    screen.getByText('Controls')
+    screen.getByText('Lights')
+    const toggle = screen.getByRole('switch', { name: 'Lights' })
+    fireEvent.click(toggle)
     expect(mockToggleLights).toBeCalled()
   })
 
   it('renders an overflow menu for the robot overview', () => {
-    const [{ getByText }] = render(props)
+    render(props)
 
-    getByText('mock RobotOverviewOverflowMenu')
+    screen.getByText('mock RobotOverviewOverflowMenu')
   })
 
   it('requests a usb registration token if connected by usb', () => {
-    when(mockGetRobotAddressesByName)
+    when(getRobotAddressesByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
-      .mockReturnValue([{ ip: OPENTRONS_USB } as DiscoveryClientRobotAddress])
+      .thenReturn([{ ip: OPENTRONS_USB } as DiscoveryClientRobotAddress])
     render(props)
-    expect(mockUseAuthorization).toBeCalledWith({
+    expect(useAuthorization).toBeCalledWith({
       subject: 'Opentrons',
       agent: 'com.opentrons.app.usb',
       agentId: 'opentrons-robot-user',

@@ -1,4 +1,5 @@
 import type { OutputSelector } from 'reselect'
+import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { RootState as Analytics } from './analytics'
 import type { RootState as Dismiss } from './dismiss'
 import type { RootState as FileData } from './file-data'
@@ -43,3 +44,5 @@ export type WellVolumes = Record<string, number>
 // or special PD-specific 'span7_8_10_11' slot (for thermocycler)
 // or a module ID.
 export type DeckSlot = string
+
+export type NozzleType = NozzleConfigurationStyle | '8-channel'

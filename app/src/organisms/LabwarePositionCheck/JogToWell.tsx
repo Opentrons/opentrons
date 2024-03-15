@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
@@ -32,7 +33,7 @@ import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
 import levelProbeWithTip from '../../assets/images/lpc_level_probe_with_tip.svg'
 import levelProbeWithLabware from '../../assets/images/lpc_level_probe_with_labware.svg'
 import { getIsOnDevice } from '../../redux/config'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
@@ -97,14 +98,17 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
   }, [])
 
   let wellsToHighlight: string[] = []
-  if (getPipetteNameSpecs(pipetteName)?.channels === 8) {
+  if (
+    getPipetteNameSpecs(pipetteName)?.channels === 8 &&
+    !shouldUseMetalProbe
+  ) {
     wellsToHighlight = labwareDef.ordering[0]
   } else {
     wellsToHighlight = ['A1']
   }
 
   const wellStroke: WellStroke = wellsToHighlight.reduce(
-    (acc, wellName) => ({ ...acc, [wellName]: COLORS.blueEnabled }),
+    (acc, wellName) => ({ ...acc, [wellName]: COLORS.blue50 }),
     {}
   )
 
@@ -144,12 +148,13 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   wellStroke={wellStroke}
                   wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
                   highlightedWellLabels={{ wells: wellsToHighlight }}
-                  labwareStroke={COLORS.medGreyEnabled}
-                  wellLabelColor={COLORS.medGreyEnabled}
+                  labwareStroke={COLORS.grey30}
+                  wellLabelColor={COLORS.grey30}
                 />
                 <PipetteRender
                   labwareDef={labwareDef}
                   pipetteName={pipetteName}
+                  usingMetalProbe={shouldUseMetalProbe}
                 />
               </>
             )}
@@ -187,47 +192,48 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
               onClick={handleConfirmPosition}
             />
           </Flex>
-          <Portal level="top">
-            {showFullJogControls ? (
-              <LegacyModalShell
-                width="60rem"
-                height="33.5rem"
-                padding={SPACING.spacing32}
-                display="flex"
-                flexDirection={DIRECTION_COLUMN}
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                header={
-                  <StyledText
-                    as="h4"
-                    css={css`
-                      font-weight: ${TYPOGRAPHY.fontWeightBold};
-                      font-size: ${TYPOGRAPHY.fontSize28};
-                      line-height: ${TYPOGRAPHY.lineHeight36};
-                    `}
-                  >
-                    {t('move_to_a1_position')}
-                  </StyledText>
-                }
-                footer={
-                  <SmallButton
-                    width="100%"
-                    textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    buttonText={t('shared:close')}
-                    onClick={() => {
-                      setShowFullJogControls(false)
-                    }}
-                  />
-                }
-              >
-                <JogControls
-                  jog={(axis, direction, step, _onSuccess) =>
-                    handleJog(axis, direction, step, setJoggedPosition)
+          {showFullJogControls
+            ? createPortal(
+                <LegacyModalShell
+                  width="60rem"
+                  height="33.5rem"
+                  padding={SPACING.spacing32}
+                  display="flex"
+                  flexDirection={DIRECTION_COLUMN}
+                  justifyContent={JUSTIFY_SPACE_BETWEEN}
+                  header={
+                    <StyledText
+                      as="h4"
+                      css={css`
+                        font-weight: ${TYPOGRAPHY.fontWeightBold};
+                        font-size: ${TYPOGRAPHY.fontSize28};
+                        line-height: ${TYPOGRAPHY.lineHeight36};
+                      `}
+                    >
+                      {t('move_to_a1_position')}
+                    </StyledText>
                   }
-                  isOnDevice={true}
-                />
-              </LegacyModalShell>
-            ) : null}
-          </Portal>
+                  footer={
+                    <SmallButton
+                      width="100%"
+                      textTransform={TYPOGRAPHY.textTransformCapitalize}
+                      buttonText={t('shared:close')}
+                      onClick={() => {
+                        setShowFullJogControls(false)
+                      }}
+                    />
+                  }
+                >
+                  <JogControls
+                    jog={(axis, direction, step, _onSuccess) =>
+                      handleJog(axis, direction, step, setJoggedPosition)
+                    }
+                    isOnDevice={true}
+                  />
+                </LegacyModalShell>,
+                getTopPortalEl()
+              )
+            : null}
         </Flex>
       ) : (
         <>

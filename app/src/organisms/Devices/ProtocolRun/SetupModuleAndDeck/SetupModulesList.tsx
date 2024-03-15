@@ -11,7 +11,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
@@ -36,7 +35,7 @@ import { TertiaryButton } from '../../../../atoms/buttons'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { StyledText } from '../../../../atoms/text'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useChainLiveCommands } from '../../../../resources/runs/hooks'
+import { useChainLiveCommands } from '../../../../resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { getModulePrepCommands } from '../../getModulePrepCommands'
@@ -216,7 +215,7 @@ interface ModulesListItemProps {
   isFlex: boolean
   calibrationStatus: ProtocolCalibrationStatus
   deckDef: DeckDefinition
-  conflictedFixture?: CutoutConfig
+  conflictedFixture: CutoutConfig | null
 }
 
 export function ModulesListItem({
@@ -273,34 +272,23 @@ export function ModulesListItem({
       <Btn
         marginLeft={SPACING.spacing20}
         css={css`
-          color: ${COLORS.blueEnabled};
+          color: ${COLORS.blue50};
 
           &:hover {
-            color: ${COLORS.blueHover};
+            color: ${COLORS.blue55};
           }
         `}
         marginTop={SPACING.spacing4}
         onClick={() => setShowModuleSetupModal(true)}
       >
         <Flex flexDirection={DIRECTION_ROW}>
-          <Icon
-            name="information"
-            size="0.75rem"
-            marginTop={SPACING.spacing4}
-          />
-          <StyledText marginLeft={SPACING.spacing4} as="p">
-            {t('view_setup_instructions')}
-          </StyledText>
+          <StyledText as="p">{t('view_setup_instructions')}</StyledText>
         </Flex>
       </Btn>
     )
   } else if (moduleModel === MAGNETIC_BLOCK_V1) {
     subText = (
-      <StyledText
-        as="p"
-        marginLeft={SPACING.spacing20}
-        color={COLORS.darkGreyEnabled}
-      >
+      <StyledText as="p" marginLeft={SPACING.spacing20} color={COLORS.grey50}>
         {t('no_usb_connection_required')}
       </StyledText>
     )
@@ -319,9 +307,9 @@ export function ModulesListItem({
   let renderModuleStatus: JSX.Element = (
     <StatusLabel
       status={moduleConnectionStatus}
-      backgroundColor={COLORS.successBackgroundLight}
-      iconColor={COLORS.successEnabled}
-      textColor={COLORS.successText}
+      backgroundColor={COLORS.green30}
+      iconColor={COLORS.green60}
+      textColor={COLORS.green60}
     />
   )
 
@@ -351,9 +339,9 @@ export function ModulesListItem({
     renderModuleStatus = (
       <StatusLabel
         status={moduleConnectionStatus}
-        backgroundColor={COLORS.warningBackgroundLight}
-        iconColor={COLORS.warningEnabled}
-        textColor={COLORS.warningText}
+        backgroundColor={COLORS.yellow30}
+        iconColor={COLORS.yellow60}
+        textColor={COLORS.yellow60}
       />
     )
   }
@@ -366,7 +354,6 @@ export function ModulesListItem({
       {showLocationConflictModal && cutoutIdForSlotName != null ? (
         <LocationConflictModal
           onCloseClick={() => setShowLocationConflictModal(false)}
-          // TODO(bh, 2023-10-10): when module caddies are fixtures, narrow slotName to Cutout and remove type assertion
           cutoutId={cutoutIdForSlotName}
           requiredModule={moduleModel}
         />
@@ -384,9 +371,9 @@ export function ModulesListItem({
       ) : null}
       <Box
         border={BORDERS.styleSolid}
-        borderColor={COLORS.medGreyEnabled}
+        borderColor={COLORS.grey30}
         borderWidth="1px"
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         padding={SPACING.spacing16}
         backgroundColor={COLORS.white}
       >
@@ -434,21 +421,27 @@ export function ModulesListItem({
               >
                 <StatusLabel
                   status={t('location_conflict')}
-                  backgroundColor={COLORS.warningBackgroundLight}
-                  iconColor={COLORS.warningEnabled}
-                  textColor={COLORS.warningText}
+                  backgroundColor={COLORS.yellow30}
+                  iconColor={COLORS.yellow60}
+                  textColor={COLORS.yellow60}
                 />
                 <TertiaryButton
                   width="max-content"
                   onClick={() => setShowLocationConflictModal(true)}
                 >
                   <StyledText as="label" cursor="pointer">
-                    {t('update_deck')}
+                    {t('resolve')}
                   </StyledText>
                 </TertiaryButton>
               </Flex>
             ) : moduleModel === MAGNETIC_BLOCK_V1 ? (
-              <StyledText as="p"> {t('n_a')}</StyledText>
+              <StatusLabel
+                status={t('n_a')}
+                backgroundColor={COLORS.grey30}
+                textColor={COLORS.grey60}
+                showIcon={false}
+                capitalizeStatus={false}
+              />
             ) : (
               renderModuleStatus
             )}

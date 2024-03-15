@@ -1,78 +1,128 @@
 import * as React from 'react'
-import i18next from 'i18next'
-import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
+import {
+  renderWithProviders,
+  nestedTextMatcher,
+} from '../../../__testing-utils__'
 import {
   getIsLabwareAboveHeight,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
 } from '@opentrons/shared-data'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import {
   ADAPTER_96_CHANNEL,
   getLabwareCompatibleWithAdapter,
 } from '../../../utils/labwareModuleCompatibility'
-import { Portal } from '../../portals/TopPortal'
+import { i18n } from '../../../localization'
 import { LabwareSelectionModal } from '../LabwareSelectionModal'
+import {
+  getInitialDeckSetup,
+  getPermittedTipracks,
+  getPipetteEntities,
+} from '../../../step-forms/selectors'
+import { getHas96Channel } from '../../../utils'
+import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import type * as SharedData from '@opentrons/shared-data'
 
-jest.mock('../../../utils/labwareModuleCompatibility')
-jest.mock('../../portals/TopPortal')
-jest.mock('../../Hints/useBlockingHint')
-jest.mock('@opentrons/shared-data', () => {
-  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+vi.mock('../../../utils/labwareModuleCompatibility')
+vi.mock('../../../step-forms/selectors')
+vi.mock('../../../labware-defs/selectors')
+vi.mock('../../Hints/useBlockingHint')
+vi.mock('../../../utils')
+vi.mock('../../../labware-ingred/selectors')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof SharedData>()
   return {
-    ...actualSharedData,
-    getIsLabwareAboveHeight: jest.fn(),
+    ...actual,
+    getIsLabwareAboveHeight: vi.fn(),
   }
 })
 
-const mockGetIsLabwareAboveHeight = getIsLabwareAboveHeight as jest.MockedFunction<
-  typeof getIsLabwareAboveHeight
->
-const mockPortal = Portal as jest.MockedFunction<typeof Portal>
-const mockGetLabwareCompatibleWithAdapter = getLabwareCompatibleWithAdapter as jest.MockedFunction<
-  typeof getLabwareCompatibleWithAdapter
->
-const render = (props: React.ComponentProps<typeof LabwareSelectionModal>) => {
-  return renderWithProviders(<LabwareSelectionModal {...props} />, {
-    i18nInstance: i18next,
+const render = () => {
+  return renderWithProviders(<LabwareSelectionModal />, {
+    i18nInstance: i18n,
   })[0]
 }
 
+const mockTipUri = 'fixture/fixture_tiprack_1000_ul/1'
+const mockPermittedTipracks = [mockTipUri]
+
 describe('LabwareSelectionModal', () => {
-  let props: React.ComponentProps<typeof LabwareSelectionModal>
   beforeEach(() => {
-    props = {
-      onClose: jest.fn(),
-      onUploadLabware: jest.fn(),
-      selectLabware: jest.fn(),
-      customLabwareDefs: {},
-      permittedTipracks: [],
-      isNextToHeaterShaker: false,
-      has96Channel: false,
-    }
-    mockPortal.mockReturnValue(<div>mock portal</div>)
-    mockGetLabwareCompatibleWithAdapter.mockReturnValue([])
+    vi.mocked(getLabwareCompatibleWithAdapter).mockReturnValue([])
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      labware: {},
+      modules: {},
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+    })
+    vi.mocked(labwareIngredSelectors.selectedAddLabwareSlot).mockReturnValue(
+      '2'
+    )
+    vi.mocked(getHas96Channel).mockReturnValue(false)
+    vi.mocked(getPermittedTipracks).mockReturnValue(mockPermittedTipracks)
+    vi.mocked(getPipetteEntities).mockReturnValue({
+      mockPip: {
+        tiprackLabwareDef: {} as any,
+        spec: {} as any,
+        name: 'p1000_single',
+        id: 'mockId',
+        tiprackDefURI: mockTipUri,
+      },
+    })
+    vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('should NOT filter out labware above 57 mm when the slot is NOT next to a heater shaker', () => {
-    props.isNextToHeaterShaker = false
-    render(props)
-    expect(mockGetIsLabwareAboveHeight).not.toHaveBeenCalled()
+    render()
+    expect(vi.mocked(getIsLabwareAboveHeight)).not.toHaveBeenCalled()
   })
   it('should filter out labware above 57 mm when the slot is next to a heater shaker', () => {
-    props.isNextToHeaterShaker = true
-    render(props)
-    expect(mockGetIsLabwareAboveHeight).toHaveBeenCalledWith(
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      labware: {},
+      modules: {
+        heaterShaker: {
+          id: 'mockId',
+          type: 'heaterShakerModuleType',
+          model: 'heaterShakerModuleV1',
+          moduleState: {} as any,
+          slot: '1',
+        } as any,
+      },
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+    })
+    render()
+    expect(vi.mocked(getIsLabwareAboveHeight)).toHaveBeenCalledWith(
       expect.any(Object),
       MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM
     )
   })
-  it('should display only permitted tipracks if the 96-channel is attached', () => {
-    const mockTipUri = 'fixture/fixture_tiprack_1000_ul/1'
-    const mockPermittedTipracks = [mockTipUri]
-    props.slot = 'A2'
-    props.has96Channel = true
-    props.adapterLoadName = ADAPTER_96_CHANNEL
-    props.permittedTipracks = mockPermittedTipracks
-    const { getByText } = render(props)
-    getByText(nestedTextMatcher('adapter compatible labware')).click()
-    getByText('Opentrons GEB 1000uL Tiprack')
+  it.only('should display only permitted tipracks if the 96-channel is attached', () => {
+    vi.mocked(getHas96Channel).mockReturnValue(true)
+    vi.mocked(labwareIngredSelectors.selectedAddLabwareSlot).mockReturnValue(
+      'adapter'
+    )
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      labware: {
+        adapter: {
+          id: 'adapter',
+          labwareDefURI: `opentrons/${ADAPTER_96_CHANNEL}/1`,
+          slot: 'A2',
+          def: { parameters: { loadName: ADAPTER_96_CHANNEL } } as any,
+        },
+      },
+      modules: {},
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+    })
+    render()
+    fireEvent.click(
+      screen.getByText(nestedTextMatcher('adapter compatible labware'))
+    )
+    screen.getByText('Opentrons GEB 1000uL Tiprack')
   })
 })

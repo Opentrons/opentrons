@@ -1,0 +1,100 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "custom",
+      "params": {
+        "legacyCommandText": "Where is the point? (0,0) Origin is the point's location.",
+        "legacyCommandType": "command.COMMENT"
+      },
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "custom",
+      "params": {
+        "legacyCommandText": "Where is the point? (0,1) Y=1 and the point is on the y-axis.",
+        "legacyCommandType": "command.COMMENT"
+      },
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "custom",
+      "params": {
+        "legacyCommandText": "Where is the point? (1,0) X=1 and the point is on the x-axis.",
+        "legacyCommandType": "command.COMMENT"
+      },
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "custom",
+      "params": {
+        "legacyCommandText": "Where is the point? (1,1) The point is located somewhere else on the plane.",
+        "legacyCommandType": "command.COMMENT"
+      },
+      "result": {},
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      12
+    ],
+    "protocolType": "python"
+  },
+  "errors": [],
+  "files": [
+    {
+      "name": "OT2_None_None_2_12_Python310SyntaxRobotAnalysisOnlyError.py",
+      "role": "main"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    }
+  ],
+  "labware": [
+    {
+      "definitionUri": "opentrons/opentrons_1_trash_1100ml_fixed/1",
+      "loadName": "opentrons_1_trash_1100ml_fixed",
+      "location": {
+        "slotName": "12"
+      }
+    }
+  ],
+  "liquids": [],
+  "metadata": {
+    "apiLevel": "2.12",
+    "author": "Opentrons Engineering <engineering@opentrons.com>",
+    "description": "Python 3.10 Only",
+    "protocolName": "🛠 3.10 only Python 🛠",
+    "source": "Software Testing Team"
+  },
+  "modules": [],
+  "pipettes": [],
+  "robotType": "OT-2 Standard"
+}

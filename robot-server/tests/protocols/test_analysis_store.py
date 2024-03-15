@@ -127,6 +127,7 @@ async def test_returned_in_order_added(
         await subject.update(
             analysis_id=analysis_id,
             robot_type="OT-2 Standard",
+            run_time_parameters=[],
             labware=[],
             modules=[],
             pipettes=[],
@@ -175,6 +176,7 @@ async def test_update_adds_details_and_completes_analysis(
     await subject.update(
         analysis_id="analysis-id",
         robot_type="OT-2 Standard",
+        run_time_parameters=[],
         labware=[labware],
         pipettes=[pipette],
         # TODO(mm, 2022-10-21): Give the subject some commands, errors, and liquids here
@@ -190,8 +192,10 @@ async def test_update_adds_details_and_completes_analysis(
 
     assert result == CompletedAnalysis(
         id="analysis-id",
+        status=AnalysisStatus.COMPLETED,
         result=AnalysisResult.OK,
         robotType="OT-2 Standard",
+        runTimeParameters=[],
         labware=[labware],
         pipettes=[pipette],
         modules=[],
@@ -205,6 +209,7 @@ async def test_update_adds_details_and_completes_analysis(
         "result": "ok",
         "status": "completed",
         "robotType": "OT-2 Standard",
+        "runTimeParameters": [],
         "labware": [
             {
                 "id": "labware-id",
@@ -275,6 +280,7 @@ async def test_update_infers_status_from_errors(
     await subject.update(
         analysis_id="analysis-id",
         robot_type="OT-2 Standard",
+        run_time_parameters=[],
         commands=commands,
         errors=errors,
         labware=[],

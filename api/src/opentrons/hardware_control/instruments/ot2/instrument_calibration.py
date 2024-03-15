@@ -17,6 +17,11 @@ if typing.TYPE_CHECKING:
         LabwareDefinition as TypeDictLabwareDef,
     )
 
+# These type aliases aid typechecking in tests that work the same on this and
+# the hardware_control.instruments.ot3 variant
+SourceType = types.SourceType
+CalibrationStatus = types.CalibrationStatus
+
 
 @dataclass
 class PipetteOffsetByPipetteMount:
@@ -25,8 +30,8 @@ class PipetteOffsetByPipetteMount:
     """
 
     offset: Point
-    source: types.SourceType
-    status: types.CalibrationStatus
+    source: SourceType
+    status: CalibrationStatus
     tiprack: typing.Optional[str] = None
     uri: typing.Optional[str] = None
     last_modified: typing.Optional[datetime] = None
@@ -44,15 +49,15 @@ class PipetteOffsetCalibration:
     tiprack: str
     uri: str
     last_modified: datetime
-    source: types.SourceType
-    status: types.CalibrationStatus
+    source: SourceType
+    status: CalibrationStatus
 
 
 @dataclass
 class TipLengthCalibration:
     tip_length: float
-    source: types.SourceType
-    status: types.CalibrationStatus
+    source: SourceType
+    status: CalibrationStatus
     pipette: str
     tiprack: str
     last_modified: datetime
@@ -65,8 +70,8 @@ def load_pipette_offset(
     # load default if pipette offset data do not exist
     pip_cal_obj = PipetteOffsetByPipetteMount(
         offset=Point(*default_pipette_offset()),
-        source=types.SourceType.default,
-        status=types.CalibrationStatus(),
+        source=SourceType.default,
+        status=CalibrationStatus(),
     )
     # TODO this can be removed once we switch to using
     # ot3 pipette types in the ot3 hardware controller.
@@ -125,18 +130,15 @@ def load_tip_length_for_pipette(
         pipette_id, tiprack
     )
 
-    # TODO (lc 09-26-2022) We shouldn't have to do a hash twice. We should figure out what
-    # information we actually need from the labware definition and pass it into
-    # the `load_tip_length_calibration` function.
-    tiprack_hash = helpers.hash_labware_def(tiprack)
+    tiprack_uri = helpers.uri_from_definition(tiprack)
 
     return TipLengthCalibration(
         tip_length=tip_length_data.tipLength,
         source=tip_length_data.source,
         pipette=pipette_id,
-        tiprack=tiprack_hash,
+        tiprack=tip_length_data.definitionHash,
         last_modified=tip_length_data.lastModified,
-        uri=tip_length_data.uri,
+        uri=tiprack_uri,
         status=types.CalibrationStatus(
             markedAt=tip_length_data.status.markedAt,
             markedBad=tip_length_data.status.markedBad,

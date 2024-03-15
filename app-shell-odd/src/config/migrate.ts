@@ -1,7 +1,6 @@
 import path from 'path'
 import { app } from 'electron'
 import uuid from 'uuid/v4'
-import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/redux/config'
 
 import type {
   Config,
@@ -14,11 +13,14 @@ import type {
   ConfigV18,
   ConfigV19,
   ConfigV20,
+  ConfigV21,
 } from '@opentrons/app/src/redux/config/types'
 // format
 // base config v12 defaults
 // any default values for later config versions are specified in the migration
 // functions for those version below
+
+const CONFIG_VERSION_LATEST = 21 // update this after each config version bump
 
 export const DEFAULTS_V12: ConfigV12 = {
   version: 12,
@@ -169,6 +171,21 @@ const toVersion20 = (prevConfig: ConfigV19): ConfigV20 => {
   }
 }
 
+const toVersion21 = (prevConfig: ConfigV20): ConfigV21 => {
+  return {
+    ...prevConfig,
+    version: 21 as const,
+    onDeviceDisplaySettings: {
+      ...prevConfig.onDeviceDisplaySettings,
+      unfinishedUnboxingFlowRoute:
+        prevConfig.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute ===
+        '/dashboard'
+          ? null
+          : prevConfig.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute,
+    },
+  }
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV12) => ConfigV13,
   (prevConfig: ConfigV13) => ConfigV14,
@@ -177,7 +194,8 @@ const MIGRATIONS: [
   (prevConfig: ConfigV16) => ConfigV17,
   (prevConfig: ConfigV17) => ConfigV18,
   (prevConfig: ConfigV18) => ConfigV19,
-  (prevConfig: ConfigV19) => ConfigV20
+  (prevConfig: ConfigV19) => ConfigV20,
+  (prevConfig: ConfigV20) => ConfigV21
 ] = [
   toVersion13,
   toVersion14,
@@ -187,6 +205,7 @@ const MIGRATIONS: [
   toVersion18,
   toVersion19,
   toVersion20,
+  toVersion21,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V12)
@@ -202,6 +221,7 @@ export function migrate(
     | ConfigV18
     | ConfigV19
     | ConfigV20
+    | ConfigV21
 ): Config {
   let result = prevConfig
   // loop through the migrations, skipping any migrations that are unnecessary

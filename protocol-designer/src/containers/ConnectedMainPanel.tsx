@@ -1,36 +1,35 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Splash } from '@opentrons/components'
-import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../steplist'
-import { Portal as MainPageModalPortal } from '../components/portals/MainPageModalPortal'
+import { START_TERMINAL_ITEM_ID } from '../steplist'
+import { getMainPagePortalEl } from '../components/portals/MainPageModalPortal'
 import { DeckSetupManager } from '../components/DeckSetupManager'
-import { ConnectedFilePage } from '../containers/ConnectedFilePage'
 import { SettingsPage } from '../components/SettingsPage'
+import { FilePage } from '../components/FilePage'
 import { LiquidsPage } from '../components/LiquidsPage'
 import { Hints } from '../components/Hints'
 import { LiquidPlacementModal } from '../components/LiquidPlacementModal'
-import { LabwareSelectionModal } from '../components/LabwareSelectionModal'
+import { LabwareSelectionModal } from '../components/LabwareSelectionModal/LabwareSelectionModal'
 import { FormManager } from '../components/FormManager'
-import { TimelineAlerts } from '../components/alerts/TimelineAlerts'
-
+import { Alerts } from '../components/alerts/Alerts'
 import { getSelectedTerminalItemId } from '../ui/steps'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
-import { selectors, Page } from '../navigation'
-import { BaseState } from '../types'
+import { selectors } from '../navigation'
+import { createPortal } from 'react-dom'
 
-interface Props {
-  page: Page
-  selectedTerminalItemId: TerminalItemId | null | undefined
-  ingredSelectionMode: boolean
-}
+export function MainPanel(): JSX.Element {
+  const page = useSelector(selectors.getCurrentPage)
+  const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
+  const selectedLabware = useSelector(
+    labwareIngredSelectors.getSelectedLabwareId
+  )
+  const ingredSelectionMode = selectedLabware != null
 
-function MainPanelComponent(props: Props): JSX.Element {
-  const { page, selectedTerminalItemId, ingredSelectionMode } = props
   switch (page) {
     case 'file-splash':
       return <Splash />
     case 'file-detail':
-      return <ConnectedFilePage />
+      return <FilePage />
     case 'liquids':
       return <LiquidsPage />
     case 'settings-app':
@@ -40,29 +39,21 @@ function MainPanelComponent(props: Props): JSX.Element {
         selectedTerminalItemId === START_TERMINAL_ITEM_ID
       return (
         <>
-          <MainPageModalPortal>
-            <TimelineAlerts />
-            <Hints />
-            {startTerminalItemSelected && <LabwareSelectionModal />}
-            <FormManager />
-            {startTerminalItemSelected && ingredSelectionMode && (
-              <LiquidPlacementModal />
-            )}
-          </MainPageModalPortal>
+          {createPortal(
+            <>
+              <Alerts componentType="Timeline" />
+              <Hints />
+              {startTerminalItemSelected && <LabwareSelectionModal />}
+              <FormManager />
+              {startTerminalItemSelected && ingredSelectionMode && (
+                <LiquidPlacementModal />
+              )}
+            </>,
+            getMainPagePortalEl()
+          )}
           <DeckSetupManager />
         </>
       )
     }
   }
 }
-
-function mapStateToProps(state: BaseState): Props {
-  return {
-    page: selectors.getCurrentPage(state),
-    selectedTerminalItemId: getSelectedTerminalItemId(state),
-    ingredSelectionMode:
-      labwareIngredSelectors.getSelectedLabwareId(state) != null,
-  }
-}
-
-export const ConnectedMainPanel = connect(mapStateToProps)(MainPanelComponent)

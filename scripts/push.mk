@@ -39,7 +39,7 @@ scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) "$(4)" root@$(1):/da
 ssh $(call id-file-arg,$(2)) $(3) root@$(1) \
 "function cleanup () { rm -f /data/$(notdir $(4)) && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
-cd /usr/lib/python3.7/site-packages &&\
+cd /usr/lib/python3.10/site-packages &&\
 unzip -o /data/$(notdir $(4)) && cleanup || cleanup"
 endef
 

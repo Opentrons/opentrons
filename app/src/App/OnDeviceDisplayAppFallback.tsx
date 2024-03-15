@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '../redux/analytics'
+import { getLocalRobot, getRobotSerialNumber } from '../redux/discovery'
 
 import type { FallbackProps } from 'react-error-boundary'
 
@@ -29,17 +30,20 @@ export function OnDeviceDisplayAppFallback({
   const { t } = useTranslation('app_settings')
   const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
+  const localRobot = useSelector(getLocalRobot)
+  const robotSerialNumber =
+    localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const handleRestartClick = (): void => {
     trackEvent({
       name: ANALYTICS_ODD_APP_ERROR,
-      properties: { errorMessage: error.message },
+      properties: { errorMessage: error.message, robotSerialNumber },
     })
     dispatch(appRestart(error.message))
   }
   const modalHeader: ModalHeaderBaseProps = {
     title: t('error_boundary_title'),
     iconName: 'ot-alert',
-    iconColor: COLORS.red2,
+    iconColor: COLORS.red50,
   }
 
   // immediately report to robot logs that something fatal happened

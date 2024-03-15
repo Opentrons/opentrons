@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { SpinnerModalPage, AlertModal, SPACING } from '@opentrons/components'
@@ -10,7 +11,7 @@ import {
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { Line } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { CalibrateDeck } from '../../organisms/CalibrateDeck'
@@ -253,58 +254,61 @@ export function RobotSettingsCalibration({
 
   return (
     <>
-      <Portal level="top">
-        <CalibrateDeck
-          session={deckCalibrationSession}
-          robotName={robotName}
-          dispatchRequests={dispatchRequests}
-          showSpinner={isPending}
-          isJogging={isJogging}
-        />
-        {createStatus === RobotApi.PENDING ? (
-          <SpinnerModalPage
-            titleBar={{
-              title: t('robot_calibration:health_check_title'),
-              back: {
-                disabled: true,
-                title: t('shared:exit'),
-                children: t('shared:exit'),
-              },
-            }}
+      {createPortal(
+        <>
+          <CalibrateDeck
+            session={deckCalibrationSession}
+            robotName={robotName}
+            dispatchRequests={dispatchRequests}
+            showSpinner={isPending}
+            isJogging={isJogging}
           />
-        ) : null}
-        <CheckCalibration
-          session={checkHealthSession}
-          robotName={robotName}
-          dispatchRequests={dispatchRequests}
-          showSpinner={isPending}
-          isJogging={isJogging}
-        />
-        {createStatus === RobotApi.FAILURE && (
-          <AlertModal
-            alertOverlay
-            heading={t('robot_calibration:deck_calibration_failure')}
-            buttons={[
-              {
-                children: t('shared:ok'),
-                onClick: () => {
-                  createRequestId.current != null &&
-                    dispatch(RobotApi.dismissRequest(createRequestId.current))
-                  createRequestId.current = null
+          {createStatus === RobotApi.PENDING ? (
+            <SpinnerModalPage
+              titleBar={{
+                title: t('robot_calibration:health_check_title'),
+                back: {
+                  disabled: true,
+                  title: t('shared:exit'),
+                  children: t('shared:exit'),
                 },
-              },
-            ]}
-          >
-            <StyledText>{t('deck_calibration_error_occurred')}</StyledText>
-            <StyledText>
-              {createRequest != null &&
-                'error' in createRequest &&
-                createRequest.error != null &&
-                RobotApi.getErrorResponseMessage(createRequest.error)}
-            </StyledText>
-          </AlertModal>
-        )}
-      </Portal>
+              }}
+            />
+          ) : null}
+          <CheckCalibration
+            session={checkHealthSession}
+            robotName={robotName}
+            dispatchRequests={dispatchRequests}
+            showSpinner={isPending}
+            isJogging={isJogging}
+          />
+          {createStatus === RobotApi.FAILURE && (
+            <AlertModal
+              alertOverlay
+              heading={t('robot_calibration:deck_calibration_failure')}
+              buttons={[
+                {
+                  children: t('shared:ok'),
+                  onClick: () => {
+                    createRequestId.current != null &&
+                      dispatch(RobotApi.dismissRequest(createRequestId.current))
+                    createRequestId.current = null
+                  },
+                },
+              ]}
+            >
+              <StyledText>{t('deck_calibration_error_occurred')}</StyledText>
+              <StyledText>
+                {createRequest != null &&
+                  'error' in createRequest &&
+                  createRequest.error != null &&
+                  RobotApi.getErrorResponseMessage(createRequest.error)}
+              </StyledText>
+            </AlertModal>
+          )}
+        </>,
+        getTopPortalEl()
+      )}
       {showHowCalibrationWorksModal ? (
         <HowCalibrationWorksModal
           onCloseClick={() => setShowHowCalibrationWorksModal(false)}
@@ -324,7 +328,10 @@ export function RobotSettingsCalibration({
             updateRobotStatus={updateRobotStatus}
           />
           <Line />
-          <RobotSettingsGripperCalibration gripper={attachedGripper} />
+          <RobotSettingsGripperCalibration
+            gripper={attachedGripper}
+            robotName={robotName}
+          />
           <Line />
           <RobotSettingsModuleCalibration
             attachedModules={attachedModules}
@@ -332,6 +339,7 @@ export function RobotSettingsCalibration({
             formattedPipetteOffsetCalibrations={
               formattedPipetteOffsetCalibrations
             }
+            robotName={robotName}
           />
         </>
       ) : (

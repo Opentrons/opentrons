@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V2,
@@ -7,16 +8,15 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
 import { getStateAndContextTempTCModules } from '@opentrons/step-generation'
 import {
   DEFAULT_DELAY_SECONDS,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
 } from '../../constants'
-import {
-  createPresavedStepForm,
-  CreatePresavedStepFormArgs,
-} from '../utils/createPresavedStepForm'
+import { createPresavedStepForm } from '../utils/createPresavedStepForm'
+import type { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
+
 const stepId = 'stepId123'
 const EXAMPLE_ENGAGE_HEIGHT = '18'
 let defaultArgs: any
@@ -48,6 +48,9 @@ beforeEach(() => {
       labwareOnMagModule: {
         labwareOnMagModule,
       },
+    },
+    additionalEquipmentEntities: {
+      mockTrash: { name: 'trashBin', id: 'mockTrash', location: 'A3' },
     },
     savedStepForms: {},
     orderedStepIds: [],
@@ -93,7 +96,7 @@ beforeEach(() => {
   }
 })
 afterEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
 })
 describe('createPresavedStepForm', () => {
   ;[true, false].forEach(hasTempModule => {
@@ -122,14 +125,15 @@ describe('createPresavedStepForm', () => {
       })
     })
   })
-  it(`should call handleFormChange with a default pipette for "moveLiquid" step`, () => {
+  it(`should call handleFormChange with a default pipette and drop tip location for "moveLiquid" step`, () => {
     const args = { ...defaultArgs, stepType: 'moveLiquid' }
     expect(createPresavedStepForm(args)).toEqual({
       id: stepId,
       pipette: 'leftPipetteId',
+      nozzles: null,
       stepType: 'moveLiquid',
       // default fields
-      dropTip_location: null,
+      dropTip_location: 'mockTrash',
       aspirate_airGap_checkbox: false,
       aspirate_airGap_volume: '1',
       aspirate_delay_checkbox: false,
@@ -176,7 +180,7 @@ describe('createPresavedStepForm', () => {
     })
   })
   describe('mix step', () => {
-    it('should call handleFormChange with a default pipette for mix step', () => {
+    it('should call handleFormChange with a default pipette and drop tip location for mix step', () => {
       const args = { ...defaultArgs, stepType: 'mix' }
       expect(createPresavedStepForm(args)).toEqual({
         id: stepId,
@@ -184,7 +188,8 @@ describe('createPresavedStepForm', () => {
         stepType: 'mix',
         // default fields
         labware: null,
-        dropTip_location: null,
+        nozzles: null,
+        dropTip_location: 'mockTrash',
         wells: [],
         aspirate_delay_checkbox: false,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,

@@ -19,7 +19,7 @@ import calibratingFrontJaw from '../../assets/videos/gripper-wizards/CALIBRATING
 import calibratingRearJaw from '../../assets/videos/gripper-wizards/CALIBRATING_REAR_JAW.webm'
 
 import type { Coordinates } from '@opentrons/shared-data'
-import type { CreateMaintenanceCommand } from '../../resources/runs/hooks'
+import type { CreateMaintenanceCommand } from '../../resources/runs'
 import type { GripperWizardStepProps, MovePinStep } from './types'
 
 interface MovePinProps extends GripperWizardStepProps, MovePinStep {
@@ -238,6 +238,11 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
             ? inProgressText
             : t('shared:stand_back_robot_is_in_motion')
         }
+        body={
+          errorMessage == null && !isExiting
+            ? t('calibration_pin_touching', { slot: 'C2' })
+            : null
+        }
         alternativeSpinner={
           errorMessage == null && !isExiting ? inProgressImage : undefined
         }
@@ -247,7 +252,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('shared:error_encountered')}
       subHeader={
         <Trans

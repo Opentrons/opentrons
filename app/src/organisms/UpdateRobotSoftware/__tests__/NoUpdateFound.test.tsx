@@ -1,11 +1,13 @@
 import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { NoUpdateFound } from '../NoUpdateFound'
 
-const mockOnContinue = jest.fn()
+const mockOnContinue = vi.fn()
 
 const render = () => {
   return renderWithProviders(<NoUpdateFound onContinue={mockOnContinue} />, {
@@ -15,15 +17,17 @@ const render = () => {
 
 describe('NoUpdateFound', () => {
   it('should render text, icon and button', () => {
-    const [{ getByText, getByTestId }] = render()
-    getByText('Your software is already up to date!')
-    expect(getByTestId('NoUpdateFound_check_circle_icon')).toBeInTheDocument()
-    getByText('Continue')
+    render()
+    screen.getByText('Your software is already up to date!')
+    expect(
+      screen.getByTestId('NoUpdateFound_check_circle_icon')
+    ).toBeInTheDocument()
+    screen.getByText('Continue')
   })
 
   it('should call mock function when tapping next button', () => {
-    const [{ getByText }] = render()
-    getByText('Continue').click()
+    render()
+    fireEvent.click(screen.getByText('Continue'))
     expect(mockOnContinue).toBeCalled()
   })
 })

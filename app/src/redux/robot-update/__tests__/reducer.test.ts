@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { mockRobot } from '../../robot-api/__fixtures__'
 import { INITIAL_STATE, robotUpdateReducer } from '../reducer'
 import type { Action } from '../../types'

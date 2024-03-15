@@ -1,10 +1,11 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import upperFirst from 'lodash/upperFirst'
 import {
   LabeledValue,
   OutlineButton,
-  SlotMap,
+  OT2SlotMap,
   Tooltip,
   useHoverTooltip,
   ModuleIcon,
@@ -16,7 +17,6 @@ import {
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
 import { actions as stepFormActions, ModuleOnDeck } from '../../step-forms'
 import {
   SPAN7_8_10_11_SLOT,
@@ -25,7 +25,7 @@ import {
 import { ModuleDiagram } from './ModuleDiagram'
 import { FlexSlotMap } from './FlexSlotMap'
 import { isModuleWithCollisionIssue } from './utils'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { ModuleType, RobotType } from '@opentrons/shared-data'
 
@@ -44,13 +44,14 @@ export function ModuleRow(props: Props): JSX.Element {
     showCollisionWarnings,
     robotType,
   } = props
+  const { t } = useTranslation(['modules', 'tooltip'])
   const type: ModuleType = moduleOnDeck?.type || props.type
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const model = moduleOnDeck?.model
   const slot = moduleOnDeck?.slot
   /*
   TODO (ka 2020-2-3): This logic is very specific to this individual implementation
-  of SlotMap. Kept it here (for now?) because it spells out the different cases.
+  of OT2SlotMap. Kept it here (for now?) because it spells out the different cases.
   */
   let slotDisplayName = null
   let occupiedSlotsForMap: string[] = []
@@ -86,12 +87,12 @@ export function ModuleRow(props: Props): JSX.Element {
   // default module slot placement magnet = Slot1 temperature = Slot3
   let collisionTooltipText = null
   if (collisionSlots && collisionSlots.includes('4')) {
-    collisionTooltipText = i18n.t(
-      `tooltip.edit_module_card.magnetic_module_collision`
+    collisionTooltipText = t(
+      `tooltip:edit_module_card.magnetic_module_collision`
     )
   } else if (collisionSlots && collisionSlots.includes('6')) {
-    collisionTooltipText = i18n.t(
-      `tooltip.edit_module_card.temperature_module_collision`
+    collisionTooltipText = t(
+      `tooltip:edit_module_card.temperature_module_collision`
     )
   }
 
@@ -126,7 +127,7 @@ export function ModuleRow(props: Props): JSX.Element {
           color={C_DARK_GRAY}
           marginRight={SPACING.spacing4}
         />
-        {i18n.t(`modules.module_display_names.${type}`)}
+        {t(`module_display_names.${type}`)}
       </h4>
       <div className={styles.module_row}>
         <div className={styles.module_diagram_container}>
@@ -139,7 +140,7 @@ export function ModuleRow(props: Props): JSX.Element {
           {model && (
             <LabeledValue
               label="Model"
-              value={i18n.t(`modules.model_display_name.${model}`)}
+              value={t(`model_display_name.${model}`)}
             />
           )}
         </div>
@@ -159,10 +160,9 @@ export function ModuleRow(props: Props): JSX.Element {
               />
             ) : (
               <div {...targetProps}>
-                <SlotMap
+                <OT2SlotMap
                   occupiedSlots={occupiedSlotsForMap}
                   collisionSlots={collisionSlots}
-                  robotType={robotType}
                 />
               </div>
             ))}

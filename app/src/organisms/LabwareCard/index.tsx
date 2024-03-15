@@ -4,22 +4,23 @@ import startCase from 'lodash/startCase'
 import { format } from 'date-fns'
 
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
+  JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
+  OVERFLOW_WRAP_ANYWHERE,
   RobotWorkSpace,
   SPACING,
   TYPOGRAPHY,
-  BORDERS,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_COLUMN,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
@@ -35,12 +36,16 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const displayName = definition?.metadata.displayName
   const displayCategory = startCase(definition.metadata.displayCategory)
   const isCustomDefinition = definition.namespace !== 'opentrons'
+  const xDimensionOverride =
+    definition.parameters.loadName === 'opentrons_universal_flat_adapter'
+      ? UNIVERSAL_FLAT_ADAPTER_X_DIMENSION
+      : definition.dimensions.xDimension
+
   return (
     <Box
       role="link"
       backgroundColor={COLORS.white}
-      color={COLORS.black}
-      css={BORDERS.cardOutlineBorder}
+      color={COLORS.black90}
       paddingLeft={SPACING.spacing16}
       paddingY={SPACING.spacing16}
       height="auto"
@@ -54,7 +59,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     >
       <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing24}>
         <RobotWorkSpace
-          viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
+          viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${xDimensionOverride} ${definition.dimensions.yDimension}`}
         >
           {() => <LabwareRender definition={definition} />}
         </RobotWorkSpace>
@@ -78,7 +83,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             {isCustomDefinition ? (
               <StyledText
                 as="label"
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50}
                 id="LabwareCard_customDef"
               >
                 {t('custom_def')}
@@ -86,7 +91,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             ) : (
               <Flex alignItems={ALIGN_CENTER} marginTop={SPACING.spacing4}>
                 <Icon
-                  color={COLORS.blueEnabled}
+                  color={COLORS.blue50}
                   name="check-decagram"
                   height=".7rem"
                 />
@@ -104,13 +109,13 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             <StyledText
               as="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey60}
               id="LabwareCard_apiName"
             >
               {t('api_name')}
             </StyledText>
 
-            <Box overflowWrap="anywhere">
+            <Box overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
               <StyledText as="p">{apiName}</StyledText>
             </Box>
           </Box>
@@ -131,14 +136,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText
                 as="label"
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50}
                 textAlign={TYPOGRAPHY.textAlignRight}
               >
                 {t('date_added')}
               </StyledText>
               <StyledText
                 as="label"
-                color={COLORS.darkGreyEnabled}
+                color={COLORS.grey50}
                 id="LabwareCard_dateAdded"
               >
                 {format(new Date(modified), 'MM/dd/yyyy')}

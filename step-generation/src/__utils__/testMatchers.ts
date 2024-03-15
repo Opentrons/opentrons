@@ -1,3 +1,4 @@
+import { expect } from 'vitest'
 import { CommandCreatorError } from '../types'
 
 // error of type exists somewhere in timeline errors

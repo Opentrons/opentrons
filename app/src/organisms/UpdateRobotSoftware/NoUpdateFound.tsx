@@ -31,18 +31,18 @@ export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        backgroundColor={COLORS.green3}
+        backgroundColor={COLORS.green35}
         height="25.75rem"
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
         padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
       >
         <Icon
           name="ot-check"
           size="3.75rem"
-          color={COLORS.green2}
+          color={COLORS.green50}
           data-testid="NoUpdateFound_check_circle_icon"
         />
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>

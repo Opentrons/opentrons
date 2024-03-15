@@ -28,7 +28,7 @@ import type { GripperData } from '@opentrons/api-client'
 
 const GO_BACK_BUTTON_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
     opacity: 70%;
@@ -99,7 +99,7 @@ export const UnmountGripper = (
     )
   return showGripperStillDetected ? (
     <SimpleWizardBody
-      iconColor={COLORS.errorEnabled}
+      iconColor={COLORS.red50}
       header={t('gripper_still_attached')}
       isSuccess={false}
     >
@@ -109,7 +109,10 @@ export const UnmountGripper = (
         alignItems={isOnDevice ? ALIGN_CENTER : ALIGN_FLEX_END}
         gridGap={SPACING.spacing8}
       >
-        <Btn onClick={() => setShowGripperStillDetected(false)}>
+        <Btn
+          paddingLeft={isOnDevice ? 0 : SPACING.spacing32}
+          onClick={() => setShowGripperStillDetected(false)}
+        >
           <StyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
             {t('shared:go_back')}
           </StyledText>

@@ -1,6 +1,10 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
-import { getWellDepth, LOW_VOLUME_PIPETTES } from '@opentrons/shared-data'
+import {
+  COLUMN,
+  getWellDepth,
+  LOW_VOLUME_PIPETTES,
+} from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
@@ -14,10 +18,13 @@ import {
   airGapHelper,
   dispenseLocationHelper,
   moveHelper,
+  getIsTallLabwareWestOf96Channel,
+  getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
-import { configureForVolume } from '../atomic/configureForVolume'
 import {
   aspirate,
+  configureForVolume,
+  configureNozzleLayout,
   delay,
   dropTip,
   moveToWell,
@@ -25,6 +32,7 @@ import {
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
+
 import type {
   ConsolidateArgs,
   CommandCreator,
@@ -50,6 +58,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   */
   const actionName = 'consolidate'
   const pipetteData = prevRobotState.pipettes[args.pipette]
+  const is96Channel =
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
 
   if (!pipetteData) {
     // bail out before doing anything else
@@ -76,6 +86,50 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
+  }
+
+  if (
+    is96Channel &&
+    args.nozzles === COLUMN &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      args.sourceLabware,
+      args.pipette
+    )
+  ) {
+    return {
+      errors: [
+        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          source: 'aspirate',
+          labware:
+            invariantContext.labwareEntities[args.sourceLabware].def.metadata
+              .displayName,
+        }),
+      ],
+    }
+  }
+
+  if (
+    is96Channel &&
+    args.nozzles === COLUMN &&
+    getIsTallLabwareWestOf96Channel(
+      prevRobotState,
+      invariantContext,
+      args.destLabware,
+      args.pipette
+    )
+  ) {
+    return {
+      errors: [
+        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
+          source: 'dispense',
+          labware:
+            invariantContext.labwareEntities[args.destLabware].def.metadata
+              .displayName,
+        }),
+      ],
+    }
   }
 
   // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
@@ -135,11 +189,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       null &&
     invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
       'trashBin'
-
-  const addressableAreaNameWasteChute =
-    invariantContext.pipetteEntities[args.pipette].spec.channels === 96
-      ? '96ChannelWasteChute'
-      : '1and8ChannelWasteChute'
+  const channels = invariantContext.pipetteEntities[args.pipette].spec.channels
+  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
+    channels
+  )
 
   const commandCreators = flatMap(
     sourceWellChunks,
@@ -211,6 +264,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 }),
               ]
             : []
+
           return [
             curryCommandCreator(aspirate, {
               pipette: args.pipette,
@@ -411,11 +465,24 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       const dropTipAfterDispenseAirGap =
         airGapAfterDispenseCommands.length > 0 ? dropTipCommand : []
 
+      const stateNozzles = prevRobotState.pipettes[args.pipette].nozzles
+      const configureNozzleLayoutCommand: CurriedCommandCreator[] =
+        //  only emit the command if previous nozzle state is different
+        is96Channel && args.nozzles != null && args.nozzles !== stateNozzles
+          ? [
+              curryCommandCreator(configureNozzleLayout, {
+                nozzles: args.nozzles,
+                pipetteId: args.pipette,
+              }),
+            ]
+          : []
+
       return [
+        ...configureNozzleLayoutCommand,
         ...tipCommands,
+        ...configureForVolumeCommand,
         ...mixBeforeCommands,
         ...preWetTipCommands, // NOTE when you both mix-before and pre-wet tip, it's kinda redundant. Prewet is like mixing once.
-        ...configureForVolumeCommand,
         ...aspirateCommands,
         ...dispenseCommands,
         ...delayAfterDispenseCommands,

@@ -1,13 +1,15 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { formatDistance } from 'date-fns'
-import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
-import { useAllRunsQuery, useProtocolQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { Skeleton } from '../../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
@@ -16,19 +18,27 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs'
+import {
+  useRobotInitializationStatus,
+  INIT_STATUS,
+} from '../../../../resources/health/hooks'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../atoms/Skeleton')
-jest.mock('../../../../pages/Protocols/hooks')
-jest.mock('../../../../organisms/Devices/hooks')
-jest.mock('../../../../organisms/RunTimeControl/hooks')
-jest.mock('../../../../organisms/ProtocolUpload/hooks')
-jest.mock('../../../../redux/analytics')
-jest.mock('../hooks')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../atoms/Skeleton')
+vi.mock('../../../../pages/Protocols/hooks')
+vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('../../../../organisms/RunTimeControl/hooks')
+vi.mock('../../../../organisms/ProtocolUpload/hooks')
+vi.mock('../../../../redux/analytics')
+vi.mock('../hooks')
+vi.mock('../../../../resources/runs')
+vi.mock('../../../../resources/health/hooks')
 
 const RUN_ID = 'mockRunId'
+const ROBOT_NAME = 'otie'
 
 const mockMissingPipette = [
   {
@@ -72,28 +82,7 @@ const mockRunData = {
   status: RUN_STATUS_FAILED,
 } as any
 
-let mockCloneRun: jest.Mock
-
-const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
-  typeof useMissingProtocolHardware
->
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
-  typeof useAllRunsQuery
->
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
->
-const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
-  typeof useTrackProtocolRunEvent
->
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
-const mockUseHardwareStatusText = useHardwareStatusText as jest.MockedFunction<
-  typeof useHardwareStatusText
->
-const mockSkeleton = Skeleton as jest.MockedFunction<typeof Skeleton>
+const mockCloneRun = vi.fn()
 
 const render = (props: React.ComponentProps<typeof RecentRunProtocolCard>) => {
   return renderWithProviders(
@@ -106,8 +95,10 @@ const render = (props: React.ComponentProps<typeof RecentRunProtocolCard>) => {
   )
 }
 
-let mockTrackEvent: jest.Mock
-let mockTrackProtocolRunEvent: jest.Mock
+const mockTrackEvent = vi.fn()
+const mockTrackProtocolRunEvent = vi.fn(
+  () => new Promise(resolve => resolve({}))
+)
 
 describe('RecentRunProtocolCard', () => {
   let props: React.ComponentProps<typeof RecentRunProtocolCard>
@@ -116,40 +107,38 @@ describe('RecentRunProtocolCard', () => {
     props = {
       runData: mockRunData,
     }
-    mockTrackEvent = jest.fn()
-    mockTrackProtocolRunEvent = jest.fn(
-      () => new Promise(resolve => resolve({}))
-    )
-    mockSkeleton.mockReturnValue(<div>mock Skeleton</div>)
-    mockUseHardwareStatusText.mockReturnValue('Ready to run')
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockUseMissingProtocolHardware.mockReturnValue({
+
+    vi.mocked(Skeleton).mockReturnValue(<div>mock Skeleton</div>)
+    vi.mocked(useHardwareStatusText).mockReturnValue('Ready to run')
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+    vi.mocked(useMissingProtocolHardware).mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
       conflictedSlots: [],
     })
-    mockUseAllRunsQuery.mockReturnValue({
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
-    mockUseProtocolQuery.mockReturnValue({
+    vi.mocked(useProtocolQuery).mockReturnValue({
       data: { data: { metadata: { protocolName: 'mockProtocol' } } },
     } as any)
-    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
+    vi.mocked(useRobotInitializationStatus).mockReturnValue(
+      INIT_STATUS.SUCCEEDED
+    )
+    when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
-    mockCloneRun = jest.fn()
-    when(mockUseCloneRun)
+    when(useCloneRun)
       .calledWith(RUN_ID, expect.anything())
-      .mockReturnValue({ cloneRun: mockCloneRun, isLoading: false })
+      .thenReturn({ cloneRun: mockCloneRun, isLoading: false })
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should render text', () => {
-    const [{ getByText }] = render(props)
+    render(props)
     const lastRunTime = formatDistance(
       new Date(mockRunData.createdAt),
       new Date(),
@@ -157,59 +146,59 @@ describe('RecentRunProtocolCard', () => {
         addSuffix: true,
       }
     ).replace('about ', '')
-    getByText('Ready to run')
-    getByText('mockProtocol')
-    getByText(`Failed ${lastRunTime}`)
+    screen.getByText('Ready to run')
+    screen.getByText('mockProtocol')
+    screen.getByText(`Failed ${lastRunTime}`)
   })
 
   it('should render missing chip when missing a pipette', () => {
-    mockUseMissingProtocolHardware.mockReturnValue({
+    vi.mocked(useMissingProtocolHardware).mockReturnValue({
       missingProtocolHardware: mockMissingPipette,
       isLoading: false,
       conflictedSlots: [],
     })
-    mockUseHardwareStatusText.mockReturnValue('Missing 1 pipette')
-    const [{ getByText }] = render(props)
-    getByText('Missing 1 pipette')
+    vi.mocked(useHardwareStatusText).mockReturnValue('Missing 1 pipette')
+    render(props)
+    screen.getByText('Missing 1 pipette')
   })
 
   it('should render missing chip when conflicted fixture', () => {
-    mockUseMissingProtocolHardware.mockReturnValue({
+    vi.mocked(useMissingProtocolHardware).mockReturnValue({
       missingProtocolHardware: [],
       isLoading: false,
       conflictedSlots: ['cutoutD3'],
     })
-    mockUseHardwareStatusText.mockReturnValue('Location conflicts')
-    const [{ getByText }] = render(props)
-    getByText('Location conflicts')
+    vi.mocked(useHardwareStatusText).mockReturnValue('Location conflicts')
+    render(props)
+    screen.getByText('Location conflicts')
   })
 
   it('should render missing chip when missing a module', () => {
-    mockUseMissingProtocolHardware.mockReturnValue({
+    vi.mocked(useMissingProtocolHardware).mockReturnValue({
       missingProtocolHardware: mockMissingModule,
       isLoading: false,
       conflictedSlots: [],
     })
-    mockUseHardwareStatusText.mockReturnValue('Missing 1 module')
-    const [{ getByText }] = render(props)
-    getByText('Missing 1 module')
+    vi.mocked(useHardwareStatusText).mockReturnValue('Missing 1 module')
+    render(props)
+    screen.getByText('Missing 1 module')
   })
 
   it('should render missing chip (module and pipette) when missing a pipette and a module', () => {
-    mockUseMissingProtocolHardware.mockReturnValue({
+    vi.mocked(useMissingProtocolHardware).mockReturnValue({
       missingProtocolHardware: missingBoth,
       isLoading: false,
       conflictedSlots: [],
     })
-    mockUseHardwareStatusText.mockReturnValue('Missing hardware')
-    const [{ getByText }] = render(props)
-    getByText('Missing hardware')
+    vi.mocked(useHardwareStatusText).mockReturnValue('Missing hardware')
+    render(props)
+    screen.getByText('Missing hardware')
   })
 
   it('when tapping a card, mock functions is called and loading state is activated', () => {
-    const [{ getByLabelText }] = render(props)
-    const button = getByLabelText('RecentRunProtocolCard')
-    expect(button).toHaveStyle(`background-color: ${COLORS.green3}`)
+    render(props)
+    const button = screen.getByLabelText('RecentRunProtocolCard')
+    expect(button).toHaveStyle(`background-color: ${COLORS.green40}`)
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
@@ -217,15 +206,29 @@ describe('RecentRunProtocolCard', () => {
     })
     // TODO(BC, 08/30/23): reintroduce check for tracking when tracking is reintroduced lazily
     // expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
-    getByLabelText('icon_ot-spinner')
-    expect(button).toHaveStyle(`background-color: ${COLORS.green3Pressed}`)
+    screen.getByLabelText('icon_ot-spinner')
+    expect(button).toHaveStyle(`background-color: ${COLORS.green40}`)
   })
 
   it('should render the skeleton when react query is loading', () => {
-    mockUseProtocolQuery.mockReturnValue({
+    vi.mocked(useProtocolQuery).mockReturnValue({
       isLoading: true,
       data: { data: { metadata: { protocolName: 'mockProtocol' } } },
     } as any)
+    render(props)
+    screen.getByText('mock Skeleton')
+  })
+
+  it('should render the skeleton when the robot server is initializing', () => {
+    vi.mocked(useRobotInitializationStatus).mockReturnValue(
+      INIT_STATUS.INITIALIZING
+    )
+    const [{ getByText }] = render(props)
+    getByText('mock Skeleton')
+  })
+
+  it('should render the skeleton when the robot server is unresponsive', () => {
+    vi.mocked(useRobotInitializationStatus).mockReturnValue(null)
     const [{ getByText }] = render(props)
     getByText('mock Skeleton')
   })

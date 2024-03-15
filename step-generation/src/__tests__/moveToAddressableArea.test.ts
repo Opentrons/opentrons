@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { getSuccessResult } from '../fixtures'
 import { moveToAddressableArea } from '../commandCreators/atomic'
 
@@ -17,7 +18,7 @@ const invariantContext: any = {
 describe('moveToAddressableArea', () => {
   it('should call moveToAddressableArea with correct params', () => {
     const robotInitialState = getRobotInitialState()
-    const mockName = '1and8ChannelWasteChute'
+    const mockName = '1ChannelWasteChute'
     const result = moveToAddressableArea(
       { pipetteId: mockId, addressableAreaName: mockName },
       invariantContext,

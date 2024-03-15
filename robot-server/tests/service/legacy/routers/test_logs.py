@@ -20,9 +20,7 @@ def test_get_serial_log_with_defaults(api_client):
         body = response.text
         assert response.status_code == 200
         assert body == expected
-        m.assert_called_once_with(
-            "opentrons-api-serial", DEFAULT_RECORDS, "short-precise"
-        )
+        m.assert_called_once_with("ALL_SERIAL", DEFAULT_RECORDS, "short-precise")
 
 
 @pytest.mark.parametrize(
@@ -59,7 +57,7 @@ def test_get_serial_log_with_params(
         assert body == expected
         assert response.status_code == 200
 
-        m.assert_called_once_with("opentrons-api-serial", records_param, mode_param)
+        m.assert_called_once_with("ALL_SERIAL", records_param, mode_param)
 
 
 @pytest.mark.parametrize(

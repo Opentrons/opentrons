@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, waitFor } from '@testing-library/react'
 import { getCurrentSubsystemUpdate } from '@opentrons/api-client'
 import { useHost } from '../../api'
 
@@ -13,13 +13,8 @@ import type {
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
-const mockGetCurrentSubsystemUpdate = getCurrentSubsystemUpdate as jest.MockedFunction<
-  typeof getCurrentSubsystemUpdate
->
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const SUBSYSTEM_TYPE = 'pipette_left'
@@ -35,23 +30,21 @@ const CURRENT_SUBSYSTEM_UPDATE_RESPONSE = {
 } as SubsystemUpdateProgressData
 
 describe('useCurrentSubsystemUpdateQuery', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{}> = ({ children }) => (
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
     wrapper = clientProvider
   })
 
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
-
   it('should return no data if no host', () => {
-    when(mockUseHost).calledWith().mockReturnValue(null)
+    vi.mocked(useHost).mockReturnValue(null)
     const { result } = renderHook(() => useCurrentSubsystemUpdateQuery(null), {
       wrapper,
     })
@@ -60,10 +53,8 @@ describe('useCurrentSubsystemUpdateQuery', () => {
   })
 
   it('should return no data if the get current system updates request fails', () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetCurrentSubsystemUpdate)
-      .calledWith(HOST_CONFIG, SUBSYSTEM_TYPE)
-      .mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getCurrentSubsystemUpdate).mockRejectedValue('oh no')
 
     const { result } = renderHook(
       () => useCurrentSubsystemUpdateQuery(SUBSYSTEM_TYPE),
@@ -75,22 +66,20 @@ describe('useCurrentSubsystemUpdateQuery', () => {
   })
 
   it('should return current subsystem update data', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetCurrentSubsystemUpdate)
-      .calledWith(HOST_CONFIG, SUBSYSTEM_TYPE)
-      .mockResolvedValue({
-        data: CURRENT_SUBSYSTEM_UPDATE_RESPONSE,
-      } as Response<SubsystemUpdateProgressData>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getCurrentSubsystemUpdate).mockResolvedValue({
+      data: CURRENT_SUBSYSTEM_UPDATE_RESPONSE,
+    } as Response<SubsystemUpdateProgressData>)
 
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => useCurrentSubsystemUpdateQuery(SUBSYSTEM_TYPE),
       {
         wrapper,
       }
     )
 
-    await waitFor(() => result.current.data != null)
-
-    expect(result.current.data).toEqual(CURRENT_SUBSYSTEM_UPDATE_RESPONSE)
+    await waitFor(() => {
+      expect(result.current.data).toEqual(CURRENT_SUBSYSTEM_UPDATE_RESPONSE)
+    })
   })
 })

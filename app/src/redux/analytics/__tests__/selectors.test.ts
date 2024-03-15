@@ -1,10 +1,12 @@
+import { vi, describe, it, expect } from 'vitest'
+
 import * as Selectors from '../selectors'
 import * as SessionsSelectors from '../../sessions/selectors'
 
 import type { State } from '../../types'
 import type { DeckCalibrationSessionDetails } from '../../sessions/deck-calibration/types'
 
-jest.mock('../../sessions/selectors')
+vi.mock('../../sessions/selectors')
 
 describe('analytics selectors', () => {
   describe('analytics config selectors', () => {
@@ -57,12 +59,9 @@ describe('analytics selectors', () => {
 
   describe('analytics calibration selectors', () => {
     describe('getAnalyticsSessionExitDetails', () => {
-      const mockGetRobotSessionById = SessionsSelectors.getRobotSessionById as jest.MockedFunction<
-        typeof SessionsSelectors.getRobotSessionById
-      >
       it('returns data if the session exists', () => {
         const mockState: State = {} as any
-        mockGetRobotSessionById.mockReturnValue({
+        vi.mocked(SessionsSelectors.getRobotSessionById).mockReturnValue({
           sessionType: 'deckCalibration',
           details: {
             currentStep: 'inspectingTip',
@@ -84,7 +83,7 @@ describe('analytics selectors', () => {
         )
       })
       it('returns null if the session cannot be found', () => {
-        mockGetRobotSessionById.mockReturnValue(null)
+        vi.mocked(SessionsSelectors.getRobotSessionById).mockReturnValue(null)
         const mockState: State = {} as any
         expect(
           Selectors.getAnalyticsSessionExitDetails(

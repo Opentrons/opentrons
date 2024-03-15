@@ -19,6 +19,13 @@ export function missingAdapter(): CommandCreatorError {
   }
 }
 
+export function removeAdapter(): CommandCreatorError {
+  return {
+    type: 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER',
+    message: 'A 96-channel cannot pick up tips partially with an adapter',
+  }
+}
+
 export function noTipOnPipette(args: {
   actionName: string
   pipette: string
@@ -29,6 +36,13 @@ export function noTipOnPipette(args: {
   return {
     message: `Attempted to ${actionName} with no tip on pipette: ${pipette} from ${labware}'s well ${well}`,
     type: 'NO_TIP_ON_PIPETTE',
+  }
+}
+
+export function pipetteHasTip(): CommandCreatorError {
+  return {
+    message: 'One or more of the pipettes has a tip',
+    type: 'PIPETTE_HAS_TIP',
   }
 }
 
@@ -161,6 +175,16 @@ export const tallLabwareEastWestOfHeaterShaker = (
   }
 }
 
+export const tallLabwareWestOf96ChannelPipetteLabware = (args: {
+  source: string
+  labware: string
+}): CommandCreatorError => {
+  return {
+    type: 'TALL_LABWARE_WEST_OF_96_CHANNEL_LABWARE',
+    message: `Labware to the left of the ${args.source} ${args.labware} is too tall and will collide with the 96-channel.`,
+  }
+}
+
 export const heaterShakerEastWestWithLatchOpen = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN',
@@ -223,5 +247,12 @@ export const pipettingIntoColumn4 = (args: {
   return {
     type: 'PIPETTING_INTO_COLUMN_4',
     message: `Cannot ${args.typeOfStep} into a column 4 slot.`,
+  }
+}
+
+export const cannotMoveWithGripper = (): CommandCreatorError => {
+  return {
+    type: 'CANNOT_MOVE_WITH_GRIPPER',
+    message: 'The gripper cannot move aluminum blocks',
   }
 }

@@ -7,7 +7,7 @@ import { move, readdir, remove, readFile } from 'fs-extra'
 import StreamZip from 'node-stream-zip'
 import getStream from 'get-stream'
 
-import { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
+import type { RobotUpdateTarget } from '@opentrons/app/src/redux/robot-update/types'
 
 import { createLogger } from '../log'
 import { fetchToFile } from '../http'

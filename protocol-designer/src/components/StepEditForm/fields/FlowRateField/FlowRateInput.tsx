@@ -1,19 +1,19 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import round from 'lodash/round'
+import { useTranslation } from 'react-i18next'
 import {
   AlertModal,
   FormGroup,
   RadioGroup,
   InputField,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import { Portal } from '../../../portals/MainPageModalPortal'
-import modalStyles from '../../../modals/modal.css'
-import stepFormStyles from '../../StepEditForm.css'
-import styles from './FlowRateInput.css'
-import { FieldProps } from '../../types'
+import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
+import modalStyles from '../../../modals/modal.module.css'
+import stepFormStyles from '../../StepEditForm.module.css'
+import styles from './FlowRateInput.module.css'
+import type { FieldProps } from '../../types'
 
-const DEFAULT_LABEL = i18n.t('form.step_edit_form.field.flow_rate.label')
 const DECIMALS_ALLOWED = 1
 
 /** When flow rate is falsey (including 0), it means 'use default' */
@@ -47,6 +47,8 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     name,
     pipetteDisplayName,
   } = props
+  const { t } = useTranslation(['form', 'application'])
+  const DEFAULT_LABEL = t('step_edit_form.field.flow_rate.label')
 
   const initialState: State = {
     isPristine: true,
@@ -140,13 +142,14 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
       isIndeterminate={isIndeterminate && modalFlowRate === null}
       name={`${name}_customFlowRate`}
       onChange={handleChangeNumber}
-      units={i18n.t('application.units.microliterPerSec')}
+      units={t('application:units.microliterPerSec')}
       value={`${modalFlowRate || ''}`}
     />
   )
 
-  const FlowRateModal = pipetteDisplayName && (
-    <Portal>
+  const FlowRateModal =
+    pipetteDisplayName &&
+    createPortal(
       <AlertModal
         alertOverlay
         className={modalStyles.modal}
@@ -179,8 +182,8 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
           onChange={handleChangeRadio}
           options={[
             {
-              name: `${defaultFlowRate || '?'} ${i18n.t(
-                'application.units.microliterPerSec'
+              name: `${defaultFlowRate || '?'} ${t(
+                'application:units.microliterPerSec'
               )} (default)`,
               value: 'default',
             },
@@ -191,9 +194,9 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
             },
           ]}
         />
-      </AlertModal>
-    </Portal>
-  )
+      </AlertModal>,
+      getMainPagePortalEl()
+    )
 
   return (
     <React.Fragment>
@@ -205,7 +208,7 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
           name={name}
           onClick={openModal}
           readOnly
-          units={i18n.t('application.units.microliterPerSec')}
+          units={t('application:units.microliterPerSec')}
           value={props.value ? String(props.value) : 'default'}
         />
       </FormGroup>

@@ -39,34 +39,34 @@ const CHIP_PROPS_BY_TYPE: Record<
   }
 > = {
   basic: {
-    backgroundColor: COLORS.darkBlack20,
-    borderRadius: BORDERS.borderRadiusSize1,
-    textColor: COLORS.darkBlack90,
+    backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
+    borderRadius: BORDERS.borderRadius4,
+    textColor: COLORS.grey60,
   },
   error: {
-    backgroundColor: COLORS.red3,
-    borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: COLORS.red1,
-    textColor: COLORS.red1,
+    backgroundColor: COLORS.red35,
+    borderRadius: BORDERS.borderRadius40,
+    iconColor: COLORS.red60,
+    textColor: COLORS.red60,
   },
   neutral: {
-    backgroundColor: COLORS.darkBlack20,
-    borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: COLORS.darkBlack90,
-    textColor: COLORS.darkBlack70,
+    backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
+    borderRadius: BORDERS.borderRadius40,
+    iconColor: COLORS.grey60,
+    textColor: COLORS.grey60,
   },
   success: {
-    backgroundColor: COLORS.green3,
-    borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: COLORS.green1,
+    backgroundColor: COLORS.green35,
+    borderRadius: BORDERS.borderRadius40,
+    iconColor: COLORS.green60,
     iconName: 'ot-check',
-    textColor: COLORS.green1,
+    textColor: COLORS.green60,
   },
   warning: {
-    backgroundColor: COLORS.yellow3,
-    borderRadius: BORDERS.borderRadiusSize5,
-    iconColor: COLORS.yellow1,
-    textColor: COLORS.yellow1,
+    backgroundColor: COLORS.yellow35,
+    borderRadius: BORDERS.borderRadius40,
+    iconColor: COLORS.yellow60,
+    textColor: COLORS.yellow60,
   },
 }
 

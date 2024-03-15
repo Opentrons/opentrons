@@ -1,19 +1,18 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { i18n } from '../../../../../i18n'
-import {
-  BaseDeck,
-  renderWithProviders,
-  partialComponentPropsMatcher,
-  LabwareRender,
-} from '@opentrons/components'
+import { when } from 'vitest-when'
+import { screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { BaseDeck, LabwareRender } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC,
   getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
   OT2_ROBOT_TYPE,
+  ot2StandardDeckV4 as ot2StandardDeckDef,
+  ot3StandardDeckV4 as ot3StandardDeckDef,
+  fixtureTiprack300ul,
 } from '@opentrons/shared-data'
 import {
   parseInitialLoadedLabwareByAdapter,
@@ -21,9 +20,9 @@ import {
   parseLiquidsInLoadOrder,
   simpleAnalysisFileFixture,
 } from '@opentrons/api-client'
-import ot2StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot2_standard.json'
-import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot3_standard.json'
 
+import { renderWithProviders } from '../../../../../__testing-utils__'
+import { i18n } from '../../../../../i18n'
 import { useAttachedModules } from '../../../hooks'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 import { getLabwareRenderInfo } from '../../utils/getLabwareRenderInfo'
@@ -40,60 +39,42 @@ import type {
   ModuleType,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type * as Components from '@opentrons/components'
 
-jest.mock('@opentrons/components', () => {
-  const actualComponents = jest.requireActual('@opentrons/components')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actualComponents = await importOriginal<typeof Components>()
   return {
     ...actualComponents,
-    LabwareRender: jest.fn(() => <div>mock LabwareRender</div>),
+    LabwareRender: vi.fn(() => <div>mock LabwareRender</div>),
   }
 })
 
-jest.mock('@opentrons/components/src/hardware-sim/BaseDeck')
-jest.mock('@opentrons/api-client')
-jest.mock('@opentrons/shared-data/js/helpers')
-jest.mock('../../LabwareInfoOverlay')
-jest.mock('../../../hooks')
-jest.mock('../utils')
-jest.mock('../../utils/getLabwareRenderInfo')
-jest.mock('../../../../ProtocolSetupModulesAndDeck/utils')
-jest.mock('../../utils/getProtocolModulesInfo')
-jest.mock('../../../../../resources/deck_configuration/utils')
-
-const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
-  typeof useAttachedModules
->
-const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
-  typeof LabwareInfoOverlay
->
-const mockLabwareRender = LabwareRender as jest.MockedFunction<
-  typeof LabwareRender
->
-const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
-const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
-  typeof getDeckDefFromRobotType
->
-const mockParseInitialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter as jest.MockedFunction<
-  typeof parseInitialLoadedLabwareByAdapter
->
-const mockParseLabwareInfoByLiquidId = parseLabwareInfoByLiquidId as jest.MockedFunction<
-  typeof parseLabwareInfoByLiquidId
->
-const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFunction<
-  typeof parseLiquidsInLoadOrder
->
-const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<
-  typeof getLabwareRenderInfo
->
-const mockGetAttachedProtocolModuleMatches = getAttachedProtocolModuleMatches as jest.MockedFunction<
-  typeof getAttachedProtocolModuleMatches
->
-const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
-  typeof getProtocolModulesInfo
->
-const mockGetSimplestDeckConfigForProtocol = getSimplestDeckConfigForProtocol as jest.MockedFunction<
-  typeof getSimplestDeckConfigForProtocol
->
+vi.mock('@opentrons/components/src/hardware-sim/BaseDeck')
+vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/shared-data/js/helpers')
+vi.mock('../../LabwareInfoOverlay')
+vi.mock('../../../hooks')
+vi.mock('../utils')
+vi.mock('../../utils/getLabwareRenderInfo')
+vi.mock('../../../../ProtocolSetupModulesAndDeck/utils')
+vi.mock('../../utils/getProtocolModulesInfo')
+vi.mock('../../../../../resources/deck_configuration/utils')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getSimplestDeckConfigForProtocol>()
+  return {
+    ...actual,
+    getSimplestDeckConfigForProtocol: vi.fn(),
+    getDeckDefFromRobotType: vi.fn(),
+  }
+})
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof BaseDeck>()
+  return {
+    ...actual,
+    BaseDeck: vi.fn(),
+    LabwareRender: vi.fn(),
+  }
+})
 
 const RUN_ID = '1'
 const MOCK_300_UL_TIPRACK_ID = '300_ul_tiprack_id'
@@ -138,59 +119,70 @@ describe('SetupLiquidsMap', () => {
       runId: RUN_ID,
       protocolAnalysis: mockProtocolAnalysis,
     }
-    when(mockLabwareRender)
-      .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected labware definition
+
+    when(vi.mocked(LabwareRender))
       .calledWith(
-        partialComponentPropsMatcher({
-          definition: fixture_tiprack_300_ul,
+        expect.objectContaining({
+          definition: fixtureTiprack300ul,
           wellFill: undefined,
-        })
+        }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
+        expect.anything()
       )
-      .mockReturnValue(
+      .thenReturn(
         <div>
-          mock labware render of {fixture_tiprack_300_ul.metadata.displayName}
+          mock labware render of {fixtureTiprack300ul.metadata.displayName}
         </div>
       )
+    when(vi.mocked(LabwareRender))
       .calledWith(
-        partialComponentPropsMatcher({
+        expect.objectContaining({
           wellFill: { C1: '#ff4888', C2: '#ff4888' },
-        })
+        }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
+        expect.anything()
       )
-      .mockReturnValue(<div>mock labware render with well fill</div>)
-    when(mockUseAttachedModules).calledWith().mockReturnValue([])
-    when(mockGetAttachedProtocolModuleMatches).mockReturnValue([])
-    when(mockGetLabwareRenderInfo)
+      .thenReturn(<div>mock labware render with well fill</div>)
+    when(vi.mocked(useAttachedModules)).calledWith().thenReturn([])
+    vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([])
+    when(vi.mocked(getLabwareRenderInfo))
       .calledWith(mockProtocolAnalysis, ot2StandardDeckDef as any)
-      .mockReturnValue({})
-    when(mockGetSimplestDeckConfigForProtocol)
+      .thenReturn({})
+    when(vi.mocked(getSimplestDeckConfigForProtocol))
       .calledWith(mockProtocolAnalysis)
-      // TODO(bh, 2023-11-13): mock the cutout config protocol spec
-      .mockReturnValue([])
-    when(mockParseLiquidsInLoadOrder)
+      .thenReturn(FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC)
+    when(vi.mocked(parseLiquidsInLoadOrder))
       .calledWith(
         mockProtocolAnalysis.liquids as any,
         mockProtocolAnalysis.commands as any
       )
-      .mockReturnValue([])
-    when(mockParseInitialLoadedLabwareByAdapter)
+      .thenReturn([])
+    when(vi.mocked(parseInitialLoadedLabwareByAdapter))
       .calledWith(mockProtocolAnalysis.commands as any)
-      .mockReturnValue({})
-    when(mockLabwareInfoOverlay)
-      .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareInfoOverlay isn't called with expected props
+      .thenReturn({})
+    when(vi.mocked(LabwareInfoOverlay))
       .calledWith(
-        partialComponentPropsMatcher({ definition: fixture_tiprack_300_ul })
+        expect.objectContaining({ definition: fixtureTiprack300ul }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
+        expect.anything()
       )
-      .mockReturnValue(
+      .thenReturn(
         <div>
           mock labware info overlay of{' '}
-          {fixture_tiprack_300_ul.metadata.displayName}
+          {fixtureTiprack300ul.metadata.displayName}
         </div>
       )
+    when(vi.mocked(LabwareInfoOverlay))
+      .calledWith(
+        expect.not.objectContaining({ definition: fixtureTiprack300ul }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
+        expect.anything()
+      )
+      .thenReturn(<div></div>)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    resetAllWhenMocks()
+    vi.clearAllMocks()
   })
 
   it('should render a deck WITHOUT labware and WITHOUT modules', () => {
@@ -199,30 +191,30 @@ describe('SetupLiquidsMap', () => {
       protocolAnalysis: null,
     }
     render(props)
-    expect(mockLabwareRender).not.toHaveBeenCalled()
-    expect(mockLabwareInfoOverlay).not.toHaveBeenCalled()
+    expect(vi.mocked(LabwareRender)).not.toHaveBeenCalled()
+    expect(vi.mocked(LabwareInfoOverlay)).not.toHaveBeenCalled()
   })
 
   it('should render base deck - robot type is OT-2', () => {
-    when(mockGetDeckDefFromRobotType)
+    when(vi.mocked(getDeckDefFromRobotType))
       .calledWith(OT2_ROBOT_TYPE)
-      .mockReturnValue(ot2StandardDeckDef as any)
-    when(mockParseLabwareInfoByLiquidId)
+      .thenReturn(ot2StandardDeckDef as any)
+    when(vi.mocked(parseLabwareInfoByLiquidId))
       .calledWith(mockProtocolAnalysis.commands as any)
-      .mockReturnValue({})
-    mockUseAttachedModules.mockReturnValue(
+      .thenReturn({})
+    vi.mocked(useAttachedModules).mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
-    when(mockGetLabwareRenderInfo).mockReturnValue({})
-    when(mockGetProtocolModulesInfo)
+    vi.mocked(getLabwareRenderInfo).mockReturnValue({})
+    when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockProtocolAnalysis, ot2StandardDeckDef as any)
-      .mockReturnValue(mockProtocolModuleInfo)
-    when(mockGetAttachedProtocolModuleMatches)
+      .thenReturn(mockProtocolModuleInfo)
+    when(vi.mocked(getAttachedProtocolModuleMatches))
       .calledWith(
         mockFetchModulesSuccessActionPayloadModules,
         mockProtocolModuleInfo
       )
-      .mockReturnValue([
+      .thenReturn([
         {
           moduleId: mockMagneticModule.moduleId,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -251,16 +243,18 @@ describe('SetupLiquidsMap', () => {
         },
       ])
 
-    when(mockBaseDeck)
+    when(vi.mocked(BaseDeck))
       .calledWith(
-        partialComponentPropsMatcher({
+        expect.objectContaining({
           robotType: OT2_ROBOT_TYPE,
           deckLayerBlocklist: getStandardDeckViewLayerBlockList(OT2_ROBOT_TYPE),
-        })
+        }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
+        expect.anything()
       )
-      .mockReturnValue(<div>mock BaseDeck</div>)
-    const [{ getByText }] = render(props)
-    getByText('mock BaseDeck')
+      .thenReturn(<div>mock BaseDeck</div>)
+    render(props)
+    screen.getByText('mock BaseDeck')
   })
 
   it('should render base deck - robot type is Flex', () => {
@@ -275,15 +269,15 @@ describe('SetupLiquidsMap', () => {
         robotType: FLEX_ROBOT_TYPE,
       },
     }
-    when(mockGetDeckDefFromRobotType)
+    when(vi.mocked(getDeckDefFromRobotType))
       .calledWith(FLEX_ROBOT_TYPE)
-      .mockReturnValue(ot3StandardDeckDef as any)
+      .thenReturn(ot3StandardDeckDef as any)
 
-    when(mockGetLabwareRenderInfo)
+    when(vi.mocked(getLabwareRenderInfo))
       .calledWith(mockFlexAnalysis, ot3StandardDeckDef as any)
-      .mockReturnValue({
+      .thenReturn({
         [MOCK_300_UL_TIPRACK_ID]: {
-          labwareDef: fixture_tiprack_300_ul as LabwareDefinition2,
+          labwareDef: fixtureTiprack300ul as LabwareDefinition2,
           displayName: 'fresh tips',
           x: MOCK_300_UL_TIPRACK_COORDS[0],
           y: MOCK_300_UL_TIPRACK_COORDS[1],
@@ -292,22 +286,22 @@ describe('SetupLiquidsMap', () => {
         },
       })
 
-    when(mockParseLabwareInfoByLiquidId)
+    when(vi.mocked(parseLabwareInfoByLiquidId))
       .calledWith(mockFlexAnalysis.commands as any)
-      .mockReturnValue({})
-    mockUseAttachedModules.mockReturnValue(
+      .thenReturn({})
+    vi.mocked(useAttachedModules).mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
 
-    when(mockGetProtocolModulesInfo)
+    when(vi.mocked(getProtocolModulesInfo))
       .calledWith(mockFlexAnalysis, ot3StandardDeckDef as any)
-      .mockReturnValue(mockProtocolModuleInfo)
-    when(mockGetAttachedProtocolModuleMatches)
+      .thenReturn(mockProtocolModuleInfo)
+    when(vi.mocked(getAttachedProtocolModuleMatches))
       .calledWith(
         mockFetchModulesSuccessActionPayloadModules,
         mockProtocolModuleInfo
       )
-      .mockReturnValue([
+      .thenReturn([
         {
           moduleId: mockMagneticModule.moduleId,
           x: MOCK_MAGNETIC_MODULE_COORDS[0],
@@ -335,9 +329,9 @@ describe('SetupLiquidsMap', () => {
           attachedModuleMatch: null,
         },
       ])
-    when(mockBaseDeck)
+    when(vi.mocked(BaseDeck))
       .calledWith(
-        partialComponentPropsMatcher({
+        expect.objectContaining({
           deckLayerBlocklist: getStandardDeckViewLayerBlockList(
             FLEX_ROBOT_TYPE
           ),
@@ -345,11 +339,13 @@ describe('SetupLiquidsMap', () => {
           // // ToDo (kk:11/03/2023) Update the following part later
           labwareOnDeck: expect.anything(),
           modulesOnDeck: expect.anything(),
-        })
+        }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
+        expect.anything()
       )
-      .mockReturnValue(<div>mock BaseDeck</div>)
-    const [{ getByText }] = render(props)
-    getByText('mock BaseDeck')
+      .thenReturn(<div>mock BaseDeck</div>)
+    render(props)
+    screen.getByText('mock BaseDeck')
   })
 
   // ToDo (kk:11/03/2023)

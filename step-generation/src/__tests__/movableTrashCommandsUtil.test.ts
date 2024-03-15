@@ -1,21 +1,19 @@
+import { describe, it, expect, vi } from 'vitest'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import { curryCommandCreator } from '../utils'
 import { movableTrashCommandsUtil } from '../utils/movableTrashCommandsUtil'
-import type { PipetteEntities } from '../types'
 import {
   aspirateInPlace,
   blowOutInPlace,
   dispenseInPlace,
   dropTipInPlace,
   moveToAddressableArea,
+  moveToAddressableAreaForDropTip,
 } from '../commandCreators/atomic'
+import type { PipetteEntities } from '../types'
 
-jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
-jest.mock('../utils/curryCommandCreator')
-
-const curryCommandCreatorMock = curryCommandCreator as jest.MockedFunction<
-  typeof curryCommandCreator
->
+vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
+vi.mock('../utils/curryCommandCreator')
 
 const mockTrashBinId = 'mockTrashBinId'
 const mockId = 'mockId'
@@ -54,11 +52,11 @@ const args = {
 describe('movableTrashCommandsUtil', () => {
   it('returns correct commands for dispensing', () => {
     movableTrashCommandsUtil({ ...args, type: 'dispense' })
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
+    expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
       mockMoveToAddressableAreaParams
     )
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(dispenseInPlace, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(dispenseInPlace, {
       pipetteId: mockId,
       volume: 10,
       flowRate: 10,
@@ -69,11 +67,11 @@ describe('movableTrashCommandsUtil', () => {
       ...args,
       type: 'blowOut',
     })
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
+    expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
       mockMoveToAddressableAreaParams
     )
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(blowOutInPlace, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInPlace, {
       pipetteId: mockId,
 
       flowRate: 10,
@@ -88,11 +86,11 @@ describe('movableTrashCommandsUtil', () => {
         tipState: { pipettes: { [mockId]: true } } as any,
       },
     })
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
-      moveToAddressableArea,
+    expect(curryCommandCreator).toHaveBeenCalledWith(
+      moveToAddressableAreaForDropTip,
       mockMoveToAddressableAreaParams
     )
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(dropTipInPlace, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(dropTipInPlace, {
       pipetteId: mockId,
     })
   })
@@ -105,11 +103,11 @@ describe('movableTrashCommandsUtil', () => {
         tipState: { pipettes: { [mockId]: true } } as any,
       },
     })
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(
+    expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
       mockMoveToAddressableAreaParams
     )
-    expect(curryCommandCreatorMock).toHaveBeenCalledWith(aspirateInPlace, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(aspirateInPlace, {
       pipetteId: mockId,
       volume: 10,
       flowRate: 10,

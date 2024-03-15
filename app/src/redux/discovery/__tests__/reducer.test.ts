@@ -1,14 +1,11 @@
-// discovery reducer test
+import { describe, it, expect } from 'vitest'
+
 import { discoveryReducer } from '../reducer'
 
 import type { Action } from '../../types'
 import type { DiscoveryState } from '../types'
 
 describe('discoveryReducer', () => {
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   const SPECS: Array<{
     name: string
     action: Action

@@ -1,8 +1,11 @@
 import * as React from 'react'
-import { act, renderHook } from '@testing-library/react-hooks'
+import { fireEvent, renderHook } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
-import { LEFT, renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, expect } from 'vitest'
 
+import { LEFT } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useConfirmCrashRecovery } from '../useConfirmCrashRecovery'
 import { mockCalibrationCheckLabware } from '../../../redux/sessions/__fixtures__'
@@ -12,13 +15,10 @@ import {
   sharedCalCommands,
 } from '../../../redux/sessions'
 
-import type { CalibrationPanelProps } from '../types'
-
 describe('useConfirmCrashRecovery', () => {
-  let wrapper: React.FunctionComponent<{}>
-  const mockSendCommands = jest.fn()
+  const mockSendCommands = vi.fn()
   const mockProps = {
-    cleanUpAndExit: jest.fn(),
+    cleanUpAndExit: vi.fn(),
     tipRack: mockCalibrationCheckLabware,
     isMulti: false,
     mount: LEFT,
@@ -26,26 +26,18 @@ describe('useConfirmCrashRecovery', () => {
     sessionType: SESSION_TYPE_DECK_CALIBRATION,
   }
 
-  beforeEach(() => {
-    wrapper = ({ children }) => (
-      <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
-    )
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders the link text', () => {
-    const { result } = renderHook<
-      CalibrationPanelProps,
-      [link: JSX.Element, confirmation: JSX.Element | null]
-    >(
+    const { result } = renderHook(
       () =>
         useConfirmCrashRecovery({
           ...mockProps,
           sendCommands: mockSendCommands,
         }),
-      { wrapper }
+      {
+        wrapper: ({ children }) => (
+          <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+        ),
+      }
     )
     const [link, confirmation] = result.current
     expect(link).not.toBeNull()
@@ -59,16 +51,17 @@ describe('useConfirmCrashRecovery', () => {
   })
 
   it('renders the modal with the right props when you click the link', () => {
-    const { result } = renderHook<
-      CalibrationPanelProps,
-      [link: JSX.Element, confirmation: JSX.Element | null]
-    >(
+    const { result } = renderHook(
       () =>
         useConfirmCrashRecovery({
           ...mockProps,
           sendCommands: mockSendCommands,
         }),
-      { wrapper }
+      {
+        wrapper: ({ children }) => (
+          <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+        ),
+      }
     )
 
     // render returned confirmation if not null, otherwise render the link
@@ -77,7 +70,7 @@ describe('useConfirmCrashRecovery', () => {
       { i18nInstance: i18n }
     )[0]
     // click the link to launch the modal
-    act(() => getByRole('button', { name: 'Start over' }).click())
+    fireEvent.click(getByRole('button', { name: 'Start over' }))
     // the confirmation should now not be null
     expect(result.current[1]).not.toBeNull()
     // the explicitly rerender to incorporate newly non-null confirmation
@@ -85,14 +78,14 @@ describe('useConfirmCrashRecovery', () => {
 
     // click the "back" link in the confirmation
     const closeConfirmationButton = getByRole('button', { name: 'resume' })
-    act(() => closeConfirmationButton.click())
+    fireEvent.click(closeConfirmationButton)
     // the confirmation should now be null once more
     expect(result.current[1]).toBeNull()
 
     // open the confirmation again and click the proceed to start over button
-    act(() => getByRole('button', { name: 'Start over' }).click())
+    fireEvent.click(getByRole('button', { name: 'Start over' }))
     const startOverButton = getByRole('button', { name: 'Start over' })
-    startOverButton.click()
+    fireEvent.click(startOverButton)
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: sharedCalCommands.INVALIDATE_LAST_ACTION,
     })

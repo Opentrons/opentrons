@@ -1,5 +1,7 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import cx from 'classnames'
+import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
 import {
   AlertModal,
@@ -10,14 +12,14 @@ import {
   OutlineButton,
   RadioGroup,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
-import { Portal } from '../../../portals/MainPageModalPortal'
-import modalStyles from '../../../modals/modal.css'
+import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
+import modalStyles from '../../../modals/modal.module.css'
+import { getIsTouchTipField } from '../../../../form-types'
 import { TipPositionZAxisViz } from './TipPositionZAxisViz'
 
-import styles from './TipPositionInput.css'
+import styles from './TipPositionInput.module.css'
 import * as utils from './utils'
-import { getIsTouchTipField, StepFieldName } from '../../../../form-types'
+import type { StepFieldName } from '../../../../form-types'
 
 const SMALL_STEP_MM = 1
 const LARGE_STEP_MM = 10
@@ -45,13 +47,14 @@ const getErrorText = (args: {
   maxMmFromBottom: number
   minMmFromBottom: number
   isPristine: boolean
+  t: any
 }): string | null => {
-  const { errors, minMmFromBottom, maxMmFromBottom, isPristine } = args
+  const { errors, minMmFromBottom, maxMmFromBottom, isPristine, t } = args
 
   if (errors.includes(TOO_MANY_DECIMALS)) {
-    return i18n.t('modal.tip_position.errors.TOO_MANY_DECIMALS')
+    return t('tip_position.errors.TOO_MANY_DECIMALS')
   } else if (!isPristine && errors.includes(OUT_OF_BOUNDS)) {
-    return i18n.t('modal.tip_position.errors.OUT_OF_BOUNDS', {
+    return t('tip_position.errors.OUT_OF_BOUNDS', {
       minMmFromBottom,
       maxMmFromBottom,
     })
@@ -89,7 +92,7 @@ const getErrors = (args: {
 
 export const TipPositionModal = (props: Props): JSX.Element => {
   const { isIndeterminate, name, wellDepthMm } = props
-
+  const { t } = useTranslation(['modal', 'button'])
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
     name,
     wellDepthMm,
@@ -135,6 +138,7 @@ export const TipPositionModal = (props: Props): JSX.Element => {
     maxMmFromBottom,
     minMmFromBottom,
     isPristine,
+    t,
   })
 
   const handleDone = (): void => {
@@ -204,106 +208,105 @@ export const TipPositionModal = (props: Props): JSX.Element => {
   // Mix Form's asp/disp tip position field has different default value text
   const isMixAspDispField = name === 'mix_mmFromBottom'
 
-  return (
-    <Portal>
-      <HandleKeypress
-        preventDefault
-        handlers={[
+  return createPortal(
+    <HandleKeypress
+      preventDefault
+      handlers={[
+        {
+          key: 'ArrowUp',
+          shiftKey: false,
+          onPress: makeHandleIncrement(SMALL_STEP_MM),
+        },
+        {
+          key: 'ArrowUp',
+          shiftKey: true,
+          onPress: makeHandleIncrement(LARGE_STEP_MM),
+        },
+        {
+          key: 'ArrowDown',
+          shiftKey: false,
+          onPress: makeHandleDecrement(SMALL_STEP_MM),
+        },
+        {
+          key: 'ArrowDown',
+          shiftKey: true,
+          onPress: makeHandleDecrement(LARGE_STEP_MM),
+        },
+      ]}
+    >
+      <AlertModal
+        alertOverlay
+        buttons={[
+          { onClick: handleCancel, children: t('button:cancel') },
           {
-            key: 'ArrowUp',
-            shiftKey: false,
-            onPress: makeHandleIncrement(SMALL_STEP_MM),
-          },
-          {
-            key: 'ArrowUp',
-            shiftKey: true,
-            onPress: makeHandleIncrement(LARGE_STEP_MM),
-          },
-          {
-            key: 'ArrowDown',
-            shiftKey: false,
-            onPress: makeHandleDecrement(SMALL_STEP_MM),
-          },
-          {
-            key: 'ArrowDown',
-            shiftKey: true,
-            onPress: makeHandleDecrement(LARGE_STEP_MM),
+            onClick: handleDone,
+            children: t('button:done'),
+            disabled: hasVisibleErrors,
           },
         ]}
+        className={modalStyles.modal}
+        contentsClassName={cx(modalStyles.modal_contents)}
+        onCloseClick={handleCancel}
       >
-        <AlertModal
-          alertOverlay
-          buttons={[
-            { onClick: handleCancel, children: i18n.t('button.cancel') },
-            {
-              onClick: handleDone,
-              children: i18n.t('button.done'),
-              disabled: hasVisibleErrors,
-            },
-          ]}
-          className={modalStyles.modal}
-          contentsClassName={cx(modalStyles.modal_contents)}
-          onCloseClick={handleCancel}
-        >
-          <div className={styles.modal_header}>
-            <h4>{i18n.t('modal.tip_position.title')}</h4>
-            <p>{i18n.t(`modal.tip_position.body.${name}`)}</p>
-          </div>
-          <div className={styles.main_row}>
-            <Flex alignItems="flex-start">
-              <div>
-                <RadioGroup
-                  value={isDefault ? 'default' : 'custom'}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setIsDefault(e.currentTarget.value === 'default')
-                  }}
-                  options={[
-                    {
-                      name: isMixAspDispField
-                        ? `Aspirate 1mm, Dispense 0.5mm from the bottom (default)`
-                        : `${defaultMmFromBottom} mm from the bottom (default)`,
-                      value: 'default',
-                    },
-                    {
-                      name: 'Custom',
-                      value: 'custom',
-                    },
-                  ]}
-                  name="TipPositionOptions"
-                />
-                {TipPositionInputField}
-              </div>
+        <div className={styles.modal_header}>
+          <h4>{t('tip_position.title')}</h4>
+          <p>{t(`tip_position.body.${name}`)}</p>
+        </div>
+        <div className={styles.main_row}>
+          <Flex alignItems="flex-start">
+            <div>
+              <RadioGroup
+                value={isDefault ? 'default' : 'custom'}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setIsDefault(e.currentTarget.value === 'default')
+                }}
+                options={[
+                  {
+                    name: isMixAspDispField
+                      ? `Aspirate 1mm, Dispense 0.5mm from the bottom (default)`
+                      : `${defaultMmFromBottom} mm from the bottom (default)`,
+                    value: 'default',
+                  },
+                  {
+                    name: 'Custom',
+                    value: 'custom',
+                  },
+                ]}
+                name="TipPositionOptions"
+              />
+              {TipPositionInputField}
+            </div>
 
-              <div className={styles.viz_group}>
-                {!isDefault && (
-                  <div className={styles.adjustment_buttons}>
-                    <OutlineButton
-                      id="Increment_tipPosition"
-                      className={styles.adjustment_button}
-                      onClick={makeHandleIncrement(SMALL_STEP_MM)}
-                    >
-                      <Icon name="plus" />
-                    </OutlineButton>
-                    <OutlineButton
-                      id="Decrement_tipPosition"
-                      className={styles.adjustment_button}
-                      onClick={makeHandleDecrement(SMALL_STEP_MM)}
-                    >
-                      <Icon name="minus" />
-                    </OutlineButton>
-                  </div>
-                )}
-                <TipPositionZAxisViz
-                  mmFromBottom={
-                    value !== null ? Number(value) : defaultMmFromBottom
-                  }
-                  wellDepthMm={wellDepthMm}
-                />
-              </div>
-            </Flex>
-          </div>
-        </AlertModal>
-      </HandleKeypress>
-    </Portal>
+            <div className={styles.viz_group}>
+              {!isDefault && (
+                <div className={styles.adjustment_buttons}>
+                  <OutlineButton
+                    id="Increment_tipPosition"
+                    className={styles.adjustment_button}
+                    onClick={makeHandleIncrement(SMALL_STEP_MM)}
+                  >
+                    <Icon name="plus" />
+                  </OutlineButton>
+                  <OutlineButton
+                    id="Decrement_tipPosition"
+                    className={styles.adjustment_button}
+                    onClick={makeHandleDecrement(SMALL_STEP_MM)}
+                  >
+                    <Icon name="minus" />
+                  </OutlineButton>
+                </div>
+              )}
+              <TipPositionZAxisViz
+                mmFromBottom={
+                  value !== null ? Number(value) : defaultMmFromBottom
+                }
+                wellDepthMm={wellDepthMm}
+              />
+            </div>
+          </Flex>
+        </div>
+      </AlertModal>
+    </HandleKeypress>,
+    getMainPagePortalEl()
   )
 }

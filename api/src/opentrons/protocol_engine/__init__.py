@@ -13,6 +13,7 @@ from .create_protocol_engine import (
 )
 from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError, ErrorOccurrence
+from .notes import CommandNote
 from .commands import (
     Command,
     CommandParams,
@@ -79,6 +80,7 @@ __all__ = [
     "CommandStatus",
     "CommandType",
     "CommandIntent",
+    "CommandNote",
     # state interfaces and models
     "State",
     "StateView",

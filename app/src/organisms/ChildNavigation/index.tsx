@@ -68,7 +68,7 @@ export function ChildNavigation({
           onClick={onClickBack}
           data-testid="ChildNavigation_Back_Button"
         >
-          <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
+          <Icon name="back" size="3rem" color={COLORS.black90} />
         </IconButton>
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {header}
@@ -108,7 +108,7 @@ const IconButton = styled('button')`
 
   &:focus-visible {
     box-shadow: ${ODD_FOCUS_VISIBLE};
-    background-color: ${COLORS.darkBlack20};
+    background-color: ${COLORS.grey35};
   }
   &:disabled {
     background-color: transparent;

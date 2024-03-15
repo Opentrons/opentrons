@@ -7,7 +7,7 @@ from fastapi import UploadFile
 from functools import wraps
 from pathlib import Path
 from types import TracebackType
-from typing import cast, Any, Awaitable, Callable, Optional, Type, TypeVar
+from typing import cast, Any, Coroutine, Callable, Optional, Type, TypeVar
 from typing_extensions import Final
 from datetime import datetime, timezone
 
@@ -41,7 +41,7 @@ class FileMeta:
 
 def save_upload(directory: Path, upload_file: UploadFile) -> FileMeta:
     """Save an uploaded file."""
-    path = directory / upload_file.filename
+    path = directory / (upload_file.filename or "")
 
     contents = upload_file.file.read()
     content_hash = hashlib.sha256(contents).hexdigest()
@@ -56,7 +56,7 @@ def save_upload(directory: Path, upload_file: UploadFile) -> FileMeta:
 _CALL_ONCE_TASK_ATTR: Final = "_call_once_task"
 
 
-AsyncFuncT = TypeVar("AsyncFuncT", bound=Callable[..., Awaitable[Any]])
+AsyncFuncT = TypeVar("AsyncFuncT", bound=Callable[..., Coroutine[Any, Any, Any]])
 
 
 def call_once(fn: AsyncFuncT) -> AsyncFuncT:

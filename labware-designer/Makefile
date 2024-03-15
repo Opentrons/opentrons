@@ -26,7 +26,7 @@ clean:
 .PHONY: dist
 dist: export NODE_ENV := production
 dist:
-	webpack --profile
+	vite build
 
 # development
 #####################################################################
@@ -34,7 +34,7 @@ dist:
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	webpack-dev-server --hot
+	vite serve --host=::
 
 .PHONY: test
 test:

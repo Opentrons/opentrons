@@ -6,7 +6,7 @@ import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import { SetWifiCred } from '../../../organisms/NetworkSettings/SetWifiCred'
 
-import type { SetSettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SetSettingOption } from '../../../pages/RobotSettingsDashboard'
 
 interface RobotSettingsSetWifiCredProps {
   handleConnect: () => void

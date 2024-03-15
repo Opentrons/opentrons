@@ -28,6 +28,7 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     Liquid,
     PostRunHardwareState,
+    AddressableAreaLocation,
 )
 from opentrons.protocol_engine.execution import (
     QueueWorker,
@@ -43,6 +44,7 @@ from opentrons.protocol_engine.actions import (
     ActionDispatcher,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    AddAddressableAreaAction,
     AddLiquidAction,
     AddModuleAction,
     PlayAction,
@@ -919,6 +921,25 @@ def test_add_labware_definition(
     result = subject.add_labware_definition(well_plate_def)
 
     assert result == "some/definition/uri"
+
+
+def test_add_addressable_area(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should dispatch an AddAddressableArea action."""
+    subject.add_addressable_area(addressable_area_name="my_funky_area")
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            AddAddressableAreaAction(
+                addressable_area=AddressableAreaLocation(
+                    addressableAreaName="my_funky_area"
+                )
+            )
+        )
+    )
 
 
 def test_add_liquid(

@@ -1,15 +1,15 @@
-import assert from 'assert'
 import isUndefined from 'lodash/isUndefined'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
 import flow from 'lodash/flow'
-import { getLabwareV1Def, getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   FileLabware,
   FilePipette,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV1'
+import { getLegacyLabwareDef } from '../../labware-defs'
 import { FormPatch } from '../../steplist/actions'
 import { FormData } from '../../form-types'
 export interface PDMetadata {
@@ -70,18 +70,18 @@ function getPipetteCapacityLegacy(
   }
   // @ts-expect-error unable to cast type string from manipulation above to type PipetteName
   const specs = getPipetteNameSpecs(pipetteName)
-  const tiprackDef = getLabwareV1Def(pipette.tiprackModel)
+  const tiprackDef = getLegacyLabwareDef(pipette.tiprackModel)
 
   if (specs && tiprackDef && tiprackDef.metadata.tipVolume) {
     return Math.min(specs.maxVolume, tiprackDef.metadata.tipVolume)
   }
 
-  assert(specs, `Expected spec for pipette ${JSON.stringify(pipette)}`)
-  assert(
+  console.assert(specs, `Expected spec for pipette ${JSON.stringify(pipette)}`)
+  console.assert(
     tiprackDef,
     `expected tiprack def for pipette ${JSON.stringify(pipette)}`
   )
-  assert(
+  console.assert(
     tiprackDef?.metadata?.tipVolume,
     `expected tiprack volume for tiprack def ${JSON.stringify(
       tiprackDef?.metadata || 'undefined'

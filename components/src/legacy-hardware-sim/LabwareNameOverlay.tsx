@@ -1,6 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
-import styles from './LabwareNameOverlay.css'
+import styles from './LabwareNameOverlay.module.css'
 
 export interface LabwareNameOverlayProps {
   title: string
@@ -8,6 +8,7 @@ export interface LabwareNameOverlayProps {
   className?: string
 }
 
+/** @deprecated use LabwareDisplayName or custom RobotCoordsForeignDiv */
 export function LabwareNameOverlay(
   props: LabwareNameOverlayProps
 ): JSX.Element {

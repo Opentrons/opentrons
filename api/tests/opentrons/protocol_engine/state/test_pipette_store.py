@@ -6,7 +6,7 @@ from typing import Optional
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.pipette import pipette_definition
 
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import DeckSlotName, MountType, Point
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.types import (
     DeckPoint,
@@ -27,6 +27,8 @@ from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
     CurrentDeckPoint,
     StaticPipetteConfig,
+    BoundingNozzlesOffsets,
+    PipetteBoundingBoxOffsets,
 )
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
@@ -35,6 +37,7 @@ from opentrons.protocol_engine.resources.pipette_data_provider import (
 from .command_fixtures import (
     create_load_pipette_command,
     create_aspirate_command,
+    create_aspirate_in_place_command,
     create_dispense_command,
     create_dispense_in_place_command,
     create_pick_up_tip_command,
@@ -43,11 +46,13 @@ from .command_fixtures import (
     create_touch_tip_command,
     create_move_to_well_command,
     create_blow_out_command,
+    create_blow_out_in_place_command,
     create_move_labware_command,
     create_move_to_coordinates_command,
     create_move_relative_command,
     create_prepare_to_aspirate_command,
 )
+from ..pipette_fixtures import get_default_nozzle_map
 
 
 @pytest.fixture
@@ -163,17 +168,23 @@ def test_handles_drop_tip_in_place(subject: PipetteStore) -> None:
     assert subject.state.aspirated_volume_by_id["xyz"] is None
 
 
-def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
+@pytest.mark.parametrize(
+    "aspirate_command",
+    [
+        create_aspirate_command(pipette_id="pipette-id", volume=42, flow_rate=1.23),
+        create_aspirate_in_place_command(
+            pipette_id="pipette-id", volume=42, flow_rate=1.23
+        ),
+    ],
+)
+def test_aspirate_adds_volume(
+    subject: PipetteStore, aspirate_command: cmd.Command
+) -> None:
     """It should add volume to pipette after an aspirate."""
     load_command = create_load_pipette_command(
         pipette_id="pipette-id",
         pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
-    )
-    aspirate_command = create_aspirate_command(
-        pipette_id="pipette-id",
-        volume=42,
-        flow_rate=1.23,
     )
 
     subject.handle_action(
@@ -192,28 +203,6 @@ def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 84
 
 
-def test_handles_blow_out(subject: PipetteStore) -> None:
-    """It should set volume to 0 and set current well."""
-    command = create_blow_out_command(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="well-name",
-        flow_rate=1.23,
-    )
-
-    subject.handle_action(UpdateCommandAction(private_result=None, command=command))
-
-    result = subject.state
-
-    assert result.aspirated_volume_by_id["pipette-id"] is None
-
-    assert result.current_location == CurrentWell(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="well-name",
-    )
-
-
 @pytest.mark.parametrize(
     "dispense_command",
     [
@@ -225,7 +214,7 @@ def test_handles_blow_out(subject: PipetteStore) -> None:
         ),
     ],
 )
-def test_pipette_volume_subtracts_dispense(
+def test_dispense_subtracts_volume(
     subject: PipetteStore, dispense_command: cmd.Command
 ) -> None:
     """It should subtract volume from pipette after a dispense."""
@@ -258,11 +247,40 @@ def test_pipette_volume_subtracts_dispense(
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
 
-    subject.handle_action(
-        UpdateCommandAction(private_result=None, command=dispense_command)
+
+@pytest.mark.parametrize(
+    "blow_out_command",
+    [
+        create_blow_out_command("pipette-id", 1.23),
+        create_blow_out_in_place_command("pipette-id", 1.23),
+    ],
+)
+def test_blow_out_clears_volume(
+    subject: PipetteStore, blow_out_command: cmd.Command
+) -> None:
+    """It should wipe out the aspirated volume after a blowOut."""
+    load_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    aspirate_command = create_aspirate_command(
+        pipette_id="pipette-id",
+        volume=42,
+        flow_rate=1.23,
     )
 
-    assert subject.state.aspirated_volume_by_id["pipette-id"] == 0
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=load_command)
+    )
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=aspirate_command)
+    )
+    subject.handle_action(
+        UpdateCommandAction(private_result=None, command=blow_out_command)
+    )
+
+    assert subject.state.aspirated_volume_by_id["pipette-id"] is None
 
 
 @pytest.mark.parametrize(
@@ -666,6 +684,9 @@ def test_add_pipette_config(
             nominal_tip_overlap={"default": 5},
             home_position=8.9,
             nozzle_offset_z=10.11,
+            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
+            back_left_corner_offset=Point(x=1, y=2, z=3),
+            front_right_corner_offset=Point(x=4, y=5, z=6),
         ),
     )
     subject.handle_action(
@@ -683,6 +704,15 @@ def test_add_pipette_config(
         nominal_tip_overlap={"default": 5},
         home_position=8.9,
         nozzle_offset_z=10.11,
+        bounding_nozzle_offsets=BoundingNozzlesOffsets(
+            back_left_offset=Point(x=0, y=0, z=0),
+            front_right_offset=Point(x=0, y=0, z=0),
+        ),
+        default_nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
+        pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
+            back_left_corner=Point(x=1, y=2, z=3),
+            front_right_corner=Point(x=4, y=5, z=6),
+        ),
     )
     assert subject.state.flow_rates_by_id["pipette-id"].default_aspirate == {"a": 1.0}
     assert subject.state.flow_rates_by_id["pipette-id"].default_dispense == {"b": 2.0}

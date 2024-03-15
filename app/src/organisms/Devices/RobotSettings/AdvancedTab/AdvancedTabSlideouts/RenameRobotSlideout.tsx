@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+import { useForm, Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useFormik } from 'formik'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -28,6 +28,7 @@ import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
 import { useIsFlex } from '../../../hooks'
 
+import type { Resolver, FieldError } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../../../../redux/types'
 interface RenameRobotSlideoutProps {
@@ -35,9 +36,8 @@ interface RenameRobotSlideoutProps {
   onCloseClick: () => void
   robotName: string
 }
-
-interface FormikErrors {
-  newRobotName?: string
+interface FormValues {
+  newRobotName: string
 }
 
 /* max length is 17 and min length is 1
@@ -70,38 +70,69 @@ export function RenameRobotSlideout({
     getUnreachableRobots(state)
   )
 
-  const formik = useFormik({
-    initialValues: {
+  const validate = (
+    data: FormValues,
+    errors: Record<string, FieldError>
+  ): Record<string, FieldError> => {
+    const newName = data.newRobotName
+    let message: string | undefined
+    if (!regexPattern.test(newName)) {
+      message = t('name_rule_error_name_length')
+    }
+    if (
+      [...connectableRobots, ...reachableRobots].some(
+        robot => newName === robot.name
+      )
+    ) {
+      message = t('name_rule_error_exist')
+    }
+
+    const updatedErrors =
+      message != null
+        ? {
+            ...errors,
+            newRobotName: {
+              type: 'error',
+              message: message,
+            },
+          }
+        : errors
+    return updatedErrors
+  }
+
+  const resolver: Resolver<FormValues> = values => {
+    let errors = {}
+    errors = validate(values, errors)
+    return { values, errors }
+  }
+
+  const {
+    handleSubmit,
+    control,
+    formState: { isDirty, isValid, errors },
+    reset,
+    watch,
+    trigger,
+  } = useForm({
+    defaultValues: {
       newRobotName: '',
     },
-    onSubmit: (values, { resetForm }) => {
-      const newName = values.newRobotName
-      setPreviousRobotName(robotName)
-      const sameNameRobotInUnavailable = unreachableRobots.find(
-        robot => robot.name === newName
-      )
-      if (sameNameRobotInUnavailable != null) {
-        dispatch(removeRobot(sameNameRobotInUnavailable.name))
-      }
-      updateRobotName(newName)
-      resetForm({ values: { newRobotName: '' } })
-    },
-    validate: values => {
-      const errors: FormikErrors = {}
-      const newName = values.newRobotName
-      if (!regexPattern.test(newName)) {
-        errors.newRobotName = t('name_rule_error_name_length')
-      }
-      if (
-        [...connectableRobots, ...reachableRobots].some(
-          robot => newName === robot.name
-        )
-      ) {
-        errors.newRobotName = t('name_rule_error_exist')
-      }
-      return errors
-    },
+    resolver: resolver,
   })
+  const newRobotName = watch('newRobotName')
+
+  const onSubmit = (data: FormValues): void => {
+    const newName = data.newRobotName
+    setPreviousRobotName(robotName)
+    const sameNameRobotInUnavailable = unreachableRobots.find(
+      robot => robot.name === newName
+    )
+    if (sameNameRobotInUnavailable != null) {
+      dispatch(removeRobot(sameNameRobotInUnavailable.name))
+    }
+    updateRobotName(newName)
+    reset({ newRobotName: '' })
+  }
 
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
@@ -124,10 +155,10 @@ export function RenameRobotSlideout({
       name: ANALYTICS_RENAME_ROBOT,
       properties: {
         previousRobotName,
-        newRobotName: formik.values.newRobotName,
+        newRobotName: newRobotName,
       },
     })
-    formik.handleSubmit()
+    handleSubmit(onSubmit)()
   }
 
   return (
@@ -138,7 +169,7 @@ export function RenameRobotSlideout({
       footer={
         <PrimaryButton
           onClick={handleSubmitRobotRename}
-          disabled={!(formik.isValid && formik.dirty)}
+          disabled={!(isDirty && isValid)}
           width="100%"
         >
           {t('rename_robot')}
@@ -161,27 +192,37 @@ export function RenameRobotSlideout({
         >
           {t('robot_name')}
         </StyledText>
-        <InputField
-          data-testid="rename-robot_input"
-          id="newRobotName"
+        <Controller
+          control={control}
           name="newRobotName"
-          type="text"
-          onChange={formik.handleChange}
-          value={formik.values.newRobotName}
-          error={formik.errors.newRobotName && ' '}
+          render={({ field, fieldState }) => (
+            <InputField
+              data-testid="rename-robot_input"
+              id="newRobotName"
+              name="newRobotName"
+              type="text"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                field.onChange(e)
+                trigger('newRobotName')
+              }}
+              value={field.value}
+              error={fieldState.error?.message && ' '}
+              onBlur={field.onBlur}
+            />
+          )}
         />
-        <StyledText as="label" color={COLORS.darkGreyEnabled}>
+        <StyledText as="label" color={COLORS.grey50}>
           {t('characters_max')}
         </StyledText>
-        {formik.errors.newRobotName && (
+        {errors.newRobotName != null ? (
           <StyledText
             as="label"
-            color={COLORS.errorEnabled}
+            color={COLORS.red50}
             marginTop={SPACING.spacing4}
           >
-            {formik.errors.newRobotName}
+            {errors.newRobotName.message}
           </StyledText>
-        )}
+        ) : null}
       </Flex>
     </Slideout>
   )

@@ -7,7 +7,7 @@ SHELL := bash
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
 # dev server port
-PORT ?= 8090
+PORT ?= 5173
 
 # Path of source package
 SRC_PATH = app
@@ -24,7 +24,7 @@ discovery_client_dir := ../discovery-client
 # make test tests=src/pages/Labware/__tests__/hooks.test.tsx would run only the
 # specified test
 tests ?=
-cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='app/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true
 test_opts ?=
 
 # standard targets
@@ -43,11 +43,10 @@ clean:
 
 # artifacts
 #####################################################################
-
 .PHONY: dist
 dist: export NODE_ENV := production
 dist:
-	webpack --profile
+	vite build
 
 # development
 #####################################################################
@@ -72,17 +71,16 @@ dev-odd:
 .PHONY: dev-server
 dev-server: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev-server:
-	webpack-dev-server --hot
+	vite serve
 
 .PHONY: dev-shell
 dev-shell:
-	wait-on http-get://localhost:$(PORT)
 	$(MAKE) -C $(shell_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)
 
 
 .PHONY: dev-shell-odd
 dev-shell-odd: export OT_APP_IS_ON_DEVICE := 1
-dev-shell-odd: export OT_APP_ON_DEVICE_DISPLAY_SETTINGS__UNFINISHED_UNBOXING_FLOW_ROUTE := /dashboard
+dev-shell-odd: export OT_APP_ON_DEVICE_DISPLAY_SETTINGS__UNFINISHED_UNBOXING_FLOW_ROUTE := 0
 dev-shell-odd: export OT_APP_UI__WIDTH := 1024
 dev-shell-odd: export OT_APP_UI__HEIGHT := 600
 dev-shell-odd:

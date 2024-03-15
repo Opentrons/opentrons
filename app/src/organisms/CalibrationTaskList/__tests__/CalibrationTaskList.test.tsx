@@ -1,6 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { CalibrationTaskList } from '..'
 import {
@@ -22,18 +25,8 @@ import {
 } from '../../Devices/hooks'
 import { mockLeftProtoPipette } from '../../../redux/pipettes/__fixtures__'
 
-jest.mock('../../Devices/hooks')
-jest.mock('../../ProtocolUpload/hooks')
-
-const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction<
-  typeof useCalibrationTaskList
->
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
->
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
->
+vi.mock('../../Devices/hooks')
+vi.mock('../../ProtocolUpload/hooks')
 
 const render = (robotName: string = 'otie') => {
   return renderWithProviders(
@@ -54,22 +47,23 @@ const render = (robotName: string = 'otie') => {
 
 describe('CalibrationTaskList', () => {
   beforeEach(() => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
-    mockUseRunHasStarted.mockReturnValue(false)
-    mockUseAttachedPipettes.mockReturnValue({
+    vi.mocked(useCalibrationTaskList).mockReturnValue(expectedTaskList)
+    vi.mocked(useRunHasStarted).mockReturnValue(false)
+    vi.mocked(useAttachedPipettes).mockReturnValue({
       left: mockLeftProtoPipette,
       right: null,
     })
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
+
   it('renders the Calibration Task List', () => {
-    const [{ getByText }] = render()
-    getByText('Deck Calibration')
-    getByText('Left Mount')
-    getByText('Right Mount')
+    render()
+    screen.getByText('Deck Calibration')
+    screen.getByText('Left Mount')
+    screen.getByText('Right Mount')
   })
 
   it('does not show the Calibrations complete screen when viewing a completed task list', () => {
@@ -80,13 +74,13 @@ describe('CalibrationTaskList', () => {
   it('shows the Calibrations complete screen after the calibrations are completed', () => {
     // initial render has incomplete calibrations, the rerender will use the completed calibrations mock response
     // this triggers the useEffect that causes the Calibrations complete screen to render
-    mockUseCalibrationTaskList.mockReturnValueOnce(
+    vi.mocked(useCalibrationTaskList).mockReturnValueOnce(
       expectedIncompleteDeckCalTaskList
     )
-    const [{ getByText, rerender }] = render()
-    expect(getByText('Calibrate')).toBeTruthy()
+    const [{ rerender }] = render()
+    expect(screen.getByText('Calibrate')).toBeTruthy()
     // Complete screen will only render if a wizard has been launched
-    getByText('Calibrate').click()
+    fireEvent.click(screen.getByText('Calibrate'))
     rerender(
       <StaticRouter>
         <CalibrationTaskList
@@ -98,21 +92,21 @@ describe('CalibrationTaskList', () => {
         />
       </StaticRouter>
     )
-    expect(getByText('Calibrations complete!')).toBeTruthy()
+    expect(screen.getByText('Calibrations complete!')).toBeTruthy()
   })
 
   it('renders the Calibration Task List properly when both tip length and offset are bad', () => {
-    mockUseCalibrationTaskList.mockReturnValueOnce(
+    vi.mocked(useCalibrationTaskList).mockReturnValueOnce(
       expectedBadTipLengthAndOffsetTaskList
     )
-    const [{ getAllByText, getByRole, getByText, rerender }] = render()
-    getByText('Deck Calibration')
-    expect(getByText('Recalibrate')).toBeTruthy()
-    getByText('Left Mount')
-    expect(getAllByText('Calibration recommended')).toHaveLength(3)
-    expect(getByRole('button', { name: 'Calibrate' })).toBeTruthy()
-    getByText('Right Mount')
-    getByText('Calibrate').click()
+    const [{ rerender }] = render()
+    screen.getByText('Deck Calibration')
+    expect(screen.getByText('Recalibrate')).toBeTruthy()
+    screen.getByText('Left Mount')
+    expect(screen.getAllByText('Calibration recommended')).toHaveLength(3)
+    expect(screen.getByRole('button', { name: 'Calibrate' })).toBeTruthy()
+    screen.getByText('Right Mount')
+    fireEvent.click(screen.getByText('Calibrate'))
     rerender(
       <StaticRouter>
         <CalibrationTaskList
@@ -124,20 +118,20 @@ describe('CalibrationTaskList', () => {
         />
       </StaticRouter>
     )
-    expect(getByText('Calibrations complete!')).toBeTruthy()
+    expect(screen.getByText('Calibrations complete!')).toBeTruthy()
   })
 
   it('renders the Calibration Task List properly when both deck and offset are bad', () => {
-    mockUseCalibrationTaskList.mockReturnValueOnce(
+    vi.mocked(useCalibrationTaskList).mockReturnValueOnce(
       expectedBadDeckAndPipetteOffsetTaskList
     )
-    const [{ getAllByText, getByRole, getByText, rerender }] = render()
-    getByText('Deck Calibration')
-    expect(getAllByText('Calibration recommended')).toHaveLength(2)
-    expect(getByRole('button', { name: 'Calibrate' })).toBeTruthy()
-    getByText('Left Mount')
-    getByText('Right Mount')
-    getByText('Calibrate').click()
+    const [{ rerender }] = render()
+    screen.getByText('Deck Calibration')
+    expect(screen.getAllByText('Calibration recommended')).toHaveLength(2)
+    expect(screen.getByRole('button', { name: 'Calibrate' })).toBeTruthy()
+    screen.getByText('Left Mount')
+    screen.getByText('Right Mount')
+    fireEvent.click(screen.getByText('Calibrate'))
     rerender(
       <StaticRouter>
         <CalibrationTaskList
@@ -149,20 +143,20 @@ describe('CalibrationTaskList', () => {
         />
       </StaticRouter>
     )
-    expect(getByText('Calibrations complete!')).toBeTruthy()
+    expect(screen.getByText('Calibrations complete!')).toBeTruthy()
   })
 
   it('renders the Calibration Task List properly when everything is bad', () => {
-    mockUseCalibrationTaskList.mockReturnValueOnce(
+    vi.mocked(useCalibrationTaskList).mockReturnValueOnce(
       expectedBadEverythingTaskList
     )
-    const [{ getAllByText, getByRole, getByText, rerender }] = render()
-    getByText('Deck Calibration')
-    expect(getAllByText('Calibration recommended')).toHaveLength(2)
-    expect(getByRole('button', { name: 'Calibrate' })).toBeTruthy()
-    getByText('Left Mount')
-    getByText('Right Mount')
-    getByText('Calibrate').click()
+    const [{ rerender }] = render()
+    screen.getByText('Deck Calibration')
+    expect(screen.getAllByText('Calibration recommended')).toHaveLength(2)
+    expect(screen.getByRole('button', { name: 'Calibrate' })).toBeTruthy()
+    screen.getByText('Left Mount')
+    screen.getByText('Right Mount')
+    fireEvent.click(screen.getByText('Calibrate'))
     rerender(
       <StaticRouter>
         <CalibrationTaskList
@@ -174,19 +168,19 @@ describe('CalibrationTaskList', () => {
         />
       </StaticRouter>
     )
-    expect(getByText('Calibrations complete!')).toBeTruthy()
+    expect(screen.getByText('Calibrations complete!')).toBeTruthy()
   })
 
   it('launching a recalibrate wizard from a subtask will allow the calibration complete screen to show', () => {
-    mockUseCalibrationTaskList.mockReturnValueOnce(
+    vi.mocked(useCalibrationTaskList).mockReturnValueOnce(
       expectedIncompleteRightMountTaskList
     )
 
-    const [{ getAllByText, getByText, rerender }] = render()
-    getByText('Left Mount').click()
-    const recalibrateLinks = getAllByText('Recalibrate') // this includes the deck and Left Mount subtasks CTAs
+    const [{ rerender }] = render()
+    fireEvent.click(screen.getByText('Left Mount'))
+    const recalibrateLinks = screen.getAllByText('Recalibrate') // this includes the deck and Left Mount subtasks CTAs
     expect(recalibrateLinks).toHaveLength(3)
-    recalibrateLinks[2].click()
+    fireEvent.click(recalibrateLinks[2])
     rerender(
       <StaticRouter>
         <CalibrationTaskList
@@ -198,19 +192,19 @@ describe('CalibrationTaskList', () => {
         />
       </StaticRouter>
     )
-    expect(getByText('Calibrations complete!')).toBeTruthy()
+    expect(screen.getByText('Calibrations complete!')).toBeTruthy()
   })
 
   it('launching a recalibrate wizard from a task will allow the calibration complete screen to show', () => {
-    mockUseCalibrationTaskList.mockReturnValueOnce(
+    vi.mocked(useCalibrationTaskList).mockReturnValueOnce(
       expectedIncompleteRightMountTaskList
     )
 
-    const [{ getAllByText, getByText, rerender }] = render()
-    getByText('Left Mount').click()
-    const recalibrateLinks = getAllByText('Recalibrate')
+    const [{ rerender }] = render()
+    fireEvent.click(screen.getByText('Left Mount'))
+    const recalibrateLinks = screen.getAllByText('Recalibrate')
     expect(recalibrateLinks).toHaveLength(3)
-    recalibrateLinks[0].click()
+    fireEvent.click(recalibrateLinks[0])
     rerender(
       <StaticRouter>
         <CalibrationTaskList
@@ -222,17 +216,17 @@ describe('CalibrationTaskList', () => {
         />
       </StaticRouter>
     )
-    expect(getByText('Calibrations complete!')).toBeTruthy()
+    expect(screen.getByText('Calibrations complete!')).toBeTruthy()
   })
 
   it('exiting a recalibrate wizard from a task will allow the current calibrations screen to show', () => {
-    mockUseCalibrationTaskList.mockReturnValueOnce(
+    vi.mocked(useCalibrationTaskList).mockReturnValueOnce(
       expectedIncompleteRightMountTaskList
     )
 
-    const [{ getByText, rerender }] = render()
-    const recalibrateLink = getByText('Recalibrate')
-    recalibrateLink.click()
+    const [{ rerender }] = render()
+    const recalibrateLink = screen.getByText('Recalibrate')
+    fireEvent.click(recalibrateLink)
     rerender(
       <StaticRouter>
         <CalibrationTaskList
@@ -244,19 +238,19 @@ describe('CalibrationTaskList', () => {
         />
       </StaticRouter>
     )
-    expect(getByText('Using current calibrations.')).toBeTruthy()
+    expect(screen.getByText('Using current calibrations.')).toBeTruthy()
   })
 
   it('prevents the user from launching calibrations or recalibrations from a task when a protocol run is active', () => {
-    mockUseCalibrationTaskList.mockReturnValueOnce(
+    vi.mocked(useCalibrationTaskList).mockReturnValueOnce(
       expectedIncompleteDeckCalTaskList
     )
-    mockUseRunHasStarted.mockReturnValue(true)
+    vi.mocked(useRunHasStarted).mockReturnValue(true)
 
-    const [{ getAllByText, rerender }] = render()
-    const calibrateButtons = getAllByText('Calibrate')
+    const [{ rerender }] = render()
+    const calibrateButtons = screen.getAllByText('Calibrate')
     expect(calibrateButtons).toHaveLength(1) // only deck's calibration button should be shown
-    calibrateButtons[0].click()
+    fireEvent.click(calibrateButtons[0])
     expect(mockDeckCalLauncher).not.toHaveBeenCalled()
     rerender(
       <StaticRouter>
@@ -269,22 +263,22 @@ describe('CalibrationTaskList', () => {
         />
       </StaticRouter>
     )
-    const recalibrateLinks = getAllByText('Recalibrate')
+    const recalibrateLinks = screen.getAllByText('Recalibrate')
     expect(recalibrateLinks).toHaveLength(1) // only deck's recalibration link should be shown
-    recalibrateLinks[0].click()
+    fireEvent.click(recalibrateLinks[0])
     expect(mockDeckCalLauncher).not.toHaveBeenCalled()
   })
 
   it('prevents the user from launching calibrations or recalibrations from a subtask when a protocol run is active', () => {
-    mockUseCalibrationTaskList.mockReturnValueOnce(
+    vi.mocked(useCalibrationTaskList).mockReturnValueOnce(
       expectedIncompleteLeftMountTaskList
     )
-    mockUseRunHasStarted.mockReturnValue(true)
+    vi.mocked(useRunHasStarted).mockReturnValue(true)
 
-    const [{ getAllByText, getByText, rerender }] = render()
-    const calibrateButtons = getAllByText('Calibrate')
+    const [{ rerender }] = render()
+    const calibrateButtons = screen.getAllByText('Calibrate')
     expect(calibrateButtons).toHaveLength(1) // only the left mounts tip length button should show
-    calibrateButtons[0].click()
+    fireEvent.click(calibrateButtons[0])
     expect(mockTipLengthCalLauncher).not.toHaveBeenCalled()
     rerender(
       <StaticRouter>
@@ -297,10 +291,10 @@ describe('CalibrationTaskList', () => {
         />
       </StaticRouter>
     )
-    getByText('Left Mount').click()
-    const recalibrateLinks = getAllByText('Recalibrate')
+    fireEvent.click(screen.getByText('Left Mount'))
+    const recalibrateLinks = screen.getAllByText('Recalibrate')
     expect(recalibrateLinks).toHaveLength(3) // deck and left mounts links are showing
-    recalibrateLinks[1].click()
+    fireEvent.click(recalibrateLinks[1])
     expect(mockTipLengthCalLauncher).not.toHaveBeenCalled()
   })
 })

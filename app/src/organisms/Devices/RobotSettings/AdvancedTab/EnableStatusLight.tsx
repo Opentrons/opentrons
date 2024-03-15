@@ -16,9 +16,11 @@ import { useLEDLights } from '../../hooks'
 
 interface EnableStatusLightProps {
   robotName: string
+  isEstopNotDisengaged: boolean
 }
 export function EnableStatusLight({
   robotName,
+  isEstopNotDisengaged,
 }: EnableStatusLightProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
@@ -46,6 +48,7 @@ export function EnableStatusLight({
         toggledOn={lightsEnabled}
         onClick={toggleLights}
         id="RobotSettings_enableStatusLightToggleButton"
+        disabled={isEstopNotDisengaged}
       />
     </Flex>
   )

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import {
@@ -38,7 +39,7 @@ import {
 import { FloatingActionButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -59,7 +60,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
 import { LabwareMapViewModal } from './LabwareMapViewModal'
 
@@ -211,59 +212,62 @@ export function ProtocolSetupLabware({
   const selectedLabwareLocation = selectedLabware?.location
   return (
     <>
-      <Portal level="top">
-        {showDeckMapModal ? (
-          <LabwareMapViewModal
-            mostRecentAnalysis={mostRecentAnalysis}
-            deckDef={deckDef}
-            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-            handleLabwareClick={handleLabwareClick}
-            onCloseClick={() => setShowDeckMapModal(false)}
-            initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
-          />
-        ) : null}
-        {showLabwareDetailsModal && selectedLabware != null ? (
-          <Modal
-            onOutsideClick={() => {
-              setShowLabwareDetailsModal(false)
-              setSelectedLabware(null)
-            }}
-          >
-            <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing48}>
-              <LabwareThumbnail
-                viewBox={`${selectedLabware.cornerOffsetFromSlot.x} ${selectedLabware.cornerOffsetFromSlot.y} ${selectedLabware.dimensions.xDimension} ${selectedLabware.dimensions.yDimension}`}
-              >
-                <LabwareRender definition={selectedLabware} />
-              </LabwareThumbnail>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                alignItems={ALIGN_FLEX_START}
-                gridGap={SPACING.spacing12}
-              >
-                <Flex gridGap={SPACING.spacing4}>{location}</Flex>
-                <StyledText
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  fontSize={TYPOGRAPHY.fontSize22}
+      {createPortal(
+        <>
+          {showDeckMapModal ? (
+            <LabwareMapViewModal
+              mostRecentAnalysis={mostRecentAnalysis}
+              deckDef={deckDef}
+              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+              handleLabwareClick={handleLabwareClick}
+              onCloseClick={() => setShowDeckMapModal(false)}
+              initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
+            />
+          ) : null}
+          {showLabwareDetailsModal && selectedLabware != null ? (
+            <Modal
+              onOutsideClick={() => {
+                setShowLabwareDetailsModal(false)
+                setSelectedLabware(null)
+              }}
+            >
+              <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing48}>
+                <LabwareThumbnail
+                  viewBox={`${selectedLabware.cornerOffsetFromSlot.x} ${selectedLabware.cornerOffsetFromSlot.y} ${selectedLabware.dimensions.xDimension} ${selectedLabware.dimensions.yDimension}`}
                 >
-                  {getLabwareDisplayName(selectedLabware)}
-                </StyledText>
-                <StyledText as="p" color={COLORS.darkBlack70}>
-                  {selectedLabware.nickName}
-                  {selectedLabwareLocation != null &&
-                  selectedLabwareLocation !== 'offDeck' &&
-                  'labwareId' in selectedLabwareLocation
-                    ? t('on_adapter', {
-                        adapterName: mostRecentAnalysis?.labware.find(
-                          l => l.id === selectedLabwareLocation.labwareId
-                        )?.displayName,
-                      })
-                    : null}
-                </StyledText>
+                  <LabwareRender definition={selectedLabware} />
+                </LabwareThumbnail>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  alignItems={ALIGN_FLEX_START}
+                  gridGap={SPACING.spacing12}
+                >
+                  <Flex gridGap={SPACING.spacing4}>{location}</Flex>
+                  <StyledText
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    fontSize={TYPOGRAPHY.fontSize22}
+                  >
+                    {getLabwareDisplayName(selectedLabware)}
+                  </StyledText>
+                  <StyledText as="p" color={COLORS.grey60}>
+                    {selectedLabware.nickName}
+                    {selectedLabwareLocation != null &&
+                    selectedLabwareLocation !== 'offDeck' &&
+                    'labwareId' in selectedLabwareLocation
+                      ? t('on_adapter', {
+                          adapterName: mostRecentAnalysis?.labware.find(
+                            l => l.id === selectedLabwareLocation.labwareId
+                          )?.displayName,
+                        })
+                      : null}
+                  </StyledText>
+                </Flex>
               </Flex>
-            </Flex>
-          </Modal>
-        ) : null}
-      </Portal>
+            </Modal>
+          ) : null}
+        </>,
+        getTopPortalEl()
+      )}
       <ODDBackButton
         label={t('labware')}
         onClick={() => setSetupScreen('prepare to run')}
@@ -275,7 +279,7 @@ export function ProtocolSetupLabware({
       >
         <Flex
           gridGap={SPACING.spacing8}
-          color={COLORS.darkBlack70}
+          color={COLORS.grey60}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight28}
@@ -316,7 +320,7 @@ export function ProtocolSetupLabware({
 
 const labwareLatchStyles = css`
   &:active {
-    background-color: ${COLORS.mediumBluePressed};
+    background-color: ${COLORS.blue35};
   }
 `
 
@@ -409,14 +413,10 @@ function LabwareLatch({
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.mediumBlueEnabled}
-      borderRadius={BORDERS.borderRadiusSize3}
+      backgroundColor={COLORS.blue35}
+      borderRadius={BORDERS.borderRadius12}
       css={labwareLatchStyles}
-      color={
-        isLatchLoading
-          ? `${COLORS.darkBlack100}${COLORS.opacity60HexCode}`
-          : COLORS.darkBlackEnabled
-      }
+      color={isLatchLoading ? COLORS.grey60 : COLORS.black90}
       height="6.5rem"
       alignSelf={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
@@ -446,8 +446,8 @@ function LabwareLatch({
               size="2.5rem"
               color={
                 commandType === 'heaterShaker/closeLabwareLatch'
-                  ? COLORS.blueEnabled
-                  : ''
+                  ? COLORS.blue50
+                  : COLORS.black90
               }
             />
           </>
@@ -546,8 +546,8 @@ function RowLabware({
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.light1}
-      borderRadius={BORDERS.borderRadiusSize3}
+      backgroundColor={COLORS.grey35}
+      borderRadius={BORDERS.borderRadius12}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       gridGap={SPACING.spacing32}
     >
@@ -569,13 +569,13 @@ function RowLabware({
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               {getLabwareDisplayName(definition)}
             </StyledText>
-            <StyledText color={COLORS.darkBlack70} as="p">
+            <StyledText color={COLORS.grey60} as="p">
               {nickName}
             </StyledText>
           </Flex>
           {nestedLabwareInfo != null ? (
             <Box
-              borderBottom={`1px solid ${COLORS.darkBlack70}`}
+              borderBottom={`1px solid ${COLORS.grey60}`}
               marginY={SPACING.spacing16}
               width="33rem"
             />
@@ -586,7 +586,7 @@ function RowLabware({
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {nestedLabwareInfo.nestedLabwareDisplayName}
               </StyledText>
-              <StyledText as="p" color={COLORS.darkBlack70}>
+              <StyledText as="p" color={COLORS.grey60}>
                 {nestedLabwareInfo.nestedLabwareNickName}
               </StyledText>
             </Flex>

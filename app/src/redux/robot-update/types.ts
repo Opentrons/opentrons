@@ -11,6 +11,7 @@ export interface RobotUpdateInfoPayload {
   version: string | null
   target: RobotUpdateTarget
   releaseNotes: string | null
+  force?: boolean
 }
 
 export interface RobotUpdateInfo {

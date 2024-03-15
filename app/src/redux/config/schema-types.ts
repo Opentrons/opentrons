@@ -7,7 +7,10 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
 export type DiscoveryCandidates = string[]
 
-export type DevInternalFlag = 'protocolStats'
+export type DevInternalFlag =
+  | 'protocolStats'
+  | 'enableRunTimeParameters'
+  | 'enableRunNotes'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
@@ -235,4 +238,8 @@ export type ConfigV20 = Omit<ConfigV19, 'version'> & {
   }
 }
 
-export type Config = ConfigV20
+export type ConfigV21 = Omit<ConfigV20, 'version'> & {
+  version: 21
+}
+
+export type Config = ConfigV21

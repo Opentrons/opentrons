@@ -24,6 +24,12 @@ class ErrorOccurrence(BaseModel):
         error: Union[ProtocolEngineError, EnumeratedError],
     ) -> "ErrorOccurrence":
         """Build an ErrorOccurrence from the details available from a FailedAction or FinishAction."""
+        if isinstance(error, ProtocolCommandFailedError) and error.original_error:
+            wrappedErrors = [error.original_error]
+        else:
+            wrappedErrors = [
+                cls.from_failed(id, createdAt, err) for err in error.wrapping
+            ]
         return cls.construct(
             id=id,
             createdAt=createdAt,
@@ -31,9 +37,7 @@ class ErrorOccurrence(BaseModel):
             detail=error.message or str(error),
             errorInfo=error.detail,
             errorCode=error.code.value.code,
-            wrappedErrors=[
-                cls.from_failed(id, createdAt, err) for err in error.wrapping
-            ],
+            wrappedErrors=wrappedErrors,
         )
 
     id: str = Field(..., description="Unique identifier of this error occurrence.")

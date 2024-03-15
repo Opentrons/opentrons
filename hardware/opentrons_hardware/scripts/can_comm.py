@@ -73,7 +73,7 @@ def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
 
     """
     # mypy wants type annotation for v.
-    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]
+    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]
 
 
 PromptedEnum = TypeVar("PromptedEnum", bound=Enum, covariant=True)
@@ -159,8 +159,7 @@ def prompt_payload(
                 )
         except ValueError as e:
             raise InvalidInput(str(e))
-    # Mypy is not liking constructing the derived types.
-    ret_instance = payload_type(**i)  # type: ignore[call-arg]
+    ret_instance = payload_type(**i)
     if message_index is not None:
         ret_instance.message_index = message_index  # type: ignore[attr-defined]
     return ret_instance

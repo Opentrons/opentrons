@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { getDiscoverableRobotByName } from '../../../../redux/discovery'
@@ -14,16 +15,12 @@ import {
 
 import { useIsRobotViewable } from '..'
 
-jest.mock('../../../../redux/discovery')
+vi.mock('../../../../redux/discovery')
 
-const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as jest.MockedFunction<
-  typeof getDiscoverableRobotByName
->
-
-const store: Store<any> = createStore(jest.fn(), {})
+const store: Store<any> = createStore(vi.fn(), {})
 
 describe('useIsRobotViewable hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
@@ -35,14 +32,13 @@ describe('useIsRobotViewable hook', () => {
     )
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns false when given an unreachable robot name', () => {
-    when(mockGetDiscoverableRobotByName)
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
-      .mockReturnValue(mockUnreachableRobot)
+      .thenReturn(mockUnreachableRobot)
 
     const { result } = renderHook(() => useIsRobotViewable('otie'), { wrapper })
 
@@ -50,9 +46,9 @@ describe('useIsRobotViewable hook', () => {
   })
 
   it('returns false when given a reachable robot name', () => {
-    when(mockGetDiscoverableRobotByName)
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
-      .mockReturnValue(mockReachableRobot)
+      .thenReturn(mockReachableRobot)
 
     const { result } = renderHook(() => useIsRobotViewable('otie'), {
       wrapper,
@@ -62,9 +58,9 @@ describe('useIsRobotViewable hook', () => {
   })
 
   it('returns true when given a connectable robot name', () => {
-    when(mockGetDiscoverableRobotByName)
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
-      .mockReturnValue(mockConnectableRobot)
+      .thenReturn(mockConnectableRobot)
 
     const { result } = renderHook(() => useIsRobotViewable('otie'), {
       wrapper,

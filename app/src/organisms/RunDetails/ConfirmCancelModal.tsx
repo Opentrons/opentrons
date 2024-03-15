@@ -1,16 +1,17 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  Icon,
-  SPACING,
-  Flex,
-  Link,
   AlertPrimaryButton,
-  DIRECTION_COLUMN,
-  JUSTIFY_FLEX_END,
-  TYPOGRAPHY,
-  COLORS,
   ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_FLEX_END,
+  Link,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   RUN_STATUS_STOPPED,
@@ -18,7 +19,7 @@ import {
 } from '@opentrons/api-client'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { Portal } from '../../App/portal'
+import { getModalPortalEl } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { useTrackProtocolRunEvent } from '../Devices/hooks'
@@ -28,16 +29,17 @@ import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../redux/analytics'
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
   runId: string
+  robotName: string
 }
 
 export function ConfirmCancelModal(
   props: ConfirmCancelModalProps
 ): JSX.Element {
-  const { onClose, runId } = props
+  const { onClose, runId, robotName } = props
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
   const runStatus = useRunStatus(runId)
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const { t } = useTranslation('run_details')
 
   const cancelRun: React.MouseEventHandler<HTMLButtonElement> = (e): void => {
@@ -62,46 +64,45 @@ export function ConfirmCancelModal(
     }
   }, [runStatus, onClose])
 
-  return (
-    <Portal>
-      <LegacyModal
-        type="warning"
-        onClose={isCanceling ? undefined : onClose}
-        title={t('cancel_run_modal_heading')}
-      >
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="p" marginBottom={SPACING.spacing24}>
-            {t('cancel_run_alert_info')}
-          </StyledText>
-          <StyledText as="p" marginBottom={SPACING.spacing24}>
-            {t('cancel_run_module_info')}
-          </StyledText>
-          <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
-            {isCanceling ? null : (
-              <Link
-                role="button"
-                onClick={onClose}
-                marginRight={SPACING.spacing24}
-                css={TYPOGRAPHY.linkPSemiBold}
-              >
-                {t('cancel_run_modal_back')}
-              </Link>
-            )}
-            <AlertPrimaryButton
-              backgroundColor={COLORS.errorEnabled}
-              onClick={cancelRun}
-              disabled={isCanceling}
-              minWidth="8rem"
+  return createPortal(
+    <LegacyModal
+      type="warning"
+      onClose={isCanceling ? undefined : onClose}
+      title={t('cancel_run_modal_heading')}
+    >
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <StyledText as="p" marginBottom={SPACING.spacing24}>
+          {t('cancel_run_alert_info')}
+        </StyledText>
+        <StyledText as="p" marginBottom={SPACING.spacing24}>
+          {t('cancel_run_module_info')}
+        </StyledText>
+        <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
+          {isCanceling ? null : (
+            <Link
+              role="button"
+              onClick={onClose}
+              marginRight={SPACING.spacing24}
+              css={TYPOGRAPHY.linkPSemiBold}
             >
-              {isCanceling ? (
-                <Icon size={TYPOGRAPHY.fontSizeP} spin name="ot-spinner" />
-              ) : (
-                t('cancel_run_modal_confirm')
-              )}
-            </AlertPrimaryButton>
-          </Flex>
+              {t('cancel_run_modal_back')}
+            </Link>
+          )}
+          <AlertPrimaryButton
+            backgroundColor={COLORS.red50}
+            onClick={cancelRun}
+            disabled={isCanceling}
+            minWidth="8rem"
+          >
+            {isCanceling ? (
+              <Icon size={TYPOGRAPHY.fontSizeP} spin name="ot-spinner" />
+            ) : (
+              t('cancel_run_modal_confirm')
+            )}
+          </AlertPrimaryButton>
         </Flex>
-      </LegacyModal>
-    </Portal>
+      </Flex>
+    </LegacyModal>,
+    getModalPortalEl()
   )
 }

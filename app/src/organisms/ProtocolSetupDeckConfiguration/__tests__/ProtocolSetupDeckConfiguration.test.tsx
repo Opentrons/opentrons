@@ -1,21 +1,31 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
 
-import { renderWithProviders, BaseDeck } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import { BaseDeck } from '@opentrons/components'
+import {
+  useDeckConfigurationQuery,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupDeckConfiguration } from '..'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
+import type {
+  CompletedProtocolAnalysis,
+  DeckConfiguration,
+} from '@opentrons/shared-data'
 
-jest.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
-const mockSetSetupScreen = jest.fn()
-const mockUpdateDeckConfiguration = jest.fn()
+const mockSetSetupScreen = vi.fn()
+const mockUpdateDeckConfiguration = vi.fn()
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
   protocolData: ({
@@ -26,13 +36,13 @@ const PROTOCOL_DETAILS = {
   robotType: 'OT-3 Standard' as const,
 }
 
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
-  typeof useUpdateDeckConfigurationMutation
->
-const mockBaseDeck = BaseDeck as jest.MockedFunction<typeof BaseDeck>
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof BaseDeck>()
+  return {
+    ...actual,
+    BaseDeck: vi.fn(),
+  }
+})
 
 const render = (
   props: React.ComponentProps<typeof ProtocolSetupDeckConfiguration>
@@ -52,35 +62,38 @@ describe('ProtocolSetupDeckConfiguration', () => {
       setSetupScreen: mockSetSetupScreen,
       providedFixtureOptions: [],
     }
-    mockBaseDeck.mockReturnValue(<div>mock BaseDeck</div>)
-    when(mockUseMostRecentCompletedAnalysis)
+    vi.mocked(BaseDeck).mockReturnValue(<div>mock BaseDeck</div>)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('mockRunId')
-      .mockReturnValue(PROTOCOL_DETAILS.protocolData)
-    mockUseUpdateDeckConfigurationMutation.mockReturnValue({
+      .thenReturn(PROTOCOL_DETAILS.protocolData)
+    vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
+      data: [],
+    } as unknown) as UseQueryResult<DeckConfiguration>)
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render text, button, and DeckConfigurator', () => {
-    const [{ getByText }] = render(props)
-    getByText('Deck configuration')
-    getByText('mock BaseDeck')
-    getByText('Confirm')
+    render(props)
+    screen.getByText('Deck configuration')
+    screen.getByText('mock BaseDeck')
+    screen.getByText('Confirm')
   })
 
   it('should call a mock function when tapping the back button', () => {
-    const [{ getByTestId }] = render(props)
-    getByTestId('ChildNavigation_Back_Button').click()
+    render(props)
+    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(mockSetSetupScreen).toHaveBeenCalledWith('modules')
   })
 
   it('should call a mock function when tapping confirm button', () => {
-    const [{ getByText }] = render(props)
-    getByText('Confirm').click()
+    render(props)
+    fireEvent.click(screen.getByText('Confirm'))
     expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
   })
 })

@@ -9,7 +9,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition as Labware
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
-from opentrons.types import DeckSlotName, Location, Mount, Point
+from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
 from opentrons.util.broker import Broker
 
 from opentrons.hardware_control import SyncHardwareAPI
@@ -19,7 +19,6 @@ from opentrons.hardware_control.modules.types import ModuleType, TemperatureModu
 
 from opentrons.protocols import labware as mock_labware
 from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocol_api._types import StagingSlotName
 from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, OFF_DECK
 from opentrons.protocol_api.core.labware import LabwareLoadParams

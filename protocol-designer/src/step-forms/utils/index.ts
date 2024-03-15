@@ -1,4 +1,3 @@
-import assert from 'assert'
 import reduce from 'lodash/reduce'
 import values from 'lodash/values'
 import find from 'lodash/find'
@@ -12,7 +11,7 @@ import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
 import { LabwareDefByDefURI } from '../../labware-defs'
 import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
-import {
+import type {
   AdditionalEquipmentOnDeck,
   InitialDeckSetup,
   ModuleOnDeck,
@@ -32,6 +31,21 @@ import type {
 import type { FormData } from '../../form-types'
 export { createPresavedStepForm } from './createPresavedStepForm'
 
+const slotToCutoutOt2Map: { [key: string]: string } = {
+  '1': 'cutout1',
+  '2': 'cutout2',
+  '3': 'cutout3',
+  '4': 'cutout4',
+  '5': 'cutout5',
+  '6': 'cutout6',
+  '7': 'cutout7',
+  '8': 'cutout8',
+  '9': 'cutout9',
+  '10': 'cutout10',
+  '11': 'cutout11',
+  '12': 'cutout12',
+}
+
 export function getIdsInRange<T extends string | number>(
   orderedIds: T[],
   startId: T,
@@ -39,15 +53,15 @@ export function getIdsInRange<T extends string | number>(
 ): T[] {
   const startIdx = orderedIds.findIndex(id => id === startId)
   const endIdx = orderedIds.findIndex(id => id === endId)
-  assert(
+  console.assert(
     startIdx !== -1,
     `start step "${String(startId)}" does not exist in orderedStepIds`
   )
-  assert(
+  console.assert(
     endIdx !== -1,
     `end step "${String(endId)}" does not exist in orderedStepIds`
   )
-  assert(
+  console.assert(
     endIdx >= startIdx,
     `expected end index to be greater than or equal to start index, got "${startIdx}", "${endIdx}"`
   )
@@ -61,7 +75,7 @@ export function getDeckItemIdInSlot(
   const idsForSourceSlot = Object.entries(itemIdToSlot)
     .filter(([id, labwareSlot]) => labwareSlot === slot)
     .map(([id, labwareSlot]) => id)
-  assert(
+  console.assert(
     idsForSourceSlot.length < 2,
     `multiple deck items in slot ${slot}, expected none or one`
   )
@@ -106,6 +120,7 @@ export const getSlotIdsBlockedBySpanning = (
 
   return []
 }
+//  TODO(jr, 3/13/24): refactor this util it is messy and confusing
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string,
@@ -113,7 +128,15 @@ export const getSlotIsEmpty = (
      since labware/wasteChute can still go on top of staging areas  **/
   includeStagingAreas?: boolean
 ): boolean => {
+  //   special-casing the TC's slot A1 for the Flex
   if (
+    slot === 'cutoutA1' &&
+    Object.values(initialDeckSetup.modules).find(
+      module => module.type === THERMOCYCLER_MODULE_TYPE
+    )
+  ) {
+    return false
+  } else if (
     slot === SPAN7_8_10_11_SLOT &&
     TC_SPAN_SLOTS.some(slot => !getSlotIsEmpty(initialDeckSetup, slot))
   ) {
@@ -128,24 +151,33 @@ export const getSlotIsEmpty = (
     return false
   }
 
-  const filteredAdditionalEquipmentOnDeck = includeStagingAreas
-    ? values(
-        initialDeckSetup.additionalEquipmentOnDeck
-      ).filter((additionalEquipment: AdditionalEquipmentOnDeck) =>
-        additionalEquipment.location?.includes(slot)
-      )
-    : values(initialDeckSetup.additionalEquipmentOnDeck).filter(
-        (additionalEquipment: AdditionalEquipmentOnDeck) =>
-          additionalEquipment.location?.includes(slot) &&
-          additionalEquipment.name !== 'stagingArea'
-      )
+  const filteredAdditionalEquipmentOnDeck = values(
+    initialDeckSetup.additionalEquipmentOnDeck
+  ).filter((additionalEquipment: AdditionalEquipmentOnDeck) => {
+    const cutoutForSlotOt2 = slotToCutoutOt2Map[slot]
+    const includeStaging = includeStagingAreas
+      ? true
+      : additionalEquipment.name !== 'stagingArea'
+    if (cutoutForSlotOt2 != null) {
+      //  for Ot-2
+      return additionalEquipment.location === cutoutForSlotOt2 && includeStaging
+    } else {
+      //  for Flex
+      return additionalEquipment.location?.includes(slot) && includeStaging
+    }
+  })
   return (
     [
-      ...values(initialDeckSetup.modules).filter((moduleOnDeck: ModuleOnDeck) =>
-        slot.includes(moduleOnDeck.slot)
+      ...values(initialDeckSetup.modules).filter(
+        (moduleOnDeck: ModuleOnDeck) => {
+          const cutoutForSlotOt2 = slotToCutoutOt2Map[slot]
+          return cutoutForSlotOt2 != null
+            ? moduleOnDeck.slot === slot
+            : slot.includes(moduleOnDeck.slot)
+        }
       ),
-      ...values(initialDeckSetup.labware).filter((labware: LabwareOnDeckType) =>
-        slot.includes(labware.slot)
+      ...values(initialDeckSetup.labware).filter(
+        (labware: LabwareOnDeckType) => labware.slot === slot
       ),
       ...filteredAdditionalEquipmentOnDeck,
     ].length === 0

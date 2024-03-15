@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   FormGroup,
   SelectField,
@@ -6,14 +7,13 @@ import {
   useHoverTooltip,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
 import {
   getDisabledChangeTipOptions,
   DisabledChangeTipArgs,
 } from './getDisabledChangeTipOptions'
 import { ChangeTipOptions } from '@opentrons/step-generation'
 import { FieldProps } from '../../types'
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 
 const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
   'always',
@@ -34,7 +34,7 @@ export const ChangeTipField = (props: Props): JSX.Element => {
     updateValue,
     value,
   } = props
-
+  const { t } = useTranslation('form')
   const disabledOptions = getDisabledChangeTipOptions({
     aspirateWells,
     dispenseWells,
@@ -49,7 +49,7 @@ export const ChangeTipField = (props: Props): JSX.Element => {
 
   return (
     <FormGroup
-      label={i18n.t('form.step_edit_form.field.change_tip.label')}
+      label={t('step_edit_form.field.change_tip.label')}
       className={styles.large_field}
     >
       <SelectField
@@ -71,6 +71,7 @@ interface LabelProps {
 
 const ChangeTipOptionLabel = (props: LabelProps): JSX.Element => {
   const { value } = props
+  const { t } = useTranslation('form')
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'bottom-start',
     strategy: TOOLTIP_FIXED,
@@ -78,12 +79,10 @@ const ChangeTipOptionLabel = (props: LabelProps): JSX.Element => {
   return (
     <>
       <div {...targetProps}>
-        {i18n.t(`form.step_edit_form.field.change_tip.option.${value}`)}
+        {t(`step_edit_form.field.change_tip.option.${value}`)}
         <Tooltip {...tooltipProps}>
           <div className={styles.tooltip}>
-            {i18n.t(
-              `form.step_edit_form.field.change_tip.option_tooltip.${value}`
-            )}
+            {t(`step_edit_form.field.change_tip.option_tooltip.${value}`)}
           </div>
         </Tooltip>
       </div>

@@ -1,9 +1,10 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import {
   getLabwareDefURI,
   MAGNETIC_MODULE_TYPE,
   LabwareDefinition2,
+  fixtureTiprack300ul as _fixtureTiprack300ul,
 } from '@opentrons/shared-data'
-import _fixtureTiprack300ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import {
   makeContext,
   makeState,
@@ -151,8 +152,8 @@ describe('getNextTiprack - single-channel', () => {
 
     const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
 
-    expect(result && result.tiprackId).toEqual('tiprack1Id')
-    expect(result && result.well).toEqual('B1')
+    expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack1Id')
+    expect(result && result.nextTiprack?.well).toEqual('B1')
   })
 
   it('single tiprack, empty, should return null', () => {
@@ -164,7 +165,7 @@ describe('getNextTiprack - single-channel', () => {
     })
 
     const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
-    expect(result).toEqual(null)
+    expect(result.nextTiprack).toEqual(null)
   })
 
   it('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
@@ -179,8 +180,8 @@ describe('getNextTiprack - single-channel', () => {
     })
     const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
 
-    expect(result && result.tiprackId).toEqual('tiprack1Id')
-    expect(result && result.well).toEqual('A1')
+    expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack1Id')
+    expect(result && result.nextTiprack?.well).toEqual('A1')
   })
 
   it('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
@@ -198,8 +199,8 @@ describe('getNextTiprack - single-channel', () => {
     robotState.tipState.tipracks.tiprack2Id.A1 = false
     const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
 
-    expect(result && result.tiprackId).toEqual('tiprack1Id')
-    expect(result && result.well).toEqual('B1')
+    expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack1Id')
+    expect(result && result.nextTiprack?.well).toEqual('B1')
   })
 
   it('multiple tipracks, all empty, should return null', () => {
@@ -214,7 +215,7 @@ describe('getNextTiprack - single-channel', () => {
     })
     const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
 
-    expect(result).toBe(null)
+    expect(result.nextTiprack).toBe(null)
   })
 })
 
@@ -231,8 +232,8 @@ describe('getNextTiprack - 8-channel', () => {
 
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
-    expect(result && result.tiprackId).toEqual('tiprack1Id')
-    expect(result && result.well).toEqual('A1')
+    expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack1Id')
+    expect(result && result.nextTiprack?.well).toEqual('A1')
   })
 
   it('single tiprack, partially full', () => {
@@ -252,8 +253,8 @@ describe('getNextTiprack - 8-channel', () => {
     }
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
-    expect(result && result.tiprackId).toEqual('tiprack1Id')
-    expect(result && result.well).toEqual('A3')
+    expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack1Id')
+    expect(result && result.nextTiprack?.well).toEqual('A3')
   })
 
   it('single tiprack, empty, should return null', () => {
@@ -267,7 +268,7 @@ describe('getNextTiprack - 8-channel', () => {
     })
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
-    expect(result).toEqual(null)
+    expect(result.nextTiprack).toEqual(null)
   })
 
   it('single tiprack, a well missing from each column, should return null', () => {
@@ -297,7 +298,7 @@ describe('getNextTiprack - 8-channel', () => {
 
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
-    expect(result).toEqual(null)
+    expect(result.nextTiprack).toEqual(null)
   })
 
   it('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
@@ -313,8 +314,8 @@ describe('getNextTiprack - 8-channel', () => {
     })
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
-    expect(result && result.tiprackId).toEqual('tiprack1Id')
-    expect(result && result.well).toEqual('A1')
+    expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack1Id')
+    expect(result && result.nextTiprack?.well).toEqual('A1')
   })
 
   it('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
@@ -368,8 +369,8 @@ describe('getNextTiprack - 8-channel', () => {
 
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
 
-    expect(result && result.tiprackId).toEqual('tiprack3Id')
-    expect(result && result.well).toEqual('A2')
+    expect(result && result.nextTiprack?.tiprackId).toEqual('tiprack3Id')
+    expect(result && result.nextTiprack?.well).toEqual('A2')
   })
 
   it('multiple tipracks, all empty, should return null', () => {
@@ -388,7 +389,7 @@ describe('getNextTiprack - 8-channel', () => {
       },
     })
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
-    expect(result).toEqual(null)
+    expect(result.nextTiprack).toEqual(null)
   })
 })
 

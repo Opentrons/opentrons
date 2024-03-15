@@ -148,14 +148,14 @@ marks: *cal_marks
 stages:
   - name: DELETE request with correct pipette AND tiprack
     request:
-      url: "{ot2_server_base_url}/calibration/tip_length?pipette_id=321&tiprack_hash=130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824"
+      url: "{ot2_server_base_url}/calibration/tip_length?pipette_id=321&tiprack_uri=opentrons/opentrons_96_filtertiprack_200ul/1"
       method: DELETE
     response:
         status_code: 200
 
   - name: DELETE request with incorrect pipette AND tiprack
     request:
-      url: "{ot2_server_base_url}/calibration/tip_length?pipette_id=321&tiprack_hash=wronghash"
+      url: "{ot2_server_base_url}/calibration/tip_length?pipette_id=321&tiprack_uri=wronguri"
       method: DELETE
     response:
         status_code: 404

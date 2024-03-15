@@ -8,6 +8,7 @@ from typing_extensions import Literal
 from opentrons.types import Point
 from ..types import (
     LabwareLocation,
+    DeckSlotLocation,
     OnLabwareLocation,
     AddressableAreaLocation,
     LabwareMovementStrategy,
@@ -115,6 +116,10 @@ class MoveLabwareImplementation(
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move {current_labware.loadName} to addressable area {area_name}"
                 )
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                area_name
+            )
+
             if fixture_validation.is_gripper_waste_chute(area_name):
                 # When dropping off labware in the waste chute, some bigger pieces
                 # of labware (namely tipracks) can get stuck between a gripper
@@ -129,6 +134,10 @@ class MoveLabwareImplementation(
                     y=0,
                     z=0,
                 )
+        elif isinstance(params.newLocation, DeckSlotLocation):
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                params.newLocation.slotName.id
+            )
 
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
             location=params.newLocation
@@ -190,6 +199,7 @@ class MoveLabwareImplementation(
                 pickUpOffset=params.pickUpOffset or LabwareOffsetVector(x=0, y=0, z=0),
                 dropOffset=params.dropOffset or LabwareOffsetVector(x=0, y=0, z=0),
             )
+
             # Skips gripper moves when using virtual gripper
             await self._labware_movement.move_labware_with_gripper(
                 labware_id=params.labwareId,

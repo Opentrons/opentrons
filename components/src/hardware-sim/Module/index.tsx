@@ -3,6 +3,7 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_MODULE_TYPE,
   ModuleDefinition,
   OT2_STANDARD_DECKID,
   TEMPERATURE_MODULE_TYPE,
@@ -22,12 +23,12 @@ import {
 import { RobotCoordsForeignObject } from '../Deck'
 import { multiplyMatrices } from '../utils'
 import { Thermocycler } from './Thermocycler'
-import { ModuleFromDef } from './ModuleFromDef'
 import { HeaterShaker } from './HeaterShaker'
 import { Temperature } from './Temperature'
+import { MagneticBlock } from './MagneticBlock'
+import { MagneticModule } from './MagneticModule'
 
 export * from './Thermocycler'
-export * from './ModuleFromDef'
 
 const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
 
@@ -38,7 +39,6 @@ interface Props {
   orientation?: 'left' | 'right'
   innerProps?:
     | React.ComponentProps<typeof Thermocycler>
-    | React.ComponentProps<typeof ModuleFromDef>
     | React.ComponentProps<typeof HeaterShaker>
     | React.ComponentProps<typeof Temperature>
     | {}
@@ -178,21 +178,14 @@ export const Module = (props: Props): JSX.Element => {
     )
   }
 
-  const magneticBlockLayerBlockList = ['Module_Title', 'Well_Labels', 'Wells']
-
-  let moduleViz: JSX.Element = (
-    <ModuleFromDef
-      layerBlocklist={
-        moduleType === MAGNETIC_BLOCK_TYPE
-          ? magneticBlockLayerBlockList
-          : undefined
-      }
-      {...(innerProps as React.ComponentProps<typeof ModuleFromDef>)}
-      def={def}
-    />
-  )
-  if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+  let moduleViz: JSX.Element | null = null
+  if (moduleType === MAGNETIC_BLOCK_TYPE) {
+    moduleViz = <MagneticBlock />
+  } else if (moduleType === MAGNETIC_MODULE_TYPE) {
+    moduleViz = <MagneticModule />
+  } else if (moduleType === THERMOCYCLER_MODULE_TYPE) {
     const thermocyclerProps = {
+      lidMotorState: 'open' as const,
       ...innerProps,
       model: def.model as ThermocyclerModuleModel,
     }

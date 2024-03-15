@@ -1,4 +1,4 @@
-"""Move to well command request, result, and implementation models."""
+"""Move to addressable area command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
@@ -16,6 +16,7 @@ from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
+    from ..state import StateView
 
 MoveToAddressableAreaCommandType = Literal["moveToAddressableArea"]
 
@@ -53,6 +54,14 @@ class MoveToAddressableAreaParams(PipetteIdMixin, MovementMixin):
         AddressableOffsetVector(x=0, y=0, z=0),
         description="Relative offset of addressable area to move pipette's critical point.",
     )
+    stayAtHighestPossibleZ: bool = Field(
+        False,
+        description=(
+            "If `true`, the pipette will retract to its highest possible height"
+            " and stay there instead of descending to the destination."
+            " `minimumZHeight` will be ignored."
+        ),
+    )
 
 
 class MoveToAddressableAreaResult(DestinationPositionResult):
@@ -66,13 +75,20 @@ class MoveToAddressableAreaImplementation(
 ):
     """Move to addressable area command implementation."""
 
-    def __init__(self, movement: MovementHandler, **kwargs: object) -> None:
+    def __init__(
+        self, movement: MovementHandler, state_view: StateView, **kwargs: object
+    ) -> None:
         self._movement = movement
+        self._state_view = state_view
 
     async def execute(
         self, params: MoveToAddressableAreaParams
     ) -> MoveToAddressableAreaResult:
         """Move the requested pipette to the requested addressable area."""
+        self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+            params.addressableAreaName
+        )
+
         if fixture_validation.is_staging_slot(params.addressableAreaName):
             raise LocationNotAccessibleByPipetteError(
                 f"Cannot move pipette to staging slot {params.addressableAreaName}"
@@ -85,6 +101,7 @@ class MoveToAddressableAreaImplementation(
             force_direct=params.forceDirect,
             minimum_z_height=params.minimumZHeight,
             speed=params.speed,
+            stay_at_highest_possible_z=params.stayAtHighestPossibleZ,
         )
 
         return MoveToAddressableAreaResult(position=DeckPoint(x=x, y=y, z=z))

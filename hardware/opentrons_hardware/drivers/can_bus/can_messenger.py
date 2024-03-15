@@ -395,7 +395,6 @@ class CanMessenger:
                     log.exception(f"Failed to build from {message}")
             else:
                 log.error(f"Message {message} is not recognized.")
-        raise StopAsyncIteration
 
     @property
     def exclusive_writer(self) -> asyncio.Lock:

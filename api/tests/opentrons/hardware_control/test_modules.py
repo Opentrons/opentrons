@@ -230,8 +230,6 @@ async def test_module_update_integration(
 ):
     from opentrons.hardware_control import modules
 
-    loop = asyncio.get_running_loop()
-
     def async_return(result):
         f = asyncio.Future()
         f.set_result(result)
@@ -240,7 +238,6 @@ async def test_module_update_integration(
     bootloader_kwargs = {
         "stdout": asyncio.subprocess.PIPE,
         "stderr": asyncio.subprocess.PIPE,
-        "loop": loop,
     }
 
     upload_via_avrdude_mock = mock.Mock(
@@ -256,14 +253,14 @@ async def test_module_update_integration(
     )
 
     # test temperature module update with avrdude bootloader
-    await modules.update_firmware(mod_tempdeck, "fake_fw_file_path", loop)
+    await modules.update_firmware(mod_tempdeck, "fake_fw_file_path")
     upload_via_avrdude_mock.assert_called_once_with(
         "ot_module_avrdude_bootloader1", "fake_fw_file_path", bootloader_kwargs
     )
     upload_via_avrdude_mock.reset_mock()
 
     # test magnetic module update with avrdude bootloader
-    await modules.update_firmware(mod_magdeck, "fake_fw_file_path", loop)
+    await modules.update_firmware(mod_magdeck, "fake_fw_file_path")
     upload_via_avrdude_mock.assert_called_once_with(
         "ot_module_avrdude_bootloader1", "fake_fw_file_path", bootloader_kwargs
     )
@@ -281,7 +278,7 @@ async def test_module_update_integration(
         modules.update, "find_bootloader_port", mock_find_bossa_bootloader_port
     )
 
-    await modules.update_firmware(mod_thermocycler, "fake_fw_file_path", loop)
+    await modules.update_firmware(mod_thermocycler, "fake_fw_file_path")
     upload_via_bossa_mock.assert_called_once_with(
         "ot_module_bossa_bootloader1", "fake_fw_file_path", bootloader_kwargs
     )
@@ -299,7 +296,7 @@ async def test_module_update_integration(
 
     monkeypatch.setattr(modules.update, "find_dfu_device", mock_find_dfu_device_hs)
 
-    await modules.update_firmware(mod_heatershaker, "fake_fw_file_path", loop)
+    await modules.update_firmware(mod_heatershaker, "fake_fw_file_path")
     upload_via_dfu_mock.assert_called_once_with(
         "df11", "fake_fw_file_path", bootloader_kwargs
     )
@@ -312,7 +309,7 @@ async def test_module_update_integration(
 
     monkeypatch.setattr(modules.update, "find_dfu_device", mock_find_dfu_device_tc2)
 
-    await modules.update_firmware(mod_thermocycler_gen2, "fake_fw_file_path", loop)
+    await modules.update_firmware(mod_thermocycler_gen2, "fake_fw_file_path")
     upload_via_dfu_mock.assert_called_once_with(
         "df11", "fake_fw_file_path", bootloader_kwargs
     )

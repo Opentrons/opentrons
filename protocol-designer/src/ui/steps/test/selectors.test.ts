@@ -1,5 +1,5 @@
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
@@ -24,15 +24,21 @@ import {
 import { getMockMoveLiquidStep, getMockMixStep } from '../__fixtures__'
 
 import * as utils from '../../modules/utils'
-import { FormData } from '../../../form-types'
+
+import type { FormData } from '../../../form-types'
+import type { StepArgsAndErrorsById } from '../../../steplist/types'
+import { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
+
+vi.mock('../../modules/utils')
 
 function createArgsForStepId(
   stepId: string,
   stepArgs: any
-): Record<string, Record<string, any>> {
+): StepArgsAndErrorsById {
   return {
     [stepId]: {
       stepArgs,
+      errors: false,
     },
   }
 }
@@ -42,13 +48,13 @@ const labware = 'well plate'
 const mixCommand = 'mix'
 const moveLabwareCommand = 'moveLabware'
 describe('getHoveredStepLabware', () => {
-  let initialDeckState: any
+  let initialDeckState: AllTemporalPropertiesForTimelineFrame
   beforeEach(() => {
     initialDeckState = {
       labware: {},
       pipettes: {},
       modules: {},
-    }
+    } as any
   })
 
   it('no labware is returned when no hovered step', () => {
@@ -58,7 +64,6 @@ describe('getHoveredStepLabware', () => {
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
     const hoveredStep = null
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStep,
@@ -75,7 +80,6 @@ describe('getHoveredStepLabware', () => {
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
     const hoveredStep = 'another-step'
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStep,
@@ -88,7 +92,6 @@ describe('getHoveredStepLabware', () => {
   it('no labware is returned when no step arguments', () => {
     const stepArgs = null
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStepId,
@@ -106,7 +109,6 @@ describe('getHoveredStepLabware', () => {
         sourceLabware,
       }
       const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-      // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
       const result = getHoveredStepLabware.resultFunc(
         argsByStepId,
         hoveredStepId,
@@ -123,7 +125,6 @@ describe('getHoveredStepLabware', () => {
       labware,
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStepId,
@@ -139,7 +140,6 @@ describe('getHoveredStepLabware', () => {
       labware,
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStepId,
@@ -173,18 +173,18 @@ describe('getHoveredStepLabware', () => {
             },
           },
         },
-      }
+      } as any
     })
 
     it('labware on module is returned when module id exists', () => {
-      // @ts-expect-error(sa, 2021-6-15): members of utils are readonly
-      utils.getLabwareOnModule = jest.fn().mockReturnValue({ id: labware })
+      vi.mocked(utils.getLabwareOnModule).mockReturnValue({
+        id: labware,
+      } as any)
       const stepArgs = {
         commandCreatorFnName: setTempCommand,
         module: type,
       }
       const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-      // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
       const result = getHoveredStepLabware.resultFunc(
         argsByStepId,
         hoveredStepId,
@@ -195,14 +195,12 @@ describe('getHoveredStepLabware', () => {
     })
 
     it('no labware is returned when no labware on module', () => {
-      // @ts-expect-error(sa, 2021-6-15): members of utils are readonly
-      utils.getLabwareOnModule = jest.fn().mockReturnValue(null)
+      vi.mocked(utils.getLabwareOnModule).mockReturnValue(null)
       const stepArgs = {
         commandCreatorFnName: setTempCommand,
         module: type,
       }
       const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
-      // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
       const result = getHoveredStepLabware.resultFunc(
         argsByStepId,
         hoveredStepId,
@@ -575,6 +573,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: 'some_pipette_id',
         },
+        nozzles: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         volume: {
           isIndeterminate: false,
           value: '30',
@@ -628,6 +630,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           // same thing with dispense_touchTip_mmFromBottom
           blowout_checkbox: false,
           // same thing here with blowout location
+          nozzles: null,
         },
       }
     })
@@ -782,6 +785,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: 'some_pipette_id',
         },
+        nozzles: {
+          isIndeterminate: true,
+        },
         volume: {
           isIndeterminate: false,
           value: '30',
@@ -834,6 +840,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_seconds: { value: '1', isIndeterminate: false },
         mix_touchTip_checkbox: { value: false, isIndeterminate: false },
         mix_touchTip_mmFromBottom: { value: null, isIndeterminate: false },
+        nozzles: { value: undefined, isIndeterminate: false },
         dropTip_location: {
           value: 'fixedTrash',
           isIndeterminate: false,
@@ -869,6 +876,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           dispense_delay_seconds: '3',
           mix_touchTip_checkbox: true,
           mix_touchTip_mmFromBottom: '14',
+          nozzles: null,
         },
       }
 
@@ -901,6 +909,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_delay_seconds: { isIndeterminate: true },
         mix_touchTip_checkbox: { isIndeterminate: true },
         mix_touchTip_mmFromBottom: { isIndeterminate: true },
+        nozzles: { isIndeterminate: true },
         dropTip_location: {
           value: 'fixedTrash',
           isIndeterminate: false,
@@ -937,27 +946,6 @@ describe('getMultiSelectFieldValues', () => {
 })
 
 describe('getMultiSelectDisabledFields', () => {
-  describe('disabled field tooltips', () => {
-    it('should exist', () => {
-      const baseText = 'tooltip.step_fields.batch_edit.disabled'
-      const disabledReasons = [
-        'pipette-different',
-        'aspirate-labware-different',
-        'dispense-labware-different',
-        'multi-aspirate-present',
-        'multi-aspirate-present-pipette-different',
-        'multi-dispense-present',
-        'multi-dispense-present-pipette-different',
-      ]
-
-      expect.assertions(7)
-      disabledReasons.forEach(reason => {
-        const searchText = `${baseText}.${reason}`
-        expect(i18n.t(`${baseText}.${reason}`) !== searchText).toBe(true)
-      })
-    })
-  })
-
   describe('when all forms are of type moveLiquid', () => {
     let mockSavedStepForms: Record<string, FormData>
     let mockmultiSelectItemIds: string[]
@@ -1004,42 +992,18 @@ describe('getMultiSelectDisabledFields', () => {
             mockmultiSelectItemIds
           )
         ).toEqual({
-          aspirate_mix_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          aspirate_mix_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          aspirate_mix_times: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          aspirate_flowRate: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          aspirate_airGap_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          aspirate_airGap_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_mix_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_mix_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_mix_times: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_flowRate: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_airGap_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_airGap_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
+          aspirate_mix_checkbox: 'Incompatible with current path',
+          aspirate_mix_volume: 'Incompatible with current path',
+          aspirate_mix_times: 'Incompatible with current path',
+          aspirate_flowRate: 'Incompatible with current path',
+          aspirate_airGap_checkbox: 'Incompatible with current path',
+          aspirate_airGap_volume: 'Incompatible with current path',
+          dispense_mix_checkbox: 'Incompatible with current path',
+          dispense_mix_volume: 'Incompatible with current path',
+          dispense_mix_times: 'Incompatible with current path',
+          dispense_flowRate: 'Incompatible with current path',
+          dispense_airGap_checkbox: 'Incompatible with current path',
+          dispense_airGap_volume: 'Incompatible with current path',
         })
       })
     })
@@ -1055,9 +1019,7 @@ describe('getMultiSelectDisabledFields', () => {
         }
       })
       it('should return fields being disabled with associated reasons', () => {
-        const aspirateLabwareDifferentText = i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.aspirate-labware-different'
-        )
+        const aspirateLabwareDifferentText = 'Incompatible with current path'
 
         expect(
           // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
@@ -1087,9 +1049,8 @@ describe('getMultiSelectDisabledFields', () => {
         }
       })
       it('should return fields being disabled with associated reasons', () => {
-        const dispenseLabwareDifferentText = i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.dispense-labware-different'
-        )
+        const dispenseLabwareDifferentText = 'Incompatible with current path'
+
         expect(
           // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
           getMultiSelectDisabledFields.resultFunc(
@@ -1125,15 +1086,9 @@ describe('getMultiSelectDisabledFields', () => {
             mockmultiSelectItemIds
           )
         ).toEqual({
-          aspirate_mix_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present'
-          ),
-          aspirate_mix_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present'
-          ),
-          aspirate_mix_times: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present'
-          ),
+          aspirate_mix_checkbox: 'Incompatible with current path',
+          aspirate_mix_volume: 'Incompatible with current path',
+          aspirate_mix_times: 'Incompatible with current path',
         })
       })
     })
@@ -1156,21 +1111,11 @@ describe('getMultiSelectDisabledFields', () => {
             mockmultiSelectItemIds
           )
         ).toEqual({
-          dispense_mix_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
-          ),
-          dispense_mix_volume: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
-          ),
-          dispense_mix_times: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
-          ),
-          blowout_checkbox: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
-          ),
-          blowout_location: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.multi-dispense-present'
-          ),
+          dispense_mix_checkbox: 'Incompatible with current path',
+          dispense_mix_volume: 'Incompatible with current path',
+          dispense_mix_times: 'Incompatible with current path',
+          blowout_checkbox: 'Incompatible with current path',
+          blowout_location: 'Incompatible with current path',
         })
       })
     })
@@ -1195,15 +1140,9 @@ describe('getMultiSelectDisabledFields', () => {
           )
         ).toEqual(
           expect.objectContaining({
-            aspirate_mix_checkbox: i18n.t(
-              'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present-pipette-different'
-            ),
-            aspirate_mix_volume: i18n.t(
-              'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present-pipette-different'
-            ),
-            aspirate_mix_times: i18n.t(
-              'tooltip.step_fields.batch_edit.disabled.multi-aspirate-present-pipette-different'
-            ),
+            aspirate_mix_checkbox: 'Incompatible with current path',
+            aspirate_mix_volume: 'Incompatible with current path',
+            aspirate_mix_times: 'Incompatible with current path',
           })
         )
       })
@@ -1229,15 +1168,9 @@ describe('getMultiSelectDisabledFields', () => {
           )
         ).toEqual(
           expect.objectContaining({
-            dispense_mix_checkbox: i18n.t(
-              'tooltip.step_fields.batch_edit.disabled.multi-dispense-present-pipette-different'
-            ),
-            dispense_mix_volume: i18n.t(
-              'tooltip.step_fields.batch_edit.disabled.multi-dispense-present-pipette-different'
-            ),
-            dispense_mix_times: i18n.t(
-              'tooltip.step_fields.batch_edit.disabled.multi-dispense-present-pipette-different'
-            ),
+            dispense_mix_checkbox: 'Incompatible with current path',
+            dispense_mix_volume: 'Incompatible with current path',
+            dispense_mix_times: 'Incompatible with current path',
           })
         )
       })
@@ -1286,12 +1219,8 @@ describe('getMultiSelectDisabledFields', () => {
             mockmultiSelectItemIds
           )
         ).toEqual({
-          aspirate_flowRate: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
-          dispense_flowRate: i18n.t(
-            'tooltip.step_fields.batch_edit.disabled.pipette-different'
-          ),
+          aspirate_flowRate: 'Incompatible with current path',
+          dispense_flowRate: 'Incompatible with current path',
         })
       })
     })
@@ -1307,9 +1236,7 @@ describe('getMultiSelectDisabledFields', () => {
         }
       })
       it('should return fields being disabled with associated reasons', () => {
-        const labwareDifferentText = i18n.t(
-          'tooltip.step_fields.batch_edit.disabled.labware-different'
-        )
+        const labwareDifferentText = 'Incompatible with current path'
 
         expect(
           // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type

@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { ProtocolDropTipBanner } from '../ProtocolDropTipBanner'
 import { i18n } from '../../../../i18n'
 
@@ -17,8 +17,8 @@ describe('Module Update Banner', () => {
 
   beforeEach(() => {
     props = {
-      onCloseClick: jest.fn(),
-      onLaunchWizardClick: jest.fn(),
+      onCloseClick: vi.fn(),
+      onLaunchWizardClick: vi.fn(),
     }
   })
 
@@ -30,16 +30,16 @@ describe('Module Update Banner', () => {
   })
 
   it('launches the drop tip wizard when clicking on the appropriate banner text', () => {
-    const { getByText } = render(props)
+    render(props)
     expect(props.onLaunchWizardClick).not.toHaveBeenCalled()
-    fireEvent.click(getByText('Remove tips'))
+    fireEvent.click(screen.getByText('Remove tips'))
     expect(props.onLaunchWizardClick).toHaveBeenCalled()
   })
 
   it('closes the banner when clicking the appropriate button', () => {
-    const { getByTestId } = render(props)
+    render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
-    fireEvent.click(getByTestId('Banner_close-button'))
+    fireEvent.click(screen.getByTestId('Banner_close-button'))
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 })

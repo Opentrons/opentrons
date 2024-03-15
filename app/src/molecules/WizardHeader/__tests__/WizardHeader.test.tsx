@@ -1,18 +1,16 @@
 import * as React from 'react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { getIsOnDevice } from '../../../redux/config'
 import { StepMeter } from '../../../atoms/StepMeter'
 import { WizardHeader } from '..'
+import { renderWithProviders } from '../../../__testing-utils__'
 
-jest.mock('../../../atoms/StepMeter')
-jest.mock('../../../redux/config')
+vi.mock('../../../atoms/StepMeter')
+vi.mock('../../../redux/config')
 
-const mockStepMeter = StepMeter as jest.MockedFunction<typeof StepMeter>
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
 const render = (props: React.ComponentProps<typeof WizardHeader>) => {
   return renderWithProviders(<WizardHeader {...props} />, {
     i18nInstance: i18n,
@@ -26,35 +24,32 @@ describe('WizardHeader', () => {
     props = {
       title: 'Tip Length Calibrations',
       totalSteps: 5,
-      onExit: jest.fn(),
+      onExit: vi.fn(),
       currentStep: 1,
     }
-    mockStepMeter.mockReturnValue(<div>step meter</div>)
-    mockGetIsOnDevice.mockReturnValue(false)
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(StepMeter).mockReturnValue(<div>step meter</div>)
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
   })
 
   it('renders correct information with step count visible and pressing on button calls props', () => {
-    const { getByText, getByRole } = render(props)
-    getByText('Tip Length Calibrations')
-    const exit = getByRole('button', { name: 'Exit' })
+    render(props)
+    screen.getByText('Tip Length Calibrations')
+    const exit = screen.getByRole('button', { name: 'Exit' })
     fireEvent.click(exit)
     expect(props.onExit).toHaveBeenCalled()
-    getByText('step meter')
-    getByText('Step 1 / 5')
+    screen.getByText('step meter')
+    screen.getByText('Step 1 / 5')
   })
 
   it('renders correct information when on device display is true', () => {
-    mockGetIsOnDevice.mockReturnValue(true)
-    const { getByText, getByRole } = render(props)
-    getByText('Tip Length Calibrations')
-    const exit = getByRole('button', { name: 'Exit' })
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
+    render(props)
+    screen.getByText('Tip Length Calibrations')
+    const exit = screen.getByRole('button', { name: 'Exit' })
     fireEvent.click(exit)
     expect(props.onExit).toHaveBeenCalled()
-    getByText('step meter')
-    getByText('Step 1 / 5')
+    screen.getByText('step meter')
+    screen.getByText('Step 1 / 5')
   })
 
   it('renders exit button as disabled when isDisabled is true', () => {
@@ -62,9 +57,9 @@ describe('WizardHeader', () => {
       ...props,
       exitDisabled: true,
     }
-    const { getByText, getByRole } = render(props)
-    getByText('Tip Length Calibrations')
-    const exit = getByRole('button', { name: 'Exit' })
+    render(props)
+    screen.getByText('Tip Length Calibrations')
+    const exit = screen.getByRole('button', { name: 'Exit' })
     expect(exit).toBeDisabled()
   })
 
@@ -74,9 +69,9 @@ describe('WizardHeader', () => {
       currentStep: 0,
     }
 
-    const { getByText, getByRole } = render(props)
-    getByText('Tip Length Calibrations')
-    getByRole('button', { name: 'Exit' })
+    render(props)
+    screen.getByText('Tip Length Calibrations')
+    screen.getByRole('button', { name: 'Exit' })
     expect(screen.queryByText('Step 0 / 5')).not.toBeInTheDocument()
   })
 
@@ -86,9 +81,9 @@ describe('WizardHeader', () => {
       currentStep: null,
     }
 
-    const { getByText, getByRole } = render(props)
-    getByText('Tip Length Calibrations')
-    getByRole('button', { name: 'Exit' })
+    render(props)
+    screen.getByText('Tip Length Calibrations')
+    screen.getByRole('button', { name: 'Exit' })
     expect(screen.queryByText('Step 1 / 5')).not.toBeInTheDocument()
   })
 })

@@ -1,11 +1,14 @@
 import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import {
-  useInstrumentsQuery,
-  useDeckConfigurationQuery,
-} from '@opentrons/react-api-client'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
+
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
+
+import {
+  nestedTextMatcher,
+  renderWithProviders,
+} from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   mock8ChannelAttachedPipetteInformation,
@@ -21,51 +24,30 @@ const render = (props: React.ComponentProps<typeof AttachProbe>) => {
     i18nInstance: i18n,
   })[0]
 }
-jest.mock('@opentrons/react-api-client')
-
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
->
+vi.mock('@opentrons/react-api-client')
 
 describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>
-  const refetch = jest.fn(() => Promise.resolve())
   beforeEach(() => {
     props = {
       mount: LEFT,
-      goBack: jest.fn(),
-      proceed: jest.fn(),
-      chainRunCommands: jest
+      goBack: vi.fn(),
+      proceed: vi.fn(),
+      chainRunCommands: vi
         .fn()
+        .mockImplementationOnce(() => Promise.resolve())
         .mockImplementationOnce(() => Promise.resolve()),
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
-      setShowErrorMessage: jest.fn(),
+      setShowErrorMessage: vi.fn(),
       isRobotMoving: false,
       isExiting: false,
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
     }
-    mockUseInstrumentsQuery.mockReturnValue({
-      data: {
-        data: [
-          {
-            ok: true,
-            mount: LEFT,
-            state: {
-              tipDetected: true,
-            },
-          },
-        ],
-      } as any,
-      refetch,
-    } as any)
-    mockUseDeckConfigurationQuery.mockReturnValue({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutD3',
@@ -74,15 +56,27 @@ describe('AttachProbe', () => {
     } as any)
   })
   it('returns the correct information, buttons work as expected', async () => {
-    const { getByText, getByTestId, getByRole, getByLabelText } = render(props)
-    getByText('Attach calibration probe')
-    getByText(
+    render(props)
+    screen.getByText('Attach calibration probe')
+    screen.getByText(
       'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
-    getByTestId('Pipette_Attach_Probe_1.webm')
-    const proceedBtn = getByRole('button', { name: 'Begin calibration' })
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
+    )
+    const proceedBtn = screen.getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(proceedBtn)
-    expect(refetch).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'verifyTipPresence',
+            params: { pipetteId: 'abc', expectedState: 'present' },
+          },
+        ],
+        false
+      )
+    })
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -105,10 +99,12 @@ describe('AttachProbe', () => {
         ],
         false
       )
+    })
+    await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
 
-    const backBtn = getByLabelText('back')
+    const backBtn = screen.getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
   })
@@ -121,8 +117,8 @@ describe('AttachProbe', () => {
         right: null,
       },
     }
-    const { getByText } = render(props)
-    getByText(
+    render(props)
+    screen.getByText(
       nestedTextMatcher(
         'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the backmost pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
       )
@@ -134,12 +130,14 @@ describe('AttachProbe', () => {
       ...props,
       isRobotMoving: true,
     }
-    const { getByText, getByTestId } = render(props)
-    getByText('Stand back, Flex 1-Channel 1000 μL is calibrating')
-    getByText(
+    render(props)
+    screen.getByText('Stand back, Flex 1-Channel 1000 μL is calibrating')
+    screen.getByText(
       'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
     )
-    getByTestId('Pipette_Probing_1.webm')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
+    )
   })
 
   it('returns the correct information when robot is in motion for 96 channel', () => {
@@ -151,12 +149,14 @@ describe('AttachProbe', () => {
       },
       isRobotMoving: true,
     }
-    const { getByText, getByTestId } = render(props)
-    getByText('Stand back, Flex 96-Channel 1000 μL is calibrating')
-    getByText(
+    render(props)
+    screen.getByText('Stand back, Flex 96-Channel 1000 μL is calibrating')
+    screen.getByText(
       'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
     )
-    getByTestId('Pipette_Probing_96.webm')
+    screen.getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
+    )
   })
 
   it('returns the correct information when robot is in motion during exiting', () => {
@@ -165,8 +165,8 @@ describe('AttachProbe', () => {
       isRobotMoving: true,
       isExiting: true,
     }
-    const { getByText } = render(props)
-    getByText('Stand back, robot is in motion')
+    render(props)
+    screen.getByText('Stand back, robot is in motion')
     expect(
       screen.queryByText(
         'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position.'
@@ -179,11 +179,11 @@ describe('AttachProbe', () => {
       ...props,
       errorMessage: 'error shmerror',
     }
-    const { getByText } = render(props)
-    getByText(
+    render(props)
+    screen.getByText(
       'Return the calibration probe to its storage location before exiting.'
     )
-    getByText('error shmerror')
+    screen.getByText('error shmerror')
   })
 
   it('renders the correct text when is on device', async () => {
@@ -196,9 +196,21 @@ describe('AttachProbe', () => {
     getByText(
       'Take the calibration probe from its storage location. Ensure its collar is unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle. Twist the collar to lock the probe. Test that the probe is secure by gently pulling it back and forth.'
     )
-    getByTestId('Pipette_Attach_Probe_1.webm')
-    getByRole('button', { name: 'Begin calibration' }).click()
-    expect(refetch).toHaveBeenCalled()
+    getByTestId(
+      '/app/src/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
+    )
+    fireEvent.click(getByRole('button', { name: 'Begin calibration' }))
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'verifyTipPresence',
+            params: { pipetteId: 'abc', expectedState: 'present' },
+          },
+        ],
+        false
+      )
+    })
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenCalledWith(
         [
@@ -221,9 +233,11 @@ describe('AttachProbe', () => {
         ],
         false
       )
+    })
+    await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
     })
-    getByLabelText('back').click()
+    fireEvent.click(getByLabelText('back'))
     expect(props.goBack).toHaveBeenCalled()
   })
 
@@ -243,8 +257,8 @@ describe('AttachProbe', () => {
         right: null,
       },
     }
-    const { getByText } = render(props)
-    getByText(
+    render(props)
+    screen.getByText(
       'Remove the waste chute from the deck plate adapter before proceeding.'
     )
   })

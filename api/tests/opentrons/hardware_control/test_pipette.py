@@ -85,8 +85,7 @@ def test_tip_tracking(
     model: Union[str, pipette_definition.PipetteModelVersionType],
 ) -> None:
     hw_pipette = pipette_builder(model)
-    with pytest.raises(AssertionError):
-        hw_pipette.remove_tip()
+    hw_pipette.remove_tip()
     assert not hw_pipette.has_tip
     tip_length = 25.0
     hw_pipette.add_tip(tip_length)
@@ -95,8 +94,7 @@ def test_tip_tracking(
         hw_pipette.add_tip(tip_length)
     hw_pipette.remove_tip()
     assert not hw_pipette.has_tip
-    with pytest.raises(AssertionError):
-        hw_pipette.remove_tip()
+    hw_pipette.remove_tip()
 
 
 @pytest.mark.parametrize(

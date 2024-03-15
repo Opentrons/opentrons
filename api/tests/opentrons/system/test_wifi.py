@@ -190,16 +190,16 @@ async def test_key_lifecycle(wifi_keys_tempdir):
                 f.write(str(random.getrandbits(2048)))
 
             # TODO(mc, 2021-09-12): use pathlib
-            with open(path, "rb") as f:  # type: ignore[assignment]
-                add_response = wifi.add_key(fn, f.read())  # type: ignore[arg-type]
+            with open(path, "rb") as f:
+                add_response = wifi.add_key(fn, f.read())
                 assert add_response.created is True
                 assert add_response.key.file == fn
                 results[fn] = add_response
 
         # We should not be able to upload a duplicate
         # TODO(mc, 2021-09-12): use pathlib
-        with open(os.path.join(source_td, "test1.pem"), "rb") as f:  # type: ignore[assignment]
-            add_response = wifi.add_key("test1.pem", f.read())  # type: ignore[arg-type]
+        with open(os.path.join(source_td, "test1.pem"), "rb") as f:
+            add_response = wifi.add_key("test1.pem", f.read())
             assert add_response.created is False
 
         # We should be able to see them all

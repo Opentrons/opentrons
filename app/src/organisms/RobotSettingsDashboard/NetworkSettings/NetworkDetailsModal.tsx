@@ -41,7 +41,7 @@ export function NetworkDetailsModal({
     title: securityType != null ? networkName : t('ethernet'),
     hasExitIcon: true,
     iconName: securityType != null ? 'wifi' : 'ethernet',
-    iconColor: COLORS.darkBlackEnabled,
+    iconColor: COLORS.black90,
   }
 
   return (
@@ -76,9 +76,9 @@ function ListItem({ itemName, itemValue }: ListItemProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      backgroundColor={COLORS.grey3}
+      backgroundColor={COLORS.grey40}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
     >
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {itemName}

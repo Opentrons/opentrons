@@ -12,7 +12,7 @@ import {
 } from '../../localization'
 import { getWellLabel } from './labels'
 import { LabelText, Value, LABEL_TOP } from '../ui'
-import styles from './styles.css'
+import styles from './styles.module.css'
 import type {
   LabwareDefinition,
   LabwareWellGroupProperties,

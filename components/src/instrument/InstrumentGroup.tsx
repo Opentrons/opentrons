@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { InstrumentInfo } from './InstrumentInfo'
-import styles from './instrument.css'
+import styles from './instrument.module.css'
 
 import type { InstrumentInfoProps } from './InstrumentInfo'
 
@@ -29,7 +29,9 @@ export function InstrumentGroup(props: InstrumentGroupProps): JSX.Element {
   return (
     <section className={styles.pipette_group}>
       <InstrumentInfo {...leftProps} showMountLabel={showMountLabel} />
-      <InstrumentInfo {...rightProps} showMountLabel={showMountLabel} />
+      {leftProps.pipetteSpecs?.channels === 96 ? null : (
+        <InstrumentInfo {...rightProps} showMountLabel={showMountLabel} />
+      )}
     </section>
   )
 }

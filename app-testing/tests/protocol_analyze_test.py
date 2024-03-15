@@ -10,22 +10,44 @@ from automation.pages.labware_landing import LabwareLanding
 from automation.pages.protocol_landing import ProtocolLanding
 from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
 
 
-def _what_protocols() -> list[(Protocol)]:
+def _what_protocols() -> list[Protocol]:
     """Use the environment variable to select which protocols are used in the test."""
     protocols: Protocols = Protocols()
     protocols_to_test: str = os.getenv("APP_ANALYSIS_TEST_PROTOCOLS", "upload_protocol")
-    tests: list[(Protocol)] = []
-    for protocol_name in [x.strip() for x in protocols_to_test.split(",")]:
-        tests.append((getattr(protocols, protocol_name)))
+    tests: list[Protocol] = []
+    for protocol_name in [x.strip() for x in protocols_to_test.split(",") if len(x.strip()) > 0]:
+        protocol = getattr(protocols, protocol_name)
+        tests.append(
+            # https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest-param
+            # pytest.param returns a special ParamterSet type. But when pytest runs
+            # the test, it will be a Protocol type. Don't feel like fighting mypy.
+            pytest.param(  # type: ignore[arg-type]
+                protocol,
+                id=protocol.protocol_name,
+                # https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest-mark-xfail
+                marks=pytest.mark.xfail(
+                    condition=protocol.expected_test_failure,
+                    reason=protocol.expected_test_reason,
+                    raises=AssertionError,
+                    run=True,
+                    strict=True,
+                ),
+            )
+        )
     return tests
 
 
-@pytest.mark.parametrize(
-    "protocol",
-    _what_protocols(),
-)
+def get_error_text(protocol_landing: ProtocolLanding, error_link: WebElement) -> str:
+    protocol_landing.base.click_webelement(error_link)
+    error_details = protocol_landing.get_popout_error().text
+    protocol_landing.click_popout_close()
+    return error_details
+
+
+@pytest.mark.parametrize("protocol", _what_protocols())
 def test_analyses(
     driver: WebDriver,
     console: Console,
@@ -49,9 +71,9 @@ def test_analyses(
                 style="white on blue",
             )
             drag_and_drop_file(labware_landing.get_drag_drop_file_button(), labware)
-            if labware_landing.get_success_toast_message(
+            if labware_landing.get_success_toast_message(filename=labware.name) or labware_landing.get_duplicate_error_toast_message(
                 filename=labware.name
-            ) or labware_landing.get_duplicate_error_toast_message(filename=labware.name):
+            ):
                 console.print(
                     f"{labware.name} uploaded to app.",
                     style="white on blue",
@@ -74,29 +96,17 @@ def test_analyses(
     ), f"Analysis took more than {analysis_timeout} seconds."
 
     # look for analysis error if the protocol should have one
+    error_link = protocol_landing.get_error_details_safe()
     if protocol.app_error:
-        error_link = protocol_landing.get_error_details_safe()
-
         assert error_link is not None, "No analysis error but was expecting one."
-        protocol_landing.base.click_webelement(error_link)
-        error_details = protocol_landing.get_popout_error().text
-        assert error_details == protocol.app_analysis_error
-        protocol_landing.click_popout_close()
-    else:
-        error_link = protocol_landing.get_error_details_safe()
-
-        if error_link is not None:
-            protocol_landing.base.click_webelement(error_link)
-            error_details = protocol_landing.get_popout_error().text
-            raise AssertionError(f"Unexpected analysis error: {error_details}")
+        assert get_error_text(protocol_landing, error_link) == protocol.app_analysis_error
+    elif error_link is not None:
+        raise AssertionError(f"Unexpected analysis error: {get_error_text(protocol_landing, error_link)}")
 
     # Verifying elements on Protocol Landing Page
     # todo fix next line needs to be safe and print name not found
     assert protocol_landing.get_deckMap_protocol_landing(protocol_name=protocol.protocol_name).is_displayed()
-    assert (
-        protocol_landing.get_protocol_name_text_protocol_landing(protocol_name=protocol.protocol_name)
-        == protocol.protocol_name
-    )
+    assert protocol_landing.get_protocol_name_text_protocol_landing(protocol_name=protocol.protocol_name) == protocol.protocol_name
 
     # TODO validate robot
 

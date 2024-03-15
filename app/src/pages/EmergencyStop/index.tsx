@@ -56,10 +56,8 @@ export function EmergencyStop(): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
-          backgroundColor={
-            isEstopConnected ? COLORS.green3 : COLORS.darkBlack20
-          }
-          borderRadius={BORDERS.borderRadiusSize3}
+          backgroundColor={isEstopConnected ? COLORS.green35 : COLORS.grey35}
+          borderRadius={BORDERS.borderRadius12}
           alignItems={ALIGN_CENTER}
         >
           <Flex
@@ -74,7 +72,7 @@ export function EmergencyStop(): JSX.Element {
                 <Icon
                   name="ot-check"
                   size="3rem"
-                  color={COLORS.green2}
+                  color={COLORS.green50}
                   data-testid="EmergencyStop_connected_icon"
                 />
                 <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -87,7 +85,7 @@ export function EmergencyStop(): JSX.Element {
                 <StyledText
                   as="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  color={COLORS.darkBlack70}
+                  color={COLORS.grey60}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
                   {t('e_stop_not_connected')}

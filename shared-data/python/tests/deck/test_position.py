@@ -76,9 +76,7 @@ def get_v4_slot_positions(
     stacks_with_slots = (
         (cutout, cutout_fixture, addressable_area)
         for (cutout, cutout_fixture, addressable_area) in get_v4_stacks(definition)
-        # v3 has a "slot" for the fixed trash, but in v4, fixedTrash is its own area type. Count
-        # it as a "slot," since we still want to compare the positions across schema versions.
-        if addressable_area["areaType"] in {"slot", "fixedTrash"}
+        if addressable_area["areaType"] == "slot"
     )
 
     slot_positions = (
@@ -99,15 +97,5 @@ def test_v3_and_v4_positional_equivalence(definition_name: str) -> None:
 
     v3_slot_positions = get_v3_slot_positions(deck_v3)
     v4_slot_positions = get_v4_slot_positions(deck_v4)
-
-    # For the purposes of this comparison, the v4 addressable areas named "fixedTrash" and
-    # "shortFixedTrash" should be compared to slot 12 in v3.
-    v4_slot_positions = set(
-        (
-            "12" if slot_id in {"fixedTrash", "shortFixedTrash"} else slot_id,
-            slot_position,
-        )
-        for slot_id, slot_position in v4_slot_positions
-    )
 
     assert v3_slot_positions == v4_slot_positions

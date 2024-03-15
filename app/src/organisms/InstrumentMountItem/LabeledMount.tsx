@@ -23,12 +23,12 @@ const MountButton = styled.button<{ isAttached: boolean }>`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
   padding: ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius12};
   background-color: ${({ isAttached }) =>
-    isAttached ? COLORS.green3 : COLORS.light1};
+    isAttached ? COLORS.green35 : COLORS.grey35};
   &:active {
     background-color: ${({ isAttached }) =>
-      isAttached ? COLORS.green3Pressed : COLORS.light1Pressed};
+      isAttached ? COLORS.green40 : COLORS.grey40};
   }
 `
 interface LabeledMountProps {
@@ -69,7 +69,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
           <StyledText
             flex="5"
             as="h4"
-            color={COLORS.darkBlack70}
+            color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignLeft}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSize28}

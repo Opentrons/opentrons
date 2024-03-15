@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+import { when } from 'vitest-when'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { LabwarePositionCheck } from '../../../../LabwarePositionCheck'
@@ -11,7 +12,6 @@ import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTy
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../../redux/config'
 import {
   useLPCDisabledReason,
-  useProtocolDetailsForRun,
   useRunCalibrationStatus,
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
@@ -19,73 +19,20 @@ import {
 import { SetupLabwareList } from '../SetupLabwareList'
 import { SetupLabwareMap } from '../SetupLabwareMap'
 import { SetupLabware } from '..'
+import { useNotifyRunQuery } from '../../../../../resources/runs'
 
-jest.mock('../SetupLabwareList')
-jest.mock('../SetupLabwareMap')
-jest.mock('../../../../LabwarePositionCheck')
-jest.mock('../../utils/getModuleTypesThatRequireExtraAttention')
-jest.mock('../../../../RunTimeControl/hooks')
-jest.mock('../../../../../redux/config')
-jest.mock('../../../hooks')
-jest.mock('../../../hooks/useLPCSuccessToast')
+vi.mock('../SetupLabwareList')
+vi.mock('../SetupLabwareMap')
+vi.mock('../../../../LabwarePositionCheck')
+vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
+vi.mock('../../../../RunTimeControl/hooks')
+vi.mock('../../../../../redux/config')
+vi.mock('../../../hooks')
+vi.mock('../../../hooks/useLPCSuccessToast')
+vi.mock('../../../../../resources/runs')
 
-const mockGetModuleTypesThatRequireExtraAttention = getModuleTypesThatRequireExtraAttention as jest.MockedFunction<
-  typeof getModuleTypesThatRequireExtraAttention
->
-const mockLabwarePostionCheck = LabwarePositionCheck as jest.MockedFunction<
-  typeof LabwarePositionCheck
->
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
->
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
->
-const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
-  typeof useUnmatchedModulesForProtocol
->
-const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
-  typeof useRunCalibrationStatus
->
-const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as jest.MockedFunction<
-  typeof getIsLabwareOffsetCodeSnippetsOn
->
-const mockUseLPCSuccessToast = useLPCSuccessToast as jest.MockedFunction<
-  typeof useLPCSuccessToast
->
-const mockSetupLabwareList = SetupLabwareList as jest.MockedFunction<
-  typeof SetupLabwareList
->
-const mockSetupLabwareMap = SetupLabwareMap as jest.MockedFunction<
-  typeof SetupLabwareMap
->
-const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
-  typeof useLPCDisabledReason
->
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
-const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
-const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
-const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
-const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
-const LABWARE_DEF = {
-  ordering: [['A1', 'A2']],
-  parameters: { isTiprack: true },
-}
-const mockLabwarePositionCheckStepTipRack = {
-  labwareId:
-    '1d57fc10-67ad-11ea-9f8b-3b50068bd62d:opentrons/opentrons_96_filtertiprack_200ul/1',
-  section: '',
-  commands: [
-    {
-      commandType: 'pickUpTip',
-      params: {
-        pipetteId: PRIMARY_PIPETTE_ID,
-        labwareId: PICKUP_TIP_LABWARE_ID,
-      },
-    },
-  ],
-} as any
 
 const render = () => {
   return renderWithProviders(
@@ -94,7 +41,7 @@ const render = () => {
         robotName={ROBOT_NAME}
         runId={RUN_ID}
         protocolRunHeaderRef={null}
-        expandStep={jest.fn()}
+        expandStep={vi.fn()}
         nextStep={'liquid_setup_step'}
       />
     </StaticRouter>,
@@ -106,76 +53,51 @@ const render = () => {
 
 describe('SetupLabware', () => {
   beforeEach(() => {
-    when(mockGetModuleTypesThatRequireExtraAttention)
+    when(vi.mocked(getModuleTypesThatRequireExtraAttention))
       .calledWith(expect.anything())
-      .mockReturnValue([])
+      .thenReturn([])
 
-    when(mockLabwarePostionCheck).mockReturnValue(
+    vi.mocked(LabwarePositionCheck).mockReturnValue(
       <div>mock Labware Position Check</div>
     )
-    when(mockUseUnmatchedModulesForProtocol)
+    when(vi.mocked(useUnmatchedModulesForProtocol))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
 
-    when(mockUseLPCSuccessToast)
+    when(vi.mocked(useLPCSuccessToast))
       .calledWith()
-      .mockReturnValue({ setIsShowingLPCSuccessToast: jest.fn() })
+      .thenReturn({ setIsShowingLPCSuccessToast: vi.fn() })
 
-    when(mockUseRunCalibrationStatus)
+    when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         complete: true,
       })
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
-    when(mockUseProtocolDetailsForRun)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        protocolData: {
-          labware: {
-            [mockLabwarePositionCheckStepTipRack.labwareId]: {
-              slot: '1',
-              displayName: 'someDisplayName',
-              definitionId: LABWARE_DEF_ID,
-            },
-          },
-          labwareDefinitions: {
-            [LABWARE_DEF_ID]: LABWARE_DEF,
-          },
-          pipettes: {
-            [PRIMARY_PIPETTE_ID]: {
-              name: PRIMARY_PIPETTE_NAME,
-              mount: 'left',
-            },
-          },
-          commands: [
-            {
-              commandType: 'pickUpTip',
-              params: { pipetteId: PRIMARY_PIPETTE_ID },
-            } as any,
-          ],
-        },
-      } as any)
-    when(mockGetIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
-    when(mockSetupLabwareMap).mockReturnValue(<div>mock setup labware map</div>)
-    when(mockSetupLabwareList).mockReturnValue(
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+    vi.mocked(getIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
+    vi.mocked(SetupLabwareMap).mockReturnValue(
+      <div>mock setup labware map</div>
+    )
+    vi.mocked(SetupLabwareList).mockReturnValue(
       <div> mock setup labware list</div>
     )
-    when(mockUseLPCDisabledReason).mockReturnValue(null)
+    vi.mocked(useLPCDisabledReason).mockReturnValue(null)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render the list view, clicking the toggle button will turn to map view', () => {
-    const { getByText, getByRole } = render()
-    getByText('mock setup labware list')
-    getByRole('button', { name: 'List View' })
-    const mapView = getByRole('button', { name: 'Map View' })
+    render()
+    screen.getByText('mock setup labware list')
+    screen.getByRole('button', { name: 'List View' })
+    const mapView = screen.getByRole('button', { name: 'Map View' })
     fireEvent.click(mapView)
-    getByText('mock setup labware map')
+    screen.getByText('mock setup labware map')
   })
 })

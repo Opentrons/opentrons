@@ -1,9 +1,11 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { UseQueryResult } from 'react-query'
-import { fireEvent } from '@testing-library/react'
 import {
   useAllCommandsQuery,
   useDeleteRunMutation,
@@ -12,53 +14,24 @@ import { i18n } from '../../../i18n'
 import runRecord from '../../../organisms/RunDetails/__fixtures__/runRecord.json'
 import { useDownloadRunLog, useTrackProtocolRunEvent } from '../hooks'
 import { useRunControls } from '../../RunTimeControl/hooks'
-import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../../redux/analytics'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
+import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 
 import type { CommandsData } from '@opentrons/api-client'
 
-const mockPush = jest.fn()
-
-jest.mock('../../../redux/analytics')
-jest.mock('../../../redux/robot-update/selectors')
-jest.mock('../../Devices/hooks')
-jest.mock('../../RunTimeControl/hooks')
-jest.mock('../../../redux/analytics')
-jest.mock('../../../redux/config')
-jest.mock('@opentrons/react-api-client')
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
-  return {
-    ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
-  }
-})
-
-const mockUseAllCommandsQuery = useAllCommandsQuery as jest.MockedFunction<
-  typeof useAllCommandsQuery
->
-const mockUseRunControls = useRunControls as jest.MockedFunction<
-  typeof useRunControls
->
-const mockUseDeleteRunMutation = useDeleteRunMutation as jest.MockedFunction<
-  typeof useDeleteRunMutation
->
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
-  typeof useTrackProtocolRunEvent
->
-const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof getRobotUpdateDisplayInfo
->
-const mockUseDownloadRunLog = useDownloadRunLog as jest.MockedFunction<
-  typeof useDownloadRunLog
->
+vi.mock('../../../redux/analytics')
+vi.mock('../../../redux/robot-update/selectors')
+vi.mock('../../Devices/hooks')
+vi.mock('../../RunTimeControl/hooks')
+vi.mock('../../../redux/analytics')
+vi.mock('../../../redux/config')
+vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('@opentrons/react-api-client')
 
 const render = (
   props: React.ComponentProps<typeof HistoricalProtocolRunOverflowMenu>
@@ -74,38 +47,36 @@ const render = (
 }
 const PAGE_LENGTH = 101
 const RUN_ID = 'id'
-let mockTrackEvent: jest.Mock
-let mockTrackProtocolRunEvent: jest.Mock
-const mockDownloadRunLog = jest.fn()
+const ROBOT_NAME = 'otie'
+let mockTrackEvent: any
+let mockTrackProtocolRunEvent: any
+const mockDownloadRunLog = vi.fn()
 
 describe('HistoricalProtocolRunOverflowMenu', () => {
   let props: React.ComponentProps<typeof HistoricalProtocolRunOverflowMenu>
   beforeEach(() => {
-    mockTrackEvent = jest.fn()
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockTrackProtocolRunEvent = jest.fn(
-      () => new Promise(resolve => resolve({}))
-    )
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    mockTrackEvent = vi.fn()
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+    mockTrackProtocolRunEvent = vi.fn(() => new Promise(resolve => resolve({})))
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'reinstall',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    when(mockUseDownloadRunLog).mockReturnValue({
+    vi.mocked(useDownloadRunLog).mockReturnValue({
       downloadRunLog: mockDownloadRunLog,
       isRunLogLoading: false,
     })
-    when(
-      mockUseDeleteRunMutation.mockReturnValue({
-        deleteRun: jest.fn(),
-      } as any)
-    )
-    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: vi.fn(),
+    } as any)
+
+    when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
-    when(mockUseRunControls)
+    when(useRunControls)
       .calledWith(RUN_ID, expect.anything())
-      .mockReturnValue({
+      .thenReturn({
         play: () => {},
         pause: () => {},
         stop: () => {},
@@ -115,7 +86,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         isStopRunActionLoading: false,
         isResetRunLoading: false,
       })
-    when(mockUseAllCommandsQuery)
+    when(useAllCommandsQuery)
       .calledWith(
         RUN_ID,
         {
@@ -124,32 +95,28 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         },
         { staleTime: Infinity }
       )
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: runRecord.data.commands, meta: { totalLength: 14 } },
       } as unknown) as UseQueryResult<CommandsData>)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
     props = {
       runId: RUN_ID,
-      robotName: 'otie',
+      robotName: ROBOT_NAME,
       robotIsBusy: false,
     }
   })
 
-  afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
-  })
-
   it('renders the correct menu when a runId is present', () => {
-    const { getByRole } = render(props)
+    render(props)
 
-    const btn = getByRole('button')
+    const btn = screen.getByRole('button')
     fireEvent.click(btn)
-    getByRole('button', {
+    screen.getByRole('button', {
       name: 'View protocol run record',
     })
-    const rerunBtn = getByRole('button', { name: 'Rerun protocol now' })
-    getByRole('button', { name: 'Download protocol run log' })
-    const deleteBtn = getByRole('button', {
+    const rerunBtn = screen.getByRole('button', { name: 'Rerun protocol now' })
+    screen.getByRole('button', { name: 'Download protocol run log' })
+    const deleteBtn = screen.getByRole('button', {
       name: 'Delete protocol run record',
     })
     fireEvent.click(rerunBtn)
@@ -157,25 +124,31 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'HistoricalProtocolRun' },
     })
-    expect(mockUseRunControls).toHaveBeenCalled()
+    expect(useRunControls).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     fireEvent.click(deleteBtn)
-    expect(mockUseDeleteRunMutation).toHaveBeenCalled()
+    expect(useDeleteRunMutation).toHaveBeenCalled()
   })
 
   it('disables the rerun protocol menu item if robot software update is available', () => {
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'upgrade',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    const { getByRole } = render(props)
-    const btn = getByRole('button')
+    render(props)
+    const btn = screen.getByRole('button')
     fireEvent.click(btn)
-    getByRole('button', {
+    screen.getByRole('button', {
       name: 'View protocol run record',
     })
-    const rerunBtn = getByRole('button', { name: 'Rerun protocol now' })
+    const rerunBtn = screen.getByRole('button', { name: 'Rerun protocol now' })
     expect(rerunBtn).toBeDisabled()
+  })
+
+  it('should make overflow menu disabled when e-stop is pressed', () => {
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
+    render(props)
+    expect(screen.getByRole('button')).toBeDisabled()
   })
 })

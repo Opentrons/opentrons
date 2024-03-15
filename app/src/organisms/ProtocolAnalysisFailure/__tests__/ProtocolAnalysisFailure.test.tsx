@@ -1,8 +1,9 @@
 import * as React from 'react'
-import '@testing-library/jest-dom'
-import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { ProtocolAnalysisFailure } from '..'
@@ -29,16 +30,18 @@ const render = (
 
 describe('ProtocolAnalysisFailure', () => {
   it('renders banner with no modal by default', () => {
-    const [{ queryByRole }] = render()
-    expect(queryByRole('button', { name: 'close' })).toBeNull()
+    render()
+    expect(screen.queryByRole('button', { name: 'close' })).toBeNull()
   })
   it('renders modal after clicking view details', () => {
-    const [{ getByRole, queryByRole }] = render()
-    const viewDetailsButton = getByRole('button', { name: 'error details' })
+    render()
+    const viewDetailsButton = screen.getByRole('button', {
+      name: 'error details',
+    })
     fireEvent.click(viewDetailsButton)
-    const closeButton = getByRole('button', { name: 'close' })
+    const closeButton = screen.getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)
-    expect(queryByRole('button', { name: 'close' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'close' })).toBeNull()
   })
   it('dispatches reanalyze action on click', () => {
     const [{ getByRole }, store] = render()

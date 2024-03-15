@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { renderHook } from '@testing-library/react'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 
 import {
   useIsFlex,
@@ -16,14 +17,10 @@ import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
-jest.mock('../useIsFlex')
-jest.mock('../useModuleRenderInfoForProtocolById')
+vi.mock('../useIsFlex')
+vi.mock('../useModuleRenderInfoForProtocolById')
 
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
-  typeof useModuleRenderInfoForProtocolById
->
-let wrapper: React.FunctionComponent<{}>
+let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
 const mockMagneticModuleDefinition = {
   moduleId: 'someMagneticModule',
@@ -68,9 +65,9 @@ const mockOffsetData = {
 describe('useModuleCalibrationStatus hook', () => {
   beforeEach(() => {
     const queryClient = new QueryClient()
-    const store = createStore(jest.fn(), {})
-    store.dispatch = jest.fn()
-    store.getState = jest.fn(() => {})
+    const store = createStore(vi.fn(), {})
+    store.dispatch = vi.fn()
+    store.getState = vi.fn(() => {})
 
     wrapper = ({ children }) => (
       <QueryClientProvider client={queryClient}>
@@ -79,15 +76,14 @@ describe('useModuleCalibrationStatus hook', () => {
     )
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should return calibration complete if OT-2', () => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(false)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
-      .mockReturnValue({})
+      .thenReturn({})
 
     const { result } = renderHook(
       () => useModuleCalibrationStatus('otie', '1'),
@@ -98,10 +94,10 @@ describe('useModuleCalibrationStatus hook', () => {
   })
 
   it('should return calibration complete if no modules needed', () => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
-      .mockReturnValue({})
+      .thenReturn({})
 
     const { result } = renderHook(
       () => useModuleCalibrationStatus('otie', '1'),
@@ -112,15 +108,16 @@ describe('useModuleCalibrationStatus hook', () => {
   })
 
   it('should return calibration complete if offset date exists', () => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
-      .mockReturnValue({
+      .thenReturn({
         magneticModuleId: {
           attachedModuleMatch: {
             ...mockMagneticModuleGen2,
             moduleOffset: mockOffsetData,
           },
+          conflictedFixture: null,
           ...MAGNETIC_MODULE_INFO,
         },
       })
@@ -134,14 +131,15 @@ describe('useModuleCalibrationStatus hook', () => {
   })
 
   it('should return calibration needed if offset date does not exist', () => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
-    when(mockUseModuleRenderInfoForProtocolById)
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
-      .mockReturnValue({
+      .thenReturn({
         magneticModuleId: {
           attachedModuleMatch: {
             ...mockMagneticModuleGen2,
           },
+          conflictedFixture: null,
           ...MAGNETIC_MODULE_INFO,
         },
       })

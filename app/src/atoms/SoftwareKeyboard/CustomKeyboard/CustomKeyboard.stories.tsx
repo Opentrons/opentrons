@@ -8,6 +8,8 @@ import {
 import { touchScreenViewport } from '../../../DesignTokens/constants'
 import { InputField } from '../../InputField'
 import { CustomKeyboard } from './'
+import '../index.css'
+import './index.css'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -34,7 +36,7 @@ const Template: Story<React.ComponentProps<typeof CustomKeyboard>> = args => {
       <Flex position={POSITION_ABSOLUTE} top="20%" width="55rem">
         {showKeyboard && (
           <CustomKeyboard
-            onChange={e => e != null && setValue(String(e))}
+            onChange={(e: string) => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
           />
         )}

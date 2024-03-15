@@ -45,6 +45,7 @@ import type {
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
+import { forConfigureNozzleLayout } from './forConfigureNozzleLayout'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(
@@ -122,6 +123,14 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
+    case 'configureNozzleLayout':
+      forConfigureNozzleLayout(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+
     case 'touchTip':
     case 'waitForDuration':
     case 'waitForResume':
@@ -129,6 +138,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'delay':
     case 'configureForVolume':
     case 'moveToAddressableArea':
+    case 'moveToAddressableAreaForDropTip':
       // these commands don't have any effects on the state
       break
 

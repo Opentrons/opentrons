@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -27,7 +28,7 @@ import {
   HS_RPM_MIN,
   RPM,
 } from '@opentrons/shared-data'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { Slideout } from '../../atoms/Slideout'
 import { TertiaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
@@ -156,26 +157,27 @@ export const TestShakeSlideout = (
         </PrimaryButton>
       }
     >
-      {showConfirmationModal && (
-        <Portal level="top">
-          <ConfirmAttachmentModal
-            onCloseClick={cancelExit}
-            isProceedToRunModal={false}
-            onConfirmClick={sendCommands}
-          />
-        </Portal>
-      )}
+      {showConfirmationModal
+        ? createPortal(
+            <ConfirmAttachmentModal
+              onCloseClick={cancelExit}
+              isProceedToRunModal={false}
+              onConfirmClick={sendCommands}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       <Flex
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         marginBottom={SPACING.spacing8}
-        backgroundColor={COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.blue30}
         paddingY={SPACING.spacing16}
         paddingLeft={SPACING.spacing4}
         paddingRight={SPACING.spacing16}
         flexDirection={DIRECTION_ROW}
         data-testid="test_shake_slideout_banner_info"
       >
-        <Flex color={COLORS.darkGreyEnabled}>
+        <Flex color={COLORS.blue60}>
           <Icon
             name="information"
             size={SPACING.spacing32}
@@ -235,7 +237,7 @@ export const TestShakeSlideout = (
             </Tooltip>
           ) : null}
         </Flex>
-        <Divider color={COLORS.medGreyEnabled} />
+        <Divider color={COLORS.grey30} />
         <StyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -264,7 +266,7 @@ export const TestShakeSlideout = (
               disabled={isShaking}
             />
             <StyledText
-              color={COLORS.darkGreyEnabled}
+              color={COLORS.grey50}
               fontSize={TYPOGRAPHY.fontSizeCaption}
             ></StyledText>
           </Flex>

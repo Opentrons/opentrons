@@ -26,7 +26,7 @@ import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
 import { LiquidDetailCard } from './LiquidDetailCard'
 import {
   getLiquidsByIdForLabware,
-  getWellFillFromLabwareId,
+  getDisabledWellFillFromLabwareId,
   getWellGroupForLiquidId,
   getDisabledWellGroupForLiquidId,
 } from './utils'
@@ -52,11 +52,6 @@ export const LiquidsLabwareDetailsModal = (
     commands
   )
   const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
-  const wellFill = getWellFillFromLabwareId(
-    labwareId,
-    liquids,
-    labwareByLiquidId
-  )
   const labwareInfo = getLiquidsByIdForLabware(labwareId, labwareByLiquidId)
   const { slotName, labwareName } = getLocationInfoNames(labwareId, commands)
   const loadLabwareCommand = commands
@@ -69,6 +64,14 @@ export const LiquidsLabwareDetailsModal = (
   const [selectedValue, setSelectedValue] = React.useState<typeof liquidId>(
     liquidId ?? filteredLiquidsInLoadOrder[0].id
   )
+
+  const wellFill = getDisabledWellFillFromLabwareId(
+    labwareId,
+    liquids,
+    labwareByLiquidId,
+    selectedValue
+  )
+
   const scrollToCurrentItem = (): void => {
     currentLiquidRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -167,7 +170,7 @@ export const LiquidsLabwareDetailsModal = (
       <Box
         paddingX={SPACING.spacing16}
         paddingTop={SPACING.spacing16}
-        backgroundColor={COLORS.fundamentalsBackground}
+        backgroundColor={COLORS.grey10}
         height="28.125rem"
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
@@ -193,14 +196,14 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="h6"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkGreyEnabled}
+                  color={COLORS.grey50}
                 >
                   {t('slot_number')}
                 </StyledText>
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlackEnabled}
+                  color={COLORS.black90}
                 >
                   {slotName}
                 </StyledText>
@@ -212,14 +215,14 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="h6"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkGreyEnabled}
+                  color={COLORS.grey50}
                 >
                   {t('labware_name')}
                 </StyledText>
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlackEnabled}
+                  color={COLORS.black90}
                 >
                   {labwareName}
                 </StyledText>

@@ -1,4 +1,6 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import merge from 'lodash/merge'
+import { COLUMN } from '@opentrons/shared-data'
 import {
   getInitialRobotStateStandard,
   makeContext,
@@ -251,9 +253,10 @@ describe('replaceTip', () => {
     })
   })
   describe('replaceTip: 96-channel', () => {
-    it('96-channel, dropping tips in waste chute', () => {
+    it('96-channel, dropping 1 column of tips in waste chute', () => {
       invariantContext = {
         ...invariantContext,
+
         additionalEquipmentEntities: {
           wasteChuteId: {
             name: 'wasteChute',
@@ -262,7 +265,9 @@ describe('replaceTip', () => {
           },
         },
       }
-      const initialTestRobotState = merge({}, initialRobotState, {
+      initialRobotState = {
+        ...initialRobotState,
+        pipettes: { p100096Id: { mount: 'left', nozzles: COLUMN } },
         tipState: {
           tipracks: {
             [tiprack4Id]: getTiprackTipstate(false),
@@ -272,14 +277,16 @@ describe('replaceTip', () => {
             p100096Id: true,
           },
         },
-      })
+      }
+
       const result = replaceTip(
         {
           pipette: p100096Id,
           dropTipLocation: 'wasteChuteId',
+          nozzles: COLUMN,
         },
         invariantContext,
-        initialTestRobotState
+        initialRobotState
       )
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([

@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from 'vitest'
 import {
   getInitialRobotStateStandard,
   makeContext,
@@ -7,9 +8,11 @@ import {
   DEST_LABWARE,
   FIXED_TRASH_ID,
 } from '@opentrons/step-generation'
-import { StepArgsAndErrorsById } from '../../steplist'
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
-jest.mock('../../labware-defs/utils')
+import type { StepArgsAndErrorsById } from '../../steplist'
+
+vi.mock('../../labware-defs/utils')
+
 describe('generateRobotStateTimeline', () => {
   it('performs eager tip dropping', () => {
     const allStepArgsAndErrors: StepArgsAndErrorsById = {
@@ -45,6 +48,7 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12', 'A12'],
           mixBeforeAspirate: null,
           description: null,
+          nozzles: null,
         },
       },
       b: {
@@ -79,6 +83,7 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12'],
           mixBeforeAspirate: null,
           description: null,
+          nozzles: null,
         },
       },
       c: {
@@ -105,6 +110,7 @@ describe('generateRobotStateTimeline', () => {
           blowoutOffsetFromTopMm: 0,
           aspirateDelaySeconds: null,
           dispenseDelaySeconds: null,
+          nozzles: null,
         },
       },
     }
@@ -124,37 +130,37 @@ describe('generateRobotStateTimeline', () => {
     )
     // NOTE: if you update this snapshot, make sure this it exhibits eager tip dropping
     expect(commandOverview).toMatchInlineSnapshot(`
-      Array [
-        Array [
+      [
+        [
           "pickUpTip",
           "aspirate",
           "dispense",
           "aspirate",
           "dispense",
-          "moveToAddressableArea",
+          "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
         ],
-        Array [
+        [
           "pickUpTip",
           "aspirate",
           "dispense",
-          "moveToAddressableArea",
+          "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
         ],
-        Array [
+        [
           "pickUpTip",
           "aspirate",
           "dispense",
           "aspirate",
           "dispense",
-          "moveToAddressableArea",
+          "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
           "pickUpTip",
           "aspirate",
           "dispense",
           "aspirate",
           "dispense",
-          "moveToAddressableArea",
+          "moveToAddressableAreaForDropTip",
           "dropTipInPlace",
         ],
       ]

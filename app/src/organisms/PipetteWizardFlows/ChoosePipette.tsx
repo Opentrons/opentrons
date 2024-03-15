@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -32,7 +33,7 @@ import {
 import { i18n } from '../../i18n'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -49,8 +50,8 @@ import type { SelectablePipettes } from './types'
 
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGreyEnabled};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border: 1px solid ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius4};
   height: 14.5625rem;
   width: 14.5625rem;
   cursor: pointer;
@@ -60,15 +61,16 @@ const UNSELECTED_OPTIONS_STYLE = css`
   grid-gap: ${SPACING.spacing8}
 
   &:hover {
-    border: 1px solid ${COLORS.medGreyHover};
+    border: 1px solid ${COLORS.grey35};
+    background-color: ${COLORS.grey10}
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     flex-direction: ${DIRECTION_ROW};
     justify-content: ${JUSTIFY_FLEX_START};
-    background-color: ${COLORS.mediumBlueEnabled};
-    border-width: 0; 
-    border-radius: ${BORDERS.borderRadiusSize4};
+    background-color: ${COLORS.blue35};
+    border-width: 0;
+    border-radius: ${BORDERS.borderRadius16};
     padding: ${SPACING.spacing24};
     height: 5.25rem;
     width: 57.8125rem;
@@ -80,22 +82,22 @@ const UNSELECTED_OPTIONS_STYLE = css`
 `
 const SELECTED_OPTIONS_STYLE = css`
   ${UNSELECTED_OPTIONS_STYLE}
-  border: 1px solid ${COLORS.blueEnabled};
-  background-color: ${COLORS.lightBlue};
+  border: 1px solid ${COLORS.blue50};
+  background-color: ${COLORS.blue10};
 
   &:hover {
-    border: 1px solid ${COLORS.blueEnabled};
-    background-color: ${COLORS.lightBlue};
+    border: 1px solid ${COLORS.blue50};
+    background-color: ${COLORS.blue30};
   }
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-width: 0px;
-    background-color: ${COLORS.blueEnabled};
+    background-color: ${COLORS.blue50};
     color: ${COLORS.white};
 
     &:hover {
       border-width: 0px;
-      background-color: ${COLORS.blueEnabled};
+      background-color: ${COLORS.blue50};
     }
   }
 `
@@ -139,77 +141,15 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
       onExit={showExitConfirmation ? exit : () => setShowExitConfirmation(true)}
     />
   )
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <LegacyModalShell height="100%" header={wizardHeader}>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            width="100%"
-            position={POSITION_ABSOLUTE}
-            backgroundColor={COLORS.white}
-          >
-            {showExitConfirmation ? (
-              <ExitModal
-                goBack={() => setShowExitConfirmation(false)}
-                proceed={exit}
-                flowType={FLOWS.ATTACH}
-                isOnDevice={isOnDevice}
-              />
-            ) : (
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                padding={SPACING.spacing32}
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                height="29.5rem"
-              >
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing8}
-                >
-                  <StyledText
-                    as="h4"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    marginBottom={SPACING.spacing4}
-                  >
-                    {t('choose_pipette')}
-                  </StyledText>
-                  <PipetteMountOption
-                    isSelected={selectedPipette === SINGLE_MOUNT_PIPETTES}
-                    onClick={() => setSelectedPipette(SINGLE_MOUNT_PIPETTES)}
-                  >
-                    <StyledText
-                      as="h4"
-                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    >
-                      {singleMount}
-                    </StyledText>
-                  </PipetteMountOption>
-                  <PipetteMountOption
-                    isSelected={selectedPipette === NINETY_SIX_CHANNEL}
-                    onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}
-                  >
-                    <StyledText
-                      as="h4"
-                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    >
-                      {bothMounts}
-                    </StyledText>
-                  </PipetteMountOption>
-                </Flex>
-                <Flex justifyContent={JUSTIFY_FLEX_END}>
-                  <SmallButton
-                    onClick={proceed}
-                    textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-                  />
-                </Flex>
-              </Flex>
-            )}
-          </Flex>
-        </LegacyModalShell>
-      ) : (
-        <LegacyModalShell width="47rem" height="30rem" header={wizardHeader}>
+  return createPortal(
+    isOnDevice ? (
+      <LegacyModalShell height="100%" header={wizardHeader}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          width="100%"
+          position={POSITION_ABSOLUTE}
+          backgroundColor={COLORS.white}
+        >
           {showExitConfirmation ? (
             <ExitModal
               goBack={() => setShowExitConfirmation(false)}
@@ -220,61 +160,119 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
           ) : (
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              padding={SPACING.spacing40}
+              padding={SPACING.spacing32}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
+              height="29.5rem"
             >
-              <Flex flexDirection={DIRECTION_COLUMN}>
-                <StyledText as="h1">{t('choose_pipette')}</StyledText>
-                <Flex
-                  margin={SPACING.spacing40}
-                  justifyContent={JUSTIFY_SPACE_AROUND}
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+                <StyledText
+                  as="h4"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  marginBottom={SPACING.spacing4}
                 >
-                  <PipetteMountOption
-                    isSelected={selectedPipette === SINGLE_MOUNT_PIPETTES}
-                    onClick={() => setSelectedPipette(SINGLE_MOUNT_PIPETTES)}
+                  {t('choose_pipette')}
+                </StyledText>
+                <PipetteMountOption
+                  isSelected={selectedPipette === SINGLE_MOUNT_PIPETTES}
+                  onClick={() => setSelectedPipette(SINGLE_MOUNT_PIPETTES)}
+                >
+                  <StyledText
+                    as="h4"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   >
-                    <img
-                      src={singleChannelAndEightChannel}
-                      width="138.78px"
-                      height="160px"
-                      alt={singleMount}
-                    />
-                    <StyledText
-                      as="h3"
-                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                      textAlign={TYPOGRAPHY.textAlignCenter}
-                    >
-                      {singleMount}
-                    </StyledText>
-                  </PipetteMountOption>
-                  <PipetteMountOption
-                    isSelected={selectedPipette === NINETY_SIX_CHANNEL}
-                    onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}
+                    {singleMount}
+                  </StyledText>
+                </PipetteMountOption>
+                <PipetteMountOption
+                  isSelected={selectedPipette === NINETY_SIX_CHANNEL}
+                  onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}
+                >
+                  <StyledText
+                    as="h4"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   >
-                    <img
-                      src={ninetySixChannel}
-                      width="138.78px"
-                      height="160px"
-                      alt={bothMounts}
-                    />
-                    <StyledText
-                      as="h3"
-                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                      textAlign={TYPOGRAPHY.textAlignCenter}
-                    >
-                      {bothMounts}
-                    </StyledText>
-                  </PipetteMountOption>
-                </Flex>
+                    {bothMounts}
+                  </StyledText>
+                </PipetteMountOption>
               </Flex>
-              <PrimaryButton onClick={proceed} alignSelf={ALIGN_FLEX_END}>
-                {i18n.format(t('shared:continue'), 'capitalize')}
-              </PrimaryButton>
+              <Flex justifyContent={JUSTIFY_FLEX_END}>
+                <SmallButton
+                  onClick={proceed}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  buttonText={i18n.format(t('shared:continue'), 'capitalize')}
+                />
+              </Flex>
             </Flex>
           )}
-        </LegacyModalShell>
-      )}
-    </Portal>
+        </Flex>
+      </LegacyModalShell>
+    ) : (
+      <LegacyModalShell width="47rem" height="30rem" header={wizardHeader}>
+        {showExitConfirmation ? (
+          <ExitModal
+            goBack={() => setShowExitConfirmation(false)}
+            proceed={exit}
+            flowType={FLOWS.ATTACH}
+            isOnDevice={isOnDevice}
+          />
+        ) : (
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            padding={SPACING.spacing40}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText as="h1">{t('choose_pipette')}</StyledText>
+              <Flex
+                margin={SPACING.spacing40}
+                justifyContent={JUSTIFY_SPACE_AROUND}
+              >
+                <PipetteMountOption
+                  isSelected={selectedPipette === SINGLE_MOUNT_PIPETTES}
+                  onClick={() => setSelectedPipette(SINGLE_MOUNT_PIPETTES)}
+                >
+                  <img
+                    src={singleChannelAndEightChannel}
+                    width="138.78px"
+                    height="160px"
+                    alt={singleMount}
+                  />
+                  <StyledText
+                    as="h3"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    textAlign={TYPOGRAPHY.textAlignCenter}
+                  >
+                    {singleMount}
+                  </StyledText>
+                </PipetteMountOption>
+                <PipetteMountOption
+                  isSelected={selectedPipette === NINETY_SIX_CHANNEL}
+                  onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}
+                >
+                  <img
+                    src={ninetySixChannel}
+                    width="138.78px"
+                    height="160px"
+                    alt={bothMounts}
+                  />
+                  <StyledText
+                    as="h3"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    textAlign={TYPOGRAPHY.textAlignCenter}
+                  >
+                    {bothMounts}
+                  </StyledText>
+                </PipetteMountOption>
+              </Flex>
+            </Flex>
+            <PrimaryButton onClick={proceed} alignSelf={ALIGN_FLEX_END}>
+              {i18n.format(t('shared:continue'), 'capitalize')}
+            </PrimaryButton>
+          </Flex>
+        )}
+      </LegacyModalShell>
+    ),
+    getTopPortalEl()
   )
 }
 
@@ -289,6 +287,7 @@ function PipetteMountOption(props: PipetteMountOptionProps): JSX.Element {
     <Flex
       onClick={onClick}
       css={isSelected ? SELECTED_OPTIONS_STYLE : UNSELECTED_OPTIONS_STYLE}
+      role="radio"
       {...styleProps}
     >
       {children}

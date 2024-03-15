@@ -1,8 +1,10 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 
+import { StaticRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import {
   getConnectableRobots,
@@ -11,39 +13,21 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '../../../redux/discovery'
-import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
+import { useFeatureFlag } from '../../../redux/config'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
+import { useNotifyService } from '../../../resources/useNotifyService'
 
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/robot-update')
-jest.mock('../../../redux/networking')
-
-const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof getRobotUpdateDisplayInfo
->
-const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
-  typeof getConnectableRobots
->
-const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
-  typeof getReachableRobots
->
-const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
-  typeof getUnreachableRobots
->
-const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
-const mockStartDiscovery = startDiscovery as jest.MockedFunction<
-  typeof startDiscovery
->
-const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
-  typeof getNetworkInterfaces
->
-
+vi.mock('../../../redux/discovery')
+vi.mock('../../../redux/robot-update')
+vi.mock('../../../redux/networking')
+vi.mock('../../../resources/useNotifyService')
+vi.mock('../../../redux/config')
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
     <StaticRouter>
@@ -55,123 +39,146 @@ const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   )
 }
 
-const mockSetSelectedRobot = jest.fn()
+const mockSetSelectedRobot = vi.fn()
 
 describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
-      autoUpdateAction: '',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableRobot])
+    vi.mocked(getUnreachableRobots).mockReturnValue([mockUnreachableRobot])
+    vi.mocked(getReachableRobots).mockReturnValue([mockReachableRobot])
+    vi.mocked(getScanning).mockReturnValue(false)
+    vi.mocked(startDiscovery).mockReturnValue({
+      type: 'mockStartDiscovery',
+    } as any)
+    vi.mocked(getNetworkInterfaces).mockReturnValue({
+      wifi: null,
+      ethernet: null,
     })
-    mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
-    mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
-    mockGetReachableRobots.mockReturnValue([mockReachableRobot])
-    mockGetScanning.mockReturnValue(false)
-    mockStartDiscovery.mockReturnValue({ type: 'mockStartDiscovery' } as any)
-    mockGetNetworkInterfaces.mockReturnValue({ wifi: null, ethernet: null })
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(useNotifyService).mockReturnValue({} as any)
   })
 
   it('renders slideout if isExpanded true', () => {
-    const [{ queryAllByText }] = render({
-      onCloseClick: jest.fn(),
+    render({
+      onCloseClick: vi.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
-      setSelectedRobot: jest.fn(),
+      setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
-    expect(queryAllByText('Choose Robot to Run')).not.toBeFalsy()
-    expect(queryAllByText('fakeSrcFileName')).not.toBeFalsy()
-  })
-  it('does not render slideout if isExpanded false', () => {
-    const [{ queryAllByText }] = render({
-      onCloseClick: jest.fn(),
-      isExpanded: true,
-      selectedRobot: null,
-      setSelectedRobot: jest.fn(),
-      title: 'choose robot slideout title',
-    })
-    expect(queryAllByText('Choose Robot to Run').length).toEqual(0)
-    expect(queryAllByText('fakeSrcFileName').length).toEqual(0)
+    screen.getByText('choose robot slideout title')
   })
   it('shows a warning if the protocol has failed analysis', () => {
-    const [{ getByText }] = render({
-      onCloseClick: jest.fn(),
+    render({
+      onCloseClick: vi.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
-      setSelectedRobot: jest.fn(),
+      setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
       isAnalysisError: true,
+      robotType: 'OT-2 Standard',
     })
-    getByText(
+    screen.getByText(
       'This protocol failed in-app analysis. It may be unusable on robots without custom software configurations.'
     )
   })
   it('renders an available robot option for every connectable robot, and link for other robots', () => {
-    const [{ queryByText }] = render({
-      onCloseClick: jest.fn(),
+    render({
+      onCloseClick: vi.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
-      setSelectedRobot: jest.fn(),
+      setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
-    expect(queryByText('opentrons-robot-name')).toBeInTheDocument()
-    expect(
-      queryByText('2 unavailable robots are not listed.')
-    ).toBeInTheDocument()
+    screen.getByText('opentrons-robot-name')
+    screen.getByText('2 unavailable robots are not listed.')
   })
   it('if scanning, show robots, but do not show link to other devices', () => {
-    mockGetScanning.mockReturnValue(true)
-    const [{ queryByText }] = render({
-      onCloseClick: jest.fn(),
+    vi.mocked(getScanning).mockReturnValue(true)
+    render({
+      onCloseClick: vi.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
-      setSelectedRobot: jest.fn(),
+      setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
-    expect(queryByText('opentrons-robot-name')).toBeInTheDocument()
+    screen.getByText('opentrons-robot-name')
     expect(
-      queryByText('2 unavailable robots are not listed.')
+      screen.queryByText('2 unavailable robots are not listed.')
     ).not.toBeInTheDocument()
   })
   it('if not scanning, show refresh button, start discovery if clicked', () => {
-    const [{ getByRole }, { dispatch }] = render({
-      onCloseClick: jest.fn(),
+    const { dispatch } = render({
+      onCloseClick: vi.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
-    })
-    const refreshButton = getByRole('button', { name: 'refresh' })
+      robotType: 'OT-2 Standard',
+    })[1]
+    const refreshButton = screen.getByRole('button', { name: 'refresh' })
     fireEvent.click(refreshButton)
-    expect(mockStartDiscovery).toHaveBeenCalled()
+    expect(vi.mocked(startDiscovery)).toHaveBeenCalled()
     expect(dispatch).toHaveBeenCalledWith({ type: 'mockStartDiscovery' })
   })
+  it('renders the multi slideout page 1', () => {
+    render({
+      onCloseClick: vi.fn(),
+      isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
+      selectedRobot: null,
+      setSelectedRobot: mockSetSelectedRobot,
+      title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
+      multiSlideout: { currentPage: 1 },
+    })
+    screen.getByText('Step 1 / 2')
+  })
+  it('renders the multi slideout page 2', () => {
+    render({
+      onCloseClick: vi.fn(),
+      isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
+      selectedRobot: null,
+      setSelectedRobot: mockSetSelectedRobot,
+      title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
+      multiSlideout: { currentPage: 2 },
+    })
+    screen.getByText('Step 2 / 2')
+  })
   it('defaults to first available robot and allows an available robot to be selected', () => {
-    mockGetConnectableRobots.mockReturnValue([
+    vi.mocked(getConnectableRobots).mockReturnValue([
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
       mockConnectableRobot,
     ])
-    const [{ getByText }] = render({
-      onCloseClick: jest.fn(),
+    render({
+      onCloseClick: vi.fn(),
       isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
     })
     expect(mockSetSelectedRobot).toBeCalledWith({
       ...mockConnectableRobot,
       name: 'otherRobot',
       ip: 'otherIp',
     })
-    const mockRobot = getByText('opentrons-robot-name')
-    mockRobot.click() // unselect default robot
+    const mockRobot = screen.getByText('opentrons-robot-name')
+    fireEvent.click(mockRobot) // unselect default robot
     expect(mockSetSelectedRobot).toBeCalledWith(mockConnectableRobot)
-    const otherRobot = getByText('otherRobot')
-    otherRobot.click()
+    const otherRobot = screen.getByText('otherRobot')
+    fireEvent.click(otherRobot)
     expect(mockSetSelectedRobot).toBeCalledWith({
       ...mockConnectableRobot,
       name: 'otherRobot',

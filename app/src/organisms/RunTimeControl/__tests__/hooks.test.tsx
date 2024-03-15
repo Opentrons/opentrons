@@ -1,14 +1,15 @@
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import { UseQueryResult } from 'react-query'
-import { act, renderHook } from '@testing-library/react-hooks'
-import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
+import { act, renderHook } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { useRunActionMutations } from '@opentrons/react-api-client'
 
 import {
   useCloneRun,
   useCurrentRunId,
   useRunCommands,
 } from '../../ProtocolUpload/hooks'
-
 import {
   useRunControls,
   useRunStatus,
@@ -16,6 +17,7 @@ import {
   useRunTimestamps,
   useRunErrors,
 } from '../hooks'
+import { useNotifyRunQuery } from '../../../resources/runs'
 
 import {
   RUN_ID_2,
@@ -30,44 +32,37 @@ import {
 } from '../__fixtures__'
 
 import type { Run } from '@opentrons/api-client'
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../ProtocolUpload/hooks')
+import type * as ApiClient from '@opentrons/react-api-client'
 
-const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
-const mockUseRunCommands = useRunCommands as jest.MockedFunction<
-  typeof useRunCommands
->
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
-const mockUseRunActionMutations = useRunActionMutations as jest.MockedFunction<
-  typeof useRunActionMutations
->
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ApiClient>()
+  return {
+    ...actual,
+    useRunActionMutations: vi.fn(),
+  }
+})
+
+vi.mock('../../ProtocolUpload/hooks')
+vi.mock('../../../resources/runs')
 
 describe('useRunControls hook', () => {
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
   it('returns run controls hooks', () => {
-    const mockPlayRun = jest.fn()
-    const mockPauseRun = jest.fn()
-    const mockStopRun = jest.fn()
-    const mockCloneRun = jest.fn()
+    const mockPlayRun = vi.fn()
+    const mockPauseRun = vi.fn()
+    const mockStopRun = vi.fn()
+    const mockCloneRun = vi.fn()
 
-    when(mockUseRunActionMutations)
-      .calledWith(mockPausedRun.id)
-      .mockReturnValue({
-        playRun: mockPlayRun,
-        pauseRun: mockPauseRun,
-        stopRun: mockStopRun,
-        isPlayRunActionLoading: false,
-        isPauseRunActionLoading: false,
-        isStopRunActionLoading: false,
-      })
-    when(mockUseCloneRun)
+    when(useRunActionMutations).calledWith(mockPausedRun.id).thenReturn({
+      playRun: mockPlayRun,
+      pauseRun: mockPauseRun,
+      stopRun: mockStopRun,
+      isPlayRunActionLoading: false,
+      isPauseRunActionLoading: false,
+      isStopRunActionLoading: false,
+    })
+    when(useCloneRun)
       .calledWith(mockPausedRun.id, undefined)
-      .mockReturnValue({ cloneRun: mockCloneRun, isLoading: false })
+      .thenReturn({ cloneRun: mockCloneRun, isLoading: false })
 
     const { result } = renderHook(() => useRunControls(mockPausedRun.id))
 
@@ -83,14 +78,10 @@ describe('useRunControls hook', () => {
 })
 
 describe('useRunStatus hook', () => {
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
-
   it('returns the run status of the run', async () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockRunningRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -99,9 +90,9 @@ describe('useRunStatus hook', () => {
   })
 
   it('returns a "idle" run status if idle and run unstarted', () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockIdleUnstartedRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -110,9 +101,9 @@ describe('useRunStatus hook', () => {
   })
 
   it('returns a "running" run status if idle and run started', () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockIdleStartedRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -123,16 +114,13 @@ describe('useRunStatus hook', () => {
 
 describe('useCurrentRunStatus hook', () => {
   beforeEach(() => {
-    when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID_2)
-  })
-  afterEach(() => {
-    resetAllWhenMocks()
+    when(useCurrentRunId).calledWith().thenReturn(RUN_ID_2)
   })
 
   it('returns the run status of the current run', async () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockRunningRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -141,9 +129,9 @@ describe('useCurrentRunStatus hook', () => {
   })
 
   it('returns a "idle" run status if idle and run unstarted', () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockIdleUnstartedRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -152,9 +140,9 @@ describe('useCurrentRunStatus hook', () => {
   })
 
   it('returns a "running" run status if idle and run started', () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockIdleStartedRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -165,18 +153,15 @@ describe('useCurrentRunStatus hook', () => {
 
 describe('useRunTimestamps hook', () => {
   beforeEach(() => {
-    when(mockUseRunCommands)
+    when(useRunCommands)
       .calledWith(RUN_ID_2, { cursor: null, pageLength: 1 }, expect.any(Object))
-      .mockReturnValue([mockCommand.data as any])
-  })
-  afterEach(() => {
-    resetAllWhenMocks()
+      .thenReturn([mockCommand.data as any])
   })
 
   it('returns the start time of the current run', async () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockRunningRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -185,9 +170,9 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns null when pause is not the last action', async () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockRunningRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -196,9 +181,9 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns the pause time of the current run when pause is the last action', async () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockPausedRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -207,9 +192,9 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns stopped time null when stop is not the last action', async () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockRunningRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -218,9 +203,9 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns the stop time of the current run when stop is the last action', async () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockStoppedRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -229,9 +214,9 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns the complete time of a successful current run', async () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockSucceededRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -240,9 +225,9 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns the complete time of a failed current run', async () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockFailedRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -251,9 +236,9 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns the complete time of a stopped current run', async () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: { data: mockStoppedRun },
       } as unknown) as UseQueryResult<Run>)
 
@@ -263,10 +248,6 @@ describe('useRunTimestamps hook', () => {
 })
 
 describe('useRunErrors hook', () => {
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
-
   it('returns errors if present', async () => {
     const fixtureErrors = [
       {
@@ -284,9 +265,9 @@ describe('useRunErrors hook', () => {
           "ErrorResponse [line 40]: /dev/ot_module_thermocycler0: 'Received error response 'Error:Plate temperature is not uniform. T1: 35.1097\tT2: 35.8139\tT3: 35.6139\tT4: 35.9809\tT5: 35.4347\tT6: 35.5264\tT.Lid: 20.2052\tT.sink: 19.8993\tT_error: 0.0000\t\r\nLid:open'",
       },
     ]
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: {
           data: {
             ...mockRunningRun,
@@ -300,9 +281,9 @@ describe('useRunErrors hook', () => {
   })
 
   it('returns no errors if no errors present', async () => {
-    when(mockUseRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .mockReturnValue(({
+      .thenReturn(({
         data: {
           data: mockRunningRun,
           errors: undefined,

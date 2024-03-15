@@ -1,17 +1,16 @@
 import * as React from 'react'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { restartRobot } from '../../../redux/robot-admin'
 import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
 
-jest.mock('../../../redux/robot-admin')
+vi.mock('../../../redux/robot-admin')
 
-const mockFunc = jest.fn()
-const mockRestartRobot = restartRobot as jest.MockedFunction<
-  typeof restartRobot
->
+const mockFunc = vi.fn()
+
 const render = (
   props: React.ComponentProps<typeof RestartRobotConfirmationModal>
 ) => {
@@ -31,22 +30,22 @@ describe('RestartRobotConfirmationModal', () => {
   })
 
   it('should render text and buttons', () => {
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('Restart now?')
-    getByTestId('restart_robot_confirmation_description')
-    getByText('Go back')
-    getByText('Restart')
+    render(props)
+    screen.getByText('Restart now?')
+    screen.getByTestId('restart_robot_confirmation_description')
+    screen.getByText('Go back')
+    screen.getByText('Restart')
   })
 
   it('should call a mock function when tapping go back button', () => {
-    const [{ getByText }] = render(props)
-    getByText('Go back').click()
+    render(props)
+    fireEvent.click(screen.getByText('Go back'))
     expect(mockFunc).toHaveBeenCalled()
   })
 
   it('should call mock restart function when tapping restart', () => {
-    const [{ getByText }] = render(props)
-    getByText('Restart').click()
-    expect(mockRestartRobot).toHaveBeenCalled()
+    render(props)
+    fireEvent.click(screen.getByText('Restart'))
+    expect(vi.mocked(restartRobot)).toHaveBeenCalled()
   })
 })

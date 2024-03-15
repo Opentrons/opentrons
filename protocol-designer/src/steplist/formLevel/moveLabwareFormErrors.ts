@@ -1,5 +1,4 @@
 import { LabwareLocation } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
 import {
   COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE,
   COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER,
@@ -12,6 +11,8 @@ import type { ProfileFormError } from './profileErrors'
 
 type HydratedFormData = any
 
+//  TODO(Jr, 1/16/24): look into the use case of this util since the i18n strings
+//  previously listed in this util were not found in any json.
 const getMoveLabwareError = (
   labware: LabwareEntity,
   newLocation: LabwareLocation,
@@ -27,9 +28,7 @@ const getMoveLabwareError = (
       invariantContext.moduleEntities[newLocation.moduleId].type
     const modAllowList = COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType]
     errorString = !modAllowList.includes(loadName)
-      ? i18n.t(
-          'form.step_edit_form.labwareLabel.errors.labwareIncompatibleWithMod'
-        )
+      ? 'labware incompatible with this module'
       : null
   } else if ('labwareId' in newLocation) {
     const adapterValueDefUri =
@@ -38,9 +37,7 @@ const getMoveLabwareError = (
     const adapterAllowList =
       COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER[adapterValueDefUri]
     errorString = !adapterAllowList?.includes(selectedLabwareDefUri)
-      ? i18n.t(
-          'form.step_edit_form.labwareLabel.errors.labwareIncompatibleWithAdapter'
-        )
+      ? 'labware incompatible with this adapter'
       : null
   }
   return errorString

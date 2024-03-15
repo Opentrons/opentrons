@@ -111,7 +111,8 @@ async def _grip_and_read_forces(
     if not api.is_simulator:
         await sleep(2)  # let sensor settle
     if duty is not None:
-        await api._grip(duty_cycle=float(duty))
+        displacement = api._gripper_handler.get_gripper().max_jaw_displacement()
+        await api._grip(duty_cycle=float(duty), expected_displacement=displacement)
         api._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
     else:
         assert force is not None

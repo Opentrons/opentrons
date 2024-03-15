@@ -3,15 +3,14 @@ import * as React from 'react'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  opentrons1Trash3200MlFixedV1 as trashLabwareDef,
 } from '@opentrons/shared-data'
-
 import { Icon } from '../../icons'
 import { Flex, Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS, BORDERS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
-
-import trashDef from '@opentrons/shared-data/labware/definitions/2/opentrons_1_trash_3200ml_fixed/1.json'
 
 import type { RobotType } from '@opentrons/shared-data'
 
@@ -37,6 +36,7 @@ interface FlexTrashProps {
  * Component to render Opentrons Flex trash
  * For use as a RobotWorkspace child component
  */
+
 export const FlexTrash = ({
   robotType,
   trashIconColor,
@@ -62,8 +62,11 @@ export const FlexTrash = ({
   } = deckDefinition.locations.addressableAreas[0].boundingBox
 
   // adjust for dimensions from trash definition
-  const { x: xAdjustment, y: yAdjustment } = trashDef.cornerOffsetFromSlot
-  const { xDimension, yDimension } = trashDef.dimensions
+  const {
+    x: xAdjustment,
+    y: yAdjustment,
+  } = trashLabwareDef.cornerOffsetFromSlot
+  const { xDimension, yDimension } = trashLabwareDef.dimensions
 
   // rotate trash 180 degrees in column 1
   const rotateDegrees =
@@ -91,7 +94,7 @@ export const FlexTrash = ({
         <Flex
           alignItems={ALIGN_CENTER}
           backgroundColor={backgroundColor}
-          borderRadius={BORDERS.radiusSoftCorners}
+          borderRadius={BORDERS.borderRadius4}
           justifyContent={JUSTIFY_CENTER}
           gridGap={SPACING.spacing8}
           width="100%"

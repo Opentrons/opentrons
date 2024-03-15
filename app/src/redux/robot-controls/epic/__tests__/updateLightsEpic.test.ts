@@ -1,3 +1,4 @@
+import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { TestScheduler } from 'rxjs/testing'
 
 import { mockRobot } from '../../../robot-api/__fixtures__'
@@ -11,32 +12,22 @@ import { robotControlsEpic } from '..'
 import type { Action, State } from '../../../types'
 import type { RobotApiRequestMeta } from '../../../robot-api/types'
 
-jest.mock('../../../robot-api/http')
-jest.mock('../../../discovery/selectors')
+vi.mock('../../../robot-api/http')
+vi.mock('../../../discovery/selectors')
 
 const mockState: State = { state: true } as any
-
-const mockFetchRobotApi = RobotApiHttp.fetchRobotApi as jest.MockedFunction<
-  typeof RobotApiHttp.fetchRobotApi
->
-
-const mockGetRobotByName = DiscoverySelectors.getRobotByName as jest.MockedFunction<
-  typeof DiscoverySelectors.getRobotByName
->
 
 describe('updateLightsEpic', () => {
   let testScheduler: TestScheduler
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot as any)
+    vi.mocked(DiscoverySelectors.getRobotByName).mockReturnValue(
+      mockRobot as any
+    )
 
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
     })
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   const meta = { requestId: '1234' } as RobotApiRequestMeta
@@ -47,7 +38,7 @@ describe('updateLightsEpic', () => {
 
   it('calls POST /robot/lights', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
         cold('r', { r: Fixtures.mockUpdateLightsSuccess })
       )
 
@@ -58,8 +49,11 @@ describe('updateLightsEpic', () => {
       expectObservable(output$)
       flush()
 
-      expect(mockGetRobotByName).toHaveBeenCalledWith(mockState, mockRobot.name)
-      expect(mockFetchRobotApi).toHaveBeenCalledWith(mockRobot, {
+      expect(DiscoverySelectors.getRobotByName).toHaveBeenCalledWith(
+        mockState,
+        mockRobot.name
+      )
+      expect(RobotApiHttp.fetchRobotApi).toHaveBeenCalledWith(mockRobot, {
         method: 'POST',
         path: '/robot/lights',
         body: { on: true },
@@ -69,7 +63,7 @@ describe('updateLightsEpic', () => {
 
   it('maps successful response to UPDATE_LIGHTS_SUCCESS', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
         cold('r', { r: Fixtures.mockUpdateLightsSuccess })
       )
 
@@ -89,7 +83,7 @@ describe('updateLightsEpic', () => {
 
   it('maps failed response to UPDATE_LIGHTS_FAILURE', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
+      vi.mocked(RobotApiHttp.fetchRobotApi).mockReturnValue(
         cold('r', { r: Fixtures.mockUpdateLightsFailure })
       )
 

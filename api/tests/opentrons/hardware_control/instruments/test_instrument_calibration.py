@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Union, cast
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import (
@@ -81,11 +81,11 @@ def test_load_tip_length(
     tip_length_data = v1_models.TipLengthModel(
         tipLength=1.23,
         lastModified=datetime(year=2023, month=1, day=1),
-        uri=LabwareUri("def456"),
-        source=subject.types.SourceType.factory,
+        definitionHash="asdfghjk",
+        source=subject.SourceType.factory,
         status=v1_models.CalibrationStatus(
             markedBad=True,
-            source=subject.types.SourceType.user,
+            source=subject.SourceType.user,
             markedAt=datetime(year=2023, month=2, day=2),
         ),
     )
@@ -99,6 +99,9 @@ def test_load_tip_length(
     decoy.when(calibration_storage.helpers.hash_labware_def(tip_rack_dict)).then_return(
         "asdfghjk"
     )
+    decoy.when(
+        calibration_storage.helpers.uri_from_definition(tip_rack_dict)
+    ).then_return(LabwareUri("def456"))
 
     result = subject.load_tip_length_for_pipette(
         pipette_id="abc123", tiprack=tip_rack_definition
@@ -106,14 +109,14 @@ def test_load_tip_length(
 
     assert result == subject.TipLengthCalibration(
         tip_length=1.23,
-        source=subject.types.SourceType.factory,
+        source=subject.SourceType.factory,
         pipette="abc123",
         tiprack="asdfghjk",
         last_modified=datetime(year=2023, month=1, day=1),
         uri=LabwareUri("def456"),
-        status=subject.types.CalibrationStatus(
+        status=subject.CalibrationStatus(
             markedBad=True,
-            source=subject.types.SourceType.user,
+            source=subject.SourceType.user,
             markedAt=datetime(year=2023, month=2, day=2),
         ),
     )

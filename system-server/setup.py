@@ -49,7 +49,7 @@ PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     "pyjwt==2.6.0",
     "systemd-python==234; sys_platform=='linux'",
-    "sqlalchemy==1.4.32",
+    "sqlalchemy==1.4.51",
 ]
 
 

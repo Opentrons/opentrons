@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { vi, describe, it, beforeEach } from 'vitest'
+import { screen } from '@testing-library/react'
 import { MemoryRouter, Route } from 'react-router-dom'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { CalibrationDashboard } from '..'
 
@@ -15,27 +16,13 @@ import { useDashboardCalibrateTipLength } from '../hooks/useDashboardCalibrateTi
 import { useDashboardCalibrateDeck } from '../hooks/useDashboardCalibrateDeck'
 import { expectedTaskList } from '../../../../organisms/Devices/hooks/__fixtures__/taskListFixtures'
 import { mockLeftProtoPipette } from '../../../../redux/pipettes/__fixtures__'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 
-jest.mock('../../../../organisms/Devices/hooks')
-jest.mock('../hooks/useDashboardCalibratePipOffset')
-jest.mock('../hooks/useDashboardCalibrateTipLength')
-jest.mock('../hooks/useDashboardCalibrateDeck')
-
-const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction<
-  typeof useCalibrationTaskList
->
-const mockUseDashboardCalibratePipOffset = useDashboardCalibratePipOffset as jest.MockedFunction<
-  typeof useDashboardCalibratePipOffset
->
-const mockUseDashboardCalibrateTipLength = useDashboardCalibrateTipLength as jest.MockedFunction<
-  typeof useDashboardCalibrateTipLength
->
-const mockUseDashboardCalibrateDeck = useDashboardCalibrateDeck as jest.MockedFunction<
-  typeof useDashboardCalibrateDeck
->
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
->
+vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('../hooks/useDashboardCalibratePipOffset')
+vi.mock('../hooks/useDashboardCalibrateTipLength')
+vi.mock('../hooks/useDashboardCalibrateDeck')
+vi.mock('../../../../resources/runs')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -52,21 +39,24 @@ const render = (path = '/') => {
 
 describe('CalibrationDashboard', () => {
   beforeEach(() => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
-    mockUseDashboardCalibratePipOffset.mockReturnValue([() => {}, null])
-    mockUseDashboardCalibrateTipLength.mockReturnValue([() => {}, null])
-    mockUseDashboardCalibrateDeck.mockReturnValue([() => {}, null, false])
-    mockUseAttachedPipettes.mockReturnValue({
+    vi.mocked(useCalibrationTaskList).mockReturnValue(expectedTaskList)
+    vi.mocked(useDashboardCalibratePipOffset).mockReturnValue([() => {}, null])
+    vi.mocked(useDashboardCalibrateTipLength).mockReturnValue([() => {}, null])
+    vi.mocked(useDashboardCalibrateDeck).mockReturnValue([
+      () => {},
+      null,
+      false,
+    ])
+    vi.mocked(useAttachedPipettes).mockReturnValue({
       left: mockLeftProtoPipette,
       right: null,
     })
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({} as any)
   })
 
   it('renders a robot calibration dashboard title', () => {
-    const [{ getByText }] = render(
-      '/devices/otie/robot-settings/calibration/dashboard'
-    )
+    render('/devices/otie/robot-settings/calibration/dashboard')
 
-    getByText(`otie Calibration Dashboard`)
+    screen.getByText(`otie Calibration Dashboard`)
   })
 })

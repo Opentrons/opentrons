@@ -1,5 +1,5 @@
 """Pipetting execution handler."""
-from typing import cast, Optional
+from typing import cast
 
 import pytest
 from decoy import Decoy
@@ -17,10 +17,12 @@ from opentrons.protocol_engine.execution.pipetting import (
 )
 from opentrons.protocol_engine.errors.exceptions import (
     TipNotAttachedError,
-    InvalidPipettingVolumeError,
+    InvalidAspirateVolumeError,
     InvalidPushOutVolumeError,
     InvalidDispenseVolumeError,
 )
+from opentrons.protocol_engine.notes import CommandNoteAdder, CommandNote
+from ..note_utils import CommandNoteMatcher
 
 
 @pytest.fixture
@@ -77,7 +79,7 @@ async def test_create_pipette_handler(
         (1.0, False, False),
     ],
 )
-def test_get_is_ready_to_aspirate(
+def test_hw_get_is_ready_to_aspirate(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
@@ -103,7 +105,7 @@ def test_get_is_ready_to_aspirate(
     assert hardware_subject.get_is_ready_to_aspirate("pipette-id") == expected
 
 
-def test_get_is_ready_to_aspirate_raises_no_tip_attached(
+def test_hw_get_is_ready_to_aspirate_raises_no_tip_attached(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
@@ -127,13 +129,17 @@ def test_get_is_ready_to_aspirate_raises_no_tip_attached(
         assert hardware_subject.get_is_ready_to_aspirate("pipette-id")
 
 
-async def test_dispense_in_place(
+async def test_hw_dispense_in_place(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
     hardware_subject: HardwarePipettingHandler,
 ) -> None:
     """It should find the pipette by ID and use it to dispense."""
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        25
+    )
+
     decoy.when(mock_hardware_api.attached_instruments).then_return({})
     decoy.when(
         mock_state_view.pipettes.get_hardware_pipette(
@@ -171,13 +177,17 @@ async def test_dispense_in_place(
     )
 
 
-async def test_dispense_in_place_raises_invalid_push_out(
+async def test_hw_dispense_in_place_raises_invalid_push_out(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
     hardware_subject: HardwarePipettingHandler,
 ) -> None:
     """It should raise an InvalidPushOutVolumeError."""
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        25
+    )
+
     decoy.when(mock_hardware_api.attached_instruments).then_return({})
     decoy.when(
         mock_state_view.pipettes.get_hardware_pipette(
@@ -204,13 +214,21 @@ async def test_dispense_in_place_raises_invalid_push_out(
         )
 
 
-async def test_aspirate_in_place(
+async def test_hw_aspirate_in_place(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
     hardware_subject: HardwarePipettingHandler,
+    mock_command_note_adder: CommandNoteAdder,
 ) -> None:
     """Should set flow_rate and call hardware_api aspirate."""
+    decoy.when(mock_state_view.pipettes.get_working_volume("pipette-id")).then_return(
+        25
+    )
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        0
+    )
+
     decoy.when(mock_hardware_api.attached_instruments).then_return({})
     decoy.when(
         mock_state_view.pipettes.get_hardware_pipette(
@@ -232,7 +250,10 @@ async def test_aspirate_in_place(
     )
 
     result = await hardware_subject.aspirate_in_place(
-        pipette_id="pipette-id", volume=25, flow_rate=2.5
+        pipette_id="pipette-id",
+        volume=25,
+        flow_rate=2.5,
+        command_note_adder=mock_command_note_adder,
     )
 
     assert result == 25
@@ -248,28 +269,7 @@ async def test_aspirate_in_place(
     )
 
 
-async def test_virtual_validate_aspirated_volume_raises(
-    decoy: Decoy,
-    mock_state_view: StateView,
-) -> None:
-    """Should validate if trying to aspirate more than the working volume."""
-    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
-        TipGeometry(length=1, diameter=2, volume=3)
-    )
-
-    decoy.when(mock_state_view.pipettes.get_working_volume("pipette-id")).then_return(3)
-
-    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
-        2
-    )
-
-    subject = VirtualPipettingHandler(state_view=mock_state_view)
-
-    with pytest.raises(InvalidPipettingVolumeError):
-        await subject.aspirate_in_place(pipette_id="pipette-id", volume=4, flow_rate=1)
-
-
-async def test_blow_out_in_place(
+async def test_virtual_blow_out_in_place(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
@@ -309,7 +309,7 @@ async def test_blow_out_in_place(
     )
 
 
-def test_get_is_ready_to_aspirate_virtual(
+def test_virtual_get_is_ready_to_aspirate(
     decoy: Decoy, mock_state_view: StateView
 ) -> None:
     """Should check if pipette is ready to aspirate."""
@@ -329,8 +329,8 @@ def test_get_is_ready_to_aspirate_virtual(
     assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id-123") is True
 
 
-async def test_aspirate_in_place_virtual(
-    mock_state_view: StateView, decoy: Decoy
+async def test_virtual_aspirate_in_place(
+    mock_state_view: StateView, decoy: Decoy, mock_command_note_adder: CommandNoteAdder
 ) -> None:
     """Should return the volume."""
     decoy.when(
@@ -348,12 +348,15 @@ async def test_aspirate_in_place_virtual(
     )
 
     result = await subject.aspirate_in_place(
-        pipette_id="pipette-id", volume=2, flow_rate=5
+        pipette_id="pipette-id",
+        volume=2,
+        flow_rate=5,
+        command_note_adder=mock_command_note_adder,
     )
     assert result == 2
 
 
-async def test_dispense_in_place_virtual(
+async def test_virtual_dispense_in_place(
     decoy: Decoy, mock_state_view: StateView
 ) -> None:
     """Should return the volume."""
@@ -373,7 +376,7 @@ async def test_dispense_in_place_virtual(
     assert result == 3
 
 
-async def test_dispense_in_place_virtual_raises_invalid_push_out(
+async def test_virtual_dispense_in_place_raises_invalid_push_out(
     decoy: Decoy, mock_state_view: StateView
 ) -> None:
     """Should raise an InvalidPushOutVolumeError."""
@@ -393,9 +396,8 @@ async def test_dispense_in_place_virtual_raises_invalid_push_out(
         )
 
 
-@pytest.mark.parametrize("aspirated_volume", [(None), (1)])
-async def test_dispense_in_place_virtual_raises_invalid_dispense(
-    decoy: Decoy, mock_state_view: StateView, aspirated_volume: Optional[float]
+async def test_virtual_dispense_in_place_raises_no_tip(
+    decoy: Decoy, mock_state_view: StateView
 ) -> None:
     """Should raise an InvalidDispenseVolumeError."""
     subject = VirtualPipettingHandler(state_view=mock_state_view)
@@ -405,7 +407,7 @@ async def test_dispense_in_place_virtual_raises_invalid_dispense(
     )
 
     decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
-        aspirated_volume
+        None
     )
 
     with pytest.raises(InvalidDispenseVolumeError):
@@ -414,8 +416,8 @@ async def test_dispense_in_place_virtual_raises_invalid_dispense(
         )
 
 
-async def test_validate_tip_attached_in_aspirate(
-    mock_state_view: StateView, decoy: Decoy
+async def test_virtual_aspirate_validate_tip_attached(
+    mock_state_view: StateView, decoy: Decoy, mock_command_note_adder: CommandNoteAdder
 ) -> None:
     """Should raise an error that a tip is not attached."""
     subject = VirtualPipettingHandler(state_view=mock_state_view)
@@ -427,10 +429,15 @@ async def test_validate_tip_attached_in_aspirate(
     with pytest.raises(
         TipNotAttachedError, match="Cannot perform aspirate without a tip attached"
     ):
-        await subject.aspirate_in_place("pipette-id", volume=20, flow_rate=1)
+        await subject.aspirate_in_place(
+            "pipette-id",
+            volume=20,
+            flow_rate=1,
+            command_note_adder=mock_command_note_adder,
+        )
 
 
-async def test_validate_tip_attached_in_dispense(
+async def test_virtual_dispense_validate_tip_attached(
     mock_state_view: StateView, decoy: Decoy
 ) -> None:
     """Should raise an error that a tip is not attached."""
@@ -446,3 +453,138 @@ async def test_validate_tip_attached_in_dispense(
         await subject.dispense_in_place(
             "pipette-id", volume=20, flow_rate=1, push_out=None
         )
+
+
+async def test_aspirate_volume_validation(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwarePipettingHandler,
+    mock_command_note_adder: CommandNoteAdder,
+) -> None:
+    """It should validate the input volume, possibly adjusting it for rounding error.
+
+    This is done on both the VirtualPipettingHandler and HardwarePipettingHandler
+    because they should behave the same way.
+    """
+    virtual_subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=1, diameter=2, volume=3)
+    )
+    decoy.when(mock_state_view.pipettes.get_working_volume("pipette-id")).then_return(3)
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        2
+    )
+
+    # Stuff that only matters for the hardware subject:
+    decoy.when(mock_hardware_api.attached_instruments).then_return({})
+    decoy.when(
+        mock_state_view.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes={},
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.LEFT,
+            config=cast(
+                PipetteDict,
+                {
+                    "aspirate_flow_rate": 1.23,
+                    "dispense_flow_rate": 4.56,
+                    "blow_out_flow_rate": 7.89,
+                },
+            ),
+        )
+    )
+
+    ok_volume = 1.0000000000001
+    not_ok_volume = 1.01
+    expected_adjusted_volume = 1
+
+    for subject in [virtual_subject, hardware_subject]:
+        assert (
+            await subject.aspirate_in_place(
+                pipette_id="pipette-id",
+                volume=ok_volume,
+                flow_rate=1,
+                command_note_adder=mock_command_note_adder,
+            )
+            == expected_adjusted_volume
+        )
+        decoy.verify(
+            mock_command_note_adder(
+                cast(
+                    CommandNote,
+                    CommandNoteMatcher(
+                        matching_noteKind_regex="warning",
+                        matching_shortMessage_regex="Aspirate clamped to 1 µL",
+                    ),
+                )
+            )
+        )
+        with pytest.raises(InvalidAspirateVolumeError):
+            await subject.aspirate_in_place(
+                pipette_id="pipette-id",
+                volume=not_ok_volume,
+                flow_rate=1,
+                command_note_adder=mock_command_note_adder,
+            )
+
+
+async def test_dispense_volume_validation(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwarePipettingHandler,
+) -> None:
+    """It should validate the input volume, possibly adjusting it for rounding error.
+
+    This is done on both the VirtualPipettingHandler and HardwarePipettingHandler
+    because they should behave the same way.
+    """
+    virtual_subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=1, diameter=2, volume=3)
+    )
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        1
+    )
+
+    # Stuff that only matters for the hardware subject:
+    decoy.when(mock_hardware_api.attached_instruments).then_return({})
+    decoy.when(
+        mock_state_view.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes={},
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.LEFT,
+            config=cast(
+                PipetteDict,
+                {
+                    "aspirate_flow_rate": 1.23,
+                    "dispense_flow_rate": 4.56,
+                    "blow_out_flow_rate": 7.89,
+                },
+            ),
+        )
+    )
+
+    ok_volume = 1.0000000000001
+    not_ok_volume = 1.01
+    expected_adjusted_volume = 1
+
+    for subject in [virtual_subject, hardware_subject]:
+        assert (
+            await subject.dispense_in_place(
+                pipette_id="pipette-id", volume=ok_volume, flow_rate=5, push_out=7
+            )
+            == expected_adjusted_volume
+        )
+        with pytest.raises(InvalidDispenseVolumeError):
+            await subject.dispense_in_place(
+                pipette_id="pipette-id", volume=not_ok_volume, flow_rate=5, push_out=7
+            )

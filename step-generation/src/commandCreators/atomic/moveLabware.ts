@@ -26,7 +26,7 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   prevRobotState
 ) => {
   const { labware, useGripper, newLocation } = args
-  const { additionalEquipmentEntities } = invariantContext
+  const { additionalEquipmentEntities, labwareEntities } = invariantContext
   const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
   const tiprackHasTip =
     prevRobotState.tipState != null
@@ -36,7 +36,9 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     prevRobotState.liquidState != null
       ? getLabwareHasLiquid(prevRobotState.liquidState, labware)
       : false
-
+  const hasTipOnPipettes = Object.values(
+    prevRobotState.tipState.pipettes
+  ).includes(true)
   const actionName = 'moveToLabware'
   const errors: CommandCreatorError[] = []
   const warnings: CommandCreatorWarning[] = []
@@ -61,11 +63,22 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     errors.push(errorCreators.labwareOffDeck())
   }
 
+  const isAluminumBlock =
+    labwareEntities[labware]?.def.metadata.displayCategory === 'aluminumBlock'
+
+  if (useGripper && isAluminumBlock) {
+    errors.push(errorCreators.cannotMoveWithGripper())
+  }
+
   if (
     (newLocationInWasteChute && hasGripper && !useGripper) ||
     (!hasGripper && useGripper)
   ) {
     errors.push(errorCreators.gripperRequired())
+  }
+
+  if (hasTipOnPipettes && useGripper) {
+    errors.push(errorCreators.pipetteHasTip())
   }
 
   const initialLabwareSlot = prevRobotState.labware[labware]?.slot

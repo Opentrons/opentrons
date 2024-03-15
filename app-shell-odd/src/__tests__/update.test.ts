@@ -1,50 +1,47 @@
 // app-shell self-update tests
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import * as http from '../http'
 import { registerUpdate, FLEX_MANIFEST_URL } from '../update'
 import * as Cfg from '../config'
 
 import type { Dispatch } from '../types'
 
-jest.unmock('electron-updater')
-jest.mock('electron-updater')
-jest.mock('../log')
-jest.mock('../config')
-jest.mock('../http')
-jest.mock('fs-extra')
-
-const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
-const fetchJson = http.fetchJson as jest.MockedFunction<typeof http.fetchJson>
+vi.unmock('electron-updater')
+vi.mock('electron-updater')
+vi.mock('../log')
+vi.mock('../config')
+vi.mock('../http')
+vi.mock('fs-extra')
 
 describe('update', () => {
   let dispatch: Dispatch
   let handleAction: Dispatch
 
   beforeEach(() => {
-    dispatch = jest.fn()
+    dispatch = vi.fn()
     handleAction = registerUpdate(dispatch)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('handles shell:CHECK_UPDATE with available update', () => {
-    when(getConfig)
+    when(vi.mocked(Cfg.getConfig))
       // @ts-expect-error getConfig mock not recognizing correct type overload
       .calledWith('update')
-      .mockReturnValue({
+      .thenReturn({
         channel: 'latest',
       } as any)
 
-    when(fetchJson)
+    when(vi.mocked(http.fetchJson))
       .calledWith(FLEX_MANIFEST_URL)
-      .mockResolvedValue({ production: { '5.0.0': {}, '6.0.0': {} } })
+      .thenResolve({ production: { '5.0.0': {}, '6.0.0': {} } })
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
 
-    expect(getConfig).toHaveBeenCalledWith('update')
+    expect(vi.mocked(Cfg.getConfig)).toHaveBeenCalledWith('update')
 
-    expect(fetchJson).toHaveBeenCalledWith(FLEX_MANIFEST_URL)
+    expect(vi.mocked(http.fetchJson)).toHaveBeenCalledWith(FLEX_MANIFEST_URL)
   })
 })

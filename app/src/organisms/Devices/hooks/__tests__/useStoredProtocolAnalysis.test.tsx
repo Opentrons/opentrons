@@ -1,16 +1,17 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { QueryClient, QueryClientProvider, UseQueryResult } from 'react-query'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 
 import {
   parseRequiredModulesEntity,
   parseInitialLoadedLabwareEntity,
   parsePipetteEntity,
 } from '@opentrons/api-client'
-import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
 import {
@@ -24,31 +25,16 @@ import {
   PIPETTE_ENTITY,
   STORED_PROTOCOL_ANALYSIS,
 } from '../__fixtures__/storedProtocolAnalysis'
+import { useNotifyRunQuery } from '../../../../resources/runs'
 
 import type { Protocol, Run } from '@opentrons/api-client'
 
-jest.mock('@opentrons/shared-data')
-jest.mock('@opentrons/api-client')
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../redux/protocol-storage/selectors')
+vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../redux/protocol-storage/selectors')
+vi.mock('../../../../resources/runs')
 
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
->
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
-const mockGetStoredProtocol = getStoredProtocol as jest.MockedFunction<
-  typeof getStoredProtocol
->
-const mockParseRequiredModulesEntity = parseRequiredModulesEntity as jest.MockedFunction<
-  typeof parseRequiredModulesEntity
->
-const mockParseInitialLoadedLabwareEntity = parseInitialLoadedLabwareEntity as jest.MockedFunction<
-  typeof parseInitialLoadedLabwareEntity
->
-const mockParsePipetteEntity = parsePipetteEntity as jest.MockedFunction<
-  typeof parsePipetteEntity
->
-const store: Store<any> = createStore(jest.fn(), {})
+const store: Store<any> = createStore(vi.fn(), {})
 
 const modifiedStoredProtocolData = {
   ...storedProtocolData,
@@ -64,7 +50,7 @@ const PROTOCOL_ID = 'the_protocol_id'
 const PROTOCOL_KEY = 'the_protocol_key'
 
 describe('useStoredProtocolAnalysis hook', () => {
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
@@ -75,22 +61,21 @@ describe('useStoredProtocolAnalysis hook', () => {
       </Provider>
     )
 
-    when(mockUseRunQuery)
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(null, { staleTime: Infinity })
-      .mockReturnValue({} as UseQueryResult<Run>)
-    when(mockUseProtocolQuery)
+      .thenReturn({} as UseQueryResult<Run>)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(null, { staleTime: Infinity })
-      .mockReturnValue({} as UseQueryResult<Protocol>)
-    when(mockGetStoredProtocol)
+      .thenReturn({} as UseQueryResult<Protocol>)
+    when(vi.mocked(getStoredProtocol))
       .calledWith(undefined as any)
-      .mockReturnValue(null)
-    when(mockParseRequiredModulesEntity).mockReturnValue([MODULE_ENTITY])
-    when(mockParseInitialLoadedLabwareEntity).mockReturnValue([LABWARE_ENTITY])
-    when(mockParsePipetteEntity).mockReturnValue([PIPETTE_ENTITY])
+      .thenReturn(null)
+    vi.mocked(parseRequiredModulesEntity).mockReturnValue([MODULE_ENTITY])
+    vi.mocked(parseInitialLoadedLabwareEntity).mockReturnValue([LABWARE_ENTITY])
+    vi.mocked(parsePipetteEntity).mockReturnValue([PIPETTE_ENTITY])
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns null when called with null', () => {
@@ -102,19 +87,19 @@ describe('useStoredProtocolAnalysis hook', () => {
   })
 
   it('returns null when there is no stored protocol analysis for a protocol key', () => {
-    when(mockUseRunQuery)
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { staleTime: Infinity })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: { protocolId: PROTOCOL_ID } },
       } as UseQueryResult<Run>)
-    when(mockUseProtocolQuery)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: { key: PROTOCOL_KEY } },
       } as UseQueryResult<Protocol>)
-    when(mockGetStoredProtocol)
+    when(vi.mocked(getStoredProtocol))
       .calledWith(undefined as any, PROTOCOL_KEY)
-      .mockReturnValue(null)
+      .thenReturn(null)
 
     const { result } = renderHook(() => useStoredProtocolAnalysis(RUN_ID), {
       wrapper,
@@ -124,19 +109,19 @@ describe('useStoredProtocolAnalysis hook', () => {
   })
 
   it('returns a stored protocol analysis when one exists for a protocol key', () => {
-    when(mockUseRunQuery)
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { staleTime: Infinity })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: { protocolId: PROTOCOL_ID } },
       } as UseQueryResult<Run>)
-    when(mockUseProtocolQuery)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: { key: PROTOCOL_KEY } },
       } as UseQueryResult<Protocol>)
-    when(mockGetStoredProtocol)
+    when(vi.mocked(getStoredProtocol))
       .calledWith(undefined as any, PROTOCOL_KEY)
-      .mockReturnValue(modifiedStoredProtocolData as StoredProtocolData)
+      .thenReturn(modifiedStoredProtocolData as StoredProtocolData)
 
     const { result } = renderHook(() => useStoredProtocolAnalysis(RUN_ID), {
       wrapper,

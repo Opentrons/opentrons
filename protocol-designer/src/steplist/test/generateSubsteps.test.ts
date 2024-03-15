@@ -1,20 +1,21 @@
+import { it, describe, expect, beforeEach } from 'vitest'
 import {
   makeInitialRobotState,
   makeContext,
-  InvariantContext,
-  RobotState,
-  EngageMagnetArgs,
-  DisengageMagnetArgs,
   FIXED_TRASH_ID,
 } from '@opentrons/step-generation'
-import {
-  SetTemperatureArgs,
-  DeactivateTemperatureArgs,
-} from '../../../../step-generation/lib/types.d'
 import { THERMOCYCLER_STATE } from '../../constants'
 import { generateSubstepItem } from '../generateSubstepItem'
 
-import type { ThermocyclerStateStepArgs } from '../../../../step-generation/src/types'
+import type {
+  RobotState,
+  InvariantContext,
+  SetTemperatureArgs,
+  EngageMagnetArgs,
+  DisengageMagnetArgs,
+  DeactivateTemperatureArgs,
+  ThermocyclerStateStepArgs,
+} from '../../../../step-generation/src/types'
 import type { StepArgsAndErrors, LabwareNamesByModuleId } from '../types'
 
 describe('generateSubstepItem', () => {

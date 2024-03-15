@@ -29,8 +29,22 @@ AttitudeMatrix = typing.Sequence[
 
 
 class InstrumentOffset(BaseModel):
-    single: Offset
-    multi: Offset
+    single: Offset = Field(
+        ...,
+        deprecated=True,
+        description=(
+            "This will always be `[0, 0, 0]`."
+            " Use the `GET /calibration/pipette_offset` endpoint instead."
+        ),
+    )
+    multi: Offset = Field(
+        ...,
+        deprecated=True,
+        description=(
+            "This will always be `[0, 0, 0]`."
+            " Use the `GET /calibration/pipette_offset` endpoint instead."
+        ),
+    )
 
 
 class InstrumentCalibrationStatus(BaseModel):
@@ -59,10 +73,17 @@ class DeckCalibrationData(BaseModel):
         None, description="The ID of the pipette used in this calibration"
     )
     tiprack: typing.Optional[str] = Field(
-        None, description="The sha256 hash of the tiprack used in this calibration"
+        None,
+        description="A hash of the labware definition of the tip rack that"
+        " was used in this calibration."
+        " This is deprecated because it was prone to bugs where semantically identical"
+        " definitions had different hashes.",
+        deprecated=True,
     )
-    source: SourceType = Field(None, description="The calibration source")
-    status: cal_model.CalibrationStatus = Field(
+    source: typing.Optional[SourceType] = Field(
+        None, description="The calibration source"
+    )
+    status: typing.Optional[cal_model.CalibrationStatus] = Field(
         None,
         description="The status of this calibration as determined"
         "by a user performing calibration check.",

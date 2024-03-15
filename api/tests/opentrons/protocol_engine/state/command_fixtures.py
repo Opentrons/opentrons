@@ -16,6 +16,7 @@ from opentrons.protocol_engine.types import (
     LabwareLocation,
     DeckSlotLocation,
     LabwareMovementStrategy,
+    AddressableOffsetVector,
 )
 
 
@@ -216,6 +217,29 @@ def create_aspirate_command(
     )
 
 
+def create_aspirate_in_place_command(
+    pipette_id: str,
+    volume: float,
+    flow_rate: float,
+) -> cmd.AspirateInPlace:
+    """Get a completed Aspirate command."""
+    params = cmd.AspirateInPlaceParams(
+        pipetteId=pipette_id,
+        volume=volume,
+        flowRate=flow_rate,
+    )
+    result = cmd.AspirateInPlaceResult(volume=volume)
+
+    return cmd.AspirateInPlace(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
 def create_dispense_command(
     pipette_id: str,
     volume: float,
@@ -370,6 +394,31 @@ def create_move_to_well_command(
     )
 
 
+def create_move_to_addressable_area_command(
+    pipette_id: str,
+    addressable_area_name: str = "area-name",
+    offset: AddressableOffsetVector = AddressableOffsetVector(x=0, y=0, z=0),
+    destination: DeckPoint = DeckPoint(x=0, y=0, z=0),
+) -> cmd.MoveToAddressableArea:
+    """Get a completed MoveToWell command."""
+    params = cmd.MoveToAddressableAreaParams(
+        pipetteId=pipette_id,
+        addressableAreaName=addressable_area_name,
+        offset=offset,
+    )
+
+    result = cmd.MoveToAddressableAreaResult(position=destination)
+
+    return cmd.MoveToAddressableArea(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
 def create_move_to_coordinates_command(
     pipette_id: str,
     coordinates: DeckPoint = DeckPoint(x=0, y=0, z=0),
@@ -432,6 +481,27 @@ def create_blow_out_command(
     result = cmd.BlowOutResult(position=destination)
 
     return cmd.BlowOut(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime(year=2022, month=1, day=1),
+        params=params,
+        result=result,
+    )
+
+
+def create_blow_out_in_place_command(
+    pipette_id: str,
+    flow_rate: float,
+) -> cmd.BlowOutInPlace:
+    """Get a completed blowOutInPlace command."""
+    params = cmd.BlowOutInPlaceParams(
+        pipetteId=pipette_id,
+        flowRate=flow_rate,
+    )
+    result = cmd.BlowOutInPlaceResult()
+
+    return cmd.BlowOutInPlace(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,

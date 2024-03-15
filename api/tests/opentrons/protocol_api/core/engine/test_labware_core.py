@@ -80,6 +80,10 @@ def test_set_calibration(subject: LabwareCore) -> None:
             namespace="hello",
             parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
             ordering=[],
+            allowedRoles=[],
+            stackingOffsetWithLabware={},
+            stackingOffsetWithModule={},
+            gripperOffsets={},
         )
     ],
 )
@@ -103,7 +107,7 @@ def test_get_definition(subject: LabwareCore) -> None:
 def test_get_user_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
     """It should get the labware's user-provided label, if any."""
     decoy.when(
-        mock_engine_client.state.labware.get_display_name("cool-labware")
+        mock_engine_client.state.labware.get_user_specified_display_name("cool-labware")
     ).then_return("Cool Label")
 
     subject = LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)
@@ -149,7 +153,7 @@ def test_get_name_load_name(subject: LabwareCore) -> None:
 def test_get_name_display_name(decoy: Decoy, mock_engine_client: EngineClient) -> None:
     """It should get the user display name when one is defined."""
     decoy.when(
-        mock_engine_client.state.labware.get_display_name("cool-labware")
+        mock_engine_client.state.labware.get_user_specified_display_name("cool-labware")
     ).then_return("my cool display name")
 
     subject = LabwareCore(labware_id="cool-labware", engine_client=mock_engine_client)
@@ -245,13 +249,16 @@ def test_get_next_tip(
             labware_id="cool-labware",
             num_tips=8,
             starting_tip_name="B1",
+            nozzle_map=None,
         )
     ).then_return("A2")
 
     starting_tip = WellCore(
         name="B1", labware_id="cool-labware", engine_client=mock_engine_client
     )
-    result = subject.get_next_tip(num_tips=8, starting_tip=starting_tip)
+    result = subject.get_next_tip(
+        num_tips=8, starting_tip=starting_tip, nozzle_map=None
+    )
 
     assert result == "A2"
 

@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from typing import Any, Dict, List, Optional, Sequence, Union
 from typing_extensions import Literal
 
+from opentrons.protocol_engine.types import RunTimeParameter
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_reader import (
     ProtocolReader,
@@ -99,6 +100,9 @@ async def _analyze(
             ),
             metadata=protocol_source.metadata,
             robotType=protocol_source.robot_type,
+            # TODO(spp, 2024-03-12): update this once protocol reader/ runner can parse
+            #  and report the runTimeParameters
+            runTimeParameters=[],
             commands=analysis.commands,
             errors=analysis.state_summary.errors,
             labware=analysis.state_summary.labware,
@@ -156,6 +160,7 @@ class AnalyzeResults(BaseModel):
 
     # Fields that should match robot-server:
     robotType: RobotType
+    runTimeParameters: List[RunTimeParameter]
     commands: List[Command]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]

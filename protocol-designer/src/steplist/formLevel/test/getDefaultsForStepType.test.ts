@@ -1,3 +1,4 @@
+import { vi, it, describe, expect, afterEach } from 'vitest'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_DELAY_SECONDS,
@@ -9,12 +10,13 @@ import { getDefaultsForStepType } from '..'
 
 describe('getDefaultsForStepType', () => {
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
   describe('moveLiquid step', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('moveLiquid')).toEqual({
         pipette: null,
+        nozzles: null,
         volume: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         path: 'single',
@@ -84,6 +86,7 @@ describe('getDefaultsForStepType', () => {
         mix_touchTip_mmFromBottom: null,
         mix_touchTip_checkbox: false,
         pipette: null,
+        nozzles: null,
         volume: undefined,
         times: null,
         wells: [],

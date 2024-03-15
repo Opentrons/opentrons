@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from typing import Generic, List, Optional, Union, Tuple
+from typing import Generic, List, Optional, Union, Tuple, Dict, TYPE_CHECKING
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
 
-from opentrons.types import DeckSlotName, Location, Mount, Point
+from opentrons.types import DeckSlotName, StagingSlotName, Location, Mount, Point
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
@@ -19,8 +19,11 @@ from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
 from .._liquid import Liquid
-from .._waste_chute import WasteChute
-from .._types import OffDeckType, StagingSlotName
+from .._types import OffDeckType
+from ..disposal_locations import TrashBin, WasteChute
+
+if TYPE_CHECKING:
+    from ..labware import Labware
 
 
 class AbstractProtocol(
@@ -55,6 +58,14 @@ class AbstractProtocol(
         definition: LabwareDefinition,
     ) -> LabwareLoadParams:
         """Add a labware definition to the set of loadable definitions."""
+        ...
+
+    @abstractmethod
+    def append_disposal_location(
+        self,
+        disposal_location: Union[Labware, TrashBin, WasteChute],
+    ) -> None:
+        """Append a disposal location object to the core"""
         ...
 
     @abstractmethod
@@ -118,6 +129,18 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
+    def load_trash_bin(self, slot_name: DeckSlotName, area_name: str) -> TrashBin:
+        ...
+
+    @abstractmethod
+    def load_ot2_fixed_trash_bin(self) -> None:
+        ...
+
+    @abstractmethod
+    def load_waste_chute(self) -> WasteChute:
+        ...
+
+    @abstractmethod
     def pause(self, msg: Optional[str]) -> None:
         ...
 
@@ -135,6 +158,10 @@ class AbstractProtocol(
 
     @abstractmethod
     def set_rail_lights(self, on: bool) -> None:
+        ...
+
+    @abstractmethod
+    def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
         ...
 
     @abstractmethod
@@ -164,14 +191,23 @@ class AbstractProtocol(
     def get_deck_definition(self) -> DeckDefinitionV4:
         """Get the geometry definition of the robot's deck."""
 
-    # TODO(jbl 10-30-2023) this method may no longer need to exist post deck config work being completed
     @abstractmethod
-    def get_slot_definition(self, slot: DeckSlotName) -> SlotDefV3:
+    def get_slot_definition(
+        self, slot: Union[DeckSlotName, StagingSlotName]
+    ) -> SlotDefV3:
         """Get the slot definition from the robot's deck."""
 
     @abstractmethod
+    def get_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all standard slot definitions available in the deck definition."""
+
+    @abstractmethod
+    def get_staging_slot_definitions(self) -> Dict[str, SlotDefV3]:
+        """Get all staging slot definitions available in the deck definition."""
+
+    @abstractmethod
     def get_slot_item(
-        self, slot_name: DeckSlotName
+        self, slot_name: Union[DeckSlotName, StagingSlotName]
     ) -> Union[LabwareCoreType, ModuleCoreType, None]:
         """Get the contents of a given slot, if any."""
 
@@ -188,7 +224,7 @@ class AbstractProtocol(
         """Get the labware on a given labware, if any."""
 
     @abstractmethod
-    def get_slot_center(self, slot_name: DeckSlotName) -> Point:
+    def get_slot_center(self, slot_name: Union[DeckSlotName, StagingSlotName]) -> Point:
         """Get the absolute coordinate of a slot's center."""
 
     @abstractmethod

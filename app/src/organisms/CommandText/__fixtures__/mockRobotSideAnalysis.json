@@ -6343,7 +6343,7 @@
       "params": {
         "forceDirect": false,
         "pipetteId": "c51ddc01-2d21-4e8a-9b10-2cef033488e8",
-        "addressableAreaName": "1and8ChannelWasteChute",
+        "addressableAreaName": "1ChannelWasteChute",
         "offset": { "x": 0, "y": 0, "z": 0 }
       }
     },

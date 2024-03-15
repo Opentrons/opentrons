@@ -276,6 +276,9 @@ class OT3PipetteHandler:
             result[
                 "default_push_out_volume"
             ] = instr.active_tip_settings.default_push_out_volume
+            result[
+                "pipette_bounding_box_offsets"
+            ] = instr.config.pipette_bounding_box_offsets
         return cast(PipetteDict, result)
 
     @property
@@ -597,7 +600,12 @@ class OT3PipetteHandler:
         else:
             disp_vol = volume
 
-        # Ensure we don't dispense more than the current volume
+        # Ensure we don't dispense more than the current volume.
+        #
+        # This clamping is inconsistent with plan_check_aspirate(), which asserts
+        # that its input is in bounds instead of clamping it. This is to match a quirk
+        # of the OT-2 version of this class. Protocol Engine does its own clamping,
+        # so we don't expect this to trigger in practice.
         disp_vol = min(instrument.current_volume, disp_vol)
         is_full_dispense = numpy.isclose(instrument.current_volume - disp_vol, 0)
 
@@ -789,7 +797,7 @@ class OT3PipetteHandler:
         else:
             check_incr = increment
 
-        pick_up_speed = pick_up_config.speed
+        pick_up_speed = pick_up_config.speed_by_tip_count[tip_count]
 
         def build_presses() -> List[TipActionMoveSpec]:
             # Press the nozzle into the tip <presses> number of times,
@@ -797,7 +805,10 @@ class OT3PipetteHandler:
             press_moves = []
             for i in range(checked_presses):
                 # move nozzle down into the tip
-                press_dist = -1.0 * pick_up_config.distance + -1.0 * check_incr * i
+                press_dist = (
+                    -1.0 * pick_up_config.distance_by_tip_count[tip_count]
+                    + -1.0 * check_incr * i
+                )
                 press_moves.append(
                     TipActionMoveSpec(
                         distance=press_dist,

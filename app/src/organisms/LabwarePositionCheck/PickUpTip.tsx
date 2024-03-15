@@ -18,7 +18,7 @@ import {
   MoveLabwareCreateCommand,
   RobotType,
 } from '@opentrons/shared-data'
-import { useChainRunCommands } from '../../resources/runs/hooks'
+import { useChainRunCommands } from '../../resources/runs'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { TipConfirmation } from './TipConfirmation'

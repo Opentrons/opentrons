@@ -10,7 +10,8 @@ import {
   JUSTIFY_CENTER,
   TEXT_ALIGN_CENTER,
 } from '../../styles'
-import { COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { SlotBase } from './SlotBase'
 
@@ -21,7 +22,7 @@ interface WasteChuteFixtureProps extends React.SVGProps<SVGGElement> {
   deckDefinition: DeckDefinition
   moduleType?: ModuleType
   fixtureBaseColor?: React.SVGProps<SVGPathElement>['fill']
-  slotClipColor?: React.SVGProps<SVGPathElement>['stroke']
+  wasteChuteColor?: string
   showExtensions?: boolean
 }
 
@@ -31,8 +32,8 @@ export function WasteChuteFixture(
   const {
     cutoutId,
     deckDefinition,
-    fixtureBaseColor = COLORS.light1,
-    slotClipColor = COLORS.darkGreyEnabled,
+    fixtureBaseColor = COLORS.grey35,
+    wasteChuteColor = COLORS.grey50,
     ...restProps
   } = props
 
@@ -60,7 +61,7 @@ export function WasteChuteFixture(
         fill={fixtureBaseColor}
       />
       <WasteChute
-        backgroundColor={slotClipColor}
+        backgroundColor={wasteChuteColor}
         wasteIconColor={fixtureBaseColor}
       />
     </g>

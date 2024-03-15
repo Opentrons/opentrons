@@ -13,7 +13,6 @@ COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
 G_CODE_TESTING_DIR := g-code-testing
 LABWARE_LIBRARY_DIR := labware-library
-NOTIFY_SERVER_DIR := notify-server
 PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
@@ -26,7 +25,7 @@ HARDWARE_DIR := hardware
 USB_BRIDGE_DIR := usb-bridge
 NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 
-PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR)
+PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -48,26 +47,32 @@ endif
 
 # run at usage (=), not on makefile parse (:=)
 # todo(mm, 2021-03-17): Deduplicate with scripts/python.mk.
-usb_host=$(shell yarn run -s discovery find -i 169.254)
+usb_host=$(shell yarn -s discovery find -i 169.254)
 
 # install all project dependencies
 .PHONY: setup
 setup: setup-js setup-py
 
+# Both the python and JS setup targets depend on a minimal python setup so they can create
+# virtual envs using pipenv.
+.PHONY: setup-py-toolchain
+setup-py-toolchain:
+	$(OT_PYTHON) -m pip install --upgrade pip
+	$(OT_PYTHON) -m pip install pipenv==2023.12.1
+
 # front-end dependecies handled by yarn
 .PHONY: setup-js
 setup-js:
+setup-js: setup-py-toolchain
 	yarn config set network-timeout 60000
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
-	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 
 .PHONY: setup-py
-setup-py:
-	$(OT_PYTHON) -m pip install pipenv==2021.5.29
+setup-py: setup-py-toolchain
 	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
 
@@ -141,8 +146,6 @@ push:
 	sleep 1
 	$(MAKE) -C $(SERVER_UTILS_DIR) push
 	sleep 1
-	$(MAKE) -C $(NOTIFY_SERVER_DIR) push
-	sleep 1
 	$(MAKE) -C $(SYSTEM_SERVER_DIR) push
 	sleep 1
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push
@@ -157,7 +160,6 @@ push-ot3:
 	$(MAKE) -C $(HARDWARE_DIR) push-no-restart-ot3
 	$(MAKE) -C $(API_DIR) push-no-restart-ot3
 	$(MAKE) -C $(SERVER_UTILS_DIR) push-ot3
-	$(MAKE) -C $(NOTIFY_SERVER_DIR) push-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
 	$(MAKE) -C $(SYSTEM_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
@@ -194,7 +196,6 @@ test-py: test-py-windows
 	$(MAKE) -C $(UPDATE_SERVER_DIR) test
 	$(MAKE) -C $(ROBOT_SERVER_DIR) test
 	$(MAKE) -C $(SERVER_UTILS_DIR) test
-	$(MAKE) -C $(NOTIFY_SERVER_DIR) test
 	$(MAKE) -C $(G_CODE_TESTING_DIR) test
 	$(MAKE) -C $(USB_BRIDGE_DIR) test
 
@@ -263,7 +264,7 @@ circular-dependencies-js:
 
 .PHONY: test-js-internal
 test-js-internal:
-	yarn jest $(tests) $(test_opts) $(cov_opts)
+	yarn vitest $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-js-%
 test-js-%: 

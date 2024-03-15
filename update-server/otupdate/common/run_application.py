@@ -15,15 +15,13 @@ async def run_and_notify_up(app: web.Application, host: str, port: int) -> NoRet
     This method will only return once the task has been canceled,
     such as if this process has been signaled to stop.
     """
-    runner = web.AppRunner(app)  # type: ignore[no-untyped-call]
+    runner = web.AppRunner(app)
 
-    await runner.setup()  # type: ignore[no-untyped-call]
+    await runner.setup()
 
     try:
-        site = web.TCPSite(  # type: ignore[no-untyped-call]
-            runner=runner, host=host, port=port
-        )
-        await site.start()  # type: ignore[no-untyped-call]
+        site = web.TCPSite(runner=runner, host=host, port=port)
+        await site.start()
 
         systemd.notify_up()
 
@@ -34,4 +32,4 @@ async def run_and_notify_up(app: web.Application, host: str, port: int) -> NoRet
             await asyncio.sleep(10)
 
     finally:
-        await runner.cleanup()  # type: ignore[no-untyped-call]
+        await runner.cleanup()

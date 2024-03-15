@@ -1,27 +1,19 @@
-import { resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe } from 'vitest'
 import { UseQueryResult } from 'react-query'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { mockModulesResponse } from '@opentrons/api-client'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import { useAttachedModules } from '..'
 
 import type { Modules } from '@opentrons/api-client'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseModulesQuery = useModulesQuery as jest.MockedFunction<
-  typeof useModulesQuery
->
+vi.mock('@opentrons/react-api-client')
 
 describe('useAttachedModules hook', () => {
-  let wrapper: React.FunctionComponent<{}>
-  afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
-  })
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 
   it('returns attached modules', () => {
-    mockUseModulesQuery.mockReturnValue({
+    vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: mockModulesResponse },
     } as UseQueryResult<Modules, unknown>)
 

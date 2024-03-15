@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderHook } from '@testing-library/react-hooks'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, vi } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, renderHook, screen } from '@testing-library/react'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { NormalKeyboard } from '..'
 
 const render = (props: React.ComponentProps<typeof NormalKeyboard>) => {
@@ -9,18 +10,14 @@ const render = (props: React.ComponentProps<typeof NormalKeyboard>) => {
 }
 
 describe('SoftwareKeyboard', () => {
-  let props: React.ComponentProps<typeof NormalKeyboard>
-
-  beforeEach(() => {
+  it('should render the software keyboards', () => {
     const { result } = renderHook(() => React.useRef(null))
-    props = {
-      onChange: jest.fn(),
+    const props = {
+      onChange: vi.fn(),
       keyboardRef: result.current,
     }
-  })
-  it('should render the software keyboards', () => {
-    const { getAllByRole } = render(props)
-    const buttons = getAllByRole('button')
+    render(props)
+    const buttons = screen.getAllByRole('button')
 
     const expectedButtonNames = [
       'q',
@@ -62,10 +59,15 @@ describe('SoftwareKeyboard', () => {
   })
 
   it('should render the software keyboards when hitting shift key', () => {
-    const { getAllByRole, getByRole } = render(props)
-    const shiftKey = getByRole('button', { name: 'SHIFT' })
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: vi.fn(),
+      keyboardRef: result.current,
+    }
+    render(props)
+    const shiftKey = screen.getByRole('button', { name: 'SHIFT' })
     fireEvent.click(shiftKey)
-    const buttons = getAllByRole('button')
+    const buttons = screen.getAllByRole('button')
     const expectedButtonNames = [
       'Q',
       'W',
@@ -106,10 +108,15 @@ describe('SoftwareKeyboard', () => {
   })
 
   it('should render the software keyboards when hitting 123 key', () => {
-    const { getAllByRole, getByRole } = render(props)
-    const numberKey = getByRole('button', { name: '123' })
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: vi.fn(),
+      keyboardRef: result.current,
+    }
+    render(props)
+    const numberKey = screen.getByRole('button', { name: '123' })
     fireEvent.click(numberKey)
-    const buttons = getAllByRole('button')
+    const buttons = screen.getAllByRole('button')
     const expectedButtonNames = [
       '1',
       '2',
@@ -149,12 +156,17 @@ describe('SoftwareKeyboard', () => {
   })
 
   it('should render the software keyboards when hitting #+= key', () => {
-    const { getAllByRole, getByRole } = render(props)
-    const numberKey = getByRole('button', { name: '123' })
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: vi.fn(),
+      keyboardRef: result.current,
+    }
+    render(props)
+    const numberKey = screen.getByRole('button', { name: '123' })
     fireEvent.click(numberKey)
-    const symbolKey = getByRole('button', { name: '#+=' })
+    const symbolKey = screen.getByRole('button', { name: '#+=' })
     fireEvent.click(symbolKey)
-    const buttons = getAllByRole('button')
+    const buttons = screen.getAllByRole('button')
     const expectedButtonNames = [
       '[',
       ']',
@@ -194,8 +206,13 @@ describe('SoftwareKeyboard', () => {
   })
 
   it('should call mock function when clicking a key', () => {
-    const { getByRole } = render(props)
-    const aKey = getByRole('button', { name: 'a' })
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: vi.fn(),
+      keyboardRef: result.current,
+    }
+    render(props)
+    const aKey = screen.getByRole('button', { name: 'a' })
     fireEvent.click(aKey)
     expect(props.onChange).toHaveBeenCalled()
   })

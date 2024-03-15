@@ -21,7 +21,7 @@ export function DisplaySearchNetwork(): JSX.Element {
       height="17.5rem"
       backgroundColor={COLORS.white}
       justifyContent={JUSTIFY_CENTER}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
       width="100%"
       data-testid="Display-Search-Network-text"
     >
@@ -32,7 +32,7 @@ export function DisplaySearchNetwork(): JSX.Element {
       >
         <StyledText
           as="h3"
-          color={COLORS.darkBlack70}
+          color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing40}
         >

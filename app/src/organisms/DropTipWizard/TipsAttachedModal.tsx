@@ -11,14 +11,16 @@ import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { DropTipWizard } from '.'
 
-import type { PipetteData } from '@opentrons/api-client'
+import type { HostConfig, PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 interface TipsAttachedModalProps {
   mount: PipetteData['mount']
   instrumentModelSpecs: PipetteModelSpecs
   robotType: RobotType
+  host: HostConfig | null
   onCloseClick?: (arg0: any) => void
 }
 
@@ -26,19 +28,21 @@ export const handleTipsAttachedModal = (
   mount: TipsAttachedModalProps['mount'],
   instrumentModelSpecs: TipsAttachedModalProps['instrumentModelSpecs'],
   robotType: TipsAttachedModalProps['robotType'],
+  host: TipsAttachedModalProps['host'],
   onCloseClick: TipsAttachedModalProps['onCloseClick']
 ): Promise<unknown> => {
   return NiceModal.show(TipsAttachedModal, {
     mount,
     instrumentModelSpecs,
     robotType,
+    host,
     onCloseClick,
   })
 }
 
 const TipsAttachedModal = NiceModal.create(
   (props: TipsAttachedModalProps): JSX.Element => {
-    const { mount, onCloseClick } = props
+    const { mount, onCloseClick, host, instrumentModelSpecs } = props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
     const [showWizard, setShowWizard] = React.useState(false)
@@ -48,11 +52,14 @@ const TipsAttachedModal = NiceModal.create(
     const tipsAttachedHeader: ModalHeaderBaseProps = {
       title: t('tips_are_attached'),
       iconName: 'ot-alert',
-      iconColor: COLORS.yellow2,
+      iconColor: COLORS.yellow50,
     }
 
+    const is96Channel = instrumentModelSpecs.channels === 96
+    const displayMountText = is96Channel ? '96-Channel' : capitalize(mount)
+
     return (
-      <>
+      <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
         <Modal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">
@@ -60,7 +67,7 @@ const TipsAttachedModal = NiceModal.create(
                 t={t}
                 i18nKey="remove_the_tips"
                 values={{
-                  mount: capitalize(mount),
+                  mount: displayMountText,
                 }}
                 components={{
                   mount: <strong />,
@@ -101,7 +108,7 @@ const TipsAttachedModal = NiceModal.create(
             }}
           />
         ) : null}
-      </>
+      </ApiHostProvider>
     )
   }
 )

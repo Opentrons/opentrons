@@ -4,6 +4,15 @@ import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
 } from '@opentrons/step-generation'
+import {
+  AddressableAreaName,
+  FLEX_ROBOT_TYPE,
+  ALL,
+  COLUMN,
+  CreateCommand,
+  OT2_ROBOT_TYPE,
+  NozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import { Channels } from '@opentrons/components'
 import { getCutoutIdByAddressableArea } from '../utils'
 import type {
@@ -13,13 +22,13 @@ import type {
   InvariantContext,
   RobotState,
 } from '@opentrons/step-generation'
-import {
-  AddressableAreaName,
-  CreateCommand,
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
 import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
+
+const wasteChuteddressableAreaNamesPipette = [
+  '1ChannelWasteChute',
+  '8ChannelWasteChute',
+  '96ChannelWasteChute',
+]
 
 /** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(
@@ -136,13 +145,11 @@ export const substepTimelineSingleChannel = (
             ? 'fixedTrashSlot'
             : 'trashBinAdapter'
 
-        const cutoutFixture =
-          moveToAddressableAreaCommand?.params.addressableAreaName ===
-            '1and8ChannelWasteChute' ||
-          moveToAddressableAreaCommand?.params.addressableAreaName ===
-            '96ChannelWasteChute'
-            ? 'wasteChuteRightAdapterNoCover'
-            : trashCutoutFixture
+        const cutoutFixture = wasteChuteddressableAreaNamesPipette.includes(
+          moveToAddressableAreaCommand?.params.addressableAreaName ?? ''
+        )
+          ? 'wasteChuteRightAdapterNoCover'
+          : trashCutoutFixture
 
         const cutoutId = getCutoutIdByAddressableArea(
           moveToAddressableAreaCommand?.params
@@ -207,7 +214,8 @@ export const substepTimelineMultiChannel = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
-  channels: Channels
+  channels: Channels,
+  nozzles: NozzleConfigurationStyle | null
 ): SubstepTimelineFrame[] => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
   // @ts-expect-error(sa, 2021-6-14): type narrow using in operator
@@ -231,10 +239,16 @@ export const substepTimelineMultiChannel = (
             ? invariantContext.labwareEntities[labwareId].def
             : null
 
+        let numChannels = channels
+        if (nozzles === ALL) {
+          numChannels = 96
+        } else if (nozzles === COLUMN) {
+          numChannels = 8
+        }
         const wellsForTips =
-          channels &&
+          numChannels &&
           labwareDef &&
-          getWellsForTips(channels, labwareDef, wellName).wellsForTips
+          getWellsForTips(numChannels, labwareDef, wellName).wellsForTips
 
         const wellInfo = {
           labwareId,
@@ -288,8 +302,9 @@ export const substepTimelineMultiChannel = (
             : 'trashBinAdapter'
 
         const cutoutFixture =
-          moveToAddressableAreaCommand?.params.addressableAreaName ===
-            '1and8ChannelWasteChute' ||
+          wasteChuteddressableAreaNamesPipette.includes(
+            moveToAddressableAreaCommand?.params.addressableAreaName ?? ''
+          ) ||
           moveToAddressableAreaCommand?.params.addressableAreaName ===
             '96ChannelWasteChute'
             ? 'wasteChuteRightAdapterNoCover'
@@ -357,7 +372,8 @@ export const substepTimeline = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
-  channels: Channels
+  channels: Channels,
+  nozzles: NozzleConfigurationStyle | null
 ): SubstepTimelineFrame[] => {
   if (channels === 1) {
     return substepTimelineSingleChannel(
@@ -370,7 +386,8 @@ export const substepTimeline = (
       commandCreator,
       invariantContext,
       initialRobotState,
-      channels
+      channels,
+      nozzles
     )
   }
 }

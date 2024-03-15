@@ -1,15 +1,19 @@
 import * as React from 'react'
-import { renderWithProviders, COLORS, SPACING } from '@opentrons/components'
-
+import { COLORS, SPACING } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { ModuleIcon } from '../'
 
 import type { AttachedModule } from '../../../redux/modules/types'
+import type * as OpentronsComponents from '@opentrons/components'
 
-jest.mock('@opentrons/components', () => {
-  const actualComponents = jest.requireActual('@opentrons/components')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actualComponents = await importOriginal<typeof OpentronsComponents>()
   return {
     ...actualComponents,
-    Tooltip: jest.fn(({ children }) => <div>{children}</div>),
+    Tooltip: vi.fn(({ children }) => <div>{children}</div>),
   }
 })
 
@@ -52,42 +56,35 @@ describe('ModuleIcon', () => {
   })
 
   it('renders SharedIcon with correct style', () => {
-    const { getByTestId } = render(props)
-    const module = getByTestId('ModuleIcon_ot-temperature-v2')
-    expect(module).toHaveStyle(`color: ${String(COLORS.darkGreyEnabled)}`)
+    render(props)
+    const module = screen.getByTestId('ModuleIcon_ot-temperature-v2')
+    expect(module).toHaveStyle(`color: ${COLORS.black90}`)
     expect(module).toHaveStyle(`height: ${SPACING.spacing16}`)
     expect(module).toHaveStyle(`width: ${SPACING.spacing16}`)
     expect(module).toHaveStyle(`margin-left: ${SPACING.spacing2}`)
     expect(module).toHaveStyle(`margin-right: ${SPACING.spacing2}`)
-    expect(module).toHaveStyleRule(
-      'color',
-      `${String(COLORS.darkBlackEnabled)}`,
-      {
-        modifier: ':hover',
-      }
-    )
   })
 
   it('renders magnetic module icon', () => {
     props.module = mockMagneticModule
-    const { getByTestId } = render(props)
-    getByTestId('ModuleIcon_ot-magnet-v2')
+    render(props)
+    screen.getByTestId('ModuleIcon_ot-magnet-v2')
   })
 
   it('renders thermocycler module icon', () => {
     props.module = mockThermocyclerModule
-    const { getByTestId } = render(props)
-    getByTestId('ModuleIcon_ot-thermocycler')
+    render(props)
+    screen.getByTestId('ModuleIcon_ot-thermocycler')
   })
 
   it('renders heatershaker module icon', () => {
     props.module = mockHeaterShakerModule
-    const { getByTestId } = render(props)
-    getByTestId('ModuleIcon_ot-heater-shaker')
+    render(props)
+    screen.getByTestId('ModuleIcon_ot-heater-shaker')
   })
 
   it('tooltip displays mock text message', () => {
-    const { getByText } = render(props)
-    getByText('mock ModuleIcon')
+    render(props)
+    screen.getByText('mock ModuleIcon')
   })
 })

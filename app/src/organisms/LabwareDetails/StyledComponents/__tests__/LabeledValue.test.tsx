@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, beforeEach } from 'vitest'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { LabeledValue } from '../LabeledValue'
 
 const render = (props: React.ComponentProps<typeof LabeledValue>) => {
@@ -16,21 +18,21 @@ describe('LabeledValue', () => {
   })
 
   it('renders correct label heading', () => {
-    const [{ getByRole }] = render(props)
+    render(props)
 
-    getByRole('heading', { name: 'height' })
+    screen.getByRole('heading', { name: 'height' })
   })
 
   it('renders correct value when value is a string', () => {
-    const [{ getByText }] = render(props)
+    render(props)
 
-    getByText('42')
+    screen.getByText('42')
   })
 
   it('renders correct value when value is a number', () => {
     props.value = 43
-    const [{ getByText }] = render(props)
+    render(props)
 
-    getByText('43')
+    screen.getByText('43')
   })
 })

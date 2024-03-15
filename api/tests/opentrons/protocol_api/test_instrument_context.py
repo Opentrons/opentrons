@@ -1,8 +1,9 @@
 """Tests for the InstrumentContext public interface."""
+from collections import OrderedDict
 import inspect
 
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 
 from opentrons.legacy_broker import LegacyBroker
@@ -29,6 +30,9 @@ from opentrons.protocol_api.core.common import InstrumentCore, ProtocolCore
 from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
     LegacyInstrumentCore,
 )
+
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.types import Location, Mount, Point
 
@@ -121,6 +125,38 @@ def subject(
 def test_api_version(api_version: APIVersion, subject: InstrumentContext) -> None:
     """It should have an api_version property."""
     assert subject.api_version == api_version
+
+
+@pytest.mark.parametrize("channels_from_core", [1, 8, 96])
+def test_channels(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_core: InstrumentCore,
+    channels_from_core: int,
+) -> None:
+    """It should return the number of channels, as returned by the core."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(channels_from_core)
+    assert subject.channels == channels_from_core
+
+
+@pytest.mark.parametrize(
+    ("channels_from_core", "expected_type"),
+    [
+        (1, "single"),
+        (8, "multi"),
+        (96, "multi"),
+    ],
+)
+def test_type(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_core: InstrumentCore,
+    channels_from_core: int,
+    expected_type: str,
+) -> None:
+    """It should map the number of channels from the core into the string "single" or "multi"."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(channels_from_core)
+    assert subject.type == expected_type
 
 
 def test_trash_container(
@@ -472,20 +508,39 @@ def test_blow_out_raises_no_location(
         subject.blow_out(location=None)
 
 
+MOCK_MAP = NozzleMap.build(
+    physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
+    physical_rows=OrderedDict({"A": ["A1"]}),
+    physical_columns=OrderedDict({"1": ["A1"]}),
+    starting_nozzle="A1",
+    back_left_nozzle="A1",
+    front_right_nozzle="A1",
+)
+
+
+@pytest.mark.parametrize(
+    argnames=["api_version", "mock_map"],
+    argvalues=[(APIVersion(2, 18), MOCK_MAP), (APIVersion(2, 17), None)],
+)
 def test_pick_up_tip_from_labware(
-    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_map: Optional[NozzleMap],
 ) -> None:
     """It should pick up the next tip from a given labware."""
     mock_tip_rack = decoy.mock(cls=Labware)
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(
         labware.next_available_tip(
             starting_tip=None,
             tip_racks=[mock_tip_rack],
             channels=123,
+            nozzle_map=mock_map,
         )
     ).then_return((mock_tip_rack, mock_well))
     decoy.when(mock_well.top()).then_return(top_location)
@@ -525,8 +580,15 @@ def test_pick_up_tip_from_well_location(
     )
 
 
+@pytest.mark.parametrize(
+    argnames=["api_version", "mock_map"],
+    argvalues=[(APIVersion(2, 18), MOCK_MAP), (APIVersion(2, 17), None)],
+)
 def test_pick_up_tip_from_labware_location(
-    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_map: Optional[NozzleMap],
 ) -> None:
     """It should pick up the next tip from a given labware-based Location."""
     mock_tip_rack = decoy.mock(cls=Labware)
@@ -534,12 +596,14 @@ def test_pick_up_tip_from_labware_location(
     location = Location(point=Point(1, 2, 3), labware=mock_tip_rack)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(
         labware.next_available_tip(
             starting_tip=None,
             tip_racks=[mock_tip_rack],
             channels=123,
+            nozzle_map=mock_map,
         )
     ).then_return((mock_tip_rack, mock_well))
     decoy.when(mock_well.top()).then_return(top_location)
@@ -558,22 +622,32 @@ def test_pick_up_tip_from_labware_location(
     )
 
 
+@pytest.mark.parametrize(
+    argnames=["api_version", "mock_map"],
+    argvalues=[(APIVersion(2, 18), MOCK_MAP), (APIVersion(2, 17), None)],
+)
 def test_pick_up_from_associated_tip_racks(
-    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_map: Optional[NozzleMap],
 ) -> None:
-    """It should pick up from it associated tip racks."""
+    """It should pick up from its associated tip racks."""
     mock_tip_rack_1 = decoy.mock(cls=Labware)
     mock_tip_rack_2 = decoy.mock(cls=Labware)
     mock_starting_tip = decoy.mock(cls=Well)
     mock_well = decoy.mock(cls=Well)
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
 
-    decoy.when(mock_instrument_core.get_channels()).then_return(123)
+    decoy.when(mock_instrument_core.is_tip_tracking_available()).then_return(True)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(
         labware.next_available_tip(
             starting_tip=mock_starting_tip,
             tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
             channels=123,
+            nozzle_map=mock_map,
         )
     ).then_return((mock_tip_rack_2, mock_well))
     decoy.when(mock_well.top()).then_return(top_location)
@@ -592,6 +666,22 @@ def test_pick_up_from_associated_tip_racks(
         ),
         times=1,
     )
+
+
+def test_pick_up_fails_when_tip_tracking_unavailable(
+    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
+) -> None:
+    """It should raise an error if automatic tip tracking is not available.."""
+    mock_tip_rack_1 = decoy.mock(cls=Labware)
+
+    decoy.when(mock_instrument_core.is_tip_tracking_available()).then_return(False)
+    decoy.when(mock_instrument_core.get_active_channels()).then_return(123)
+
+    subject.tip_racks = [mock_tip_rack_1]
+    with pytest.raises(
+        CommandPreconditionViolated, match="Automatic tip tracking is not available"
+    ):
+        subject.pick_up_tip()
 
 
 def test_drop_tip_to_well(
@@ -658,6 +748,65 @@ def test_drop_tip_to_randomized_trash_location(
             well_core=mock_well._core,
             home_after=None,
             alternate_drop_location=True,
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_in_trash_bin(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+) -> None:
+    """It should drop a tip in a deck configured trash bin."""
+    trash_bin = decoy.mock(cls=TrashBin)
+
+    subject.drop_tip(trash_bin)
+
+    decoy.verify(
+        mock_instrument_core.drop_tip_in_disposal_location(
+            trash_bin,
+            home_after=None,
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_in_waste_chute(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+) -> None:
+    """It should drop a tip in a deck configured trash bin or waste chute."""
+    waste_chute = decoy.mock(cls=WasteChute)
+
+    subject.drop_tip(waste_chute)
+
+    decoy.verify(
+        mock_instrument_core.drop_tip_in_disposal_location(
+            waste_chute,
+            home_after=None,
+        ),
+        times=1,
+    )
+
+
+def test_drop_tip_in_disposal_location_implicitly(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+) -> None:
+    """It should drop a tip in a deck configured trash bin when no arguments have been provided."""
+    trash_bin = decoy.mock(cls=TrashBin)
+    subject.trash_container = trash_bin
+
+    subject.drop_tip()
+
+    decoy.verify(
+        mock_instrument_core.drop_tip_in_disposal_location(
+            trash_bin,
+            home_after=None,
+            alternate_tip_drop=True,
         ),
         times=1,
     )
@@ -958,3 +1107,140 @@ def test_configure_nozzle_layout(
     """The correct model is passed to the engine client."""
     with exception:
         subject.configure_nozzle_layout(style, primary_nozzle, front_right_nozzle)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
+def test_dispense_0_volume_means_dispense_everything(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should dispense all liquid to a well."""
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    decoy.when(
+        mock_validation.validate_location(location=input_location, last_location=None)
+    ).then_return(mock_validation.PointTarget(location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(100)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
+    subject.dispense(volume=0, location=input_location, rate=1.23, push_out=None)
+
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=None,
+            in_place=False,
+            volume=100,
+            rate=1.23,
+            flow_rate=5.67,
+            push_out=None,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 16)])
+def test_dispense_0_volume_means_dispense_nothing(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should dispense no liquid to a well."""
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    decoy.when(
+        mock_validation.validate_location(location=input_location, last_location=None)
+    ).then_return(mock_validation.PointTarget(location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
+    subject.dispense(volume=0, location=input_location, rate=1.23, push_out=None)
+
+    decoy.verify(
+        mock_instrument_core.dispense(
+            location=input_location,
+            well_core=None,
+            in_place=False,
+            volume=0,
+            rate=1.23,
+            flow_rate=5.67,
+            push_out=None,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
+def test_aspirate_0_volume_means_aspirate_everything(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate to a well."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.get_available_volume()).then_return(200)
+    subject.aspirate(volume=0, location=input_location, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            in_place=False,
+            volume=200,
+            rate=1.23,
+            flow_rate=5.67,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 16)])
+def test_aspirate_0_volume_means_aspirate_nothing(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should aspirate to a well."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=input_location, in_place=False))
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+
+    subject.aspirate(volume=0, location=input_location, rate=1.23)
+
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            location=input_location,
+            well_core=mock_well._core,
+            in_place=False,
+            volume=0,
+            rate=1.23,
+            flow_rate=5.67,
+        ),
+        times=1,
+    )

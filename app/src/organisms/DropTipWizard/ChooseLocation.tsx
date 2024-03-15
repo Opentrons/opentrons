@@ -18,10 +18,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  getDeckDefFromRobotType,
-  getPositionFromSlotId,
-} from '@opentrons/shared-data'
+import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
@@ -30,7 +27,7 @@ import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 
 import type { CommandData } from '@opentrons/api-client'
-import type { RobotType } from '@opentrons/shared-data'
+import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
 
 // TODO: get help link article URL
 // const NEED_HELP_URL = ''
@@ -41,7 +38,9 @@ interface ChooseLocationProps {
   title: string
   body: string | JSX.Element
   robotType: RobotType
-  moveToXYCoordinate: (x: number, y: number) => Promise<CommandData[] | null>
+  moveToAddressableArea: (
+    addressableArea: AddressableAreaName
+  ) => Promise<CommandData | null>
   isRobotMoving: boolean
   isOnDevice: boolean
   setErrorMessage: (arg0: string) => void
@@ -56,7 +55,7 @@ export const ChooseLocation = (
     title,
     body,
     robotType,
-    moveToXYCoordinate,
+    moveToAddressableArea,
     isRobotMoving,
     isOnDevice,
     setErrorMessage,
@@ -70,26 +69,10 @@ export const ChooseLocation = (
   const handleConfirmPosition = (): void => {
     const deckSlot = deckDef.locations.addressableAreas.find(
       l => l.id === selectedLocation.slotName
-    )
+    )?.id
 
-    const slotPosition = getPositionFromSlotId(
-      selectedLocation.slotName,
-      deckDef
-    )
-
-    const slotX = slotPosition?.[0]
-    const slotY = slotPosition?.[1]
-    const xDimension = deckSlot?.boundingBox.xDimension
-    const yDimension = deckSlot?.boundingBox.yDimension
-    if (
-      slotX != null &&
-      slotY != null &&
-      xDimension != null &&
-      yDimension != null
-    ) {
-      const targetX = slotX + xDimension / 2
-      const targetY = slotY + yDimension / 2
-      moveToXYCoordinate(targetX, targetY)
+    if (deckSlot != null) {
+      moveToAddressableArea(deckSlot)
         .then(() => handleProceed())
         .catch(e => setErrorMessage(`${e.message}`))
     }
@@ -188,7 +171,7 @@ const TILE_CONTAINER_STYLE = css`
 `
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.grey50};
 
   &:hover {
     opacity: 70%;

@@ -10,7 +10,6 @@ import {
 
 import {
   Flex,
-  ModalShell,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   COLORS,
@@ -26,7 +25,6 @@ import { Banner } from '../../atoms/Banner'
 import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
-import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { useIsFlex, useIsRobotViewable, useRunStatuses } from './hooks'
 import {
   getIs96ChannelPipetteAttached,
@@ -35,12 +33,13 @@ import {
 } from './utils'
 import { PipetteCard } from './PipetteCard'
 import { GripperCard } from '../GripperCard'
+import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+
 import type {
   BadGripper,
   BadPipette,
   GripperData,
   PipetteData,
-  Subsystem,
 } from '@opentrons/api-client'
 
 const EQUIPMENT_POLL_MS = 5000
@@ -63,10 +62,7 @@ export function InstrumentsAndModules({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal, isRunRunning } = useRunStatuses()
   const isFlex = useIsFlex(robotName)
-  const [
-    subsystemToUpdate,
-    setSubsystemToUpdate,
-  ] = React.useState<Subsystem | null>(null)
+  const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
@@ -105,6 +101,8 @@ export function InstrumentsAndModules({
     attachedPipettes?.left ?? null
   )
   const attachPipetteRequired =
+    attachedLeftPipette == null && attachedRightPipette == null
+  const calibratePipetteRequired =
     attachedLeftPipette?.data?.calibratedOffset?.last_modified == null &&
     attachedRightPipette?.data?.calibratedOffset?.last_modified == null
   const updatePipetteFWRequired =
@@ -148,17 +146,6 @@ export function InstrumentsAndModules({
       flexDirection={DIRECTION_COLUMN}
       width="100%"
     >
-      {subsystemToUpdate != null && (
-        <ModalShell>
-          <FirmwareUpdateModal
-            subsystem={subsystemToUpdate}
-            proceed={() => setSubsystemToUpdate(null)}
-            description={t('updating_firmware')}
-            proceedDescription={t('firmware_up_to_date')}
-            isOnDevice={false}
-          />
-        </ModalShell>
-      )}
       <StyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -216,8 +203,8 @@ export function InstrumentsAndModules({
                 robotName={robotName}
                 pipetteIs96Channel={is96ChannelAttached}
                 pipetteIsBad={badLeftPipette != null}
-                updatePipette={() => setSubsystemToUpdate('pipette_left')}
                 isRunActive={currentRunId != null && isRunRunning}
+                isEstopNotDisengaged={isEstopNotDisengaged}
               />
               {isFlex && (
                 <GripperCard
@@ -227,8 +214,8 @@ export function InstrumentsAndModules({
                     attachedGripper?.data?.calibratedOffset?.last_modified !=
                       null
                   }
-                  setSubsystemToUpdate={setSubsystemToUpdate}
                   isRunActive={currentRunId != null && isRunRunning}
+                  isEstopNotDisengaged={isEstopNotDisengaged}
                 />
               )}
               {leftColumnModules.map((module, index) => (
@@ -240,6 +227,7 @@ export function InstrumentsAndModules({
                   module={module}
                   isLoadedInRun={false}
                   attachPipetteRequired={attachPipetteRequired}
+                  calibratePipetteRequired={calibratePipetteRequired}
                   updatePipetteFWRequired={updatePipetteFWRequired}
                 />
               ))}
@@ -268,8 +256,8 @@ export function InstrumentsAndModules({
                   robotName={robotName}
                   pipetteIs96Channel={false}
                   pipetteIsBad={badRightPipette != null}
-                  updatePipette={() => setSubsystemToUpdate('pipette_right')}
                   isRunActive={currentRunId != null && isRunRunning}
+                  isEstopNotDisengaged={isEstopNotDisengaged}
                 />
               )}
               {rightColumnModules.map((module, index) => (
@@ -281,6 +269,7 @@ export function InstrumentsAndModules({
                   module={module}
                   isLoadedInRun={false}
                   attachPipetteRequired={attachPipetteRequired}
+                  calibratePipetteRequired={calibratePipetteRequired}
                   updatePipetteFWRequired={updatePipetteFWRequired}
                 />
               ))}
@@ -298,7 +287,7 @@ export function InstrumentsAndModules({
             {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
             <StyledText
               as="p"
-              color={COLORS.errorDisabled}
+              color={COLORS.grey40}
               id="InstrumentsAndModules_offline"
             >
               {t('offline_instruments_and_modules')}

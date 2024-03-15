@@ -1,10 +1,9 @@
 """Input file value objects."""
 from __future__ import annotations
-from typing import IO
-from typing_extensions import Protocol as InterfaceShape
+from typing import BinaryIO, Protocol
 
 
-class AbstractInputFile(InterfaceShape):
+class AbstractInputFile(Protocol):
     """An individual file to be read as part of a protocol.
 
     Properties:
@@ -14,4 +13,4 @@ class AbstractInputFile(InterfaceShape):
     """
 
     filename: str
-    file: IO[bytes]
+    file: BinaryIO

@@ -16,8 +16,8 @@ export const InstrumentContainer = (
 
   return (
     <Flex
-      backgroundColor={COLORS.fundamentalsBackgroundShade}
-      borderRadius={BORDERS.radiusSoftCorners}
+      backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
+      borderRadius={BORDERS.borderRadius4}
       paddingX={SPACING.spacing8}
       paddingY={SPACING.spacing2}
       width="max-content"

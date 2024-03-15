@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import {
   CompletedProtocolAnalysis,
@@ -7,7 +8,7 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { RobotMotionLoader } from '../RobotMotionLoader'
 import { getPrepCommands } from './getPrepCommands'
-import { useChainRunCommands } from '../../../resources/runs/hooks'
+import { useChainRunCommands } from '../../../resources/runs'
 import type { RegisterPositionAction } from '../types'
 import type { Jog } from '../../../molecules/JogControls'
 import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
@@ -31,7 +32,7 @@ import {
 } from '@opentrons/components'
 import { LabwareOffset } from '@opentrons/api-client'
 import { css } from 'styled-components'
-import { Portal } from '../../../App/portal'
+import { getTopPortalEl } from '../../../App/portal'
 import { LegacyModalShell } from '../../../molecules/LegacyModal'
 import { SmallButton } from '../../../atoms/buttons'
 import { CALIBRATION_PROBE } from '../../PipetteWizardFlows/constants'
@@ -139,7 +140,7 @@ export const IntroScreen = (props: {
 
 const VIEW_OFFSETS_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.darkBlackEnabled};
+  color: ${COLORS.black90};
   font-size: ${TYPOGRAPHY.fontSize22};
   &:hover {
     opacity: 100%;
@@ -167,43 +168,44 @@ function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
         css={VIEW_OFFSETS_BUTTON_STYLE}
         aria-label="show labware offsets"
       >
-        <Icon name="reticle" size="1.75rem" color={COLORS.darkBlackEnabled} />
+        <Icon name="reticle" size="1.75rem" color={COLORS.black90} />
         <StyledText as="p">
           {i18n.format(t('view_current_offsets'), 'capitalize')}
         </StyledText>
       </Btn>
-      {showOffsetsTable ? (
-        <Portal level="top">
-          <LegacyModalShell
-            width="60rem"
-            height="33.5rem"
-            padding={SPACING.spacing32}
-            display="flex"
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            header={
-              <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
-                {i18n.format(t('labware_offset_data'), 'capitalize')}
-              </StyledText>
-            }
-            footer={
-              <SmallButton
-                width="100%"
-                textTransform={TYPOGRAPHY.textTransformCapitalize}
-                buttonText={t('shared:close')}
-                onClick={() => setShowOffsetsModal(false)}
-              />
-            }
-          >
-            <Box overflowY="scroll" marginBottom={SPACING.spacing16}>
-              <TerseOffsetTable
-                offsets={latestCurrentOffsets}
-                labwareDefinitions={labwareDefinitions}
-              />
-            </Box>
-          </LegacyModalShell>
-        </Portal>
-      ) : null}
+      {showOffsetsTable
+        ? createPortal(
+            <LegacyModalShell
+              width="60rem"
+              height="33.5rem"
+              padding={SPACING.spacing32}
+              display="flex"
+              flexDirection={DIRECTION_COLUMN}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              header={
+                <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
+                  {i18n.format(t('labware_offset_data'), 'capitalize')}
+                </StyledText>
+              }
+              footer={
+                <SmallButton
+                  width="100%"
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  buttonText={t('shared:close')}
+                  onClick={() => setShowOffsetsModal(false)}
+                />
+              }
+            >
+              <Box overflowY="scroll" marginBottom={SPACING.spacing16}>
+                <TerseOffsetTable
+                  offsets={latestCurrentOffsets}
+                  labwareDefinitions={labwareDefinitions}
+                />
+              </Box>
+            </LegacyModalShell>,
+            getTopPortalEl()
+          )
+        : null}
     </>
   ) : (
     <Flex />

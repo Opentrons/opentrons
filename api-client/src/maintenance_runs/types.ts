@@ -4,35 +4,16 @@ import type {
   LoadedModule,
   LoadedPipette,
 } from '@opentrons/shared-data'
-import type { RunCommandSummary, LabwareOffsetCreateData } from '../runs'
-
-export const ENGINE_STATUS_IDLE = 'idle' as const
-export const ENGINE_STATUS_RUNNING = 'running' as const
-export const ENGINE_STATUS_PAUSE_REQUESTED = 'pause-requested' as const
-export const ENGINE_STATUS_PAUSED = 'paused'
-export const ENGINE_STATUS_STOP_REQUESTED = 'stop-requested' as const
-export const ENGINE_STATUS_STOPPED = 'stopped' as const
-export const ENGINE_STATUS_FAILED = 'failed' as const
-export const ENGINE_STATUS_FINISHING = 'finishing' as const
-export const ENGINE_STATUS_SUCCEEDED = 'succeeded' as const
-export const ENGINE_STATUS_BLOCKED_BY_OPEN_DOOR = 'blocked-by-open-door' as const
-
-export type EngineStatus =
-  | typeof ENGINE_STATUS_IDLE
-  | typeof ENGINE_STATUS_RUNNING
-  | typeof ENGINE_STATUS_PAUSE_REQUESTED
-  | typeof ENGINE_STATUS_PAUSED
-  | typeof ENGINE_STATUS_STOP_REQUESTED
-  | typeof ENGINE_STATUS_STOPPED
-  | typeof ENGINE_STATUS_FAILED
-  | typeof ENGINE_STATUS_FINISHING
-  | typeof ENGINE_STATUS_SUCCEEDED
-  | typeof ENGINE_STATUS_BLOCKED_BY_OPEN_DOOR
+import type {
+  RunCommandSummary,
+  LabwareOffsetCreateData,
+  RunStatus,
+} from '../runs'
 
 export interface MaintenanceRunData {
   id: string
   createdAt: string
-  status: EngineStatus
+  status: RunStatus
   current: boolean
   actions: MaintenanceRunAction[]
   errors: MaintenanceRunError[]

@@ -1,4 +1,3 @@
-import assert from 'assert'
 import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
@@ -255,7 +254,7 @@ function transferLikeSubsteps(args: {
 
   // TODO Ian 2018-04-06 use assert here
   if (!pipetteSpec) {
-    assert(
+    console.assert(
       false,
       `Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`
     )
@@ -271,7 +270,10 @@ function transferLikeSubsteps(args: {
   )
 
   if (!substepCommandCreator) {
-    assert(false, `transferLikeSubsteps could not make a command creator`)
+    console.assert(
+      false,
+      `transferLikeSubsteps could not make a command creator`
+    )
     return null
   }
 
@@ -281,7 +283,8 @@ function transferLikeSubsteps(args: {
       substepCommandCreator,
       invariantContext,
       initialRobotState,
-      pipetteSpec.channels
+      pipetteSpec.channels,
+      stepArgs.nozzles
     )
     const mergedMultiRows: StepItemSourceDestRow[][] = mergeSubstepRowsMultiChannel(
       {
@@ -304,7 +307,8 @@ function transferLikeSubsteps(args: {
       substepCommandCreator,
       invariantContext,
       initialRobotState,
-      1
+      1,
+      null
     )
     const mergedRows: StepItemSourceDestRow[] = mergeSubstepRowsSingleChannel({
       substepRows,

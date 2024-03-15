@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-
-import { renderWithProviders } from '@opentrons/components'
+import { when } from 'vitest-when'
+import { screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
 import { i18n } from '../../../../i18n'
 import {
@@ -13,6 +14,7 @@ import {
   useIsFlex,
   useAttachedPipettesFromInstrumentsQuery,
 } from '../../../Devices/hooks'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
 import { formatLastCalibrated } from '../utils'
@@ -56,40 +58,30 @@ const mockPipetteOffsetCalibrationsForOt3 = [
   },
 ]
 
-jest.mock('../../../../redux/custom-labware/selectors')
-jest.mock('../../../../redux/sessions/selectors')
-jest.mock('../../../../redux/discovery')
-jest.mock('../../../../assets/labware/findLabware')
-jest.mock('../../../../organisms/Devices/hooks')
-jest.mock('../OverflowMenu')
+vi.mock('../../../../redux/custom-labware/selectors')
+vi.mock('../../../../redux/sessions/selectors')
+vi.mock('../../../../redux/discovery')
+vi.mock('../../../../assets/labware/findLabware')
+vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('../OverflowMenu')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
   right: mockAttachedPipette,
 } as any
-const mockUpdateRobotStatus = jest.fn()
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
->
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-const mockOverflowMenu = OverflowMenu as jest.MockedFunction<
-  typeof OverflowMenu
->
-const mockUseAttachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery as jest.MockedFunction<
-  typeof useAttachedPipettesFromInstrumentsQuery
->
+const mockUpdateRobotStatus = vi.fn()
 
 describe('PipetteOffsetCalibrationItems', () => {
   let props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
 
   beforeEach(() => {
-    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+    vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: null,
       right: null,
     })
-    mockOverflowMenu.mockReturnValue(<div>mock overflow menu</div>)
-    mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(false)
+    vi.mocked(OverflowMenu).mockReturnValue(<div>mock overflow menu</div>)
+    vi.mocked(useAttachedPipettes).mockReturnValue(mockAttachedPipettes)
+    when(useIsFlex).calledWith('otie').thenReturn(false)
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
@@ -97,60 +89,55 @@ describe('PipetteOffsetCalibrationItems', () => {
     }
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
-  })
-
   it('should render table headers', () => {
-    const [{ getByText }] = render(props)
-    getByText('Pipette Model and Serial')
-    getByText('Mount')
-    getByText('Tip Rack')
-    getByText('Last Calibrated')
+    render(props)
+    screen.getByText('Pipette Model and Serial')
+    screen.getByText('Mount')
+    screen.getByText('Tip Rack')
+    screen.getByText('Last Calibrated')
   })
 
-  it('should omit tip rack table header for OT-3', () => {
-    when(mockUseIsFlex).calledWith('otie').mockReturnValue(true)
-    const [{ getByText, queryByText }] = render(props)
-    getByText('Pipette Model and Serial')
-    getByText('Mount')
-    expect(queryByText('Tip Rack')).toBeNull()
-    getByText('Last Calibrated')
+  it('should omit tip rack table header for Flex', () => {
+    when(useIsFlex).calledWith('otie').thenReturn(true)
+    render(props)
+    screen.getByText('Pipette Model and Serial')
+    screen.getByText('Mount')
+    expect(screen.queryByText('Tip Rack')).toBeNull()
+    screen.getByText('Last Calibrated')
   })
 
-  it('should include the correct information for OT-3 when 1 pipette is attached', () => {
+  it('should include the correct information for Flex when 1 pipette is attached', () => {
     props = {
       ...props,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrationsForOt3,
     }
-    mockUseIsFlex.mockReturnValue(true)
-    mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
+    vi.mocked(useIsFlex).mockReturnValue(true)
+    vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
       left: mockAttachedPipetteInformation,
       right: null,
     })
-    const [{ getByText }] = render(props)
-    getByText('mockPipetteModelLeft')
-    getByText('1234567')
-    getByText('left')
-    getByText('11/10/2022 18:15:02')
+    render(props)
+    screen.getByText('mockPipetteModelLeft')
+    screen.getByText('1234567')
+    screen.getByText('left')
+    screen.getByText('11/10/2022 18:15:02')
   })
 
   it('should render overflow menu', () => {
-    const [{ queryAllByText }] = render(props)
-    expect(queryAllByText('mock overflow menu')).toHaveLength(2)
+    render(props)
+    expect(screen.queryAllByText('mock overflow menu')).toHaveLength(2)
   })
 
   it('should render pipette offset calibrations data - unknown custom tiprack', () => {
-    const [{ getByText }] = render(props)
-    getByText('mockPipetteModelLeft')
-    getByText('1234567')
-    getByText('left')
-    getByText('11/10/2022 18:14:01')
-    getByText('mockPipetteModelRight')
-    getByText('01234567')
-    getByText('right')
-    getByText('11/10/2022 18:15:02')
+    render(props)
+    screen.getByText('mockPipetteModelLeft')
+    screen.getByText('1234567')
+    screen.getByText('left')
+    screen.getByText('11/10/2022 18:14:01')
+    screen.getByText('mockPipetteModelRight')
+    screen.getByText('01234567')
+    screen.getByText('right')
+    screen.getByText('11/10/2022 18:15:02')
   })
 
   it('should only render text when calibration missing', () => {
@@ -166,8 +153,8 @@ describe('PipetteOffsetCalibrationItems', () => {
         },
       ],
     }
-    const [{ getByText }] = render(props)
-    getByText('Not calibrated')
+    render(props)
+    screen.getByText('Not calibrated')
   })
 
   it('should only render last calibrated date text when calibration recommended', () => {
@@ -184,8 +171,8 @@ describe('PipetteOffsetCalibrationItems', () => {
         },
       ],
     }
-    const [{ getByText, queryByText }] = render(props)
-    expect(queryByText('Not calibrated')).not.toBeInTheDocument()
-    getByText(formatLastCalibrated('2022-11-10T18:15:02'))
+    render(props)
+    expect(screen.queryByText('Not calibrated')).not.toBeInTheDocument()
+    screen.getByText(formatLastCalibrated('2022-11-10T18:15:02'))
   })
 })

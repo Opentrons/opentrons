@@ -1,8 +1,12 @@
 // sets up the main window ui
 import { app, shell, BrowserWindow } from 'electron'
 import path from 'path'
+
 import { getConfig } from './config'
+import { RELOAD_UI } from './constants'
 import { createLogger } from './log'
+
+import type { Action } from './types'
 
 const config = getConfig('ui')
 const log = createLogger('ui')
@@ -52,12 +56,25 @@ export function createUi(): BrowserWindow {
   mainWindow.loadURL(url, { extraHeaders: 'pragma: no-cache\n' })
 
   // open new windows (<a target="_blank" ...) in browser windows
-  mainWindow.webContents.on('new-window', (event, url) => {
-    log.debug('Opening external link', { url })
-    event.preventDefault()
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    shell.openExternal(url)
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    // eslint-disable-next-line no-void
+    void shell.openExternal(url)
+    return { action: 'deny' }
   })
 
   return mainWindow
+}
+
+export function registerReloadUi(
+  browserWindow: BrowserWindow
+): (action: Action) => unknown {
+  return function handleAction(action: Action) {
+    switch (action.type) {
+      case RELOAD_UI:
+        log.info(`reloading UI: ${action.payload.message}`)
+        browserWindow.webContents.reload()
+
+        break
+    }
+  }
 }

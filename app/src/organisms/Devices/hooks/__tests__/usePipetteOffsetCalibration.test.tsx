@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import {
@@ -18,22 +19,11 @@ import type { DiscoveredRobot } from '../../../../redux/discovery/types'
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 import { AttachedPipette, Mount } from '../../../../redux/pipettes/types'
 
-jest.mock('../../../../redux/calibration')
-jest.mock('../../../../redux/robot-api')
-jest.mock('../useRobot')
+vi.mock('../../../../redux/calibration')
+vi.mock('../../../../redux/robot-api')
+vi.mock('../useRobot')
 
-const mockFetchPipetteOffsetCalibrations = fetchPipetteOffsetCalibrations as jest.MockedFunction<
-  typeof fetchPipetteOffsetCalibrations
->
-const mockGetCalibrationForPipette = getCalibrationForPipette as jest.MockedFunction<
-  typeof getCalibrationForPipette
->
-const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
-  typeof useDispatchApiRequest
->
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-
-const store: Store<any> = createStore(jest.fn(), {})
+const store: Store<any> = createStore(vi.fn(), {})
 
 const ROBOT_NAME = 'otie'
 const PIPETTE_ID = 'pipetteId' as AttachedPipette['id']
@@ -41,9 +31,9 @@ const MOUNT = 'left' as Mount
 
 describe('usePipetteOffsetCalibration hook', () => {
   let dispatchApiRequest: DispatchApiRequestType
-  let wrapper: React.FunctionComponent<{}>
+  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
-    dispatchApiRequest = jest.fn()
+    dispatchApiRequest = vi.fn()
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
       <Provider store={store}>
@@ -52,18 +42,17 @@ describe('usePipetteOffsetCalibration hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
-    when(mockUseRobot)
+    vi.mocked(useDispatchApiRequest).mockReturnValue([dispatchApiRequest, []])
+    when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
-      .mockReturnValue(({ status: 'chill' } as unknown) as DiscoveredRobot)
+      .thenReturn(({ status: 'chill' } as unknown) as DiscoveredRobot)
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns no pipette offset calibration when given a null robot name and null pipette id', () => {
-    mockGetCalibrationForPipette.mockReturnValue(null)
+    vi.mocked(getCalibrationForPipette).mockReturnValue(null)
 
     const { result } = renderHook(
       () => usePipetteOffsetCalibration(null, null, MOUNT),
@@ -77,9 +66,9 @@ describe('usePipetteOffsetCalibration hook', () => {
   })
 
   it('returns pipette offset calibration when given a robot name, pipette id, and mount', () => {
-    when(mockGetCalibrationForPipette)
+    when(vi.mocked(getCalibrationForPipette))
       .calledWith(undefined as any, ROBOT_NAME, PIPETTE_ID, MOUNT)
-      .mockReturnValue(mockPipetteOffsetCalibration1)
+      .thenReturn(mockPipetteOffsetCalibration1)
 
     const { result } = renderHook(
       () => usePipetteOffsetCalibration(ROBOT_NAME, PIPETTE_ID, MOUNT),
@@ -90,7 +79,7 @@ describe('usePipetteOffsetCalibration hook', () => {
 
     expect(result.current).toEqual(mockPipetteOffsetCalibration1)
     expect(dispatchApiRequest).toBeCalledWith(
-      mockFetchPipetteOffsetCalibrations(ROBOT_NAME)
+      vi.mocked(fetchPipetteOffsetCalibrations)(ROBOT_NAME)
     )
   })
 })

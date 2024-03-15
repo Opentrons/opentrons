@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation, Trans } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
 import { COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
@@ -8,7 +9,7 @@ import {
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
@@ -19,15 +20,21 @@ import type { Subsystem } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface UpdateNeededModalProps {
-  setShowUpdateModal: React.Dispatch<React.SetStateAction<boolean>>
+  onClose: () => void
+  shouldExit: boolean
   subsystem: Subsystem
   setInitiatedSubsystemUpdate: (subsystem: Subsystem | null) => void
 }
 
 export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
-  const { setShowUpdateModal, subsystem, setInitiatedSubsystemUpdate } = props
+  const { onClose, shouldExit, subsystem, setInitiatedSubsystemUpdate } = props
   const { t } = useTranslation('firmware_update')
-  const [updateId, setUpdateId] = React.useState('')
+  const [updateId, setUpdateId] = React.useState<string | null>(null)
+  // when we move to the next subsystem to update, set updateId back to null
+  React.useEffect(() => {
+    setUpdateId(null)
+  }, [subsystem])
+
   const {
     data: instrumentsData,
     refetch: refetchInstruments,
@@ -44,13 +51,14 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
 
   const { data: updateData } = useSubsystemUpdateQuery(updateId)
   const status = updateData?.data.updateStatus
+  const ongoingUpdateId = updateData?.data.id
+
   React.useEffect(() => {
     if (status === 'done') {
       setInitiatedSubsystemUpdate(null)
     }
   }, [status, setInitiatedSubsystemUpdate])
 
-  const percentComplete = updateData?.data.updateProgress ?? 0
   const updateError = updateData?.data.updateError
   const instrumentType = subsystem === 'gripper' ? 'gripper' : 'pipette'
   let mount = ''
@@ -60,7 +68,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   const updateNeededHeader: ModalHeaderBaseProps = {
     title: t('update_needed'),
     iconName: 'ot-alert',
-    iconColor: COLORS.yellow2,
+    iconColor: COLORS.yellow50,
   }
 
   let modalContent = (
@@ -90,25 +98,24 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
       </Flex>
     </Modal>
   )
-  if (status === 'updating' || status === 'queued') {
-    modalContent = (
-      <UpdateInProgressModal
-        percentComplete={percentComplete}
-        subsystem={subsystem}
-      />
-    )
-  } else if (status === 'done' || instrument?.ok) {
+  if (
+    (status === 'updating' || status === 'queued') &&
+    ongoingUpdateId != null
+  ) {
+    modalContent = <UpdateInProgressModal subsystem={subsystem} />
+  } else if (status === 'done' && ongoingUpdateId != null) {
     modalContent = (
       <UpdateResultsModal
         instrument={instrument}
         isSuccess={updateError === undefined}
-        closeModal={() => {
+        onClose={() => {
           refetchInstruments().catch(error => console.error(error))
-          setShowUpdateModal(false)
+          onClose()
         }}
+        shouldExit={shouldExit}
       />
     )
   }
 
-  return <Portal level="top">{modalContent}</Portal>
+  return createPortal(modalContent, getTopPortalEl())
 }

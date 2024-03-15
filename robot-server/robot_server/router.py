@@ -2,26 +2,25 @@
 from fastapi import APIRouter, Depends, status
 
 from .constants import V1_TAG
-from .errors import LegacyErrorResponse
+from .errors.error_responses import LegacyErrorResponse
 from .versioning import check_version_header
 
-from .commands import commands_router
+from .commands.router import commands_router
 from .deck_configuration.router import router as deck_configuration_router
-from .health import health_router
-from .instruments import instruments_router
+from .health.router import health_router
+from .instruments.router import instruments_router
 from .maintenance_runs.router import maintenance_runs_router
-from .modules import modules_router
-from .protocols import protocols_router
+from .modules.router import modules_router
+from .protocols.router import protocols_router
 from .robot.router import robot_router
-from .runs import runs_router
+from .runs.router import runs_router
 from .service.labware.router import router as labware_router
 from .service.legacy.routers import legacy_routes
-from .service.notifications.router import router as notifications_router
 from .service.pipette_offset.router import router as pip_os_router
 from .service.session.router import router as deprecated_session_router
 from .service.tip_length.router import router as tl_router
 from .subsystems.router import subsystems_router
-from .system import system_router
+from .system.router import system_router
 
 router = APIRouter()
 
@@ -73,7 +72,7 @@ router.include_router(
 
 router.include_router(
     router=deck_configuration_router,
-    tags=["Deck Configuration"],
+    tags=["Flex Deck Configuration"],
     dependencies=[Depends(check_version_header)],
 )
 
@@ -91,7 +90,7 @@ router.include_router(
 
 router.include_router(
     router=deprecated_session_router,
-    tags=["Session Management"],
+    tags=["OT-2 Calibration Sessions"],
     dependencies=[Depends(check_version_header)],
 )
 
@@ -114,12 +113,6 @@ router.include_router(
 )
 
 router.include_router(
-    router=notifications_router,
-    tags=["Notification Server Management"],
-    dependencies=[Depends(check_version_header)],
-)
-
-router.include_router(
     router=system_router,
     tags=["System Control"],
     dependencies=[Depends(check_version_header)],
@@ -127,7 +120,7 @@ router.include_router(
 
 router.include_router(
     router=subsystems_router,
-    tags=["Subsystem Management"],
+    tags=["Flex Subsystem Management"],
     dependencies=[Depends(check_version_header)],
 )
 

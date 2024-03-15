@@ -1,9 +1,12 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { CompleteUpdateSoftware } from '../CompleteUpdateSoftware'
 
-jest.mock('../../../redux/robot-admin')
+vi.mock('../../../redux/robot-admin')
 
 const render = (props: React.ComponentProps<typeof CompleteUpdateSoftware>) => {
   return renderWithProviders(<CompleteUpdateSoftware {...props} />, {
@@ -21,10 +24,10 @@ describe('CompleteUpdateSoftware', () => {
   })
 
   it('should render text, progress bar and button', () => {
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('Update complete!')
-    getByText('Install complete, robot restarting...')
-    const bar = getByTestId('ProgressBar_Bar')
+    render(props)
+    screen.getByText('Update complete!')
+    screen.getByText('Install complete, robot restarting...')
+    const bar = screen.getByTestId('ProgressBar_Bar')
     expect(bar).toHaveStyle('width: 100%')
   })
 })

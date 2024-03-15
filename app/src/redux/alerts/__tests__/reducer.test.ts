@@ -1,5 +1,6 @@
-import * as Actions from '../actions'
+import { describe, it, expect } from 'vitest'
 import { alertsReducer } from '../reducer'
+import * as Actions from '../actions'
 
 import type { AlertId, AlertsState } from '../types'
 

@@ -138,4 +138,5 @@ __all__ = [
     "NotSupportedOnRobotType",
     # error occurrence models
     "ErrorOccurrence",
+    "FailedGripperPickupError",
 ]

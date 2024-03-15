@@ -75,7 +75,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     control API. Its only purpose is to gather state.
     """
 
-    DictType = Dict[str, Union[str, float, bool]]
+    DictType = Dict[
+        str, Union[str, float, bool]
+    ]  # spp: as_dict() has value items that aren't Union[str, float, bool]..
     #: The type of this data class as a dict
 
     def __init__(
@@ -510,7 +512,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         Remove the tip from the pipette (effectively updates the pipette's
         critical point)
         """
-        assert self.has_tip
         self._has_tip = False
         self._current_tip_length = 0.0
 

@@ -58,7 +58,7 @@ async def incoming_messages() -> Queue[CanMessage]:
 
 
 @pytest.fixture
-def mock_driver(incoming_messages: Queue[CanMessage]) -> AsyncMock:
+async def mock_driver(incoming_messages: Queue[CanMessage]) -> AsyncMock:
     """Mock can driver."""
     m = AsyncMock()
     m.__aiter__.side_effect = lambda: m
@@ -67,7 +67,7 @@ def mock_driver(incoming_messages: Queue[CanMessage]) -> AsyncMock:
 
 
 @pytest.fixture
-def subject(mock_driver: AsyncMock) -> CanMessenger:
+async def subject(mock_driver: AsyncMock) -> CanMessenger:
     """The test subject."""
     return CanMessenger(driver=mock_driver)
 
@@ -106,7 +106,8 @@ async def test_send(
     message: MessageDefinition,
 ) -> None:
     """It should create a can message and use the driver to send the message."""
-    await subject.send(node_id, message)
+    async with subject:
+        await subject.send(node_id, message)
     mock_driver.send.assert_called_once_with(
         message=CanMessage(
             arbitration_id=ArbitrationId(
@@ -157,11 +158,8 @@ async def test_ensure_send(
         )
     )
 
-    """It should create a can message and use the driver to send the message and raise no exception."""
-    error, ignore = await asyncio.gather(
-        subject.ensure_send(node_id, message, expected_nodes=[node_id]),
-        subject.__aenter__(),
-    )
+    async with subject:
+        error = await subject.ensure_send(node_id, message, expected_nodes=[node_id])
     assert error == ErrorCode.ok
     mock_driver.send.assert_called_once_with(
         message=CanMessage(
@@ -219,11 +217,8 @@ async def test_ensure_send_error(
         )
     )
 
-    """It should create a can message and use the driver to send the message and raise no exception."""
-    error, ignore = await asyncio.gather(
-        subject.ensure_send(node_id, message, expected_nodes=[node_id]),
-        subject.__aenter__(),
-    )
+    async with subject:
+        error = await subject.ensure_send(node_id, message, expected_nodes=[node_id])
     assert error == 5
     mock_driver.send.assert_called_once_with(
         message=CanMessage(
@@ -290,12 +285,8 @@ async def test_ensure_send_subnodes(
                 data=message.payload.message_index.value.to_bytes(4, "big"),
             )
         )
-
-    """It should create a can message and use the driver to send the message and raise no exception."""
-    error, ignore = await asyncio.gather(
-        subject.ensure_send(node_id, message, expected_nodes=[node_id]),
-        subject.__aenter__(),
-    )
+    async with subject:
+        error = await subject.ensure_send(node_id, message, expected_nodes=[node_id])
     assert error == ErrorCode.ok
     mock_driver.send.assert_called_once_with(
         message=CanMessage(
@@ -332,10 +323,11 @@ async def test_ensure_send_timeout(
     message: MessageDefinition,
 ) -> None:
     """It should create a can message and use the driver to send the message but raise an TimeoutError."""
-    error, ignore = await asyncio.gather(
-        subject.ensure_send(node_id, message, timeout=0.1, expected_nodes=[node_id]),
-        subject.__aenter__(),
-    )
+    async with subject:
+        error = await subject.ensure_send(
+            node_id, message, timeout=0.1, expected_nodes=[node_id]
+        )
+
     assert error == ErrorCode.timeout
     mock_driver.send.assert_called_once_with(
         message=CanMessage(

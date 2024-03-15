@@ -29,7 +29,7 @@ export function ProtocolUploadInput(
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
-  const logger = useLogger(__filename)
+  const logger = useLogger(new URL('', import.meta.url).pathname)
   const trackEvent = useTrackEvent()
 
   const handleUpload = (file: File): void => {
@@ -59,7 +59,7 @@ export function ProtocolUploadInput(
               t={t}
               i18nKey="shared:drag_and_drop"
               components={{
-                a: <Link color={COLORS.blueHover} role="button" />,
+                a: <Link color={COLORS.blue55} role="button" />,
               }}
             />
           </StyledText>

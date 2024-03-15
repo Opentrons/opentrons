@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { useFormik } from 'formik'
+import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
 
 import {
@@ -19,6 +19,7 @@ import { StyledText } from '../../atoms/text'
 import { addManualIp } from '../../redux/config'
 import { startDiscovery } from '../../redux/discovery'
 
+import type { FieldError, Resolver } from 'react-hook-form'
 import type { Dispatch } from '../../redux/types'
 
 const FlexForm = styled.form`
@@ -34,16 +35,17 @@ const StyledInput = styled.input`
   margin: ${SPACING.spacing4} 0;
   background-color: ${COLORS.white};
   border-radius: ${SPACING.spacing4};
-  border: 1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled};
+  border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
   height: ${SIZE_2};
   font-size: ${TYPOGRAPHY.fontSizeP};
+  padding-left: ${SPACING.spacing8};
 
   &:active {
-    border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.grey50};
   }
 
   &:hover {
-    border: 1px ${BORDERS.styleSolid} ${COLORS.blueEnabled};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
   }
 
   &:focus-visible {
@@ -51,12 +53,12 @@ const StyledInput = styled.input`
   }
 
   &:disabled {
-    border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyDisabled};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
   }
 `
 
-interface FormikErrors {
-  ip?: string
+interface FormValues {
+  ip: string
 }
 interface ManualIpHostnameFormProps {
   setMostRecentAddition: (ip: string) => void
@@ -71,32 +73,53 @@ export function ManualIpHostnameForm({
     dispatch(addManualIp(ip))
     dispatch(startDiscovery())
   }
-  const formik = useFormik({
-    initialValues: {
+
+  const resolver: Resolver<FormValues> = values => {
+    let errors = {}
+    errors = validateForm(values, errors)
+    return { values, errors }
+  }
+  const { formState, handleSubmit, register, reset } = useForm<FormValues>({
+    defaultValues: {
       ip: '',
     },
-    onSubmit: (values, { resetForm }) => {
-      const ip = values.ip.trim()
-      const inputForm = document.getElementById('ip')
-      if (inputForm != null)
-        inputForm.style.border = `1px solid ${String(COLORS.medGreyEnabled)}`
-      addManualIpAndHostname(ip)
-      resetForm()
-      setMostRecentAddition(ip)
-    },
-    validate: values => {
-      const errors: FormikErrors = {}
-      const ip = values.ip.trim()
-      // ToDo: kj 12/19/2022 for this, the best way is to use the regex because invisible unicode characters
-      if (!ip) {
-        errors.ip = t('add_ip_error')
-        const inputForm = document.getElementById('ip')
-        if (inputForm != null)
-          inputForm.style.border = `1px solid ${String(COLORS.errorEnabled)}`
-      }
-      return errors
-    },
+    resolver: resolver,
   })
+
+  const validateForm = (
+    data: FormValues,
+    errors: Record<string, FieldError>
+  ): Record<string, FieldError> => {
+    const ip = data.ip.trim()
+    let message: string | undefined
+    if (!ip) {
+      message = t('add_ip_error')
+    }
+    const updatedErrors =
+      message != null
+        ? {
+            ...errors,
+            ip: {
+              type: 'error',
+              message: message,
+            },
+          }
+        : errors
+    return updatedErrors
+  }
+
+  const onSubmit = (data: FormValues): void => {
+    const trimmedIp = data.ip.trim()
+    const inputForm = document.getElementById('ip')
+
+    if (inputForm !== null) {
+      inputForm.style.border = `1px solid ${COLORS.grey30}`
+    }
+
+    addManualIpAndHostname(trimmedIp)
+    reset()
+    setMostRecentAddition(trimmedIp)
+  }
 
   return (
     <Flex
@@ -104,14 +127,11 @@ export function ManualIpHostnameForm({
       margin={`${SPACING.spacing4} 0`}
       height={SPACING.spacing32}
     >
-      <FlexForm onSubmit={formik.handleSubmit}>
+      <FlexForm onSubmit={handleSubmit(onSubmit)}>
         <StyledInput
           id="ip"
-          name="ip"
           type="text"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.ip}
+          {...register('ip')}
           data-testid="manual-ip-hostname-input"
         />
         <TertiaryButton
@@ -124,13 +144,13 @@ export function ManualIpHostnameForm({
           {t('add_ip_button')}
         </TertiaryButton>
       </FlexForm>
-      {formik.errors.ip != null && (
+      {formState.errors?.ip != null && (
         <StyledText
           as="label"
           marginTop={SPACING.spacing4}
-          color={COLORS.errorEnabled}
+          color={COLORS.red50}
         >
-          {formik.errors.ip}
+          {formState.errors.ip.message}
         </StyledText>
       )}
     </Flex>

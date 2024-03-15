@@ -111,10 +111,18 @@ class LoadLabwareImplementation(
             )
 
         if isinstance(params.location, AddressableAreaLocation):
+            area_name = params.location.addressableAreaName
             if not fixture_validation.is_deck_slot(params.location.addressableAreaName):
                 raise LabwareIsNotAllowedInLocationError(
-                    f"Cannot load {params.loadName} onto addressable area {params.location.addressableAreaName}"
+                    f"Cannot load {params.loadName} onto addressable area {area_name}"
                 )
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                area_name
+            )
+        elif isinstance(params.location, DeckSlotLocation):
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                params.location.slotName.id
+            )
 
         verified_location = self._state_view.geometry.ensure_location_not_occupied(
             params.location

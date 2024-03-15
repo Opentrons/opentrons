@@ -447,6 +447,24 @@ class CalibrationStructureNotFoundError(RoboticsControlError):
         )
 
 
+class FailedGripperPickupError(RoboticsControlError):
+    """Raised when the gripper expects to be holding an object, but the jaw is closed farther than expected."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FailedGripperPickupError."""
+        super().__init__(
+            ErrorCodes.FAILED_GRIPPER_PICKUP_ERROR,
+            message or "Expected to grip labware, but none found.",
+            details,
+            wrapping,
+        )
+
+
 class EdgeNotFoundError(RoboticsControlError):
     """An error indicating that a calibration square edge was not able to be found."""
 
@@ -540,11 +558,9 @@ class UnmatchedTipPresenceStates(RoboticsControlError):
         """Build an UnmatchedTipPresenceStatesError."""
         format_tip_state = {0: "not detected", 1: "detected"}
         msg = (
-            "Received two differing tip presence statuses:"
-            "\nRear Sensor tips"
-            + format_tip_state[states[0]]
-            + "\nFront Sensor tips"
-            + format_tip_state[states[1]]
+            f"Received two differing tip presence statuses."
+            f" Rear Sensor tips: {format_tip_state[states[0]]}."
+            f" Front Sensor tips: {format_tip_state[states[1]]}."
         )
         if detail:
             msg += str(detail)

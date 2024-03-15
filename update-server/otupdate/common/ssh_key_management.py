@@ -39,9 +39,7 @@ def require_linklocal(handler: Handler) -> Handler:
             ),
         }
         if not ipaddr_str:
-            return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
-                data=invalid_req_data, status=403
-            )
+            return web.json_response(data=invalid_req_data, status=403)
         try:
             addr = ipaddress.ip_address(ipaddr_str)
         except ValueError:
@@ -49,9 +47,7 @@ def require_linklocal(handler: Handler) -> Handler:
             raise
 
         if not addr.is_link_local:
-            return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
-                data=invalid_req_data, status=403
-            )
+            return web.json_response(data=invalid_req_data, status=403)
 
         return await handler(request)
 
@@ -106,9 +102,7 @@ def key_present(hashval: str) -> bool:
 
 
 def key_error(error: str, message: str, status: int = 400) -> web.Response:
-    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
-        data={"error": error, "message": message}, status=status
-    )
+    return web.json_response(data={"error": error, "message": message}, status=status)
 
 
 @require_linklocal
@@ -120,7 +114,7 @@ async def list_keys(request: web.Request) -> web.Response:
 
     (or 403 if not from the link-local connection)
     """
-    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+    return web.json_response(
         {
             "public_keys": [
                 {"key_md5": details[0], "key": details[1]} for details in get_keys()
@@ -173,7 +167,7 @@ async def add(request: web.Request) -> web.Response:
         with authorized_keys("a") as ak:
             ak.write(f"{pubkey}\n")
 
-    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+    return web.json_response(
         data={"message": f"Added key {hashval}", "key_md5": hashval}, status=201
     )
 
@@ -190,7 +184,7 @@ async def clear(request: web.Request) -> web.Response:
     with authorized_keys("w") as ak:
         ak.write("\n".join([]) + "\n")
 
-    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+    return web.json_response(
         data={
             "message": "Keys cleared. " "Restart robot to take effect",
             "restart_url": "/server/restart",
@@ -217,7 +211,7 @@ async def remove(request: web.Request) -> web.Response:
             new_keys.append(key)
 
     if not found:
-        return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+        return web.json_response(
             data={
                 "error": "invalid-key-hash",
                 "message": f"No such key md5 {requested_hash}",
@@ -228,7 +222,7 @@ async def remove(request: web.Request) -> web.Response:
     with authorized_keys("w") as ak:
         ak.write("\n".join(new_keys) + "\n")
 
-    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+    return web.json_response(
         data={
             "message": f"Key {requested_hash} deleted. " "Restart robot to take effect",
             "restart_url": "/server/restart",
@@ -281,7 +275,7 @@ async def add_from_local(request: web.Request) -> web.Response:
                 LOG.error(f"Could not process ssh public key: {key} {e}")
                 continue
 
-    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+    return web.json_response(
         data={"message": f"Added {len(new_keys)} new keys", "key_md5": new_keys},
         status=201,
     )

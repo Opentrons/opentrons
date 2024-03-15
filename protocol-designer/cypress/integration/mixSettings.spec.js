@@ -10,7 +10,6 @@ function importProtocol() {
       mimeType: 'application/json',
       encoding: 'utf8',
     })
-    cy.get('[data-test="ComputingSpinner"]').should('exist')
     cy.get('div')
       .contains(
         'Your protocol will be automatically updated to the latest version.'
@@ -125,7 +124,7 @@ describe('Advanced Settings for Mix Form', () => {
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
 
-    cy.get('div[class*=FlowRateInput__description]').contains(
+    cy.contains(
       'Our default aspirate speed is optimal for a P1000 Single-Channel GEN2 aspirating liquids with a viscosity similar to water'
     )
     cy.get('input[name="aspirate_flowRate_customFlowRate"]').type('100')
@@ -144,7 +143,7 @@ describe('Advanced Settings for Mix Form', () => {
   it('verify functionality of flowrate in batch edit mix form', () => {
     // Batch editing the Flowrate value
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
-    cy.get('div[class*=FlowRateInput__description]').contains(
+    cy.contains(
       'Our default aspirate speed is optimal for a P1000 Single-Channel GEN2 aspirating liquids with a viscosity similar to water'
     )
     cy.get('input[name="aspirate_flowRate_customFlowRate"]').type('100')
@@ -317,7 +316,7 @@ describe('Advanced Settings for Mix Form', () => {
     // Verify dest well is selected
     cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
       const value = $input.val()
-      const expectedSubstring = 'dest_well'
+      const expectedSubstring = 'trashBin'
       expect(value).to.include(expectedSubstring)
     })
     // Click on step 3 to verify the batch editing
@@ -327,7 +326,7 @@ describe('Advanced Settings for Mix Form', () => {
     // Verify that dest well is selected for the blowout option
     cy.get('[id=BlowoutLocationField_dropdown]').should($input => {
       const value = $input.val()
-      const expectedSubstring = 'dest_well'
+      const expectedSubstring = 'trashBin'
       expect(value).to.include(expectedSubstring)
     })
   })

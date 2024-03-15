@@ -15,7 +15,7 @@ export interface EditModulesProps {
     moduleId?: string | null
     moduleType: ModuleType
   }
-  onCloseClick: () => unknown
+  onCloseClick: () => void
 }
 
 export interface ModelModuleInfo {
@@ -75,7 +75,7 @@ export const EditModules = (props: EditModulesProps): JSX.Element => {
   })
 
   return (
-    changeModuleWarning || (
+    changeModuleWarning ?? (
       <EditModulesModal
         moduleType={moduleType}
         moduleOnDeck={moduleOnDeck}
