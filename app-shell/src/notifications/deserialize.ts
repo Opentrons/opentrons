@@ -33,10 +33,10 @@ export function sendDeserialized({
   } catch {} // Prevents shell erroring during app shutdown event.
 }
 
-export function sendDeserializedGenericError({
-  hostname,
-  topic,
-}: Omit<SendToBrowserParams, 'message'>): void {
+export function sendDeserializedGenericError(
+  hostname: string,
+  topic: NotifyTopic
+): void {
   sendDeserialized({
     hostname,
     topic,

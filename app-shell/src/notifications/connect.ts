@@ -2,6 +2,7 @@ import mqtt from 'mqtt'
 
 import { connectionStore } from './store'
 import {
+  sendDeserialized,
   sendDeserializedGenericError,
   deserializeExpectedMessages,
 } from './deserialize'
@@ -135,15 +136,8 @@ function establishListeners({
             hostname,
             topic,
           })
-          try {
-            const browserWindow = connectionStore.getBrowserWindow()
-            browserWindow?.webContents.send(
-              'notify',
-              hostname,
-              topic,
-              deserializedMessage
-            )
-          } catch {} // Prevents shell erroring during app shutdown event.
+
+          sendDeserialized({ hostname, topic, message: deserializedMessage })
         })
         .catch(error => notifyLog.debug(`${error.message}`))
     }
@@ -155,10 +149,7 @@ function establishListeners({
   // handles transport layer errors only
   client.on('error', error => {
     notifyLog.warn(`Error - ${error.name}: ${error.message}`)
-    sendDeserializedGenericError({
-      hostname,
-      topic: 'ALL_TOPICS',
-    })
+    sendDeserializedGenericError(hostname, 'ALL_TOPICS')
     client.end()
   })
 
@@ -173,10 +164,7 @@ function establishListeners({
         packet.reasonCode ?? 'undefined'
       }`
     )
-    sendDeserializedGenericError({
-      hostname,
-      topic: 'ALL_TOPICS',
-    })
+    sendDeserializedGenericError(hostname, 'ALL_TOPICS')
   })
 }
 

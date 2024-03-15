@@ -53,29 +53,20 @@ export function subscribe({
           void waitUntilActiveOrErrored('subscription').catch(
             (error: Error) => {
               notifyLog.debug(error.message)
-              sendDeserializedGenericError({
-                hostname,
-                topic,
-              })
+              sendDeserializedGenericError(hostname, topic)
             }
           )
         }
       })
       .catch((error: Error) => {
         notifyLog.debug(error.message)
-        sendDeserializedGenericError({
-          hostname,
-          topic,
-        })
+        sendDeserializedGenericError(hostname, topic)
       })
   }
 
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
     if (error != null) {
-      sendDeserializedGenericError({
-        hostname,
-        topic,
-      })
+      sendDeserializedGenericError(hostname, topic)
     } else {
       notifyLog.debug(
         `Successfully subscribed on ${hostname} to topic: ${topic}`
