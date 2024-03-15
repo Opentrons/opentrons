@@ -87,7 +87,6 @@ async def get_run_controller(
 async def create_run_action(
     runId: str,
     request_body: RequestModel[RunActionCreate],
-    engine_store: EngineStore = Depends(get_engine_store),
     run_controller: RunController = Depends(get_run_controller),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),
