@@ -56,7 +56,8 @@ These are all versioned and released together. These assets are produced in 2 po
 - Release (External facing releases - stable, beta, alpha)
 - Internal Release (Internal facing releases - stable, beta, alpha)
 
-> [!TIP] > `git config remote.origin.tagOpt --tags` ensures that when you fetch and pull, you get all the tags from the origin remote.
+> [!TIP]
+> using `git config remote.origin.tagOpt --tags` ensures that when you fetch and pull, you get all the tags from the origin remote.
 
 ### Steps to release the changes in `edge`
 
@@ -75,14 +76,14 @@ These are all versioned and released together. These assets are produced in 2 po
 
 4. Check out and pull `chore_release-${version}` locally. Create a tag for a new alpha version. The alpha versions end with an `-alpha.N` prerelease tag, where `N` increments by 1 from 0 over the course of the QA process. You don't need a PR or a commit to create a new version. Pushing tags in the formats prescribed here are the triggers of the release process. Let's call the alpha version you're about to create `${alphaVersion}`:
 
-   > [!IMPORTANT]
-   > Use annotated tag (`-a`) with a message (`-m`) for all tags.
+> [!IMPORTANT]
+> Use annotated tag (`-a`) with a message (`-m`) for all tags.
 
-   ```shell
-   git switch chore_release-${version}
-   git pull
-   git tag -a v${alphaVersion} -m 'chore(release): ${alphaVersion}
-   ```
+```shell
+git switch chore_release-${version}
+git pull
+git tag -a v${alphaVersion} -m 'chore(release): ${alphaVersion}
+```
 
 5. Review the tag with `git log v${alphaVersion} --oneline -n10`. Double check that the commit displayed is the one you want - it should probably be the latest commit in your release branch, and you should double check that with the Github web UI. If the tag looks good, push it - this starts the build process. This is a release candidate that will undergo QA. Changelogs for the release are automatically generated when the tag is pushed and sent to the release page in github.
 
@@ -96,27 +97,23 @@ These are all versioned and released together. These assets are produced in 2 po
 
 8. We are ready to `merge -ff-only` the `chore_release-${version}` into `release`.
 
-   > [!CAUTION]
-   >
-   > - Do **NOT** squash or rebase
-   > - Do **NOT** yet push a tag
+> [!CAUTION]
+> Do **NOT** squash or rebase <br></br>
+> Do **NOT** yet push a tag
 
-   This should be done from your local command line. Here we make use of the PR in step 2 to bypass the branch protection on `release`. The PR checks must be passing and the PR must have approval:
+This should be done from your local command line. Here we make use of the PR in step 2 to bypass the branch protection on `release`. The PR checks must be passing and the PR must have approval:
 
-   ```shell
-   git switch chore_release-${version}
-   git pull
-   git checkout release
-   git pull
-   # now do the merge
-   git merge --ff-only chore_release-${version}
-   git push origin release
-   ```
+```shell
+git switch chore_release-${version}
+git pull
+git checkout release
+git pull
+# now do the merge
+git merge --ff-only chore_release-${version}
+git push origin release
+```
 
 9. Make a tag for the release. This tag will have the actual target release version, no alpha prerelease tags involved. It should be the same as the `${version}` part of your release branch:
-
-   > [!IMPORTANT]
-   > Use annotated tag (`-a`) with a message (`-m`) for all tags.
 
    ```shell
    git tag -a v${version} -m 'chore(release): ${version}'
@@ -166,9 +163,6 @@ If critical bugfixes or isolated features need to be released, the process is th
 ### tag usage
 
 We specify the version of a release artifact through a specifically-formatted git tag. We consider our monorepo to support several projects: robot stack, ot3, protocol-designer, etc.
-
-> [!IMPORTANT]
-> Use annotated tag (`-a`) with a message (`-m`) for all tags.
 
 #### Tags look like this:
 
