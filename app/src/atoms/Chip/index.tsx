@@ -57,7 +57,7 @@ const CHIP_PROPS_BY_TYPE: Record<
   },
   info: {
     backgroundColor: COLORS.blue35,
-    borderRadius: BORDERS.borderRadiusSize5,
+    borderRadius: BORDERS.borderRadius40,
     iconColor: COLORS.blue60,
     textColor: COLORS.blue60,
   },
