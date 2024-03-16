@@ -24,6 +24,7 @@ import { useNotifyRunQuery } from '../../resources/runs'
 
 import type { UseQueryOptions } from 'react-query'
 import type { RunAction, RunStatus, Run, RunData } from '@opentrons/api-client'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 export interface RunControls {
   play: () => void
@@ -182,4 +183,14 @@ export function useRunErrors(runId: string | null): RunData['errors'] {
   })
 
   return runRecord?.data?.errors ?? []
+}
+
+export function useProtocolHasRunTimeParameters(runId: string | null): boolean {
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+
+  console.log(
+    'TODO: delete the hardcoded true',
+    mostRecentAnalysis?.runTimeParameters
+  )
+  return true
 }

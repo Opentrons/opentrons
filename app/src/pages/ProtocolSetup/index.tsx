@@ -69,6 +69,7 @@ import {
   getProtocolUsesGripper,
 } from '../../organisms/ProtocolSetupInstruments/utils'
 import {
+  useProtocolHasRunTimeParameters,
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
@@ -96,6 +97,7 @@ import type {
   ProtocolFixture,
 } from '../../pages/Protocols/hooks'
 import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { ProtocolSetupParameters } from '../../organisms/ProtocolSetupParameters'
 
 const FETCH_DURATION_MS = 5000
 interface ProtocolSetupStepProps {
@@ -735,6 +737,7 @@ function PrepareToRun({
 }
 
 export type SetupScreens =
+  | 'run time parameters'
   | 'prepare to run'
   | 'instruments'
   | 'modules'
@@ -749,6 +752,7 @@ export function ProtocolSetup(): JSX.Element {
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
+  const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
 
   const handleProceedToRunClick = (): void => {
     trackEvent({
@@ -775,9 +779,12 @@ export function ProtocolSetup(): JSX.Element {
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
-    'prepare to run'
+    hasRunTimeParameters ? 'run time parameters' : 'prepare to run'
   )
   const setupComponentByScreen = {
+    'run time parameters': (
+      <ProtocolSetupParameters runId={runId} setSetupScreen={setSetupScreen} />
+    ),
     'prepare to run': (
       <PrepareToRun
         runId={runId}
