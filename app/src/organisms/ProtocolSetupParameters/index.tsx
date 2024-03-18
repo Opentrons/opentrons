@@ -166,6 +166,32 @@ export function ProtocolSetupParameters({
   //  TODO(jr, 3/18/24): remove mockData
   const parameters = mostRecentAnalysis?.runTimeParameters ?? mockData
 
+  const getDefault = (parameter: RunTimeParameter): string => {
+    const { type, default: defaultValue } = parameter
+    const suffix =
+      'suffix' in parameter && parameter.suffix != null ? parameter.suffix : ''
+    switch (type) {
+      case 'int':
+      case 'float':
+        return `${defaultValue.toString()} ${suffix}`
+      case 'boolean':
+        return Boolean(defaultValue)
+          ? i18n.format(t('on'), 'capitalize')
+          : i18n.format(t('off'), 'capitalize')
+      case 'str':
+        if ('choices' in parameter && parameter.choices != null) {
+          const choice = parameter.choices.find(
+            choice => choice.value === defaultValue
+          )
+          if (choice != null) {
+            return choice.displayName
+          }
+        }
+        break
+    }
+    return ''
+  }
+
   return (
     <>
       <ChildNavigation
@@ -187,33 +213,6 @@ export function ProtocolSetupParameters({
         paddingX={SPACING.spacing8}
       >
         {parameters.map(parameter => {
-          const getDefault = (parameter: RunTimeParameter): string => {
-            const { type, default: defaultValue } = parameter
-            const suffix =
-              'suffix' in parameter && parameter.suffix != null
-                ? parameter.suffix
-                : ''
-            switch (type) {
-              case 'int':
-              case 'float':
-                return `${defaultValue.toString()} ${suffix}`
-              case 'boolean':
-                return Boolean(defaultValue)
-                  ? i18n.format(t('on'), 'capitalize')
-                  : i18n.format(t('off'), 'capitalize')
-              case 'str':
-                if ('choices' in parameter && parameter.choices != null) {
-                  const choice = parameter.choices.find(
-                    choice => choice.value === defaultValue
-                  )
-                  if (choice != null) {
-                    return choice.displayName
-                  }
-                }
-                break
-            }
-            return ''
-          }
           return (
             <React.Fragment key={parameter.displayName}>
               <ProtocolSetupStep
