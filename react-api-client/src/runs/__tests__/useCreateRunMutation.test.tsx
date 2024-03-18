@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { createRun, CreateRunData } from '@opentrons/api-client'
@@ -9,11 +9,8 @@ import { useCreateRunMutation } from '..'
 
 import type { HostConfig, Response, Run } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockCreateRun = createRun as jest.MockedFunction<typeof createRun>
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
@@ -32,15 +29,10 @@ describe('useCreateRunMutation hook', () => {
 
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data when calling createRun if the request fails', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateRun)
-      .calledWith(HOST_CONFIG, createRunData)
-      .mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createRun).mockRejectedValue('oh no')
 
     const { result } = renderHook(() => useCreateRunMutation(), {
       wrapper,
@@ -54,10 +46,10 @@ describe('useCreateRunMutation hook', () => {
   })
 
   it('should create a run when calling the createRun callback with basic run args', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateRun)
-      .calledWith(HOST_CONFIG, createRunData)
-      .mockResolvedValue({ data: mockRunResponse } as Response<Run>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createRun).mockResolvedValue({
+      data: mockRunResponse,
+    } as Response<Run>)
 
     const { result } = renderHook(() => useCreateRunMutation(), {
       wrapper,
@@ -71,10 +63,10 @@ describe('useCreateRunMutation hook', () => {
 
   it('should create a protocol run when calling the createRun callback with protocol run args', async () => {
     createRunData = { protocolId: PROTOCOL_ID }
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateRun)
-      .calledWith(HOST_CONFIG, createRunData)
-      .mockResolvedValue({ data: mockRunResponse } as Response<Run>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createRun).mockResolvedValue({
+      data: mockRunResponse,
+    } as Response<Run>)
 
     const { result } = renderHook(() => useCreateRunMutation(), {
       wrapper,

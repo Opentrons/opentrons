@@ -57,7 +57,7 @@ const LabwareRow = styled.div`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
   border-color: ${COLORS.grey30};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   padding: ${SPACING.spacing16};
 `
 

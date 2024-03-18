@@ -20,6 +20,7 @@ from ..types import WellLocation, WellOrigin, CurrentWell, DeckPoint
 if TYPE_CHECKING:
     from ..execution import MovementHandler, PipettingHandler
     from ..state import StateView
+    from ..notes import CommandNoteAdder
 
 
 AspirateCommandType = Literal["aspirate"]
@@ -48,12 +49,14 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]
         state_view: StateView,
         hardware_api: HardwareControlAPI,
         movement: MovementHandler,
+        command_note_adder: CommandNoteAdder,
         **kwargs: object,
     ) -> None:
         self._pipetting = pipetting
         self._state_view = state_view
         self._hardware_api = hardware_api
         self._movement = movement
+        self._command_note_adder = command_note_adder
 
     async def execute(self, params: AspirateParams) -> AspirateResult:
         """Move to and aspirate from the requested well.
@@ -98,7 +101,10 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]
         )
 
         volume = await self._pipetting.aspirate_in_place(
-            pipette_id=pipette_id, volume=params.volume, flow_rate=params.flowRate
+            pipette_id=pipette_id,
+            volume=params.volume,
+            flow_rate=params.flowRate,
+            command_note_adder=self._command_note_adder,
         )
 
         return AspirateResult(

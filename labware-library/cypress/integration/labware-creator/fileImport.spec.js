@@ -12,7 +12,7 @@ context('File Import', () => {
   it('drags in a file', () => {
     cy.fixture(importedLabwareFile, 'utf8').then(fileJson => {
       const fileContent = JSON.stringify(fileJson)
-      cy.get('[class*="_file_drop__"]').upload(
+      cy.get('[class*="file_drop"]').first().upload(
         {
           fileContent,
           fileName: importedLabwareFile,
@@ -95,6 +95,26 @@ context('File Import', () => {
     cy.get("input[placeholder='TestPro 15 Well Plate 5 µL']").should('exist')
     cy.get("input[placeholder='testpro_15_wellplate_5ul']").should('exist')
 
+<<<<<<< HEAD
+=======
+    // Test pipette
+    // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
+    cy.get('label')
+      .contains('Test Pipette')
+      .children()
+      .first()
+      .trigger('mousedown')
+    cy.get('*[class^="_option_label"]')
+      .contains(/P10.*Single-Channel.*GEN1/)
+      .click()
+
+    // All fields present
+    cy.get('button[class*="_export_button_"]').click({ force: true })
+    cy.contains(
+      'Please resolve all invalid fields in order to export the labware definition'
+    ).should('not.exist')
+
+>>>>>>> edge
     cy.window()
       .its('__lastSavedBlobZip__')
       .should('be.a', 'blob') // wait until we get the blob

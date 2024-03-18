@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
+import { COLORS, BORDERS } from '../../helix-design-system'
 import { Flex, Box } from '../../primitives'
 import { Icon } from '../../icons'
 import { ALIGN_CENTER, JUSTIFY_CENTER, SIZE_1 } from '../../styles'
@@ -36,7 +36,9 @@ const INPUT_STYLE = css`
   border: 0;
 `
 const OUTER_STYLE = css`
-  @apply --font-form-default;
+  font-size: var(--fs-body-1); /* from legacy --font-form-default */
+  font-weight: var(--fw-regular); /* from legacy --font-form-default */
+  color: var(--c-font-dark); /* from legacy --font-form-default */
 
   display: flex;
   align-items: ${ALIGN_CENTER};
@@ -126,7 +128,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
-          borderRadius="2px"
+          borderRadius={BORDERS.borderRadius2}
           backgroundColor={COLORS.grey30}
           size={SIZE_1}
         >

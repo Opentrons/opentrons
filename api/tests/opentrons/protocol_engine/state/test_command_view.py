@@ -24,7 +24,9 @@ from opentrons.protocol_engine.state.commands import (
     RunResult,
     QueueStatus,
 )
-from opentrons.protocol_engine.errors import ProtocolCommandFailedError
+from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence
+
+from opentrons_shared_data.errors.codes import ErrorCodes
 
 from .command_fixtures import (
     create_queued_command,
@@ -44,6 +46,7 @@ def get_command_view(
     queued_command_ids: Sequence[str] = (),
     queued_setup_command_ids: Sequence[str] = (),
     run_error: Optional[errors.ErrorOccurrence] = None,
+    failed_command: Optional[CommandEntry] = None,
     finish_error: Optional[errors.ErrorOccurrence] = None,
     commands: Sequence[cmd.Command] = (),
     latest_command_hash: Optional[str] = None,
@@ -65,6 +68,7 @@ def get_command_view(
         queued_setup_command_ids=OrderedSet(queued_setup_command_ids),
         run_error=run_error,
         finish_error=finish_error,
+        failed_command=failed_command,
         all_command_ids=all_command_ids,
         commands_by_id=commands_by_id,
         run_started_at=run_started_at,
@@ -463,7 +467,7 @@ def test_validate_action_allowed(
     """It should validate allowed play/pause/stop actions."""
     expectation = pytest.raises(expected_error) if expected_error else does_not_raise()
 
-    with expectation:  # type: ignore[attr-defined]
+    with expectation:
         result = subject.validate_action_allowed(action)
 
     if expected_error is None:
@@ -679,6 +683,15 @@ def test_get_okay_to_clear(subject: CommandView, expected_is_okay: bool) -> None
     assert subject.get_is_okay_to_clear() is expected_is_okay
 
 
+def test_get_running_command_id() -> None:
+    """It should return the running command ID."""
+    subject_with_running = get_command_view(running_command_id="command-id")
+    assert subject_with_running.get_running_command_id() == "command-id"
+
+    subject_without_running = get_command_view(running_command_id=None)
+    assert subject_without_running.get_running_command_id() is None
+
+
 def test_get_current() -> None:
     """It should return the "current" command."""
     subject = get_command_view(
@@ -793,6 +806,37 @@ def test_get_slice_default_cursor_no_current() -> None:
     )
 
 
+def test_get_slice_default_cursor_failed_command() -> None:
+    """It should return a slice from the last executed command."""
+    command_1 = create_failed_command(command_id="command-id-1")
+    command_2 = create_failed_command(command_id="command-id-2")
+    command_3 = create_failed_command(
+        command_id="command-id-3",
+        error=ErrorOccurrence(
+            id="error-id",
+            errorType="ProtocolEngineError",
+            createdAt=datetime(year=2022, month=2, day=2),
+            detail="oh no",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ),
+    )
+    command_4 = create_failed_command(command_id="command-id-4")
+
+    subject = get_command_view(
+        commands=[command_1, command_2, command_3, command_4],
+        run_result=RunResult.FAILED,
+        failed_command=CommandEntry(index=2, command=command_3),
+    )
+
+    result = subject.get_slice(cursor=None, length=3)
+
+    assert result == CommandSlice(
+        commands=[command_3, command_4],
+        cursor=2,
+        total_length=4,
+    )
+
+
 def test_get_slice_default_cursor_running() -> None:
     """It should select a cursor based on the running command, if present."""
     command_1 = create_succeeded_command(command_id="command-id-1")
@@ -816,7 +860,7 @@ def test_get_slice_default_cursor_running() -> None:
 
 
 def test_get_slice_default_cursor_queued() -> None:
-    """It should select a cursor based on the next queued command, if present."""
+    """It should select a cursor automatically."""
     command_1 = create_succeeded_command(command_id="command-id-1")
     command_2 = create_succeeded_command(command_id="command-id-2")
     command_3 = create_succeeded_command(command_id="command-id-3")
@@ -826,7 +870,7 @@ def test_get_slice_default_cursor_queued() -> None:
     subject = get_command_view(
         commands=[command_1, command_2, command_3, command_4, command_5],
         running_command_id=None,
-        queued_command_ids=["command-id-4", "command-id-4", "command-id-5"],
+        queued_command_ids=[command_4.id, command_5.id],
     )
 
     result = subject.get_slice(cursor=None, length=2)

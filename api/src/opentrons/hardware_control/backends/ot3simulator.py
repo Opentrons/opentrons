@@ -25,6 +25,8 @@ from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import (
     BoardRevision,
     Axis,
+    HepaFanState,
+    HepaUVState,
     OT3Mount,
     OT3AxisMap,
     CurrentConfig,
@@ -400,16 +402,19 @@ class OT3Simulator(FlexBackend):
     async def gripper_grip_jaw(
         self,
         duty_cycle: float,
+        expected_displacement: float,
         stop_condition: HWStopCondition = HWStopCondition.none,
         stay_engaged: bool = True,
     ) -> None:
         """Move gripper inward."""
         self._sim_jaw_state = GripperJawState.GRIPPING
+        self._encoder_position[Axis.G] = expected_displacement
 
     @ensure_yield
     async def gripper_home_jaw(self, duty_cycle: float) -> None:
         """Move gripper outward."""
         self._motor_status[Axis.G] = MotorStatus(True, True)
+        self._encoder_position[Axis.G] = self._get_home_position()[Axis.G]
         self._sim_jaw_state = GripperJawState.HOMED_READY
 
     @ensure_yield
@@ -443,7 +448,7 @@ class OT3Simulator(FlexBackend):
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
     ) -> OT3AttachedInstruments:
-        init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})  # type: ignore
+        init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})
         if mount is OT3Mount.GRIPPER:
             return self._attached_gripper_to_mount(cast(GripperSpec, init_instr))
         return self._attached_pipette_to_mount(
@@ -572,6 +577,14 @@ class OT3Simulator(FlexBackend):
         """
         Temporarily restore the active current ONLY when homing or
         retracting the Z_R axis while the 96-channel is attached.
+        """
+        yield
+
+    @asynccontextmanager
+    async def increase_z_l_hold_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily increase the hold current when engaging the Z_L axis
+        while the 96-channel is attached
         """
         yield
 
@@ -778,3 +791,29 @@ class OT3Simulator(FlexBackend):
 
     def add_estop_callback(self, cb: HardwareEventHandler) -> HardwareEventUnsubscriber:
         return lambda: None
+
+    def check_gripper_position_within_bounds(
+        self,
+        expected_grip_width: float,
+        grip_width_uncertainty_wider: float,
+        grip_width_uncertainty_narrower: float,
+        jaw_width: float,
+        max_allowed_grip_error: float,
+        hard_limit_lower: float,
+        hard_limit_upper: float,
+    ) -> None:
+        # This is a (pretty bad) simulation of the gripper actually gripping something,
+        # but it should work.
+        self._encoder_position[Axis.G] = (hard_limit_upper - jaw_width) / 2
+
+    async def set_hepa_fan_state(self, fan_on: bool, duty_cycle: int) -> bool:
+        return False
+
+    async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
+        return None
+
+    async def set_hepa_uv_state(self, light_on: bool, timeout_s: int) -> bool:
+        return False
+
+    async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
+        return None

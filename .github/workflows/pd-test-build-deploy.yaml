@@ -9,7 +9,6 @@ on:
       - 'step-generation/**'
       - 'shared-data/**'
       - 'components/**'
-      - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/pd-test-build-deploy.yaml'
   push:
@@ -18,7 +17,6 @@ on:
       - 'step-generation/**'
       - 'shared-data/**'
       - 'components/**'
-      - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/pd-test-build-deploy.yaml'
     branches:
@@ -53,7 +51,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -98,7 +96,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
@@ -135,7 +133,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -145,8 +143,6 @@ jobs:
             ${{ github.workspace }}/.yarn-cache
             ${{ github.workspace }}/.npm-cache
           key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
@@ -178,7 +174,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v3'
         with:
-          node-version: '16'
+          node-version: '18.19.0'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'

@@ -88,7 +88,7 @@ export function WifiConnectionDetails({
               width="100%"
               padding={SPACING.spacing24}
               backgroundColor={COLORS.green35}
-              borderRadius={BORDERS.borderRadiusSize3}
+              borderRadius={BORDERS.borderRadius12}
               onClick={() => setShowNetworkDetailModal(true)}
               alignItems={ALIGN_CENTER}
             >

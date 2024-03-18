@@ -61,9 +61,7 @@ def test_application_for(node_id: NodeId) -> None:
 
     # get a flattened list of all the sub-nodes, which are nodes with more
     # than one element in the NodeId.bootloader_map list.
-    sub_nodes = sum(  # type: ignore[var-annotated]
-        [n for n in NodeId.bootloader_map().values() if len(n) > 1], []
-    )
+    sub_nodes = sum([n for n in NodeId.bootloader_map().values() if len(n) > 1], [])
     # Make sure that if this is a sub-node that the application node is the first
     # element in the bootloader map list
     if node_id in sub_nodes:

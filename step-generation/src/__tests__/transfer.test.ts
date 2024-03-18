@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect, test } from 'vitest'
 import {
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   WASTE_CHUTE_CUTOUT,
@@ -160,7 +161,7 @@ describe('pick up tip if no tip on pipette', () => {
   })
 })
 
-test('single transfer: 1 source & 1 dest', () => {
+it('single transfer: 1 source & 1 dest', () => {
   mixinArgs = {
     ...mixinArgs,
     sourceWells: ['A1'],

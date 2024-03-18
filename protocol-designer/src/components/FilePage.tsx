@@ -1,52 +1,43 @@
 import * as React from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import mapValues from 'lodash/mapValues'
-import { Formik, FormikProps } from 'formik'
 import { format } from 'date-fns'
 import cx from 'classnames'
 
 import {
   Card,
   FormGroup,
-  InputField,
   InstrumentGroup,
   OutlineButton,
   DeprecatedPrimaryButton,
+  InputField,
 } from '@opentrons/components'
 import { resetScrollElements } from '../ui/steps/utils'
-import { Portal } from './portals/MainPageModalPortal'
 import { EditModulesCard } from './modules'
 import { EditModules } from './EditModules'
+
+import styles from './FilePage.module.css'
+import modalStyles from '../components/modals/modal.module.css'
+import formStyles from '../components/forms/forms.module.css'
 import { actions, selectors as fileSelectors } from '../file-data'
 import { actions as navActions } from '../navigation'
 import { actions as steplistActions } from '../steplist'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
 import { FilePipettesModal } from './modals/FilePipettesModal'
-import styles from './FilePage.css'
-import modalStyles from '../components/modals/modal.css'
-import formStyles from '../components/forms/forms.css'
 
 import type { ModuleType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
-import type { ModulesForEditModulesCard } from '../step-forms'
-
-export interface Props {
-  formValues: FileMetadataFields
-  instruments: React.ComponentProps<typeof InstrumentGroup>
-  goToNextPage: () => unknown
-  saveFileMetadata: (fileMetaDataFields: FileMetadataFields) => void
-  swapPipettes: () => unknown
-  modules: ModulesForEditModulesCard
-  t: any
-}
+import { createPortal } from 'react-dom'
+import { getTopPortalEl } from './portals/TopPortal'
 
 // TODO(mc, 2020-02-28): explore l10n for these dates
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
 const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 export const FilePage = (): JSX.Element => {
-  const { t } = useTranslation('button')
+  const { t } = useTranslation(['button', 'application'])
   const dispatch = useDispatch()
 
   const formValues = useSelector(fileSelectors.getFileMetadata)
@@ -93,100 +84,119 @@ export const FilePage = (): JSX.Element => {
     dispatch(actions.saveFileMetadata(nextFormValues))
   }
 
+  const {
+    handleSubmit,
+    watch,
+    control,
+    formState: { isDirty },
+  } = useForm<FileMetadataFields>({ defaultValues: formValues })
+
+  const [created, lastModified, protocolName, author, description] = watch([
+    'created',
+    'lastModified',
+    'protocolName',
+    'author',
+    'description',
+  ])
+
   return (
     <div className={styles.file_page}>
-      <Card title="Information">
-        <Formik
-          enableReinitialize
-          initialValues={formValues}
-          onSubmit={saveFileMetadata}
+      <Card title={t('application:information')}>
+        <form
+          onSubmit={handleSubmit(saveFileMetadata)}
+          className={styles.card_content}
         >
-          {({
-            handleChange,
-            handleSubmit,
-            dirty,
-            touched,
-            values,
-          }: FormikProps<FileMetadataFields>) => (
-            <form onSubmit={handleSubmit} className={styles.card_content}>
-              <div
-                className={cx(
-                  formStyles.row_wrapper,
-                  formStyles.stacked_row_large
-                )}
-              >
-                <FormGroup
-                  label="Date Created"
-                  className={formStyles.column_1_2}
-                >
-                  {values.created && format(values.created, DATE_ONLY_FORMAT)}
-                </FormGroup>
+          <div
+            className={cx(formStyles.row_wrapper, formStyles.stacked_row_large)}
+          >
+            <FormGroup
+              label={t('application:date_created')}
+              className={formStyles.column_1_2}
+            >
+              {created && format(created, DATE_ONLY_FORMAT)}
+            </FormGroup>
 
-                <FormGroup
-                  label="Last Exported"
-                  className={formStyles.column_1_2}
-                >
-                  {values.lastModified &&
-                    format(values.lastModified, DATETIME_FORMAT)}
-                </FormGroup>
-              </div>
+            <FormGroup
+              label={t('application:last_exported')}
+              className={formStyles.column_1_2}
+            >
+              {lastModified && format(lastModified, DATETIME_FORMAT)}
+            </FormGroup>
+          </div>
 
-              <div
-                className={cx(formStyles.row_wrapper, formStyles.stacked_row)}
-              >
-                <FormGroup
-                  label="Protocol Name"
-                  className={formStyles.column_1_2}
-                >
+          <div className={cx(formStyles.row_wrapper, formStyles.stacked_row)}>
+            <FormGroup
+              label={t('application:protocol_name')}
+              className={formStyles.column_1_2}
+            >
+              <Controller
+                control={control}
+                name="protocolName"
+                render={({ field }) => (
                   <InputField
                     placeholder="Untitled"
                     name="protocolName"
-                    onChange={handleChange}
-                    value={values.protocolName}
+                    value={protocolName}
+                    onChange={field.onChange}
                   />
-                </FormGroup>
+                )}
+              />
+            </FormGroup>
 
-                <FormGroup
-                  label="Organization/Author"
-                  className={formStyles.column_1_2}
-                >
+            <FormGroup
+              label={t('application:organization_author')}
+              className={formStyles.column_1_2}
+            >
+              <Controller
+                control={control}
+                name="author"
+                render={({ field }) => (
                   <InputField
                     name="author"
-                    onChange={handleChange}
-                    value={values.author}
+                    value={author}
+                    onChange={field.onChange}
                   />
-                </FormGroup>
-              </div>
+                )}
+              />
+            </FormGroup>
+          </div>
 
-              <FormGroup label="Description" className={formStyles.stacked_row}>
+          <FormGroup
+            label={t('application:description')}
+            className={formStyles.stacked_row}
+          >
+            <Controller
+              control={control}
+              name="description"
+              render={({ field }) => (
                 <InputField
                   name="description"
-                  value={values.description}
-                  onChange={handleChange}
+                  value={description}
+                  onChange={field.onChange}
                 />
-              </FormGroup>
-              <div className={modalStyles.button_row}>
-                <OutlineButton
-                  type="submit"
-                  className={styles.update_button}
-                  disabled={!dirty}
-                >
-                  {dirty ? 'UPDATE' : 'UPDATED'}
-                </OutlineButton>
-              </div>
-            </form>
-          )}
-        </Formik>
+              )}
+            />
+          </FormGroup>
+          <div className={modalStyles.button_row}>
+            <OutlineButton
+              type="submit"
+              className={styles.update_button}
+              disabled={!isDirty}
+            >
+              {isDirty ? t('application:update') : t('application:updated')}
+            </OutlineButton>
+          </div>
+        </form>
       </Card>
 
-      <Card title="Pipettes">
+      <Card title={t('application:pipettes')}>
         <div className={styles.card_content}>
           <InstrumentGroup {...instruments} showMountLabel />
           <div className={styles.pipette_button_row}>
             <DeprecatedPrimaryButton
               onClick={openEditPipetteModal}
               className={styles.edit_button}
-              name={'editPipettes'}
+              name="editPipettes"
             >
               {t('edit')}
             </DeprecatedPrimaryButton>
@@ -203,7 +213,7 @@ export const FilePage = (): JSX.Element => {
               }
               className={styles.swap_button}
               iconName="swap-horizontal"
-              name={'swapPipettes'}
+              name="swapPipettes"
               disabled={instruments?.left?.pipetteSpecs?.channels === 96}
             >
               {t('swap')}
@@ -222,23 +232,25 @@ export const FilePage = (): JSX.Element => {
           onClick={() => dispatch(navActions.navigateToPage('liquids'))}
           className={styles.continue_button}
           iconName="arrow-right"
-          name={'continueToLiquids'}
+          name="continueToLiquids"
         >
           {t('continue_to_liquids')}
         </DeprecatedPrimaryButton>
       </div>
-
-      <Portal>
-        {isEditPipetteModalOpen && (
-          <FilePipettesModal closeModal={closeEditPipetteModal} />
-        )}
-        {moduleToEdit != null && (
-          <EditModules
-            moduleToEdit={moduleToEdit}
-            onCloseClick={closeEditModulesModal}
-          />
-        )}
-      </Portal>
+      {createPortal(
+        <>
+          {isEditPipetteModalOpen && (
+            <FilePipettesModal closeModal={closeEditPipetteModal} />
+          )}
+          {moduleToEdit != null && (
+            <EditModules
+              moduleToEdit={moduleToEdit}
+              onCloseClick={closeEditModulesModal}
+            />
+          )}
+        </>,
+        getTopPortalEl()
+      )}
     </div>
   )
 }

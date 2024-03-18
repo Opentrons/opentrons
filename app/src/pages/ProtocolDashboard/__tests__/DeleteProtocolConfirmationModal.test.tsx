@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { act, fireEvent, screen } from '@testing-library/react'
 
 import {
@@ -8,38 +9,21 @@ import {
   deleteRun,
   HostConfig,
 } from '@opentrons/api-client'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { useHost, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { useToaster } from '../../../organisms/ToasterOven'
 import { DeleteProtocolConfirmationModal } from '../DeleteProtocolConfirmationModal'
 
-jest.mock('@opentrons/api-client')
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../organisms/ToasterOven')
+vi.mock('@opentrons/api-client')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../organisms/ToasterOven')
 
-const mockFunc = jest.fn()
+const mockFunc = vi.fn()
 const PROTOCOL_ID = 'mockProtocolId'
-const mockMakeSnackbar = jest.fn()
+const mockMakeSnackbar = vi.fn()
 const MOCK_HOST_CONFIG = {} as HostConfig
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
-const mockGetProtocol = getProtocol as jest.MockedFunction<typeof getProtocol>
-const mockDeleteProtocol = deleteProtocol as jest.MockedFunction<
-  typeof deleteProtocol
->
-const mockDeleteRun = deleteRun as jest.MockedFunction<typeof deleteRun>
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
->
-const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
-
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
-  return {
-    ...reactRouterDom,
-  }
-})
 
 const render = (
   props: React.ComponentProps<typeof DeleteProtocolConfirmationModal>
@@ -57,26 +41,25 @@ describe('DeleteProtocolConfirmationModal', () => {
       protocolId: PROTOCOL_ID,
       setShowDeleteConfirmationModal: mockFunc,
     }
-    when(mockUseHost).calledWith().mockReturnValue(MOCK_HOST_CONFIG)
-    when(mockUseProtocolQuery)
+    when(vi.mocked(useHost)).calledWith().thenReturn(MOCK_HOST_CONFIG)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: {
             metadata: { protocolName: 'mockProtocol1' },
           },
         },
       } as any)
-    when(mockUseToaster).calledWith().mockReturnValue({
+    when(vi.mocked(useToaster)).calledWith().thenReturn({
       makeSnackbar: mockMakeSnackbar,
-      makeToast: jest.fn(),
-      eatToast: jest.fn(),
+      makeToast: vi.fn(),
+      eatToast: vi.fn(),
     })
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render text and buttons', () => {
@@ -94,9 +77,9 @@ describe('DeleteProtocolConfirmationModal', () => {
   })
 
   it('should call a mock function when tapping delete button', async () => {
-    when(mockGetProtocol)
+    when(vi.mocked(getProtocol))
       .calledWith(MOCK_HOST_CONFIG, PROTOCOL_ID)
-      .mockResolvedValue({
+      .thenResolve({
         data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
       } as any)
 
@@ -105,9 +88,9 @@ describe('DeleteProtocolConfirmationModal', () => {
       screen.getByText('Delete').click()
     })
     await new Promise(setImmediate)
-    expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
-    expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
-    expect(mockDeleteProtocol).toHaveBeenCalledWith(
+    expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
+    expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
+    expect(vi.mocked(deleteProtocol)).toHaveBeenCalledWith(
       MOCK_HOST_CONFIG,
       PROTOCOL_ID
     )

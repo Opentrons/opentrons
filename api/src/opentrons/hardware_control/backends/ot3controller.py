@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from functools import wraps
 import logging
 from copy import deepcopy
+from numpy import isclose
 from typing import (
     Any,
     Awaitable,
@@ -53,7 +54,7 @@ from .ot3utils import (
 from .tip_presence_manager import TipPresenceManager
 
 try:
-    import aionotify  # type: ignore[import]
+    import aionotify  # type: ignore[import-untyped]
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
@@ -168,6 +169,12 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
 from opentrons_hardware.hardware_control.gripper_settings import (
     get_gripper_jaw_state,
 )
+from opentrons_hardware.hardware_control.hepa_uv_settings import (
+    set_hepa_fan_state as set_hepa_fan_state_fw,
+    get_hepa_fan_state as get_hepa_fan_state_fw,
+    set_hepa_uv_state as set_hepa_uv_state_fw,
+    get_hepa_uv_state as get_hepa_uv_state_fw,
+)
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -182,6 +189,7 @@ from opentrons_shared_data.errors.exceptions import (
     EStopNotPresentError,
     PipetteOverpressureError,
     FirmwareUpdateRequiredError,
+    FailedGripperPickupError,
 )
 
 from .subsystem_manager import SubsystemManager
@@ -191,7 +199,7 @@ from ..dev_types import (
     AttachedGripper,
     OT3AttachedInstruments,
 )
-from ..types import StatusBarState
+from ..types import HepaFanState, HepaUVState, StatusBarState
 
 from .types import HWStopCondition
 from .flex_protocol import FlexBackend
@@ -651,6 +659,7 @@ class OT3Controller(FlexBackend):
             if not self._feature_flags.stall_detection_enabled
             else False,
         )
+
         mounts_moving = [
             k
             for k in moving_axes_in_move_group(move_group)
@@ -853,6 +862,7 @@ class OT3Controller(FlexBackend):
     async def gripper_grip_jaw(
         self,
         duty_cycle: float,
+        expected_displacement: float,  # not used on real hardware
         stop_condition: HWStopCondition = HWStopCondition.none,
         stay_engaged: bool = True,
     ) -> None:
@@ -1088,6 +1098,24 @@ class OT3Controller(FlexBackend):
                 {Axis.Z_R: high_throughput_settings[Axis.Z_R].run_current}
             )
 
+    @asynccontextmanager
+    async def increase_z_l_hold_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily increase the hold current when engaging the Z_L axis
+        while the 96-channel is attached
+        """
+        assert self._current_settings
+        high_throughput_settings = deepcopy(self._current_settings)
+        await self.set_hold_current(
+            {Axis.Z_L: high_throughput_settings[Axis.Z_L].run_current}
+        )
+        try:
+            yield
+        finally:
+            await self.set_hold_current(
+                {Axis.Z_L: high_throughput_settings[Axis.Z_L].hold_current}
+            )
+
     @staticmethod
     def _build_event_watcher() -> aionotify.Watcher:
         watcher = aionotify.Watcher()
@@ -1129,7 +1157,7 @@ class OT3Controller(FlexBackend):
     def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
         """Get the axis bounds."""
         # TODO (AL, 2021-11-18): The bounds need to be defined
-        phony_bounds = (0, 10000)
+        phony_bounds = (0, 500)
         return {
             Axis.Z_L: phony_bounds,
             Axis.Z_R: phony_bounds,
@@ -1197,7 +1225,6 @@ class OT3Controller(FlexBackend):
 
     async def clean_up(self) -> None:
         """Clean up."""
-
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
@@ -1206,6 +1233,15 @@ class OT3Controller(FlexBackend):
         if hasattr(self, "_event_watcher"):
             if loop.is_running() and self._event_watcher:
                 self._event_watcher.close()
+
+        messenger = getattr(self, "_messenger", None)
+        if messenger:
+            await messenger.stop()
+
+        usb_messenger = getattr(self, "_usb_messenger", None)
+        if usb_messenger:
+            await usb_messenger.stop()
+
         return None
 
     @staticmethod
@@ -1474,3 +1510,98 @@ class OT3Controller(FlexBackend):
 
     def add_estop_callback(self, cb: HardwareEventHandler) -> HardwareEventUnsubscriber:
         return self._estop_state_machine.add_listener(cb)
+
+    def check_gripper_position_within_bounds(
+        self,
+        expected_grip_width: float,
+        grip_width_uncertainty_wider: float,
+        grip_width_uncertainty_narrower: float,
+        jaw_width: float,
+        max_allowed_grip_error: float,
+        hard_limit_lower: float,
+        hard_limit_upper: float,
+    ) -> None:
+        """
+        Check if the gripper is at the expected location.
+
+        While this doesn't seem like it belongs here, it needs to act differently
+        when we're simulating, so it does.
+        """
+        expected_gripper_position_min = (
+            expected_grip_width - grip_width_uncertainty_narrower
+        )
+        expected_gripper_position_max = (
+            expected_grip_width + grip_width_uncertainty_wider
+        )
+        current_gripper_position = jaw_width
+        if isclose(current_gripper_position, hard_limit_lower):
+            raise FailedGripperPickupError(
+                message="Failed to grip: jaws all the way closed",
+                details={
+                    "failure-type": "jaws-all-the-way-closed",
+                    "actual-jaw-width": current_gripper_position,
+                },
+            )
+        if isclose(current_gripper_position, hard_limit_upper):
+            raise FailedGripperPickupError(
+                message="Failed to grip: jaws all the way open",
+                details={
+                    "failure-type": "jaws-all-the-way-open",
+                    "actual-jaw-width": current_gripper_position,
+                },
+            )
+        if (
+            current_gripper_position - expected_gripper_position_min
+            < -max_allowed_grip_error
+        ):
+            raise FailedGripperPickupError(
+                message="Failed to grip: jaws closed too far",
+                details={
+                    "failure-type": "jaws-more-closed-than-expected",
+                    "lower-bound-labware-width": expected_grip_width
+                    - grip_width_uncertainty_narrower,
+                    "actual-jaw-width": current_gripper_position,
+                },
+            )
+        if (
+            current_gripper_position - expected_gripper_position_max
+            > max_allowed_grip_error
+        ):
+            raise FailedGripperPickupError(
+                message="Failed to grip: jaws could not close far enough",
+                details={
+                    "failure-type": "jaws-more-open-than-expected",
+                    "upper-bound-labware-width": expected_grip_width
+                    - grip_width_uncertainty_narrower,
+                    "actual-jaw-width": current_gripper_position,
+                },
+            )
+
+    async def set_hepa_fan_state(self, fan_on: bool, duty_cycle: int) -> bool:
+        return await set_hepa_fan_state_fw(self._messenger, fan_on, duty_cycle)
+
+    async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
+        res = await get_hepa_fan_state_fw(self._messenger)
+        return (
+            HepaFanState(
+                fan_on=res.fan_on,
+                duty_cycle=res.duty_cycle,
+            )
+            if res
+            else None
+        )
+
+    async def set_hepa_uv_state(self, light_on: bool, uv_duration_s: int) -> bool:
+        return await set_hepa_uv_state_fw(self._messenger, light_on, uv_duration_s)
+
+    async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
+        res = await get_hepa_uv_state_fw(self._messenger)
+        return (
+            HepaUVState(
+                light_on=res.uv_light_on,
+                uv_duration_s=res.uv_duration_s,
+                remaining_time_s=res.remaining_time_s,
+            )
+            if res
+            else None
+        )

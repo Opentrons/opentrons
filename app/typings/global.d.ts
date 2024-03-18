@@ -1,15 +1,11 @@
-import type { IpcRenderer } from 'electron'
-
-declare global {
-  namespace NodeJS {
-    export interface Global {
-      APP_SHELL_REMOTE: {
-        ipcRenderer: IpcRenderer
-      }
-      btoa: (str: string | Buffer) => string
-      [key: string]: unknown
-    }
+declare const global: typeof globalThis & {
+  _PKG_VERSION_: string
+  _OPENTRONS_PROJECT_: string
+  APP_SHELL_REMOTE: {
+    // sa 02-02-2024 any typing this because importing the IpcRenderer type
+    // from electron makes this ambient type declaration a module instead of
+    // a script, which typescript does not like
+    ipcRenderer: any
+    [key: string]: any
   }
-  export const _PKG_VERSION_: string
-  export const _OPENTRONS_PROJECT_: string
 }

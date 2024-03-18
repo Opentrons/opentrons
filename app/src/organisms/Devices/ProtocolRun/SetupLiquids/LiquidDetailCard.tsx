@@ -27,17 +27,28 @@ import {
 import { getIsOnDevice } from '../../../../redux/config'
 import { getWellRangeForLiquidLabwarePair } from './utils'
 
+export const CARD_OUTLINE_BORDER_STYLE = css`
+  border-style: ${BORDERS.styleSolid};
+  border-width: 1px;
+  border-color: ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius8};
+  &:hover {
+    border-color: ${COLORS.grey55};
+  }
+`
+
 const LIQUID_CARD_STYLE = css`
-  ${BORDERS.cardOutlineBorder}
+  ${CARD_OUTLINE_BORDER_STYLE}
   &:hover {
     border: 1px solid ${COLORS.grey60};
+    border-radius: ${BORDERS.borderRadius8};
     cursor: pointer;
   }
 `
 const LIQUID_CARD_ODD_STYLE = css`
   border-color: ${COLORS.grey30};
   border: ${SPACING.spacing4} solid ${COLORS.grey30};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius12};
 `
 interface LiquidDetailCardProps {
   liquidId: string
@@ -68,7 +79,9 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   const ACTIVE_STYLE = css`
     background-color: ${isOnDevice ? COLORS.blue30 : COLORS.blue10};
     border: ${isOnDevice ? SPACING.spacing4 : `1px`} solid ${COLORS.blue50};
-    border-radius: ${isOnDevice ? BORDERS.borderRadiusSize3 : 0};
+    border-radius: ${isOnDevice
+      ? BORDERS.borderRadius12
+      : BORDERS.borderRadius8};
   `
   const volumePerWellRange = getWellRangeForLiquidLabwarePair(
     volumeByWell,
@@ -86,7 +99,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   return isOnDevice ? (
     <Box
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_ODD_STYLE}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadius8}
       backgroundColor={COLORS.white}
       onClick={() => setSelectedValue(liquidId)}
       width="19.875rem"
@@ -95,8 +108,8 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     >
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
         <Flex
-          css={BORDERS.cardOutlineBorder}
-          padding={SPACING.spacing8}
+          css={CARD_OUTLINE_BORDER_STYLE}
+          padding={SPACING.spacing4}
           height="3rem"
           width="3rem"
           backgroundColor={COLORS.white}
@@ -121,18 +134,22 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           {description != null ? description : null}
         </StyledText>
         <Flex
-          backgroundColor={COLORS.grey35}
-          borderRadius={BORDERS.radiusSoftCorners}
+          backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
+          borderRadius={BORDERS.borderRadius4}
           height="2.75rem"
           padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
           alignItems={TYPOGRAPHY.textAlignCenter}
           marginTop={SPACING.spacing16}
           width="max-content"
         >
-          <>
+          <StyledText
+            fontSize={TYPOGRAPHY.fontSize22}
+            lineHeight={TYPOGRAPHY.lineHeight28}
+            color={COLORS.black90}
+          >
             {Object.values(volumeByWell).reduce((prev, curr) => prev + curr, 0)}{' '}
             {MICRO_LITERS} {t('total_vol')}
-          </>
+          </StyledText>
         </Flex>
       </Flex>
       {selectedValue === liquidId ? (
@@ -158,7 +175,6 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                   <StyledText
                     lineHeight={TYPOGRAPHY.lineHeight28}
                     fontSize={TYPOGRAPHY.fontSize22}
-                    color={COLORS.grey60}
                   >
                     {well.wellName}
                   </StyledText>
@@ -179,7 +195,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   ) : (
     <Box
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_STYLE}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadius8}
       padding={SPACING.spacing16}
       backgroundColor={COLORS.white}
       onClick={handleSelectedValue}
@@ -192,7 +208,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex
-          css={BORDERS.cardOutlineBorder}
+          css={CARD_OUTLINE_BORDER_STYLE}
           padding={SPACING.spacing8}
           height="max-content"
           width="max-content"
@@ -212,23 +228,30 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         </StyledText>
 
         <Flex
-          backgroundColor={COLORS.black90 + '1A'}
-          borderRadius={BORDERS.radiusSoftCorners}
+          backgroundColor={`${COLORS.black90}${COLORS.opacity20HexCode}`}
+          borderRadius={BORDERS.borderRadius8}
           height="max-content"
           width="max-content"
           paddingY={SPACING.spacing4}
           paddingX={SPACING.spacing8}
           marginTop={SPACING.spacing8}
         >
-          <StyledText as="p">
+          <StyledText
+            fontSize={TYPOGRAPHY.fontSizeH4}
+            lineHeight={TYPOGRAPHY.lineHeight20}
+          >
             {Object.values(volumeByWell).reduce((prev, curr) => prev + curr, 0)}{' '}
-            {MICRO_LITERS}
+            {MICRO_LITERS} {t('total_vol')}
           </StyledText>
         </Flex>
       </Flex>
       {selectedValue === liquidId ? (
         <>
-          <Divider marginX="-1rem" marginY={SPACING.spacing16} />
+          <Divider
+            marginX="-1rem"
+            marginY={SPACING.spacing16}
+            color={`${COLORS.black90}${COLORS.opacity20HexCode}`}
+          />
           {volumePerWellRange.map((well, index) => {
             return (
               <Flex

@@ -1,8 +1,9 @@
 import React from 'react'
-import { when } from 'jest-when'
 import { FormikConfig } from 'formik'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
 import {
   getDefaultFormState,
   getInitialStatus,
@@ -12,11 +13,7 @@ import { isEveryFieldHidden } from '../../../utils'
 import { Export } from '../../sections/Export'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 
-jest.mock('../../../utils')
-
-const isEveryFieldHiddenMock = isEveryFieldHidden as jest.MockedFunction<
-  typeof isEveryFieldHidden
->
+vi.mock('../../../utils')
 
 let formikConfig: FormikConfig<LabwareFields>
 let onExportClick: (e: any) => unknown
@@ -26,18 +23,18 @@ describe('Export', () => {
     formikConfig = {
       initialStatus: getInitialStatus(),
       initialValues: getDefaultFormState(),
-      onSubmit: jest.fn(),
+      onSubmit: vi.fn(),
     }
 
-    onExportClick = jest.fn()
+    onExportClick = vi.fn()
 
-    when(isEveryFieldHiddenMock)
+    when(vi.mocked(isEveryFieldHidden))
       .calledWith(['loadName'], formikConfig.initialValues)
-      .mockReturnValue(false)
+      .thenReturn(false)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render button when section is visible', () => {

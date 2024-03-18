@@ -1,7 +1,6 @@
 // system info module
 import { app } from 'electron'
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import * as SystemInfo from '@opentrons/app/src/redux/system-info'
+import { UI_INITIALIZED } from '../constants'
 import { createLogger } from '../log'
 import { isWindows } from '../os'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from './usb-devices'
@@ -12,11 +11,17 @@ import {
 
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { Action, Dispatch } from '../types'
-import type { UsbDeviceMonitor, Device } from './usb-devices'
+import type { UsbDeviceMonitor } from './usb-devices'
 import type {
   NetworkInterface,
   NetworkInterfaceMonitor,
 } from './network-interfaces'
+import {
+  initialized,
+  networkInterfacesChanged,
+  usbDeviceAdded,
+  usbDeviceRemoved,
+} from '../config/actions'
 
 export { createNetworkInterfaceMonitor }
 export type { NetworkInterface, NetworkInterfaceMonitor }
@@ -26,15 +31,19 @@ const IFACE_POLL_INTERVAL_MS = 30000
 
 const log = createLogger('system-info')
 
-const addDriverVersion = (device: Device): Promise<UsbDevice> => {
-  if (isWindows() && RE_REALTEK.test(device.manufacturer)) {
+const addDriverVersion = (device: UsbDevice): Promise<UsbDevice> => {
+  if (
+    isWindows() &&
+    device.manufacturerName != null &&
+    RE_REALTEK.test(device.manufacturerName)
+  ) {
     return getWindowsDriverVersion(device).then(windowsDriverVersion => ({
       ...device,
       windowsDriverVersion,
     }))
   }
 
-  return Promise.resolve({ ...device })
+  return Promise.resolve(device)
 }
 
 export function registerSystemInfo(
@@ -43,17 +52,17 @@ export function registerSystemInfo(
   let usbMonitor: UsbDeviceMonitor
   let ifaceMonitor: NetworkInterfaceMonitor
 
-  const handleDeviceAdd = (device: Device): void => {
+  const handleDeviceAdd = (device: UsbDevice): void => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    addDriverVersion(device).then(d => dispatch(SystemInfo.usbDeviceAdded(d)))
+    addDriverVersion(device).then(d => dispatch(usbDeviceAdded(d)))
   }
 
-  const handleDeviceRemove = (d: Device): void => {
-    dispatch(SystemInfo.usbDeviceRemoved({ ...d }))
+  const handleDeviceRemove = (d: UsbDevice): void => {
+    dispatch(usbDeviceRemoved(d))
   }
 
   const handleIfacesChanged = (interfaces: NetworkInterface[]): void => {
-    dispatch(SystemInfo.networkInterfacesChanged(interfaces))
+    dispatch(networkInterfacesChanged(interfaces))
   }
 
   app.once('will-quit', () => {
@@ -91,7 +100,7 @@ export function registerSystemInfo(
           .getAllDevices()
           .then(devices => Promise.all(devices.map(addDriverVersion)))
           .then(devices => {
-            dispatch(SystemInfo.initialized(devices, getActiveInterfaces()))
+            dispatch(initialized(devices, getActiveInterfaces()))
           })
           .catch((error: Error) =>
             log.warn(`unable to start usb monitor with error: ${error.message}`)

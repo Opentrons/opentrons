@@ -15,6 +15,8 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  OVERFLOW_WRAP_ANYWHERE,
+  OVERFLOW_WRAP_BREAK_WORD,
   SIZE_2,
   SPACING,
   TYPOGRAPHY,
@@ -30,7 +32,7 @@ import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LongPressModal } from './LongPressModal'
-import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { formatTimeWithUtcLabel } from '../../resources/runs'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -155,7 +157,7 @@ export function ProtocolCard(props: {
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
       backgroundColor={isFailedAnalysis ? COLORS.red35 : COLORS.grey35}
-      borderRadius={BORDERS.borderRadiusSize4}
+      borderRadius={BORDERS.borderRadius16}
       marginBottom={SPACING.spacing8}
       gridGap={SPACING.spacing48}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
@@ -175,7 +177,7 @@ export function ProtocolCard(props: {
       ) : null}
       <Flex
         width="28.9375rem"
-        overflowWrap="anywhere"
+        overflowWrap={OVERFLOW_WRAP_ANYWHERE}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
       >
@@ -253,7 +255,7 @@ export function ProtocolCard(props: {
                           -webkit-box-orient: vertical;
                           -webkit-line-clamp: 3;
                           overflow: hidden;
-                          overflow-wrap: break-word;
+                          overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
                           height: max-content;
                         `}
                       />

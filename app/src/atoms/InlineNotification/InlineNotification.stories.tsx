@@ -13,9 +13,9 @@ export default {
       defaultValue: false,
     },
     type: {
+      options: ['alert', 'error', 'neutral', 'success'],
       control: {
         type: 'select',
-        options: ['alert', 'error', 'neutral', 'success'],
       },
       defaultValue: 'success',
     },

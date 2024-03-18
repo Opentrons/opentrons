@@ -129,7 +129,7 @@ const contentsBySessionTypeByCurrentStep: {
 
 export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
   const { t } = useTranslation('robot_calibration')
-  const logger = useLogger(__filename)
+  const logger = useLogger(new URL('', import.meta.url).pathname)
   const {
     isMulti,
     mount,

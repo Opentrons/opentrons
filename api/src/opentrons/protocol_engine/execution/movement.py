@@ -111,6 +111,9 @@ class MovementHandler:
         )
         origin_cp = pipette_location.critical_point
 
+        await self._gantry_mover.prepare_for_mount_movement(
+            pipette_location.mount.to_hw_mount()
+        )
         origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
         max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 
@@ -147,6 +150,7 @@ class MovementHandler:
         minimum_z_height: Optional[float] = None,
         speed: Optional[float] = None,
         stay_at_highest_possible_z: bool = False,
+        ignore_tip_configuration: Optional[bool] = True,
     ) -> Point:
         """Move to a specific addressable area."""
         # Check for presence of heater shakers on deck, and if planned
@@ -180,6 +184,9 @@ class MovementHandler:
         )
         origin_cp = pipette_location.critical_point
 
+        await self._gantry_mover.prepare_for_mount_movement(
+            pipette_location.mount.to_hw_mount()
+        )
         origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
         max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 
@@ -193,6 +200,7 @@ class MovementHandler:
             force_direct=force_direct,
             minimum_z_height=minimum_z_height,
             stay_at_max_travel_z=stay_at_highest_possible_z,
+            ignore_tip_configuration=ignore_tip_configuration,
         )
 
         speed = self._state_store.pipettes.get_movement_speed(
@@ -237,6 +245,13 @@ class MovementHandler:
         speed: Optional[float] = None,
     ) -> Point:
         """Move pipette to a given deck coordinate."""
+        # get the pipette's mount, if applicable
+        pipette_location = self._state_store.motion.get_pipette_location(
+            pipette_id=pipette_id
+        )
+        await self._gantry_mover.prepare_for_mount_movement(
+            pipette_location.mount.to_hw_mount()
+        )
         origin = await self._gantry_mover.get_position(pipette_id=pipette_id)
         max_travel_z = self._gantry_mover.get_max_travel_z(pipette_id=pipette_id)
 

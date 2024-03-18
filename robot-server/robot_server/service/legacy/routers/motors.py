@@ -9,7 +9,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
-from robot_server.errors import LegacyErrorResponse
+from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models import motors as model

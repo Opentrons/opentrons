@@ -17,7 +17,7 @@ import {
   WellIngredientVolumeData,
   WellIngredientNames,
 } from '../../steplist/types'
-import styles from './StepItem.css'
+import styles from './StepItem.module.css'
 
 interface SubstepRowProps {
   volume: number | string | null | undefined

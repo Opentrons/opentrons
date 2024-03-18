@@ -54,11 +54,11 @@ const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing16};
-  background-color: ${COLORS.grey10};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  background-color: ${COLORS.grey20};
+  border-radius: ${BORDERS.borderRadius4};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     background-color: ${COLORS.grey35};
-    border-radius: ${BORDERS.borderRadiusSize3};
+    border-radius: ${BORDERS.borderRadius8};
   }
 `
 
@@ -70,7 +70,7 @@ const LABWARE_NAME_TITLE_STYLE = css`
 `
 
 const LABWARE_NAME_STYLE = css`
-  color: ${COLORS.grey40};
+  color: ${COLORS.grey60};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.bodyTextBold}
     color: ${COLORS.black90};

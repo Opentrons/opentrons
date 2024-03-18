@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 
 import * as Discovery from '../../../discovery'
@@ -14,10 +16,6 @@ const makeTriggerAction = (robotName: string) =>
   })
 
 describe('networking wifiConfigureEpic', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('calls POST /wifi/configure with options', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,

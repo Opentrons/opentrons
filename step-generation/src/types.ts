@@ -1,11 +1,9 @@
-import type { Mount } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
-  LabwareLocation,
 } from '@opentrons/shared-data'
 import type {
   CreateCommand,
@@ -15,6 +13,8 @@ import type {
   PipetteNameSpecs,
   PipetteName,
   NozzleConfigurationStyle,
+  LabwareLocation,
+  PipetteMount as Mount,
 } from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,
@@ -27,7 +27,7 @@ import type {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
 } from './constants'
-import { ShakeSpeedParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { ShakeSpeedParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 export type { Command }
 
@@ -519,6 +519,7 @@ export type ErrorType =
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'NO_TIP_ON_PIPETTE'
   | 'PIPETTE_DOES_NOT_EXIST'
+  | 'PIPETTE_HAS_TIP'
   | 'PIPETTE_VOLUME_EXCEEDED'
   | 'PIPETTING_INTO_COLUMN_4'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'

@@ -1,31 +1,26 @@
 import * as React from 'react'
 import { i18n } from '../../../i18n'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useAttachedModules } from '../hooks'
-
-jest.mock('@opentrons/react-api-client')
-jest.mock('../hooks')
-jest.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
-jest.mock('../HeaterShakerWizard/HeaterShakerModuleCard')
-
-const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
-  typeof useMostRecentCompletedAnalysis
->
-const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
-  typeof useCreateLiveCommandMutation
->
-const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
-  typeof useAttachedModules
->
-const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction<
-  typeof HeaterShakerModuleCard
->
+import type * as ReactApiClient from '@opentrons/react-api-client'
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ReactApiClient>()
+  return {
+    ...actual,
+    useCreateLiveCommandMutation: vi.fn(),
+  }
+})
+vi.mock('../hooks')
+vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('../HeaterShakerWizard/HeaterShakerModuleCard')
 
 const mockMovingHeaterShakerOne = {
   id: 'heatershaker_id_1',
@@ -81,23 +76,23 @@ const render = (
 
 describe('HeaterShakerIsRunningModal', () => {
   let props: React.ComponentProps<typeof HeaterShakerIsRunningModal>
-  let mockCreateLiveCommand = jest.fn()
+  let mockCreateLiveCommand = vi.fn()
   beforeEach(() => {
     props = {
-      closeModal: jest.fn(),
+      closeModal: vi.fn(),
       module: mockHeaterShaker,
-      startRun: jest.fn(),
+      startRun: vi.fn(),
     }
-    mockHeaterShakerModuleCard.mockReturnValue(
+    vi.mocked(HeaterShakerModuleCard).mockReturnValue(
       <div>mock HeaterShakerModuleCard</div>
     )
-    mockUseAttachedModules.mockReturnValue([mockMovingHeaterShakerOne])
-    mockCreateLiveCommand = jest.fn()
+    vi.mocked(useAttachedModules).mockReturnValue([mockMovingHeaterShakerOne])
+    mockCreateLiveCommand = vi.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockUseLiveCommandMutation.mockReturnValue({
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       pipettes: {},
       labware: {},
       modules: {
@@ -134,27 +129,23 @@ describe('HeaterShakerIsRunningModal', () => {
     } as any)
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders the correct modal icon and title', () => {
-    const { getByText, getByTestId } = render(props)
+    render(props)
 
-    getByTestId('HeaterShakerIsRunning_warning_icon')
-    getByText('Heater-Shaker Module is currently shaking')
+    screen.getByTestId('HeaterShakerIsRunning_warning_icon')
+    screen.getByText('Heater-Shaker Module is currently shaking')
   })
 
   it('renders the heater shaker module card and prompt', () => {
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('mock HeaterShakerModuleCard')
-    getByText('Continue shaking while the protocol starts?')
+    screen.getByText('mock HeaterShakerModuleCard')
+    screen.getByText('Continue shaking while the protocol starts?')
   })
 
   it('renders the stop shaking and start run button and calls the stop run command', () => {
-    const { getByRole } = render(props)
-    const button = getByRole('button', {
+    render(props)
+    const button = screen.getByRole('button', {
       name: /Stop shaking and start run/i,
     })
     fireEvent.click(button)
@@ -171,12 +162,12 @@ describe('HeaterShakerIsRunningModal', () => {
   })
 
   it('should call the stop shaker command twice for two heater shakers', () => {
-    mockUseAttachedModules.mockReturnValue([
+    vi.mocked(useAttachedModules).mockReturnValue([
       mockMovingHeaterShakerOne,
       mockMovingHeaterShakerTwo,
     ])
-    const { getByRole } = render(props)
-    const button = getByRole('button', {
+    render(props)
+    const button = screen.getByRole('button', {
       name: /Stop shaking and start run/i,
     })
     fireEvent.click(button)
@@ -184,8 +175,8 @@ describe('HeaterShakerIsRunningModal', () => {
   })
 
   it('renders the keep shaking and start run button and calls startRun and closeModal', () => {
-    const { getByRole } = render(props)
-    const button = getByRole('button', {
+    render(props)
+    const button = screen.getByRole('button', {
       name: /Keep shaking and start run/i,
     })
     fireEvent.click(button)

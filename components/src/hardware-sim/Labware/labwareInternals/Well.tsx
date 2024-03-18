@@ -1,12 +1,10 @@
 import * as React from 'react'
 
 import { COLORS } from '../../../helix-design-system'
-
+import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/shared-data'
 import type { LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './types'
 import type { StyleProps } from '../../../primitives'
-
-export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
 export interface WellProps extends StyleProps {
   /** Well Name (eg 'A1') */
   wellName: string

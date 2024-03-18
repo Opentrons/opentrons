@@ -5,11 +5,18 @@ import get from 'lodash/get'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
 
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import * as Cfg from '@opentrons/app/src/redux/config'
 import { createLogger } from '../log'
+import {
+  ADD_UNIQUE_VALUE,
+  RESET_VALUE,
+  SUBTRACT_VALUE,
+  TOGGLE_VALUE,
+  UI_INITIALIZED,
+  UPDATE_VALUE,
+} from '../constants'
 import { DEFAULTS_V0, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
+import { configInitialized, configValueUpdated } from './actions'
 
 import type {
   ConfigV0,
@@ -57,13 +64,13 @@ const log = (): Logger => _log ?? (_log = createLogger('config'))
 export function registerConfig(dispatch: Dispatch): (action: Action) => void {
   return function handleIncomingAction(action: Action) {
     if (action.type === UI_INITIALIZED) {
-      dispatch(Cfg.configInitialized(getFullConfig()))
+      dispatch(configInitialized(getFullConfig()))
     } else if (
-      action.type === Cfg.UPDATE_VALUE ||
-      action.type === Cfg.RESET_VALUE ||
-      action.type === Cfg.TOGGLE_VALUE ||
-      action.type === Cfg.ADD_UNIQUE_VALUE ||
-      action.type === Cfg.SUBTRACT_VALUE
+      action.type === UPDATE_VALUE ||
+      action.type === RESET_VALUE ||
+      action.type === TOGGLE_VALUE ||
+      action.type === ADD_UNIQUE_VALUE ||
+      action.type === SUBTRACT_VALUE
     ) {
       const { path } = action.payload as { path: string }
 
@@ -75,7 +82,7 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
 
         log().debug('Updating config', { path, nextValue })
         store().set(path, nextValue)
-        dispatch(Cfg.configValueUpdated(path, nextValue))
+        dispatch(configValueUpdated(path, nextValue))
       } else {
         log().debug(`config path in overrides; not updating`, { path })
       }

@@ -1,5 +1,6 @@
 import * as React from 'react'
-import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
+import ReactSelect, { components } from 'react-select'
+
 import {
   BORDERS,
   Box,
@@ -17,6 +18,7 @@ import type {
   StylesConfig,
   OptionProps,
   CSSObjectWithLabel,
+  DropdownIndicatorProps,
 } from 'react-select'
 
 export interface SelectOption {
@@ -39,9 +41,9 @@ export function Select(props: SelectComponentProps): JSX.Element {
     clearIndicator: NO_STYLE_FN,
     control: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      borderRadius: BORDERS.radiusRoundEdge,
+      borderRadius: BORDERS.borderRadiusFull,
       border: BORDERS.lineBorder,
-      width: props.width != null ? props.width : 'auto',
+      width: props.width ?? 'auto',
       height: SPACING.spacing16,
       borderColor: COLORS.grey30,
       boxShadow: 'none',

@@ -3,9 +3,9 @@ import {
   ANALYTICS_TIP_LENGTH_STARTED,
 } from './constants'
 
+import type { PipetteMount as Mount } from '@opentrons/shared-data'
 import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
 import type { DeckCalibrationStatus } from '../calibration/types'
-import type { Mount } from '@opentrons/components'
 import type { ConfigV0 } from '../config/types'
 
 export type AnalyticsConfig = ConfigV0['analytics']
@@ -21,6 +21,7 @@ export interface ProtocolAnalyticsData {
   protocolText: string
   pipettes: string
   modules: string
+  robotSerialNumber: string
 }
 
 export type RobotAnalyticsData = {
@@ -28,6 +29,7 @@ export type RobotAnalyticsData = {
   robotSmoothieVersion: string
   robotLeftPipette: string
   robotRightPipette: string
+  robotSerialNumber: string
 } & {
   // feature flags
   // e.g. robotFF_settingName

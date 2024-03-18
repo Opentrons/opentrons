@@ -6,7 +6,7 @@ import { saveAs } from 'file-saver'
 import { reportEvent } from '../analytics'
 import { reportErrors } from './analyticsUtils'
 import { AlertModal } from '@opentrons/components'
-import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
+import { labwareSchemaV2 as labwareSchema } from '@opentrons/shared-data'
 import {
   aluminumBlockAutofills,
   aluminumBlockChildTypeOptions,
@@ -49,7 +49,7 @@ import { WellBottomAndDepth } from './components/sections/WellBottomAndDepth'
 import { WellShapeAndSides } from './components/sections/WellShapeAndSides'
 import { WellSpacing } from './components/sections/WellSpacing'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
@@ -194,10 +194,12 @@ export const LabwareCreator = (): JSX.Element => {
             parsedLabwareDef = JSON.parse(result as string)
           } catch (error: any) {
             console.error(error)
-            setImportError({
-              key: 'INVALID_JSON_FILE',
-              messages: [error.message],
-            })
+            if (error instanceof Error) {
+              setImportError({
+                key: 'INVALID_JSON_FILE',
+                messages: [error.message],
+              })
+            }
             return
           }
 

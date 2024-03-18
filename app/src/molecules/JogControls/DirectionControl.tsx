@@ -371,7 +371,7 @@ const ARROW_BUTTON_STYLES = css`
     height: 125px;
     background-color: ${COLORS.grey35};
     color: ${COLORS.black90};
-    border-radius: ${BORDERS.borderRadiusSize4};
+    border-radius: ${BORDERS.borderRadius16};
 
     &:hover {
       background-color: ${COLORS.grey40};
@@ -458,7 +458,7 @@ export function TouchDirectionControl(
       flex="1"
       flexDirection={DIRECTION_COLUMN}
       border={`1px solid ${COLORS.grey50}`}
-      borderRadius={BORDERS.borderRadiusSize4}
+      borderRadius={BORDERS.borderRadius16}
       padding={SPACING.spacing16}
       gridGap={SPACING.spacing16}
     >

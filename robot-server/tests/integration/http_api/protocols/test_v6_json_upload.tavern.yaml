@@ -85,6 +85,7 @@ stages:
             status: completed
             result: ok
             robotType: OT-2 Standard
+            runTimeParameters: []
             pipettes:
               - id: pipetteId
                 pipetteName: p10_single

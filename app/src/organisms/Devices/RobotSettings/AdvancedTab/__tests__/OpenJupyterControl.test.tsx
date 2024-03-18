@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import {
   useTrackEvent,
@@ -9,17 +11,15 @@ import {
 } from '../../../../../redux/analytics'
 import { OpenJupyterControl } from '../OpenJupyterControl'
 
-jest.mock('../../../../../redux/analytics')
-
-const mockUseTrackEvent = useTrackEvent as jest.Mock<typeof useTrackEvent>
+vi.mock('../../../../../redux/analytics')
 
 const mockIpAddress = '1.1.1.1'
 const mockLink = `http://${mockIpAddress}:48888`
-const trackEvent = jest.fn()
+const trackEvent = vi.fn()
 
 global.window = Object.create(window)
 Object.defineProperty(window, 'open', { writable: true, configurable: true })
-window.open = jest.fn()
+window.open = vi.fn()
 
 const render = (props: React.ComponentProps<typeof OpenJupyterControl>) => {
   return renderWithProviders(
@@ -37,11 +37,7 @@ describe('RobotSettings OpenJupyterControl', () => {
       robotIp: mockIpAddress,
       isEstopNotDisengaged: false,
     }
-    mockUseTrackEvent.mockReturnValue(trackEvent)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(useTrackEvent).mockReturnValue(trackEvent)
   })
 
   it('should render title, description and button', () => {
@@ -67,8 +63,10 @@ describe('RobotSettings OpenJupyterControl', () => {
   })
 
   it('should send and analytics event on button click', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Launch Jupyter Notebook' })
+    render(props)
+    const button = screen.getByRole('button', {
+      name: 'Launch Jupyter Notebook',
+    })
     fireEvent.click(button)
     expect(trackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_JUPYTER_OPEN,
@@ -78,8 +76,10 @@ describe('RobotSettings OpenJupyterControl', () => {
 
   it('should render disabled button when e-stop button is pressed', () => {
     props = { ...props, isEstopNotDisengaged: true }
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Launch Jupyter Notebook' })
+    render(props)
+    const button = screen.getByRole('button', {
+      name: 'Launch Jupyter Notebook',
+    })
     expect(button).toBeDisabled()
   })
 })

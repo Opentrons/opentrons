@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import pick from 'lodash/pick'
@@ -14,6 +14,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   COLORS,
+  BORDERS,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 
@@ -88,7 +89,12 @@ export function CurrentOffsetsTable(
               : offset.definitionUri
           return (
             <OffsetTableRow key={offset.id}>
-              <OffsetTableDatum>
+              <OffsetTableDatum
+                css={css`
+                  border-radius: ${BORDERS.borderRadius8} 0 0
+                    ${BORDERS.borderRadius8};
+                `}
+              >
                 {getDisplayLocation(
                   offset.location,
                   getLabwareDefinitionsFromCommands(commands),
@@ -97,7 +103,12 @@ export function CurrentOffsetsTable(
                 )}
               </OffsetTableDatum>
               <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
-              <OffsetTableDatum>
+              <OffsetTableDatum
+                css={css`
+                  border-radius: 0 ${BORDERS.borderRadius8}
+                    ${BORDERS.borderRadius8} 0;
+                `}
+              >
                 <OffsetVector {...offset.vector} />
               </OffsetTableDatum>
             </OffsetTableRow>

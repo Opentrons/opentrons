@@ -80,6 +80,7 @@ SUBSYSTEM_NODEID: Dict[SubSystem, NodeId] = {
     SubSystem.pipette_left: NodeId.pipette_left,
     SubSystem.pipette_right: NodeId.pipette_right,
     SubSystem.gripper: NodeId.gripper,
+    SubSystem.hepa_uv: NodeId.hepa_uv,
 }
 
 NODEID_SUBSYSTEM = {node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()}
@@ -350,8 +351,13 @@ def motor_nodes(devices: Set[FirmwareTarget]) -> Set[NodeId]:
         NodeId.head_bootloader,
         NodeId.gripper_bootloader,
     }
+    hepa_uv_nodes = {
+        NodeId.hepa_uv,
+        NodeId.hepa_uv_bootloader,
+    }
     # remove any bootloader nodes
     motor_nodes -= bootloader_nodes
+    motor_nodes -= hepa_uv_nodes
     # filter out usb nodes
     return {NodeId(target) for target in motor_nodes if target in NodeId}
 

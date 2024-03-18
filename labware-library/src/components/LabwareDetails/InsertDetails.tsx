@@ -6,7 +6,7 @@ import { getWellLabel, WellProperties, ManufacturerStats } from '../labware-ui'
 import { DetailsBox } from '../ui'
 import { WellDimensions } from './WellDimensions'
 
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { LabwareDefinition } from '../../types'
 

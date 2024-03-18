@@ -65,6 +65,7 @@ class TrashBin:
     """A non-labware trash bin (loaded via api level 2.16 and above)."""
 
     name_for_errors: str
+    highest_z: float
 
 
 @dataclass
@@ -138,9 +139,7 @@ class _MaxHeight(NamedTuple):
         elif isinstance(item, _Module):
             return item.highest_z_including_labware < self.max_height
         elif isinstance(item, TrashBin):
-            # Since this is a restriction for OT-2 only and OT-2 trashes exceeded the height limit, always return False
-            # TODO(jbl 2024-01-16) Include trash height and use that for check for more robustness
-            return False
+            return item.highest_z < self.max_height
 
 
 class _NoModule(NamedTuple):

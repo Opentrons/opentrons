@@ -4,9 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { FormGroup } from '@opentrons/components'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { StepFormDropdown, RadioGroupField, TextField } from '../fields'
+import styles from '../StepEditForm.module.css'
 import type { StepFormProps } from '../types'
-
-import styles from '../StepEditForm.css'
 
 export const TemperatureForm = (props: StepFormProps): JSX.Element => {
   const { t } = useTranslation(['application', 'form'])

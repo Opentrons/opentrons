@@ -33,10 +33,12 @@ from opentrons.hardware_control.types import (
     EstopState,
     HardwareEventHandler,
     HardwareEventUnsubscriber,
+    HepaFanState,
+    HepaUVState,
+    StatusBarState,
 )
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from ..dev_types import OT3AttachedInstruments
-from ..types import StatusBarState
 from .types import HWStopCondition
 
 Cls = TypeVar("Cls")
@@ -188,6 +190,7 @@ class FlexBackend(Protocol):
     async def gripper_grip_jaw(
         self,
         duty_cycle: float,
+        expected_displacement: float,
         stop_condition: HWStopCondition = HWStopCondition.none,
         stay_engaged: bool = True,
     ) -> None:
@@ -263,6 +266,14 @@ class FlexBackend(Protocol):
         """
         Temporarily restore the active current ONLY when homing or
         retracting the Z_R axis while the 96-channel is attached.
+        """
+        ...
+
+    @asynccontextmanager
+    def increase_z_l_hold_current(self) -> AsyncIterator[None]:
+        """
+        Temporarily increase the hold current when engaging the Z_L axis
+        while the 96-channel is attached
         """
         ...
 
@@ -395,4 +406,30 @@ class FlexBackend(Protocol):
         ...
 
     def add_estop_callback(self, cb: HardwareEventHandler) -> HardwareEventUnsubscriber:
+        ...
+
+    def check_gripper_position_within_bounds(
+        self,
+        expected_grip_width: float,
+        grip_width_uncertainty_wider: float,
+        grip_width_uncertainty_narrower: float,
+        jaw_width: float,
+        max_allowed_grip_error: float,
+        hard_limit_lower: float,
+        hard_limit_upper: float,
+    ) -> None:
+        ...
+
+    async def set_hepa_fan_state(self, fan_on: bool, duty_cycle: int) -> bool:
+        """Sets the state and duty cycle of the Hepa/UV module."""
+        ...
+
+    async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
+        ...
+
+    async def set_hepa_uv_state(self, light_on: bool, uv_duration_s: int) -> bool:
+        """Sets the state and duration (seconds) of the UV light for the Hepa/UV module."""
+        ...
+
+    async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         ...

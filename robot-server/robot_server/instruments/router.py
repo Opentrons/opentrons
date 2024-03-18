@@ -216,7 +216,7 @@ async def _get_attached_instruments_ot3(
     hardware: OT3HardwareControlAPI,
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
     # OT3
-    await hardware.cache_instruments()
+    await hardware.cache_instruments(skip_if_would_block=True)
     response_data = await _get_instrument_data(hardware)
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(
@@ -251,11 +251,17 @@ async def _get_attached_instruments_ot2(
     )
 
 
-@instruments_router.get(
+@PydanticResponse.wrap_route(
+    instruments_router.get,
     path="/instruments",
-    summary="Get attached instruments.",
-    description="Get a list of all instruments (pipettes & gripper) currently attached"
-    " to the robot.",
+    summary="Get attached instruments",
+    description=(
+        "Get a list of all instruments (pipettes & gripper) currently attached"
+        " to the robot."
+        "\n\n"
+        "**Warning:** The behavior of this endpoint is currently only defined for Flex"
+        " robots. For OT-2 robots, use `/pipettes` instead."
+    ),
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[AttachedItem]}},
 )
 async def get_attached_instruments(

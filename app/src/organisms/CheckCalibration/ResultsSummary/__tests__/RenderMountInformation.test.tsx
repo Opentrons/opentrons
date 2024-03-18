@@ -1,25 +1,24 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, beforeEach } from 'vitest'
+
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { LEFT, RIGHT } from '../../../../redux/pipettes'
 import * as Fixtures from '../../../../redux/sessions/__fixtures__'
 import { RenderMountInformation } from '../RenderMountInformation'
 
-jest.mock('@opentrons/shared-data', () => ({
-  getAllPipetteNames: jest.fn(
-    jest.requireActual('@opentrons/shared-data').getAllPipetteNames
-  ),
-  getPipetteNameSpecs: jest.fn(
-    jest.requireActual('@opentrons/shared-data').getPipetteNameSpecs
-  ),
-  getPipetteModelSpecs: jest.fn(),
-}))
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getPipetteModelSpecs>()
+  return {
+    ...actual,
+    getPipetteModelSpecs: vi.fn(),
+  }
+})
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
-const mockGetPipetteModelSpecs = getPipetteModelSpecs as jest.MockedFunction<
-  typeof getPipetteModelSpecs
->
+
 const render = (props: React.ComponentProps<typeof RenderMountInformation>) => {
   return renderWithProviders(<RenderMountInformation {...props} />, {
     i18nInstance: i18n,
@@ -34,7 +33,7 @@ describe('RenderMountInformation', () => {
       mount: LEFT,
       pipette: mockSessionDetails.instruments[0],
     }
-    mockGetPipetteModelSpecs.mockReturnValue({
+    vi.mocked(getPipetteModelSpecs).mockReturnValue({
       displayName: 'mock pipette display name',
     } as any)
   })

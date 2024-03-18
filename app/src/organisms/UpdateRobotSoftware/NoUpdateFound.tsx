@@ -36,7 +36,7 @@ export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
         padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
       >
         <Icon

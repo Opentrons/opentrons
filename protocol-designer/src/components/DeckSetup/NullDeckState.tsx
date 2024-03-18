@@ -1,9 +1,9 @@
 import * as React from 'react'
+import { getDeckDefinitions } from '@opentrons/shared-data'
 import { useTranslation } from 'react-i18next'
 import {
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_BOLD,
-  getDeckDefinitions,
   RobotCoordsText,
   RobotWorkSpace,
   TEXT_TRANSFORM_UPPERCASE,
@@ -16,7 +16,7 @@ import {
 } from './constants'
 import { DECK_LAYER_BLOCKLIST } from './index'
 
-import styles from './DeckSetup.css'
+import styles from './DeckSetup.module.css'
 
 export const NullDeckState = (): JSX.Element => {
   const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])

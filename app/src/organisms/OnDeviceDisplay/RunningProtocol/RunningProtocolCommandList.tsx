@@ -13,6 +13,7 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_HIDDEN,
+  OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
   TYPOGRAPHY,
@@ -47,7 +48,7 @@ const TITLE_TEXT_STYLE = css`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   height: max-content;
 `
 
@@ -231,7 +232,7 @@ export function RunningProtocolCommandList({
                     fontSize="1.375rem"
                     lineHeight="1.75rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    borderRadius={BORDERS.borderRadiusSize2}
+                    borderRadius={BORDERS.borderRadius8}
                     gridGap="0.875rem"
                   >
                     <CommandIcon command={command} size="2rem" />

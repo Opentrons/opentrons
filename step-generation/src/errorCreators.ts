@@ -39,6 +39,13 @@ export function noTipOnPipette(args: {
   }
 }
 
+export function pipetteHasTip(): CommandCreatorError {
+  return {
+    message: 'One or more of the pipettes has a tip',
+    type: 'PIPETTE_HAS_TIP',
+  }
+}
+
 export function pipetteDoesNotExist(args: {
   actionName: string
   pipette: string

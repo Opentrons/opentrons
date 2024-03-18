@@ -101,7 +101,7 @@ export const AboutModuleSlideout = (
             <StyledText
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.grey50}
+              color={COLORS.grey60}
             >
               {i18n.format(t('current_version'), 'upperCase')}
             </StyledText>
@@ -117,7 +117,7 @@ export const AboutModuleSlideout = (
         <StyledText
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.grey50}
+          color={COLORS.grey60}
           data-testid={`alert_item_serial_number_text_${String(
             module.moduleModel
           )}`}

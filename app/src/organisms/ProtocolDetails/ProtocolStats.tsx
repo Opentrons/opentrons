@@ -13,11 +13,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  getPipetteNameSpecs,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 interface ProtocolStatsProps {
   analysis: ProtocolAnalysisOutput | null
@@ -196,7 +194,7 @@ export const StatRow = (props: StatRowProps): JSX.Element => {
       </Flex>
       <Flex
         backgroundColor={COLORS.black90 + '1A'}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius8}
         height="max-content"
         paddingY={SPACING.spacing4}
         paddingX={SPACING.spacing8}

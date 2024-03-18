@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import cloneDeep from 'lodash/cloneDeep'
 import {
   MAGNETIC_MODULE_TYPE,

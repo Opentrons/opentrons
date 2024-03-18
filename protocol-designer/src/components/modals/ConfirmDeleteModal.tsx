@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { AlertModal } from '@opentrons/components'
-import { Portal } from '../portals/MainPageModalPortal'
-import modalStyles from './modal.css'
+import { getMainPagePortalEl } from '../portals/MainPageModalPortal'
+import modalStyles from './modal.module.css'
 
 export const DELETE_PROFILE_CYCLE: 'deleteProfileCycle' = 'deleteProfileCycle'
 export const CLOSE_STEP_FORM_WITH_CHANGES: 'closeStepFormWithChanges' =
@@ -46,18 +47,17 @@ export function ConfirmDeleteModal(props: Props): JSX.Element {
       onClick: onContinueClick,
     },
   ]
-  return (
-    <Portal>
-      <AlertModal
-        alertOverlay
-        restrictOuterScroll={false}
-        buttons={buttons}
-        onCloseClick={onCancelClick}
-        className={modalStyles.modal}
-        heading={t(`confirm_delete_modal.${modalType}.title`)}
-      >
-        <p>{t(`confirm_delete_modal.${modalType}.body`)}</p>
-      </AlertModal>
-    </Portal>
+  return createPortal(
+    <AlertModal
+      alertOverlay
+      restrictOuterScroll={false}
+      buttons={buttons}
+      onCloseClick={onCancelClick}
+      className={modalStyles.modal}
+      heading={t(`confirm_delete_modal.${modalType}.title`)}
+    >
+      <p>{t(`confirm_delete_modal.${modalType}.body`)}</p>
+    </AlertModal>,
+    getMainPagePortalEl()
   )
 }

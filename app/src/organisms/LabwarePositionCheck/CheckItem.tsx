@@ -28,7 +28,7 @@ import {
 } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
-import { useChainRunCommands } from '../../resources/runs/hooks'
+import { useChainRunCommands } from '../../resources/runs'
 import { getIsOnDevice } from '../../redux/config'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 

@@ -1,9 +1,9 @@
 import * as React from 'react'
-
-import { renderWithProviders } from '@opentrons/components'
-
+import { screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi } from 'vitest'
 import { i18n } from '../../../i18n'
 import { useFeatureFlag } from '../../../redux/config'
+import { renderWithProviders } from '../../../__testing-utils__'
 import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
@@ -21,26 +21,13 @@ import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibr
 import type { FormattedPipetteOffsetCalibration } from '..'
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
-jest.mock('../../../redux/config')
-jest.mock('../../../organisms/Devices/hooks')
-jest.mock('../CalibrationDetails/TipLengthCalibrationItems')
-
-const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunction<
-  typeof useTipLengthCalibrations
->
-const mockTipLengthCalibrationItems = TipLengthCalibrationItems as jest.MockedFunction<
-  typeof TipLengthCalibrationItems
->
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
->
+vi.mock('../../../redux/config')
+vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../CalibrationDetails/TipLengthCalibrationItems')
 
 const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
 
-const mockUpdateRobotStatus = jest.fn()
+const mockUpdateRobotStatus = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -59,28 +46,24 @@ const render = () => {
 
 describe('RobotSettingsTipLengthCalibration', () => {
   beforeEach(() => {
-    mockUseTipLengthCalibrations.mockReturnValue([
+    vi.mocked(useTipLengthCalibrations).mockReturnValue([
       mockTipLengthCalibration1,
       mockTipLengthCalibration2,
       mockTipLengthCalibration3,
     ])
-    mockTipLengthCalibrationItems.mockReturnValue(
+    vi.mocked(TipLengthCalibrationItems).mockReturnValue(
       <div>Mock TipLengthCalibrationItems</div>
     )
-    mockUseFeatureFlag.mockReturnValue(false)
-    mockUseAttachedPipettes.mockReturnValue({
+    vi.mocked(useFeatureFlag).mockReturnValue(false)
+    vi.mocked(useAttachedPipettes).mockReturnValue({
       left: mockAttachedPipette,
       right: null,
     } as AttachedPipettesByMount)
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders a title', () => {
-    const [{ getByText }] = render()
-    getByText('Tip Length Calibrations')
-    getByText('Mock TipLengthCalibrationItems')
+    render()
+    screen.getByText('Tip Length Calibrations')
+    screen.getByText('Mock TipLengthCalibrationItems')
   })
 })

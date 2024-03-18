@@ -16,7 +16,6 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     trash_labware = protocol_context.load_labware(
         "opentrons_1_trash_3200ml_fixed", "A3"
     )
-
     badly_placed_tiprack = protocol_context.load_labware(
         "opentrons_flex_96_tiprack_50ul", "C2"
     )
@@ -30,7 +29,10 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     )
 
     thermocycler = protocol_context.load_module("thermocyclerModuleV2")
-    partially_accessible_plate = thermocycler.load_labware(
+    tc_adjacent_plate = protocol_context.load_labware(
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "A2"
+    )
+    accessible_plate = thermocycler.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt"
     )
 
@@ -68,14 +70,19 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     ):
         instrument.dispense(50, badly_placed_labware.wells()[0])
 
+    with pytest.raises(
+        PartialTipMovementNotAllowedError, match="collision with thermocycler lid"
+    ):
+        instrument.dispense(10, tc_adjacent_plate.wells_by_name()["A1"])
+
     # No error cuz dispensing from high above plate, so it clears tuberack in west slot
-    instrument.dispense(25, badly_placed_labware.wells_by_name()["A1"].top(150))
+    instrument.dispense(15, badly_placed_labware.wells_by_name()["A1"].top(150))
 
     thermocycler.open_lid()  # type: ignore[union-attr]
 
     # Will NOT raise error since first column of TC labware is accessible
     # (it is just a few mm away from the left bound)
-    instrument.dispense(25, partially_accessible_plate.wells_by_name()["A1"])
+    instrument.dispense(25, accessible_plate.wells_by_name()["A1"])
 
     instrument.drop_tip()
 
@@ -88,8 +95,8 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
     # No error NOW because of full config
     instrument.aspirate(50, badly_placed_labware.wells_by_name()["A1"])
 
-    # No error NOW because of full config
-    instrument.dispense(50, partially_accessible_plate.wells_by_name()["A1"])
+    # No error
+    instrument.dispense(50, accessible_plate.wells_by_name()["A1"])
 
 
 @pytest.mark.ot3_only
@@ -138,7 +145,7 @@ def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
     with pytest.raises(
         PartialTipMovementNotAllowedError, match="collision with items in deck slot"
     ):
-        instrument.aspirate(25, badly_placed_plate.wells_by_name()["A1"])
+        instrument.aspirate(25, badly_placed_plate.wells_by_name()["A10"])
 
     with pytest.raises(
         PartialTipMovementNotAllowedError, match="outside of robot bounds"

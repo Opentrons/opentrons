@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom'
 
 import {
   ALIGN_START,
+  BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -46,7 +47,7 @@ import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
-import { useChainLiveCommands } from '../../resources/runs/hooks'
+import { useChainLiveCommands } from '../../resources/runs'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { useIsFlex } from '../../organisms/Devices/hooks'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
@@ -248,7 +249,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      borderRadius={SPACING.spacing4}
+      borderRadius={BORDERS.borderRadius8}
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
@@ -375,6 +376,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   name="ot-spinner"
                   spin
                   aria-label="ot-spinner"
+                  color={COLORS.grey60}
                 />
                 <StyledText marginLeft={SPACING.spacing8}>
                   {t('updating_firmware')}

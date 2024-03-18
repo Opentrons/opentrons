@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { DropdownOption } from '../../../components/lib/forms/DropdownField.d'
 import {
   getPipetteNameSpecs,
@@ -42,7 +41,7 @@ export function getPipetteCapacity(pipetteEntity: PipetteEntity): number {
     return Math.min(spec.maxVolume, getTiprackVolume(tiprackDef))
   }
 
-  assert(
+  console.assert(
     false,
     `Expected spec and tiprack def for pipette ${
       pipetteEntity ? pipetteEntity.id : '???'
@@ -57,7 +56,7 @@ export function getMinPipetteVolume(pipetteEntity: PipetteEntity): number {
     return spec.minVolume
   }
 
-  assert(
+  console.assert(
     false,
     `Expected spec for pipette ${pipetteEntity ? pipetteEntity.id : '???'}`
   )

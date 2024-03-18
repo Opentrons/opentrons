@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import pick from 'lodash/pick'
 import { Trans, useTranslation } from 'react-i18next'
@@ -14,7 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   CheckboxField,
 } from '@opentrons/components'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import {
   LegacyModalHeader,
   LegacyModalShell,
@@ -107,77 +108,78 @@ export function ApplyHistoricOffsets(
       >
         {t(noOffsetData ? 'learn_more' : 'view_data')}
       </Link>
-      {showOffsetDataModal ? (
-        <Portal level="top">
-          <LegacyModalShell
-            maxWidth="40rem"
-            header={
-              <LegacyModalHeader
-                title={t(
-                  noOffsetData
-                    ? 'what_is_labware_offset_data'
-                    : 'stored_offset_data'
-                )}
-                onClose={() => setShowOffsetDataModal(false)}
-              />
-            }
-          >
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              padding={
-                noOffsetData
-                  ? `${SPACING.spacing16} ${SPACING.spacing32} ${SPACING.spacing32}`
-                  : SPACING.spacing32
+      {showOffsetDataModal
+        ? createPortal(
+            <LegacyModalShell
+              maxWidth="40rem"
+              header={
+                <LegacyModalHeader
+                  title={t(
+                    noOffsetData
+                      ? 'what_is_labware_offset_data'
+                      : 'stored_offset_data'
+                  )}
+                  onClose={() => setShowOffsetDataModal(false)}
+                />
               }
             >
-              {noOffsetData ? (
-                <Trans
-                  t={t}
-                  i18nKey={'robot_has_no_offsets_from_previous_runs'}
-                  components={{
-                    block: (
-                      <StyledText as="p" marginBottom={SPACING.spacing8} />
-                    ),
-                  }}
-                />
-              ) : (
-                <StyledText as="p">
-                  {t('robot_has_offsets_from_previous_runs')}
-                </StyledText>
-              )}
-              <ExternalLink
-                marginTop={noOffsetData ? '0px' : SPACING.spacing8}
-                href={HOW_OFFSETS_WORK_SUPPORT_URL}
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                padding={
+                  noOffsetData
+                    ? `${SPACING.spacing16} ${SPACING.spacing32} ${SPACING.spacing32}`
+                    : SPACING.spacing32
+                }
               >
-                {t('see_how_offsets_work')}
-              </ExternalLink>
-              {!noOffsetData ? (
-                isLabwareOffsetCodeSnippetsOn ? (
-                  <LabwareOffsetTabs
-                    TableComponent={
-                      <LabwareOffsetTable
-                        offsetCandidates={offsetCandidates}
-                        labwareDefinitions={getLabwareDefinitionsFromCommands(
-                          commands
-                        )}
-                      />
-                    }
-                    JupyterComponent={JupyterSnippet}
-                    CommandLineComponent={CommandLineSnippet}
+                {noOffsetData ? (
+                  <Trans
+                    t={t}
+                    i18nKey={'robot_has_no_offsets_from_previous_runs'}
+                    components={{
+                      block: (
+                        <StyledText as="p" marginBottom={SPACING.spacing8} />
+                      ),
+                    }}
                   />
                 ) : (
-                  <LabwareOffsetTable
-                    offsetCandidates={offsetCandidates}
-                    labwareDefinitions={getLabwareDefinitionsFromCommands(
-                      commands
-                    )}
-                  />
-                )
-              ) : null}
-            </Flex>
-          </LegacyModalShell>
-        </Portal>
-      ) : null}
+                  <StyledText as="p">
+                    {t('robot_has_offsets_from_previous_runs')}
+                  </StyledText>
+                )}
+                <ExternalLink
+                  marginTop={noOffsetData ? '0px' : SPACING.spacing8}
+                  href={HOW_OFFSETS_WORK_SUPPORT_URL}
+                >
+                  {t('see_how_offsets_work')}
+                </ExternalLink>
+                {!noOffsetData ? (
+                  isLabwareOffsetCodeSnippetsOn ? (
+                    <LabwareOffsetTabs
+                      TableComponent={
+                        <LabwareOffsetTable
+                          offsetCandidates={offsetCandidates}
+                          labwareDefinitions={getLabwareDefinitionsFromCommands(
+                            commands
+                          )}
+                        />
+                      }
+                      JupyterComponent={JupyterSnippet}
+                      CommandLineComponent={CommandLineSnippet}
+                    />
+                  ) : (
+                    <LabwareOffsetTable
+                      offsetCandidates={offsetCandidates}
+                      labwareDefinitions={getLabwareDefinitionsFromCommands(
+                        commands
+                      )}
+                    />
+                  )
+                ) : null}
+              </Flex>
+            </LegacyModalShell>,
+            getTopPortalEl()
+          )
+        : null}
     </Flex>
   )
 }

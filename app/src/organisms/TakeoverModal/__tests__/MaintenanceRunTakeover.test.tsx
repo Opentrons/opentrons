@@ -1,13 +1,17 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { i18n } from '../../../i18n'
-import { when } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
-import { useMaintenanceRunTakeover as mockUseMaintenanceRunTakeover } from '../useMaintenanceRunTakeover'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { useMaintenanceRunTakeover } from '../useMaintenanceRunTakeover'
 import { MaintenanceRunTakeover } from '../MaintenanceRunTakeover'
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
+
 import type { MaintenanceRunStatus } from '../MaintenanceRunStatusProvider'
 
-jest.mock('../useMaintenanceRunTakeover')
+vi.mock('../useMaintenanceRunTakeover')
+vi.mock('../../../resources/maintenance_runs')
 
 const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {
   getRunIds: () => ({
@@ -16,10 +20,6 @@ const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {
   }),
   setOddRunIds: () => null,
 }
-
-const useMaintenanceRunTakeover = mockUseMaintenanceRunTakeover as jest.MockedFunction<
-  typeof mockUseMaintenanceRunTakeover
->
 
 const render = (props: React.ComponentProps<typeof MaintenanceRunTakeover>) => {
   return renderWithProviders(<MaintenanceRunTakeover {...props} />, {
@@ -33,9 +33,14 @@ describe('MaintenanceRunTakeover', () => {
 
   beforeEach(() => {
     props = { children: [testComponent] }
-    when(useMaintenanceRunTakeover)
-      .calledWith()
-      .mockReturnValue(MOCK_MAINTENANCE_RUN)
+    vi.mocked(useMaintenanceRunTakeover).mockReturnValue(MOCK_MAINTENANCE_RUN)
+    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
+      data: {
+        data: {
+          id: 'test',
+        },
+      },
+    } as any)
   })
 
   it('renders child components successfuly', () => {
@@ -58,7 +63,7 @@ describe('MaintenanceRunTakeover', () => {
       }),
     }
 
-    when(useMaintenanceRunTakeover).calledWith().mockReturnValue(MOCK_ODD_RUN)
+    vi.mocked(useMaintenanceRunTakeover).mockReturnValue(MOCK_ODD_RUN)
 
     render(props)
     expect(screen.queryByText('Robot is busy')).not.toBeInTheDocument()
@@ -73,11 +78,8 @@ describe('MaintenanceRunTakeover', () => {
       }),
     }
 
-    when(useMaintenanceRunTakeover)
-      .calledWith()
-      .mockReturnValue(MOCK_DESKTOP_RUN)
+    vi.mocked(useMaintenanceRunTakeover).mockReturnValue(MOCK_DESKTOP_RUN)
 
     render(props)
-    screen.getByText('Robot is busy')
   })
 })

@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from opentrons.hardware_control import HardwareControlAPI
 
 from ..state import StateView, HardwarePipette
+from ..notes import CommandNoteAdder, CommandNote
 from ..errors.exceptions import (
     TipNotAttachedError,
     InvalidAspirateVolumeError,
@@ -39,6 +40,7 @@ class PipettingHandler(TypingProtocol):
         pipette_id: str,
         volume: float,
         flow_rate: float,
+        command_note_adder: CommandNoteAdder,
     ) -> float:
         """Set flow-rate and aspirate."""
 
@@ -88,11 +90,15 @@ class HardwarePipettingHandler(PipettingHandler):
         pipette_id: str,
         volume: float,
         flow_rate: float,
+        command_note_adder: CommandNoteAdder,
     ) -> float:
         """Set flow-rate and aspirate."""
         # get mount and config data from state and hardware controller
         adjusted_volume = _validate_aspirate_volume(
-            state_view=self._state_view, pipette_id=pipette_id, aspirate_volume=volume
+            state_view=self._state_view,
+            pipette_id=pipette_id,
+            aspirate_volume=volume,
+            command_note_adder=command_note_adder,
         )
         hw_pipette = self._state_view.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
@@ -199,11 +205,15 @@ class VirtualPipettingHandler(PipettingHandler):
         pipette_id: str,
         volume: float,
         flow_rate: float,
+        command_note_adder: CommandNoteAdder,
     ) -> float:
         """Virtually aspirate (no-op)."""
         self._validate_tip_attached(pipette_id=pipette_id, command_name="aspirate")
         return _validate_aspirate_volume(
-            state_view=self._state_view, pipette_id=pipette_id, aspirate_volume=volume
+            state_view=self._state_view,
+            pipette_id=pipette_id,
+            aspirate_volume=volume,
+            command_note_adder=command_note_adder,
         )
 
     async def dispense_in_place(
@@ -252,7 +262,10 @@ def create_pipetting_handler(
 
 
 def _validate_aspirate_volume(
-    state_view: StateView, pipette_id: str, aspirate_volume: float
+    state_view: StateView,
+    pipette_id: str,
+    aspirate_volume: float,
+    command_note_adder: CommandNoteAdder,
 ) -> float:
     """Get whether the given volume is valid to aspirate right now.
 
@@ -285,7 +298,21 @@ def _validate_aspirate_volume(
             ),
         )
     else:
-        return min(aspirate_volume, available_volume)
+        volume_to_aspirate = min(aspirate_volume, available_volume)
+        if volume_to_aspirate < aspirate_volume:
+            command_note_adder(
+                CommandNote(
+                    noteKind="warning",
+                    shortMessage=f"Aspirate clamped to {available_volume} µL",
+                    longMessage=(
+                        f"Command requested to aspirate {aspirate_volume} µL but only"
+                        f" {available_volume} µL were available in the pipette. This is"
+                        " probably a floating point artifact."
+                    ),
+                    source="execution",
+                )
+            )
+        return volume_to_aspirate
 
 
 def _validate_dispense_volume(

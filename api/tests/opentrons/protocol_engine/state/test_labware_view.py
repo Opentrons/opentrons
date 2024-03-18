@@ -7,6 +7,7 @@ from contextlib import nullcontext as does_not_raise
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
     Parameters,
     LabwareRole,
@@ -1517,3 +1518,36 @@ def test_get_grip_height_from_labware_bottom(
     assert (
         subject.get_grip_height_from_labware_bottom("reservoir-id") == 15.7
     )  # default
+
+
+@pytest.mark.parametrize(
+    "labware_to_check,well_bbox",
+    [
+        ("opentrons_universal_flat_adapter", Dimensions(0, 0, 0)),
+        (
+            "corning_96_wellplate_360ul_flat",
+            Dimensions(116.81 - 10.95, 77.67 - 7.81, 14.22),
+        ),
+        ("nest_12_reservoir_15ml", Dimensions(117.48 - 10.28, 78.38 - 7.18, 31.4)),
+    ],
+)
+def test_calculates_well_bounding_box(
+    labware_to_check: str, well_bbox: Dimensions
+) -> None:
+    """It should be able to calculate well bounding boxes."""
+    definition = LabwareDefinition.parse_obj(load_definition(labware_to_check, 1))
+    labware = LoadedLabware(
+        id="test-labware-id",
+        loadName=labware_to_check,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        definitionUri="test-labware-uri",
+        offsetId=None,
+        displayName="Fancy Plate Name",
+    )
+    subject = get_labware_view(
+        labware_by_id={"test-labware-id": labware},
+        definitions_by_uri={"test-labware-uri": definition},
+    )
+    assert subject.get_well_bbox("test-labware-id").x == pytest.approx(well_bbox.x)
+    assert subject.get_well_bbox("test-labware-id").y == pytest.approx(well_bbox.y)
+    assert subject.get_well_bbox("test-labware-id").z == pytest.approx(well_bbox.z)

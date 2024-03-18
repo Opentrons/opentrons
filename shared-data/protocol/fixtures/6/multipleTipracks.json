@@ -4311,10 +4311,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 46.43,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 46.43
       }
     },
     {
@@ -4329,10 +4326,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 46.43,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 46.43
       }
     },
     {
@@ -4365,10 +4359,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
@@ -4383,10 +4374,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
@@ -4419,10 +4407,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
@@ -4437,10 +4422,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
@@ -4473,10 +4455,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
@@ -4491,10 +4470,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
@@ -4527,10 +4503,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
@@ -4545,10 +4518,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
@@ -4581,10 +4551,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
@@ -4599,10 +4566,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
@@ -4635,10 +4599,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
@@ -4653,10 +4614,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
@@ -4689,10 +4647,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
@@ -4707,10 +4662,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
@@ -4743,10 +4695,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
@@ -4761,10 +4710,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
@@ -4797,10 +4743,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
@@ -4815,10 +4758,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
@@ -4851,10 +4791,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
@@ -4869,10 +4806,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
@@ -4905,10 +4839,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
@@ -4923,10 +4854,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {
@@ -4959,10 +4887,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 1 }
         },
-        "flowRate": 150,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 150
       }
     },
     {
@@ -5001,10 +4926,7 @@
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 0.5 }
         },
-        "flowRate": 300,
-        "wellLocation": {
-          "origin": "top"
-        }
+        "flowRate": 300
       }
     },
     {

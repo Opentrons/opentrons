@@ -1,31 +1,33 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, describe, beforeEach, expect, it } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { getDeckDefinitions } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import * as Sessions from '../../../redux/sessions'
 import { mockDeckCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
-
 import { CalibrateDeck } from '../index'
+
 import type { DeckCalibrationStep } from '../../../redux/sessions/types'
 import type { DispatchRequestsType } from '../../../redux/robot-api'
 
-jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
-jest.mock('../../../redux/sessions/selectors')
-jest.mock('../../../redux/robot-api/selectors')
-jest.mock('../../../redux/config')
+vi.mock('../../../redux/sessions/selectors')
+vi.mock('../../../redux/robot-api/selectors')
+vi.mock('../../../redux/config')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getDeckDefinitions>()
+  return {
+    ...actual,
+    getDeckDefinitions: vi.fn(),
+  }
+})
 
 interface CalibrateDeckSpec {
   heading: string
   currentStep: DeckCalibrationStep
 }
-
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
-  typeof getDeckDefinitions
->
 
 describe('CalibrateDeck', () => {
   let dispatchRequests: DispatchRequestsType
@@ -81,11 +83,8 @@ describe('CalibrateDeck', () => {
   ]
 
   beforeEach(() => {
-    dispatchRequests = jest.fn()
-    when(mockGetDeckDefinitions).calledWith().mockReturnValue({})
-  })
-  afterEach(() => {
-    resetAllWhenMocks()
+    dispatchRequests = vi.fn()
+    vi.mocked(getDeckDefinitions).mockReturnValue({})
   })
 
   SPECS.forEach(spec => {

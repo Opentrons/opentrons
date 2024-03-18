@@ -567,10 +567,12 @@ async def update_pick_up_current(
 async def update_pick_up_distance(
     api: OT3API, mount: OT3Mount, distance: float = 17.0
 ) -> None:
-    """Update pick-up-tip current."""
+    """Update pick-up-tip distance."""
     pipette = _get_pipette_from_mount(api, mount)
     config_model = pipette.pick_up_configurations.press_fit
-    config_model.distance = distance
+    config_model.distance_by_tip_count = {
+        k: distance for k in config_model.distance_by_tip_count.keys()
+    }
     pipette.pick_up_configurations.press_fit = config_model
 
 
@@ -598,6 +600,11 @@ async def move_plunger_absolute_ot3(
             run_currents={Axis.of_main_tool_actuator(mount): motor_current}
         ):
             await _move_coro
+
+
+async def home_tip_motors(api: OT3API, back_off: bool = True) -> None:
+    """Homes the tip motors with backoff option broken out."""
+    await api._backend.home_tip_motors(distance=50, velocity=5, back_off=back_off)
 
 
 async def move_tip_motor_relative_ot3(

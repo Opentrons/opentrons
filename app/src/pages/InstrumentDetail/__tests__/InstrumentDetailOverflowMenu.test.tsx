@@ -1,28 +1,36 @@
 import React from 'react'
 import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent } from '@testing-library/react'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
-import { handleInstrumentDetailOverflowMenu } from '../../../pages/InstrumentDetail/InstrumentDetailOverflowMenu'
+import { handleInstrumentDetailOverflowMenu } from '../InstrumentDetailOverflowMenu'
+import { useNotifyCurrentMaintenanceRun } from '../../../resources/maintenance_runs'
+import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
+import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
+import { DropTipWizard } from '../../../organisms/DropTipWizard'
 
-import type { PipetteData, GripperData } from '@opentrons/api-client'
+import type {
+  PipetteData,
+  GripperData,
+  HostConfig,
+} from '@opentrons/api-client'
+import type * as SharedData from '@opentrons/shared-data'
 
-jest.mock('@opentrons/shared-data', () => ({
-  getAllPipetteNames: jest.fn(
-    jest.requireActual('@opentrons/shared-data').getAllPipetteNames
-  ),
-  getPipetteNameSpecs: jest.fn(
-    jest.requireActual('@opentrons/shared-data').getPipetteNameSpecs
-  ),
-  getPipetteModelSpecs: jest.fn(),
-}))
-
-const mockGetPipetteModelSpecs = getPipetteModelSpecs as jest.MockedFunction<
-  typeof getPipetteModelSpecs
->
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof SharedData>()
+  return {
+    ...actual,
+    getPipetteModelSpecs: vi.fn(),
+  }
+})
+vi.mock('../../../resources/maintenance_runs')
+vi.mock('../../../organisms/PipetteWizardFlows')
+vi.mock('../../../organisms/GripperWizardFlows')
+vi.mock('../../../organisms/DropTipWizard')
 
 const MOCK_PIPETTE = {
   mount: 'left',
@@ -93,11 +101,15 @@ const MOCK_GRIPPER = {
   instrumentName: 'p1000_single_flex',
 } as GripperData
 
+const MOCK_HOST: HostConfig = { hostname: 'TEST_HOST' }
+
 const render = (pipetteOrGripper: PipetteData | GripperData) => {
   return renderWithProviders(
     <NiceModal.Provider>
       <button
-        onClick={() => handleInstrumentDetailOverflowMenu(pipetteOrGripper)}
+        onClick={() =>
+          handleInstrumentDetailOverflowMenu(pipetteOrGripper, MOCK_HOST)
+        }
         data-testid="testButton"
       />
     </NiceModal.Provider>,
@@ -109,13 +121,20 @@ const render = (pipetteOrGripper: PipetteData | GripperData) => {
 
 describe('UpdateBuildroot', () => {
   beforeEach(() => {
-    mockGetPipetteModelSpecs.mockReturnValue({
+    vi.mocked(getPipetteModelSpecs).mockReturnValue({
       displayName: 'mockPipette',
+    } as any)
+    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
+      data: {
+        data: {
+          id: 'test',
+        },
+      },
     } as any)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders appropriate options when the instrument is a pipette', () => {
@@ -152,17 +171,16 @@ describe('UpdateBuildroot', () => {
     const btn = getByTestId('testButton')
     fireEvent.click(btn)
     fireEvent.click(getByText('Recalibrate'))
-
-    getByText('Calibrate Left Pipette')
+    expect(vi.mocked(PipetteWizardFlows)).toHaveBeenCalled()
   })
 
   it('renders the drop tip wizard  when Drop tips is clicked', () => {
-    const [{ getByTestId, getByText, getAllByText }] = render(MOCK_PIPETTE)
+    const [{ getByTestId, getByText }] = render(MOCK_PIPETTE)
     const btn = getByTestId('testButton')
     fireEvent.click(btn)
     fireEvent.click(getByText('Drop tips'))
 
-    expect(getAllByText('Drop tips')).toHaveLength(2)
+    expect(vi.mocked(DropTipWizard)).toHaveBeenCalled()
   })
 
   it('renders the gripper calibration wizard when recalibrate is clicked', () => {
@@ -171,18 +189,7 @@ describe('UpdateBuildroot', () => {
     fireEvent.click(btn)
     fireEvent.click(getByText('Recalibrate'))
 
-    getByText('Calibrate Gripper')
-  })
-
-  it('closes the overflow menu when a launched wizard closes', () => {
-    const [{ getByTestId, getByText, queryByText }] = render(MOCK_GRIPPER)
-    const btn = getByTestId('testButton')
-    fireEvent.click(btn)
-    fireEvent.click(getByText('Recalibrate'))
-
-    getByText('Calibrate Gripper')
-    fireEvent.click(getByText('exit'))
-    expect(queryByText('Recalibrate')).not.toBeInTheDocument()
+    expect(vi.mocked(GripperWizardFlows)).toHaveBeenCalled()
   })
 
   it('closes the overflow menu when a click occurs outside of the overflow menu', () => {

@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom'
 import {
   ALIGN_START,
   Box,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -62,6 +63,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
     <Flex
       alignItems={ALIGN_START}
       backgroundColor={COLORS.white}
+      borderRadius={BORDERS.borderRadius8}
       cursor="pointer"
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing16}

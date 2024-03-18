@@ -5,15 +5,6 @@ import fs from 'fs'
 import path from 'path'
 
 import {
-  usbRequestsStart,
-  usbRequestsStop,
-} from '@opentrons/app/src/redux/shell'
-import {
-  INITIALIZED as SYSTEM_INFO_INITIALIZED,
-  USB_DEVICE_ADDED,
-  USB_DEVICE_REMOVED,
-} from '@opentrons/app/src/redux/system-info/constants'
-import {
   fetchSerialPortList,
   SerialPortHttpAgent,
   DEFAULT_PRODUCT_ID,
@@ -22,6 +13,12 @@ import {
 
 import { createLogger } from './log'
 import { getProtocolSrcFilePaths } from './protocol-storage'
+import { usbRequestsStart, usbRequestsStop } from './config/actions'
+import {
+  SYSTEM_INFO_INITIALIZED,
+  USB_DEVICE_ADDED,
+  USB_DEVICE_REMOVED,
+} from './constants'
 
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'
@@ -129,7 +126,9 @@ async function usbListener(
       statusText: response.statusText,
     }
   } catch (e) {
-    console.log(`axios request error ${e?.message ?? 'unknown'}`)
+    if (e instanceof Error) {
+      console.log(`axios request error ${e?.message ?? 'unknown'}`)
+    }
   }
 }
 
@@ -157,9 +156,9 @@ function tryCreateAndStartUsbHttpRequests(dispatch: Dispatch): void {
           }) === 0
       )
 
-      // retry if no OT-3 serial port found - usb-detection and serialport packages have race condition
+      // retry if no Flex serial port found - usb-detection and serialport packages have race condition
       if (ot3UsbSerialPort == null) {
-        usbLog.debug('no OT-3 serial port found')
+        usbLog.debug('No Flex serial port found.')
         return
       }
       if (usbHttpAgent == null) {

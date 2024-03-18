@@ -452,13 +452,14 @@ class FailedGripperPickupError(RoboticsControlError):
 
     def __init__(
         self,
+        message: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a FailedGripperPickupError."""
         super().__init__(
             ErrorCodes.FAILED_GRIPPER_PICKUP_ERROR,
-            "Expected to grip labware, but none found.",
+            message or "Expected to grip labware, but none found.",
             details,
             wrapping,
         )
@@ -557,11 +558,9 @@ class UnmatchedTipPresenceStates(RoboticsControlError):
         """Build an UnmatchedTipPresenceStatesError."""
         format_tip_state = {0: "not detected", 1: "detected"}
         msg = (
-            "Received two differing tip presence statuses:"
-            "\nRear Sensor tips"
-            + format_tip_state[states[0]]
-            + "\nFront Sensor tips"
-            + format_tip_state[states[1]]
+            f"Received two differing tip presence statuses."
+            f" Rear Sensor tips: {format_tip_state[states[0]]}."
+            f" Front Sensor tips: {format_tip_state[states[1]]}."
         )
         if detail:
             msg += str(detail)

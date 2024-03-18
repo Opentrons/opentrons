@@ -1,3 +1,4 @@
+import type { IpcMainEvent } from 'electron'
 import type { Error } from '../types'
 import type { RobotSystemAction } from './is-ready/types'
 
@@ -5,8 +6,30 @@ export interface Remote {
   ipcRenderer: {
     invoke: (channel: string, ...args: unknown[]) => Promise<any>
     send: (channel: string, ...args: unknown[]) => void
+    on: (
+      channel: string,
+      listener: (
+        event: IpcMainEvent,
+        hostname: string,
+        topic: NotifyTopic,
+        message: NotifyResponseData | NotifyNetworkError,
+        ...args: unknown[]
+      ) => void
+    ) => void
   }
 }
+
+export interface NotifyRefetchData {
+  refetchUsingHTTP: boolean
+}
+
+export interface NotifyUnsubscribeData {
+  unsubscribe: boolean
+}
+
+export type NotifyBrokerResponses = NotifyRefetchData | NotifyUnsubscribeData
+export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
+export type NotifyResponseData = NotifyBrokerResponses | NotifyNetworkError
 
 interface File {
   sha512: string
@@ -112,6 +135,33 @@ export interface RobotMassStorageDeviceRemoved {
   meta: { shell: true }
 }
 
+export type NotifyTopic =
+  | 'ALL_TOPICS'
+  | 'robot-server/maintenance_runs/current_run'
+  | 'robot-server/runs/current_command'
+  | 'robot-server/runs'
+  | `robot-server/runs/${string}`
+
+export type NotifyAction = 'subscribe' | 'unsubscribe'
+
+export interface NotifySubscribeAction {
+  type: 'shell:NOTIFY_SUBSCRIBE'
+  payload: {
+    hostname: string
+    topic: NotifyTopic
+  }
+  meta: { shell: true }
+}
+
+export interface NotifyUnsubscribeAction {
+  type: 'shell:NOTIFY_UNSUBSCRIBE'
+  payload: {
+    hostname: string
+    topic: NotifyTopic
+  }
+  meta: { shell: true }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
@@ -124,3 +174,5 @@ export type ShellAction =
   | RobotMassStorageDeviceAdded
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
+  | NotifySubscribeAction
+  | NotifyUnsubscribeAction

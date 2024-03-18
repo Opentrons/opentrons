@@ -9,12 +9,11 @@ import {
 } from '@opentrons/components'
 import { actions as steplistActions } from '../../steplist'
 import { StepFieldName } from '../../steplist/fieldLevel'
+import modalStyles from './modal.module.css'
+import styles from './MoreOptionsModal.module.css'
 
 import type { FormData } from '../../form-types'
 import type { ChangeFormPayload } from '../../steplist/actions'
-
-import modalStyles from './modal.css'
-import styles from './MoreOptionsModal.css'
 
 interface Props {
   close: (event?: React.MouseEvent) => unknown

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -37,7 +38,7 @@ import { SelectNetwork } from './SelectNetwork'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { State, Dispatch } from '../../../redux/types'
-import { Portal } from '../../../App/portal'
+import { getModalPortalEl } from '../../../App/portal'
 interface NetworkingProps {
   robotName: string
   updateRobotStatus: (isRobotBusy: boolean) => void
@@ -98,14 +99,15 @@ export function RobotSettingsNetworking({
 
   return (
     <>
-      <Portal>
-        {showDisconnectModal ? (
-          <DisconnectModal
-            onCancel={() => setShowDisconnectModal(false)}
-            robotName={robotName}
-          />
-        ) : null}
-      </Portal>
+      {showDisconnectModal
+        ? createPortal(
+            <DisconnectModal
+              onCancel={() => setShowDisconnectModal(false)}
+              robotName={robotName}
+            />,
+            getModalPortalEl()
+          )
+        : null}
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <Flex alignItems={ALIGN_CENTER}>
           {isFlexConnectedViaWifi ? (

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
@@ -40,7 +41,7 @@ import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceRe
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
 import { UNREACHABLE } from '../../../redux/discovery'
-import { Portal } from '../../../App/portal'
+import { getTopPortalEl } from '../../../App/portal'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { State, Dispatch } from '../../../redux/types'
@@ -138,16 +139,16 @@ export function RobotSettingsAdvanced({
             updateResetStatus={updateResetStatus}
           />
         )}
-        {showDeviceResetModal && (
-          <Portal level="top">
+        {showDeviceResetModal &&
+          createPortal(
             <DeviceResetModal
               closeModal={() => setShowDeviceResetModal(false)}
               isRobotReachable={isRobotReachable}
               robotName={robotName}
               resetOptions={resetOptions}
-            />
-          </Portal>
-        )}
+            />,
+            getTopPortalEl()
+          )}
         <DisplayRobotName
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}

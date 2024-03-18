@@ -108,8 +108,6 @@ class TipPresenceManager:
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
         state = self._last_state[self._get_key(mount)]
-        if state is None:
-            log.warning(f"Tip state for {mount} is unknown")
         return state
 
     @staticmethod

@@ -7,8 +7,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { C_MED_LIGHT_GRAY } from '../../../styles'
-import { BORDERS } from '../../../ui-style-constants'
-import { COLORS } from '../../../helix-design-system'
+import { COLORS, BORDERS } from '../../../helix-design-system'
 
 import { RobotCoordsForeignDiv } from '../../Deck'
 import { ThermocyclerGEN1 } from './ThermocyclerGEN1'

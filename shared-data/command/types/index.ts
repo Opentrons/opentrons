@@ -31,7 +31,12 @@ export * from './timing'
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
 // the command's identity and parameters which can be known prior to runtime
-
+export interface CommandNote {
+  noteKind: 'warning' | 'information' | string
+  shortMessage: string
+  longMessage: string
+  source: string
+}
 export type CommandStatus = 'queued' | 'running' | 'succeeded' | 'failed'
 export interface CommonCommandRunTimeInfo {
   key?: string
@@ -42,6 +47,7 @@ export interface CommonCommandRunTimeInfo {
   startedAt: string | null
   completedAt: string | null
   intent?: 'protocol' | 'setup'
+  notes?: CommandNote[] | null
 }
 export interface CommonCommandCreateInfo {
   key?: string

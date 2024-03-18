@@ -20,8 +20,7 @@ export const MenuItem = styled.button<ButtonProps>`
   padding: ${SPACING.spacing8} ${SPACING.spacing12} ${SPACING.spacing8}
     ${SPACING.spacing12};
 
-  &:hover,
-  &:active {
+  &:hover {
     background-color: ${COLORS.blue10};
   }
 

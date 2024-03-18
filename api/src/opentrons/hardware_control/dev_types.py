@@ -19,6 +19,7 @@ from opentrons_shared_data.pipette.types import PipetteTipType
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
     SupportedTipsDefinition,
+    PipetteBoundingBoxOffsetDefinition,
 )
 from opentrons_shared_data.gripper import (
     GripperModel,
@@ -95,7 +96,8 @@ class PipetteDict(InstrumentDict):
     has_tip: bool
     default_push_out_volume: Optional[float]
     supported_tips: Dict[PipetteTipType, SupportedTipsDefinition]
-    current_nozzle_map: Optional[NozzleMap]
+    pipette_bounding_box_offsets: PipetteBoundingBoxOffsetDefinition
+    current_nozzle_map: NozzleMap
 
 
 class PipetteStateDict(TypedDict):

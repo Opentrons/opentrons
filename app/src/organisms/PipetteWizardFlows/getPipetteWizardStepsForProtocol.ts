@@ -8,23 +8,17 @@ export const getPipetteWizardStepsForProtocol = (
   attachedPipettes: AttachedPipettesFromInstrumentsQuery,
   pipetteInfo: LoadedPipette[],
   mount: Mount
-): PipetteWizardStep[] => {
+): PipetteWizardStep[] | null => {
   const requiredPipette = pipetteInfo.find(pipette => pipette.mount === mount)
   const nintySixChannelAttached =
     attachedPipettes[LEFT]?.instrumentName === 'p1000_96'
 
-  //  return empty array when correct pipette is attached && pipette cal not needed or
-  //  no pipette is required in the protocol
-  if (
-    (requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName &&
-      attachedPipettes[mount]?.data?.calibratedOffset?.last_modified != null) ||
-    requiredPipette == null
-  ) {
-    return []
-    //    return calibration flow only if correct pipette is attached and pipette cal null
+  //  return empty array if no pipette is required in the protocol
+  if (requiredPipette == null) {
+    return null
+    // return calibration flow if correct pipette is attached
   } else if (
-    requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName &&
-    attachedPipettes[mount]?.data?.calibratedOffset?.last_modified == null
+    requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName
   ) {
     return [
       {

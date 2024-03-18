@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { screen, fireEvent } from '@testing-library/react'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { InputField } from '..'
 
 const render = (props: React.ComponentProps<typeof InputField>) => {
@@ -19,32 +20,28 @@ describe('HeaterShakerSlideout', () => {
       units: 'rpm',
       value: '5',
       disabled: false,
-      onFocus: jest.fn(),
-      onBlur: jest.fn(),
-      onChange: jest.fn(),
+      onFocus: vi.fn(),
+      onBlur: vi.fn(),
+      onChange: vi.fn(),
       readOnly: false,
       autoFocus: false,
     }
   })
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders correct information when type is number', () => {
-    const { getByText } = render(props)
-    getByText('caption')
-    getByText('secondary caption')
-    getByText('rpm')
+    render(props)
+    screen.getByText('caption')
+    screen.getByText('secondary caption')
+    screen.getByText('rpm')
   })
   it('renders correct information when type is text', () => {
     props = {
       type: 'text',
       value: 'string',
       units: 'C',
-      onChange: jest.fn(),
+      onChange: vi.fn(),
     }
-    const { getByText } = render(props)
-    getByText('C')
+    render(props)
+    screen.getByText('C')
   })
   it('renders error message when value is outside of number type range', () => {
     props = {
@@ -55,14 +52,14 @@ describe('HeaterShakerSlideout', () => {
       units: 'rpm',
       value: '9',
       error: 'error',
-      onChange: jest.fn(),
+      onChange: vi.fn(),
       id: 'input_id',
     }
-    const { getByText, getByTestId } = render(props)
-    const input = getByTestId('input_id')
+    render(props)
+    const input = screen.getByTestId('input_id')
     fireEvent.change(input, { target: { value: ['12'] } })
     expect(props.onChange).toHaveBeenCalled()
-    getByText('caption')
-    getByText('error')
+    screen.getByText('caption')
+    screen.getByText('error')
   })
 })

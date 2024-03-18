@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { createLabwareOffset } from '@opentrons/api-client'
@@ -8,14 +8,8 @@ import { useHost } from '../../api'
 import { useCreateLabwareOffsetMutation } from '../useCreateLabwareOffsetMutation'
 import type { HostConfig, LabwareOffsetCreateData } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
-
-const mockCreateLabwareOffset = createLabwareOffset as jest.MockedFunction<
-  typeof createLabwareOffset
->
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID = 'run_id'
@@ -41,15 +35,12 @@ describe('useCreateLabwareOffsetMutation hook', () => {
       vector: OFFSET,
     }
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should create labware offsets when callback is called', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateLabwareOffset)
-      .calledWith(HOST_CONFIG, RUN_ID, labwareOffset)
-      .mockResolvedValue({ data: 'created offsets!' } as any)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createLabwareOffset).mockResolvedValue({
+      data: 'created offsets!',
+    } as any)
 
     const { result } = renderHook(useCreateLabwareOffsetMutation, {
       wrapper,

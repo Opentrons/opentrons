@@ -161,11 +161,15 @@ class PressFitPickUpTipConfiguration(BaseModel):
         ...,
         description="The increment to move the pipette down on each force tip pickup press",
     )
-    distance: float = Field(
-        ..., description="The starting distance to begin a pick up tip from"
+    distance_by_tip_count: Dict[int, float] = Field(
+        ...,
+        description="The starting distance to begin a pick up tip from, based on number of tips being picked up",
+        alias="distanceByTipCount",
     )
-    speed: float = Field(
-        ..., description="The speed to move the Z axis for each force pickup"
+    speed_by_tip_count: Dict[int, float] = Field(
+        ...,
+        description="The speed to move the Z axis for each force pickup, based on number of tips being picked up",
+        alias="speedByTipCount",
     )
     current_by_tip_count: Dict[int, float] = Field(
         ...,
@@ -253,7 +257,7 @@ class PartialTipDefinition(BaseModel):
         description="Whether partial tip pick up is supported.",
         alias="partialTipSupported",
     )
-    available_configurations: List[int] = Field(
+    available_configurations: Optional[List[int]] = Field(
         default=None,
         description="A list of the types of partial tip configurations supported, listed by channel ints",
         alias="availableConfigurations",
@@ -386,6 +390,11 @@ class PipetteColumnDefinition(BaseModel):
         return v
 
 
+class PipetteBoundingBoxOffsetDefinition(BaseModel):
+    back_left_corner: List[float] = Field(..., alias="backLeftCorner")
+    front_right_corner: List[float] = Field(..., alias="frontRightCorner")
+
+
 class PipetteGeometryDefinition(BaseModel):
     """The geometry properties definition of a pipette."""
 
@@ -396,6 +405,9 @@ class PipetteGeometryDefinition(BaseModel):
         alias="pathTo3D",
     )
     nozzle_map: Dict[str, List[float]] = Field(..., alias="nozzleMap")
+    pipette_bounding_box_offsets: PipetteBoundingBoxOffsetDefinition = Field(
+        ..., alias="pipetteBoundingBoxOffsets"
+    )
     ordered_columns: List[PipetteColumnDefinition] = Field(..., alias="orderedColumns")
     ordered_rows: List[PipetteRowDefinition] = Field(..., alias="orderedRows")
 

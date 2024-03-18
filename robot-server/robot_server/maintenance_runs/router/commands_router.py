@@ -14,7 +14,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
-from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
     RequestModel,
     SimpleBody,
@@ -115,7 +115,8 @@ async def get_current_run_engine_from_url(
     return engine_store.engine
 
 
-@commands_router.post(
+@PydanticResponse.wrap_route(
+    commands_router.post,
     path="/maintenance_runs/{runId}/commands",
     summary="Enqueue a command",
     description=textwrap.dedent(
@@ -203,7 +204,8 @@ async def create_run_command(
     )
 
 
-@commands_router.get(
+@PydanticResponse.wrap_route(
+    commands_router.get,
     path="/maintenance_runs/{runId}/commands",
     summary="Get a list of all commands in the run",
     description=(
@@ -297,7 +299,8 @@ async def get_run_commands(
     )
 
 
-@commands_router.get(
+@PydanticResponse.wrap_route(
+    commands_router.get,
     path="/maintenance_runs/{runId}/commands/{commandId}",
     summary="Get full details about a specific command in the run",
     description=(

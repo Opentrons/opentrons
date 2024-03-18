@@ -21,6 +21,8 @@ from opentrons.protocol_engine.errors.exceptions import (
     InvalidPushOutVolumeError,
     InvalidDispenseVolumeError,
 )
+from opentrons.protocol_engine.notes import CommandNoteAdder, CommandNote
+from ..note_utils import CommandNoteMatcher
 
 
 @pytest.fixture
@@ -217,6 +219,7 @@ async def test_hw_aspirate_in_place(
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
     hardware_subject: HardwarePipettingHandler,
+    mock_command_note_adder: CommandNoteAdder,
 ) -> None:
     """Should set flow_rate and call hardware_api aspirate."""
     decoy.when(mock_state_view.pipettes.get_working_volume("pipette-id")).then_return(
@@ -247,7 +250,10 @@ async def test_hw_aspirate_in_place(
     )
 
     result = await hardware_subject.aspirate_in_place(
-        pipette_id="pipette-id", volume=25, flow_rate=2.5
+        pipette_id="pipette-id",
+        volume=25,
+        flow_rate=2.5,
+        command_note_adder=mock_command_note_adder,
     )
 
     assert result == 25
@@ -324,7 +330,7 @@ def test_virtual_get_is_ready_to_aspirate(
 
 
 async def test_virtual_aspirate_in_place(
-    mock_state_view: StateView, decoy: Decoy
+    mock_state_view: StateView, decoy: Decoy, mock_command_note_adder: CommandNoteAdder
 ) -> None:
     """Should return the volume."""
     decoy.when(
@@ -342,7 +348,10 @@ async def test_virtual_aspirate_in_place(
     )
 
     result = await subject.aspirate_in_place(
-        pipette_id="pipette-id", volume=2, flow_rate=5
+        pipette_id="pipette-id",
+        volume=2,
+        flow_rate=5,
+        command_note_adder=mock_command_note_adder,
     )
     assert result == 2
 
@@ -408,7 +417,7 @@ async def test_virtual_dispense_in_place_raises_no_tip(
 
 
 async def test_virtual_aspirate_validate_tip_attached(
-    mock_state_view: StateView, decoy: Decoy
+    mock_state_view: StateView, decoy: Decoy, mock_command_note_adder: CommandNoteAdder
 ) -> None:
     """Should raise an error that a tip is not attached."""
     subject = VirtualPipettingHandler(state_view=mock_state_view)
@@ -420,7 +429,12 @@ async def test_virtual_aspirate_validate_tip_attached(
     with pytest.raises(
         TipNotAttachedError, match="Cannot perform aspirate without a tip attached"
     ):
-        await subject.aspirate_in_place("pipette-id", volume=20, flow_rate=1)
+        await subject.aspirate_in_place(
+            "pipette-id",
+            volume=20,
+            flow_rate=1,
+            command_note_adder=mock_command_note_adder,
+        )
 
 
 async def test_virtual_dispense_validate_tip_attached(
@@ -446,6 +460,7 @@ async def test_aspirate_volume_validation(
     mock_state_view: StateView,
     mock_hardware_api: HardwareAPI,
     hardware_subject: HardwarePipettingHandler,
+    mock_command_note_adder: CommandNoteAdder,
 ) -> None:
     """It should validate the input volume, possibly adjusting it for rounding error.
 
@@ -490,13 +505,30 @@ async def test_aspirate_volume_validation(
     for subject in [virtual_subject, hardware_subject]:
         assert (
             await subject.aspirate_in_place(
-                pipette_id="pipette-id", volume=ok_volume, flow_rate=1
+                pipette_id="pipette-id",
+                volume=ok_volume,
+                flow_rate=1,
+                command_note_adder=mock_command_note_adder,
             )
             == expected_adjusted_volume
         )
+        decoy.verify(
+            mock_command_note_adder(
+                cast(
+                    CommandNote,
+                    CommandNoteMatcher(
+                        matching_noteKind_regex="warning",
+                        matching_shortMessage_regex="Aspirate clamped to 1 µL",
+                    ),
+                )
+            )
+        )
         with pytest.raises(InvalidAspirateVolumeError):
             await subject.aspirate_in_place(
-                pipette_id="pipette-id", volume=not_ok_volume, flow_rate=1
+                pipette_id="pipette-id",
+                volume=not_ok_volume,
+                flow_rate=1,
+                command_note_adder=mock_command_note_adder,
             )
 
 

@@ -18,6 +18,7 @@ from opentrons.hardware_control.nozzle_manager import (
 )
 
 from ..types import FlowRates
+from ...types import Point
 
 
 @dataclass(frozen=True)
@@ -36,6 +37,9 @@ class LoadedStaticPipetteData:
         float, pipette_definition.SupportedTipsDefinition
     ]
     nominal_tip_overlap: Dict[str, float]
+    nozzle_map: NozzleMap
+    back_left_corner_offset: Point
+    front_right_corner_offset: Point
 
 
 class VirtualPipetteDataProvider:
@@ -147,6 +151,9 @@ class VirtualPipetteDataProvider:
             tip_type
         ]
 
+        nozzle_manager = NozzleConfigurationManager.build_from_config(config)
+        pip_back_left = config.pipette_bounding_box_offsets.back_left_corner
+        pip_front_right = config.pipette_bounding_box_offsets.front_right_corner
         return LoadedStaticPipetteData(
             model=str(pipette_model),
             display_name=config.display_name,
@@ -169,6 +176,13 @@ class VirtualPipetteDataProvider:
             nominal_tip_overlap=config.liquid_properties[
                 liquid_class
             ].tip_overlap_dictionary,
+            nozzle_map=nozzle_manager.current_configuration,
+            back_left_corner_offset=Point(
+                pip_back_left[0], pip_back_left[1], pip_back_left[2]
+            ),
+            front_right_corner_offset=Point(
+                pip_front_right[0], pip_front_right[1], pip_front_right[2]
+            ),
         )
 
     def get_virtual_pipette_static_config(
@@ -183,6 +197,8 @@ class VirtualPipetteDataProvider:
 
 def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteData:
     """Get the config for a pipette, given the state/config object from the HW API."""
+    back_left_offset = pipette_dict["pipette_bounding_box_offsets"].back_left_corner
+    front_right_offset = pipette_dict["pipette_bounding_box_offsets"].front_right_corner
     return LoadedStaticPipetteData(
         model=pipette_dict["model"],
         display_name=pipette_dict["display_name"],
@@ -202,4 +218,11 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
         # https://opentrons.atlassian.net/browse/RCORE-655
         home_position=0,
         nozzle_offset_z=0,
+        nozzle_map=pipette_dict["current_nozzle_map"],
+        back_left_corner_offset=Point(
+            back_left_offset[0], back_left_offset[1], back_left_offset[2]
+        ),
+        front_right_corner_offset=Point(
+            front_right_offset[0], front_right_offset[1], front_right_offset[2]
+        ),
     )

@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { MemoryRouter, Route, Switch } from 'react-router-dom'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { BackButton } from '..'
@@ -28,16 +30,13 @@ const render = (props?: React.HTMLProps<HTMLButtonElement>) => {
 }
 
 describe('BackButton', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
   it('renders a button that says Back', () => {
-    const { getByRole } = render()
-    getByRole('button', { name: 'Back' })
+    render()
+    screen.getByRole('button', { name: 'Back' })
   })
 
   it('calls provided on click handler and does not go back one page', () => {
-    const mockOnClick = jest.fn()
+    const mockOnClick = vi.fn()
 
     render({ onClick: mockOnClick })
 

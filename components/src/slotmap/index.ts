@@ -1,1 +1,1 @@
-export * from './SlotMap'
+export * from './OT2SlotMap'

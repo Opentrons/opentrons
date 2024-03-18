@@ -11,8 +11,7 @@ import { PDTitledList, PDListItem } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
 import { swatchColors } from '../swatchColors'
 import { LabwareDetailsCard } from './LabwareDetailsCard/LabwareDetailsCard'
-
-import styles from './IngredientsList.css'
+import styles from './IngredientsList.module.css'
 
 import type { SelectedContainerId } from '../../labware-ingred/reducers'
 import type { LiquidGroup } from '../../labware-ingred/types'

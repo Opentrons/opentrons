@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
@@ -8,32 +10,20 @@ import { useRunStatus, useRunTimestamps } from '../../RunTimeControl/hooks'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 import type { RunStatus, RunData } from '@opentrons/api-client'
+import type * as Dom from 'react-router-dom'
 
-const mockPush = jest.fn()
+const mockPush = vi.fn()
 
-jest.mock('../../../redux/protocol-storage')
-jest.mock('../../RunTimeControl/hooks')
-jest.mock('../HistoricalProtocolRunOverflowMenu')
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
-  return {
+vi.mock('../../../redux/protocol-storage')
+vi.mock('../../RunTimeControl/hooks')
+vi.mock('../HistoricalProtocolRunOverflowMenu')
+vi.mock('react-router-dom', async importOriginal => {
+  const reactRouterDom = importOriginal<typeof Dom>()
+  return await {
     ...reactRouterDom,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
-
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
->
-const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
-  typeof useRunTimestamps
->
-const mockHistoricalProtocolRunOverflowMenu = HistoricalProtocolRunOverflowMenu as jest.MockedFunction<
-  typeof HistoricalProtocolRunOverflowMenu
->
-const mockGetStoredProtocols = getStoredProtocols as jest.MockedFunction<
-  typeof getStoredProtocols
->
 
 const run = {
   current: false,
@@ -59,31 +49,29 @@ describe('RecentProtocolRuns', () => {
       robotIsBusy: false,
       run: run,
     }
-    mockHistoricalProtocolRunOverflowMenu.mockReturnValue(
+    vi.mocked(HistoricalProtocolRunOverflowMenu).mockReturnValue(
       <div>mock HistoricalProtocolRunOverflowMenu</div>
     )
-    mockUseRunStatus.mockReturnValue('succeeded')
-    mockUseRunTimestamps.mockReturnValue({
+    vi.mocked(useRunStatus).mockReturnValue('succeeded')
+    vi.mocked(useRunTimestamps).mockReturnValue({
       startedAt: '2022-05-04T18:24:40.833862+00:00',
       pausedAt: '',
       stoppedAt: '',
       completedAt: '2022-05-04T18:24:41.833862+00:00',
     })
-    mockGetStoredProtocols.mockReturnValue([storedProtocolDataFixture])
+    vi.mocked(getStoredProtocols).mockReturnValue([storedProtocolDataFixture])
   })
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
+
   it('renders the correct information derived from run and protocol', () => {
-    const { getByText } = render(props)
-    const protocolBtn = getByText('my protocol')
-    getByText('Completed')
-    getByText('mock HistoricalProtocolRunOverflowMenu')
+    render(props)
+    const protocolBtn = screen.getByText('my protocol')
+    screen.getByText('Completed')
+    screen.getByText('mock HistoricalProtocolRunOverflowMenu')
     fireEvent.click(protocolBtn)
     expect(mockPush).toHaveBeenCalledWith('/protocols/protocolKeyStub')
   })
   it('renders buttons that are not clickable when the protocol was deleted from the app directory', () => {
-    mockGetStoredProtocols.mockReturnValue([storedProtocolDataFixture])
+    vi.mocked(getStoredProtocols).mockReturnValue([storedProtocolDataFixture])
     props = {
       robotName: 'otie',
       protocolName: 'my protocol',
@@ -91,10 +79,10 @@ describe('RecentProtocolRuns', () => {
       robotIsBusy: false,
       run: run,
     }
-    const { getByText } = render(props)
-    const protocolBtn = getByText('my protocol')
-    getByText('Completed')
-    getByText('mock HistoricalProtocolRunOverflowMenu')
+    render(props)
+    const protocolBtn = screen.getByText('my protocol')
+    screen.getByText('Completed')
+    screen.getByText('mock HistoricalProtocolRunOverflowMenu')
     fireEvent.click(protocolBtn)
     expect(mockPush).not.toHaveBeenCalledWith('/protocols/12345')
   })

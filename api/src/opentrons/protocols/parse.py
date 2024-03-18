@@ -192,7 +192,9 @@ def version_from_string(vstr: str) -> APIVersion:
     return APIVersion(major=int(matches.group(1)), minor=int(matches.group(2)))
 
 
-def _parse_json(protocol_contents: str, filename: Optional[str] = None) -> JsonProtocol:
+def _parse_json(
+    protocol_contents: Union[str, bytes], filename: Optional[str] = None
+) -> JsonProtocol:
     """Parse a protocol known or at least suspected to be json"""
     protocol_json = json.loads(protocol_contents)
     version, validated = validate_json(protocol_json)
@@ -208,7 +210,7 @@ def _parse_json(protocol_contents: str, filename: Optional[str] = None) -> JsonP
 
 
 def _parse_python(
-    protocol_contents: str,
+    protocol_contents: Union[str, bytes],
     python_parse_mode: PythonParseMode,
     filename: Optional[str] = None,
     bundled_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
@@ -338,28 +340,37 @@ def parse(
             )
         return result
     else:
-        if isinstance(protocol_file, bytes):
-            protocol_str = protocol_file.decode("utf-8")
-        else:
-            protocol_str = protocol_file
-
         if filename and filename.endswith(".json"):
-            return _parse_json(protocol_str, filename)
+            return _parse_json(protocol_file, filename)
         elif filename and filename.endswith(".py"):
             return _parse_python(
-                protocol_contents=protocol_str,
+                protocol_contents=protocol_file,
                 python_parse_mode=python_parse_mode,
                 filename=filename,
                 extra_labware=extra_labware,
                 bundled_data=extra_data,
             )
 
-        # our jsonschema says the top level json kind is object
-        if protocol_str and protocol_str[0] in ("{", b"{"):
-            return _parse_json(protocol_str, filename)
+        # our jsonschema says the top level json kind is object so we can
+        # rely on it starting with a { if it's valid. that could either be
+        # a string or bytes.
+        #
+        # if it's a string, then if the protocol file starts with a { and
+        # we do protocol_file[0] then we get the string "{".
+        #
+        # if it's a bytes, then if the protocol file starts with the ascii or
+        # utf-8 representation of { and we do protocol_file[0] we get 123,
+        # because while single elements of strings are strings, single elements
+        # of bytes are the byte value as a number.
+        #
+        # to get that number we could either use ord() or do what we do here
+        # which I think is a little nicer, if any of the above can be called
+        # "nice".
+        if protocol_file and protocol_file[0] in ("{", b"{"[0]):
+            return _parse_json(protocol_file, filename)
         else:
             return _parse_python(
-                protocol_contents=protocol_str,
+                protocol_contents=protocol_file,
                 python_parse_mode=python_parse_mode,
                 filename=filename,
                 extra_labware=extra_labware,
@@ -499,6 +510,7 @@ def _version_from_static_python_info(
     """
     from_requirements = (static_python_info.requirements or {}).get("apiLevel", None)
     from_metadata = (static_python_info.metadata or {}).get("apiLevel", None)
+
     requested_level = from_requirements or from_metadata
     if requested_level is None:
         return None

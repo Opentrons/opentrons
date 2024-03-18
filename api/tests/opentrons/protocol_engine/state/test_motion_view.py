@@ -554,6 +554,66 @@ def test_get_movement_waypoints_to_addressable_area(
         max_travel_z=1337,
         force_direct=True,
         minimum_z_height=123,
+        ignore_tip_configuration=False,
+    )
+
+    assert result == waypoints
+
+
+def test_move_to_moveable_trash_addressable_area(
+    decoy: Decoy,
+    pipette_view: PipetteView,
+    addressable_area_view: AddressableAreaView,
+    geometry_view: GeometryView,
+    subject: MotionView,
+) -> None:
+    """Ensure that a move request to a moveableTrash addressable utilizes the Instrument Center critical point."""
+    location = CurrentAddressableArea(
+        pipette_id="123", addressable_area_name="moveableTrashA1"
+    )
+
+    decoy.when(pipette_view.get_current_location()).then_return(location)
+    decoy.when(
+        addressable_area_view.get_addressable_area_move_to_location("moveableTrashA1")
+    ).then_return(Point(x=3, y=3, z=3))
+    decoy.when(geometry_view.get_all_obstacle_highest_z()).then_return(42)
+
+    decoy.when(
+        addressable_area_view.get_addressable_area_base_slot("moveableTrashA1")
+    ).then_return(DeckSlotName.SLOT_1)
+
+    decoy.when(
+        geometry_view.get_extra_waypoints(location, DeckSlotName.SLOT_1)
+    ).then_return([])
+
+    waypoints = [
+        motion_planning.Waypoint(
+            position=Point(1, 2, 3), critical_point=CriticalPoint.INSTRUMENT_XY_CENTER
+        )
+    ]
+
+    decoy.when(
+        motion_planning.get_waypoints(
+            move_type=motion_planning.MoveType.DIRECT,
+            origin=Point(x=1, y=2, z=3),
+            origin_cp=CriticalPoint.MOUNT,
+            max_travel_z=1337,
+            min_travel_z=123,
+            dest=Point(x=4, y=5, z=6),
+            dest_cp=CriticalPoint.INSTRUMENT_XY_CENTER,
+            xy_waypoints=[],
+        )
+    ).then_return(waypoints)
+
+    result = subject.get_movement_waypoints_to_addressable_area(
+        addressable_area_name="moveableTrashA1",
+        offset=AddressableOffsetVector(x=1, y=2, z=3),
+        origin=Point(x=1, y=2, z=3),
+        origin_cp=CriticalPoint.MOUNT,
+        max_travel_z=1337,
+        force_direct=True,
+        minimum_z_height=123,
+        ignore_tip_configuration=True,
     )
 
     assert result == waypoints
@@ -624,6 +684,7 @@ def test_get_movement_waypoints_to_addressable_area_stay_at_max_travel_z(
         force_direct=True,
         minimum_z_height=123,
         stay_at_max_travel_z=True,
+        ignore_tip_configuration=False,
     )
 
     assert result == waypoints

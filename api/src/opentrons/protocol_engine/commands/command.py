@@ -6,7 +6,14 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Generic, Optional, TypeVar, Tuple
+from typing import (
+    TYPE_CHECKING,
+    Generic,
+    Optional,
+    TypeVar,
+    Tuple,
+    List,
+)
 
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
@@ -14,6 +21,7 @@ from pydantic.generics import GenericModel
 from opentrons.hardware_control import HardwareControlAPI
 
 from ..errors import ErrorOccurrence
+from ..notes import CommandNote, CommandNoteAdder
 
 # Work around type-only circular dependencies.
 if TYPE_CHECKING:
@@ -144,6 +152,13 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
             " a command that is part of a calibration procedure."
         ),
     )
+    notes: Optional[List[CommandNote]] = Field(
+        None,
+        description=(
+            "Information not critical to the execution of the command derived from either"
+            " the command's execution or the command's generation."
+        ),
+    )
 
 
 class AbstractCommandImpl(
@@ -176,6 +191,7 @@ class AbstractCommandImpl(
         run_control: execution.RunControlHandler,
         rail_lights: execution.RailLightsHandler,
         status_bar: execution.StatusBarHandler,
+        command_note_adder: CommandNoteAdder,
     ) -> None:
         """Initialize the command implementation with execution handlers."""
         pass
@@ -217,6 +233,7 @@ class AbstractCommandWithPrivateResultImpl(
         run_control: execution.RunControlHandler,
         rail_lights: execution.RailLightsHandler,
         status_bar: execution.StatusBarHandler,
+        command_note_adder: CommandNoteAdder,
     ) -> None:
         """Initialize the command implementation with execution handlers."""
         pass

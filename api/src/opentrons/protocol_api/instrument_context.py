@@ -27,13 +27,13 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
+from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 
 from .core.common import InstrumentCore, ProtocolCore
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
-from ._trash_bin import TrashBin
-from ._waste_chute import WasteChute
+from .disposal_locations import TrashBin, WasteChute
 from ._nozzle_layout import NozzleLayout
 from . import labware, validation
 
@@ -57,6 +57,9 @@ _PRESSES_INCREMENT_REMOVED_IN = APIVersion(2, 14)
 _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN = APIVersion(2, 15)
 """The version after which a drop-tip-into-trash procedure drops tips in different alternating locations within the trash well."""
 _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN = APIVersion(2, 16)
+"""The version after which a partial nozzle configuration became available for the 96 Channel Pipette."""
+_PARTIAL_NOZZLE_CONFIGURATION_AUTOMATIC_TIP_TRACKING_IN = APIVersion(2, 18)
+"""The version after which automatic tip tracking supported partially configured nozzle layouts."""
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -290,15 +293,20 @@ class InstrumentContext(publisher.CommandPublisher):
 
         See :ref:`new-dispense` for more details and examples.
 
-        :param volume: The volume to dispense, measured in µL. If unspecified,
-                       defaults to :py:attr:`current_volume`. If only a volume is
-                       passed, the pipette will dispense from its current position.
+        :param volume: The volume to dispense, measured in µL.
 
-                       If ``dispense`` is called with a volume of precisely 0, its behavior
-                       depends on the API level of the protocol. On API levels below 2.16,
-                       it will behave the same as a volume of ``None``/unspecified: dispense
-                       all liquid in the pipette. On API levels at or above 2.16, no liquid
-                       will be dispensed.
+                         - If unspecified or ``None``, dispense the :py:attr:`current_volume`.
+
+                         - If 0, the behavior of ``dispense()`` depends on the API level
+                           of the protocol. In API version 2.16 and earlier, dispense all
+                           liquid in the pipette (same as unspecified or ``None``). In API
+                           version 2.17 and later, dispense no liquid.
+
+                         - If greater than :py:obj:`.current_volume`, the behavior of
+                           ``dispense()`` depends on the API level of the protocol. In API
+                           version 2.16 and earlier, dispense all liquid in the pipette.
+                           In API version 2.17 and later, raise an error.
+
         :type volume: int or float
 
         :param location: Tells the robot where to dispense liquid held in the pipette.
@@ -347,8 +355,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Added the ``push_out`` parameter.
 
         .. versionchanged:: 2.17
-            Now raises an exception if you try to dispense more than is available.
-            Previously, it would silently clamp.
+            Behavior of the ``volume`` parameter.
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
@@ -404,17 +411,25 @@ class InstrumentContext(publisher.CommandPublisher):
         flow_rate = self._core.get_dispense_flow_rate(rate)
 
         if isinstance(target, (TrashBin, WasteChute)):
-            # HANDLE THE MOVETOADDDRESSABLEAREA
-            self._core.dispense(
-                volume=c_vol,
-                rate=rate,
-                location=target,
-                well_core=None,
-                flow_rate=flow_rate,
-                in_place=False,
-                push_out=push_out,
-            )
-            # TODO publish this info
+            with publisher.publish_context(
+                broker=self.broker,
+                command=cmds.dispense_in_disposal_location(
+                    instrument=self,
+                    volume=c_vol,
+                    location=target,
+                    rate=rate,
+                    flow_rate=flow_rate,
+                ),
+            ):
+                self._core.dispense(
+                    volume=c_vol,
+                    rate=rate,
+                    location=target,
+                    well_core=None,
+                    flow_rate=flow_rate,
+                    in_place=False,
+                    push_out=push_out,
+                )
             return self
 
         with publisher.publish_context(
@@ -568,12 +583,17 @@ class InstrumentContext(publisher.CommandPublisher):
         elif isinstance(target, validation.PointTarget):
             move_to_location = target.location
         elif isinstance(target, (TrashBin, WasteChute)):
-            # TODO handle publish info
-            self._core.blow_out(
-                location=target,
-                well_core=None,
-                in_place=False,
-            )
+            with publisher.publish_context(
+                broker=self.broker,
+                command=cmds.blow_out_in_disposal_location(
+                    instrument=self, location=target
+                ),
+            ):
+                self._core.blow_out(
+                    location=target,
+                    well_core=None,
+                    in_place=False,
+                )
             return self
 
         with publisher.publish_context(
@@ -861,8 +881,31 @@ class InstrumentContext(publisher.CommandPublisher):
             if self._api_version >= _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
             else self.channels
         )
+        nozzle_map = (
+            self._core.get_nozzle_map()
+            if self._api_version
+            >= _PARTIAL_NOZZLE_CONFIGURATION_AUTOMATIC_TIP_TRACKING_IN
+            else None
+        )
 
         if location is None:
+            if (
+                nozzle_map is not None
+                and nozzle_map.configuration != NozzleConfigurationType.FULL
+                and self.starting_tip is not None
+            ):
+                # Disallowing this avoids concerning the system with the direction
+                # in which self.starting_tip consumes tips. It would currently vary
+                # depending on the configuration layout of a pipette at a given
+                # time, which means that some combination of starting tip and partial
+                # configuraiton are incompatible under the current understanding of
+                # starting tip behavior. Replacing starting_tip with an undeprecated
+                # Labware.has_tip may solve this.
+                raise CommandPreconditionViolated(
+                    "Automatic tip tracking is not available when using a partial pipette"
+                    " nozzle configuration and InstrumentContext.starting_tip."
+                    " Switch to a full configuration or set starting_tip to None."
+                )
             if not self._core.is_tip_tracking_available():
                 raise CommandPreconditionViolated(
                     "Automatic tip tracking is not available for the current pipette"
@@ -870,11 +913,11 @@ class InstrumentContext(publisher.CommandPublisher):
                     " that supports automatic tip tracking or specifying the exact tip"
                     " to pick up."
                 )
-
             tip_rack, well = labware.next_available_tip(
                 starting_tip=self.starting_tip,
                 tip_racks=self.tip_racks,
                 channels=active_channels,
+                nozzle_map=nozzle_map,
             )
 
         elif isinstance(location, labware.Well):
@@ -886,6 +929,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 starting_tip=None,
                 tip_racks=[location],
                 channels=active_channels,
+                nozzle_map=nozzle_map,
             )
 
         elif isinstance(location, types.Location):
@@ -901,6 +945,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     starting_tip=None,
                     tip_racks=[maybe_tip_rack],
                     channels=active_channels,
+                    nozzle_map=nozzle_map,
                 )
             else:
                 raise TypeError(
@@ -1008,9 +1053,17 @@ class InstrumentContext(publisher.CommandPublisher):
             if isinstance(trash_container, labware.Labware):
                 well = trash_container.wells()[0]
             else:  # implicit drop tip in disposal location, not well
-                self._core.drop_tip_in_disposal_location(
-                    trash_container, home_after=home_after
-                )
+                with publisher.publish_context(
+                    broker=self.broker,
+                    command=cmds.drop_tip_in_disposal_location(
+                        instrument=self, location=trash_container
+                    ),
+                ):
+                    self._core.drop_tip_in_disposal_location(
+                        trash_container,
+                        home_after=home_after,
+                        alternate_tip_drop=True,
+                    )
                 self._last_tip_picked_up_from = None
                 return self
 
@@ -1033,8 +1086,17 @@ class InstrumentContext(publisher.CommandPublisher):
             well = maybe_well
 
         elif isinstance(location, (TrashBin, WasteChute)):
-            # TODO: Publish to run log.
-            self._core.drop_tip_in_disposal_location(location, home_after=home_after)
+            with publisher.publish_context(
+                broker=self.broker,
+                command=cmds.drop_tip_in_disposal_location(
+                    instrument=self, location=location
+                ),
+            ):
+                # TODO(jbl 2024-02-28) when adding 2.18 api version checks, set alternate_tip_drop
+                #   if below that version for compatability
+                self._core.drop_tip_in_disposal_location(
+                    location, home_after=home_after
+                )
             self._last_tip_picked_up_from = None
             return self
 
@@ -1290,6 +1352,12 @@ class InstrumentContext(publisher.CommandPublisher):
             if self._api_version >= _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN
             else self.channels
         )
+        nozzle_map = (
+            self._core.get_nozzle_map()
+            if self._api_version
+            >= _PARTIAL_NOZZLE_CONFIGURATION_AUTOMATIC_TIP_TRACKING_IN
+            else None
+        )
 
         if blow_out and not blowout_location:
             if self.current_volume:
@@ -1306,7 +1374,10 @@ class InstrumentContext(publisher.CommandPublisher):
 
         if new_tip != types.TransferTipPolicy.NEVER:
             tr, next_tip = labware.next_available_tip(
-                self.starting_tip, self.tip_racks, active_channels
+                self.starting_tip,
+                self.tip_racks,
+                active_channels,
+                nozzle_map=nozzle_map,
             )
             max_volume = min(next_tip.max_volume, self.max_volume)
         else:
@@ -1419,36 +1490,43 @@ class InstrumentContext(publisher.CommandPublisher):
         :param publish: Whether to list this function call in the run preview.
                         Default is ``True``.
         """
-
-        if isinstance(location, (TrashBin, WasteChute)):
-            self._core.move_to(
-                location=location,
-                well_core=None,
-                force_direct=force_direct,
-                minimum_z_height=minimum_z_height,
-                speed=speed,
-            )
-            # TODO handle publish
-            return self
-
         with ExitStack() as contexts:
-            if publish:
-                contexts.enter_context(
-                    publisher.publish_context(
-                        broker=self.broker,
-                        command=cmds.move_to(instrument=self, location=location),
+            if isinstance(location, (TrashBin, WasteChute)):
+                if publish:
+                    contexts.enter_context(
+                        publisher.publish_context(
+                            broker=self.broker,
+                            command=cmds.move_to_disposal_location(
+                                instrument=self, location=location
+                            ),
+                        )
                     )
+
+                self._core.move_to(
+                    location=location,
+                    well_core=None,
+                    force_direct=force_direct,
+                    minimum_z_height=minimum_z_height,
+                    speed=speed,
                 )
+            else:
+                if publish:
+                    contexts.enter_context(
+                        publisher.publish_context(
+                            broker=self.broker,
+                            command=cmds.move_to(instrument=self, location=location),
+                        )
+                    )
 
-            _, well = location.labware.get_parent_labware_and_well()
+                _, well = location.labware.get_parent_labware_and_well()
 
-            self._core.move_to(
-                location=location,
-                well_core=well._core if well is not None else None,
-                force_direct=force_direct,
-                minimum_z_height=minimum_z_height,
-                speed=speed,
-            )
+                self._core.move_to(
+                    location=location,
+                    well_core=well._core if well is not None else None,
+                    force_direct=force_direct,
+                    minimum_z_height=minimum_z_height,
+                    speed=speed,
+                )
 
         return self
 

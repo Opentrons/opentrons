@@ -1,6 +1,7 @@
 import * as React from 'react'
 
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
 import { renderHook } from '@testing-library/react'
@@ -10,11 +11,12 @@ import { i18n } from '../../../i18n'
 import { useWifiList } from '../../../resources/networking/hooks'
 import * as Networking from '../../../redux/networking'
 import * as Fixtures from '../../../redux/networking/__fixtures__'
+import { getNetworkInterfaces } from '../../../redux/networking'
 
 import { useNetworkConnection } from '../hooks/useNetworkConnection'
 
-jest.mock('../../../resources/networking/hooks')
-jest.mock('../../../redux/networking/selectors')
+vi.mock('../../../resources/networking/hooks')
+vi.mock('../../../redux/networking/selectors')
 
 const mockRobotName = 'robot-name'
 const mockWifiList = [
@@ -41,12 +43,7 @@ const mockEthernet = {
   type: Networking.INTERFACE_ETHERNET,
 }
 
-const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
-const mockGetNetworkInterface = Networking.getNetworkInterfaces as jest.MockedFunction<
-  typeof Networking.getNetworkInterfaces
->
-
-const store: Store<any> = createStore(jest.fn(), {})
+const store: Store<any> = createStore(vi.fn(), {})
 
 // ToDo (kj:0202/2023) USB test cases will be added when USB is out
 describe('useNetworkConnection', () => {
@@ -59,18 +56,12 @@ describe('useNetworkConnection', () => {
       </I18nextProvider>
     )
 
-    when(mockUseWifiList)
-      .calledWith(mockRobotName, 10000)
-      .mockReturnValue(mockWifiList)
-    when(mockGetNetworkInterface)
+    when(useWifiList).calledWith(mockRobotName, 10000).thenReturn(mockWifiList)
+    when(getNetworkInterfaces)
       .calledWith(undefined as any, mockRobotName)
-      .mockReturnValue({ wifi: mockWifi, ethernet: mockEthernet })
+      .thenReturn({ wifi: mockWifi, ethernet: mockEthernet })
   })
 
-  afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
-  })
   it('should return network connection information - wifi and ethernet are connected', () => {
     const { result } = renderHook(() => useNetworkConnection(mockRobotName), {
       wrapper,
@@ -84,9 +75,9 @@ describe('useNetworkConnection', () => {
   })
 
   it('should return network connection information - only wifi is connected and ethernet is connected', () => {
-    when(mockGetNetworkInterface)
+    when(getNetworkInterfaces)
       .calledWith(undefined as any, mockRobotName)
-      .mockReturnValue({ wifi: mockWifi, ethernet: null })
+      .thenReturn({ wifi: mockWifi, ethernet: null })
     const { result } = renderHook(() => useNetworkConnection(mockRobotName), {
       wrapper,
     })
@@ -97,9 +88,9 @@ describe('useNetworkConnection', () => {
   })
 
   it('should return network connection information - only ethernet is connected', () => {
-    when(mockGetNetworkInterface)
+    when(getNetworkInterfaces)
       .calledWith(undefined as any, mockRobotName)
-      .mockReturnValue({ wifi: null, ethernet: mockEthernet })
+      .thenReturn({ wifi: null, ethernet: mockEthernet })
     const { result } = renderHook(() => useNetworkConnection(mockRobotName), {
       wrapper,
     })
@@ -109,9 +100,9 @@ describe('useNetworkConnection', () => {
   })
 
   it('should return network connection information - wifi and ethernet are not connected', () => {
-    when(mockGetNetworkInterface)
+    when(getNetworkInterfaces)
       .calledWith(undefined as any, mockRobotName)
-      .mockReturnValue({ wifi: null, ethernet: null })
+      .thenReturn({ wifi: null, ethernet: null })
     const { result } = renderHook(() => useNetworkConnection(mockRobotName), {
       wrapper,
     })

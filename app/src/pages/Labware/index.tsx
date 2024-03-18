@@ -67,12 +67,12 @@ const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
-    background-color: ${COLORS.grey60};
+    background-color: ${COLORS.grey30};
   }
-
   &:active,
   &:focus {
-    background-color: ${COLORS.grey30};
+    background-color: ${COLORS.grey40};
+  }
   }
 `
 
@@ -142,18 +142,14 @@ export function Labware(): JSX.Element {
           alignItems={ALIGN_FLEX_END}
           paddingBottom={SPACING.spacing24}
         >
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {t('category')}
-            </StyledText>
-            <DropdownMenu
-              filterOptions={FILTER_OPTIONS}
-              currentOption={{ value: filterBy, name: startCase(filterBy) }}
-              onClick={value => {
-                setFilterBy(value as LabwareFilter)
-              }}
-            />
-          </Flex>
+          <DropdownMenu
+            filterOptions={FILTER_OPTIONS}
+            currentOption={{ value: filterBy, name: startCase(filterBy) }}
+            onClick={value => {
+              setFilterBy(value as LabwareFilter)
+            }}
+            title={t('category')}
+          />
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <StyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.grey50}>
               {t('shared:sort_by')}
@@ -161,7 +157,7 @@ export function Labware(): JSX.Element {
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              borderRadius={BORDERS.radiusSoftCorners}
+              borderRadius={BORDERS.borderRadius4}
               marginLeft={SPACING.spacing8}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
@@ -188,7 +184,7 @@ export function Labware(): JSX.Element {
             <Flex
               width="9.375rem"
               zIndex={2}
-              borderRadius={BORDERS.radiusSoftCorners}
+              borderRadius={BORDERS.borderRadius4}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}

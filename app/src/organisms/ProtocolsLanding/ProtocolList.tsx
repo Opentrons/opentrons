@@ -42,7 +42,7 @@ const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
-    background-color: ${COLORS.grey60};
+    background-color: ${COLORS.grey30};
   }
   &:active,
   &:focus {
@@ -161,14 +161,14 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.grey50}
+              color={COLORS.grey60}
             >
               {t('shared:sort_by')}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              borderRadius={BORDERS.radiusSoftCorners}
+              borderRadius={BORDERS.borderRadius8}
               marginLeft={SPACING.spacing8}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
@@ -195,7 +195,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           {showSortByMenu && (
             <Flex
               zIndex={2}
-              borderRadius={BORDERS.radiusSoftCorners}
+              borderRadius={BORDERS.borderRadius4}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}
@@ -239,14 +239,15 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         gridGap={SPACING.spacing8}
         marginBottom={SPACING.spacing40}
       >
-        {sortedStoredProtocols.map(storedProtocol => (
-          <ProtocolCard
-            key={storedProtocol.protocolKey}
-            handleRunProtocol={handleRunProtocol}
-            handleSendProtocolToFlex={handleSendProtocolToFlex}
-            storedProtocolData={storedProtocol}
-          />
-        ))}
+        {sortedStoredProtocols != null &&
+          sortedStoredProtocols.map(storedProtocol => (
+            <ProtocolCard
+              key={storedProtocol.protocolKey}
+              handleRunProtocol={handleRunProtocol}
+              handleSendProtocolToFlex={handleSendProtocolToFlex}
+              storedProtocolData={storedProtocol}
+            />
+          ))}
       </Flex>
       <EmptyStateLinks title={t('create_or_download')} />
       <Slideout

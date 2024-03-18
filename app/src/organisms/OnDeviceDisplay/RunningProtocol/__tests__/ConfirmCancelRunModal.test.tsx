@@ -1,61 +1,49 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
-import { renderWithProviders } from '@opentrons/components'
 import {
   useStopRunMutation,
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
 
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { useTrackProtocolRunEvent } from '../../../../organisms/Devices/hooks'
 import { useRunStatus } from '../../../../organisms/RunTimeControl/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
+import { getLocalRobot } from '../../../../redux/discovery'
+import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
 import { CancelingRunModal } from '../CancelingRunModal'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../organisms/Devices/hooks')
-jest.mock('../../../../organisms/RunTimeControl/hooks')
-jest.mock('../../../../redux/analytics')
-jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../CancelingRunModal')
+import type { useHistory } from 'react-router-dom'
 
-const mockPush = jest.fn()
-let mockStopRun: jest.Mock
-let mockDismissCurrentRun: jest.Mock
-let mockTrackEvent: jest.Mock
-let mockTrackProtocolRunEvent: jest.Mock
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../organisms/Devices/hooks')
+vi.mock('../../../../organisms/RunTimeControl/hooks')
+vi.mock('../../../../redux/analytics')
+vi.mock('../../../ProtocolUpload/hooks')
+vi.mock('../CancelingRunModal')
+vi.mock('../../../../redux/discovery')
+const mockPush = vi.fn()
+const mockStopRun = vi.fn()
+const mockDismissCurrentRun = vi.fn()
+const mockTrackEvent = vi.fn()
+const mockTrackProtocolRunEvent = vi.fn(
+  () => new Promise(resolve => resolve({}))
+)
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof useHistory>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
-
-const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
-  typeof useTrackProtocolRunEvent
->
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockUseStopRunMutation = useStopRunMutation as jest.MockedFunction<
-  typeof useStopRunMutation
->
-const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
-  typeof useDismissCurrentRunMutation
->
-const mockCancelingRunModal = CancelingRunModal as jest.MockedFunction<
-  typeof CancelingRunModal
->
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
->
 
 const render = (props: React.ComponentProps<typeof ConfirmCancelRunModal>) => {
   return renderWithProviders(
@@ -69,7 +57,9 @@ const render = (props: React.ComponentProps<typeof ConfirmCancelRunModal>) => {
 }
 
 const RUN_ID = 'mock_runID'
-const mockFn = jest.fn()
+const ROBOT_NAME = 'otie'
+
+const mockFn = vi.fn()
 
 describe('ConfirmCancelRunModal', () => {
   let props: React.ComponentProps<typeof ConfirmCancelRunModal>
@@ -80,71 +70,72 @@ describe('ConfirmCancelRunModal', () => {
       runId: RUN_ID,
       setShowConfirmCancelRunModal: mockFn,
     }
-    mockTrackEvent = jest.fn()
-    mockStopRun = jest.fn()
-    mockDismissCurrentRun = jest.fn()
-    mockTrackProtocolRunEvent = jest.fn(
-      () => new Promise(resolve => resolve({}))
-    )
-    mockUseStopRunMutation.mockReturnValue({ stopRun: mockStopRun } as any)
-    mockUseDismissCurrentRunMutation.mockReturnValue({
+
+    vi.mocked(useStopRunMutation).mockReturnValue({
+      stopRun: mockStopRun,
+    } as any)
+    vi.mocked(useDismissCurrentRunMutation).mockReturnValue({
       dismissCurrentRun: mockDismissCurrentRun,
       isLoading: false,
     } as any)
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+    when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
-    mockCancelingRunModal.mockReturnValue(<div>mock CancelingRunModal</div>)
-    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
+    vi.mocked(CancelingRunModal).mockReturnValue(
+      <div>mock CancelingRunModal</div>
+    )
+
+    vi.mocked(getLocalRobot).mockReturnValue({
+      ...mockConnectedRobot,
+      name: ROBOT_NAME,
+    })
+    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render text and buttons', () => {
-    const [{ getByText, getAllByRole }] = render(props)
-    getByText('Are you sure you want to cancel this run?')
-    getByText(
+    render(props)
+    screen.getByText('Are you sure you want to cancel this run?')
+    screen.getByText(
       'Doing so will terminate this run, drop any attached tips in the trash container and home your robot.'
     )
-    getByText(
+    screen.getByText(
       'Additionally, any hardware modules used within the protocol will remain active and maintain their current states until deactivated.'
     )
-    expect(getAllByRole('button').length).toBe(2)
-    getByText('Go back')
-    getByText('Cancel run')
+    expect(screen.getAllByRole('button').length).toBe(2)
+    screen.getByText('Go back')
+    screen.getByText('Cancel run')
   })
 
   it('shoudler render the canceling run modal when run is dismissing', () => {
-    mockUseDismissCurrentRunMutation.mockReturnValue({
+    vi.mocked(useDismissCurrentRunMutation).mockReturnValue({
       dismissCurrentRun: mockDismissCurrentRun,
       isLoading: true,
     } as any)
-    const [{ getByText }] = render(props)
-    getByText('mock CancelingRunModal')
+    render(props)
+    screen.getByText('mock CancelingRunModal')
   })
 
   it('when tapping go back, the mock function is called', () => {
-    const [{ getByText }] = render(props)
-    const button = getByText('Go back')
+    render(props)
+    const button = screen.getByText('Go back')
     fireEvent.click(button)
     expect(mockFn).toHaveBeenCalled()
   })
 
   it('when tapping cancel run, the run is stopped', () => {
-    const [{ getByText }] = render(props)
-    const button = getByText('Cancel run')
+    render(props)
+    const button = screen.getByText('Cancel run')
     fireEvent.click(button)
     expect(mockStopRun).toHaveBeenCalled()
   })
 
   it('when run is stopped, the run is dismissed and the modal closes', () => {
-    when(mockUseRunStatus)
-      .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_STOPPED)
+    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
     render(props)
 
     expect(mockDismissCurrentRun).toHaveBeenCalled()
@@ -156,9 +147,7 @@ describe('ConfirmCancelRunModal', () => {
       ...props,
       isActiveRun: false,
     }
-    when(mockUseRunStatus)
-      .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_STOPPED)
+    when(useRunStatus).calledWith(RUN_ID).thenReturn(RUN_STATUS_STOPPED)
     render(props)
 
     expect(mockDismissCurrentRun).toHaveBeenCalled()

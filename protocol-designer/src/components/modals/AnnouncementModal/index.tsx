@@ -8,8 +8,8 @@ import {
   localStorageAnnouncementKey,
 } from '../../../persist'
 import { useAnnouncements } from './announcements'
-import modalStyles from '../modal.css'
-import styles from './AnnouncementModal.css'
+import modalStyles from '../modal.module.css'
+import styles from './AnnouncementModal.module.css'
 
 export const AnnouncementModal = (): JSX.Element => {
   const { t } = useTranslation(['modal', 'button'])

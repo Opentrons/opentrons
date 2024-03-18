@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { updateRobotName } from '@opentrons/api-client'
@@ -12,20 +12,15 @@ import type {
   UpdatedRobotName,
 } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const newRobotName = 'mockRobotName'
-const mockUpdateRobotName = updateRobotName as jest.MockedFunction<
-  typeof updateRobotName
->
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 const UPDATE_ROBOT_NAME_RESPONSE = {
   name: 'mockRobotName',
 }
+const newRobotName = 'mockRobotName'
 
 describe('useUpdatedRobotNameMutation, hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
@@ -39,15 +34,10 @@ describe('useUpdatedRobotNameMutation, hook', () => {
     )
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data when calling updateRobotName if the request fails', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockUpdateRobotName)
-      .calledWith(HOST_CONFIG, newRobotName)
-      .mockRejectedValue('error')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(updateRobotName).mockRejectedValue('error')
 
     const { result } = renderHook(() => useUpdateRobotNameMutation(), {
       wrapper,
@@ -61,12 +51,10 @@ describe('useUpdatedRobotNameMutation, hook', () => {
   })
 
   it('should update a robot name when calling the useRobotName callback', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockUpdateRobotName)
-      .calledWith(HOST_CONFIG, newRobotName)
-      .mockResolvedValue({
-        data: UPDATE_ROBOT_NAME_RESPONSE,
-      } as Response<UpdatedRobotName>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(updateRobotName).mockResolvedValue({
+      data: UPDATE_ROBOT_NAME_RESPONSE,
+    } as Response<UpdatedRobotName>)
 
     const { result } = renderHook(() => useUpdateRobotNameMutation(), {
       wrapper,

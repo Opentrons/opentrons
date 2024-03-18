@@ -2,17 +2,19 @@
 // Instances of BlockingHint need to be individually placed by whatever component
 // is controlling the flow that this modal will block, via useBlockingHint.
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { actions, selectors, HintKey } from '../../tutorial'
 import { ContinueModal, DeprecatedCheckboxField } from '@opentrons/components'
-import { Portal } from '../portals/MainPageModalPortal'
-import styles from './hints.css'
+import { actions, selectors } from '../../tutorial'
+import { getMainPagePortalEl } from '../portals/MainPageModalPortal'
+import styles from './hints.module.css'
+import type { HintKey } from '../../tutorial'
 
 export interface HintProps {
   hintKey: HintKey
-  handleCancel: () => unknown
-  handleContinue: () => unknown
+  handleCancel: () => void
+  handleContinue: () => void
   content: React.ReactNode
 }
 
@@ -40,25 +42,24 @@ export const BlockingHint = (props: HintProps): JSX.Element => {
     handleContinue()
   }
 
-  return (
-    <Portal>
-      <ContinueModal
-        alertOverlay
-        heading={t(`hint.${hintKey}.title`)}
-        onCancelClick={onCancelClick}
-        onContinueClick={onContinueClick}
-      >
-        <div className={styles.hint_contents}>{props.content}</div>
-        <div>
-          <DeprecatedCheckboxField
-            className={styles.dont_show_again}
-            label={t('hint.dont_show_again')}
-            onChange={toggleRememberDismissal}
-            value={rememberDismissal}
-          />
-        </div>
-      </ContinueModal>
-    </Portal>
+  return createPortal(
+    <ContinueModal
+      alertOverlay
+      heading={t(`hint.${hintKey}.title`)}
+      onCancelClick={onCancelClick}
+      onContinueClick={onContinueClick}
+    >
+      <div className={styles.hint_contents}>{props.content}</div>
+      <div>
+        <DeprecatedCheckboxField
+          className={styles.dont_show_again}
+          label={t('hint.dont_show_again')}
+          onChange={toggleRememberDismissal}
+          value={rememberDismissal}
+        />
+      </div>
+    </ContinueModal>,
+    getMainPagePortalEl()
   )
 }
 
@@ -69,8 +70,8 @@ export interface HintArgs {
   enabled: boolean
   hintKey: HintKey
   content: React.ReactNode
-  handleCancel: () => unknown
-  handleContinue: () => unknown
+  handleCancel: () => void
+  handleContinue: () => void
 }
 
 export const useBlockingHint = (args: HintArgs): JSX.Element | null => {

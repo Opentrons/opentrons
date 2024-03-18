@@ -9,7 +9,7 @@ import { RadioField } from '../RadioField'
 import { GridImg } from '../diagrams'
 import { SectionBody } from './SectionBody'
 
-import styles from '../../styles.css'
+import styles from '../../styles.module.css'
 
 interface Props {
   values: LabwareFields

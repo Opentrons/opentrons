@@ -32,8 +32,7 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerStep,
 )
 
-from ._trash_bin import TrashBin
-from ._waste_chute import WasteChute
+from .disposal_locations import TrashBin, WasteChute
 
 if TYPE_CHECKING:
     from .labware import Well

@@ -25,7 +25,7 @@ export function CancelingRunModal(): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
         backgroundColor={COLORS.grey35}
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
         width="41.625rem"
         height="17.25rem"
         gridGap={SPACING.spacing24}

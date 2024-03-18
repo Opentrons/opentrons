@@ -7,6 +7,7 @@ from opentrons.hardware_control.instruments.ot3 import gripper, instrument_calib
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.config import gripper_config
 from opentrons_shared_data.gripper import GripperModel
+from opentrons_shared_data.errors.exceptions import MotionFailedError
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
@@ -88,3 +89,24 @@ def test_reload_instrument_cal_ot3(fake_offset: "GripperCalibrationOffset") -> N
     assert new_gripper == old_gripper
     # we said upstream could skip
     assert skip
+
+
+@pytest.mark.ot3_only
+def test_jaw_calibration_error_checking() -> None:
+    subject = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
+    with pytest.raises(MotionFailedError):
+        subject.update_jaw_open_position_from_closed_position(0)
+
+
+@pytest.mark.ot3_only
+def test_jaw_calibration() -> None:
+    subject = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
+    subject.update_jaw_open_position_from_closed_position(
+        (
+            fake_gripper_conf.geometry.jaw_width["max"]
+            - fake_gripper_conf.geometry.jaw_width["min"]
+            + 2
+        )
+        / 2
+    )
+    assert subject.max_jaw_width == fake_gripper_conf.geometry.jaw_width["max"] + 2

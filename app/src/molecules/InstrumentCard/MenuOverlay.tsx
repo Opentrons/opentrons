@@ -32,7 +32,7 @@ export function MenuOverlay(props: MenuOverlayProps): JSX.Element {
   return (
     <Flex
       backgroundColor={COLORS.white}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadius8}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_ABSOLUTE}
@@ -40,7 +40,7 @@ export function MenuOverlay(props: MenuOverlayProps): JSX.Element {
       right="0"
       whiteSpace="nowrap"
       zIndex={10}
-      onClick={e => {
+      onClick={(e: React.MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
         setShowMenuOverlay(false)

@@ -19,6 +19,7 @@ import {
   NINETY_SIX_CHANNEL,
   PipetteName,
   SINGLE_MOUNT_PIPETTES,
+  LoadedPipette,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -36,7 +37,7 @@ export const MountItem = styled.div<{ isReady: boolean }>`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius8};
   background-color: ${({ isReady }) =>
     isReady ? COLORS.green35 : COLORS.yellow35};
   &:active {
@@ -49,6 +50,7 @@ interface ProtocolInstrumentMountItemProps {
   attachedInstrument: InstrumentData | null
   speccedName: PipetteName | GripperModel
   instrumentsRefetch?: () => void
+  pipetteInfo?: LoadedPipette[]
 }
 export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
@@ -172,6 +174,7 @@ export function ProtocolInstrumentMountItem(
           closeFlow={() => setShowPipetteWizardFlow(false)}
           selectedPipette={selectedPipette}
           mount={mount as Mount}
+          pipetteInfo={props.pipetteInfo}
           onComplete={props.instrumentsRefetch}
         />
       ) : null}

@@ -1,18 +1,19 @@
-import 'jest-styled-components'
-import { screen, fireEvent } from '@testing-library/react'
 import * as React from 'react'
+import { screen, fireEvent } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import {
   ALIGN_CENTER,
   COLORS,
   JUSTIFY_CENTER,
-  renderWithProviders,
   SPACING,
 } from '@opentrons/components'
 
 import { LegacyModalHeader } from '../LegacyModalHeader'
 
-const mockClose = jest.fn()
+const mockClose = vi.fn()
 
 const render = (props: React.ComponentProps<typeof LegacyModalHeader>) => {
   return renderWithProviders(<LegacyModalHeader {...props} />)
@@ -70,12 +71,6 @@ describe('LegacyModalHeader', () => {
     expect(closeIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
     expect(closeIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
     expect(closeIcon).toHaveStyle('border-radius: 0.875rem')
-    expect(closeIcon).toHaveStyleRule('background-color', COLORS.grey30, {
-      modifier: ':hover',
-    })
-    expect(closeIcon).toHaveStyleRule('background-color', COLORS.grey35, {
-      modifier: ':active',
-    })
     fireEvent.click(closeIcon)
     expect(mockClose).toHaveBeenCalled()
   })

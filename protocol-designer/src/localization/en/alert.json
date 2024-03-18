@@ -175,6 +175,10 @@
       "CANNOT_MOVE_WITH_GRIPPER": {
         "title": "Cannot move with gripper",
         "body": "The gripper cannot move aluminum blocks. Edit the step and deselect the 'Use Gripper' checkbox."
+      },
+      "PIPETTE_HAS_TIP": {
+        "title": "Possible collision with tip",
+        "body": "The gripper cannot pick up labware while pipettes have tips attached. Drop all tips before this move labware step."
       }
     },
     "warning": {
@@ -270,7 +274,7 @@
       "heading": "One or more staging area slots are unused",
       "body1_plural": "The {{count}} staging area slots in [{{slot}}] in your protocol are not currently in use. They will not appear as a needed item on the deck when uploaded to the app.",
       "body1": "The staging area slot in {{slot}} in your protocol is not currently in use. It will not appear as a needed item on the deck when uploaded to the app.",
-      "body2_plural": "If you don't intend to use these staging area slots, please consider removing it from your protocol.",
+      "body2_plural": "If you don't intend to use these staging area slots, please consider removing them from your protocol.",
       "body2": "If you don't intend to use this staging area slot, please consider removing it from your protocol."
     }
   },

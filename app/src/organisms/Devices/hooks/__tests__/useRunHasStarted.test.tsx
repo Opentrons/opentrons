@@ -1,25 +1,19 @@
 import { renderHook } from '@testing-library/react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, expect, describe, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { useRunStatus } from '../../../../organisms/RunTimeControl/hooks'
 import { useRunHasStarted } from '../useRunHasStarted'
 
-jest.mock('../../../../organisms/RunTimeControl/hooks')
-
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
->
+vi.mock('../../../../organisms/RunTimeControl/hooks')
 
 const MOCK_RUN_ID = '1'
 
 describe('useRunHasStarted', () => {
   beforeEach(() => {
-    when(mockUseRunStatus).calledWith(null).mockReturnValue(null)
-  })
-  afterEach(() => {
-    resetAllWhenMocks()
+    when(vi.mocked(useRunStatus)).calledWith(null).thenReturn(null)
   })
 
   it('should return false when no run id is provided', () => {
@@ -28,17 +22,17 @@ describe('useRunHasStarted', () => {
   })
 
   it('should return false when run has not started', () => {
-    when(mockUseRunStatus)
+    when(vi.mocked(useRunStatus))
       .calledWith(MOCK_RUN_ID)
-      .mockReturnValue(RUN_STATUS_IDLE)
+      .thenReturn(RUN_STATUS_IDLE)
     const { result } = renderHook(() => useRunHasStarted(MOCK_RUN_ID))
     expect(result.current).toEqual(false)
   })
 
   it('should return true when run has started', () => {
-    when(mockUseRunStatus)
+    when(vi.mocked(useRunStatus))
       .calledWith(MOCK_RUN_ID)
-      .mockReturnValue(RUN_STATUS_RUNNING)
+      .thenReturn(RUN_STATUS_RUNNING)
     const { result } = renderHook(() => useRunHasStarted(MOCK_RUN_ID))
     expect(result.current).toEqual(true)
   })

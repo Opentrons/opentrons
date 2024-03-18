@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
@@ -12,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Portal } from '../../../App/portal'
+import { getTopPortalEl } from '../../../App/portal'
 import { Banner } from '../../../atoms/Banner'
 import { LegacyModal } from '../../../molecules/LegacyModal'
 import { StyledText } from '../../../atoms/text'
@@ -62,32 +63,33 @@ export function ProtocolAnalysisErrorBanner(
           />
         </StyledText>
       </Flex>
-      {showErrorDetails ? (
-        <Portal level="top">
-          <LegacyModal
-            type="error"
-            title={t('protocol_analysis_failure')}
-            onClose={handleToggleDetails}
-          >
-            {errors.map((error, index) => (
-              <StyledText as="p" key={index}>
-                {error?.detail}
-              </StyledText>
-            ))}
-            <Flex justifyContent={JUSTIFY_FLEX_END}>
-              <PrimaryButton
-                role="button"
-                aria-label="close_modal_button"
-                onClick={handleToggleDetails}
-                textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginTop={SPACING.spacing16}
-              >
-                {t('shared:close')}
-              </PrimaryButton>
-            </Flex>
-          </LegacyModal>
-        </Portal>
-      ) : null}
+      {showErrorDetails
+        ? createPortal(
+            <LegacyModal
+              type="error"
+              title={t('protocol_analysis_failure')}
+              onClose={handleToggleDetails}
+            >
+              {errors.map((error, index) => (
+                <StyledText as="p" key={index}>
+                  {error?.detail}
+                </StyledText>
+              ))}
+              <Flex justifyContent={JUSTIFY_FLEX_END}>
+                <PrimaryButton
+                  role="button"
+                  aria-label="close_modal_button"
+                  onClick={handleToggleDetails}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  marginTop={SPACING.spacing16}
+                >
+                  {t('shared:close')}
+                </PrimaryButton>
+              </Flex>
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
     </Banner>
   )
 }

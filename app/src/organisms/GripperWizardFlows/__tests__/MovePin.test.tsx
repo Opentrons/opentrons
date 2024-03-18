@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { instrumentsResponseFixture } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 
@@ -15,13 +16,13 @@ import {
 import type { CommandData } from '@opentrons/api-client'
 
 describe('MovePin', () => {
-  let mockCreateRunCommand: jest.Mock
-  let mockSetErrorMessage: jest.Mock
+  let mockCreateRunCommand: any
+  let mockSetErrorMessage: any
 
-  const mockGoBack = jest.fn()
-  const mockProceed = jest.fn()
-  const mockChainRunCommands = jest.fn()
-  const mockSetFrontJawOffset = jest.fn()
+  const mockGoBack = vi.fn()
+  const mockProceed = vi.fn()
+  const mockChainRunCommands = vi.fn()
+  const mockSetFrontJawOffset = vi.fn()
   const mockRunId = 'fakeRunId'
 
   const render = (
@@ -50,20 +51,21 @@ describe('MovePin', () => {
     )
   }
   beforeEach(() => {
-    mockCreateRunCommand = jest.fn(() => {
+    mockCreateRunCommand = vi.fn(() => {
       return Promise.resolve({ data: {} } as CommandData)
     })
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('clicking confirm proceed calls proceed with correct callbacks', async () => {
     render()
     const begin = screen.getByRole('button', { name: 'Begin calibration' })
     fireEvent.click(begin)
-    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
+    await new Promise((resolve, reject) => setTimeout(resolve))
+    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
       maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'home',
@@ -71,7 +73,7 @@ describe('MovePin', () => {
       },
       waitUntilComplete: true,
     })
-    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
       maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'home',
@@ -79,7 +81,7 @@ describe('MovePin', () => {
       },
       waitUntilComplete: true,
     })
-    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
       maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/calibrateGripper',
@@ -87,7 +89,7 @@ describe('MovePin', () => {
       },
       waitUntilComplete: true,
     })
-    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(4, {
+    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(4, {
       maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
@@ -136,8 +138,8 @@ describe('MovePin', () => {
       name: 'Continue calibration',
     })
     fireEvent.click(continueButton)
-
-    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
+    await new Promise((resolve, reject) => setTimeout(resolve))
+    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
       maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'home',
@@ -145,7 +147,7 @@ describe('MovePin', () => {
       },
       waitUntilComplete: true,
     })
-    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
+    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(2, {
       maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'home',
@@ -153,7 +155,7 @@ describe('MovePin', () => {
       },
       waitUntilComplete: true,
     })
-    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
+    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
       maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/calibrateGripper',
@@ -164,7 +166,7 @@ describe('MovePin', () => {
       },
       waitUntilComplete: true,
     })
-    await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(4, {
+    expect(mockCreateRunCommand).toHaveBeenNthCalledWith(4, {
       maintenanceRunId: 'fakeRunId',
       command: {
         commandType: 'calibration/moveToMaintenancePosition',

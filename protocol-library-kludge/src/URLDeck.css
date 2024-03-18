@@ -1,7 +1,0 @@
-.labware_name_overlay {
-  opacity: 0;
-
-  &:hover {
-    opacity: 1;
-  }
-}

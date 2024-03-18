@@ -82,7 +82,8 @@ export const ProtocolRunModuleControls = ({
   } = usePipetteIsReady()
 
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    runId
+    runId,
+    true
   )
   const attachedModules = Object.values(moduleRenderInfoForProtocolById).filter(
     module => module.attachedModuleMatch != null

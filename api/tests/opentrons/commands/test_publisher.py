@@ -17,7 +17,7 @@ def broker(decoy: Decoy) -> LegacyBroker:
 
 def test_publish_decorator(decoy: Decoy, broker: LegacyBroker) -> None:
     """It should publish "before" and "after" messages for decorated methods."""
-    _act = decoy.mock()
+    _act = decoy.mock(name="_act")
 
     def _get_command_payload(foo: str, bar: int) -> CommandDict:
         return cast(
@@ -73,7 +73,7 @@ def test_publish_decorator_with_arg_defaults(
     decoy: Decoy, broker: LegacyBroker
 ) -> None:
     """It should pass method argument defaults to the command creator."""
-    _act = decoy.mock()
+    _act = decoy.mock(name="_act")
 
     def _get_command_payload(foo: str, bar: int) -> CommandDict:
         return cast(
@@ -175,7 +175,7 @@ def test_publish_decorator_remaps_instrument(
     decoy: Decoy, broker: LegacyBroker
 ) -> None:
     """It should pass "self" to command creator arguments named "instrument"."""
-    _act = decoy.mock()
+    _act = decoy.mock(name="_act")
 
     def _get_command_payload(foo: str, instrument: _Subject) -> Dict[str, Any]:
         return {
@@ -226,7 +226,7 @@ def test_publish_decorator_remaps_instrument(
 
 
 def test_publish_context(decoy: Decoy, broker: LegacyBroker) -> None:
-    _act = decoy.mock()
+    _act = decoy.mock(name="_act")
 
     command = cast(
         CommandDict,

@@ -37,7 +37,7 @@ import { LocationConflictModal } from '../../organisms/Devices/ProtocolRun/Setup
 import { ModuleWizardFlows } from '../../organisms/ModuleWizardFlows'
 import { useToaster } from '../../organisms/ToasterOven'
 import { getLocalRobot } from '../../redux/discovery'
-import { useChainLiveCommands } from '../../resources/runs/hooks'
+import { useChainLiveCommands } from '../../resources/runs'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
@@ -113,10 +113,15 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
         const isMagneticBlockModule =
           module.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE
 
+        const isThermocycler =
+          module.moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
+
         const conflictedFixture =
           deckConfig?.find(
             fixture =>
-              fixture.cutoutId === cutoutIdForSlotName &&
+              (fixture.cutoutId === cutoutIdForSlotName ||
+                // special-case A1 for the thermocycler to require a single slot fixture
+                (fixture.cutoutId === 'cutoutA1' && isThermocycler)) &&
               fixture.cutoutFixtureId != null &&
               // do not generate a conflict for single slot fixtures, because modules are not yet fixtures
               !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId) &&
@@ -307,7 +312,7 @@ function ModuleTableItem({
             ? COLORS.grey35
             : COLORS.yellow35
         }
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
         cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
         gridGap={SPACING.spacing24}
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}

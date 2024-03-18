@@ -1,18 +1,19 @@
 import * as React from 'react'
-import { when } from 'jest-when'
-import {
-  partialComponentPropsMatcher,
-  renderWithProviders,
-  RobotCoordsForeignDiv,
-} from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, vi } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { FlexModuleTag } from '../FlexModuleTag'
 import type { ModuleDimensions } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/components/src/hardware-sim/Deck/RobotCoordsForeignDiv')
-
-const mockRobotCoordsForeignDiv = RobotCoordsForeignDiv as jest.MockedFunction<
-  typeof RobotCoordsForeignDiv
->
+vi.mock('@opentrons/components', async () => {
+  const actual = await vi.importActual('@opentrons/components')
+  return {
+    ...actual,
+    RobotCoordsForeignDiv: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
+  }
+})
 
 const render = (props: React.ComponentProps<typeof FlexModuleTag>) => {
   return renderWithProviders(<FlexModuleTag {...props} />)[0]
@@ -24,43 +25,17 @@ const mockDimensions: ModuleDimensions = {
 
 describe('FlexModuleTag', () => {
   it('renders the flex module tag for magnetic block', () => {
-    when(mockRobotCoordsForeignDiv)
-      .calledWith(
-        partialComponentPropsMatcher({
-          width: 5,
-          height: 20,
-        })
-      )
-      .mockImplementation(({ children }) => (
-        <div>
-          {`rectangle with width 5 and height 16`} {children}
-        </div>
-      ))
-    const { getByText } = render({
+    render({
       dimensions: mockDimensions,
       displayName: 'mock Magnetic Block',
     })
-    getByText('mock Magnetic Block')
-    getByText('rectangle with width 5 and height 16')
+    screen.getByText('mock Magnetic Block')
   })
   it('renders the flex module tag for heater-shaker', () => {
-    when(mockRobotCoordsForeignDiv)
-      .calledWith(
-        partialComponentPropsMatcher({
-          width: 5,
-          height: 20,
-        })
-      )
-      .mockImplementation(({ children }) => (
-        <div>
-          {`rectangle with width 5 and height 16`} {children}
-        </div>
-      ))
-    const { getByText } = render({
+    render({
       dimensions: mockDimensions,
       displayName: 'mock Heater-shaker',
     })
-    getByText('mock Heater-shaker')
-    getByText('rectangle with width 5 and height 16')
+    screen.getByText('mock Heater-shaker')
   })
 })

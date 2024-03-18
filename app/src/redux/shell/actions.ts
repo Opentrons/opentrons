@@ -8,6 +8,9 @@ import type {
   RobotMassStorageDeviceAdded,
   RobotMassStorageDeviceEnumerated,
   RobotMassStorageDeviceRemoved,
+  NotifySubscribeAction,
+  NotifyUnsubscribeAction,
+  NotifyTopic,
 } from './types'
 
 export const UI_INITIALIZED: 'shell:UI_INITIALIZED' = 'shell:UI_INITIALIZED'
@@ -26,6 +29,10 @@ export const ROBOT_MASS_STORAGE_DEVICE_REMOVED: 'shell:ROBOT_MASS_STORAGE_DEVICE
   'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED'
 export const ROBOT_MASS_STORAGE_DEVICE_ENUMERATED: 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED' =
   'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED'
+export const NOTIFY_SUBSCRIBE: 'shell:NOTIFY_SUBSCRIBE' =
+  'shell:NOTIFY_SUBSCRIBE'
+export const NOTIFY_UNSUBSCRIBE: 'shell:NOTIFY_UNSUBSCRIBE' =
+  'shell:NOTIFY_UNSUBSCRIBE'
 
 export const uiInitialized = (): UiInitializedAction => ({
   type: UI_INITIALIZED,
@@ -102,6 +109,30 @@ export const robotMassStorageDeviceEnumerated = (
   payload: {
     rootPath,
     filePaths,
+  },
+  meta: { shell: true },
+})
+
+export const notifySubscribeAction = (
+  hostname: string,
+  topic: NotifyTopic
+): NotifySubscribeAction => ({
+  type: NOTIFY_SUBSCRIBE,
+  payload: {
+    hostname,
+    topic,
+  },
+  meta: { shell: true },
+})
+
+export const notifyUnsubscribeAction = (
+  hostname: string,
+  topic: NotifyTopic
+): NotifyUnsubscribeAction => ({
+  type: NOTIFY_UNSUBSCRIBE,
+  payload: {
+    hostname,
+    topic,
   },
   meta: { shell: true },
 })

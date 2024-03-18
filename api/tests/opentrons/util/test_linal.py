@@ -2,6 +2,7 @@ from math import pi, sin, cos
 from opentrons.util.linal import solve, add_z, apply_transform, solve_attitude
 from numpy.linalg import inv
 import numpy as np
+from numpy.typing import NDArray
 
 
 def test_solve() -> None:
@@ -22,7 +23,7 @@ def test_solve() -> None:
 
     X = solve(expected, actual)
 
-    expected2 = np.array(
+    expected2: NDArray[np.double] = np.array(
         [cos(theta + pi / 2) * scale + 0.5, sin(theta + pi / 2) * scale + 0.25, 1]
     )
     result = np.dot(X, np.array([[0], [1], [1]])).transpose()
@@ -35,9 +36,11 @@ def test_add_z() -> None:
     y = 10
     z = 20
 
-    xy_array = np.array([[1, 0, x], [0, 1, y], [0, 0, 1]])
+    xy_array: NDArray[np.double] = np.array([[1, 0, x], [0, 1, y], [0, 0, 1]])
 
-    expected = np.array([[1, 0, 0, x], [0, 1, 0, y], [0, 0, 1, z], [0, 0, 0, 1]])
+    expected: NDArray[np.double] = np.array(
+        [[1, 0, 0, x], [0, 1, 0, y], [0, 0, 1, z], [0, 0, 0, 1]]
+    )
 
     result = add_z(xy_array, z)
     assert (result == expected).all()

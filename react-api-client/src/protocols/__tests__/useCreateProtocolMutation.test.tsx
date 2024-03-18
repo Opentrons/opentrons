@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { createProtocol } from '@opentrons/api-client'
@@ -7,8 +7,8 @@ import { useHost } from '../../api'
 import { useCreateProtocolMutation } from '..'
 import type { HostConfig, Response, Protocol } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const contents = JSON.stringify({
   metadata: {
@@ -23,11 +23,6 @@ const contents = JSON.stringify({
   },
 })
 const jsonFile = new File([contents], 'valid.json')
-
-const mockCreateProtocol = createProtocol as jest.MockedFunction<
-  typeof createProtocol
->
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const PROTOCOL_RESPONSE = {
@@ -55,15 +50,10 @@ describe('useCreateProtocolMutation hook', () => {
     )
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data when calling createProtocol if the request fails', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateProtocol)
-      .calledWith(HOST_CONFIG, createProtocolData)
-      .mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createProtocol).mockRejectedValue('oh no')
 
     const { result } = renderHook(() => useCreateProtocolMutation(), {
       wrapper,
@@ -77,10 +67,10 @@ describe('useCreateProtocolMutation hook', () => {
   })
 
   it('should create a protocol when calling the createProtocol callback', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateProtocol)
-      .calledWith(HOST_CONFIG, createProtocolData, undefined)
-      .mockResolvedValue({ data: PROTOCOL_RESPONSE } as Response<Protocol>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createProtocol).mockResolvedValue({
+      data: PROTOCOL_RESPONSE,
+    } as Response<Protocol>)
 
     const { result } = renderHook(() => useCreateProtocolMutation(), {
       wrapper,
@@ -93,10 +83,10 @@ describe('useCreateProtocolMutation hook', () => {
   })
 
   it('should create a protocol with a protocolKey if included', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockCreateProtocol)
-      .calledWith(HOST_CONFIG, createProtocolData, 'fakeProtocolKey')
-      .mockResolvedValue({ data: PROTOCOL_RESPONSE } as Response<Protocol>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(createProtocol).mockResolvedValue({
+      data: PROTOCOL_RESPONSE,
+    } as Response<Protocol>)
 
     const { result } = renderHook(() => useCreateProtocolMutation(), {
       wrapper,

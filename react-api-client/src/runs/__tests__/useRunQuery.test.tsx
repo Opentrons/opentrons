@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { getRun } from '@opentrons/api-client'
@@ -8,11 +8,8 @@ import { useRunQuery } from '..'
 
 import type { HostConfig, Response, Run } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockGetRun = getRun as jest.MockedFunction<typeof getRun>
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID = '1'
@@ -31,12 +28,9 @@ describe('useRunQuery hook', () => {
 
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data if no host', () => {
-    when(mockUseHost).calledWith().mockReturnValue(null)
+    vi.mocked(useHost).mockReturnValue(null)
 
     const { result } = renderHook(() => useRunQuery(RUN_ID), {
       wrapper,
@@ -46,8 +40,8 @@ describe('useRunQuery hook', () => {
   })
 
   it('should return no data if the get runs request fails', () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetRun).calledWith(HOST_CONFIG, RUN_ID).mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getRun).mockRejectedValue('oh no')
 
     const { result } = renderHook(() => useRunQuery(RUN_ID), {
       wrapper,
@@ -56,10 +50,8 @@ describe('useRunQuery hook', () => {
   })
 
   it('should return a run', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetRun)
-      .calledWith(HOST_CONFIG, RUN_ID)
-      .mockResolvedValue({ data: RUN_RESPONSE } as Response<Run>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getRun).mockResolvedValue({ data: RUN_RESPONSE } as Response<Run>)
 
     const { result } = renderHook(() => useRunQuery(RUN_ID), {
       wrapper,

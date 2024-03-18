@@ -26,6 +26,7 @@ import {
 import {
   useCurrentSubsystemUpdateQuery,
   usePipetteSettingsQuery,
+  useHost,
 } from '@opentrons/react-api-client'
 
 import { LEFT } from '../../../redux/pipettes'
@@ -36,7 +37,7 @@ import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { InstrumentCard } from '../../../molecules/InstrumentCard'
 import { ChangePipette } from '../../ChangePipette'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
-import { PipetteWizardFlows } from '../../PipetteWizardFlows'
+import { handlePipetteWizardFlows } from '../../PipetteWizardFlows'
 import { ChoosePipette } from '../../PipetteWizardFlows/ChoosePipette'
 import { useIsFlex } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
@@ -50,6 +51,7 @@ import type {
   SelectablePipettes,
 } from '../../PipetteWizardFlows/types'
 import { DropTipWizard } from '../../DropTipWizard'
+import { HostConfig } from '@opentrons/api-client'
 
 interface PipetteCardProps {
   pipetteModelSpecs: PipetteModelSpecs | null
@@ -59,15 +61,9 @@ interface PipetteCardProps {
   robotName: string
   pipetteIs96Channel: boolean
   pipetteIsBad: boolean
-  updatePipette: () => void
   isRunActive: boolean
   isEstopNotDisengaged: boolean
 }
-const BANNER_LINK_STYLE = css`
-  text-decoration: underline;
-  cursor: pointer;
-  margin-left: ${SPACING.spacing8};
-`
 
 const INSTRUMENT_CARD_STYLE = css`
   p {
@@ -91,7 +87,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteId,
     pipetteIs96Channel,
     pipetteIsBad,
-    updatePipette,
     isRunActive,
     isEstopNotDisengaged,
   } = props
@@ -102,6 +97,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const isFlex = useIsFlex(robotName)
+  const host = useHost() as HostConfig
   const pipetteName = pipetteModelSpecs?.name
   const isFlexPipetteAttached = isFlexPipette(pipetteName as PipetteName)
   const pipetteDisplayName = pipetteModelSpecs?.displayName
@@ -111,10 +107,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const [showChangePipette, setChangePipette] = React.useState(false)
   const [showDropTipWizard, setShowDropTipWizard] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
-  const [
-    pipetteWizardFlow,
-    setPipetteWizardFlow,
-  ] = React.useState<PipetteWizardFlow | null>(null)
   const [showAttachPipette, setShowAttachPipette] = React.useState(false)
   const [showAboutSlideout, setShowAboutSlideout] = React.useState(false)
   const subsystem = mount === LEFT ? 'pipette_left' : 'pipette_right'
@@ -155,10 +147,12 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     selectedPipette,
     setSelectedPipette,
   ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
+  const selectedPipetteForWizard =
+    pipetteName === 'p1000_96' ? NINETY_SIX_CHANNEL : selectedPipette
 
   const handleChangePipette = (): void => {
     if (isFlexPipetteAttached && isFlex) {
-      setPipetteWizardFlow(FLOWS.DETACH)
+      handleLaunchPipetteWizardFlows(FLOWS.DETACH)
     } else if (!isFlexPipetteAttached && isFlex) {
       setShowAttachPipette(true)
     } else {
@@ -169,7 +163,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     setShowDropTipWizard(true)
   }
   const handleCalibrate = (): void => {
-    if (isFlexPipetteAttached) setPipetteWizardFlow(FLOWS.CALIBRATE)
+    if (isFlexPipetteAttached) {
+      handleLaunchPipetteWizardFlows(FLOWS.CALIBRATE)
+    }
   }
   const handleAboutSlideout = (): void => {
     setShowAboutSlideout(true)
@@ -177,15 +173,26 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const handleSettingsSlideout = (): void => {
     setShowSlideout(true)
   }
-
   const handleAttachPipette = (): void => {
     setShowAttachPipette(false)
-    setPipetteWizardFlow(FLOWS.ATTACH)
+    handleLaunchPipetteWizardFlows(FLOWS.ATTACH)
   }
+  const setCloseFlow = (): void => {
+    setSelectedPipette(SINGLE_MOUNT_PIPETTES)
+  }
+  const handleLaunchPipetteWizardFlows = (flowType: PipetteWizardFlow): void =>
+    handlePipetteWizardFlows({
+      flowType,
+      mount,
+      closeFlow: setCloseFlow,
+      selectedPipette: selectedPipetteForWizard,
+      host,
+    })
+
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadius8}
       width="100%"
       data-testid={`PipetteCard_${String(pipetteDisplayName)}`}
     >
@@ -196,19 +203,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           selectedPipette={selectedPipette}
           exit={() => setShowAttachPipette(false)}
           mount={mount}
-        />
-      ) : null}
-      {pipetteWizardFlow != null ? (
-        <PipetteWizardFlows
-          flowType={pipetteWizardFlow}
-          mount={mount}
-          closeFlow={() => {
-            setSelectedPipette(SINGLE_MOUNT_PIPETTES)
-            setPipetteWizardFlow(null)
-          }}
-          selectedPipette={
-            pipetteName === 'p1000_96' ? NINETY_SIX_CHANNEL : selectedPipette
-          }
         />
       ) : null}
       {showChangePipette && (
@@ -252,22 +246,23 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <>
           <Box padding={SPACING.spacing16} width="100%">
             <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
-              <Flex alignItems={ALIGN_CENTER} width="3.75rem" height="3.375rem">
-                {pipetteModelSpecs !== null ? (
+              {pipetteModelSpecs !== null ? (
+                <Flex
+                  alignItems={ALIGN_CENTER}
+                  width="3.75rem"
+                  height="3.375rem"
+                  paddingRight={SPACING.spacing8}
+                >
                   <InstrumentDiagram
                     pipetteSpecs={pipetteModelSpecs}
                     mount={mount}
                     //  pipette images for Flex are slightly smaller so need to be scaled accordingly
                     transform="scale(0.3)"
-                    transformOrigin={isFlex ? '-10% 52%' : '20% 52%'}
+                    transformOrigin={isFlex ? '-5% 52%' : '20% 52%'}
                   />
-                ) : null}
-              </Flex>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                flex="100%"
-                paddingLeft={SPACING.spacing8}
-              >
+                </Flex>
+              ) : null}
+              <Flex flexDirection={DIRECTION_COLUMN} flex="100%">
                 {isFlexPipetteAttached && !isPipetteCalibrated ? (
                   <Banner type="error" marginBottom={SPACING.spacing4}>
                     {isEstopNotDisengaged ? (
@@ -297,7 +292,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 ) : null}
                 <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  color={COLORS.grey50}
+                  color={COLORS.grey60}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
                   paddingBottom={SPACING.spacing4}
@@ -355,17 +350,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                 i18nKey={
                   subsystemUpdateData != null
                     ? 'firmware_update_occurring'
-                    : 'firmware_update_available_now'
+                    : 'firmware_update_needed'
                 }
-                components={{
-                  updateLink: (
-                    <StyledText
-                      as="p"
-                      css={BANNER_LINK_STYLE}
-                      onClick={updatePipette}
-                    />
-                  ),
-                }}
               />
             </Banner>
           }

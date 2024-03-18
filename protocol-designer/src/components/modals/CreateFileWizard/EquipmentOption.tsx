@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   Flex,
   Text,
@@ -9,12 +10,50 @@ import {
   BORDERS,
   JUSTIFY_CENTER,
   COLORS,
-  StyleProps,
   TYPOGRAPHY,
   useHoverTooltip,
   Tooltip,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 
+const EQUIPMENT_OPTION_STYLE = css`
+  background-color: ${COLORS.white};
+  border-radius: ${BORDERS.borderRadius8};
+  border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
+
+  &:hover {
+    background-color: ${COLORS.grey10};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.grey35};
+  }
+
+  &:focus {
+    outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
+    outline-offset: 3px;
+  }
+`
+
+const EQUIPMENT_OPTION_SELECTED_STYLE = css`
+  ${EQUIPMENT_OPTION_STYLE}
+  background-color: ${COLORS.blue10};
+  border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
+
+  &:hover {
+    background-color: ${COLORS.blue10};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2);
+  }
+`
+
+const EQUIPMENT_OPTION_DISABLED_STYLE = css`
+  ${EQUIPMENT_OPTION_STYLE}
+  background-color: ${COLORS.white};
+  border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
+
+  &:hover {
+    background-color: ${COLORS.white};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
+  }
+`
 interface EquipmentOptionProps extends StyleProps {
   onClick: React.MouseEventHandler
   isSelected: boolean
@@ -36,6 +75,12 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
   const { t } = useTranslation('tooltip')
   const [targetProps, tooltipProps] = useHoverTooltip()
 
+  let equpimentOptionStyle
+  if (disabled) {
+    equpimentOptionStyle = EQUIPMENT_OPTION_DISABLED_STYLE
+  } else if (isSelected) {
+    equpimentOptionStyle = EQUIPMENT_OPTION_SELECTED_STYLE
+  } else equpimentOptionStyle = EQUIPMENT_OPTION_STYLE
   return (
     <>
       <Flex
@@ -48,12 +93,13 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             ? BORDERS.activeLineBorder
             : BORDERS.lineBorder
         }
-        borderRadius={BORDERS.borderRadiusSize2}
+        borderRadius={BORDERS.borderRadius8}
         cursor={disabled ? 'auto' : 'pointer'}
         backgroundColor={disabled ? COLORS.grey30 : COLORS.transparent}
         onClick={disabled ? undefined : onClick}
         {...styleProps}
         {...targetProps}
+        css={equpimentOptionStyle}
       >
         {showCheckbox ? (
           <Icon
@@ -75,7 +121,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         <Text
           as="p"
           fontSize={TYPOGRAPHY.fontSizeP}
-          color={disabled ? COLORS.grey40 : COLORS.black90}
+          color={disabled ? COLORS.grey50 : COLORS.black90}
         >
           {text}
         </Text>

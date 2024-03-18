@@ -1,12 +1,13 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 
 import {
   useInstrumentsQuery,
-  useCurrentMaintenanceRun,
   useCurrentAllSubsystemUpdatesQuery,
   useSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
-import { Portal } from '../../App/portal'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
+import { getTopPortalEl } from '../../App/portal'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateNeededModal } from './UpdateNeededModal'
@@ -42,7 +43,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   })
   const [indexToUpdate, setIndexToUpdate] = React.useState(0)
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: POLL_INTERVAL_MS,
   })
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
@@ -63,7 +64,16 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   )
 
   React.useEffect(() => {
+    // in case instruments are updated elsewhere in the app, clear update needed list
+    // when all instruments are ok but array has elements
     if (
+      instrumentsData?.find(instrument => !instrument.ok) == null &&
+      !showUpdateNeededModal &&
+      instrumentsToUpdate.length > 0
+    ) {
+      setInstrumentsToUpdate([])
+      setIndexToUpdate(0)
+    } else if (
       instrumentsToUpdate.length > indexToUpdate &&
       instrumentsToUpdate[indexToUpdate]?.subsystem != null &&
       maintenanceRunData == null &&
@@ -72,12 +82,23 @@ export function FirmwareUpdateTakeover(): JSX.Element {
     ) {
       setShowUpdateNeededModal(true)
     }
+    // close modal if update is no longer needed
+    else if (
+      instrumentsData?.find(instrument => !instrument.ok) == null &&
+      initiatedSubsystemUpdate == null &&
+      showUpdateNeededModal
+    ) {
+      setShowUpdateNeededModal(false)
+    }
   }, [
-    instrumentsToUpdate,
-    indexToUpdate,
-    maintenanceRunData,
-    isUnboxingFlowOngoing,
     externalSubsystemUpdate,
+    indexToUpdate,
+    instrumentsToUpdate,
+    initiatedSubsystemUpdate,
+    instrumentsData,
+    isUnboxingFlowOngoing,
+    maintenanceRunData,
+    showUpdateNeededModal,
   ])
 
   return (
@@ -88,10 +109,12 @@ export function FirmwareUpdateTakeover(): JSX.Element {
         <UpdateNeededModal
           subsystem={instrumentsToUpdate[indexToUpdate]?.subsystem}
           onClose={() => {
-            // if no more instruments need updating, close the modal
+            // if no more instruments need updating, close the modal and clear data
             // otherwise start over with next instrument
             if (instrumentsToUpdate.length <= indexToUpdate + 1) {
               setShowUpdateNeededModal(false)
+              setInstrumentsToUpdate([])
+              setIndexToUpdate(0)
             } else {
               setIndexToUpdate(prevIndexToUpdate => prevIndexToUpdate + 1)
             }
@@ -100,14 +123,14 @@ export function FirmwareUpdateTakeover(): JSX.Element {
           setInitiatedSubsystemUpdate={setInitiatedSubsystemUpdate}
         />
       ) : null}
-      {externalsubsystemUpdateData != null && maintenanceRunData == null ? (
-        <Portal level="top">
-          <UpdateInProgressModal
-            percentComplete={externalsubsystemUpdateData.data.updateProgress}
-            subsystem={externalsubsystemUpdateData.data.subsystem}
-          />
-        </Portal>
-      ) : null}
+      {externalsubsystemUpdateData != null && maintenanceRunData == null
+        ? createPortal(
+            <UpdateInProgressModal
+              subsystem={externalsubsystemUpdateData.data.subsystem}
+            />,
+            getTopPortalEl()
+          )
+        : null}
     </>
   )
 }

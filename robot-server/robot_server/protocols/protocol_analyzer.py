@@ -2,10 +2,13 @@
 import logging
 
 from opentrons import protocol_runner
+from opentrons.protocol_engine.errors import ErrorOccurrence
+import opentrons.util.helpers as datetime_helper
+
+import robot_server.errors.error_mappers as em
 
 from .protocol_store import ProtocolResource
 from .analysis_store import AnalysisStore
-
 
 log = logging.getLogger(__name__)
 
@@ -30,15 +33,43 @@ class ProtocolAnalyzer:
             robot_type=protocol_resource.source.robot_type,
             protocol_config=protocol_resource.source.config,
         )
-        result = await runner.run(
-            protocol_source=protocol_resource.source, deck_configuration=[]
-        )
+        try:
+            result = await runner.run(
+                protocol_source=protocol_resource.source, deck_configuration=[]
+            )
+        except BaseException as error:
+            internal_error = em.map_unexpected_error(error=error)
+            await self._analysis_store.update(
+                analysis_id=analysis_id,
+                robot_type=protocol_resource.source.robot_type,
+                # TODO (spp, 2024-03-12): populate the RTP field if we decide to have
+                #  parameter parsing and validation in protocol reader itself.
+                run_time_parameters=[],
+                commands=[],
+                labware=[],
+                modules=[],
+                pipettes=[],
+                errors=[
+                    ErrorOccurrence.from_failed(
+                        # TODO(tz, 2-15-24): replace with a different error type
+                        #  when we are able to support different errors.
+                        id="internal-error",
+                        createdAt=datetime_helper.utc_now(),
+                        error=internal_error,
+                    )
+                ],
+                liquids=[],
+            )
+            return
 
         log.info(f'Completed analysis "{analysis_id}".')
 
         await self._analysis_store.update(
             analysis_id=analysis_id,
             robot_type=protocol_resource.source.robot_type,
+            # TODO(spp, 2024-03-12): update this once protocol reader/ runner can parse
+            #  and report the runTimeParameters
+            run_time_parameters=[],
             commands=result.commands,
             labware=result.state_summary.labware,
             modules=result.state_summary.modules,
