@@ -169,7 +169,7 @@ def live_runner_subject(
         (None, LiveRunner),
     ],
 )
-async def test_create_protocol_runner(
+def test_create_protocol_runner(
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareAPI,
     task_queue: TaskQueue,
@@ -203,7 +203,7 @@ async def test_create_protocol_runner(
         (lazy_fixture("live_runner_subject")),
     ],
 )
-async def test_play_starts_run(
+def test_play_starts_run(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
@@ -223,7 +223,7 @@ async def test_play_starts_run(
         (lazy_fixture("live_runner_subject")),
     ],
 )
-async def test_pause(
+def test_pause(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
     subject: AnyRunner,
@@ -284,6 +284,25 @@ async def test_stop_when_run_never_started(
         ),
         times=1,
     )
+
+
+@pytest.mark.parametrize(
+    "subject",
+    [
+        (lazy_fixture("json_runner_subject")),
+        (lazy_fixture("legacy_python_runner_subject")),
+        (lazy_fixture("live_runner_subject")),
+    ],
+)
+def test_resume_from_recovery(
+    decoy: Decoy,
+    protocol_engine: ProtocolEngine,
+    subject: AnyRunner,
+) -> None:
+    """It should call `resume_from_recovery()` on the underlying engine."""
+    subject.resume_from_recovery()
+
+    decoy.verify(protocol_engine.resume_from_recovery(), times=1)
 
 
 async def test_run_json_runner(

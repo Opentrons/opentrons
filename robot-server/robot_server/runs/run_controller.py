@@ -85,6 +85,9 @@ class RunController:
                 log.info(f'Stopping run "{self._run_id}".')
                 self._task_runner.run(self._engine_store.runner.stop)
 
+            elif action_type == RunActionType.RESUME_FROM_RECOVERY:
+                self._engine_store.runner.resume_from_recovery()
+
         except ProtocolEngineError as e:
             raise RunActionNotAllowedError(message=e.message, wrapping=[e]) from e
 
