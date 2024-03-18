@@ -271,7 +271,12 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
 
           return (
             <TableRow key={index}>
-              <TableDatum>
+              <TableDatum
+                css={`
+                  border-radius: ${BORDERS.borderRadius4} 0 0
+                    ${BORDERS.borderRadius4};
+                `}
+              >
                 <StyledText
                   as="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
@@ -282,7 +287,12 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
               <TableDatum>
                 <StyledText as="p">{labwareDisplayName}</StyledText>
               </TableDatum>
-              <TableDatum>
+              <TableDatum
+                css={`
+                  border-radius: 0 ${BORDERS.borderRadius4}
+                    ${BORDERS.borderRadius4} 0;
+                `}
+              >
                 {isEqual(vector, IDENTITY_VECTOR) ? (
                   <StyledText>{t('no_labware_offsets')}</StyledText>
                 ) : (
