@@ -2,21 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import {
-  COLORS,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  DIRECTION_ROW,
 } from '@opentrons/components'
-import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { ProtocolSetupStep, SetupScreens } from '../../pages/ProtocolSetup'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import { ChildNavigation } from '../ChildNavigation'
 
 const mockData: RunTimeParameter[] = [
   {
@@ -169,42 +164,21 @@ export function ProtocolSetupParameters({
   }
 
   //  TODO(jr, 3/18/24): remove mockData
-  const parameters =
-    mostRecentAnalysis?.runTimeParameters?.length === 0
-      ? mockData
-      : mostRecentAnalysis?.runTimeParameters ?? []
+  const parameters = mostRecentAnalysis?.runTimeParameters ?? mockData
 
   return (
     <>
-      <Flex
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        flexDirection={DIRECTION_ROW}
-        width="100%"
-        paddingBottom={SPACING.spacing32}
-      >
-        <ODDBackButton
-          label={t('parameters')}
-          onClick={() => history.goBack()}
-        />
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing32}
-        >
-          <StyledText
-            as="p"
-            color={COLORS.grey50}
-            onClick={() => console.log('TODO: wire this up!')}
-          >
-            {t('restore_default')}
-          </StyledText>
-          <SmallButton
-            buttonCategory="rounded"
-            buttonText={t('confirm_values')}
-            onClick={handleConfirmValues}
-          />
-        </Flex>
-      </Flex>
+      <ChildNavigation
+        header={t('parameters')}
+        onClickBack={() => history.goBack()}
+        onClickButton={handleConfirmValues}
+        buttonText={t('confirm_values')}
+        secondaryButtonProps={{
+          buttonType: 'tertiaryLowLight',
+          buttonText: t('restore_default'),
+          onClick: () => console.log('TODO: wire this up!'),
+        }}
+      />
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
