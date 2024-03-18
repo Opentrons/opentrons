@@ -54,7 +54,7 @@ export function closeAllNotifyConnections(): Promise<unknown[]> {
 
     notifyLog.debug('Stopping notify service connections')
     const closeConnections = closeConnectionsForcefullyFor(
-      Object.keys(connectionStore)
+      connectionStore.getReachableHosts()
     )
     Promise.all(closeConnections).then(resolve).catch(reject)
   })

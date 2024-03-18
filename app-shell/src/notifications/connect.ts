@@ -43,6 +43,11 @@ export function getHealthyRobotDataForNotifyConnections(
   )
 }
 
+/**
+ *
+ * @description Remove connections from the connection store by forcibly disconnecting from MQTT
+ * as robots are no longer discoverable.
+ */
 export function cleanUpUnreachableRobots(
   healthyRobots: RobotData[]
 ): Promise<void> {
@@ -50,13 +55,9 @@ export function cleanUpUnreachableRobots(
     const healthyRobotIPs = healthyRobots.map(({ hostname }) => hostname)
     const healthyRobotIPsSet = new Set(healthyRobotIPs)
     const unreachableRobots = connectionStore
-      .getUnreachableHosts()
+      .getReachableHosts()
       .filter(hostname => {
-        if (!healthyRobotIPsSet.has(hostname)) {
-          connectionStore.deleteHost(hostname)
-          return true
-        }
-        return false
+        return !healthyRobotIPsSet.has(hostname)
       })
     void closeConnectionsForcefullyFor(unreachableRobots)
   })
@@ -180,8 +181,10 @@ export function closeConnectionsForcefullyFor(
 ): Array<Promise<void>> {
   return hosts.map(hostname => {
     const client = connectionStore.getClient(hostname)
-    return new Promise<void>((resolve, reject) =>
-      client?.end(true, {}, () => resolve())
-    )
+    return new Promise<void>((resolve, reject) => {
+      client?.end(true, {})
+      connectionStore.deleteHost(hostname)
+      resolve()
+    })
   })
 }
