@@ -187,7 +187,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           )}
         </Link>
       </Box>
-      <Box border={BORDERS.lineBorder}>
+      <Box border={BORDERS.lineBorder} borderRadius={BORDERS.borderRadius4}>
         <Box padding={SPACING.spacing16}>
           <WellCount
             wellLabel={getWellLabel(definition)}
