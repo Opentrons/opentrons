@@ -202,7 +202,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
-        # currently `protocol_source` arg is only used by tests
+        # currently `protocol_source` arg is only used by tests & protocol analyzer
         if protocol_source:
             await self.load(
                 protocol_source=protocol_source,

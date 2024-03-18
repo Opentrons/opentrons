@@ -90,14 +90,16 @@ class RunController:
 
         self._run_store.insert_action(run_id=self._run_id, action=action)
 
-        # TODO (spp, 2023-11-09): I think the response should also containt the action payload
+        # TODO (spp, 2023-11-09): I think the response should also contain the action payload
         return action
 
     async def _run_protocol_and_insert_result(
         self, deck_configuration: DeckConfigurationType
     ) -> None:
         result = await self._engine_store.runner.run(
-            deck_configuration=deck_configuration
+            deck_configuration=deck_configuration,
+            # TODO (spp, 2024-03-18): update when we start accepting RTP overrides for run
+            run_time_params_overrides=None,
         )
         self._run_store.update_run_state(
             run_id=self._run_id,

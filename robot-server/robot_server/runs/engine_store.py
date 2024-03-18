@@ -214,6 +214,8 @@ class EngineStore:
                 # was uploaded before we added stricter validation, and that
                 # doesn't conform to the new rules.
                 python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+                # TODO (spp, 2024-03-18): update when we start accepting RTP overrides for run
+                run_time_params_overrides=None,
             )
         elif isinstance(runner, JsonRunner):
             assert (

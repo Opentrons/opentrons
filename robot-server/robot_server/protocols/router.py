@@ -4,7 +4,7 @@ import logging
 from textwrap import dedent
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Union, Annotated, cast
+from typing import List, Optional, Union
 
 from opentrons_shared_data.robot import user_facing_robot_type
 from typing_extensions import Literal
