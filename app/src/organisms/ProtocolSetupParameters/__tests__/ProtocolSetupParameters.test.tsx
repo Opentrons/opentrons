@@ -50,4 +50,9 @@ describe('ProtocolSetupParameters', () => {
     fireEvent.click(screen.getAllByRole('button')[0])
     expect(mockGoBack).toHaveBeenCalled()
   })
+  it('renders the confirm values button and clicking on it calls correct stuff', () => {
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
+    expect(props.setSetupScreen).toHaveBeenCalled()
+  })
 })
