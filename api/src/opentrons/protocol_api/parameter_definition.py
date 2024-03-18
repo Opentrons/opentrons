@@ -10,6 +10,11 @@ from .parameter_validation_and_errors import (
     ParameterDefinitionError,
     ParameterValueError,
     validate_options,
+    validate_type,
+    ensure_display_name,
+    ensure_variable_name,
+    ensure_description,
+    ensure_unit_string_length,
 )
 
 
@@ -47,11 +52,10 @@ class ParameterDefinition(Generic[ParamType]):
             description: An optional description for the parameter.
             unit: An optional suffix for float and int type parameters.
         """
-        self._display_name = display_name
-        # TODO this needs to be validated that there are no spaces, special characters, etc
-        self._variable_name = variable_name
-        self._description = description
-        self._unit = unit
+        self._display_name = ensure_display_name(display_name)
+        self._variable_name = ensure_variable_name(variable_name)
+        self._description = ensure_description(description)
+        self._unit = ensure_unit_string_length(unit)
 
         if parameter_type not in get_args(AllowedTypes):
             raise ParameterDefinitionError(
@@ -85,11 +89,8 @@ class ParameterDefinition(Generic[ParamType]):
 
     @value.setter
     def value(self, new_value: ParamType) -> None:
-        if self._type is bool and not isinstance(new_value, bool):
-            raise ParameterValueError(
-                "Parameter of type boolean can only be set to True or False."
-            )
-        elif self._allowed_values is not None and new_value not in self._allowed_values:
+        validate_type(new_value, self._type)
+        if self._allowed_values is not None and new_value not in self._allowed_values:
             raise ParameterValueError(
                 f"Parameter must be set to one of the allowed values of {self._allowed_values}."
             )

@@ -1,4 +1,5 @@
 from typing import List, Optional, TypeVar, Union, TypedDict
+import keyword
 
 
 # TODO these should inherit from shared_data exceptions
@@ -16,7 +17,9 @@ class ParameterNameError(ValueError):
 
 AllowedTypes = Union[str, int, float, bool]
 ParamType = TypeVar("ParamType", bound=AllowedTypes)
+UNIT_MAX_LEN = 10
 DISPLAY_NAME_MAX_LEN = 30
+DESCRIPTION_MAX_LEN = 100
 
 
 class ParameterChoices(TypedDict):
@@ -26,20 +29,42 @@ class ParameterChoices(TypedDict):
     value: AllowedTypes
 
 
-def _validate_default(default: ParamType, parameter_type: type) -> None:
-    """Validate default parameter is the correct type."""
-    if not isinstance(default, parameter_type):
-        raise ParameterValueError(
-            f"Default parameter value has type {type(default)} must match type {parameter_type}."
-        )
-
-
-def _validate_display_name(display_name: str) -> None:
+def ensure_display_name(display_name: str) -> str:
     """Validate display name is within the character limit."""
     if len(display_name) > DISPLAY_NAME_MAX_LEN:
         raise ParameterNameError(
             f"Display name {display_name} greater than {DISPLAY_NAME_MAX_LEN} characters."
         )
+    return display_name
+
+
+def ensure_variable_name(variable_name: str) -> str:
+    """Validate variable name is a valid python variable name."""
+    if not variable_name.isidentifier():
+        raise ParameterNameError(
+            "Variable name must only contain alphanumeric characters, underscores, and cannot start with a digit."
+        )
+    if keyword.iskeyword(variable_name):
+        raise ParameterNameError("Variable name cannot be a reserved Python key word.")
+    return variable_name
+
+
+def ensure_description(description: Optional[str]) -> Optional[str]:
+    """Validate description is within the character limit."""
+    if description is not None and len(description) > DESCRIPTION_MAX_LEN:
+        raise ParameterNameError(
+            f"Description {description} greater than {DESCRIPTION_MAX_LEN} characters."
+        )
+    return description
+
+
+def ensure_unit_string_length(unit: Optional[str]) -> Optional[str]:
+    """Validate unit is within the character limit."""
+    if unit is not None and len(unit) > UNIT_MAX_LEN:
+        raise ParameterNameError(
+            f"Description {unit} greater than {UNIT_MAX_LEN} characters."
+        )
+    return unit
 
 
 def _validate_choices(
@@ -61,7 +86,7 @@ def _validate_choices(
             raise ParameterDefinitionError(
                 "All choices must be a dictionary with keys 'display_name' and 'value'."
             )
-        _validate_display_name(display_name)
+        ensure_display_name(display_name)
         if not isinstance(value, parameter_type):
             raise ParameterDefinitionError(
                 f"All choices provided must match type {type(parameter_type)}"
@@ -101,6 +126,14 @@ def _validate_min_and_max(
             )
 
 
+def validate_type(value: ParamType, parameter_type: type) -> None:
+    """Validate parameter value is the correct type."""
+    if not isinstance(value, parameter_type):
+        raise ParameterValueError(
+            f"Default parameter value has type {type(value)} must match type {parameter_type}."
+        )
+
+
 def validate_options(
     default: ParamType,
     minimum: Optional[ParamType],
@@ -109,7 +142,7 @@ def validate_options(
     parameter_type: type,
 ) -> None:
     """Validate default values and all possible constraints for a valid parameter definition."""
-    _validate_default(default, parameter_type)
+    validate_type(default, parameter_type)
 
     if choices is None and minimum is None and maximum is None:
         raise ParameterDefinitionError(
