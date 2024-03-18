@@ -26,7 +26,7 @@ import {
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_TYPE,
   OT2_ROBOT_TYPE,
-  getPipetteSpecsV2,
+  getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
 import { PipetteFields } from './PipetteFields'
@@ -455,8 +455,8 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
   const showHeaterShakerPipetteCollisions =
     hasHeaterShakerSelected &&
     [
-      getPipetteSpecsV2(left.pipetteName as PipetteName),
-      getPipetteSpecsV2(right.pipetteName as PipetteName),
+      getPipetteNameSpecs(left.pipetteName as PipetteName),
+      getPipetteNameSpecs(right.pipetteName as PipetteName),
     ].some(pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1)
 
   const crashablePipetteSelected = getIsCrashablePipetteSelected(
