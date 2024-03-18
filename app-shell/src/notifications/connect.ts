@@ -98,15 +98,15 @@ export function addNewRobotsToConnectionStore(
         .then(() => {
           connectAsync(`mqtt://${ip}`)
             .then(client => {
-              notifyLog.debug(`Successfully connected to ${ip}`)
+              notifyLog.debug(`Successfully connected to ${robotName} on ${ip}`)
               void connectionStore
                 .setConnected(ip, client)
-                .then(() => establishListeners({ client, ip }))
+                .then(() => establishListeners(client, ip, robotName))
                 .catch((error: Error) => notifyLog.debug(error.message))
             })
             .catch((error: Error) => {
               notifyLog.warn(
-                `Failed to connect to ${ip} - ${error.name}: ${error.message} `
+                `Failed to connect to ${robotName} on ${ip} - ${error.name}: ${error.message} `
               )
               void connectionStore.setFailedConnection(ip, error)
             })
@@ -151,13 +151,11 @@ function connectAsync(brokerURL: string): Promise<mqtt.Client> {
   })
 }
 
-function establishListeners({
-  client,
-  ip,
-}: {
-  client: mqtt.MqttClient
-  ip: string
-}): void {
+function establishListeners(
+  client: mqtt.MqttClient,
+  ip: string,
+  robotName: string
+): void {
   client.on(
     'message',
     (topic: NotifyTopic, message: Buffer, packet: mqtt.IPublishPacket) => {
@@ -182,7 +180,7 @@ function establishListeners({
   )
 
   client.on('reconnect', () => {
-    notifyLog.debug(`Attempting to reconnect to ${ip}`)
+    notifyLog.debug(`Attempting to reconnect to ${robotName} on ${ip}`)
   })
   // handles transport layer errors only
   client.on('error', error => {
@@ -192,12 +190,16 @@ function establishListeners({
   })
 
   client.on('end', () => {
-    notifyLog.debug(`Closed connection to ${ip}`)
+    void connectionStore
+      .deleteAllAssociatedIPsGivenIP(ip)
+      .then(() => notifyLog.debug(`Closed connection to ${robotName} on ${ip}`))
   })
 
   client.on('disconnect', packet => {
     notifyLog.warn(
-      `Disconnected from ${ip} with code ${packet.reasonCode ?? 'undefined'}`
+      `Disconnected from ${robotName} on ${ip} with code ${
+        packet.reasonCode ?? 'undefined'
+      }`
     )
     sendDeserializedGenericError(ip, 'ALL_TOPICS')
   })

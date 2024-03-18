@@ -30,10 +30,7 @@ export function registerNotify(
   return function handleAction(action: Action) {
     switch (action.type) {
       case 'shell:NOTIFY_SUBSCRIBE':
-        return subscribe({
-          ip: action.payload.hostname,
-          topic: action.payload.topic,
-        })
+        return subscribe(action.payload.hostname, action.payload.topic)
     }
   }
 }

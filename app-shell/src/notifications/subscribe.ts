@@ -16,13 +16,9 @@ const subscribeOptions: mqtt.IClientSubscribeOptions = {
 
 const CHECK_CONNECTION_INTERVAL = 500
 
-export function subscribe({
-  ip,
-  topic,
-}: {
-  ip: string
-  topic: NotifyTopic
-}): Promise<void> {
+export function subscribe(ip: string, topic: NotifyTopic): Promise<void> {
+  const robotName = connectionStore.getRobotNameFromIP(ip)
+
   if (!connectionStore.isBrokerReachable(ip)) {
     const errorMessage = connectionStore.getFailedConnectionStatus(ip)
     if (errorMessage != null) {
@@ -72,8 +68,13 @@ export function subscribe({
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
     if (error != null) {
       sendDeserializedGenericError(ip, topic)
+      notifyLog.debug(
+        `Failed to subscribe to ${robotName} on ${ip} to topic: ${topic}`
+      )
     } else {
-      notifyLog.debug(`Successfully subscribed on ${ip} to topic: ${topic}`)
+      notifyLog.debug(
+        `Successfully subscribed to ${robotName} on ${ip} to topic: ${topic}`
+      )
       connectionStore
         .setSubStatus(ip, topic, 'subscribed')
         .catch((error: Error) => notifyLog.debug(error.message))
@@ -99,7 +100,11 @@ export function subscribe({
         counter++
         if (counter === MAX_RETRIES) {
           clearInterval(intervalId)
-          reject(new Error('Maximum number of retries exceeded.'))
+          reject(
+            new Error(
+              `Maximum number of retries exceeded for ${robotName} on ${ip}.`
+            )
+          )
         }
       }, CHECK_CONNECTION_INTERVAL)
     })

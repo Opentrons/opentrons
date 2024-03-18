@@ -15,13 +15,14 @@ export function unsubscribe(ip: string, topic: NotifyTopic): Promise<void> {
           }
 
           client.unsubscribe(topic, {}, (error, result) => {
+            const robotName = connectionStore.getRobotNameFromIP(ip)
             if (error != null) {
               notifyLog.debug(
-                `Failed to unsubscribe on ${ip} from topic: ${topic}`
+                `Failed to unsubscribe to ${robotName} on ${ip} from topic: ${topic}`
               )
             } else {
               notifyLog.debug(
-                `Successfully unsubscribed on ${ip} from topic: ${topic}`
+                `Successfully unsubscribed to ${robotName} on ${ip} from topic: ${topic}`
               )
               connectionStore.setUnubStatus(ip, topic, 'unsubscribed')
             }
