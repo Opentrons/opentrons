@@ -24,7 +24,6 @@ from .protocol_source import (
     JsonProtocolConfig,
     PythonProtocolConfig,
 )
-from ..protocol_engine.types import RunTimeParameterValues
 
 
 class ProtocolReader:

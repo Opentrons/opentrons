@@ -70,6 +70,7 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
             metadata={},
             robot_type="OT-2 Standard",
             content_hash="abc123",
+            run_time_param_values=None,
         ),
         protocol_key=None,
     )

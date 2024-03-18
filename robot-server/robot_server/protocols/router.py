@@ -4,7 +4,7 @@ import logging
 from textwrap import dedent
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Annotated, cast
 
 from opentrons_shared_data.robot import user_facing_robot_type
 from typing_extensions import Literal
@@ -168,7 +168,7 @@ async def create_protocol(
     ),
     runTimeParameterValues: Optional[str] = Form(
         default=None,
-        description="Key value pairs of run-time parameters defined in a protocol."
+        description="Key value pairs of run-time parameters defined in a protocol.",
     ),
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
@@ -211,13 +211,32 @@ async def create_protocol(
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
 
-    parsed_rtp = json.loads(runTimeParameterValues) if runTimeParameterValues else None
+    if isinstance(runTimeParameterValues, str):
+        # We have to do this isinstance check because if `runTimeParameterValues` is
+        # not specified in the request, then it gets assigned a Form(None) value
+        # instead of just a None. \(O.o)/
+        parsed_rtp = json.loads(runTimeParameterValues)
+    else:
+        parsed_rtp = None
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
-    if not parsed_rtp and cached_protocol_id is not None:
-        # Neither a new protocol nor any run-time parameters passed with an existing protocol.
+    if cached_protocol_id is not None:
+        # Protocol exists in database
         resource = protocol_store.get(protocol_id=cached_protocol_id)
+        if parsed_rtp:
+            # This protocol exists in database but needs to be re-analyzed with the
+            # passed-in RTP overrides
+            task_runner.run(
+                protocol_analyzer.analyze,
+                protocol_resource=resource,
+                analysis_id=analysis_id,
+                run_time_param_overrides=parsed_rtp,
+            )
+            analysis_store.add_pending(
+                protocol_id=cached_protocol_id,
+                analysis_id=analysis_id,
+            )
         analyses = analysis_store.get_summaries_by_protocol(
             protocol_id=cached_protocol_id
         )
@@ -237,7 +256,7 @@ async def create_protocol(
 
         log.info(
             f'Protocol with id "{cached_protocol_id}" with same contents already exists.'
-            f' Returning existing protocol data in response payload.'
+            f" Returning existing protocol data in response payload."
         )
 
         return await PydanticResponse.create(
@@ -247,7 +266,6 @@ async def create_protocol(
         )
 
     try:
-        # Can make the passed in RTPs as part of protocolSource returned here
         source = await protocol_reader.save(
             files=buffered_files,
             directory=protocol_directory / protocol_id,
@@ -281,6 +299,7 @@ async def create_protocol(
         protocol_analyzer.analyze,
         protocol_resource=protocol_resource,
         analysis_id=analysis_id,
+        run_time_param_overrides=parsed_rtp,
     )
     pending_analysis = analysis_store.add_pending(
         protocol_id=protocol_id,
