@@ -44,6 +44,7 @@ import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchL
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import { mockProtocolModuleInfo } from '../../../organisms/ProtocolSetupInstruments/__fixtures__'
 import {
+  useProtocolHasRunTimeParameters,
   useRunControls,
   useRunStatus,
 } from '../../../organisms/RunTimeControl/hooks'
@@ -53,6 +54,7 @@ import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttach
 import { ProtocolSetup } from '../../../pages/ProtocolSetup'
 import { useNotifyRunQuery } from '../../../resources/runs'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import { mockRunTimeParameterData } from '../../ProtocolDetails/fixtures'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -72,6 +74,7 @@ Object.defineProperty(window, 'IntersectionObserver', {
 
 let mockHistoryPush = vi.fn()
 
+vi.mock('../../ProtocolDetails/fixtures')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const sharedData = await importOriginal<typeof SharedData>()
   return {
@@ -275,6 +278,7 @@ describe('ProtocolSetup', () => {
         makeSnackbar: MOCK_MAKE_SNACKBAR,
       } as unknown) as any)
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
+    vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(false)
     when(vi.mocked(useTrackProtocolRunEvent))
       .calledWith(RUN_ID, ROBOT_NAME)
       .thenReturn({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
@@ -339,6 +343,27 @@ describe('ProtocolSetup', () => {
     screen.getByText('1 initial liquid')
     fireEvent.click(screen.getByText('Liquids'))
     expect(vi.mocked(ProtocolSetupLiquids)).toHaveBeenCalled()
+  })
+
+  it('should launch the parameters screen when there are parameters', () => {
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: {
+        ...mockRobotSideAnalysis,
+        runTimeParameters: mockRunTimeParameterData,
+      },
+    } as any)
+    vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(true)
+    when(vi.mocked(getProtocolModulesInfo))
+      .calledWith({ ...mockRobotSideAnalysis }, flexDeckDefV4 as any)
+      .thenReturn(mockProtocolModuleInfo)
+    vi.mocked(getUnmatchedModulesForProtocol).mockReturnValue({
+      missingModuleIds: [],
+      remainingAttachedModules: [],
+    })
+    render(`/runs/${RUN_ID}/setup/`)
+    screen.getByText('Parameters')
+    screen.getByText('Confirm values')
+    screen.getByText('Restore default values')
   })
 
   it('should launch LPC when clicked', () => {

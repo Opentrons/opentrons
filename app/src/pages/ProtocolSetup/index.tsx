@@ -112,6 +112,8 @@ interface ProtocolSetupStepProps {
   disabled?: boolean
   // display the reason the setup step is disabled
   disabledReason?: string | null
+  //  optional description
+  description?: string
 }
 
 export function ProtocolSetupStep({
@@ -122,6 +124,7 @@ export function ProtocolSetupStep({
   subDetail,
   disabled = false,
   disabledReason,
+  description,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
     ready: COLORS.green35,
@@ -180,13 +183,18 @@ export function ProtocolSetupStep({
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
         ) : null}
-        <StyledText
-          as="h4"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={disabled ? COLORS.grey50 : COLORS.black90}
-        >
-          {title}
-        </StyledText>
+        <Flex flexDirection={DIRECTION_COLUMN} textAlign={TYPOGRAPHY.textAlignLeft}>
+          <StyledText
+            as="h4"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            color={disabled ? COLORS.grey50 : COLORS.black90}
+          >
+            {title}
+          </StyledText>
+          <StyledText as="h4" color={COLORS.grey50}>
+            {description}
+          </StyledText>
+        </Flex>
         <Flex flex="1" justifyContent={JUSTIFY_END}>
           <StyledText
             as="p"
