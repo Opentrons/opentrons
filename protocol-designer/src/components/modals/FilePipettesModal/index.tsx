@@ -22,11 +22,11 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   ModuleType,
   ModuleModel,
+  getPipetteNameSpecs,
   PipetteName,
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_TYPE,
   OT2_ROBOT_TYPE,
-  getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
 import { PipetteFields } from './PipetteFields'
