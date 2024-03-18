@@ -44,15 +44,7 @@ const WINDOW_OPTS = {
 export function createUi(dispatch: Dispatch): BrowserWindow {
   log.debug('Creating main window', { options: WINDOW_OPTS })
 
-  const mainWindow = new BrowserWindow(WINDOW_OPTS).once(
-    'ready-to-show',
-    () => {
-      log.debug('Main window ready to show')
-      mainWindow.show()
-      process.env.NODE_ENV !== 'development' &&
-        waitForRobotServerAndShowMainWIndow(dispatch)
-    }
-  )
+  const mainWindow = new BrowserWindow(WINDOW_OPTS)
 
   log.info(`Loading ${url}`)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -66,19 +58,24 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
   return mainWindow
 }
 
-export function waitForRobotServerAndShowMainWIndow(dispatch: Dispatch): void {
-  setTimeout(function () {
-    systemd
-      .getisRobotServerReady()
-      .then((isReady: boolean) => {
-        dispatch(sendReadyStatus(isReady))
-        if (!isReady) {
-          waitForRobotServerAndShowMainWIndow(dispatch)
-        }
-      })
-      .catch(e => {
-        log.debug('Could not get status of robot server service', { e })
-        waitForRobotServerAndShowMainWIndow(dispatch)
-      })
-  }, 1500)
+export function waitForRobotServerAndShowMainWindow(
+  dispatch: Dispatch,
+  mainWindow: BrowserWindow
+): void {
+  mainWindow.show()
+  process.env.NODE_ENV !== 'development' &&
+    setTimeout(function () {
+      systemd
+        .getisRobotServerReady()
+        .then((isReady: boolean) => {
+          dispatch(sendReadyStatus(isReady))
+          if (!isReady) {
+            waitForRobotServerAndShowMainWindow(dispatch, mainWindow)
+          }
+        })
+        .catch(e => {
+          log.debug('Could not get status of robot server service', { e })
+          waitForRobotServerAndShowMainWindow(dispatch, mainWindow)
+        })
+    }, 1500)
 }

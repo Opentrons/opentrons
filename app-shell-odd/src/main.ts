@@ -3,7 +3,7 @@ import { app, ipcMain } from 'electron'
 import dns from 'dns'
 import fse from 'fs-extra'
 import path from 'path'
-import { createUi } from './ui'
+import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
 import {
@@ -122,10 +122,16 @@ function startUp(): void {
   log.silly('Global references', { mainWindow, rendererLogger })
 
   ipcMain.once('dispatch', () => {
+    log.info('First dispatch, showing')
     systemd.sendStatus('started')
     systemd.ready()
     const stopWatching = watchForMassStorage(dispatch)
     ipcMain.once('quit', stopWatching)
+    if (!!!mainWindow) {
+      log.error('mainWindow went away before show')
+    } else {
+      waitForRobotServerAndShowMainWindow(dispatch, mainWindow)
+    }
   })
 }
 
