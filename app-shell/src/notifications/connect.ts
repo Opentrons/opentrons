@@ -67,9 +67,32 @@ export function addNewRobotsToConnectionStore(
   healthyRobots: RobotData[]
 ): Promise<void> {
   return new Promise(() => {
-    const newRobots = healthyRobots.filter(({ hostname, robotName }) =>
-      connectionStore.isHostNewlyDiscovered(hostname, robotName)
-    )
+    const newRobots = healthyRobots.filter(({ hostname, robotName }) => {
+      const isNewHostname = connectionStore.isHostnameNewlyDiscovered(hostname)
+      const isHostnameAssociatedWithKnownRobot = connectionStore.isAssociatedWithExistingHostData(
+        robotName
+      )
+      // Not a new robot, but a new IP for a robot present in connectionStore.
+      if (isNewHostname && isHostnameAssociatedWithKnownRobot) {
+        // Pass until the next discovery-client poll so the current connection can resolve.
+        if (!connectionStore.isAssociatedHostnameConnected(hostname)) {
+          return false
+        }
+        // Hostname is reachable on an associated IP. Do not connect on this IP.
+        if (connectionStore.isAssociatedHostnameReachable(hostname)) {
+          connectionStore.associateWithExistingHostData(hostname, robotName)
+          return false
+        }
+        // The robot isn't reachable on existing IPs.
+        // Mark this IP as a new connection to see if the robot is reachable on this IP.
+        else {
+          connectionStore.deleteAllAssociatedHostsGivenRobotName(robotName)
+          return true
+        }
+      } else {
+        return isNewHostname
+      }
+    })
     newRobots.forEach(({ hostname, robotName }) => {
       connectionStore.setPendingHost(hostname, robotName)
       connectAsync(`mqtt://${hostname}`)
@@ -163,7 +186,6 @@ function establishListeners({
 
   client.on('end', () => {
     notifyLog.debug(`Closed connection to ${hostname}`)
-    connectionStore.deleteHost(hostname)
   })
 
   client.on('disconnect', packet => {
@@ -182,8 +204,10 @@ export function closeConnectionsForcefullyFor(
   return hosts.map(hostname => {
     const client = connectionStore.getClient(hostname)
     return new Promise<void>((resolve, reject) => {
-      client?.end(true, {})
-      connectionStore.deleteHost(hostname)
+      if (client != null) {
+        client.end(true, {})
+      }
+      connectionStore.deleteAllAssociatedHostsGivenHostname(hostname)
       resolve()
     })
   })

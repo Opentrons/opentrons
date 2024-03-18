@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
 import type mqtt from 'mqtt'
+import head from 'lodash/head'
 
 import { FAILURE_STATUSES } from '../constants'
 
@@ -8,23 +9,20 @@ import type { BrowserWindow } from 'electron'
 
 type FailedConnStatus = typeof FAILURE_STATUSES[keyof typeof FAILURE_STATUSES]
 
-interface IHosts {
+interface HostData {
   robotName: string
   client: mqtt.MqttClient | null
   subscriptions: Set<NotifyTopic>
   pendingSubs: Set<NotifyTopic>
   pendingUnsubs: Set<NotifyTopic>
+  unreachableStatus: FailedConnStatus | null
 }
 
 /**
  * Manages the internal state of MQTT connections to various robot hosts.
  */
 class ConnectionStore {
-  private hosts: Record<string, IHosts> = {}
-
-  private unreachableHosts: Record<string, FailedConnStatus> = {}
-
-  readonly seenRobotNames = new Set<string>()
+  private hosts: Record<string, HostData> = {}
 
   private browserWindow: BrowserWindow | null = null
 
@@ -46,10 +44,10 @@ class ConnectionStore {
    * for analytics reasons. Afterward, a generic "ECONNFAILED" is returned.
    */
   public getFailedConnectionStatus(hostname: string): FailedConnStatus | null {
-    if (hostname in this.unreachableHosts) {
-      const failureStatus = this.unreachableHosts[hostname]
+    if (hostname in this.hosts) {
+      const failureStatus = this.hosts[hostname].unreachableStatus
       if (failureStatus === FAILURE_STATUSES.ECONNREFUSED) {
-        this.unreachableHosts[hostname] = FAILURE_STATUSES.ECONNFAILED
+        this.hosts[hostname].unreachableStatus = FAILURE_STATUSES.ECONNFAILED
       }
       return failureStatus
     } else {
@@ -61,21 +59,32 @@ class ConnectionStore {
     return Object.keys(this.hosts)
   }
 
+  public getAssociatedHostnamesFromHostname(hostname: string): string[] {
+    const robotName = this.hosts[hostname].robotName
+    return Object.keys(this.hosts).filter(
+      hostname => this.hosts[hostname].robotName === robotName
+    )
+  }
+
+  public getAssociatedHostnamesFromRobotName(robotName: string): string[] {
+    return Object.keys(this.hosts).filter(
+      hostname => this.hosts[hostname].robotName === robotName
+    )
+  }
+
   public setBrowserWindow(window: BrowserWindow): void {
     this.browserWindow = window
   }
 
   public setPendingHost(hostname: string, robotName: string): void {
-    if (!this.seenRobotNames.has(robotName)) {
-      if (!(hostname in this.hosts)) {
-        this.seenRobotNames.add(robotName)
-        this.hosts[hostname] = {
-          robotName,
-          client: null,
-          subscriptions: new Set(),
-          pendingSubs: new Set(),
-          pendingUnsubs: new Set(),
-        }
+    if (!this.isAssociatedWithExistingHostData(robotName)) {
+      this.hosts[hostname] = {
+        robotName,
+        client: null,
+        subscriptions: new Set(),
+        pendingSubs: new Set(),
+        pendingUnsubs: new Set(),
+        unreachableStatus: null,
       }
     }
   }
@@ -94,14 +103,11 @@ class ConnectionStore {
    */
   public setFailedToConnectHost(hostname: string, error: Error): void {
     if (hostname in this.hosts) {
-      delete this.hosts[hostname]
-    }
-    if (!(hostname in this.unreachableHosts)) {
       const errorStatus = error.message.includes(FAILURE_STATUSES.ECONNREFUSED)
         ? FAILURE_STATUSES.ECONNREFUSED
         : FAILURE_STATUSES.ECONNFAILED
 
-      this.unreachableHosts[hostname] = errorStatus
+      this.hosts[hostname].unreachableStatus = errorStatus
     }
   }
 
@@ -139,26 +145,55 @@ class ConnectionStore {
     }
   }
 
-  public deleteHost(hostname: string): void {
-    if (hostname in this.hosts) {
-      this.seenRobotNames.delete(this.hosts[hostname].robotName)
-      delete this.hosts[hostname]
-    }
-    if (hostname in this.unreachableHosts) {
-      delete this.unreachableHosts[hostname]
+  /**
+   *
+   * @description Creates a new hosts entry for a given hostname with HostData that is a reference to an existing
+   * host's HostData. This occurs when two hostnames reported by discovery-client actually point to the same robot.
+   */
+  public associateWithExistingHostData(
+    hostname: string,
+    robotName: string
+  ): void {
+    const associatedHost = Object.values(this.hosts).find(
+      hostData => hostData.robotName === robotName
+    )
+    if (associatedHost != null) {
+      this.hosts[hostname] = associatedHost
     }
   }
 
-  public isHostNewlyDiscovered(hostname: string, name: string): boolean {
-    if (this.seenRobotNames.has(name)) {
-      return false
-    } else if (hostname in this.hosts) {
-      return false
-    } else if (hostname in this.unreachableHosts) {
-      return false
-    } else {
-      return true
-    }
+  // Deleting associated hosts does not prevent the connection from re-establishing on an associated host if an
+  // associated host is discoverable.
+  public deleteAllAssociatedHostsGivenHostname(hostname: string): void {
+    const associatedHosts = this.getAssociatedHostnamesFromHostname(hostname)
+    associatedHosts.forEach(hostname => {
+      delete this.hosts[hostname]
+    })
+  }
+
+  public deleteAllAssociatedHostsGivenRobotName(robotName: string): void {
+    const associatedHosts = this.getAssociatedHostnamesFromRobotName(robotName)
+    associatedHosts.forEach(hostname => {
+      delete this.hosts[hostname]
+    })
+  }
+
+  public isHostnameNewlyDiscovered(hostname: string): boolean {
+    return hostname in this.hosts
+  }
+
+  public isAssociatedWithExistingHostData(robotName: string): boolean {
+    return this.getAssociatedHostnamesFromRobotName(robotName).length != null
+  }
+
+  public isAssociatedHostnameReachable(hostname: string): boolean {
+    const associatedRobots = this.getAssociatedHostnamesFromHostname(hostname)
+    return this.isHostReachable(head(associatedRobots) as string)
+  }
+
+  public isAssociatedHostnameConnected(hostname: string): boolean {
+    const associatedRobots = this.getAssociatedHostnamesFromHostname(hostname)
+    return this.isHostConnected(head(associatedRobots) as string)
   }
 
   public isHostConnected(hostname: string): boolean {
@@ -197,10 +232,10 @@ class ConnectionStore {
   }
 
   public isHostReachable(hostname: string): boolean {
-    if (hostname in this.unreachableHosts) {
-      return false
+    if (hostname in this.hosts) {
+      return this.hosts[hostname].unreachableStatus == null
     } else {
-      return hostname in this.hosts
+      return false
     }
   }
 }
