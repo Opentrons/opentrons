@@ -6,9 +6,44 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  A1_ADDRESSABLE_AREA,
+  A2_ADDRESSABLE_AREA,
+  A3_ADDRESSABLE_AREA,
+  B1_ADDRESSABLE_AREA,
+  B2_ADDRESSABLE_AREA,
+  B3_ADDRESSABLE_AREA,
+  C1_ADDRESSABLE_AREA,
+  C2_ADDRESSABLE_AREA,
+  C3_ADDRESSABLE_AREA,
+  D1_ADDRESSABLE_AREA,
+  D2_ADDRESSABLE_AREA,
+  D3_ADDRESSABLE_AREA,
+  ADDRESSABLE_AREA_1,
+  ADDRESSABLE_AREA_2,
+  ADDRESSABLE_AREA_3,
+  ADDRESSABLE_AREA_4,
+  ADDRESSABLE_AREA_5,
+  ADDRESSABLE_AREA_6,
+  ADDRESSABLE_AREA_7,
+  ADDRESSABLE_AREA_8,
+  ADDRESSABLE_AREA_9,
+  ADDRESSABLE_AREA_10,
+  ADDRESSABLE_AREA_11,
+  HEATERSHAKER_MODULE_V1_FIXTURE,
+  HEATERSHAKER_MODULE_V1,
+  TEMPERATURE_MODULE_V2_FIXTURE,
+  TEMPERATURE_MODULE_V2,
+  MAGNETIC_BLOCK_V1_FIXTURE,
+  MAGNETIC_BLOCK_V1,
+  THERMOCYCLER_V2_REAR_FIXTURE,
+  THERMOCYCLER_MODULE_V2,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  MODULE_FIXTURES_BY_MODEL,
 } from './constants'
-import type { CutoutFixtureId, CutoutId, OT2CutoutId } from '../deck'
-import type { AddressableArea, CoordinateTuple, DeckDefinition } from './types'
+import type { CutoutFixtureId, CutoutId, FlexModuleCutoutFixtureId, OT2CutoutId } from '../deck'
+import type { AddressableArea, CoordinateTuple, DeckDefinition, ModuleModel } from './types'
+import type { LoadModuleCreateCommand } from '../command'
+import { getModuleDisplayName } from './modules'
 
 export function getCutoutDisplayName(cutout: CutoutId): string {
   return cutout.replace('cutout', '')
@@ -107,59 +142,83 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
+export function getCutoutFixturesForModuleModel(
+  moduleModel: ModuleModel
+): FlexModuleCutoutFixtureId[] {
+  const moduleFixtures = MODULE_FIXTURES_BY_MODEL[moduleModel]
+  return moduleFixtures ?? []
+}
+
+export function getAddressableAreaFromLoadedModule(
+  params: LoadModuleCreateCommand['params'],
+  deckDef: DeckDefinition
+): AddressableArea | null {
+  const moduleFixtures = getCutoutFixturesForModuleModel(params.model)
+  return (
+    deckDef.locations.addressableAreas.find(
+      addressableArea => addressableArea.id === slotId
+    ) ?? null
+  )
+}
+
 export function getFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureId | null
 ): string {
-  if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
-    return 'Staging area slot'
-  } else if (cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE) {
-    return 'Trash bin'
-  } else if (cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE) {
-    return 'Waste chute only'
-  } else if (cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE) {
-    return 'Waste chute only with cover'
-  } else if (
-    cutoutFixtureId ===
-    STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
-  ) {
-    return 'Waste chute with staging area slot'
-  } else if (
-    cutoutFixtureId ===
-    STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE
-  ) {
-    return 'Waste chute with staging area slot and cover'
-  } else {
-    return 'Slot'
+  switch(cutoutFixtureId) {
+    case STAGING_AREA_RIGHT_SLOT_FIXTURE:
+      return 'Staging area slot'
+    case TRASH_BIN_ADAPTER_FIXTURE:
+      return 'Trash bin'
+    case WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
+      return 'Waste chute only'
+    case WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
+      return 'Waste chute only with cover'
+    case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE:
+      return 'Waste chute with staging area slot'
+    case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
+      return 'Waste chute with staging area slot and cover'
+    case HEATERSHAKER_MODULE_V1_FIXTURE:
+      return getModuleDisplayName(HEATERSHAKER_MODULE_V1)
+    case TEMPERATURE_MODULE_V2_FIXTURE:
+      return getModuleDisplayName(TEMPERATURE_MODULE_V2)
+    case MAGNETIC_BLOCK_V1_FIXTURE:
+      return getModuleDisplayName(MAGNETIC_BLOCK_V1)
+    case THERMOCYCLER_V2_REAR_FIXTURE:
+      return getModuleDisplayName(THERMOCYCLER_MODULE_V2)
+    case THERMOCYCLER_V2_FRONT_FIXTURE:
+      return getModuleDisplayName(THERMOCYCLER_MODULE_V2)
+    default:
+      return 'Slot'
   }
 }
 
 const STANDARD_OT2_SLOTS = [
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '10',
-  '11',
+  ADDRESSABLE_AREA_1,
+  ADDRESSABLE_AREA_2,
+  ADDRESSABLE_AREA_3,
+  ADDRESSABLE_AREA_4,
+  ADDRESSABLE_AREA_5,
+  ADDRESSABLE_AREA_6,
+  ADDRESSABLE_AREA_7,
+  ADDRESSABLE_AREA_8,
+  ADDRESSABLE_AREA_9,
+  ADDRESSABLE_AREA_10,
+  ADDRESSABLE_AREA_11,
 ]
 
 const STANDARD_FLEX_SLOTS = [
-  'A1',
-  'A2',
-  'A3',
-  'B1',
-  'B2',
-  'B3',
-  'C1',
-  'C2',
-  'C3',
-  'D1',
-  'D2',
-  'D3',
+  A1_ADDRESSABLE_AREA,
+  A2_ADDRESSABLE_AREA,
+  A3_ADDRESSABLE_AREA,
+  B1_ADDRESSABLE_AREA,
+  B2_ADDRESSABLE_AREA,
+  B3_ADDRESSABLE_AREA,
+  C1_ADDRESSABLE_AREA,
+  C2_ADDRESSABLE_AREA,
+  C3_ADDRESSABLE_AREA,
+  D1_ADDRESSABLE_AREA,
+  D2_ADDRESSABLE_AREA,
+  D3_ADDRESSABLE_AREA,
 ]
 
 export const isAddressableAreaStandardSlot = (
