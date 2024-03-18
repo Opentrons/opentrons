@@ -31,7 +31,7 @@ def ensure_variable_name(variable_name: str) -> str:
             "Variable name must only contain alphanumeric characters, underscores, and cannot start with a digit."
         )
     if keyword.iskeyword(variable_name):
-        raise ParameterNameError("Variable name cannot be a reserved Python key word.")
+        raise ParameterNameError("Variable name cannot be a reserved Python keyword.")
     return variable_name
 
 

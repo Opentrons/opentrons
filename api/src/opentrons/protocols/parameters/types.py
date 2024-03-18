@@ -13,7 +13,6 @@ class ParameterChoices(TypedDict):
     value: AllowedTypes
 
 
-# TODO these should inherit from shared_data exceptions
 class ParameterValueError(ValueError):
     """An error raised when a parameter value is not valid."""
 

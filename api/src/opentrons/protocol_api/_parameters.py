@@ -1,6 +1,6 @@
 from typing import Dict, Optional, Any
 
-from opentrons.protocols.parameters.types import AllowedTypes
+from opentrons.protocols.parameters.types import AllowedTypes, ParameterNameError
 
 
 class Parameters:
@@ -14,7 +14,6 @@ class Parameters:
         return getattr(self, f"_{variable_name}")
 
     def _initialize_parameter(self, variable_name: str, value: AllowedTypes) -> None:
-        # TODO raise an error if the variable name already exists to prevent overwriting anything important
         if not hasattr(self, variable_name) and not hasattr(self, f"_{variable_name}"):
             setattr(self, f"_{variable_name}", value)
             prop = property(
@@ -22,6 +21,11 @@ class Parameters:
             )
             setattr(Parameters, variable_name, prop)
             self._values[variable_name] = value
+        else:
+            raise ParameterNameError(
+                f"Cannot use {variable_name} as a variable name, either duplicates another"
+                f" parameter name, Opentrons reserved function, or Python built-in"
+            )
 
     def get_all(self) -> Dict[str, AllowedTypes]:
         return self._values
