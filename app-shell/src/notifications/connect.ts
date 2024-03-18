@@ -14,8 +14,7 @@ import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
 
 // MQTT is somewhat particular about the clientId format and will connect erratically if an unexpected string is supplied.
-// This clientId is derived from the mqttjs library.
-const CLIENT_ID = 'app-' + Math.random().toString(16).slice(2, 8)
+const CLIENT_ID = 'app-' + Math.random().toString(16).slice(2, 8) // Derived from the mqttjs library.
 const connectOptions: mqtt.IClientOptions = {
   clientId: CLIENT_ID,
   port: 1883,
@@ -28,7 +27,7 @@ const connectOptions: mqtt.IClientOptions = {
 }
 
 export interface RobotData {
-  hostname: string
+  ip: string
   robotName: string
 }
 
@@ -39,20 +38,20 @@ export function getHealthyRobotDataForNotifyConnections(
   return robots.flatMap(robot =>
     robot.addresses
       .filter(address => address.healthStatus === HEALTH_STATUS_OK)
-      .map(address => ({ hostname: address.ip, robotName: robot.name }))
+      .map(address => ({ ip: address.ip, robotName: robot.name }))
   )
 }
 
 /**
  *
- * @description Remove connections from the connection store by forcibly disconnecting from MQTT
+ * @description Remove broker connections from the connection store by forcibly disconnecting from brokers
  * as robots are no longer discoverable.
  */
 export function cleanUpUnreachableRobots(
   healthyRobots: RobotData[]
 ): Promise<void> {
   return new Promise(() => {
-    const healthyRobotIPs = healthyRobots.map(({ hostname }) => hostname)
+    const healthyRobotIPs = healthyRobots.map(({ ip }) => ip)
     const healthyRobotIPsSet = new Set(healthyRobotIPs)
     const unreachableRobots = connectionStore
       .getReachableHosts()
@@ -67,45 +66,45 @@ export function addNewRobotsToConnectionStore(
   healthyRobots: RobotData[]
 ): Promise<void> {
   return new Promise(() => {
-    const newRobots = healthyRobots.filter(({ hostname, robotName }) => {
-      const isNewHostname = connectionStore.isHostnameNewlyDiscovered(hostname)
-      const isHostnameAssociatedWithKnownRobot = connectionStore.isAssociatedWithExistingHostData(
+    const newRobots = healthyRobots.filter(({ ip, robotName }) => {
+      const isNewIP = connectionStore.isIPNewlyDiscovered(ip)
+      const isIPAssociatedWithKnownRobot = connectionStore.isAssociatedWithExistingHostData(
         robotName
       )
       // Not a new robot, but a new IP for a robot present in connectionStore.
-      if (isNewHostname && isHostnameAssociatedWithKnownRobot) {
+      if (isNewIP && isIPAssociatedWithKnownRobot) {
         // Pass until the next discovery-client poll so the current connection can resolve.
-        if (!connectionStore.isAssociatedHostnameConnected(hostname)) {
+        if (!connectionStore.isAssociatedBrokerConnected(ip)) {
           return false
         }
-        // Hostname is reachable on an associated IP. Do not connect on this IP.
-        if (connectionStore.isAssociatedHostnameReachable(hostname)) {
-          connectionStore.associateWithExistingHostData(hostname, robotName)
+        // Robot is reachable on an associated IP. Do not connect on this IP.
+        if (connectionStore.isAssociatedBrokerReachable(ip)) {
+          connectionStore.associateIPWithExistingHostData(ip, robotName)
           return false
         }
-        // The robot isn't reachable on existing IPs.
-        // Mark this IP as a new connection to see if the robot is reachable on this IP.
+        // The broker isn't reachable on existing IPs.
+        // Mark this IP as a new broker connection to see if the broker is reachable on this IP.
         else {
-          connectionStore.deleteAllAssociatedHostsGivenRobotName(robotName)
+          connectionStore.deleteAllAssociatedIPsGivenRobotName(robotName)
           return true
         }
       } else {
-        return isNewHostname
+        return isNewIP
       }
     })
-    newRobots.forEach(({ hostname, robotName }) => {
-      connectionStore.setPendingHost(hostname, robotName)
-      connectAsync(`mqtt://${hostname}`)
+    newRobots.forEach(({ ip, robotName }) => {
+      connectionStore.setPendingConnection(ip, robotName)
+      connectAsync(`mqtt://${ip}`)
         .then(client => {
-          notifyLog.debug(`Successfully connected to ${hostname}`)
-          connectionStore.setConnectedHost(hostname, client)
-          establishListeners({ client, hostname })
+          notifyLog.debug(`Successfully connected to ${ip}`)
+          connectionStore.setConnected(ip, client)
+          establishListeners({ client, ip: ip })
         })
         .catch((error: Error) => {
           notifyLog.warn(
-            `Failed to connect to ${hostname} - ${error.name}: ${error.message} `
+            `Failed to connect to ${ip} - ${error.name}: ${error.message} `
           )
-          connectionStore.setFailedToConnectHost(hostname, error)
+          connectionStore.setFailedConnection(ip, error)
         })
     })
   })
@@ -148,10 +147,10 @@ function connectAsync(brokerURL: string): Promise<mqtt.Client> {
 
 function establishListeners({
   client,
-  hostname,
+  ip,
 }: {
   client: mqtt.MqttClient
-  hostname: string
+  ip: string
 }): void {
   client.on(
     'message',
@@ -160,41 +159,39 @@ function establishListeners({
         .then(deserializedMessage => {
           const messageContainsUnsubFlag = 'unsubscribe' in deserializedMessage
           if (messageContainsUnsubFlag) {
-            void unsubscribe(hostname, topic)
+            void unsubscribe(ip, topic)
           }
 
           notifyLog.debug('Received notification data from main via IPC', {
-            hostname,
+            ip,
             topic,
           })
 
-          sendDeserialized({ hostname, topic, message: deserializedMessage })
+          sendDeserialized({ ip, topic, message: deserializedMessage })
         })
         .catch(error => notifyLog.debug(`${error.message}`))
     }
   )
 
   client.on('reconnect', () => {
-    notifyLog.debug(`Attempting to reconnect to ${hostname}`)
+    notifyLog.debug(`Attempting to reconnect to ${ip}`)
   })
   // handles transport layer errors only
   client.on('error', error => {
     notifyLog.warn(`Error - ${error.name}: ${error.message}`)
-    sendDeserializedGenericError(hostname, 'ALL_TOPICS')
+    sendDeserializedGenericError(ip, 'ALL_TOPICS')
     client.end()
   })
 
   client.on('end', () => {
-    notifyLog.debug(`Closed connection to ${hostname}`)
+    notifyLog.debug(`Closed connection to ${ip}`)
   })
 
   client.on('disconnect', packet => {
     notifyLog.warn(
-      `Disconnected from ${hostname} with code ${
-        packet.reasonCode ?? 'undefined'
-      }`
+      `Disconnected from ${ip} with code ${packet.reasonCode ?? 'undefined'}`
     )
-    sendDeserializedGenericError(hostname, 'ALL_TOPICS')
+    sendDeserializedGenericError(ip, 'ALL_TOPICS')
   })
 }
 
@@ -207,7 +204,7 @@ export function closeConnectionsForcefullyFor(
       if (client != null) {
         client.end(true, {})
       }
-      connectionStore.deleteAllAssociatedHostsGivenHostname(hostname)
+      connectionStore.deleteAllAssociatedIPsGivenIP(hostname)
       resolve()
     })
   })

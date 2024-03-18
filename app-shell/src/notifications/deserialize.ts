@@ -12,7 +12,7 @@ import type {
 import { FAILURE_STATUSES } from '../constants'
 
 interface SendToBrowserParams {
-  hostname: string
+  ip: string
   topic: NotifyTopic
   message: NotifyResponseData
 }
@@ -23,22 +23,22 @@ const VALID_NOTIFY_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
 ]
 
 export function sendDeserialized({
-  hostname,
+  ip,
   topic,
   message,
 }: SendToBrowserParams): void {
   try {
     const browserWindow = connectionStore.getBrowserWindow()
-    browserWindow?.webContents.send('notify', hostname, topic, message)
+    browserWindow?.webContents.send('notify', ip, topic, message)
   } catch {} // Prevents shell erroring during app shutdown event.
 }
 
 export function sendDeserializedGenericError(
-  hostname: string,
+  ip: string,
   topic: NotifyTopic
 ): void {
   sendDeserialized({
-    hostname,
+    ip,
     topic,
     message: FAILURE_STATUSES.ECONNFAILED,
   })

@@ -30,9 +30,9 @@ class ConnectionStore {
     return this.browserWindow
   }
 
-  public getClient(hostname: string): mqtt.MqttClient | null {
-    if (hostname in this.hosts) {
-      return this.hosts[hostname].client
+  public getClient(ip: string): mqtt.MqttClient | null {
+    if (ip in this.hosts) {
+      return this.hosts[ip].client
     } else {
       return null
     }
@@ -43,11 +43,11 @@ class ConnectionStore {
    * @returns {FailedConnStatus} "ECONNREFUSED" is a proxy for a port block error and is only returned once
    * for analytics reasons. Afterward, a generic "ECONNFAILED" is returned.
    */
-  public getFailedConnectionStatus(hostname: string): FailedConnStatus | null {
-    if (hostname in this.hosts) {
-      const failureStatus = this.hosts[hostname].unreachableStatus
+  public getFailedConnectionStatus(ip: string): FailedConnStatus | null {
+    if (ip in this.hosts) {
+      const failureStatus = this.hosts[ip].unreachableStatus
       if (failureStatus === FAILURE_STATUSES.ECONNREFUSED) {
-        this.hosts[hostname].unreachableStatus = FAILURE_STATUSES.ECONNFAILED
+        this.hosts[ip].unreachableStatus = FAILURE_STATUSES.ECONNFAILED
       }
       return failureStatus
     } else {
@@ -59,16 +59,16 @@ class ConnectionStore {
     return Object.keys(this.hosts)
   }
 
-  public getAssociatedHostnamesFromHostname(hostname: string): string[] {
-    const robotName = this.hosts[hostname].robotName
+  public getAssociatedIPsFromIP(ip: string): string[] {
+    const robotName = this.hosts[ip].robotName
     return Object.keys(this.hosts).filter(
-      hostname => this.hosts[hostname].robotName === robotName
+      ip => this.hosts[ip].robotName === robotName
     )
   }
 
-  public getAssociatedHostnamesFromRobotName(robotName: string): string[] {
+  public getAssociatedIPsFromRobotName(robotName: string): string[] {
     return Object.keys(this.hosts).filter(
-      hostname => this.hosts[hostname].robotName === robotName
+      ip => this.hosts[ip].robotName === robotName
     )
   }
 
@@ -76,9 +76,9 @@ class ConnectionStore {
     this.browserWindow = window
   }
 
-  public setPendingHost(hostname: string, robotName: string): void {
+  public setPendingConnection(ip: string, robotName: string): void {
     if (!this.isAssociatedWithExistingHostData(robotName)) {
-      this.hosts[hostname] = {
+      this.hosts[ip] = {
         robotName,
         client: null,
         subscriptions: new Set(),
@@ -89,10 +89,10 @@ class ConnectionStore {
     }
   }
 
-  public setConnectedHost(hostname: string, client: mqtt.MqttClient): void {
-    if (hostname in this.hosts) {
-      if (this.hosts[hostname].client == null) {
-        this.hosts[hostname].client = client
+  public setConnected(ip: string, client: mqtt.MqttClient): void {
+    if (ip in this.hosts) {
+      if (this.hosts[ip].client == null) {
+        this.hosts[ip].client = client
       }
     }
   }
@@ -101,23 +101,23 @@ class ConnectionStore {
    *
    * @description Adds the host as unreachable with an error status derived from the MQTT returned error object.
    */
-  public setFailedToConnectHost(hostname: string, error: Error): void {
-    if (hostname in this.hosts) {
+  public setFailedConnection(ip: string, error: Error): void {
+    if (ip in this.hosts) {
       const errorStatus = error.message.includes(FAILURE_STATUSES.ECONNREFUSED)
         ? FAILURE_STATUSES.ECONNREFUSED
         : FAILURE_STATUSES.ECONNFAILED
 
-      this.hosts[hostname].unreachableStatus = errorStatus
+      this.hosts[ip].unreachableStatus = errorStatus
     }
   }
 
   public setSubStatus(
-    hostname: string,
+    ip: string,
     topic: NotifyTopic,
     status: 'pending' | 'subscribed'
   ): void {
-    if (hostname in this.hosts) {
-      const { pendingSubs, subscriptions } = this.hosts[hostname]
+    if (ip in this.hosts) {
+      const { pendingSubs, subscriptions } = this.hosts[ip]
       if (status === 'pending') {
         pendingSubs.add(topic)
       } else {
@@ -128,12 +128,12 @@ class ConnectionStore {
   }
 
   public setUnubStatus(
-    hostname: string,
+    ip: string,
     topic: NotifyTopic,
     status: 'pending' | 'unsubscribed'
   ): void {
-    if (hostname in this.hosts) {
-      const { pendingUnsubs, subscriptions } = this.hosts[hostname]
+    if (ip in this.hosts) {
+      const { pendingUnsubs, subscriptions } = this.hosts[ip]
       if (subscriptions.has(topic)) {
         if (status === 'pending') {
           pendingUnsubs.add(topic)
@@ -147,93 +147,90 @@ class ConnectionStore {
 
   /**
    *
-   * @description Creates a new hosts entry for a given hostname with HostData that is a reference to an existing
-   * host's HostData. This occurs when two hostnames reported by discovery-client actually point to the same robot.
+   * @description Creates a new hosts entry for a given IP with HostData that is a reference to an existing
+   * IP's HostData. This occurs when two IPs reported by discovery-client actually reference the same broker.
    */
-  public associateWithExistingHostData(
-    hostname: string,
-    robotName: string
-  ): void {
+  public associateIPWithExistingHostData(ip: string, robotName: string): void {
     const associatedHost = Object.values(this.hosts).find(
       hostData => hostData.robotName === robotName
     )
     if (associatedHost != null) {
-      this.hosts[hostname] = associatedHost
+      this.hosts[ip] = associatedHost
     }
   }
 
-  // Deleting associated hosts does not prevent the connection from re-establishing on an associated host if an
-  // associated host is discoverable.
-  public deleteAllAssociatedHostsGivenHostname(hostname: string): void {
-    const associatedHosts = this.getAssociatedHostnamesFromHostname(hostname)
+  // Deleting associated IPs does not prevent re-establishing the connection on an associated IP if an
+  // associated IP is discoverable.
+  public deleteAllAssociatedIPsGivenIP(ip: string): void {
+    const associatedHosts = this.getAssociatedIPsFromIP(ip)
+    associatedHosts.forEach(ip => {
+      delete this.hosts[ip]
+    })
+  }
+
+  public deleteAllAssociatedIPsGivenRobotName(robotName: string): void {
+    const associatedHosts = this.getAssociatedIPsFromRobotName(robotName)
     associatedHosts.forEach(hostname => {
       delete this.hosts[hostname]
     })
   }
 
-  public deleteAllAssociatedHostsGivenRobotName(robotName: string): void {
-    const associatedHosts = this.getAssociatedHostnamesFromRobotName(robotName)
-    associatedHosts.forEach(hostname => {
-      delete this.hosts[hostname]
-    })
-  }
-
-  public isHostnameNewlyDiscovered(hostname: string): boolean {
-    return hostname in this.hosts
+  public isIPNewlyDiscovered(ip: string): boolean {
+    return ip in this.hosts
   }
 
   public isAssociatedWithExistingHostData(robotName: string): boolean {
-    return this.getAssociatedHostnamesFromRobotName(robotName).length != null
+    return this.getAssociatedIPsFromRobotName(robotName).length != null
   }
 
-  public isAssociatedHostnameReachable(hostname: string): boolean {
-    const associatedRobots = this.getAssociatedHostnamesFromHostname(hostname)
-    return this.isHostReachable(head(associatedRobots) as string)
+  public isAssociatedBrokerReachable(ip: string): boolean {
+    const associatedRobots = this.getAssociatedIPsFromIP(ip)
+    return this.isBrokerReachable(head(associatedRobots) as string)
   }
 
-  public isAssociatedHostnameConnected(hostname: string): boolean {
-    const associatedRobots = this.getAssociatedHostnamesFromHostname(hostname)
-    return this.isHostConnected(head(associatedRobots) as string)
+  public isAssociatedBrokerConnected(ip: string): boolean {
+    const associatedIPs = this.getAssociatedIPsFromIP(ip)
+    return this.isConnectedToBroker(head(associatedIPs) as string)
   }
 
-  public isHostConnected(hostname: string): boolean {
-    if (hostname in this.hosts) {
-      return this.hosts[hostname].client != null
-    } else {
-      return false
-    }
+  public isConnectedToBroker(ip: string): boolean {
+    return this.hosts[ip]?.client?.connected ?? false
   }
 
-  public isPendingSub(hostname: string, topic: NotifyTopic): boolean {
-    if (hostname in this.hosts) {
-      const { pendingSubs } = this.hosts[hostname]
+  public isPendingSub(ip: string, topic: NotifyTopic): boolean {
+    if (ip in this.hosts) {
+      const { pendingSubs } = this.hosts[ip]
       return pendingSubs.has(topic)
     } else {
       return false
     }
   }
 
-  public isActiveSub(hostname: string, topic: NotifyTopic): boolean {
-    if (hostname in this.hosts) {
-      const { subscriptions } = this.hosts[hostname]
+  public isActiveSub(ip: string, topic: NotifyTopic): boolean {
+    if (ip in this.hosts) {
+      const { subscriptions } = this.hosts[ip]
       return subscriptions.has(topic)
     } else {
       return false
     }
   }
 
-  public isPendingUnsub(hostname: string, topic: NotifyTopic): boolean {
-    if (hostname in this.hosts) {
-      const { pendingUnsubs } = this.hosts[hostname]
+  public isPendingUnsub(ip: string, topic: NotifyTopic): boolean {
+    if (ip in this.hosts) {
+      const { pendingUnsubs } = this.hosts[ip]
       return pendingUnsubs.has(topic)
     } else {
       return false
     }
   }
 
-  public isHostReachable(hostname: string): boolean {
-    if (hostname in this.hosts) {
-      return this.hosts[hostname].unreachableStatus == null
+  /**
+   *
+   * @description Reachable refers to whether the broker connection has returned an error.
+   */
+  public isBrokerReachable(ip: string): boolean {
+    if (ip in this.hosts) {
+      return this.hosts[ip].unreachableStatus == null
     } else {
       return false
     }

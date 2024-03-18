@@ -17,17 +17,17 @@ const subscribeOptions: mqtt.IClientSubscribeOptions = {
 const CHECK_CONNECTION_INTERVAL = 500
 
 export function subscribe({
-  hostname,
+  ip,
   topic,
 }: {
-  hostname: string
+  ip: string
   topic: NotifyTopic
 }): Promise<void> {
-  if (!connectionStore.isHostReachable(hostname)) {
-    const errorMessage = connectionStore.getFailedConnectionStatus(hostname)
+  if (!connectionStore.isBrokerReachable(ip)) {
+    const errorMessage = connectionStore.getFailedConnectionStatus(ip)
     if (errorMessage != null) {
       sendDeserialized({
-        hostname,
+        ip,
         topic,
         message: errorMessage,
       })
@@ -36,16 +36,16 @@ export function subscribe({
   } else {
     return waitUntilActiveOrErrored('client')
       .then(() => {
-        const client = connectionStore.getClient(hostname)
+        const client = connectionStore.getClient(ip)
         if (client == null) {
           return Promise.reject(new Error('Expected hostData, received null.'))
         }
 
         if (
-          !connectionStore.isActiveSub(hostname, topic) &&
-          !connectionStore.isPendingSub(hostname, topic)
+          !connectionStore.isActiveSub(ip, topic) &&
+          !connectionStore.isPendingSub(ip, topic)
         ) {
-          connectionStore.setSubStatus(hostname, topic, 'pending')
+          connectionStore.setSubStatus(ip, topic, 'pending')
           return new Promise<void>(() => {
             client.subscribe(topic, subscribeOptions, subscribeCb)
           })
@@ -53,25 +53,23 @@ export function subscribe({
           void waitUntilActiveOrErrored('subscription').catch(
             (error: Error) => {
               notifyLog.debug(error.message)
-              sendDeserializedGenericError(hostname, topic)
+              sendDeserializedGenericError(ip, topic)
             }
           )
         }
       })
       .catch((error: Error) => {
         notifyLog.debug(error.message)
-        sendDeserializedGenericError(hostname, topic)
+        sendDeserializedGenericError(ip, topic)
       })
   }
 
   function subscribeCb(error: Error, result: mqtt.ISubscriptionGrant[]): void {
     if (error != null) {
-      sendDeserializedGenericError(hostname, topic)
+      sendDeserializedGenericError(ip, topic)
     } else {
-      notifyLog.debug(
-        `Successfully subscribed on ${hostname} to topic: ${topic}`
-      )
-      connectionStore.setSubStatus(hostname, topic, 'subscribed')
+      notifyLog.debug(`Successfully subscribed on ${ip} to topic: ${topic}`)
+      connectionStore.setSubStatus(ip, topic, 'subscribed')
     }
   }
   // Check every 500ms for 2 seconds before failing.
@@ -84,8 +82,8 @@ export function subscribe({
       const intervalId = setInterval(() => {
         const hasReceivedAck =
           connection === 'client'
-            ? connectionStore.isHostConnected(hostname)
-            : connectionStore.isActiveSub(hostname, topic)
+            ? connectionStore.isConnectedToBroker(ip)
+            : connectionStore.isActiveSub(ip, topic)
         if (hasReceivedAck) {
           clearInterval(intervalId)
           resolve()
