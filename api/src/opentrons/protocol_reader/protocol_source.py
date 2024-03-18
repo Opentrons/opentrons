@@ -123,4 +123,3 @@ class ProtocolSource:
     metadata: Metadata
     robot_type: RobotType
     config: ProtocolConfig
-    run_time_param_values: Optional[RunTimeParameterValues]

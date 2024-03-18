@@ -74,8 +74,6 @@ class PythonProtocol(_ProtocolCommon):
     bundled_python: Optional[Dict[str, str]]
     # this should only be included when the protocol is not a zip
     extra_labware: Optional[Dict[str, "LabwareDefinition"]]
-    # TODO: Use a common type definition between engine's RTP type & this one
-    run_time_param_values: Optional[Dict[str, Union[float, bool, str]]]
 
 
 Protocol = Union[JsonProtocol, PythonProtocol]

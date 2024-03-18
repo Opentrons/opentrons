@@ -252,7 +252,6 @@ async def create_protocol(
             files=buffered_files,
             directory=protocol_directory / protocol_id,
             content_hash=content_hash,
-            run_time_param_values=parsed_rtp,
         )
     except ProtocolFilesInvalidError as e:
         raise ProtocolFilesInvalid(detail=str(e)).as_error(

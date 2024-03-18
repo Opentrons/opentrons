@@ -57,7 +57,6 @@ class ProtocolReader:
         self,
         files: Sequence[BufferedFile],
         directory: Path, content_hash: str,
-        run_time_param_values: RunTimeParameterValues,
     ) -> ProtocolSource:
         """Compute a `ProtocolSource` from buffered files and save them as files.
 
@@ -69,7 +68,6 @@ class ProtocolReader:
             files: List buffered files. Do not attempt to reuse any objects
                 in this list once they've been passed to the ProtocolReader.
             directory: Name of the directory to create and place files in.
-            run_time_param_values: Client-supplied values for Run Time Parameters.
 
         Returns:
             A ProtocolSource describing the validated protocol.
@@ -103,7 +101,6 @@ class ProtocolReader:
             config=self._map_config(role_analysis),
             robot_type=role_analysis.main_file.robot_type,
             metadata=role_analysis.main_file.metadata,
-            run_time_param_values=run_time_param_values,
         )
 
     async def read_saved(
@@ -170,9 +167,6 @@ class ProtocolReader:
             config=self._map_config(role_analysis),
             robot_type=role_analysis.main_file.robot_type,
             metadata=role_analysis.main_file.metadata,
-            # We are not passing any RTP values, just reading the existing protocol.
-            # RTPs passed when the protocol was uploaded/ analyzed will be in the analysis.
-            run_time_param_values=None,
         )
 
     @staticmethod

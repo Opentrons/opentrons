@@ -35,7 +35,8 @@ from .legacy_wrappers import (
     LegacyExecutor,
     LegacyLoadInfo,
 )
-from ..protocol_engine.types import PostRunHardwareState, DeckConfigurationType
+from ..protocol_engine.types import PostRunHardwareState, DeckConfigurationType, \
+    RTPOverridesType
 
 
 class RunResult(NamedTuple):
@@ -105,6 +106,7 @@ class AbstractRunner(ABC):
     async def run(
         self,
         deck_configuration: DeckConfigurationType,
+        run_time_params_overrides: Optional[RTPOverridesType],
         protocol_source: Optional[ProtocolSource] = None,
     ) -> RunResult:
         """Run a given protocol to completion."""
@@ -137,7 +139,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         # of runner interface
         self._task_queue = (
             task_queue or TaskQueue()
-        )  # cleanup_func=protocol_engine.finish))
+        )
         self._task_queue.set_cleanup_func(
             func=protocol_engine.finish,
             drop_tips_after_run=drop_tips_after_run,
@@ -145,7 +147,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         )
 
     async def load(
-        self, protocol_source: ProtocolSource, python_parse_mode: PythonParseMode
+        self, protocol_source: ProtocolSource, python_parse_mode: PythonParseMode, run_time_params_overrides: Optional[RTPOverridesType],
     ) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
@@ -182,18 +184,20 @@ class PythonAndLegacyRunner(AbstractRunner):
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
         )
-        # this command homes all axes, including pipette plugner and gripper jaw
+        # this command homes all axes, including pipette plunger and gripper jaw
         self._protocol_engine.add_command(request=initial_home_command)
 
         self._task_queue.set_run_func(
             func=self._legacy_executor.execute,
             protocol=protocol,
             context=context,
+            run_time_params_overrides=run_time_params_overrides,
         )
 
     async def run(  # noqa: D102
         self,
         deck_configuration: DeckConfigurationType,
+        run_time_params_overrides: Optional[RTPOverridesType],
         protocol_source: Optional[ProtocolSource] = None,
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
@@ -201,7 +205,9 @@ class PythonAndLegacyRunner(AbstractRunner):
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
             await self.load(
-                protocol_source=protocol_source, python_parse_mode=python_parse_mode
+                protocol_source=protocol_source,
+                python_parse_mode=python_parse_mode,
+                run_time_params_overrides=run_time_params_overrides,
             )
 
         self.play(deck_configuration=deck_configuration)
@@ -301,6 +307,7 @@ class JsonRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
+        run_time_params_overrides: Optional[RTPOverridesType] = None,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
@@ -344,6 +351,7 @@ class LiveRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
+        run_time_params_overrides: Optional[RTPOverridesType] = None,
     ) -> RunResult:
         assert protocol_source is None
         await self._hardware_api.home()

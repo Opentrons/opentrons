@@ -1,8 +1,10 @@
 """Protocol analysis module."""
 import logging
+from typing import Optional
 
 from opentrons import protocol_runner
 from opentrons.protocol_engine.errors import ErrorOccurrence
+from opentrons.protocol_engine.types import RTPOverridesType
 import opentrons.util.helpers as datetime_helper
 
 import robot_server.errors.error_mappers as em
@@ -27,6 +29,7 @@ class ProtocolAnalyzer:
         self,
         protocol_resource: ProtocolResource,
         analysis_id: str,
+        run_time_param_overrides: Optional[RTPOverridesType],
     ) -> None:
         """Analyze a given protocol, storing the analysis when complete."""
         runner = await protocol_runner.create_simulating_runner(
@@ -35,7 +38,9 @@ class ProtocolAnalyzer:
         )
         try:
             result = await runner.run(
-                protocol_source=protocol_resource.source, deck_configuration=[]
+                protocol_source=protocol_resource.source,
+                deck_configuration=[],
+                run_time_params_overrides=run_time_param_overrides,
             )
         except BaseException as error:
             internal_error = em.map_unexpected_error(error=error)
