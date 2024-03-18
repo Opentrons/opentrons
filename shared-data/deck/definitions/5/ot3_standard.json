@@ -22,8 +22,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot D1",
-        "compatibleModuleTypes": []
+        "displayName": "Slot D1"
       },
       {
         "id": "D2",
@@ -35,8 +34,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot D2",
-        "compatibleModuleTypes": []
+        "displayName": "Slot D2"
       },
       {
         "id": "D3",
@@ -48,8 +46,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot D3",
-        "compatibleModuleTypes": []
+        "displayName": "Slot D3"
       },
       {
         "id": "C1",
@@ -61,8 +58,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot C1",
-        "compatibleModuleTypes": []
+        "displayName": "Slot C1"
       },
       {
         "id": "C2",
@@ -74,8 +70,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot C2",
-        "compatibleModuleTypes": []
+        "displayName": "Slot C2"
       },
       {
         "id": "C3",
@@ -87,8 +82,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot C3",
-        "compatibleModuleTypes": []
+        "displayName": "Slot C3"
       },
       {
         "id": "B1",
@@ -100,8 +94,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot B1",
-        "compatibleModuleTypes": []
+        "displayName": "Slot B1"
       },
       {
         "id": "B2",
@@ -113,8 +106,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot B2",
-        "compatibleModuleTypes": []
+        "displayName": "Slot B2"
       },
       {
         "id": "B3",
@@ -126,8 +118,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot B3",
-        "compatibleModuleTypes": []
+        "displayName": "Slot B3"
       },
       {
         "id": "A1",
@@ -139,8 +130,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot A1",
-        "compatibleModuleTypes": []
+        "displayName": "Slot A1"
       },
       {
         "id": "A2",
@@ -373,8 +363,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Thermocycler Module Slot",
-        "compatibleModuleTypes": []
+        "displayName": "Thermocycler Module Slot"
       },
       {
         "id": "heaterShakerD1",
@@ -385,8 +374,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Heater Shaker in D1",
-        "ableToDropTips": true
+        "displayName": "Heater Shaker in D1"
       },
       {
         "id": "heaterShakerC1",
@@ -397,8 +385,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Heater Shaker in C1",
-        "ableToDropTips": true
+        "displayName": "Heater Shaker in C1"
       },
       {
         "id": "heaterShakerB1",
@@ -409,8 +396,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Heater Shaker in B1",
-        "ableToDropTips": true
+        "displayName": "Heater Shaker in B1"
       },
       {
         "id": "heaterShakerA1",
@@ -421,8 +407,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Heater Shaker in A1",
-        "ableToDropTips": true
+        "displayName": "Heater Shaker in A1"
       },
       {
         "id": "heaterShakerD3",
@@ -433,8 +418,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Heater Shaker in D3",
-        "ableToDropTips": true
+        "displayName": "Heater Shaker in D3"
       },
       {
         "id": "heaterShakerC3",
@@ -445,8 +429,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Heater Shaker in C3",
-        "ableToDropTips": true
+        "displayName": "Heater Shaker in C3"
       },
       {
         "id": "heaterShakerB3",
@@ -457,8 +440,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Heater Shaker in B3",
-        "ableToDropTips": true
+        "displayName": "Heater Shaker in B3"
       },
       {
         "id": "heaterShakerA3",
@@ -469,8 +451,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Heater Shaker in A3",
-        "ableToDropTips": true
+        "displayName": "Heater Shaker in A3"
       },
       {
         "id": "temperatureModuleD1",
@@ -481,8 +462,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Temperature Module in D1",
-        "ableToDropTips": true
+        "displayName": "Temperature Module in D1"
       },
       {
         "id": "temperatureModuleC1",
@@ -493,8 +473,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Temperature Module in C1",
-        "ableToDropTips": true
+        "displayName": "Temperature Module in C1"
       },
       {
         "id": "temperatureModuleB1",
@@ -505,8 +484,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Temperature Module in B1",
-        "ableToDropTips": true
+        "displayName": "Temperature Module in B1"
       },
       {
         "id": "temperatureModuleA1",
@@ -517,8 +495,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Temperature Module in A1",
-        "ableToDropTips": true
+        "displayName": "Temperature Module in A1"
       },
       {
         "id": "temperatureModuleD3",
@@ -529,8 +506,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Temperature Module in D3",
-        "ableToDropTips": true
+        "displayName": "Temperature Module in D3"
       },
       {
         "id": "temperatureModuleC3",
@@ -541,8 +517,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Temperature Module in C3",
-        "ableToDropTips": true
+        "displayName": "Temperature Module in C3"
       },
       {
         "id": "temperatureModuleB3",
@@ -553,8 +528,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Temperature Module in B3",
-        "ableToDropTips": true
+        "displayName": "Temperature Module in B3"
       },
       {
         "id": "temperatureModuleA3",
@@ -565,9 +539,140 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Temperature Module in A3",
-        "ableToDropTips": true
+        "displayName": "Temperature Module in A3"
       },
+      {
+        "id": "magneticBlockD1",
+        "areaType": "magneticBlock",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Magnetic Block Module in D1"
+      },
+      {
+        "id": "magneticBlockC1",
+        "areaType": "magneticBlock",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Magnetic Block Module in C1"
+      },
+      {
+        "id": "magneticBlockB1",
+        "areaType": "magneticBlock",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Magnetic Block Module in B1"
+      },
+      {
+        "id": "magneticBlockA1",
+        "areaType": "magneticBlock",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Magnetic Block Module in A1"
+      },
+      {
+        "id": "magneticBlockD2",
+        "areaType": "magneticBlock",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Magnetic Block Module in D2"
+      },
+      {
+        "id": "magneticBlockC2",
+        "areaType": "magneticBlock",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Magnetic Block Module in C2"
+      },
+      {
+        "id": "magneticBlockB2",
+        "areaType": "magneticBlock",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Magnetic Block Module in B2"
+      },
+      {
+        "id": "magneticBlockA2",
+        "areaType": "magneticBlock",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Magnetic Block Module in A2"
+      },
+      {
+        "id": "magneticBlockD3",
+        "areaType": "magneticBlock",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Magnetic Block Module in D3"
+      },
+      {
+        "id": "magneticBlockC3",
+        "areaType": "magneticBlock",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Magnetic Block Module in C3"
+      },
+      {
+        "id": "magneticBlockB3",
+        "areaType": "magneticBlock",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Magnetic Block Module in B3"
+      },
+      {
+        "id": "magneticBlockA3",
+        "areaType": "magneticBlock",
+        "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Magnetic Block Module in A3"
+      }
     ],
     "cutouts": [
       {

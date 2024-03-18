@@ -3,11 +3,8 @@ from __future__ import annotations
 from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
 from opentrons.protocol_engine.commands import LoadModuleResult
-from opentrons_shared_data.deck.dev_types import (
-    DeckDefinitionV5,
-    SlotDefV3,
-    CutoutFixture,
-)
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, SlotDefV3
+from opentrons.protocol_engine.resources import deck_configuration_provider
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -638,16 +635,14 @@ class ProtocolCore(
                 )
         else:
             cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)
-            potential_fixtures_in_slot = self._engine_client.state.addressable_areas._state.potential_cutout_fixtures_by_cutout_id[
-                self._engine_client.state.addressable_areas.get_cutout_id_by_deck_slot_name(
-                    slot
-                )
-            ]
-            module_fixture_found = False
-            for fixture in potential_fixtures_in_slot:
-                if fixture.cutout_fixture_id == cutout_fixture_id:
-                    module_fixture_found = True
-            if not module_fixture_found:
+            module_fixture = deck_configuration_provider.get_cutout_fixture(
+                cutout_fixture_id,
+                self._engine_client.state.addressable_areas.state.deck_definition,
+            )
+            cutout_id = self._engine_client.state.addressable_areas.get_cutout_id_by_deck_slot_name(
+                slot
+            )
+            if cutout_id not in module_fixture["mayMountTo"]:
                 raise ValueError(
                     f"A {module_type.value} cannot be loaded into slot {slot}"
                 )

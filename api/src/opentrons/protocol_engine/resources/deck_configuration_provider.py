@@ -51,9 +51,10 @@ def get_provided_addressable_area_names(
     try:
         return cutout_fixture["providesAddressableAreas"][cutout_id]
     except KeyError as exception:
-        raise FixtureDoesNotProvideAreasError(
-            f"Cutout fixture {cutout_fixture['id']} does not provide addressable areas for {cutout_id}"
-        ) from exception
+        # raise FixtureDoesNotProvideAreasError(
+        #     f"Cutout fixture {cutout_fixture['id']} does not provide addressable areas for {cutout_id}"
+        # ) from exception
+        return []
 
 
 def get_addressable_area_display_name(

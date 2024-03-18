@@ -711,7 +711,6 @@ class AreaType(Enum):
     TEMPERATURE = "temperatureModule"
 
 
-
 @dataclass(frozen=True)
 class AddressableArea:
     """Addressable area that has been loaded."""
