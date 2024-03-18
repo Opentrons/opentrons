@@ -101,9 +101,9 @@ class AbstractRunner(ABC):
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
 
-    def complete_recovery(self) -> None:
-        """See `ProtocolEngine.complete_recovery()`."""
-        self._protocol_engine.complete_recovery()
+    def resume_from_recovery(self) -> None:
+        """See `ProtocolEngine.resume_from_recovery()`."""
+        self._protocol_engine.resume_from_recovery()
 
     @abstractmethod
     async def run(

@@ -62,8 +62,8 @@ class StopAction:
 
 
 @dataclass(frozen=True)
-class CompleteRecoveryAction:
-    """See `ProtocolEngine.complete_recovery()`."""
+class ResumeFromRecoveryAction:
+    """See `ProtocolEngine.resume_from_recovery()`."""
 
     pass
 
@@ -210,7 +210,7 @@ Action = Union[
     PlayAction,
     PauseAction,
     StopAction,
-    CompleteRecoveryAction,
+    ResumeFromRecoveryAction,
     FinishAction,
     HardwareStoppedAction,
     DoorChangeAction,

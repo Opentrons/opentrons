@@ -11,7 +11,7 @@ from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonExce
 from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorState
-from opentrons.protocol_engine.actions.actions import CompleteRecoveryAction
+from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 
 from ..actions import (
     Action,
@@ -672,11 +672,15 @@ class CommandView(HasState[CommandState]):
             PlayAction,
             PauseAction,
             StopAction,
-            CompleteRecoveryAction,
+            ResumeFromRecoveryAction,
             QueueCommandAction,
         ],
     ) -> Union[
-        PlayAction, PauseAction, StopAction, CompleteRecoveryAction, QueueCommandAction
+        PlayAction,
+        PauseAction,
+        StopAction,
+        ResumeFromRecoveryAction,
+        QueueCommandAction,
     ]:
         """Validate whether a given control action is allowed.
 
@@ -711,7 +715,7 @@ class CommandView(HasState[CommandState]):
                 )
 
         elif (
-            isinstance(action, CompleteRecoveryAction)
+            isinstance(action, ResumeFromRecoveryAction)
             or self.get_status() == EngineStatus.AWAITING_RECOVERY
         ):
             # While we're developing error recovery, we'll conservatively disallow

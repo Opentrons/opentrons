@@ -294,15 +294,15 @@ async def test_stop_when_run_never_started(
         (lazy_fixture("live_runner_subject")),
     ],
 )
-def test_complete_recovery(
+def test_resume_from_recovery(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
     subject: AnyRunner,
 ) -> None:
-    """It should call `complete_recovery()` on the underlying engine."""
-    subject.complete_recovery()
+    """It should call `resume_from_recovery()` on the underlying engine."""
+    subject.resume_from_recovery()
 
-    decoy.verify(protocol_engine.complete_recovery(), times=1)
+    decoy.verify(protocol_engine.resume_from_recovery(), times=1)
 
 
 async def test_run_json_runner(

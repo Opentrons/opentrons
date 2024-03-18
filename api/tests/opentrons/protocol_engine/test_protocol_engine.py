@@ -8,7 +8,7 @@ from decoy import Decoy
 
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.ordered_set import OrderedSet
-from opentrons.protocol_engine.actions.actions import CompleteRecoveryAction
+from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
@@ -428,20 +428,20 @@ def test_pause(
     )
 
 
-def test_complete_recovery(
+def test_resume_from_recovery(
     decoy: Decoy,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     subject: ProtocolEngine,
 ) -> None:
-    """It should dispatch a CompleteRecoveryAction."""
-    expected_action = CompleteRecoveryAction()
+    """It should dispatch a ResumeFromRecoveryAction."""
+    expected_action = ResumeFromRecoveryAction()
 
     decoy.when(
         state_store.commands.validate_action_allowed(expected_action)
     ).then_return(expected_action)
 
-    subject.complete_recovery()
+    subject.resume_from_recovery()
 
     decoy.verify(action_dispatcher.dispatch(expected_action))
 
