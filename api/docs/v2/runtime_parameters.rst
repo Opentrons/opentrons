@@ -7,6 +7,7 @@ Runtime Parameters
 ******************
 
 .. toctree::
+    parameters/choosing
     parameters/defining
     parameters/using_values
     
