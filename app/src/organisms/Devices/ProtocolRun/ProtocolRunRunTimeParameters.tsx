@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -11,10 +14,12 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
+import { Banner } from '../../../atoms/Banner'
+import { Divider } from '../../../atoms/structure'
 import { NoParameter } from '../../ProtocolDetails/ProtocolParameters/NoParameter'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
-import { RunTimeParameter } from '@opentrons/shared-data'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const mockData: RunTimeParameter[] = [
   {
@@ -156,11 +161,44 @@ export function ProtocolRunRuntimeParameters({
 }: ProtocolRunRuntimeParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const parameters = mostRecentAnalysis?.runTimeParameters ?? mockData
-  const isNoParameter = parameters.length < 1
+  // ToDo (kk:03/18/2024) mockData will be replaced with []
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? mockData
+  const isNoParameter = runTimeParameters.length < 1
+
+  const formattedValue = (runTimeParameter: RunTimeParameter): string => {
+    const { type, default: defaultValue } = runTimeParameter
+    const suffix =
+      'suffix' in runTimeParameter && runTimeParameter.suffix != null
+        ? runTimeParameter.suffix
+        : ''
+    switch (type) {
+      case 'int':
+      case 'float':
+        return `${defaultValue.toString()} ${suffix}`
+      case 'boolean':
+        return Boolean(defaultValue) ? t('on') : t('off')
+      case 'str':
+        if ('choices' in runTimeParameter && runTimeParameter.choices != null) {
+          const choice = runTimeParameter.choices.find(
+            choice => choice.value === defaultValue
+          )
+          if (choice != null) {
+            return choice.displayName
+          }
+        }
+        break
+    }
+    return ''
+  }
+  // ToDO (kk:03/18/2024) Need to add Chip to updated runTime parameter value
+  // This part will be implemented in a following PR since need to runTime parameter slideout
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      <Flex backgroundColor={COLORS.white} padding={SPACING.spacing16}>
+    <>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        padding={SPACING.spacing16}
+        gridGap={SPACING.spacing10}
+      >
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing8}
@@ -175,14 +213,96 @@ export function ProtocolRunRuntimeParameters({
             </StyledText>
           ) : null}
         </Flex>
+        {!isNoParameter ? (
+          <Banner
+            type="informing"
+            width="100%"
+            iconMarginLeft={SPACING.spacing4}
+          >
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                {t('values_are_view_only')}
+              </StyledText>
+              <StyledText as="p">{t('cancel_and_restart_to_edit')}</StyledText>
+            </Flex>
+          </Banner>
+        ) : null}
       </Flex>
-      <Flex backgroundColor={COLORS.white} padding={SPACING.spacing16}>
-        {isNoParameter ? (
+      {isNoParameter ? (
+        <Flex padding={SPACING.spacing16}>
           <NoParameter />
-        ) : (
-          <StyledText>{'parameters'}</StyledText>
-        )}
-      </Flex>
-    </Flex>
+        </Flex>
+      ) : (
+        <>
+          <Divider width="100%" />
+          <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+            <StyledTable>
+              <thead>
+                <StyledTableHeader>{t('name')}</StyledTableHeader>
+                <StyledTableHeader>{t('value')}</StyledTableHeader>
+              </thead>
+              <tbody>
+                {runTimeParameters.map(
+                  (parameter: RunTimeParameter, index: number) => {
+                    return (
+                      <StyledTableRow
+                        isLast={index === runTimeParameters.length - 1}
+                        key={`runTimeParameter-${index}`}
+                      >
+                        <StyledTableCell
+                          isLast={index === runTimeParameters.length - 1}
+                        >
+                          <StyledText as="p">
+                            {parameter.displayName}
+                          </StyledText>
+                        </StyledTableCell>
+                        <StyledTableCell
+                          isLast={index === runTimeParameters.length - 1}
+                        >
+                          <StyledText as="p">
+                            {formattedValue(parameter)}
+                          </StyledText>
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    )
+                  }
+                )}
+              </tbody>
+            </StyledTable>
+          </Flex>
+        </>
+      )}
+    </>
   )
 }
+
+const StyledTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+`
+
+const StyledTableHeader = styled.th`
+  ${TYPOGRAPHY.labelSemiBold}
+  padding: ${SPACING.spacing8};
+  border-bottom: ${BORDERS.lineBorder};
+`
+
+interface StyledTableRowProps {
+  isLast: boolean
+}
+
+const StyledTableRow = styled.tr<StyledTableRowProps>`
+  padding: ${SPACING.spacing8};
+  border-bottom: ${props => (props.isLast ? 'none' : BORDERS.lineBorder)};
+`
+
+interface StyledTableCellProps {
+  isLast: boolean
+}
+
+const StyledTableCell = styled.td<StyledTableCellProps>`
+  padding-left: ${SPACING.spacing8};
+  padding-top: ${SPACING.spacing12};
+  padding-bottom: ${props => (props.isLast ? 0 : SPACING.spacing12)};
+`

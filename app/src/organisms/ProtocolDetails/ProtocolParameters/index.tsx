@@ -35,7 +35,7 @@ export function ProtocolParameters({
           <Banner
             type="informing"
             width="100%"
-            iconMarginRight={SPACING.spacing12}
+            iconMarginLeft={SPACING.spacing4}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
