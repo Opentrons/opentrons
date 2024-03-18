@@ -89,6 +89,7 @@ import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
 import { useNotifyRunQuery } from '../../resources/runs'
+import { ProtocolSetupParameters } from '../../organisms/ProtocolSetupParameters'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
@@ -97,7 +98,6 @@ import type {
   ProtocolFixture,
 } from '../../pages/Protocols/hooks'
 import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupParameters } from '../../organisms/ProtocolSetupParameters'
 
 const FETCH_DURATION_MS = 5000
 interface ProtocolSetupStepProps {
@@ -114,6 +114,8 @@ interface ProtocolSetupStepProps {
   disabledReason?: string | null
   //  optional description
   description?: string
+  //  optional removal of the icon
+  hasIcon?: boolean
 }
 
 export function ProtocolSetupStep({
@@ -125,6 +127,7 @@ export function ProtocolSetupStep({
   disabled = false,
   disabledReason,
   description,
+  hasIcon = true,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
     ready: COLORS.green35,
@@ -183,7 +186,10 @@ export function ProtocolSetupStep({
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
         ) : null}
-        <Flex flexDirection={DIRECTION_COLUMN} textAlign={TYPOGRAPHY.textAlignLeft}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          textAlign={TYPOGRAPHY.textAlignLeft}
+        >
           <StyledText
             as="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -206,7 +212,7 @@ export function ProtocolSetupStep({
             {subDetail}
           </StyledText>
         </Flex>
-        {disabled ? null : (
+        {disabled || !hasIcon ? null : (
           <Icon
             marginLeft={SPACING.spacing8}
             name="more"

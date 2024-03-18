@@ -242,6 +242,7 @@ export function ProtocolSetupParameters({
           return (
             <React.Fragment key={parameter.displayName}>
               <ProtocolSetupStep
+                hasIcon={!(parameter.type === 'boolean')}
                 status="general"
                 title={parameter.displayName}
                 onClickSetupStep={() => console.log('TODO: wire this up')}
