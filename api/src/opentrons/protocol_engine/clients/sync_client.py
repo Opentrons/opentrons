@@ -1,6 +1,6 @@
 """Control a `ProtocolEngine` without async/await."""
 
-from typing import cast, List, Optional, Dict
+from typing import cast, List, Optional, Dict, Union
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -25,6 +25,7 @@ from ..types import (
     Liquid,
     NozzleLayoutConfigurationType,
     AddressableOffsetVector,
+    AddressableAreaLocation,
 )
 from .transports import ChildThreadTransport
 
@@ -264,7 +265,7 @@ class SyncClient:
     def load_module(
         self,
         model: ModuleModel,
-        location: DeckSlotLocation,
+        location: Union[DeckSlotLocation, AddressableAreaLocation],
     ) -> commands.LoadModuleResult:
         """Execute a LoadModule command and return the result."""
         request = commands.LoadModuleCreate(

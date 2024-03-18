@@ -45,7 +45,9 @@ from ..types import (
     HeaterShakerMovementRestrictors,
     DeckType,
     LabwareMovementOffsetData,
+    AddressableAreaLocation,
 )
+from .addressable_areas import AddressableAreaView
 from .. import errors
 from ..commands import (
     Command,
@@ -170,6 +172,9 @@ class ModuleState:
     deck_type: DeckType
     """Type of deck that the modules are on."""
 
+    addressable_area_view: AddressableAreaView
+    """Read-only view of the deck's addressable area state."""
+
 
 class ModuleStore(HasState[ModuleState], HandlesActions):
     """Module state container."""
@@ -179,6 +184,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def __init__(
         self,
         config: Config,
+        addressable_area_view: AddressableAreaView,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
     ) -> None:
         """Initialize a ModuleStore and its state."""
@@ -190,6 +196,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             substate_by_module_id={},
             module_offset_by_serial=module_calibration_offsets or {},
             deck_type=config.deck_type,
+            addressable_area_view=addressable_area_view,
         )
         self._robot_type = config.robot_type
 
@@ -210,11 +217,19 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
     def _handle_command(self, command: Command) -> None:
         if isinstance(command.result, LoadModuleResult):
+            if isinstance(command.params.location, AddressableAreaLocation):
+                slot_name = (
+                    self._state.addressable_area_view.get_addressable_area_base_slot(
+                        command.params.location.addressableAreaName
+                    )
+                )
+            else:
+                slot_name = command.params.location.slotName
             self._add_module_substate(
                 module_id=command.result.moduleId,
                 serial_number=command.result.serialNumber,
                 definition=command.result.definition,
-                slot_name=command.params.location.slotName,
+                slot_name=slot_name,
                 requested_model=command.params.model,
                 module_live_data=None,
             )
@@ -946,7 +961,7 @@ class ModuleView(HasState[ModuleState]):
     def select_hardware_module_to_load(
         self,
         model: ModuleModel,
-        location: DeckSlotLocation,
+        location: Union[DeckSlotLocation, AddressableAreaLocation],
         attached_modules: Sequence[HardwareModule],
     ) -> HardwareModule:
         """Get the next matching hardware module for the given model and location.
@@ -973,9 +988,19 @@ class ModuleView(HasState[ModuleState]):
         existing_mod_in_slot = None
 
         for mod_id, slot in self._state.slot_by_module_id.items():
-            if slot == location.slotName:
-                existing_mod_in_slot = self._state.hardware_by_module_id.get(mod_id)
-                break
+            if isinstance(location, DeckSlotLocation):
+                if slot == location.slotName:
+                    existing_mod_in_slot = self._state.hardware_by_module_id.get(mod_id)
+                    break
+            elif isinstance(location, AddressableAreaLocation):
+                if (
+                    slot
+                    == self._state.addressable_area_view.get_addressable_area_base_slot(
+                        location.addressableAreaName
+                    )
+                ):
+                    existing_mod_in_slot = self._state.hardware_by_module_id.get(mod_id)
+                    break
 
         if existing_mod_in_slot:
             existing_def = existing_mod_in_slot.definition
@@ -984,10 +1009,16 @@ class ModuleView(HasState[ModuleState]):
                 return existing_mod_in_slot
 
             else:
-                raise errors.ModuleAlreadyPresentError(
-                    f"A {existing_def.model.value} is already"
-                    f" present in {location.slotName.value}"
-                )
+                if isinstance(location, AddressableAreaLocation):
+                    raise errors.ModuleAlreadyPresentError(
+                        f"A {existing_def.model.value} is already"
+                        f" present in {location.addressableAreaName}"
+                    )
+                else:
+                    raise errors.ModuleAlreadyPresentError(
+                        f"A {existing_def.model.value} is already"
+                        f" present in {location.slotName.value}"
+                    )
 
         for m in attached_modules:
             if m not in self._state.hardware_by_module_id.values():

@@ -709,6 +709,7 @@ class AreaType(Enum):
     THERMOCYCLER = "thermocycler"
     HEATER_SHAKER = "heaterShaker"
     TEMPERATURE = "temperatureModule"
+    MAGNETICBLOCK = "magneticBlock"
 
 
 @dataclass(frozen=True)
