@@ -45,6 +45,11 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
   log.debug('Creating main window', { options: WINDOW_OPTS })
 
   const mainWindow = new BrowserWindow(WINDOW_OPTS)
+  // TODO: In the app, we immediately do .once('ready-to-show', () => { mainWindow.show() }). We don't do that
+  // here because in electron 27.0.0 for some reason ready-to-show isn't firing, so instead we use "the app sent
+  // something via IPC" as our signifier that the window can bw shown. This happens in main.ts.
+  // This is a worrying thing to have to do, and it would be good to stop doing it. We'll have to change this
+  // further when we upgrade past 27.
 
   log.info(`Loading ${url}`)
   // eslint-disable-next-line @typescript-eslint/no-floating-promises

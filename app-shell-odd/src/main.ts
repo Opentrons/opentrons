@@ -127,6 +127,8 @@ function startUp(): void {
     systemd.ready()
     const stopWatching = watchForMassStorage(dispatch)
     ipcMain.once('quit', stopWatching)
+    // TODO: This is where we render the main window for the first time. See ui.ts
+    // in the createUI function for more.
     if (!!!mainWindow) {
       log.error('mainWindow went away before show')
     } else {
