@@ -16,6 +16,7 @@ import type {
 } from '@opentrons/shared-data'
 
 vi.mock('../../../ProtocolDetails/ProtocolParameters/NoParameter')
+vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
 const RUN_ID = 'mockId'
 
@@ -77,7 +78,7 @@ const render = (
   })
 }
 
-describe(() => {
+describe('ProtocolRunRuntimeParameters', () => {
   let props: React.ComponentProps<typeof ProtocolRunRuntimeParameters>
   beforeEach(() => {
     props = {
@@ -92,7 +93,7 @@ describe(() => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   it('should render title, and banner when RunTimeParameters are note empty', () => {

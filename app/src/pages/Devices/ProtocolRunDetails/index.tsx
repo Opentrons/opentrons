@@ -204,7 +204,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
         runId={runId}
       />
     ),
-    'runtime-parameters': <ProtocolRunRuntimeParameters />,
+    'runtime-parameters': <ProtocolRunRuntimeParameters runId={runId} />,
     'module-controls': (
       <ProtocolRunModuleControls robotName={robotName} runId={runId} />
     ),
