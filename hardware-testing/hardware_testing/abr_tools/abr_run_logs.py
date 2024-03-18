@@ -1,5 +1,4 @@
 """ABR Run Log Pull."""
-from .abr_robots import ABR_IPS
 from typing import Set, Dict, Any
 import argparse
 import os
@@ -112,8 +111,13 @@ def get_all_run_logs(storage_directory: str) -> None:
     Read each robot's list of unique run log IDs and compare them to all IDs in storage.
     Any ID that is not in storage, download the run log and put it in storage.
     """
+    ip_json_file = os.path.join(storage_directory, "IPs.json")
+    ip_file = json.load(open(ip_json_file))
+    ip_address_list = ip_file["ip_address_list"]
+    print(ip_address_list)
+
     runs_from_storage = get_run_ids_from_storage(storage_directory)
-    for ip in ABR_IPS:
+    for ip in ip_address_list:
         try:
             runs = get_run_ids_from_robot(ip)
             runs_to_save = get_unseen_run_ids(runs, runs_from_storage)

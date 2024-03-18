@@ -1,5 +1,5 @@
-"""Read ABR Logs and Extract Command Data Stats"""
-from typing import Set, Dict, Any, List, Tuple
+"""Read ABR Logs and Extract Command Data Stats."""
+from typing import Set, Dict, Any, List, Tuple, Union
 import argparse
 import os
 import sys
@@ -16,7 +16,7 @@ from .abr_read_logs import (
 
 def set_up_data_sheet(
     tab_number: int, google_sheet_name: str, commandTypes: str, headers: List
-)-> Any:
+) -> Tuple[object, str]:
     """Connects to google sheet and creates local csv."""
     try:
         google_sheet = google_sheets_tool.google_sheet(
@@ -25,7 +25,7 @@ def set_up_data_sheet(
         print("Connected to google sheet.")
     except FileNotFoundError:
         print("No google sheets credentials. Add credentials to storage notebook.")
-    csv_name = google_sheet_name + "-" + commandTypes + ".csv"
+    csv_name = google_sheet_name + "-" + commandTypes
     create_abr_data_sheet(storage_directory, csv_name, headers)
 
     return google_sheet, csv_name
@@ -51,7 +51,9 @@ def command_time(command: Dict[str, str]) -> Tuple[float, float]:
     return create_to_start, start_to_complete
 
 
-def pipette_commands(file_results: Dict[str, str]) -> Dict[str, Any]:
+def pipette_commands(
+    file_results: Dict[str, Any]
+) -> Dict[Tuple[str, str, str, str, str], Dict[str, Any]]:
     """Get pipette commands."""
     pipetteCmdList = (
         "aspirate",
@@ -62,14 +64,17 @@ def pipette_commands(file_results: Dict[str, str]) -> Dict[str, Any]:
         "blowout",
         "dropTip",
     )
-    commandData = file_results.get("commands", "")
+    commandData: List[Dict[str, Any]] = file_results.get("commands", "")
+    pipettes: Dict[str, Any] = file_results.get("pipettes", {})
     all_pipettes = [
         {
             "pipetteId": pipette.get("id", ""),
             "Serial #": file_results.get(pipette.get("mount", ""), ""),
         }
-        for pipette in file_results.get("pipettes", {})
+        for pipette in pipettes.values()
+        if isinstance(pipettes, dict)
     ]
+
     group_totals = {}
     for command in commandData:
         commandType = command["commandType"]
@@ -114,7 +119,9 @@ def pipette_commands(file_results: Dict[str, str]) -> Dict[str, Any]:
     return group_totals
 
 
-def module_commands(file_results: Dict[str, str]) -> Dict[str, Any]:
+def module_commands(
+    file_results: Dict[str, Any]
+) -> Dict[Tuple[Any, Union[Any, str], Any, Any], Dict[str, Any]]:
     """Get module commands."""
     moduleCmdList = [
         "thermocycler/openLid",
@@ -126,10 +133,12 @@ def module_commands(file_results: Dict[str, str]) -> Dict[str, Any]:
         "temperatureModule/setTargetTemperature",
         "temperatureModule/waitForTemperature",
     ]
-    commandData = file_results.get("commands", "")
+    commandData: List[Dict[str, Any]] = file_results.get("commands", "")
+    modules: Dict[str, Any] = file_results.get("modules", {})
     all_modules = [
         {"moduleId": module.get("id", ""), "Serial #": module.get("serialNumber", "")}
-        for module in file_results.get("modules", {})
+        for module in modules.values()
+        if isinstance(modules, dict)
     ]
     group_totals = {}
     for command in commandData:
@@ -169,17 +178,25 @@ def module_commands(file_results: Dict[str, str]) -> Dict[str, Any]:
     return group_totals
 
 
-def motion_commands(file_results: Dict[str, str]) -> Dict[str, Any]:
+def motion_commands(
+    file_results: Dict[str, Any]
+) -> Dict[Tuple[Any, Union[Any, str]], Dict[str, Any]]:
     """Get motion commands."""
     motionCmdList = [
         "moveToWell",
         "moveToAddressableAreaForDropTip",
         "moveLabware",
     ]
-    commandData = file_results.get("commands", "")
+    commandData: List[Dict[str, Any]] = file_results.get("commands", "")
+    labwares: Dict[str, Any] = file_results.get("labware", "")
     all_labware = [
-        {"id": labware.get("id", ""), "loadName": labware.get("loadName", ""), "displayName": labware.get("displayName", None)}
-        for labware in file_results.get("labware", {})
+        {
+            "id": labware.get("id", ""),
+            "loadName": labware.get("loadName", ""),
+            "displayName": labware.get("displayName", None),
+        }
+        for labware in labwares.values()
+        if isinstance(labwares, dict)
     ]
     group_totals = {}
     for command in commandData:
@@ -188,14 +205,15 @@ def motion_commands(file_results: Dict[str, str]) -> Dict[str, Any]:
             create_to_start, start_to_complete = command_time(command)
             labware_id = command["params"].get("labwareId", "")
             labware_name = next(
-            (
-                labware.get("displayName", labware.get("loadName", ""))
-                if labware["id"] == labware_id and labware.get("displayName") is not None
-                else labware.get("loadName", "")
-                for labware in all_labware
-            ),
-            "",
-        )
+                (
+                    labware.get("displayName", labware.get("loadName", ""))
+                    if labware["id"] == labware_id
+                    and labware.get("displayName") is not None
+                    else labware.get("loadName", "")
+                    for labware in all_labware
+                ),
+                "",
+            )
             group_key = (commandType, labware_name)
             if group_key not in group_totals:
                 group_totals[group_key] = {
@@ -214,7 +232,9 @@ def motion_commands(file_results: Dict[str, str]) -> Dict[str, Any]:
     return group_totals
 
 
-def setup_commands(file_results: Dict[str, str]) -> Dict[str, Any]:
+def setup_commands(
+    file_results: Dict[str, Any]
+) -> Dict[Tuple[Any, Any, Any], Dict[str, Any]]:
     """Get setup commands."""
     setupCmdList = [
         "custom",
@@ -224,7 +244,7 @@ def setup_commands(file_results: Dict[str, str]) -> Dict[str, Any]:
         "waitforResume",
         "home",
     ]
-    commandData = file_results.get("commands", "")
+    commandData: List[Dict[str, Any]] = file_results.get("commands", "")
     group_totals = {}
     for command in commandData:
         commandType = command["commandType"]
@@ -259,9 +279,10 @@ def setup_commands(file_results: Dict[str, str]) -> Dict[str, Any]:
                 group_totals[group_key]["count"] += 1
     return group_totals
 
+
 def command_data_dictionary(
-    runs_to_save: Set[str], storage_directory: str, i: int, n: int, m: int, p:int
-):
+    runs_to_save: Set[str], storage_directory: str, i: int, n: int, m: int, p: int
+) -> Tuple[Dict, Dict, Dict, Dict]:
     """Pull data from run files and format into a dictionary."""
     runs_and_instrument_commands = {}
     runs_and_module_commands = {}
@@ -349,7 +370,7 @@ def command_data_dictionary(
         runs_and_instrument_commands,
         runs_and_module_commands,
         runs_and_setup_commands,
-        runs_and_move_commands
+        runs_and_move_commands,
     )
 
 
@@ -449,7 +470,7 @@ if __name__ == "__main__":
         "Start to Complete (sec)",
         "Count",
     ]
-    
+
     google_sheet_instruments, csv_instruments = set_up_data_sheet(
         0, "ABR Command Data", "Instruments", instrument_headers
     )
@@ -470,14 +491,13 @@ if __name__ == "__main__":
     runs_in_sheet = read_abr_data_sheet(
         storage_directory, csv_instruments, google_sheet_instruments
     )
-    read_abr_data_sheet(storage_directory, csv_modules, google_sheet_modules)
     runs_to_save = get_unseen_run_ids(runs_from_storage, runs_in_sheet)
     (
         runs_and_instrument_commands,
         runs_and_module_commands,
         runs_and_setup_commands,
-        runs_and_move_commands
-    ) = command_data_dictionary(runs_to_save, storage_directory, i, m, n,p)
+        runs_and_move_commands,
+    ) = command_data_dictionary(runs_to_save, storage_directory, i, m, n, p)
     write_to_abr_sheet(
         runs_and_instrument_commands,
         storage_directory,
