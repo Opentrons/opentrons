@@ -22,19 +22,19 @@ describe('load and immediately save integrity test', () => {
   // (without these fields, Yup schema cast would fail)
   const testCases = [
     {
-      inputDef: fixture_96_plate,
+      inputDef: fixture_96_plate as LabwareDefinition2,
       extraFields: {},
     },
     {
-      inputDef: fixture_12_trough,
+      inputDef: fixture_12_trough as LabwareDefinition2,
       extraFields: {},
     },
     {
-      inputDef: fixture_tiprack_300_ul,
+      inputDef: fixture_tiprack_300_ul as LabwareDefinition2,
       extraFields: {},
     },
     {
-      inputDef: fixture_24_tuberack,
+      inputDef: fixture_24_tuberack as LabwareDefinition2,
       extraFields: { tubeRackInsertLoadName: 'customTubeRack' },
     },
   ]
