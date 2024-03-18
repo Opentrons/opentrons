@@ -666,7 +666,7 @@ class CommandView(HasState[CommandState]):
         """Get whether engine is in a terminal state."""
         return self._state.run_result is not None
 
-    def validate_action_allowed(
+    def validate_action_allowed(  # noqa: C901
         self,
         action: Union[
             PlayAction,
@@ -694,6 +694,17 @@ class CommandView(HasState[CommandState]):
             SetupCommandNotAllowedError: The engine is running, so a setup command
                 may not be added.
         """
+        if self.get_status() == EngineStatus.AWAITING_RECOVERY:
+            # While we're developing error recovery, we'll conservatively disallow
+            # all actions, to avoid putting the engine in weird undefined states.
+            # We'll allow specific actions here as we flesh things out and add support
+            # for them.
+            raise NotImplementedError()
+
+        if isinstance(action, ResumeFromRecoveryAction):
+            # https://opentrons.atlassian.net/browse/EXEC-301
+            raise NotImplementedError()
+
         if self._state.run_result is not None:
             raise RunStoppedError("The run has already stopped.")
 
@@ -713,16 +724,6 @@ class CommandView(HasState[CommandState]):
                 raise SetupCommandNotAllowedError(
                     "Setup commands are not allowed after run has started."
                 )
-
-        elif (
-            isinstance(action, ResumeFromRecoveryAction)
-            or self.get_status() == EngineStatus.AWAITING_RECOVERY
-        ):
-            # While we're developing error recovery, we'll conservatively disallow
-            # all actions, to avoid putting the engine in weird undefined states.
-            # We'll allow specific actions here as we flesh things out and add support
-            # for them.
-            raise NotImplementedError()
 
         return action
 
