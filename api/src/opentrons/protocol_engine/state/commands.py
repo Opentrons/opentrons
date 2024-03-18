@@ -618,10 +618,12 @@ class CommandView(HasState[CommandState]):
         """
         status = self.get(command_id).status
 
+        run_requested_to_stop = self._state.run_result is not None
+
         return (
             status == CommandStatus.SUCCEEDED
             or status == CommandStatus.FAILED
-            or (status == CommandStatus.QUEUED and self._state.run_result is not None)
+            or (status == CommandStatus.QUEUED and run_requested_to_stop)
         )
 
     def get_all_commands_final(self) -> bool:
@@ -634,8 +636,11 @@ class CommandView(HasState[CommandState]):
             `setup`.
         """
         no_command_running = self._state.running_command_id is None
+        run_requested_to_stop = self._state.run_result is not None
         no_command_to_execute = (
-            self._state.run_result is not None
+            run_requested_to_stop
+            # TODO(mm, 2024-03-15): This ignores queued setup commands,
+            # which seems questionable?
             or len(self._state.queued_command_ids) == 0
         )
 
