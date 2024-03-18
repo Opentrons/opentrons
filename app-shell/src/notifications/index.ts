@@ -4,6 +4,7 @@ import {
   cleanUpUnreachableRobots,
   getHealthyRobotDataForNotifyConnections,
   closeConnectionsForcefullyFor,
+  RobotData,
 } from './connect'
 import { subscribe } from './subscribe'
 import { notifyLog } from './notifyLog'
@@ -38,10 +39,10 @@ export function registerNotify(
 
 export function handleNotificationConnectionsFor(
   robots: DiscoveryClientRobot[]
-): string[] {
+): RobotData[] {
   const reachableRobots = getHealthyRobotDataForNotifyConnections(robots)
-  cleanUpUnreachableRobots(reachableRobots)
-  addNewRobotsToConnectionStore(reachableRobots)
+  void cleanUpUnreachableRobots(reachableRobots)
+  void addNewRobotsToConnectionStore(reachableRobots)
 
   return reachableRobots
 }

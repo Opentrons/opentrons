@@ -27,7 +27,7 @@ const connectOptions: mqtt.IClientOptions = {
   resubscribe: true,
 }
 
-interface RobotData {
+export interface RobotData {
   hostname: string
   robotName: string
 }
