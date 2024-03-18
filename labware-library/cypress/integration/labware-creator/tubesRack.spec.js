@@ -146,22 +146,6 @@ context('Tubes and Rack', () => {
         ).should('exist')
         cy.get("input[placeholder='opentrons_6_tuberack_10ul']").should('exist')
 
-<<<<<<< HEAD
-=======
-        // Test pipette
-        cy.contains('Test Pipette is a required field').should('exist')
-        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-        cy.get('label')
-          .contains('Test Pipette')
-          .children()
-          .first()
-          .trigger('mousedown')
-        cy.get('*[class^="_option_label"]')
-          .contains(/P10.*Single-Channel.*GEN1/)
-          .click()
-        cy.contains('Test Pipette is a required field').should('not.exist')
-
->>>>>>> edge
         // All fields present
         cy.get('button[class*="_export_button_"]').click({ force: true })
         cy.contains(
@@ -317,22 +301,6 @@ context('Tubes and Rack', () => {
           'exist'
         )
 
-<<<<<<< HEAD
-=======
-        // Test pipette
-        cy.contains('Test Pipette is a required field').should('exist')
-        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-        cy.get('label')
-          .contains('Test Pipette')
-          .children()
-          .first()
-          .trigger('mousedown')
-        cy.get('*[class^="_option_label"]')
-          .contains(/P10.*Single-Channel.*GEN1/)
-          .click()
-        cy.contains('Test Pipette is a required field').should('not.exist')
-
->>>>>>> edge
         // All fields present
         cy.get('button[class*="_export_button_"]').click({ force: true })
         cy.contains(
@@ -488,22 +456,6 @@ context('Tubes and Rack', () => {
           'exist'
         )
 
-<<<<<<< HEAD
-=======
-        // Test pipette
-        cy.contains('Test Pipette is a required field').should('exist')
-        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-        cy.get('label')
-          .contains('Test Pipette')
-          .children()
-          .first()
-          .trigger('mousedown')
-        cy.get('*[class^="_option_label"]')
-          .contains(/P10.*Single-Channel.*GEN1/)
-          .click()
-        cy.contains('Test Pipette is a required field').should('not.exist')
-
->>>>>>> edge
         // All fields present
         cy.get('button[class*="_export_button_"]').click({ force: true })
         cy.contains(

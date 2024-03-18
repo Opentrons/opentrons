@@ -248,34 +248,6 @@
   width: 100%;
 }
 
-<<<<<<< HEAD:labware-library/src/labware-creator/styles.css
-=======
-.export_callout {
-  padding: 2rem;
-  text-align: center;
-  font-size: var(--fs-body-1);
-}
-
-.test_labware_heading {
-  font-size: var(--fs-body-2);
-}
-
-.test_guide_button {
-  /* from legacy --linkb-tn */
-  display: block;
-  width: 100%;
-  margin: 1.5rem 0 0.5rem;
-  border-radius: 3px;
-  font-size: var(--fs-body-2);
-  text-align: center;
-  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
-  text-transform: uppercase;
-  cursor: pointer;
-  margin-top: 0;
-  padding: 1rem 4rem;
-}
-
->>>>>>> edge:labware-library/src/labware-creator/styles.module.css
 .capitalize {
   text-transform: capitalize;
 }

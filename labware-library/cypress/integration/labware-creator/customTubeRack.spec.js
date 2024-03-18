@@ -180,28 +180,6 @@ context('Tubes and Rack', () => {
       cy.get("input[placeholder='somerackbrand_24_tuberack_1500ul']").should(
         'exist'
       )
-<<<<<<< HEAD
-=======
-
-      // Test pipette
-      cy.contains('Test Pipette is a required field').should('exist')
-      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-      cy.get('label')
-        .contains('Test Pipette')
-        .children()
-        .first()
-        .trigger('mousedown')
-      cy.get('*[class^="_option_label"]')
-        .contains(/P20.*Single-Channel.*GEN2/)
-        .click()
-      cy.contains('Test Pipette is a required field').should('not.exist')
-
-      // All fields present
-      cy.get('button[class*="_export_button_"]').click({ force: true })
-      cy.contains(
-        'Please resolve all invalid fields in order to export the labware definition'
-      ).should('not.exist')
->>>>>>> edge
     })
 
     it('should export a file matching the fixture', () => {

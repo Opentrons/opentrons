@@ -259,26 +259,6 @@ describe('Create a Tip Rack', () => {
     cy.get('input[name="loadName"]').clear().type('generic_1_tiprack_20ul')
   })
 
-<<<<<<< HEAD
-=======
-  it('Select the pipette', () => {
-    cy.get('#Export h2').contains('Labware Test Protocol').should('exist')
-    cy.get('#react-select-4-input').click()
-    cy.get('input[name="pipetteName"]')
-      .invoke('attr', 'value', 'p20_single_gen2')
-      .should('have.attr', 'value', 'p20_single_gen2')
-    cy.get('*[class^="_option_label"]')
-      .contains(/P20.*Single-Channel.*GEN2/)
-      .click()
-    cy.get('#DefinitionTest a').contains('tip rack test guide').click()
-    cy.get('#DefinitionTest a').should(
-      'have.attr',
-      'href',
-      'https://insights.opentrons.com/hubfs/Products/Consumables%20and%20Reagents/labwareDefinition_tipRack_testGuide.pdf'
-    )
-  })
-
->>>>>>> edge
   it('Verify the exported file to the fixture', () => {
     cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
       cy.get('button').contains('EXPORT FILE').click()
