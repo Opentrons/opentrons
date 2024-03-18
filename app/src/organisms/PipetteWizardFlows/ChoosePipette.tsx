@@ -51,7 +51,7 @@ import type { SelectablePipettes } from './types'
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
   border: 1px solid ${COLORS.grey30};
-  border-radius: ${BORDERS.borderRadius4};
+  border-radius: ${BORDERS.borderRadius8};
   height: 14.5625rem;
   width: 14.5625rem;
   cursor: pointer;

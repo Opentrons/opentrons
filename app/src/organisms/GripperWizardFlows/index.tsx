@@ -357,7 +357,7 @@ export const GripperWizard = (
         top="16px"
         border={BORDERS.lineBorder}
         boxShadow={BORDERS.shadowSmall}
-        borderRadius={BORDERS.borderRadius16}
+        borderRadius={BORDERS.borderRadius8}
         position={POSITION_ABSOLUTE}
         backgroundColor={COLORS.white}
       >

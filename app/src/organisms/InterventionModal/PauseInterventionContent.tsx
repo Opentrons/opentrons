@@ -54,7 +54,7 @@ const PAUSE_HEADER_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     align-self: ${ALIGN_CENTER};
     background-color: ${COLORS.grey35};
-    border-radius: ${BORDERS.borderRadius12};
+    border-radius: ${BORDERS.borderRadius8};
     grid-gap: ${SPACING.spacing32};
     padding: ${SPACING.spacing24};
     min-width: 36.5rem;

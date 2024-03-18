@@ -253,7 +253,7 @@ export function AddFixtureModal({
 const FIXTURE_BUTTON_STYLE = css`
   background-color: ${COLORS.grey35};
   cursor: default;
-  border-radius: ${BORDERS.borderRadius12};
+  border-radius: ${BORDERS.borderRadius16};
   box-shadow: none;
 
   &:focus {

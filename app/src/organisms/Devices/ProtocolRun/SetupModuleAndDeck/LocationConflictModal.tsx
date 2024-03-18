@@ -288,6 +288,7 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
                 alignItems={ALIGN_CENTER}
+                borderRadius={BORDERS.borderRadius4}
               >
                 <StyledText as="label" width={SPACING.spacing120}>
                   {t('protocol_specifies')}
@@ -302,6 +303,7 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
                 alignItems={ALIGN_CENTER}
+                borderRadius={BORDERS.borderRadius4}
               >
                 <StyledText as="label" width={SPACING.spacing120}>
                   {t('currently_configured')}

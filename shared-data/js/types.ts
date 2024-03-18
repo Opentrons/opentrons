@@ -613,18 +613,18 @@ interface BooleanParameter {
   default: boolean
 }
 
-type RunTimeParameterTypes = 'int' | 'float' | 'str' | 'boolean'
+type RunTimeParameterType = 'int' | 'float' | 'str' | 'boolean'
 
-type RunTimeParameter = IntParameter | ChoiceParameter | BooleanParameter
-interface BaseRunTimeParameters {
+type ParameterType = IntParameter | ChoiceParameter | BooleanParameter
+interface BaseRunTimeParameter {
   displayName: string
   variableName: string
   description: string
-  type: RunTimeParameterTypes
+  type: RunTimeParameterType
   suffix?: string
 }
 
-export type RunTimeParameters = BaseRunTimeParameters & RunTimeParameter
+export type RunTimeParameter = BaseRunTimeParameter & ParameterType
 
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
@@ -638,7 +638,7 @@ export interface CompletedProtocolAnalysis {
   commands: RunTimeCommand[]
   errors: AnalysisError[]
   robotType?: RobotType | null
-  runTimeParameters?: RunTimeParameters[]
+  runTimeParameters?: RunTimeParameter[]
 }
 
 export interface ResourceFile {
