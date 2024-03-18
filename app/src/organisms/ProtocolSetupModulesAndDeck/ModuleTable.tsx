@@ -312,7 +312,7 @@ function ModuleTableItem({
             ? COLORS.grey35
             : COLORS.yellow35
         }
-        borderRadius={BORDERS.borderRadius12}
+        borderRadius={BORDERS.borderRadius8}
         cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
         gridGap={SPACING.spacing24}
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
