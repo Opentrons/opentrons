@@ -9,9 +9,9 @@ import {
 } from '@opentrons/components'
 import { ProtocolSetupStep, SetupScreens } from '../../pages/ProtocolSetup'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { ChildNavigation } from '../ChildNavigation'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import { ChildNavigation } from '../ChildNavigation'
 
 const mockData: RunTimeParameter[] = [
   {
@@ -180,6 +180,7 @@ export function ProtocolSetupParameters({
         }}
       />
       <Flex
+        marginTop="7.75rem"
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
