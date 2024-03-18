@@ -175,7 +175,7 @@ export function AddFixtureModal({
                         flexDirection={DIRECTION_ROW}
                         alignItems={ALIGN_CENTER}
                         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-                        css={FIXTURE_BUTTON_STYLE}
+                        css={FIXTURE_BUTTON_STYLE_ODD}
                       >
                         <StyledText
                           as="p"
@@ -250,7 +250,7 @@ export function AddFixtureModal({
   )
 }
 
-const FIXTURE_BUTTON_STYLE = css`
+const FIXTURE_BUTTON_STYLE_ODD = css`
   background-color: ${COLORS.grey35};
   cursor: default;
   border-radius: ${BORDERS.borderRadius16};

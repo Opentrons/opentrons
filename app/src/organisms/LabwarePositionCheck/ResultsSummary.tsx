@@ -388,13 +388,13 @@ const TerseTable = styled('table')`
   margin: ${SPACING.spacing16} 0;
   text-align: left;
   tr td:first-child {
-    border-top-left-radius: ${BORDERS.borderRadius12};
-    border-bottom-left-radius: ${BORDERS.borderRadius12};
+    border-top-left-radius: ${BORDERS.borderRadius8};
+    border-bottom-left-radius: ${BORDERS.borderRadius8};
     padding-left: ${SPACING.spacing12};
   }
   tr td:last-child {
-    border-top-right-radius: ${BORDERS.borderRadius12};
-    border-bottom-right-radius: ${BORDERS.borderRadius12};
+    border-top-right-radius: ${BORDERS.borderRadius8};
+    border-bottom-right-radius: ${BORDERS.borderRadius8};
     padding-right: ${SPACING.spacing12};
   }
 `

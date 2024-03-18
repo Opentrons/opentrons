@@ -163,6 +163,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         backgroundColor={COLORS.grey20}
         padding={SPACING.spacing16}
         marginBottom={SPACING.spacing24}
+        borderRadius={BORDERS.borderRadius4}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
         <Link

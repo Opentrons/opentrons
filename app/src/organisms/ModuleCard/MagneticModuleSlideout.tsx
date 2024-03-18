@@ -7,6 +7,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   COLORS,
+  BORDERS,
   TYPOGRAPHY,
   SPACING,
   JUSTIFY_END,
@@ -169,6 +170,7 @@ export const MagneticModuleSlideout = (
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         padding={SPACING.spacing16}
+        borderRadius={BORDERS.borderRadius4}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}

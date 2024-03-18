@@ -13,7 +13,7 @@ export const OverflowBtn: (
     return (
       <Btn
         css={css`
-          border-radius: ${BORDERS.borderRadius8};
+          border-radius: ${BORDERS.borderRadius4};
           max-height: ${SPACING.spacing32};
 
           &:hover {
