@@ -3,6 +3,11 @@ from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import Dict, Optional, Union
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+from opentrons.protocol_engine.error_recovery_policy import (
+    ErrorRecoveryPolicy,
+    ErrorRecoveryType,
+    error_recovery_by_ff,
+)
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -90,6 +95,7 @@ class ProtocolEngine:
         hardware_stopper: Optional[HardwareStopper] = None,
         door_watcher: Optional[DoorWatcher] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
+        error_recovery_policy: ErrorRecoveryPolicy = error_recovery_by_ff,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -113,6 +119,7 @@ class ProtocolEngine:
             hardware_api=hardware_api,
             state_store=self._state_store,
             action_dispatcher=self._action_dispatcher,
+            error_recovery_policy=error_recovery_policy,
         )
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api,
@@ -259,6 +266,7 @@ class ProtocolEngine:
                 error_id=self._model_utils.generate_id(),
                 failed_at=self._model_utils.get_timestamp(),
                 error=EStopActivatedError(message="Estop Activated"),
+                type=ErrorRecoveryType.FAIL_RUN,
             )
             self._action_dispatcher.dispatch(fail_action)
 
@@ -271,6 +279,7 @@ class ProtocolEngine:
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
                     error=EStopActivatedError(message="Estop Activated"),
+                    type=ErrorRecoveryType.FAIL_RUN,
                 )
                 self._action_dispatcher.dispatch(fail_action)
             self._queue_worker.cancel()

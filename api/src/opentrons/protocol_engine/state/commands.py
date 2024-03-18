@@ -12,6 +12,7 @@ from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 
 from ..actions import (
     Action,
