@@ -197,7 +197,7 @@ export function ProtocolSetupStep({
           >
             {title}
           </StyledText>
-          <StyledText as="h4" color={COLORS.grey50} maxWidth='35rem'>
+          <StyledText as="h4" color={COLORS.grey50} maxWidth="35rem">
             {description}
           </StyledText>
         </Flex>
@@ -206,7 +206,7 @@ export function ProtocolSetupStep({
             as="p"
             textAlign={TEXT_ALIGN_RIGHT}
             color={disabled ? COLORS.grey50 : COLORS.black90}
-            maxWidth='20rem'
+            maxWidth="20rem"
           >
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
