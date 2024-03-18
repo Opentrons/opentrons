@@ -216,7 +216,7 @@ export function AddFixtureModal({
                         justifyContent={JUSTIFY_SPACE_BETWEEN}
                         padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
                         backgroundColor={COLORS.grey20}
-                        borderRadius={BORDERS.borderRadius8}
+                        borderRadius={BORDERS.borderRadius16}
                       >
                         <StyledText css={TYPOGRAPHY.pSemiBold}>
                           {fixtureDisplayName}
@@ -253,7 +253,7 @@ export function AddFixtureModal({
 const FIXTURE_BUTTON_STYLE = css`
   background-color: ${COLORS.grey35};
   cursor: default;
-  border-radius: ${BORDERS.borderRadiusFull};
+  border-radius: ${BORDERS.borderRadius16};
   box-shadow: none;
 
   &:focus {
