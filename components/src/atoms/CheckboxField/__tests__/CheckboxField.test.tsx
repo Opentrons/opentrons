@@ -43,7 +43,7 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey60)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
+    expect(checkBoxIcon).toHaveStyle(`border-radius: 2px`)
     expect(checkBoxIcon).toHaveStyle(
       `justify-content: ${String(JUSTIFY_CENTER)}`
     )
@@ -82,7 +82,7 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.blue60)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
+    expect(checkBoxIcon).toHaveStyle(`border-radius: 2px`)
     expect(checkBoxIcon).toHaveStyle(
       `justify-content: ${String(JUSTIFY_CENTER)}`
     )
@@ -97,7 +97,7 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey60)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
+    expect(checkBoxIcon).toHaveStyle(`border-radius: 2px`)
     expect(checkBoxIcon).toHaveStyle(
       `justify-content: ${String(JUSTIFY_CENTER)}`
     )
