@@ -1,6 +1,6 @@
 import React from 'react'
 import { FormikConfig } from 'formik'
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { vi, describe, it, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
