@@ -21,7 +21,7 @@ export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
   const selectedPipetteDefaultTipracks =
     selectedPipetteName != null
       ? getPipetteSpecsV2(selectedPipetteName as PipetteName)
-          ?.liquids[0].defaultTipracks ?? []
+          ?.liquids['default'].defaultTipracks ?? []
       : []
   const selectedPipetteDisplayCategory =
     selectedPipetteName != null

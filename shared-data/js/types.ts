@@ -435,7 +435,7 @@ export interface PipetteV2GeneralSpecs {
     partialTipSupported: boolean
     availableConfigurations: number[] | null
   }
-  channels: number
+  channels: PipetteChannels
   shaftDiameter: number
   shaftULperMM: number
   backCompatNames: string[]

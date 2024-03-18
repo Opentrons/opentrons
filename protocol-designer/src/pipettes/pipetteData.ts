@@ -1,6 +1,6 @@
 import { DropdownOption } from '../../../components/lib/forms/DropdownField.d'
 import {
-  getPipetteNameSpecs,
+  getPipetteSpecsV2,
   getTiprackVolume,
   PipetteName,
 } from '@opentrons/shared-data'
@@ -18,12 +18,12 @@ const supportedPipetteNames: PipetteName[] = [
 // TODO: should a version of pipetteOptions be moved to shared-data,
 // and used for both PD and Run App?
 export const pipetteOptions: Options = supportedPipetteNames
-  .map((name: PipetteName) => {
-    const pipette = getPipetteNameSpecs(name)
+  .map(name => {
+    const pipette = getPipetteSpecsV2(name)
     return pipette
       ? {
           name: pipette.displayName,
-          value: pipette.name,
+          value: name as string,
         }
       : null
   })

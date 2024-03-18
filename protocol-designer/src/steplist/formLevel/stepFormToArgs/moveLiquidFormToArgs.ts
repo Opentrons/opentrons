@@ -1,4 +1,8 @@
-import { getWellsDepth, LabwareDefinition2 } from '@opentrons/shared-data'
+import {
+  getWellsDepth,
+  LabwareDefinition2,
+  LOW_VOLUME_PIPETTES,
+} from '@opentrons/shared-data'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -171,21 +175,51 @@ export const moveLiquidFormToArgs = (
     'dispense_airGap_checkbox',
     'dispense_airGap_volume'
   )
+  const tipLength = fields.pipette.tiprackLabwareDef.parameters.tipLength ?? 0
+  if (tipLength === 0) {
+    console.error(
+      `expected to find a tiplength with tiprack ${fields.pipette.tiprackLabwareDef.metadata.displayName} but could not`
+    )
+  }
+  const isLowVolumePipette = LOW_VOLUME_PIPETTES.includes(fields.pipette.name)
+  const isUsingLowVolume = fields.volume < 5
+  const liquidType =
+    isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
+  const liquidSupportedTips = Object.values(
+    fields.pipette.spec.liquids[liquidType].supportedTips
+  )
+
+  //  find the supported tip liquid specs that either exactly match
+  //  tipLength or are closest, this accounts for custom tipracks
+  const matchingTipLiquidSpecs = liquidSupportedTips.sort((tipA, tipB) => {
+    const differenceA = Math.abs(tipA.defaultTipLength - tipLength)
+    const differenceB = Math.abs(tipB.defaultTipLength - tipLength)
+    return differenceA - differenceB
+  })[0]
+
+  console.assert(
+    matchingTipLiquidSpecs,
+    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${fields.pipette.tiprackLabwareDef.metadata.displayName}`
+  )
+
   const commonFields = {
     pipette: pipetteId,
     volume,
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
     aspirateFlowRateUlSec:
-      fields.aspirate_flowRate || pipetteSpec.defaultAspirateFlowRate.value,
+      fields.aspirate_flowRate ||
+      matchingTipLiquidSpecs.defaultAspirateFlowRate.default,
     dispenseFlowRateUlSec:
-      fields.dispense_flowRate || pipetteSpec.defaultDispenseFlowRate.value,
+      fields.dispense_flowRate ||
+      matchingTipLiquidSpecs.defaultDispenseFlowRate.default,
     aspirateOffsetFromBottomMm:
       fields.aspirate_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
     dispenseOffsetFromBottomMm:
       fields.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     blowoutFlowRateUlSec:
-      fields.dispense_flowRate || pipetteSpec.defaultBlowOutFlowRate.value,
+      fields.dispense_flowRate ||
+      matchingTipLiquidSpecs.defaultBlowOutFlowRate.default,
     blowoutOffsetFromTopMm,
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),

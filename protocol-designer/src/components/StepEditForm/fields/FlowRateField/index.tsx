@@ -18,6 +18,7 @@ export function FlowRateField(props: OP): JSX.Element {
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
   const pipetteDisplayName = pipette ? pipette.spec.displayName : 'pipette'
   const innerKey = `${name}:${String(value || 0)}`
+
   let defaultFlowRate
   if (pipette) {
     if (flowRateType === 'aspirate') {
@@ -36,7 +37,9 @@ export function FlowRateField(props: OP): JSX.Element {
       key={innerKey}
       defaultFlowRate={defaultFlowRate}
       minFlowRate={0}
-      maxFlowRate={pipette ? pipette.spec.maxVolume : Infinity}
+      maxFlowRate={
+        pipette ? pipette.spec.liquids['default'].maxVolume : Infinity
+      }
     />
   )
 }

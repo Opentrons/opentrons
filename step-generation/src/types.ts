@@ -10,11 +10,11 @@ import type {
   LabwareDefinition2,
   ModuleType,
   ModuleModel,
-  PipetteNameSpecs,
   PipetteName,
   NozzleConfigurationStyle,
   LabwareLocation,
   PipetteMount as Mount,
+  PipetteV2Specs,
 } from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,
@@ -132,7 +132,7 @@ export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteByI
 // =========== PIPETTES ========
 export type PipetteEntity = NormalizedPipette & {
   tiprackLabwareDef: LabwareDefinition2
-  spec: PipetteNameSpecs
+  spec: PipetteV2Specs
 }
 
 export interface PipetteEntities {
