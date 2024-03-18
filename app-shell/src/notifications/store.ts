@@ -60,16 +60,24 @@ class ConnectionStore {
   }
 
   public getAssociatedIPsFromIP(ip: string): string[] {
-    const robotName = this.hosts[ip].robotName
-    return Object.keys(this.hosts).filter(
-      ip => this.hosts[ip].robotName === robotName
-    )
+    if (ip in this.hosts) {
+      const robotName = this.hosts[ip].robotName
+      return Object.keys(this.hosts).filter(
+        ip => this.hosts[ip].robotName === robotName
+      )
+    } else return []
   }
 
   public getAssociatedIPsFromRobotName(robotName: string): string[] {
     return Object.keys(this.hosts).filter(
       ip => this.hosts[ip].robotName === robotName
     )
+  }
+
+  public getRobotNameFromIP(ip: string): string | null {
+    if (ip in this.hosts) {
+      return this.hosts[ip].robotName
+    } else return null
   }
 
   public setBrowserWindow(window: BrowserWindow): void {
@@ -225,11 +233,11 @@ class ConnectionStore {
   }
 
   public isIPNewlyDiscovered(ip: string): boolean {
-    return ip in this.hosts
+    return !(ip in this.hosts)
   }
 
   public isAssociatedWithExistingHostData(robotName: string): boolean {
-    return this.getAssociatedIPsFromRobotName(robotName).length != null
+    return this.getAssociatedIPsFromRobotName(robotName).length > 0
   }
 
   public isAssociatedBrokerReachable(ip: string): boolean {
