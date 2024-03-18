@@ -90,7 +90,3 @@ An example string enumeration::
         default="flex_1channel_50",
         description="What pipette to use during the protocol.",
     )
-
-
-What to Parameterize
-====================
