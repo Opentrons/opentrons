@@ -232,6 +232,7 @@ async def test_cycle(
     cycles: int,
     bottom_position: List[float],
     single: bool,
+    z_move: bool,
 ) -> None:
 
     speed = flow * FLOW_TO_SPEED
@@ -239,14 +240,18 @@ async def test_cycle(
     for i in range(cycles):
         if not single:
             await move_twin_plunger_absolute_ot3(api, positions[0], speed=speed)
-            await twin_z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
+            if z_move:
+                await twin_z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
             await move_twin_plunger_absolute_ot3(api, positions[1], speed=speed)
-            await twin_z_move(api, bottom_position)
+            if z_move:
+                await twin_z_move(api, bottom_position)
         else:
             await move_plunger_absolute_ot3(api, positions[0], speed=speed)
-            await z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
+            if z_move:
+                await z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
             await move_plunger_absolute_ot3(api, positions[1], speed=speed)
-            await z_move(api, bottom_position)
+            if z_move:
+                await z_move(api, bottom_position)
         starting_cycle += 1
 
 
@@ -451,8 +456,8 @@ async def _main(is_simulating: bool, trials: int, flow: float,
         total_cycles = 0
         cycles_per_trial = 100
         blow_inc = 10
-        # cycles_per_trial = 2
-        # blow_inc = 10
+        # cycles_per_trial = 3
+        # blow_inc = 5
         for t in range(trials):
             await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
                 api,
@@ -466,17 +471,23 @@ async def _main(is_simulating: bool, trials: int, flow: float,
                 default_max_speed=DEFAULT_SPEED,
                 acceleration=FLOW_ACCELERATION,
             )
+            #only do the z move once every portion of cycles
             await test_cycle(api, [pip_top, pip_bot], flow,
-                             total_cycles, cycles_per_trial,
+                             total_cycles, cycles_per_trial-1,
                              temp_reservoir_a1_nominal,
-                             single)
+                             single, False)
+            await test_cycle(api, [pip_top, pip_bot], flow,
+                             total_cycles, 1,
+                             temp_reservoir_a1_nominal,
+                             single, True)
 
             if t%blow_inc == 0:
                 print("Blow Out")
-                await test_cycle(api, [pip_blow, pip_bot], flow,
-                                 0, 1,
-                                 temp_reservoir_a1_nominal,
-                                 single)
+                speed = flow * FLOW_TO_SPEED
+                await twin_z_move(api, temp_reservoir_a1_nominal + Point(z=DISPENSE_OFFSET)) #move Z up
+                await move_twin_plunger_absolute_ot3(api, pip_blow, speed=speed) #blow out
+                await move_twin_plunger_absolute_ot3(api, pip_bot, speed=speed) #return to pipette bottom
+                await twin_z_move(api, temp_reservoir_a1_nominal) #move Z down
 
             total_cycles += cycles_per_trial
             print(total_cycles)
