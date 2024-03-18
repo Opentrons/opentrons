@@ -25,7 +25,7 @@ def set_up_data_sheet(
         print("Connected to google sheet.")
     except FileNotFoundError:
         print("No google sheets credentials. Add credentials to storage notebook.")
-    csv_name = google_sheet_name + "-" + commandTypes
+    csv_name = google_sheet_name + "-" + commandTypes + ".csv"
     create_abr_data_sheet(storage_directory, csv_name, headers)
 
     return google_sheet, csv_name
@@ -65,14 +65,14 @@ def pipette_commands(
         "dropTip",
     )
     commandData: List[Dict[str, Any]] = file_results.get("commands", "")
-    pipettes: Dict[str, Any] = file_results.get("pipettes", {})
+    pipettes: List[Dict[str, Any]] = file_results.get("pipettes", [])
     all_pipettes = [
         {
             "pipetteId": pipette.get("id", ""),
             "Serial #": file_results.get(pipette.get("mount", ""), ""),
         }
-        for pipette in pipettes.values()
-        if isinstance(pipettes, dict)
+        for pipette in pipettes
+        if isinstance(pipette, dict)
     ]
 
     group_totals = {}
@@ -134,11 +134,11 @@ def module_commands(
         "temperatureModule/waitForTemperature",
     ]
     commandData: List[Dict[str, Any]] = file_results.get("commands", "")
-    modules: Dict[str, Any] = file_results.get("modules", {})
+    modules: List[Dict[str, Any]] = file_results.get("modules", {})
     all_modules = [
         {"moduleId": module.get("id", ""), "Serial #": module.get("serialNumber", "")}
-        for module in modules.values()
-        if isinstance(modules, dict)
+        for module in modules
+        if isinstance(module, dict)
     ]
     group_totals = {}
     for command in commandData:
@@ -188,15 +188,15 @@ def motion_commands(
         "moveLabware",
     ]
     commandData: List[Dict[str, Any]] = file_results.get("commands", "")
-    labwares: Dict[str, Any] = file_results.get("labware", "")
+    labwares: List[Dict[str, Any]] = file_results.get("labware", "")
     all_labware = [
         {
             "id": labware.get("id", ""),
             "loadName": labware.get("loadName", ""),
             "displayName": labware.get("displayName", None),
         }
-        for labware in labwares.values()
-        if isinstance(labwares, dict)
+        for labware in labwares
+        if isinstance(labware, dict)
     ]
     group_totals = {}
     for command in commandData:
@@ -383,13 +383,21 @@ if __name__ == "__main__":
         nargs=1,
         help="Path to long term storage directory for run logs.",
     )
+    parser.add_argument(
+        "google_sheet_name",
+        metavar="GOOGLE_SHEET_NAME",
+        type=str,
+        nargs=1,
+        help="Name of google sheet",
+    )
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
+    google_sheet_name = args.google_sheet_name[0]
     try:
         sys.path.insert(0, storage_directory)
         import google_sheets_tool  # type: ignore[import]
 
-        credentials_path = os.path.join(storage_directory, "abr.json")
+        credentials_path = os.path.join(storage_directory, "credentials.json")
     except ImportError:
         raise ImportError("Make sure google_sheets_tool.py is in storage directory.")
 
@@ -472,16 +480,16 @@ if __name__ == "__main__":
     ]
 
     google_sheet_instruments, csv_instruments = set_up_data_sheet(
-        0, "ABR Command Data", "Instruments", instrument_headers
+        0, google_sheet_name, "Instruments", instrument_headers
     )
     google_sheet_modules, csv_modules = set_up_data_sheet(
-        1, "ABR Command Data", "Modules", module_headers
+        1, google_sheet_name, "Modules", module_headers
     )
     google_sheet_setup, csv_setup = set_up_data_sheet(
-        2, "ABR Command Data", "Setup", setup_headers
+        2, google_sheet_name, "Setup", setup_headers
     )
     google_sheet_movement, csv_movement = set_up_data_sheet(
-        3, "ABR Command Data", "Movement", movement_headers
+        3, google_sheet_name, "Movement", movement_headers
     )
     runs_from_storage = get_run_ids_from_storage(storage_directory)
     i = 0

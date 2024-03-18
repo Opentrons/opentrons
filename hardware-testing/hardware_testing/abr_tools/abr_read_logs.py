@@ -71,6 +71,7 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
 def create_abr_data_sheet(storage_directory: str, file_name: str, headers: List) -> str:
     """Creates csv file to log ABR data."""
     file_name_csv = file_name + ".csv"
+    print(file_name_csv)
     sheet_location = os.path.join(storage_directory, file_name_csv)
     if os.path.exists(sheet_location):
         print(f"File {sheet_location} located. Not overwriting.")
@@ -165,6 +166,7 @@ def read_abr_data_sheet(
     storage_directory: str, file_name_csv: str, google_sheet: Any
 ) -> Set[str]:
     """Reads current run sheet to determine what new run data should be added."""
+    print(file_name_csv)
     sheet_location = os.path.join(storage_directory, file_name_csv)
     runs_in_sheet = set()
     # Read the CSV file
@@ -177,6 +179,8 @@ def read_abr_data_sheet(
                 runs_in_sheet.add(run_id)
         print(f"There are {str(len(runs_in_sheet))} runs documented in the ABR sheet.")
     # Read Google Sheet
+    if google_sheet.creditals.access_token_expired:
+        google_sheet.gc.login()
     google_sheet.write_header(headers)
     google_sheet.update_row_index()
     return runs_in_sheet
@@ -197,9 +201,11 @@ def write_to_abr_sheet(
             row = runs_and_robots[list_of_runs[run]].values()
             row_list = list(row)
             writer.writerow(row_list)
+            if google_sheet.creditals.access_token_expired:
+                google_sheet.gc.login()
             google_sheet.update_row_index()
             google_sheet.write_to_row(row_list)
-            t.sleep(5)
+            t.sleep(3)
 
 
 if __name__ == "__main__":
