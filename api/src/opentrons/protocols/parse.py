@@ -212,6 +212,7 @@ def _parse_json(
 def _parse_python(
     protocol_contents: Union[str, bytes],
     python_parse_mode: PythonParseMode,
+    run_time_param_values: Optional[Dict[str, Union[float, bool, str]]],
     filename: Optional[str] = None,
     bundled_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
@@ -273,6 +274,7 @@ def _parse_python(
         bundled_data=bundled_data,
         bundled_python=bundled_python,
         extra_labware=extra_labware,
+        run_time_param_values=run_time_param_values,
     )
 
     return result
@@ -303,6 +305,7 @@ def _parse_bundle(
 
 def parse(
     protocol_file: Union[str, bytes],
+    run_time_param_values: Optional[Dict[str, Union[float, bool, str]]],
     filename: Optional[str] = None,
     extra_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
     extra_data: Optional[Dict[str, bytes]] = None,
@@ -314,6 +317,8 @@ def parse(
 
     :param protocol_file: The protocol file, or for single-file protocols, a
                         string of the protocol contents.
+    :param run_time_param_values: Values of run-time parameters sent by the client,
+                     to be used during analysis/ run.
     :param filename: The name of the protocol. Optional, but helps with
                      deducing the kind of protocol (e.g. if it ends with
                      '.json' we can treat it like json)

@@ -94,6 +94,7 @@ class LegacyFileReader:
             extra_data={
                 data_path.name: data_path.read_bytes() for data_path in data_file_paths
             },
+            run_time_param_values=protocol_source.run_time_param_values,
             python_parse_mode=python_parse_mode,
         )
 

@@ -1,4 +1,5 @@
 """Router for /protocols endpoints."""
+import json
 import logging
 from textwrap import dedent
 from datetime import datetime
@@ -165,6 +166,10 @@ async def create_protocol(
             " protocol resources on the robot."
         ),
     ),
+    runTimeParameterValues: Optional[str] = Form(
+        default=None,
+        description="Key value pairs of run-time parameters defined in a protocol."
+    ),
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
@@ -184,6 +189,7 @@ async def create_protocol(
     Arguments:
         files: List of uploaded files, from form-data.
         key: Optional key for client-side tracking
+        runTimeParameterValues: Key value pairs of run-time parameters defined in a protocol.
         protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
@@ -205,10 +211,12 @@ async def create_protocol(
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
 
+    parsed_rtp = json.loads(runTimeParameterValues) if runTimeParameterValues else None
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
-    if cached_protocol_id is not None:
+    if not parsed_rtp and cached_protocol_id is not None:
+        # Neither a new protocol nor any run-time parameters passed with an existing protocol.
         resource = protocol_store.get(protocol_id=cached_protocol_id)
         analyses = analysis_store.get_summaries_by_protocol(
             protocol_id=cached_protocol_id
@@ -228,7 +236,8 @@ async def create_protocol(
         )
 
         log.info(
-            f'Protocol with id "{cached_protocol_id}" with same contents already exists. returning existing protocol data in response payload'
+            f'Protocol with id "{cached_protocol_id}" with same contents already exists.'
+            f' Returning existing protocol data in response payload.'
         )
 
         return await PydanticResponse.create(
@@ -243,6 +252,7 @@ async def create_protocol(
             files=buffered_files,
             directory=protocol_directory / protocol_id,
             content_hash=content_hash,
+            run_time_param_values=parsed_rtp,
         )
     except ProtocolFilesInvalidError as e:
         raise ProtocolFilesInvalid(detail=str(e)).as_error(
