@@ -2,7 +2,7 @@ import { connectionStore } from './store'
 import {
   addNewRobotsToConnectionStore,
   cleanUpUnreachableRobots,
-  getHealthyRobotIPsForNotifications,
+  getHealthyRobotDataForNotifyConnections,
   closeConnectionsForcefullyFor,
 } from './connect'
 import { subscribe } from './subscribe'
@@ -13,9 +13,10 @@ import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch } from '../types'
 
 // Manages MQTT broker connections through a connection store. Broker connections are added or removed based on
-// health status changes reported by discovery-client. Subscriptions are handled "lazily", in which a component must
-// express interest in a topic before a subscription request is made. Unsubscribe requests only occur if an "unsubscribe"
-// flag is received from the broker. Pending subs and unsubs are used to prevent unnecessary network and broker load.
+// health status changes reported by discovery-client. Because a robot may have several IPs, only the first reported IP
+// associated with a robot name is added to the connection store. Subscriptions are handled "lazily", in which a component must
+// express interest in a topic before a subscription request is made. Unsubscribe requests only occur if the broker
+// sends an "unsubscribe" flag. Pending subs and unsubs are used to prevent unnecessary network and broker load.
 
 export function registerNotify(
   dispatch: Dispatch,
@@ -38,11 +39,11 @@ export function registerNotify(
 export function handleNotificationConnectionsFor(
   robots: DiscoveryClientRobot[]
 ): string[] {
-  const reachableRobotIPs = getHealthyRobotIPsForNotifications(robots)
-  cleanUpUnreachableRobots(reachableRobotIPs)
-  addNewRobotsToConnectionStore(reachableRobotIPs)
+  const reachableRobots = getHealthyRobotDataForNotifyConnections(robots)
+  cleanUpUnreachableRobots(reachableRobots)
+  addNewRobotsToConnectionStore(reachableRobots)
 
-  return reachableRobotIPs
+  return reachableRobots
 }
 
 export function closeAllNotifyConnections(): Promise<unknown[]> {

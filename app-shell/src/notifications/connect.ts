@@ -27,26 +27,31 @@ const connectOptions: mqtt.IClientOptions = {
   resubscribe: true,
 }
 
+interface RobotData {
+  hostname: string
+  robotName: string
+}
+
 // This is the discovery-client equivalent of "available" robots when viewing the Devices page in the app.
-export function getHealthyRobotIPsForNotifications(
+export function getHealthyRobotDataForNotifyConnections(
   robots: DiscoveryClientRobot[]
-): string[] {
+): RobotData[] {
   return robots.flatMap(robot =>
     robot.addresses
       .filter(address => address.healthStatus === HEALTH_STATUS_OK)
-      .map(address => address.ip)
+      .map(address => ({ hostname: address.ip, robotName: robot.name }))
   )
 }
 
 export function cleanUpUnreachableRobots(
-  healthyRobotIPs: string[]
+  healthyRobots: RobotData[]
 ): Promise<void> {
   return new Promise(() => {
+    const healthyRobotIPs = healthyRobots.map(({ hostname }) => hostname)
     const healthyRobotIPsSet = new Set(healthyRobotIPs)
     const unreachableRobots = connectionStore
       .getUnreachableHosts()
       .filter(hostname => {
-        // The connection is forcefully closed, so remove from the connection store immediately to reduce disconnect packets.
         if (!healthyRobotIPsSet.has(hostname)) {
           connectionStore.deleteHost(hostname)
           return true
@@ -57,13 +62,15 @@ export function cleanUpUnreachableRobots(
   })
 }
 
-export function addNewRobotsToConnectionStore(robots: string[]): Promise<void> {
+export function addNewRobotsToConnectionStore(
+  healthyRobots: RobotData[]
+): Promise<void> {
   return new Promise(() => {
-    const newRobots = robots.filter(hostname =>
-      connectionStore.isHostNewlyDiscovered(hostname)
+    const newRobots = healthyRobots.filter(({ hostname, robotName }) =>
+      connectionStore.isHostNewlyDiscovered(hostname, robotName)
     )
-    newRobots.forEach(hostname => {
-      connectionStore.setPendingHost(hostname)
+    newRobots.forEach(({ hostname, robotName }) => {
+      connectionStore.setPendingHost(hostname, robotName)
       connectAsync(`mqtt://${hostname}`)
         .then(client => {
           notifyLog.debug(`Successfully connected to ${hostname}`)

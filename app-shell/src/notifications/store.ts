@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
-import mqtt from 'mqtt'
+import type mqtt from 'mqtt'
 
 import { FAILURE_STATUSES } from '../constants'
 
@@ -9,6 +9,7 @@ import type { BrowserWindow } from 'electron'
 type FailedConnStatus = typeof FAILURE_STATUSES[keyof typeof FAILURE_STATUSES]
 
 interface IHosts {
+  robotName: string
   client: mqtt.MqttClient | null
   subscriptions: Set<NotifyTopic>
   pendingSubs: Set<NotifyTopic>
@@ -19,9 +20,11 @@ interface IHosts {
  * Manages the internal state of MQTT connections to various robot hosts.
  */
 class ConnectionStore {
+  private hosts: Record<string, IHosts> = {}
+
   private unreachableHosts: Record<string, FailedConnStatus> = {}
 
-  private hosts: Record<string, IHosts> = {}
+  readonly seenRobotNames = new Set<string>()
 
   private browserWindow: BrowserWindow | null = null
 
@@ -62,13 +65,17 @@ class ConnectionStore {
     this.browserWindow = window
   }
 
-  public setPendingHost(hostname: string): void {
-    if (!(hostname in this.hosts)) {
-      this.hosts[hostname] = {
-        client: null,
-        subscriptions: new Set(),
-        pendingSubs: new Set(),
-        pendingUnsubs: new Set(),
+  public setPendingHost(hostname: string, robotName: string): void {
+    if (!this.seenRobotNames.has(robotName)) {
+      if (!(hostname in this.hosts)) {
+        this.seenRobotNames.add(robotName)
+        this.hosts[hostname] = {
+          robotName,
+          client: null,
+          subscriptions: new Set(),
+          pendingSubs: new Set(),
+          pendingUnsubs: new Set(),
+        }
       }
     }
   }
@@ -78,9 +85,6 @@ class ConnectionStore {
       if (this.hosts[hostname].client == null) {
         this.hosts[hostname].client = client
       }
-    } else {
-      this.setPendingHost(hostname)
-      this.hosts[hostname].client = client
     }
   }
 
@@ -137,6 +141,7 @@ class ConnectionStore {
 
   public deleteHost(hostname: string): void {
     if (hostname in this.hosts) {
+      this.seenRobotNames.delete(this.hosts[hostname].robotName)
       delete this.hosts[hostname]
     }
     if (hostname in this.unreachableHosts) {
@@ -144,8 +149,10 @@ class ConnectionStore {
     }
   }
 
-  public isHostNewlyDiscovered(hostname: string): boolean {
-    if (hostname in this.hosts) {
+  public isHostNewlyDiscovered(hostname: string, name: string): boolean {
+    if (this.seenRobotNames.has(name)) {
+      return false
+    } else if (hostname in this.hosts) {
       return false
     } else if (hostname in this.unreachableHosts) {
       return false
