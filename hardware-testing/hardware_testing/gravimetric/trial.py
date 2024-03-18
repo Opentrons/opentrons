@@ -89,6 +89,7 @@ def build_gravimetric_trials(
     liquid_tracker: LiquidTracker,
     blank: bool,
     env_sensor: asair_sensor.AsairSensorBase,
+    stable: bool = True,
 ) -> Dict[float, Dict[int, List[GravimetricTrial]]]:
     """Build a list of all the trials that will be run."""
     trial_list: Dict[float, Dict[int, List[GravimetricTrial]]] = {}
@@ -115,7 +116,7 @@ def build_gravimetric_trials(
                     liquid_tracker=liquid_tracker,
                     blank=blank,
                     mix=cfg.mix,
-                    stable=True,
+                    stable=False,  # NOTE: evaporation rate may be faster than scale's internal stability tracking
                     scale_delay=cfg.scale_delay,
                     acceptable_cv=None,
                     acceptable_d=None,
@@ -168,7 +169,7 @@ def build_gravimetric_trials(
                             liquid_tracker=liquid_tracker,
                             blank=blank,
                             mix=cfg.mix,
-                            stable=True,
+                            stable=stable,
                             scale_delay=cfg.scale_delay,
                             acceptable_cv=cv,
                             acceptable_d=d,

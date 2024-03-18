@@ -47,6 +47,7 @@ class GravimetricConfig(VolumetricConfig):
     blank: bool
     gantry_speed: int
     scale_delay: int
+    allow_unstable: bool
     isolate_channels: List[int]
     isolate_volumes: List[float]
 

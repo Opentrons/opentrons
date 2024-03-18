@@ -359,6 +359,7 @@ def build_gravimetric_cfg(
     user_volumes: bool,
     gantry_speed: int,
     scale_delay: int,
+    allow_unstable: bool,
     isolate_channels: List[int],
     isolate_volumes: List[float],
     extra: bool,
@@ -387,6 +388,7 @@ def build_gravimetric_cfg(
         user_volumes=user_volumes,
         gantry_speed=gantry_speed,
         scale_delay=scale_delay,
+        allow_unstable=allow_unstable,
         isolate_channels=isolate_channels,
         isolate_volumes=isolate_volumes,
         kind=ConfigType.gravimetric,
@@ -485,6 +487,7 @@ def _main(
             args.user_volumes,
             args.gantry_speed,
             args.scale_delay,
+            args.allow_unstable,
             args.isolate_channels if args.isolate_channels else [],
             args.isolate_volumes if args.isolate_volumes else [],
             args.extra,
@@ -544,6 +547,7 @@ if __name__ == "__main__":
     parser.add_argument("--user-volumes", action="store_true")
     parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
     parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
+    parser.add_argument("--allow-unstable", action="store_true")
     parser.add_argument("--photometric", action="store_true")
     parser.add_argument("--touch-tip", action="store_true")
     parser.add_argument("--refill", action="store_true")

@@ -658,6 +658,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             liquid_tracker,
             False,
             resources.env_sensor,
+            stable=not cfg.allow_unstable,
         )
         for volume in trials.keys():
             actual_asp_list_all = []
