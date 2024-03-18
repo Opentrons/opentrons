@@ -96,7 +96,7 @@ context('File Import', () => {
     cy.get("input[placeholder='testpro_15_wellplate_5ul']").should('exist')
 
     cy.window()
-      .its('__lastSavedBlobZip__')
+      .its('__lastSavedFileBlob__')
       .should('be.a', 'blob') // wait until we get the blob
       .then(labwareBlob => {
         cy.wrap(labwareBlob)

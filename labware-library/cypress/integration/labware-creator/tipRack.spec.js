@@ -264,7 +264,7 @@ describe('Create a Tip Rack', () => {
       cy.get('button').contains('EXPORT FILE').click()
 
       cy.window()
-        .its('__lastSavedBlobZip__')
+        .its('__lastSavedFileBlob__')
         .should('be.a', 'blob')
         .should(async blob => {
           const labwareDefText = await blob.async('text')

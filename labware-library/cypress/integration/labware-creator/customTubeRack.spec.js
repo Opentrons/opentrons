@@ -187,10 +187,10 @@ context('Tubes and Rack', () => {
         cy.get('button').contains('EXPORT FILE').click()
 
         cy.window()
-          .its('__lastSavedBlobZip__')
+          .its('__lastSavedFileBlob__')
           .should('be.a', 'blob')
           .should(async blob => {
-            const labwareDefText = await blob.async('text')
+            const labwareDefText = await blob.text()
             const savedDef = JSON.parse(labwareDefText)
 
             expectDeepEqual(assert, savedDef, expectedExportLabwareDef)
@@ -198,7 +198,7 @@ context('Tubes and Rack', () => {
 
         cy.window()
           .its('__lastSavedFileName__')
-          .should('equal', `somerackbrand_24_tuberack_1500ul.zip`)
+          .should('equal', `somerackbrand_24_tuberack_1500ul.json`)
       })
     })
   })

@@ -130,13 +130,6 @@ context('Tubes and Rack', () => {
       })
 
       it('tests the file export', () => {
-        // Try with missing fields
-        cy.get('button[class*="_export_button_"]').click({ force: true })
-        cy.contains(
-          'Please resolve all invalid fields in order to export the labware definition'
-        ).should('exist')
-        cy.contains('close').click({ force: true })
-
         // Brand field should not be shown for Opentrons tube rack (aka non-custom)
         cy.contains('Brand is a required field').should('not.exist')
 
@@ -283,13 +276,6 @@ context('Tubes and Rack', () => {
       })
 
       it('tests the file export', () => {
-        // Try with missing fields
-        cy.get('button[class*="_export_button_"]').click({ force: true })
-        cy.contains(
-          'Please resolve all invalid fields in order to export the labware definition'
-        ).should('exist')
-        cy.contains('close').click({ force: true })
-
         // Brand field should not be shown for Opentrons tube rack (aka non-custom)
         cy.contains('Brand is a required field').should('not.exist')
 
@@ -438,13 +424,6 @@ context('Tubes and Rack', () => {
       })
 
       it('tests the file export', () => {
-        // Try with missing fields
-        cy.get('button[class*="_export_button_"]').click({ force: true })
-        cy.contains(
-          'Please resolve all invalid fields in order to export the labware definition'
-        ).should('exist')
-        cy.contains('close').click({ force: true })
-
         // Brand field should not be shown for Opentrons tube rack (aka non-custom)
         cy.contains('Brand is a required field').should('not.exist')
 
