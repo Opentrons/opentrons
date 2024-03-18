@@ -4,22 +4,16 @@ from typing import List, Optional, Union
 
 from opentrons.protocols.api_support.types import APIVersion
 
-from .parameter_definition import (
-    ParameterDefinition,
-    create_int_parameter,
-    create_float_parameter,
-    create_bool_parameter,
-    create_str_parameter,
-)
 from .parameter_validation_and_errors import ParameterChoices
 from .parameters import Parameters
+from . import parameter_definition
 
 
 _ParameterDefinitionTypes = Union[
-    ParameterDefinition[int],
-    ParameterDefinition[bool],
-    ParameterDefinition[float],
-    ParameterDefinition[str],
+    parameter_definition.ParameterDefinition[int],
+    parameter_definition.ParameterDefinition[bool],
+    parameter_definition.ParameterDefinition[float],
+    parameter_definition.ParameterDefinition[str],
 ]
 
 
@@ -56,7 +50,7 @@ class ParameterContext:
             unit: An optional unit to be appended to the end of the integer as it shown on the frontend.
         """
         self._parameters.append(
-            create_int_parameter(
+            parameter_definition.create_int_parameter(
                 display_name=display_name,
                 variable_name=variable_name,
                 default=default,
@@ -72,9 +66,9 @@ class ParameterContext:
         self,
         display_name: str,
         variable_name: str,
-        default: int,
-        minimum: Optional[int] = None,
-        maximum: Optional[int] = None,
+        default: float,
+        minimum: Optional[float] = None,
+        maximum: Optional[float] = None,
         choices: Optional[List[ParameterChoices]] = None,
         description: Optional[str] = None,
         unit: Optional[str] = None,
@@ -93,7 +87,7 @@ class ParameterContext:
             unit: An optional unit to be appended to the end of the float as it shown on the frontend.
         """
         self._parameters.append(
-            create_float_parameter(
+            parameter_definition.create_float_parameter(
                 display_name=display_name,
                 variable_name=variable_name,
                 default=default,
@@ -121,7 +115,7 @@ class ParameterContext:
             description: A description of the parameter as it will show up on the frontend.
         """
         self._parameters.append(
-            create_bool_parameter(
+            parameter_definition.create_bool_parameter(
                 display_name=display_name,
                 variable_name=variable_name,
                 default=default,
@@ -152,7 +146,7 @@ class ParameterContext:
             description: A description of the parameter as it will show up on the frontend.
         """
         self._parameters.append(
-            create_str_parameter(
+            parameter_definition.create_str_parameter(
                 display_name=display_name,
                 variable_name=variable_name,
                 default=default,
