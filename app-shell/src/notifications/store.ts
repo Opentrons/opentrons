@@ -26,6 +26,8 @@ class ConnectionStore {
 
   private browserWindow: BrowserWindow | null = null
 
+  private readonly knownPortBlockedIPs = new Set<string>()
+
   public getBrowserWindow(): BrowserWindow | null {
     return this.browserWindow
   }
@@ -59,15 +61,6 @@ class ConnectionStore {
     return Object.keys(this.hosts)
   }
 
-  public getAssociatedIPsFromIP(ip: string): string[] {
-    if (ip in this.hosts) {
-      const robotName = this.hosts[ip].robotName
-      return Object.keys(this.hosts).filter(
-        ip => this.hosts[ip].robotName === robotName
-      )
-    } else return []
-  }
-
   public getAssociatedIPsFromRobotName(robotName: string): string[] {
     return Object.keys(this.hosts).filter(
       ip => this.hosts[ip].robotName === robotName
@@ -86,7 +79,7 @@ class ConnectionStore {
 
   public setPendingConnection(ip: string, robotName: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (!this.isAssociatedWithExistingHostData(robotName)) {
+      if (!this.isAssociatedBrokerConnecting(robotName)) {
         this.hosts[ip] = {
           robotName,
           client: null,
@@ -99,7 +92,7 @@ class ConnectionStore {
       } else {
         reject(
           new Error(
-            'Cannot create a new connection if IP is associated with an existing connection'
+            'Cannot create a new connection while connecting on an associated IP.'
           )
         )
       }
@@ -123,7 +116,8 @@ class ConnectionStore {
 
   /**
    *
-   * @description Adds the host as unreachable with an error status derived from the MQTT returned error object.
+   * @description Marks the host as unreachable with an error status derived from the MQTT returned error object.
+   *
    */
   public setFailedConnection(ip: string, error: Error): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -135,6 +129,9 @@ class ConnectionStore {
           : FAILURE_STATUSES.ECONNFAILED
 
         this.hosts[ip].unreachableStatus = errorStatus
+        if (errorStatus === FAILURE_STATUSES.ECONNREFUSED) {
+          this.knownPortBlockedIPs.add(ip)
+        }
         resolve()
       } else {
         reject(new Error('IP is not associated with a connection'))
@@ -208,18 +205,6 @@ class ConnectionStore {
     })
   }
 
-  // Deleting associated IPs does not prevent re-establishing the connection on an associated IP if an
-  // associated IP is discoverable.
-  public deleteAllAssociatedIPsGivenIP(ip: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const associatedHosts = this.getAssociatedIPsFromIP(ip)
-      associatedHosts.forEach(ip => {
-        delete this.hosts[ip]
-      })
-      resolve()
-    })
-  }
-
   public deleteAllAssociatedIPsGivenRobotName(
     robotName: string
   ): Promise<void> {
@@ -232,26 +217,37 @@ class ConnectionStore {
     })
   }
 
-  public isIPNewlyDiscovered(ip: string): boolean {
-    return !(ip in this.hosts)
+  public isIPInStore(ip: string): boolean {
+    return ip in this.hosts
   }
 
   public isAssociatedWithExistingHostData(robotName: string): boolean {
     return this.getAssociatedIPsFromRobotName(robotName).length > 0
   }
 
-  public isAssociatedBrokerReachable(ip: string): boolean {
-    const associatedRobots = this.getAssociatedIPsFromIP(ip)
-    return this.isBrokerReachable(head(associatedRobots) as string)
+  public isAssociatedBrokerErrored(robotName: string): boolean {
+    const associatedRobots = this.getAssociatedIPsFromRobotName(robotName)
+    return this.isBrokerErrored(head(associatedRobots) as string)
   }
 
-  public isAssociatedBrokerConnected(ip: string): boolean {
-    const associatedIPs = this.getAssociatedIPsFromIP(ip)
+  public isAssociatedBrokerConnected(robotName: string): boolean {
+    const associatedIPs = this.getAssociatedIPsFromRobotName(robotName)
     return this.isConnectedToBroker(head(associatedIPs) as string)
+  }
+
+  public isAssociatedBrokerConnecting(robotName: string): boolean {
+    const associatedIPs = this.getAssociatedIPsFromRobotName(robotName)
+    return this.isConnectingToBroker(head(associatedIPs) as string)
   }
 
   public isConnectedToBroker(ip: string): boolean {
     return this.hosts[ip]?.client?.connected ?? false
+  }
+
+  public isConnectingToBroker(ip: string): boolean {
+    return (
+      (this.hosts[ip]?.client == null ?? false) && !this.isBrokerErrored(ip)
+    )
   }
 
   public isPendingSub(ip: string, topic: NotifyTopic): boolean {
@@ -285,12 +281,16 @@ class ConnectionStore {
    *
    * @description Reachable refers to whether the broker connection has returned an error.
    */
-  public isBrokerReachable(ip: string): boolean {
+  public isBrokerErrored(ip: string): boolean {
     if (ip in this.hosts) {
-      return this.hosts[ip].unreachableStatus == null
+      return this.hosts[ip].unreachableStatus != null
     } else {
-      return false
+      return true
     }
+  }
+
+  public isKnownPortBlockedIP(ip: string): boolean {
+    return this.knownPortBlockedIPs.has(ip)
   }
 }
 

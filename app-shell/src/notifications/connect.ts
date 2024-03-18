@@ -67,29 +67,30 @@ export function addNewRobotsToConnectionStore(
 ): Promise<void> {
   return new Promise(() => {
     const newRobots = healthyRobots.filter(({ ip, robotName }) => {
-      const isNewIP = connectionStore.isIPNewlyDiscovered(ip)
+      const isIPInStore = connectionStore.isIPInStore(ip)
       const isIPAssociatedWithKnownRobot = connectionStore.isAssociatedWithExistingHostData(
         robotName
       )
-      // Not a new robot, but a new IP for a robot present in connectionStore.
-      if (isNewIP && isIPAssociatedWithKnownRobot) {
-        // Pass until the next discovery-client poll so the current connection can resolve.
-        if (!connectionStore.isAssociatedBrokerConnected(ip)) {
-          return false
-        }
-        // Robot is reachable on an associated IP. Do not connect on this IP.
-        if (connectionStore.isAssociatedBrokerReachable(ip)) {
-          void connectionStore.associateIPWithExistingHostData(ip, robotName)
+      if (!isIPInStore && isIPAssociatedWithKnownRobot) {
+        if (!connectionStore.isAssociatedBrokerErrored(robotName)) {
+          // If not yet connected, pass until the next discovery-client poll so the current connection can resolve.
+          if (connectionStore.isAssociatedBrokerConnected(robotName)) {
+            void connectionStore.associateIPWithExistingHostData(ip, robotName)
+          }
           return false
         }
         // The broker isn't reachable on existing IPs.
-        // Mark this IP as a new broker connection to see if the broker is reachable on this IP.
         else {
-          void connectionStore.deleteAllAssociatedIPsGivenRobotName(robotName)
-          return true
+          // Mark this IP as a new broker connection to see if the broker is reachable on this IP.
+          if (!connectionStore.isKnownPortBlockedIP(ip)) {
+            void connectionStore.deleteAllAssociatedIPsGivenRobotName(robotName)
+            return true
+          } else {
+            return false
+          }
         }
       } else {
-        return isNewIP
+        return !isIPInStore && !connectionStore.isKnownPortBlockedIP(ip)
       }
     })
     newRobots.forEach(({ ip, robotName }) => {
@@ -190,9 +191,7 @@ function establishListeners(
   })
 
   client.on('end', () => {
-    void connectionStore
-      .deleteAllAssociatedIPsGivenIP(ip)
-      .then(() => notifyLog.debug(`Closed connection to ${robotName} on ${ip}`))
+    notifyLog.debug(`Closed connection to ${robotName} on ${ip}`)
   })
 
   client.on('disconnect', packet => {
@@ -208,14 +207,15 @@ function establishListeners(
 export function closeConnectionsForcefullyFor(
   hosts: string[]
 ): Array<Promise<void>> {
-  return hosts.map(hostname => {
-    const client = connectionStore.getClient(hostname)
+  return hosts.map(ip => {
+    const client = connectionStore.getClient(ip)
     return new Promise<void>((resolve, reject) => {
       if (client != null) {
         client.end(true, {})
       }
+      const robotName = connectionStore.getRobotNameFromIP(ip) as string
       void connectionStore
-        .deleteAllAssociatedIPsGivenIP(hostname)
+        .deleteAllAssociatedIPsGivenRobotName(robotName)
         .then(() => resolve())
     })
   })

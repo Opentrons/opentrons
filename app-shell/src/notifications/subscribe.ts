@@ -19,7 +19,7 @@ const CHECK_CONNECTION_INTERVAL = 500
 export function subscribe(ip: string, topic: NotifyTopic): Promise<void> {
   const robotName = connectionStore.getRobotNameFromIP(ip)
 
-  if (!connectionStore.isBrokerReachable(ip)) {
+  if (connectionStore.isBrokerErrored(ip)) {
     const errorMessage = connectionStore.getFailedConnectionStatus(ip)
     if (errorMessage != null) {
       sendDeserialized({
