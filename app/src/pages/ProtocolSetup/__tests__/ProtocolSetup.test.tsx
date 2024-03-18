@@ -74,7 +74,6 @@ Object.defineProperty(window, 'IntersectionObserver', {
 
 let mockHistoryPush = vi.fn()
 
-vi.mock('../../ProtocolDetails/fixtures')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const sharedData = await importOriginal<typeof SharedData>()
   return {
