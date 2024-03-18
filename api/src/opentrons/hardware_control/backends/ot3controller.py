@@ -1359,18 +1359,18 @@ class OT3Controller(FlexBackend):
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
         positions = await liquid_probe(
-            self._messenger,
-            tool,
-            head_node,
-            max_z_distance,
-            plunger_speed,
-            mount_speed,
-            threshold_pascals,
-            OutputOptions.none,
-            None,
-            auto_zero_sensor,
-            num_baseline_reads,
-            sensor_id_for_instrument(probe),
+            messenger=self._messenger,
+            tool=tool,
+            head_node=head_node,
+            max_z_distance=max_z_distance,
+            plunger_speed=plunger_speed,
+            mount_speed=mount_speed,
+            threshold_pascals=threshold_pascals,
+            output_format=OutputOptions.none,
+            data_file=None,
+            auto_zero_sensor=auto_zero_sensor,
+            num_baseline_reads=num_baseline_reads,
+            sensor_id=sensor_id_for_instrument(probe),
         )
         for node, point in positions.items():
             self._position.update({node: point.motor_position})
