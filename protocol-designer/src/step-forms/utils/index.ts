@@ -3,14 +3,20 @@ import values from 'lodash/values'
 import find from 'lodash/find'
 import mapValues from 'lodash/mapValues'
 import {
-  getPipetteNameSpecs,
+  getPipetteSpecsV2,
   GEN_ONE_MULTI_PIPETTES,
   THERMOCYCLER_MODULE_TYPE,
+  PipetteV2Specs,
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
 import { LabwareDefByDefURI } from '../../labware-defs'
-import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
+import type {
+  DeckSlotId,
+  ModuleType,
+  PipetteChannels,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentOnDeck,
   InitialDeckSetup,
@@ -89,12 +95,24 @@ export function denormalizePipetteEntities(
     pipetteInvariantProperties,
     (acc: PipetteEntities, pipette: NormalizedPipette): PipetteEntities => {
       const pipetteId = pipette.id
-      const spec = getPipetteNameSpecs(pipette.name)
+      const spec = getPipetteSpecsV2(pipette.name)
 
       if (!spec) {
         throw new Error(
           `no pipette spec for pipette id "${pipetteId}", name "${pipette.name}"`
         )
+      }
+
+      const pipetteEntitySpecs: PipetteNameSpecs = {
+        name: pipette.name,
+        displayName: spec.displayName,
+        displayCategory: spec.displayCategory,
+        minVolume: spec.liquids[0].minVolume,
+        maxVolume: spec.liquids[0].maxVolume,
+        channels: spec.channels as PipetteChannels,
+        defaultAspirateFlowRate: spec.liquids[0].supportedTips[0].defaultAspirateFlowRate.default,
+
+        // add other properties from spec if needed
       }
       const pipetteEntity: PipetteEntity = {
         ...pipette,
