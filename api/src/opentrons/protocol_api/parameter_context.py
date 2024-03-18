@@ -3,11 +3,10 @@
 from typing import List, Optional, Union
 
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.parameters import parameter_definition
+from opentrons.protocols.parameters.types import ParameterChoices
 
-from .parameter_validation_and_errors import ParameterChoices
-from .parameters import Parameters
-from . import parameter_definition
-
+from ._parameters import Parameters
 
 _ParameterDefinitionTypes = Union[
     parameter_definition.ParameterDefinition[int],

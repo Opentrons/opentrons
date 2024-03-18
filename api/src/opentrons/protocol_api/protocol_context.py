@@ -64,7 +64,7 @@ from .module_contexts import (
     MagneticBlockContext,
     ModuleContext,
 )
-from .parameters import Parameters
+from ._parameters import Parameters
 
 
 logger = logging.getLogger(__name__)

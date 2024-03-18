@@ -1,32 +1,18 @@
-from typing import List, Optional, TypeVar, Union, TypedDict
 import keyword
+from typing import List, Optional
+
+from .types import (
+    ParamType,
+    ParameterChoices,
+    ParameterNameError,
+    ParameterValueError,
+    ParameterDefinitionError,
+)
 
 
-# TODO these should inherit from shared_data exceptions
-class ParameterValueError(ValueError):
-    """An error raised when a parameter value is not valid."""
-
-
-class ParameterDefinitionError(ValueError):
-    """An error raised when a parameter definition value is not valid."""
-
-
-class ParameterNameError(ValueError):
-    """An error raised when a parameter name or description is not valid."""
-
-
-AllowedTypes = Union[str, int, float, bool]
-ParamType = TypeVar("ParamType", bound=AllowedTypes)
 UNIT_MAX_LEN = 10
 DISPLAY_NAME_MAX_LEN = 30
 DESCRIPTION_MAX_LEN = 100
-
-
-class ParameterChoices(TypedDict):
-    """A parameter choice containing the display name and value."""
-
-    display_name: str
-    value: AllowedTypes
 
 
 def ensure_display_name(display_name: str) -> str:

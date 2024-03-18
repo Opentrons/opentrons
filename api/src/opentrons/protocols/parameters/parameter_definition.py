@@ -2,20 +2,14 @@
 
 from typing import Generic, Optional, List, Set, Union, get_args
 
-
-from .parameter_validation_and_errors import (
+from opentrons.protocols.parameters.types import (
     ParamType,
     ParameterChoices,
     AllowedTypes,
     ParameterDefinitionError,
     ParameterValueError,
-    validate_options,
-    validate_type,
-    ensure_display_name,
-    ensure_variable_name,
-    ensure_description,
-    ensure_unit_string_length,
 )
+from opentrons.protocols.parameters import validation
 
 
 class ParameterDefinition(Generic[ParamType]):
@@ -52,10 +46,10 @@ class ParameterDefinition(Generic[ParamType]):
             description: An optional description for the parameter.
             unit: An optional suffix for float and int type parameters.
         """
-        self._display_name = ensure_display_name(display_name)
-        self._variable_name = ensure_variable_name(variable_name)
-        self._description = ensure_description(description)
-        self._unit = ensure_unit_string_length(unit)
+        self._display_name = validation.ensure_display_name(display_name)
+        self._variable_name = validation.ensure_variable_name(variable_name)
+        self._description = validation.ensure_description(description)
+        self._unit = validation.ensure_unit_string_length(unit)
 
         if parameter_type not in get_args(AllowedTypes):
             raise ParameterDefinitionError(
@@ -69,7 +63,7 @@ class ParameterDefinition(Generic[ParamType]):
         self._minimum: Optional[Union[int, float]] = None
         self._maximum: Optional[Union[int, float]] = None
 
-        validate_options(default, minimum, maximum, choices, parameter_type)
+        validation.validate_options(default, minimum, maximum, choices, parameter_type)
         if choices is not None:
             self._allowed_values = {choice["value"] for choice in choices}
         else:
@@ -89,7 +83,7 @@ class ParameterDefinition(Generic[ParamType]):
 
     @value.setter
     def value(self, new_value: ParamType) -> None:
-        validate_type(new_value, self._type)
+        validation.validate_type(new_value, self._type)
         if self._allowed_values is not None and new_value not in self._allowed_values:
             raise ParameterValueError(
                 f"Parameter must be set to one of the allowed values of {self._allowed_values}."

@@ -7,6 +7,8 @@ from decoy import Decoy
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
+)
+from opentrons.protocols.parameters import (
     parameter_definition as mock_parameter_definition,
 )
 from opentrons.protocol_api.parameter_context import ParameterContext
