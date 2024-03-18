@@ -31,7 +31,8 @@ export function registerNotify(
     switch (action.type) {
       case 'shell:NOTIFY_SUBSCRIBE':
         return subscribe({
-          ...action.payload,
+          ip: action.payload.hostname,
+          topic: action.payload.topic,
         })
     }
   }

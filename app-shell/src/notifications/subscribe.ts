@@ -45,10 +45,15 @@ export function subscribe({
           !connectionStore.isActiveSub(ip, topic) &&
           !connectionStore.isPendingSub(ip, topic)
         ) {
-          connectionStore.setSubStatus(ip, topic, 'pending')
-          return new Promise<void>(() => {
-            client.subscribe(topic, subscribeOptions, subscribeCb)
-          })
+          connectionStore
+            .setSubStatus(ip, topic, 'pending')
+            .then(
+              () =>
+                new Promise<void>(() => {
+                  client.subscribe(topic, subscribeOptions, subscribeCb)
+                })
+            )
+            .catch((error: Error) => notifyLog.debug(error.message))
         } else {
           void waitUntilActiveOrErrored('subscription').catch(
             (error: Error) => {
@@ -69,7 +74,9 @@ export function subscribe({
       sendDeserializedGenericError(ip, topic)
     } else {
       notifyLog.debug(`Successfully subscribed on ${ip} to topic: ${topic}`)
-      connectionStore.setSubStatus(ip, topic, 'subscribed')
+      connectionStore
+        .setSubStatus(ip, topic, 'subscribed')
+        .catch((error: Error) => notifyLog.debug(error.message))
     }
   }
   // Check every 500ms for 2 seconds before failing.

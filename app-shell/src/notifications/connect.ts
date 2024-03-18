@@ -79,13 +79,13 @@ export function addNewRobotsToConnectionStore(
         }
         // Robot is reachable on an associated IP. Do not connect on this IP.
         if (connectionStore.isAssociatedBrokerReachable(ip)) {
-          connectionStore.associateIPWithExistingHostData(ip, robotName)
+          void connectionStore.associateIPWithExistingHostData(ip, robotName)
           return false
         }
         // The broker isn't reachable on existing IPs.
         // Mark this IP as a new broker connection to see if the broker is reachable on this IP.
         else {
-          connectionStore.deleteAllAssociatedIPsGivenRobotName(robotName)
+          void connectionStore.deleteAllAssociatedIPsGivenRobotName(robotName)
           return true
         }
       } else {
@@ -93,19 +93,25 @@ export function addNewRobotsToConnectionStore(
       }
     })
     newRobots.forEach(({ ip, robotName }) => {
-      connectionStore.setPendingConnection(ip, robotName)
-      connectAsync(`mqtt://${ip}`)
-        .then(client => {
-          notifyLog.debug(`Successfully connected to ${ip}`)
-          connectionStore.setConnected(ip, client)
-          establishListeners({ client, ip: ip })
+      void connectionStore
+        .setPendingConnection(ip, robotName)
+        .then(() => {
+          connectAsync(`mqtt://${ip}`)
+            .then(client => {
+              notifyLog.debug(`Successfully connected to ${ip}`)
+              void connectionStore
+                .setConnected(ip, client)
+                .then(() => establishListeners({ client, ip }))
+                .catch((error: Error) => notifyLog.debug(error.message))
+            })
+            .catch((error: Error) => {
+              notifyLog.warn(
+                `Failed to connect to ${ip} - ${error.name}: ${error.message} `
+              )
+              void connectionStore.setFailedConnection(ip, error)
+            })
         })
-        .catch((error: Error) => {
-          notifyLog.warn(
-            `Failed to connect to ${ip} - ${error.name}: ${error.message} `
-          )
-          connectionStore.setFailedConnection(ip, error)
-        })
+        .catch((error: Error) => notifyLog.debug(error.message))
     })
   })
 }
@@ -159,7 +165,9 @@ function establishListeners({
         .then(deserializedMessage => {
           const messageContainsUnsubFlag = 'unsubscribe' in deserializedMessage
           if (messageContainsUnsubFlag) {
-            void unsubscribe(ip, topic)
+            void unsubscribe(ip, topic).catch((error: Error) =>
+              notifyLog.debug(error.message)
+            )
           }
 
           notifyLog.debug('Received notification data from main via IPC', {
@@ -204,8 +212,9 @@ export function closeConnectionsForcefullyFor(
       if (client != null) {
         client.end(true, {})
       }
-      connectionStore.deleteAllAssociatedIPsGivenIP(hostname)
-      resolve()
+      void connectionStore
+        .deleteAllAssociatedIPsGivenIP(hostname)
+        .then(() => resolve())
     })
   })
 }
