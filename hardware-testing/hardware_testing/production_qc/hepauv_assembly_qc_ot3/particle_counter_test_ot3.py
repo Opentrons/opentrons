@@ -61,78 +61,78 @@ async def _main(simulating: bool) -> None:
     # home and move to attach position
     await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
     
-    slotc2 = (229.71,196.32,291.17)
-    await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, Point(slotc2[0], slotc2[1], slotc2[2]))
+    #slotc2 = (229.71,196.32,291.17)
+    #await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, Point(slotc2[0], slotc2[1], slotc2[2]))
     
     instrument = BuildAsairGT521S()
     uvinstrument = BuildAsairUV()
     INTSN = instrument.serial_number().strip("SS").replace(' ', '')
     csv_props, csv_cb = _create_csv_and_get_callbacks(HEPASN)
     
-    csv_cb.write(["operator:", operator])
-    csv_cb.write(["test_time:", datetime.utcnow().strftime("%Y/%m/%d-%H:%M:%S")])
-    csv_cb.write(["INSTRUMENT SN:", INTSN])
-    csv_cb.write(["HEPA SN:" , HEPASN])
+    # csv_cb.write(["operator:", operator])
+    # csv_cb.write(["test_time:", datetime.utcnow().strftime("%Y/%m/%d-%H:%M:%S")])
+    # csv_cb.write(["INSTRUMENT SN:", INTSN])
+    # csv_cb.write(["HEPA SN:" , HEPASN])
 
-    test_data={
-                    'Time(Date Time)': None,
-                    'Size1(um)': None,
-                    'Count1(M3)': None,
-                    'Size2(um)': None,
-                    'Count2(M3)': None,
-                    'Location': None,
-                    'Sample Time(sec)': None,
-                    'PASS/FAIL': None,
-                        }
+    # test_data={
+    #                 'Time(Date Time)': None,
+    #                 'Size1(um)': None,
+    #                 'Count1(M3)': None,
+    #                 'Size2(um)': None,
+    #                 'Count2(M3)': None,
+    #                 'Location': None,
+    #                 'Sample Time(sec)': None,
+    #                 'PASS/FAIL': None,
+    #                     }
                         
    
-    print("TURN ON FAN")
-    input("PRESS ENTER TO CONTINUE")
-    instrument.initialize_connection()
-    instrument.clear_data()
-    instrument.set_number_of_samples(6)
-    instrument.start_sampling()
-    await asyncio.sleep(3)
-    #Determines if the MetOne Device is running
-    operation = True
-    try:
-        while operation:
-            stats = instrument.operation_status()
-            if stats == "Stop":
-                operation = False
-            print(stats)
-            print('\r', end='')
-            await asyncio.sleep(1)
-    except Exception as errval:
-        print("errval",errval)
-    #print out the data
-    print("TURN OFF FAN")
-    input("PRESS ENTER TO CONTINUE")
+    # print("TURN ON FAN")
+    # input("PRESS ENTER TO CONTINUE")
+    # instrument.initialize_connection()
+    # instrument.clear_data()
+    # instrument.set_number_of_samples(6)
+    # instrument.start_sampling()
+    # await asyncio.sleep(3)
+    # #Determines if the MetOne Device is running
+    # operation = True
+    # try:
+    #     while operation:
+    #         stats = instrument.operation_status()
+    #         if stats == "Stop":
+    #             operation = False
+    #         print(stats)
+    #         print('\r', end='')
+    #         await asyncio.sleep(1)
+    # except Exception as errval:
+    #     print("errval",errval)
+    # #print out the data
+    # print("TURN OFF FAN")
+    # input("PRESS ENTER TO CONTINUE")
 
 
     try:
-        header, data = instrument.available_records()
-        #Record to designated columns using a sorting loop
-        record_dict = {}
-        csv_cb.write(list(test_data.keys()))
-        for number in range(6):
-            for key, value in zip(header.items(), data[number]):
-                for element in key:
-                    record_dict[element]= value
-            particle_count_1 = int(record_dict['Count1(M3)'])
-            particle_count_2 = int(record_dict['Count2(M3)'])
-            test_result = \
-                    determine_criterion(particle_count_1, particle_count_2)
-            print(record_dict)
-            test_data['Time(Date Time)']=record_dict['Time']
-            test_data['Size1(um)']=record_dict['Size1']
-            test_data['Count1(M3)']=record_dict['Count1(M3)']
-            test_data['Size2(um)']=record_dict['Size2']
-            test_data['Count2(M3)']=record_dict['Count2(M3)']
-            test_data['Location']=record_dict['Location']
-            test_data['Sample Time(sec)']=record_dict['Sample Time']
-            test_data['PASS/FAIL'] = test_result
-            csv_cb.write(list(test_data.values()))
+    #     header, data = instrument.available_records()
+    #     #Record to designated columns using a sorting loop
+    #     record_dict = {}
+    #     csv_cb.write(list(test_data.keys()))
+    #     for number in range(6):
+    #         for key, value in zip(header.items(), data[number]):
+    #             for element in key:
+    #                 record_dict[element]= value
+    #         particle_count_1 = int(record_dict['Count1(M3)'])
+    #         particle_count_2 = int(record_dict['Count2(M3)'])
+    #         test_result = \
+    #                 determine_criterion(particle_count_1, particle_count_2)
+    #         print(record_dict)
+    #         test_data['Time(Date Time)']=record_dict['Time']
+    #         test_data['Size1(um)']=record_dict['Size1']
+    #         test_data['Count1(M3)']=record_dict['Count1(M3)']
+    #         test_data['Size2(um)']=record_dict['Size2']
+    #         test_data['Count2(M3)']=record_dict['Count2(M3)']
+    #         test_data['Location']=record_dict['Location']
+    #         test_data['Sample Time(sec)']=record_dict['Sample Time']
+    #         test_data['PASS/FAIL'] = test_result
+    #         csv_cb.write(list(test_data.values()))
         
 
         
@@ -159,7 +159,9 @@ async def _main(simulating: bool) -> None:
             1:"D1",
             8:"B2",
             5:"C2",
-            10:"A1"
+            10:"A1",
+            "A4":"A4",
+            "D4":"D4"
         
         }
         mount = OT3Mount.GRIPPER
@@ -172,7 +174,7 @@ async def _main(simulating: bool) -> None:
                 
                 hover_pos = slot_loc[grip_slot1]
                 print("1",hover_pos)
-                hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2])
+                hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2]-0.5)
                 print("3",hover_over_slot_3)
                 await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
 
@@ -193,7 +195,7 @@ async def _main(simulating: bool) -> None:
             if grip_slot2 == "A4" or grip_slot2 == "D4":
                 hover_pos = slot_loc[grip_slot2]
                 print("1",hover_pos)
-                hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2])
+                hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2]-0.5)
                 await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
                  
             else:
