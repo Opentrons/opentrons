@@ -58,7 +58,7 @@ const MODAL_STYLE = {
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
   width: '47rem',
-  border: `6px ${BORDERS.styleSolid} ${COLORS.blue50}`,
+  border: `${BORDERS.borderRadius8} ${BORDERS.styleSolid} ${COLORS.blue50}`,
   borderRadius: BORDERS.borderRadius8,
   boxShadow: BORDERS.smallDropShadow,
 } as const
@@ -156,7 +156,7 @@ export function InterventionModal({
   // reimplement when design system shares a modal component between desktop/ODD
   return isOnDevice ? (
     <Modal
-      border={`8px ${BORDERS.styleSolid} ${COLORS.blue50}`}
+      border={`${BORDERS.borderRadius8} ${BORDERS.styleSolid} ${COLORS.blue50}`}
       modalSize="large"
       header={{
         backgroundColor: COLORS.blue50,
