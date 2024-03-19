@@ -108,7 +108,7 @@ class _ABRAsairSensor:
 
 
 if __name__ == "__main__":
-    robot_list = [
+    robot_list: List = [
         "DVT1ABR1",
         "DVT1ABR2",
         "DVT1ABR3",
@@ -123,10 +123,7 @@ if __name__ == "__main__":
         "PVT1ABR12",
         "ROOM_339",
         "Room_340",
-    ]  # type: List
-    # robot = _get_user_input(robot_list, "Robot/Room: ")
-    # duration = int(input("Duration (min): "))
-    # frequency = int(input("Frequency (min): "))
+    ]  
     parser = argparse.ArgumentParser(description="Starts Temp/RH Sensor.")
     parser.add_argument(
         "robot", metavar="ROBOT", type=str, nargs=1, help="ABR Robot Name"
