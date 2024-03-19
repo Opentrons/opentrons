@@ -60,7 +60,7 @@ const Template: Story<
   )
 }
 
-export const NormalSoftwareKeyboard = Template.bind({})
-NormalSoftwareKeyboard.args = {
+export const Keyboard = Template.bind({})
+Keyboard.args = {
   isDecimal: false,
 }
