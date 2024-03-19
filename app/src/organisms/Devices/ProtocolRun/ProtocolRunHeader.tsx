@@ -430,6 +430,7 @@ export function ProtocolRunHeader({
             display="grid"
             gridTemplateColumns="4fr 6fr 4fr"
             padding={SPACING.spacing8}
+            borderRadius={BORDERS.borderRadius4}
           >
             <LabeledValue
               label={t('protocol_start')}

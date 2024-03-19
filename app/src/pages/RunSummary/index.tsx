@@ -8,8 +8,8 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
-  Btn,
   BORDERS,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -416,7 +416,7 @@ const SummaryDatum = styled.div`
   grid-gap: ${SPACING.spacing4};
   height: 44px;
   background: #d6d6d6;
-  border-radius: 4px;
+  border-radius: ${BORDERS.borderRadius4};
   color: ${COLORS.grey60};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};

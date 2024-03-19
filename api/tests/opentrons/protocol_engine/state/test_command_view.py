@@ -14,6 +14,7 @@ from opentrons.protocol_engine.actions import (
     StopAction,
     QueueCommandAction,
 )
+from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 
 from opentrons.protocol_engine.state.commands import (
     CommandState,
@@ -322,8 +323,14 @@ class ActionAllowedSpec(NamedTuple):
     """Spec data to test CommandView.validate_action_allowed."""
 
     subject: CommandView
-    action: Union[PlayAction, PauseAction, StopAction, QueueCommandAction]
-    expected_error: Optional[Type[errors.ProtocolEngineError]]
+    action: Union[
+        PlayAction,
+        PauseAction,
+        StopAction,
+        QueueCommandAction,
+        ResumeFromRecoveryAction,
+    ]
+    expected_error: Optional[Type[Exception]]
 
 
 action_allowed_specs: List[ActionAllowedSpec] = [
@@ -455,6 +462,13 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         ),
         expected_error=errors.SetupCommandNotAllowedError,
     ),
+    # Resuming from error recovery is not implemented yet.
+    # https://opentrons.atlassian.net/browse/EXEC-301
+    ActionAllowedSpec(
+        subject=get_command_view(),
+        action=ResumeFromRecoveryAction(),
+        expected_error=NotImplementedError,
+    ),
 ]
 
 
@@ -462,7 +476,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
 def test_validate_action_allowed(
     subject: CommandView,
     action: Union[PlayAction, PauseAction, StopAction],
-    expected_error: Optional[Type[errors.ProtocolEngineError]],
+    expected_error: Optional[Type[Exception]],
 ) -> None:
     """It should validate allowed play/pause/stop actions."""
     expectation = pytest.raises(expected_error) if expected_error else does_not_raise()

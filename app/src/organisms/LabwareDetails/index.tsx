@@ -163,6 +163,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         backgroundColor={COLORS.grey20}
         padding={SPACING.spacing16}
         marginBottom={SPACING.spacing24}
+        borderRadius={BORDERS.borderRadius4}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
         <Link
@@ -186,7 +187,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           )}
         </Link>
       </Box>
-      <Box border={BORDERS.lineBorder}>
+      <Box border={BORDERS.lineBorder} borderRadius={BORDERS.borderRadius4}>
         <Box padding={SPACING.spacing16}>
           <WellCount
             wellLabel={getWellLabel(definition)}

@@ -142,18 +142,14 @@ export function Labware(): JSX.Element {
           alignItems={ALIGN_FLEX_END}
           paddingBottom={SPACING.spacing24}
         >
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {t('category')}
-            </StyledText>
-            <DropdownMenu
-              filterOptions={FILTER_OPTIONS}
-              currentOption={{ value: filterBy, name: startCase(filterBy) }}
-              onClick={value => {
-                setFilterBy(value as LabwareFilter)
-              }}
-            />
-          </Flex>
+          <DropdownMenu
+            filterOptions={FILTER_OPTIONS}
+            currentOption={{ value: filterBy, name: startCase(filterBy) }}
+            onClick={value => {
+              setFilterBy(value as LabwareFilter)
+            }}
+            title={t('category')}
+          />
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <StyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.grey50}>
               {t('shared:sort_by')}
@@ -161,7 +157,7 @@ export function Labware(): JSX.Element {
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              borderRadius={BORDERS.borderRadius4}
+              borderRadius={BORDERS.borderRadius8}
               marginLeft={SPACING.spacing8}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}

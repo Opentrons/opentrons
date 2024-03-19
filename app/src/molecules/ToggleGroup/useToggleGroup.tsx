@@ -47,12 +47,12 @@ const BUTTON_GROUP_STYLES = css`
   }
 
   button:first-child {
-    border-radius: ${BORDERS.borderRadius4} 0 0 ${BORDERS.borderRadius8};
+    border-radius: ${BORDERS.borderRadius8} 0 0 ${BORDERS.borderRadius8};
     border-right: none;
   }
 
   button:last-child {
-    border-radius: 0 ${BORDERS.borderRadius4} ${BORDERS.borderRadius8} 0;
+    border-radius: 0 ${BORDERS.borderRadius8} ${BORDERS.borderRadius8} 0;
     border-left: none;
   }
 `

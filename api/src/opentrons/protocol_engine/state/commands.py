@@ -11,6 +11,7 @@ from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonExce
 from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorState
+from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 
 from ..actions import (
     Action,
@@ -665,10 +666,22 @@ class CommandView(HasState[CommandState]):
         """Get whether engine is in a terminal state."""
         return self._state.run_result is not None
 
-    def validate_action_allowed(
+    def validate_action_allowed(  # noqa: C901
         self,
-        action: Union[PlayAction, PauseAction, StopAction, QueueCommandAction],
-    ) -> Union[PlayAction, PauseAction, StopAction, QueueCommandAction]:
+        action: Union[
+            PlayAction,
+            PauseAction,
+            StopAction,
+            ResumeFromRecoveryAction,
+            QueueCommandAction,
+        ],
+    ) -> Union[
+        PlayAction,
+        PauseAction,
+        StopAction,
+        ResumeFromRecoveryAction,
+        QueueCommandAction,
+    ]:
         """Validate whether a given control action is allowed.
 
         Returns:
@@ -681,6 +694,17 @@ class CommandView(HasState[CommandState]):
             SetupCommandNotAllowedError: The engine is running, so a setup command
                 may not be added.
         """
+        if self.get_status() == EngineStatus.AWAITING_RECOVERY:
+            # While we're developing error recovery, we'll conservatively disallow
+            # all actions, to avoid putting the engine in weird undefined states.
+            # We'll allow specific actions here as we flesh things out and add support
+            # for them.
+            raise NotImplementedError()
+
+        if isinstance(action, ResumeFromRecoveryAction):
+            # https://opentrons.atlassian.net/browse/EXEC-301
+            raise NotImplementedError()
+
         if self._state.run_result is not None:
             raise RunStoppedError("The run has already stopped.")
 
@@ -700,13 +724,6 @@ class CommandView(HasState[CommandState]):
                 raise SetupCommandNotAllowedError(
                     "Setup commands are not allowed after run has started."
                 )
-
-        elif self.get_status() == EngineStatus.AWAITING_RECOVERY:
-            # While we're developing error recovery, we'll conservatively disallow
-            # all actions, to avoid putting the engine in weird undefined states.
-            # We'll allow specific actions here as we flesh things out and add support
-            # for them.
-            raise NotImplementedError()
 
         return action
 
