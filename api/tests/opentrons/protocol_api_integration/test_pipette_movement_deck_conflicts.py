@@ -100,6 +100,36 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
 
 
 @pytest.mark.ot3_only
+def test_close_shave_deck_conflicts_for_96_ch_a12_column_configuration() -> None:
+    """Shouldn't raise errors for "almost collision"s."""
+    protocol_context = simulate.get_protocol_api(version="2.16", robot_type="Flex")
+    res12 = protocol_context.load_labware("nest_12_reservoir_15ml", "C3")
+
+    # Mag block and tiprack adapter are very close to the destination reservoir labware
+    protocol_context.load_module("magneticBlockV1", "D2")
+    protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_200ul",
+        "B3",
+        adapter="opentrons_flex_96_tiprack_adapter",
+    )
+    tiprack_8 = protocol_context.load_labware("opentrons_flex_96_tiprack_200ul", "B2")
+    hs = protocol_context.load_module("heaterShakerModuleV1", "D1")
+    hs_adapter = hs.load_adapter("opentrons_96_deep_well_adapter")
+    deepwell = hs_adapter.load_labware("nest_96_wellplate_2ml_deep")
+    protocol_context.load_trash_bin("A3")
+    p1000_96 = protocol_context.load_instrument("flex_96channel_1000")
+    p1000_96.configure_nozzle_layout(style=COLUMN, start="A12", tip_racks=[tiprack_8])
+
+    hs.close_labware_latch()  # type: ignore[union-attr]
+    p1000_96.distribute(
+        15,
+        res12.wells()[0],
+        deepwell.rows()[0],
+        disposal_vol=0,
+    )
+
+
+@pytest.mark.ot3_only
 def test_deck_conflicts_for_96_ch_a1_column_configuration() -> None:
     """It should raise errors for expected deck conflicts."""
     protocol = simulate.get_protocol_api(version="2.16", robot_type="Flex")

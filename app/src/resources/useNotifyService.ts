@@ -55,14 +55,26 @@ export function useNotifyService<TData, TError = Error>({
     if (shouldUseNotifications) {
       // Always fetch on initial mount.
       setRefetchUsingHTTP('once')
-      appShellListener(hostname, topic, onDataEvent)
+      appShellListener({
+        hostname,
+        topic,
+        callback: onDataEvent,
+      })
       dispatch(notifySubscribeAction(hostname, topic))
       hasUsedNotifyService.current = true
     } else setRefetchUsingHTTP('always')
 
     return () => {
-      if (hasUsedNotifyService.current && hostname != null) {
-        dispatch(notifyUnsubscribeAction(hostname, topic))
+      if (hasUsedNotifyService.current) {
+        if (hostname != null) {
+          dispatch(notifyUnsubscribeAction(hostname, topic))
+        }
+        appShellListener({
+          hostname: hostname as string,
+          topic,
+          callback: onDataEvent,
+          isDismounting: true,
+        })
       }
     }
   }, [topic, host, shouldUseNotifications])
