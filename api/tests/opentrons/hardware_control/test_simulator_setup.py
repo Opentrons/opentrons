@@ -56,7 +56,12 @@ async def test_with_magdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) -
     """It should work to build a magdeck."""
     setup = setup_klass(
         attached_modules={
-            "magdeck": [simulator_setup.ModuleCall("engage", kwargs={"height": 3})]
+            "magdeck": [
+                simulator_setup.ModuleItem(
+                    serial_number="123",
+                    items=[simulator_setup.ModuleCall("engage", kwargs={"height": 3})],
+                )
+            ]
         }
     )
     simulator = await simulator_setup.create_simulator(setup)
@@ -75,14 +80,19 @@ async def test_with_thermocycler(
     setup = setup_klass(
         attached_modules={
             "thermocycler": [
-                simulator_setup.ModuleCall(
-                    "set_temperature",
-                    kwargs={
-                        "temperature": 3,
-                        "hold_time_seconds": 1,
-                        "hold_time_minutes": 2,
-                        "volume": 5,
-                    },
+                simulator_setup.ModuleItem(
+                    serial_number="123",
+                    items=[
+                        simulator_setup.ModuleCall(
+                            "set_temperature",
+                            kwargs={
+                                "temperature": 3,
+                                "hold_time_seconds": 1,
+                                "hold_time_minutes": 2,
+                                "volume": 5,
+                            },
+                        )
+                    ],
                 )
             ]
         }
@@ -114,12 +124,17 @@ async def test_with_tempdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) 
     setup = setup_klass(
         attached_modules={
             "tempdeck": [
-                simulator_setup.ModuleCall(
-                    "start_set_temperature", kwargs={"celsius": 23}
-                ),
-                simulator_setup.ModuleCall(
-                    "await_temperature", kwargs={"awaiting_temperature": None}
-                ),
+                simulator_setup.ModuleItem(
+                    serial_number="123",
+                    items=[
+                        simulator_setup.ModuleCall(
+                            "start_set_temperature", kwargs={"celsius": 23}
+                        ),
+                        simulator_setup.ModuleCall(
+                            "await_temperature", kwargs={"awaiting_temperature": None}
+                        ),
+                    ],
+                )
             ]
         }
     )

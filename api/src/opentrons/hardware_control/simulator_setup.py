@@ -87,10 +87,11 @@ async def create_simulator(
     """Create a simulator"""
     simulator = await _simulator_for_setup(setup, loop)
     for attached_module in simulator.attached_modules:
-        calls = setup.attached_modules[attached_module.name()]
-        for call in calls:
-            f = getattr(attached_module, call.function_name)
-            await f(*call.args, **call.kwargs)
+        modules = setup.attached_modules[attached_module.name()]
+        for module in modules:
+            for call in module.items:
+                f = getattr(attached_module, call.function_name)
+                await f(*call.args, **call.kwargs)
 
     return simulator
 
@@ -109,7 +110,10 @@ def _thread_manager_for_setup(
         return ThreadManager(
             API.build_hardware_simulator,
             attached_instruments=setup.attached_instruments,
-            attached_modules=list(setup.attached_modules.keys()),
+            attached_modules={
+                k: [m.serial_number for m in v]
+                for k, v in setup.attached_modules.items()
+            },
             config=setup.config,
             strict_attached_instruments=setup.strict_attached_instruments,
             feature_flags=HardwareFeatureFlags.build_from_ff(),
