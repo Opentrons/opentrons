@@ -100,7 +100,7 @@ async def test_register_modules(
             port="/dev/foo",
             usb_port=USBPort(name="baz", port_number=0),
             type=ModuleType.TEMPERATURE,
-            serial_number=None,
+            sim_serial_number=None,
         )
     ).then_return(module)
 
@@ -150,7 +150,7 @@ async def test_register_modules_sort(
                 usb_port=mod.usb_port,
                 port=matchers.Anything(),
                 type=matchers.Anything(),
-                serial_number=None,
+                sim_serial_number=None,
             )
         ).then_return(mod)
 

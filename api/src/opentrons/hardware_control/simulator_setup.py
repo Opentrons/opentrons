@@ -92,7 +92,7 @@ async def create_simulator(
     for attached_module in simulator.attached_modules:
         modules = setup.attached_modules[attached_module.name()]
         for module in modules:
-            for call in module.items:
+            for call in module.calls:
                 f = getattr(attached_module, call.function_name)
                 await f(*call.args, **call.kwargs)
 
@@ -147,7 +147,7 @@ async def create_simulator_thread_manager(
     for attached_module in thread_manager.wrapped().attached_modules:
         modules = setup.attached_modules[attached_module.name()]
         for module in modules:
-            for call in module.items:
+            for call in module.calls:
                 f = getattr(attached_module, call.function_name)
                 await f(*call.args, **call.kwargs)
 
@@ -225,7 +225,7 @@ def _prepare_for_ot3_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
                 attached_modules.setdefault(key, []).append(
                     ModuleItem(
                         serial_number=obj["serial_number"],
-                        items=[ModuleCall(**data) for data in obj["items"]],
+                        calls=[ModuleCall(**data) for data in obj["calls"]],
                     )
                 )
 

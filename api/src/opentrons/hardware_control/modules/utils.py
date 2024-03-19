@@ -51,7 +51,7 @@ async def build(
         hw_control_loop=hw_control_loop,
         execution_manager=execution_manager,
         sim_model=sim_model,
-        serial_number=sim_serial_number,
+        sim_serial_number=sim_serial_number,
     )
 
 
