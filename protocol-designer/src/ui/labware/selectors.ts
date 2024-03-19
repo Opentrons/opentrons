@@ -11,6 +11,10 @@ import { getLabwareOffDeck, getLabwareInColumn4 } from './utils'
 import type { LabwareEntity } from '@opentrons/step-generation'
 import type { DropdownOption, Options } from '@opentrons/components'
 import type { Selector } from '../../types'
+import {
+  AllTemporalPropertiesForTimelineFrame,
+  SavedStepFormState,
+} from '../../step-forms'
 
 const TRASH = 'Trash Bin'
 
@@ -35,29 +39,121 @@ export const _sortLabwareDropdownOptions = (options: Options): Options =>
     return a.name.localeCompare(b.name)
   })
 
-/** Returns options for labware dropdowns.
+const getNickNames = (
+  nicknamesById: Record<string, string>,
+  initialDeckSetup: AllTemporalPropertiesForTimelineFrame,
+  labwareId: string,
+  savedStepForms: SavedStepFormState
+): string => {
+  const isOffDeck = getLabwareOffDeck(
+    initialDeckSetup,
+    savedStepForms ?? {},
+    labwareId
+  )
+
+  const moduleOnDeck = getModuleUnderLabware(
+    initialDeckSetup,
+    savedStepForms ?? {},
+    labwareId
+  )
+  const module =
+    moduleOnDeck != null ? getModuleShortNames(moduleOnDeck.type) : null
+
+  const isLabwareInColumn4 = getLabwareInColumn4(
+    initialDeckSetup,
+    savedStepForms ?? {},
+    labwareId
+  )
+
+  let nickName = nicknamesById[labwareId]
+  if (module != null) {
+    nickName = `${nicknamesById[labwareId]} in ${module}`
+  } else if (isOffDeck) {
+    nickName = `${nicknamesById[labwareId]} off-deck`
+  } else if (isLabwareInColumn4) {
+    nickName = `${nicknamesById[labwareId]} in staging area slot`
+  }
+  return nickName
+}
+
+/** Returns options for labware dropdowns for moveLabware.
  * Ordered by display name / nickname, but with trash at the bottom.
  */
-export const getLabwareOptions: Selector<Options> = createSelector(
+export const getMoveLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getLabwareEntities,
   getLabwareNicknamesById,
   stepFormSelectors.getInitialDeckSetup,
-  stepFormSelectors.getPresavedStepForm,
   stepFormSelectors.getSavedStepForms,
   stepFormSelectors.getAdditionalEquipmentEntities,
   (
     labwareEntities,
     nicknamesById,
     initialDeckSetup,
-    presavedStepForm,
     savedStepForms,
     additionalEquipmentEntities
   ) => {
-    const moveLabwarePresavedStep = presavedStepForm?.stepType === 'moveLabware'
     const wasteChuteLocation = Object.values(additionalEquipmentEntities).find(
       aE => aE.name === 'wasteChute'
     )?.location
+    const moveLabwareOptions = reduce(
+      labwareEntities,
+      (
+        acc: Options,
+        labwareEntity: LabwareEntity,
+        labwareId: string
+      ): Options => {
+        const isLabwareInWasteChute = Object.values(savedStepForms).find(
+          form =>
+            form.stepType === 'moveLabware' &&
+            form.labware === labwareId &&
+            form.newLocation === wasteChuteLocation
+        )
 
+        const isAdapter = labwareEntity.def.allowedRoles?.includes('adapter')
+        const nickName = getNickNames(
+          nicknamesById,
+          initialDeckSetup,
+          labwareId,
+          savedStepForms
+        )
+
+        //  filter out moving trash, adapters, and labware in
+        //  waste chute for moveLabware
+        return isAdapter || isLabwareInWasteChute
+          ? acc
+          : [
+              ...acc,
+              {
+                name: nickName,
+                value: labwareId,
+              },
+            ]
+      },
+      []
+    )
+    return _sortLabwareDropdownOptions(moveLabwareOptions)
+  }
+)
+
+/** Returns options for labware dropdowns for moveLiquids.
+ * Ordered by display name / nickname, but with trash at the bottom.
+ */
+export const getLabwareOptions: Selector<Options> = createSelector(
+  stepFormSelectors.getLabwareEntities,
+  getLabwareNicknamesById,
+  stepFormSelectors.getInitialDeckSetup,
+  stepFormSelectors.getSavedStepForms,
+  stepFormSelectors.getAdditionalEquipmentEntities,
+  (
+    labwareEntities,
+    nicknamesById,
+    initialDeckSetup,
+    savedStepForms,
+    additionalEquipmentEntities
+  ) => {
+    const wasteChuteLocation = Object.values(additionalEquipmentEntities).find(
+      aE => aE.name === 'wasteChute'
+    )?.location
     const labwareOptions = reduce(
       labwareEntities,
       (
@@ -73,66 +169,27 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         )
 
         const isAdapter = labwareEntity.def.allowedRoles?.includes('adapter')
-        const isOffDeck = getLabwareOffDeck(
+        const nickName = getNickNames(
+          nicknamesById,
           initialDeckSetup,
-          savedStepForms ?? {},
-          labwareId
+          labwareId,
+          savedStepForms
         )
 
-        const moduleOnDeck = getModuleUnderLabware(
-          initialDeckSetup,
-          savedStepForms ?? {},
-          labwareId
-        )
-        const module =
-          moduleOnDeck != null ? getModuleShortNames(moduleOnDeck.type) : null
-
-        const isLabwareInColumn4 = getLabwareInColumn4(
-          initialDeckSetup,
-          savedStepForms ?? {},
-          labwareId
-        )
-
-        let nickName = nicknamesById[labwareId]
-        if (module != null) {
-          nickName = `${nicknamesById[labwareId]} in ${module}`
-        } else if (isOffDeck) {
-          nickName = `${nicknamesById[labwareId]} off-deck`
-        } else if (isLabwareInColumn4) {
-          nickName = `${nicknamesById[labwareId]} in staging area slot`
-        }
-
-        if (!moveLabwarePresavedStep) {
-          //  filter out tip racks, adapters, and labware in waste chute
-          //  for aspirating/dispensing/mixing into
-          return getIsTiprack(labwareEntity.def) ||
-            isAdapter ||
-            isLabwareInWasteChute
-            ? acc
-            : [
-                ...acc,
-                {
-                  name: nickName,
-                  value: labwareId,
-                },
-              ]
-        } else {
-          //  filter out moving trash, adapters, and labware in
-          //  waste chute for moveLabware
-          return isAdapter || isLabwareInWasteChute
-            ? acc
-            : [
-                ...acc,
-                {
-                  name: nickName,
-                  value: labwareId,
-                },
-              ]
-        }
+        return getIsTiprack(labwareEntity.def) ||
+          isAdapter ||
+          isLabwareInWasteChute
+          ? acc
+          : [
+              ...acc,
+              {
+                name: nickName,
+                value: labwareId,
+              },
+            ]
       },
       []
     )
-
     return _sortLabwareDropdownOptions(labwareOptions)
   }
 )
