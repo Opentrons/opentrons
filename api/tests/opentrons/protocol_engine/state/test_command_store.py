@@ -5,12 +5,14 @@ from datetime import datetime
 from typing import NamedTuple, Type
 
 from opentrons_shared_data.errors import ErrorCodes
-from opentrons.ordered_set import OrderedSet
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
+from opentrons.ordered_set import OrderedSet
 from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.types import DoorState
 
 from opentrons.protocol_engine import commands, errors
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import DeckSlotLocation, DeckType, WellLocation
 from opentrons.protocol_engine.state import Config
 from opentrons.protocol_engine.state.commands import (
@@ -469,6 +471,7 @@ def test_command_failure_clears_queues() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
+        type=ErrorRecoveryType.FAIL_RUN,
     )
 
     expected_failed_1 = commands.WaitForResume(
@@ -572,6 +575,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
+        type=ErrorRecoveryType.FAIL_RUN,
     )
     expected_failed_cmd_2 = commands.WaitForResume(
         id="command-id-2",
@@ -621,6 +625,86 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         "command-id-1": CommandEntry(index=0, command=cmd_1_non_setup),
         "command-id-2": CommandEntry(index=1, command=expected_failed_cmd_2),
         "command-id-3": CommandEntry(index=2, command=expected_failed_cmd_3),
+    }
+
+
+def test_nonfatal_command_failure() -> None:
+    """It should clear the command queue on command failure."""
+    queue_1 = QueueCommandAction(
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(), key="command-key-1"
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-1",
+    )
+    queue_2 = QueueCommandAction(
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(), key="command-key-2"
+        ),
+        request_hash=None,
+        created_at=datetime(year=2021, month=1, day=1),
+        command_id="command-id-2",
+    )
+    running_1 = UpdateCommandAction(
+        private_result=None,
+        command=commands.WaitForResume(
+            id="command-id-1",
+            key="command-key-1",
+            createdAt=datetime(year=2021, month=1, day=1),
+            startedAt=datetime(year=2022, month=2, day=2),
+            params=commands.WaitForResumeParams(),
+            status=commands.CommandStatus.RUNNING,
+        ),
+    )
+    fail_1 = FailCommandAction(
+        command_id="command-id-1",
+        error_id="error-id",
+        failed_at=datetime(year=2023, month=3, day=3),
+        error=errors.ProtocolEngineError(message="oh no"),
+        type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+    )
+
+    expected_failed_1 = commands.WaitForResume(
+        id="command-id-1",
+        key="command-key-1",
+        error=errors.ErrorOccurrence(
+            id="error-id",
+            createdAt=datetime(year=2023, month=3, day=3),
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+            errorType="ProtocolEngineError",
+            detail="oh no",
+        ),
+        createdAt=datetime(year=2021, month=1, day=1),
+        startedAt=datetime(year=2022, month=2, day=2),
+        completedAt=datetime(year=2023, month=3, day=3),
+        params=commands.WaitForResumeParams(),
+        status=commands.CommandStatus.FAILED,
+    )
+    expected_queued_2 = commands.WaitForResume(
+        id="command-id-2",
+        key="command-key-2",
+        error=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        startedAt=None,
+        completedAt=None,
+        params=commands.WaitForResumeParams(),
+        status=commands.CommandStatus.QUEUED,
+    )
+
+    subject = CommandStore(is_door_open=False, config=_make_config())
+
+    subject.handle_action(queue_1)
+    subject.handle_action(queue_2)
+    subject.handle_action(running_1)
+    subject.handle_action(fail_1)
+
+    assert subject.state.running_command_id is None
+    assert subject.state.queued_command_ids == OrderedSet(["command-id-2"])
+    assert subject.state.all_command_ids == ["command-id-1", "command-id-2"]
+    assert subject.state.commands_by_id == {
+        "command-id-1": CommandEntry(index=0, command=expected_failed_1),
+        "command-id-2": CommandEntry(index=1, command=expected_queued_2),
     }
 
 
@@ -1091,6 +1175,7 @@ def test_command_store_handles_command_failed() -> None:
             error_id="error-id",
             failed_at=datetime(year=2022, month=2, day=2),
             error=errors.ProtocolEngineError(message="oh no"),
+            type=ErrorRecoveryType.FAIL_RUN,
         )
     )
 
