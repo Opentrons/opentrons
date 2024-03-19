@@ -37,14 +37,16 @@ def build_arg_parser():
     arg_parser.add_argument('-i', '--tip_size', type=str, required=False, help='Sets tip size', default='T1K')
     arg_parser.add_argument('-g', '--gauge_slot', type=str, required=False, help='Sets the gauge slot', default='D2')
     arg_parser.add_argument('-p', '--tiprack_slot', type=str, help='Sets the tiprack slot', default='B1')
+    arg_parser.add_argument('-r', '--trough_slot', type=str, help='Sets the trough slot', default='D3')
     arg_parser.add_argument('-t', '--trash_slot', type=str, help='Sets the trash slot', default='A3')
+    arg_parser.add_argument('-v', '--volume', type=float, help='Sets the leak test volume', default=1000)
     arg_parser.add_argument('-a', '--calibrate', action="store_true", required=False, help='Calibrates tiprack position')
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Eight_Channel_Partial_Pickup_Test:
     def __init__(
-        self, simulate: bool, calibrate: bool, cycles: int, nozzles: int, gauge_slot: str, tiprack_slot: str, trash_slot: str, tip_size: str
+        self, simulate: bool, calibrate: bool, cycles: int, nozzles: int, gauge_slot: str, tiprack_slot: str, trough_slot: str, trash_slot: str, tip_size: str, volume: float
     ) -> None:
         self.simulate = simulate
         self.calibrate = calibrate
@@ -52,13 +54,19 @@ class Eight_Channel_Partial_Pickup_Test:
         self.nozzles = nozzles
         self.gauge_slot = gauge_slot
         self.tiprack_slot = tiprack_slot
+        self.trough_slot = trough_slot
         self.trash_slot = trash_slot
         self.tip_size = tip_size
+        self.volume = volume
         self.api = None
         self.mount = None
         self.home = None
         self.pipette_id = None
         self.deck_slot = None
+        self.tiprack_position = None
+        self.drop_position = None
+        self.gauge_position = None
+        self.trough_position = None
         self.axes = [Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R]
         self.test_data ={
             "Time":"None",
@@ -82,7 +90,8 @@ class Eight_Channel_Partial_Pickup_Test:
             # "Y":Point(x=0, y=0, z=-5),
             # "X":Point(x=0, y=0, z=-5),
         }
-        self.tip_distance = 8 # mm
+        self.leak_time = 30 # seconds
+        self.tip_distance = 9 # mm
         self.tip_overlap = 10.5 # mm
         self.tip_length = {
             "T1K":95.7,
@@ -269,7 +278,7 @@ class Eight_Channel_Partial_Pickup_Test:
 
     async def _calibrate_tiprack(
         self, api: OT3API, mount: OT3Mount
-    ):
+    ) -> None:
         cp = CriticalPoint.NOZZLE
         print(f"\nCalibrating Pick-up Tip Position at Slot {self.tiprack_slot}!")
         tiprack_loc = Point(self.deck_slot['deck_slot'][self.tiprack_slot]['X'],
@@ -302,21 +311,18 @@ class Eight_Channel_Partial_Pickup_Test:
         self.deck_slot['deck_slot'][self.trash_slot][Axis.Y.name] = drop_tip_loc.y
         self.deck_slot['deck_slot'][self.trash_slot]['Z'] = drop_tip_loc.z
         self._save_config(self.calibration_path + self.calibration_file, self.deck_slot)
-        return tiprack_loc, drop_tip_loc
+        self.tiprack_position = tiprack_loc
+        self.drop_position = drop_tip_loc
 
     async def _calibrate_gauge(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         await api.home_z(mount)
         cp = CriticalPoint.TIP
-        # slot = _ot3_to_ot2[self.gauge_slot]
-        # nominal_center = Point(*get_calibration_square_position_in_slot(2))
-        # above_gauge_position = nominal_center._replace(z=self.home.z)
         print(f"\nCalibrating Gauge at Slot {self.gauge_slot}!")
         gauge_loc = Point(self.deck_slot['deck_slot'][self.gauge_slot]['X'],
                             self.deck_slot['deck_slot'][self.gauge_slot]['Y'],
                             self.deck_slot['deck_slot'][self.gauge_slot]['Z'])
-        # await self.api.move_to(self.mount, above_gauge_position)
         await self._move_to_point(api, mount, gauge_loc, cp)
         current_position = await api.current_position_ot3(mount, cp)
         gauge_loc = await self.jog(api, mount, current_position, cp)
@@ -325,6 +331,26 @@ class Eight_Channel_Partial_Pickup_Test:
         self.deck_slot['deck_slot'][self.gauge_slot][Axis.Y.name] = gauge_loc.y
         self.deck_slot['deck_slot'][self.gauge_slot]['Z'] = gauge_loc.z
         self._save_config(self.calibration_path + self.calibration_file, self.deck_slot)
+        self.gauge_position = gauge_loc
+
+    async def _calibrate_trough(
+        self, api: OT3API, mount: OT3Mount
+    ) -> None:
+        await api.home_z(mount)
+        cp = CriticalPoint.TIP
+        print(f"\nCalibrating Trough at Slot {self.trough_slot}!")
+        trough_loc = Point(self.deck_slot['deck_slot'][self.trough_slot]['X'],
+                            self.deck_slot['deck_slot'][self.trough_slot]['Y'],
+                            self.deck_slot['deck_slot'][self.trough_slot]['Z'])
+        await self._move_to_point(api, mount, trough_loc, cp)
+        current_position = await api.current_position_ot3(mount, cp)
+        trough_loc = await self.jog(api, mount, current_position, cp)
+        trough_loc = Point(trough_loc[Axis.X], trough_loc[Axis.Y], trough_loc[Axis.by_mount(mount)])
+        self.deck_slot['deck_slot'][self.trough_slot][Axis.X.name] = trough_loc.x
+        self.deck_slot['deck_slot'][self.trough_slot][Axis.Y.name] = trough_loc.y
+        self.deck_slot['deck_slot'][self.trough_slot]['Z'] = trough_loc.z
+        self._save_config(self.calibration_path + self.calibration_file, self.deck_slot)
+        self.trough_position = trough_loc
 
     async def _update_pick_up_current(
         self, api: OT3API, mount: OT3Mount, tip_count, current
@@ -368,7 +394,11 @@ class Eight_Channel_Partial_Pickup_Test:
         tip_loc = Point(self.deck_slot['deck_slot'][self.gauge_slot]['X'],
                         self.deck_slot['deck_slot'][self.gauge_slot]['Y'] - y_offset,
                         self.deck_slot['deck_slot'][self.gauge_slot]['Z'])
-        await api.move_to(self.mount, tip_loc, speed=10)
+        if tip == 1:
+            cp = CriticalPoint.TIP
+            await self._move_to_point(api, mount, tip_loc, cp)
+        else:
+            await api.move_to(mount, tip_loc, speed=10)
 
     async def _measure_gauges(
         self, api: OT3API, mount: OT3Mount
@@ -384,6 +414,17 @@ class Eight_Channel_Partial_Pickup_Test:
             print(f"{key} Gauge = {gauge}mm")
             # Relax gauge
             await api.move_rel(mount, (-1)*self.gauge_offsets[key], speed=10)
+
+    async def _leak_test(
+        self, api: OT3API, mount: OT3Mount
+    ) -> None:
+        await api.prepare_for_aspirate(mount)
+        await move_to_point(api, mount, self.trough_position, cp)
+        await api.aspirate(mount, self.volume)
+        await api.home_z(mount)
+        await countdown(self.leak_time)
+        await move_to_point(api, mount, self.trough_position, cp)
+        await api.dispense(mount)
 
     async def _home(
         self, api: OT3API, mount: OT3Mount
@@ -411,13 +452,14 @@ class Eight_Channel_Partial_Pickup_Test:
                 await self._home(self.api, self.mount)
                 motor_current = float(input("Motor Current (Amps): "))
                 pick_up_speed = float(input("Pick-up Tip Speed (mm/s): "))
-                self.test_data["Current"] = str(motor_current)
-                self.test_data["Speed"] = str(pick_up_speed)
                 await self._update_pick_up_current(self.api, self.mount, self.nozzles, motor_current)
                 await self._update_pick_up_speed(self.api, self.mount, self.nozzles, pick_up_speed)
+                self.test_data["Current"] = str(motor_current)
+                self.test_data["Speed"] = str(pick_up_speed)
                 if self.calibrate:
-                    pick_up_loc, droptip_loc = await self._calibrate_tiprack(self.api, self.mount)
+                    await self._calibrate_tiprack(self.api, self.mount)
                     await self._calibrate_gauge(self.api, self.mount)
+                    await self._calibrate_trough(self.api, self.mount)
                 for i in range(self.cycles):
                     cycle = i + 1
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
@@ -429,6 +471,7 @@ class Eight_Channel_Partial_Pickup_Test:
                         if len(self.gauges) > 0:
                             await self._measure_gauges(self.api, self.mount)
                         await self._record_data(cycle)
+                    await self._leak_test(self.api, self.mount)
                     await self._reset(self.api, self.mount)
         except Exception as e:
             await self.exit()
@@ -444,5 +487,5 @@ if __name__ == '__main__':
     print("\nOT-3 8-Channel Partial Tip Pick-up Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Eight_Channel_Partial_Pickup_Test(args.simulate, args.calibrate, args.cycles, args.nozzles, args.gauge_slot, args.tiprack_slot, args.trash_slot, args.tip_size)
+    test = Eight_Channel_Partial_Pickup_Test(args.simulate, args.calibrate, args.cycles, args.nozzles, args.gauge_slot, args.tiprack_slot, args.trough_slot, args.trash_slot, args.tip_size, args.volume)
     asyncio.run(test.run())
