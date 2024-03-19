@@ -1,3 +1,3 @@
 export { CustomKeyboard } from './CustomKeyboard'
 export { NormalKeyboard } from './NormalKeyboard'
-export { Numpad } from './NumericalKeyboard'
+export { NumericalKeyboard } from './NumericalKeyboard'
