@@ -7,6 +7,7 @@ import sys
 import time as t
 from typing import List
 import os
+import argparse
 
 
 def _get_user_input(lst: List[str], some_string: str) -> str:
@@ -107,7 +108,7 @@ class _ABRAsairSensor:
 
 
 if __name__ == "__main__":
-    robot_list = [
+    robot_list: List = [
         "DVT1ABR1",
         "DVT1ABR2",
         "DVT1ABR3",
@@ -122,8 +123,24 @@ if __name__ == "__main__":
         "PVT1ABR12",
         "ROOM_339",
         "Room_340",
-    ]  # type: List
-    robot = _get_user_input(robot_list, "Robot/Room: ")
-    duration = int(input("Duration (min): "))
-    frequency = int(input("Frequency (min): "))
-    _ABRAsairSensor(robot, duration, frequency)
+    ]
+    parser = argparse.ArgumentParser(description="Starts Temp/RH Sensor.")
+    parser.add_argument(
+        "robot", metavar="ROBOT", type=str, nargs=1, help="ABR Robot Name"
+    )
+    parser.add_argument(
+        "duration",
+        metavar="DURATION",
+        type=int,
+        nargs=1,
+        help="Duration (min) to run sensor for.",
+    )
+    parser.add_argument(
+        "frequency",
+        metavar="FREQUENCY",
+        type=int,
+        nargs=1,
+        help="How frequently to record temp/rh (min for.",
+    )
+    args = parser.parse_args()
+    _ABRAsairSensor(args.robot[0], args.duration[0], args.frequency[0])
