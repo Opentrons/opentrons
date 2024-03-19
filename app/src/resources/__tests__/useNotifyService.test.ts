@@ -138,11 +138,12 @@ describe('useNotifyService', () => {
   })
 
   it('should return set HTTP refetch to always and fire an analytics reporting event if the connection was refused', () => {
-    vi.mocked(appShellListener).mockImplementation(
-      (_: any, __: any, mockCb: any) => {
-        mockCb('ECONNREFUSED')
-      }
-    )
+    vi.mocked(appShellListener).mockImplementation(function ({
+      callback,
+    }): any {
+      // eslint-disable-next-line n/no-callback-literal
+      callback('ECONNREFUSED')
+    })
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
@@ -156,11 +157,12 @@ describe('useNotifyService', () => {
   })
 
   it('should trigger a single HTTP refetch if the refetch flag was returned', () => {
-    vi.mocked(appShellListener).mockImplementation(
-      (_: any, __: any, mockCb: any) => {
-        mockCb({ refetchUsingHTTP: true })
-      }
-    )
+    vi.mocked(appShellListener).mockImplementation(function ({
+      callback,
+    }): any {
+      // eslint-disable-next-line n/no-callback-literal
+      callback({ refetchUsingHTTP: true })
+    })
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
@@ -173,11 +175,12 @@ describe('useNotifyService', () => {
   })
 
   it('should trigger a single HTTP refetch if the unsubscribe flag was returned', () => {
-    vi.mocked(appShellListener).mockImplementation(
-      (_: any, __: any, mockCb: any) => {
-        mockCb({ unsubscribe: true })
-      }
-    )
+    vi.mocked(appShellListener).mockImplementation(function ({
+      callback,
+    }): any {
+      // eslint-disable-next-line n/no-callback-literal
+      callback({ unsubscribe: true })
+    })
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
@@ -187,5 +190,17 @@ describe('useNotifyService', () => {
     )
     rerender()
     expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
+  })
+
+  it('should clean up the listener on dismount', () => {
+    const { unmount } = renderHook(() =>
+      useNotifyService({
+        topic: MOCK_TOPIC,
+        setRefetchUsingHTTP: mockHTTPRefetch,
+        options: MOCK_OPTIONS,
+      })
+    )
+    unmount()
+    expect(appShellListener).toHaveBeenCalled()
   })
 })

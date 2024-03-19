@@ -6,18 +6,18 @@ export interface Remote {
   ipcRenderer: {
     invoke: (channel: string, ...args: unknown[]) => Promise<any>
     send: (channel: string, ...args: unknown[]) => void
-    on: (
-      channel: string,
-      listener: (
-        event: IpcMainEvent,
-        hostname: string,
-        topic: NotifyTopic,
-        message: NotifyResponseData | NotifyNetworkError,
-        ...args: unknown[]
-      ) => void
-    ) => void
+    on: (channel: string, listener: IpcListener) => void
+    off: (channel: string, listener: IpcListener) => void
   }
 }
+
+export type IpcListener = (
+  event: IpcMainEvent,
+  hostname: string,
+  topic: NotifyTopic,
+  message: NotifyResponseData | NotifyNetworkError,
+  ...args: unknown[]
+) => void
 
 export interface NotifyRefetchData {
   refetchUsingHTTP: boolean
