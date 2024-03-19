@@ -99,7 +99,7 @@ describe('ProtocolRunRuntimeParameters', () => {
   it('should render title, and banner when RunTimeParameters are note empty', () => {
     render(props)
     screen.getByText('Parameters')
-    screen.getByText('Default values')
+    screen.getByText('Custom values')
     screen.getByText('Values are view-only')
     screen.getByText('Cancel the run and restart setup to edit')
     screen.getByText('Name')
@@ -131,4 +131,5 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   // ToDo Additional test will be implemented when chip component is added
+  // Need to a case to test subtext default values/custom values
 })
