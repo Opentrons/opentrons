@@ -231,7 +231,7 @@ export function ProtocolSetupParameters({
                 onClickSetupStep={() => console.log('TODO: wire this up')}
                 detail={getDefault(parameter)}
                 description={parameter.description}
-                hasLargeFont
+                fontSize="h4"
               />
             </React.Fragment>
           )

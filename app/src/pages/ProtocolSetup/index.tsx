@@ -117,7 +117,7 @@ interface ProtocolSetupStepProps {
   //  optional removal of the icon
   hasIcon?: boolean
   //  optional enlarge the font size
-  hasLargeFont?: boolean
+  fontSize?: string
 }
 
 export function ProtocolSetupStep({
@@ -130,7 +130,7 @@ export function ProtocolSetupStep({
   disabledReason,
   description,
   hasIcon = true,
-  hasLargeFont = false,
+  fontSize = 'p',
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
     ready: COLORS.green35,
@@ -214,7 +214,7 @@ export function ProtocolSetupStep({
           }
         >
           <StyledText
-            as={hasLargeFont ? 'h4' : 'p'}
+            as={fontSize}
             textAlign={TEXT_ALIGN_RIGHT}
             color={disabled ? COLORS.grey50 : COLORS.black90}
             maxWidth="20rem"
