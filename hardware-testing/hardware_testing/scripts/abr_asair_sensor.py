@@ -7,16 +7,7 @@ import sys
 import time as t
 from typing import List
 import os
-
-
-def _get_user_input(lst: List[str], some_string: str) -> str:
-    variable = input(some_string)
-    while variable not in lst:
-        print(
-            f"Your input was {variable}. Expected input is one of the following: {lst}"
-        )
-        variable = input(some_string)
-    return variable
+import argparse
 
 
 class _ABRAsairSensor:
@@ -85,6 +76,8 @@ class _ABRAsairSensor:
                 break
             # write to google sheet
             try:
+                if google_sheet.creditals.access_token_expired:
+                    google_sheet.gc.login()
                 google_sheet.write_header(header)
                 google_sheet.update_row_index()
                 google_sheet.write_to_row(row)
@@ -107,23 +100,23 @@ class _ABRAsairSensor:
 
 
 if __name__ == "__main__":
-    robot_list = [
-        "DVT1ABR1",
-        "DVT1ABR2",
-        "DVT1ABR3",
-        "DVT1ABR4",
-        "DVT2ABR5",
-        "DVT2ABR6",
-        "PVT1ABR7",
-        "PVT1ABR8",
-        "PVT1ABR9",
-        "PVT1ABR10",
-        "PVT1ABR11",
-        "PVT1ABR12",
-        "ROOM_339",
-        "Room_340",
-    ]  # type: List
-    robot = _get_user_input(robot_list, "Robot/Room: ")
-    duration = int(input("Duration (min): "))
-    frequency = int(input("Frequency (min): "))
-    _ABRAsairSensor(robot, duration, frequency)
+    parser = argparse.ArgumentParser(description="Starts Temp/RH Sensor.")
+    parser.add_argument(
+        "robot", metavar="ROBOT", type=str, nargs=1, help="ABR Robot Name"
+    )
+    parser.add_argument(
+        "duration",
+        metavar="DURATION",
+        type=int,
+        nargs=1,
+        help="Duration (min) to run sensor for.",
+    )
+    parser.add_argument(
+        "frequency",
+        metavar="FREQUENCY",
+        type=int,
+        nargs=1,
+        help="How frequently to record temp/rh (min for.",
+    )
+    args = parser.parse_args()
+    _ABRAsairSensor(args.robot[0], args.duration[0], args.frequency[0])
