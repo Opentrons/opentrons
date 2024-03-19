@@ -316,12 +316,12 @@ class ProtocolEngine:
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
 
-        Raises:
-            CommandExecutionFailedError: if any protocol command failed.
+        If a command encountered a fatal error, it's raised as an exception.
         """
         await self._state_store.wait_for(
             condition=self._state_store.commands.get_all_commands_final
         )
+        self._state_store.commands.raise_fatal_command_error()
 
     async def finish(
         self,

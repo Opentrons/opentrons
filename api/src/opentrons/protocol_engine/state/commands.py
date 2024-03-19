@@ -644,20 +644,28 @@ class CommandView(HasState[CommandState]):
             or len(self._state.queued_command_ids) == 0
         )
 
-        if no_command_running and no_command_to_execute:
-            # TODO(mm, 2024-03-14): This is a slow O(n) scan. When a long run ends and
-            # we reach this loop, it can disrupt the robot server.
-            # https://opentrons.atlassian.net/browse/EXEC-55
-            for command_id in self._state.all_command_ids:
-                command = self._state.commands_by_id[command_id].command
-                if command.error and command.intent != CommandIntent.SETUP:
-                    # TODO(tz, 7-11-23): avoid raising an error and return the status instead
-                    raise ProtocolCommandFailedError(
-                        original_error=command.error, message=command.error.detail
-                    )
-            return True
-        else:
-            return False
+        return no_command_running and no_command_to_execute
+
+    def raise_fatal_command_error(self) -> None:
+        """Raise the run's fatal command error, if there was one, as an exception.
+
+        The "fatal command error" is the error from any non-setup command.
+        It's intended to be used as the fatal error of the overall run
+        (see `ProtocolEngine.finish()`) for JSON and live HTTP protocols.
+
+        This isn't useful for Python protocols, which have to account for the
+        fatal error of the overall coming from anywhere in the Python script,
+        including in between commands.
+        """
+        # TODO(mm, 2024-03-14): This is a slow O(n) scan. When a long run ends and
+        # we reach this loop, it can disrupt the robot server.
+        # https://opentrons.atlassian.net/browse/EXEC-55
+        for command_id in self._state.all_command_ids:
+            command = self._state.commands_by_id[command_id].command
+            if command.error and command.intent != CommandIntent.SETUP:
+                raise ProtocolCommandFailedError(
+                    original_error=command.error, message=command.error.detail
+                )
 
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
