@@ -116,6 +116,8 @@ interface ProtocolSetupStepProps {
   description?: string
   //  optional removal of the icon
   hasIcon?: boolean
+  //  optional enlarge the font size
+  fontSize?: string
 }
 
 export function ProtocolSetupStep({
@@ -128,6 +130,7 @@ export function ProtocolSetupStep({
   disabledReason,
   description,
   hasIcon = true,
+  fontSize = 'p',
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
     ready: COLORS.green35,
@@ -161,6 +164,8 @@ export function ProtocolSetupStep({
       background-color: ${backgroundColor};
     }
   `
+
+  const isToggle = detail === 'On' || detail === 'Off'
 
   return (
     <Btn
@@ -201,9 +206,15 @@ export function ProtocolSetupStep({
             {description}
           </StyledText>
         </Flex>
-        <Flex flex="1" justifyContent={JUSTIFY_END}>
+        <Flex
+          flex="1"
+          justifyContent={JUSTIFY_END}
+          padding={
+            isToggle ? `${SPACING.spacing12} ${SPACING.spacing10}` : 'undefined'
+          }
+        >
           <StyledText
-            as="p"
+            as={fontSize}
             textAlign={TEXT_ALIGN_RIGHT}
             color={disabled ? COLORS.grey50 : COLORS.black90}
             maxWidth="20rem"
