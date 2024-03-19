@@ -460,7 +460,7 @@ async def test_create_protocol(
         )
     ).then_return([buffered_file])
 
-    decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("a_b_c")
+    decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("abc123")
 
     decoy.when(
         await protocol_reader.save(
@@ -513,6 +513,7 @@ async def test_create_protocol(
             protocol_analyzer.analyze,
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
+            run_time_param_overrides=None,
         ),
     )
 
