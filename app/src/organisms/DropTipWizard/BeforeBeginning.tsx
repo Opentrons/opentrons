@@ -187,7 +187,7 @@ export const BeforeBeginning = (
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
   border: 1px solid ${COLORS.grey30};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius8};
   height: 12.5625rem;
   width: 14.5625rem;
   cursor: pointer;
@@ -205,7 +205,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     justify-content: ${JUSTIFY_FLEX_START};
     background-color: ${COLORS.blue35};
     border-width: 0;
-    border-radius: ${BORDERS.borderRadiusSize4};
+    border-radius: ${BORDERS.borderRadius16};
     padding: ${SPACING.spacing24};
     height: 5.25rem;
     width: 57.8125rem;

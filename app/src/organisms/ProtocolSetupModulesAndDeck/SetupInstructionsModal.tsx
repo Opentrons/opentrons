@@ -48,7 +48,7 @@ export function SetupInstructionsModal({
           <StyledText as="p">{t('setup_instructions_description')}</StyledText>
           <Flex
             backgroundColor={COLORS.grey35}
-            borderRadius={BORDERS.borderRadiusSize3}
+            borderRadius={BORDERS.borderRadius8}
             padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
           >
             <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

@@ -15,7 +15,7 @@ import { FileUploadMessageModal } from './modals/FileUploadMessageModal/FileUplo
 import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal/LabwareUploadMessageModal'
 import { GateModal } from './modals/GateModal'
 import { AnnouncementModal } from './modals/AnnouncementModal'
-import styles from './ProtocolEditor.css'
+import styles from './ProtocolEditor.module.css'
 import { CreateFileWizard } from './modals/CreateFileWizard'
 
 const showGateModal =
@@ -23,7 +23,7 @@ const showGateModal =
 
 function ProtocolEditorComponent(): JSX.Element {
   return (
-    <div>
+    <div id="protocol-editor">
       <ComputingSpinner />
       <TopPortalRoot />
       {showGateModal ? <GateModal /> : null}

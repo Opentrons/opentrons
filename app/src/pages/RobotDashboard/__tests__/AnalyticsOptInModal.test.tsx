@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { updateConfigValue } from '../../../redux/config'
@@ -11,19 +12,9 @@ import { AnalyticsOptInModal } from '../AnalyticsOptInModal'
 
 import type { DiscoveredRobot } from '../../../redux/discovery/types'
 
-jest.mock('../../../redux/config')
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/robot-settings')
-
-const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
-  typeof updateConfigValue
->
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
-const mockUpdateSetting = updateSetting as jest.MockedFunction<
-  typeof updateSetting
->
+vi.mock('../../../redux/config')
+vi.mock('../../../redux/discovery')
+vi.mock('../../../redux/robot-settings')
 
 const render = (props: React.ComponentProps<typeof AnalyticsOptInModal>) => {
   return renderWithProviders(<AnalyticsOptInModal {...props} />, {
@@ -36,9 +27,11 @@ describe('AnalyticsOptInModal', () => {
 
   beforeEach(() => {
     props = {
-      setShowAnalyticsOptInModal: jest.fn(),
+      setShowAnalyticsOptInModal: vi.fn(),
     }
-    mockGetLocalRobot.mockReturnValue({ name: 'Otie' } as DiscoveredRobot)
+    vi.mocked(getLocalRobot).mockReturnValue({
+      name: 'Otie',
+    } as DiscoveredRobot)
   })
 
   it('should render text and button', () => {
@@ -56,11 +49,11 @@ describe('AnalyticsOptInModal', () => {
     const [{ getByText }] = render(props)
     fireEvent.click(getByText('Opt out'))
 
-    expect(mockUpdateConfigValue).toHaveBeenCalledWith(
+    expect(vi.mocked(updateConfigValue)).toHaveBeenCalledWith(
       'analytics.optedIn',
       false
     )
-    expect(mockUpdateSetting).toHaveBeenCalledWith(
+    expect(vi.mocked(updateSetting)).toHaveBeenCalledWith(
       'Otie',
       'disableLogAggregation',
       true
@@ -72,11 +65,11 @@ describe('AnalyticsOptInModal', () => {
     const [{ getByText }] = render(props)
     fireEvent.click(getByText('Opt in'))
 
-    expect(mockUpdateConfigValue).toHaveBeenCalledWith(
+    expect(vi.mocked(updateConfigValue)).toHaveBeenCalledWith(
       'analytics.optedIn',
       true
     )
-    expect(mockUpdateSetting).toHaveBeenCalledWith(
+    expect(vi.mocked(updateSetting)).toHaveBeenCalledWith(
       'Otie',
       'disableLogAggregation',
       true

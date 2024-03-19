@@ -5,18 +5,16 @@
       "path": "./tsconfig-data.json"
     },
     {
-      "path": "../components"
+      "path": "../shared-data"
     },
     {
-      "path": "../shared-data"
+      "path": "../components"
     },
     {
       "path": "../step-generation"
     }
   ],
   "compilerOptions": {
-    "composite": true,
-    "noErrorTruncation": true,
     "rootDir": "src",
     "outDir": "lib"
   },

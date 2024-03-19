@@ -83,7 +83,7 @@ export function RobotSystemVersion({
               flexDirection={DIRECTION_ROW}
               padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              borderRadius={BORDERS.borderRadiusSize3}
+              borderRadius={BORDERS.borderRadius8}
             >
               <StyledText
                 as="p"

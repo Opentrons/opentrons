@@ -7,14 +7,12 @@ on:
     paths:
       - 'step-generation/**'
       - 'shared-data/**'
-      - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/step-generation-test.yaml'
   push:
     paths:
       - 'step-generation/**'
       - 'shared-data/**'
-      - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/step-generation-test.yaml'
     branches:

@@ -1,7 +1,11 @@
-import { when, resetAllWhenMocks } from 'jest-when'
-import { getLabwareDefURI, getPipetteNameSpecs } from '@opentrons/shared-data'
+import { when } from 'vitest-when'
+import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
+import {
+  getLabwareDefURI,
+  getPipetteNameSpecs,
+  fixtureTiprack1000ul as _fixtureTiprack1000ul,
+} from '@opentrons/shared-data'
 import { heaterShakerOpenLatch } from '../commandCreators/atomic/heaterShakerOpenLatch'
-import _fixtureTiprack1000ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 import { getIsTallLabwareEastWestOfHeaterShaker } from '../utils'
 import {
   getErrorResult,
@@ -12,15 +16,12 @@ import {
 import type { InvariantContext, RobotState } from '../types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-jest.mock('../utils/heaterShakerCollision')
+vi.mock('../utils/heaterShakerCollision')
 
 const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
 const FLEX_PIPETTE = 'p1000_single_flex'
 const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
 
-const mockGetIsTallLabwareEastWestOfHeaterShaker = getIsTallLabwareEastWestOfHeaterShaker as jest.MockedFunction<
-  typeof getIsTallLabwareEastWestOfHeaterShaker
->
 describe('heaterShakerOpenLatch', () => {
   const HEATER_SHAKER_ID = 'heaterShakerId'
   const HEATER_SHAKER_SLOT = '1'
@@ -53,16 +54,16 @@ describe('heaterShakerOpenLatch', () => {
     }
   })
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
   it('should return an error when there is labware east/west that is above 53 mm', () => {
-    when(mockGetIsTallLabwareEastWestOfHeaterShaker)
+    when(getIsTallLabwareEastWestOfHeaterShaker)
       .calledWith(
         robotState.labware,
         invariantContext.labwareEntities,
         HEATER_SHAKER_SLOT
       )
-      .mockReturnValue(true)
+      .thenReturn(true)
     const result = heaterShakerOpenLatch(
       {
         moduleId: HEATER_SHAKER_ID,
@@ -81,7 +82,7 @@ describe('heaterShakerOpenLatch', () => {
         DEFAULT_PIPETTE
       ].spec = FlexPipetteNameSpecs
     }
-    mockGetIsTallLabwareEastWestOfHeaterShaker.mockReturnValue(false)
+    vi.mocked(getIsTallLabwareEastWestOfHeaterShaker).mockReturnValue(false)
 
     const result = heaterShakerOpenLatch(
       {
@@ -101,13 +102,13 @@ describe('heaterShakerOpenLatch', () => {
     })
   })
   it('should return an open latch command when there is no labware that is too tall east/west of the heater shaker', () => {
-    when(mockGetIsTallLabwareEastWestOfHeaterShaker)
+    when(getIsTallLabwareEastWestOfHeaterShaker)
       .calledWith(
         robotState.labware,
         invariantContext.labwareEntities,
         HEATER_SHAKER_SLOT
       )
-      .mockReturnValue(false)
+      .thenReturn(false)
     const result = heaterShakerOpenLatch(
       {
         moduleId: HEATER_SHAKER_ID,

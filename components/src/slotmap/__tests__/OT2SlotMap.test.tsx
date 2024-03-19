@@ -1,3 +1,4 @@
-describe('OT2SlotMap', () => {
+import { describe, it } from 'vitest'
+describe('SlotMap', () => {
   it.todo('replace deprecated enzyme test')
 })

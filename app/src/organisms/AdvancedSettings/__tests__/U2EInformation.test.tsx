@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { i18n } from '../../../i18n'
 import {
   getU2EAdapterDevice,
@@ -11,17 +10,11 @@ import {
   UP_TO_DATE,
 } from '../../../redux/system-info'
 import * as Fixtures from '../../../redux/system-info/__fixtures__'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { U2EInformation } from '../U2EInformation'
 
-jest.mock('../../../redux/system-info')
-
-const mockGetU2EAdapterDevice = getU2EAdapterDevice as jest.MockedFunction<
-  typeof getU2EAdapterDevice
->
-const mockGetU2EWindowsDriverStatus = getU2EWindowsDriverStatus as jest.MockedFunction<
-  typeof getU2EWindowsDriverStatus
->
+vi.mock('../../../redux/system-info')
 
 const render = () => {
   return renderWithProviders(<U2EInformation />, {
@@ -31,8 +24,10 @@ const render = () => {
 
 describe('U2EInformation', () => {
   beforeEach(() => {
-    mockGetU2EAdapterDevice.mockReturnValue(Fixtures.mockWindowsRealtekDevice)
-    mockGetU2EWindowsDriverStatus.mockReturnValue(OUTDATED)
+    vi.mocked(getU2EAdapterDevice).mockReturnValue(
+      Fixtures.mockWindowsRealtekDevice
+    )
+    vi.mocked(getU2EWindowsDriverStatus).mockReturnValue(OUTDATED)
   })
 
   it('render the usb-to-ethernet adapter information', () => {
@@ -47,10 +42,10 @@ describe('U2EInformation', () => {
   })
 
   it('renders the test data of the usb-to-ethernet adapter information with mac', () => {
-    mockGetU2EAdapterDevice.mockReturnValue({
+    vi.mocked(getU2EAdapterDevice).mockReturnValue({
       ...Fixtures.mockRealtekDevice,
     })
-    mockGetU2EWindowsDriverStatus.mockReturnValue(NOT_APPLICABLE)
+    vi.mocked(getU2EWindowsDriverStatus).mockReturnValue(NOT_APPLICABLE)
     render()
     screen.getByText('USB 10/100 LAN')
     screen.getByText('Realtek')
@@ -64,7 +59,7 @@ describe('U2EInformation', () => {
   })
 
   it('should render text and driver information', () => {
-    mockGetU2EWindowsDriverStatus.mockReturnValue(UP_TO_DATE)
+    vi.mocked(getU2EWindowsDriverStatus).mockReturnValue(UP_TO_DATE)
     render()
     screen.getByText('Realtek USB FE Family Controller')
     screen.getByText('Realtek')
@@ -78,7 +73,7 @@ describe('U2EInformation', () => {
   })
 
   it('renders the not connected message and not display item titles when USB-to-Ethernet is not connected', () => {
-    mockGetU2EAdapterDevice.mockReturnValue(null)
+    vi.mocked(getU2EAdapterDevice).mockReturnValue(null)
     render()
     expect(screen.queryByText('Description')).not.toBeInTheDocument()
     expect(screen.queryByText('Manufacturer')).not.toBeInTheDocument()

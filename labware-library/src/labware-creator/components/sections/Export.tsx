@@ -10,7 +10,7 @@ import { FormAlerts } from '../alerts/FormAlerts'
 import { Dropdown } from '../Dropdown'
 import { LinkOut } from '../LinkOut'
 import { SectionBody } from './SectionBody'
-import styles from '../../styles.css'
+import styles from '../../styles.module.css'
 import { determineMultiChannelSupport } from '../../utils/determineMultiChannelSupport'
 
 const LABWARE_PDF_URL =

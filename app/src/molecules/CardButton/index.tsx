@@ -22,7 +22,7 @@ const CARD_BUTTON_STYLE = css`
   display: flex;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
-  border-radius: ${BORDERS.borderRadiusSize5};
+  border-radius: ${BORDERS.borderRadius40};
   padding: ${SPACING.spacing32};
   box-shadow: none;
 

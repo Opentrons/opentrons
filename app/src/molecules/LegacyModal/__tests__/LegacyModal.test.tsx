@@ -1,8 +1,10 @@
+//
 import * as React from 'react'
+import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
-
-import { COLORS, renderWithProviders } from '@opentrons/components'
-
+import { describe, it, expect, beforeEach } from 'vitest'
+import { COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { LegacyModal } from '..'
 
 const render = (props: React.ComponentProps<typeof LegacyModal>) => {

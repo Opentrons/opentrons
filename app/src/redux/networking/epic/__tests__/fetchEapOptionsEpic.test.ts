@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
@@ -9,10 +11,6 @@ const makeTriggerAction = (robotName: string) =>
   Actions.fetchEapOptions(robotName)
 
 describe('networking fetch eap option epic', () => {
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('calls GET /wifi/eap-options', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,

@@ -219,6 +219,9 @@ Movement Speeds
 
 In addition to instructing the robot where to move a pipette, you can also control the speed at which it moves. Speed controls can be applied either to all pipette motions or to movement along a particular axis.
 
+.. note::
+    Like all mechanical systems, Opentrons robots have resonant frequencies that depend on their construction and current configuration. It's possible to set a speed that causes your robot to resonate, producing louder sounds than typical operation. This is safe, but if you find it annoying, increase or decrease the speed slightly.
+
 .. _gantry_speed: 
 
 Gantry Speed

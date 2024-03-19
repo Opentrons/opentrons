@@ -25,7 +25,7 @@ import {
 import { ModuleDiagram } from './ModuleDiagram'
 import { FlexSlotMap } from './FlexSlotMap'
 import { isModuleWithCollisionIssue } from './utils'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
 import type { ModuleType, RobotType } from '@opentrons/shared-data'
 

@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import {
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,

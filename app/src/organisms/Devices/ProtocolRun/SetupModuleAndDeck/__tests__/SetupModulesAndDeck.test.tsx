@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { when } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { when } from 'vitest-when'
+import { describe, it, beforeEach, expect, vi } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { mockTemperatureModule } from '../../../../../redux/modules/__fixtures__'
 import {
@@ -19,38 +20,13 @@ import { SetupModulesList } from '../SetupModulesList'
 import { SetupModulesMap } from '../SetupModulesMap'
 import { SetupFixtureList } from '../SetupFixtureList'
 
-jest.mock('../../../hooks')
-jest.mock('../SetupModulesList')
-jest.mock('../SetupModulesMap')
-jest.mock('../SetupFixtureList')
-jest.mock('../../../../../redux/config')
-jest.mock('../../../../../resources/deck_configuration/utils')
+vi.mock('../../../hooks')
+vi.mock('../SetupModulesList')
+vi.mock('../SetupModulesMap')
+vi.mock('../SetupFixtureList')
+vi.mock('../../../../../redux/config')
+vi.mock('../../../../../resources/deck_configuration/utils')
 
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
->
-const mockUseUnmatchedModulesForProtocol = useUnmatchedModulesForProtocol as jest.MockedFunction<
-  typeof useUnmatchedModulesForProtocol
->
-const mockUseModuleCalibrationStatus = useModuleCalibrationStatus as jest.MockedFunction<
-  typeof useModuleCalibrationStatus
->
-const mockSetupModulesList = SetupModulesList as jest.MockedFunction<
-  typeof SetupModulesList
->
-const mockSetupFixtureList = SetupFixtureList as jest.MockedFunction<
-  typeof SetupFixtureList
->
-const mockSetupModulesMap = SetupModulesMap as jest.MockedFunction<
-  typeof SetupModulesMap
->
-const mockGetRequiredDeckConfig = getRequiredDeckConfig as jest.MockedFunction<
-  typeof getRequiredDeckConfig
->
-const mockGetIsFixtureMismatch = getIsFixtureMismatch as jest.MockedFunction<
-  typeof getIsFixtureMismatch
->
 const MOCK_ROBOT_NAME = 'otie'
 const MOCK_RUN_ID = '1'
 
@@ -66,77 +42,83 @@ describe('SetupModuleAndDeck', () => {
     props = {
       robotName: MOCK_ROBOT_NAME,
       runId: MOCK_RUN_ID,
-      expandLabwarePositionCheckStep: () => jest.fn(),
+      expandLabwarePositionCheckStep: () => vi.fn(),
       hasModules: true,
       protocolAnalysis: null,
     }
-    mockSetupFixtureList.mockReturnValue(<div>Mock setup fixture list</div>)
-    mockSetupModulesList.mockReturnValue(<div>Mock setup modules list</div>)
-    mockSetupModulesMap.mockReturnValue(<div>Mock setup modules map</div>)
-    when(mockUseRunHasStarted).calledWith(MOCK_RUN_ID).mockReturnValue(false)
-    when(mockUseUnmatchedModulesForProtocol)
+    vi.mocked(SetupFixtureList).mockReturnValue(
+      <div>Mock setup fixture list</div>
+    )
+    vi.mocked(SetupModulesList).mockReturnValue(
+      <div>Mock setup modules list</div>
+    )
+    vi.mocked(SetupModulesMap).mockReturnValue(
+      <div>Mock setup modules map</div>
+    )
+    vi.mocked(useRunHasStarted).mockReturnValue(false)
+    when(useUnmatchedModulesForProtocol)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
-    when(mockUseModuleCalibrationStatus)
+    when(useModuleCalibrationStatus)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({ complete: true })
-    when(mockUseIsFlex).calledWith(MOCK_ROBOT_NAME).mockReturnValue(false)
-    when(mockGetRequiredDeckConfig).mockReturnValue([])
-    when(mockGetIsFixtureMismatch).mockReturnValue(false)
+      .thenReturn({ complete: true })
+    when(useIsFlex).calledWith(MOCK_ROBOT_NAME).thenReturn(false)
+    vi.mocked(getRequiredDeckConfig).mockReturnValue([])
+    vi.mocked(getIsFixtureMismatch).mockReturnValue(false)
   })
 
   it('renders the list and map view buttons', () => {
-    const { getByRole } = render(props)
-    getByRole('button', { name: 'List View' })
-    getByRole('button', { name: 'Map View' })
+    render(props)
+    screen.getByRole('button', { name: 'List View' })
+    screen.getByRole('button', { name: 'Map View' })
   })
 
   it('should render Proceed to labware setup CTA that is enabled', () => {
-    const { getByRole } = render(props)
-    const button = getByRole('button', {
+    render(props)
+    const button = screen.getByRole('button', {
       name: 'Proceed to labware position check',
     })
     expect(button).toBeEnabled()
   })
 
   it('should render a disabled Proceed to labware setup CTA if the protocol requests modules and they are not all attached to the robot', () => {
-    when(mockUseUnmatchedModulesForProtocol)
+    when(useUnmatchedModulesForProtocol)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({
+      .thenReturn({
         missingModuleIds: ['foo'],
         remainingAttachedModules: [mockTemperatureModule],
       })
-    const { getByRole } = render(props)
-    const button = getByRole('button', {
+    render(props)
+    const button = screen.getByRole('button', {
       name: 'Proceed to labware position check',
     })
     expect(button).toBeDisabled()
   })
 
   it('should render a disabled Proceed to labware setup CTA if the protocol requests modules they are not all calibrated', () => {
-    when(mockUseModuleCalibrationStatus)
+    when(useModuleCalibrationStatus)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
-      .mockReturnValue({ complete: false })
-    const { getByRole } = render(props)
-    const button = getByRole('button', {
+      .thenReturn({ complete: false })
+    render(props)
+    const button = screen.getByRole('button', {
       name: 'Proceed to labware position check',
     })
     expect(button).toBeDisabled()
   })
 
   it('should render the SetupModulesList component when clicking List View', () => {
-    const { getByRole, getByText } = render(props)
-    const button = getByRole('button', { name: 'List View' })
+    render(props)
+    const button = screen.getByRole('button', { name: 'List View' })
     fireEvent.click(button)
-    getByText('Mock setup modules list')
+    screen.getByText('Mock setup modules list')
   })
 
   it('should render the SetupModulesList and SetupFixtureList component when clicking List View for Flex', () => {
-    when(mockUseIsFlex).calledWith(MOCK_ROBOT_NAME).mockReturnValue(true)
-    when(mockGetRequiredDeckConfig).mockReturnValue([
+    when(useIsFlex).calledWith(MOCK_ROBOT_NAME).thenReturn(true)
+    vi.mocked(getRequiredDeckConfig).mockReturnValue([
       {
         cutoutId: 'cutoutA1',
         cutoutFixtureId: 'trashBinAdapter',
@@ -145,33 +127,33 @@ describe('SetupModuleAndDeck', () => {
         missingLabwareDisplayName: null,
       },
     ])
-    const { getByRole, getByText } = render(props)
-    const button = getByRole('button', { name: 'List View' })
+    render(props)
+    const button = screen.getByRole('button', { name: 'List View' })
     fireEvent.click(button)
-    getByText('Mock setup modules list')
-    getByText('Mock setup fixture list')
+    screen.getByText('Mock setup modules list')
+    screen.getByText('Mock setup fixture list')
   })
 
   it('should not render the SetupFixtureList component when there are no required fixtures', () => {
-    when(mockUseIsFlex).calledWith(MOCK_ROBOT_NAME).mockReturnValue(true)
-    const { getByRole, getByText, queryByText } = render(props)
-    const button = getByRole('button', { name: 'List View' })
+    when(useIsFlex).calledWith(MOCK_ROBOT_NAME).thenReturn(true)
+    render(props)
+    const button = screen.getByRole('button', { name: 'List View' })
     fireEvent.click(button)
-    getByText('Mock setup modules list')
-    expect(queryByText('Mock setup fixture list')).toBeNull()
+    screen.getByText('Mock setup modules list')
+    expect(screen.queryByText('Mock setup fixture list')).toBeNull()
   })
 
   it('should render the SetupModulesMap component when clicking Map View', () => {
-    const { getByRole, getByText } = render(props)
-    const button = getByRole('button', { name: 'Map View' })
+    render(props)
+    const button = screen.getByRole('button', { name: 'Map View' })
     fireEvent.click(button)
-    getByText('Mock setup modules map')
+    screen.getByText('Mock setup modules map')
   })
 
   it('should render disabled button when deck config is not configured or there is a conflict', () => {
-    when(mockGetIsFixtureMismatch).mockReturnValue(true)
-    const { getByRole } = render(props)
-    const button = getByRole('button', {
+    vi.mocked(getIsFixtureMismatch).mockReturnValue(true)
+    render(props)
+    const button = screen.getByRole('button', {
       name: 'Proceed to labware position check',
     })
     expect(button).toBeDisabled()

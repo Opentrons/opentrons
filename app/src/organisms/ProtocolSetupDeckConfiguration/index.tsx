@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -21,7 +22,7 @@ import { ChildNavigation } from '../ChildNavigation'
 import { AddFixtureModal } from '../DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { DeckConfigurationDiscardChangesModal } from '../DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 
 import type {
   CutoutFixtureId,
@@ -84,22 +85,25 @@ export function ProtocolSetupDeckConfiguration({
 
   return (
     <>
-      <Portal level="top">
-        {showDiscardChangeModal ? (
-          <DeckConfigurationDiscardChangesModal
-            setShowConfirmationModal={setShowDiscardChangeModal}
-          />
-        ) : null}
-        {showConfigurationModal && cutoutId != null ? (
-          <AddFixtureModal
-            cutoutId={cutoutId}
-            setShowAddFixtureModal={setShowConfigurationModal}
-            providedFixtureOptions={providedFixtureOptions}
-            setCurrentDeckConfig={setCurrentDeckConfig}
-            isOnDevice
-          />
-        ) : null}
-      </Portal>
+      {createPortal(
+        <>
+          {showDiscardChangeModal ? (
+            <DeckConfigurationDiscardChangesModal
+              setShowConfirmationModal={setShowDiscardChangeModal}
+            />
+          ) : null}
+          {showConfigurationModal && cutoutId != null ? (
+            <AddFixtureModal
+              cutoutId={cutoutId}
+              setShowAddFixtureModal={setShowConfigurationModal}
+              providedFixtureOptions={providedFixtureOptions}
+              setCurrentDeckConfig={setCurrentDeckConfig}
+              isOnDevice
+            />
+          ) : null}
+        </>,
+        getTopPortalEl()
+      )}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <ChildNavigation
           header={t('devices_landing:deck_configuration')}

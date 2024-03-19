@@ -249,13 +249,16 @@ def test_get_next_tip(
             labware_id="cool-labware",
             num_tips=8,
             starting_tip_name="B1",
+            nozzle_map=None,
         )
     ).then_return("A2")
 
     starting_tip = WellCore(
         name="B1", labware_id="cool-labware", engine_client=mock_engine_client
     )
-    result = subject.get_next_tip(num_tips=8, starting_tip=starting_tip)
+    result = subject.get_next_tip(
+        num_tips=8, starting_tip=starting_tip, nozzle_map=None
+    )
 
     assert result == "A2"
 

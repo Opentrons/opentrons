@@ -1,5 +1,5 @@
 import * as React from 'react'
-import assert from 'assert'
+
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
@@ -10,9 +10,8 @@ import { selectors as labwareIngredSelectors } from '../../../labware-ingred/sel
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { PDTitledList, PDListItem } from '../../lists'
 import { EditableTextField } from '../../EditableTextField'
+import styles from './labwareDetailsCard.module.css'
 import type { ThunkDispatch } from '../../../types'
-
-import styles from './labwareDetailsCard.css'
 
 export function LabwareDetailsCard(): JSX.Element {
   const { t } = useTranslation('form')
@@ -27,13 +26,13 @@ export function LabwareDetailsCard(): JSX.Element {
       ? getLabwareDisplayName(labwareEntities[labwareId].def)
       : null
 
-  assert(
+  console.assert(
     labwareId,
     'Expected labware id to exist in connected labware details card'
   )
 
   const renameLabware = (name: string): void => {
-    assert(
+    console.assert(
       labwareId,
       'renameLabware in LabwareDetailsCard expected a labwareId'
     )
@@ -64,7 +63,11 @@ export function LabwareDetailsCard(): JSX.Element {
             {t('generic.nickname')}
           </span>
           <EditableTextField
-            value={labwareNicknamesById[labwareId] ?? 'Unnamed Labware'}
+            value={
+              labwareId != null && labwareNicknamesById[labwareId] != null
+                ? labwareNicknamesById[labwareId]
+                : 'Unnamed Labware'
+            }
             saveEdit={renameLabware}
           />
         </div>

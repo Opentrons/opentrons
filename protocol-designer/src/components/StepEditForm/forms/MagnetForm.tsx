@@ -8,7 +8,7 @@ import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { maskField } from '../../../steplist/fieldLevel'
 import { TextField, RadioGroupField } from '../fields'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 import { StepFormProps } from '../types'
 

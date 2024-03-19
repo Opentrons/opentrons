@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { Navigation } from '../../organisms/Navigation'
 import { AttachedInstrumentMountItem } from '../../organisms/InstrumentMountItem'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
@@ -30,7 +29,7 @@ export const InstrumentsDashboard = (): JSX.Element => {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Navigation routes={onDeviceDisplayRoutes} />
+      <Navigation />
       <Flex
         paddingX={SPACING.spacing40}
         flexDirection={DIRECTION_COLUMN}

@@ -4,6 +4,7 @@ import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
+import { vi } from 'vitest'
 import { render, RenderResult } from '@testing-library/react'
 import { createStore } from 'redux'
 
@@ -23,11 +24,11 @@ export function renderWithProviders<State>(
   const { initialState = {}, i18nInstance = null } = options || {}
 
   const store: Store<State> = createStore(
-    jest.fn(),
+    vi.fn(),
     initialState as PreloadedState<State>
   )
-  store.dispatch = jest.fn()
-  store.getState = jest.fn(() => initialState) as () => State
+  store.dispatch = vi.fn()
+  store.getState = vi.fn(() => initialState) as () => State
 
   const queryClient = new QueryClient()
 

@@ -1,4 +1,5972 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p10_multi_v1 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": -1,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2,
+  },
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 5,
+    "valuesByApiLevel": {
+      "2.0": 5,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 10,
+    "valuesByApiLevel": {
+      "2.0": 10,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P10 8-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 10,
+  "minVolume": 1,
+  "model": "p10_multi_v1",
+  "modelOffset": [
+    0,
+    31.5,
+    -25.8,
+  ],
+  "name": "p10_multi",
+  "nozzleOffset": [
+    0,
+    31.5,
+    0.8,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.4,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 33,
+  },
+  "tipOverlap": {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          1.893415617,
+          -1.1069,
+          3.042593193,
+        ],
+        [
+          2.497849452,
+          -0.1888,
+          1.30410391,
+        ],
+        [
+          5.649462387,
+          -0.0081,
+          0.8528667891,
+        ],
+        [
+          12.74444519,
+          -0.0018,
+          0.8170558891,
+        ],
+      ],
+      "dispense": [
+        [
+          12.74444519,
+          0,
+          0.8058688085,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          1.438649211,
+          0.01931415115,
+          0.691538317,
+        ],
+        [
+          1.836824579,
+          0.03868955123,
+          0.6636639129,
+        ],
+        [
+          2.960052684,
+          0.00470371018,
+          0.7260899411,
+        ],
+        [
+          4.487508789,
+          0.005175245625,
+          0.7246941713,
+        ],
+        [
+          10.59661421,
+          0.001470408978,
+          0.7413196584,
+        ],
+      ],
+      "dispense": [
+        [
+          12.74444519,
+          0,
+          0.8058688085,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p10_multi_v1.3 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": -2.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 0.5,
+  },
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 5,
+    "valuesByApiLevel": {
+      "2.0": 5,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 10,
+    "valuesByApiLevel": {
+      "2.0": 10,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P10 8-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -5.5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 10,
+  "minVolume": 1,
+  "model": "p10_multi_v1.3",
+  "modelOffset": [
+    0,
+    31.5,
+    -25.8,
+  ],
+  "name": "p10_multi",
+  "nozzleOffset": [
+    0,
+    31.5,
+    0.8,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.4,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 33,
+  },
+  "tipOverlap": {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          1.893415617,
+          -1.1069,
+          3.042593193,
+        ],
+        [
+          2.497849452,
+          -0.1888,
+          1.30410391,
+        ],
+        [
+          5.649462387,
+          -0.0081,
+          0.8528667891,
+        ],
+        [
+          12.74444519,
+          -0.0018,
+          0.8170558891,
+        ],
+      ],
+      "dispense": [
+        [
+          12.74444519,
+          0,
+          0.8058688085,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          1.438649211,
+          0.01931415115,
+          0.691538317,
+        ],
+        [
+          1.836824579,
+          0.03868955123,
+          0.6636639129,
+        ],
+        [
+          2.960052684,
+          0.00470371018,
+          0.7260899411,
+        ],
+        [
+          4.487508789,
+          0.005175245625,
+          0.7246941713,
+        ],
+        [
+          10.59661421,
+          0.001470408978,
+          0.7413196584,
+        ],
+      ],
+      "dispense": [
+        [
+          12.74444519,
+          0,
+          0.8058688085,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p10_multi_v1.4 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": -1,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2,
+  },
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 5,
+    "valuesByApiLevel": {
+      "2.0": 5,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 10,
+    "valuesByApiLevel": {
+      "2.0": 10,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P10 8-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4.5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 10,
+  "minVolume": 1,
+  "model": "p10_multi_v1.4",
+  "modelOffset": [
+    0,
+    31.5,
+    -25.8,
+  ],
+  "name": "p10_multi",
+  "nozzleOffset": [
+    0,
+    31.5,
+    0.8,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.4,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 33,
+  },
+  "tipOverlap": {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          1.893415617,
+          -1.1069,
+          3.042593193,
+        ],
+        [
+          2.497849452,
+          -0.1888,
+          1.30410391,
+        ],
+        [
+          5.649462387,
+          -0.0081,
+          0.8528667891,
+        ],
+        [
+          12.74444519,
+          -0.0018,
+          0.8170558891,
+        ],
+      ],
+      "dispense": [
+        [
+          12.74444519,
+          0,
+          0.8058688085,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          1.438649211,
+          0.01931415115,
+          0.691538317,
+        ],
+        [
+          1.836824579,
+          0.03868955123,
+          0.6636639129,
+        ],
+        [
+          2.960052684,
+          0.00470371018,
+          0.7260899411,
+        ],
+        [
+          4.487508789,
+          0.005175245625,
+          0.7246941713,
+        ],
+        [
+          10.59661421,
+          0.001470408978,
+          0.7413196584,
+        ],
+      ],
+      "dispense": [
+        [
+          12.74444519,
+          0,
+          0.8058688085,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p10_multi_v1.5 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": -1,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2,
+  },
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 5,
+    "valuesByApiLevel": {
+      "2.0": 5,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 10,
+    "valuesByApiLevel": {
+      "2.0": 10,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P10 8-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4.5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 10,
+  "minVolume": 1,
+  "model": "p10_multi_v1.5",
+  "modelOffset": [
+    0,
+    31.5,
+    -25.8,
+  ],
+  "name": "p10_multi",
+  "nozzleOffset": [
+    0,
+    31.5,
+    0.8,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.55,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 3,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "dropTipShake",
+    "doubleDropTip",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 33,
+  },
+  "tipOverlap": {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          1.774444444,
+          -0.1917910448,
+          1.2026,
+        ],
+        [
+          2.151481481,
+          -0.0706286837,
+          1.0125,
+        ],
+        [
+          2.898518519,
+          -0.04343083788,
+          0.954,
+        ],
+        [
+          6.373333333,
+          -0.00905990194,
+          0.8544,
+        ],
+        [
+          11.00259259,
+          -0.002325900358,
+          0.8115,
+        ],
+      ],
+      "dispense": [
+        [
+          12.74444519,
+          0,
+          0.8058688085,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p10_single_v1 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": -1,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 5,
+    "valuesByApiLevel": {
+      "2.0": 5,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 10,
+    "valuesByApiLevel": {
+      "2.0": 10,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P10 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4.5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 10,
+  "minVolume": 1,
+  "model": "p10_single_v1",
+  "modelOffset": [
+    0,
+    0,
+    -13,
+  ],
+  "name": "p10_single",
+  "nozzleOffset": [
+    0,
+    0,
+    12,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.3,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 33,
+  },
+  "tipOverlap": {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          1.8263,
+          -0.0958,
+          1.088,
+        ],
+        [
+          2.5222,
+          -0.104,
+          1.1031,
+        ],
+        [
+          3.2354,
+          -0.0447,
+          0.9536,
+        ],
+        [
+          3.9984,
+          -0.012,
+          0.8477,
+        ],
+        [
+          12.5135,
+          -0.0021,
+          0.8079,
+        ],
+      ],
+      "dispense": [
+        [
+          12.5135,
+          0,
+          0.7945,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          1.438649211,
+          0.01931415115,
+          0.691538317,
+        ],
+        [
+          1.836824579,
+          0.03868955123,
+          0.6636639129,
+        ],
+        [
+          2.960052684,
+          0.00470371018,
+          0.7260899411,
+        ],
+        [
+          4.487508789,
+          0.005175245625,
+          0.7246941713,
+        ],
+        [
+          10.59661421,
+          0.001470408978,
+          0.7413196584,
+        ],
+      ],
+      "dispense": [
+        [
+          12.5135,
+          0,
+          0.7945,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p10_single_v1.3 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": -2.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 0.5,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 5,
+    "valuesByApiLevel": {
+      "2.0": 5,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 10,
+    "valuesByApiLevel": {
+      "2.0": 10,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P10 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -6,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 10,
+  "minVolume": 1,
+  "model": "p10_single_v1.3",
+  "modelOffset": [
+    0,
+    0,
+    -13,
+  ],
+  "name": "p10_single",
+  "nozzleOffset": [
+    0,
+    0,
+    12,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.3,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 33,
+  },
+  "tipOverlap": {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          1.8263,
+          -0.0958,
+          1.088,
+        ],
+        [
+          2.5222,
+          -0.104,
+          1.1031,
+        ],
+        [
+          3.2354,
+          -0.0447,
+          0.9536,
+        ],
+        [
+          3.9984,
+          -0.012,
+          0.8477,
+        ],
+        [
+          12.5135,
+          -0.0021,
+          0.8079,
+        ],
+      ],
+      "dispense": [
+        [
+          12.5135,
+          0,
+          0.7945,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          1.438649211,
+          0.01931415115,
+          0.691538317,
+        ],
+        [
+          1.836824579,
+          0.03868955123,
+          0.6636639129,
+        ],
+        [
+          2.960052684,
+          0.00470371018,
+          0.7260899411,
+        ],
+        [
+          4.487508789,
+          0.005175245625,
+          0.7246941713,
+        ],
+        [
+          10.59661421,
+          0.001470408978,
+          0.7413196584,
+        ],
+      ],
+      "dispense": [
+        [
+          12.5135,
+          0,
+          0.7945,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p10_single_v1.4 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": -0.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2.5,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 5,
+    "valuesByApiLevel": {
+      "2.0": 5,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 10,
+    "valuesByApiLevel": {
+      "2.0": 10,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P10 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -5.2,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 10,
+  "minVolume": 1,
+  "model": "p10_single_v1.4",
+  "modelOffset": [
+    0,
+    0,
+    -13,
+  ],
+  "name": "p10_single",
+  "nozzleOffset": [
+    0,
+    0,
+    12,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.3,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 33,
+  },
+  "tipOverlap": {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          1.8263,
+          -0.0958,
+          1.088,
+        ],
+        [
+          2.5222,
+          -0.104,
+          1.1031,
+        ],
+        [
+          3.2354,
+          -0.0447,
+          0.9536,
+        ],
+        [
+          3.9984,
+          -0.012,
+          0.8477,
+        ],
+        [
+          12.5135,
+          -0.0021,
+          0.8079,
+        ],
+      ],
+      "dispense": [
+        [
+          12.5135,
+          0,
+          0.7945,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          1.438649211,
+          0.01931415115,
+          0.691538317,
+        ],
+        [
+          1.836824579,
+          0.03868955123,
+          0.6636639129,
+        ],
+        [
+          2.960052684,
+          0.00470371018,
+          0.7260899411,
+        ],
+        [
+          4.487508789,
+          0.005175245625,
+          0.7246941713,
+        ],
+        [
+          10.59661421,
+          0.001470408978,
+          0.7413196584,
+        ],
+      ],
+      "dispense": [
+        [
+          12.5135,
+          0,
+          0.7945,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p10_single_v1.5 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": -0.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2.5,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 5,
+    "valuesByApiLevel": {
+      "2.0": 5,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 10,
+    "valuesByApiLevel": {
+      "2.0": 10,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P10 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -5.2,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 10,
+  "minVolume": 1,
+  "model": "p10_single_v1.5",
+  "modelOffset": [
+    0,
+    0,
+    -13,
+  ],
+  "name": "p10_single",
+  "nozzleOffset": [
+    0,
+    0,
+    12,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.3,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 33,
+  },
+  "tipOverlap": {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          1.553425807,
+          -0.03427618068,
+          0.83,
+        ],
+        [
+          1.934976526,
+          -0.007134812859,
+          0.7878,
+        ],
+        [
+          2.689843897,
+          -0.007238069768,
+          0.788,
+        ],
+        [
+          6.161165493,
+          0.0004663523509,
+          0.7673,
+        ],
+        [
+          10.7963169,
+          0.0002200157553,
+          0.7688,
+        ],
+      ],
+      "dispense": [
+        [
+          12.5135,
+          0,
+          0.7945,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p50_multi_v1 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 2,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2.5,
+  },
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 25,
+    "valuesByApiLevel": {
+      "2.0": 25,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 50,
+    "valuesByApiLevel": {
+      "2.0": 50,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P50 8-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -3.5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 50,
+  "minVolume": 5,
+  "model": "p50_multi_v1",
+  "modelOffset": [
+    0,
+    31.5,
+    -25.8,
+  ],
+  "name": "p50_multi",
+  "nozzleOffset": [
+    0,
+    31.5,
+    0.8,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.6,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          12.29687531,
+          -0.0049,
+          3.134703694,
+        ],
+        [
+          50,
+          -0.0002,
+          3.077116024,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          3.06368702,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          5.5768667,
+          0.076142366,
+          2.363797525,
+        ],
+        [
+          7.0999333,
+          0.0338396036,
+          2.599714392,
+        ],
+        [
+          11.5943825,
+          0.0130432679,
+          2.747366988,
+        ],
+        [
+          17.6461325,
+          0.007010609879,
+          2.817311933,
+        ],
+        [
+          50,
+          0.002620115513,
+          2.894787178,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          3.06368702,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p50_multi_v1.3 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 0.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2,
+  },
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 25,
+    "valuesByApiLevel": {
+      "2.0": 25,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 50,
+    "valuesByApiLevel": {
+      "2.0": 50,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P50 8-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 50,
+  "minVolume": 5,
+  "model": "p50_multi_v1.3",
+  "modelOffset": [
+    0,
+    31.5,
+    -25.8,
+  ],
+  "name": "p50_multi",
+  "nozzleOffset": [
+    0,
+    31.5,
+    0.8,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.6,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          12.29687531,
+          -0.0049,
+          3.134703694,
+        ],
+        [
+          50,
+          -0.0002,
+          3.077116024,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          3.06368702,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          5.5768667,
+          0.076142366,
+          2.363797525,
+        ],
+        [
+          7.0999333,
+          0.0338396036,
+          2.599714392,
+        ],
+        [
+          11.5943825,
+          0.0130432679,
+          2.747366988,
+        ],
+        [
+          17.6461325,
+          0.007010609879,
+          2.817311933,
+        ],
+        [
+          50,
+          0.002620115513,
+          2.894787178,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          3.06368702,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p50_multi_v1.4 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 0.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2,
+  },
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 25,
+    "valuesByApiLevel": {
+      "2.0": 25,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 50,
+    "valuesByApiLevel": {
+      "2.0": 50,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P50 8-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 50,
+  "minVolume": 5,
+  "model": "p50_multi_v1.4",
+  "modelOffset": [
+    0,
+    31.5,
+    -25.8,
+  ],
+  "name": "p50_multi",
+  "nozzleOffset": [
+    0,
+    31.5,
+    0.8,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.6,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          12.29687531,
+          -0.0049,
+          3.134703694,
+        ],
+        [
+          50,
+          -0.0002,
+          3.077116024,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          3.06368702,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          5.5768667,
+          0.076142366,
+          2.363797525,
+        ],
+        [
+          7.0999333,
+          0.0338396036,
+          2.599714392,
+        ],
+        [
+          11.5943825,
+          0.0130432679,
+          2.747366988,
+        ],
+        [
+          17.6461325,
+          0.007010609879,
+          2.817311933,
+        ],
+        [
+          50,
+          0.002620115513,
+          2.894787178,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          3.06368702,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p50_multi_v1.5 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 0.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2,
+  },
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 25,
+    "valuesByApiLevel": {
+      "2.0": 25,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 50,
+    "valuesByApiLevel": {
+      "2.0": 50,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P50 8-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 50,
+  "minVolume": 5,
+  "model": "p50_multi_v1.5",
+  "modelOffset": [
+    0,
+    31.5,
+    -25.8,
+  ],
+  "name": "p50_multi",
+  "nozzleOffset": [
+    0,
+    31.5,
+    0.8,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.8,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 3,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "dropTipShake",
+    "doubleDropTip",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          6.190392157,
+          -0.01092438778,
+          3.1628,
+        ],
+        [
+          7.639705882,
+          -0.02712575255,
+          3.2631,
+        ],
+        [
+          10.69666667,
+          0.0001007939816,
+          3.0551,
+        ],
+        [
+          24.49343137,
+          0.0003978066956,
+          3.0519,
+        ],
+        [
+          50,
+          -0.00001501363238,
+          3.062,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          3.06368702,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p50_single_v1 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 2,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2.01,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 25,
+    "valuesByApiLevel": {
+      "2.0": 25,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 50,
+    "valuesByApiLevel": {
+      "2.0": 50,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P50 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4.5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 50,
+  "minVolume": 5,
+  "model": "p50_single_v1",
+  "modelOffset": [
+    0,
+    0,
+    0,
+  ],
+  "name": "p50_single",
+  "nozzleOffset": [
+    0,
+    0,
+    25,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.3,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          11.79687499,
+          -0.0098,
+          3.064988953,
+        ],
+        [
+          50,
+          -0.0004,
+          2.954068131,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          2.931601299,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          5.538952382,
+          0.04994568474,
+          2.492829422,
+        ],
+        [
+          7.050333334,
+          0.0335171238,
+          2.583826438,
+        ],
+        [
+          11.5397619,
+          0.01443549911,
+          2.718358253,
+        ],
+        [
+          17.55071427,
+          0.006684226987,
+          2.807806088,
+        ],
+        [
+          50,
+          0.001789563193,
+          2.893710933,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          2.931601299,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p50_single_v1.3 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 0.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 25,
+    "valuesByApiLevel": {
+      "2.0": 25,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 50,
+    "valuesByApiLevel": {
+      "2.0": 50,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P50 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -6,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 50,
+  "minVolume": 5,
+  "model": "p50_single_v1.3",
+  "modelOffset": [
+    0,
+    0,
+    0,
+  ],
+  "name": "p50_single",
+  "nozzleOffset": [
+    0,
+    0,
+    25,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.3,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          11.79687499,
+          -0.0098,
+          3.064988953,
+        ],
+        [
+          50,
+          -0.0004,
+          2.954068131,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          2.931601299,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          5.538952382,
+          0.04994568474,
+          2.492829422,
+        ],
+        [
+          7.050333334,
+          0.0335171238,
+          2.583826438,
+        ],
+        [
+          11.5397619,
+          0.01443549911,
+          2.718358253,
+        ],
+        [
+          17.55071427,
+          0.006684226987,
+          2.807806088,
+        ],
+        [
+          50,
+          0.001789563193,
+          2.893710933,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          2.931601299,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p50_single_v1.4 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 0.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 25,
+    "valuesByApiLevel": {
+      "2.0": 25,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 50,
+    "valuesByApiLevel": {
+      "2.0": 50,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P50 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 50,
+  "minVolume": 5,
+  "model": "p50_single_v1.4",
+  "modelOffset": [
+    0,
+    0,
+    0,
+  ],
+  "name": "p50_single",
+  "nozzleOffset": [
+    0,
+    0,
+    25,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.3,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          11.79687499,
+          -0.0098,
+          3.064988953,
+        ],
+        [
+          50,
+          -0.0004,
+          2.954068131,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          2.931601299,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          5.538952382,
+          0.04994568474,
+          2.492829422,
+        ],
+        [
+          7.050333334,
+          0.0335171238,
+          2.583826438,
+        ],
+        [
+          11.5397619,
+          0.01443549911,
+          2.718358253,
+        ],
+        [
+          17.55071427,
+          0.006684226987,
+          2.807806088,
+        ],
+        [
+          50,
+          0.001789563193,
+          2.893710933,
+        ],
+      ],
+      "dispense": [
+        [
+          50,
+          0,
+          2.931601299,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p300_multi_v1 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 3,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 3.5,
+  },
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 150,
+    "valuesByApiLevel": {
+      "2.0": 150,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 300,
+    "valuesByApiLevel": {
+      "2.0": 300,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P300 8-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -2,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 300,
+  "minVolume": 30,
+  "model": "p300_multi_v1",
+  "modelOffset": [
+    0,
+    31.5,
+    -25.8,
+  ],
+  "name": "p300_multi",
+  "nozzleOffset": [
+    0,
+    31.5,
+    0.8,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.6,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          57.25698968,
+          0.017,
+          18.132,
+        ],
+        [
+          309.2612689,
+          0.001,
+          19.03,
+        ],
+      ],
+      "dispense": [
+        [
+          309.2612689,
+          0,
+          19.29389273,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p300_multi_v1.3 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 1.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 3.5,
+  },
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 150,
+    "valuesByApiLevel": {
+      "2.0": 150,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 300,
+    "valuesByApiLevel": {
+      "2.0": 300,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P300 8-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -3.5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 300,
+  "minVolume": 30,
+  "model": "p300_multi_v1.3",
+  "modelOffset": [
+    0,
+    31.5,
+    -25.8,
+  ],
+  "name": "p300_multi",
+  "nozzleOffset": [
+    0,
+    31.5,
+    0.8,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.6,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          57.25698968,
+          0.017,
+          18.132,
+        ],
+        [
+          309.2612689,
+          0.001,
+          19.03,
+        ],
+      ],
+      "dispense": [
+        [
+          309.2612689,
+          0,
+          19.29389273,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p300_multi_v1.4 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 1.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 3.5,
+  },
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 150,
+    "valuesByApiLevel": {
+      "2.0": 150,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 300,
+    "valuesByApiLevel": {
+      "2.0": 300,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P300 8-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -3.5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm",
+    "value": 5,
+  },
+  "maxVolume": 300,
+  "minVolume": 30,
+  "model": "p300_multi_v1.4",
+  "modelOffset": [
+    0,
+    31.5,
+    -25.8,
+  ],
+  "name": "p300_multi",
+  "nozzleOffset": [
+    0,
+    31.5,
+    0.8,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.6,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          57.25698968,
+          0.017,
+          18.132,
+        ],
+        [
+          309.2612689,
+          0.001,
+          19.03,
+        ],
+      ],
+      "dispense": [
+        [
+          309.2612689,
+          0,
+          19.29389273,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p300_multi_v1.5 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 1.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 3.5,
+  },
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 150,
+    "valuesByApiLevel": {
+      "2.0": 150,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 300,
+    "valuesByApiLevel": {
+      "2.0": 300,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P300 8-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -3.5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm",
+    "value": 5,
+  },
+  "maxVolume": 300,
+  "minVolume": 30,
+  "model": "p300_multi_v1.5",
+  "modelOffset": [
+    0,
+    31.5,
+    -25.8,
+  ],
+  "name": "p300_multi",
+  "nozzleOffset": [
+    0,
+    31.5,
+    0.8,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.9,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 3,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "dropTipShake",
+    "doubleDropTip",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          57.25698968,
+          0.017,
+          18.132,
+        ],
+        [
+          309.2612689,
+          0.001,
+          19.03,
+        ],
+      ],
+      "dispense": [
+        [
+          309.2612689,
+          0,
+          19.29389273,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p300_single_v1 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 0,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 1.5,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 150,
+    "valuesByApiLevel": {
+      "2.0": 150,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 300,
+    "valuesByApiLevel": {
+      "2.0": 300,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P300 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 300,
+  "minVolume": 30,
+  "model": "p300_single_v1",
+  "modelOffset": [
+    0,
+    0,
+    0,
+  ],
+  "name": "p300_single",
+  "nozzleOffset": [
+    0,
+    0,
+    25,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.3,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          36.19844973,
+          0.043,
+          16.548,
+        ],
+        [
+          54.98518519,
+          0.012,
+          17.658,
+        ],
+        [
+          73.90077516,
+          0.008,
+          17.902,
+        ],
+        [
+          111.8437953,
+          0.004,
+          18.153,
+        ],
+        [
+          302.3895337,
+          0.001,
+          18.23,
+        ],
+      ],
+      "dispense": [
+        [
+          302.3895337,
+          0,
+          18.83156277,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          53.958,
+          0.0252,
+          16.6268,
+        ],
+        [
+          73.0217,
+          0.0141,
+          17.2234,
+        ],
+        [
+          82.6834,
+          0.0123,
+          17.3586,
+        ],
+        [
+          120.7877,
+          0.0055,
+          17.9214,
+        ],
+        [
+          197.3909,
+          0.0028,
+          18.2415,
+        ],
+        [
+          300,
+          0.0014,
+          18.5235,
+        ],
+      ],
+      "dispense": [
+        [
+          302.3895337,
+          0,
+          18.83156277,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p300_single_v1.3 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": -1.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 1.5,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 150,
+    "valuesByApiLevel": {
+      "2.0": 150,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 300,
+    "valuesByApiLevel": {
+      "2.0": 300,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P300 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -5.5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 300,
+  "minVolume": 30,
+  "model": "p300_single_v1.3",
+  "modelOffset": [
+    0,
+    0,
+    0,
+  ],
+  "name": "p300_single",
+  "nozzleOffset": [
+    0,
+    0,
+    25,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.3,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          36.19844973,
+          0.043,
+          16.548,
+        ],
+        [
+          54.98518519,
+          0.012,
+          17.658,
+        ],
+        [
+          73.90077516,
+          0.008,
+          17.902,
+        ],
+        [
+          111.8437953,
+          0.004,
+          18.153,
+        ],
+        [
+          302.3895337,
+          0.001,
+          18.23,
+        ],
+      ],
+      "dispense": [
+        [
+          302.3895337,
+          0,
+          18.83156277,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          53.958,
+          0.0252,
+          16.6268,
+        ],
+        [
+          73.0217,
+          0.0141,
+          17.2234,
+        ],
+        [
+          82.6834,
+          0.0123,
+          17.3586,
+        ],
+        [
+          120.7877,
+          0.0055,
+          17.9214,
+        ],
+        [
+          197.3909,
+          0.0028,
+          18.2415,
+        ],
+        [
+          300,
+          0.0014,
+          18.5235,
+        ],
+      ],
+      "dispense": [
+        [
+          302.3895337,
+          0,
+          18.83156277,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p300_single_v1.4 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 0,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 3,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 150,
+    "valuesByApiLevel": {
+      "2.0": 150,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 300,
+    "valuesByApiLevel": {
+      "2.0": 300,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P300 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4.5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 300,
+  "minVolume": 30,
+  "model": "p300_single_v1.4",
+  "modelOffset": [
+    0,
+    0,
+    0,
+  ],
+  "name": "p300_single",
+  "nozzleOffset": [
+    0,
+    0,
+    25,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.3,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          36.19844973,
+          0.043,
+          16.548,
+        ],
+        [
+          54.98518519,
+          0.012,
+          17.658,
+        ],
+        [
+          73.90077516,
+          0.008,
+          17.902,
+        ],
+        [
+          111.8437953,
+          0.004,
+          18.153,
+        ],
+        [
+          302.3895337,
+          0.001,
+          18.23,
+        ],
+      ],
+      "dispense": [
+        [
+          302.3895337,
+          0,
+          18.83156277,
+        ],
+      ],
+    },
+    {
+      "aspirate": [
+        [
+          53.958,
+          0.0252,
+          16.6268,
+        ],
+        [
+          73.0217,
+          0.0141,
+          17.2234,
+        ],
+        [
+          82.6834,
+          0.0123,
+          17.3586,
+        ],
+        [
+          120.7877,
+          0.0055,
+          17.9214,
+        ],
+        [
+          197.3909,
+          0.0028,
+          18.2415,
+        ],
+        [
+          300,
+          0.0014,
+          18.5235,
+        ],
+      ],
+      "dispense": [
+        [
+          302.3895337,
+          0,
+          18.83156277,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p300_single_v1.5 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 0,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 3,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 150,
+    "valuesByApiLevel": {
+      "2.0": 150,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 300,
+    "valuesByApiLevel": {
+      "2.0": 300,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P300 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4.5,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 300,
+  "minVolume": 30,
+  "model": "p300_single_v1.5",
+  "modelOffset": [
+    0,
+    0,
+    0,
+  ],
+  "name": "p300_single",
+  "nozzleOffset": [
+    0,
+    0,
+    25,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 10,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.3,
+  },
+  "quirks": [
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 51.7,
+  },
+  "tipOverlap": {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          35.11266179,
+          0.03721315938,
+          16.2497,
+        ],
+        [
+          44.37338506,
+          0.02084320206,
+          16.8245,
+        ],
+        [
+          63.12001468,
+          0.01519931266,
+          17.0749,
+        ],
+        [
+          148.3020792,
+          0.005910516464,
+          17.6612,
+        ],
+        [
+          224.5387262,
+          0.00227975152,
+          18.1997,
+        ],
+        [
+          301.049323,
+          0.001359578667,
+          18.4063,
+        ],
+      ],
+      "dispense": [
+        [
+          302.3895337,
+          0,
+          18.83156277,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p1000_single_v1 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 3,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 2000,
+    "min": 50,
+    "value": 500,
+    "valuesByApiLevel": {
+      "2.0": 500,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 2000,
+    "min": 50,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_1000ul/1",
+    "opentrons/opentrons_96_filtertiprack_1000ul/1",
+    "opentrons/geb_96_tiprack_1000ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P1000 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -2.2,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 1000,
+  "minVolume": 100,
+  "model": "p1000_single_v1",
+  "modelOffset": [
+    0,
+    0,
+    20,
+  ],
+  "name": "p1000_single",
+  "nozzleOffset": [
+    0,
+    0,
+    45,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 15,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "pickupTipShake",
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 76.7,
+  },
+  "tipOverlap": {
+    "default": 7.95,
+    "opentrons/eppendorf_96_tiprack_1000ul_eptips/1": 0,
+    "opentrons/geb_96_tiprack_1000ul/1": 11.2,
+    "opentrons/opentrons_96_filtertiprack_1000ul/1": 7.95,
+    "opentrons/opentrons_96_tiprack_1000ul/1": 7.95,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          148.9157,
+          0.0213,
+          56.3986,
+        ],
+        [
+          210.8237,
+          0.0108,
+          57.9568,
+        ],
+        [
+          241.2405,
+          0.0025,
+          59.717,
+        ],
+        [
+          365.2719,
+          0.0046,
+          59.2043,
+        ],
+        [
+          614.4871,
+          0.0023,
+          60.0431,
+        ],
+        [
+          1000,
+          0.001,
+          60.8209,
+        ],
+      ],
+      "dispense": [
+        [
+          1000,
+          0,
+          61.3275,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p1000_single_v1.3 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 0.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2.5,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 2000,
+    "min": 50,
+    "value": 500,
+    "valuesByApiLevel": {
+      "2.0": 500,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 2000,
+    "min": 50,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_1000ul/1",
+    "opentrons/opentrons_96_filtertiprack_1000ul/1",
+    "opentrons/geb_96_tiprack_1000ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P1000 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.7,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 1000,
+  "minVolume": 100,
+  "model": "p1000_single_v1.3",
+  "modelOffset": [
+    0,
+    0,
+    20,
+  ],
+  "name": "p1000_single",
+  "nozzleOffset": [
+    0,
+    0,
+    45,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 15,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "pickupTipShake",
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 76.7,
+  },
+  "tipOverlap": {
+    "default": 7.95,
+    "opentrons/eppendorf_96_tiprack_1000ul_eptips/1": 0,
+    "opentrons/geb_96_tiprack_1000ul/1": 11.2,
+    "opentrons/opentrons_96_filtertiprack_1000ul/1": 7.95,
+    "opentrons/opentrons_96_tiprack_1000ul/1": 7.95,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          148.9157,
+          0.0213,
+          56.3986,
+        ],
+        [
+          210.8237,
+          0.0108,
+          57.9568,
+        ],
+        [
+          241.2405,
+          0.0025,
+          59.717,
+        ],
+        [
+          365.2719,
+          0.0046,
+          59.2043,
+        ],
+        [
+          614.4871,
+          0.0023,
+          60.0431,
+        ],
+        [
+          1000,
+          0.001,
+          60.8209,
+        ],
+      ],
+      "dispense": [
+        [
+          1000,
+          0,
+          61.3275,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p1000_single_v1.4 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 0.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2.5,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 2000,
+    "min": 50,
+    "value": 500,
+    "valuesByApiLevel": {
+      "2.0": 500,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 2000,
+    "min": 50,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_1000ul/1",
+    "opentrons/opentrons_96_filtertiprack_1000ul/1",
+    "opentrons/geb_96_tiprack_1000ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P1000 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.7,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 1000,
+  "minVolume": 100,
+  "model": "p1000_single_v1.4",
+  "modelOffset": [
+    0,
+    0,
+    20,
+  ],
+  "name": "p1000_single",
+  "nozzleOffset": [
+    0,
+    0,
+    45,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.1,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 15,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "pickupTipShake",
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 76.7,
+  },
+  "tipOverlap": {
+    "default": 7.95,
+    "opentrons/eppendorf_96_tiprack_1000ul_eptips/1": 0,
+    "opentrons/geb_96_tiprack_1000ul/1": 11.2,
+    "opentrons/opentrons_96_filtertiprack_1000ul/1": 7.95,
+    "opentrons/opentrons_96_tiprack_1000ul/1": 7.95,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          148.9157,
+          0.0213,
+          56.3986,
+        ],
+        [
+          210.8237,
+          0.0108,
+          57.9568,
+        ],
+        [
+          241.2405,
+          0.0025,
+          59.717,
+        ],
+        [
+          365.2719,
+          0.0046,
+          59.2043,
+        ],
+        [
+          614.4871,
+          0.0023,
+          60.0431,
+        ],
+        [
+          1000,
+          0.001,
+          60.8209,
+        ],
+      ],
+      "dispense": [
+        [
+          1000,
+          0,
+          61.3275,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteModelSpecs > model p1000_single_v1.5 snapshot 1`] = `
+{
+  "blowout": {
+    "max": 10,
+    "min": -4,
+    "type": "float",
+    "units": "mm",
+    "value": 0.5,
+  },
+  "bottom": {
+    "max": 19,
+    "min": -2,
+    "type": "float",
+    "units": "mm",
+    "value": 2.5,
+  },
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 2000,
+    "min": 50,
+    "value": 500,
+    "valuesByApiLevel": {
+      "2.0": 500,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 2000,
+    "min": 50,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_1000ul/1",
+    "opentrons/opentrons_96_filtertiprack_1000ul/1",
+    "opentrons/geb_96_tiprack_1000ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P1000 Single-Channel GEN1",
+  "dropTip": {
+    "max": 2,
+    "min": -6,
+    "type": "float",
+    "units": "mm",
+    "value": -4,
+  },
+  "dropTipCurrent": {
+    "max": 0.8,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.7,
+  },
+  "dropTipSpeed": {
+    "max": 30,
+    "min": 0.001,
+    "type": "float",
+    "units": "mm/sec",
+    "value": 5,
+  },
+  "maxVolume": 1000,
+  "minVolume": 100,
+  "model": "p1000_single_v1.5",
+  "modelOffset": [
+    0,
+    0,
+    20,
+  ],
+  "name": "p1000_single",
+  "nozzleOffset": [
+    0,
+    0,
+    45,
+  ],
+  "pickUpCurrent": {
+    "max": 2,
+    "min": 0.05,
+    "type": "float",
+    "units": "amps",
+    "value": 0.15,
+  },
+  "pickUpDistance": {
+    "max": 30,
+    "min": 1,
+    "type": "float",
+    "units": "mm",
+    "value": 15,
+  },
+  "pickUpIncrement": {
+    "max": 10,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 1,
+  },
+  "pickUpPresses": {
+    "max": 10,
+    "min": 0,
+    "type": "int",
+    "units": "presses",
+    "value": 3,
+  },
+  "pickUpSpeed": {
+    "max": 100,
+    "min": 1,
+    "type": "float",
+    "units": "mm/s",
+    "value": 30,
+  },
+  "plungerCurrent": {
+    "max": 0.5,
+    "min": 0.1,
+    "type": "float",
+    "units": "amps",
+    "value": 0.5,
+  },
+  "quirks": [
+    "pickupTipShake",
+    "dropTipShake",
+  ],
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+  "tipLength": {
+    "max": 100,
+    "min": 0,
+    "type": "float",
+    "units": "mm",
+    "value": 76.7,
+  },
+  "tipOverlap": {
+    "default": 7.95,
+    "opentrons/eppendorf_96_tiprack_1000ul_eptips/1": 0,
+    "opentrons/geb_96_tiprack_1000ul/1": 11.2,
+    "opentrons/opentrons_96_filtertiprack_1000ul/1": 7.95,
+    "opentrons/opentrons_96_tiprack_1000ul/1": 7.95,
+  },
+  "top": {
+    "max": 19.5,
+    "min": 5,
+    "type": "float",
+    "units": "mm",
+    "value": 19.5,
+  },
+  "ulPerMm": [
+    {
+      "aspirate": [
+        [
+          148.9157,
+          0.0213,
+          56.3986,
+        ],
+        [
+          210.8237,
+          0.0108,
+          57.9568,
+        ],
+        [
+          241.2405,
+          0.0025,
+          59.717,
+        ],
+        [
+          365.2719,
+          0.0046,
+          59.2043,
+        ],
+        [
+          614.4871,
+          0.0023,
+          60.0431,
+        ],
+        [
+          1000,
+          0.001,
+          60.8209,
+        ],
+      ],
+      "dispense": [
+        [
+          1000,
+          0,
+          61.3275,
+        ],
+      ],
+    },
+  ],
+}
+`;
+
+exports[`pipette data accessors > getPipetteNameSpecs > name p10_multi snapshot 1`] = `
+{
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 5,
+    "valuesByApiLevel": {
+      "2.0": 5,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 10,
+    "valuesByApiLevel": {
+      "2.0": 10,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P10 8-Channel GEN1",
+  "maxVolume": 10,
+  "minVolume": 1,
+  "name": "p10_multi",
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+}
+`;
+
+exports[`pipette data accessors > getPipetteNameSpecs > name p10_single snapshot 1`] = `
+{
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 5,
+    "valuesByApiLevel": {
+      "2.0": 5,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 50,
+    "min": 0.001,
+    "value": 10,
+    "valuesByApiLevel": {
+      "2.0": 10,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_10ul/1",
+    "opentrons/opentrons_96_filtertiprack_10ul/1",
+    "opentrons/geb_96_tiprack_10ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P10 Single-Channel GEN1",
+  "maxVolume": 10,
+  "minVolume": 1,
+  "name": "p10_single",
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+}
+`;
+
+exports[`pipette data accessors > getPipetteNameSpecs > name p50_multi snapshot 1`] = `
+{
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 25,
+    "valuesByApiLevel": {
+      "2.0": 25,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 50,
+    "valuesByApiLevel": {
+      "2.0": 50,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P50 8-Channel GEN1",
+  "maxVolume": 50,
+  "minVolume": 5,
+  "name": "p50_multi",
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+}
+`;
+
+exports[`pipette data accessors > getPipetteNameSpecs > name p50_single snapshot 1`] = `
+{
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 25,
+    "valuesByApiLevel": {
+      "2.0": 25,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 100,
+    "min": 0.001,
+    "value": 50,
+    "valuesByApiLevel": {
+      "2.0": 50,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P50 Single-Channel GEN1",
+  "maxVolume": 50,
+  "minVolume": 5,
+  "name": "p50_single",
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+}
+`;
+
+exports[`pipette data accessors > getPipetteNameSpecs > name p300_multi snapshot 1`] = `
+{
+  "channels": 8,
+  "defaultAspirateFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 150,
+    "valuesByApiLevel": {
+      "2.0": 150,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 300,
+    "valuesByApiLevel": {
+      "2.0": 300,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P300 8-Channel GEN1",
+  "maxVolume": 300,
+  "minVolume": 30,
+  "name": "p300_multi",
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+}
+`;
+
+exports[`pipette data accessors > getPipetteNameSpecs > name p300_single snapshot 1`] = `
+{
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 150,
+    "valuesByApiLevel": {
+      "2.0": 150,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 600,
+    "min": 0.001,
+    "value": 300,
+    "valuesByApiLevel": {
+      "2.0": 300,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_300ul/1",
+    "opentrons/opentrons_96_filtertiprack_200ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P300 Single-Channel GEN1",
+  "maxVolume": 300,
+  "minVolume": 30,
+  "name": "p300_single",
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+}
+`;
+
+exports[`pipette data accessors > getPipetteNameSpecs > name p1000_single snapshot 1`] = `
+{
+  "channels": 1,
+  "defaultAspirateFlowRate": {
+    "max": 2000,
+    "min": 50,
+    "value": 500,
+    "valuesByApiLevel": {
+      "2.0": 500,
+    },
+  },
+  "defaultBlowOutFlowRate": {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultDispenseFlowRate": {
+    "max": 2000,
+    "min": 50,
+    "value": 1000,
+    "valuesByApiLevel": {
+      "2.0": 1000,
+    },
+  },
+  "defaultTipracks": [
+    "opentrons/opentrons_96_tiprack_1000ul/1",
+    "opentrons/opentrons_96_filtertiprack_1000ul/1",
+    "opentrons/geb_96_tiprack_1000ul/1",
+  ],
+  "displayCategory": "GEN1",
+  "displayName": "P1000 Single-Channel GEN1",
+  "maxVolume": 1000,
+  "minVolume": 100,
+  "name": "p1000_single",
+  "smoothieConfigs": {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
+}
+`;
 
 exports[`pipette data accessors getPipetteModelSpecs model p10_multi_v1 snapshot 1`] = `
 Object {

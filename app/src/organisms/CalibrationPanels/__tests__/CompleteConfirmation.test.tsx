@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, expect } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { CompleteConfirmation } from '../CompleteConfirmation'
 
 describe('CompleteConfirmation', () => {
-  const mockCleanUpAndExit = jest.fn()
+  const mockCleanUpAndExit = vi.fn()
   const render = (
     props: Partial<React.ComponentProps<typeof CompleteConfirmation>> = {}
   ) => {
@@ -21,10 +23,6 @@ describe('CompleteConfirmation', () => {
       { i18nInstance: i18n }
     )
   }
-
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('clicking continue sends exit command and deletes session', () => {
     render()

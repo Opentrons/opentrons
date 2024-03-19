@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { SidePanel } from '@opentrons/components'
 import { selectors } from '../../navigation'
 import { PDTitledList } from '../lists'
-import styles from './SettingsPage.css'
+import styles from './SettingsPage.module.css'
 
 export const SettingsSidebar = (): JSX.Element => {
   const currentPage = useSelector(selectors.getCurrentPage)

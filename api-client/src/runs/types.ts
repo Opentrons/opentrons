@@ -18,6 +18,7 @@ export const RUN_STATUS_FAILED = 'failed' as const
 export const RUN_STATUS_FINISHING = 'finishing' as const
 export const RUN_STATUS_SUCCEEDED = 'succeeded' as const
 export const RUN_STATUS_BLOCKED_BY_OPEN_DOOR = 'blocked-by-open-door' as const
+export const RUN_STATUS_AWAITING_RECOVERY = 'awaiting-recovery' as const
 
 export type RunStatus =
   | typeof RUN_STATUS_IDLE
@@ -30,6 +31,7 @@ export type RunStatus =
   | typeof RUN_STATUS_FINISHING
   | typeof RUN_STATUS_SUCCEEDED
   | typeof RUN_STATUS_BLOCKED_BY_OPEN_DOOR
+  | typeof RUN_STATUS_AWAITING_RECOVERY
 
 export interface RunData {
   id: string
@@ -80,11 +82,14 @@ export interface Runs {
 export const RUN_ACTION_TYPE_PLAY: 'play' = 'play'
 export const RUN_ACTION_TYPE_PAUSE: 'pause' = 'pause'
 export const RUN_ACTION_TYPE_STOP: 'stop' = 'stop'
+export const RUN_ACTION_TYPE_RESUME_FROM_RECOVERY: 'resume-from-recovery' =
+  'resume-from-recovery'
 
 export type RunActionType =
   | typeof RUN_ACTION_TYPE_PLAY
   | typeof RUN_ACTION_TYPE_PAUSE
   | typeof RUN_ACTION_TYPE_STOP
+  | typeof RUN_ACTION_TYPE_RESUME_FROM_RECOVERY
 
 export interface RunAction {
   id: string

@@ -48,7 +48,7 @@ const EXIT_BUTTON_STYLE = css`
 const BOX_STYLE = css`
   background-color: ${COLORS.white} @media
     ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    border-radius: ${BORDERS.borderRadiusSize4};
+    border-radius: ${BORDERS.borderRadius16};
   }
 `
 const HEADER_CONTAINER_STYLE = css`
@@ -57,7 +57,7 @@ const HEADER_CONTAINER_STYLE = css`
   padding: ${SPACING.spacing16} ${SPACING.spacing32};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: 1.75rem ${SPACING.spacing32};
-    border-radius: ${BORDERS.borderRadiusSize4};
+    border-radius: ${BORDERS.borderRadius16};
   }
 `
 const HEADER_TEXT_STYLE = css`

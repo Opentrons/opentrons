@@ -20,7 +20,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { LongPressModal } from './LongPressModal'
-import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { formatTimeWithUtcLabel } from '../../resources/runs'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -104,7 +104,7 @@ export function PinnedProtocol(props: {
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.grey35}
-      borderRadius={BORDERS.borderRadiusSize4}
+      borderRadius={BORDERS.borderRadius16}
       css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing24}

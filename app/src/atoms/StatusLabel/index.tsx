@@ -43,7 +43,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
     <Flex>
       <Flex
         backgroundColor={backgroundColor}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         gridGap={SPACING.spacing4}
         paddingX={SPACING.spacing6}
         paddingY={SPACING.spacing2}

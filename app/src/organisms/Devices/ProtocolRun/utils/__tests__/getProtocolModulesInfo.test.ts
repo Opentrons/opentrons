@@ -1,16 +1,17 @@
-import _protocolWithMagTempTC from '@opentrons/shared-data/protocol/fixtures/6/transferSettings.json'
-import _protocolWithMultipleTemps from '@opentrons/shared-data/protocol/fixtures/6/multipleTempModules.json'
-import _standardDeckDef from '@opentrons/shared-data/deck/definitions/4/ot2_standard.json'
-import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
+import { describe, it, expect } from 'vitest'
 import {
+  transfer_settings,
+  multiple_temp_modules,
+  ot2DeckDefV4,
   getModuleDef2,
   ProtocolAnalysisOutput,
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
+import { getProtocolModulesInfo } from '../getProtocolModulesInfo'
 
 const protocolWithMagTempTC = ({
-  ..._protocolWithMagTempTC,
+  ...transfer_settings,
   labware: [
     {
       id: 'fixedTrash',
@@ -92,7 +93,7 @@ const protocolWithMagTempTC = ({
   ] as LoadedModule[],
 } as unknown) as ProtocolAnalysisOutput
 const protocolWithMultipleTemps = ({
-  ..._protocolWithMultipleTemps,
+  ...multiple_temp_modules,
   labware: [
     {
       id: 'fixedTrash',
@@ -173,7 +174,7 @@ const protocolWithMultipleTemps = ({
     },
   ] as LoadedModule[],
 } as unknown) as ProtocolAnalysisOutput
-const standardDeckDef = _standardDeckDef as any
+const standardDeckDef = ot2DeckDefV4 as any
 
 describe('getProtocolModulesInfo', () => {
   it('should gather protocol module info for temp, mag, and tc', () => {
@@ -184,11 +185,11 @@ describe('getProtocolModulesInfo', () => {
     // TC takes up rests in slot 7 which has [x,y] coordinate [0,181,0]
     const SLOT_7_COORDS = [0, 181, 0]
     // these ids come from the protocol fixture
-    const MAG_MOD_ID: keyof typeof _protocolWithMagTempTC.modules =
+    const MAG_MOD_ID: keyof typeof transfer_settings.modules =
       '3e012450-3412-11eb-ad93-ed232a2337cf:magneticModuleType'
-    const TEMP_MOD_ID: keyof typeof _protocolWithMagTempTC.modules =
+    const TEMP_MOD_ID: keyof typeof transfer_settings.modules =
       '3e0283e0-3412-11eb-ad93-ed232a2337cf:temperatureModuleType'
-    const TC_ID: keyof typeof _protocolWithMagTempTC.modules =
+    const TC_ID: keyof typeof transfer_settings.modules =
       '3e039550-3412-11eb-ad93-ed232a2337cf:thermocyclerModuleType'
 
     const MAG_LW_ID =
@@ -206,7 +207,7 @@ describe('getProtocolModulesInfo', () => {
         z: SLOT_1_COORDS[2],
         moduleDef: getModuleDef2('magneticModuleV2'),
         nestedLabwareDef:
-          _protocolWithMagTempTC.labwareDefinitions[
+          transfer_settings.labwareDefinitions[
             'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
           ],
         nestedLabwareId: MAG_LW_ID,
@@ -221,7 +222,7 @@ describe('getProtocolModulesInfo', () => {
         z: SLOT_3_COORDS[2],
         moduleDef: getModuleDef2('temperatureModuleV2'),
         nestedLabwareDef:
-          _protocolWithMagTempTC.labwareDefinitions[
+          transfer_settings.labwareDefinitions[
             'opentrons/opentrons_96_aluminumblock_generic_pcr_strip_200ul/1'
           ],
         nestedLabwareId: TEMP_LW_ID,
@@ -237,7 +238,7 @@ describe('getProtocolModulesInfo', () => {
         z: SLOT_7_COORDS[2],
         moduleDef: getModuleDef2('thermocyclerModuleV1'),
         nestedLabwareDef:
-          _protocolWithMagTempTC.labwareDefinitions[
+          transfer_settings.labwareDefinitions[
             'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
           ],
         nestedLabwareId: TC_LW_ID,
@@ -260,11 +261,11 @@ describe('getProtocolModulesInfo', () => {
     // TC takes up rests in slot 7 which has [x,y] coordinate [0,181,0]
     const SLOT_7_COORDS = [0, 181, 0]
     // these ids come from the protocol fixture
-    const MAG_MOD_ID: keyof typeof _protocolWithMultipleTemps.modules =
+    const MAG_MOD_ID: keyof typeof multiple_temp_modules.modules =
       '3e012450-3412-11eb-ad93-ed232a2337cf:magneticModuleType'
-    const TEMP_MOD_ONE_ID: keyof typeof _protocolWithMultipleTemps.modules =
+    const TEMP_MOD_ONE_ID: keyof typeof multiple_temp_modules.modules =
       '3e0283e0-3412-11eb-ad93-ed232a2337cf:temperatureModuleType1'
-    const TEMP_MOD_TWO_ID: keyof typeof _protocolWithMultipleTemps.modules =
+    const TEMP_MOD_TWO_ID: keyof typeof multiple_temp_modules.modules =
       '3e039550-3412-11eb-ad93-ed232a2337cf:temperatureModuleType2'
 
     const MAG_LW_ID =
@@ -282,7 +283,7 @@ describe('getProtocolModulesInfo', () => {
         z: SLOT_1_COORDS[2],
         moduleDef: getModuleDef2('magneticModuleV2'),
         nestedLabwareDef:
-          _protocolWithMultipleTemps.labwareDefinitions[
+          multiple_temp_modules.labwareDefinitions[
             'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
           ],
         nestedLabwareId: MAG_LW_ID,
@@ -297,7 +298,7 @@ describe('getProtocolModulesInfo', () => {
         z: SLOT_3_COORDS[2],
         moduleDef: getModuleDef2('temperatureModuleV2'),
         nestedLabwareDef:
-          _protocolWithMultipleTemps.labwareDefinitions[
+          multiple_temp_modules.labwareDefinitions[
             'opentrons/opentrons_96_aluminumblock_generic_pcr_strip_200ul/1'
           ],
         nestedLabwareId: TEMP_ONE_LW_ID,
@@ -313,7 +314,7 @@ describe('getProtocolModulesInfo', () => {
         z: SLOT_7_COORDS[2],
         moduleDef: getModuleDef2('temperatureModuleV2'),
         nestedLabwareDef:
-          _protocolWithMultipleTemps.labwareDefinitions[
+          multiple_temp_modules.labwareDefinitions[
             'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
           ],
         nestedLabwareId: TEMP_TWO_LW_ID,
@@ -346,7 +347,7 @@ describe('getProtocolModulesInfo', () => {
         z: SLOT_1_COORDS[2],
         moduleDef: getModuleDef2('magneticModuleV2'),
         nestedLabwareDef:
-          _protocolWithMagTempTC.labwareDefinitions[
+          transfer_settings.labwareDefinitions[
             'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1'
           ],
         nestedLabwareId: MAG_LW_ID,

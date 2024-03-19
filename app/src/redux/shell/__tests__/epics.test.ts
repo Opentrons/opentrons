@@ -1,4 +1,4 @@
-// tests for the shell module
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { EMPTY } from 'rxjs'
 import { TestScheduler } from 'rxjs/testing'
 import { take } from 'rxjs/operators'
@@ -13,22 +13,20 @@ import type { Action, State } from '../../types'
 
 const { ipcRenderer: mockIpc } = mockRemote
 
-jest.mock('../../config')
+vi.mock('../../config')
+vi.mock('../remote')
 
 // TODO(mc, 2020-10-08): this is a partial mock because shell/update
 // needs some reorg to split actions and selectors
-jest.mock('../update', () => ({
-  ...jest.requireActual<{}>('../update'),
-  getAvailableShellUpdate: jest.fn(),
-}))
-
-const getUpdateChannel = Config.getUpdateChannel as jest.MockedFunction<
-  typeof Config.getUpdateChannel
->
-
-const getAvailableShellUpdate = ShellUpdate.getAvailableShellUpdate as jest.MockedFunction<
-  typeof ShellUpdate.getAvailableShellUpdate
->
+vi.mock('../update', async importOriginal => {
+  const actual = await importOriginal<
+    typeof ShellUpdate.getAvailableShellUpdate
+  >()
+  return {
+    ...actual,
+    getAvailableShellUpdate: vi.fn(),
+  }
+})
 
 describe('shell epics', () => {
   let testScheduler: TestScheduler
@@ -40,7 +38,7 @@ describe('shell epics', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('"dispatches" actions to IPC if meta.shell', () => {
@@ -72,8 +70,8 @@ describe('shell epics', () => {
   it('triggers an appUpdateAvailable alert if an app update becomes available', () => {
     const mockState: State = { mockState: true } as any
 
-    getAvailableShellUpdate.mockReturnValueOnce(null)
-    getAvailableShellUpdate.mockReturnValue('1.2.3')
+    vi.mocked(ShellUpdate.getAvailableShellUpdate).mockReturnValueOnce(null)
+    vi.mocked(ShellUpdate.getAvailableShellUpdate).mockReturnValue('1.2.3')
 
     testScheduler.run(({ hot, expectObservable }) => {
       const action$ = hot<Action>('----')
@@ -91,8 +89,8 @@ describe('shell epics', () => {
   it('should trigger a shell:CHECK_UPDATE action if the update channel changes', () => {
     const mockState: State = { mockState: true } as any
 
-    getUpdateChannel.mockReturnValueOnce('latest')
-    getUpdateChannel.mockReturnValue('beta')
+    vi.mocked(Config.getUpdateChannel).mockReturnValueOnce('latest')
+    vi.mocked(Config.getUpdateChannel).mockReturnValue('beta')
 
     testScheduler.run(({ hot, expectObservable }) => {
       const action$ = hot<Action>('------')

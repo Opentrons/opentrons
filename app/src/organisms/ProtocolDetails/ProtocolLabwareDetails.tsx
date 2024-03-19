@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
@@ -17,7 +18,7 @@ import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { LabwareDetails } from '../LabwareDetails'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
@@ -54,11 +55,7 @@ export const ProtocolLabwareDetails = (
       : []
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      width="100%"
-      marginBottom={SPACING.spacing8}
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex flexDirection={DIRECTION_ROW}>
         <StyledText
           as="label"
@@ -191,15 +188,18 @@ export const LabwareDetailOverflowMenu = (
           </MenuItem>
         </Flex>
       ) : null}
-      <Portal level="top">
-        {menuOverlay}
-        {showLabwareDetailSlideout ? (
-          <LabwareDetails
-            labware={labware}
-            onClose={() => setShowLabwareDetailSlideout(false)}
-          />
-        ) : null}
-      </Portal>
+      {createPortal(
+        <>
+          {menuOverlay}
+          {showLabwareDetailSlideout ? (
+            <LabwareDetails
+              labware={labware}
+              onClose={() => setShowLabwareDetailSlideout(false)}
+            />
+          ) : null}
+        </>,
+        getTopPortalEl()
+      )}
     </Flex>
   )
 }

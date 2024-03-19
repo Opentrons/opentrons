@@ -28,7 +28,7 @@ import { AspDispSection } from './AspDispSection'
 
 import type { StepFormProps } from '../types'
 
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)

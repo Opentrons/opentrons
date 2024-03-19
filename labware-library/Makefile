@@ -9,10 +9,9 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
 tests ?=
-cov_opts ?= --coverage=true --ci=true --collectCoverageFrom='labware-library/src/**/*.(js|ts|tsx)'
+cov_opts ?= --coverage=true
 test_opts ?=
 
-# --coverage=true --ci=true --collectCoverageFrom="labware-library/src/**/*.(js|ts|tsx)" labware-library/src
 
 .PHONY: all
 all: clean dist
@@ -22,11 +21,10 @@ clean:
 	shx rm -rf dist
 
 # production assets
-# override webpack's default hashing algorithm for node 18: https://github.com/webpack/webpack/issues/14532
 .PHONY: dist
 dist: export NODE_ENV := production
 dist:
-	export NODE_OPTIONS=--openssl-legacy-provider && webpack --profile
+	vite build
 	node ./renderStatic.js
 
 # development assets server
@@ -34,7 +32,7 @@ dist:
 dev: export NODE_ENV := development
 dev: export NODE_OPTIONS := --openssl-legacy-provider
 dev:
-	webpack-dev-server --hot --host=::
+	vite serve --host=::
 
 # production assets server
 .PHONY: serve
@@ -46,7 +44,7 @@ serve: all
 test-e2e:
 	concurrently --no-color --kill-others --success first --names "labware-library-server,labware-library-tests" \
 	"$(MAKE) dev CYPRESS=1 GTM_ID=''" \
-	"wait-on http://localhost:8080/ && echo \"Running cypress at $(date)\" && cypress run --browser chrome --headless --record false"
+	"wait-on http://localhost:5173/ && echo \"Running cypress at $(date)\" && cypress run --browser chrome --headless --record false"
 
 # unit tests
 .PHONY: test

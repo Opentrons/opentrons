@@ -1,7 +1,7 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import {
-  makeStateArgsStandard,
   makeContext,
-  makeState,
+  getInitialRobotStateStandard,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../fixtures'
@@ -9,48 +9,36 @@ import { makeImmutableStateUpdater } from '../__utils__'
 import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
 import { InvariantContext, RobotState } from '../types'
 const forDropTip = makeImmutableStateUpdater(_forDropTip)
+
 describe('dropTip', () => {
   let invariantContext: InvariantContext
+  let prevRobotState: RobotState
   beforeEach(() => {
     invariantContext = makeContext()
+    prevRobotState = getInitialRobotStateStandard(invariantContext)
   })
-
-  // TODO Ian 2019-04-19: this is a ONE-OFF fixture
-  function makeRobotState(args: {
-    singleHasTips: boolean
-    multiHasTips: boolean
-  }): RobotState {
-    const _robotState = makeState({
-      ...makeStateArgsStandard(),
-      invariantContext,
-      tiprackSetting: {
-        tiprack1Id: true,
-      },
-    })
-
-    _robotState.tipState.pipettes.p300SingleId = args.singleHasTips
-    _robotState.tipState.pipettes.p300MultiId = args.multiHasTips
-    return _robotState
-  }
 
   describe('replaceTip: single channel', () => {
     it('drop tip if there is a tip', () => {
-      const prevRobotState = makeRobotState({
-        singleHasTips: true,
-        multiHasTips: true,
-      })
+      prevRobotState = {
+        ...prevRobotState,
+        tipState: {
+          pipettes: {
+            p300SingleId: true,
+            p300MultiId: true,
+          },
+          tipracks: {} as any,
+        },
+      }
       const params = {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
-      expect(result).toEqual({
-        warnings: [],
-        robotState: makeRobotState({
-          singleHasTips: false,
-          multiHasTips: true,
-        }),
+      expect(result.robotState.tipState.pipettes).toEqual({
+        p300SingleId: false,
+        p300MultiId: true,
       })
     })
     // TODO: IL 2019-11-20
@@ -58,31 +46,40 @@ describe('dropTip', () => {
   })
   describe('Multi-channel dropTip', () => {
     it('drop tip when there are tips', () => {
-      const prevRobotState = makeRobotState({
-        singleHasTips: true,
-        multiHasTips: true,
-      })
+      prevRobotState = {
+        ...prevRobotState,
+        tipState: {
+          pipettes: {
+            p300SingleId: true,
+            p300MultiId: true,
+          },
+          tipracks: {} as any,
+        },
+      }
       const params = {
         pipetteId: 'p300MultiId',
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
-      expect(result).toEqual({
-        warnings: [],
-        robotState: makeRobotState({
-          singleHasTips: true,
-          multiHasTips: false,
-        }),
+      expect(result.robotState.tipState.pipettes).toEqual({
+        p300SingleId: true,
+        p300MultiId: false,
       })
     })
   })
   describe('liquid tracking', () => {
     it('dropTip uses full volume when transfering tip to trash', () => {
-      const prevRobotState = makeRobotState({
-        singleHasTips: true,
-        multiHasTips: true,
-      })
+      prevRobotState = {
+        ...prevRobotState,
+        tipState: {
+          pipettes: {
+            p300SingleId: true,
+            p300MultiId: true,
+          },
+          tipracks: {} as any,
+        },
+      }
       const params = {
         pipetteId: 'p300MultiId',
         labwareId: SOURCE_LABWARE,

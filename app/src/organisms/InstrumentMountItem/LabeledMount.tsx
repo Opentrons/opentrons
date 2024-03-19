@@ -23,7 +23,7 @@ const MountButton = styled.button<{ isAttached: boolean }>`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
   padding: ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius12};
   background-color: ${({ isAttached }) =>
     isAttached ? COLORS.green35 : COLORS.grey35};
   &:active {

@@ -1,9 +1,8 @@
 // robot update files
 import path from 'path'
 import { readFile, ensureDir } from 'fs-extra'
-
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from '../log'
+import { UI_INITIALIZED } from '../constants'
 
 import { downloadManifest, getReleaseSet } from './release-manifest'
 import {

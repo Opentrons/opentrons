@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ConnectingNetwork } from '../ConnectingNetwork'
 
@@ -26,12 +27,12 @@ describe('ConnectingNetwork', () => {
     }
   })
   it('should render text', () => {
-    const [{ getByText }] = render(props)
-    getByText('Connecting to mockWifiSsid...')
+    render(props)
+    screen.getByText('Connecting to mockWifiSsid...')
   })
 
   it('should render a spinner icon', () => {
-    const [{ getByLabelText }] = render(props)
-    expect(getByLabelText('spinner')).toBeInTheDocument()
+    render(props)
+    expect(screen.getByLabelText('spinner')).toBeInTheDocument()
   })
 })

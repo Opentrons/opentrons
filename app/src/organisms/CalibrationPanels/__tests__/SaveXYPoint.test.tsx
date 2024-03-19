@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, expect } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
@@ -8,8 +10,8 @@ import * as Sessions from '../../../redux/sessions'
 import { SaveXYPoint } from '../SaveXYPoint'
 
 describe('SaveXYPoint', () => {
-  const mockSendCommands = jest.fn()
-  const mockDeleteSession = jest.fn()
+  const mockSendCommands = vi.fn()
+  const mockDeleteSession = vi.fn()
   const render = (
     props: Partial<React.ComponentProps<typeof SaveXYPoint>> = {}
   ) => {
@@ -35,10 +37,6 @@ describe('SaveXYPoint', () => {
       { i18nInstance: i18n }
     )
   }
-
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('displays proper assets for slot 1 left multi', () => {
     render({

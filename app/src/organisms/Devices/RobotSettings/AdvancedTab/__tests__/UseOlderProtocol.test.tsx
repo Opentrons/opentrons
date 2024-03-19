@@ -1,19 +1,16 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { screen, fireEvent } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 
 import { i18n } from '../../../../../i18n'
 import { getRobotSettings } from '../../../../../redux/robot-settings'
 
 import { UseOlderProtocol } from '../UseOlderProtocol'
 
-jest.mock('../../../../../redux/robot-settings/selectors')
-
-const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
-  typeof getRobotSettings
->
+vi.mock('../../../../../redux/robot-settings/selectors')
 
 const mockSettings = {
   id: 'disableFastProtocolUpload',
@@ -35,21 +32,17 @@ const render = (isRobotBusy = false) => {
 
 describe('RobotSettings ShortTrashBin', () => {
   beforeEach(() => {
-    mockGetRobotSettings.mockReturnValue([mockSettings])
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(getRobotSettings).mockReturnValue([mockSettings])
   })
 
   it('should render title, description and toggle button', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Use older protocol analysis method')
-    getByText(
+    render()
+    screen.getByText('Use older protocol analysis method')
+    screen.getByText(
       'Use an older, slower method of analyzing uploaded protocols. This changes how the OT-2 validates your protocol during the upload step, but does not affect how your protocol actually runs. Opentrons Support might ask you to change this setting if you encounter problems with the newer, faster protocol analysis method.'
     )
 
-    const toggleButton = getByRole('switch', {
+    const toggleButton = screen.getByRole('switch', {
       name: 'use_older_protocol_analysis_method',
     })
     expect(toggleButton.getAttribute('aria-checked')).toBe('true')
@@ -60,9 +53,9 @@ describe('RobotSettings ShortTrashBin', () => {
       ...mockSettings,
       value: false,
     }
-    mockGetRobotSettings.mockReturnValue([tempMockSettings])
-    const [{ getByRole }] = render()
-    const toggleButton = getByRole('switch', {
+    vi.mocked(getRobotSettings).mockReturnValue([tempMockSettings])
+    render()
+    const toggleButton = screen.getByRole('switch', {
       name: 'use_older_protocol_analysis_method',
     })
     fireEvent.click(toggleButton)
@@ -70,8 +63,8 @@ describe('RobotSettings ShortTrashBin', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    const [{ getByRole }] = render(true)
-    const toggleButton = getByRole('switch', {
+    render(true)
+    const toggleButton = screen.getByRole('switch', {
       name: 'use_older_protocol_analysis_method',
     })
     expect(toggleButton).toBeDisabled()

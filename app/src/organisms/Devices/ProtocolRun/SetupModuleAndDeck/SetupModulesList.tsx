@@ -35,7 +35,7 @@ import { TertiaryButton } from '../../../../atoms/buttons'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { StyledText } from '../../../../atoms/text'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useChainLiveCommands } from '../../../../resources/runs/hooks'
+import { useChainLiveCommands } from '../../../../resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
 import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { getModulePrepCommands } from '../../getModulePrepCommands'
@@ -373,7 +373,7 @@ export function ModulesListItem({
         border={BORDERS.styleSolid}
         borderColor={COLORS.grey30}
         borderWidth="1px"
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         padding={SPACING.spacing16}
         backgroundColor={COLORS.white}
       >

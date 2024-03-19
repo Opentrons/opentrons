@@ -1,6 +1,8 @@
 import * as React from 'react'
+import { it, describe, beforeEach } from 'vitest'
+
 import { i18n } from '../../../i18n'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { ChosenTipRackRender } from '../ChosenTipRackRender'
 import type { SelectOption } from '../../../atoms/SelectField/Select'
 
@@ -21,10 +23,6 @@ describe('ChosenTipRackRender', () => {
     props = {
       selectedValue: mockSelectValue,
     }
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   it('renders text and image alt text when tip rack is Opentrons 96 1000uL', () => {

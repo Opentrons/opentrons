@@ -62,6 +62,13 @@ class StopAction:
 
 
 @dataclass(frozen=True)
+class ResumeFromRecoveryAction:
+    """See `ProtocolEngine.resume_from_recovery()`."""
+
+    pass
+
+
+@dataclass(frozen=True)
 class FinishErrorDetails:
     """Error details for the payload of a FinishAction or HardwareStoppedAction."""
 
@@ -203,6 +210,7 @@ Action = Union[
     PlayAction,
     PauseAction,
     StopAction,
+    ResumeFromRecoveryAction,
     FinishAction,
     HardwareStoppedAction,
     DoorChangeAction,

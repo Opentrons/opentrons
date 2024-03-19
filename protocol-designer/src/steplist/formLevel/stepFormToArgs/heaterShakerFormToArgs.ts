@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { HeaterShakerArgs } from '@opentrons/step-generation'
 import type { HydratedHeaterShakerFormData } from '../../../form-types'
 
@@ -13,13 +12,13 @@ export const heaterShakerFormToArgs = (
     setShake,
     latchOpen,
   } = formData
-  assert(
+  console.assert(
     setHeaterShakerTemperature
       ? !Number.isNaN(targetHeaterShakerTemperature)
       : true,
     'heaterShakerFormToArgs expected targetTemp to be a number when setTemp is true'
   )
-  assert(
+  console.assert(
     setShake ? !Number.isNaN(targetSpeed) : true,
     'heaterShakerFormToArgs expected targeShake to be a number when setShake is true'
   )

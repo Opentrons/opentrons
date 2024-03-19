@@ -151,7 +151,14 @@ stages:
       status_code: 200
       json:
         links:
-          current: !anydict
+          current:
+            href: !anystr
+            meta:
+              runId: !anystr
+              commandId: !anystr
+              index: 1
+              key: !anystr
+              createdAt: !anystr
         meta:
           cursor: 0
           totalLength: 2

@@ -1,32 +1,30 @@
 import * as React from 'react'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { UseQueryResult } from 'react-query'
 import { useProtocolAnalysisAsDocumentQuery } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ProtocolCard } from '../ProtocolCard'
+import type * as ReactRouterDom from 'react-router-dom'
 
 import type {
   CompletedProtocolAnalysis,
   ProtocolResource,
 } from '@opentrons/shared-data'
 
-const mockPush = jest.fn()
+const mockPush = vi.fn()
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof ReactRouterDom>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
-jest.mock('@opentrons/react-api-client')
-
-const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
-  typeof useProtocolAnalysisAsDocumentQuery
->
+vi.mock('@opentrons/react-api-client')
 
 const mockProtocol: ProtocolResource = {
   id: 'mockProtocol1',
@@ -47,10 +45,10 @@ const mockProtocol: ProtocolResource = {
 
 const props = {
   protocol: mockProtocol,
-  longPress: jest.fn(),
-  setTargetProtocol: jest.fn(),
-  setShowDeleteConfirmationModal: jest.fn(),
-  setTargetProtocolId: jest.fn(),
+  longPress: vi.fn(),
+  setTargetProtocol: vi.fn(),
+  setShowDeleteConfirmationModal: vi.fn(),
+  setTargetProtocolId: vi.fn(),
 }
 
 const render = () => {
@@ -65,10 +63,10 @@ const render = () => {
 }
 
 describe('ProtocolCard', () => {
-  jest.useFakeTimers()
+  vi.useFakeTimers()
 
   beforeEach(() => {
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'ok' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
   })
@@ -80,7 +78,7 @@ describe('ProtocolCard', () => {
   })
 
   it('should display the analysis failed error modal when clicking on the protocol', () => {
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'error' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render()
@@ -99,12 +97,12 @@ describe('ProtocolCard', () => {
   })
 
   it('should display modal after long click', async () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     render()
     const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     act(() => {
-      jest.advanceTimersByTime(1005)
+      vi.advanceTimersByTime(1005)
     })
     expect(props.longPress).toHaveBeenCalled()
     screen.getByText('Run protocol')
@@ -113,15 +111,15 @@ describe('ProtocolCard', () => {
   })
 
   it('should display the analysis failed error modal when clicking on the protocol when doing a long pressing', async () => {
-    jest.useFakeTimers()
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    vi.useFakeTimers()
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'error' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render()
     const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     act(() => {
-      jest.advanceTimersByTime(1005)
+      vi.advanceTimersByTime(1005)
     })
     expect(props.longPress).toHaveBeenCalled()
     screen.getByLabelText('failedAnalysis_icon')
@@ -135,14 +133,14 @@ describe('ProtocolCard', () => {
   })
 
   it('should display a loading spinner when analysis is pending', async () => {
-    mockUseProtocolAnalysisAsDocumentQuery.mockReturnValue({
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: null as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
     render()
     const name = screen.getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     act(() => {
-      jest.advanceTimersByTime(1005)
+      vi.advanceTimersByTime(1005)
     })
     expect(props.longPress).toHaveBeenCalled()
     screen.getByLabelText('Protocol is loading')

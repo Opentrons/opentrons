@@ -1,19 +1,21 @@
 import * as React from 'react'
+import { vi, it, describe, expect } from 'vitest'
 import { act, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { PinnedProtocol } from '../PinnedProtocol'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
+import type * as ReactRouterDom from 'react-router-dom'
 
-const mockPush = jest.fn()
+const mockPush = vi.fn()
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof ReactRouterDom>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
@@ -37,9 +39,9 @@ const mockProtocol: ProtocolResource = {
 
 const props = {
   protocol: mockProtocol,
-  longPress: jest.fn(),
-  setShowDeleteConfirmationModal: jest.fn(),
-  setTargetProtocolId: jest.fn(),
+  longPress: vi.fn(),
+  setShowDeleteConfirmationModal: vi.fn(),
+  setTargetProtocolId: vi.fn(),
 }
 
 const render = () => {
@@ -54,7 +56,7 @@ const render = () => {
 }
 
 describe('Pinned Protocol', () => {
-  jest.useFakeTimers()
+  vi.useFakeTimers()
 
   it('should redirect to protocol details after short click', () => {
     const [{ getByText }] = render()
@@ -64,12 +66,12 @@ describe('Pinned Protocol', () => {
   })
 
   it('should display modal after long click', async () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     const [{ getByText }] = render()
     const name = getByText('yay mock protocol')
     fireEvent.mouseDown(name)
     act(() => {
-      jest.advanceTimersByTime(1005)
+      vi.advanceTimersByTime(1005)
     })
     expect(props.longPress).toHaveBeenCalled()
     getByText('Run protocol')

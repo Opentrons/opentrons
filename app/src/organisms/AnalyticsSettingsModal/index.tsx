@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
@@ -8,7 +9,7 @@ import {
 
 import { Modal, OutlineButton, SPACING } from '@opentrons/components'
 import { AnalyticsToggle } from './AnalyticsToggle'
-import { Portal } from '../../App/portal'
+import { getModalPortalEl } from '../../App/portal'
 import type { Dispatch } from '../../redux/types'
 
 // TODO(bc, 2021-02-04): i18n
@@ -21,18 +22,19 @@ export function AnalyticsSettingsModal(): JSX.Element | null {
   const seen = useSelector(getAnalyticsOptInSeen)
   const setSeen = (): unknown => dispatch(setAnalyticsOptInSeen())
 
-  return !seen ? (
-    <Portal>
-      <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
-        <AnalyticsToggle />
-        <OutlineButton
-          onClick={setSeen}
-          float="right"
-          margin={SPACING.spacing12}
-        >
-          {CONTINUE}
-        </OutlineButton>
-      </Modal>
-    </Portal>
-  ) : null
+  return !seen
+    ? createPortal(
+        <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
+          <AnalyticsToggle />
+          <OutlineButton
+            onClick={setSeen}
+            float="right"
+            margin={SPACING.spacing12}
+          >
+            {CONTINUE}
+          </OutlineButton>
+        </Modal>,
+        getModalPortalEl()
+      )
+    : null
 }
