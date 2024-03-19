@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { when } from 'vitest-when'
 import { it, describe, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
@@ -18,6 +19,7 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
+const RUN_ID = 'mockId'
 const render = (
   props: React.ComponentProps<typeof ProtocolSetupParameters>
 ) => {
@@ -33,9 +35,11 @@ describe('ProtocolSetupParameters', () => {
       runId: 'mockId',
       setSetupScreen: vi.fn(),
     }
-    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
-      runTimeParameters: mockRunTimeParameterData,
-    } as any)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn({
+        runTimeParameters: mockRunTimeParameterData,
+      } as any)
   })
   it('renders the parameters labels and mock data', () => {
     render(props)
