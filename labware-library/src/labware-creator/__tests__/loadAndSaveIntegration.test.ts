@@ -15,7 +15,6 @@ import type { ProcessedLabwareFields } from '../fields'
 vi.mock('../../definitions')
 
 describe('load and immediately save integrity test', () => {
-  const pipetteName = 'p10_single'
   const fakeDisplayName = 'Fake Display Name'
   const fakeLoadName = 'fake_load_name'
 
@@ -24,19 +23,19 @@ describe('load and immediately save integrity test', () => {
   const testCases = [
     {
       inputDef: fixture_96_plate as LabwareDefinition2,
-      extraFields: { pipetteName },
+      extraFields: {},
     },
     {
       inputDef: fixture_12_trough as LabwareDefinition2,
-      extraFields: { pipetteName },
+      extraFields: {},
     },
     {
       inputDef: fixture_tiprack_300_ul as LabwareDefinition2,
-      extraFields: { pipetteName },
+      extraFields: {},
     },
     {
       inputDef: fixture_24_tuberack as LabwareDefinition2,
-      extraFields: { pipetteName, tubeRackInsertLoadName: 'customTubeRack' },
+      extraFields: { tubeRackInsertLoadName: 'customTubeRack' },
     },
   ]
   testCases.forEach(({ inputDef, extraFields }) => {

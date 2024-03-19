@@ -27,12 +27,6 @@ context('Tubes and Rack', () => {
       cy.contains('start creating labware').click({ force: true })
     })
 
-    it('contains a button to the testing guide', () => {
-      cy.contains('labware test guide')
-        .should('have.prop', 'href')
-        .and('to.have.string', 'labwareDefinition_testGuide')
-    })
-
     it('does not have a preview image', () => {
       cy.contains('Add missing info to see labware preview').should('exist')
     })
@@ -136,13 +130,6 @@ context('Tubes and Rack', () => {
       })
 
       it('tests the file export', () => {
-        // Try with missing fields
-        cy.get('button[class*="_export_button_"]').click({ force: true })
-        cy.contains(
-          'Please resolve all invalid fields in order to export the labware definition'
-        ).should('exist')
-        cy.contains('close').click({ force: true })
-
         // Brand field should not be shown for Opentrons tube rack (aka non-custom)
         cy.contains('Brand is a required field').should('not.exist')
 
@@ -151,19 +138,6 @@ context('Tubes and Rack', () => {
           "input[placeholder='Opentrons 6 Tube Rack with Generic 0.01 mL']"
         ).should('exist')
         cy.get("input[placeholder='opentrons_6_tuberack_10ul']").should('exist')
-
-        // Test pipette
-        cy.contains('Test Pipette is a required field').should('exist')
-        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-        cy.get('label')
-          .contains('Test Pipette')
-          .children()
-          .first()
-          .trigger('mousedown')
-        cy.get('*[class^="_option_label"]')
-          .contains(/P10.*Single-Channel.*GEN1/)
-          .click()
-        cy.contains('Test Pipette is a required field').should('not.exist')
 
         // All fields present
         cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -199,12 +173,6 @@ context('Tubes and Rack', () => {
       cy.contains('start creating labware').click({ force: true })
     })
 
-    it('contains a button to the testing guide', () => {
-      cy.contains('labware test guide')
-        .should('have.prop', 'href')
-        .and('to.have.string', 'labwareDefinition_testGuide')
-    })
-
     it('does not have a preview image', () => {
       cy.contains('Add missing info to see labware preview').should('exist')
     })
@@ -308,13 +276,6 @@ context('Tubes and Rack', () => {
       })
 
       it('tests the file export', () => {
-        // Try with missing fields
-        cy.get('button[class*="_export_button_"]').click({ force: true })
-        cy.contains(
-          'Please resolve all invalid fields in order to export the labware definition'
-        ).should('exist')
-        cy.contains('close').click({ force: true })
-
         // Brand field should not be shown for Opentrons tube rack (aka non-custom)
         cy.contains('Brand is a required field').should('not.exist')
 
@@ -325,19 +286,6 @@ context('Tubes and Rack', () => {
         cy.get("input[placeholder='opentrons_15_tuberack_10ul']").should(
           'exist'
         )
-
-        // Test pipette
-        cy.contains('Test Pipette is a required field').should('exist')
-        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-        cy.get('label')
-          .contains('Test Pipette')
-          .children()
-          .first()
-          .trigger('mousedown')
-        cy.get('*[class^="_option_label"]')
-          .contains(/P10.*Single-Channel.*GEN1/)
-          .click()
-        cy.contains('Test Pipette is a required field').should('not.exist')
 
         // All fields present
         cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -373,12 +321,6 @@ context('Tubes and Rack', () => {
       cy.contains('start creating labware').click({ force: true })
     })
 
-    it('contains a button to the testing guide', () => {
-      cy.contains('labware test guide')
-        .should('have.prop', 'href')
-        .and('to.have.string', 'labwareDefinition_testGuide')
-    })
-
     it('does not have a preview image', () => {
       cy.contains('Add missing info to see labware preview').should('exist')
     })
@@ -482,13 +424,6 @@ context('Tubes and Rack', () => {
       })
 
       it('tests the file export', () => {
-        // Try with missing fields
-        cy.get('button[class*="_export_button_"]').click({ force: true })
-        cy.contains(
-          'Please resolve all invalid fields in order to export the labware definition'
-        ).should('exist')
-        cy.contains('close').click({ force: true })
-
         // Brand field should not be shown for Opentrons tube rack (aka non-custom)
         cy.contains('Brand is a required field').should('not.exist')
 
@@ -499,19 +434,6 @@ context('Tubes and Rack', () => {
         cy.get("input[placeholder='opentrons_24_tuberack_10ul']").should(
           'exist'
         )
-
-        // Test pipette
-        cy.contains('Test Pipette is a required field').should('exist')
-        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-        cy.get('label')
-          .contains('Test Pipette')
-          .children()
-          .first()
-          .trigger('mousedown')
-        cy.get('*[class^="_option_label"]')
-          .contains(/P10.*Single-Channel.*GEN1/)
-          .click()
-        cy.contains('Test Pipette is a required field').should('not.exist')
 
         // All fields present
         cy.get('button[class*="_export_button_"]').click({ force: true })
