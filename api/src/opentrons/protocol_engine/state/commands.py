@@ -6,6 +6,7 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional, Union
+from typing_extensions import assert_never
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
 
@@ -306,13 +307,25 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         command_id=id, failed_at=action.failed_at, error_occurrence=None
                     )
                 self._state.queued_setup_command_ids.clear()
+            elif (
+                prev_entry.command.intent == CommandIntent.PROTOCOL
+                or prev_entry.command.intent is None
+            ):
+                if action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY:
+                    self._state.queue_status = QueueStatus.AWAITING_RECOVERY
+                elif action.type == ErrorRecoveryType.FAIL_RUN:
+                    other_command_ids_to_fail = self._state.queued_command_ids
+                    for id in other_command_ids_to_fail:
+                        self._update_to_failed(
+                            command_id=id,
+                            failed_at=action.failed_at,
+                            error_occurrence=None,
+                        )
+                    self._state.queued_command_ids.clear()
+                else:
+                    assert_never(action.type)
             else:
-                other_command_ids_to_fail = self._state.queued_command_ids
-                for id in other_command_ids_to_fail:
-                    self._update_to_failed(
-                        command_id=id, failed_at=action.failed_at, error_occurrence=None
-                    )
-                self._state.queued_command_ids.clear()
+                assert_never(prev_entry.command.intent)
 
             if self._state.running_command_id == action.command_id:
                 self._state.running_command_id = None
@@ -330,6 +343,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.PAUSED
+
+        elif isinstance(action, ResumeFromRecoveryAction):
+            self._state.queue_status = QueueStatus.RUNNING
 
         elif isinstance(action, StopAction):
             if not self._state.run_result:
@@ -377,6 +393,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if self._config.block_on_door_open:
                 if action.door_state == DoorState.OPEN:
                     self._state.is_door_blocking = True
+                    # todo(mm, 2024-03-19): It's unclear how the door should interact
+                    # with error recovery (QueueStatus.AWAITING_RECOVERY).
                     if self._state.queue_status != QueueStatus.SETUP:
                         self._state.queue_status = QueueStatus.PAUSED
                 elif action.door_state == DoorState.CLOSED:
@@ -802,6 +820,11 @@ class CommandView(HasState[CommandState]):
             else:
                 return EngineStatus.PAUSED
 
+        elif self._state.queue_status == QueueStatus.AWAITING_RECOVERY:
+            return EngineStatus.AWAITING_RECOVERY
+
+        # todo(mm, 2024-03-19): Does this intentionally return idle if QueueStatus is
+        # SETUP and we're currently a setup command?
         return EngineStatus.IDLE
 
     def get_latest_command_hash(self) -> Optional[str]:
