@@ -9,6 +9,7 @@ from decoy import Decoy
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
@@ -695,7 +696,8 @@ async def test_wait_until_complete(
     decoy.verify(
         await state_store.wait_for(
             condition=state_store.commands.get_all_commands_final
-        )
+        ),
+        state_store.commands.raise_fatal_command_error(),
     )
 
 
@@ -778,12 +780,14 @@ async def test_estop_during_command(
         error_id=error_id,
         failed_at=timestamp,
         error=EStopActivatedError(message="Estop Activated"),
+        type=ErrorRecoveryType.FAIL_RUN,
     )
     expected_action_2 = FailCommandAction(
         command_id=fake_command_set.head(),
         error_id=error_id,
         failed_at=timestamp,
         error=EStopActivatedError(message="Estop Activated"),
+        type=ErrorRecoveryType.FAIL_RUN,
     )
 
     subject.estop(maintenance_run=maintenance_run)
