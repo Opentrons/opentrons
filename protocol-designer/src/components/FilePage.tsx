@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
@@ -27,11 +28,10 @@ import { actions as steplistActions } from '../steplist'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
 import { FilePipettesModal } from './modals/FilePipettesModal'
+import { getTopPortalEl } from './portals/TopPortal'
 
 import type { ModuleType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
-import { createPortal } from 'react-dom'
-import { getTopPortalEl } from './portals/TopPortal'
 
 // TODO(mc, 2020-02-28): explore l10n for these dates
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
@@ -88,8 +88,25 @@ export const FilePage = (): JSX.Element => {
     handleSubmit,
     watch,
     control,
+    setValue,
     formState: { isDirty },
   } = useForm<FileMetadataFields>({ defaultValues: formValues })
+
+  //  to ensure that values from watch are up to date if the defaultValues
+  //  change
+  React.useEffect(() => {
+    setValue('protocolName', formValues.protocolName)
+    setValue('created', formValues.created)
+    setValue('lastModified', formValues.lastModified)
+    setValue('author', formValues.author)
+    setValue('description', formValues.description)
+  }, [
+    formValues.protocolName,
+    formValues.created,
+    formValues.lastModified,
+    formValues.author,
+    formValues.description,
+  ])
 
   const [created, lastModified, protocolName, author, description] = watch([
     'created',
