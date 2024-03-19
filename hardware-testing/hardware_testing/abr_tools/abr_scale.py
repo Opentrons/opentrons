@@ -7,7 +7,7 @@ from hardware_testing.drivers.radwag import RadwagScale
 from typing import Any, List
 import argparse
 import csv
-from .abr_read_logs import create_abr_data_sheet
+from hardware_testing.abr_tools.read_robot_logs import ReadRobotLogs
 
 
 def write_to_sheets(file_name_csv: str, google_sheet: Any, row_list: List) -> None:
@@ -77,7 +77,9 @@ if __name__ == "__main__":
     is_stable = False
     # Set up csv sheet
     headers = ["Robot", "Date", "Timestamp", "Labware", "Mass (g)", "Measurement Step"]
-    all_data_csv = create_abr_data_sheet(storage_directory, file_name, headers)
+    all_data_csv = ReadRobotLogs.create_abr_data_sheet(
+        storage_directory, file_name, headers
+    )
     # Set up google sheet
     try:
         sys.path.insert(0, storage_directory)

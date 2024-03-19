@@ -9,6 +9,7 @@ from typing import List
 import os
 import argparse
 
+
 class _ABRAsairSensor:
     def __init__(self, robot: str, duration: int, frequency: int) -> None:
         try:
