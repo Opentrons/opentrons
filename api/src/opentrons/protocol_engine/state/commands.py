@@ -725,38 +725,47 @@ class CommandView(HasState[CommandState]):
             SetupCommandNotAllowedError: The engine is running, so a setup command
                 may not be added.
         """
-        if self.get_status() == EngineStatus.AWAITING_RECOVERY:
-            # While we're developing error recovery, we'll conservatively disallow
-            # all actions, to avoid putting the engine in weird undefined states.
-            # We'll allow specific actions here as we flesh things out and add support
-            # for them.
-            raise NotImplementedError()
-
-        if isinstance(action, ResumeFromRecoveryAction):
-            # https://opentrons.atlassian.net/browse/EXEC-301
-            raise NotImplementedError()
-
         if self._state.run_result is not None:
             raise RunStoppedError("The run has already stopped.")
 
         elif isinstance(action, PlayAction):
             if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
                 raise RobotDoorOpenError("Front door or top window is currently open.")
+            elif self.get_status() == EngineStatus.AWAITING_RECOVERY:
+                raise NotImplementedError()
+            else:
+                return action
 
         elif isinstance(action, PauseAction):
             if not self.get_is_running():
                 raise PauseNotAllowedError("Cannot pause a run that is not running.")
+            elif self.get_status() == EngineStatus.AWAITING_RECOVERY:
+                raise NotImplementedError()
+            else:
+                return action
 
-        elif (
-            isinstance(action, QueueCommandAction)
-            and action.request.intent == CommandIntent.SETUP
-        ):
-            if self._state.queue_status != QueueStatus.SETUP:
+        elif isinstance(action, QueueCommandAction):
+            if (
+                action.request.intent == CommandIntent.SETUP
+                and self._state.queue_status != QueueStatus.SETUP
+            ):
                 raise SetupCommandNotAllowedError(
                     "Setup commands are not allowed after run has started."
                 )
+            else:
+                return action
 
-        return action
+        elif isinstance(action, ResumeFromRecoveryAction):
+            if self.get_status() != EngineStatus.AWAITING_RECOVERY:
+                raise NotImplementedError()
+            else:
+                return action
+
+        elif isinstance(action, StopAction):
+            return action
+
+        else:
+            assert_never(action)
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
