@@ -1,0 +1,27 @@
+/* stylelint-disable */
+
+.numerical-keyboard button.hg-button.hg-button-backspace,
+.numerical-keyboard button.hg-button.hg-button-abc,
+.numerical-keyboard button.hg-button.hg-standardBtn {
+  flex: 1;
+}
+
+.numerical-keyboard button.hg-button.hg-button-backspace span,
+.numerical-keyboard button.hg-button.hg-button-abc span,
+.numerical-keyboard button.hg-button.hg-standardBtn span {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+div:nth-child(4) .hg-button.hg-standardBtn:nth-child(1) {
+  background-color: transparent;
+  box-shadow: none;
+  cursor: none;
+}
+
+.numerical-keyboard button.hg-button.hg-standardBtn.hg-decimal-point {
+  background-color: #fff;
+  cursor: pointer;
+}

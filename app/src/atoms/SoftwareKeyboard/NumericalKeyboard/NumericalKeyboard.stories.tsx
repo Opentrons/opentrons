@@ -1,25 +1,36 @@
 import * as React from 'react'
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
 import { touchScreenViewport } from '../../../DesignTokens/constants'
 import { InputField } from '../../InputField'
-import { Numpad } from './'
+import { NumericalKeyboard } from '.'
 import '../index.css'
 import './index.css'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Atoms/SoftwareKeyboard/Numpad',
-  component: Numpad,
+  title: 'ODD/Atoms/SoftwareKeyboard/NumericalKeyboard',
+  component: NumericalKeyboard,
   parameters: touchScreenViewport,
+  argTypes: {
+    isDecimal: {
+      control: {
+        type: 'boolean',
+        options: [true, false],
+      },
+      defaultValue: false,
+    },
+  },
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof Numpad>> = args => {
+const Template: Story<
+  React.ComponentProps<typeof NumericalKeyboard>
+> = args => {
   const [showKeyboard, setShowKeyboard] = React.useState(false)
   const [value, setValue] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
@@ -30,14 +41,18 @@ const Template: Story<React.ComponentProps<typeof Numpad>> = args => {
           value={value}
           type="text"
           placeholder="When focusing, the numpad shows up"
-          onFocus={() => setShowKeyboard(true)}
+          onFocus={() => {
+            setShowKeyboard(true)
+          }}
         />
       </form>
       <Flex position={POSITION_ABSOLUTE} top="20%" width="15rem">
         {showKeyboard && (
-          <Numpad
+          <NumericalKeyboard
+            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
             onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
+            isDecimal={args.isDecimal}
           />
         )}
       </Flex>
@@ -46,3 +61,6 @@ const Template: Story<React.ComponentProps<typeof Numpad>> = args => {
 }
 
 export const NormalSoftwareKeyboard = Template.bind({})
+NormalSoftwareKeyboard.args = {
+  isDecimal: false,
+}
