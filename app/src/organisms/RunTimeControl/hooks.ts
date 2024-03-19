@@ -21,6 +21,8 @@ import {
   useRunCommands,
 } from '../ProtocolUpload/hooks'
 import { useNotifyRunQuery } from '../../resources/runs'
+import { useFeatureFlag } from '../../redux/config'
+import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { UseQueryOptions } from 'react-query'
 import type { RunAction, RunStatus, Run, RunData } from '@opentrons/api-client'
@@ -182,4 +184,15 @@ export function useRunErrors(runId: string | null): RunData['errors'] {
   })
 
   return runRecord?.data?.errors ?? []
+}
+
+export function useProtocolHasRunTimeParameters(runId: string | null): boolean {
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const runTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
+
+  console.log(
+    'TODO: delete the feature flag logic',
+    mostRecentAnalysis?.runTimeParameters
+  )
+  return runTimeParametersFF
 }

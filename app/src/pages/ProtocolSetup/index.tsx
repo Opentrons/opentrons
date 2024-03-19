@@ -69,6 +69,7 @@ import {
   getProtocolUsesGripper,
 } from '../../organisms/ProtocolSetupInstruments/utils'
 import {
+  useProtocolHasRunTimeParameters,
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
@@ -88,6 +89,7 @@ import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
 import { useNotifyRunQuery } from '../../resources/runs'
+import { ProtocolSetupParameters } from '../../organisms/ProtocolSetupParameters'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
@@ -110,6 +112,10 @@ interface ProtocolSetupStepProps {
   disabled?: boolean
   // display the reason the setup step is disabled
   disabledReason?: string | null
+  //  optional description
+  description?: string
+  //  optional removal of the icon
+  hasIcon?: boolean
 }
 
 export function ProtocolSetupStep({
@@ -120,6 +126,8 @@ export function ProtocolSetupStep({
   subDetail,
   disabled = false,
   disabledReason,
+  description,
+  hasIcon = true,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
     ready: COLORS.green35,
@@ -178,25 +186,34 @@ export function ProtocolSetupStep({
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
         ) : null}
-        <StyledText
-          as="h4"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={disabled ? COLORS.grey50 : COLORS.black90}
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          textAlign={TYPOGRAPHY.textAlignLeft}
         >
-          {title}
-        </StyledText>
+          <StyledText
+            as="h4"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            color={disabled ? COLORS.grey50 : COLORS.black90}
+          >
+            {title}
+          </StyledText>
+          <StyledText as="h4" color={COLORS.grey50} maxWidth="35rem">
+            {description}
+          </StyledText>
+        </Flex>
         <Flex flex="1" justifyContent={JUSTIFY_END}>
           <StyledText
             as="p"
             textAlign={TEXT_ALIGN_RIGHT}
             color={disabled ? COLORS.grey50 : COLORS.black90}
+            maxWidth="20rem"
           >
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
             {subDetail}
           </StyledText>
         </Flex>
-        {disabled ? null : (
+        {disabled || !hasIcon ? null : (
           <Icon
             marginLeft={SPACING.spacing8}
             name="more"
@@ -735,6 +752,7 @@ function PrepareToRun({
 }
 
 export type SetupScreens =
+  | 'run time parameters'
   | 'prepare to run'
   | 'instruments'
   | 'modules'
@@ -749,6 +767,7 @@ export function ProtocolSetup(): JSX.Element {
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
+  const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
 
   const handleProceedToRunClick = (): void => {
     trackEvent({
@@ -775,9 +794,12 @@ export function ProtocolSetup(): JSX.Element {
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
-    'prepare to run'
+    hasRunTimeParameters ? 'run time parameters' : 'prepare to run'
   )
   const setupComponentByScreen = {
+    'run time parameters': (
+      <ProtocolSetupParameters runId={runId} setSetupScreen={setSetupScreen} />
+    ),
     'prepare to run': (
       <PrepareToRun
         runId={runId}
