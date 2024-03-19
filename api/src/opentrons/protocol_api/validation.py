@@ -87,6 +87,10 @@ class InvalidTrashBinLocationError(ValueError):
     """An error raised when attempting to load trash bins in invalid slots."""
 
 
+class InvalidFixtureLocationError(ValueError):
+    """An error raised when attempting to load a fixture in an invalid cutout."""
+
+
 def ensure_mount_for_pipette(
     mount: Union[str, Mount, None], pipette: PipetteNameType
 ) -> Mount:
@@ -330,6 +334,109 @@ def ensure_and_convert_trash_bin_location(
         )
 
     return map_trash_bin_addressable_area[slot_name_ot3]
+
+
+def ensure_and_convert_module_fixture_location(
+    deck_slot: Optional[Union[int, str]],
+    api_version: APIVersion,
+    robot_type: RobotType,
+    model: ModuleModel,
+) -> Optional[str]:
+    """Ensure module fixture load location is valid.
+
+    Also, convert the deck slot to a valid module fixture addressable area.
+    """
+
+    if robot_type == "OT-2 Standard":
+        # OT-2 Utilizes the existing compatibleModulelTypes list of traditional addressable areas
+        return None
+
+    if isinstance(model, MagneticBlockModel):
+        valid_slots = [
+            DeckSlotName(slot)
+            for slot in [
+                "A1",
+                "B1",
+                "C1",
+                "D1",
+                "A2",
+                "B2",
+                "C2",
+                "D2",
+                "A3",
+                "B3",
+                "C3",
+                "D3",
+            ]
+        ]
+        addressable_areas = [
+            "magneticBlockA1",
+            "magneticBlockB1",
+            "magneticBlockC1",
+            "magneticBlockD1",
+            "magneticBlockA2",
+            "magneticBlockB2",
+            "magneticBlockC2",
+            "magneticBlockD2",
+            "magneticBlockA3",
+            "magneticBlockB3",
+            "magneticBlockC3",
+            "magneticBlockD3",
+        ]
+
+    elif isinstance(model, HeaterShakerModuleModel):
+        valid_slots = [
+            DeckSlotName(slot)
+            for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
+        ]
+        addressable_areas = [
+            "heaterShakerA1",
+            "heaterShakerB1",
+            "heaterShakerC1",
+            "heaterShakerD1",
+            "heaterShakerA3",
+            "heaterShakerB3",
+            "heaterShakerC3",
+            "heaterShakerD3",
+        ]
+    elif isinstance(model, TemperatureModuleModel):
+        valid_slots = [
+            DeckSlotName(slot)
+            for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
+        ]
+        addressable_areas = [
+            "temperatureModuleA1",
+            "temperatureModuleB1",
+            "temperatureModuleC1",
+            "temperatureModuleD1",
+            "temperatureModuleA3",
+            "temperatureModuleB3",
+            "temperatureModuleC3",
+            "temperatureModuleD3",
+        ]
+    elif isinstance(model, ThermocyclerModuleModel):
+        return "thermocyclerModule"
+    else:
+        return None
+
+    map_addressable_area = {
+        slot: addressable_area
+        for slot, addressable_area in zip(valid_slots, addressable_areas)
+    }
+    if isinstance(deck_slot, int) or isinstance(deck_slot, str):
+        slot_name_ot3 = ensure_and_convert_deck_slot(deck_slot, api_version, robot_type)
+        if not isinstance(slot_name_ot3, DeckSlotName):
+            raise ValueError("Staging areas not permitted for module fixtures.")
+        if slot_name_ot3 not in valid_slots:
+            raise InvalidFixtureLocationError(
+                f"Invalid location: {slot_name_ot3} for fixture: {model.name}."
+            )
+
+        return map_addressable_area[slot_name_ot3]
+    else:
+        raise ValueError(
+            "Location must be provided when loading modules except for the Thermocycler."
+        )
 
 
 def ensure_hold_time_seconds(

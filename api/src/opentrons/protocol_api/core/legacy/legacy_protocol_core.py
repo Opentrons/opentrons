@@ -288,6 +288,7 @@ class LegacyProtocolCore(
         model: ModuleModel,
         deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
+        addressable_area: Optional[str],
     ) -> legacy_module_core.LegacyModuleCore:
         """Load a module."""
         resolved_type = ModuleType.from_model(model)

@@ -394,6 +394,7 @@ class ProtocolCore(
         model: ModuleModel,
         deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
+        addressable_area: Optional[str],
     ) -> Union[ModuleCore, NonConnectedModuleCore]:
         """Load a module into the protocol."""
         assert configuration is None, "Module `configuration` is deprecated"
@@ -412,28 +413,12 @@ class ProtocolCore(
         normalized_deck_slot = deck_slot.to_equivalent_for_robot_type(robot_type)
         self._ensure_module_location(normalized_deck_slot, module_type)
 
-        module_loaded = False
-        if robot_type == "OT-3 Standard":
-            if isinstance(deck_slot, DeckSlotName):
-                addressable_areas = deck_configuration_provider.get_provided_addressable_area_names(
-                    cutout_fixture_id=ModuleType.to_module_fixture_id(module_type),
-                    cutout_id=self._engine_client.state.addressable_areas.get_cutout_id_by_deck_slot_name(
-                        normalized_deck_slot
-                    ),
-                    deck_definition=self._engine_client.state.addressable_areas.state.deck_definition,
-                )
-                if len(addressable_areas) > 0:
-                    # TODO (cb, 2023-03-18): Currently modules only supply one addressable area at most, so this is safe but not if we have multi AAs
-                    # An example: For the waste chute we hardcode which addressable area is selected based on number of pipette channels
-                    # If we make one module with many AAs, we will need a way to pick which one to use
-                    result = self._engine_client.load_module(
-                        model=EngineModuleModel(model),
-                        location=AddressableAreaLocation(
-                            addressableAreaName=addressable_areas[0]
-                        ),
-                    )
-                    module_loaded = True
-        if not module_loaded:
+        if robot_type == "OT-3 Standard" and isinstance(addressable_area, str):
+            result = self._engine_client.load_module(
+                model=EngineModuleModel(model),
+                location=AddressableAreaLocation(addressableAreaName=addressable_area),
+            )
+        else:
             result = self._engine_client.load_module(
                 model=EngineModuleModel(model),
                 location=DeckSlotLocation(slotName=normalized_deck_slot),

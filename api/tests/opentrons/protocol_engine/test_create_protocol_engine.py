@@ -2,7 +2,7 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -47,7 +47,7 @@ async def test_create_engine_initializes_state_with_no_fixed_trash(
     hardware_api: HardwareAPI,
     robot_type: RobotType,
     deck_type: DeckType,
-    expected_deck_def: DeckDefinitionV4,
+    expected_deck_def: DeckDefinitionV5,
 ) -> None:
     """It should load deck geometry data into the store on create."""
     engine = await create_protocol_engine(
@@ -102,7 +102,7 @@ async def test_create_engine_initializes_state_with_fixed_trash(
     hardware_api: HardwareAPI,
     robot_type: RobotType,
     deck_type: DeckType,
-    expected_deck_def: DeckDefinitionV4,
+    expected_deck_def: DeckDefinitionV5,
     expected_fixed_trash_def: LabwareDefinition,
     expected_fixed_trash_slot: DeckSlotName,
 ) -> None:
