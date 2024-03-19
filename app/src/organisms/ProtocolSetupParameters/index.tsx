@@ -7,12 +7,13 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import { ProtocolSetupStep, SetupScreens } from '../../pages/ProtocolSetup'
+import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 
 const mockData: RunTimeParameter[] = [
   {
@@ -230,6 +231,7 @@ export function ProtocolSetupParameters({
                 onClickSetupStep={() => console.log('TODO: wire this up')}
                 detail={getDefault(parameter)}
                 description={parameter.description}
+                hasLargeFont
               />
             </React.Fragment>
           )
