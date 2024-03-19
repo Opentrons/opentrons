@@ -32,6 +32,7 @@
   "location": "location",
   "modules": "modules",
   "name": "Name",
+  "num_choices": "{{num}} choices",
   "no_available_robots_found": "No available robots found",
   "no_parameters": "No parameters specified in this protocol",
   "no_summary": "no summary specified for this protocol.",

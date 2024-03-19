@@ -209,6 +209,7 @@ export function DeviceDetailsDeckConfiguration({
                     <Flex
                       key={fixture.cutoutId}
                       backgroundColor={COLORS.grey20}
+                      borderRadius={BORDERS.borderRadius4}
                       gridGap={SPACING.spacing60}
                       padding={SPACING.spacing8}
                       width="100%"

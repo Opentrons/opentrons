@@ -195,7 +195,7 @@ const TouchNavLink = styled(NavLink)`
 `
 
 const IconButton = styled('button')`
-  border-radius: ${SPACING.spacing4};
+  border-radius: ${BORDERS.borderRadius8};
   max-height: 100%;
   background-color: ${COLORS.white};
 

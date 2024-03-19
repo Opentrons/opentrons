@@ -50,7 +50,7 @@ const INNER_STYLE_VALUE = css`
   min-width: ${SPACING.spacing20};
   color: ${COLORS.blue50};
   display: flex;
-  border-radius: 1px;
+  border-radius: ${BORDERS.borderRadius2};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
 
@@ -76,7 +76,7 @@ const INNER_STYLE_NO_VALUE = css`
   min-width: ${SPACING.spacing20};
   color: ${COLORS.grey50};
   display: flex;
-  border-radius: 1px;
+  border-radius: ${BORDERS.borderRadius2};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
 

@@ -276,7 +276,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               backgroundColor={COLORS.grey35}
               padding={SPACING.spacing8}
               border={BORDERS.lineBorder}
-              borderRadius={BORDERS.borderRadius8}
+              borderRadius={BORDERS.borderRadiusFull}
             >
               <Text
                 as="h4"

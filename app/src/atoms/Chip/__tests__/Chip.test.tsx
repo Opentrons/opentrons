@@ -152,4 +152,35 @@ describe('Chip', () => {
     const icon = screen.getByLabelText('icon_mockError')
     expect(icon).toHaveStyle(`color: ${COLORS.red60}`)
   })
+
+  it('should render text, icon, bgcolor with info colors', () => {
+    props = {
+      text: 'mockInfo',
+      type: 'info',
+    }
+    render(props)
+    const chip = screen.getByTestId('Chip_info')
+    const chipText = screen.getByText('mockInfo')
+    expect(chip).toHaveStyle(`background-color: ${COLORS.blue35}`)
+    expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadius40}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.blue60}`)
+    const icon = screen.getByLabelText('icon_mockInfo')
+    expect(icon).toHaveStyle(`color: ${COLORS.blue60}`)
+  })
+
+  it('should render text, icon, no bgcolor with info colors and bg false', () => {
+    props = {
+      background: false,
+      text: 'mockInfo',
+      type: 'info',
+    }
+    render(props)
+    const chip = screen.getByTestId('Chip_info')
+    const chipText = screen.getByText('mockInfo')
+    expect(chip).toHaveStyle(`background-color: ${COLORS.transparent}`)
+    expect(chip).toHaveStyle(`border-radius: ${BORDERS.borderRadius40}`)
+    expect(chipText).toHaveStyle(`color: ${COLORS.blue60}`)
+    const icon = screen.getByLabelText('icon_mockInfo')
+    expect(icon).toHaveStyle(`color: ${COLORS.blue60}`)
+  })
 })

@@ -271,7 +271,12 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
 
           return (
             <TableRow key={index}>
-              <TableDatum>
+              <TableDatum
+                css={`
+                  border-radius: ${BORDERS.borderRadius4} 0 0
+                    ${BORDERS.borderRadius4};
+                `}
+              >
                 <StyledText
                   as="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
@@ -282,7 +287,12 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
               <TableDatum>
                 <StyledText as="p">{labwareDisplayName}</StyledText>
               </TableDatum>
-              <TableDatum>
+              <TableDatum
+                css={`
+                  border-radius: 0 ${BORDERS.borderRadius4}
+                    ${BORDERS.borderRadius4} 0;
+                `}
+              >
                 {isEqual(vector, IDENTITY_VECTOR) ? (
                   <StyledText>{t('no_labware_offsets')}</StyledText>
                 ) : (
@@ -388,13 +398,13 @@ const TerseTable = styled('table')`
   margin: ${SPACING.spacing16} 0;
   text-align: left;
   tr td:first-child {
-    border-top-left-radius: ${BORDERS.borderRadius12};
-    border-bottom-left-radius: ${BORDERS.borderRadius12};
+    border-top-left-radius: ${BORDERS.borderRadius8};
+    border-bottom-left-radius: ${BORDERS.borderRadius8};
     padding-left: ${SPACING.spacing12};
   }
   tr td:last-child {
-    border-top-right-radius: ${BORDERS.borderRadius12};
-    border-bottom-right-radius: ${BORDERS.borderRadius12};
+    border-top-right-radius: ${BORDERS.borderRadius8};
+    border-bottom-right-radius: ${BORDERS.borderRadius8};
     padding-right: ${SPACING.spacing12};
   }
 `
