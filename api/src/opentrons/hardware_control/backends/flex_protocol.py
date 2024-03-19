@@ -309,6 +309,14 @@ class FlexBackend(Protocol):
         """Get engaged axes."""
         ...
 
+    async def update_engaged_axes(self) -> None:
+        """Update engaged axes."""
+        ...
+
+    async def is_motor_engaged(self, axis: Axis) -> bool:
+        """Check if axis is enabled."""
+        ...
+
     async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
         ...

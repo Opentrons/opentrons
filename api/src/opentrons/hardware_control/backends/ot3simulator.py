@@ -97,6 +97,7 @@ class OT3Simulator(FlexBackend):
     _position: Dict[Axis, float]
     _encoder_position: Dict[Axis, float]
     _motor_status: Dict[Axis, MotorStatus]
+    _engaged_axes: Dict[Axis, bool]
 
     @classmethod
     async def build(
@@ -148,6 +149,7 @@ class OT3Simulator(FlexBackend):
         self._initialized = False
         self._lights = {"button": False, "rails": False}
         self._gear_motor_position: Dict[Axis, float] = {}
+        self._engaged_axes: Dict[Axis, bool] = {}
         self._feature_flags = feature_flags or HardwareFeatureFlags()
 
         def _sanitize_attached_instrument(
@@ -374,6 +376,8 @@ class OT3Simulator(FlexBackend):
         Returns:
             None
         """
+        for ax in origin:
+            self._engaged_axes[ax] = True
         self._position.update(target)
         self._encoder_position.update(target)
 
@@ -396,6 +400,7 @@ class OT3Simulator(FlexBackend):
         for h in homed:
             self._position[h] = self._get_home_position()[h]
             self._motor_status[h] = MotorStatus(True, True)
+            self._engaged_axes[h] = True
         return axis_pad(self._position, 0.0)
 
     @ensure_yield
@@ -643,16 +648,29 @@ class OT3Simulator(FlexBackend):
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
-        return {}
+        return self._engaged_axes
+
+    async def update_engaged_axes(self) -> None:
+        """Update engaged axes."""
+        return None
+
+    async def is_motor_engaged(self, axis: Axis) -> bool:
+        if axis not in self._engaged_axes.keys():
+            return False
+        return self._engaged_axes[axis]
 
     @ensure_yield
     async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
+        for ax in axes:
+            self._engaged_axes.update({ax: False})
         return None
 
     @ensure_yield
     async def engage_axes(self, axes: List[Axis]) -> None:
         """Engage axes."""
+        for ax in axes:
+            self._engaged_axes.update({ax: True})
         return None
 
     @ensure_yield
