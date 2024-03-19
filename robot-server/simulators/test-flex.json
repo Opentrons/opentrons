@@ -37,7 +37,7 @@
     "tempdeck": [
       {
         "serial_number": "temp-123",
-        "items": [
+        "calls": [
       {
         "function_name": "start_set_temperature",
         "kwargs": {
