@@ -69,6 +69,7 @@ class _ABRAsairSensor:
                 temp,
                 rh,
             ]
+
             results_list.append(row)
             # Check if duration elapsed
             elapsed_time = datetime.datetime.now() - start_time
