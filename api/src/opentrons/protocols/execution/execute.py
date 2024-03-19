@@ -20,7 +20,7 @@ MODULE_LOG = logging.getLogger(__name__)
 def run_protocol(
     protocol: Protocol,
     context: ProtocolContext,
-    run_time_param_overrides: Optional[Dict[str, Union[float, bool, str]]],
+    run_time_param_overrides: Optional[Dict[str, Union[float, bool, str]]] = None,
 ) -> None:
     """Run a protocol.
 

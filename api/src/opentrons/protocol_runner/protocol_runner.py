@@ -195,7 +195,7 @@ class PythonAndLegacyRunner(AbstractRunner):
             func=self._legacy_executor.execute,
             protocol=protocol,
             context=context,
-            run_time_params_overrides=run_time_params_overrides,
+            run_time_param_overrides=run_time_params_overrides,
         )
 
     async def run(  # noqa: D102

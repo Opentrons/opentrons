@@ -469,6 +469,7 @@ async def test_load_legacy_python(
             func=legacy_executor.execute,
             protocol=legacy_protocol,
             context=legacy_context,
+            run_time_param_overrides=None,
         ),
     )
     assert broker_captor.value is legacy_python_runner_subject.broker
@@ -602,6 +603,7 @@ async def test_load_legacy_json(
             func=legacy_executor.execute,
             protocol=legacy_protocol,
             context=legacy_context,
+            run_time_param_overrides=None,
         ),
     )
 
