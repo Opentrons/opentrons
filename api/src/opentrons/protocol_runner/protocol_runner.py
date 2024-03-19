@@ -35,8 +35,11 @@ from .legacy_wrappers import (
     LegacyExecutor,
     LegacyLoadInfo,
 )
-from ..protocol_engine.types import PostRunHardwareState, DeckConfigurationType, \
-    RTPOverridesType
+from ..protocol_engine.types import (
+    PostRunHardwareState,
+    DeckConfigurationType,
+    RTPOverridesType,
+)
 
 
 class RunResult(NamedTuple):
@@ -106,8 +109,8 @@ class AbstractRunner(ABC):
     async def run(
         self,
         deck_configuration: DeckConfigurationType,
-        run_time_params_overrides: Optional[RTPOverridesType],
         protocol_source: Optional[ProtocolSource] = None,
+        run_time_params_overrides: Optional[RTPOverridesType] = None,
     ) -> RunResult:
         """Run a given protocol to completion."""
 
@@ -137,9 +140,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         self._legacy_executor = legacy_executor or LegacyExecutor()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
-        self._task_queue = (
-            task_queue or TaskQueue()
-        )
+        self._task_queue = task_queue or TaskQueue()
         self._task_queue.set_cleanup_func(
             func=protocol_engine.finish,
             drop_tips_after_run=drop_tips_after_run,
@@ -147,7 +148,10 @@ class PythonAndLegacyRunner(AbstractRunner):
         )
 
     async def load(
-        self, protocol_source: ProtocolSource, python_parse_mode: PythonParseMode, run_time_params_overrides: Optional[RTPOverridesType],
+        self,
+        protocol_source: ProtocolSource,
+        python_parse_mode: PythonParseMode,
+        run_time_params_overrides: Optional[RTPOverridesType],
     ) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
@@ -197,8 +201,8 @@ class PythonAndLegacyRunner(AbstractRunner):
     async def run(  # noqa: D102
         self,
         deck_configuration: DeckConfigurationType,
-        run_time_params_overrides: Optional[RTPOverridesType],
         protocol_source: Optional[ProtocolSource] = None,
+        run_time_params_overrides: Optional[RTPOverridesType] = None,
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`

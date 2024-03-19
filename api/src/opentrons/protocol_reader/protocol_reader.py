@@ -1,6 +1,6 @@
 """Read relevant protocol information from a set of files."""
 from pathlib import Path
-from typing import Optional, Sequence, Dict, Union
+from typing import Optional, Sequence
 
 from opentrons.protocols.parse import PythonParseMode
 
@@ -55,7 +55,8 @@ class ProtocolReader:
     async def save(
         self,
         files: Sequence[BufferedFile],
-        directory: Path, content_hash: str,
+        directory: Path,
+        content_hash: str,
     ) -> ProtocolSource:
         """Compute a `ProtocolSource` from buffered files and save them as files.
 

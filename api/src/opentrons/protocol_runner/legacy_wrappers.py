@@ -169,9 +169,15 @@ class LegacyExecutor:
     """Interface to execute Protocol API v2 protocols in a child thread."""
 
     @staticmethod
-    async def execute(protocol: LegacyProtocol, context: LegacyProtocolContext, run_time_param_overrides: Optional[RTPOverridesType]) -> None:
+    async def execute(
+        protocol: LegacyProtocol,
+        context: LegacyProtocolContext,
+        run_time_param_overrides: Optional[RTPOverridesType],
+    ) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
-        await to_thread.run_sync(run_protocol, protocol, context, run_time_param_overrides)
+        await to_thread.run_sync(
+            run_protocol, protocol, context, run_time_param_overrides
+        )
 
 
 __all__ = [
