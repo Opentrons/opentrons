@@ -14,5 +14,6 @@ export const LabwareField = (props: FieldProps): JSX.Element => {
     props.name === 'dispense_labware'
       ? [...options, ...disposalOptions]
       : [...options]
+
   return <StepFormDropdown {...props} options={allOptions} />
 }
