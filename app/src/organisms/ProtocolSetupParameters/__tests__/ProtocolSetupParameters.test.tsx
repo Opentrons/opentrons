@@ -59,4 +59,17 @@ describe('ProtocolSetupParameters', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
     expect(props.setSetupScreen).toHaveBeenCalled()
   })
+  it('renders the reset values modal', () => {
+    render(props)
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Restore default values' })
+    )
+    screen.getByText(
+      'This will discard any changes you have made. All parameters will have their default values.'
+    )
+    const title = screen.getByText('Reset parameter values?')
+    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
+    expect(title).not.toBeInTheDocument()
+    //  TODO(jr, 3/19/24): wire up the confirm button
+  })
 })

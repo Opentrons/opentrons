@@ -10,6 +10,7 @@ import {
 import { ProtocolSetupStep, SetupScreens } from '../../pages/ProtocolSetup'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ChildNavigation } from '../ChildNavigation'
+import { ResetValuesModal } from './ResetValuesModal'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -157,6 +158,9 @@ export function ProtocolSetupParameters({
   const { t, i18n } = useTranslation('protocol_setup')
   const history = useHistory()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
+    false
+  )
 
   const handleConfirmValues = (): void => {
     setSetupScreen('prepare to run')
@@ -194,6 +198,10 @@ export function ProtocolSetupParameters({
 
   return (
     <>
+      {resetValuesModal ? (
+        <ResetValuesModal handleGoBack={() => showResetValuesModal(false)} />
+      ) : null}
+
       <ChildNavigation
         header={t('parameters')}
         onClickBack={() => history.goBack()}
@@ -202,7 +210,7 @@ export function ProtocolSetupParameters({
         secondaryButtonProps={{
           buttonType: 'tertiaryLowLight',
           buttonText: t('restore_default'),
-          onClick: () => console.log('TODO: wire this up!'),
+          onClick: () => showResetValuesModal(true),
         }}
       />
       <Flex
