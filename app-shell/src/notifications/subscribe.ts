@@ -30,7 +30,7 @@ export function subscribe(ip: string, topic: NotifyTopic): Promise<void> {
     }
     return Promise.resolve()
   } else {
-    return waitUntilActiveOrErrored('client')
+    return waitUntilActiveOrErrored({ connection: 'client', ip, robotName })
       .then(() => {
         const client = connectionStore.getClient(ip)
         if (client == null) {
@@ -51,12 +51,15 @@ export function subscribe(ip: string, topic: NotifyTopic): Promise<void> {
             )
             .catch((error: Error) => notifyLog.debug(error.message))
         } else {
-          void waitUntilActiveOrErrored('subscription').catch(
-            (error: Error) => {
-              notifyLog.debug(error.message)
-              sendDeserializedGenericError(ip, topic)
-            }
-          )
+          void waitUntilActiveOrErrored({
+            connection: 'subscription',
+            ip,
+            robotName,
+            topic,
+          }).catch((error: Error) => {
+            notifyLog.debug(error.message)
+            sendDeserializedGenericError(ip, topic)
+          })
         }
       })
       .catch((error: Error) => {
@@ -80,33 +83,54 @@ export function subscribe(ip: string, topic: NotifyTopic): Promise<void> {
         .catch((error: Error) => notifyLog.debug(error.message))
     }
   }
-  // Check every 500ms for 2 seconds before failing.
-  function waitUntilActiveOrErrored(
-    connection: 'client' | 'subscription'
-  ): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      const MAX_RETRIES = 4
-      let counter = 0
-      const intervalId = setInterval(() => {
-        const hasReceivedAck =
-          connection === 'client'
-            ? connectionStore.isConnectedToBroker(ip)
-            : connectionStore.isActiveSub(ip, topic)
-        if (hasReceivedAck) {
-          clearInterval(intervalId)
-          resolve()
-        }
+}
 
-        counter++
-        if (counter === MAX_RETRIES) {
-          clearInterval(intervalId)
-          reject(
-            new Error(
-              `Maximum number of retries exceeded for ${robotName} on ${ip}.`
-            )
+interface WaitUntilActiveOrErroredParams {
+  connection: 'client' | 'subscription'
+  ip: string
+  robotName: string | null
+  topic?: NotifyTopic
+}
+
+// Check every 500ms for 2 seconds before failing.
+function waitUntilActiveOrErrored({
+  connection,
+  ip,
+  robotName,
+  topic,
+}: WaitUntilActiveOrErroredParams): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    if (connection === 'subscription') {
+      if (topic == null) {
+        reject(
+          new Error(
+            'Must specify a topic when connection is type "subscription".'
           )
-        }
-      }, CHECK_CONNECTION_INTERVAL)
-    })
-  }
+        )
+      }
+    }
+
+    const MAX_RETRIES = 4
+    let counter = 0
+    const intervalId = setInterval(() => {
+      const hasReceivedAck =
+        connection === 'client'
+          ? connectionStore.isConnectedToBroker(ip)
+          : connectionStore.isActiveSub(ip, topic as NotifyTopic)
+      if (hasReceivedAck) {
+        clearInterval(intervalId)
+        resolve()
+      }
+
+      counter++
+      if (counter === MAX_RETRIES) {
+        clearInterval(intervalId)
+        reject(
+          new Error(
+            `Maximum number of retries exceeded for ${robotName} on ${ip}.`
+          )
+        )
+      }
+    }, CHECK_CONNECTION_INTERVAL)
+  })
 }

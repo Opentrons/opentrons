@@ -8,13 +8,13 @@ import {
 } from './deserialize'
 import { unsubscribe } from './unsubscribe'
 import { notifyLog } from './notifyLog'
-import { HEALTH_STATUS_OK } from '../constants'
+import { FAILURE_STATUSES, HEALTH_STATUS_OK } from '../constants'
 
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 import type { DiscoveryClientRobot } from '@opentrons/discovery-client'
 
 // MQTT is somewhat particular about the clientId format and will connect erratically if an unexpected string is supplied.
-const CLIENT_ID = 'app-' + Math.random().toString(16).slice(2, 8) // Derived from the mqttjs library.
+const CLIENT_ID = 'app-' + Math.random().toString(16).slice(2, 8) // Derived from mqttjs
 const connectOptions: mqtt.IClientOptions = {
   clientId: CLIENT_ID,
   port: 1883,
@@ -62,26 +62,22 @@ export function cleanUpUnreachableRobots(
   })
 }
 
-export function addNewRobotsToConnectionStore(
+export function establishConnections(
   healthyRobots: RobotData[]
 ): Promise<void> {
   return new Promise(() => {
-    const newRobots = healthyRobots.filter(({ ip, robotName }) => {
-      const isIPInStore = connectionStore.isIPInStore(ip)
-      const isIPAssociatedWithKnownRobot = connectionStore.isAssociatedWithExistingHostData(
-        robotName
-      )
-      if (!isIPInStore && isIPAssociatedWithKnownRobot) {
+    const newConnections = healthyRobots.filter(({ ip, robotName }) => {
+      if (connectionStore.isConnectedToBroker(ip)) {
+        return false
+      } else if (connectionStore.isAssociatedWithExistingHostData(robotName)) {
         if (!connectionStore.isAssociatedBrokerErrored(robotName)) {
-          // If not yet connected, pass until the next discovery-client poll so the current connection can resolve.
+          // If not connected, wait for another poll of discovery-client to resolve the current connection.
           if (connectionStore.isAssociatedBrokerConnected(robotName)) {
             void connectionStore.associateIPWithExistingHostData(ip, robotName)
           }
           return false
-        }
-        // The broker isn't reachable on existing IPs.
-        else {
-          // Mark this IP as a new broker connection to see if the broker is reachable on this IP.
+        } else {
+          // Mark this IP as a new potential broker connection to check if the broker is reachable on this IP.
           if (!connectionStore.isKnownPortBlockedIP(ip)) {
             void connectionStore.deleteAllAssociatedIPsGivenRobotName(robotName)
             return true
@@ -90,10 +86,10 @@ export function addNewRobotsToConnectionStore(
           }
         }
       } else {
-        return !isIPInStore && !connectionStore.isKnownPortBlockedIP(ip)
+        return !connectionStore.isKnownPortBlockedIP(ip)
       }
     })
-    newRobots.forEach(({ ip, robotName }) => {
+    newConnections.forEach(({ ip, robotName }) => {
       void connectionStore
         .setPendingConnection(ip, robotName)
         .then(() => {
@@ -109,7 +105,7 @@ export function addNewRobotsToConnectionStore(
               notifyLog.warn(
                 `Failed to connect to ${robotName} on ${ip} - ${error.name}: ${error.message} `
               )
-              void connectionStore.setFailedConnection(ip, error)
+              void connectionStore.setErrorStatus(ip, error.message)
             })
         })
         .catch((error: Error) => notifyLog.debug(error.message))
@@ -192,6 +188,7 @@ function establishListeners(
 
   client.on('end', () => {
     notifyLog.debug(`Closed connection to ${robotName} on ${ip}`)
+    void connectionStore.setErrorStatus(ip, FAILURE_STATUSES.ECONNFAILED)
   })
 
   client.on('disconnect', packet => {
@@ -211,12 +208,8 @@ export function closeConnectionsForcefullyFor(
     const client = connectionStore.getClient(ip)
     return new Promise<void>((resolve, reject) => {
       if (client != null) {
-        client.end(true, {})
+        client.end(true, {}, () => resolve())
       }
-      const robotName = connectionStore.getRobotNameFromIP(ip) as string
-      void connectionStore
-        .deleteAllAssociatedIPsGivenRobotName(robotName)
-        .then(() => resolve())
     })
   })
 }

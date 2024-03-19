@@ -32,6 +32,10 @@ class ConnectionStore {
     return this.browserWindow
   }
 
+  public getReachableHosts(): string[] {
+    return Object.keys(this.hosts)
+  }
+
   public getClient(ip: string): mqtt.MqttClient | null {
     if (ip in this.hosts) {
       return this.hosts[ip].client
@@ -55,10 +59,6 @@ class ConnectionStore {
     } else {
       return null
     }
-  }
-
-  public getReachableHosts(): string[] {
-    return Object.keys(this.hosts)
   }
 
   public getAssociatedIPsFromRobotName(robotName: string): string[] {
@@ -119,22 +119,24 @@ class ConnectionStore {
    * @description Marks the host as unreachable with an error status derived from the MQTT returned error object.
    *
    */
-  public setFailedConnection(ip: string, error: Error): Promise<void> {
+  public setErrorStatus(ip: string, errorMessage: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (ip in this.hosts) {
-        const errorStatus = error.message.includes(
-          FAILURE_STATUSES.ECONNREFUSED
-        )
-          ? FAILURE_STATUSES.ECONNREFUSED
-          : FAILURE_STATUSES.ECONNFAILED
+        if (this.hosts[ip].unreachableStatus == null) {
+          const errorStatus = errorMessage?.includes(
+            FAILURE_STATUSES.ECONNREFUSED
+          )
+            ? FAILURE_STATUSES.ECONNREFUSED
+            : FAILURE_STATUSES.ECONNFAILED
 
-        this.hosts[ip].unreachableStatus = errorStatus
-        if (errorStatus === FAILURE_STATUSES.ECONNREFUSED) {
-          this.knownPortBlockedIPs.add(ip)
+          this.hosts[ip].unreachableStatus = errorStatus
+          if (errorStatus === FAILURE_STATUSES.ECONNREFUSED) {
+            this.knownPortBlockedIPs.add(ip)
+          }
+          resolve()
         }
-        resolve()
       } else {
-        reject(new Error('IP is not associated with a connection'))
+        reject(new Error(`${ip} is not associated with a connection`))
       }
     })
   }
@@ -217,10 +219,6 @@ class ConnectionStore {
     })
   }
 
-  public isIPInStore(ip: string): boolean {
-    return ip in this.hosts
-  }
-
   public isAssociatedWithExistingHostData(robotName: string): boolean {
     return this.getAssociatedIPsFromRobotName(robotName).length > 0
   }
@@ -291,6 +289,10 @@ class ConnectionStore {
 
   public isKnownPortBlockedIP(ip: string): boolean {
     return this.knownPortBlockedIPs.has(ip)
+  }
+
+  public isIPInStore(ip: string): boolean {
+    return ip in this.hosts
   }
 }
 
