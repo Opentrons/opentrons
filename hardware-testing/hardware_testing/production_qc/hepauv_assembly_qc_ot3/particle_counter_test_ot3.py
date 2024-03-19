@@ -197,7 +197,10 @@ async def _main(simulating: bool) -> None:
 
             #获取数据UV
             aa = input("Press open UV to continue...(打开UV灯后,回车继续)")
-            await asyncio.sleep(11)
+
+            for i in range(10):
+                await asyncio.sleep(1)
+                print(i+1,"S")
             alldata = uvinstrument.get_uv_()
             intdatadict = uvinstrument.parse_modbus_data(alldata)
             print(intdatadict)
