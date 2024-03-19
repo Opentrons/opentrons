@@ -397,7 +397,6 @@ const EditModulesModalComponent = (
               )}
             </Flex>
             <Box>
-              
               {slotIssue ? (
                 <PDAlert
                   alertType="warning"
