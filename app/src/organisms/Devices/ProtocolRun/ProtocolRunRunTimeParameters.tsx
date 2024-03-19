@@ -16,7 +16,7 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
-import { Chip } from '../../../atoms/Chip'
+// import { Chip } from '../../../atoms/Chip'
 import { NoParameter } from '../../ProtocolDetails/ProtocolParameters/NoParameter'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
