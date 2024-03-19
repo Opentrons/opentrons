@@ -32,10 +32,12 @@ import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/Protoc
 import { RunPreview } from '../../../organisms/RunPreview'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
+import { ProtocolRunRuntimeParameters } from '../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { OPENTRONS_USB } from '../../../redux/discovery'
 import { fetchProtocols } from '../../../redux/protocol-storage'
 import { appShellRequestor } from '../../../redux/shell/remote'
+import { useFeatureFlag } from '../../../redux/config'
 
 import type {
   DesktopRouteParams,
@@ -178,6 +180,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
   const listRef = React.useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = React.useState<number | null>(null)
+  const enableRunTimeParameters = useFeatureFlag('enableRunTimeParameters')
   React.useEffect(() => {
     if (jumpedIndex != null) {
       setTimeout(() => setJumpedIndex(null), JUMPED_STEP_HIGHLIGHT_DELAY_MS)
@@ -201,6 +204,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
         runId={runId}
       />
     ),
+    'runtime-parameters': <ProtocolRunRuntimeParameters runId={runId} />,
     'module-controls': (
       <ProtocolRunModuleControls robotName={robotName} runId={runId} />
     ),
@@ -232,6 +236,9 @@ function PageContents(props: PageContentsProps): JSX.Element {
       />
       <Flex gridGap={SPACING.spacing8} marginBottom={SPACING.spacing12}>
         <SetupTab robotName={robotName} runId={runId} />
+        {enableRunTimeParameters ? (
+          <ParametersTab robotName={robotName} runId={runId} />
+        ) : null}
         <ModuleControlsTab robotName={robotName} runId={runId} />
         <RunPreviewTab robotName={robotName} runId={runId} />
       </Flex>
@@ -271,6 +278,34 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
       />
       {currentRunId !== runId ? (
         // redirect to run preview if not current run
+        <Redirect
+          to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
+        />
+      ) : null}
+    </>
+  )
+}
+
+interface ParametersTabProps {
+  robotName: string
+  runId: string
+}
+
+const ParametersTab = (props: ParametersTabProps): JSX.Element | null => {
+  const { robotName, runId } = props
+  const { t } = useTranslation('run_details')
+  const disabled = false
+  const tabDisabledReason = ''
+
+  return (
+    <>
+      <RoundTab
+        disabled={disabled}
+        tabDisabledReason={tabDisabledReason}
+        to={`/devices/${robotName}/protocol-runs/${runId}/runtime-parameters`}
+        tabName={t('parameters')}
+      />
+      {disabled ? (
         <Redirect
           to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
         />
