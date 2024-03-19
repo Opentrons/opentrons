@@ -218,6 +218,7 @@ class ProtocolContext(CommandPublisher):
         return self._bundled_data
 
     @property
+    @requires_version(2, 18)
     def params(self) -> Parameters:
         return self._params
 

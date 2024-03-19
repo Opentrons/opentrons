@@ -11,7 +11,7 @@ from opentrons.protocol_api import (
 from opentrons.protocols.parameters import (
     parameter_definition as mock_parameter_definition,
 )
-from opentrons.protocol_api.parameter_context import ParameterContext
+from opentrons.protocol_api._parameter_context import ParameterContext
 
 
 @pytest.fixture(autouse=True)
