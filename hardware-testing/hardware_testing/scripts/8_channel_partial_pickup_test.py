@@ -418,13 +418,28 @@ class Eight_Channel_Partial_Pickup_Test:
     async def _leak_test(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
+        cp = CriticalPoint.TIP
         await api.prepare_for_aspirate(mount)
-        await move_to_point(api, mount, self.trough_position, cp)
+        await self._move_to_point(api, mount, self.trough_position, cp)
         await api.aspirate(mount, self.volume)
         await api.home_z(mount)
-        await countdown(self.leak_time)
-        await move_to_point(api, mount, self.trough_position, cp)
+        await self._countdown(self.leak_time)
+        await self._move_to_point(api, mount, self.trough_position, cp)
         await api.dispense(mount)
+
+    async def _countdown(
+        self, count_time: float
+    ) -> None:
+        """
+        This function loops through a countdown before checking the leak visually
+        """
+        time_suspend = 0
+        while time_suspend < count_time:
+            await asyncio.sleep(1)
+            time_suspend += 1
+            print(f"Remaining: {count_time - time_suspend} (s)", end="")
+            print("\r", end="")
+        print("")
 
     async def _home(
         self, api: OT3API, mount: OT3Mount
