@@ -138,7 +138,9 @@ describe('useNotifyService', () => {
   })
 
   it('should return set HTTP refetch to always and fire an analytics reporting event if the connection was refused', () => {
-    vi.mocked(appShellListener).mockImplementation(function ({ callback }): any {
+    vi.mocked(appShellListener).mockImplementation(function ({
+      callback,
+    }): any {
       // eslint-disable-next-line n/no-callback-literal
       callback('ECONNREFUSED')
     })
@@ -155,9 +157,11 @@ describe('useNotifyService', () => {
   })
 
   it('should trigger a single HTTP refetch if the refetch flag was returned', () => {
-    vi.mocked(appShellListener).mockImplementation(function ({ callback }): any {
+    vi.mocked(appShellListener).mockImplementation(function ({
+      callback,
+    }): any {
       // eslint-disable-next-line n/no-callback-literal
-      callback('ECONNREFUSED')
+      callback({ refetchUsingHTTP: true })
     })
     const { rerender } = renderHook(() =>
       useNotifyService({
@@ -171,9 +175,11 @@ describe('useNotifyService', () => {
   })
 
   it('should trigger a single HTTP refetch if the unsubscribe flag was returned', () => {
-    vi.mocked(appShellListener).mockImplementation(function ({ callback }): any {
+    vi.mocked(appShellListener).mockImplementation(function ({
+      callback,
+    }): any {
       // eslint-disable-next-line n/no-callback-literal
-      callback('ECONNREFUSED')
+      callback({ unsubscribe: true })
     })
     const { rerender } = renderHook(() =>
       useNotifyService({
