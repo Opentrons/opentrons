@@ -25,8 +25,8 @@ def set_up_data_sheet(
         print("Connected to google sheet.")
     except FileNotFoundError:
         print("No google sheets credentials. Add credentials to storage notebook.")
-    csv_name = google_sheet_name + "-" + commandTypes + ".csv"
-    create_abr_data_sheet(storage_directory, csv_name, headers)
+    local_file_str = google_sheet_name + "-" + commandTypes
+    csv_name = create_abr_data_sheet(storage_directory, local_file_str, headers)
 
     return google_sheet, csv_name
 
