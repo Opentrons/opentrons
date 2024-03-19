@@ -160,7 +160,7 @@ interface ProtocolRunRuntimeParametersProps {
 export function ProtocolRunRuntimeParameters({
   runId,
 }: ProtocolRunRuntimeParametersProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { i18n, t } = useTranslation('protocol_setup')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   // ToDo (kk:03/18/2024) mockData will be replaced with []
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? mockData
@@ -177,7 +177,9 @@ export function ProtocolRunRuntimeParameters({
       case 'float':
         return `${defaultValue.toString()} ${suffix}`
       case 'boolean':
-        return Boolean(defaultValue) ? t('on') : t('off')
+        return Boolean(defaultValue)
+          ? i18n.format(t('on'), 'capitalize')
+          : i18n.format(t('off'), 'capitalize')
       case 'str':
         if ('choices' in runTimeParameter && runTimeParameter.choices != null) {
           const choice = runTimeParameter.choices.find(
