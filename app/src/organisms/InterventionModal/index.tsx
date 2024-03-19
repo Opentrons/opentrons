@@ -58,7 +58,7 @@ const MODAL_STYLE = {
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
   width: '47rem',
-  border: `${BORDERS.borderRadius8} ${BORDERS.styleSolid} ${COLORS.blue50}`,
+  border: `6px ${BORDERS.styleSolid} ${COLORS.blue50}`,
   borderRadius: BORDERS.borderRadius8,
   boxShadow: BORDERS.smallDropShadow,
 } as const
