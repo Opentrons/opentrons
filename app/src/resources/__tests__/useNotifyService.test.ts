@@ -151,7 +151,11 @@ describe('useNotifyService', () => {
       callback,
     }): any {
       // eslint-disable-next-line n/no-callback-literal
+<<<<<<< HEAD
       callback({ refetch: true })
+=======
+      callback({ unsubscribe: true })
+>>>>>>> e50afb44e6 (test fixes)
     })
     const { rerender } = renderHook(() =>
       useNotifyService({

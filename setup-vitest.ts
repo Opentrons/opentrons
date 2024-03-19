@@ -7,8 +7,12 @@ vi.mock('electron-store')
 vi.mock('electron-updater')
 vi.mock('electron')
 <<<<<<< HEAD
+<<<<<<< HEAD
 vi.mock('./app/src/redux/shell/remote')
 vi.mock('./app/src/resources/useNotifyService')
+=======
+vi.mock('./app/src/redux/shell/remote')
+>>>>>>> e50afb44e6 (test fixes)
 
 process.env.OT_PD_VERSION = 'fake_PD_version'
 global._PKG_VERSION_ = 'test environment'
