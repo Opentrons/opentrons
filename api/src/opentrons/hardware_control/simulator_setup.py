@@ -25,7 +25,7 @@ class ModuleCall:
 @dataclass(frozen=True)
 class ModuleItem:
     serial_number: str
-    items: List[ModuleCall] = field(default_factory=list)
+    calls: List[ModuleCall] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
