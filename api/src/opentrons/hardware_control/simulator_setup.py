@@ -59,7 +59,10 @@ async def _simulator_for_setup(
     if setup.machine == "OT-2 Standard":
         return await API.build_hardware_simulator(
             attached_instruments=setup.attached_instruments,
-            attached_modules=list(setup.attached_modules.keys()),
+            attached_modules={
+                k: [m.serial_number for m in v]
+                for k, v in setup.attached_modules.items()
+            },
             config=setup.config,
             strict_attached_instruments=setup.strict_attached_instruments,
             loop=loop,
