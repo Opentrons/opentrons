@@ -6,7 +6,7 @@ from fastapi import Depends
 from typing import Any, Dict, Optional
 from enum import Enum
 
-from ..json_api import NotifyRefetchBody
+from ..json_api import NotifyRefetchBody, NotifyUnsubscribeBody
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
@@ -77,26 +77,50 @@ class NotificationClient:
         self.client.loop_stop()
         await to_thread.run_sync(self.client.disconnect)
 
-    async def publish_async(
-        self, topic: str, message: NotifyRefetchBody = NotifyRefetchBody()
-    ) -> None:
-        """Asynchronously Publish a message on a specific topic to the MQTT broker.
+    async def publish_advise_refetch_async(self, topic: str) -> None:
+        """Asynchronously publish a refetch message on a specific topic to the MQTT broker.
 
         Args:
             topic: The topic to publish the message on.
-            message: The message to be published, in the format of NotifyRefetchBody.
         """
-        await to_thread.run_sync(self.publish, topic, message)
+        await to_thread.run_sync(self.publish_advise_refetch, topic)
 
-    def publish(
-        self, topic: str, message: NotifyRefetchBody = NotifyRefetchBody()
-    ) -> None:
-        """Publish a message on a specific topic to the MQTT broker.
+    async def publish_advise_unsubscribe_async(self, topic: str) -> None:
+        """Asynchronously publish an unsubscribe message on a specific topic to the MQTT broker.
 
         Args:
             topic: The topic to publish the message on.
-            message: The message to be published.
         """
+        await to_thread.run_sync(self.publish_advise_unsubscribe, topic)
+
+    def publish_advise_refetch(
+        self,
+        topic: str,
+    ) -> None:
+        """Publish a refetch message on a specific topic to the MQTT broker.
+
+        Args:
+            topic: The topic to publish the message on.
+        """
+        message = NotifyRefetchBody.construct()
+        payload = message.json()
+        self.client.publish(
+            topic=topic,
+            payload=payload,
+            qos=self._default_qos,
+            retain=self._retain_message,
+        )
+
+    def publish_advise_unsubscribe(
+        self,
+        topic: str,
+    ) -> None:
+        """Publish an unsubscribe message on a specific topic to the MQTT broker.
+
+        Args:
+            topic: The topic to publish the message on.
+        """
+        message = NotifyUnsubscribeBody.construct()
         payload = message.json()
         self.client.publish(
             topic=topic,

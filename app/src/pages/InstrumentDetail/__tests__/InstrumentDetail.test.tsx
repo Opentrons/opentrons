@@ -1,9 +1,9 @@
 import React from 'react'
-import { when } from 'jest-when'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { useParams } from 'react-router-dom'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import {
   getPipetteModelSpecs,
   getGripperDisplayName,
@@ -13,27 +13,21 @@ import { i18n } from '../../../i18n'
 import { InstrumentDetail } from '../../../pages/InstrumentDetail'
 
 import type { Instruments } from '@opentrons/api-client'
+import type * as SharedData from '@opentrons/shared-data'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('@opentrons/shared-data', () => ({
-  getAllPipetteNames: jest.fn(
-    jest.requireActual('@opentrons/shared-data').getAllPipetteNames
-  ),
-  getPipetteNameSpecs: jest.fn(
-    jest.requireActual('@opentrons/shared-data').getPipetteNameSpecs
-  ),
-  getPipetteModelSpecs: jest.fn(),
-  getGripperDisplayName: jest.fn(),
+vi.mock('@opentrons/react-api-client')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof SharedData>()
+  return {
+    ...actual,
+    getPipetteModelSpecs: vi.fn(),
+    getGripperDisplayName: vi.fn(),
+  }
+})
+vi.mock('react-router-dom', () => ({
+  useParams: vi.fn(),
+  useHistory: vi.fn(),
 }))
-jest.mock('react-router-dom', () => ({
-  useParams: jest.fn(),
-  useHistory: jest.fn(),
-}))
-
-const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
-const mockUseParams = useParams as jest.MockedFunction<typeof useParams>
 
 const render = () => {
   return renderWithProviders(<InstrumentDetail />, {
@@ -100,18 +94,18 @@ describe('InstrumentDetail', () => {
         totalLength: 2,
       },
     }
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: mockInstrumentsQuery,
     } as any)
-    when(getPipetteModelSpecs).mockReturnValue({
+    vi.mocked(getPipetteModelSpecs).mockReturnValue({
       displayName: 'mockPipette',
     } as any)
-    when(getGripperDisplayName).mockReturnValue('mockGripper')
-    mockUseParams.mockReturnValue({ mount: 'left' })
+    vi.mocked(getGripperDisplayName).mockReturnValue('mockGripper')
+    vi.mocked(useParams).mockReturnValue({ mount: 'left' })
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('displays header containing the instrument name and an overflow menu button', () => {
@@ -122,7 +116,7 @@ describe('InstrumentDetail', () => {
   })
 
   it('renders the gripper name if the instrument is a gripper', () => {
-    mockUseParams.mockReturnValue({ mount: 'extension' })
+    vi.mocked(useParams).mockReturnValue({ mount: 'extension' })
     const [{ getByText }] = render()
 
     getByText('mockGripper')
@@ -137,7 +131,7 @@ describe('InstrumentDetail', () => {
       })),
     } as any
 
-    when(mockUseInstrumentsQuery).mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: mockInstrumentsQuery,
     } as any)
 
@@ -161,7 +155,7 @@ describe('InstrumentDetail', () => {
         data: { ...item.data, calibratedOffset: null },
       })),
     }
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: mockInstrumentsQuery,
     } as any)
     const [{ getByText }] = render()
@@ -188,7 +182,7 @@ describe('InstrumentDetail', () => {
   })
 
   it('renders detach and recalibrate button if calibration data exists for a gripper', () => {
-    mockUseParams.mockReturnValue({ mount: 'extension' })
+    vi.mocked(useParams).mockReturnValue({ mount: 'extension' })
     const [{ getByText }] = render()
     getByText('detach')
     getByText('recalibrate')
@@ -202,7 +196,7 @@ describe('InstrumentDetail', () => {
         data: { ...item.data, calibratedOffset: null },
       })),
     }
-    mockUseInstrumentsQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: mockInstrumentsQuery,
     } as any)
 

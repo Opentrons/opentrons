@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
@@ -7,7 +8,7 @@ import {
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { FloatingActionButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
@@ -88,29 +89,31 @@ export function ProtocolSetupModulesAndDeck({
 
   const isModuleMismatch =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
-
   return (
     <>
-      <Portal level="top">
-        {showMultipleModulesModal ? (
-          <MultipleModulesModal
-            onCloseClick={() => setShowMultipleModulesModal(false)}
-          />
-        ) : null}
-        {showSetupInstructionsModal ? (
-          <SetupInstructionsModal
-            setShowSetupInstructionsModal={setShowSetupInstructionsModal}
-          />
-        ) : null}
-        {showDeckMapModal ? (
-          <ModulesAndDeckMapViewModal
-            setShowDeckMapModal={setShowDeckMapModal}
-            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-            runId={runId}
-            protocolAnalysis={mostRecentAnalysis}
-          />
-        ) : null}
-      </Portal>
+      {createPortal(
+        <>
+          {showMultipleModulesModal ? (
+            <MultipleModulesModal
+              onCloseClick={() => setShowMultipleModulesModal(false)}
+            />
+          ) : null}
+          {showSetupInstructionsModal ? (
+            <SetupInstructionsModal
+              setShowSetupInstructionsModal={setShowSetupInstructionsModal}
+            />
+          ) : null}
+          {showDeckMapModal ? (
+            <ModulesAndDeckMapViewModal
+              setShowDeckMapModal={setShowDeckMapModal}
+              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+              runId={runId}
+              protocolAnalysis={mostRecentAnalysis}
+            />
+          ) : null}
+        </>,
+        getTopPortalEl()
+      )}
       <ChildNavigation
         header={t('modules_and_deck')}
         onClickBack={() => setSetupScreen('prepare to run')}

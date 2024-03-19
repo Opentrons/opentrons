@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, beforeEach, vi, expect, afterEach } from 'vitest'
+
 import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
@@ -10,23 +11,17 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { AddFixtureModal } from '../AddFixtureModal'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/react-api-client')
-const mockSetShowAddFixtureModal = jest.fn()
-const mockUpdateDeckConfiguration = jest.fn()
-const mockSetCurrentDeckConfig = jest.fn()
-
-const mockUseUpdateDeckConfigurationMutation = useUpdateDeckConfigurationMutation as jest.MockedFunction<
-  typeof useUpdateDeckConfigurationMutation
->
-const mockUseDeckConfigurationQuery = useDeckConfigurationQuery as jest.MockedFunction<
-  typeof useDeckConfigurationQuery
->
+vi.mock('@opentrons/react-api-client')
+const mockSetShowAddFixtureModal = vi.fn()
+const mockUpdateDeckConfiguration = vi.fn()
+const mockSetCurrentDeckConfig = vi.fn()
 
 const render = (props: React.ComponentProps<typeof AddFixtureModal>) => {
   return renderWithProviders(<AddFixtureModal {...props} />, {
@@ -44,10 +39,10 @@ describe('Touchscreen AddFixtureModal', () => {
       setCurrentDeckConfig: mockSetCurrentDeckConfig,
       isOnDevice: true,
     }
-    mockUseUpdateDeckConfigurationMutation.mockReturnValue({
+    vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
-    mockUseDeckConfigurationQuery.mockReturnValue(({
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
   })
@@ -97,13 +92,13 @@ describe('Desktop AddFixtureModal', () => {
       cutoutId: 'cutoutD3',
       setShowAddFixtureModal: mockSetShowAddFixtureModal,
     }
-    mockUseUpdateDeckConfigurationMutation.mockReturnValue({
+    vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should render text and buttons slot D3', () => {

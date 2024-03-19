@@ -68,9 +68,9 @@ export function LabwareOffsetTabs({
         border={BORDERS.lineBorder}
         // remove left upper corner border radius when first tab is active
         borderRadius={`${
-          currentTab === 'table' ? '0' : BORDERS.radiusSoftCorners
-        } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
-          BORDERS.radiusSoftCorners
+          currentTab === 'table' ? '0' : BORDERS.borderRadius4
+        } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
+          BORDERS.borderRadius4
         }`}
         paddingX={SPACING.spacing16}
       >

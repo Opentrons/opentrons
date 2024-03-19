@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { vi, it, describe, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
 import * as RobotUpdate from '../../../redux/robot-update'
@@ -13,18 +14,8 @@ import { UpdateRobot } from '../UpdateRobot'
 
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/robot-update')
-
-const mockGetRobotUpdateUpdateAvailable = RobotUpdate.getRobotUpdateAvailable as jest.MockedFunction<
-  typeof RobotUpdate.getRobotUpdateAvailable
->
-const mockGetRobotUpdateSession = RobotUpdate.getRobotUpdateSession as jest.MockedFunction<
-  typeof RobotUpdate.getRobotUpdateSession
->
-const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
-  typeof getLocalRobot
->
+vi.mock('../../../redux/discovery')
+vi.mock('../../../redux/robot-update')
 
 const MOCK_STATE: State = {
   discovery: {
@@ -86,13 +77,14 @@ const render = () => {
 
 describe('UpdateRobot', () => {
   beforeEach(() => {
-    mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.UPGRADE)
-    when(mockGetLocalRobot).calledWith(MOCK_STATE).mockReturnValue(mockRobot)
+    vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
+      RobotUpdate.UPGRADE
+    )
+    when(vi.mocked(getLocalRobot)).calledWith(MOCK_STATE).thenReturn(mockRobot)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render mock Update Software for downloading', () => {
@@ -100,19 +92,25 @@ describe('UpdateRobot', () => {
       ...mockSession,
       step: RobotUpdate.RESTART,
     }
-    mockGetRobotUpdateSession.mockReturnValue(mockDownloadSession)
+    vi.mocked(RobotUpdate.getRobotUpdateSession).mockReturnValue(
+      mockDownloadSession
+    )
     const [{ getByText }] = render()
     getByText('Downloading software...')
   })
 
   it('should render NoUpdateFound when there is no upgrade - reinstall', () => {
-    mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.REINSTALL)
+    vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
+      RobotUpdate.REINSTALL
+    )
     const [{ getByText }] = render()
     getByText('Your software is already up to date!')
   })
 
   it('should render mock NoUpdate found when there is no upgrade - downgrade', () => {
-    mockGetRobotUpdateUpdateAvailable.mockReturnValue(RobotUpdate.DOWNGRADE)
+    vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
+      RobotUpdate.DOWNGRADE
+    )
     const [{ getByText }] = render()
     getByText('Your software is already up to date!')
   })
@@ -122,7 +120,9 @@ describe('UpdateRobot', () => {
       ...mockSession,
       error: 'mock error',
     }
-    mockGetRobotUpdateSession.mockReturnValue(mockErrorSession)
+    vi.mocked(RobotUpdate.getRobotUpdateSession).mockReturnValue(
+      mockErrorSession
+    )
     const [{ getByText }] = render()
     getByText('Software update error')
     getByText('mock error')

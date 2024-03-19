@@ -1,19 +1,21 @@
 import * as React from 'react'
-import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+
+import {
+  nestedTextMatcher,
+  renderWithProviders,
+} from '../../../__testing-utils__'
 import { LEFT } from '@opentrons/shared-data'
 import { fixtureP10Multi } from '@opentrons/shared-data/pipette/fixtures/name'
 import { i18n } from '../../../i18n'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { Instructions } from '../Instructions'
 import { CheckPipettesButton } from '../CheckPipettesButton'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
-jest.mock('../CheckPipettesButton')
-
-const mockCheckPipettesButton = CheckPipettesButton as jest.MockedFunction<
-  typeof CheckPipettesButton
->
+vi.mock('../CheckPipettesButton')
 
 const render = (props: React.ComponentProps<typeof Instructions>) => {
   return renderWithProviders(<Instructions {...props} />, {
@@ -40,15 +42,15 @@ describe('Instructions', () => {
       actualPipette: MOCK_ACTUAL_PIPETTE,
       displayCategory: 'GEN1',
       direction: 'detach',
-      setWantedName: jest.fn(),
-      confirm: jest.fn(),
-      back: jest.fn(),
-      nextStep: jest.fn(),
-      prevStep: jest.fn(),
+      setWantedName: vi.fn(),
+      confirm: vi.fn(),
+      back: vi.fn(),
+      nextStep: vi.fn(),
+      prevStep: vi.fn(),
       currentStepCount: 1,
       attachedWrong: false,
     }
-    mockCheckPipettesButton.mockReturnValue(
+    vi.mocked(CheckPipettesButton).mockReturnValue(
       <div>mock check pipettes button</div>
     )
   })
@@ -92,11 +94,11 @@ describe('Instructions', () => {
       actualPipette: null,
       displayCategory: null,
       direction: 'attach',
-      setWantedName: jest.fn(),
-      confirm: jest.fn(),
-      back: jest.fn(),
-      nextStep: jest.fn(),
-      prevStep: jest.fn(),
+      setWantedName: vi.fn(),
+      confirm: vi.fn(),
+      back: vi.fn(),
+      nextStep: vi.fn(),
+      prevStep: vi.fn(),
       currentStepCount: 0,
       attachedWrong: false,
     }
@@ -116,11 +118,11 @@ describe('Instructions', () => {
       actualPipette: null,
       displayCategory: 'GEN1',
       direction: 'attach',
-      setWantedName: jest.fn(),
-      confirm: jest.fn(),
-      back: jest.fn(),
-      nextStep: jest.fn(),
-      prevStep: jest.fn(),
+      setWantedName: vi.fn(),
+      confirm: vi.fn(),
+      back: vi.fn(),
+      nextStep: vi.fn(),
+      prevStep: vi.fn(),
       currentStepCount: 1,
       attachedWrong: false,
     }
@@ -149,11 +151,11 @@ describe('Instructions', () => {
       actualPipette: null,
       displayCategory: 'GEN1',
       direction: 'attach',
-      setWantedName: jest.fn(),
-      confirm: jest.fn(),
-      back: jest.fn(),
-      nextStep: jest.fn(),
-      prevStep: jest.fn(),
+      setWantedName: vi.fn(),
+      confirm: vi.fn(),
+      back: vi.fn(),
+      nextStep: vi.fn(),
+      prevStep: vi.fn(),
       currentStepCount: 2,
       attachedWrong: false,
     }
@@ -177,11 +179,11 @@ describe('Instructions', () => {
       actualPipette: null,
       displayCategory: 'GEN1',
       direction: 'attach',
-      setWantedName: jest.fn(),
-      confirm: jest.fn(),
-      back: jest.fn(),
-      nextStep: jest.fn(),
-      prevStep: jest.fn(),
+      setWantedName: vi.fn(),
+      confirm: vi.fn(),
+      back: vi.fn(),
+      nextStep: vi.fn(),
+      prevStep: vi.fn(),
       currentStepCount: 1,
       attachedWrong: false,
     }
@@ -209,11 +211,11 @@ describe('Instructions', () => {
       actualPipette: null,
       displayCategory: 'GEN1',
       direction: 'attach',
-      setWantedName: jest.fn(),
-      confirm: jest.fn(),
-      back: jest.fn(),
-      nextStep: jest.fn(),
-      prevStep: jest.fn(),
+      setWantedName: vi.fn(),
+      confirm: vi.fn(),
+      back: vi.fn(),
+      nextStep: vi.fn(),
+      prevStep: vi.fn(),
       currentStepCount: 2,
       attachedWrong: false,
     }
@@ -237,11 +239,11 @@ describe('Instructions', () => {
       actualPipette: null,
       displayCategory: 'GEN1',
       direction: 'attach',
-      setWantedName: jest.fn(),
-      confirm: jest.fn(),
-      back: jest.fn(),
-      nextStep: jest.fn(),
-      prevStep: jest.fn(),
+      setWantedName: vi.fn(),
+      confirm: vi.fn(),
+      back: vi.fn(),
+      nextStep: vi.fn(),
+      prevStep: vi.fn(),
       currentStepCount: 2,
       attachedWrong: true,
     }

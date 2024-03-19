@@ -1,9 +1,10 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   useDeckConfigurationQuery,
   useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client/src/deck_configuration'
+} from '@opentrons/react-api-client'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -16,7 +17,7 @@ import {
 } from '@opentrons/components'
 import { getFixtureDisplayName } from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
-import { Portal } from '../../../../App/portal'
+import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
 
@@ -47,35 +48,34 @@ export const NotConfiguredModal = (
     onCloseClick()
   }
 
-  return (
-    <Portal level="top">
-      <LegacyModal
-        title={t('add_fixture', {
-          fixtureName: getFixtureDisplayName(requiredFixtureId),
-        })}
-        onClose={onCloseClick}
-        width="27.75rem"
-      >
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="p">{t('add_fixture_to_deck')}</StyledText>
-          <Flex paddingTop={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
-            <Flex
-              padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
-              backgroundColor={COLORS.grey30}
-              borderRadius={BORDERS.radiusSoftCorners}
-              alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-            >
-              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                {getFixtureDisplayName(requiredFixtureId)}
-              </StyledText>
-              <TertiaryButton onClick={handleUpdateDeck}>
-                {i18n.format(t('shared:add'), 'capitalize')}
-              </TertiaryButton>
-            </Flex>
+  return createPortal(
+    <LegacyModal
+      title={t('add_fixture', {
+        fixtureName: getFixtureDisplayName(requiredFixtureId),
+      })}
+      onClose={onCloseClick}
+      width="27.75rem"
+    >
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <StyledText as="p">{t('add_fixture_to_deck')}</StyledText>
+        <Flex paddingTop={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
+          <Flex
+            padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+            backgroundColor={COLORS.grey30}
+            borderRadius={BORDERS.borderRadius8}
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {getFixtureDisplayName(requiredFixtureId)}
+            </StyledText>
+            <TertiaryButton onClick={handleUpdateDeck}>
+              {i18n.format(t('shared:add'), 'capitalize')}
+            </TertiaryButton>
           </Flex>
         </Flex>
-      </LegacyModal>
-    </Portal>
+      </Flex>
+    </LegacyModal>,
+    getTopPortalEl()
   )
 }

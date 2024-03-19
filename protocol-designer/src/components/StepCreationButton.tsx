@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Tooltip,
@@ -24,11 +25,12 @@ import {
   ConfirmDeleteModal,
   CLOSE_UNSAVED_STEP_FORM,
 } from './modals/ConfirmDeleteModal'
-import { Portal } from './portals/MainPageModalPortal'
-import { stepIconsByType, StepType } from '../form-types'
-import styles from './listButtons.css'
-import { ThunkDispatch } from 'redux-thunk'
-import { BaseState } from '../types'
+import { getMainPagePortalEl } from './portals/MainPageModalPortal'
+import { stepIconsByType } from '../form-types'
+import styles from './listButtons.module.css'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { BaseState } from '../types'
+import type { StepType } from '../form-types'
 
 interface StepButtonComponentProps {
   children: React.ReactNode
@@ -165,8 +167,8 @@ export const StepCreationButton = (): JSX.Element => {
 
   return (
     <>
-      {enqueuedStepType !== null && (
-        <Portal>
+      {enqueuedStepType !== null &&
+        createPortal(
           <ConfirmDeleteModal
             modalType={CLOSE_UNSAVED_STEP_FORM}
             onCancelClick={() => setEnqueuedStepType(null)}
@@ -176,9 +178,9 @@ export const StepCreationButton = (): JSX.Element => {
                 setEnqueuedStepType(null)
               }
             }}
-          />
-        </Portal>
-      )}
+          />,
+          getMainPagePortalEl()
+        )}
       <StepCreationButtonComponent
         expanded={expanded}
         setExpanded={setExpanded}

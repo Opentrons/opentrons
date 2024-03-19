@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import { AlertModal, OutlineButton } from '@opentrons/components'
+import modalStyles from '../modal.module.css'
 import {
   selectors as loadFileSelectors,
   actions as loadFileActions,
 } from '../../../load-file'
 import { useModalContents } from './modalContents'
-import modalStyles from '../modal.css'
 
 export function FileUploadMessageModal(): JSX.Element | null {
   const message = useSelector(loadFileSelectors.getFileUploadMessages)

@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import cx from 'classnames'
 import { Icon, useOnClickOutside } from '@opentrons/components'
 import { renameLabware } from '../../../labware-ingred/actions'
-import styles from './LabwareOverlays.css'
+import styles from './LabwareOverlays.module.css'
 
 import type { LabwareEntity } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../../types'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import assert from 'assert'
+
 import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
 import isEmpty from 'lodash/isEmpty'
@@ -17,9 +17,9 @@ import { selectWells, deselectWells } from '../well-selection/actions'
 import { LiquidPlacementForm } from './LiquidPlacementForm/LiquidPlacementForm'
 import { WellSelectionInstructions } from './WellSelectionInstructions'
 
-import styles from './LiquidPlacementModal.css'
+import styles from './LiquidPlacementModal.module.css'
 
-export function LiquidPlacementModal(): JSX.Element {
+export function LiquidPlacementModal(): JSX.Element | null {
   const [highlightedWells, setHighlightedWells] = React.useState<
     WellGroup | {}
   >({})
@@ -33,10 +33,11 @@ export function LiquidPlacementModal(): JSX.Element {
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
   if (labwareId == null) {
-    assert(
+    console.assert(
       false,
       'LiquidPlacementModal: No labware is selected, and no labwareId was given to LiquidPlacementModal'
     )
+    return null
   }
 
   const labwareDef = labwareEntities[labwareId]?.def

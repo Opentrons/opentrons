@@ -11,7 +11,6 @@ on:
       - 'app-shell-odd/**/*'
       - 'components/**/*'
       - 'shared-data/**/*'
-      - 'webpack-config/**/*'
       - 'discovery-client/**/*'
       - '*.js'
       - 'scripts/**/*'
@@ -32,7 +31,6 @@ on:
       - 'app-shell-odd/**/*'
       - 'components/**/*'
       - 'shared-data/**/*'
-      - 'webpack-config/**/*'
       - 'discovery-client/**/*'
       - '*.js'
       - '*.json'
@@ -141,7 +139,7 @@ jobs:
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
       - name: 'test native(er) packages'
-        run: make test-js-internal tests="app-shell/src app-shell-odd/src discovery-client/src" cov_opts="--coverage=true --ci=true --collectCoverageFrom='(app-shell|app-shell-odd| discovery-client)/src/**/*.(js|ts|tsx)'"
+        run: make test-js-internal tests="app-shell/src app-shell-odd/src discovery-client/src" cov_opts="--coverage=true"
       - name: 'Upload coverage report'
         uses: 'codecov/codecov-action@v3'
         with:
@@ -293,7 +291,7 @@ jobs:
           OT_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}
 
         run: |
-          make -C app-shell dist-${{ matrix.os }}
+          make -C app-shell dist-${{ matrix.os }} USE_HARD_LINKS=false
 
       - name: 'upload github artifact'
         if: matrix.target == 'desktop'
@@ -443,7 +441,6 @@ jobs:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild
             ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
       - name: 'setup-js'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache

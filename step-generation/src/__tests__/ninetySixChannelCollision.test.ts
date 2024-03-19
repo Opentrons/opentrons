@@ -1,3 +1,4 @@
+import { beforeEach, describe, it, expect } from 'vitest'
 import { getIsTallLabwareWestOf96Channel } from '../utils/ninetySixChannelCollision'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { RobotState, InvariantContext } from '../types'

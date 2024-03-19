@@ -1,9 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
-  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -16,24 +14,6 @@ import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
-
-const SSID_INPUT_FIELD_STYLE = css`
-  padding-top: 2.125rem;
-  padding-bottom: 2.125rem;
-  height: 4.25rem;
-  font-size: ${TYPOGRAPHY.fontSize28};
-  line-height: ${TYPOGRAPHY.lineHeight36};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  color: ${COLORS.black90};
-  padding-left: ${SPACING.spacing24};
-  box-sizing: border-box;
-
-  &:focus {
-    border: 3px solid ${COLORS.blue50};
-    filter: drop-shadow(0px 0px 10px ${COLORS.blue50});
-    border-radius: ${BORDERS.borderRadiusSize1};
-  }
-`
 
 interface SetWifiSsidProps {
   errorMessage?: string | null
@@ -68,15 +48,19 @@ export function SetWifiSsid({
         <InputField
           aria-label="wifi_ssid"
           value={inputSsid}
+          id="wifiSsid"
           onChange={e => setInputSsid(e.target.value)}
           type="text"
-          css={SSID_INPUT_FIELD_STYLE}
           error={errorMessage}
+          onBlur={e => e.target.focus()}
+          autoFocus
         />
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
         <NormalKeyboard
-          onChange={e => e != null && setInputSsid(String(e))}
+          onChange={e => {
+            e != null && setInputSsid(e)
+          }}
           keyboardRef={keyboardRef}
         />
       </Flex>

@@ -1,9 +1,9 @@
 import {
   LabwareDefinition2,
-  ModuleDefinition,
   SPAN7_8_10_11_SLOT,
+  THERMOCYCLER_MODULE_V1,
+  getModuleDef2,
 } from '@opentrons/shared-data'
-import thermocyclerModuleV1 from '@opentrons/shared-data/module/definitions/3/thermocyclerModuleV1.json'
 
 import type { RunData } from '@opentrons/api-client'
 import type {
@@ -204,7 +204,7 @@ export const mockModuleRenderInfoWithLabware = [
     moduleId: 'mockTCModuleID',
     x: 100,
     y: 100,
-    moduleDef: (thermocyclerModuleV1 as unknown) as ModuleDefinition,
+    moduleDef: getModuleDef2(THERMOCYCLER_MODULE_V1),
     nestedLabwareDef: mockLabwareDefinition,
     nestedLabwareId: 'mockLabwareID',
   },
@@ -215,7 +215,7 @@ export const mockModuleRenderInfoWithoutLabware = [
     moduleId: 'mockTCModuleID',
     x: 100,
     y: 100,
-    moduleDef: (thermocyclerModuleV1 as unknown) as ModuleDefinition,
+    moduleDef: getModuleDef2(THERMOCYCLER_MODULE_V1),
     nestedLabwareDef: null,
     nestedLabwareId: null,
   },

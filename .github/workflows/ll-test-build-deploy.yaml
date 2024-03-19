@@ -8,7 +8,6 @@ on:
       - 'labware-library/**'
       - 'shared-data/labware/**'
       - 'components/**'
-      - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/ll-test-build-deploy.yaml'
       - '.github/actions/webstack/deploy-to-sandbox/**'
@@ -18,7 +17,6 @@ on:
       - 'labware-library/**'
       - 'shared-data/labware/**'
       - 'components/**'
-      - 'webpack-config/**'
       - 'package.json'
       - '.github/workflows/ll-test-build-deploy.yaml'
     branches:

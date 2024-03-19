@@ -1,19 +1,18 @@
 import fetch from 'node-fetch'
 import isError from 'lodash/isError'
+import { describe, it, vi, expect, beforeEach } from 'vitest'
 
-import { HTTP_API_VERSION } from '@opentrons/app/src/redux/robot-api/constants'
+import { HTTP_API_VERSION } from '../constants'
 import * as Http from '../http'
 
 import type { Request, Response } from 'node-fetch'
 
-jest.mock('../config')
-jest.mock('node-fetch')
-
-const mockFetch = fetch as jest.MockedFunction<typeof fetch>
+vi.mock('../config')
+vi.mock('node-fetch')
 
 describe('app-shell main http module', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const SUCCESS_SPECS = [
@@ -84,12 +83,12 @@ describe('app-shell main http module', () => {
     const { name, method, request, requestOptions, response, expected } = spec
 
     it(`it should handle when ${name}`, () => {
-      mockFetch.mockResolvedValueOnce((response as unknown) as Response)
+      vi.mocked(fetch).mockResolvedValueOnce((response as unknown) as Response)
 
       // @ts-expect-error(mc, 2021-02-17): reqwrite as integration tests and
       // avoid mocking node-fetch
       return method((request as unknown) as Request).then((result: string) => {
-        expect(mockFetch).toHaveBeenCalledWith(request, requestOptions)
+        expect(vi.mocked(fetch)).toHaveBeenCalledWith(request, requestOptions)
         expect(result).toEqual(expected)
       })
     })
@@ -100,9 +99,11 @@ describe('app-shell main http module', () => {
 
     it(`it should handle when ${name}`, () => {
       if (isError(response)) {
-        mockFetch.mockRejectedValueOnce(response)
+        vi.mocked(fetch).mockRejectedValueOnce(response)
       } else {
-        mockFetch.mockResolvedValueOnce((response as unknown) as Response)
+        vi.mocked(fetch).mockResolvedValueOnce(
+          (response as unknown) as Response
+        )
       }
 
       return expect(method((request as unknown) as Request)).rejects.toThrow(

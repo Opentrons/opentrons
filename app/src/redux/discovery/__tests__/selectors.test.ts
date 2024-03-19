@@ -1,4 +1,5 @@
-// discovery selectors tests
+import { describe, it, expect } from 'vitest'
+
 import {
   mockLegacyHealthResponse,
   mockLegacyServerHealthResponse,
@@ -8,7 +9,7 @@ import {
   mockOT3ServerHealthResponse,
   mockHealthErrorStringResponse,
   mockHealthFetchErrorResponse,
-} from '@opentrons/discovery-client/src/__fixtures__'
+} from '../../../../../discovery-client/src/fixtures'
 
 import {
   HEALTH_STATUS_OK,

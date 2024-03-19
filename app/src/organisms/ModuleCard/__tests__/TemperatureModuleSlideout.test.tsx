@@ -1,19 +1,18 @@
 import * as React from 'react'
-import { i18n } from '../../../i18n'
+import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
+
+import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '../../../i18n'
 import {
   mockTemperatureModule,
   mockTemperatureModuleGen2,
 } from '../../../redux/modules/__fixtures__'
+import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
-  typeof useCreateLiveCommandMutation
->
+vi.mock('@opentrons/react-api-client')
 
 const render = (
   props: React.ComponentProps<typeof TemperatureModuleSlideout>
@@ -25,59 +24,59 @@ const render = (
 
 describe('TemperatureModuleSlideout', () => {
   let props: React.ComponentProps<typeof TemperatureModuleSlideout>
-  let mockCreateLiveCommand = jest.fn()
+  let mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
-    mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand = vi.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
 
     props = {
       module: mockTemperatureModule,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    mockUseLiveCommandMutation.mockReturnValue({
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders correct title and body for a gen1 temperature module', () => {
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('Set Temperature for Temperature Module GEN1')
-    getByText(
+    screen.getByText('Set Temperature for Temperature Module GEN1')
+    screen.getByText(
       'Pre heat or cool your Temperature Module GEN1. Enter a whole number between 4 °C and 96 °C.'
     )
-    getByText('Set temperature')
+    screen.getByText('Set temperature')
   })
 
   it('renders correct title and body for a gen2 temperature module', () => {
     props = {
       module: mockTemperatureModuleGen2,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    const { getByText } = render(props)
+    render(props)
 
-    getByText('Set Temperature for Temperature Module GEN2')
-    getByText(
+    screen.getByText('Set Temperature for Temperature Module GEN2')
+    screen.getByText(
       'Pre heat or cool your Temperature Module GEN2. Enter a whole number between 4 °C and 96 °C.'
     )
-    getByText('Set temperature')
+    screen.getByText('Set temperature')
   })
 
   it('renders the button and it is not clickable until there is something in form field', () => {
     props = {
       module: mockTemperatureModuleGen2,
       isExpanded: true,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
     }
-    const { getByRole, getByTestId } = render(props)
-    const button = getByRole('button', { name: 'Confirm' })
-    const input = getByTestId('temperatureModuleV2')
+    render(props)
+    const button = screen.getByRole('button', { name: 'Confirm' })
+    const input = screen.getByTestId('temperatureModuleV2')
     fireEvent.change(input, { target: { value: '20' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)

@@ -110,7 +110,7 @@ class SimpleMultiBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
     # to be covariant is to make data the covariant Sequence protocol.
     meta: MultiBodyMeta = Field(
         ...,
-        description="Metadata about the colletion response.",
+        description="Metadata about the collection response.",
     )
 
 
@@ -125,7 +125,7 @@ class MultiBody(
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
     meta: MultiBodyMeta = Field(
         ...,
-        description="Metadata about the colletion response.",
+        description="Metadata about the collection response.",
     )
 
 
@@ -285,5 +285,15 @@ class ResponseList(BaseModel, Generic[ResponseDataT]):
 
 
 class NotifyRefetchBody(BaseResponseBody):
-    "A notification response that returns a flag for refetching via HTTP."
+    """A notification response that returns a flag for refetching via HTTP."""
+
     refetchUsingHTTP: bool = True
+
+
+class NotifyUnsubscribeBody(BaseResponseBody):
+    """A notification response.
+
+    Returns flags for unsubscribing from a topic.
+    """
+
+    unsubscribe: bool = True

@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { mockBaseBrowser } from '../__fixtures__'
 import { getBrowserInterfaces, compareInterfaces } from '../interfaces'
 

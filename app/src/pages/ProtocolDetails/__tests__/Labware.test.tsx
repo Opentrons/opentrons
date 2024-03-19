@@ -1,21 +1,20 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useRequiredProtocolLabware } from '../../Protocols/hooks'
 import { Labware } from '../Labware'
 
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import {
+  fixtureTiprack10ul,
+  fixtureTiprack300ul,
+  fixture96Plate,
+} from '@opentrons/shared-data'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-jest.mock('../../Protocols/hooks')
-
-const mockUseRequiredProtocolLabware = useRequiredProtocolLabware as jest.MockedFunction<
-  typeof useRequiredProtocolLabware
->
+vi.mock('../../Protocols/hooks')
 
 const MOCK_PROTOCOL_ID = 'mock_protocol_id'
 
@@ -31,32 +30,32 @@ describe('Labware', () => {
     props = {
       protocolId: MOCK_PROTOCOL_ID,
     }
-    when(mockUseRequiredProtocolLabware)
+    when(vi.mocked(useRequiredProtocolLabware))
       .calledWith(MOCK_PROTOCOL_ID)
-      .mockReturnValue([
+      .thenReturn([
         {
-          definition: fixture_tiprack_10_ul as LabwareDefinition2,
+          definition: fixtureTiprack10ul as LabwareDefinition2,
           initialLocation: { slotName: '1' },
           moduleLocation: null,
           moduleModel: null,
           nickName: null,
         },
         {
-          definition: fixture_tiprack_300_ul as LabwareDefinition2,
+          definition: fixtureTiprack300ul as LabwareDefinition2,
           initialLocation: { slotName: '3' },
           moduleLocation: null,
           moduleModel: null,
           nickName: null,
         },
         {
-          definition: fixture_96_plate as LabwareDefinition2,
+          definition: fixture96Plate as LabwareDefinition2,
           initialLocation: { slotName: '5' },
           moduleLocation: null,
           moduleModel: null,
           nickName: null,
         },
         {
-          definition: fixture_tiprack_10_ul as LabwareDefinition2,
+          definition: fixtureTiprack10ul as LabwareDefinition2,
           initialLocation: { slotName: '7' },
           moduleLocation: null,
           moduleModel: null,
@@ -65,7 +64,7 @@ describe('Labware', () => {
       ])
   })
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render column headers that indicate where the labware is, what is called, and how many are required', () => {

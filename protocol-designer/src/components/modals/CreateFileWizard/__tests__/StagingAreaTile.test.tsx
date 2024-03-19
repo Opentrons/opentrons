@@ -1,17 +1,23 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { vi, describe, beforeEach, expect, it } from 'vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { DeckConfigurator, renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { StagingAreaTile } from '../StagingAreaTile'
 
+import type * as Components from '@opentrons/components'
 import type { FormState, WizardTileProps } from '../types'
 
-jest.mock('@opentrons/components/src/hardware-sim/DeckConfigurator/index')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof Components>()
+  return {
+    ...actual,
+    DeckConfigurator: () => <div>mock deck configurator</div>,
+  }
+})
 
-const mockDeckConfigurator = DeckConfigurator as jest.MockedFunction<
-  typeof DeckConfigurator
->
 const render = (props: React.ComponentProps<typeof StagingAreaTile>) => {
   return renderWithProviders(<StagingAreaTile {...props} />, {
     i18nInstance: i18n,
@@ -26,11 +32,11 @@ const values = {
 } as FormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  goBack: jest.fn(),
-  proceed: jest.fn(),
-  setValue: jest.fn(),
-  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
-  getValues: jest.fn(() => values) as any,
+  goBack: vi.fn(),
+  proceed: vi.fn(),
+  setValue: vi.fn(),
+  watch: vi.fn((name: keyof typeof values) => values[name]) as any,
+  getValues: vi.fn(() => values) as any,
 }
 
 describe('StagingAreaTile', () => {
@@ -41,7 +47,6 @@ describe('StagingAreaTile', () => {
       ...props,
       ...mockWizardTileProps,
     } as WizardTileProps
-    mockDeckConfigurator.mockReturnValue(<div>mock deck configurator</div>)
   })
   it('renders null when robot type is ot-2', () => {
     render(props)
@@ -56,11 +61,11 @@ describe('StagingAreaTile', () => {
     } as FormState
 
     const mockWizardTileProps: Partial<WizardTileProps> = {
-      goBack: jest.fn(),
-      proceed: jest.fn(),
-      setValue: jest.fn(),
-      watch: jest.fn((name: keyof typeof values) => values[name]) as any,
-      getValues: jest.fn(() => values) as any,
+      goBack: vi.fn(),
+      proceed: vi.fn(),
+      setValue: vi.fn(),
+      watch: vi.fn((name: keyof typeof values) => values[name]) as any,
+      getValues: vi.fn(() => values) as any,
     }
 
     props = {

@@ -1,39 +1,27 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
-  FLEX_ROBOT_TYPE,
-  LabwareDefinition2,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+  fixture_tiprack_10_ul,
+  fixture_tiprack_300_ul,
+} from '@opentrons/shared-data/labware/fixtures/2'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
 import { getTiprackOptions } from '../../utils'
 import { PipetteTipsTile } from '../PipetteTipsTile'
 import { EquipmentOption } from '../EquipmentOption'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'
 
-jest.mock('../../../../labware-defs/selectors')
-jest.mock('../../../../feature-flags/selectors')
-jest.mock('../../utils')
-jest.mock('../EquipmentOption')
+vi.mock('../../../../labware-defs/selectors')
+vi.mock('../../../../feature-flags/selectors')
+vi.mock('../../utils')
+vi.mock('../EquipmentOption')
 
-const mockEquipmentOption = EquipmentOption as jest.MockedFunction<
-  typeof EquipmentOption
->
-const mockGetAllowAllTipracks = getAllowAllTipracks as jest.MockedFunction<
-  typeof getAllowAllTipracks
->
-const mockGetLabwareDefsByURI = getLabwareDefsByURI as jest.MockedFunction<
-  typeof getLabwareDefsByURI
->
-const mockGetTiprackOptions = getTiprackOptions as jest.MockedFunction<
-  typeof getTiprackOptions
->
 const render = (props: React.ComponentProps<typeof PipetteTipsTile>) => {
   return renderWithProviders(<PipetteTipsTile {...props} />, {
     i18nInstance: i18n,
@@ -64,9 +52,9 @@ const values = {
 } as FormState
 
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  goBack: jest.fn(),
-  proceed: jest.fn(),
-  watch: jest.fn((name: keyof typeof values) => values[name]) as any,
+  goBack: vi.fn(),
+  proceed: vi.fn(),
+  watch: vi.fn((name: keyof typeof values) => values[name]) as any,
 }
 
 const fixtureTipRack10ul = {
@@ -90,13 +78,13 @@ describe('PipetteTipsTile', () => {
       ...mockWizardTileProps,
       mount: 'left',
     }
-    mockGetAllowAllTipracks.mockReturnValue(false)
-    mockGetLabwareDefsByURI.mockReturnValue({
+    vi.mocked(getAllowAllTipracks).mockReturnValue(false)
+    vi.mocked(getLabwareDefsByURI).mockReturnValue({
       [ten]: fixtureTipRack10ul,
       [threeHundred]: fixtureTipRack300uL,
     })
-    mockEquipmentOption.mockReturnValue(<div>mock EquipmentOption</div>)
-    mockGetTiprackOptions.mockReturnValue([
+    vi.mocked(EquipmentOption).mockReturnValue(<div>mock EquipmentOption</div>)
+    vi.mocked(getTiprackOptions).mockReturnValue([
       {
         name: '200uL Flex tipracks',
         value: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
@@ -106,6 +94,9 @@ describe('PipetteTipsTile', () => {
         value: 'opentrons/opentrons_flex_96_tiprack_1000ul/1',
       },
     ])
+  })
+  afterEach(() => {
+    cleanup()
   })
   it('renders default tiprack options for 50uL flex pipette and btn ctas work', () => {
     render(props)
@@ -125,7 +116,7 @@ describe('PipetteTipsTile', () => {
     screen.getByText('Upload a custom tiprack to select its definition')
   })
   it('renders the custom tip btn and section with a custom tip', () => {
-    mockGetTiprackOptions.mockReturnValue([
+    vi.mocked(getTiprackOptions).mockReturnValue([
       {
         name: '200uL Flex tipracks',
         value: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
@@ -146,7 +137,7 @@ describe('PipetteTipsTile', () => {
     expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(2)
   })
   it('renders all tiprack options for 50uL flex pipette when all tipracks are true', () => {
-    mockGetAllowAllTipracks.mockReturnValue(true)
+    vi.mocked(getAllowAllTipracks).mockReturnValue(true)
     render(props)
     screen.getByText('Choose tips for Flex 1-Channel 50 μL')
     expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(2)
@@ -173,9 +164,9 @@ describe('PipetteTipsTile', () => {
     } as FormState
 
     const mockWizardTileProps: Partial<WizardTileProps> = {
-      goBack: jest.fn(),
-      proceed: jest.fn(),
-      watch: jest.fn((name: keyof typeof values) => values[name]) as any,
+      goBack: vi.fn(),
+      proceed: vi.fn(),
+      watch: vi.fn((name: keyof typeof values) => values[name]) as any,
     }
 
     props = {
@@ -183,7 +174,7 @@ describe('PipetteTipsTile', () => {
       ...mockWizardTileProps,
       mount: 'left',
     }
-    mockGetTiprackOptions.mockReturnValue([
+    vi.mocked(getTiprackOptions).mockReturnValue([
       {
         name: '10uL tipracks',
         value: 'opentrons/opentrons_96_tiprack_10ul/1',

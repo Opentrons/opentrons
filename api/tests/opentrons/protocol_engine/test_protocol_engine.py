@@ -8,6 +8,7 @@ from decoy import Decoy
 
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.ordered_set import OrderedSet
+from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
@@ -427,6 +428,24 @@ def test_pause(
     )
 
 
+def test_resume_from_recovery(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should dispatch a ResumeFromRecoveryAction."""
+    expected_action = ResumeFromRecoveryAction()
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_action)
+    ).then_return(expected_action)
+
+    subject.resume_from_recovery()
+
+    decoy.verify(action_dispatcher.dispatch(expected_action))
+
+
 @pytest.mark.parametrize("drop_tips_after_run", [True, False])
 @pytest.mark.parametrize("set_run_status", [True, False])
 @pytest.mark.parametrize(
@@ -749,7 +768,7 @@ async def test_estop_during_command(
     decoy.when(model_utils.get_timestamp()).then_return(timestamp)
     decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(state_store.commands.get_is_stopped()).then_return(False)
-    decoy.when(state_store.commands.state.running_command_id).then_return(command_id)
+    decoy.when(state_store.commands.get_running_command_id()).then_return(command_id)
     decoy.when(state_store.commands.state.queued_command_ids).then_return(
         fake_command_set
     )
@@ -793,7 +812,7 @@ async def test_estop_without_command(
     decoy.when(model_utils.get_timestamp()).then_return(timestamp)
     decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(state_store.commands.get_is_stopped()).then_return(False)
-    decoy.when(state_store.commands.state.running_command_id).then_return(None)
+    decoy.when(state_store.commands.get_running_command_id()).then_return(None)
 
     expected_stop = StopAction(from_estop=True)
     expected_hardware_stop = HardwareStoppedAction(

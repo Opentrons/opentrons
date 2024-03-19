@@ -10,7 +10,7 @@ export default {
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof Banner>> = args => (
-  <Banner {...args} />
+  <Banner {...args}>{'Banner component'}</Banner>
 )
 
 export const Primary = Template.bind({})

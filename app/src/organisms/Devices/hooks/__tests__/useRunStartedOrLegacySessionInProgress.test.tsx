@@ -1,6 +1,7 @@
 import { UseQueryResult } from 'react-query'
 import { useAllSessionsQuery } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
@@ -8,31 +9,21 @@ import { useRunStartedOrLegacySessionInProgress } from '..'
 
 import type { Sessions } from '@opentrons/api-client'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../../../RunTimeControl/hooks')
-
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
->
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
-const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
-  typeof useAllSessionsQuery
->
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../ProtocolUpload/hooks')
+vi.mock('../../../RunTimeControl/hooks')
 
 describe('useRunStartedOrLegacySessionInProgress', () => {
   beforeEach(() => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
-    mockUseCurrentRunId.mockReturnValue('123')
-    mockUseAllSessionsQuery.mockReturnValue(({
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
+    vi.mocked(useCurrentRunId).mockReturnValue('123')
+    vi.mocked(useAllSessionsQuery).mockReturnValue(({
       data: [],
       links: null,
     } as unknown) as UseQueryResult<Sessions, Error>)
   })
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns true when current run status is not idle or sessions are empty', () => {
@@ -41,8 +32,8 @@ describe('useRunStartedOrLegacySessionInProgress', () => {
   })
 
   it('returns false when run status is idle or sessions are not empty', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
-    mockUseAllSessionsQuery.mockReturnValue(({
+    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)
+    vi.mocked(useAllSessionsQuery).mockReturnValue(({
       data: [
         {
           id: 'test',

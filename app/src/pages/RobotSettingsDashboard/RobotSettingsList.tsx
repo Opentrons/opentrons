@@ -37,7 +37,6 @@ import { getRobotSettings, updateSetting } from '../../redux/robot-settings'
 import { UNREACHABLE } from '../../redux/discovery/constants'
 import { Navigation } from '../../organisms/Navigation'
 import { useLEDLights } from '../../organisms/Devices/hooks'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { useNetworkConnection } from '../../resources/networking/hooks/useNetworkConnection'
 import { RobotSettingButton } from '../../pages/RobotSettingsDashboard/RobotSettingButton'
 
@@ -79,7 +78,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Navigation routes={onDeviceDisplayRoutes} />
+      <Navigation />
       <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
         <RobotSettingButton
           settingName={t('network_settings')}
@@ -208,7 +207,7 @@ function FeatureFlags(): JSX.Element {
           marginBottom={SPACING.spacing8}
           backgroundColor={COLORS.grey35}
           padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
-          borderRadius={BORDERS.borderRadiusSize4}
+          borderRadius={BORDERS.borderRadius16}
           display={DISPLAY_FLEX}
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing24}
@@ -252,7 +251,7 @@ export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.transparent}
       padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
-      borderRadius={BORDERS.borderRadiusSize4}
+      borderRadius={BORDERS.borderRadius16}
     >
       <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
         {props.isOn ? t('on') : t('off')}

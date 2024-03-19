@@ -35,10 +35,8 @@ Labware
    signatures, since users should never construct these directly.
 
 .. autoclass:: opentrons.protocol_api.TrashBin()
-   :members:
 
 .. autoclass:: opentrons.protocol_api.WasteChute()
-   :members:
 
 Wells and Liquids
 =================

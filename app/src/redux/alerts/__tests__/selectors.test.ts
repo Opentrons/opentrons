@@ -1,3 +1,5 @@
+import { vi, describe, it, expect } from 'vitest'
+
 import * as Cfg from '../../config'
 import * as Selectors from '../selectors'
 
@@ -5,9 +7,7 @@ import type { State } from '../../types'
 import type { Config } from '../../config/types'
 import type { AlertId } from '../types'
 
-jest.mock('../../config/selectors')
-
-const getConfig = Cfg.getConfig as jest.MockedFunction<typeof Cfg.getConfig>
+vi.mock('../../config/selectors')
 
 const MOCK_ALERT_1: AlertId = 'mockAlert1' as any
 const MOCK_ALERT_2: AlertId = 'mockAlert2' as any
@@ -19,15 +19,11 @@ const MOCK_CONFIG: Config = {
 
 describe('alerts selectors', () => {
   const stubGetConfig = (state: State, value = MOCK_CONFIG) => {
-    getConfig.mockImplementation((s: State) => {
+    vi.mocked(Cfg.getConfig).mockImplementation((s: State) => {
       expect(s).toEqual(state)
       return value
     })
   }
-
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('should be able to get a list of active alerts', () => {
     const state: State = {

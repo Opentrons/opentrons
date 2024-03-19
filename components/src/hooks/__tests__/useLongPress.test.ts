@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { useLongPress } from '../useLongPress'
 

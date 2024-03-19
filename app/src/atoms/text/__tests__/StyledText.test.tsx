@@ -1,6 +1,10 @@
 import * as React from 'react'
-import { TYPOGRAPHY, renderWithProviders } from '@opentrons/components'
+import { describe, it, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { screen } from '@testing-library/react'
+import { TYPOGRAPHY } from '@opentrons/components'
 import { StyledText } from '../'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 const render = (props: React.ComponentProps<typeof StyledText>) => {
   return renderWithProviders(<StyledText {...props} />)[0]
@@ -14,15 +18,15 @@ describe('StyledText', () => {
       as: 'h1',
       children: 'h1Default',
     }
-    const { getByText } = render(props)
-    expect(getByText('h1Default')).toHaveStyle(
-      `fontSize: ${String(TYPOGRAPHY.fontSizeH1)}`
+    render(props)
+    expect(screen.getByText('h1Default')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSizeH1}`
     )
-    expect(getByText('h1Default')).toHaveStyle(
-      `fontWeight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
+    expect(screen.getByText('h1Default')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightSemiBold}`
     )
-    expect(getByText('h1Default')).toHaveStyle(
-      `lineHeight: ${String(TYPOGRAPHY.lineHeight24)}`
+    expect(screen.getByText('h1Default')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight24}`
     )
   })
 
@@ -31,15 +35,15 @@ describe('StyledText', () => {
       as: 'h2',
       children: 'h2Regular',
     }
-    const { getByText } = render(props)
-    expect(getByText('h2Regular')).toHaveStyle(
-      `fontSize: ${String(TYPOGRAPHY.fontSizeH2)}`
+    render(props)
+    expect(screen.getByText('h2Regular')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSizeH2}`
     )
-    expect(getByText('h2Regular')).toHaveStyle(
-      `fontWeight: ${String(TYPOGRAPHY.fontWeightRegular)}`
+    expect(screen.getByText('h2Regular')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightRegular}`
     )
-    expect(getByText('h2Regular')).toHaveStyle(
-      `lineHeight: ${String(TYPOGRAPHY.lineHeight20)}`
+    expect(screen.getByText('h2Regular')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight20}`
     )
   })
 
@@ -48,15 +52,15 @@ describe('StyledText', () => {
       as: 'h3',
       children: 'h3Regular',
     }
-    const { getByText } = render(props)
-    expect(getByText('h3Regular')).toHaveStyle(
-      `fontSize: ${String(TYPOGRAPHY.fontSizeH3)}`
+    render(props)
+    expect(screen.getByText('h3Regular')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSizeH3}`
     )
-    expect(getByText('h3Regular')).toHaveStyle(
-      `fontWeight: ${String(TYPOGRAPHY.fontWeightRegular)}`
+    expect(screen.getByText('h3Regular')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightRegular}`
     )
-    expect(getByText('h3Regular')).toHaveStyle(
-      `lineHeight: ${String(TYPOGRAPHY.lineHeight20)}`
+    expect(screen.getByText('h3Regular')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight20}`
     )
   })
 
@@ -65,18 +69,18 @@ describe('StyledText', () => {
       as: 'h6',
       children: 'h6Default',
     }
-    const { getByText } = render(props)
-    expect(getByText('h6Default')).toHaveStyle(
-      `fontSize: ${String(TYPOGRAPHY.fontSizeH6)}`
+    render(props)
+    expect(screen.getByText('h6Default')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSizeH6}`
     )
-    expect(getByText('h6Default')).toHaveStyle(
-      `fontWeight: ${String(TYPOGRAPHY.fontWeightRegular)}`
+    expect(screen.getByText('h6Default')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightRegular}`
     )
-    expect(getByText('h6Default')).toHaveStyle(
-      `lineHeight: ${String(TYPOGRAPHY.lineHeight12)}`
+    expect(screen.getByText('h6Default')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight12}`
     )
-    expect(getByText('h6Default')).toHaveStyle(
-      `textTransform: ${String(TYPOGRAPHY.textTransformUppercase)}`
+    expect(screen.getByText('h6Default')).toHaveStyle(
+      `textTransform: ${TYPOGRAPHY.textTransformUppercase}`
     )
   })
 
@@ -85,15 +89,15 @@ describe('StyledText', () => {
       as: 'p',
       children: 'pRegular',
     }
-    const { getByText } = render(props)
-    expect(getByText('pRegular')).toHaveStyle(
-      `fontSize: ${String(TYPOGRAPHY.fontSizeP)}`
+    render(props)
+    expect(screen.getByText('pRegular')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSizeP}`
     )
-    expect(getByText('pRegular')).toHaveStyle(
-      `fontWeight: ${String(TYPOGRAPHY.fontWeightRegular)}`
+    expect(screen.getByText('pRegular')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightRegular}`
     )
-    expect(getByText('pRegular')).toHaveStyle(
-      `lineHeight: ${String(TYPOGRAPHY.lineHeight20)}`
+    expect(screen.getByText('pRegular')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight20}`
     )
   })
 
@@ -102,15 +106,15 @@ describe('StyledText', () => {
       as: 'label',
       children: 'labelRegular',
     }
-    const { getByText } = render(props)
-    expect(getByText('labelRegular')).toHaveStyle(
-      `fontSize: ${String(TYPOGRAPHY.fontSizeLabel)}`
+    render(props)
+    expect(screen.getByText('labelRegular')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSizeLabel}`
     )
-    expect(getByText('labelRegular')).toHaveStyle(
-      `fontWeight: ${String(TYPOGRAPHY.fontWeightRegular)}`
+    expect(screen.getByText('labelRegular')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightRegular}`
     )
-    expect(getByText('labelRegular')).toHaveStyle(
-      `lineHeight: ${String(TYPOGRAPHY.lineHeight12)}`
+    expect(screen.getByText('labelRegular')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight12}`
     )
   })
 
@@ -119,15 +123,15 @@ describe('StyledText', () => {
       as: 'h2SemiBold',
       children: 'h2SemiBold',
     }
-    const { getByText } = render(props)
-    expect(getByText('h2SemiBold')).toHaveStyle(
-      `fontSize: ${String(TYPOGRAPHY.fontSizeH2)}`
+    render(props)
+    expect(screen.getByText('h2SemiBold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSizeH2}`
     )
-    expect(getByText('h2SemiBold')).toHaveStyle(
-      `fontWeight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
+    expect(screen.getByText('h2SemiBold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightSemiBold}`
     )
-    expect(getByText('h2SemiBold')).toHaveStyle(
-      `lineHeight: ${String(TYPOGRAPHY.lineHeight20)}`
+    expect(screen.getByText('h2SemiBold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight20}`
     )
   })
 
@@ -136,15 +140,15 @@ describe('StyledText', () => {
       as: 'h3SemiBold',
       children: 'h3SemiBold',
     }
-    const { getByText } = render(props)
-    expect(getByText('h3SemiBold')).toHaveStyle(
-      `fontSize: ${String(TYPOGRAPHY.fontSizeH3)}`
+    render(props)
+    expect(screen.getByText('h3SemiBold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSizeH3}`
     )
-    expect(getByText('h3SemiBold')).toHaveStyle(
-      `fontWeight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
+    expect(screen.getByText('h3SemiBold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightSemiBold}`
     )
-    expect(getByText('h3SemiBold')).toHaveStyle(
-      `lineHeight: ${String(TYPOGRAPHY.lineHeight20)}`
+    expect(screen.getByText('h3SemiBold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight20}`
     )
   })
 
@@ -153,15 +157,15 @@ describe('StyledText', () => {
       as: 'h6SemiBold',
       children: 'h6SemiBold',
     }
-    const { getByText } = render(props)
-    expect(getByText('h6SemiBold')).toHaveStyle(
-      `fontSize: ${String(TYPOGRAPHY.fontSizeH6)}`
+    render(props)
+    expect(screen.getByText('h6SemiBold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSizeH6}`
     )
-    expect(getByText('h6SemiBold')).toHaveStyle(
-      `fontWeight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
+    expect(screen.getByText('h6SemiBold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightSemiBold}`
     )
-    expect(getByText('h6SemiBold')).toHaveStyle(
-      `lineHeight: ${String(TYPOGRAPHY.lineHeight12)}`
+    expect(screen.getByText('h6SemiBold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight12}`
     )
   })
 
@@ -170,15 +174,15 @@ describe('StyledText', () => {
       as: 'pSemiBold',
       children: 'pSemiBold',
     }
-    const { getByText } = render(props)
-    expect(getByText('pSemiBold')).toHaveStyle(
-      `fontSize: ${String(TYPOGRAPHY.fontSizeP)}`
+    render(props)
+    expect(screen.getByText('pSemiBold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSizeP}`
     )
-    expect(getByText('pSemiBold')).toHaveStyle(
-      `fontWeight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
+    expect(screen.getByText('pSemiBold')).toHaveStyle(
+      `fontWeight: ${TYPOGRAPHY.fontWeightSemiBold}`
     )
-    expect(getByText('pSemiBold')).toHaveStyle(
-      `lineHeight: ${String(TYPOGRAPHY.lineHeight20)}`
+    expect(screen.getByText('pSemiBold')).toHaveStyle(
+      `lineHeight: ${TYPOGRAPHY.lineHeight20}`
     )
   })
 
@@ -187,14 +191,14 @@ describe('StyledText', () => {
       as: 'labelSemiBold',
       children: 'labelSemiBold',
     }
-    const { getByText } = render(props)
-    expect(getByText('labelSemiBold')).toHaveStyle(
+    render(props)
+    expect(screen.getByText('labelSemiBold')).toHaveStyle(
       `fontSize: ${TYPOGRAPHY.fontSizeLabel}`
     )
-    expect(getByText('labelSemiBold')).toHaveStyle(
+    expect(screen.getByText('labelSemiBold')).toHaveStyle(
       `fontWeight: ${TYPOGRAPHY.fontWeightSemiBold}`
     )
-    expect(getByText('labelSemiBold')).toHaveStyle(
+    expect(screen.getByText('labelSemiBold')).toHaveStyle(
       `lineHeight: ${TYPOGRAPHY.lineHeight12}`
     )
   })
@@ -204,14 +208,14 @@ describe('StyledText', () => {
       as: 'h2Bold',
       children: 'h2Bold',
     }
-    const { getByText } = render(props)
-    expect(getByText('h2Bold')).toHaveStyle(
+    render(props)
+    expect(screen.getByText('h2Bold')).toHaveStyle(
       `fontSize: ${TYPOGRAPHY.fontSize38}`
     )
-    expect(getByText('h2Bold')).toHaveStyle(
+    expect(screen.getByText('h2Bold')).toHaveStyle(
       `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
     )
-    expect(getByText('h2Bold')).toHaveStyle(
+    expect(screen.getByText('h2Bold')).toHaveStyle(
       `lineHeight: ${TYPOGRAPHY.lineHeight48}`
     )
   })
@@ -221,14 +225,14 @@ describe('StyledText', () => {
       as: 'h3Bold',
       children: 'h3Bold',
     }
-    const { getByText } = render(props)
-    expect(getByText('h3Bold')).toHaveStyle(
+    render(props)
+    expect(screen.getByText('h3Bold')).toHaveStyle(
       `fontSize: ${TYPOGRAPHY.fontSize32}`
     )
-    expect(getByText('h3Bold')).toHaveStyle(
+    expect(screen.getByText('h3Bold')).toHaveStyle(
       `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
     )
-    expect(getByText('h3Bold')).toHaveStyle(
+    expect(screen.getByText('h3Bold')).toHaveStyle(
       `lineHeight: ${TYPOGRAPHY.lineHeight42}`
     )
   })
@@ -238,14 +242,14 @@ describe('StyledText', () => {
       as: 'h4Bold',
       children: 'h4Bold',
     }
-    const { getByText } = render(props)
-    expect(getByText('h4Bold')).toHaveStyle(
+    render(props)
+    expect(screen.getByText('h4Bold')).toHaveStyle(
       `fontSize: ${TYPOGRAPHY.fontSize28}`
     )
-    expect(getByText('h4Bold')).toHaveStyle(
+    expect(screen.getByText('h4Bold')).toHaveStyle(
       `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
     )
-    expect(getByText('h4Bold')).toHaveStyle(
+    expect(screen.getByText('h4Bold')).toHaveStyle(
       `lineHeight: ${TYPOGRAPHY.lineHeight36}`
     )
   })
@@ -255,12 +259,14 @@ describe('StyledText', () => {
       as: 'pBold',
       children: 'pBold',
     }
-    const { getByText } = render(props)
-    expect(getByText('pBold')).toHaveStyle(`fontSize: ${TYPOGRAPHY.fontSize22}`)
-    expect(getByText('pBold')).toHaveStyle(
+    render(props)
+    expect(screen.getByText('pBold')).toHaveStyle(
+      `fontSize: ${TYPOGRAPHY.fontSize22}`
+    )
+    expect(screen.getByText('pBold')).toHaveStyle(
       `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
     )
-    expect(getByText('pBold')).toHaveStyle(
+    expect(screen.getByText('pBold')).toHaveStyle(
       `lineHeight: ${TYPOGRAPHY.lineHeight28}`
     )
   })
@@ -270,14 +276,14 @@ describe('StyledText', () => {
       as: 'labelBold',
       children: 'labelBold',
     }
-    const { getByText } = render(props)
-    expect(getByText('labelBold')).toHaveStyle(
+    render(props)
+    expect(screen.getByText('labelBold')).toHaveStyle(
       `fontSize: ${TYPOGRAPHY.fontSize20}`
     )
-    expect(getByText('labelBold')).toHaveStyle(
+    expect(screen.getByText('labelBold')).toHaveStyle(
       `fontWeight: ${TYPOGRAPHY.fontWeightBold}`
     )
-    expect(getByText('labelBold')).toHaveStyle(
+    expect(screen.getByText('labelBold')).toHaveStyle(
       `lineHeight: ${TYPOGRAPHY.lineHeight24}`
     )
   })

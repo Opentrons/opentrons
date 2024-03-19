@@ -1,4 +1,3 @@
-import assert from 'assert'
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DropTargetMonitor, useDrop } from 'react-dnd'
@@ -15,7 +14,6 @@ import {
   moveDeckItem,
   openAddLabwareModal,
 } from '../../../labware-ingred/actions'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, TerminalItemId } from '../../../steplist'
 import { BlockedSlot } from './BlockedSlot'
@@ -23,7 +21,7 @@ import { BlockedSlot } from './BlockedSlot'
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '../../../step-forms'
 
-import styles from './LabwareOverlays.css'
+import styles from './LabwareOverlays.module.css'
 
 interface AdapterControlsProps {
   slotPosition: CoordinateTuple
@@ -55,67 +53,58 @@ export const AdapterControls = (
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
-  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const labware = activeDeckSetup.labware
   const ref = React.useRef(null)
-  const [newSlot, setSlot] = React.useState<string | null>(null)
   const dispatch = useDispatch()
 
   const adapterName =
     allLabware.find(labware => labware.id === labwareId)?.def.metadata
       .displayName ?? ''
 
-  const [{ itemType, draggedItem, isOver }, drop] = useDrop({
-    accept: DND_TYPES.LABWARE,
-    canDrop: (item: DroppedItem) => {
-      const draggedDef = item.labwareOnDeck?.def
-      assert(draggedDef, 'no labware def of dragged item, expected it on drop')
+  const [{ itemType, draggedItem, isOver }, drop] = useDrop(
+    () => ({
+      accept: DND_TYPES.LABWARE,
+      canDrop: (item: DroppedItem) => {
+        const draggedDef = item.labwareOnDeck?.def
+        console.assert(
+          draggedDef,
+          'no labware def of dragged item, expected it on drop'
+        )
 
-      if (draggedDef != null) {
-        const isCustomLabware = getLabwareIsCustom(
-          customLabwareDefs,
-          item.labwareOnDeck
-        )
-        return (
-          getAdapterLabwareIsAMatch(
-            labwareId,
-            allLabware,
-            draggedDef.parameters.loadName
-          ) || isCustomLabware
-        )
-      }
-      return true
-    },
-    drop: (item: DroppedItem) => {
-      const droppedLabware = item
-      if (newSlot != null) {
-        dispatch(moveDeckItem(newSlot, labwareId))
-      } else if (droppedLabware.labwareOnDeck != null) {
-        const droppedSlot = droppedLabware.labwareOnDeck.slot
-        dispatch(moveDeckItem(droppedSlot, labwareId))
-      }
-    },
-    hover: () => {
-      if (handleDragHover != null) {
-        handleDragHover()
-      }
-    },
-    collect: (monitor: DropTargetMonitor) => ({
-      itemType: monitor.getItemType(),
-      isOver: !!monitor.isOver(),
-      draggedItem: monitor.getItem() as DroppedItem,
+        if (draggedDef != null) {
+          const isCustomLabware = getLabwareIsCustom(
+            customLabwareDefs,
+            item.labwareOnDeck
+          )
+          return (
+            getAdapterLabwareIsAMatch(
+              labwareId,
+              allLabware,
+              draggedDef.parameters.loadName
+            ) || isCustomLabware
+          )
+        }
+        return true
+      },
+      drop: (item: DroppedItem) => {
+        const droppedLabware = item
+        if (droppedLabware.labwareOnDeck != null) {
+          const droppedSlot = droppedLabware.labwareOnDeck.slot
+          dispatch(moveDeckItem(droppedSlot, labwareId))
+        }
+      },
+      hover: () => {
+        if (handleDragHover != null) {
+          handleDragHover()
+        }
+      },
+      collect: (monitor: DropTargetMonitor) => ({
+        itemType: monitor.getItemType(),
+        isOver: !!monitor.isOver(),
+        draggedItem: monitor.getItem() as DroppedItem,
+      }),
     }),
-  })
-
-  const draggedLabware = Object.values(labware).find(
-    l => l.id === draggedItem?.labwareOnDeck?.id
+    []
   )
-
-  React.useEffect(() => {
-    if (draggedLabware != null) {
-      setSlot(draggedLabware.slot)
-    }
-  })
 
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||

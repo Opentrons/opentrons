@@ -33,9 +33,6 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.errors.exceptions import (
-    StallOrCollisionDetectedError,
-)
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs
@@ -653,12 +650,16 @@ class OT3API(
 
     # TODO (spp, 2023-01-31): add unit tests
     async def cache_instruments(
-        self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
+        self,
+        require: Optional[Dict[top_types.Mount, PipetteName]] = None,
+        skip_if_would_block: bool = False,
     ) -> None:
         """
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
+        if skip_if_would_block and self._motion_lock.locked():
+            return
         async with self._motion_lock:
             skip_configure = await self._cache_instruments(require)
             if not skip_configure or not self._configured_since_update:
@@ -1533,19 +1534,12 @@ class OT3API(
                 axis_home_dist = 20.0
             if origin[axis] - target_pos[axis] > axis_home_dist:
                 target_pos[axis] += axis_home_dist
-                try:
-                    await self._backend.move(
-                        origin,
-                        target_pos,
-                        speed=400,
-                        stop_condition=HWStopCondition.none,
-                    )
-                except StallOrCollisionDetectedError:
-                    self._log.warning(
-                        f"Stall on {axis} during fast home, encoder may have missed an overflow"
-                    )
-                    await self.refresh_positions(acquire_lock=False)
-
+                await self._backend.move(
+                    origin,
+                    target_pos,
+                    speed=400,
+                    stop_condition=HWStopCondition.none,
+                )
             await self._backend.home([axis], self.gantry_load)
         else:
             # both stepper and encoder positions are invalid, must home

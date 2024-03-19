@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 import { i18n } from '../../../i18n'
 import { startDiscovery } from '../../../redux/discovery'
@@ -9,11 +11,7 @@ import {
   TROUBLESHOOTING_CONNECTION_PROBLEMS_URL,
 } from '../DevicesEmptyState'
 
-jest.mock('../../../redux/discovery')
-
-const mockStartDiscovery = startDiscovery as jest.MockedFunction<
-  typeof startDiscovery
->
+vi.mock('../../../redux/discovery')
 
 const render = () => {
   return renderWithProviders(<DevicesEmptyState />, {
@@ -23,25 +21,25 @@ const render = () => {
 
 describe('DevicesEmptyState', () => {
   it('renders a "No robots found" message', () => {
-    const [{ getByText }] = render()
+    render()
 
-    getByText('No robots found')
+    screen.getByText('No robots found')
   })
 
   it('renders a refresh button that scans for robots', () => {
-    const [{ getByRole }] = render()
+    render()
 
-    const refreshButton = getByRole('button', {
+    const refreshButton = screen.getByRole('button', {
       name: 'Refresh',
     })
     fireEvent.click(refreshButton)
-    expect(mockStartDiscovery).toBeCalled()
+    expect(startDiscovery).toBeCalled()
   })
 
   it('link to support documents', () => {
-    const [{ getByRole }] = render()
+    render()
 
-    const troubleshootingLink = getByRole('link', {
+    const troubleshootingLink = screen.getByRole('link', {
       name: 'Learn more about troubleshooting connection problems',
     })
     expect(troubleshootingLink.getAttribute('href')).toBe(

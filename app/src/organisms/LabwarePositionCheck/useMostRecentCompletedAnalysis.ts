@@ -4,7 +4,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../resources/runs'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 

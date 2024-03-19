@@ -1,11 +1,11 @@
 import fse from 'fs-extra'
 import tempy from 'tempy'
+import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
+
 import * as Http from '../../http'
 import { downloadManifest } from '../release-manifest'
 
-jest.mock('../../http')
-
-const fetchJson = Http.fetchJson as jest.MockedFunction<typeof Http.fetchJson>
+vi.mock('../../http')
 
 describe('release manifest utilities', () => {
   let manifestFile: string
@@ -22,7 +22,7 @@ describe('release manifest utilities', () => {
     const result = { mockResult: true }
     const manifestUrl = 'http://example.com/releases.json'
 
-    fetchJson.mockImplementation(
+    vi.mocked(Http.fetchJson).mockImplementation(
       (url: unknown): Promise<unknown> => {
         if (url === manifestUrl) return Promise.resolve(result)
         return Promise.resolve()
@@ -38,7 +38,7 @@ describe('release manifest utilities', () => {
     const result = { mockResult: true }
     const manifestUrl = 'http://example.com/releases.json'
 
-    fetchJson.mockResolvedValue(result)
+    vi.mocked(Http.fetchJson).mockResolvedValue(result)
 
     return downloadManifest(manifestUrl, manifestFile)
       .then(() => fse.readJson(manifestFile))
@@ -50,7 +50,7 @@ describe('release manifest utilities', () => {
     const manifestUrl = 'http://example.com/releases.json'
 
     fse.writeJsonSync(manifestFile, manifest)
-    fetchJson.mockRejectedValue(new Error('AH'))
+    vi.mocked(Http.fetchJson).mockRejectedValue(new Error('AH'))
 
     return downloadManifest(manifestUrl, manifestFile).then(result =>
       expect(result).toEqual(manifest)

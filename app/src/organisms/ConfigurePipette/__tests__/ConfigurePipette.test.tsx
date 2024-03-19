@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { when } from 'vitest-when'
+import { vi, it, expect, describe, beforeEach } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import * as RobotApi from '../../../redux/robot-api'
 import { ConfigurePipette } from '../../ConfigurePipette'
@@ -10,16 +12,8 @@ import { getConfig } from '../../../redux/config'
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
 import type { State } from '../../../redux/types'
 
-jest.mock('../../../redux/robot-api')
-jest.mock('../../../redux/config')
-
-const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
-const mockUseDispatchApiRequest = RobotApi.useDispatchApiRequest as jest.MockedFunction<
-  typeof RobotApi.useDispatchApiRequest
->
-const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
-  typeof RobotApi.getRequestById
->
+vi.mock('../../../redux/robot-api')
+vi.mock('../../../redux/config')
 
 const render = (props: React.ComponentProps<typeof ConfigurePipette>) => {
   return renderWithProviders(<ConfigurePipette {...props} />, {
@@ -39,13 +33,13 @@ describe('ConfigurePipette', () => {
       updateError: null,
       settings: mockPipetteSettingsFieldsMap,
       robotName: mockRobotName,
-      updateSettings: jest.fn(),
-      closeModal: jest.fn(),
+      updateSettings: vi.fn(),
+      closeModal: vi.fn(),
       formId: 'id',
     }
-    when(mockGetRequestById)
+    when(vi.mocked(RobotApi.getRequestById))
       .calledWith({} as State, 'id')
-      .mockReturnValue({
+      .thenReturn({
         status: RobotApi.SUCCESS,
         response: {
           method: 'POST',
@@ -54,15 +48,11 @@ describe('ConfigurePipette', () => {
           status: 200,
         },
       })
-    mockGetConfig.mockReturnValue({} as any)
-    dispatchApiRequest = jest.fn()
-    when(mockUseDispatchApiRequest)
+    vi.mocked(getConfig).mockReturnValue({} as any)
+    dispatchApiRequest = vi.fn()
+    when(vi.mocked(RobotApi.useDispatchApiRequest))
       .calledWith()
-      .mockReturnValue([dispatchApiRequest, ['id']])
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+      .thenReturn([dispatchApiRequest, ['id']])
   })
 
   it('renders correct number of text boxes given the pipette settings data supplied by getAttachedPipetteSettingsFieldsById', () => {

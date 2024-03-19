@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
@@ -20,10 +21,10 @@ import {
 import {
   useCreateTargetedMaintenanceRunMutation,
   useChainMaintenanceCommands,
-} from '../../resources/runs/hooks'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+} from '../../resources/runs'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
@@ -405,31 +406,30 @@ export const PipetteWizardFlows = (
     />
   )
 
-  return (
-    <Portal level="top">
-      {isOnDevice ? (
-        <LegacyModalShell>
-          {wizardHeader}
-          {modalContent}
-        </LegacyModalShell>
-      ) : (
-        <LegacyModalShell
-          width="47rem"
-          height={
-            //  changing modal height for now on BeforeBeginning 96 channel attach flow
-            //  until we do design qa to normalize the modal sizes
-            currentStep.section === SECTIONS.BEFORE_BEGINNING &&
-            selectedPipette === NINETY_SIX_CHANNEL &&
-            flowType === FLOWS.ATTACH
-              ? '70%'
-              : 'auto'
-          }
-          header={wizardHeader}
-        >
-          {modalContent}
-        </LegacyModalShell>
-      )}
-    </Portal>
+  return createPortal(
+    isOnDevice ? (
+      <LegacyModalShell>
+        {wizardHeader}
+        {modalContent}
+      </LegacyModalShell>
+    ) : (
+      <LegacyModalShell
+        width="47rem"
+        height={
+          //  changing modal height for now on BeforeBeginning 96 channel attach flow
+          //  until we do design qa to normalize the modal sizes
+          currentStep.section === SECTIONS.BEFORE_BEGINNING &&
+          selectedPipette === NINETY_SIX_CHANNEL &&
+          flowType === FLOWS.ATTACH
+            ? '70%'
+            : 'auto'
+        }
+        header={wizardHeader}
+      >
+        {modalContent}
+      </LegacyModalShell>
+    ),
+    getTopPortalEl()
   )
 }
 

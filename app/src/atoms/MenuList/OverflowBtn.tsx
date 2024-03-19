@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { Btn, COLORS, SPACING } from '@opentrons/components'
+import { Btn, BORDERS, COLORS, SPACING } from '@opentrons/components'
 
-export const OverflowBtn = React.forwardRef(
+export const OverflowBtn: (
+  props: React.ComponentProps<typeof Btn>,
+  ref: React.ForwardedRef<HTMLInputElement>
+) => React.ReactNode = React.forwardRef(
   (
     props: React.ComponentProps<typeof Btn>,
     ref: React.ForwardedRef<HTMLInputElement>
@@ -10,7 +13,7 @@ export const OverflowBtn = React.forwardRef(
     return (
       <Btn
         css={css`
-          border-radius: ${SPACING.spacing4};
+          border-radius: ${BORDERS.borderRadius4};
           max-height: ${SPACING.spacing32};
 
           &:hover {

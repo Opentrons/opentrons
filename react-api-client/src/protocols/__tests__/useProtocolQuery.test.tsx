@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { getProtocol } from '@opentrons/api-client'
@@ -8,11 +8,8 @@ import { useProtocolQuery } from '..'
 
 import type { HostConfig, Response, Protocol } from '@opentrons/api-client'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockGetProtocol = getProtocol as jest.MockedFunction<typeof getProtocol>
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const PROTOCOL_ID = '1'
@@ -41,12 +38,9 @@ describe('useProtocolQuery hook', () => {
 
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data if no host', () => {
-    when(mockUseHost).calledWith().mockReturnValue(null)
+    vi.mocked(useHost).mockReturnValue(null)
 
     const { result } = renderHook(() => useProtocolQuery(PROTOCOL_ID), {
       wrapper,
@@ -56,10 +50,8 @@ describe('useProtocolQuery hook', () => {
   })
 
   it('should return no data if the get protocols request fails', () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetProtocol)
-      .calledWith(HOST_CONFIG, PROTOCOL_ID)
-      .mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getProtocol).mockRejectedValue('oh no')
 
     const { result } = renderHook(() => useProtocolQuery(PROTOCOL_ID), {
       wrapper,
@@ -68,10 +60,10 @@ describe('useProtocolQuery hook', () => {
   })
 
   it('should return a protocol', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetProtocol)
-      .calledWith(HOST_CONFIG, PROTOCOL_ID)
-      .mockResolvedValue({ data: PROTOCOL_RESPONSE } as Response<Protocol>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getProtocol).mockResolvedValue({
+      data: PROTOCOL_RESPONSE,
+    } as Response<Protocol>)
 
     const { result } = renderHook(() => useProtocolQuery(PROTOCOL_ID), {
       wrapper,

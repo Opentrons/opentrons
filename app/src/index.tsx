@@ -15,12 +15,15 @@ import { uiInitialized } from './redux/shell'
 import { history } from './redux/reducer'
 import { store } from './redux/store'
 
-import './styles.global.css'
+import '../src/atoms/SoftwareKeyboard/index.css'
+import '../src/atoms/SoftwareKeyboard/CustomKeyboard/index.css'
+import '../src/atoms/SoftwareKeyboard/NormalKeyboard/index.css'
+import '../src/atoms/SoftwareKeyboard/Numpad/index.css'
 
 // component tree
 import { App } from './App'
 
-const log = createLogger(__filename)
+const log = createLogger(new URL('', import.meta.url).pathname)
 
 // kickoff app-shell initializations
 store.dispatch(uiInitialized())

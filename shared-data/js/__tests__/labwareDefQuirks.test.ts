@@ -1,5 +1,6 @@
 import path from 'path'
 import glob from 'glob'
+import { describe, expect, it, beforeAll } from 'vitest'
 
 const definitionsGlobPath = path.join(
   __dirname,

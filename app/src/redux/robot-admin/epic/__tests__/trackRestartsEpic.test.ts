@@ -1,4 +1,5 @@
-import { when } from 'jest-when'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { when } from 'vitest-when'
 
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Actions from '../../actions'
@@ -13,23 +14,13 @@ import type {
 } from '../../../discovery/types'
 import type { Action } from '../../../types'
 
-jest.mock('../../../discovery/selectors')
-jest.mock('../../selectors')
+vi.mock('../../../discovery/selectors')
+vi.mock('../../selectors')
 
-const getNextRestartStatus = robotAdminSelectors.getNextRestartStatus as jest.MockedFunction<
-  typeof robotAdminSelectors.getNextRestartStatus
->
-const getDiscoveredRobots = discoverySelectors.getDiscoveredRobots as jest.MockedFunction<
-  typeof discoverySelectors.getDiscoveredRobots
->
 describe('robotAdminEpic tracks restarting state', () => {
   beforeEach(() => {
-    getNextRestartStatus.mockReturnValue(null)
-    getDiscoveredRobots.mockReturnValue([])
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(robotAdminSelectors.getNextRestartStatus).mockReturnValue(null)
+    vi.mocked(discoverySelectors.getDiscoveredRobots).mockReturnValue([])
   })
 
   it('dispatches a RESTART_STATUS_CHANGED action on restart success', () => {
@@ -38,8 +29,8 @@ describe('robotAdminEpic tracks restarting state', () => {
     )
 
     when(mocks.getRobotByName)
-      .calledWith(mocks.state, mocks.robot.name)
-      .mockReturnValue(mocks.robot as any)
+      .calledWith((mocks as any).state, (mocks as any).robot.name)
+      .thenReturn(mocks.robot as any)
 
     runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--a', { a: mocks.action })
@@ -63,8 +54,8 @@ describe('robotAdminEpic tracks restarting state', () => {
     )
 
     when(mocks.getRobotByName)
-      .calledWith(mocks.state, mocks.robot.name)
-      .mockReturnValue({
+      .calledWith((mocks as any).state, (mocks as any).robot.name)
+      .thenReturn({
         ...mocks.robot,
         serverHealth: { bootId: 'previous-boot-id' },
       } as any)
@@ -109,15 +100,15 @@ describe('robotAdminEpic tracks restarting state', () => {
       serverHealth: { bootId: 'robot-3-boot' },
     }
 
-    when(getDiscoveredRobots)
+    when(vi.mocked(discoverySelectors.getDiscoveredRobots))
       .calledWith(mocks.state)
-      .mockReturnValue([
+      .thenReturn([
         robot1 as DiscoveredRobot,
         robot2 as DiscoveredRobot,
         robot3 as DiscoveredRobot,
       ])
 
-    when(getNextRestartStatus)
+    when(vi.mocked(robotAdminSelectors.getNextRestartStatus))
       .calledWith(
         mocks.state,
         robot1.name,
@@ -125,9 +116,9 @@ describe('robotAdminEpic tracks restarting state', () => {
         'robot-1-boot',
         expect.any(Date)
       )
-      .mockReturnValue('restart-in-progress')
+      .thenReturn('restart-in-progress')
 
-    when(getNextRestartStatus)
+    when(vi.mocked(robotAdminSelectors.getNextRestartStatus))
       .calledWith(
         mocks.state,
         robot2.name,
@@ -135,9 +126,9 @@ describe('robotAdminEpic tracks restarting state', () => {
         'robot-2-boot',
         expect.any(Date)
       )
-      .mockReturnValue(null)
+      .thenReturn(null)
 
-    when(getNextRestartStatus)
+    when(vi.mocked(robotAdminSelectors.getNextRestartStatus))
       .calledWith(
         mocks.state,
         robot3.name,
@@ -145,7 +136,7 @@ describe('robotAdminEpic tracks restarting state', () => {
         'robot-3-boot',
         expect.any(Date)
       )
-      .mockReturnValue('restart-timed-out')
+      .thenReturn('restart-timed-out')
 
     runEpicTest<Action>(mocks, ({ hot, expectObservable }) => {
       const action$ = hot('--')

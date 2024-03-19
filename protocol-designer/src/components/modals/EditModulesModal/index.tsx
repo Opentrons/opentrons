@@ -68,7 +68,7 @@ import { PDAlert } from '../../alerts/PDAlert'
 import { isModuleWithCollisionIssue } from '../../modules'
 import { ModelDropdown } from './ModelDropdown'
 import { SlotDropdown } from './SlotDropdown'
-import styles from './EditModules.css'
+import styles from './EditModules.module.css'
 
 import type { ModuleOnDeck } from '../../../step-forms/types'
 import type { ModelModuleInfo } from '../../EditModules'
@@ -395,7 +395,11 @@ const EditModulesModalComponent = (
             {slotIssue ? (
               <PDAlert
                 alertType="warning"
-                title={validation.selectedSlot}
+                title={
+                  robotType === OT2_ROBOT_TYPE
+                    ? t('alert:module_placement.SLOT_OCCUPIED.title')
+                    : validation.selectedSlot
+                }
                 description={''}
               />
             ) : null}

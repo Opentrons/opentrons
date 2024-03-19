@@ -62,18 +62,18 @@ async def get_networking_status() -> NetworkingStatus:
     "/wifi/list",
     summary="Scan for visible Wi-Fi networks",
     description="Returns the list of the visible wifi networks "
-    "along with some data about their security and strength. "
-    "Only use rescan=True based on the user needs like clicking on"
-    "the scan network button and not to just poll.",
+    "along with some data about their security and strength.",
     response_model=WifiNetworks,
 )
 async def get_wifi_networks(
     rescan: Optional[bool] = Query(
         default=False,
         description=(
-            "If `true` it forces a rescan for beaconing WiFi networks, "
-            "this is an expensive operation which can take ~10 seconds."
-            "If `false` it returns the cached wifi networks, "
+            "If `true`, forces a rescan for beaconing Wi-Fi networks. "
+            "This is an expensive operation that can take ~10 seconds, "
+            'so only do it based on user needs like clicking a "scan network" '
+            "button, not just to poll. "
+            "If `false`, returns the cached Wi-Fi networks, "
             "letting the system decide when to do a rescan."
         ),
     )
@@ -123,6 +123,7 @@ async def post_wifi_configure(
 
 @router.get(
     "/wifi/keys",
+    summary="Get Wi-Fi keys",
     description="Get a list of key files known to the system",
     response_model=WifiKeyFiles,
     response_model_by_alias=True,
@@ -146,6 +147,7 @@ async def get_wifi_keys():
 
 @router.post(
     "/wifi/keys",
+    summary="Add a Wi-Fi key",
     description="Send a new key file to the robot",
     responses={
         status.HTTP_200_OK: {"model": AddWifiKeyFileResponse},
@@ -179,6 +181,7 @@ async def post_wifi_key(key: UploadFile = File(...)):
 
 @router.delete(
     path="/wifi/keys/{key_uuid}",
+    summary="Delete a Wi-Fi key",
     description="Delete a key file from the robot",
     response_model=V1BasicResponse,
     responses={
@@ -204,6 +207,7 @@ async def delete_wifi_key(
 
 @router.get(
     "/wifi/eap-options",
+    summary="Get EAP options",
     description="Get the supported EAP variants and their " "configuration parameters",
     response_model=EapOptions,
 )

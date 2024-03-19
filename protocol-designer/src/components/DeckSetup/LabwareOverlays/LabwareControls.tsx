@@ -9,7 +9,7 @@ import { BrowseLabware } from './BrowseLabware'
 import { EditLabware } from './EditLabware'
 import { LabwareName } from './LabwareName'
 import { LabwareHighlight } from './LabwareHighlight'
-import styles from './LabwareOverlays.css'
+import styles from './LabwareOverlays.module.css'
 
 import type { CoordinateTuple } from '@opentrons/shared-data'
 

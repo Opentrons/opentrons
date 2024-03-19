@@ -1,5 +1,6 @@
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { css } from 'styled-components'
@@ -22,7 +23,7 @@ import {
 } from '../../organisms/CalibrationPanels'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 
 import slotOneRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
 import slotThreeRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
@@ -135,51 +136,50 @@ export function CalibrateTipLength(
     currentStep != null && currentStep in PANEL_BY_STEP
       ? PANEL_BY_STEP[currentStep]
       : null
-  return (
-    <Portal level="top">
-      <LegacyModalShell
-        width="47rem"
-        header={
-          <WizardHeader
-            title={t('tip_length_calibration')}
-            currentStep={
-              STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0
-            }
-            totalSteps={STEPS_IN_ORDER.length - 1}
-            onExit={confirmExit}
-          />
-        }
-      >
-        {showSpinner || currentStep == null || Panel == null ? (
-          <LoadingState />
-        ) : showConfirmExit ? (
-          <ConfirmExit
-            exit={confirmExit}
-            back={cancelExit}
-            heading={t('progress_will_be_lost', {
-              sessionType: t('tip_length_calibration'),
-            })}
-            body={t('confirm_exit_before_completion', {
-              sessionType: t('tip_length_calibration'),
-            })}
-          />
-        ) : (
-          <Panel
-            sendCommands={sendCommands}
-            cleanUpAndExit={cleanUpAndExit}
-            isMulti={isMulti}
-            mount={instrument?.mount.toLowerCase() as Mount}
-            tipRack={tipRack}
-            calBlock={calBlock}
-            currentStep={currentStep}
-            sessionType={session.sessionType}
-            supportedCommands={supportedCommands}
-            calInvalidationHandler={offsetInvalidationHandler}
-            allowChangeTipRack={allowChangeTipRack}
-          />
-        )}
-      </LegacyModalShell>
-    </Portal>
+  return createPortal(
+    <LegacyModalShell
+      width="47rem"
+      header={
+        <WizardHeader
+          title={t('tip_length_calibration')}
+          currentStep={
+            STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0
+          }
+          totalSteps={STEPS_IN_ORDER.length - 1}
+          onExit={confirmExit}
+        />
+      }
+    >
+      {showSpinner || currentStep == null || Panel == null ? (
+        <LoadingState />
+      ) : showConfirmExit ? (
+        <ConfirmExit
+          exit={confirmExit}
+          back={cancelExit}
+          heading={t('progress_will_be_lost', {
+            sessionType: t('tip_length_calibration'),
+          })}
+          body={t('confirm_exit_before_completion', {
+            sessionType: t('tip_length_calibration'),
+          })}
+        />
+      ) : (
+        <Panel
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
+          isMulti={isMulti}
+          mount={instrument?.mount.toLowerCase() as Mount}
+          tipRack={tipRack}
+          calBlock={calBlock}
+          currentStep={currentStep}
+          sessionType={session.sessionType}
+          supportedCommands={supportedCommands}
+          calInvalidationHandler={offsetInvalidationHandler}
+          allowChangeTipRack={allowChangeTipRack}
+        />
+      )}
+    </LegacyModalShell>,
+    getTopPortalEl()
   )
 }
 

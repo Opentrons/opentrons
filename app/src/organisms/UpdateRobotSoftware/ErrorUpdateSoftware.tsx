@@ -38,7 +38,7 @@ export function ErrorUpdateSoftware({
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
       >
         <Icon name="ot-alert" size="3.75rem" color={COLORS.red50} />
         <Flex

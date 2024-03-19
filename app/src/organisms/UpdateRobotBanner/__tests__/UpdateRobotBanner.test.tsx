@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
 import * as Buildroot from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
@@ -10,15 +12,11 @@ import {
 import { handleUpdateBuildroot } from '../../Devices/RobotSettings/UpdateBuildroot'
 import { UpdateRobotBanner } from '..'
 
-jest.mock('../../../redux/robot-update')
-jest.mock('../../Devices/RobotSettings/UpdateBuildroot')
+vi.mock('../../../redux/robot-update')
+vi.mock('../../Devices/RobotSettings/UpdateBuildroot')
 
-const getRobotUpdateDisplayInfo = Buildroot.getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof Buildroot.getRobotUpdateDisplayInfo
->
-const mockUpdateBuildroot = handleUpdateBuildroot as jest.MockedFunction<
-  typeof handleUpdateBuildroot
->
+const getUpdateDisplayInfo = Buildroot.getRobotUpdateDisplayInfo
+
 const render = (props: React.ComponentProps<typeof UpdateRobotBanner>) => {
   return renderWithProviders(<UpdateRobotBanner {...props} />, {
     i18nInstance: i18n,
@@ -32,15 +30,11 @@ describe('UpdateRobotBanner', () => {
     props = {
       robot: mockConnectableRobot,
     }
-    getRobotUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(getUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'upgrade',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
   })
 
   it('should display correct information', () => {
@@ -50,11 +44,11 @@ describe('UpdateRobotBanner', () => {
     )
     const btn = getByRole('button', { name: 'View update' })
     fireEvent.click(btn)
-    expect(mockUpdateBuildroot).toHaveBeenCalled()
+    expect(handleUpdateBuildroot).toHaveBeenCalled()
   })
 
   it('should render nothing if update is not available when autoUpdateAction returns reinstall', () => {
-    getRobotUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(getUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'reinstall',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
@@ -66,7 +60,7 @@ describe('UpdateRobotBanner', () => {
   })
 
   it('should render nothing if update is not available when autoUpdateAction returns downgrade', () => {
-    getRobotUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(getUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'downgrade',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
