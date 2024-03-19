@@ -11,12 +11,6 @@ export default {
   parameters: touchScreenViewport,
 } as Meta
 
-const dummyConfig = {
-  config: {
-    isOnDevice: true,
-  },
-} as any
-
 const Template: Story<React.ComponentProps<typeof ResetValuesModal>> = args => (
   <ResetValuesModal {...args} />
 )
