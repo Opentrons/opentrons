@@ -69,6 +69,7 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
                   {...propsForFields.useGripper}
                   disabled={!isGripperAttached}
                   label={t('form:step_edit_form.field.useGripper.label')}
+                  tooltipContent={null}
                 />
               </FormGroup>
             </div>
