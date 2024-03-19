@@ -2,6 +2,7 @@
 from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import Dict, Optional, Union
+from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -158,6 +159,13 @@ class ProtocolEngine:
         )
         self._action_dispatcher.dispatch(action)
         self._hardware_api.pause(HardwarePauseType.PAUSE)
+
+    def resume_from_recovery(self) -> None:
+        """Resume normal protocol execution after the engine was `AWAITING_RECOVERY`."""
+        action = self._state_store.commands.validate_action_allowed(
+            ResumeFromRecoveryAction()
+        )
+        self._action_dispatcher.dispatch(action)
 
     def add_command(self, request: commands.CommandCreate) -> commands.Command:
         """Add a command to the `ProtocolEngine`'s queue.

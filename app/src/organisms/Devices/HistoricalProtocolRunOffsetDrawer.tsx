@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   Box,
+  BORDERS,
   SPACING,
   COLORS,
   TYPOGRAPHY,
@@ -85,6 +86,7 @@ export function HistoricalProtocolRunOffsetDrawer(
       backgroundColor={COLORS.grey20}
       width="100%"
       padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
+      borderRadius={BORDERS.borderRadius4}
     >
       {isOutOfDate ? (
         <Banner type="warning" marginTop={SPACING.spacing8}>
@@ -145,6 +147,7 @@ export function HistoricalProtocolRunOffsetDrawer(
             padding={SPACING.spacing8}
             backgroundColor={COLORS.white}
             marginY={SPACING.spacing8}
+            borderRadius={BORDERS.borderRadius4}
           >
             <StyledText width="23.5%" as="label">
               {t('slot', { slotName: offset.location.slotName })}

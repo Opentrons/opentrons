@@ -223,7 +223,7 @@ function SubTask({
           ? BORDERS.activeLineBorder
           : `1px solid ${COLORS.grey30}`
       }
-      borderRadius={BORDERS.borderRadius4}
+      borderRadius={BORDERS.borderRadius8}
       gridGap={SPACING.spacing24}
       width="100%"
     >
@@ -366,7 +366,7 @@ function Task({
         border={
           isActiveTask && !isTaskOpen ? BORDERS.activeLineBorder : undefined
         }
-        borderRadius={BORDERS.borderRadius4}
+        borderRadius={BORDERS.borderRadius8}
         width="100%"
       >
         <Flex

@@ -236,7 +236,7 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
       </StyledText>
       <Flex
         backgroundColor={COLORS.grey35}
-        borderRadius={BORDERS.borderRadius4}
+        borderRadius={BORDERS.borderRadius8}
         marginTop={SPACING.spacing24}
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}

@@ -82,11 +82,14 @@ export interface Runs {
 export const RUN_ACTION_TYPE_PLAY: 'play' = 'play'
 export const RUN_ACTION_TYPE_PAUSE: 'pause' = 'pause'
 export const RUN_ACTION_TYPE_STOP: 'stop' = 'stop'
+export const RUN_ACTION_TYPE_RESUME_FROM_RECOVERY: 'resume-from-recovery' =
+  'resume-from-recovery'
 
 export type RunActionType =
   | typeof RUN_ACTION_TYPE_PLAY
   | typeof RUN_ACTION_TYPE_PAUSE
   | typeof RUN_ACTION_TYPE_STOP
+  | typeof RUN_ACTION_TYPE_RESUME_FROM_RECOVERY
 
 export interface RunAction {
   id: string
