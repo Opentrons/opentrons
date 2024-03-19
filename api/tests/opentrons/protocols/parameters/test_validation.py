@@ -3,7 +3,7 @@ from typing import Optional, List
 
 from opentrons.protocols.parameters.types import (
     AllowedTypes,
-    ParameterChoices,
+    ParameterChoice,
     ParameterNameError,
     ParameterValueError,
     ParameterDefinitionError,
@@ -171,7 +171,7 @@ def test_validate_options_raise_definition_error(
     default: AllowedTypes,
     minimum: Optional[AllowedTypes],
     maximum: Optional[AllowedTypes],
-    choices: Optional[List[ParameterChoices]],
+    choices: Optional[List[ParameterChoice]],
     parameter_type: type,
     error_text: str,
 ) -> None:

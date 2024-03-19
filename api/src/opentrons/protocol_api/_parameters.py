@@ -11,16 +11,15 @@ class Parameters:
                 self._initialize_parameter(name, value)
 
     def _getparam(self, variable_name: str) -> Any:
-        return getattr(self, f"_{variable_name}")
+        return self._values[variable_name]
 
     def _initialize_parameter(self, variable_name: str, value: AllowedTypes) -> None:
-        if not hasattr(self, variable_name) and not hasattr(self, f"_{variable_name}"):
-            setattr(self, f"_{variable_name}", value)
+        if not hasattr(self, variable_name):
+            self._values[variable_name] = value
             prop = property(
                 fget=lambda s, v=variable_name: Parameters._getparam(s, v)  # type: ignore[misc]
             )
             setattr(Parameters, variable_name, prop)
-            self._values[variable_name] = value
         else:
             raise ParameterNameError(
                 f"Cannot use {variable_name} as a variable name, either duplicates another"

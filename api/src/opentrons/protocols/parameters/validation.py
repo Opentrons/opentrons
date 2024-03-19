@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from .types import (
     ParamType,
-    ParameterChoices,
+    ParameterChoice,
     ParameterNameError,
     ParameterValueError,
     ParameterDefinitionError,
@@ -56,7 +56,7 @@ def ensure_unit_string_length(unit: Optional[str]) -> Optional[str]:
 def _validate_choices(
     minimum: Optional[ParamType],
     maximum: Optional[ParamType],
-    choices: List[ParameterChoices],
+    choices: List[ParameterChoice],
     parameter_type: type,
 ) -> None:
     """Validate that min and max is not defined and all choices are properly formatted."""
@@ -124,7 +124,7 @@ def validate_options(
     default: ParamType,
     minimum: Optional[ParamType],
     maximum: Optional[ParamType],
-    choices: Optional[List[ParameterChoices]],
+    choices: Optional[List[ParameterChoice]],
     parameter_type: type,
 ) -> None:
     """Validate default values and all possible constraints for a valid parameter definition."""

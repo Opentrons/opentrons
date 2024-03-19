@@ -4,7 +4,7 @@ from typing import List, Optional, Union
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parameters import parameter_definition
-from opentrons.protocols.parameters.types import ParameterChoices
+from opentrons.protocols.parameters.types import ParameterChoice
 
 from ._parameters import Parameters
 
@@ -31,7 +31,7 @@ class ParameterContext:
         default: int,
         minimum: Optional[int] = None,
         maximum: Optional[int] = None,
-        choices: Optional[List[ParameterChoices]] = None,
+        choices: Optional[List[ParameterChoice]] = None,
         description: Optional[str] = None,
         unit: Optional[str] = None,
     ) -> None:
@@ -68,7 +68,7 @@ class ParameterContext:
         default: float,
         minimum: Optional[float] = None,
         maximum: Optional[float] = None,
-        choices: Optional[List[ParameterChoices]] = None,
+        choices: Optional[List[ParameterChoice]] = None,
         description: Optional[str] = None,
         unit: Optional[str] = None,
     ) -> None:
@@ -131,7 +131,7 @@ class ParameterContext:
         display_name: str,
         variable_name: str,
         default: str,
-        choices: Optional[List[ParameterChoices]] = None,
+        choices: Optional[List[ParameterChoice]] = None,
         description: Optional[str] = None,
     ) -> None:
         """Creates a string parameter, settable among given choices.

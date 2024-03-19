@@ -4,7 +4,7 @@ from typing import Generic, Optional, List, Set, Union, get_args
 
 from opentrons.protocols.parameters.types import (
     ParamType,
-    ParameterChoices,
+    ParameterChoice,
     AllowedTypes,
     ParameterDefinitionError,
     ParameterValueError,
@@ -23,7 +23,7 @@ class ParameterDefinition(Generic[ParamType]):
         default: ParamType,
         minimum: Optional[ParamType] = None,
         maximum: Optional[ParamType] = None,
-        choices: Optional[List[ParameterChoices]] = None,
+        choices: Optional[List[ParameterChoice]] = None,
         description: Optional[str] = None,
         unit: Optional[str] = None,
     ) -> None:
@@ -57,7 +57,7 @@ class ParameterDefinition(Generic[ParamType]):
             )
         self._type = parameter_type
 
-        self._choices: Optional[List[ParameterChoices]] = choices
+        self._choices: Optional[List[ParameterChoice]] = choices
         self._allowed_values: Optional[Set[AllowedTypes]] = None
 
         self._minimum: Optional[Union[int, float]] = None
@@ -111,7 +111,7 @@ def create_int_parameter(
     default: int,
     minimum: Optional[int] = None,
     maximum: Optional[int] = None,
-    choices: Optional[List[ParameterChoices]] = None,
+    choices: Optional[List[ParameterChoice]] = None,
     description: Optional[str] = None,
     unit: Optional[str] = None,
 ) -> ParameterDefinition[int]:
@@ -135,7 +135,7 @@ def create_float_parameter(
     default: float,
     minimum: Optional[float] = None,
     maximum: Optional[float] = None,
-    choices: Optional[List[ParameterChoices]] = None,
+    choices: Optional[List[ParameterChoice]] = None,
     description: Optional[str] = None,
     unit: Optional[str] = None,
 ) -> ParameterDefinition[float]:
@@ -157,7 +157,7 @@ def create_bool_parameter(
     display_name: str,
     variable_name: str,
     default: bool,
-    choices: List[ParameterChoices],
+    choices: List[ParameterChoice],
     description: Optional[str] = None,
 ) -> ParameterDefinition[bool]:
     """Creates a boolean parameter."""
@@ -175,7 +175,7 @@ def create_str_parameter(
     display_name: str,
     variable_name: str,
     default: str,
-    choices: Optional[List[ParameterChoices]] = None,
+    choices: Optional[List[ParameterChoice]] = None,
     description: Optional[str] = None,
 ) -> ParameterDefinition[str]:
     """Creates a string parameter."""

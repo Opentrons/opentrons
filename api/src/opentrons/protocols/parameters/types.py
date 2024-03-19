@@ -6,7 +6,7 @@ AllowedTypes = Union[str, int, float, bool]
 ParamType = TypeVar("ParamType", bound=AllowedTypes)
 
 
-class ParameterChoices(TypedDict):
+class ParameterChoice(TypedDict):
     """A parameter choice containing the display name and value."""
 
     display_name: str
