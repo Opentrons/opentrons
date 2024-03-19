@@ -27,7 +27,6 @@ export const StepFormDropdown = (props: StepFormDropdownProps): JSX.Element => {
   const availableOptionIds = options.map(opt => opt.value)
   // @ts-expect-error (ce, 2021-06-21) unknown not assignable to string
   const fieldValue = availableOptionIds.includes(value) ? String(value) : null
-
   return (
     <DropdownField
       name={name}
