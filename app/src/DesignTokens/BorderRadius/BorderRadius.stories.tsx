@@ -1,13 +1,13 @@
 import * as React from 'react'
 import {
-  Flex,
-  COLORS,
-  DIRECTION_COLUMN,
-  SPACING,
-  TYPOGRAPHY,
-  Box,
   ALIGN_FLEX_START,
   BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { Story, Meta } from '@storybook/react'
@@ -23,9 +23,15 @@ interface BorderRadiusStorybookProps {
 }
 
 const Template: Story<BorderRadiusStorybookProps> = args => {
-  const targetBorderRadiuses = args.borderRadius.filter(s =>
-    s[0].includes('borderRadiusSize')
-  )
+  const targetBorderRadiuses = args.borderRadius
+    .filter(s => s[0].includes('borderRadius'))
+    .sort((a, b) => {
+      const aValue = parseInt(a[1])
+      const bValue = parseInt(b[1])
+      return aValue - bValue
+    })
+  console.log(targetBorderRadiuses)
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
