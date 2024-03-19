@@ -123,7 +123,7 @@ if __name__ == "__main__":
         "PVT1ABR12",
         "ROOM_339",
         "Room_340",
-    ]  
+    ]
     parser = argparse.ArgumentParser(description="Starts Temp/RH Sensor.")
     parser.add_argument(
         "robot", metavar="ROBOT", type=str, nargs=1, help="ABR Robot Name"
