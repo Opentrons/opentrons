@@ -29,6 +29,7 @@ from ._nozzle_layout import (
     COLUMN,
     ALL,
 )
+from ._parameters import Parameters
 from ._parameter_context import ParameterContext
 
 from .create_protocol_context import (
@@ -55,6 +56,7 @@ __all__ = [
     "WasteChute",
     "Well",
     "Liquid",
+    "Parameters",
     "COLUMN",
     "ALL",
     "OFF_DECK",
