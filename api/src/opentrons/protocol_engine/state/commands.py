@@ -173,7 +173,12 @@ class CommandState:
     """
 
     failed_command: Optional[CommandEntry]
-    """The command, if any, that made the run fail and the index in the command list."""
+    """The most recent command failure, if any."""
+    # TODO(mm, 2024-03-19): This attribute is currently only used to help robot-server
+    # with pagination, but "the failed command" is an increasingly nuanced idea, now
+    # that we're doing error recovery. See if we can implement robot-server pagination
+    # atop simpler concepts, like "the last command that ran" or "the next command that
+    # would run."
 
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
