@@ -71,6 +71,7 @@ async def test_with_magdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) -
         "data": {"engaged": True, "height": 3},
         "status": "engaged",
     }
+    assert simulator.attached_modules[0].device_info["serial"] == "123"
 
 
 async def test_with_thermocycler(
@@ -117,6 +118,7 @@ async def test_with_thermocycler(
         },
         "status": "holding at target",
     }
+    assert simulator.attached_modules[0].device_info["serial"] == "123"
 
 
 async def test_with_tempdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) -> None:
@@ -145,6 +147,7 @@ async def test_with_tempdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) 
         "data": {"currentTemp": 23, "targetTemp": 23},
         "status": "holding at target",
     }
+    assert simulator.attached_modules[0].device_info["serial"] == "123"
 
 
 def test_persistence_ot2(tmpdir: str) -> None:
