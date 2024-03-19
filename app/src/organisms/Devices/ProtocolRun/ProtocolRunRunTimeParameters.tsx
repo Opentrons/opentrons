@@ -16,6 +16,7 @@ import {
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
+import { Chip } from '../../../atoms/Chip'
 import { NoParameter } from '../../ProtocolDetails/ProtocolParameters/NoParameter'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
@@ -190,6 +191,10 @@ export function ProtocolRunRuntimeParameters({
     }
     return ''
   }
+
+  // ToDo (kk:03/19/2024) this will be replaced with the boolean from values check result
+  const dummyBoolean = true
+
   // ToDO (kk:03/18/2024) Need to add Chip to updated runTime parameter value
   // This part will be implemented in a following PR since need to runTime parameter slideout
   return (
@@ -209,7 +214,7 @@ export function ProtocolRunRuntimeParameters({
           </StyledText>
           {!isNoParameter ? (
             <StyledText as="label" color={COLORS.grey60}>
-              {t('default_values')}
+              {dummyBoolean ? t('custom_values') : t('default_values')}
             </StyledText>
           ) : null}
         </Flex>
@@ -259,9 +264,18 @@ export function ProtocolRunRuntimeParameters({
                         <StyledTableCell
                           isLast={index === runTimeParameters.length - 1}
                         >
-                          <StyledText as="p">
-                            {formattedValue(parameter)}
-                          </StyledText>
+                          <Flex
+                            flexDirection={DIRECTION_ROW}
+                            gridGap={SPACING.spacing16}
+                          >
+                            <StyledText as="p">
+                              {formattedValue(parameter)}
+                            </StyledText>
+                            {/* ToDo (kk:03/19/2024) chip will be here with conditional render */}
+                            {/* {index % 2 === 0 ? (
+                              <Chip text={t('updated')} type="success" />
+                            ) : null} */}
+                          </Flex>
                         </StyledTableCell>
                       </StyledTableRow>
                     )
