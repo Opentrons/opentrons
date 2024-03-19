@@ -5,7 +5,7 @@ import os
 import json
 import sys
 from datetime import datetime, timedelta
-from hardware_testing.abr_tools.read_robot_logs import ReadRobotLogs
+from . import read_robot_logs
 
 
 def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
@@ -53,7 +53,7 @@ def create_data_dictionary(
                 error_code,
                 error_instrument,
                 error_level,
-            ) = ReadRobotLogs.get_error_info(file_results)
+            ) = read_robot_logs.get_error_info(file_results)
             all_modules = get_modules(file_results)
 
             start_time_str, complete_time_str, start_date, run_time_min = (
@@ -171,15 +171,15 @@ if __name__ == "__main__":
         "magneticBlockV1",
         "thermocyclerModuleV2",
     ]
-    runs_from_storage = ReadRobotLogs.get_run_ids_from_storage(storage_directory)
-    file_name_csv = ReadRobotLogs.create_abr_data_sheet(
+    runs_from_storage = read_robot_logs.get_run_ids_from_storage(storage_directory)
+    file_name_csv = read_robot_logs.create_abr_data_sheet(
         storage_directory, file_name, headers
     )
-    runs_in_sheet = ReadRobotLogs.read_abr_data_sheet(
+    runs_in_sheet = read_robot_logs.read_abr_data_sheet(
         storage_directory, file_name_csv, google_sheet
     )
-    runs_to_save = ReadRobotLogs.get_unseen_run_ids(runs_from_storage, runs_in_sheet)
+    runs_to_save = read_robot_logs.get_unseen_run_ids(runs_from_storage, runs_in_sheet)
     runs_and_robots = create_data_dictionary(runs_to_save, storage_directory)
-    ReadRobotLogs.write_to_abr_sheet(
+    read_robot_logs.write_to_abr_sheet(
         runs_and_robots, storage_directory, file_name_csv, google_sheet
     )
