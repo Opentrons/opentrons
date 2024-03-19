@@ -260,9 +260,9 @@ describe('Create a Tip Rack', () => {
   })
 
   it('Verify the exported file to the fixture', () => {
-    cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
-      cy.get('button').contains('EXPORT FILE').click()
+    cy.get('button').contains('EXPORT FILE').click()
 
+    cy.fixture(expectedExportFixture).then(expectedExportLabwareDef => {
       cy.window()
         .its('__lastSavedFileBlob__')
         .should('be.a', 'blob')
@@ -272,11 +272,11 @@ describe('Create a Tip Rack', () => {
 
           expectDeepEqual(assert, savedDef, expectedExportLabwareDef)
         })
-
-      cy.window()
-        .its('__lastSavedFileName__')
-        .should('equal', `generic_1_tiprack_20ul.zip`)
     })
+
+    cy.window()
+      .its('__lastSavedFileName__')
+      .should('equal', `generic_1_tiprack_20ul.json`)
   })
   it('verify the too big, too small error', () => {
     cy.get('input[name="gridOffsetY"]').clear().type('24')

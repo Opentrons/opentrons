@@ -95,6 +95,12 @@ context('File Import', () => {
     cy.get("input[placeholder='TestPro 15 Well Plate 5 µL']").should('exist')
     cy.get("input[placeholder='testpro_15_wellplate_5ul']").should('exist')
 
+    // All fields present
+    cy.get('button[class*="_export_button_"]').click({ force: true })
+    cy.contains(
+      'Please resolve all invalid fields in order to export the labware definition'
+    ).should('not.exist')
+
     cy.fixture(importedLabwareFile).then(expected => {
       cy.window()
         .its('__lastSavedFileBlob__')
