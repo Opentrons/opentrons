@@ -7,6 +7,7 @@ export const mockRunTimeParameterData: RunTimeParameter[] = [
     description: 'a dry run description',
     type: 'boolean',
     default: false,
+    value: false,
   },
   {
     displayName: 'Use Gripper',
@@ -14,6 +15,7 @@ export const mockRunTimeParameterData: RunTimeParameter[] = [
     description: '',
     type: 'boolean',
     default: true,
+    value: true,
   },
   {
     displayName: 'Trash Tips',
@@ -21,6 +23,7 @@ export const mockRunTimeParameterData: RunTimeParameter[] = [
     description: 'throw tip in trash',
     type: 'boolean',
     default: true,
+    value: true,
   },
   {
     displayName: 'Deactivate Temperatures',
@@ -28,6 +31,7 @@ export const mockRunTimeParameterData: RunTimeParameter[] = [
     description: 'deactivate temperature?',
     type: 'boolean',
     default: true,
+    value: true,
   },
   {
     displayName: 'Columns of Samples',
@@ -38,6 +42,7 @@ export const mockRunTimeParameterData: RunTimeParameter[] = [
     min: 1,
     max: 14,
     default: 4,
+    value: 4,
   },
   {
     displayName: 'PCR Cycles',
@@ -47,6 +52,7 @@ export const mockRunTimeParameterData: RunTimeParameter[] = [
     min: 1,
     max: 10,
     default: 6,
+    value: 6,
   },
   {
     displayName: 'EtoH Volume',
@@ -56,10 +62,12 @@ export const mockRunTimeParameterData: RunTimeParameter[] = [
     min: 1.5,
     max: 10.0,
     default: 6.5,
+    value: 6.5,
   },
   {
     displayName: 'Default Module Offsets',
     variableName: 'DEFAULT_OFFSETS',
+    value: 'none',
     description: '',
     type: 'str',
     choices: [
@@ -94,5 +102,6 @@ export const mockRunTimeParameterData: RunTimeParameter[] = [
       },
     ],
     default: '2',
+    value: '2',
   },
 ]

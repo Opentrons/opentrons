@@ -16,6 +16,7 @@ import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const mockData: RunTimeParameter[] = [
   {
+    value: false,
     displayName: 'Dry Run',
     variableName: 'DRYRUN',
     description: 'Is this a dry or wet run? Wet is true, dry is false',
@@ -23,6 +24,7 @@ const mockData: RunTimeParameter[] = [
     default: false,
   },
   {
+    value: true,
     displayName: 'Use Gripper',
     variableName: 'USE_GRIPPER',
     description: 'For using the gripper.',
@@ -30,6 +32,7 @@ const mockData: RunTimeParameter[] = [
     default: true,
   },
   {
+    value: true,
     displayName: 'Trash Tips',
     variableName: 'TIP_TRASH',
     description:
@@ -38,6 +41,7 @@ const mockData: RunTimeParameter[] = [
     default: true,
   },
   {
+    value: true,
     displayName: 'Deactivate Temperatures',
     variableName: 'DEACTIVATE_TEMP',
     description: 'deactivate temperature on the module',
@@ -45,6 +49,7 @@ const mockData: RunTimeParameter[] = [
     default: true,
   },
   {
+    value: 4,
     displayName: 'Columns of Samples',
     variableName: 'COLUMNS',
     description: 'How many columns do you want?',
@@ -54,6 +59,7 @@ const mockData: RunTimeParameter[] = [
     default: 4,
   },
   {
+    value: 6,
     displayName: 'PCR Cycles',
     variableName: 'PCR_CYCLES',
     description: 'number of PCR cycles on a thermocycler',
@@ -63,6 +69,7 @@ const mockData: RunTimeParameter[] = [
     default: 6,
   },
   {
+    value: 6.5,
     displayName: 'EtoH Volume',
     variableName: 'ETOH_VOLUME',
     description: '70% ethanol volume',
@@ -73,6 +80,7 @@ const mockData: RunTimeParameter[] = [
     default: 6.5,
   },
   {
+    value: 'none',
     displayName: 'Default Module Offsets',
     variableName: 'DEFAULT_OFFSETS',
     description: 'default module offsets for temp, H-S, and none',
@@ -94,6 +102,7 @@ const mockData: RunTimeParameter[] = [
     default: 'none',
   },
   {
+    value: 'left',
     displayName: 'pipette mount',
     variableName: 'mont',
     description: 'pipette mount',
@@ -111,6 +120,7 @@ const mockData: RunTimeParameter[] = [
     default: 'left',
   },
   {
+    value: 'flex',
     displayName: 'short test case',
     variableName: 'short 2 options',
     description: 'this play 2 short options',
@@ -128,6 +138,7 @@ const mockData: RunTimeParameter[] = [
     default: 'flex',
   },
   {
+    value: 'flex',
     displayName: 'long test case',
     variableName: 'long 2 options',
     description: 'this play 2 long options',

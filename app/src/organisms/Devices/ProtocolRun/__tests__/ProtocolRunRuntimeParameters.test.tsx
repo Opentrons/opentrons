@@ -27,6 +27,7 @@ const mockRunTimeParameterData: RunTimeParameter[] = [
     description: 'Is this a dry or wet run? Wet is true, dry is false',
     type: 'boolean',
     default: false,
+    value: false,
   },
   {
     displayName: 'Columns of Samples',
@@ -36,6 +37,7 @@ const mockRunTimeParameterData: RunTimeParameter[] = [
     min: 1,
     max: 14,
     default: 4,
+    value: 4,
   },
   {
     displayName: 'EtoH Volume',
@@ -46,12 +48,14 @@ const mockRunTimeParameterData: RunTimeParameter[] = [
     min: 1.5,
     max: 10.0,
     default: 6.5,
+    value: 6.5,
   },
   {
     displayName: 'Default Module Offsets',
     variableName: 'DEFAULT_OFFSETS',
     description: 'default module offsets for temp, H-S, and none',
     type: 'str',
+    value: 'none',
     choices: [
       {
         displayName: 'No offsets',

@@ -202,6 +202,7 @@ export const useRunTimeParameters = (
 
   const mockData: RunTimeParameter[] = [
     {
+      value: false,
       displayName: 'Dry Run',
       variableName: 'DRYRUN',
       description: 'Is this a dry or wet run? Wet is true, dry is false',
@@ -209,6 +210,7 @@ export const useRunTimeParameters = (
       default: false,
     },
     {
+      value: true,
       displayName: 'Use Gripper',
       variableName: 'USE_GRIPPER',
       description: 'For using the gripper.',
@@ -216,6 +218,7 @@ export const useRunTimeParameters = (
       default: true,
     },
     {
+      value: true,
       displayName: 'Trash Tips',
       variableName: 'TIP_TRASH',
       description:
@@ -224,6 +227,7 @@ export const useRunTimeParameters = (
       default: true,
     },
     {
+      value: true,
       displayName: 'Deactivate Temperatures',
       variableName: 'DEACTIVATE_TEMP',
       description: 'deactivate temperature on the module',
@@ -231,6 +235,7 @@ export const useRunTimeParameters = (
       default: true,
     },
     {
+      value: 4,
       displayName: 'Columns of Samples',
       variableName: 'COLUMNS',
       description: 'How many columns do you want?',
@@ -240,6 +245,7 @@ export const useRunTimeParameters = (
       default: 4,
     },
     {
+      value: 6,
       displayName: 'PCR Cycles',
       variableName: 'PCR_CYCLES',
       description: 'number of PCR cycles on a thermocycler',
@@ -249,6 +255,7 @@ export const useRunTimeParameters = (
       default: 6,
     },
     {
+      value: 6.5,
       displayName: 'EtoH Volume',
       variableName: 'ETOH_VOLUME',
       description: '70% ethanol volume',
@@ -259,6 +266,7 @@ export const useRunTimeParameters = (
       default: 6.5,
     },
     {
+      value: 'none',
       displayName: 'Default Module Offsets',
       variableName: 'DEFAULT_OFFSETS',
       description: 'default module offsets for temp, H-S, and none',
@@ -280,6 +288,7 @@ export const useRunTimeParameters = (
       default: 'none',
     },
     {
+      value: 'left',
       displayName: 'pipette mount',
       variableName: 'mont',
       description: 'pipette mount',
@@ -297,6 +306,7 @@ export const useRunTimeParameters = (
       default: 'left',
     },
     {
+      value: 'flex',
       displayName: 'short test case',
       variableName: 'short 2 options',
       description: 'this play 2 short options',
@@ -314,6 +324,7 @@ export const useRunTimeParameters = (
       default: 'flex',
     },
     {
+      value: 'flex',
       displayName: 'long test case',
       variableName: 'long 2 options',
       description: 'this play 2 long options',
