@@ -5,13 +5,7 @@ import os
 import sys
 import json
 from datetime import datetime, timedelta
-from .abr_run_logs import get_run_ids_from_storage, get_unseen_run_ids
-from .abr_read_logs import (
-    create_abr_data_sheet,
-    read_abr_data_sheet,
-    get_error_info,
-    write_to_abr_sheet,
-)
+from . import read_robot_logs
 
 
 def set_up_data_sheet(
@@ -26,7 +20,9 @@ def set_up_data_sheet(
     except FileNotFoundError:
         print("No google sheets credentials. Add credentials to storage notebook.")
     local_file_str = google_sheet_name + "-" + commandTypes
-    csv_name = create_abr_data_sheet(storage_directory, local_file_str, headers)
+    csv_name = read_robot_logs.create_abr_data_sheet(
+        storage_directory, local_file_str, headers
+    )
 
     return google_sheet, csv_name
 
@@ -309,7 +305,7 @@ def command_data_dictionary(
                 error_code,
                 error_instrument,
                 error_level,
-            ) = get_error_info(file_results)
+            ) = read_robot_logs.get_error_info(file_results)
 
             all_pipette_commands_list = pipette_commands(file_results)
             all_module_commands_list = module_commands(file_results)
@@ -491,33 +487,33 @@ if __name__ == "__main__":
     google_sheet_movement, csv_movement = set_up_data_sheet(
         3, google_sheet_name, "Movement", movement_headers
     )
-    runs_from_storage = get_run_ids_from_storage(storage_directory)
+    runs_from_storage = read_robot_logs.get_run_ids_from_storage(storage_directory)
     i = 0
     n = 0
     m = 0
     p = 0
-    runs_in_sheet = read_abr_data_sheet(
+    runs_in_sheet = read_robot_logs.read_abr_data_sheet(
         storage_directory, csv_instruments, google_sheet_instruments
     )
-    runs_to_save = get_unseen_run_ids(runs_from_storage, runs_in_sheet)
+    runs_to_save = read_robot_logs.get_unseen_run_ids(runs_from_storage, runs_in_sheet)
     (
         runs_and_instrument_commands,
         runs_and_module_commands,
         runs_and_setup_commands,
         runs_and_move_commands,
     ) = command_data_dictionary(runs_to_save, storage_directory, i, m, n, p)
-    write_to_abr_sheet(
+    read_robot_logs.write_to_abr_sheet(
         runs_and_instrument_commands,
         storage_directory,
         csv_instruments,
         google_sheet_instruments,
     )
-    write_to_abr_sheet(
+    read_robot_logs.write_to_abr_sheet(
         runs_and_module_commands, storage_directory, csv_modules, google_sheet_modules
     )
-    write_to_abr_sheet(
+    read_robot_logs.write_to_abr_sheet(
         runs_and_setup_commands, storage_directory, csv_setup, google_sheet_setup
     )
-    write_to_abr_sheet(
+    read_robot_logs.write_to_abr_sheet(
         runs_and_move_commands, storage_directory, csv_movement, google_sheet_movement
     )

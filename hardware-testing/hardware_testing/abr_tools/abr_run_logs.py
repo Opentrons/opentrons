@@ -5,28 +5,7 @@ import os
 import json
 import traceback
 import requests
-
-
-def get_run_ids_from_storage(storage_directory: str) -> Set[str]:
-    """Read all files in storage directory, extracts run id, adds to set."""
-    os.makedirs(storage_directory, exist_ok=True)
-    list_of_files = os.listdir(storage_directory)
-    run_ids = set()
-    for this_file in list_of_files:
-        read_file = os.path.join(storage_directory, this_file)
-        if read_file.endswith(".json"):
-            file_results = json.load(open(read_file))
-        run_id = file_results.get("run_id", "")
-        if len(run_id) > 0:
-            run_ids.add(run_id)
-    return run_ids
-
-
-def get_unseen_run_ids(runs: Set[str], runs_from_storage: Set[str]) -> Set[str]:
-    """Subtracts runs from storage from current runs being read."""
-    runs_to_save = runs - runs_from_storage
-    print(f"There are {str(len(runs_to_save))} new run(s) to save.")
-    return runs_to_save
+from . import read_robot_logs
 
 
 def get_run_ids_from_robot(ip: str) -> Set[str]:
@@ -116,11 +95,11 @@ def get_all_run_logs(storage_directory: str) -> None:
     ip_address_list = ip_file["ip_address_list"]
     print(ip_address_list)
 
-    runs_from_storage = get_run_ids_from_storage(storage_directory)
+    runs_from_storage = read_robot_logs.get_run_ids_from_storage(storage_directory)
     for ip in ip_address_list:
         try:
             runs = get_run_ids_from_robot(ip)
-            runs_to_save = get_unseen_run_ids(runs, runs_from_storage)
+            runs_to_save = read_robot_logs.get_unseen_run_ids(runs, runs_from_storage)
             save_runs(runs_to_save, ip, storage_directory)
         except Exception:
             print(f"Failed to read IP address: {ip}.")
