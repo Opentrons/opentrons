@@ -299,19 +299,17 @@ const ParametersTab = (props: ParametersTabProps): JSX.Element | null => {
 
   return (
     <>
-      <>
-        <RoundTab
-          disabled={disabled}
-          tabDisabledReason={tabDisabledReason}
-          to={`/devices/${robotName}/protocol-runs/${runId}/runtime-parameters`}
-          tabName={t('parameters')}
+      <RoundTab
+        disabled={disabled}
+        tabDisabledReason={tabDisabledReason}
+        to={`/devices/${robotName}/protocol-runs/${runId}/runtime-parameters`}
+        tabName={t('parameters')}
+      />
+      {disabled ? (
+        <Redirect
+          to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
         />
-        {disabled ? (
-          <Redirect
-            to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
-          />
-        ) : null}
-      </>
+      ) : null}
     </>
   )
 }
