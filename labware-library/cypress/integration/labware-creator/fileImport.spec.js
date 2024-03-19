@@ -95,22 +95,20 @@ context('File Import', () => {
     cy.get("input[placeholder='TestPro 15 Well Plate 5 µL']").should('exist')
     cy.get("input[placeholder='testpro_15_wellplate_5ul']").should('exist')
 
-    cy.window()
-      .its('__lastSavedFileBlob__')
-      .should('be.a', 'blob') // wait until we get the blob
-      .then(labwareBlob => {
-        cy.wrap(labwareBlob)
-          .invoke('async', 'string')
-          .then(jsonFile => {
-            cy.fixture(importedLabwareFile).then(expected => {
-              // TODO(IL, 2020/04/13): use deep equal util from PD cypress tests
-              expectDeepEqual(assert, JSON.parse(jsonFile), expected)
-            })
-          })
-      })
+    cy.fixture(importedLabwareFile).then(expected => {
+      cy.window()
+        .its('__lastSavedFileBlob__')
+        .should('be.a', 'blob') // wait until we get the blob
+        .should(async blob => {
+          const labwareDefText = await blob.text()
+          const savedDef = JSON.parse(labwareDefText)
+
+          expectDeepEqual(assert, savedDef, expected)
+        })
+    })
 
     cy.window()
       .its('__lastSavedFileName__')
-      .should('equal', 'testpro_15_wellplate_5ul.zip')
+      .should('equal', 'testpro_15_wellplate_5ul.json')
   })
 })

@@ -267,7 +267,7 @@ describe('Create a Tip Rack', () => {
         .its('__lastSavedFileBlob__')
         .should('be.a', 'blob')
         .should(async blob => {
-          const labwareDefText = await blob.async('text')
+          const labwareDefText = await blob.text()
           const savedDef = JSON.parse(labwareDefText)
 
           expectDeepEqual(assert, savedDef, expectedExportLabwareDef)
