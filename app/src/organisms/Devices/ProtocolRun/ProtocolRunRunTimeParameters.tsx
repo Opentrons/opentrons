@@ -164,7 +164,7 @@ export function ProtocolRunRuntimeParameters({
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   // ToDo (kk:03/18/2024) mockData will be replaced with []
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? mockData
-  const isNoParameter = runTimeParameters.length < 1
+  const hasParameter = runTimeParameters.length > 0
 
   const formattedValue = (runTimeParameter: RunTimeParameter): string => {
     const { type, default: defaultValue } = runTimeParameter
@@ -212,13 +212,13 @@ export function ProtocolRunRuntimeParameters({
           <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('parameters')}
           </StyledText>
-          {!isNoParameter ? (
+          {hasParameter ? (
             <StyledText as="label" color={COLORS.grey60}>
               {dummyBoolean ? t('custom_values') : t('default_values')}
             </StyledText>
           ) : null}
         </Flex>
-        {!isNoParameter ? (
+        {hasParameter ? (
           <Banner
             type="informing"
             width="100%"
@@ -233,7 +233,7 @@ export function ProtocolRunRuntimeParameters({
           </Banner>
         ) : null}
       </Flex>
-      {isNoParameter ? (
+      {!hasParameter ? (
         <Flex padding={SPACING.spacing16}>
           <NoParameter />
         </Flex>
