@@ -209,7 +209,7 @@ def motion_commands(
                     labware.get("displayName", labware.get("loadName", ""))
                     if labware["id"] == labware_id
                     and labware.get("displayName") is not None
-                    else labware.get("loadName", "")
+                    else labware_id
                     for labware in all_labware
                 ),
                 "",
