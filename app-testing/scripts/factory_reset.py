@@ -1,7 +1,8 @@
 import argparse
+import sys
 
 from requests import post
-from rich import print, print_json
+from rich import get_console
 
 BOOT_SCRIPTS_KEY = "bootScripts"
 DECK_CALIBRATION_KEY = "deckCalibration"
@@ -20,22 +21,28 @@ ALL_KEYS = [
     AUTHORIZED_KEYS_KEY,
 ]
 
+headers = {"opentrons-version": "*"}
+console = get_console()
+
 
 def reset(args: argparse.Namespace):
     url = f"http://{args.host}:31950/settings/reset"
-    headers = {"opentrons-version": "*"}
+
     if args.reset_settings is None:
         args.reset_settings = ALL_KEYS
-
     body = {key: True for key in args.reset_settings}
-    print(f"Requesting reset of {args.host} with: {" ".join(body.keys())}")
+
+    console.print(f"Requesting -> reset of {args.host} with:")
+    console.print_json(data=body)
     response = post(url=url, headers=headers, json=body)
 
-    print_json(response.text)
-    print(f"Requesting restart of {args.host}")
-    response = post(url=f"http://{args.host}:31950/server/restart", headers=headers, json={})
-    print_json(response.text)
-
+    if response.status_code == 200:
+        console.print("Response -> [bold green] reset successful\n")
+        console.print("\n--->  You must restart the robot after running this script  <---\n", style="bold white on blue")
+    else:
+        console.print("Response -> [bold red] reset failed\n")
+        console.print(response.text)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
@@ -94,4 +101,5 @@ if __name__ == "__main__":
         const="authorizedKeys",
     )
     args = parser.parse_args()
+
     reset(args)
