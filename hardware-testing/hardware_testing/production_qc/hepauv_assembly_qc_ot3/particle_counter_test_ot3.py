@@ -22,22 +22,20 @@ GRIP_HEIGHT_MM = 48
 GAUGE_HEIGHT_MM = 75
 SLOT_WIDTH_GAUGE: List[Optional[int]] = [[], [], []]
 from datetime import datetime
+warm_up_time = 190
 
-async def _main(simulating: bool) -> None:
+async def _main(arguments: argparse.Namespace) -> None:
     try:
         operator = input("Enter Operator Name(输入测试者名称):: ").strip()
         HEPASN = input("Enter HEPA/UV Barcode Number(输入HEPA/UV条码):: ").strip()
 
-        input("Enter Operator Name(输入测试者名称):: ").strip()
+        input("CLEAN OT3FLEX,PRESS ENTER TO CONTINUE(清洁0T3后,按回车键开始测试)").strip()
+
         api = await helpers_ot3.build_async_ot3_hardware_api(
-            is_simulating=simulating, use_defaults=True
+            is_simulating=arguments.simulate, use_defaults=True
         )
         # home and move to attach position
         await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
-        
-        slotc2 = (229.71,196.32,291.17)
-        await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, Point(slotc2[0], slotc2[1], slotc2[2]))
-        
         instrument = BuildAsairGT521S()
         uvinstrument = BuildAsairUV()
         INTSN = instrument.serial_number().strip("SS").replace(' ', '')
@@ -48,193 +46,187 @@ async def _main(simulating: bool) -> None:
         csv_cb.write(["INSTRUMENT SN:", INTSN])
         csv_cb.write(["HEPA SN:" , HEPASN])
 
-        test_data={
-                        'Time(Date Time)': None,
-                        'Size1(um)': None,
-                        'Count1(M3)': None,
-                        'Size2(um)': None,
-                        'Count2(M3)': None,
-                        'Location': None,
-                        'Sample Time(sec)': None,
-                        'PASS/FAIL': None,
+        if not arguments.skip_fan:
+            slotc2 = (229.71,196.32,291.17)
+            await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, Point(slotc2[0], slotc2[1], slotc2[2]))
+            test_data={
+                            'Time(Date Time)': None,
+                            'Size1(um)': None,
+                            'Count1(M3)': None,
+                            'Size2(um)': None,
+                            'Count2(M3)': None,
+                            'Location': None,
+                            'Sample Time(sec)': None,
+                            'PASS/FAIL': None,
+                                }
+                                
+        
+            input("TURN ON FAN,PRESS ENTER TO CONTINUE.(打开风扇后,按回车键继续)")
+            instrument.initialize_connection()
+            instrument.clear_data()
+            instrument.set_number_of_samples(6)
+            instrument.start_sampling()
+            await asyncio.sleep(3)
+            #Determines if the MetOne Device is running
+            operation = True
+            try:
+                while operation:
+                    stats = instrument.operation_status()
+                    if stats == "Stop":
+                        operation = False
+                    print(stats)
+                    print('\r', end='')
+                    await asyncio.sleep(1)
+            except Exception as errval:
+                print("errval",errval)
+            #print out the data
+            input("CLEAN OTFLEX,PRESS ENTER TO START TEST(清洁OT3后按回车键开始测试)")
+            header, data = instrument.available_records()
+            #Record to designated columns using a sorting loop
+            record_dict = {}
+            csv_cb.write(list(test_data.keys()))
+            time_dict = {
+                0:30,
+                1:60,
+                2:90,
+                3:120,
+                4:150,
+                5:180
+            }
+
+            for number in range(6):
+                for key, value in zip(header.items(), data[number]):
+                    for element in key:
+                        record_dict[element]= value
+                particle_count_1 = int(record_dict['Count1(M3)'])
+                particle_count_2 = int(record_dict['Count2(M3)'])
+                test_result = \
+                        determine_criterion(particle_count_1, particle_count_2)
+                print(record_dict)
+                test_data['Time(Date Time)']=time_dict[number] #record_dict['Time']
+                test_data['Size1(um)']=record_dict['Size1']
+                test_data['Count1(M3)']=record_dict['Count1(M3)']
+                test_data['Size2(um)']=record_dict['Size2']
+                test_data['Count2(M3)']=record_dict['Count2(M3)']
+                test_data['Location']=record_dict['Location']
+                test_data['Sample Time(sec)']=record_dict['Sample Time']
+                test_data['PASS/FAIL'] = test_result
+                csv_cb.write(list(test_data.values()))
+        
+
+        if not arguments.skip_uv:
+            #UV
+            await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+            test_data2={
+                        'SLOT': None,
+                        'uvdata': None,
+                        
                             }
-                            
-    
-        input("TURN ON FAN,PRESS ENTER TO CONTINUE.(打开风扇后,按回车键继续)")
-        instrument.initialize_connection()
-        instrument.clear_data()
-        instrument.set_number_of_samples(6)
-        instrument.start_sampling()
-        await asyncio.sleep(3)
-        #Determines if the MetOne Device is running
-        operation = True
-        try:
-            while operation:
-                stats = instrument.operation_status()
-                if stats == "Stop":
-                    operation = False
-                print(stats)
-                print('\r', end='')
-                await asyncio.sleep(1)
-        except Exception as errval:
-            print("errval",errval)
-        #print out the data
-        input("CLEAN OTFLEX,PRESS ENTER TO CONTINUE(清洁OT3后按回车键开始测试)")
-        header, data = instrument.available_records()
-        #Record to designated columns using a sorting loop
-        record_dict = {}
-        csv_cb.write(list(test_data.keys()))
-        time_dict = {
-            0:30,
-            1:60,
-            2:90,
-            3:120,
-            4:150,
-            5:180
-        }
+            csv_cb.write(list(test_data2.keys()))
+            sleppp = input("Press Enter to continue...(开始UV测试,准备好回车继续)")
+            #GRIP_SLOT = [[8,5,"home"],[5,10,"home"],[10,"A4",1],["A4",1,"home"],[1,"D4","home"]]
+            GRIP_SLOT_DICIT = {"GRIP":(8,5,10,"A4",1),
+            "UNGRIP":(5,10,"A4",1,"D4"),
+            "HOME":("home","home",10,"home","home")
+            }
+            slot_loc = {
+            "A4": (554.2, 363.72, 27.04),
+            "D4": (554.21, 41.77, 27.04)
+            }
 
-        for number in range(6):
-            for key, value in zip(header.items(), data[number]):
-                for element in key:
-                    record_dict[element]= value
-            particle_count_1 = int(record_dict['Count1(M3)'])
-            particle_count_2 = int(record_dict['Count2(M3)'])
-            test_result = \
-                    determine_criterion(particle_count_1, particle_count_2)
-            print(record_dict)
-            test_data['Time(Date Time)']=time_dict[number] #record_dict['Time']
-            test_data['Size1(um)']=record_dict['Size1']
-            test_data['Count1(M3)']=record_dict['Count1(M3)']
-            test_data['Size2(um)']=record_dict['Size2']
-            test_data['Count2(M3)']=record_dict['Count2(M3)']
-            test_data['Location']=record_dict['Location']
-            test_data['Sample Time(sec)']=record_dict['Sample Time']
-            test_data['PASS/FAIL'] = test_result
-            csv_cb.write(list(test_data.values()))
-        
+            slot_name = {
+                1:"D1",
+                8:"B2",
+                5:"C2",
+                10:"A1",
+                "A4":"A4",
+                "D4":"D4"
+            
+            }
+            mount = OT3Mount.GRIPPER
+            tetsuv = False
+            for iii in range(5):
 
-        
-        #UV
-        await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
-        test_data2={
-                    'SLOT': None,
-                    'uvdata': None,
+                grip_slot1 = GRIP_SLOT_DICIT["GRIP"][iii]
+                hover_pos = (0, 0, 0)
+                if grip_slot1 == "A4" or grip_slot1 == "D4":
                     
-                        }
-        csv_cb.write(list(test_data2.keys()))
-        sleppp = input("Press Enter to continue...(开始UV测试,准备好回车继续)")
-        #GRIP_SLOT = [[8,5,"home"],[5,10,"home"],[10,"A4",1],["A4",1,"home"],[1,"D4","home"]]
-        GRIP_SLOT_DICIT = {"GRIP":(8,5,10,"A4",1),
-        "UNGRIP":(5,10,"A4",1,"D4"),
-        "HOME":("home","home",1,"home","home")
-        }
-        slot_loc = {
-        "A4": (554.2, 363.72, 27.04),
-        "D4": (554.21, 41.77, 27.04)
-        }
+                    hover_pos = slot_loc[grip_slot1]
+                    hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2])
+                    await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
 
-        slot_name = {
-            1:"D1",
-            8:"B2",
-            5:"C2",
-            10:"A1",
-            "A4":"A4",
-            "D4":"D4"
-        
-        }
-        mount = OT3Mount.GRIPPER
-        tetsuv = False
-        for iii in range(5):
+                    
+                else:
+                    hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(grip_slot1)
+                    await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 10))
+                await api.grip(30)
+                await api.home([Axis.Z_G])
 
-            grip_slot1 = GRIP_SLOT_DICIT["GRIP"][iii]
-            print(grip_slot1)
-            hover_pos = (0, 0, 0)
-            if grip_slot1 == "A4" or grip_slot1 == "D4":
+
+
+                grip_slot2 = GRIP_SLOT_DICIT["UNGRIP"][iii]
+                print(grip_slot2)
+                if grip_slot2 == "A4" or grip_slot2 == "D4":
+                    hover_pos = slot_loc[grip_slot2]
+                    hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2]-3)
+                    await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
+                    
+                else:
+                    hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(grip_slot2)
+                    await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 10))
+                await api.ungrip()
                 
-                hover_pos = slot_loc[grip_slot1]
-                print("1",hover_pos)
-                hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2])
-                print("3",hover_over_slot_3)
-                await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
+               
 
-                   
-            else:
-                hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(grip_slot1)
-                # MOVE TO SLOT
-                #aa = input("1 Press Enter to continue...")
-                await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 10))
-            print("hover_pos",hover_pos)
-            await api.grip(30)
-            await api.home([Axis.Z_G])
+                grip_slot = GRIP_SLOT_DICIT["HOME"][iii]
+                print(grip_slot)
+                if grip_slot == 10:
+                    await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+                    hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(grip_slot)
+                    current_pos = await api.gantry_position(mount)
+                    hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=current_pos[2])
+                    await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
+                else:
+                    await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
 
+                #获取数据UV get uv data
+                aa = input("Press open UV to continue...(打开UV灯后,回车继续)")
 
+                for i in range(10):
+                    await asyncio.sleep(1)
+                    print(i+1,"S")
+                alldata = uvinstrument.get_uv_()
+                intdatadict = uvinstrument.parse_modbus_data(alldata)
+                print(intdatadict)
+                aa = input("Press close UV to continue...(关闭UV灯后,回车继续)")
 
-            grip_slot2 = GRIP_SLOT_DICIT["UNGRIP"][iii]
-            print(grip_slot2)
-            if grip_slot2 == "A4" or grip_slot2 == "D4":
-                hover_pos = slot_loc[grip_slot2]
-                print("1",hover_pos)
-                hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2]-3)
-                await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
-                 
-            else:
-                hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(grip_slot2)
-                # MOVE TO SLOT
-                #aa = input("2 Press Enter to continue...")
-                await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 10))
-            await api.ungrip()
-            
-            #print("hover_pos end",hover_pos) 
-            #aa = input("3 Press Enter to continue...")
+                
 
-            grip_slot = GRIP_SLOT_DICIT["HOME"][iii]
-            print(grip_slot)
-            if grip_slot == 1:
-                await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
-                hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(grip_slot)
-                current_pos = await api.gantry_position(mount)
-                hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=current_pos[2])
-                await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
-            else:
-                await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+                test_data2['SLOT']=slot_name[grip_slot2]
+                test_data2['uvdata']=intdatadict['uvdata']
+                csv_cb.write(list(test_data2.values()))
 
-            #获取数据UV
-            aa = input("Press open UV to continue...(打开UV灯后,回车继续)")
-
-            for i in range(10):
-                await asyncio.sleep(1)
-                print(i+1,"S")
-            alldata = uvinstrument.get_uv_()
-            intdatadict = uvinstrument.parse_modbus_data(alldata)
-            print(intdatadict)
-            aa = input("Press close UV to continue...(关闭UV灯后,回车继续)")
-
-            
-
-            test_data2['SLOT']=slot_name[grip_slot2]
-            test_data2['uvdata']=intdatadict['uvdata']
-            csv_cb.write(list(test_data2.values()))
-
-            # LOOP THROUGH FORCES
-            if iii == 4:
-                tetsuv = True
+                # LOOP THROUGH FORCES
+                if iii == 4:
+                    tetsuv = True
         
         if tetsuv:
-            print("环境恢复")
+            print("home(环境恢复)")
             hover_pos = slot_loc["D4"]
             hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2]-1)
             await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
             await api.grip(30)
-            await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
-
+            await api.home([Axis.Z_G])
             hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(8)
             # MOVE TO SLOT
             await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 10))
             await api.ungrip()
+            await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
 
     except Exception as err:
         print("err:",err)
     finally:
+        await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
         print(f"CSV: {csv_props.name}")
 
 async def UV_test(simulating: bool):
@@ -435,13 +427,14 @@ def _create_csv_and_get_callbacks(
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser(description="OT-3 HEPA/UV Assembly QC Test")
     arg_parser.add_argument("--simulate", type=bool, default=False)
+    arg_parser.add_argument("--skip-fan", action="store_true")
+    arg_parser.add_argument("--skip-uv", action="store_true")
     args = arg_parser.parse_args()
-    
     # if args.operator:
     #     operator = args.operator
     # elif not args.simulate:
     #     operator = input("OPERATOR name:").strip()
     # else:
     #     operator = "simulation"
-    warm_up_time = 190 #300 seconds == 5mins
-    asyncio.run(_main(args.simulate))
+    #warm_up_time = 190 #300 seconds == 5mins
+    asyncio.run(_main(arg_parser.parse_args()))
