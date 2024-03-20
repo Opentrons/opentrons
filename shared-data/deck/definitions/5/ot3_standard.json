@@ -890,7 +890,9 @@
       "expectOpentronsModuleSerialNumber": true,
       "mayMountTo": ["cutoutA1"],
       "displayName": "Rear Slot portion of the Thermocycler Moduler",
-      "providesAddressableAreas": {},
+      "providesAddressableAreas": {
+        "cutoutA1": ["thermocyclerModuleV2"]
+      },
       "fixtureGroup": ["thermocyclerModuleV2Rear", "thermocyclerModuleV2Front"],
       "height": 124.5
     },
@@ -924,7 +926,7 @@
         "cutoutC1": ["heaterShakerV1C1"],
         "cutoutB1": ["heaterShakerV1B1"],
         "cutoutA1": ["heaterShakerV1A1"],
-        "cutoutD3": ["heaterShakerV13"],
+        "cutoutD3": ["heaterShakerV1D3"],
         "cutoutC3": ["heaterShakerV1C3"],
         "cutoutB3": ["heaterShakerV1B3"],
         "cutoutA3": ["heaterShakerV1A3"]
