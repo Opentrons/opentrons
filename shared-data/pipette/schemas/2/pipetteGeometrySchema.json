@@ -21,6 +21,14 @@
       "type": "string",
       "pattern": "[0-9]+",
       "description": "The name of a column of nozzles"
+    },
+    "mountDefinition": {
+      "type": "object",
+      "required": ["left", "right"],
+      "properties": {
+        "left": { "$ref": "#/definitions/xyzArray" },
+        "right": { "$ref": "#/definitions/xyzArray" }
+      }
     }
   },
   "type": "object",
@@ -32,6 +40,14 @@
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/pipette/schemas/2/pipetteGeometrySchema.json is a reference to this schema."
     },
     "nozzleOffset": { "$ref": "#/definitions/xyzArray" },
+    "robotPositions": {
+      "description": "The pipette specific robot extents which change depending on the mount.",
+      "type": "object",
+      "properties": {
+        "robotFrontLeftPosition": { "$ref": "#/definitions/mountDefinition" },
+        "robotHomePosition": { "$ref": "#/definitions/mountDefinition" }
+      }
+    },
     "pipetteBoundingBoxOffsets": {
       "description": "Offsets from the pipette mount position to the back-left & front-right corners of the pipette's bounding box which includes the outer casing and all nozzles.",
       "type": "object",
