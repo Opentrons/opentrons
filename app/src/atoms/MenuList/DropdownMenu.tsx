@@ -107,11 +107,14 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           css={DROPDOWN_STYLE}
         >
           <StyledText
-            css={
-              dropdownType === 'rounded'
+            css={css`
+              ${dropdownType === 'rounded'
                 ? TYPOGRAPHY.pSemiBold
-                : TYPOGRAPHY.pRegular
-            }
+                : TYPOGRAPHY.pRegular}
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            `}
           >
             {currentOption.name}
           </StyledText>

@@ -42,7 +42,7 @@ import { StyledText } from '../../atoms/text'
 import { ToggleButton } from '../../atoms/buttons'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { InputField } from '../../atoms/InputField'
-import { SelectField } from '../../atoms/SelectField'
+import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 
 import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
 import type { SlideoutProps } from '../../atoms/Slideout'
@@ -50,7 +50,7 @@ import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlide
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 import { useFeatureFlag } from '../../redux/config'
-import type { SelectOption } from '../../atoms/SelectField/Select'
+import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
@@ -331,17 +331,18 @@ export function ChooseRobotSlideout(
     (runtimeParam, index) => {
       if ('choices' in runtimeParam) {
         const dropdownOptions = runtimeParam.choices.map(choice => {
-          return { label: choice.displayName, value: choice.value }
-        }) as SelectOption[]
+          return { name: choice.displayName, value: choice.value }
+        }) as DropdownOption[]
         return (
-          <SelectField
+          <DropdownMenu
             key={runtimeParam.variableName}
-            name={runtimeParam.variableName}
-            options={dropdownOptions}
-            // placeholder={dropdownOptions[0].label}
-            isSearchable={false}
-            value={runtimeParam.value}
-            onValueChange={(_, choice) => {
+            filterOptions={dropdownOptions}
+            currentOption={
+              dropdownOptions.find(choice => {
+                return choice.value === runtimeParam.value
+              }) ?? dropdownOptions[0]
+            }
+            onClick={choice => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
                   return {
@@ -358,6 +359,7 @@ export function ChooseRobotSlideout(
             title={runtimeParam.displayName}
             caption={runtimeParam.description}
             width="100%"
+            dropdownType="neutral"
           />
         )
       } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
