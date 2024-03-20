@@ -121,16 +121,35 @@ class QueueCommandAction:
 
 
 @dataclass(frozen=True)
-class UpdateCommandAction:
-    """Update a given command."""
+class RunCommandAction:
+    """Mark a given command as running.
+
+    The command must be queued immediately prior to this action.
+    """
+
+    command_id: str
+    started_at: datetime
+
+
+@dataclass(frozen=True)
+class SucceedCommandAction:
+    """Mark a given command as succeeded.
+
+    The command must be running immediately prior to this action.
+    """
 
     command: Command
+    """The command in its new succeeded state."""
+
     private_result: CommandPrivateResult
 
 
 @dataclass(frozen=True)
 class FailCommandAction:
-    """Mark a given command as failed."""
+    """Mark a given command as failed.
+
+    The command must be running immediately prior to this action.
+    """
 
     command_id: str
     error_id: str
@@ -211,7 +230,8 @@ Action = Union[
     HardwareStoppedAction,
     DoorChangeAction,
     QueueCommandAction,
-    UpdateCommandAction,
+    RunCommandAction,
+    SucceedCommandAction,
     FailCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
