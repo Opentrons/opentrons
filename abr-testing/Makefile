@@ -7,10 +7,10 @@ ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
 project_ir_default = $(if $(ot_project),$(ot_project),ot3)
 
-package_name = hardware_testing
-package_version = $(call python_package_version,hardware-testing,$(project_rs_default))
-wheel_file = dist/$(call python_get_wheelname,hardware-testing,$(project_rs_default),$(package_name),$(BUILD_NUMBER))
-sdist_file = dist/$(call python_get_sdistname,hardware-testing,$(project_rs_default),$(package_name))
+package_name = abr_testing
+package_version = $(call python_package_version,abr-testing,$(project_rs_default))
+wheel_file = dist/$(call python_get_wheelname,abr-testing,$(project_rs_default),$(package_name),$(BUILD_NUMBER))
+sdist_file = dist/$(call python_get_sdistname,abr-testing,$(project_rs_default),$(package_name))
 
 tests ?= tests
 test_opts ?=
@@ -67,13 +67,13 @@ sdist:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy hardware_testing tests
-	$(python) -m black --check hardware_testing tests setup.py
-	$(python) -m flake8 hardware_testing tests setup.py
+	$(python) -m mypy abr_testing tests
+	$(python) -m black --check abr_testing tests setup.py
+	$(python) -m flake8 abr_testing tests setup.py
 
 .PHONY: format
 format:
-	$(python) -m black hardware_testing tests setup.py
+	$(python) -m black abr_testing tests setup.py
 
 .PHONY: test
 test:
