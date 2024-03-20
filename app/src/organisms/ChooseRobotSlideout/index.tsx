@@ -23,6 +23,7 @@ import {
   SIZE_4,
   SPACING,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -43,6 +44,7 @@ import { ToggleButton } from '../../atoms/buttons'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { InputField } from '../../atoms/InputField'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
+import { Tooltip } from '../../atoms/Tooltip'
 
 import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
 import type { SlideoutProps } from '../../atoms/Slideout'
@@ -141,6 +143,7 @@ export function ChooseRobotSlideout(
   const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const unhealthyReachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
@@ -451,17 +454,17 @@ export function ChooseRobotSlideout(
     }
   `
 
+  const isRestoreDefaultsLinkEnabled = runTimeParametersOverrides.some(
+    parameter => parameter.value !== parameter.default
+  )
+
   const pageTwoBody = (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex justifyContent={JUSTIFY_END}>
         <Link
           textAlign={TYPOGRAPHY.textAlignRight}
           css={
-            runTimeParametersOverrides.some(
-              parameter => parameter.value !== parameter.default
-            )
-              ? ENABLED_LINK_CSS
-              : DISABLED_LINK_CSS
+            isRestoreDefaultsLinkEnabled ? ENABLED_LINK_CSS : DISABLED_LINK_CSS
           }
           onClick={() => {
             const clone = runTimeParametersOverrides.map(parameter => ({
@@ -471,9 +474,15 @@ export function ChooseRobotSlideout(
             setRunTimeParametersOverrides(clone)
           }}
           paddingBottom={SPACING.spacing10}
+          {...targetProps}
         >
           Restore default values
         </Link>
+        {!isRestoreDefaultsLinkEnabled && (
+          <Tooltip tooltipProps={tooltipProps}>
+            {'No custom values specified'}
+          </Tooltip>
+        )}
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         {runtimeParams}
