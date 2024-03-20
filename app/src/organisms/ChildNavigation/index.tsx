@@ -19,6 +19,7 @@ import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { SmallButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { StyledText } from '../../atoms/text'
+import { Chip } from '../../atoms/Chip'
 
 import type { IconName } from '@opentrons/components'
 import type { InlineNotificationProps } from '../../atoms/InlineNotification'
@@ -37,6 +38,7 @@ interface ChildNavigationProps {
   iconName?: IconName
   iconPlacement?: IconPlacement
   secondaryButtonProps?: React.ComponentProps<typeof SmallButton>
+  chipProps?: React.ComponentProps<typeof Chip>
 }
 
 export function ChildNavigation({
@@ -49,6 +51,7 @@ export function ChildNavigation({
   iconName,
   iconPlacement,
   secondaryButtonProps,
+  chipProps,
 }: ChildNavigationProps): JSX.Element {
   return (
     <Flex
@@ -90,6 +93,7 @@ export function ChildNavigation({
           />
         </Flex>
       ) : null}
+      {chipProps != null ? <Chip {...chipProps} /> : null}
       {inlineNotification != null ? (
         <InlineNotification
           heading={inlineNotification.heading}

@@ -20,7 +20,11 @@ import {
 import { i18n } from '../../../i18n'
 import { useHardwareStatusText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useMissingProtocolHardware } from '../../Protocols/hooks'
+import {
+  useMissingProtocolHardware,
+  useRunTimeParameters,
+} from '../../Protocols/hooks'
+import { ProtocolSetupParameters } from '../../../organisms/ProtocolSetupParameters'
 import { useFeatureFlag } from '../../../redux/config'
 import { formatTimeWithUtcLabel } from '../../../resources/runs'
 import { ProtocolDetails } from '..'
@@ -28,6 +32,7 @@ import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
 import { Parameters } from '../Parameters'
+import { mockRunTimeParameterData } from '../fixtures'
 
 // Mock IntersectionObserver
 class IntersectionObserver {
@@ -41,7 +46,7 @@ Object.defineProperty(window, 'IntersectionObserver', {
   configurable: true,
   value: IntersectionObserver,
 })
-
+vi.mock('../../../organisms/ProtocolSetupParameters')
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
@@ -92,6 +97,7 @@ const render = (path = '/protocols/fakeProtocolId') => {
 
 describe('ODDProtocolDetails', () => {
   beforeEach(() => {
+    vi.mocked(useRunTimeParameters).mockReturnValue([])
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
@@ -213,5 +219,11 @@ describe('ODDProtocolDetails', () => {
     } as any)
     render()
     expect(screen.getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+  })
+  it('renders the parameters screen', () => {
+    vi.mocked(useRunTimeParameters).mockReturnValue(mockRunTimeParameterData)
+    render()
+    fireEvent.click(screen.getByText('Start setup'))
+    expect(vi.mocked(ProtocolSetupParameters)).toHaveBeenCalled()
   })
 })

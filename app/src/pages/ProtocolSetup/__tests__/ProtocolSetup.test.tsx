@@ -53,6 +53,8 @@ import { useDeckConfigurationCompatibility } from '../../../resources/deck_confi
 import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttachedModal'
 import { ProtocolSetup } from '../../../pages/ProtocolSetup'
 import { useNotifyRunQuery } from '../../../resources/runs'
+import { useFeatureFlag } from '../../../redux/config'
+import { ViewOnlyParameters } from '../../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { mockRunTimeParameterData } from '../../ProtocolDetails/fixtures'
 
@@ -95,6 +97,8 @@ vi.mock('react-router-dom', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../redux/config')
+vi.mock('../../../organisms/ProtocolSetupParameters/ViewOnlyParameters')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
@@ -344,25 +348,30 @@ describe('ProtocolSetup', () => {
     expect(vi.mocked(ProtocolSetupLiquids)).toHaveBeenCalled()
   })
 
-  it('should launch the parameters screen when there are parameters', () => {
+  it('should launch view only parameters screen when click parameters', () => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(true)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: {
         ...mockRobotSideAnalysis,
         runTimeParameters: mockRunTimeParameterData,
       },
     } as any)
-    vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(true)
     when(vi.mocked(getProtocolModulesInfo))
-      .calledWith({ ...mockRobotSideAnalysis }, flexDeckDefV4 as any)
+      .calledWith(
+        {
+          ...mockRobotSideAnalysis,
+          runTimeParameters: mockRunTimeParameterData,
+        },
+        flexDeckDefV4 as any
+      )
       .thenReturn(mockProtocolModuleInfo)
-    vi.mocked(getUnmatchedModulesForProtocol).mockReturnValue({
-      missingModuleIds: [],
-      remainingAttachedModules: [],
-    })
+    when(vi.mocked(getUnmatchedModulesForProtocol))
+      .calledWith([], mockProtocolModuleInfo)
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     render(`/runs/${RUN_ID}/setup/`)
-    screen.getByText('Parameters')
-    screen.getByText('Confirm values')
-    screen.getByText('Restore default values')
+    fireEvent.click(screen.getByText('Parameters'))
+    expect(vi.mocked(ViewOnlyParameters)).toHaveBeenCalled()
   })
 
   it('should launch LPC when clicked', () => {

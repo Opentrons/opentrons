@@ -38,4 +38,5 @@ export const ChipComponent = Template.bind({})
 ChipComponent.args = {
   type: 'basic',
   text: 'Chip component',
+  hasIcon: true,
 }
