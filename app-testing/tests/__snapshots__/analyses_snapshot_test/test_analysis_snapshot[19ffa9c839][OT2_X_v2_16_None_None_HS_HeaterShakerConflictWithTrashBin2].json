@@ -526,6 +526,10 @@
     }
   ],
   "pipettes": [],
+<<<<<<< HEAD:app-testing/tests/__snapshots__/analyses_snapshot_test/test_analysis_snapshot[19ffa9c839][OT2_X_v2_16_None_None_HS_HeaterShakerConflictWithTrashBin2].json
   "robotType": "OT-2 Standard",
+=======
+  "robotType": "OT-3 Standard",
+>>>>>>> ca2f7d91f0 (fix(app-testing): snapshot failure capture (#14586)):app-testing/tests/__snapshots__/analyses_snapshot_test/test_analysis_snapshot[25f79fd65e][Flex_None_None_TM_2_16_AnalysisError_ModuleInStagingAreaCol3].json
   "runTimeParameters": []
 }
