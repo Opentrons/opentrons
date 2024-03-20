@@ -107,8 +107,8 @@ interface ChooseRobotSlideoutProps
   robotType: RobotType | null
   selectedRobot: Robot | null
   setSelectedRobot: (robot: Robot | null) => void
-  runTimeParametersOverrides: RunTimeParameter[]
-  setRunTimeParametersOverrides: (parameters: RunTimeParameter[]) => void
+  runTimeParametersOverrides?: RunTimeParameter[]
+  setRunTimeParametersOverrides?: (parameters: RunTimeParameter[]) => void
   isAnalysisError?: boolean
   isAnalysisStale?: boolean
   showIdleOnly?: boolean
@@ -137,9 +137,10 @@ export function ChooseRobotSlideout(
     showIdleOnly = false,
     multiSlideout,
     runTimeParametersOverrides = [],
-    setRunTimeParametersOverrides,
   } = props
 
+  const setRunTimeParametersOverrides =
+    props.setRunTimeParametersOverrides ?? (() => {})
   const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
