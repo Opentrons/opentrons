@@ -284,6 +284,15 @@ class ErrorCode(int, Enum):
 
 
 @unique
+class MotorDriverErrorCode(int, Enum):
+    """Motor driver error codes."""
+
+    over_temperature = 0x2000000
+    short_circuit = 0x18000000
+    open_circuit = 0x60000000
+
+
+@unique
 class ToolType(int, Enum):
     """Tool types detected on Head."""
 

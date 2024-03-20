@@ -13,6 +13,7 @@ from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     MotionFailedError,
     PythonException,
+    MotorDriverError,
 )
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
@@ -22,6 +23,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     ErrorSeverity,
     GearMotorId,
     MoveAckId,
+    MotorDriverErrorCode,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -38,6 +40,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     TipActionResponse,
     ErrorMessage,
     StopRequest,
+    ReadMotorDriverErrorStatusResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
@@ -497,6 +500,42 @@ class MoveScheduler:
             # pick up groups they don't care about, and need to not fail.
             pass
 
+    def _handle_motor_driver_error(
+        self, message: ReadMotorDriverErrorStatusResponse, arbitration_id: ArbitrationId
+    ) -> None:
+        node_id = arbitration_id.parts.originating_node_id
+        data = message.payload.data.value
+        if data & MotorDriverErrorCode.over_temperature.value:
+            log.error(f"Motor driver error from node {node_id}")
+            self._errors.append(
+                MotorDriverError(
+                    detail={
+                        "node": NodeId(node_id).name,
+                        "error": "over temperature",
+                    }
+                )
+            )
+        if data & MotorDriverErrorCode.short_circuit.value:
+            log.error(f"Motor driver error from node {node_id}")
+            self._errors.append(
+                MotorDriverError(
+                    detail={
+                        "node": NodeId(node_id).name,
+                        "error": "short circuit",
+                    }
+                )
+            )
+        if data & MotorDriverErrorCode.open_circuit.value:
+            log.error(f"Motor driver error from node {node_id}")
+            self._errors.append(
+                MotorDriverError(
+                    detail={
+                        "node": NodeId(node_id).name,
+                        "error": "open circuit",
+                    }
+                )
+            )
+
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
@@ -510,6 +549,8 @@ class MoveScheduler:
                 self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
+        elif isinstance(message, ReadMotorDriverErrorStatusResponse):
+            self._handle_motor_driver_error(message, arbitration_id)
 
     def _handle_tip_action_motors(self, message: TipActionResponse) -> bool:
         gear_id = GearMotorId(message.payload.gear_motor_id.value)
@@ -571,7 +612,7 @@ class MoveScheduler:
 
         log.debug(f"Executing move group {group_id}.")
         self._current_group = group_id - self._start_at_index
-        error = await can_messenger.ensure_send( # catches Error response as opposed to ack response??
+        error = await can_messenger.ensure_send(
             node_id=NodeId.broadcast,
             message=ExecuteMoveGroupRequest(
                 payload=ExecuteMoveGroupRequestPayload(
@@ -587,8 +628,6 @@ class MoveScheduler:
         if error != ErrorCode.ok:
             log.error(f"received error trying to execute move group: {str(error)}")
 
-        # just report errors when move requested
-        # we want to report follow-up message! Just let logs gather it if error doesn't occur during a move? Do we collect non-response (error) messages??
         expected_time = max(3.0, self._durations[group_id - self._start_at_index] * 1.1)
         full_timeout = max(5.0, self._durations[group_id - self._start_at_index] * 2)
         start_time = time.time()

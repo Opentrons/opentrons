@@ -12,6 +12,7 @@ from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     LabwareDroppedError,
     PythonException,
+    MotorDriverError,
 )
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -133,6 +134,9 @@ def raise_from_error_message(  # noqa: C901
         raise RoboticsControlError(
             message="Unexpected robotics error", detail=detail_dict
         )
+    
+    if error_code in (ErrorCode.motor_driver_error_detected,):
+        raise MotorDriverError(detail=detail_dict)
 
     raise RoboticsControlError(message="Hardware error", detail=detail_dict)
 
