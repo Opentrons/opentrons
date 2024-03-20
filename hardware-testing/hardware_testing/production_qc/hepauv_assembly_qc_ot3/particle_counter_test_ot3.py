@@ -80,7 +80,6 @@ async def _main(arguments: argparse.Namespace) -> None:
             except Exception as errval:
                 print("errval",errval)
             #print out the data
-            input("CLEAN OTFLEX,PRESS ENTER TO START TEST(清洁OT3后按回车键开始测试)")
             header, data = instrument.available_records()
             #Record to designated columns using a sorting loop
             record_dict = {}
@@ -115,6 +114,7 @@ async def _main(arguments: argparse.Namespace) -> None:
         
 
         if not arguments.skip_uv:
+            input("PLACE THE UV METER ON THE SLOT B3 TO START TEST(将紫外线计放置在插槽B3上开始测试)")
             #UV
             await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
             test_data2={
@@ -123,7 +123,6 @@ async def _main(arguments: argparse.Namespace) -> None:
                         
                             }
             csv_cb.write(list(test_data2.keys()))
-            sleppp = input("Press Enter to continue...(开始UV测试,准备好回车继续)")
             #GRIP_SLOT = [[8,5,"home"],[5,10,"home"],[10,"A4",1],["A4",1,"home"],[1,"D4","home"]]
             GRIP_SLOT_DICIT = {"GRIP":(8,5,10,"A4",1),
             "UNGRIP":(5,10,"A4",1,"D4"),
