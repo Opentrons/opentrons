@@ -1255,7 +1255,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashC3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -1266,7 +1266,7 @@
       },
       "result": {
         "position": {
-          "x": 466.25,
+          "x": 434.25,
           "y": 150.0,
           "z": 40.0
         }
@@ -1381,5 +1381,6 @@
       "pipetteName": "p1000_96"
     }
   ],
-  "robotType": "OT-3 Standard"
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
 }

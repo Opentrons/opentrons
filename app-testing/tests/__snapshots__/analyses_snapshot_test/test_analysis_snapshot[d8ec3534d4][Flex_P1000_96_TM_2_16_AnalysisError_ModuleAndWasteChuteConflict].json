@@ -1289,5 +1289,6 @@
   },
   "modules": [],
   "pipettes": [],
-  "robotType": "OT-3 Standard"
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
 }

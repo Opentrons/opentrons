@@ -12,9 +12,9 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import {
-  LabwareField,
   LabwareLocationField,
   CheckboxRowField,
+  MoveLabwareField,
 } from '../../fields'
 import styles from '../../StepEditForm.module.css'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -50,7 +50,7 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
           label={t('form:step_edit_form.labwareLabel.movedLabware')}
           className={styles.large_field}
         >
-          <LabwareField {...propsForFields.labware} />
+          <MoveLabwareField {...propsForFields.labware} />
         </FormGroup>
         {robotType === FLEX_ROBOT_TYPE ? (
           <Flex
