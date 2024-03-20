@@ -1,5 +1,5 @@
-import type { CutoutFixtureId, CutoutId, AddressableAreaName } from '../deck'
-import type { ModuleType } from './types'
+import type { CutoutFixtureId, CutoutId, AddressableAreaName, FlexModuleCutoutFixtureId } from '../deck'
+import type { ModuleModel, ModuleType } from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
@@ -275,6 +275,24 @@ export const NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '96ChannelWasteChu
 export const GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA: 'gripperWasteChute' =
   'gripperWasteChute'
 
+export const THERMOCYCLER_ADDRESSABLE_AREA: 'thermocyclerModule' = 'thermocyclerModule'
+export const HEATERSHAKER_A1_ADDRESSABLE_AREA: 'heaterShakerA1' = 'heaterShakerA1'
+export const HEATERSHAKER_B1_ADDRESSABLE_AREA: 'heaterShakerB1' = 'heaterShakerB1'
+export const HEATERSHAKER_C1_ADDRESSABLE_AREA: 'heaterShakerC1' = 'heaterShakerC1'
+export const HEATERSHAKER_D1_ADDRESSABLE_AREA: 'heaterShakerD1' = 'heaterShakerD1'
+export const HEATERSHAKER_A3_ADDRESSABLE_AREA: 'heaterShakerA3' = 'heaterShakerA3'
+export const HEATERSHAKER_B3_ADDRESSABLE_AREA: 'heaterShakerB3' = 'heaterShakerB3'
+export const HEATERSHAKER_C3_ADDRESSABLE_AREA: 'heaterShakerC3' = 'heaterShakerC3'
+export const HEATERSHAKER_D3_ADDRESSABLE_AREA: 'heaterShakerD3' = 'heaterShakerD3'
+export const TEMPERATURE_MODULE_A1_ADDRESSABLE_AREA: 'temperatureModuleA1' = 'temperatureModuleA1'
+export const TEMPERATURE_MODULE_B1_ADDRESSABLE_AREA: 'temperatureModuleB1' = 'temperatureModuleB1'
+export const TEMPERATURE_MODULE_C1_ADDRESSABLE_AREA: 'temperatureModuleC1' = 'temperatureModuleC1'
+export const TEMPERATURE_MODULE_D1_ADDRESSABLE_AREA: 'temperatureModuleD1' = 'temperatureModuleD1'
+export const TEMPERATURE_MODULE_A3_ADDRESSABLE_AREA: 'temperatureModuleA3' = 'temperatureModuleA3'
+export const TEMPERATURE_MODULE_B3_ADDRESSABLE_AREA: 'temperatureModuleB3' = 'temperatureModuleB3'
+export const TEMPERATURE_MODULE_C3_ADDRESSABLE_AREA: 'temperatureModuleC3' = 'temperatureModuleC3'
+export const TEMPERATURE_MODULE_D3_ADDRESSABLE_AREA: 'temperatureModuleD3' = 'temperatureModuleD3'
+
 export const ADDRESSABLE_AREA_1: '1' = '1'
 export const ADDRESSABLE_AREA_2: '2' = '2'
 export const ADDRESSABLE_AREA_3: '3' = '3'
@@ -358,6 +376,19 @@ export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE: '
   'stagingAreaSlotWithWasteChuteRightAdapterCovered'
 export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE: 'stagingAreaSlotWithWasteChuteRightAdapterNoCover' =
   'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
+
+export const HEATERSHAKER_MODULE_V1_FIXTURE: 'heaterShakerModuleV1' = 'heaterShakerModuleV1'
+export const TEMPERATURE_MODULE_V2_FIXTURE: 'temperatureModuleV2' = 'temperatureModuleV2'
+export const MAGNETIC_BLOCK_V1_FIXTURE: 'magneticBlockModuleV1' = 'magneticBlockModuleV1'
+export const THERMOCYCLER_V2_REAR_FIXTURE: 'thermocyclerModuleV2Rear' = 'thermocyclerModuleV2Rear'
+export const THERMOCYCLER_V2_FRONT_FIXTURE: 'thermocyclerModuleV2Front' = 'thermocyclerModuleV2Front'
+
+export const MODULE_FIXTURES_BY_MODEL: {[moduleModel in ModuleModel]?: FlexModuleCutoutFixtureId[]} = {
+  [HEATERSHAKER_MODULE_V1]: [HEATERSHAKER_MODULE_V1_FIXTURE],
+  [TEMPERATURE_MODULE_V2]: [TEMPERATURE_MODULE_V2_FIXTURE],
+  [MAGNETIC_BLOCK_V1]: [MAGNETIC_BLOCK_V1_FIXTURE],
+  [THERMOCYCLER_MODULE_V2]: [THERMOCYCLER_V2_REAR_FIXTURE, THERMOCYCLER_V2_FRONT_FIXTURE],
+}
 
 export const SINGLE_SLOT_FIXTURES: CutoutFixtureId[] = [
   SINGLE_LEFT_SLOT_FIXTURE,
