@@ -27,6 +27,8 @@ async def _main(simulating: bool) -> None:
     try:
         operator = input("Enter Operator Name(输入测试者名称):: ").strip()
         HEPASN = input("Enter HEPA/UV Barcode Number(输入HEPA/UV条码):: ").strip()
+
+        input("Enter Operator Name(输入测试者名称):: ").strip()
         api = await helpers_ot3.build_async_ot3_hardware_api(
             is_simulating=simulating, use_defaults=True
         )
@@ -77,7 +79,7 @@ async def _main(simulating: bool) -> None:
         except Exception as errval:
             print("errval",errval)
         #print out the data
-        input("TURN OFF FAN,PRESS ENTER TO CONTINUE(关闭风扇后按回车键继续)")
+        input("CLEAN OTFLEX,PRESS ENTER TO CONTINUE(清洁OT3后按回车键开始测试)")
         header, data = instrument.available_records()
         #Record to designated columns using a sorting loop
         record_dict = {}
@@ -141,6 +143,7 @@ async def _main(simulating: bool) -> None:
         
         }
         mount = OT3Mount.GRIPPER
+        tetsuv = False
         for iii in range(5):
 
             grip_slot1 = GRIP_SLOT_DICIT["GRIP"][iii]
@@ -171,7 +174,7 @@ async def _main(simulating: bool) -> None:
             if grip_slot2 == "A4" or grip_slot2 == "D4":
                 hover_pos = slot_loc[grip_slot2]
                 print("1",hover_pos)
-                hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2]-1)
+                hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2]-3)
                 await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
                  
             else:
@@ -213,6 +216,22 @@ async def _main(simulating: bool) -> None:
             csv_cb.write(list(test_data2.values()))
 
             # LOOP THROUGH FORCES
+            if iii == 4:
+                tetsuv = True
+        
+        if tetsuv:
+            print("环境恢复")
+            hover_pos = slot_loc["D4"]
+            hover_over_slot_3 = Point(x=hover_pos[0],y=hover_pos[1],z=hover_pos[2]-1)
+            await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
+            await api.grip(30)
+            await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+
+            hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(8)
+            # MOVE TO SLOT
+            await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 10))
+            await api.ungrip()
+
     except Exception as err:
         print("err:",err)
     finally:
