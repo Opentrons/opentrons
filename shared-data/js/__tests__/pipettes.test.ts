@@ -130,6 +130,13 @@ describe('pipette data accessors', () => {
           backLeftCorner: [-8, -22, -259.15],
           frontRightCorner: [-8, -22, -259.15],
         },
+        robotPositions: {
+          robotHomePosition: { left: [0.3, -4.3], right: [-53.7, -4.3] },
+          robotFrontLeftPosition: {
+            left: [537.8, 401.515],
+            right: [483.8, 401.515],
+          },
+        },
       } as PipetteV2Specs
       expect(getPipetteSpecsV2('p1000_single_flex')).toStrictEqual(
         mockP1000Specs
