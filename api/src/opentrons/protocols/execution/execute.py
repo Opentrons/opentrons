@@ -20,6 +20,7 @@ MODULE_LOG = logging.getLogger(__name__)
 def run_protocol(
     protocol: Protocol,
     context: ProtocolContext,
+    # TODO (spp, 2024-03-20): move RunTimeParamValuesType to a top level types and use here
     run_time_param_overrides: Optional[Dict[str, Union[float, bool, str]]] = None,
 ) -> None:
     """Run a protocol.
