@@ -37,5 +37,12 @@
     "F1": [0.0, -13.5, 35.52],
     "G1": [0.0, -22.5, 35.52],
     "H1": [0.0, -31.5, 35.52]
+  },
+  "robotPositions": {
+    "robotHomePosition": { "left": [0.0, 0.0], "right": [-35, 0.0] },
+    "robotFrontLeftPosition": {
+      "left": [411.74, 347.5],
+      "right": [376.74, 347.5]
+    }
   }
 }

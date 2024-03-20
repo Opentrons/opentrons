@@ -291,5 +291,9 @@
     "H10": [45.0, -88.5, -259.15],
     "H11": [54.0, -88.5, -259.15],
     "H12": [63.0, -88.5, -259.15]
+  },
+  "robotPositions": {
+    "robotHomePosition": { "left": [28, -0.8], "right": [28, -0.8] },
+    "robotFrontLeftPosition": { "left": [565.8, 405], "right": [565.8, 405] }
   }
 }

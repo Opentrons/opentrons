@@ -395,6 +395,22 @@ class PipetteBoundingBoxOffsetDefinition(BaseModel):
     front_right_corner: List[float] = Field(..., alias="frontRightCorner")
 
 
+class PipetteMountPositions(BaseModel):
+    left: List[float]
+    right: List[float]
+
+
+class PipetteUniqueRobotGeometryDefinition(BaseModel):
+    robot_home_position: PipetteMountPositions = Field(
+        ..., alias="robotHomePosition", description="The back right corner of a robot"
+    )
+    robot_front_left_position: PipetteMountPositions = Field(
+        ...,
+        alias="robotFrontLeftPosition",
+        description="The front left corner of a robot",
+    )
+
+
 class PipetteGeometryDefinition(BaseModel):
     """The geometry properties definition of a pipette."""
 
@@ -410,6 +426,9 @@ class PipetteGeometryDefinition(BaseModel):
     )
     ordered_columns: List[PipetteColumnDefinition] = Field(..., alias="orderedColumns")
     ordered_rows: List[PipetteRowDefinition] = Field(..., alias="orderedRows")
+    robot_positions: PipetteUniqueRobotGeometryDefinition = Field(
+        ..., alias="robotPositions"
+    )
 
     @validator("nozzle_map", pre=True)
     def check_nonempty_strings(

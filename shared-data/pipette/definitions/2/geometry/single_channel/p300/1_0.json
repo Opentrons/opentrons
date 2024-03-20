@@ -10,5 +10,12 @@
   "orderedColumns": [{ "key": "1", "orderedNozzles": ["A1"] }],
   "nozzleMap": {
     "A1": [0.0, 0.0, 25.0]
+  },
+  "robotPositions": {
+    "robotHomePosition": { "left": [0.0, 0.0], "right": [-35, 0.0] },
+    "robotFrontLeftPosition": {
+      "left": [411.74, 347.5],
+      "right": [376.74, 347.5]
+    }
   }
 }
