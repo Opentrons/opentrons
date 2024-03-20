@@ -166,9 +166,13 @@ async def create_protocol(
             " protocol resources on the robot."
         ),
     ),
-    runTimeParameterValues: Optional[str] = Form(
+    run_time_parameter_values: Optional[str] = Form(
         default=None,
-        description="Key value pairs of run-time parameters defined in a protocol.",
+        description="Key-value pairs of run-time parameters defined in a protocol."
+        " Note that this is expected to be a string holding a JSON object."
+        " Also, if this data is included in the request, the server will"
+        " always trigger an analysis (for now).",
+        alias="runTimeParameterValues",
     ),
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
@@ -189,7 +193,7 @@ async def create_protocol(
     Arguments:
         files: List of uploaded files, from form-data.
         key: Optional key for client-side tracking
-        runTimeParameterValues: Key value pairs of run-time parameters defined in a protocol.
+        run_time_parameter_values: Key value pairs of run-time parameters defined in a protocol.
         protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
@@ -211,11 +215,13 @@ async def create_protocol(
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
 
-    if isinstance(runTimeParameterValues, str):
+    if isinstance(run_time_parameter_values, str):
         # We have to do this isinstance check because if `runTimeParameterValues` is
         # not specified in the request, then it gets assigned a Form(None) value
         # instead of just a None. \(O.o)/
-        parsed_rtp = json.loads(runTimeParameterValues)
+        # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
+        #  so we can validate the data contents and return a better error response.
+        parsed_rtp = json.loads(run_time_parameter_values)
     else:
         parsed_rtp = None
     content_hash = await file_hasher.hash(buffered_files)

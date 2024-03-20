@@ -28,7 +28,7 @@ stages:
 
   - name: Check that the analysis summary is present in /protocols/:id; retry until it says it's completed
     max_retries: 5
-    delay_after: 5
+    delay_after: 1
     request:
       url: '{ot2_server_base_url}/protocols/{protocol_id}'
     response:
@@ -95,16 +95,15 @@ stages:
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
     response:
-      save:
-        json:
-          protocol_id: data.id
-          analysis_id: data.analysisSummaries[1].id
       strict:
         - json:off
       status_code: 200
       json:
         data:
+          id: '{protocol_id}'
           analyses: []
           analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
             - id: !anystr
               status: pending
