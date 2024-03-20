@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -37,10 +37,6 @@ describe('AnalysisFailedModal', () => {
       protocolId: PROTOCOL_ID,
       setShowAnalysisFailedModal: mockSetShowAnalysisFailedModal,
     }
-  })
-
-  afterEach(() => {
-    vi.resetAllMocks()
   })
 
   it('should render text and button', () => {
