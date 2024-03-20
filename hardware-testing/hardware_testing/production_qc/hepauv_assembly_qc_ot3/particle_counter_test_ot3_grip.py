@@ -35,12 +35,13 @@ async def _main(simulating: bool) -> None:
         is_simulating=simulating, use_defaults=True
     )
     # home and move to attach position
+    aa = input("1 Press Enter to continue...")
     for i in [1,2,4,5,6,7,8,9,10,11,12]:
         await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
         hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(i)
         # MOVE TO SLOT
         #aa = input("1 Press Enter to continue...")
-        await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 35))
+        await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 10))
         await api.grip(30)
         await api.home([Axis.Z_G])
         hover_pos = helpers_ot3.get_slot_calibration_square_position_ot3(3)
@@ -49,9 +50,9 @@ async def _main(simulating: bool) -> None:
         # MOVE TO SLOT
         #aa = input("1 Press Enter to continue...")
         await helpers_ot3.move_to_arched_ot3(api, mount, hover_over_slot_3)
-        aa = input("1 Press Enter to continue...")
+        #aa = input("1 Press Enter to continue...")
         await api.ungrip()
-        input("end")
+        #input("end")
 
     
     # operator = input("Enter Operator Name:: ").strip()
