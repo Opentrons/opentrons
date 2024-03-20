@@ -1,19 +1,15 @@
 import * as React from 'react'
 
-import {
-  BORDERS,
-  Flex,
-  DIRECTION_ROW,
-  ALIGN_CENTER,
-  SPACING,
-  TYPOGRAPHY,
-  Icon,
-  COLORS,
-} from '@opentrons/components'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
+import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { Icon } from '../../icons'
 
-import { StyledText } from '../../../../app/src/atoms/text'
+import { StyledText } from '@opentrons/app/src/atoms/text'
 
-import type { IconName, StyleProps } from '@opentrons/components'
+import type { IconName } from '../../icons'
+import type { StyleProps } from '../../primitives'
 
 export type ChipType =
   | 'basic'
