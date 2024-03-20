@@ -891,7 +891,7 @@
       "mayMountTo": ["cutoutA1"],
       "displayName": "Rear Slot portion of the Thermocycler Moduler",
       "providesAddressableAreas": {
-        "cutoutA1": ["thermocyclerModuleV2"]
+        "cutoutA1": []
       },
       "fixtureGroup": ["thermocyclerModuleV2Rear", "thermocyclerModuleV2Front"],
       "height": 124.5
