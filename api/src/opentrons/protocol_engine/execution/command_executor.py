@@ -22,7 +22,12 @@ from ..commands import (
     CommandPrivateResult,
     Command,
 )
-from ..actions import ActionDispatcher, UpdateCommandAction, FailCommandAction
+from ..actions import (
+    ActionDispatcher,
+    RunCommandAction,
+    SucceedCommandAction,
+    FailCommandAction,
+)
 from ..errors import RunStoppedError
 from ..errors.exceptions import EStopActivatedError as PE_EStopActivatedError
 from ..notes import CommandNote, CommandNoteTracker
@@ -140,7 +145,7 @@ class CommandExecutor:
         )
 
         self._action_dispatcher.dispatch(
-            UpdateCommandAction(command=running_command, private_result=None)
+            RunCommandAction(command_id=command.id, started_at=started_at)
         )
 
         try:
@@ -168,12 +173,15 @@ class CommandExecutor:
             )
 
             if notes_update:
-                command_with_new_notes = running_command.copy(update=notes_update)
-                self._action_dispatcher.dispatch(
-                    UpdateCommandAction(
-                        command=command_with_new_notes, private_result=None
-                    )
-                )
+                # FIX BEFORE MERGE
+                pass
+                # command_with_new_notes = running_command.copy(update=notes_update)
+                # self._action_dispatcher.dispatch(
+                #     # FIX BEFORE MERGE
+                #     SucceedCommandAction(
+                #         command=command_with_new_notes, private_result=None
+                #     )
+                # )
 
             self._action_dispatcher.dispatch(
                 FailCommandAction(
@@ -203,7 +211,7 @@ class CommandExecutor:
             }
             completed_command = running_command.copy(update=update)
             self._action_dispatcher.dispatch(
-                UpdateCommandAction(
+                SucceedCommandAction(
                     command=completed_command, private_result=private_result
                 ),
             )

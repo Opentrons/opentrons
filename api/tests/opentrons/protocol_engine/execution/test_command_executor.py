@@ -21,7 +21,7 @@ from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
-    UpdateCommandAction,
+    SucceedCommandAction,
     FailCommandAction,
 )
 
@@ -319,10 +319,10 @@ async def test_execute(
 
     decoy.verify(
         action_dispatcher.dispatch(
-            UpdateCommandAction(private_result=None, command=running_command)
+            SucceedCommandAction(private_result=None, command=running_command)
         ),
         action_dispatcher.dispatch(
-            UpdateCommandAction(private_result=None, command=completed_command)
+            SucceedCommandAction(private_result=None, command=completed_command)
         ),
     )
 
@@ -451,7 +451,7 @@ async def test_execute_raises_protocol_engine_error(
 
     decoy.verify(
         action_dispatcher.dispatch(
-            UpdateCommandAction(private_result=None, command=running_command)
+            SucceedCommandAction(private_result=None, command=running_command)
         ),
         action_dispatcher.dispatch(
             FailCommandAction(
@@ -581,10 +581,10 @@ async def test_executor_forwards_notes_on_command_success(
 
     decoy.verify(
         action_dispatcher.dispatch(
-            UpdateCommandAction(private_result=None, command=running_command)
+            SucceedCommandAction(private_result=None, command=running_command)
         ),
         action_dispatcher.dispatch(
-            UpdateCommandAction(private_result=None, command=completed_command)
+            SucceedCommandAction(private_result=None, command=completed_command)
         ),
     )
 
@@ -696,10 +696,12 @@ async def test_executor_forwards_notes_on_command_failure(
 
     decoy.verify(
         action_dispatcher.dispatch(
-            UpdateCommandAction(private_result=None, command=running_command)
+            SucceedCommandAction(private_result=None, command=running_command)
         ),
         action_dispatcher.dispatch(
-            UpdateCommandAction(private_result=None, command=running_command_with_notes)
+            SucceedCommandAction(
+                private_result=None, command=running_command_with_notes
+            )
         ),
         action_dispatcher.dispatch(
             FailCommandAction(
