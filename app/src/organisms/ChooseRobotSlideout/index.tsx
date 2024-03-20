@@ -15,6 +15,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_END,
+  JUSTIFY_FLEX_START,
   Link,
   OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
@@ -37,14 +39,18 @@ import { Banner } from '../../atoms/Banner'
 import { Slideout } from '../../atoms/Slideout'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
 import { StyledText } from '../../atoms/text'
+import { ToggleButton } from '../../atoms/buttons'
 import { AvailableRobotOption } from './AvailableRobotOption'
+import { InputField } from '../../atoms/InputField'
+import { SelectField } from '../../atoms/SelectField'
 
-import type { RobotType } from '@opentrons/shared-data'
+import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
 import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 import { useFeatureFlag } from '../../redux/config'
+import type { SelectOption } from '../../atoms/SelectField/Select'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
@@ -99,6 +105,8 @@ interface ChooseRobotSlideoutProps
   robotType: RobotType | null
   selectedRobot: Robot | null
   setSelectedRobot: (robot: Robot | null) => void
+  runTimeParametersOverrides: RunTimeParameter[]
+  setRunTimeParametersOverrides: (parameters: RunTimeParameter[]) => void
   isAnalysisError?: boolean
   isAnalysisStale?: boolean
   showIdleOnly?: boolean
@@ -126,7 +134,10 @@ export function ChooseRobotSlideout(
     robotType,
     showIdleOnly = false,
     multiSlideout,
+    runTimeParametersOverrides = [],
+    setRunTimeParametersOverrides,
   } = props
+
   const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
@@ -316,7 +327,157 @@ export function ChooseRobotSlideout(
     </Flex>
   )
 
-  const pageTwoBody = <Flex>TODO</Flex>
+  const runtimeParams = runTimeParametersOverrides.map(
+    (runtimeParam, index) => {
+      if ('choices' in runtimeParam) {
+        const dropdownOptions = runtimeParam.choices.map(choice => {
+          return { label: choice.displayName, value: choice.value }
+        }) as SelectOption[]
+        return (
+          <SelectField
+            key={runtimeParam.variableName}
+            name={runtimeParam.variableName}
+            options={dropdownOptions}
+            // placeholder={dropdownOptions[0].label}
+            isSearchable={false}
+            value={runtimeParam.value}
+            onValueChange={(_, choice) => {
+              const clone = runTimeParametersOverrides.map((parameter, i) => {
+                if (i === index) {
+                  return {
+                    ...parameter,
+                    value:
+                      dropdownOptions.find(option => option.value === choice)
+                        ?.value ?? parameter.default,
+                  }
+                }
+                return parameter
+              })
+              setRunTimeParametersOverrides(clone)
+            }}
+            title={runtimeParam.displayName}
+            caption={runtimeParam.description}
+            width="100%"
+          />
+        )
+      } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
+        return (
+          <InputField
+            key={runtimeParam.variableName}
+            type="number"
+            units={runtimeParam.suffix}
+            placeholder={runtimeParam.value as string}
+            value={runtimeParam.value as number}
+            title={runtimeParam.displayName}
+            caption={runtimeParam.description}
+            onChange={e => {
+              const clone = runTimeParametersOverrides.map((parameter, i) => {
+                if (i === index) {
+                  return {
+                    ...parameter,
+                    value:
+                      runtimeParam.type === 'int'
+                        ? Math.round(e.target.valueAsNumber)
+                        : e.target.valueAsNumber,
+                  }
+                }
+                return parameter
+              })
+              setRunTimeParametersOverrides(clone)
+            }}
+          />
+        )
+      } else if (runtimeParam.type === 'boolean') {
+        return (
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            key={runtimeParam.variableName}
+          >
+            <StyledText as="labelSemiBold" paddingBottom={SPACING.spacing8}>
+              {runtimeParam.displayName}
+            </StyledText>
+            <Flex
+              gridGap={SPACING.spacing8}
+              justifyContent={JUSTIFY_FLEX_START}
+              width="max-content"
+            >
+              <ToggleButton
+                toggledOn={runtimeParam.value as boolean}
+                onClick={() => {
+                  const clone = runTimeParametersOverrides.map(
+                    (parameter, i) => {
+                      if (i === index) {
+                        return {
+                          ...parameter,
+                          value: !parameter.value,
+                        }
+                      }
+                      return parameter
+                    }
+                  )
+                  setRunTimeParametersOverrides(clone)
+                }}
+                height="0.813rem"
+                label={runtimeParam.value ? 'on' : 'off'}
+                paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
+              />
+              <StyledText as="p">
+                {runtimeParam.value ? 'On' : 'Off'}
+              </StyledText>
+            </Flex>
+            <StyledText as="label" paddingTop={SPACING.spacing8}>
+              {runtimeParam.description}
+            </StyledText>
+          </Flex>
+        )
+      }
+    }
+  )
+
+  const ENABLED_LINK_CSS = css`
+    ${TYPOGRAPHY.linkPSemiBold}
+    cursor: pointer;
+  `
+
+  const DISABLED_LINK_CSS = css`
+    ${TYPOGRAPHY.linkPSemiBold}
+    color: ${COLORS.grey50};
+    cursor: default;
+
+    &:hover {
+      color: ${COLORS.grey50};
+    }
+  `
+
+  const pageTwoBody = (
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex justifyContent={JUSTIFY_END}>
+        <Link
+          textAlign={TYPOGRAPHY.textAlignRight}
+          css={
+            runTimeParametersOverrides.some(
+              parameter => parameter.value !== parameter.default
+            )
+              ? ENABLED_LINK_CSS
+              : DISABLED_LINK_CSS
+          }
+          onClick={() => {
+            const clone = runTimeParametersOverrides.map(parameter => ({
+              ...parameter,
+              value: parameter.default,
+            }))
+            setRunTimeParametersOverrides(clone)
+          }}
+          paddingBottom={SPACING.spacing10}
+        >
+          Restore default values
+        </Link>
+      </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        {runtimeParams}
+      </Flex>
+    </Flex>
+  )
 
   return multiSlideout != null && enableRunTimeParametersFF ? (
     <MultiSlideout

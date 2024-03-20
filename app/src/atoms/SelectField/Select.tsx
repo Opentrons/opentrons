@@ -31,6 +31,7 @@ export type SelectProps = ReactSelectProps<SelectOption>
 
 interface SelectComponentProps extends SelectProps {
   width?: string
+  dropdownType?: 'rounded' | 'neutral'
 }
 
 const VOID_STYLE: unknown = undefined
@@ -41,8 +42,13 @@ export function Select(props: SelectComponentProps): JSX.Element {
     clearIndicator: NO_STYLE_FN,
     control: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      borderRadius: BORDERS.borderRadiusFull,
-      border: BORDERS.lineBorder,
+      borderRadius:
+        props.dropdownType === 'rounded'
+          ? BORDERS.borderRadiusFull
+          : BORDERS.borderRadius4,
+      border: `1px ${BORDERS.styleSolid} ${
+        props.menuIsOpen ? COLORS.blue50 : COLORS.grey50
+      }`,
       width: props.width ?? 'auto',
       height: SPACING.spacing16,
       borderColor: COLORS.grey30,
@@ -50,10 +56,10 @@ export function Select(props: SelectComponentProps): JSX.Element {
       padding: SPACING.spacing6,
       flexDirection: DIRECTION_ROW,
       '&:hover': {
-        borderColor: COLORS.grey60,
+        borderColor: COLORS.grey50,
       },
       '&:active': {
-        borderColor: COLORS.grey60,
+        borderColor: COLORS.blue50,
       },
     }),
     container: (styles: CSSObjectWithLabel) => ({
@@ -155,9 +161,9 @@ function DropdownIndicator(
         width={SPACING.spacing20}
       >
         {Boolean(props.selectProps.menuIsOpen) ? (
-          <Icon transform="rotate(180deg)" name="menu-down" height="1.25rem" />
+          <Icon transform="rotate(180deg)" name="menu-down" height="1rem" />
         ) : (
-          <Icon name="menu-down" height="1.25rem" />
+          <Icon name="menu-down" height="1rem" />
         )}
       </Box>
     </components.DropdownIndicator>
