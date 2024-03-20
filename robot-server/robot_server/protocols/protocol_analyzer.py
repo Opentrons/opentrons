@@ -4,7 +4,7 @@ from typing import Optional
 
 from opentrons import protocol_runner
 from opentrons.protocol_engine.errors import ErrorOccurrence
-from opentrons.protocol_engine.types import RTPOverridesType
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 import opentrons.util.helpers as datetime_helper
 
 import robot_server.errors.error_mappers as em
@@ -29,7 +29,7 @@ class ProtocolAnalyzer:
         self,
         protocol_resource: ProtocolResource,
         analysis_id: str,
-        run_time_param_overrides: Optional[RTPOverridesType],
+        run_time_param_values: Optional[RunTimeParamValuesType],
     ) -> None:
         """Analyze a given protocol, storing the analysis when complete."""
         runner = await protocol_runner.create_simulating_runner(
@@ -40,7 +40,7 @@ class ProtocolAnalyzer:
             result = await runner.run(
                 protocol_source=protocol_resource.source,
                 deck_configuration=[],
-                run_time_params_overrides=run_time_param_overrides,
+                run_time_param_values=run_time_param_values,
             )
         except BaseException as error:
             internal_error = em.map_unexpected_error(error=error)

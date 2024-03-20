@@ -38,7 +38,7 @@ from .legacy_wrappers import (
 from ..protocol_engine.types import (
     PostRunHardwareState,
     DeckConfigurationType,
-    RTPOverridesType,
+    RunTimeParamValuesType,
 )
 
 
@@ -110,7 +110,7 @@ class AbstractRunner(ABC):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_params_overrides: Optional[RTPOverridesType] = None,
+        run_time_param_values: Optional[RunTimeParamValuesType] = None,
     ) -> RunResult:
         """Run a given protocol to completion."""
 
@@ -151,7 +151,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         self,
         protocol_source: ProtocolSource,
         python_parse_mode: PythonParseMode,
-        run_time_params_overrides: Optional[RTPOverridesType],
+        run_time_param_values: Optional[RunTimeParamValuesType],
     ) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
@@ -195,14 +195,14 @@ class PythonAndLegacyRunner(AbstractRunner):
             func=self._legacy_executor.execute,
             protocol=protocol,
             context=context,
-            run_time_param_overrides=run_time_params_overrides,
+            run_time_param_values=run_time_param_values,
         )
 
     async def run(  # noqa: D102
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_params_overrides: Optional[RTPOverridesType] = None,
+        run_time_param_values: Optional[RunTimeParamValuesType] = None,
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
@@ -211,7 +211,7 @@ class PythonAndLegacyRunner(AbstractRunner):
             await self.load(
                 protocol_source=protocol_source,
                 python_parse_mode=python_parse_mode,
-                run_time_params_overrides=run_time_params_overrides,
+                run_time_param_values=run_time_param_values,
             )
 
         self.play(deck_configuration=deck_configuration)
@@ -311,7 +311,7 @@ class JsonRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_params_overrides: Optional[RTPOverridesType] = None,
+        run_time_param_values: Optional[RunTimeParamValuesType] = None,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
@@ -355,7 +355,7 @@ class LiveRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
-        run_time_params_overrides: Optional[RTPOverridesType] = None,
+        run_time_param_values: Optional[RunTimeParamValuesType] = None,
     ) -> RunResult:
         assert protocol_source is None
         await self._hardware_api.home()

@@ -98,8 +98,6 @@ class RunController:
     ) -> None:
         result = await self._engine_store.runner.run(
             deck_configuration=deck_configuration,
-            # TODO (spp, 2024-03-18): update when we start accepting RTP overrides for run
-            run_time_params_overrides=None,
         )
         self._run_store.update_run_state(
             run_id=self._run_id,

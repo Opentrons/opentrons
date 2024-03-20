@@ -910,6 +910,6 @@ class EnumParameter(RTPBase):
 
 RunTimeParameter = Union[IntParameter, FloatParameter, EnumParameter]
 
-RTPOverridesType = Dict[
+RunTimeParamValuesType = Dict[
     str, Union[float, bool, str]
 ]  # update value types as more RTP types are added

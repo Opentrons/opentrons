@@ -20,7 +20,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocol_engine.types import RTPOverridesType
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 from opentrons.protocol_reader import ProtocolSource, ProtocolFileRole
 from opentrons.util.broker import Broker
 
@@ -172,12 +172,10 @@ class LegacyExecutor:
     async def execute(
         protocol: LegacyProtocol,
         context: LegacyProtocolContext,
-        run_time_param_overrides: Optional[RTPOverridesType],
+        run_time_param_values: Optional[RunTimeParamValuesType],
     ) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
-        await to_thread.run_sync(
-            run_protocol, protocol, context, run_time_param_overrides
-        )
+        await to_thread.run_sync(run_protocol, protocol, context, run_time_param_values)
 
 
 __all__ = [

@@ -133,7 +133,7 @@ async def test_analyze(
         await json_runner.run(
             deck_configuration=[],
             protocol_source=protocol_resource.source,
-            run_time_params_overrides=None,
+            run_time_param_values=None,
         )
     ).then_return(
         protocol_runner.RunResult(
@@ -154,7 +154,7 @@ async def test_analyze(
     await subject.analyze(
         protocol_resource=protocol_resource,
         analysis_id="analysis-id",
-        run_time_param_overrides=None,
+        run_time_param_values=None,
     )
 
     decoy.verify(
@@ -222,7 +222,7 @@ async def test_analyze_updates_pending_on_error(
         await json_runner.run(
             deck_configuration=[],
             protocol_source=protocol_resource.source,
-            run_time_params_overrides=None,
+            run_time_param_values=None,
         )
     ).then_raise(raised_exception)
 
@@ -237,7 +237,7 @@ async def test_analyze_updates_pending_on_error(
     await subject.analyze(
         protocol_resource=protocol_resource,
         analysis_id="analysis-id",
-        run_time_param_overrides=None,
+        run_time_param_values=None,
     )
 
     decoy.verify(
