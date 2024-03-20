@@ -1,4 +1,5 @@
 import shared from './shared.json'
+import anon_app_settings from './anon_app_settings.json'
 import app_settings from './app_settings.json'
 import change_pipette from './change_pipette.json'
 import protocol_command_text from './protocol_command_text.json'
@@ -32,6 +33,7 @@ import top_navigation from './top_navigation.json'
 
 export const en = {
   shared,
+  anon_app_settings,
   app_settings,
   change_pipette,
   protocol_command_text,

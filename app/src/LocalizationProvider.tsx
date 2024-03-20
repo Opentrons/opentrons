@@ -1,16 +1,20 @@
 import * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
-// import reduce from 'lodash/reduce'
+import reduce from 'lodash/reduce'
 
 import { resources } from './assets/localization'
-import app_settings from './assets/localization/en/anon_app_settings.json'
-import original_app_settings from './assets/localization/en/app_settings.json'
 import { i18n, i18nCb, i18nConfig } from './i18n'
 import { useFeatureFlag } from './redux/config'
 
 export interface LocalizationProviderProps {
   children?: React.ReactNode
 }
+
+/**
+ * POC: substituting the phrase "Otie Settings" for "App Settings" when enableRunNotes feature flag is on
+ * The real thing will create branded.json and anonymous.json
+ * And OEM mode will be based on a newly created robot setting
+ */
 
 // const BRANDED_RESOURCE = 'branded'
 const BRANDED_RESOURCE = 'app_settings'
@@ -23,18 +27,27 @@ export function LocalizationProvider(
 ): JSX.Element {
   const isOEMMode = useFeatureFlag('enableRunNotes')
 
-  // TODO: iterate through languages, nested resources
-  // create branded.json and anon_branded.json
-  // alias anon_branded.json as branded
-
-  const anonResources = isOEMMode
-    ? { en: { ...resources.en, [BRANDED_RESOURCE]: app_settings } }
-    : resources
-
-  // reinitialize i18n with anon_app_settings, aliased as app_settings
-  // void i18n.init({ resources: anonResources })
-
-  const currentAppSettings = i18n.getResourceBundle('en', 'app_settings')
+  // iterate through language resources, nested files, substitute anonymous file for branded file for OEM mode
+  const anonResources = reduce(
+    resources,
+    (acc, resource, language) => {
+      const anonFiles = reduce(
+        resource,
+        (acc, file, fileName) => {
+          if (fileName === BRANDED_RESOURCE && isOEMMode) {
+            return acc
+          } else if (fileName === ANONYMOUS_RESOURCE) {
+            return isOEMMode ? { ...acc, [BRANDED_RESOURCE]: file } : acc
+          } else {
+            return { ...acc, [fileName]: file }
+          }
+        },
+        {}
+      )
+      return { ...acc, [language]: anonFiles }
+    },
+    {}
+  )
 
   const anonI18n = i18n.createInstance(
     {
@@ -42,21 +55,6 @@ export function LocalizationProvider(
       resources: anonResources,
     },
     i18nCb
-  )
-
-  const anonAppSettings = anonI18n.getResourceBundle('en', 'app_settings')
-
-  console.log(
-    'isOEMMode',
-    isOEMMode,
-    'currentAppSettings',
-    currentAppSettings.app_settings,
-    'anonAppSettings',
-    anonAppSettings.app_settings,
-    'original_app_settings',
-    original_app_settings.app_settings,
-    'anonResources',
-    anonResources.en.app_settings.app_settings
   )
 
   return <I18nextProvider i18n={anonI18n}>{props.children}</I18nextProvider>
