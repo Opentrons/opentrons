@@ -100,7 +100,10 @@ class AttachedModulesControl:
         )
 
     async def unregister_modules(
-        self, mods_at_ports: List[modules.ModuleAtPort]
+        self,
+        mods_at_ports: Union[
+            List[modules.ModuleAtPort], List[modules.SimulatingModuleAtPort]
+        ],
     ) -> None:
         """
         De-register Modules.
@@ -108,6 +111,7 @@ class AttachedModulesControl:
         Remove any modules that are no longer found by aionotify.
         """
         removed_modules = []
+
         for mod in mods_at_ports:
             for attached_mod in self.available_modules:
                 if attached_mod.port == mod.port:
