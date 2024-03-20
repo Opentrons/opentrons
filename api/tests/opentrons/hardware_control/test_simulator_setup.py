@@ -59,7 +59,7 @@ async def test_with_magdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) -
             "magdeck": [
                 simulator_setup.ModuleItem(
                     serial_number="123",
-                    items=[simulator_setup.ModuleCall("engage", kwargs={"height": 3})],
+                    calls=[simulator_setup.ModuleCall("engage", kwargs={"height": 3})],
                 )
             ]
         }
@@ -83,7 +83,7 @@ async def test_with_thermocycler(
             "thermocycler": [
                 simulator_setup.ModuleItem(
                     serial_number="123",
-                    items=[
+                    calls=[
                         simulator_setup.ModuleCall(
                             "set_temperature",
                             kwargs={
@@ -128,7 +128,7 @@ async def test_with_tempdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) 
             "tempdeck": [
                 simulator_setup.ModuleItem(
                     serial_number="123",
-                    items=[
+                    calls=[
                         simulator_setup.ModuleCall(
                             "start_set_temperature", kwargs={"celsius": 23}
                         ),
@@ -183,7 +183,7 @@ def test_persistence_ot3(tmpdir: str) -> None:
             "magdeck": [
                 simulator_setup.ModuleItem(
                     serial_number="mag-1",
-                    items=[
+                    calls=[
                         simulator_setup.ModuleCall(
                             function_name="engage",
                             kwargs={"height": 3},
@@ -194,7 +194,7 @@ def test_persistence_ot3(tmpdir: str) -> None:
             "tempdeck": [
                 simulator_setup.ModuleItem(
                     serial_number="temp-1",
-                    items=[
+                    calls=[
                         simulator_setup.ModuleCall(
                             function_name="set_temperature",
                             kwargs={"celsius": 23},
@@ -207,7 +207,7 @@ def test_persistence_ot3(tmpdir: str) -> None:
                 ),
                 simulator_setup.ModuleItem(
                     serial_number="temp-2",
-                    items=[
+                    calls=[
                         simulator_setup.ModuleCall(
                             function_name="set_temperature",
                             kwargs={"celsius": 23},
