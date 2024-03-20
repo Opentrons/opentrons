@@ -629,7 +629,11 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
 
 
 def test_nonfatal_command_failure() -> None:
-    """It should clear the command queue on command failure."""
+    """Test the command queue if a command fails recoverably.
+
+    Commands that were after the failed command in the queue should be left in
+    the queue.
+    """
     queue_1 = QueueCommandAction(
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(), key="command-key-1"
@@ -646,7 +650,7 @@ def test_nonfatal_command_failure() -> None:
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
     )
-    running_1 = UpdateCommandAction(
+    run_1 = UpdateCommandAction(
         private_result=None,
         command=commands.WaitForResume(
             id="command-id-1",
@@ -696,7 +700,7 @@ def test_nonfatal_command_failure() -> None:
 
     subject.handle_action(queue_1)
     subject.handle_action(queue_2)
-    subject.handle_action(running_1)
+    subject.handle_action(run_1)
     subject.handle_action(fail_1)
 
     assert subject.state.running_command_id is None
