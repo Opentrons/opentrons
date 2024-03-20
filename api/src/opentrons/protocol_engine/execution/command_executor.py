@@ -189,7 +189,6 @@ class CommandExecutor:
                     # on the pipette.) However, this currently does the opposite,
                     # acting as if the command never executed.
                     type=self._error_recovery_policy(
-                        # todo: should possibly be command_with_new_notes
                         running_command,
                         error,
                     ),
