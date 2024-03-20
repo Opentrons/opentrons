@@ -1,6 +1,7 @@
 import argparse
 
 from requests import post
+from rich import print, print_json
 
 BOOT_SCRIPTS_KEY = "bootScripts"
 DECK_CALIBRATION_KEY = "deckCalibration"
@@ -27,9 +28,14 @@ def reset(args: argparse.Namespace):
         args.reset_settings = ALL_KEYS
 
     body = {key: True for key in args.reset_settings}
-    print(f"Resetting {args.host} with: {" ".join(body.keys())}")
+    print(f"Requesting reset of {args.host} with: {" ".join(body.keys())}")
     response = post(url=url, headers=headers, json=body)
-    print(response.text)
+
+    print_json(response.text)
+    print(f"Requesting restart of {args.host}")
+    response = post(url=f"http://{args.host}:31950/server/restart", headers=headers, json={})
+    print_json(response.text)
+
 
 
 if __name__ == "__main__":
