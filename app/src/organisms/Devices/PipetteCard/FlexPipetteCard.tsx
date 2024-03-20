@@ -98,7 +98,7 @@ export function FlexPipetteCard({
   const handleChoosePipette: React.MouseEventHandler<HTMLButtonElement> = () => {
     setShowChoosePipette(true)
   }
-  const handleAttach = () => {
+  const handleAttach = (): void => {
     setShowChoosePipette(false)
     handleLaunchPipetteWizardFlows(FLOWS.ATTACH)
   }

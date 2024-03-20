@@ -226,7 +226,7 @@ export function InstrumentsAndModules({
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing8}
             >
-              {!isFlex && (
+              {!isFlex ? (
                 <PipetteCard
                   pipetteId={attachedPipettes.right?.id}
                   pipetteModelSpecs={
@@ -240,7 +240,7 @@ export function InstrumentsAndModules({
                   isRunActive={currentRunId != null && isRunRunning}
                   isEstopNotDisengaged={isEstopNotDisengaged}
                 />
-              )}
+              ) : null}
               {isFlex && !is96ChannelAttached ? (
                 <FlexPipetteCard
                   attachedPipette={attachedRightPipette}

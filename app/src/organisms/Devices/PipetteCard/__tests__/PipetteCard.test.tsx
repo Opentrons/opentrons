@@ -10,7 +10,6 @@ import { i18n } from '../../../../i18n'
 import { getHasCalibrationBlock } from '../../../../redux/config'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
 import { PipetteOverflowMenu } from '../PipetteOverflowMenu'
-import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { PipetteCard } from '..'
 
 import {
@@ -22,7 +21,6 @@ import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
 vi.mock('../PipetteOverflowMenu')
 vi.mock('../../../../redux/config')
-vi.mock('../AboutPipetteSlideout')
 vi.mock('../../../../redux/robot-api')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../redux/pipettes')
@@ -35,12 +33,10 @@ const render = (props: React.ComponentProps<typeof PipetteCard>) => {
 
 const mockRobotName = 'mockRobotName'
 describe('PipetteCard', () => {
-  let startWizard: any
   let dispatchApiRequest: DispatchApiRequestType
   let props: React.ComponentProps<typeof PipetteCard>
 
   beforeEach(() => {
-    startWizard = vi.fn()
     dispatchApiRequest = vi.fn()
     props = {
       pipetteModelSpecs: mockLeftSpecs,
@@ -50,9 +46,6 @@ describe('PipetteCard', () => {
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
-    vi.mocked(AboutPipetteSlideout).mockReturnValue(
-      <div>mock about slideout</div>
-    )
     vi.mocked(PipetteOverflowMenu).mockReturnValue(
       <div>mock pipette overflow menu</div>
     )
