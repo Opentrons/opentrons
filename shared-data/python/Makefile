@@ -128,7 +128,7 @@ test:
 
 .PHONY: generate-schema
 generate-schema:
-	$(python) -c "from opentrons_shared_data.$(target) import generate_schema; print(generate_schema())" > ../${target}/schemas/${version}.json
+	$(python) -c "from opentrons_shared_data.$(target) import generate_schema; print(generate_schema(${version}))" > ../${target}/schemas/${version}.json
 
 %-schema:
 	$(MAKE) generate-schema target=$*

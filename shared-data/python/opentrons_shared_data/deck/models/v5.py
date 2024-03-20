@@ -1,6 +1,6 @@
 from typing import Dict, Literal, List, Any
 from enum import Enum
-from pydantic import validator
+from pydantic import BaseModel, validator
 
 from . import v4
 from .shared_models import (
@@ -48,7 +48,7 @@ class CutoutFixture(v4.CutoutFixture):
     fixtureGroup: List[str] | None = None
 
 
-class LocationsV5:
+class LocationsV5(BaseModel):
     addressableAreas: List[AddressableArea]
     calibrationPoints: List[CalibrationPoint]
     cutouts: List[v4.Cutout]

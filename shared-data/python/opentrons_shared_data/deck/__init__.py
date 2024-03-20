@@ -6,6 +6,7 @@ from typing_extensions import Final
 import json
 
 from .. import get_shared_data_root, load_shared_data
+from .models import v3, v4, v5
 
 if TYPE_CHECKING:
     from .dev_types import (
@@ -101,3 +102,16 @@ def get_calibration_square_position_in_slot(slot: int) -> Offset:
         float(sum(x)) for x in zip(bottom_left, relative_center, square_z)
     ]
     return Offset(*nominal_position)
+
+
+def generate_schema(version: int) -> str:
+    """Create schema."""
+    version_map = {
+        3: v3.DeckDefinitionV3,
+        4: v4.DeckDefinitionV4,
+        5: v5.DeckDefinitionV5,
+    }
+
+    raw_json_schema = version_map[version].schema_json()
+    schema_as_dict = json.loads(raw_json_schema)
+    return json.dumps(schema_as_dict, indent=2)
