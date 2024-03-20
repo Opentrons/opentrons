@@ -220,6 +220,8 @@
   "reset_parameter_values": "Reset parameter values?",
   "reset_values": "Reset values",
   "resolve": "Resolve",
+  "restart_setup_and_try": "Restart setup and try using different parameter values.",
+  "restart_setup": "Restart setup",
   "restore_default": "Restore default values",
   "robot_cal_description": "Robot calibration establishes how the robot knows where it is in relation to the deck. Accurate Robot calibration is essential to run protocols successfully. Robot calibration has 3 parts: Deck calibration, Tip Length calibration and Pipette Offset calibration.",
   "robot_cal_help_title": "How Robot Calibration Works",
@@ -263,5 +265,6 @@
   "view_setup_instructions": "View setup instructions",
   "volume": "Volume",
   "what_labware_offset_is": "A Labware Offset is a type of positional adjustment that accounts for small, real-world variances in the overall position of the labware on a robot’s deck. Labware Offset data is unique to a specific combination of labware definition, deck slot, and robot.",
-  "why_use_lpc": "Labware Position Check is intended to correct for minor variances. Opentrons does not recommend using Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration."
+  "why_use_lpc": "Labware Position Check is intended to correct for minor variances. Opentrons does not recommend using Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration.",
+  "with_the_chosen_value": "With the chosen values, the following error occurred:"
 }
