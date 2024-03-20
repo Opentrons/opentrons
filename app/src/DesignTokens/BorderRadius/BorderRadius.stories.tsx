@@ -30,7 +30,6 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
       const bValue = parseInt(b[1])
       return aValue - bValue
     })
-  console.log(targetBorderRadiuses)
 
   return (
     <Flex
