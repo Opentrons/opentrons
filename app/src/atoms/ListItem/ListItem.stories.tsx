@@ -1,6 +1,10 @@
 import * as React from 'react'
-import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  VIEWPORT,
+} from '@opentrons/components'
 import { StyledText } from '../text'
 import { ListItem } from '.'
 import type { Story, Meta } from '@storybook/react'
@@ -15,7 +19,7 @@ export default {
       },
     },
   },
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const ListItemTemplate: Story<React.ComponentProps<typeof ListItem>> = args => (

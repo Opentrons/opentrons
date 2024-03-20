@@ -9,6 +9,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -30,7 +31,6 @@ import {
 } from '@opentrons/react-api-client'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../atoms/buttons'
-import { Chip } from '../../atoms/Chip'
 import { StyledText } from '../../atoms/text'
 import {
   ProtocolDetailsHeaderChipSkeleton,

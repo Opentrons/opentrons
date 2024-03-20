@@ -1,11 +1,13 @@
 import * as React from 'react'
-import { Flex, COLORS, SPACING } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+
+import { Flex } from '../../primitives'
+import { COLORS } from '../../helix-design-system'
+import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { Chip } from '.'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Atoms/Chip',
+  title: 'Library/Atoms/Chip',
   argTypes: {
     type: {
       options: ['basic', 'error', 'info', 'neutral', 'success', 'warning'],
@@ -16,7 +18,7 @@ export default {
     },
   },
   component: Chip,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 interface ChipStorybookProps extends React.ComponentProps<typeof Chip> {
@@ -27,7 +29,7 @@ interface ChipStorybookProps extends React.ComponentProps<typeof Chip> {
 const Template: Story<ChipStorybookProps> = ({ ...args }) => (
   <Flex
     padding={SPACING.spacing16}
-    backgroundColor={COLORS.grey50}
+    backgroundColor={COLORS.white}
     width="59rem"
   >
     <Chip {...args} />

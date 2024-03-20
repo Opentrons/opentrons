@@ -11,7 +11,7 @@ import {
   COLORS,
 } from '@opentrons/components'
 
-import { StyledText } from '../text'
+import { StyledText } from '../../../../app/src/atoms/text'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 

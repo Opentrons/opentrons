@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
-import { BORDERS, COLORS } from '@opentrons/components'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
 import { Chip } from '..'
 
 const render = (props: React.ComponentProps<typeof Chip>) => {

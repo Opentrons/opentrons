@@ -4,6 +4,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  Chip,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -20,7 +21,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Chip } from '../../atoms/Chip'
 import { StyledText } from '../../atoms/text'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'

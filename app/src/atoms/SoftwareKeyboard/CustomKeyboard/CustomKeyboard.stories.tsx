@@ -1,11 +1,11 @@
 import * as React from 'react'
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   POSITION_ABSOLUTE,
   SPACING,
+  VIEWPORT,
 } from '@opentrons/components'
-import { touchScreenViewport } from '../../../DesignTokens/constants'
 import { InputField } from '../../InputField'
 import { CustomKeyboard } from './'
 import '../index.css'
