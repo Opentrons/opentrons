@@ -7,7 +7,7 @@ export function unsubscribe(ip: string, topic: NotifyTopic): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     if (!connectionStore.isPendingUnsub(ip, topic)) {
       connectionStore
-        .setUnubStatus(ip, topic, 'pending')
+        .setUnsubStatus(ip, topic, 'pending')
         .then(() => {
           const client = connectionStore.getClient(ip)
           if (client == null) {
@@ -15,7 +15,7 @@ export function unsubscribe(ip: string, topic: NotifyTopic): Promise<void> {
           }
 
           client.unsubscribe(topic, {}, (error, result) => {
-            const robotName = connectionStore.getRobotNameFromIP(ip)
+            const robotName = connectionStore.getRobotNameByIP(ip)
             if (error != null) {
               notifyLog.debug(
                 `Failed to unsubscribe to ${robotName} on ${ip} from topic: ${topic}`
@@ -24,7 +24,9 @@ export function unsubscribe(ip: string, topic: NotifyTopic): Promise<void> {
               notifyLog.debug(
                 `Successfully unsubscribed to ${robotName} on ${ip} from topic: ${topic}`
               )
-              connectionStore.setUnubStatus(ip, topic, 'unsubscribed')
+              connectionStore
+                .setUnsubStatus(ip, topic, 'unsubscribed')
+                .catch((error: Error) => notifyLog.debug(error.message))
             }
           })
         })

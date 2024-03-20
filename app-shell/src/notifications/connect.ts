@@ -51,12 +51,12 @@ export function cleanUpUnreachableRobots(
   healthyRobots: RobotData[]
 ): Promise<void> {
   return new Promise(() => {
-    const healthyRobotIPs = healthyRobots.map(({ ip }) => ip)
-    const healthyRobotIPsSet = new Set(healthyRobotIPs)
+    const healthyRobotNames = healthyRobots.map(({ robotName }) => robotName)
+    const healthyRobotNamesSet = new Set(healthyRobotNames)
     const unreachableRobots = connectionStore
-      .getReachableHosts()
-      .filter(hostname => {
-        return !healthyRobotIPsSet.has(hostname)
+      .getAllBrokersInStore()
+      .filter(robotName => {
+        return !healthyRobotNamesSet.has(robotName)
       })
     void closeConnectionsForcefullyFor(unreachableRobots)
   })
@@ -67,31 +67,20 @@ export function establishConnections(
 ): Promise<void> {
   return new Promise(() => {
     const newConnections = healthyRobots.filter(({ ip, robotName }) => {
-      if (connectionStore.isConnectedToBroker(ip)) {
+      if (connectionStore.isConnectedToBroker(robotName)) {
         return false
-      } else if (connectionStore.isAssociatedWithExistingHostData(robotName)) {
-        if (!connectionStore.isAssociatedBrokerErrored(robotName)) {
-          // If not connected, wait for another poll of discovery-client to resolve the current connection.
-          if (connectionStore.isAssociatedBrokerConnected(robotName)) {
-            void connectionStore.associateIPWithExistingHostData(ip, robotName)
-          }
+      } else {
+        connectionStore.associateIPWithRobotName(ip, robotName)
+        if (!connectionStore.isConnectionTerminated(robotName)) {
           return false
         } else {
-          // Mark this IP as a new potential broker connection to check if the broker is reachable on this IP.
-          if (!connectionStore.isKnownPortBlockedIP(ip)) {
-            void connectionStore.deleteAllAssociatedIPsGivenRobotName(robotName)
-            return true
-          } else {
-            return false
-          }
+          return !connectionStore.isKnownPortBlockedIP(ip)
         }
-      } else {
-        return !connectionStore.isKnownPortBlockedIP(ip)
       }
     })
     newConnections.forEach(({ ip, robotName }) => {
       void connectionStore
-        .setPendingConnection(ip, robotName)
+        .setPendingConnection(robotName)
         .then(() => {
           connectAsync(`mqtt://${ip}`)
             .then(client => {
@@ -188,6 +177,8 @@ function establishListeners(
 
   client.on('end', () => {
     notifyLog.debug(`Closed connection to ${robotName} on ${ip}`)
+    // Marking the connection as failed with a generic error status lets the connection re-establish in the future
+    // and tells the browser to fall back to polling (assuming this 'end' event isn't caused by the app closing).
     void connectionStore.setErrorStatus(ip, FAILURE_STATUSES.ECONNFAILED)
   })
 

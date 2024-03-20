@@ -17,9 +17,9 @@ const subscribeOptions: mqtt.IClientSubscribeOptions = {
 const CHECK_CONNECTION_INTERVAL = 500
 
 export function subscribe(ip: string, topic: NotifyTopic): Promise<void> {
-  const robotName = connectionStore.getRobotNameFromIP(ip)
+  const robotName = connectionStore.getRobotNameByIP(ip)
 
-  if (connectionStore.isBrokerErrored(ip)) {
+  if (connectionStore.isConnectionTerminated(ip)) {
     const errorMessage = connectionStore.getFailedConnectionStatus(ip)
     if (errorMessage != null) {
       sendDeserialized({
