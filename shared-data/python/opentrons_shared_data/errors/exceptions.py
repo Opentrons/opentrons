@@ -678,6 +678,19 @@ class UnexpectedTipAttachError(RoboticsInteractionError):
         super().__init__(ErrorCodes.UNEXPECTED_TIP_ATTACH, message, detail, wrapping)
 
 
+class HepaUVFailedError(RoboticsInteractionError):
+    """An error indicating that the HEPA UV module has errored."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an HepaUVFailedError."""
+        super().__init__(ErrorCodes.HEPA_UV_FAILED, message, detail, wrapping)
+
+
 class FirmwareUpdateRequiredError(RoboticsInteractionError):
     """An error indicating that a firmware update is required."""
 
