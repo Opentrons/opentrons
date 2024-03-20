@@ -453,7 +453,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         """
         addressable_area = self._get_addressable_area_from_deck_data(
             addressable_area_name=addressable_area_name,
-            do_compatibility_check=False, # This should probably not default to false
+            do_compatibility_check=False,  # This should probably not default to false
         )
         position = addressable_area.position
         return Point(x=position.x, y=position.y, z=position.z)

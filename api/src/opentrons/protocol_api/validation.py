@@ -370,18 +370,18 @@ def ensure_and_convert_module_fixture_location(
             ]
         ]
         addressable_areas = [
-            "magneticBlockA1",
-            "magneticBlockB1",
-            "magneticBlockC1",
-            "magneticBlockD1",
-            "magneticBlockA2",
-            "magneticBlockB2",
-            "magneticBlockC2",
-            "magneticBlockD2",
-            "magneticBlockA3",
-            "magneticBlockB3",
-            "magneticBlockC3",
-            "magneticBlockD3",
+            "magneticBlockV1A1",
+            "magneticBlockV1B1",
+            "magneticBlockV1C1",
+            "magneticBlockV1D1",
+            "magneticBlockV1A2",
+            "magneticBlockV1B2",
+            "magneticBlockV1C2",
+            "magneticBlockV1D2",
+            "magneticBlockV1A3",
+            "magneticBlockV1B3",
+            "magneticBlockV1C3",
+            "magneticBlockV1D3",
         ]
 
     elif isinstance(model, HeaterShakerModuleModel):
@@ -390,14 +390,14 @@ def ensure_and_convert_module_fixture_location(
             for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
         ]
         addressable_areas = [
-            "heaterShakerA1",
-            "heaterShakerB1",
-            "heaterShakerC1",
-            "heaterShakerD1",
-            "heaterShakerA3",
-            "heaterShakerB3",
-            "heaterShakerC3",
-            "heaterShakerD3",
+            "heaterShakerV1A1",
+            "heaterShakerV1B1",
+            "heaterShakerV1C1",
+            "heaterShakerV1D1",
+            "heaterShakerV1A3",
+            "heaterShakerV1B3",
+            "heaterShakerV1C3",
+            "heaterShakerV1D3",
         ]
     elif isinstance(model, TemperatureModuleModel):
         valid_slots = [
@@ -405,17 +405,17 @@ def ensure_and_convert_module_fixture_location(
             for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
         ]
         addressable_areas = [
-            "temperatureModuleA1",
-            "temperatureModuleB1",
-            "temperatureModuleC1",
-            "temperatureModuleD1",
-            "temperatureModuleA3",
-            "temperatureModuleB3",
-            "temperatureModuleC3",
-            "temperatureModuleD3",
+            "temperatureModuleV2A1",
+            "temperatureModuleV2B1",
+            "temperatureModuleV2C1",
+            "temperatureModuleV2D1",
+            "temperatureModuleV2A3",
+            "temperatureModuleV2B3",
+            "temperatureModuleV2C3",
+            "temperatureModuleV2D3",
         ]
     elif isinstance(model, ThermocyclerModuleModel):
-        return "thermocyclerModule"
+        return "thermocyclerModuleV2"
     else:
         return None
 
