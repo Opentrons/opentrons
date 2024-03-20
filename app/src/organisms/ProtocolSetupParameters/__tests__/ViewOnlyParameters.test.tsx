@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when } from 'vitest-when'
 import { it, describe, beforeEach, vi, expect } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -17,7 +17,7 @@ const render = (props: React.ComponentProps<typeof ViewOnlyParameters>) => {
     i18nInstance: i18n,
   })
 }
-const MOCK_MAKE_SNACK_BAR = vi.fn()
+const mockMakeSnackBar = vi.fn()
 describe('ViewOnlyParameters', () => {
   let props: React.ComponentProps<typeof ViewOnlyParameters>
 
@@ -34,7 +34,7 @@ describe('ViewOnlyParameters', () => {
     when(useToaster)
       .calledWith()
       .thenReturn({
-        makeSnackBar: MOCK_MAKE_SNACK_BAR,
+        makeSnackBar: mockMakeSnackBar,
       } as any)
   })
   it('renders the parameters labels and mock data', () => {
@@ -47,6 +47,8 @@ describe('ViewOnlyParameters', () => {
     screen.getByText('6.5')
     screen.getByText('Use Gripper')
     screen.getByText('Default Module Offsets')
+    screen.getByText('Columns of Samples')
+    screen.getByText('4 mL')
   })
   it('renders the back icon and calls the prop', () => {
     render(props)

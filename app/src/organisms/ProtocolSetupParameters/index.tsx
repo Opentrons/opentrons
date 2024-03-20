@@ -160,7 +160,7 @@ export const mockData: RunTimeParameter[] = [
   },
 ]
 
-export interface ProtocolSetupParametersProps {
+interface ProtocolSetupParametersProps {
   protocolId: string
   runTimeParameters?: RunTimeParameter[]
   labwareOffsets?: LabwareOffsetCreateData[]

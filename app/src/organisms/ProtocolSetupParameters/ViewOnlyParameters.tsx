@@ -32,7 +32,7 @@ export function ViewOnlyParameters({
   const { t, i18n } = useTranslation('protocol_setup')
   const { makeSnackbar } = useToaster()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const makeSnack = (): void => {
+  const handleOnClick = (): void => {
     makeSnackbar(t('reset_setup'))
   }
 
@@ -70,10 +70,9 @@ export function ViewOnlyParameters({
       <ChildNavigation
         header={t('parameters')}
         onClickBack={() => setSetupScreen('prepare to run')}
-        chipProps={{
-          type: 'info',
-          iconName: 'information',
-          text: t('values_are_view_only'),
+        inlineNotification={{
+          type: 'neutral',
+          heading: t('values_are_view_only'),
         }}
       />
       <Flex
@@ -85,9 +84,9 @@ export function ViewOnlyParameters({
         <Flex
           gridGap={SPACING.spacing8}
           color={COLORS.grey60}
-          fontSize={TYPOGRAPHY.fontSize22}
+          fontSize={TYPOGRAPHY.fontSize20}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={TYPOGRAPHY.lineHeight28}
+          lineHeight={TYPOGRAPHY.lineHeight24}
         >
           <StyledText paddingLeft={SPACING.spacing16} width="50%">
             {t('name')}
@@ -100,13 +99,13 @@ export function ViewOnlyParameters({
           const hasCustomValue = true
           return (
             <Flex
-              onClick={makeSnack}
+              onClick={handleOnClick}
               key={`${parameter.displayName}_${index}`}
               alignItems={ALIGN_CENTER}
               backgroundColor={COLORS.grey35}
               borderRadius={BORDERS.borderRadius8}
               padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-              gridGap={SPACING.spacing32}
+              gridGap={SPACING.spacing24}
             >
               <StyledText
                 width="48%"
@@ -120,7 +119,7 @@ export function ViewOnlyParameters({
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing8}
               >
-                <StyledText as="p" maxWidth="15rem">
+                <StyledText as="p" maxWidth="15rem" color={COLORS.grey60}>
                   {getDefault(parameter)}
                 </StyledText>
                 {hasCustomValue ? (

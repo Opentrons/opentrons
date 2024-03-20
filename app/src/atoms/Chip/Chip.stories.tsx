@@ -14,6 +14,12 @@ export default {
       },
       defaultValue: 'basic',
     },
+    hasIcon: {
+      control: {
+        type: 'boolean',
+      },
+      defaultValue: true,
+    },
   },
   component: Chip,
   parameters: touchScreenViewport,
