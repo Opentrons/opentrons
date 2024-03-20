@@ -89,7 +89,7 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
     isSearchable = true,
     width,
     title,
-    dropdownType = 'neutral',
+    dropdownType = 'rounded',
   } = props
   const allOptions = options.flatMap(og =>
     'options' in og ? og.options : [og]
