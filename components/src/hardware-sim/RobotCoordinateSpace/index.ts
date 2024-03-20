@@ -1,2 +1,2 @@
-export * from './RobotCoordinateSpaceWithDOMCoords'
+export * from './RobotCoordinateSpaceWithRef'
 export * from './RobotCoordinateSpace'

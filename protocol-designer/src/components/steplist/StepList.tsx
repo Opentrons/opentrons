@@ -65,7 +65,7 @@ export const StepList = (): JSX.Element => {
 
       <StartingDeckStateTerminalItem />
       <DraggableStepItems
-        orderedStepIds={orderedStepIds.slice()}
+        orderedStepIds={orderedStepIds}
         reorderSteps={(stepIds: StepIdType[]) => {
           dispatch(steplistActions.reorderSteps(stepIds))
         }}

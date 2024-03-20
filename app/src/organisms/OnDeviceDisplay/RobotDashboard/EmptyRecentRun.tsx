@@ -25,7 +25,7 @@ export function EmptyRecentRun(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       height="27.25rem"
       justifyContent={JUSTIFY_CENTER}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
     >
       <img
         src={abstractImage}

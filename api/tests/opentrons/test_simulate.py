@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Generator, List, TextIO, cast
 
 import pytest
+from _pytest.fixtures import SubRequest
 
 from opentrons_shared_data import get_shared_data_root, load_shared_data
 
@@ -26,13 +27,13 @@ HERE = Path(__file__).parent
 
 
 @pytest.fixture(params=[APIVersion(2, 0), ENGINE_CORE_API_VERSION])
-def api_version(request: pytest.FixtureRequest) -> APIVersion:
+def api_version(request: SubRequest) -> APIVersion:
     """Return an API version to test with.
 
     Newer API versions execute through Protocol Engine, and older API versions don't.
     The two codepaths are very different, so we need to test them both.
     """
-    return request.param  # type: ignore[attr-defined,no-any-return]
+    return cast(APIVersion, request.param)
 
 
 @pytest.mark.parametrize(
@@ -87,6 +88,13 @@ def test_simulate_without_filename(protocol: Protocol, protocol_file: str) -> No
                 "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on slot 2 at 500.0 uL/sec",
                 "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on slot 2 at 1000.0 uL/sec",
                 "Dropping tip into H12 of Opentrons OT-2 96 Tip Rack 1000 µL on slot 1",
+            ],
+        ),
+        (
+            "ot2_drop_tip.py",
+            [
+                "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 300 µL on slot 5",
+                "Dropping tip into Trash Bin on slot 12",
             ],
         ),
     ],

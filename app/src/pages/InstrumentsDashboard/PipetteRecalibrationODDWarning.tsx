@@ -22,7 +22,7 @@ export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
     <Flex
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
       backgroundColor={COLORS.yellow35}
       padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
       height="5.76rem"

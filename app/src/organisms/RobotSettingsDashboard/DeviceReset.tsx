@@ -40,7 +40,7 @@ const OptionButton = styled.input`
 
 const OptionLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize4};
+  border-radius: ${BORDERS.borderRadius16};
   color: ${({ isSelected }) =>
     isSelected === true ? COLORS.white : COLORS.black90};
   background: ${({ isSelected }) =>

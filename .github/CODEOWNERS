@@ -12,7 +12,6 @@
 /protocol-designer @Opentrons/app-and-uis
 /labware-designer @Opentrons/app-and-uis
 /labware-library @Opentrons/app-and-uis
-/protocol-library-kludge @Opentrons/app-and-uis
 /update-server @Opentrons/robot-svcs
 /discovery-client @Opentrons/robot-svcs @Opentrons/app-and-uis
 /shared-data/pipette @Opentrons/embedded-sw
@@ -24,6 +23,8 @@
 # subprojects by language - some subprojects are shared by teams but united by a
 # language community (including makefiles and config) so mark them appropriately
 /app @Opentrons/js
+/api-client @Opentrons/js
+/react-api-client @Opentrons/js
 /app-shell @Opentrons/js
 /components @Opentrons/js
 /api @Opentrons/py

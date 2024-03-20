@@ -54,7 +54,7 @@ from .ot3utils import (
 from .tip_presence_manager import TipPresenceManager
 
 try:
-    import aionotify  # type: ignore[import]
+    import aionotify  # type: ignore[import-untyped]
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
@@ -86,6 +86,7 @@ from opentrons_hardware.hardware_control.motor_enable_disable import (
     set_disable_motor,
     set_enable_tip_motor,
     set_disable_tip_motor,
+    get_motor_enabled,
 )
 from opentrons_hardware.hardware_control.motor_position_status import (
     get_motor_position,
@@ -169,6 +170,12 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
 from opentrons_hardware.hardware_control.gripper_settings import (
     get_gripper_jaw_state,
 )
+from opentrons_hardware.hardware_control.hepa_uv_settings import (
+    set_hepa_fan_state as set_hepa_fan_state_fw,
+    get_hepa_fan_state as get_hepa_fan_state_fw,
+    set_hepa_uv_state as set_hepa_uv_state_fw,
+    get_hepa_uv_state as get_hepa_uv_state_fw,
+)
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
@@ -193,7 +200,7 @@ from ..dev_types import (
     AttachedGripper,
     OT3AttachedInstruments,
 )
-from ..types import StatusBarState
+from ..types import HepaFanState, HepaUVState, StatusBarState
 
 from .types import HWStopCondition
 from .flex_protocol import FlexBackend
@@ -253,6 +260,7 @@ class OT3Controller(FlexBackend):
     _encoder_position: Dict[NodeId, float]
     _motor_status: Dict[NodeId, MotorStatus]
     _subsystem_manager: SubsystemManager
+    _engaged_axes: OT3AxisMap[bool]
 
     @classmethod
     async def build(
@@ -328,6 +336,7 @@ class OT3Controller(FlexBackend):
         self._gear_motor_position: Dict[NodeId, float] = {}
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
+        self._engaged_axes = {}
         self._check_updates = check_updates
         self._initialized = False
         self._status_bar = status_bar.StatusBar(messenger=self._usb_messenger)
@@ -653,6 +662,7 @@ class OT3Controller(FlexBackend):
             if not self._feature_flags.stall_detection_enabled
             else False,
         )
+
         mounts_moving = [
             k
             for k in moving_axes_in_move_group(move_group)
@@ -1150,37 +1160,58 @@ class OT3Controller(FlexBackend):
     def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
         """Get the axis bounds."""
         # TODO (AL, 2021-11-18): The bounds need to be defined
-        phony_bounds = (0, 10000)
         return {
-            Axis.Z_L: phony_bounds,
-            Axis.Z_R: phony_bounds,
-            Axis.P_L: phony_bounds,
-            Axis.P_R: phony_bounds,
-            Axis.X: phony_bounds,
-            Axis.Y: phony_bounds,
-            Axis.Z_G: phony_bounds,
-            Axis.Q: phony_bounds,
+            Axis.Z_L: (0, 300),
+            Axis.Z_R: (0, 300),
+            Axis.P_L: (0, 200),
+            Axis.P_R: (0, 200),
+            Axis.X: (0, 550),
+            Axis.Y: (0, 550),
+            Axis.Z_G: (0, 300),
+            Axis.Q: (0, 200),
         }
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
-        return {}
+        return self._engaged_axes
+
+    async def update_engaged_axes(self) -> None:
+        """Update engaged axes."""
+        motor_nodes = self._motor_nodes()
+        results = await get_motor_enabled(self._messenger, motor_nodes)
+        for node, status in results.items():
+            self._engaged_axes[node_to_axis(node)] = status
+
+    async def is_motor_engaged(self, axis: Axis) -> bool:
+        node = axis_to_node(axis)
+        result = await get_motor_enabled(self._messenger, {node})
+        engaged = result[node]
+        self._engaged_axes.update({axis: engaged})
+        return engaged
 
     async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
         if Axis.Q in axes:
             await set_disable_tip_motor(self._messenger, {axis_to_node(Axis.Q)})
-        nodes = {axis_to_node(ax) for ax in axes if ax is not Axis.Q}
-        if len(nodes) > 0:
-            await set_disable_motor(self._messenger, nodes)
+            self._engaged_axes[Axis.Q] = False
+            axes = [ax for ax in axes if ax is not Axis.Q]
+
+        if len(axes) > 0:
+            await set_disable_motor(self._messenger, {axis_to_node(ax) for ax in axes})
+        for ax in axes:
+            self._engaged_axes[ax] = False
 
     async def engage_axes(self, axes: List[Axis]) -> None:
         """Engage axes."""
         if Axis.Q in axes:
             await set_enable_tip_motor(self._messenger, {axis_to_node(Axis.Q)})
-        nodes = {axis_to_node(ax) for ax in axes if ax is not Axis.Q}
-        if len(nodes) > 0:
-            await set_enable_motor(self._messenger, nodes)
+            self._engaged_axes[Axis.Q] = True
+            axes = [ax for ax in axes if ax is not Axis.Q]
+
+        if len(axes) > 0:
+            await set_enable_motor(self._messenger, {axis_to_node(ax) for ax in axes})
+        for ax in axes:
+            self._engaged_axes[ax] = True
 
     @requires_update
     async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
@@ -1218,7 +1249,6 @@ class OT3Controller(FlexBackend):
 
     async def clean_up(self) -> None:
         """Clean up."""
-
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
@@ -1227,6 +1257,15 @@ class OT3Controller(FlexBackend):
         if hasattr(self, "_event_watcher"):
             if loop.is_running() and self._event_watcher:
                 self._event_watcher.close()
+
+        messenger = getattr(self, "_messenger", None)
+        if messenger:
+            await messenger.stop()
+
+        usb_messenger = getattr(self, "_usb_messenger", None)
+        if usb_messenger:
+            await usb_messenger.stop()
+
         return None
 
     @staticmethod
@@ -1561,3 +1600,32 @@ class OT3Controller(FlexBackend):
                     "actual-jaw-width": current_gripper_position,
                 },
             )
+
+    async def set_hepa_fan_state(self, fan_on: bool, duty_cycle: int) -> bool:
+        return await set_hepa_fan_state_fw(self._messenger, fan_on, duty_cycle)
+
+    async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
+        res = await get_hepa_fan_state_fw(self._messenger)
+        return (
+            HepaFanState(
+                fan_on=res.fan_on,
+                duty_cycle=res.duty_cycle,
+            )
+            if res
+            else None
+        )
+
+    async def set_hepa_uv_state(self, light_on: bool, uv_duration_s: int) -> bool:
+        return await set_hepa_uv_state_fw(self._messenger, light_on, uv_duration_s)
+
+    async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
+        res = await get_hepa_uv_state_fw(self._messenger)
+        return (
+            HepaUVState(
+                light_on=res.uv_light_on,
+                uv_duration_s=res.uv_duration_s,
+                remaining_time_s=res.remaining_time_s,
+            )
+            if res
+            else None
+        )

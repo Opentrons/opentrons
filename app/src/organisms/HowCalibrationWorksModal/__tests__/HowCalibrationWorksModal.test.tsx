@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { HowCalibrationWorksModal } from '..'
 
@@ -15,7 +17,7 @@ const render = (
 describe('HowCalibrationWorksModal', () => {
   let props: React.ComponentProps<typeof HowCalibrationWorksModal>
   beforeEach(() => {
-    props = { onCloseClick: jest.fn() }
+    props = { onCloseClick: vi.fn() }
   })
 
   it('should render the correct header', () => {
@@ -72,9 +74,9 @@ describe('HowCalibrationWorksModal', () => {
   })
 
   it('should call onCloseClick when the close button is pressed', () => {
-    const { getByRole } = render(props)
+    render(props)
     expect(props.onCloseClick).not.toHaveBeenCalled()
-    const closeButton = getByRole('button', { name: 'close' })
+    const closeButton = screen.getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)
     expect(props.onCloseClick).toHaveBeenCalled()
   })

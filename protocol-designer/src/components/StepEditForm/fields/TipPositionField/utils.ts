@@ -1,4 +1,3 @@
-import assert from 'assert'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -35,7 +34,7 @@ export function getDefaultMmFromBottom(args: {
 
     default:
       // touch tip fields
-      assert(
+      console.assert(
         getIsTouchTipField(name),
         `getDefaultMmFromBottom fn does not know what to do with field ${name}`
       )

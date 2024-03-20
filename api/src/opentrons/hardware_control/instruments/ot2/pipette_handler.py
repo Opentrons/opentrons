@@ -242,8 +242,6 @@ class PipetteHandlerProvider(Generic[MountType]):
                 instr, instr.blow_out_flow_rate, "dispense"
             )
             result["ready_to_aspirate"] = instr.ready_to_aspirate
-            # TODO (12-5-2022) figure out why this is using default aspirate flow rate
-            # rather than default dispense flow rate.
             result["default_blow_out_speeds"] = {
                 alvl: self.plunger_speed(instr, fr, "blowout")
                 for alvl, fr in instr.blow_out_flow_rates_lookup.items()
@@ -257,6 +255,9 @@ class PipetteHandlerProvider(Generic[MountType]):
                 alvl: self.plunger_speed(instr, fr, "aspirate")
                 for alvl, fr in instr.aspirate_flow_rates_lookup.items()
             }
+            result[
+                "pipette_bounding_box_offsets"
+            ] = instr.config.pipette_bounding_box_offsets
         return cast(PipetteDict, result)
 
     @property
@@ -771,7 +772,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         if instrument.has_tip:
             raise UnexpectedTipAttachError("pick_up_tip", instrument.name, mount.name)
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
-
+        tip_count = instrument.nozzle_manager.current_configuration.tip_count
         if presses is None or presses < 0:
             checked_presses = instrument.pick_up_configurations.press_fit.presses
         else:
@@ -782,17 +783,20 @@ class PipetteHandlerProvider(Generic[MountType]):
         else:
             check_incr = increment
 
-        pick_up_speed = instrument.pick_up_configurations.press_fit.speed
+        pick_up_speed = instrument.pick_up_configurations.press_fit.speed_by_tip_count[
+            tip_count
+        ]
+        pick_up_distance = (
+            instrument.pick_up_configurations.press_fit.distance_by_tip_count[tip_count]
+        )
 
         def build_presses() -> Iterator[Tuple[float, float]]:
             # Press the nozzle into the tip <presses> number of times,
             # moving further by <increment> mm after each press
             for i in range(checked_presses):
                 # move nozzle down into the tip
-                press_dist = (
-                    -1.0 * instrument.pick_up_configurations.press_fit.distance
-                    + -1.0 * check_incr * i
-                )
+
+                press_dist = -1.0 * pick_up_distance + -1.0 * check_incr * i
                 # move nozzle back up
                 backup_dist = -press_dist
                 yield (press_dist, backup_dist)
@@ -814,7 +818,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                                 Axis.by_mount(
                                     mount
                                 ): instrument.pick_up_configurations.press_fit.current_by_tip_count[
-                                    instrument.nozzle_manager.current_configuration.tip_count
+                                    tip_count
                                 ]
                             },
                             speed=pick_up_speed,
@@ -824,9 +828,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                         for press_dist, backup_dist in build_presses()
                     ],
                     shake_off_list=self._build_pickup_shakes(instrument),
-                    retract_target=instrument.pick_up_configurations.press_fit.distance
-                    + check_incr * checked_presses
-                    + 2,
+                    retract_target=pick_up_distance + check_incr * checked_presses + 2,
                 ),
                 add_tip_to_instr,
             )
@@ -855,9 +857,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                         for press_dist, backup_dist in build_presses()
                     ],
                     shake_off_list=self._build_pickup_shakes(instrument),
-                    retract_target=instrument.pick_up_configurations.press_fit.distance
-                    + check_incr * checked_presses
-                    + 2,
+                    retract_target=pick_up_distance + check_incr * checked_presses + 2,
                 ),
                 add_tip_to_instr,
             )

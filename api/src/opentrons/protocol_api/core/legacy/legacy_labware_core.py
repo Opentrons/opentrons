@@ -5,6 +5,7 @@ from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 
 from opentrons.types import DeckSlotName, Location, Point
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
 from ..labware import AbstractLabware, LabwareLoadParams
@@ -153,8 +154,15 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
                 well.set_has_tip(True)
 
     def get_next_tip(
-        self, num_tips: int, starting_tip: Optional[LegacyWellCore]
+        self,
+        num_tips: int,
+        starting_tip: Optional[LegacyWellCore],
+        nozzle_map: Optional[NozzleMap],
     ) -> Optional[str]:
+        if nozzle_map is not None:
+            raise ValueError(
+                "Nozzle Map cannot be provided to calls for next tip in legacy protocols."
+            )
         next_well = self._tip_tracker.next_tip(num_tips, starting_tip)
         return next_well.get_name() if next_well else None
 

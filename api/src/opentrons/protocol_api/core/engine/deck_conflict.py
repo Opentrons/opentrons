@@ -2,19 +2,25 @@
 from __future__ import annotations
 import itertools
 import logging
-from typing import Collection, Dict, Optional, Tuple, overload, Union, TYPE_CHECKING
+from typing import (
+    Collection,
+    Dict,
+    Optional,
+    Tuple,
+    overload,
+    Union,
+    TYPE_CHECKING,
+    List,
+)
 
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
+from opentrons_shared_data.module import FLEX_TC_LID_COLLISION_ZONE
 
 from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
-from opentrons.motion_planning.adjacent_slots_getters import (
-    get_north_slot,
-    get_west_slot,
-    get_east_slot,
-    get_south_slot,
-)
+from opentrons.motion_planning import adjacent_slots_getters
+
 from opentrons.protocol_engine import (
     StateView,
     DeckSlotLocation,
@@ -26,9 +32,12 @@ from opentrons.protocol_engine import (
     DropTipWellLocation,
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
+from opentrons.protocol_engine.types import (
+    StagingSlotLocation,
+)
 from opentrons.types import DeckSlotName, StagingSlotName, Point
-from ..._trash_bin import TrashBin
-from ..._waste_chute import WasteChute
+from ...disposal_locations import TrashBin, WasteChute
+from . import point_calculations
 
 if TYPE_CHECKING:
     from ...labware import Labware
@@ -69,8 +78,17 @@ A1_column_back_right_bound = Point(
     x=A12_column_back_right_bound.x - _NOZZLE_PITCH * 11, y=506.2
 )
 
-# Arbitrary safety margin in z-direction
-Z_SAFETY_MARGIN = 10
+_FLEX_TC_LID_BACK_LEFT_PT = Point(
+    x=FLEX_TC_LID_COLLISION_ZONE["back_left"]["x"],
+    y=FLEX_TC_LID_COLLISION_ZONE["back_left"]["y"],
+    z=FLEX_TC_LID_COLLISION_ZONE["back_left"]["z"],
+)
+
+_FLEX_TC_LID_FRONT_RIGHT_PT = Point(
+    x=FLEX_TC_LID_COLLISION_ZONE["front_right"]["x"],
+    y=FLEX_TC_LID_COLLISION_ZONE["front_right"]["y"],
+    z=FLEX_TC_LID_COLLISION_ZONE["front_right"]["z"],
+)
 
 
 @overload
@@ -190,6 +208,7 @@ def check(
     )
 
 
+# TODO (spp, 2023-02-16): move pipette movement safety checks to its own separate file.
 def check_safe_for_pipette_movement(
     engine_state: StateView,
     pipette_id: str,
@@ -198,6 +217,7 @@ def check_safe_for_pipette_movement(
     well_location: Union[WellLocation, DropTipWellLocation],
 ) -> None:
     """Check if the labware is safe to move to with a pipette in partial tip configuration.
+
     Args:
         engine_state: engine state view
         pipette_id: ID of the pipette to be moved
@@ -205,26 +225,148 @@ def check_safe_for_pipette_movement(
         well_name: Name of the well to move to
         well_location: exact location within the well to move to
     """
-    # TODO: either hide unsupported configurations behind an advance setting
-    #  or log a warning that deck conflicts cannot be checked for tip config other than
-    #  column config with A12 primary nozzle for the 96 channel
-    #  or single tip config for 8-channel.
-    if engine_state.pipettes.get_channels(pipette_id) == 96:
-        _check_deck_conflict_for_96_channel(
-            engine_state=engine_state,
+    # TODO (spp, 2023-02-06): remove this check after thorough testing.
+    #  This function is capable of checking for movement conflict regardless of
+    #  nozzle configuration.
+    if not engine_state.pipettes.get_is_partially_configured(pipette_id):
+        return
+
+    if isinstance(well_location, DropTipWellLocation):
+        # convert to WellLocation
+        well_location = engine_state.geometry.get_checked_tip_drop_location(
             pipette_id=pipette_id,
             labware_id=labware_id,
-            well_name=well_name,
             well_location=well_location,
+            partially_configured=True,
         )
-    elif engine_state.pipettes.get_channels(pipette_id) == 8:
-        _check_deck_conflict_for_8_channel(
+    well_location_point = engine_state.geometry.get_well_position(
+        labware_id=labware_id, well_name=well_name, well_location=well_location
+    )
+    primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
+
+    if not _is_within_pipette_extents(
+        engine_state=engine_state, pipette_id=pipette_id, location=well_location_point
+    ):
+        raise PartialTipMovementNotAllowedError(
+            f"Requested motion with the {primary_nozzle} nozzle partial configuration"
+            f" is outside of robot bounds for the pipette."
+        )
+
+    labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
+    pipette_bounds_at_well_location = (
+        engine_state.pipettes.get_pipette_bounds_at_specified_move_to_position(
+            pipette_id=pipette_id, destination_position=well_location_point
+        )
+    )
+    surrounding_slots = adjacent_slots_getters.get_surrounding_slots(
+        slot=labware_slot.as_int(), robot_type=engine_state.config.robot_type
+    )
+
+    if _will_collide_with_thermocycler_lid(
+        engine_state=engine_state,
+        pipette_bounds=pipette_bounds_at_well_location,
+        surrounding_regular_slots=surrounding_slots.regular_slots,
+    ):
+        raise PartialTipMovementNotAllowedError(
+            f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
+            f" {labware_slot} with {primary_nozzle} nozzle partial configuration"
+            f" will result in collision with thermocycler lid in deck slot A1."
+        )
+
+    for regular_slot in surrounding_slots.regular_slots:
+        if _slot_has_potential_colliding_object(
             engine_state=engine_state,
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
+            pipette_bounds=pipette_bounds_at_well_location,
+            surrounding_slot=regular_slot,
+        ):
+            raise PartialTipMovementNotAllowedError(
+                f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
+                f" {labware_slot} with {primary_nozzle} nozzle partial configuration"
+                f" will result in collision with items in deck slot {regular_slot}."
+            )
+    for staging_slot in surrounding_slots.staging_slots:
+        if _slot_has_potential_colliding_object(
+            engine_state=engine_state,
+            pipette_bounds=pipette_bounds_at_well_location,
+            surrounding_slot=staging_slot,
+        ):
+            raise PartialTipMovementNotAllowedError(
+                f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
+                f" {labware_slot} with {primary_nozzle} nozzle partial configuration"
+                f" will result in collision with items in staging slot {staging_slot}."
+            )
+
+
+def _slot_has_potential_colliding_object(
+    engine_state: StateView,
+    pipette_bounds: Tuple[Point, Point, Point, Point],
+    surrounding_slot: Union[DeckSlotName, StagingSlotName],
+) -> bool:
+    """Return the slot, if any, that has an item that the pipette might collide into."""
+    # Check if slot overlaps with pipette position
+    slot_pos = engine_state.addressable_areas.get_addressable_area_position(
+        addressable_area_name=surrounding_slot.id,
+        do_compatibility_check=False,
+    )
+    slot_bounds = engine_state.addressable_areas.get_addressable_area_bounding_box(
+        addressable_area_name=surrounding_slot.id,
+        do_compatibility_check=False,
+    )
+    slot_back_left_coords = Point(slot_pos.x, slot_pos.y + slot_bounds.y, slot_pos.z)
+    slot_front_right_coords = Point(slot_pos.x + slot_bounds.x, slot_pos.y, slot_pos.z)
+
+    # If slot overlaps with pipette bounds
+    if point_calculations.are_overlapping_rectangles(
+        rectangle1=(pipette_bounds[0], pipette_bounds[1]),
+        rectangle2=(slot_back_left_coords, slot_front_right_coords),
+    ):
+        # Check z-height of items in overlapping slot
+        if isinstance(surrounding_slot, DeckSlotName):
+            slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
+                DeckSlotLocation(slotName=surrounding_slot)
+            )
+        else:
+            slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
+                StagingSlotLocation(slotName=surrounding_slot)
+            )
+        return slot_highest_z >= pipette_bounds[0].z
+    return False
+
+
+def _will_collide_with_thermocycler_lid(
+    engine_state: StateView,
+    pipette_bounds: Tuple[Point, Point, Point, Point],
+    surrounding_regular_slots: List[DeckSlotName],
+) -> bool:
+    """Return whether the pipette might collide with thermocycler's lid/clips on a Flex.
+
+    If any of the pipette's bounding vertices lie inside the no-go zone of the thermocycler-
+    which is the area that's to the left, back and below the thermocycler's lid's
+    protruding clips, then we will mark the movement for possible collision.
+
+    This could cause false raises for the case where an 8-channel is accessing the
+    thermocycler labware in a location such that the pipette is in the area between
+    the clips but not touching either clips. But that's a tradeoff we'll need to make
+    between a complicated check involving accurate positions of all entities involved
+    and a crude check that disallows all partial tip movements around the thermocycler.
+    """
+    # TODO (spp, 2024-02-27): Improvements:
+    #  - make the check dynamic according to lid state:
+    #     - if lid is open, check if pipette is in no-go zone
+    #     - if lid is closed, use the closed lid height to check for conflict
+    if (
+        DeckSlotName.SLOT_A1 in surrounding_regular_slots
+        and engine_state.modules.is_flex_deck_with_thermocycler()
+    ):
+        return (
+            point_calculations.are_overlapping_rectangles(
+                rectangle1=(_FLEX_TC_LID_BACK_LEFT_PT, _FLEX_TC_LID_FRONT_RIGHT_PT),
+                rectangle2=(pipette_bounds[0], pipette_bounds[1]),
+            )
+            and pipette_bounds[0].z <= _FLEX_TC_LID_BACK_LEFT_PT.z
         )
+
+    return False
 
 
 def check_safe_for_tip_pickup_and_return(
@@ -281,154 +423,8 @@ def check_safe_for_tip_pickup_and_return(
         )
 
 
-def _check_deck_conflict_for_96_channel(
-    engine_state: StateView,
-    pipette_id: str,
-    labware_id: str,
-    well_name: str,
-    well_location: Union[WellLocation, DropTipWellLocation],
-) -> None:
-    """Check if there are any conflicts moving to the given labware with the configuration of 96-ch pipette."""
-    if not (
-        engine_state.pipettes.get_nozzle_layout_type(pipette_id)
-        == NozzleConfigurationType.COLUMN
-    ):
-        # Checking deck conflicts only for column config
-        return
-
-    if isinstance(well_location, DropTipWellLocation):
-        # convert to WellLocation
-        well_location = engine_state.geometry.get_checked_tip_drop_location(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_location=well_location,
-            partially_configured=True,
-        )
-
-    well_location_point = engine_state.geometry.get_well_position(
-        labware_id=labware_id, well_name=well_name, well_location=well_location
-    )
-    primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
-
-    if not _is_within_pipette_extents(
-        engine_state=engine_state, pipette_id=pipette_id, location=well_location_point
-    ):
-        raise PartialTipMovementNotAllowedError(
-            f"Requested motion with the {primary_nozzle} nozzle column configuration"
-            f" is outside of robot bounds for the 96-channel."
-        )
-
-    labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
-
-    destination_slot_num = labware_slot.as_int()
-    adjacent_slot_num = None
-    # TODO (spp, 2023-12-18): change this eventually to "column 1"/"column 12"
-    #  via the column mappings in the pipette geometry definitions.
-    if primary_nozzle == "A12":
-        adjacent_slot_num = get_west_slot(destination_slot_num)
-    elif primary_nozzle == "A1":
-        adjacent_slot_num = get_east_slot(destination_slot_num)
-
-    def _check_conflict_with_slot_item(
-        adjacent_slot: DeckSlotName,
-    ) -> None:
-        """Raises error if the pipette is expected to collide with adjacent slot items."""
-        slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
-            DeckSlotLocation(slotName=adjacent_slot)
-        )
-
-        pipette_tip = engine_state.pipettes.get_attached_tip(pipette_id)
-        tip_length = pipette_tip.length if pipette_tip else 0.0
-
-        if slot_highest_z + Z_SAFETY_MARGIN > well_location_point.z + tip_length:
-            raise PartialTipMovementNotAllowedError(
-                f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
-                f" {labware_slot} with pipette column {primary_nozzle} nozzle configuration"
-                f" will result in collision with items in deck slot {adjacent_slot}."
-            )
-
-    if adjacent_slot_num is None:
-        return
-    _check_conflict_with_slot_item(
-        adjacent_slot=DeckSlotName.from_primitive(
-            adjacent_slot_num
-        ).to_equivalent_for_robot_type(engine_state.config.robot_type)
-    )
-
-
-def _check_deck_conflict_for_8_channel(
-    engine_state: StateView,
-    pipette_id: str,
-    labware_id: str,
-    well_name: str,
-    well_location: Union[WellLocation, DropTipWellLocation],
-) -> None:
-    """Check if there are any conflicts moving to the given labware with the configuration of 8-ch pipette."""
-    if not (
-        engine_state.pipettes.get_nozzle_layout_type(pipette_id)
-        == NozzleConfigurationType.SINGLE
-    ):
-        # Checking deck conflicts only for single tip config
-        return
-
-    if isinstance(well_location, DropTipWellLocation):
-        # convert to WellLocation
-        well_location = engine_state.geometry.get_checked_tip_drop_location(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_location=well_location,
-            partially_configured=True,
-        )
-
-    well_location_point = engine_state.geometry.get_well_position(
-        labware_id=labware_id, well_name=well_name, well_location=well_location
-    )
-    primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
-
-    if not _is_within_pipette_extents(
-        engine_state=engine_state, pipette_id=pipette_id, location=well_location_point
-    ):
-        # WARNING: (spp, 2023-11-30: this needs to be wired up to check for
-        # 8-channel pipette extents on both OT2 & Flex!!)
-        raise PartialTipMovementNotAllowedError(
-            f"Requested motion with single {primary_nozzle} nozzle configuration"
-            f" is outside of robot bounds for the 8-channel."
-        )
-
-    labware_slot = engine_state.geometry.get_ancestor_slot_name(labware_id)
-    destination_slot = labware_slot.as_int()
-    adjacent_slot_num = None
-    # TODO (spp, 2023-12-18): change this eventually to use nozzles from mappings in
-    #  the pipette geometry definitions.
-    if primary_nozzle == "H1":
-        adjacent_slot_num = get_north_slot(destination_slot)
-    elif primary_nozzle == "A1":
-        adjacent_slot_num = get_south_slot(destination_slot)
-
-    def _check_conflict_with_slot_item(adjacent_slot: DeckSlotName) -> None:
-        slot_highest_z = engine_state.geometry.get_highest_z_in_slot(
-            DeckSlotLocation(slotName=adjacent_slot)
-        )
-
-        pipette_tip = engine_state.pipettes.get_attached_tip(pipette_id)
-        tip_length = pipette_tip.length if pipette_tip else 0.0
-
-        if slot_highest_z + Z_SAFETY_MARGIN > well_location_point.z + tip_length:
-            raise PartialTipMovementNotAllowedError(
-                f"Moving to {engine_state.labware.get_display_name(labware_id)} in slot"
-                f" {labware_slot} with pipette nozzle {primary_nozzle} configuration"
-                f" will result in collision with items in deck slot {adjacent_slot}."
-            )
-
-    if adjacent_slot_num is None:
-        return
-    _check_conflict_with_slot_item(
-        adjacent_slot=DeckSlotName.from_primitive(
-            adjacent_slot_num
-        ).to_equivalent_for_robot_type(engine_state.config.robot_type)
-    )
-
-
+# TODO (spp, 2023-02-06): update the extents check to use all nozzle bounds instead of
+#  just position of primary nozzle when checking if the pipette is out-of-bounds
 def _is_within_pipette_extents(
     engine_state: StateView,
     pipette_id: str,
@@ -593,7 +589,9 @@ def _map_disposal_location(
     if isinstance(disposal_location, TrashBin):
         return (
             disposal_location.location,
-            wrapped_deck_conflict.TrashBin(name_for_errors="trash bin"),
+            wrapped_deck_conflict.TrashBin(
+                name_for_errors="trash bin", highest_z=disposal_location.height
+            ),
         )
     else:
         return None

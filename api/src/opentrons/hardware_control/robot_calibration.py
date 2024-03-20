@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime
 from dataclasses import dataclass
 from typing import Optional, List, Any, cast
+from numpy.typing import NDArray
 
 from opentrons import config
 
@@ -49,7 +50,7 @@ def validate_attitude_deck_calibration(
     TODO(lc, 8/10/2020): As with the OT2, expand on this method, or create
     another method to diagnose bad instrument offset data
     """
-    curr_cal = np.array(deck_cal.attitude)
+    curr_cal: linal.DoubleMatrix = np.array(deck_cal.attitude)
     row, _ = curr_cal.shape
     rank: int = np.linalg.matrix_rank(curr_cal)
     if row != rank:
@@ -68,7 +69,7 @@ def validate_gantry_calibration(gantry_cal: List[List[float]]) -> DeckTransformS
     This function determines whether the gantry calibration is valid
     or not based on the following use-cases:
     """
-    curr_cal = np.array(gantry_cal)
+    curr_cal: linal.DoubleMatrix = np.array(gantry_cal)
     row, _ = curr_cal.shape
 
     rank: int = np.linalg.matrix_rank(curr_cal)
@@ -95,7 +96,7 @@ def validate_gantry_calibration(gantry_cal: List[List[float]]) -> DeckTransformS
 def migrate_affine_xy_to_attitude(
     gantry_cal: List[List[float]],
 ) -> types.AttitudeMatrix:
-    masked_transform = np.array(
+    masked_transform: NDArray[np.bool_] = np.array(
         [
             [True, True, True, False],
             [True, True, True, False],
@@ -108,7 +109,7 @@ def migrate_affine_xy_to_attitude(
     ] = np.ma.masked_array(  # type: ignore
         gantry_cal, ~masked_transform
     )
-    attitude_array = np.zeros((3, 3))
+    attitude_array: linal.DoubleMatrix = np.zeros((3, 3))
     np.put(attitude_array, [0, 1, 2], masked_array[0].compressed())
     np.put(attitude_array, [3, 4, 5], masked_array[1].compressed())
     np.put(attitude_array, 8, 1)

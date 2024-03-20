@@ -5,7 +5,7 @@ describe('Desktop Navigation', () => {
   })
 
   it('contains a working file button', () => {
-    cy.get("button[class*='navbar__tab__']")
+    cy.get("button[id='NavTab_file']")
       .contains('FILE')
       .parent()
       .should('have.prop', 'disabled')
@@ -13,21 +13,21 @@ describe('Desktop Navigation', () => {
   })
 
   it('contains a disabled liquids button', () => {
-    cy.get("button[class*='navbar__tab__']")
+    cy.get("button[id='NavTab_liquids']")
       .contains('LIQUIDS')
       .parent()
       .should('have.prop', 'disabled')
   })
 
   it('contains a disabled design button', () => {
-    cy.get("button[class*='navbar__tab__']")
+    cy.get("button[id='NavTab_design']")
       .contains('DESIGN')
       .parent()
       .should('have.prop', 'disabled')
   })
 
   it('contains a help button with external link', () => {
-    cy.get("a[class*='navbar__tab__']")
+    cy.get('a')
       .contains('HELP')
       .parent()
       .should('have.prop', 'href')
@@ -35,13 +35,11 @@ describe('Desktop Navigation', () => {
   })
 
   it('contains a settings button', () => {
-    cy.get("button[class*='navbar__tab__']")
-      .contains('Settings')
-      .should('exist')
+    cy.get('button').contains('Settings').should('exist')
   })
 
   it('returns to the file controls when the file button is clicked', () => {
-    cy.get("button[class*='navbar__tab__']").contains('FILE').click()
+    cy.get("button[id='NavTab_file']").contains('FILE').click()
     cy.contains('Protocol File')
   })
 })

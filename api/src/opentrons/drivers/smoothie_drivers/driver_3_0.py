@@ -18,7 +18,7 @@ from typing import Any, Dict, Optional, Union, List, Tuple, cast, AsyncIterator
 from math import isclose
 
 from opentrons.drivers.serial_communication import get_ports_by_name
-from serial.serialutil import SerialException  # type: ignore[import]
+from serial.serialutil import SerialException  # type: ignore[import-untyped]
 
 from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
 from opentrons.drivers.smoothie_drivers.constants import (

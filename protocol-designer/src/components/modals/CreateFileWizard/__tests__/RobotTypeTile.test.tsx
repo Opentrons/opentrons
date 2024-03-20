@@ -1,7 +1,10 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { COLORS } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { RobotTypeTile } from '../RobotTypeTile'
 import type { FormState, WizardTileProps } from '../types'
@@ -12,20 +15,21 @@ const render = (props: React.ComponentProps<typeof RobotTypeTile>) => {
   })[0]
 }
 
+const values = {
+  fields: {
+    name: 'mockName',
+    description: 'mockDescription',
+    organizationOrAuthor: 'mockOrganizationOrAuthor',
+    robotType: FLEX_ROBOT_TYPE,
+  },
+} as FormState
+
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  handleChange: jest.fn(),
-  handleBlur: jest.fn(),
-  goBack: jest.fn(),
-  proceed: jest.fn(),
-  setFieldValue: jest.fn(),
-  values: {
-    fields: {
-      name: 'mockName',
-      description: 'mockDescription',
-      organizationOrAuthor: 'mockOrganizationOrAuthor',
-      robotType: FLEX_ROBOT_TYPE,
-    },
-  } as FormState,
+  proceed: vi.fn(),
+  setValue: vi.fn(),
+  //  @ts-expect-error: ts can't tell that its a nested key
+  //  in values
+  watch: vi.fn(() => values['fields.robotType']),
 }
 
 describe('RobotTypeTile', () => {
@@ -37,19 +41,22 @@ describe('RobotTypeTile', () => {
       ...mockWizardTileProps,
     } as WizardTileProps
   })
+  afterEach(() => {
+    cleanup()
+  })
 
   it('renders robot images and clicking on them changing the style', () => {
     render(props)
-    screen.getByLabelText('OpentronsFlex.png')
-    screen.getByLabelText('OT2.png')
-    const flex = screen.getByLabelText('RobotTypeTile_OT-3 Standard')
+    screen.getByLabelText('Opentrons Flex image')
+    screen.getByLabelText('Opentrons OT-2 image')
+    const flex = screen.getByLabelText('Opentrons Flex option')
     fireEvent.click(flex)
-    expect(props.setFieldValue).toHaveBeenCalled()
-    expect(flex).toHaveStyle(`background-color: ${COLORS.blue10}`)
-    const ot2 = screen.getByLabelText('RobotTypeTile_OT-2 Standard')
+    expect(props.setValue).toHaveBeenCalled()
+    expect(flex).toHaveStyle(`background-color: ${COLORS.white}`)
+    const ot2 = screen.getByLabelText('Opentrons OT-2 option')
     fireEvent.click(ot2)
-    expect(props.setFieldValue).toHaveBeenCalled()
-    expect(ot2).toHaveStyle(`background-color: ${COLORS.white}`)
+    expect(props.setValue).toHaveBeenCalled()
+    expect(ot2).toHaveStyle(`background-color: ${COLORS.blue10}`)
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(props.proceed).toHaveBeenCalled()
   })

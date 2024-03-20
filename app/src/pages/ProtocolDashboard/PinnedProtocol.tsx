@@ -12,6 +12,7 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   TYPOGRAPHY,
   useLongPress,
@@ -19,7 +20,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { LongPressModal } from './LongPressModal'
-import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { formatTimeWithUtcLabel } from '../../resources/runs'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -103,7 +104,7 @@ export function PinnedProtocol(props: {
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.grey35}
-      borderRadius={BORDERS.borderRadiusSize4}
+      borderRadius={BORDERS.borderRadius16}
       css={PUSHED_STATE_STYLE}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing24}
@@ -112,7 +113,7 @@ export function PinnedProtocol(props: {
       maxWidth={cardStyleBySize[cardSize].width}
       minWidth={cardStyleBySize[cardSize].width}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
-      overflowWrap="anywhere"
+      overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       padding={SPACING.spacing24}
       ref={longpress.ref}
     >
@@ -160,7 +161,7 @@ const ProtocolNameText = styled(StyledText)`
   -webkit-line-clamp: ${(props: { cardSize: CardSizeType }) =>
     props.cardSize === 'full' ? 1 : 2};
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   font-size: ${(props: { cardSize: CardSizeType }) =>
     cardStyleBySize[props.cardSize].fontSize};
   font-weight: ${(props: { cardSize: CardSizeType }) =>

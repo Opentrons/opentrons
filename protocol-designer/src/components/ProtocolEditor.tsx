@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { DragDropContext } from 'react-dnd'
-import MouseBackEnd from 'react-dnd-mouse-backend'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 import { ComputingSpinner } from '../components/ComputingSpinner'
 import { ConnectedNav } from '../containers/ConnectedNav'
 import { Sidebar } from '../containers/ConnectedSidebar'
@@ -15,7 +15,7 @@ import { FileUploadMessageModal } from './modals/FileUploadMessageModal/FileUplo
 import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal/LabwareUploadMessageModal'
 import { GateModal } from './modals/GateModal'
 import { AnnouncementModal } from './modals/AnnouncementModal'
-import styles from './ProtocolEditor.css'
+import styles from './ProtocolEditor.module.css'
 import { CreateFileWizard } from './modals/CreateFileWizard'
 
 const showGateModal =
@@ -23,7 +23,7 @@ const showGateModal =
 
 function ProtocolEditorComponent(): JSX.Element {
   return (
-    <div>
+    <div id="protocol-editor">
       <ComputingSpinner />
       <TopPortalRoot />
       {showGateModal ? <GateModal /> : null}
@@ -55,6 +55,8 @@ function ProtocolEditorComponent(): JSX.Element {
   )
 }
 
-export const ProtocolEditor = DragDropContext(MouseBackEnd)(
-  ProtocolEditorComponent
+export const ProtocolEditor = (): JSX.Element => (
+  <DndProvider backend={HTML5Backend}>
+    <ProtocolEditorComponent />
+  </DndProvider>
 )

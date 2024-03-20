@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import map from 'lodash/map'
 import omit from 'lodash/omit'
 import isEmpty from 'lodash/isEmpty'
@@ -23,6 +24,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   Link,
+  OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   PrimaryButton,
   ProtocolDeck,
@@ -44,7 +46,7 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -70,6 +72,8 @@ import { ProtocolStats } from './ProtocolStats'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
+import { ProtocolParameters } from './ProtocolParameters'
+import { useRunTimeParameters } from '../../pages/Protocols/hooks'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -82,7 +86,7 @@ const GRID_STYLE = css`
 `
 
 const ZOOM_ICON_STYLE = css`
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   &:hover {
     background: ${COLORS.grey30};
   }
@@ -196,8 +200,9 @@ export function ProtocolDetails(
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const enableProtocolStats = useFeatureFlag('protocolStats')
+  const enableRunTimeParameters = useFeatureFlag('enableRunTimeParameters')
   const [currentTab, setCurrentTab] = React.useState<
-    'robot_config' | 'labware' | 'liquids' | 'stats'
+    'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
   >('robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
@@ -209,17 +214,17 @@ export function ProtocolDetails(
   ] = React.useState<boolean>(false)
   const [showDeckViewModal, setShowDeckViewModal] = React.useState(false)
 
-  React.useEffect(() => {
-    if (mostRecentAnalysis != null && !('liquids' in mostRecentAnalysis)) {
-      dispatch(analyzeProtocol(protocolKey))
-    }
-  }, [])
-
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
+
+  const runTimeParameters = useRunTimeParameters(protocolKey)
+
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
-  if (analysisStatus === 'missing') return null
+
+  if (analysisStatus === 'stale') {
+    dispatch(analyzeProtocol(protocolKey))
+  } else if (analysisStatus === 'missing') return null
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     mostRecentAnalysis != null
@@ -237,7 +242,9 @@ export function ProtocolDetails(
       : []
 
   const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
-    mostRecentAnalysis
+    analysisStatus !== 'stale' && analysisStatus !== 'loading'
+      ? mostRecentAnalysis
+      : null
   )
 
   const requiredLabwareDetails =
@@ -326,11 +333,15 @@ export function ProtocolDetails(
     stats: enableProtocolStats ? (
       <ProtocolStats analysis={mostRecentAnalysis} />
     ) : null,
+    parameters: enableRunTimeParameters ? (
+      <ProtocolParameters runTimeParameters={runTimeParameters} />
+    ) : null,
   }
 
   const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
 
   const deckViewByAnalysisStatus = {
+    stale: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     missing: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     loading: <Box size="14rem" backgroundColor={COLORS.grey30} />,
     error: <Box size="14rem" backgroundColor={COLORS.grey30} />,
@@ -362,16 +373,17 @@ export function ProtocolDetails(
 
   return (
     <>
-      <Portal level="top">
-        {showDeckViewModal ? (
-          <LegacyModal
-            title={t('deck_view')}
-            onClose={() => setShowDeckViewModal(false)}
-          >
-            {deckMap}
-          </LegacyModal>
-        ) : null}
-      </Portal>
+      {showDeckViewModal
+        ? createPortal(
+            <LegacyModal
+              title={t('deck_view')}
+              onClose={() => setShowDeckViewModal(false)}
+            >
+              {deckMap}
+            </LegacyModal>,
+            getTopPortalEl()
+          )
+        : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing16}
@@ -391,7 +403,7 @@ export function ProtocolDetails(
 
           <Flex
             backgroundColor={COLORS.white}
-            borderRadius={BORDERS.radiusSoftCorners}
+            borderRadius={BORDERS.borderRadius4}
             position={POSITION_RELATIVE}
             flexDirection={DIRECTION_ROW}
             width="100%"
@@ -415,7 +427,7 @@ export function ProtocolDetails(
                 css={TYPOGRAPHY.h2SemiBold}
                 marginBottom={SPACING.spacing16}
                 data-testid={`ProtocolDetails_${protocolDisplayName}`}
-                overflowWrap="anywhere"
+                overflowWrap={OVERFLOW_WRAP_ANYWHERE}
               >
                 {protocolDisplayName}
               </StyledText>
@@ -424,7 +436,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
                 >
-                  <StyledText as="h6" color={COLORS.grey50}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('creation_method')}
                   </StyledText>
                   <StyledText as="p">
@@ -437,7 +449,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastUpdated"
                 >
-                  <StyledText as="h6" color={COLORS.grey50}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('last_updated')}
                   </StyledText>
                   <StyledText as="p">
@@ -450,7 +462,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastAnalyzed"
                 >
-                  <StyledText as="h6" color={COLORS.grey50}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('last_analyzed')}
                   </StyledText>
                   <StyledText as="p">
@@ -480,13 +492,13 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
                 >
-                  <StyledText as="h6" color={COLORS.grey50}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('org_or_author')}
                   </StyledText>
                   <StyledText
                     as="p"
                     marginRight={SPACING.spacing20}
-                    overflowWrap="anywhere"
+                    overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   >
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
@@ -497,7 +509,7 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_description"
                 >
-                  <StyledText as="h6" color={COLORS.grey50}>
+                  <StyledText as="h6" color={COLORS.grey60}>
                     {t('description')}
                   </StyledText>
                   {analysisStatus === 'loading' ? (
@@ -538,7 +550,7 @@ export function ProtocolDetails(
               flex={`0 0 ${String(SIZE_5)}`}
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.white}
-              borderRadius={BORDERS.borderRadiusSize2}
+              borderRadius={BORDERS.borderRadius8}
               height="100%"
               data-testid="ProtocolDetails_deckMap"
             >
@@ -566,7 +578,7 @@ export function ProtocolDetails(
                     color={
                       analysisStatus !== 'complete'
                         ? COLORS.grey40
-                        : COLORS.grey50
+                        : COLORS.grey60
                     }
                   />
                 </Btn>
@@ -584,19 +596,36 @@ export function ProtocolDetails(
               gridGap={SPACING.spacing8}
             >
               <Flex gridGap={SPACING.spacing8}>
+                {enableRunTimeParameters && mostRecentAnalysis != null && (
+                  <RoundTab
+                    data-testid="ProtocolDetails_parameters"
+                    isCurrent={currentTab === 'parameters'}
+                    onClick={() => {
+                      setCurrentTab('parameters')
+                    }}
+                  >
+                    <StyledText>
+                      {i18n.format(t('parameters'), 'capitalize')}
+                    </StyledText>
+                  </RoundTab>
+                )}
                 <RoundTab
                   data-testid="ProtocolDetails_robotConfig"
                   isCurrent={currentTab === 'robot_config'}
-                  onClick={() => setCurrentTab('robot_config')}
+                  onClick={() => {
+                    setCurrentTab('robot_config')
+                  }}
                 >
                   <StyledText>
-                    {i18n.format(t('robot_configuration'), 'capitalize')}
+                    {i18n.format(t('hardware'), 'capitalize')}
                   </StyledText>
                 </RoundTab>
                 <RoundTab
                   data-testid="ProtocolDetails_labware"
                   isCurrent={currentTab === 'labware'}
-                  onClick={() => setCurrentTab('labware')}
+                  onClick={() => {
+                    setCurrentTab('labware')
+                  }}
                 >
                   <StyledText>
                     {i18n.format(t('labware'), 'capitalize')}
@@ -606,7 +635,9 @@ export function ProtocolDetails(
                   <RoundTab
                     data-testid="ProtocolDetails_liquids"
                     isCurrent={currentTab === 'liquids'}
-                    onClick={() => setCurrentTab('liquids')}
+                    onClick={() => {
+                      setCurrentTab('liquids')
+                    }}
                   >
                     <StyledText>
                       {i18n.format(t('liquids'), 'capitalize')}
@@ -617,7 +648,9 @@ export function ProtocolDetails(
                   <RoundTab
                     data-testid="ProtocolDetails_stats"
                     isCurrent={currentTab === 'stats'}
-                    onClick={() => setCurrentTab('stats')}
+                    onClick={() => {
+                      setCurrentTab('stats')
+                    }}
                   >
                     <StyledText>
                       {i18n.format(t('stats'), 'capitalize')}
@@ -629,13 +662,11 @@ export function ProtocolDetails(
                 backgroundColor={COLORS.white}
                 // remove left upper corner border radius when first tab is active
                 borderRadius={`${
-                  currentTab === 'robot_config'
-                    ? '0'
-                    : BORDERS.radiusSoftCorners
-                } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
-                  BORDERS.radiusSoftCorners
+                  currentTab === 'robot_config' ? '0' : BORDERS.borderRadius4
+                } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
+                  BORDERS.borderRadius4
                 }`}
-                padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
+                padding={SPACING.spacing16}
               >
                 {contentsByTabName[currentTab]}
               </Box>

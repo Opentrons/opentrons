@@ -26,7 +26,7 @@ export function CheckUpdates(): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
       width="100%"
       height="32.5rem"
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
     >
       <Icon name="ot-spinner" size="5rem" spin color={COLORS.grey60} />
       <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>

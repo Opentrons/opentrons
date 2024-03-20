@@ -12,39 +12,46 @@ import {
 
 import type { ModuleType } from '@opentrons/shared-data'
 import type { FormModulesByType } from '../../../step-forms'
-import type { FormState } from './types'
+import type { AdditionalEquipment, FormState } from './types'
 
 export const FLEX_TRASH_DEFAULT_SLOT = 'cutoutA3'
 const ALL_STAGING_AREAS = 4
 
-export const getLastCheckedEquipment = (values: FormState): string | null => {
+interface LastCheckedProps {
+  additionalEquipment: AdditionalEquipment[]
+  modulesByType: FormModulesByType
+}
+
+export const getLastCheckedEquipment = (
+  props: LastCheckedProps
+): string | null => {
+  const { additionalEquipment, modulesByType } = props
   const hasAllStagingAreas =
-    values.additionalEquipment.filter(equipment =>
-      equipment.includes('stagingArea')
-    ).length === ALL_STAGING_AREAS
-  const hasTrashBin = values.additionalEquipment.includes('trashBin')
+    additionalEquipment.filter(equipment => equipment.includes('stagingArea'))
+      .length === ALL_STAGING_AREAS
+  const hasTrashBin = additionalEquipment.includes('trashBin')
 
   if (!hasTrashBin || !hasAllStagingAreas) {
     return null
   }
 
   if (
-    values.modulesByType.heaterShakerModuleType.onDeck &&
-    values.modulesByType.thermocyclerModuleType.onDeck
+    modulesByType.heaterShakerModuleType.onDeck &&
+    modulesByType.thermocyclerModuleType.onDeck
   ) {
     return TEMPERATURE_MODULE_TYPE
   }
 
   if (
-    values.modulesByType.heaterShakerModuleType.onDeck &&
-    values.modulesByType.temperatureModuleType.onDeck
+    modulesByType.heaterShakerModuleType.onDeck &&
+    modulesByType.temperatureModuleType.onDeck
   ) {
     return THERMOCYCLER_MODULE_TYPE
   }
 
   if (
-    values.modulesByType.thermocyclerModuleType.onDeck &&
-    values.modulesByType.temperatureModuleType.onDeck
+    modulesByType.thermocyclerModuleType.onDeck &&
+    modulesByType.temperatureModuleType.onDeck
   ) {
     return HEATERSHAKER_MODULE_TYPE
   }
@@ -65,16 +72,16 @@ export const getCrashableModuleSelected = (
   return crashableModuleOnDeck
 }
 
-export const getTrashBinOptionDisabled = (values: FormState): boolean => {
+export const getTrashBinOptionDisabled = (props: LastCheckedProps): boolean => {
+  const { additionalEquipment, modulesByType } = props
   const allStagingAreasInUse =
-    values.additionalEquipment.filter(equipment =>
-      equipment.includes('stagingArea')
-    ).length === ALL_STAGING_AREAS
+    additionalEquipment.filter(equipment => equipment.includes('stagingArea'))
+      .length === ALL_STAGING_AREAS
 
   const allModulesInSideSlotsOnDeck =
-    values.modulesByType.heaterShakerModuleType.onDeck &&
-    values.modulesByType.thermocyclerModuleType.onDeck &&
-    values.modulesByType.temperatureModuleType.onDeck
+    modulesByType.heaterShakerModuleType.onDeck &&
+    modulesByType.thermocyclerModuleType.onDeck &&
+    modulesByType.temperatureModuleType.onDeck
 
   return allStagingAreasInUse && allModulesInSideSlotsOnDeck
 }

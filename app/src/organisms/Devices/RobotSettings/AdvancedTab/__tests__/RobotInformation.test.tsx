@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import {
   getRobotSerialNumber,
@@ -11,19 +14,8 @@ import { useRobot } from '../../../hooks'
 import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
 import { RobotInformation } from '../RobotInformation'
 
-jest.mock('../../../hooks')
-jest.mock('../../../../../redux/discovery/selectors')
-
-const mockGetRobotSerialNumber = getRobotSerialNumber as jest.MockedFunction<
-  typeof getRobotSerialNumber
->
-const mockGetRobotFirmwareVersion = getRobotFirmwareVersion as jest.MockedFunction<
-  typeof getRobotFirmwareVersion
->
-const mockGetRobotProtocolApiVersion = getRobotProtocolApiVersion as jest.MockedFunction<
-  typeof getRobotProtocolApiVersion
->
-const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
+vi.mock('../../../hooks')
+vi.mock('../../../../../redux/discovery/selectors')
 
 const MOCK_ROBOT_SERIAL_NUMBER = '0.0.0'
 const MOCK_FIRMWARE_VERSION = '4.5.6'
@@ -41,48 +33,44 @@ const render = () => {
 
 describe('RobotSettings RobotInformation', () => {
   beforeEach(() => {
-    mockUseRobot.mockReturnValue(mockConnectableRobot)
-    mockGetRobotSerialNumber.mockReturnValue(MOCK_ROBOT_SERIAL_NUMBER)
-    mockGetRobotFirmwareVersion.mockReturnValue(MOCK_FIRMWARE_VERSION)
-    mockGetRobotProtocolApiVersion.mockReturnValue({
+    vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
+    vi.mocked(getRobotSerialNumber).mockReturnValue(MOCK_ROBOT_SERIAL_NUMBER)
+    vi.mocked(getRobotFirmwareVersion).mockReturnValue(MOCK_FIRMWARE_VERSION)
+    vi.mocked(getRobotProtocolApiVersion).mockReturnValue({
       min: MOCK_MIN_PAPI_VERSION,
       max: MOCK_MAX_PAPI_VERSION,
     })
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('should render item title', () => {
-    const [{ getByText }] = render()
-    getByText('Robot Serial Number')
-    getByText('Firmware Version')
-    getByText('Supported Protocol API Versions')
+    render()
+    screen.getByText('Robot Serial Number')
+    screen.getByText('Firmware Version')
+    screen.getByText('Supported Protocol API Versions')
   })
 
   it('should not render serial number, firmware version and supported protocol api versions', () => {
-    const [{ getByText }] = render()
-    getByText('0.0.0')
-    getByText('4.5.6')
-    getByText('v0.0 - v5.1')
+    render()
+    screen.getByText('0.0.0')
+    screen.getByText('4.5.6')
+    screen.getByText('v0.0 - v5.1')
   })
 
   it('should not render serial number, firmware version and supported protocol api versions without ViewableRobot', () => {
-    mockUseRobot.mockReturnValue(null)
-    const [{ queryByText }] = render()
-    expect(queryByText('0.0.0')).not.toBeInTheDocument()
-    expect(queryByText('4.5.6')).not.toBeInTheDocument()
-    expect(queryByText('v0.0 - v5.1')).not.toBeInTheDocument()
+    vi.mocked(useRobot).mockReturnValue(null)
+    render()
+    expect(screen.queryByText('0.0.0')).not.toBeInTheDocument()
+    expect(screen.queryByText('4.5.6')).not.toBeInTheDocument()
+    expect(screen.queryByText('v0.0 - v5.1')).not.toBeInTheDocument()
   })
 
   it('should render only one version when min supported protocol version and max supported protocol version are equal', () => {
-    mockGetRobotProtocolApiVersion.mockReturnValue({
+    vi.mocked(getRobotProtocolApiVersion).mockReturnValue({
       min: '2.15',
       max: '2.15',
     })
-    const [{ getByText, queryByText }] = render()
-    getByText('v2.15')
-    expect(queryByText('v2.15 - v2.15')).not.toBeInTheDocument()
+    render()
+    screen.getByText('v2.15')
+    expect(screen.queryByText('v2.15 - v2.15')).not.toBeInTheDocument()
   })
 })

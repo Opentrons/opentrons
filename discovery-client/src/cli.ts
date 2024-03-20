@@ -169,11 +169,14 @@ Yargs.options({
   },
 })
   .env('OT_DC')
+  // @ts-expect-error
   .middleware([debugLogArgvMiddleware])
+  // @ts-expect-error
   .command(['$0', 'browse'], 'Browse for robots on the network', noop, browse)
   .command(
     'find [name]',
     'Find the IP of a robot by its name',
+    // @ts-expect-error
     yargs => {
       yargs.positional('name', {
         describe: 'Name of robot to find; if omitted will find first robot',

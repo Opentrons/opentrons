@@ -17,9 +17,11 @@ export {
   disengageMagnet,
   dispense,
   dropTip,
+  dropTipInPlace,
   engageMagnet,
   replaceTip,
   setTemperature,
   touchTip,
   moveLabware,
+  moveToAddressableArea,
 } from './atomic'

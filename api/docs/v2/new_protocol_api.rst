@@ -14,7 +14,7 @@ Protocols
 
 .. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
-   :exclude-members: location_cache, cleanup, clear_commands
+   :exclude-members: location_cache, cleanup, clear_commands, params
 
 Instruments
 ===========
@@ -37,7 +37,6 @@ Labware
 .. autoclass:: opentrons.protocol_api.TrashBin()
 
 .. autoclass:: opentrons.protocol_api.WasteChute()
-
 
 Wells and Liquids
 =================

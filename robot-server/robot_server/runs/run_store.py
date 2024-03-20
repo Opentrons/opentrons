@@ -13,14 +13,15 @@ from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
 from opentrons.protocol_engine.commands import Command
 
-from robot_server.persistence import (
+from robot_server.persistence.database import sqlite_rowid
+from robot_server.persistence.tables import (
     run_table,
     run_command_table,
     action_table,
-    sqlite_rowid,
 )
 from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
-from robot_server.protocols import ProtocolNotFoundError
+from robot_server.protocols.protocol_store import ProtocolNotFoundError
+from robot_server.service.notifications import RunsPublisher
 
 from .action_models import RunAction, RunActionType
 from .run_models import RunNotFoundError
@@ -55,9 +56,14 @@ class CommandNotFoundError(ValueError):
 class RunStore:
     """Methods for storing and retrieving run resources."""
 
-    def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
-        """Initialize a RunStore with sql engine."""
+    def __init__(
+        self,
+        sql_engine: sqlalchemy.engine.Engine,
+        runs_publisher: RunsPublisher,
+    ) -> None:
+        """Initialize a RunStore with sql engine and notification client."""
         self._sql_engine = sql_engine
+        self._runs_publisher = runs_publisher
 
     def update_run_state(
         self,
@@ -95,11 +101,13 @@ class RunStore:
         )
         insert_command = sqlalchemy.insert(run_command_table)
 
-        select_run_resource = sqlalchemy.select(_run_columns).where(
+        select_run_resource = sqlalchemy.select(*_run_columns).where(
             run_table.c.id == run_id
         )
-        select_actions = sqlalchemy.select(action_table).where(
-            action_table.c.run_id == run_id
+        select_actions = (
+            sqlalchemy.select(action_table)
+            .where(action_table.c.run_id == run_id)
+            .order_by(sqlite_rowid)
         )
 
         with self._sql_engine.begin() as transaction:
@@ -123,6 +131,7 @@ class RunStore:
             action_rows = transaction.execute(select_actions).all()
 
         self._clear_caches()
+        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
         return _convert_row_to_run(row=run_row, action_rows=action_rows)
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
@@ -145,6 +154,7 @@ class RunStore:
             transaction.execute(insert)
 
         self._clear_caches()
+        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
 
     def insert(
         self,
@@ -186,6 +196,7 @@ class RunStore:
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self._clear_caches()
+        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
         return run
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
@@ -207,12 +218,14 @@ class RunStore:
         Raises:
             RunNotFoundError: The given run ID was not found.
         """
-        select_run_resource = sqlalchemy.select(_run_columns).where(
+        select_run_resource = sqlalchemy.select(*_run_columns).where(
             run_table.c.id == run_id
         )
 
-        select_actions = sqlalchemy.select(action_table).where(
-            action_table.c.run_id == run_id
+        select_actions = (
+            sqlalchemy.select(action_table)
+            .where(action_table.c.run_id == run_id)
+            .order_by(sqlite_rowid)
         )
 
         with self._sql_engine.begin() as transaction:
@@ -228,26 +241,28 @@ class RunStore:
     def get_all(self, length: Optional[int] = None) -> List[RunResource]:
         """Get all known run resources.
 
-        Returns:
-            All stored run entries.
+        Results are ordered from oldest to newest.
+
+        Params:
+            length: If `None`, return all runs. Otherwise, return the newest n runs.
         """
-        select_runs = sqlalchemy.select(_run_columns)
         select_actions = sqlalchemy.select(action_table).order_by(sqlite_rowid.asc())
         actions_by_run_id = defaultdict(list)
 
         with self._sql_engine.begin() as transaction:
             if length is not None:
                 select_runs = (
-                    select_runs.limit(length)
+                    sqlalchemy.select(*_run_columns)
                     .order_by(sqlite_rowid.desc())
                     .limit(length)
                 )
                 # need to select the last inserted runs and return by asc order
                 runs = list(reversed(transaction.execute(select_runs).all()))
             else:
-                runs = transaction.execute(
-                    select_runs.order_by(sqlite_rowid.asc())
-                ).all()
+                select_runs = sqlalchemy.select(*_run_columns).order_by(
+                    sqlite_rowid.asc()
+                )
+                runs = transaction.execute(select_runs).all()
 
             actions = transaction.execute(select_actions).all()
 
@@ -402,6 +417,7 @@ class RunStore:
             raise RunNotFoundError(run_id)
 
         self._clear_caches()
+        self._runs_publisher.publish_runs_advise_unsubscribe(run_id=run_id)
 
     def _run_exists(
         self, run_id: str, connection: sqlalchemy.engine.Connection

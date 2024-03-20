@@ -50,9 +50,15 @@ from opentrons.protocol_engine.state import move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
-from opentrons.protocol_engine.state.pipettes import PipetteView, StaticPipetteConfig
+from opentrons.protocol_engine.state.pipettes import (
+    PipetteView,
+    StaticPipetteConfig,
+    BoundingNozzlesOffsets,
+    PipetteBoundingBoxOffsets,
+)
 from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
+from ..pipette_fixtures import get_default_nozzle_map
 
 
 @pytest.fixture
@@ -174,9 +180,7 @@ def test_get_labware_parent_position_on_module(
     ).then_return(Point(1, 2, 3))
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
-        module_view.get_nominal_module_offset(
-            module_id="module-id", deck_type=DeckType.OT2_STANDARD
-        )
+        module_view.get_nominal_module_offset(module_id="module-id")
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_connected_model("module-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V2
@@ -238,9 +242,7 @@ def test_get_labware_parent_position_on_labware(
 
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
-        module_view.get_nominal_module_offset(
-            module_id="module-id", deck_type=DeckType.OT2_STANDARD
-        )
+        module_view.get_nominal_module_offset(module_id="module-id")
     ).then_return(LabwareOffsetVector(x=1, y=2, z=3))
 
     decoy.when(module_view.get_connected_model("module-id")).then_return(
@@ -420,9 +422,7 @@ def test_get_module_labware_highest_z(
     )
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
-        module_view.get_nominal_module_offset(
-            module_id="module-id", deck_type=DeckType.OT2_STANDARD
-        )
+        module_view.get_nominal_module_offset(module_id="module-id")
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_height_over_labware("module-id")).then_return(0.5)
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
@@ -707,11 +707,9 @@ def test_get_highest_z_in_slot_with_single_module(
         errors.LabwareNotLoadedOnModuleError("only module")
     )
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
-    decoy.when(
-        module_view.get_module_highest_z(
-            module_id="only-module", deck_type=DeckType("ot2_standard")
-        )
-    ).then_return(12345)
+    decoy.when(module_view.get_module_highest_z(module_id="only-module")).then_return(
+        12345
+    )
 
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
@@ -885,9 +883,7 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
     )
     decoy.when(
-        module_view.get_nominal_module_offset(
-            module_id="module-id", deck_type=DeckType("ot2_standard")
-        )
+        module_view.get_nominal_module_offset(module_id="module-id")
     ).then_return(LabwareOffsetVector(x=40, y=50, z=60))
     decoy.when(module_view.get_connected_model("module-id")).then_return(
         ModuleModel.TEMPERATURE_MODULE_V2
@@ -1091,9 +1087,7 @@ def test_get_module_labware_well_position(
     )
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
-        module_view.get_nominal_module_offset(
-            module_id="module-id", deck_type=DeckType.OT2_STANDARD
-        )
+        module_view.get_nominal_module_offset(module_id="module-id")
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
         ModuleOffsetData(
@@ -1632,9 +1626,7 @@ def test_get_labware_grip_point_for_labware_on_module(
     )
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
-        module_view.get_nominal_module_offset(
-            module_id="module-id", deck_type=DeckType.OT2_STANDARD
-        )
+        module_view.get_nominal_module_offset(module_id="module-id")
     ).then_return(LabwareOffsetVector(x=1, y=2, z=3))
     decoy.when(module_view.get_connected_model("module-id")).then_return(
         ModuleModel.MAGNETIC_MODULE_V2
@@ -1740,6 +1732,22 @@ def test_get_slot_item(
     assert subject.get_slot_item(DeckSlotName.SLOT_3) == module
 
 
+def test_get_slot_item_that_is_overflowed_module(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should return the module that occupies the slot, even if not loaded on it."""
+    module = LoadedModule.construct(id="cool-module")  # type: ignore[call-arg]
+    decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
+    decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
+    decoy.when(
+        module_view.get_overflowed_module_in_slot(DeckSlotName.SLOT_3)
+    ).then_return(module)
+    assert subject.get_slot_item(DeckSlotName.SLOT_3) == module
+
+
 @pytest.mark.parametrize(
     argnames=["slot_name", "expected_column"],
     argvalues=[
@@ -1835,6 +1843,12 @@ def test_get_next_drop_tip_location(
     decoy.when(
         labware_view.get_well_size(labware_id="abc", well_name="A1")
     ).then_return((well_size, 0, 0))
+    if pipette_channels == 96:
+        pip_type = PipetteNameType.P1000_96
+    elif pipette_channels == 8:
+        pip_type = PipetteNameType.P300_MULTI
+    else:
+        pip_type = PipetteNameType.P300_SINGLE
     decoy.when(mock_pipette_view.get_config("pip-123")).then_return(
         StaticPipetteConfig(
             min_volume=1,
@@ -1847,6 +1861,15 @@ def test_get_next_drop_tip_location(
             nominal_tip_overlap={},
             home_position=0,
             nozzle_offset_z=0,
+            bounding_nozzle_offsets=BoundingNozzlesOffsets(
+                back_left_offset=Point(x=10, y=20, z=30),
+                front_right_offset=Point(x=40, y=50, z=60),
+            ),
+            default_nozzle_map=get_default_nozzle_map(pip_type),
+            pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
+                back_left_corner=Point(x=10, y=20, z=30),
+                front_right_corner=Point(x=40, y=50, z=60),
+            ),
         )
     )
     decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)

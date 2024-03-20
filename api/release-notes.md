@@ -6,16 +6,47 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-## Opentrons Robot Software Changes in [!!EDIT ME WITH THE ACTUAL NUMBER OF THE NEXT RELEASE!!]
+## Opentrons Robot Software Changes in 7.2.1
 
-### HTTP API
+Welcome to the v7.2.1 release of the Opentrons robot software!
 
-- In the `/runs/commands`, `/maintenance_runs/commands`, and `/protocols` endpoints, the `dispense` command will now return an error if you try to dispense more than you've aspirated, instead of silently clamping.
-- The `/notifications/subscribe` WebSocket endpoint has been removed. See https://github.com/Opentrons/opentrons/pull/14280 for details.
+### Bug Fixes
 
-### Other Changes
+- Fixed an issue where OT-2 tip length calibrations created before v4.1.0 would cause a "missing calibration data" error that you could only resolve by resetting calibration.
+- Fixed collision prediction being too conservative in certain conditions on Flex, leading to errors even when collisions wouldn't take place.
+- Flex now properly homes after an instrument collision.
+- `opentrons_simulate` now outputs entries for commands that drop tips in the default trash container in protocols that specify Python API version 2.16 or newer.
 
-- The `notify_server` Python package has been removed. See https://github.com/Opentrons/opentrons/pull/14280 for details.
+---
+
+## Opentrons Robot Software Changes in 7.2.0
+
+Welcome to the v7.2.0 release of the Opentrons robot software!
+
+This update may take longer than usual if your robot has a lot of long protocols and runs stored on it. Allow *approximately 20 minutes* for your robot to restart. This delay will only happen once.
+
+If you don't care about preserving your labware offsets and run history, you can avoid the delay by clearing your runs and protocols before starting this update. Go to **Robot Settings** > **Device Reset** and select **Clear protocol run history**.
+
+### Improved Features
+
+- The robot software now runs Python 3.10. Many built-in Python packages were updated to match. If you have installed your own Python packages on the robot, re-install them to ensure compatibility.
+- Added error handling when dispensing. The `/runs/commands`, `/maintenance_runs/commands`, and `/protocols` HTTP API endpoints now return an error if you try to dispense more than you've aspirated.
+- Improved performance of the `/runs/commands` endpoints. They are now significantly faster when requesting a small number of commands from a stored run.
+
+### Bug Fixes
+
+- The OT-2 now consistently applies tip length calibration. There used to be a height discrepancy between Labware Position Check and protocol runs. If you previously compensated for the inconsistent pipette height with labware offsets, re-run Labware Position Check to avoid pipette crashes.
+- The OT-2 now accurately calculates the position of the Thermocycler. If you previously compensated for the incorrect position with labware offsets, re-run Labware Position Check to avoid pipette crashes.
+- The Flex Gripper will no longer pick up large labware that could collide with tips held by an adjoining pipette.
+- Flex now properly configures itself when connected by Ethernet directly to a computer.
+
+### Removals
+
+- Removed the `notify_server` Python package and `/notifications/subscribe` WebSocket endpoint, as they were never fully used. (See pull request [#14280](https://github.com/Opentrons/opentrons/pull/14280) for details.)
+
+### Known Issues
+
+- Downgrading an OT-2 to an earlier software version will delete tip length calibrations created with version 7.2.0. If you need to downgrade, re-run all pipette calibrations afterward.
 
 ---
 

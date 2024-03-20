@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+
 import {
   uiInitialized,
   notifySubscribeAction,
@@ -7,7 +9,7 @@ import {
 import type { NotifyTopic } from '../types'
 
 const MOCK_HOSTNAME = 'hostTest'
-const MOCK_TOPIC: NotifyTopic = 'robot-server/maintenance_runs'
+const MOCK_TOPIC: NotifyTopic = 'robot-server/maintenance_runs/current_run'
 
 describe('shell actions', () => {
   it('should be able to create a UI_INITIALIZED action', () => {

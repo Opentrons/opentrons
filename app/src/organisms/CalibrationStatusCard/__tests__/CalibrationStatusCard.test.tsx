@@ -1,10 +1,9 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { resetAllWhenMocks } from 'jest-when'
 
-import { renderWithProviders } from '@opentrons/components'
-
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { CalibrationStatusCard } from '..'
 import { useCalibrationTaskList } from '../../Devices/hooks'
@@ -19,11 +18,7 @@ import {
   expectedTaskList,
 } from '../../Devices/hooks/__fixtures__/taskListFixtures'
 
-jest.mock('../../Devices/hooks')
-
-const mockUseCalibrationTaskList = useCalibrationTaskList as jest.MockedFunction<
-  typeof useCalibrationTaskList
->
+vi.mock('../../Devices/hooks')
 
 const render = (props: React.ComponentProps<typeof CalibrationStatusCard>) => {
   return renderWithProviders(
@@ -36,16 +31,11 @@ const render = (props: React.ComponentProps<typeof CalibrationStatusCard>) => {
   )
 }
 
-const mockSetShowHowCalibrationWorksModal = jest.fn()
+const mockSetShowHowCalibrationWorksModal = vi.fn()
 
 describe('CalibrationStatusCard', () => {
   beforeEach(() => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedTaskList)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.mocked(useCalibrationTaskList).mockReturnValue(expectedTaskList)
   })
 
   const props: React.ComponentProps<typeof CalibrationStatusCard> = {
@@ -67,7 +57,7 @@ describe('CalibrationStatusCard', () => {
   })
 
   it('renders a missing status label', () => {
-    mockUseCalibrationTaskList.mockReturnValue(
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
       expectedIncompleteDeckCalTaskList
     )
     render(props)
@@ -75,13 +65,13 @@ describe('CalibrationStatusCard', () => {
   })
 
   it('renders a recommended status label when the deck is bad', () => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedBadDeckTaskList)
+    vi.mocked(useCalibrationTaskList).mockReturnValue(expectedBadDeckTaskList)
     render(props)
     screen.getByText('Calibration recommended')
   })
 
   it('renders a recommended status label when both the deck and offset is bad', () => {
-    mockUseCalibrationTaskList.mockReturnValue(
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
       expectedBadDeckAndPipetteOffsetTaskList
     )
     render(props)
@@ -89,25 +79,31 @@ describe('CalibrationStatusCard', () => {
   })
 
   it('renders a recommended status label when everything is bad', () => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedBadEverythingTaskList)
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
+      expectedBadEverythingTaskList
+    )
     render(props)
     screen.getByText('Calibration recommended')
   })
 
   it('renders a recommended status label when the offset is bad', () => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedBadPipetteOffsetTaskList)
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
+      expectedBadPipetteOffsetTaskList
+    )
     render(props)
     screen.getByText('Calibration recommended')
   })
 
   it('renders a recommended status label when the tip length is bad', () => {
-    mockUseCalibrationTaskList.mockReturnValue(expectedBadTipLengthTaskList)
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
+      expectedBadTipLengthTaskList
+    )
     render(props)
     screen.getByText('Calibration recommended')
   })
 
   it('renders a recommended status label when both the tip length and offset is bad', () => {
-    mockUseCalibrationTaskList.mockReturnValue(
+    vi.mocked(useCalibrationTaskList).mockReturnValue(
       expectedBadTipLengthAndOffsetTaskList
     )
     render(props)

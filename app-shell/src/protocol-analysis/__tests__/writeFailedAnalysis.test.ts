@@ -1,5 +1,6 @@
 import { readFile, rm } from 'fs/promises'
 import tempy from 'tempy'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 
 import { writeFailedAnalysis } from '../writeFailedAnalysis'
 

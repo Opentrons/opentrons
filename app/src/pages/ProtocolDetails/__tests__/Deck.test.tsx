@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import {
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -14,14 +15,7 @@ import type { UseQueryResult } from 'react-query'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { Protocol } from '@opentrons/api-client'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseProtocolAnalysisAsDocumentQuery = useProtocolAnalysisAsDocumentQuery as jest.MockedFunction<
-  typeof useProtocolAnalysisAsDocumentQuery
->
-const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
-  typeof useProtocolQuery
->
+vi.mock('@opentrons/react-api-client')
 
 const MOCK_PROTOCOL_ID = 'mockProtocolId'
 const MOCK_PROTOCOL_ANALYSIS = {
@@ -158,23 +152,23 @@ describe('Deck', () => {
     props = {
       protocolId: MOCK_PROTOCOL_ID,
     }
-    when(mockUseProtocolQuery)
+    when(vi.mocked(useProtocolQuery))
       .calledWith(MOCK_PROTOCOL_ID)
-      .mockReturnValue({
+      .thenReturn({
         data: {
           data: { analysisSummaries: [{ id: MOCK_PROTOCOL_ANALYSIS.id }] },
         } as any,
       } as UseQueryResult<Protocol>)
-    when(mockUseProtocolAnalysisAsDocumentQuery)
+    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(MOCK_PROTOCOL_ID, MOCK_PROTOCOL_ANALYSIS.id, {
         enabled: true,
       })
-      .mockReturnValue({
+      .thenReturn({
         data: MOCK_PROTOCOL_ANALYSIS as any,
       } as UseQueryResult<CompletedProtocolAnalysis>)
   })
   afterEach(() => {
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('renders deck view section', () => {

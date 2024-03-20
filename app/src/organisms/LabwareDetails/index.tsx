@@ -4,21 +4,22 @@ import { format } from 'date-fns'
 import { css } from 'styled-components'
 
 import {
-  Box,
-  Link,
-  Icon,
-  Flex,
-  SPACING,
-  COLORS,
-  TYPOGRAPHY,
+  ALIGN_CENTER,
   BORDERS,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
+  Link,
+  OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
-  useHoverTooltip,
+  SPACING,
   TOOLTIP_TOP_START,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
@@ -159,9 +160,10 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
     <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
       <Gallery definition={definition} />
       <Box
-        backgroundColor={COLORS.grey10}
+        backgroundColor={COLORS.grey20}
         padding={SPACING.spacing16}
         marginBottom={SPACING.spacing24}
+        borderRadius={BORDERS.borderRadius4}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
         <Link
@@ -170,7 +172,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           role="button"
           aria-label="copy"
         >
-          <Flex overflowWrap="anywhere">
+          <Flex overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
             <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black90}>
               {apiName}
               <span {...targetProps}>
@@ -185,7 +187,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           )}
         </Link>
       </Box>
-      <Box border={BORDERS.lineBorder}>
+      <Box border={BORDERS.lineBorder} borderRadius={BORDERS.borderRadius4}>
         <Box padding={SPACING.spacing16}>
           <WellCount
             wellLabel={getWellLabel(definition)}

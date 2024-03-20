@@ -1,5 +1,5 @@
 import pytest
-from typing import Dict, List, Tuple, Union, Iterator
+from typing import Dict, List, Tuple, Union, Iterator, cast
 
 from opentrons.hardware_control import nozzle_manager
 
@@ -132,6 +132,7 @@ def test_multi_config_identification(
         pipette_details[0], PipetteChannelType.EIGHT_CHANNEL, pipette_details[1]
     )
     subject = nozzle_manager.NozzleConfigurationManager.build_from_config(config)
+
     assert (
         subject.current_configuration.configuration
         == nozzle_manager.NozzleConfigurationType.FULL
@@ -151,25 +152,37 @@ def test_multi_config_identification(
 
     subject.update_nozzle_configuration("A1", "D1", "A1")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.COLUMN
     )
 
     subject.update_nozzle_configuration("A1", "A1", "A1")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.SINGLE
     )
 
     subject.update_nozzle_configuration("H1", "H1", "H1")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.SINGLE
     )
 
     subject.update_nozzle_configuration("C1", "F1", "C1")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.COLUMN
     )
 
@@ -328,70 +341,109 @@ def test_96_config_identification(
     )
     subject.update_nozzle_configuration("A1", "H1")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.COLUMN
     )
     subject.update_nozzle_configuration("A12", "H12")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.COLUMN
     )
     subject.update_nozzle_configuration("A8", "H8")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.COLUMN
     )
 
     subject.update_nozzle_configuration("A1", "A12")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.ROW
     )
     subject.update_nozzle_configuration("H1", "H12")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.ROW
     )
     subject.update_nozzle_configuration("D1", "D12")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.ROW
     )
 
     subject.update_nozzle_configuration("E1", "H6")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
     subject.update_nozzle_configuration("E7", "H12")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
 
     subject.update_nozzle_configuration("C4", "F9")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
     subject.update_nozzle_configuration("A1", "D12")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
     subject.update_nozzle_configuration("E1", "H12")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
     subject.update_nozzle_configuration("A1", "H6")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
     subject.update_nozzle_configuration("A7", "H12")
     assert (
-        subject.current_configuration.configuration
+        cast(
+            nozzle_manager.NozzleConfigurationType,
+            subject.current_configuration.configuration,
+        )
         == nozzle_manager.NozzleConfigurationType.SUBRECT
     )
 

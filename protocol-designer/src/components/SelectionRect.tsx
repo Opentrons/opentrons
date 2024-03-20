@@ -1,5 +1,6 @@
 import * as React from 'react'
-import styles from './SelectionRect.css'
+
+import styles from './SelectionRect.module.module.css'
 import type { DragRect, GenericRect } from '../collision-types'
 
 interface SelectionRectProps {

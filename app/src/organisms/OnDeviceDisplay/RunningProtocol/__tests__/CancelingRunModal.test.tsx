@@ -1,5 +1,8 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it } from 'vitest'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { CancelingRunModal } from '../CancelingRunModal'
 
@@ -11,8 +14,8 @@ const render = () => {
 
 describe('CancelingRunModal', () => {
   it('should render text and icon', () => {
-    const [{ getByText, getByLabelText }] = render()
-    getByText('Canceling run...')
-    getByLabelText('CancelingRunModal_icon')
+    render()
+    screen.getByText('Canceling run...')
+    screen.getByLabelText('CancelingRunModal_icon')
   })
 })

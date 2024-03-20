@@ -33,10 +33,12 @@ from opentrons.hardware_control.types import (
     EstopState,
     HardwareEventHandler,
     HardwareEventUnsubscriber,
+    HepaFanState,
+    HepaUVState,
+    StatusBarState,
 )
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from ..dev_types import OT3AttachedInstruments
-from ..types import StatusBarState
 from .types import HWStopCondition
 
 Cls = TypeVar("Cls")
@@ -307,6 +309,14 @@ class FlexBackend(Protocol):
         """Get engaged axes."""
         ...
 
+    async def update_engaged_axes(self) -> None:
+        """Update engaged axes."""
+        ...
+
+    async def is_motor_engaged(self, axis: Axis) -> bool:
+        """Check if axis is enabled."""
+        ...
+
     async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
         ...
@@ -416,4 +426,18 @@ class FlexBackend(Protocol):
         hard_limit_lower: float,
         hard_limit_upper: float,
     ) -> None:
+        ...
+
+    async def set_hepa_fan_state(self, fan_on: bool, duty_cycle: int) -> bool:
+        """Sets the state and duty cycle of the Hepa/UV module."""
+        ...
+
+    async def get_hepa_fan_state(self) -> Optional[HepaFanState]:
+        ...
+
+    async def set_hepa_uv_state(self, light_on: bool, uv_duration_s: int) -> bool:
+        """Sets the state and duration (seconds) of the UV light for the Hepa/UV module."""
+        ...
+
+    async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         ...

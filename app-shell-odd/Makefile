@@ -9,7 +9,7 @@ SHELL := bash
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
 # dev server port
-PORT ?= 8090
+PORT ?= 5173
 
 # dep directories for production build
 # TODO(mc, 2018-08-07): figure out a better way to do this
@@ -24,7 +24,7 @@ ssh_opts ?= $(default_ssh_opts)
 builder := yarn electron-builder \
 	--config electron-builder.config.js \
 	--publish never
-  
+
 electron := yarn electron . \
 	--devtools \
 	--log.level.console="debug" \
@@ -56,7 +56,7 @@ clean:
 .PHONY: lib
 lib: export NODE_ENV := production
 lib:
-	OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) webpack --profile
+	OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) vite build
 
 .PHONY: deps
 deps:
@@ -83,7 +83,7 @@ push-ot3: dist-ot3
 .PHONY: dev
 dev: export NODE_ENV := development
 dev:
-	webpack
+	vite build
 	$(electron)
 
 .PHONY: test

@@ -1,5 +1,4 @@
 import 'cypress-file-upload'
-import JSZip from 'jszip'
 import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
 
 const expectedExportFixture =
@@ -24,9 +23,7 @@ context('Tubes and Rack', () => {
         .children()
         .first()
         .trigger('mousedown')
-      cy.get('*[class^="Dropdown__option_label"]')
-        .contains('Tubes + Tube Rack')
-        .click()
+      cy.get('*[class^="_option_label"]').contains('Tubes + Tube Rack').click()
 
       // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
       cy.get('label')
@@ -34,17 +31,11 @@ context('Tubes and Rack', () => {
         .children()
         .first()
         .trigger('mousedown')
-      cy.get('*[class^="Dropdown__option_label"]')
+      cy.get('*[class^="_option_label"]')
         .contains('Non-Opentrons tube rack')
         .click()
 
       cy.contains('start creating labware').click({ force: true })
-    })
-
-    it('contains a button to the testing guide', () => {
-      cy.contains('labware test guide')
-        .should('have.prop', 'href')
-        .and('to.have.string', 'labwareDefinition_testGuide')
     })
 
     it('does not have a preview image', () => {
@@ -189,25 +180,6 @@ context('Tubes and Rack', () => {
       cy.get("input[placeholder='somerackbrand_24_tuberack_1500ul']").should(
         'exist'
       )
-
-      // Test pipette
-      cy.contains('Test Pipette is a required field').should('exist')
-      // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-      cy.get('label')
-        .contains('Test Pipette')
-        .children()
-        .first()
-        .trigger('mousedown')
-      cy.get('*[class^="Dropdown__option_label"]')
-        .contains(/P20.*Single-Channel.*GEN2/)
-        .click()
-      cy.contains('Test Pipette is a required field').should('not.exist')
-
-      // All fields present
-      cy.get('button[class*="_export_button_"]').click({ force: true })
-      cy.contains(
-        'Please resolve all invalid fields in order to export the labware definition'
-      ).should('not.exist')
     })
 
     it('should export a file matching the fixture', () => {
@@ -215,13 +187,10 @@ context('Tubes and Rack', () => {
         cy.get('button').contains('EXPORT FILE').click()
 
         cy.window()
-          .its('__lastSavedBlobZip__')
+          .its('__lastSavedFileBlob__')
           .should('be.a', 'blob')
           .should(async blob => {
-            const zipObj = await JSZip.loadAsync(blob)
-            const labwareDefFile =
-              zipObj.files['somerackbrand_24_tuberack_1500ul.json']
-            const labwareDefText = await labwareDefFile.async('text')
+            const labwareDefText = await blob.text()
             const savedDef = JSON.parse(labwareDefText)
 
             expectDeepEqual(assert, savedDef, expectedExportLabwareDef)
@@ -229,7 +198,7 @@ context('Tubes and Rack', () => {
 
         cy.window()
           .its('__lastSavedFileName__')
-          .should('equal', `somerackbrand_24_tuberack_1500ul.zip`)
+          .should('equal', `somerackbrand_24_tuberack_1500ul.json`)
       })
     })
   })

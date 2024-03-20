@@ -202,7 +202,6 @@ class EquipmentHandler:
         )
 
         pipette_id = pipette_id or self._model_utils.generate_id()
-
         if not use_virtual_pipettes:
             cache_request = {mount.to_hw_mount(): pipette_name_value}
 
@@ -244,7 +243,6 @@ class EquipmentHandler:
                 )
             )
         serial = serial_number or ""
-
         return LoadedPipetteData(
             pipette_id=pipette_id,
             serial_number=serial,
@@ -390,7 +388,7 @@ class EquipmentHandler:
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
         back_left_nozzle: Optional[str] = None,
-    ) -> Optional[NozzleMap]:
+    ) -> NozzleMap:
         """Ensure the requested nozzle layout is compatible with the current pipette.
 
         Args:

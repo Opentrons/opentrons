@@ -25,7 +25,7 @@ const STRETCH_LIST_STYLE = css`
   width: 100%;
   padding: ${SPACING.spacing16};
   background-color: ${COLORS.grey35};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius8};
 `
 
 interface EthernetConnectionDetailsProps {

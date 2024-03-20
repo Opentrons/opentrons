@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from logging import getLogger
 from typing import Dict, List, Optional
+
+from opentrons.protocol_engine.types import RunTimeParameter
 from typing_extensions import Final
 from opentrons_shared_data.robot.dev_types import RobotType
 
@@ -113,6 +115,8 @@ class AnalysisStore:
         Returns:
             A summary of the just-added analysis.
         """
+        # TODO (spp, 2024-03-19): cap the number of analyses being stored by
+        #  auto-deleting old ones
         new_pending_analysis = self._pending_store.add(
             protocol_id=protocol_id, analysis_id=analysis_id
         )
@@ -122,6 +126,7 @@ class AnalysisStore:
         self,
         analysis_id: str,
         robot_type: RobotType,
+        run_time_parameters: List[RunTimeParameter],
         commands: List[Command],
         labware: List[LoadedLabware],
         modules: List[LoadedModule],
@@ -135,6 +140,7 @@ class AnalysisStore:
             analysis_id: The ID of the analysis to promote.
                 Must point to a valid pending analysis.
             robot_type: See `CompletedAnalysis.robotType`.
+            run_time_parameters: See `CompletedAnalysis.runTimeParameters`.
             commands: See `CompletedAnalysis.commands`.
             labware: See `CompletedAnalysis.labware`.
             modules: See `CompletedAnalysis.modules`.
@@ -161,6 +167,7 @@ class AnalysisStore:
             result=result,
             robotType=robot_type,
             status=AnalysisStatus.COMPLETED,
+            runTimeParameters=run_time_parameters,
             commands=commands,
             labware=labware,
             modules=modules,

@@ -31,7 +31,7 @@ from opentrons.protocol_engine import (
     create_protocol_engine,
 )
 
-from robot_server.protocols import ProtocolResource
+from robot_server.protocols.protocol_store import ProtocolResource
 from opentrons.protocol_engine.types import DeckConfigurationType
 
 
@@ -214,6 +214,7 @@ class EngineStore:
                 # was uploaded before we added stricter validation, and that
                 # doesn't conform to the new rules.
                 python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+                run_time_param_values=None,
             )
         elif isinstance(runner, JsonRunner):
             assert (

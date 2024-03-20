@@ -1,18 +1,20 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
+import { useHistory } from 'react-router-dom'
 
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { DeckConfigurationDiscardChangesModal } from '../DeckConfigurationDiscardChangesModal'
 
-const mockFunc = jest.fn()
-const mockGoBack = jest.fn()
+const mockFunc = vi.fn()
+const mockGoBack = vi.fn()
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof useHistory>()
   return {
-    ...reactRouterDom,
-    useHistory: () => ({ goBack: mockGoBack } as any),
+    ...actual,
+    useHistory: () => ({ goBack: mockGoBack }),
   }
 })
 

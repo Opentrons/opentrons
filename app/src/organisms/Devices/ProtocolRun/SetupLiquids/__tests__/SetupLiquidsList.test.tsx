@@ -1,16 +1,18 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { when } from 'jest-when'
-import { i18n } from '../../../../../i18n'
-import {
-  renderWithProviders,
-  partialComponentPropsMatcher,
-  nestedTextMatcher,
-} from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { when } from 'vitest-when'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
+
 import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
+
+import {
+  nestedTextMatcher,
+  renderWithProviders,
+} from '../../../../../__testing-utils__'
+import { i18n } from '../../../../../i18n'
 import {
   useTrackEvent,
   ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
@@ -23,6 +25,9 @@ import {
   getTotalVolumePerLiquidLabwarePair,
 } from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
+import { useNotifyRunQuery } from '../../../../../resources/runs'
+
+import type { Mock } from 'vitest'
 
 const MOCK_LIQUIDS_IN_LOAD_ORDER = [
   {
@@ -51,99 +56,83 @@ const MOCK_LABWARE_INFO_BY_LIQUID_ID = {
   ],
 }
 
-jest.mock('../utils')
-jest.mock('../../utils/getLocationInfoNames')
-jest.mock('../LiquidsLabwareDetailsModal')
-jest.mock('@opentrons/api-client')
-jest.mock('../../../../../redux/analytics')
-
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
->
-const mockGetTotalVolumePerLiquidId = getTotalVolumePerLiquidId as jest.MockedFunction<
-  typeof getTotalVolumePerLiquidId
->
-const mockGetTotalVolumePerLiquidLabwarePair = getTotalVolumePerLiquidLabwarePair as jest.MockedFunction<
-  typeof getTotalVolumePerLiquidLabwarePair
->
-const mockGetLocationInfoNames = getLocationInfoNames as jest.MockedFunction<
-  typeof getLocationInfoNames
->
-const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFunction<
-  typeof parseLiquidsInLoadOrder
->
-const mockParseLabwareInfoByLiquidId = parseLabwareInfoByLiquidId as jest.MockedFunction<
-  typeof parseLabwareInfoByLiquidId
->
-const mockLiquidsLabwareDetailsModal = LiquidsLabwareDetailsModal as jest.MockedFunction<
-  typeof LiquidsLabwareDetailsModal
->
+vi.mock('../utils')
+vi.mock('../../utils/getLocationInfoNames')
+vi.mock('../LiquidsLabwareDetailsModal')
+vi.mock('@opentrons/api-client')
+vi.mock('../../../../../redux/analytics')
+vi.mock('../../../../../resources/runs')
 
 const render = (props: React.ComponentProps<typeof SetupLiquidsList>) => {
   return renderWithProviders(<SetupLiquidsList {...props} />, {
     i18nInstance: i18n,
   })
 }
-let mockTrackEvent: jest.Mock
+let mockTrackEvent: Mock
 
 describe('SetupLiquidsList', () => {
   let props: React.ComponentProps<typeof SetupLiquidsList>
   beforeEach(() => {
     props = { runId: '123' }
-    mockGetTotalVolumePerLiquidId.mockReturnValue(400)
-    mockGetTotalVolumePerLiquidLabwarePair.mockReturnValue(200)
-    mockGetLocationInfoNames.mockReturnValue({
+    vi.mocked(getTotalVolumePerLiquidId).mockReturnValue(400)
+    vi.mocked(getTotalVolumePerLiquidLabwarePair).mockReturnValue(200)
+    vi.mocked(getLocationInfoNames).mockReturnValue({
       labwareName: 'mock labware name',
       slotName: '4',
     })
-    mockTrackEvent = jest.fn()
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    mockParseLiquidsInLoadOrder.mockReturnValue(MOCK_LIQUIDS_IN_LOAD_ORDER)
-    mockParseLabwareInfoByLiquidId.mockReturnValue(
+    mockTrackEvent = vi.fn()
+    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
+    vi.mocked(parseLiquidsInLoadOrder).mockReturnValue(
+      MOCK_LIQUIDS_IN_LOAD_ORDER
+    )
+    vi.mocked(parseLabwareInfoByLiquidId).mockReturnValue(
       MOCK_LABWARE_INFO_BY_LIQUID_ID as any
     )
-    when(mockLiquidsLabwareDetailsModal)
+    when(vi.mocked(LiquidsLabwareDetailsModal))
       .calledWith(
-        partialComponentPropsMatcher({ labwareId: '123', liquidId: '0' })
+        expect.objectContaining({ labwareId: '123', liquidId: '0' }),
+        // @ts-expect-error Potential Vitest issue. Seems this actually takes two args.
+        expect.anything()
       )
-      .mockReturnValue(<div>Mock liquids labwaqre details modal</div>)
+      .thenReturn(<div>Mock liquids labware details modal</div>)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({} as any)
   })
 
   it('renders the total volume of the liquid, sample display name, and description', () => {
-    const [{ getByText, getAllByText }] = render(props)
-    getAllByText(nestedTextMatcher('400 µL'))
-    getByText('mock liquid 1')
-    getByText('mock sample')
-    getByText('mock liquid 2')
-    getByText('another mock sample')
+    render(props)
+    screen.getAllByText(nestedTextMatcher('400 µL'))
+    screen.getByText('mock liquid 1')
+    screen.getByText('mock sample')
+    screen.getByText('mock liquid 2')
+    screen.getByText('another mock sample')
   })
 
   it('renders slot and labware info when clicking a liquid item', () => {
-    const [{ getByText, getAllByText }] = render(props)
-    const row = getByText('mock liquid 1')
+    render(props)
+    const row = screen.getByText('mock liquid 1')
     fireEvent.click(row)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
       properties: {},
     })
-    getByText('Location')
-    getByText('Labware name')
-    getByText('Volume')
-    getAllByText(nestedTextMatcher('200 µL'))
-    getByText('4')
-    getByText('mock labware name')
+    screen.getByText('Location')
+    screen.getByText('Labware name')
+    screen.getByText('Volume')
+    screen.getAllByText(nestedTextMatcher('200 µL'))
+    screen.getByText('4')
+    screen.getByText('mock labware name')
   })
 
   it('opens the modal with correct props when a line item is clicked', () => {
-    const [{ getByText }] = render(props)
-    const row = getByText('mock liquid 1')
+    render(props)
+    const row = screen.getByText('mock liquid 1')
     fireEvent.click(row)
-    const subRow = getByText('mock labware name')
+    const subRow = screen.getByText('mock labware name')
     fireEvent.click(subRow)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
       properties: {},
     })
-    getByText('Mock liquids labwaqre details modal')
+    screen.getByText('Mock liquids labware details modal')
   })
 })

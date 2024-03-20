@@ -145,6 +145,7 @@ class MessageId(int, Enum):
     instrument_info_request = 0x306
     pipette_info_response = 0x307
     gripper_info_response = 0x308
+    hepauv_info_response = 0x309
     set_serial_number = 0x30A
     get_motor_usage_request = 0x30B
     get_motor_usage_response = 0x30C
@@ -154,6 +155,7 @@ class MessageId(int, Enum):
     error_message = 0x02
 
     get_status_request = 0x01
+    get_gear_status_response = 0x4
     get_status_response = 0x05
 
     enable_motor_request = 0x06
@@ -251,6 +253,13 @@ class MessageId(int, Enum):
     peripheral_status_response = 0x8D
     baseline_sensor_response = 0x8E
 
+    set_hepa_fan_state_request = 0x90
+    get_hepa_fan_state_request = 0x91
+    get_hepa_fan_state_response = 0x92
+    set_hepa_uv_state_request = 0x93
+    get_hepa_uv_state_request = 0x94
+    get_hepa_uv_state_response = 0x95
+
 
 @unique
 class ErrorSeverity(int, Enum):
@@ -280,7 +289,9 @@ class ErrorCode(int, Enum):
     motor_busy = 0x0B
     stop_requested = 0x0C
     over_pressure = 0x0D
-    motor_driver_error_detected = 0x0E
+    door_open = 0x0E
+    reed_open = 0x0F
+    motor_driver_error_detected = 0x10
 
 
 @unique

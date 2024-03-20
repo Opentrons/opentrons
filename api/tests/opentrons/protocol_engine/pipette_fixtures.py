@@ -3,6 +3,9 @@
 from collections import OrderedDict
 
 from opentrons.types import Point
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 
 NINETY_SIX_ROWS = OrderedDict(
     (
@@ -263,3 +266,88 @@ NINETY_SIX_MAP = OrderedDict(
         ("H12", Point(63.0, -88.5, -259.15)),
     )
 )
+
+EIGHT_CHANNEL_ROWS = OrderedDict(
+    (
+        (
+            "A",
+            ["A1"],
+        ),
+        (
+            "B",
+            ["B1"],
+        ),
+        (
+            "C",
+            ["C1"],
+        ),
+        (
+            "D",
+            ["D1"],
+        ),
+        (
+            "E",
+            ["E1"],
+        ),
+        (
+            "F",
+            ["F1"],
+        ),
+        (
+            "G",
+            ["G1"],
+        ),
+        (
+            "H",
+            ["H1"],
+        ),
+    )
+)
+
+EIGHT_CHANNEL_COLS = OrderedDict(
+    (("1", ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"]),)
+)
+
+EIGHT_CHANNEL_MAP = OrderedDict(
+    (
+        ("A1", Point(0.0, 31.5, 35.52)),
+        ("B1", Point(0.0, 22.5, 35.52)),
+        ("C1", Point(0.0, 13.5, 35.52)),
+        ("D1", Point(0.0, 4.5, 35.52)),
+        ("E1", Point(0.0, -4.5, 35.52)),
+        ("F1", Point(0.0, -13.5, 35.52)),
+        ("G1", Point(0.0, -22.5, 35.52)),
+        ("H1", Point(0.0, -31.5, 35.52)),
+    )
+)
+
+
+def get_default_nozzle_map(pipette_type: PipetteNameType) -> NozzleMap:
+    """Get default nozzle map for a given pipette type."""
+    if "multi" in pipette_type.value:
+        return NozzleMap.build(
+            physical_nozzles=EIGHT_CHANNEL_MAP,
+            physical_rows=EIGHT_CHANNEL_ROWS,
+            physical_columns=EIGHT_CHANNEL_COLS,
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="H1",
+        )
+    elif "96" in pipette_type.value:
+        return NozzleMap.build(
+            physical_nozzles=NINETY_SIX_MAP,
+            physical_rows=NINETY_SIX_ROWS,
+            physical_columns=NINETY_SIX_COLS,
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="H12",
+        )
+    else:
+        return NozzleMap.build(
+            physical_nozzles=OrderedDict({"A1": Point(0, 0, 0)}),
+            physical_rows=OrderedDict({"A": ["A1"]}),
+            physical_columns=OrderedDict({"1": ["A1"]}),
+            starting_nozzle="A1",
+            back_left_nozzle="A1",
+            front_right_nozzle="A1",
+        )

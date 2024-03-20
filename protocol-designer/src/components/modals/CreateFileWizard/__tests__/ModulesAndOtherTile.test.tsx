@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
 import { CrashInfoBox } from '../../../modules'
@@ -11,55 +13,46 @@ import { EquipmentOption } from '../EquipmentOption'
 import type { FormPipettesByMount } from '../../../../step-forms'
 import type { FormState, WizardTileProps } from '../types'
 
-jest.mock('../../../modules')
-jest.mock('../../FilePipettesModal/ModuleFields')
-jest.mock('../EquipmentOption')
-jest.mock('../../../../feature-flags/selectors')
-jest.mock('../../FilePipettesModal')
+vi.mock('../../../modules')
+vi.mock('../../FilePipettesModal/ModuleFields')
+vi.mock('../EquipmentOption')
+vi.mock('../../../../feature-flags/selectors')
+vi.mock('../../FilePipettesModal')
 
-const mockEquipmentOption = EquipmentOption as jest.MockedFunction<
-  typeof EquipmentOption
->
-const mockCrashInfoBox = CrashInfoBox as jest.MockedFunction<
-  typeof CrashInfoBox
->
-const mockGetDisableModuleRestrictions = getDisableModuleRestrictions as jest.MockedFunction<
-  typeof getDisableModuleRestrictions
->
-const mockModuleFields = ModuleFields as jest.MockedFunction<
-  typeof ModuleFields
->
 const render = (props: React.ComponentProps<typeof ModulesAndOtherTile>) => {
   return renderWithProviders(<ModulesAndOtherTile {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
+const values = {
+  fields: {
+    name: 'mockName',
+    description: 'mockDescription',
+    organizationOrAuthor: 'mockOrganizationOrAuthor',
+    robotType: FLEX_ROBOT_TYPE,
+  },
+  pipettesByMount: {
+    left: { pipetteName: 'mockPipetteName', tiprackDefURI: 'mocktip' },
+    right: { pipetteName: null, tiprackDefURI: null },
+  } as FormPipettesByMount,
+  modulesByType: {
+    heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
+    magneticBlockType: { onDeck: false, model: null, slot: '2' },
+    temperatureModuleType: { onDeck: false, model: null, slot: '3' },
+    thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
+  },
+  additionalEquipment: ['gripper'],
+} as FormState
+
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  handleChange: jest.fn(),
-  handleBlur: jest.fn(),
-  goBack: jest.fn(),
-  proceed: jest.fn(),
-  setFieldValue: jest.fn(),
-  values: {
-    fields: {
-      name: 'mockName',
-      description: 'mockDescription',
-      organizationOrAuthor: 'mockOrganizationOrAuthor',
-      robotType: FLEX_ROBOT_TYPE,
-    },
-    pipettesByMount: {
-      left: { pipetteName: 'mockPipetteName', tiprackDefURI: 'mocktip' },
-      right: { pipetteName: null, tiprackDefURI: null },
-    } as FormPipettesByMount,
-    modulesByType: {
-      heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-      magneticBlockType: { onDeck: false, model: null, slot: '2' },
-      temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-      thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-    },
-    additionalEquipment: ['gripper'],
-  } as FormState,
+  watch: vi.fn((name: keyof typeof values) => values[name]) as any,
+  trigger: vi.fn(),
+  goBack: vi.fn(),
+  proceed: vi.fn(),
+  setValue: vi.fn(),
+  getValues: vi.fn(() => values) as any,
+  formState: {} as any,
 }
 
 describe('ModulesAndOtherTile', () => {
@@ -70,10 +63,14 @@ describe('ModulesAndOtherTile', () => {
       ...props,
       ...mockWizardTileProps,
     } as WizardTileProps
-    mockCrashInfoBox.mockReturnValue(<div> mock CrashInfoBox</div>)
-    mockEquipmentOption.mockReturnValue(<div>mock EquipmentOption</div>)
-    mockGetDisableModuleRestrictions.mockReturnValue(false)
-    mockModuleFields.mockReturnValue(<div>mock ModuleFields</div>)
+    vi.mocked(CrashInfoBox).mockReturnValue(<div> mock CrashInfoBox</div>)
+    vi.mocked(EquipmentOption).mockReturnValue(<div>mock EquipmentOption</div>)
+    vi.mocked(getDisableModuleRestrictions).mockReturnValue(false)
+    vi.mocked(ModuleFields).mockReturnValue(<div>mock ModuleFields</div>)
+  })
+
+  afterEach(() => {
+    cleanup()
   })
 
   it('renders correct module, gripper and trash length for flex with disabled button', () => {
@@ -86,13 +83,14 @@ describe('ModulesAndOtherTile', () => {
     expect(screen.getByText('Review file details')).toBeDisabled()
   })
   it('renders correct module, gripper and trash length for flex', () => {
+    const newValues = {
+      ...values,
+      additionalEquipment: ['trashBin'],
+    }
     props = {
       ...props,
-      values: {
-        ...mockWizardTileProps.values,
-        additionalEquipment: ['trashBin'],
-      },
-    } as WizardTileProps
+      getValues: vi.fn(() => newValues) as any,
+    }
     render(props)
     screen.getByText('Choose additional items')
     expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(7)
@@ -103,24 +101,28 @@ describe('ModulesAndOtherTile', () => {
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders correct module length for ot-2', () => {
+    const values = {
+      fields: {
+        robotType: OT2_ROBOT_TYPE,
+      },
+      pipettesByMount: {
+        left: { pipetteName: 'p1000_single', tiprackDefURI: 'mocktip' },
+        right: { pipetteName: null, tiprackDefURI: null },
+      } as FormPipettesByMount,
+      modulesByType: {
+        heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
+        magneticModuleType: { onDeck: false, model: null, slot: '2' },
+        temperatureModuleType: { onDeck: false, model: null, slot: '3' },
+        thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
+      },
+    } as FormState
+
     const mockWizardTileProps: Partial<WizardTileProps> = {
-      errors: { modulesByType: {} },
-      touched: { modulesByType: {} },
-      values: {
-        fields: {
-          robotType: OT2_ROBOT_TYPE,
-        },
-        pipettesByMount: {
-          left: { pipetteName: 'p1000_single', tiprackDefURI: 'mocktip' },
-          right: { pipetteName: null, tiprackDefURI: null },
-        } as FormPipettesByMount,
-        modulesByType: {
-          heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-          magneticModuleType: { onDeck: false, model: null, slot: '2' },
-          temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-          thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-        },
-      } as FormState,
+      formState: {
+        errors: { modulesByType: {} },
+        touchedFields: { modulesByType: {} },
+      } as any,
+      getValues: vi.fn(() => values) as any,
     }
     props = {
       ...props,

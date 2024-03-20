@@ -21,13 +21,15 @@ import { GoBack } from './GoBack'
 import { HandleEnter } from './HandleEnter'
 
 import type { DeckConfiguration, CutoutId } from '@opentrons/shared-data'
-import type { WizardTileProps } from './types'
+import type { AdditionalEquipment, WizardTileProps } from './types'
 
 export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
-  const { values, goBack, proceed, setFieldValue } = props
+  const { getValues, goBack, proceed, setValue, watch } = props
   const { t } = useTranslation(['modal', 'application'])
-  const isOt2 = values.fields.robotType === OT2_ROBOT_TYPE
-  const stagingAreaItems = values.additionalEquipment.filter(equipment =>
+  const { fields, pipettesByMount } = getValues()
+  const additionalEquipment = watch('additionalEquipment')
+  const isOt2 = fields.robotType === OT2_ROBOT_TYPE
+  const stagingAreaItems = additionalEquipment.filter(equipment =>
     // TODO(bc, 11/14/2023): refactor the additional items field to include a cutoutId
     // and a cutoutFixtureId so that we don't have to string parse here to generate them
     equipment.includes('stagingArea')
@@ -87,9 +89,9 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
       return slot
     })
     setUpdatedSlots(modifiedSlots)
-    setFieldValue('additionalEquipment', [
-      ...values.additionalEquipment,
-      `stagingArea_${cutoutId}`,
+    setValue('additionalEquipment', [
+      ...additionalEquipment,
+      `stagingArea_${cutoutId}` as AdditionalEquipment,
     ])
   }
 
@@ -104,9 +106,12 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
       return slot
     })
     setUpdatedSlots(modifiedSlots)
-    setFieldValue(
+    setValue(
       'additionalEquipment',
-      without(values.additionalEquipment, `stagingArea_${cutoutId}`)
+      without(
+        additionalEquipment,
+        `stagingArea_${cutoutId}` as AdditionalEquipment
+      )
     )
   }
 
@@ -129,9 +134,9 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
         >
           <GoBack
             onClick={() => {
-              if (values.pipettesByMount.left.pipetteName === 'p1000_96') {
+              if (pipettesByMount.left.pipetteName === 'p1000_96') {
                 goBack(3)
-              } else if (values.pipettesByMount.right.pipetteName === '') {
+              } else if (pipettesByMount.right.pipetteName === '') {
                 goBack(2)
               } else {
                 goBack()

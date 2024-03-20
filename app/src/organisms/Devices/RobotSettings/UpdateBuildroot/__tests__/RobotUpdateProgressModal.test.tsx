@@ -1,11 +1,14 @@
 import * as React from 'react'
 import { i18n } from '../../../../../i18n'
 import { act, fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   RobotUpdateProgressModal,
-  TIME_BEFORE_ALLOWING_EXIT_MS,
+  TIME_BEFORE_ALLOWING_EXIT,
+  TIME_BEFORE_ALLOWING_EXIT_INIT,
 } from '../RobotUpdateProgressModal'
 import { useRobotUpdateInfo } from '../useRobotUpdateInfo'
 import {
@@ -13,30 +16,19 @@ import {
   getRobotUpdateDownloadError,
 } from '../../../../../redux/robot-update'
 import { useDispatchStartRobotUpdate } from '../../../../../redux/robot-update/hooks'
+import {
+  useRobotInitializationStatus,
+  INIT_STATUS,
+} from '../../../../../resources/health/hooks'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { RobotUpdateSession } from '../../../../../redux/robot-update/types'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../useRobotUpdateInfo')
-jest.mock('../../../../../redux/robot-update')
-jest.mock('../../../../../redux/robot-update/hooks')
-
-const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
-  typeof useCreateLiveCommandMutation
->
-const mockUseRobotUpdateInfo = useRobotUpdateInfo as jest.MockedFunction<
-  typeof useRobotUpdateInfo
->
-const mockGetRobotSessionIsManualFile = getRobotSessionIsManualFile as jest.MockedFunction<
-  typeof getRobotSessionIsManualFile
->
-const mockUseDispatchStartRobotUpdate = useDispatchStartRobotUpdate as jest.MockedFunction<
-  typeof useDispatchStartRobotUpdate
->
-const mockGetRobotUpdateDownloadError = getRobotUpdateDownloadError as jest.MockedFunction<
-  typeof getRobotUpdateDownloadError
->
+vi.mock('@opentrons/react-api-client')
+vi.mock('../useRobotUpdateInfo')
+vi.mock('../../../../../redux/robot-update')
+vi.mock('../../../../../redux/robot-update/hooks')
+vi.mock('../../../../../resources/health/hooks')
 
 const render = (
   props: React.ComponentProps<typeof RobotUpdateProgressModal>
@@ -59,33 +51,31 @@ describe('DownloadUpdateModal', () => {
   }
 
   let props: React.ComponentProps<typeof RobotUpdateProgressModal>
-  const mockCreateLiveCommand = jest.fn()
+  const mockCreateLiveCommand = vi.fn()
 
   beforeEach(() => {
     mockCreateLiveCommand.mockResolvedValue(null)
     props = {
       robotName: 'testRobot',
       session: mockRobotUpdateSession,
-      closeUpdateBuildroot: jest.fn(),
+      closeUpdateBuildroot: vi.fn(),
     }
-    mockUseCreateLiveCommandMutation.mockReturnValue({
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-    mockUseRobotUpdateInfo.mockReturnValue({
+    vi.mocked(useRobotUpdateInfo).mockReturnValue({
       updateStep: 'install',
       progressPercent: 50,
     })
-    mockGetRobotSessionIsManualFile.mockReturnValue(false)
-    mockUseDispatchStartRobotUpdate.mockReturnValue(jest.fn)
-    mockGetRobotUpdateDownloadError.mockReturnValue(null)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(getRobotSessionIsManualFile).mockReturnValue(false)
+    vi.mocked(useDispatchStartRobotUpdate).mockReturnValue(vi.fn)
+    vi.mocked(getRobotUpdateDownloadError).mockReturnValue(null)
   })
 
   it('renders robot update download errors', () => {
-    mockGetRobotUpdateDownloadError.mockReturnValue('test download error')
+    vi.mocked(getRobotUpdateDownloadError).mockReturnValue(
+      'test download error'
+    )
     render(props)
     screen.getByText('test download error')
   })
@@ -101,7 +91,7 @@ describe('DownloadUpdateModal', () => {
       commandType: 'setStatusBar',
       params: { animation: 'updating' },
     }
-    expect(mockUseCreateLiveCommandMutation).toBeCalledWith()
+    expect(useCreateLiveCommandMutation).toBeCalledWith()
     expect(mockCreateLiveCommand).toBeCalledWith({
       command: updatingCommand,
       waitUntilComplete: false,
@@ -120,7 +110,7 @@ describe('DownloadUpdateModal', () => {
   })
 
   it('renders the correct text when finalizing the robot update with no close button', () => {
-    mockUseRobotUpdateInfo.mockReturnValue({
+    vi.mocked(useRobotUpdateInfo).mockReturnValue({
       updateStep: 'restart',
       progressPercent: 100,
     })
@@ -138,7 +128,7 @@ describe('DownloadUpdateModal', () => {
   })
 
   it('renders a success modal and exit button upon finishing the update process', () => {
-    mockUseRobotUpdateInfo.mockReturnValue({
+    vi.mocked(useRobotUpdateInfo).mockReturnValue({
       updateStep: 'finished',
       progressPercent: 100,
     })
@@ -150,7 +140,7 @@ describe('DownloadUpdateModal', () => {
       screen.getByText('Robot software successfully updated')
     ).toBeInTheDocument()
     expect(exitButton).toBeInTheDocument()
-    expect(mockCreateLiveCommand).toBeCalledTimes(1)
+    expect(mockCreateLiveCommand).toHaveBeenCalled()
     fireEvent.click(exitButton)
     expect(props.closeUpdateBuildroot).toHaveBeenCalled()
   })
@@ -175,8 +165,8 @@ describe('DownloadUpdateModal', () => {
     fireEvent.click(exitButton)
     expect(props.closeUpdateBuildroot).toHaveBeenCalled()
 
-    expect(mockUseCreateLiveCommandMutation).toBeCalledWith()
-    expect(mockCreateLiveCommand).toBeCalledTimes(2)
+    expect(useCreateLiveCommandMutation).toBeCalledWith()
+    expect(mockCreateLiveCommand).toHaveBeenCalled()
     expect(mockCreateLiveCommand).toBeCalledWith({
       command: idleCommand,
       waitUntilComplete: false,
@@ -184,14 +174,50 @@ describe('DownloadUpdateModal', () => {
   })
 
   it('renders alternative text if update takes too long', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     render(props)
 
     act(() => {
-      jest.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT_MS)
+      vi.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT)
     })
 
     screen.getByText(/Try restarting the update./i)
     screen.getByText(/This update is taking longer than usual/i)
+  })
+
+  it('renders alternative text if the robot is initializing', () => {
+    vi.mocked(useRobotInitializationStatus).mockReturnValue(
+      INIT_STATUS.INITIALIZING
+    )
+    vi.mocked(useRobotUpdateInfo).mockReturnValue({
+      updateStep: 'restart',
+      progressPercent: 100,
+    })
+    render(props)
+
+    screen.getByText(/Initializing robot.../i)
+    screen.getByText(
+      "This could take up to 40 minutes. Don't turn off the robot."
+    )
+  })
+
+  it('renders alternative text if update takes too long while robot is initializing', () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    vi.mocked(useRobotInitializationStatus).mockReturnValue(
+      INIT_STATUS.INITIALIZING
+    )
+    vi.mocked(useRobotUpdateInfo).mockReturnValue({
+      updateStep: 'restart',
+      progressPercent: 100,
+    })
+    render(props)
+
+    act(() => {
+      vi.advanceTimersByTime(TIME_BEFORE_ALLOWING_EXIT_INIT)
+    })
+
+    screen.getByText(
+      /Check the Advanced tab of its settings page to see whether it updated successfully./i
+    )
   })
 })

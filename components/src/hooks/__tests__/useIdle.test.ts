@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { useIdle } from '../useIdle'
 
@@ -14,7 +15,7 @@ const MOCK_OPTIONS = {
 
 describe('useIdle', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers({ shouldAdvanceTime: true })
   })
 
   it('should return the default initialState', () => {

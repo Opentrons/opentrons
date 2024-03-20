@@ -45,15 +45,30 @@ class NoTrashDefinedError(EnumeratedError):
         )
 
 
-def should_load_fixed_trash_for_python_protocol(api_version: APIVersion) -> bool:
+def should_load_fixed_trash_labware_for_python_protocol(
+    api_version: APIVersion,
+) -> bool:
+    """Whether to automatically load the fixed trash as a labware for a Python protocol at protocol start."""
     return api_version <= LOAD_FIXED_TRASH_GATE_VERSION_PYTHON
 
 
+def should_load_fixed_trash_area_for_python_protocol(
+    api_version: APIVersion, robot_type: RobotType
+) -> bool:
+    """Whether to automatically load the fixed trash addressable area for OT-2 protocols on 2.16 and above."""
+    return (
+        api_version > LOAD_FIXED_TRASH_GATE_VERSION_PYTHON
+        and robot_type == "OT-2 Standard"
+    )
+
+
 def should_load_fixed_trash(protocol_config: ProtocolConfig) -> bool:
-    """Decide whether to automatically load fixed trash on the deck based on version."""
+    """Decide whether to automatically load fixed trash labware on the deck based on version."""
     load_fixed_trash = False
     if isinstance(protocol_config, PythonProtocolConfig):
-        return should_load_fixed_trash_for_python_protocol(protocol_config.api_version)
+        return should_load_fixed_trash_labware_for_python_protocol(
+            protocol_config.api_version
+        )
     # TODO(jbl 2023-10-27), when schema v8 is out, use a new deck version field to support fixed trash protocols
     elif isinstance(protocol_config, JsonProtocolConfig):
         load_fixed_trash = (

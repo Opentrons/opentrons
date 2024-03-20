@@ -8,6 +8,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
+  BORDERS,
   Btn,
   COLORS,
   DIRECTION_COLUMN,
@@ -18,11 +19,13 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_HIDDEN,
+  OVERFLOW_WRAP_ANYWHERE,
+  OVERFLOW_WRAP_BREAK_WORD,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  WRAP,
   SPACING,
   TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 import {
   RUN_STATUS_FAILED,
@@ -32,7 +35,6 @@ import {
 import {
   useHost,
   useProtocolQuery,
-  useRunQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
@@ -58,7 +60,7 @@ import {
 } from '../../redux/analytics'
 import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
-import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { formatTimeWithUtcLabel, useNotifyRunQuery } from '../../resources/runs'
 import { handleTipsAttachedModal } from '../../organisms/DropTipWizard/TipsAttachedModal'
 import { getPipettesWithTipAttached } from '../../organisms/DropTipWizard/getPipettesWithTipAttached'
 import { getPipetteModelSpecs, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -77,7 +79,7 @@ export function RunSummary(): JSX.Element {
   const { t } = useTranslation('run_details')
   const history = useHistory()
   const host = useHost()
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const isRunCurrent = Boolean(runRecord?.data?.current)
   const mostRecentRunId = useMostRecentRunId()
   const { data: attachedInstruments } = useInstrumentsQuery()
@@ -105,16 +107,17 @@ export function RunSummary(): JSX.Element {
   const [showSplash, setShowSplash] = React.useState(
     runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED
   )
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
-  const { reset } = useRunControls(runId)
-  const trackEvent = useTrackEvent()
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
+  const { reset, isResetRunLoading } = useRunControls(runId)
+  const trackEvent = useTrackEvent()
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
     false
   )
+
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipettesWithTip[]
   >([])
@@ -140,6 +143,7 @@ export function RunSummary(): JSX.Element {
         mount,
         specs,
         FLEX_ROBOT_TYPE,
+        host,
         setPipettesWithTip
       ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
     } else {
@@ -155,16 +159,19 @@ export function RunSummary(): JSX.Element {
         mount,
         specs,
         FLEX_ROBOT_TYPE,
+        host,
         setPipettesWithTip
       ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
     } else {
-      setShowRunAgainSpinner(true)
-      reset()
-      trackEvent({
-        name: 'proceedToRun',
-        properties: { sourceLocation: 'RunSummary' },
-      })
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+      if (!isResetRunLoading) {
+        setShowRunAgainSpinner(true)
+        reset()
+        trackEvent({
+          name: 'proceedToRun',
+          properties: { sourceLocation: 'RunSummary' },
+        })
+        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+      }
     }
   }
 
@@ -362,7 +369,7 @@ const SplashBody = styled.h4`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 4;
   overflow: hidden;
-  overflow-wrap: break-word;
+  overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignCenter};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
@@ -386,6 +393,7 @@ const SplashFrame = styled(Flex)`
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing40};
+  border-radius: ${BORDERS.borderRadius8};
 `
 
 const ProtocolName = styled.h4`
@@ -398,7 +406,7 @@ const ProtocolName = styled.h4`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  overflow-wrap: anywhere;
+  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
   height: max-content;
 `
 
@@ -410,7 +418,7 @@ const SummaryDatum = styled.div`
   grid-gap: ${SPACING.spacing4};
   height: 44px;
   background: #d6d6d6;
-  border-radius: 4px;
+  border-radius: ${BORDERS.borderRadius4};
   color: ${COLORS.grey60};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};

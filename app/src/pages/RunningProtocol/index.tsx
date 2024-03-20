@@ -20,7 +20,6 @@ import {
 import {
   useAllCommandsQuery,
   useProtocolQuery,
-  useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 import {
@@ -30,7 +29,10 @@ import {
 
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyLastRunCommandKey } from '../../resources/runs/useNotifyLastRunCommandKey'
+import {
+  useNotifyLastRunCommandKey,
+  useNotifyRunQuery,
+} from '../../resources/runs'
 import { InterventionModal } from '../../organisms/InterventionModal'
 import { isInterventionCommand } from '../../organisms/InterventionModal/utils'
 import {
@@ -65,7 +67,7 @@ const Bullet = styled.div`
   border-radius: 50%;
   z-index: 2;
   background: ${(props: BulletProps) =>
-    props.isActive ? COLORS.grey50 : COLORS.grey50};
+    props.isActive ? COLORS.grey50 : COLORS.grey40};
   transform: ${(props: BulletProps) =>
     props.isActive ? 'scale(2)' : 'scale(1)'};
 `
@@ -101,7 +103,7 @@ export function RunningProtocol(): JSX.Element {
     refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
   })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
@@ -110,9 +112,9 @@ export function RunningProtocol(): JSX.Element {
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
   const { playRun, pauseRun } = useRunActionMutations(runId)
-  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const robotType = useRobotType(robotName)
   React.useEffect(() => {

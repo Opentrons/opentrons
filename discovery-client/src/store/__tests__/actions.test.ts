@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import * as Actions from '../actions'
 
 describe('discovery client action creators', () => {

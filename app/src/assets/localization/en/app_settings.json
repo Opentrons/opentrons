@@ -1,5 +1,7 @@
 {
   "__dev_internal__protocolStats": "Protocol Stats",
+  "__dev_internal__enableRunTimeParameters": "Enable Run Time Parameters",
+  "__dev_internal__enableRunNotes": "Display Notes During a Protocol Run",
   "add_folder_button": "Add labware source folder",
   "add_ip_button": "Add",
   "add_ip_error": "Enter an IP Address or Hostname",
@@ -112,6 +114,8 @@
   "usb_to_ethernet_adapter_no_driver_version": "Unknown",
   "usb_to_ethernet_adapter_toast_message": "An update is available for Realtek USB-to-Ethernet adapter driver",
   "usb_to_ethernet_not_connected": "No USB-to-Ethernet adapter connected",
+  "usb_to_ethernet_unknown_manufacturer": "Unknown Manufacturer",
+  "usb_to_ethernet_unknown_product": "Unknown Adapter",
   "versions_sync": "Learn more about keeping the Opentrons App and robot software in sync",
   "view_change_log": "View Opentrons technical change log",
   "view_issue_tracker": "View Opentrons issue tracker",

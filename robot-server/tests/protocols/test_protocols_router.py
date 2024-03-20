@@ -1,4 +1,5 @@
 """Tests for the /protocols router."""
+import io
 import pytest
 from datetime import datetime
 from decoy import Decoy, matchers
@@ -20,7 +21,7 @@ from opentrons.protocol_reader import (
     BufferedFile,
 )
 
-from robot_server.errors import ApiError
+from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols.analysis_store import AnalysisStore, AnalysisNotFoundError
@@ -309,6 +310,101 @@ async def test_get_protocol_not_found(
     assert exc_info.value.status_code == 404
 
 
+async def test_create_existing_protocol(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+    protocol_reader: ProtocolReader,
+    file_reader_writer: FileReaderWriter,
+    file_hasher: FileHasher,
+    protocol_analyzer: ProtocolAnalyzer,
+    task_runner: TaskRunner,
+    protocol_auto_deleter: ProtocolAutoDeleter,
+) -> None:
+    """It should return the existing protocol info from database."""
+    protocol_directory = Path("/dev/null")
+    content = bytes("some_content", encoding="utf-8")
+    uploaded_file = io.BytesIO(content)
+
+    protocol_file = UploadFile(filename="foo.json", file=uploaded_file)
+    buffered_file = BufferedFile(name="blah", contents=content, path=None)
+
+    protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/foo.json"),
+        files=[
+            ProtocolSourceFile(
+                path=Path("/dev/null/foo.json"),
+                role=ProtocolFileRole.MAIN,
+            )
+        ],
+        metadata={"this_is_fake_metadata": True},
+        robot_type="OT-2 Standard",
+        config=JsonProtocolConfig(schema_version=123),
+        content_hash="a_b_c",
+    )
+
+    stored_protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2020, month=1, day=1),
+        source=protocol_source,
+        protocol_key="dummy-key-222",
+    )
+
+    completed_analysis = AnalysisSummary(
+        id="analysis-id",
+        status=AnalysisStatus.COMPLETED,
+    )
+
+    decoy.when(
+        await file_reader_writer.read(
+            # TODO(mm, 2024-02-07): Recent FastAPI upgrades mean protocol_file.filename
+            # is typed as possibly None. Investigate whether that can actually happen in
+            # practice and whether we need to account for it.
+            files=[protocol_file]  # type: ignore[list-item]
+        )
+    ).then_return([buffered_file])
+
+    decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("a_b_c")
+    decoy.when(protocol_store.get_id_by_hash("a_b_c")).then_return("the-og-proto-id")
+    decoy.when(protocol_store.get(protocol_id="the-og-proto-id")).then_return(
+        stored_protocol_resource
+    )
+    decoy.when(
+        analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
+    ).then_return([completed_analysis])
+
+    result = await create_protocol(
+        files=[protocol_file],
+        key="dummy-key-111",
+        protocol_directory=protocol_directory,
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+        file_reader_writer=file_reader_writer,
+        protocol_reader=protocol_reader,
+        file_hasher=file_hasher,
+        protocol_analyzer=protocol_analyzer,
+        task_runner=task_runner,
+        protocol_auto_deleter=protocol_auto_deleter,
+        robot_type="OT-2 Standard",
+        protocol_id="protocol-id",
+        analysis_id="analysis-id",
+        created_at=datetime(year=2021, month=1, day=1),
+    )
+
+    assert result.content.data == Protocol(
+        id="the-og-proto-id",
+        createdAt=datetime(year=2020, month=1, day=1),
+        protocolType=ProtocolType.JSON,
+        metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
+        robotType="OT-2 Standard",
+        analysisSummaries=[completed_analysis],
+        files=[ProtocolFile(name="foo.json", role=ProtocolFileRole.MAIN)],
+        key="dummy-key-222",
+    )
+    assert result.status_code == 200
+
+
 async def test_create_protocol(
     decoy: Decoy,
     protocol_store: ProtocolStore,
@@ -322,11 +418,11 @@ async def test_create_protocol(
 ) -> None:
     """It should store an uploaded protocol file."""
     protocol_directory = Path("/dev/null")
+    content = bytes("some_content", encoding="utf-8")
+    uploaded_file = io.BytesIO(content)
 
-    protocol_file = UploadFile(filename="foo.json")
-    buffered_file = BufferedFile(
-        name="blah", contents=bytes("some_content", encoding="utf-8"), path=None
-    )
+    protocol_file = UploadFile(filename="foo.json", file=uploaded_file)
+    buffered_file = BufferedFile(name="blah", contents=content, path=None)
 
     protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -355,9 +451,14 @@ async def test_create_protocol(
         status=AnalysisStatus.PENDING,
     )
 
-    decoy.when(await file_reader_writer.read(files=[protocol_file])).then_return(
-        [buffered_file]
-    )
+    decoy.when(
+        await file_reader_writer.read(
+            # TODO(mm, 2024-02-07): Recent FastAPI upgrades mean protocol_file.filename
+            # is typed as possibly None. Investigate whether that can actually happen in
+            # practice and whether we need to account for it.
+            files=[protocol_file]  # type: ignore[list-item]
+        )
+    ).then_return([buffered_file])
 
     decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("abc123")
 
@@ -381,8 +482,8 @@ async def test_create_protocol(
         protocol_directory=protocol_directory,
         protocol_store=protocol_store,
         analysis_store=analysis_store,
-        protocol_reader=protocol_reader,
         file_reader_writer=file_reader_writer,
+        protocol_reader=protocol_reader,
         file_hasher=file_hasher,
         protocol_analyzer=protocol_analyzer,
         task_runner=task_runner,
@@ -412,6 +513,223 @@ async def test_create_protocol(
             protocol_analyzer.analyze,
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
+            run_time_param_values=None,
+        ),
+    )
+
+
+async def test_create_protocol_with_run_time_params(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+    protocol_reader: ProtocolReader,
+    file_reader_writer: FileReaderWriter,
+    file_hasher: FileHasher,
+    protocol_analyzer: ProtocolAnalyzer,
+    task_runner: TaskRunner,
+    protocol_auto_deleter: ProtocolAutoDeleter,
+) -> None:
+    """It should handle the run time parameter overrides correctly."""
+    protocol_directory = Path("/dev/null")
+    content = bytes("some_content", encoding="utf-8")
+    uploaded_file = io.BytesIO(content)
+
+    protocol_file = UploadFile(filename="foo.json", file=uploaded_file)
+    buffered_file = BufferedFile(name="blah", contents=content, path=None)
+
+    protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/foo.json"),
+        files=[
+            ProtocolSourceFile(
+                path=Path("/dev/null/foo.json"),
+                role=ProtocolFileRole.MAIN,
+            )
+        ],
+        metadata={"this_is_fake_metadata": True},
+        robot_type="OT-2 Standard",
+        config=JsonProtocolConfig(schema_version=123),
+        content_hash="a_b_c",
+    )
+
+    protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2021, month=1, day=1),
+        source=protocol_source,
+        protocol_key="dummy-key-111",
+    )
+
+    pending_analysis = AnalysisSummary(
+        id="analysis-id",
+        status=AnalysisStatus.PENDING,
+    )
+
+    decoy.when(
+        await file_reader_writer.read(
+            # TODO(mm, 2024-02-07): Recent FastAPI upgrades mean protocol_file.filename
+            # is typed as possibly None. Investigate whether that can actually happen in
+            # practice and whether we need to account for it.
+            files=[protocol_file]  # type: ignore[list-item]
+        )
+    ).then_return([buffered_file])
+
+    decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("abc123")
+
+    decoy.when(
+        await protocol_reader.save(
+            files=[buffered_file],
+            directory=protocol_directory / "protocol-id",
+            content_hash="abc123",
+        )
+    ).then_return(protocol_source)
+
+    decoy.when(
+        analysis_store.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+    ).then_return(pending_analysis)
+
+    decoy.when(protocol_store.get_all()).then_return([])
+
+    await create_protocol(
+        files=[protocol_file],
+        key="dummy-key-111",
+        run_time_parameter_values='{"vol": 123, "dry_run": true, "mount": "left"}',
+        protocol_directory=protocol_directory,
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+        file_reader_writer=file_reader_writer,
+        protocol_reader=protocol_reader,
+        file_hasher=file_hasher,
+        protocol_analyzer=protocol_analyzer,
+        task_runner=task_runner,
+        protocol_auto_deleter=protocol_auto_deleter,
+        robot_type="OT-2 Standard",
+        protocol_id="protocol-id",
+        analysis_id="analysis-id",
+        created_at=datetime(year=2021, month=1, day=1),
+    )
+
+    decoy.verify(
+        protocol_auto_deleter.make_room_for_new_protocol(),
+        protocol_store.insert(protocol_resource),
+        task_runner.run(
+            protocol_analyzer.analyze,
+            analysis_id="analysis-id",
+            protocol_resource=protocol_resource,
+            run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
+        ),
+    )
+
+
+async def test_create_existing_protocol_with_run_time_params(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+    protocol_reader: ProtocolReader,
+    file_reader_writer: FileReaderWriter,
+    file_hasher: FileHasher,
+    protocol_analyzer: ProtocolAnalyzer,
+    task_runner: TaskRunner,
+    protocol_auto_deleter: ProtocolAutoDeleter,
+) -> None:
+    """It should re-trigger analysis of the existing protocol resource."""
+    protocol_directory = Path("/dev/null")
+    content = bytes("some_content", encoding="utf-8")
+    uploaded_file = io.BytesIO(content)
+
+    protocol_file = UploadFile(filename="foo.json", file=uploaded_file)
+    buffered_file = BufferedFile(name="blah", contents=content, path=None)
+
+    protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/foo.json"),
+        files=[
+            ProtocolSourceFile(
+                path=Path("/dev/null/foo.json"),
+                role=ProtocolFileRole.MAIN,
+            )
+        ],
+        metadata={"this_is_fake_metadata": True},
+        robot_type="OT-2 Standard",
+        config=JsonProtocolConfig(schema_version=123),
+        content_hash="a_b_c",
+    )
+
+    stored_protocol_resource = ProtocolResource(
+        protocol_id="protocol-id",
+        created_at=datetime(year=2020, month=1, day=1),
+        source=protocol_source,
+        protocol_key="dummy-key-222",
+    )
+
+    analysis_summaries = [
+        AnalysisSummary(
+            id="analysis-id",
+            status=AnalysisStatus.COMPLETED,
+        ),
+        AnalysisSummary(
+            id="analysis-id",
+            status=AnalysisStatus.PENDING,
+        ),
+    ]
+
+    decoy.when(
+        await file_reader_writer.read(
+            # TODO(mm, 2024-02-07): Recent FastAPI upgrades mean protocol_file.filename
+            # is typed as possibly None. Investigate whether that can actually happen in
+            # practice and whether we need to account for it.
+            files=[protocol_file]  # type: ignore[list-item]
+        )
+    ).then_return([buffered_file])
+
+    decoy.when(await file_hasher.hash(files=[buffered_file])).then_return("a_b_c")
+    decoy.when(protocol_store.get_id_by_hash("a_b_c")).then_return("the-og-proto-id")
+    decoy.when(protocol_store.get(protocol_id="the-og-proto-id")).then_return(
+        stored_protocol_resource
+    )
+    decoy.when(
+        analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
+    ).then_return(analysis_summaries)
+
+    result = await create_protocol(
+        files=[protocol_file],
+        key="dummy-key-111",
+        run_time_parameter_values='{"vol": 123, "dry_run": true, "mount": "left"}',
+        protocol_directory=protocol_directory,
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+        file_reader_writer=file_reader_writer,
+        protocol_reader=protocol_reader,
+        file_hasher=file_hasher,
+        protocol_analyzer=protocol_analyzer,
+        task_runner=task_runner,
+        protocol_auto_deleter=protocol_auto_deleter,
+        robot_type="OT-2 Standard",
+        protocol_id="protocol-id",
+        analysis_id="analysis-id",
+        created_at=datetime(year=2021, month=1, day=1),
+    )
+
+    assert result.content.data == Protocol(
+        id="the-og-proto-id",
+        createdAt=datetime(year=2020, month=1, day=1),
+        protocolType=ProtocolType.JSON,
+        metadata=Metadata(this_is_fake_metadata=True),  # type: ignore[call-arg]
+        robotType="OT-2 Standard",
+        analysisSummaries=analysis_summaries,
+        files=[ProtocolFile(name="foo.json", role=ProtocolFileRole.MAIN)],
+        key="dummy-key-222",
+    )
+    assert result.status_code == 200
+    decoy.verify(
+        task_runner.run(
+            protocol_analyzer.analyze,
+            analysis_id="analysis-id",
+            protocol_resource=stored_protocol_resource,
+            run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
+        ),
+        analysis_store.add_pending(
+            protocol_id="the-og-proto-id",
+            analysis_id="analysis-id",
         ),
     )
 
@@ -441,11 +759,11 @@ async def test_create_protocol_not_readable(
         await create_protocol(
             files=[],
             protocol_directory=Path("/dev/null"),
-            protocol_reader=protocol_reader,
             protocol_store=protocol_store,
-            protocol_id="protocol-id",
             file_reader_writer=file_reader_writer,
+            protocol_reader=protocol_reader,
             file_hasher=file_hasher,
+            protocol_id="protocol-id",
         )
 
     assert exc_info.value.status_code == 422
@@ -493,9 +811,9 @@ async def test_create_protocol_different_robot_type(
         await create_protocol(
             files=[],
             protocol_directory=Path("/dev/null"),
-            protocol_reader=protocol_reader,
             protocol_store=protocol_store,
             file_reader_writer=file_reader_writer,
+            protocol_reader=protocol_reader,
             file_hasher=file_hasher,
             protocol_id="protocol-id",
         )

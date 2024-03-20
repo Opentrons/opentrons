@@ -1,3 +1,4 @@
+import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { getLabwareDisplayName, ModuleModel } from '@opentrons/shared-data'
 import { getLocationInfoNames } from '../getLocationInfoNames'
 
@@ -118,14 +119,11 @@ const MOCK_ADAPTER_COMMANDS = [
   },
 ]
 
-jest.mock('@opentrons/shared-data')
-const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
-  typeof getLabwareDisplayName
->
+vi.mock('@opentrons/shared-data')
 
 describe('getLocationInfoNames', () => {
   beforeEach(() => {
-    mockGetLabwareDisplayName.mockReturnValue(LABWARE_DISPLAY_NAME)
+    vi.mocked(getLabwareDisplayName).mockReturnValue(LABWARE_DISPLAY_NAME)
   })
   it('returns labware name and slot number for labware id on the deck', () => {
     const expected = {

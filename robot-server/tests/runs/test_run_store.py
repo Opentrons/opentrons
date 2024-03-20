@@ -3,7 +3,9 @@ from datetime import datetime, timezone
 from typing import List, Optional, Type
 
 import pytest
+from decoy import Decoy
 from sqlalchemy.engine import Engine
+from unittest import mock
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -15,6 +17,7 @@ from robot_server.runs.run_store import (
 )
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
+from robot_server.service.notifications import RunsPublisher
 
 from opentrons.protocol_engine import (
     commands as pe_commands,
@@ -28,10 +31,22 @@ from opentrons.protocol_engine import (
 from opentrons.types import MountType, DeckSlotName
 
 
+@pytest.fixture()
+def mock_runs_publisher(decoy: Decoy) -> RunsPublisher:
+    """Get a mock RunsPublisher."""
+    return decoy.mock(cls=RunsPublisher)
+
+
 @pytest.fixture
-def subject(sql_engine: Engine) -> RunStore:
+def subject(
+    sql_engine: Engine,
+    mock_runs_publisher: RunsPublisher,
+) -> RunStore:
     """Get a ProtocolStore test subject."""
-    return RunStore(sql_engine=sql_engine)
+    return RunStore(
+        sql_engine=sql_engine,
+        runs_publisher=mock_runs_publisher,
+    )
 
 
 @pytest.fixture
@@ -148,6 +163,7 @@ def test_update_run_state(
     subject: RunStore,
     state_summary: StateSummary,
     protocol_commands: List[pe_commands.Command],
+    mock_runs_publisher: mock.Mock,
 ) -> None:
     """It should be able to update a run state to the store."""
     action = RunAction(
@@ -183,6 +199,9 @@ def test_update_run_state(
     )
     assert run_summary_result == state_summary
     assert commands_result.commands == protocol_commands
+    mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
+        run_id="run-id"
+    )
 
 
 def test_update_state_run_not_found(
@@ -358,7 +377,7 @@ def test_get_all_runs(
     assert result == expected_result
 
 
-def test_remove_run(subject: RunStore) -> None:
+def test_remove_run(subject: RunStore, mock_runs_publisher: mock.Mock) -> None:
     """It can remove a previously stored run entry."""
     action = RunAction(
         actionType=RunActionType.PLAY,
@@ -375,6 +394,9 @@ def test_remove_run(subject: RunStore) -> None:
     subject.remove(run_id="run-id")
 
     assert subject.get_all(length=20) == []
+    mock_runs_publisher.publish_runs_advise_unsubscribe.assert_called_once_with(
+        run_id="run-id"
+    )
 
 
 def test_remove_run_missing_id(subject: RunStore) -> None:
@@ -395,7 +417,9 @@ def test_insert_actions_no_run(subject: RunStore) -> None:
         subject.insert_action(run_id="run-id-996", action=action)
 
 
-def test_get_state_summary(subject: RunStore, state_summary: StateSummary) -> None:
+def test_get_state_summary(
+    subject: RunStore, state_summary: StateSummary, mock_runs_publisher: mock.Mock
+) -> None:
     """It should be able to get store run data."""
     subject.insert(
         run_id="run-id",
@@ -405,6 +429,9 @@ def test_get_state_summary(subject: RunStore, state_summary: StateSummary) -> No
     subject.update_run_state(run_id="run-id", summary=state_summary, commands=[])
     result = subject.get_state_summary(run_id="run-id")
     assert result == state_summary
+    mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
+        run_id="run-id"
+    )
 
 
 def test_get_state_summary_failure(

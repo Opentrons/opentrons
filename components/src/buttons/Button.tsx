@@ -3,7 +3,7 @@ import cx from 'classnames'
 import omit from 'lodash/omit'
 
 import { Icon } from '../icons'
-import styles from './buttons.css'
+import styles from './buttons.module.css'
 
 import {
   BUTTON_TYPE_SUBMIT,

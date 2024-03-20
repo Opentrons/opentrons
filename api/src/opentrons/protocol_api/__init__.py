@@ -22,14 +22,15 @@ from .module_contexts import (
     HeaterShakerContext,
     MagneticBlockContext,
 )
+from .disposal_locations import TrashBin, WasteChute
 from ._liquid import Liquid
 from ._types import OFF_DECK
-from ._trash_bin import TrashBin
-from ._waste_chute import WasteChute
 from ._nozzle_layout import (
     COLUMN,
     ALL,
 )
+from ._parameters import Parameters
+from ._parameter_context import ParameterContext
 
 from .create_protocol_context import (
     create_protocol_context,
@@ -49,11 +50,13 @@ __all__ = [
     "ThermocyclerContext",
     "HeaterShakerContext",
     "MagneticBlockContext",
+    "ParameterContext",
     "Labware",
     "TrashBin",
     "WasteChute",
     "Well",
     "Liquid",
+    "Parameters",
     "COLUMN",
     "ALL",
     "OFF_DECK",

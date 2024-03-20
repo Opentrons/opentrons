@@ -6,18 +6,30 @@ export interface Remote {
   ipcRenderer: {
     invoke: (channel: string, ...args: unknown[]) => Promise<any>
     send: (channel: string, ...args: unknown[]) => void
-    on: (
-      channel: string,
-      listener: (
-        event: IpcMainEvent,
-        hostname: string,
-        topic: NotifyTopic,
-        message: string | Object,
-        ...args: unknown[]
-      ) => void
-    ) => void
+    on: (channel: string, listener: IpcListener) => void
+    off: (channel: string, listener: IpcListener) => void
   }
 }
+
+export type IpcListener = (
+  event: IpcMainEvent,
+  hostname: string,
+  topic: NotifyTopic,
+  message: NotifyResponseData | NotifyNetworkError,
+  ...args: unknown[]
+) => void
+
+export interface NotifyRefetchData {
+  refetchUsingHTTP: boolean
+}
+
+export interface NotifyUnsubscribeData {
+  unsubscribe: boolean
+}
+
+export type NotifyBrokerResponses = NotifyRefetchData | NotifyUnsubscribeData
+export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
+export type NotifyResponseData = NotifyBrokerResponses | NotifyNetworkError
 
 interface File {
   sha512: string
@@ -124,8 +136,11 @@ export interface RobotMassStorageDeviceRemoved {
 }
 
 export type NotifyTopic =
-  | 'robot-server/maintenance_runs'
+  | 'ALL_TOPICS'
+  | 'robot-server/maintenance_runs/current_run'
   | 'robot-server/runs/current_command'
+  | 'robot-server/runs'
+  | `robot-server/runs/${string}`
 
 export type NotifyAction = 'subscribe' | 'unsubscribe'
 

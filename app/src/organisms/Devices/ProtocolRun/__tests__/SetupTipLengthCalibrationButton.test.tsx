@@ -1,9 +1,11 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import { screen, fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
 
+import { fixtureTiprack300ul } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtures'
@@ -13,24 +15,14 @@ import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationBut
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-jest.mock('@opentrons/components/src/hooks')
-jest.mock('../../../../organisms/RunTimeControl/hooks')
-jest.mock(
+vi.mock('@opentrons/components/src/hooks')
+vi.mock('../../../../organisms/RunTimeControl/hooks')
+vi.mock(
   '../../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 )
-jest.mock('../../../../redux/config')
-jest.mock('../../../../redux/sessions/selectors')
-jest.mock('../../hooks')
-
-const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
-  typeof useRunHasStarted
->
-const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
-  typeof useDeckCalibrationData
->
-const mockUseDashboardCalibrateTipLength = useDashboardCalibrateTipLength as jest.MockedFunction<
-  typeof useDashboardCalibrateTipLength
->
+vi.mock('../../../../redux/config')
+vi.mock('../../../../redux/sessions/selectors')
+vi.mock('../../hooks')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -42,7 +34,7 @@ describe('SetupTipLengthCalibrationButton', () => {
     robotName = ROBOT_NAME,
     runId = RUN_ID,
     hasCalibrated = false,
-    tipRackDefinition = fixture_tiprack_300_ul as LabwareDefinition2,
+    tipRackDefinition = fixtureTiprack300ul as LabwareDefinition2,
     isExtendedPipOffset = false,
   }: Partial<
     React.ComponentProps<typeof SetupTipLengthCalibrationButton>
@@ -64,20 +56,19 @@ describe('SetupTipLengthCalibrationButton', () => {
   }
 
   beforeEach(() => {
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
-    when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+    when(vi.mocked(useDeckCalibrationData)).calledWith(ROBOT_NAME).thenReturn({
       deckCalibrationData: mockDeckCalData,
       isDeckCalibrated: true,
     })
-    mockUseDashboardCalibrateTipLength.mockReturnValue([
+    vi.mocked(useDashboardCalibrateTipLength).mockReturnValue([
       mockTipLengthCalLauncher,
       null,
     ])
   })
 
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders the calibrate now button if tip length not calibrated', () => {
@@ -105,7 +96,7 @@ describe('SetupTipLengthCalibrationButton', () => {
   })
 
   it('disables the recalibrate link if tip length calibrated and run started', () => {
-    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
     render({ hasCalibrated: true })
     const recalibrate = screen.getByText('Recalibrate')
     fireEvent.click(recalibrate)

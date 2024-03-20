@@ -8,7 +8,7 @@ import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { maskField } from '../../../steplist/fieldLevel'
 import { TextField, RadioGroupField } from '../fields'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 import { StepFormProps } from '../types'
 
@@ -59,7 +59,9 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
             {...propsForFields.magnetAction}
             options={[
               {
-                name: t('step_edit_form.field.magnetAction.options.engage'),
+                name: t(
+                  'form:step_edit_form.field.magnetAction.options.engage'
+                ),
                 value: 'engage',
               },
             ]}
@@ -68,7 +70,9 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
             {...propsForFields.magnetAction}
             options={[
               {
-                name: t('step_edit_form.field.magnetAction.options.disengage'),
+                name: t(
+                  'form:step_edit_form.field.magnetAction.options.disengage'
+                ),
                 value: 'disengage',
               },
             ]}
@@ -76,7 +80,7 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
         </FormGroup>
         {magnetAction === 'engage' && (
           <FormGroup
-            label={t('step_edit_form.field.engageHeight.label')}
+            label={t('form:step_edit_form.field.engageHeight.label')}
             className={styles.magnet_form_group}
           >
             <TextField

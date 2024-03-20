@@ -1,20 +1,18 @@
 import * as React from 'react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { UploadInput } from '..'
+import { renderWithProviders } from '../../../__testing-utils__'
 
 describe('UploadInput', () => {
-  let onUpload: jest.MockedFunction<() => {}>
+  let onUpload: any
 
   beforeEach(() => {
-    onUpload = jest.fn()
+    onUpload = vi.fn()
   })
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders correct contents for empty state', () => {
     renderWithProviders(
       <BrowserRouter>
@@ -39,7 +37,7 @@ describe('UploadInput', () => {
     )
     const button = screen.getByRole('button', { name: 'Upload' })
     const input = screen.getByTestId('file_input')
-    input.click = jest.fn()
+    input.click = vi.fn()
     fireEvent.click(button)
     expect(input.click).toHaveBeenCalled()
   })

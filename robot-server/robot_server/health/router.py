@@ -11,7 +11,9 @@ from opentrons.hardware_control import HardwareControlAPI
 from server_utils.util import call_once
 
 from robot_server.hardware import get_hardware, get_robot_type
-from robot_server.persistence import get_sql_engine as ensure_sql_engine_is_ready
+from robot_server.persistence.fastapi_dependencies import (
+    get_sql_engine as ensure_sql_engine_is_ready,
+)
 from robot_server.service.legacy.models import V1BasicResponse
 
 from opentrons_shared_data.robot.dev_types import RobotType

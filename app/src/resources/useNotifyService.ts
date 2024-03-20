@@ -1,8 +1,6 @@
 import * as React from 'react'
-import inRange from 'lodash/inRange'
 
 import { useDispatch } from 'react-redux'
-import { useQuery, useQueryClient } from 'react-query'
 
 import { useHost } from '@opentrons/react-api-client'
 
@@ -12,118 +10,87 @@ import {
   useTrackEvent,
   ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
 } from '../redux/analytics'
+import { useIsFlex } from '../organisms/Devices/hooks/useIsFlex'
 
-import type { UseQueryResult, UseQueryOptions, QueryKey } from 'react-query'
-import type { NotifyTopic } from '../redux/shell/types'
+import type { UseQueryOptions } from 'react-query'
+import type { HostConfig } from '@opentrons/api-client'
+import type { NotifyTopic, NotifyResponseData } from '../redux/shell/types'
 
-export interface QueryOptionsWithPolling<TData, Error>
-  extends UseQueryOptions<TData, Error> {
+export type HTTPRefetchFrequency = 'once' | 'always' | null
+
+export interface QueryOptionsWithPolling<TData, TError = Error>
+  extends UseQueryOptions<TData, TError> {
   forceHttpPolling?: boolean
 }
 
-type DataWithStatusCode<TData> = TData & { statusCode: number }
-
-interface NotifyRefetchData {
-  refetchUsingHTTP: boolean
-  statusCode: never
-}
-
-export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
-
-type NotifyResponseData<TData> =
-  | DataWithStatusCode<TData>
-  | NotifyRefetchData
-  | NotifyNetworkError
-
-interface UseNotifyServiceProps<TData, Error> {
+interface UseNotifyServiceProps<TData, TError = Error> {
   topic: NotifyTopic
-  queryKey: QueryKey
-  refetchUsingHTTP: () => void
-  options: QueryOptionsWithPolling<TData, Error>
+  setRefetchUsingHTTP: (refetch: HTTPRefetchFrequency) => void
+  options: QueryOptionsWithPolling<TData, TError>
+  hostOverride?: HostConfig | null
 }
 
-interface UseNotifyServiceReturn<TData> {
-  notifyQueryResponse: UseQueryResult<TData>
-  isNotifyError: boolean
-}
-
-export function useNotifyService<TData>({
+export function useNotifyService<TData, TError = Error>({
   topic,
-  queryKey,
-  refetchUsingHTTP,
+  setRefetchUsingHTTP,
   options,
-}: UseNotifyServiceProps<TData, Error>): UseNotifyServiceReturn<TData> {
+  hostOverride,
+}: UseNotifyServiceProps<TData, TError>): void {
   const dispatch = useDispatch()
-  const host = useHost()
-  const queryClient = useQueryClient()
-  const isNotifyError = React.useRef(false)
+  const hostFromProvider = useHost()
+  const host = hostOverride ?? hostFromProvider
+  const hostname = host?.hostname ?? null
   const doTrackEvent = useTrackEvent()
-  const { enabled, refetchInterval, forceHttpPolling } = options
-  const isRefetchEnabled =
-    refetchInterval !== undefined && refetchInterval !== false
+  const isFlex = useIsFlex(host?.robotName ?? '')
+  const hasUsedNotifyService = React.useRef(false)
+  const { enabled, staleTime, forceHttpPolling } = options
+
+  const shouldUseNotifications =
+    !forceHttpPolling &&
+    enabled !== false &&
+    hostname != null &&
+    staleTime !== Infinity
 
   React.useEffect(() => {
-    if (!forceHttpPolling && isRefetchEnabled) {
-      const hostname = host?.hostname ?? null
-      const eventEmitter = appShellListener(hostname, topic)
+    if (shouldUseNotifications) {
+      // Always fetch on initial mount.
+      setRefetchUsingHTTP('once')
+      appShellListener({
+        hostname,
+        topic,
+        callback: onDataEvent,
+      })
+      dispatch(notifySubscribeAction(hostname, topic))
+      hasUsedNotifyService.current = true
+    } else setRefetchUsingHTTP('always')
 
-      eventEmitter.on('data', onDataListener)
-
-      if (hostname != null) {
-        dispatch(notifySubscribeAction(hostname, topic))
-      } else {
-        console.error('NotifyService expected hostname, received null.')
-      }
-
-      return () => {
-        eventEmitter.off('data', onDataListener)
+    return () => {
+      if (hasUsedNotifyService.current) {
         if (hostname != null) {
           dispatch(notifyUnsubscribeAction(hostname, topic))
         }
+        appShellListener({
+          hostname: hostname as string,
+          topic,
+          callback: onDataEvent,
+          isDismounting: true,
+        })
       }
     }
-  }, [])
+  }, [topic, host, shouldUseNotifications])
 
-  const query = useQuery(
-    queryKey,
-    () => queryClient.getQueryData(queryKey) as TData,
-    {
-      ...options,
-      staleTime: Infinity,
-      refetchInterval: false,
-      onError: () => null,
-      enabled: enabled && isRefetchEnabled,
-    }
-  )
-
-  return { notifyQueryResponse: query, isNotifyError: isNotifyError.current }
-
-  function onDataListener(data: NotifyResponseData<TData>): void {
-    if (!isNotifyError.current) {
-      if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
-        isNotifyError.current = true
-        if (data === 'ECONNREFUSED') {
-          doTrackEvent({
-            name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
-            properties: {},
-          })
-        }
-      } else if ('refetchUsingHTTP' in data) {
-        refetchUsingHTTP()
-      } else {
-        // Emulate React Query's implict onError behavior when passed an error status code.
-        if (options.onError != null && inRange(data.statusCode, 400, 600)) {
-          const err = new Error(
-            `NotifyService received status code: ${data.statusCode}`
-          )
-          console.error(err)
-          options.onError(err)
-        }
-        // Prefer setQueryData() and manual callback invocation within onDataListener
-        // as opposed to invalidateQueries() and manual callback invocation/cache logic
-        // within the query function. The former is signficantly more performant: ~25ms vs ~1.5s.
-        else queryClient.setQueryData(queryKey, data)
+  function onDataEvent(data: NotifyResponseData): void {
+    if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
+      setRefetchUsingHTTP('always')
+      // TODO(jh 2023-02-23): remove the robot type check once OT-2s support MQTT.
+      if (data === 'ECONNREFUSED' && isFlex) {
+        doTrackEvent({
+          name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
+          properties: {},
+        })
       }
+    } else if ('refetchUsingHTTP' in data || 'unsubscribe' in data) {
+      setRefetchUsingHTTP('once')
     }
   }
 }

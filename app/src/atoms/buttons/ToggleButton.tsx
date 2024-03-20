@@ -9,7 +9,7 @@ const TOGGLE_DISABLED_STYLES = css`
   color: ${COLORS.grey50};
 
   &:hover {
-    color: ${COLORS.grey60};
+    color: ${COLORS.grey55};
   }
 
   &:focus-visible {
@@ -17,7 +17,7 @@ const TOGGLE_DISABLED_STYLES = css`
   }
 
   &:disabled {
-    color: ${COLORS.grey40};
+    color: ${COLORS.grey30};
   }
 `
 
@@ -33,7 +33,7 @@ const TOGGLE_ENABLED_STYLES = css`
   }
 
   &:disabled {
-    color: ${COLORS.grey40};
+    color: ${COLORS.grey30};
   }
 `
 

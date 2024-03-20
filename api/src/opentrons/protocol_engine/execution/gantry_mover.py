@@ -75,6 +75,11 @@ class GantryMover(TypingProtocol):
 
     async def retract_axis(self, axis: MotorAxis) -> None:
         """Retract the specified axis to its home position."""
+        ...
+
+    async def prepare_for_mount_movement(self, mount: Mount) -> None:
+        """Retract the 'idle' mount if necessary."""
+        ...
 
 
 class HardwareGantryMover(GantryMover):
@@ -211,6 +216,10 @@ class HardwareGantryMover(GantryMover):
             )
         await self._hardware_api.retract_axis(axis=hardware_axis)
 
+    async def prepare_for_mount_movement(self, mount: Mount) -> None:
+        """Retract the 'idle' mount if necessary."""
+        await self._hardware_api.prepare_for_mount_movement(mount)
+
 
 class VirtualGantryMover(GantryMover):
     """State store based gantry movement handler for simulation/analysis."""
@@ -284,6 +293,10 @@ class VirtualGantryMover(GantryMover):
 
     async def retract_axis(self, axis: MotorAxis) -> None:
         """Retract the specified axis. No-op in virtual implementation."""
+        pass
+
+    async def prepare_for_mount_movement(self, mount: Mount) -> None:
+        """Retract the 'idle' mount if necessary."""
         pass
 
 

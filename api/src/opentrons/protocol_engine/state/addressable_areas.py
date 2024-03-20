@@ -3,7 +3,11 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Union
 
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
+from opentrons_shared_data.deck.dev_types import (
+    DeckDefinitionV4,
+    SlotDefV3,
+    CutoutFixture,
+)
 
 from opentrons.types import Point, DeckSlotName
 
@@ -20,6 +24,7 @@ from ..errors import (
     AreaNotInDeckConfigurationError,
     SlotDoesNotExistError,
     AddressableAreaDoesNotExistError,
+    CutoutDoesNotExistError,
 )
 from ..resources import deck_configuration_provider
 from ..types import (
@@ -28,6 +33,7 @@ from ..types import (
     AddressableArea,
     PotentialCutoutFixture,
     DeckConfigurationType,
+    Dimensions,
 )
 from ..actions import Action, UpdateCommandAction, PlayAction, AddAddressableAreaAction
 from .config import Config
@@ -137,6 +143,9 @@ CUTOUT_TO_DECK_SLOT_MAP: Dict[str, DeckSlotName] = {
     "cutoutD1": DeckSlotName.SLOT_D1,
     "cutoutD2": DeckSlotName.SLOT_D2,
     "cutoutD3": DeckSlotName.SLOT_D3,
+}
+DECK_SLOT_TO_CUTOUT_MAP = {
+    deck_slot: cutout for cutout, deck_slot in CUTOUT_TO_DECK_SLOT_MAP.items()
 }
 
 
@@ -321,7 +330,10 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         if not self._state.use_simulated_deck_config:
             return self._get_loaded_addressable_area(addressable_area_name)
         else:
-            return self._get_addressable_area_from_deck_data(addressable_area_name)
+            return self._get_addressable_area_from_deck_data(
+                addressable_area_name=addressable_area_name,
+                do_compatibility_check=True,
+            )
 
     def get_all(self) -> List[str]:
         """Get a list of all loaded addressable area names."""
@@ -381,7 +393,9 @@ class AddressableAreaView(HasState[AddressableAreaState]):
                 )
 
     def _get_addressable_area_from_deck_data(
-        self, addressable_area_name: str
+        self,
+        addressable_area_name: str,
+        do_compatibility_check: bool,
     ) -> AddressableArea:
         """Get an addressable area that may not have been already loaded for a simulated run.
 
@@ -399,9 +413,10 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             addressable_area_name, self._state.deck_definition
         )
 
-        self._check_if_area_is_compatible_with_potential_fixtures(
-            addressable_area_name, cutout_id, potential_fixtures
-        )
+        if do_compatibility_check:
+            self._check_if_area_is_compatible_with_potential_fixtures(
+                addressable_area_name, cutout_id, potential_fixtures
+            )
 
         cutout_position = deck_configuration_provider.get_cutout_position(
             cutout_id, self._state.deck_definition
@@ -421,7 +436,11 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         addressable_area = self.get_addressable_area(addressable_area_name)
         return addressable_area.base_slot
 
-    def get_addressable_area_position(self, addressable_area_name: str) -> Point:
+    def get_addressable_area_position(
+        self,
+        addressable_area_name: str,
+        do_compatibility_check: bool = True,
+    ) -> Point:
         """Get the position of an addressable area.
 
         This does not require the addressable area to be in the deck configuration.
@@ -433,10 +452,28 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         areas that have been pre-validated, otherwise there could be the risk of collision.
         """
         addressable_area = self._get_addressable_area_from_deck_data(
-            addressable_area_name
+            addressable_area_name=addressable_area_name,
+            do_compatibility_check=do_compatibility_check,
         )
         position = addressable_area.position
         return Point(x=position.x, y=position.y, z=position.z)
+
+    def get_addressable_area_bounding_box(
+        self,
+        addressable_area_name: str,
+        do_compatibility_check: bool = True,
+    ) -> Dimensions:
+        """Get the bounding box of an addressable area.
+
+        This does not require the addressable area to be in the deck configuration.
+        For movement purposes, this should only be called for
+        areas that have been pre-validated, otherwise there could be the risk of collision.
+        """
+        addressable_area = self._get_addressable_area_from_deck_data(
+            addressable_area_name=addressable_area_name,
+            do_compatibility_check=do_compatibility_check,
+        )
+        return addressable_area.bounding_box
 
     def get_addressable_area_move_to_location(
         self, addressable_area_name: str
@@ -462,6 +499,32 @@ class AddressableAreaView(HasState[AddressableAreaState]):
             z=position.z,
         )
 
+    def get_fixture_by_deck_slot_name(
+        self, slot_name: DeckSlotName
+    ) -> Optional[CutoutFixture]:
+        """Get the Cutout Fixture currently loaded where a specific Deck Slot would be."""
+        deck_config = self.state.deck_configuration
+        if deck_config:
+            slot_cutout_id = DECK_SLOT_TO_CUTOUT_MAP[slot_name]
+            slot_cutout_fixture = None
+            # This will only ever be one under current assumptions
+            for cutout_id, cutout_fixture_id in deck_config:
+                if cutout_id == slot_cutout_id:
+                    slot_cutout_fixture = (
+                        deck_configuration_provider.get_cutout_fixture(
+                            cutout_fixture_id, self.state.deck_definition
+                        )
+                    )
+                    return slot_cutout_fixture
+            if slot_cutout_fixture is None:
+                # If this happens, it's a bug. Either DECK_SLOT_TO_CUTOUT_MAP
+                # is missing an entry for the slot, or the deck configuration is missing
+                # an entry for the cutout.
+                raise CutoutDoesNotExistError(
+                    f"No Cutout was found in the Deck that matched provided slot {slot_name}."
+                )
+        return None
+
     def get_fixture_height(self, cutout_fixture_name: str) -> float:
         """Get the z height of a cutout fixture."""
         cutout_fixture = deck_configuration_provider.get_cutout_fixture(
@@ -475,7 +538,10 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         This does not require that the slot exist in deck configuration.
         """
         try:
-            addressable_area = self._get_addressable_area_from_deck_data(slot_id)
+            addressable_area = self._get_addressable_area_from_deck_data(
+                addressable_area_name=slot_id,
+                do_compatibility_check=True,  # From the description of get_slot_definition, this might have to be False.
+            )
         except AddressableAreaDoesNotExistError:
             raise SlotDoesNotExistError(
                 f"Slot ID {slot_id} does not exist in deck {self._state.deck_definition['otId']}"

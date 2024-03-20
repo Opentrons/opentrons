@@ -4,13 +4,14 @@ from collections import OrderedDict
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Mapping, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
 
 from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorState
+from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 
 from ..actions import (
     Action,
@@ -152,6 +153,9 @@ class CommandState:
     are stored on the individual commands themselves.
     """
 
+    failed_command: Optional[CommandEntry]
+    """The command, if any, that made the run fail and the index in the command list."""
+
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
 
@@ -189,6 +193,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             commands_by_id=OrderedDict(),
             run_error=None,
             finish_error=None,
+            failed_command=None,
             run_completed_at=None,
             run_started_at=None,
             latest_command_hash=None,
@@ -197,8 +202,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:  # noqa: C901
         """Modify state in reaction to an action."""
-        errors_by_id: Mapping[str, ErrorOccurrence]
-
         if isinstance(action, QueueCommandAction):
             assert action.command_id not in self._state.commands_by_id
 
@@ -269,43 +272,29 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 error=action.error,
             )
             prev_entry = self._state.commands_by_id[action.command_id]
-            self._state.commands_by_id[action.command_id] = CommandEntry(
-                index=prev_entry.index,
-                # TODO(mc, 2022-06-06): add new "cancelled" status or similar
-                # and don't set `completedAt` in commands other than the
-                # specific one that failed
-                command=prev_entry.command.copy(
-                    update={
-                        "error": error_occurrence,
-                        "completedAt": action.failed_at,
-                        "status": CommandStatus.FAILED,
-                    }
-                ),
+            # TODO(mc, 2022-06-06): add new "cancelled" status or similar
+            self._update_to_failed(
+                command_id=action.command_id,
+                failed_at=action.failed_at,
+                error_occurrence=error_occurrence,
             )
 
+            self._state.failed_command = self._state.commands_by_id[action.command_id]
+
             if prev_entry.command.intent == CommandIntent.SETUP:
-                other_command_ids_to_fail = [
-                    *[i for i in self._state.queued_setup_command_ids],
-                ]
+                other_command_ids_to_fail = self._state.queued_setup_command_ids
+                for id in other_command_ids_to_fail:
+                    self._update_to_failed(
+                        command_id=id, failed_at=action.failed_at, error_occurrence=None
+                    )
                 self._state.queued_setup_command_ids.clear()
             else:
-                other_command_ids_to_fail = [
-                    *[i for i in self._state.queued_command_ids],
-                ]
+                other_command_ids_to_fail = self._state.queued_command_ids
+                for id in other_command_ids_to_fail:
+                    self._update_to_failed(
+                        command_id=id, failed_at=action.failed_at, error_occurrence=None
+                    )
                 self._state.queued_command_ids.clear()
-
-            for command_id in other_command_ids_to_fail:
-                prev_entry = self._state.commands_by_id[command_id]
-
-                self._state.commands_by_id[command_id] = CommandEntry(
-                    index=prev_entry.index,
-                    command=prev_entry.command.copy(
-                        update={
-                            "completedAt": action.failed_at,
-                            "status": CommandStatus.FAILED,
-                        }
-                    ),
-                )
 
             if self._state.running_command_id == action.command_id:
                 self._state.running_command_id = None
@@ -374,6 +363,24 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         self._state.queue_status = QueueStatus.PAUSED
                 elif action.door_state == DoorState.CLOSED:
                     self._state.is_door_blocking = False
+
+    def _update_to_failed(
+        self,
+        command_id: str,
+        failed_at: datetime,
+        error_occurrence: Optional[ErrorOccurrence],
+    ) -> None:
+        prev_entry = self._state.commands_by_id[command_id]
+        updated_command = prev_entry.command.copy(
+            update={
+                "completedAt": failed_at,
+                "status": CommandStatus.FAILED,
+                **({"error": error_occurrence} if error_occurrence else {}),
+            }
+        )
+        self._state.commands_by_id[command_id] = CommandEntry(
+            index=prev_entry.index, command=updated_command
+        )
 
     @staticmethod
     def _map_run_exception_to_error_occurrence(
@@ -466,6 +473,12 @@ class CommandView(HasState[CommandState]):
                 cursor = commands_by_id[running_command_id].index
             elif len(queued_command_ids) > 0:
                 cursor = commands_by_id[queued_command_ids.head()].index - 1
+            elif (
+                self._state.run_result
+                and self._state.run_result == RunResult.FAILED
+                and self._state.failed_command
+            ):
+                cursor = self._state.failed_command.index
             else:
                 cursor = total_length - length
 
@@ -506,6 +519,10 @@ class CommandView(HasState[CommandState]):
             return combined_error
         else:
             return run_error or finish_error
+
+    def get_running_command_id(self) -> Optional[str]:
+        """Return the ID of the command that's currently running, if there is one."""
+        return self._state.running_command_id
 
     def get_current(self) -> Optional[CurrentCommand]:
         """Return the "current" command, if any.
@@ -623,6 +640,9 @@ class CommandView(HasState[CommandState]):
         )
 
         if no_command_running and no_command_to_execute:
+            # TODO(mm, 2024-03-14): This is a slow O(n) scan. When a long run ends and
+            # we reach this loop, it can disrupt the robot server.
+            # https://opentrons.atlassian.net/browse/EXEC-55
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
@@ -646,10 +666,22 @@ class CommandView(HasState[CommandState]):
         """Get whether engine is in a terminal state."""
         return self._state.run_result is not None
 
-    def validate_action_allowed(
+    def validate_action_allowed(  # noqa: C901
         self,
-        action: Union[PlayAction, PauseAction, StopAction, QueueCommandAction],
-    ) -> Union[PlayAction, PauseAction, StopAction, QueueCommandAction]:
+        action: Union[
+            PlayAction,
+            PauseAction,
+            StopAction,
+            ResumeFromRecoveryAction,
+            QueueCommandAction,
+        ],
+    ) -> Union[
+        PlayAction,
+        PauseAction,
+        StopAction,
+        ResumeFromRecoveryAction,
+        QueueCommandAction,
+    ]:
         """Validate whether a given control action is allowed.
 
         Returns:
@@ -662,6 +694,17 @@ class CommandView(HasState[CommandState]):
             SetupCommandNotAllowedError: The engine is running, so a setup command
                 may not be added.
         """
+        if self.get_status() == EngineStatus.AWAITING_RECOVERY:
+            # While we're developing error recovery, we'll conservatively disallow
+            # all actions, to avoid putting the engine in weird undefined states.
+            # We'll allow specific actions here as we flesh things out and add support
+            # for them.
+            raise NotImplementedError()
+
+        if isinstance(action, ResumeFromRecoveryAction):
+            # https://opentrons.atlassian.net/browse/EXEC-301
+            raise NotImplementedError()
+
         if self._state.run_result is not None:
             raise RunStoppedError("The run has already stopped.")
 

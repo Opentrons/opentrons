@@ -1,8 +1,10 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { fireEvent, screen } from '@testing-library/react'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 
-import { renderWithProviders } from '@opentrons/components'
-import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
+import { renderWithProviders } from '../../../__testing-utils__'
+import { getDeckDefinitions } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import * as Sessions from '../../../redux/sessions'
@@ -10,24 +12,25 @@ import { mockTipLengthCalibrationSessionAttributes } from '../../../redux/sessio
 
 import { CalibrateTipLength } from '../index'
 import type { TipLengthCalibrationStep } from '../../../redux/sessions/types'
-import { fireEvent, screen } from '@testing-library/react'
 
-jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
-jest.mock('../../../redux/sessions/selectors')
-jest.mock('../../../redux/robot-api/selectors')
-jest.mock('../../../redux/config')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getDeckDefinitions>()
+  return {
+    ...actual,
+    getDeckDefinitions: vi.fn(),
+  }
+})
+vi.mock('../../../redux/sessions/selectors')
+vi.mock('../../../redux/robot-api/selectors')
+vi.mock('../../../redux/config')
 
 interface CalibrateTipLengthSpec {
   heading: string
   currentStep: TipLengthCalibrationStep
 }
 
-const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
-  typeof getDeckDefinitions
->
-
 describe('CalibrateTipLength', () => {
-  const dispatchRequests = jest.fn()
+  const dispatchRequests = vi.fn()
   const mockTipLengthSession: Sessions.TipLengthCalibrationSession = {
     id: 'fake_session_id',
     ...mockTipLengthCalibrationSessionAttributes,
@@ -72,12 +75,10 @@ describe('CalibrateTipLength', () => {
   ]
 
   beforeEach(() => {
-    when(mockGetDeckDefinitions).calledWith().mockReturnValue({})
+    when(vi.mocked(getDeckDefinitions)).calledWith().thenReturn({})
   })
-
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   SPECS.forEach(spec => {

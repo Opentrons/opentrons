@@ -6,8 +6,9 @@ import forEach from 'lodash/forEach'
 import mergeOptions from 'merge-options'
 import yargsParser from 'yargs-parser'
 
-import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
-import * as Cfg from '@opentrons/app/src/redux/config'
+import { UI_INITIALIZED } from '../constants'
+import * as Cfg from '../constants'
+import { configInitialized, configValueUpdated } from '../actions'
 import systemd from '../systemd'
 import { createLogger } from '../log'
 import { DEFAULTS_V12, migrate } from './migrate'
@@ -65,7 +66,7 @@ const log = (): Logger => _log ?? (_log = createLogger('config'))
 export function registerConfig(dispatch: Dispatch): (action: Action) => void {
   return function handleIncomingAction(action: Action) {
     if (action.type === UI_INITIALIZED) {
-      dispatch(Cfg.configInitialized(getFullConfig()))
+      dispatch(configInitialized(getFullConfig()))
     } else if (
       action.type === Cfg.UPDATE_VALUE ||
       action.type === Cfg.RESET_VALUE ||
@@ -103,7 +104,7 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
 
         log().debug('Updating config', { path, nextValue })
         store().set(path, nextValue)
-        dispatch(Cfg.configValueUpdated(path, nextValue))
+        dispatch(configValueUpdated(path, nextValue))
       } else {
         log().debug(`config path in overrides; not updating`, { path })
       }

@@ -95,43 +95,43 @@ export const MODELS_FOR_MODULE_TYPE: Record<
 > = {
   [MAGNETIC_MODULE_TYPE]: [
     {
-      name: 'Magnetic',
+      name: 'GEN1',
       value: MAGNETIC_MODULE_V1,
     },
     {
-      name: 'Magnetic',
+      name: 'GEN2',
       value: MAGNETIC_MODULE_V2,
     },
   ],
   [TEMPERATURE_MODULE_TYPE]: [
     {
-      name: 'Temperature',
+      name: 'GEN1',
       value: TEMPERATURE_MODULE_V1,
     },
     {
-      name: 'Temperature',
+      name: 'GEN2',
       value: TEMPERATURE_MODULE_V2,
     },
   ],
   [THERMOCYCLER_MODULE_TYPE]: [
     {
-      name: 'Thermocycler',
+      name: 'GEN1',
       value: THERMOCYCLER_MODULE_V1,
     },
     {
-      name: 'Thermocycler',
+      name: 'GEN2',
       value: THERMOCYCLER_MODULE_V2,
     },
   ],
   [HEATERSHAKER_MODULE_TYPE]: [
     {
-      name: 'Heater-Shaker',
+      name: 'GEN1',
       value: HEATERSHAKER_MODULE_V1,
     },
   ],
   [MAGNETIC_BLOCK_TYPE]: [
     {
-      name: 'Magnetic Block',
+      name: 'GEN1',
       value: MAGNETIC_BLOCK_V1,
     },
   ],

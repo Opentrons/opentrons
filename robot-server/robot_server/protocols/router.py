@@ -1,4 +1,5 @@
 """Router for /protocols endpoints."""
+import json
 import logging
 from textwrap import dedent
 from datetime import datetime
@@ -19,7 +20,8 @@ from opentrons.protocol_reader import (
     FileHasher,
 )
 from opentrons_shared_data.robot.dev_types import RobotType
-from robot_server.errors import ErrorDetails, ErrorBody
+
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.hardware import get_robot_type
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 from robot_server.service.dependencies import get_unique_id, get_current_time
@@ -108,14 +110,18 @@ class ProtocolLinks(BaseModel):
 
     referencingRuns: List[RunLink] = Field(
         ...,
-        description="Links to runs that reference the protocol.",
+        description=(
+            "Links to runs that reference the protocol,"
+            " in order from the oldest run to the newest run."
+        ),
     )
 
 
 protocols_router = APIRouter()
 
 
-@protocols_router.post(
+@PydanticResponse.wrap_route(
+    protocols_router.post,
     path="/protocols",
     summary="Upload a protocol",
     description=dedent(
@@ -128,11 +134,18 @@ protocols_router = APIRouter()
         When too many protocols already exist, old ones will be automatically deleted
         to make room for the new one.
         A protocol will never be automatically deleted if there's a run
-        referring to it, though.
+        referring to it, though. (See the `/runs/` endpoints.)
+
+        If you upload the exact same set of files multiple times, the first protocol
+        resource will be returned instead of creating duplicate ones.
+
+        When a new protocol resource is created, an analysis is started for it.
+        See the `/protocols/{id}/analyses/` endpoints.
         """
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
+        status.HTTP_200_OK: {"model": SimpleBody[Protocol]},
         status.HTTP_201_CREATED: {"model": SimpleBody[Protocol]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": ErrorBody[Union[ProtocolFilesInvalid, ProtocolRobotTypeMismatch]]
@@ -143,7 +156,24 @@ async def create_protocol(
     files: List[UploadFile] = File(...),
     # use Form because request is multipart/form-data
     # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
-    key: Optional[str] = Form(None),
+    key: Optional[str] = Form(
+        default=None,
+        description=(
+            "An arbitrary client-defined string to attach to the new protocol resource."
+            " This should be no longer than ~100 characters or so."
+            " It's intended to store something like a UUID, to help clients that store"
+            " protocols locally keep track of which local files correspond to which"
+            " protocol resources on the robot."
+        ),
+    ),
+    run_time_parameter_values: Optional[str] = Form(
+        default=None,
+        description="Key-value pairs of run-time parameters defined in a protocol."
+        " Note that this is expected to be a string holding a JSON object."
+        " Also, if this data is included in the request, the server will"
+        " always trigger an analysis (for now).",
+        alias="runTimeParameterValues",
+    ),
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
@@ -163,6 +193,7 @@ async def create_protocol(
     Arguments:
         files: List of uploaded files, from form-data.
         key: Optional key for client-side tracking
+        run_time_parameter_values: Key value pairs of run-time parameters defined in a protocol.
         protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
@@ -179,12 +210,39 @@ async def create_protocol(
         analysis_id: Unique identifier to attach to the analysis resource.
         created_at: Timestamp to attach to the new resource.
     """
-    buffered_files = await file_reader_writer.read(files=files)
+    for file in files:
+        # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.
+        assert file.filename is not None
+    buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
+
+    if isinstance(run_time_parameter_values, str):
+        # We have to do this isinstance check because if `runTimeParameterValues` is
+        # not specified in the request, then it gets assigned a Form(None) value
+        # instead of just a None. \(O.o)/
+        # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
+        #  so we can validate the data contents and return a better error response.
+        parsed_rtp = json.loads(run_time_parameter_values)
+    else:
+        parsed_rtp = None
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
     if cached_protocol_id is not None:
+        # Protocol exists in database
         resource = protocol_store.get(protocol_id=cached_protocol_id)
+        if parsed_rtp:
+            # This protocol exists in database but needs to be re-analyzed with the
+            # passed-in RTP overrides
+            task_runner.run(
+                protocol_analyzer.analyze,
+                protocol_resource=resource,
+                analysis_id=analysis_id,
+                run_time_param_values=parsed_rtp,
+            )
+            analysis_store.add_pending(
+                protocol_id=cached_protocol_id,
+                analysis_id=analysis_id,
+            )
         analyses = analysis_store.get_summaries_by_protocol(
             protocol_id=cached_protocol_id
         )
@@ -203,7 +261,8 @@ async def create_protocol(
         )
 
         log.info(
-            f'Protocol with id "{cached_protocol_id}" with same contents already exists. returning existing protocol data in response payload'
+            f'Protocol with id "{cached_protocol_id}" with same contents already exists.'
+            f" Returning existing protocol data in response payload."
         )
 
         return await PydanticResponse.create(
@@ -246,6 +305,7 @@ async def create_protocol(
         protocol_analyzer.analyze,
         protocol_resource=protocol_resource,
         analysis_id=analysis_id,
+        run_time_param_values=parsed_rtp,
     )
     pending_analysis = analysis_store.add_pending(
         protocol_id=protocol_id,
@@ -271,9 +331,11 @@ async def create_protocol(
     )
 
 
-@protocols_router.get(
+@PydanticResponse.wrap_route(
+    protocols_router.get,
     path="/protocols",
     summary="Get uploaded protocols",
+    description="Return all stored protocols, in order from first-uploaded to last-uploaded.",
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[Protocol]}},
 )
 async def get_protocols(
@@ -308,7 +370,8 @@ async def get_protocols(
     )
 
 
-@protocols_router.get(
+@PydanticResponse.wrap_route(
+    protocols_router.get,
     path="/protocols/ids",
     summary="[Internal] Get uploaded protocol IDs",
     description=(
@@ -337,7 +400,8 @@ async def get_protocol_ids(
     )
 
 
-@protocols_router.get(
+@PydanticResponse.wrap_route(
+    protocols_router.get,
     path="/protocols/{protocolId}",
     summary="Get an uploaded protocol",
     responses={
@@ -394,7 +458,8 @@ async def get_protocol_by_id(
     )
 
 
-@protocols_router.delete(
+@PydanticResponse.wrap_route(
+    protocols_router.delete,
     path="/protocols/{protocolId}",
     summary="Delete an uploaded protocol",
     responses={
@@ -428,7 +493,8 @@ async def delete_protocol_by_id(
     )
 
 
-@protocols_router.get(
+@PydanticResponse.wrap_route(
+    protocols_router.get,
     path="/protocols/{protocolId}/analyses",
     summary="Get a protocol's analyses",
     responses={
@@ -465,7 +531,8 @@ async def get_protocol_analyses(
     )
 
 
-@protocols_router.get(
+@PydanticResponse.wrap_route(
+    protocols_router.get,
     path="/protocols/{protocolId}/analyses/{analysisId}",
     summary="Get one of a protocol's analyses",
     responses={

@@ -10,7 +10,7 @@ import {
 
 export const TertiaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue50};
-  border-radius: ${BORDERS.radiusRoundEdge};
+  border-radius: ${BORDERS.borderRadiusFull};
   box-shadow: none;
   color: ${COLORS.white};
   overflow: no-wrap;

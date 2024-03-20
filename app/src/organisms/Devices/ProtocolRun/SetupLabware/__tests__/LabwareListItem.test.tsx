@@ -1,9 +1,12 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { StaticRouter } from 'react-router-dom'
-import { renderWithProviders } from '@opentrons/components'
-import fixture_adapter from '@opentrons/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json'
+
+import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import {
   mockHeaterShaker,
@@ -24,17 +27,10 @@ import type {
 import type { AttachedModule } from '../../../../../redux/modules/types'
 import type { ModuleRenderInfoForProtocol } from '../../../hooks'
 
-jest.mock('../SecureLabwareModal')
-jest.mock('@opentrons/react-api-client')
+vi.mock('../SecureLabwareModal')
+vi.mock('@opentrons/react-api-client')
 
-const mockSecureLabwareModal = SecureLabwareModal as jest.MockedFunction<
-  typeof SecureLabwareModal
->
-const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
-  typeof useCreateLiveCommandMutation
->
-
-const mockAdapterDef = fixture_adapter as LabwareDefinition2
+const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
 const mockAdapterId = 'mockAdapterId'
 const mockNestedLabwareDisplayName = 'nested labware display name'
 const mockLocationInfo = {
@@ -82,17 +78,19 @@ const render = (props: React.ComponentProps<typeof LabwareListItem>) => {
 }
 
 describe('LabwareListItem', () => {
-  const mockCreateLiveCommand = jest.fn()
+  const mockCreateLiveCommand = vi.fn()
   beforeEach(() => {
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockSecureLabwareModal.mockReturnValue(<div>mock secure labware modal</div>)
-    mockUseLiveCommandMutation.mockReturnValue({
+    vi.mocked(SecureLabwareModal).mockReturnValue(
+      <div>mock secure labware modal</div>
+    )
+    vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
   })
 
   it('renders the correct info for a thermocycler (OT2), clicking on secure labware instructions opens the modal', () => {
-    const { getByText } = render({
+    render({
       commands: [],
       nickName: mockNickName,
       definition: mockLabwareDef,
@@ -111,18 +109,18 @@ describe('LabwareListItem', () => {
       isFlex: false,
       nestedLabwareInfo: null,
     })
-    getByText('Mock Labware Definition')
-    getByText('nickName')
-    getByText('Thermocycler Module GEN1')
-    getByText('7,8,10,11')
-    const button = getByText('Secure labware instructions')
+    screen.getByText('Mock Labware Definition')
+    screen.getByText('nickName')
+    screen.getByText('Thermocycler Module GEN1')
+    screen.getByText('7,8,10,11')
+    const button = screen.getByText('Secure labware instructions')
     fireEvent.click(button)
-    getByText('mock secure labware modal')
-    getByText('nickName')
+    screen.getByText('mock secure labware modal')
+    screen.getByText('nickName')
   })
 
   it('renders the correct info for a thermocycler (OT3)', () => {
-    const { getByText } = render({
+    render({
       commands: [],
       nickName: mockNickName,
       definition: mockLabwareDef,
@@ -141,13 +139,13 @@ describe('LabwareListItem', () => {
       isFlex: true,
       nestedLabwareInfo: null,
     })
-    getByText('Mock Labware Definition')
-    getByText('A1+B1')
-    getByText('Thermocycler Module GEN1')
+    screen.getByText('Mock Labware Definition')
+    screen.getByText('A1+B1')
+    screen.getByText('Thermocycler Module GEN1')
   })
 
   it('renders the correct info for a labware on top of a magnetic module', () => {
-    const { getByText, getByTestId } = render({
+    render({
       commands: [],
       nickName: mockNickName,
       definition: mockLabwareDef,
@@ -172,17 +170,17 @@ describe('LabwareListItem', () => {
       isFlex: false,
       nestedLabwareInfo: null,
     })
-    getByText('Mock Labware Definition')
-    getByTestId('slot_info_7')
-    getByText('Magnetic Module GEN1')
-    const button = getByText('Secure labware instructions')
+    screen.getByText('Mock Labware Definition')
+    screen.getByTestId('slot_info_7')
+    screen.getByText('Magnetic Module GEN1')
+    const button = screen.getByText('Secure labware instructions')
     fireEvent.click(button)
-    getByText('mock secure labware modal')
-    getByText('nickName')
+    screen.getByText('mock secure labware modal')
+    screen.getByText('nickName')
   })
 
   it('renders the correct info for a labware on top of a temperature module', () => {
-    const { getByText, getByTestId } = render({
+    render({
       commands: [],
       nickName: mockNickName,
       definition: mockLabwareDef,
@@ -206,10 +204,10 @@ describe('LabwareListItem', () => {
       isFlex: false,
       nestedLabwareInfo: null,
     })
-    getByText('Mock Labware Definition')
-    getByTestId('slot_info_7')
-    getByText('Temperature Module GEN1')
-    getByText('nickName')
+    screen.getByText('Mock Labware Definition')
+    screen.getByTestId('slot_info_7')
+    screen.getByText('Temperature Module GEN1')
+    screen.getByText('nickName')
   })
 
   it('renders the correct info for a labware on an adapter on top of a temperature module', () => {
@@ -240,7 +238,7 @@ describe('LabwareListItem', () => {
       },
     } as any
 
-    const { getByText, getAllByText } = render({
+    render({
       commands: [mockAdapterLoadCommand, mockModuleLoadCommand],
       nickName: mockNickName,
       definition: mockLabwareDef,
@@ -269,12 +267,12 @@ describe('LabwareListItem', () => {
         nestedLabwareDefinition: mockLabwareDef,
       },
     })
-    getByText('Mock Labware Definition')
-    getAllByText('7')
-    getByText('Temperature Module GEN2')
-    getByText('mock nested display name')
-    getByText('nestedLabwareNickName')
-    getByText('nickName')
+    screen.getByText('Mock Labware Definition')
+    screen.getAllByText('7')
+    screen.getByText('Temperature Module GEN2')
+    screen.getByText('mock nested display name')
+    screen.getByText('nestedLabwareNickName')
+    screen.getByText('nickName')
   })
 
   it('renders the correct info for a labware on an adapter on the deck', () => {
@@ -294,7 +292,7 @@ describe('LabwareListItem', () => {
       },
     } as any
 
-    const { getByText } = render({
+    render({
       commands: [mockAdapterLoadCommand],
       nickName: mockNickName,
       definition: mockLabwareDef,
@@ -311,16 +309,16 @@ describe('LabwareListItem', () => {
         nestedLabwareDefinition: mockLabwareDef,
       },
     })
-    getByText('Mock Labware Definition')
-    getByText('A2')
-    getByText('mock nested display name')
-    getByText('nestedLabwareNickName')
-    getByText('nickName')
-    getByText('On deck')
+    screen.getByText('Mock Labware Definition')
+    screen.getByText('A2')
+    screen.getByText('mock nested display name')
+    screen.getByText('nestedLabwareNickName')
+    screen.getByText('nickName')
+    screen.getByText('On deck')
   })
 
   it('renders the correct info for a labware on top of a heater shaker', () => {
-    const { getByText, getByLabelText, getByTestId } = render({
+    render({
       nickName: mockNickName,
       commands: [],
       definition: mockLabwareDef,
@@ -344,14 +342,14 @@ describe('LabwareListItem', () => {
       isFlex: false,
       nestedLabwareInfo: null,
     })
-    getByText('Mock Labware Definition')
-    getByTestId('slot_info_7')
-    getByText('Heater-Shaker Module GEN1')
-    getByText('nickName')
-    getByText('To add labware, use the toggle to control the latch')
-    getByText('Labware Latch')
-    getByText('Secure')
-    const button = getByLabelText('heater_shaker_7_latch_toggle')
+    screen.getByText('Mock Labware Definition')
+    screen.getByTestId('slot_info_7')
+    screen.getByText('Heater-Shaker Module GEN1')
+    screen.getByText('nickName')
+    screen.getByText('To add labware, use the toggle to control the latch')
+    screen.getByText('Labware Latch')
+    screen.getByText('Secure')
+    const button = screen.getByLabelText('heater_shaker_7_latch_toggle')
     fireEvent.click(button)
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
@@ -364,7 +362,7 @@ describe('LabwareListItem', () => {
   })
 
   it('renders the correct info for an off deck labware', () => {
-    const { getByText } = render({
+    render({
       nickName: null,
       definition: mockLabwareDef,
       initialLocation: 'offDeck',
@@ -376,7 +374,7 @@ describe('LabwareListItem', () => {
       isFlex: false,
       nestedLabwareInfo: null,
     })
-    getByText('Mock Labware Definition')
-    getByText('Off deck')
+    screen.getByText('Mock Labware Definition')
+    screen.getByText('Off deck')
   })
 })

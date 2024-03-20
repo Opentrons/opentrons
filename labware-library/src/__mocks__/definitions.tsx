@@ -1,9 +1,11 @@
 import assert from 'assert'
+import { vi } from 'vitest'
 // replace webpack-specific require.context with Node-based glob in tests
 import path from 'path'
 import glob from 'glob'
 import uniq from 'lodash/uniq'
 
+import type { Mock } from 'vitest'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const LABWARE_FIXTURE_PATTERN = path.join(
@@ -23,7 +25,7 @@ assert(
   `no labware loadNames found, something broke. ${LABWARE_FIXTURE_PATTERN}`
 )
 
-export const getAllLoadNames = jest.fn(() => allLoadNames)
+export const getAllLoadNames: Mock = vi.fn(() => allLoadNames)
 
 const allDisplayNames = uniq(
   glob
@@ -37,7 +39,7 @@ assert(
   `no labware displayNames found, something broke. ${LABWARE_FIXTURE_PATTERN}`
 )
 
-export const getAllDisplayNames = jest.fn(() => allDisplayNames)
+export const getAllDisplayNames: Mock = vi.fn(() => allDisplayNames)
 
 const allLabware = glob
   .sync(LABWARE_FIXTURE_PATTERN)
@@ -51,4 +53,4 @@ assert(
   `no labware fixtures found, is the path correct? ${LABWARE_FIXTURE_PATTERN}`
 )
 
-export const getAllDefinitions = jest.fn(() => allLabware)
+export const getAllDefinitions: Mock = vi.fn(() => allLabware)

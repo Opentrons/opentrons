@@ -6,6 +6,7 @@
   "begin_calibration": "Begin calibration",
   "calibrate_gripper": "Calibrate Gripper",
   "calibration_pin": "Calibration Pin",
+  "calibration_pin_touching": "The calibration pin will touch the calibration square in slot {{slot}} to determine its exact position.",
   "complete_calibration": "Complete calibration",
   "connect_and_screw_in_gripper": "Connect and secure Flex Gripper",
   "continue": "Continue",

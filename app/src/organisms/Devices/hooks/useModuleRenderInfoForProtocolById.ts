@@ -6,8 +6,9 @@ import {
   MAGNETIC_BLOCK_TYPE,
   SINGLE_SLOT_FIXTURES,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client/src/deck_configuration'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -27,18 +28,21 @@ export interface ModuleRenderInfoById {
   [moduleId: string]: ModuleRenderInfoForProtocol
 }
 
-const DECK_CONFIG_REFETCH_INTERVAL = 5000
+const REFETCH_INTERVAL_5000_MS = 5000
 
 export function useModuleRenderInfoForProtocolById(
-  runId: string
+  runId: string,
+  pollModules?: boolean
 ): ModuleRenderInfoById {
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const { data: deckConfig } = useDeckConfigurationQuery({
-    refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+    refetchInterval: REFETCH_INTERVAL_5000_MS,
   })
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
-  const attachedModules = useAttachedModules()
+  const attachedModules = useAttachedModules({
+    refetchInterval: pollModules ? REFETCH_INTERVAL_5000_MS : false,
+  })
   if (protocolAnalysis == null) return {}
 
   const deckDef = getDeckDefFromRobotType(
@@ -70,10 +74,15 @@ export function useModuleRenderInfoForProtocolById(
       const isMagneticBlockModule =
         protocolMod.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE
 
+      const isThermocycler =
+        protocolMod.moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
+
       const conflictedFixture =
         deckConfig?.find(
           fixture =>
-            fixture.cutoutId === cutoutIdForSlotName &&
+            (fixture.cutoutId === cutoutIdForSlotName ||
+              // special-case A1 for the thermocycler to require a single slot fixture
+              (isThermocycler && fixture.cutoutId === 'cutoutA1')) &&
             fixture.cutoutFixtureId != null &&
             // do not generate a conflict for single slot fixtures, because modules are not yet fixtures
             !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId) &&

@@ -4,6 +4,7 @@ import path from 'path'
 import glob from 'glob'
 import { validate } from '../protocols'
 import { omit } from 'lodash'
+import { describe, expect, it } from 'vitest'
 
 const relRoot = path.join(__dirname, '../../protocol/fixtures/')
 

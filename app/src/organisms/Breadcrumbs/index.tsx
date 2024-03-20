@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useLocation } from 'react-router'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
@@ -11,6 +10,7 @@ import {
   Icon,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  BORDERS,
   COLORS,
   DIRECTION_ROW,
   SPACING,
@@ -121,6 +121,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
+      borderBottom={BORDERS.lineBorder}
       css={TYPOGRAPHY.labelRegular}
       flexDirection={DIRECTION_ROW}
       padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing8}`}

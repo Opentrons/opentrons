@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styles from './styles.css'
+import styles from './styles.module.css'
 import { MobileMenu } from './MobileMenu'
 import { MobileContent } from './MobileContent'
 import { ProductMobileContent } from './ProductMobileContent'

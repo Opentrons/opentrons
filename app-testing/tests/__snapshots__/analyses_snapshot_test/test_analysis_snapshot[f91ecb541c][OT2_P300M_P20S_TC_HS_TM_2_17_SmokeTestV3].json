@@ -1,0 +1,56 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      16
+    ],
+    "protocolType": "python"
+  },
+  "errors": [],
+  "files": [
+    {
+      "name": "OT2_P300M_P20S_TC_HS_TM_2_17_SmokeTestV3.py",
+      "role": "main"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "author": "Opentrons Engineering <engineering@opentrons.com>",
+    "description": "Placeholder - 2.17 Smoke Test is the same a 2.16 Smoke Test.",
+    "protocolName": "🛠️ 2.17 Smoke Test",
+    "source": "Software Testing Team"
+  },
+  "modules": [],
+  "pipettes": [],
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": []
+}

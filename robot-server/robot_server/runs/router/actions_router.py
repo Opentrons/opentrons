@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Union
 from typing_extensions import Literal
 
-from robot_server.errors import ErrorDetails, ErrorBody
+from robot_server.errors.error_responses import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
 from robot_server.service.task_runner import TaskRunner, get_task_runner
@@ -24,11 +24,10 @@ from ..run_controller import RunController, RunActionNotAllowedError
 from ..action_models import RunAction, RunActionCreate, RunActionType
 from ..dependencies import get_engine_store, get_run_store
 from .base_router import RunNotFound, RunStopped
-from robot_server.maintenance_runs import (
+from robot_server.maintenance_runs.maintenance_engine_store import (
     MaintenanceEngineStore,
-    get_maintenance_engine_store,
 )
-
+from robot_server.maintenance_runs.dependencies import get_maintenance_engine_store
 
 log = logging.getLogger(__name__)
 actions_router = APIRouter()
@@ -71,7 +70,8 @@ async def get_run_controller(
     )
 
 
-@actions_router.post(
+@PydanticResponse.wrap_route(
+    actions_router.post,
     path="/runs/{runId}/actions",
     summary="Issue a control action to the run",
     description="Provide an action in order to control execution of the run.",
@@ -87,7 +87,6 @@ async def get_run_controller(
 async def create_run_action(
     runId: str,
     request_body: RequestModel[RunActionCreate],
-    engine_store: EngineStore = Depends(get_engine_store),
     run_controller: RunController = Depends(get_run_controller),
     action_id: str = Depends(get_unique_id),
     created_at: datetime = Depends(get_current_time),

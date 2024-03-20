@@ -1,11 +1,13 @@
 import * as React from 'react'
 
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
-import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
-import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
+import {
+  fixture96Plate as _fixture96Plate,
+  fixture24Tuberack as _fixture24Tuberack,
+  fixture12Trough as _fixture12Trough,
+  fixtureTiprack10ul as _fixtureTiprack10ul,
+  fixtureTiprack300ul as _fixtureTiprack300ul,
+  fixtureTiprack1000ul as _fixtureTiprack1000ul,
+} from '@opentrons/shared-data'
 
 import { RobotWorkSpace } from '../Deck'
 import { LabwareRender } from './LabwareRender'
@@ -13,13 +15,13 @@ import { LabwareRender } from './LabwareRender'
 import type { Story, Meta } from '@storybook/react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-const fixture96Plate = fixture_96_plate as LabwareDefinition2
-const fixture24Tuberack = fixture_24_tuberack as LabwareDefinition2
-const fixture12Trough = fixture_12_trough as LabwareDefinition2
+const fixture96Plate = _fixture96Plate as LabwareDefinition2
+const fixture24Tuberack = _fixture24Tuberack as LabwareDefinition2
+const fixture12Trough = _fixture12Trough as LabwareDefinition2
 
-const fixtureTiprack10 = fixture_tiprack_10_ul as LabwareDefinition2
-const fixtureTiprack300 = fixture_tiprack_300_ul as LabwareDefinition2
-const fixtureTiprack1000 = fixture_tiprack_1000_ul as LabwareDefinition2
+const fixtureTiprack10 = _fixtureTiprack10ul as LabwareDefinition2
+const fixtureTiprack300 = _fixtureTiprack300ul as LabwareDefinition2
+const fixtureTiprack1000 = _fixtureTiprack1000ul as LabwareDefinition2
 
 const labwareDefMap: Record<string, LabwareDefinition2> = {
   [fixture96Plate.metadata.displayName]: fixture96Plate,
@@ -38,7 +40,7 @@ export default {
   decorators: [
     Story => (
       <RobotWorkSpace
-        viewBox={`0 0 ${fixture_96_plate.dimensions.xDimension} ${fixture_96_plate.dimensions.yDimension}`}
+        viewBox={`0 0 ${fixture96Plate.dimensions.xDimension} ${fixture96Plate.dimensions.yDimension}`}
       >
         {() => <Story />}
       </RobotWorkSpace>
@@ -64,7 +66,7 @@ Basic.argTypes = {
         d => labwareDefMap[d].metadata.displayName
       ),
     },
-    defaultValue: fixture_96_plate.metadata.displayName,
+    defaultValue: fixture96Plate.metadata.displayName,
   },
 }
 Basic.args = {
@@ -83,7 +85,7 @@ TipRack.argTypes = {
         d => tipRackDefMap[d].metadata.displayName
       ),
     },
-    defaultValue: fixture_tiprack_10_ul.metadata.displayName,
+    defaultValue: fixtureTiprack10.metadata.displayName,
   },
 }
 TipRack.args = {

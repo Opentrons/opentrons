@@ -1,6 +1,10 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
   "nozzleOffset": [0.0, 31.5, 0.8],
+  "pipetteBoundingBoxOffsets": {
+    "backLeftCorner": [-30.5, 47.5, 0.8],
+    "frontRightCorner": [19.5, -47.5, 0.8]
+  },
   "pathTo3D": "pipette/definitions/2/geometry/eight_channel/p50/placeholder.gltf",
   "orderedRows": [
     {

@@ -2,7 +2,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '../icons'
 import { IconButton } from '../buttons'
-import styles from './alerts.css'
+import styles from './alerts.module.css'
 
 import type { IconProps } from '../icons'
 

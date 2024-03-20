@@ -96,5 +96,6 @@
   },
   "modules": [],
   "pipettes": [],
-  "robotType": "OT-2 Standard"
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": []
 }

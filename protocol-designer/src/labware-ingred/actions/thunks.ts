@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { getIsTiprack } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
@@ -116,7 +115,7 @@ export const duplicateLabware: (
   const templateLabwareDefURI = stepFormSelectors.getLabwareEntities(state)[
     templateLabwareId
   ].labwareDefURI
-  assert(
+  console.assert(
     templateLabwareDefURI,
     `no labwareDefURI for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
   )

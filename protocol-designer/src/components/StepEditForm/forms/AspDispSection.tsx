@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { IconButton, Tooltip, useHoverTooltip } from '@opentrons/components'
-import styles from '../StepEditForm.css'
+import styles from '../StepEditForm.module.css'
 
 interface Props {
   className?: string | null

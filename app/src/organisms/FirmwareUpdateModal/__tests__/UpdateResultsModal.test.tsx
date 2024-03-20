@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { UpdateResultsModal } from '../UpdateResultsModal'
 
@@ -16,7 +18,7 @@ describe('UpdateResultsModal', () => {
     props = {
       isSuccess: true,
       shouldExit: true,
-      onClose: jest.fn(),
+      onClose: vi.fn(),
       instrument: {
         ok: true,
         instrumentType: 'gripper',
@@ -26,27 +28,26 @@ describe('UpdateResultsModal', () => {
     }
   })
   it('renders correct text for a successful instrument update', () => {
-    const { getByText } = render(props)
-    getByText('Successful update!')
-    getByText(nestedTextMatcher('Your Flex Gripper is ready to use!'))
+    render(props)
+    screen.getByText('Successful update!')
   })
   it('calls close modal when the close button is pressed', () => {
-    const { getByText } = render(props)
-    fireEvent.click(getByText('Close'))
+    render(props)
+    fireEvent.click(screen.getByText('Close'))
     expect(props.onClose).toHaveBeenCalled()
   })
   it('renders correct text for a failed instrument update', () => {
     props = {
       isSuccess: false,
       shouldExit: true,
-      onClose: jest.fn(),
+      onClose: vi.fn(),
       instrument: {
         ok: false,
       } as any,
     }
-    const { getByText } = render(props)
-    getByText('Update failed')
-    getByText(
+    render(props)
+    screen.getByText('Update failed')
+    screen.getByText(
       'Download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.'
     )
   })

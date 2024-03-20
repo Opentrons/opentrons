@@ -9,11 +9,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
 import { Navigation } from '../../organisms/Navigation'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
@@ -23,12 +21,16 @@ import { AnalyticsOptInModal } from './AnalyticsOptInModal'
 import { WelcomeModal } from './WelcomeModal'
 import { RunData } from '@opentrons/api-client'
 import { ServerInitializing } from '../../organisms/OnDeviceDisplay/RobotDashboard/ServerInitializing'
+import { useNotifyAllRunsQuery } from '../../resources/runs'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 
 export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
-  const { data: allRunsQueryData, error: allRunsQueryError } = useAllRunsQuery()
+  const {
+    data: allRunsQueryData,
+    error: allRunsQueryError,
+  } = useNotifyAllRunsQuery()
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
@@ -79,7 +81,7 @@ export function RobotDashboard(): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Navigation routes={onDeviceDisplayRoutes} />
+      <Navigation />
       <Flex
         paddingX={SPACING.spacing40}
         flexDirection={DIRECTION_COLUMN}

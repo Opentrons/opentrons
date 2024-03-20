@@ -1,6 +1,7 @@
 // tests for the HostConfig context and hook
 import * as React from 'react'
-import { when } from 'jest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
+import { when } from 'vitest-when'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
@@ -10,18 +11,14 @@ import { useProtocolMetadata } from '../useProtocolMetadata'
 import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
 
-jest.mock('../../../ProtocolUpload/hooks')
-
-const mockUseCurrentProtocol = useCurrentProtocol as jest.MockedFunction<
-  typeof useCurrentProtocol
->
+vi.mock('../../../ProtocolUpload/hooks')
 
 describe('useProtocolMetadata', () => {
-  const store: Store<State> = createStore(jest.fn(), {})
+  const store: Store<State> = createStore(vi.fn(), {})
 
-  when(mockUseCurrentProtocol)
+  when(vi.mocked(useCurrentProtocol))
     .calledWith()
-    .mockReturnValue({
+    .thenReturn({
       data: {
         protocolType: 'json',
         robotType: 'OT-3 Standard',
@@ -34,11 +31,11 @@ describe('useProtocolMetadata', () => {
     } as any)
 
   beforeEach(() => {
-    store.dispatch = jest.fn()
+    store.dispatch = vi.fn()
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('should return author, lastUpdated, method, description, and robot type', () => {

@@ -12281,8 +12281,9 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashC1",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
+        "ignoreTipConfiguration": true,
         "offset": {
           "x": 0.0,
           "y": 0.0,
@@ -12291,7 +12292,7 @@
       },
       "result": {
         "position": {
-          "x": 54.25,
+          "x": 22.25,
           "y": 150.0,
           "z": 40.0
         }
@@ -12525,8 +12526,9 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashD1",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
+        "ignoreTipConfiguration": true,
         "offset": {
           "x": 0.0,
           "y": 0.0,
@@ -12535,7 +12537,7 @@
       },
       "result": {
         "position": {
-          "x": 54.25,
+          "x": 22.25,
           "y": 43.0,
           "z": 40.0
         }
@@ -12985,5 +12987,6 @@
       "pipetteName": "p1000_96"
     }
   ],
-  "robotType": "OT-3 Standard"
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
 }

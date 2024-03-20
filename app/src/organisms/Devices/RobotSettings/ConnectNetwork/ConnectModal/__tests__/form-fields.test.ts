@@ -1,4 +1,5 @@
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
+import { describe, it, expect } from 'vitest'
 
 import {
   CONFIGURE_FIELD_SSID,
@@ -196,21 +197,29 @@ describe('getConnectFormFields', () => {
 
 describe('validateConnectFormFields', () => {
   it('should error if network is hidden and ssid is blank', () => {
-    const errors = validateConnectFormFields(null, [], {
-      securityType: SECURITY_WPA_PSK,
-      psk: '12345678',
-    })
+    const errors = validateConnectFormFields(
+      null,
+      [],
+      {
+        securityType: SECURITY_WPA_PSK,
+        psk: '12345678',
+      },
+      {}
+    )
 
     expect(errors).toEqual({
-      ssid: `${LABEL_SSID} is required`,
+      ssid: { message: `${LABEL_SSID} is required`, type: 'ssidError' },
     })
   })
 
   it('should error if network is hidden and securityType is blank', () => {
-    const errors = validateConnectFormFields(null, [], { ssid: 'foobar' })
+    const errors = validateConnectFormFields(null, [], { ssid: 'foobar' }, {})
 
     expect(errors).toEqual({
-      securityType: `${LABEL_SECURITY} is required`,
+      securityType: {
+        message: `${LABEL_SECURITY} is required`,
+        type: 'securityTypeError',
+      },
     })
   })
 
@@ -219,19 +228,25 @@ describe('validateConnectFormFields', () => {
       ...Fixtures.mockWifiNetwork,
       securityType: SECURITY_WPA_PSK,
     }
-    const errors = validateConnectFormFields(network, [], { psk: '' })
+    const errors = validateConnectFormFields(network, [], { psk: '' }, {})
 
     expect(errors).toEqual({
-      psk: `${LABEL_PSK} must be at least 8 characters`,
+      psk: {
+        message: `${LABEL_PSK} must be at least 8 characters`,
+        type: 'pskError',
+      },
     })
   })
 
   it('should error if selected security is PSK and psk is blank', () => {
     const values = { ssid: 'foobar', securityType: SECURITY_WPA_PSK }
-    const errors = validateConnectFormFields(null, [], values)
+    const errors = validateConnectFormFields(null, [], values, {})
 
     expect(errors).toEqual({
-      psk: `${LABEL_PSK} must be at least 8 characters`,
+      psk: {
+        message: `${LABEL_PSK} must be at least 8 characters`,
+        type: 'pskError',
+      },
     })
   })
 
@@ -240,10 +255,13 @@ describe('validateConnectFormFields', () => {
       ...Fixtures.mockWifiNetwork,
       securityType: SECURITY_WPA_EAP,
     }
-    const errors = validateConnectFormFields(network, [], {})
+    const errors = validateConnectFormFields(network, [], {}, {})
 
     expect(errors).toEqual({
-      securityType: `${LABEL_SECURITY} is required`,
+      securityType: {
+        message: `${LABEL_SECURITY} is required`,
+        type: 'securityTypeError',
+      },
     })
   })
 
@@ -260,10 +278,13 @@ describe('validateConnectFormFields', () => {
       securityType: 'someOtherEapType',
       eapConfig: { fileField: '123' },
     }
-    const errors = validateConnectFormFields(network, eapOptions, values)
+    const errors = validateConnectFormFields(network, eapOptions, values, {})
 
     expect(errors).toEqual({
-      'eapConfig.stringField': `String Field is required`,
+      'eapConfig.stringField': {
+        message: `String Field is required`,
+        type: 'eapError',
+      },
     })
   })
 })

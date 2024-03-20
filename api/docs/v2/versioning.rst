@@ -59,6 +59,8 @@ When choosing an API level, consider what features you need and how widely you p
 
 On the one hand, using the highest available version will give your protocol access to all the latest :ref:`features and fixes <version-notes>`. On the other hand, using the lowest possible version lets the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software. Specifying version 2.14 would limit the protocol to robots running 6.2.0 or higher.
 
+.. _max-version:
+
 Maximum Supported Versions
 ==========================
 
@@ -66,7 +68,7 @@ The maximum supported API version for your robot is listed in the Opentrons App 
 
 If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
-Opentrons robots running the latest software (7.1.0) support the following version ranges: 
+Opentrons robots running the latest software (7.2.0) support the following version ranges: 
 
     * **Flex:** version 2.15–|apiLevel|.
     * **OT-2:** versions 2.0–|apiLevel|.
@@ -82,6 +84,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.17    |          7.2.0               |
++-------------+------------------------------+
 |     2.16    |          7.1.0               |
 +-------------+------------------------------+
 |     2.15    |          7.0.0               |
@@ -127,7 +131,7 @@ Changes in API Versions
 Version 2.17
 ------------
 
-- :py:meth:`.dispense` will now raise an error if you try to dispense more than is available.
+- :py:meth:`.dispense` now raises an error if you try to dispense more than :py:obj:`.InstrumentContext.current_volume`.
 
 Version 2.16
 ------------
@@ -150,10 +154,6 @@ This version introduces new features for Flex and adds and improves methods for 
 
   - :py:obj:`.ProtocolContext.fixed_trash` and :py:obj:`.InstrumentContext.trash_container` now return :py:class:`.TrashBin` objects instead of :py:class:`.Labware` objects.
   - Flex will no longer automatically drop tips in the trash at the end of a protocol. You can add a :py:meth:`.drop_tip()` command to your protocol or use the Opentrons App to drop the tips.
-  
-- Known issues
-
-  - It's possible to load a Thermocycler and then load another item in slot A1. Don't do this, as it could lead to unexpected pipetting behavior and crashes.
 
 Version 2.15
 ------------

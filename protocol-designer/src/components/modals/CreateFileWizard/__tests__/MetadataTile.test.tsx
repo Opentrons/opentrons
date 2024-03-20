@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { MetadataTile } from '../MetadataTile'
 import type { FormState, WizardTileProps } from '../types'
@@ -12,19 +14,24 @@ const render = (props: React.ComponentProps<typeof MetadataTile>) => {
   })[0]
 }
 
+const values = {
+  fields: {
+    name: '',
+    description: 'mockDescription',
+    organizationOrAuthor: 'mockOrganizationOrAuthor',
+    robotType: FLEX_ROBOT_TYPE,
+  },
+} as FormState
+
 const mockWizardTileProps: Partial<WizardTileProps> = {
-  handleChange: jest.fn(),
-  handleBlur: jest.fn(),
-  goBack: jest.fn(),
-  proceed: jest.fn(),
-  values: {
-    fields: {
-      name: 'mockName',
-      description: 'mockDescription',
-      organizationOrAuthor: 'mockOrganizationOrAuthor',
-      robotType: FLEX_ROBOT_TYPE,
-    },
-  } as FormState,
+  goBack: vi.fn(),
+  proceed: vi.fn(),
+  watch: vi.fn((name: keyof typeof values) => values[name]) as any,
+  register: vi.fn() as any,
+  formState: {
+    errors: { fields: { name: null } },
+    touchedFields: { fields: { name: true } },
+  } as any,
 }
 
 describe('MetadataTile', () => {
@@ -36,6 +43,9 @@ describe('MetadataTile', () => {
       ...mockWizardTileProps,
     } as WizardTileProps
   })
+  afterEach(() => {
+    cleanup()
+  })
   it('renders the tile with all the information, expect back to be clickable but proceed disabled', () => {
     render(props)
     screen.getByText('Protocol name and description')
@@ -45,7 +55,6 @@ describe('MetadataTile', () => {
       name: 'Add more information, if you like (you can change this later).',
     })
     screen.getByText('Description')
-    screen.getByText('mockDescription')
     screen.getByText('Organization/Author')
     fireEvent.click(screen.getByRole('button', { name: 'GoBack_button' }))
     expect(props.goBack).toHaveBeenCalled()
@@ -53,14 +62,14 @@ describe('MetadataTile', () => {
   })
   it('renders protocol name input field and adding to it calls handleChange', () => {
     render(props)
-    const input = screen.getByLabelText('MetadataTile_protocolName')
+    const input = screen.getAllByRole('textbox', { name: '' })[1]
     fireEvent.change(input, { target: { value: 'mockProtocolName' } })
-    expect(props.handleChange).toHaveBeenCalled()
+    expect(props.register).toHaveBeenCalled()
   })
   it('renders org or author input field and adding to it calls handle change', () => {
     render(props)
-    const input = screen.getByLabelText('MetadataTile_orgOrAuth')
+    const input = screen.getAllByRole('textbox', { name: '' })[2]
     fireEvent.change(input, { target: { value: 'mock org' } })
-    expect(props.handleChange).toHaveBeenCalled()
+    expect(props.register).toHaveBeenCalled()
   })
 })

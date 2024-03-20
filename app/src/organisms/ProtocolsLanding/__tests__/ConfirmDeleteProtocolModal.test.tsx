@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ConfirmDeleteProtocolModal } from '../ConfirmDeleteProtocolModal'
 
@@ -17,32 +18,32 @@ describe('ConfirmDeleteProtocolModal', () => {
 
   beforeEach(() => {
     props = {
-      cancelDeleteProtocol: jest.fn(),
-      handleClickDelete: jest.fn(),
+      cancelDeleteProtocol: vi.fn(),
+      handleClickDelete: vi.fn(),
     }
   })
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('renders correct text', () => {
-    const { getByText } = render(props)
-    getByText('Delete this protocol?')
-    getByText(
+    render(props)
+    screen.getByText('Delete this protocol?')
+    screen.getByText(
       'This protocol will be moved to this computer’s trash and may be unrecoverable.'
     )
   })
 
   it('renders buttons and clicking on them call corresponding props', () => {
     props = {
-      cancelDeleteProtocol: jest.fn(),
-      handleClickDelete: jest.fn(),
+      cancelDeleteProtocol: vi.fn(),
+      handleClickDelete: vi.fn(),
     }
-    const { getByText, getByRole } = render(props)
-    const cancel = getByText('cancel')
+    render(props)
+    const cancel = screen.getByText('cancel')
     fireEvent.click(cancel)
     expect(props.cancelDeleteProtocol).toHaveBeenCalled()
-    const confirm = getByRole('button', { name: 'Yes, delete protocol' })
+    const confirm = screen.getByRole('button', { name: 'Yes, delete protocol' })
     fireEvent.click(confirm)
     expect(props.handleClickDelete).toHaveBeenCalled()
   })

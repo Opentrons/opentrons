@@ -1,5 +1,6 @@
 const isMacOSX = Cypress.platform === 'darwin'
 const batchEditClickOptions = { [isMacOSX ? 'metaKey' : 'ctrlKey']: true }
+
 const invalidInput = 'abcdefghijklmnopqrstuvwxyz!@#$%^&*()<>?,-'
 
 function importProtocol() {
@@ -131,7 +132,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
 
-    cy.get('div[class*=FlowRateInput__description]').contains(
+    cy.contains(
       'Our default aspirate speed is optimal for a P1000 Single-Channel GEN2 aspirating liquids with a viscosity similar to water'
     )
     cy.get('input[name="aspirate_flowRate_customFlowRate"]').type('100')
@@ -150,7 +151,7 @@ describe('Advanced Settings for Transfer Form', () => {
   it('verify functionality of flowrate in batch edit transfer', () => {
     // Batch editing the Flowrate value
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
-    cy.get('div[class*=FlowRateInput__description]').contains(
+    cy.contains(
       'Our default aspirate speed is optimal for a P1000 Single-Channel GEN2 aspirating liquids with a viscosity similar to water'
     )
     cy.get('input[name="aspirate_flowRate_customFlowRate"]').type('100')

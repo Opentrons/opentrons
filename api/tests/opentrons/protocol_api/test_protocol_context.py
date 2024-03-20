@@ -38,6 +38,7 @@ from opentrons.protocol_api.core.common import (
     MagneticModuleCore,
     MagneticBlockCore,
 )
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocols.api_support.deck_type import (
     NoTrashDefinedError,
 )
@@ -110,6 +111,42 @@ def subject(
         core_map=mock_core_map,
         deck=mock_deck,
     )
+
+
+def test_legacy_trash_loading(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    mock_fixed_trash: Labware,
+    mock_deck: Deck,
+) -> None:
+    """It should load a trash labware on init on API level 2.15 and below."""
+    decoy.when(mock_core_map.get(mock_core.fixed_trash)).then_return(mock_fixed_trash)
+    context = ProtocolContext(
+        api_version=APIVersion(2, 15),
+        core=mock_core,
+        core_map=mock_core_map,
+        deck=mock_deck,
+    )
+    assert mock_fixed_trash == context.fixed_trash
+    decoy.verify(mock_core.append_disposal_location(mock_fixed_trash))
+
+
+def test_automatic_ot2_trash_loading(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    mock_deck: Deck,
+) -> None:
+    """It should load a trash labware on init on API level 2.15 and below."""
+    decoy.when(mock_core.robot_type).then_return("OT-2 Standard")
+    ProtocolContext(
+        api_version=APIVersion(2, 16),
+        core=mock_core,
+        core_map=mock_core_map,
+        deck=mock_deck,
+    )
+    decoy.verify(mock_core.load_ot2_fixed_trash_bin())
 
 
 def test_fixed_trash(
@@ -754,6 +791,9 @@ def test_move_labware_to_module(
     mock_broker = decoy.mock(cls=LegacyBroker)
 
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
+    decoy.when(mock_module_core.get_deck_slot()).then_return(DeckSlotName.SLOT_A1)
+    decoy.when(mock_core.get_labware_on_module(mock_module_core)).then_return(None)
+    decoy.when(mock_core_map.get(None)).then_return(None)
 
     movable_labware = Labware(
         core=mock_labware_core,
@@ -834,6 +874,66 @@ def test_move_labware_off_deck_raises(
 
     with pytest.raises(APIVersionError):
         subject.move_labware(labware=movable_labware, new_location=OFF_DECK)
+
+
+def test_load_trash_bin(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should load a trash bin."""
+    mock_trash = decoy.mock(cls=TrashBin)
+
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(
+            "blah", api_version, "OT-3 Standard"
+        )
+    ).then_return(DeckSlotName.SLOT_A1)
+    decoy.when(
+        mock_validation.ensure_and_convert_trash_bin_location(
+            "blah", api_version, "OT-3 Standard"
+        )
+    ).then_return("my swanky trash bin")
+    decoy.when(
+        mock_core.load_trash_bin(DeckSlotName.SLOT_A1, "my swanky trash bin")
+    ).then_return(mock_trash)
+
+    result = subject.load_trash_bin("blah")
+
+    assert result == mock_trash
+
+
+def test_load_trash_bin_raises_for_staging_slot(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should raise when a trash bin load is attempted in a staging slot."""
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(
+            "bleh", api_version, "OT-3 Standard"
+        )
+    ).then_return(StagingSlotName.SLOT_A4)
+
+    with pytest.raises(ValueError, match="Staging areas not permitted"):
+        subject.load_trash_bin("bleh")
+
+
+def test_load_wast_chute(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should load a waste chute."""
+    mock_chute = decoy.mock(cls=WasteChute)
+    decoy.when(mock_core.load_waste_chute()).then_return(mock_chute)
+    result = subject.load_waste_chute()
+    assert result == mock_chute
 
 
 def test_load_module(

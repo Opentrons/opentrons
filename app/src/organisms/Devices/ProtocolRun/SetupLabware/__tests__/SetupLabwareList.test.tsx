@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { StaticRouter } from 'react-router-dom'
-import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, beforeEach, vi, expect } from 'vitest'
+import { screen } from '@testing-library/react'
+
+import { multiple_tipacks_with_tc } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { mockDefinition } from '../../../../../redux/custom-labware/__fixtures__'
 import { SetupLabwareList } from '../SetupLabwareList'
@@ -11,13 +15,9 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 
-jest.mock('../LabwareListItem')
+vi.mock('../LabwareListItem')
 
-const protocolWithTC = (_uncastedProtocolWithTC as unknown) as CompletedProtocolAnalysis
-
-const mockLabwareListItem = LabwareListItem as jest.MockedFunction<
-  typeof LabwareListItem
->
+const protocolWithTC = (multiple_tipacks_with_tc as unknown) as CompletedProtocolAnalysis
 
 const render = (props: React.ComponentProps<typeof SetupLabwareList>) => {
   return renderWithProviders(
@@ -165,10 +165,12 @@ const mockOffDeckCommands = ([
 
 describe('SetupLabwareList', () => {
   beforeEach(() => {
-    mockLabwareListItem.mockReturnValue(<div>mock labware list item</div>)
+    vi.mocked(LabwareListItem).mockReturnValue(
+      <div>mock labware list item</div>
+    )
   })
   it('renders the correct headers and labware list items', () => {
-    const { getAllByText, getByText } = render({
+    render({
       commands: protocolWithTC.commands,
       extraAttentionModules: [],
       attachedModuleInfo: {
@@ -181,13 +183,13 @@ describe('SetupLabwareList', () => {
       isFlex: false,
     })
 
-    getAllByText('mock labware list item')
-    getByText('Labware name')
-    getByText('Location')
-    getByText('Placement')
+    screen.getAllByText('mock labware list item')
+    screen.getByText('Labware name')
+    screen.getByText('Location')
+    screen.getByText('Placement')
   })
   it('renders null for the offdeck labware list when there are none', () => {
-    const { queryByText } = render({
+    render({
       commands: protocolWithTC.commands,
       extraAttentionModules: [],
       attachedModuleInfo: {
@@ -199,17 +201,19 @@ describe('SetupLabwareList', () => {
       } as any,
       isFlex: false,
     })
-    expect(queryByText('Additional Off-Deck Labware')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Additional Off-Deck Labware')
+    ).not.toBeInTheDocument()
   })
 
   it('renders offdeck labware list when there are additional offdeck labwares', () => {
-    const { getAllByText, getByText } = render({
+    render({
       commands: mockOffDeckCommands,
       extraAttentionModules: [],
       attachedModuleInfo: {} as any,
       isFlex: false,
     })
-    getByText('Additional Off-Deck Labware')
-    getAllByText('mock labware list item')
+    screen.getByText('Additional Off-Deck Labware')
+    screen.getAllByText('mock labware list item')
   })
 })

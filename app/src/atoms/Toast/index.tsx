@@ -303,10 +303,10 @@ export function Toast(props: ToastProps): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
       borderRadius={
-        showODDStyle ? BORDERS.borderRadiusSize3 : BORDERS.radiusSoftCorners
+        showODDStyle ? BORDERS.borderRadius12 : BORDERS.borderRadius4
       }
       borderColor={toastStyleByType[type].color}
-      borderWidth={showODDStyle ? BORDERS.borderRadiusSize1 : '1px'}
+      borderWidth={showODDStyle ? BORDERS.borderRadius4 : '1px'}
       border={BORDERS.styleSolid}
       boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}

@@ -28,6 +28,7 @@ class InstrumentConfigurer(Protocol[MountArgType]):
     async def cache_instruments(
         self,
         require: Optional[Dict[Mount, PipetteName]] = None,
+        skip_if_would_block: bool = False,
     ) -> None:
         """
         Scan the attached instruments, take necessary configuration actions,

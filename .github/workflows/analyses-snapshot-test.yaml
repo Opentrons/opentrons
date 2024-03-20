@@ -12,10 +12,11 @@ on:
         required: true
         default: 'edge'
   schedule:
-    - cron:  '0 7-8 * * *' # Random time between 2-3 AM EST (7-8 AM UTC)
+    - cron:  '26 7 * * *' # 7:26 AM UTC
 
 jobs:
   build-and-test:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     env:
       TARGET: ${{ github.event.inputs.TARGET || 'edge' }}
@@ -64,7 +65,7 @@ jobs:
       uses: peter-evans/create-pull-request@v5
       with:
           commit-message: 'fix(app-testing): snapshot failure capture'
-          title: 'Evaluate Analyses Snapshot Update ${{ env.TARGET }}'
+          title: 'fix(app-testing): snapshot failure capture'
           body: 'This PR is an automated snapshot update request. Please review the changes and merge if they are acceptable or find you bug and fix it.'
           branch: 'app-testing/${{ env.TARGET }}-from-${{ env.TEST_SOURCE}}'
           base: ${{ env.TEST_SOURCE}}

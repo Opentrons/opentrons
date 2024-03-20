@@ -20,7 +20,7 @@ import {
 } from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { NameThisLabware } from './NameThisLabware'
-import styles from './LabwareOverlays.css'
+import styles from './LabwareOverlays.module.css'
 
 import type { LabwareEntity } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../../types'
@@ -46,7 +46,7 @@ const REGULAR_OVERLAY_STYLE = css`
   display: flex;
   align-items: ${ALIGN_FLEX_START};
   justify-content: ${JUSTIFY_SPACE_AROUND};
-  border-radius: ${BORDERS.borderRadiusSize4};
+  border-radius: ${BORDERS.borderRadius16};
   bottom: 0;
   font-size: 0.7rem;
   position: ${POSITION_ABSOLUTE};

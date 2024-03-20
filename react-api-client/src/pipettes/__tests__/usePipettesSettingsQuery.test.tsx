@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import {
@@ -16,13 +16,8 @@ import type {
 } from '@opentrons/api-client'
 import type { UsePipetteSettingsQueryOptions } from '../usePipetteSettingsQuery'
 
-jest.mock('@opentrons/api-client')
-jest.mock('../../api/useHost')
-
-const mockGetPipetteSettings = getPipetteSettings as jest.MockedFunction<
-  typeof getPipetteSettings
->
-const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
+vi.mock('@opentrons/api-client')
+vi.mock('../../api/useHost')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
@@ -41,12 +36,9 @@ describe('usePipetteSettingsQuery hook', () => {
 
     wrapper = clientProvider
   })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
 
   it('should return no data if no host', () => {
-    when(mockUseHost).calledWith().mockReturnValue(null)
+    vi.mocked(useHost).mockReturnValue(null)
 
     const { result } = renderHook(usePipetteSettingsQuery, { wrapper })
 
@@ -54,22 +46,18 @@ describe('usePipetteSettingsQuery hook', () => {
   })
 
   it('should return no data if the getPipettes request fails', () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetPipetteSettings)
-      .calledWith(HOST_CONFIG)
-      .mockRejectedValue('oh no')
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getPipetteSettings).mockRejectedValue('oh no')
 
     const { result } = renderHook(usePipetteSettingsQuery, { wrapper })
     expect(result.current.data).toBeUndefined()
   })
 
   it('should return all current attached pipettes', async () => {
-    when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetPipetteSettings)
-      .calledWith(HOST_CONFIG)
-      .mockResolvedValue({
-        data: pipetteSettingsResponseFixture as any,
-      } as Response<PipetteSettings>)
+    vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
+    vi.mocked(getPipetteSettings).mockResolvedValue({
+      data: pipetteSettingsResponseFixture as any,
+    } as Response<PipetteSettings>)
 
     const { result } = renderHook(usePipetteSettingsQuery, {
       wrapper,

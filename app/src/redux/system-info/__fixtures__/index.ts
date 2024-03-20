@@ -1,39 +1,36 @@
 import type { UsbDevice, NetworkInterface } from '../types'
 
 export const mockUsbDevice: UsbDevice = {
-  locationId: 1,
   // 0x0001
   vendorId: 1,
   // 0x000A
   productId: 10,
-  deviceName: 'USB Device',
-  manufacturer: 'Manufacturer Name',
+  productName: 'USB Device',
+  manufacturerName: 'Manufacturer Name',
   serialNumber: 'Serial Number',
-  deviceAddress: 5,
+  identifier: 'aasdhasdasd',
 }
 
 export const mockRealtekDevice: UsbDevice = {
-  locationId: 1,
   // 0x0BDA
   vendorId: 3034,
   // 0x8150
   productId: 33104,
-  deviceName: 'USB 10/100 LAN',
-  manufacturer: 'Realtek',
+  productName: 'USB 10/100 LAN',
+  manufacturerName: 'Realtek',
   serialNumber: 'Serial Number',
-  deviceAddress: 5,
+  identifier: 'kjhgkjhdf',
 }
 
 export const mockWindowsRealtekDevice: UsbDevice = {
-  locationId: 1,
   // 0x0BDA
   vendorId: 3034,
   // 0x8150
   productId: 33104,
-  deviceName: 'Realtek USB FE Family Controller',
-  manufacturer: 'Realtek',
+  productName: 'Realtek USB FE Family Controller',
+  manufacturerName: 'Realtek',
   serialNumber: 'Serial Number',
-  deviceAddress: 5,
+  identifier: '0tgewu0dfasd',
   windowsDriverVersion: '1.2.3',
 }
 

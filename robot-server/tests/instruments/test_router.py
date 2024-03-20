@@ -121,7 +121,7 @@ async def test_get_all_attached_instruments(
         subsystem=SubSystem.pipette_right,
     )
 
-    async def rehearse_instrument_retrievals() -> None:
+    async def rehearse_instrument_retrievals(skip_if_would_block: bool = False) -> None:
         decoy.when(ot3_hardware_api.attached_gripper).then_return(
             cast(
                 GripperDict,
@@ -188,9 +188,9 @@ async def test_get_all_attached_instruments(
 
     # We use this convoluted way of testing to verify the important point that
     # cache_instruments is called before fetching attached pipette and gripper data.
-    decoy.when(await ot3_hardware_api.cache_instruments()).then_do(
-        rehearse_instrument_retrievals
-    )
+    decoy.when(
+        await ot3_hardware_api.cache_instruments(skip_if_would_block=True)
+    ).then_do(rehearse_instrument_retrievals)
     decoy.when(ot3_hardware_api.get_instrument_offset(mount=OT3Mount.LEFT)).then_return(
         PipetteOffsetSummary(
             offset=Point(1, 2, 3),

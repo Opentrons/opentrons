@@ -9,9 +9,11 @@ export {
   disengageMagnet,
   dispense,
   dropTip,
+  dropTipInPlace,
   engageMagnet,
   mix,
   moveLabware,
+  moveToAddressableArea,
   replaceTip,
   setTemperature,
   thermocyclerProfileStep,
@@ -21,9 +23,10 @@ export {
   heaterShaker,
 } from './commandCreators'
 
+export * from './utils'
 export * from './robotStateSelectors'
 export * from './types'
-export * from './utils'
 export * from './constants'
 export * from './getNextRobotStateAndWarnings'
-export * from './fixtures'
+export * from './fixtures/robotStateFixtures'
+export * from './fixtures/data'

@@ -7,15 +7,15 @@ SHX := npx shx
 
 ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
-project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+project_ir_default = $(if $(ot_project),$(ot_project),ot3)
 
 package_name = hardware_testing
-package_version = $(call python_package_version,hardware-testing,$(project_ot3_default))
+package_version = $(call python_package_version,hardware-testing,$(project_rs_default))
 wheel_file = dist/$(call python_get_wheelname,hardware-testing,$(project_rs_default),$(package_name),$(BUILD_NUMBER))
-sdist_file = dist/$(call python_get_sdistname,hardware-testing,$(project_ot3_default),$(package_name))
+sdist_file = dist/$(call python_get_sdistname,hardware-testing,$(project_rs_default),$(package_name))
 usb_file =   dist/$(package_name)-usb-$(package_version).tar.gz
 # Find the branch, sha, version that will be used to update the VERSION.json file
-version_file = $(call python_get_git_version,hardware-testing,$(project_ot3_default),hardware-testing)
+version_file = $(call python_get_git_version,hardware-testing,$(project_rs_default),hardware-testing)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -70,7 +70,7 @@ wheel:
 	$(SHX) ls dist
 
 .PHONY: sdist
-sdist: export OPENTRONS_PROJECT=$(project_ot3_default)
+sdist: export OPENTRONS_PROJECT=$(project_rs_default)
 sdist:
 	$(clean_cmd)
 	$(python) setup.py sdist

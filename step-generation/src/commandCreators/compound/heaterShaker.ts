@@ -78,14 +78,6 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     )
   }
 
-  if (args.latchOpen) {
-    commandCreators.push(
-      curryCommandCreator(heaterShakerOpenLatch, {
-        moduleId: args.module,
-      })
-    )
-  }
-
   if (
     (args.timerMinutes != null && args.timerMinutes !== 0) ||
     (args.timerSeconds != null && args.timerSeconds !== 0)
@@ -108,6 +100,14 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     )
     commandCreators.push(
       curryCommandCreator(heaterShakerDeactivateHeater, {
+        moduleId: args.module,
+      })
+    )
+  }
+
+  if (args.latchOpen) {
+    commandCreators.push(
+      curryCommandCreator(heaterShakerOpenLatch, {
         moduleId: args.module,
       })
     )

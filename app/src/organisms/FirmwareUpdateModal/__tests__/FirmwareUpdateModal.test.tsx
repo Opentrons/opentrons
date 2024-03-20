@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { act, screen, waitFor } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import {
   useInstrumentsQuery,
   useSubsystemUpdateQuery,
@@ -14,17 +16,7 @@ import {
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
 
-jest.mock('@opentrons/react-api-client')
-
-const mockUseInstrumentQuery = useInstrumentsQuery as jest.MockedFunction<
-  typeof useInstrumentsQuery
->
-const mockUseSubsystemUpdateQuery = useSubsystemUpdateQuery as jest.MockedFunction<
-  typeof useSubsystemUpdateQuery
->
-const mockUseUpdateSubsystemMutation = useUpdateSubsystemMutation as jest.MockedFunction<
-  typeof useUpdateSubsystemMutation
->
+vi.mock('@opentrons/react-api-client')
 
 const render = (props: React.ComponentProps<typeof FirmwareUpdateModal>) => {
   return renderWithProviders(<FirmwareUpdateModal {...props} />, {
@@ -34,17 +26,17 @@ const render = (props: React.ComponentProps<typeof FirmwareUpdateModal>) => {
 
 describe('FirmwareUpdateModal', () => {
   let props: React.ComponentProps<typeof FirmwareUpdateModal>
-  const refetch = jest.fn(() => Promise.resolve())
-  const updateSubsystem = jest.fn(() => Promise.resolve())
+  const refetch = vi.fn(() => Promise.resolve())
+  const updateSubsystem = vi.fn(() => Promise.resolve())
   beforeEach(() => {
     props = {
-      proceed: jest.fn(),
+      proceed: vi.fn(),
       description: 'A firmware update is required, instrument is updating',
       subsystem: 'pipette_left',
       proceedDescription: 'Firmware is up to date.',
       isOnDevice: true,
     }
-    mockUseInstrumentQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [
           {
@@ -55,7 +47,7 @@ describe('FirmwareUpdateModal', () => {
       },
       refetch,
     } as any)
-    mockUseSubsystemUpdateQuery.mockReturnValue({
+    vi.mocked(useSubsystemUpdateQuery).mockReturnValue({
       data: {
         data: {
           id: 'update id',
@@ -63,7 +55,7 @@ describe('FirmwareUpdateModal', () => {
         } as any,
       } as SubsystemUpdateProgressData,
     } as any)
-    mockUseUpdateSubsystemMutation.mockReturnValue({
+    vi.mocked(useUpdateSubsystemMutation).mockReturnValue({
       data: {
         data: {
           id: 'update id',
@@ -75,7 +67,7 @@ describe('FirmwareUpdateModal', () => {
     } as any)
   })
   it('initially renders a spinner and text', () => {
-    mockUseInstrumentQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [
           {
@@ -86,7 +78,7 @@ describe('FirmwareUpdateModal', () => {
       },
       refetch,
     } as any)
-    mockUseSubsystemUpdateQuery.mockReturnValue({
+    vi.mocked(useSubsystemUpdateQuery).mockReturnValue({
       data: {
         data: {
           id: 'update id',
@@ -99,7 +91,7 @@ describe('FirmwareUpdateModal', () => {
     getByText('Checking for updates...')
   })
   it('calls proceed if no update is needed', async () => {
-    mockUseInstrumentQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [
           {
@@ -110,7 +102,7 @@ describe('FirmwareUpdateModal', () => {
       },
       refetch,
     } as any)
-    mockUseSubsystemUpdateQuery.mockReturnValue({
+    vi.mocked(useSubsystemUpdateQuery).mockReturnValue({
       data: {
         data: {
           id: 'update id',
@@ -118,19 +110,23 @@ describe('FirmwareUpdateModal', () => {
         } as any,
       } as SubsystemUpdateProgressData,
     } as any)
-    jest.useFakeTimers()
+    //  TODO(jr, 2/27/24): had to specify shouldAdvanceTime
+    //  due to vitest breaking user-events
+    //   https://github.com/testing-library/react-testing-library/issues/1197
+    vi.useFakeTimers({ shouldAdvanceTime: true })
     render(props)
     act(() => {
-      jest.advanceTimersByTime(3000)
+      vi.advanceTimersByTime(3000)
     })
     screen.getByText('Firmware is up to date.')
+    screen.getByLabelText('check')
     act(() => {
-      jest.advanceTimersByTime(3000)
+      vi.advanceTimersByTime(3000)
     })
     await waitFor(() => expect(props.proceed).toHaveBeenCalled())
   })
-  it('does not render text or a progress bar until instrument update status is known', () => {
-    mockUseSubsystemUpdateQuery.mockReturnValue({
+  it('does not render text until instrument update status is known', () => {
+    vi.mocked(useSubsystemUpdateQuery).mockReturnValue({
       data: {
         data: {
           id: 'update id',
@@ -138,7 +134,7 @@ describe('FirmwareUpdateModal', () => {
         } as any,
       } as SubsystemUpdateProgressData,
     } as any)
-    mockUseInstrumentQuery.mockReturnValue({
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: undefined,
       refetch,
     } as any)
@@ -150,7 +146,7 @@ describe('FirmwareUpdateModal', () => {
     ).not.toBeInTheDocument()
   })
   it('calls update subsystem if update is needed', () => {
-    mockUseSubsystemUpdateQuery.mockReturnValue({
+    vi.mocked(useSubsystemUpdateQuery).mockReturnValue({
       data: {
         data: {
           id: 'update id',
@@ -158,21 +154,25 @@ describe('FirmwareUpdateModal', () => {
         } as any,
       } as SubsystemUpdateProgressData,
     } as any)
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     render(props)
     act(() => {
-      jest.advanceTimersByTime(3000)
+      vi.advanceTimersByTime(3000)
     })
     screen.getByText('A firmware update is required, instrument is updating')
+    screen.getByLabelText('spinner')
     expect(updateSubsystem).toHaveBeenCalled()
   })
   it('calls refetch instruments and then proceed once update is complete', async () => {
-    jest.useFakeTimers()
+    //  TODO(jr, 2/27/24): had to specify shouldAdvanceTime
+    //  due to vitest breaking user-events
+    //   https://github.com/testing-library/react-testing-library/issues/1197
+    vi.useFakeTimers({ shouldAdvanceTime: true })
     render(props)
     screen.getByText('A firmware update is required, instrument is updating')
     await waitFor(() => expect(refetch).toHaveBeenCalled())
     act(() => {
-      jest.advanceTimersByTime(10000)
+      vi.advanceTimersByTime(10000)
     })
     await waitFor(() => expect(props.proceed).toHaveBeenCalled())
   })

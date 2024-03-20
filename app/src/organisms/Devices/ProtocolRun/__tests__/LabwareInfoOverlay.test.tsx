@@ -1,13 +1,19 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
+
 import {
   getLabwareDisplayName,
   LabwareDefinition2,
   ProtocolFile,
   LoadedLabware,
+  fixtureTiprack300ul,
 } from '@opentrons/shared-data'
-import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
+
+import {
+  nestedTextMatcher,
+  renderWithProviders,
+} from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { useCurrentRun } from '../../../ProtocolUpload/hooks'
 import { getLabwareLocation } from '../utils/getLabwareLocation'
@@ -15,17 +21,17 @@ import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareDefinitionUri } from '../utils/getLabwareDefinitionUri'
 import { useLabwareOffsetForLabware } from '../useLabwareOffsetForLabware'
 
-jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../utils/getLabwareLocation')
-jest.mock('../../hooks')
-jest.mock('../utils/getLabwareDefinitionUri')
-jest.mock('../useLabwareOffsetForLabware')
+vi.mock('../../../ProtocolUpload/hooks')
+vi.mock('../utils/getLabwareLocation')
+vi.mock('../../hooks')
+vi.mock('../utils/getLabwareDefinitionUri')
+vi.mock('../useLabwareOffsetForLabware')
 
-jest.mock('@opentrons/shared-data', () => {
-  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getLabwareDisplayName>()
   return {
-    ...actualSharedData,
-    getLabwareDisplayName: jest.fn(),
+    ...actual,
+    getLabwareDisplayName: vi.fn(),
   }
 })
 
@@ -40,21 +46,6 @@ const render = (props: React.ComponentProps<typeof LabwareInfoOverlay>) => {
   )[0]
 }
 
-const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
-  typeof getLabwareDisplayName
->
-const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
-  typeof useCurrentRun
->
-const mockUseLabwareOffsetForLabware = useLabwareOffsetForLabware as jest.MockedFunction<
-  typeof useLabwareOffsetForLabware
->
-const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
-  typeof getLabwareLocation
->
-const mockGetLabwareDefinitionUri = getLabwareDefinitionUri as jest.MockedFunction<
-  typeof getLabwareDefinitionUri
->
 const MOCK_LABWARE_ID = 'some_labware_id'
 const MOCK_LABWARE_DEFINITION_URI = 'some_labware_definition_uri'
 const MOCK_SLOT_NAME = '4'
@@ -67,7 +58,7 @@ describe('LabwareInfoOverlay', () => {
   let labwareDefinitions: ProtocolFile<{}>['labwareDefinitions']
   beforeEach(() => {
     props = {
-      definition: fixture_tiprack_300_ul as LabwareDefinition2,
+      definition: fixtureTiprack300ul as LabwareDefinition2,
       displayName: 'fresh tips',
       labwareId: MOCK_LABWARE_ID,
       runId: MOCK_RUN_ID,
@@ -79,15 +70,15 @@ describe('LabwareInfoOverlay', () => {
       } as LoadedLabware,
     ]
     labwareDefinitions = {
-      [MOCK_LABWARE_DEFINITION_URI]: fixture_tiprack_300_ul as LabwareDefinition2,
+      [MOCK_LABWARE_DEFINITION_URI]: fixtureTiprack300ul as LabwareDefinition2,
     }
-    when(mockGetLabwareDisplayName)
+    when(vi.mocked(getLabwareDisplayName))
       .calledWith(props.definition)
-      .mockReturnValue('mock definition display name')
+      .thenReturn('mock definition display name')
 
-    when(mockUseLabwareOffsetForLabware)
+    when(vi.mocked(useLabwareOffsetForLabware))
       .calledWith(MOCK_RUN_ID, MOCK_LABWARE_ID)
-      .mockReturnValue({
+      .thenReturn({
         id: 'fake_offset_id',
         createdAt: 'fake_timestamp',
         definitionUri: 'fake_def_uri',
@@ -95,21 +86,20 @@ describe('LabwareInfoOverlay', () => {
         vector: MOCK_LABWARE_VECTOR,
       })
 
-    when(mockUseCurrentRun)
+    when(vi.mocked(useCurrentRun))
       .calledWith()
-      .mockReturnValue({} as any)
+      .thenReturn({} as any)
 
-    when(mockGetLabwareLocation)
+    when(vi.mocked(getLabwareLocation))
       .calledWith(MOCK_LABWARE_ID, [])
-      .mockReturnValue({ slotName: MOCK_SLOT_NAME })
+      .thenReturn({ slotName: MOCK_SLOT_NAME })
 
-    when(mockGetLabwareDefinitionUri)
+    when(vi.mocked(getLabwareDefinitionUri))
       .calledWith(MOCK_LABWARE_ID, labware, labwareDefinitions)
-      .mockReturnValue(MOCK_LABWARE_DEFINITION_URI)
+      .thenReturn(MOCK_LABWARE_DEFINITION_URI)
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('should render the labware display name if present', () => {
@@ -131,9 +121,9 @@ describe('LabwareInfoOverlay', () => {
   })
 
   it('should render the offset data when offset data exists', () => {
-    when(mockUseCurrentRun)
+    when(vi.mocked(useCurrentRun))
       .calledWith()
-      .mockReturnValue({
+      .thenReturn({
         data: {
           labwareOffsets: [
             {

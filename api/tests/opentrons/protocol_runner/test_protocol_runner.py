@@ -1,6 +1,6 @@
 """Tests for the PythonAndLegacyRunner, JsonRunner & LiveRunner classes."""
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy, matchers
 from pathlib import Path
 from typing import List, cast, Optional, Union, Type
@@ -169,7 +169,7 @@ def live_runner_subject(
         (None, LiveRunner),
     ],
 )
-async def test_create_protocol_runner(
+def test_create_protocol_runner(
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareAPI,
     task_queue: TaskQueue,
@@ -203,7 +203,7 @@ async def test_create_protocol_runner(
         (lazy_fixture("live_runner_subject")),
     ],
 )
-async def test_play_starts_run(
+def test_play_starts_run(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
@@ -223,7 +223,7 @@ async def test_play_starts_run(
         (lazy_fixture("live_runner_subject")),
     ],
 )
-async def test_pause(
+def test_pause(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
     subject: AnyRunner,
@@ -284,6 +284,25 @@ async def test_stop_when_run_never_started(
         ),
         times=1,
     )
+
+
+@pytest.mark.parametrize(
+    "subject",
+    [
+        (lazy_fixture("json_runner_subject")),
+        (lazy_fixture("legacy_python_runner_subject")),
+        (lazy_fixture("live_runner_subject")),
+    ],
+)
+def test_resume_from_recovery(
+    decoy: Decoy,
+    protocol_engine: ProtocolEngine,
+    subject: AnyRunner,
+) -> None:
+    """It should call `resume_from_recovery()` on the underlying engine."""
+    subject.resume_from_recovery()
+
+    decoy.verify(protocol_engine.resume_from_recovery(), times=1)
 
 
 async def test_run_json_runner(
@@ -456,6 +475,7 @@ async def test_load_legacy_python(
     await legacy_python_runner_subject.load(
         legacy_protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+        run_time_param_values=None,
     )
 
     decoy.verify(
@@ -468,6 +488,7 @@ async def test_load_legacy_python(
             func=legacy_executor.execute,
             protocol=legacy_protocol,
             context=legacy_context,
+            run_time_param_values=None,
         ),
     )
     assert broker_captor.value is legacy_python_runner_subject.broker
@@ -526,6 +547,7 @@ async def test_load_python_with_pe_papi_core(
     await legacy_python_runner_subject.load(
         legacy_protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+        run_time_param_values=None,
     )
 
     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
@@ -587,6 +609,7 @@ async def test_load_legacy_json(
     await legacy_python_runner_subject.load(
         legacy_protocol_source,
         python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+        run_time_param_values=None,
     )
 
     decoy.verify(
@@ -599,6 +622,7 @@ async def test_load_legacy_json(
             func=legacy_executor.execute,
             protocol=legacy_protocol,
             context=legacy_context,
+            run_time_param_values=None,
         ),
     )
 

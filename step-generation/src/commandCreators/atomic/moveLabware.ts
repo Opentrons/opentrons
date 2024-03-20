@@ -36,6 +36,9 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     prevRobotState.liquidState != null
       ? getLabwareHasLiquid(prevRobotState.liquidState, labware)
       : false
+  const hasTipOnPipettes = Object.values(
+    prevRobotState.tipState.pipettes
+  ).includes(true)
   const actionName = 'moveToLabware'
   const errors: CommandCreatorError[] = []
   const warnings: CommandCreatorWarning[] = []
@@ -72,6 +75,10 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     (!hasGripper && useGripper)
   ) {
     errors.push(errorCreators.gripperRequired())
+  }
+
+  if (hasTipOnPipettes && useGripper) {
+    errors.push(errorCreators.pipetteHasTip())
   }
 
   const initialLabwareSlot = prevRobotState.labware[labware]?.slot

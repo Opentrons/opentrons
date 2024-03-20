@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
@@ -9,21 +11,13 @@ import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
+import { useNotifyService } from '../../../resources/useNotifyService'
 
-jest.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
-jest.mock('../../../redux/protocol-storage')
-jest.mock('../../../organisms/Devices/hooks')
-jest.mock('../../../redux/config')
-
-const mockGetStoredProtocols = getStoredProtocols as jest.MockedFunction<
-  typeof getStoredProtocols
->
-const mockUseCreateRunFromProtocol = useCreateRunFromProtocol as jest.MockedFunction<
-  typeof useCreateRunFromProtocol
->
-const mockUseTrackCreateProtocolRunEvent = useTrackCreateProtocolRunEvent as jest.MockedFunction<
-  typeof useTrackCreateProtocolRunEvent
->
+vi.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
+vi.mock('../../../redux/protocol-storage')
+vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../redux/config')
+vi.mock('../../../resources/useNotifyService')
 
 const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
   return renderWithProviders(
@@ -37,30 +31,28 @@ const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
 }
 
 describe('ChooseProtocolSlideout', () => {
-  let mockCreateRunFromProtocol: jest.Mock
-  let mockTrackCreateProtocolRunEvent: jest.Mock
+  let mockCreateRunFromProtocol = vi.fn()
+  let mockTrackCreateProtocolRunEvent = vi.fn()
   beforeEach(() => {
-    mockCreateRunFromProtocol = jest.fn()
-    mockTrackCreateProtocolRunEvent = jest.fn(
+    mockCreateRunFromProtocol = vi.fn()
+    mockTrackCreateProtocolRunEvent = vi.fn(
       () => new Promise(resolve => resolve({}))
     )
-    mockGetStoredProtocols.mockReturnValue([storedProtocolDataFixture])
-    mockUseCreateRunFromProtocol.mockReturnValue({
+    vi.mocked(getStoredProtocols).mockReturnValue([storedProtocolDataFixture])
+    vi.mocked(useCreateRunFromProtocol).mockReturnValue({
       createRunFromProtocolSource: mockCreateRunFromProtocol,
-      reset: jest.fn(),
+      reset: vi.fn(),
     } as any)
-    mockUseTrackCreateProtocolRunEvent.mockReturnValue({
+    vi.mocked(useTrackCreateProtocolRunEvent).mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
+    vi.mocked(useNotifyService).mockReturnValue({} as any)
   })
 
   it('renders slideout if showSlideout true', () => {
     render({
       robot: mockConnectableRobot,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       showSlideout: true,
     })
     screen.getByText(/choose protocol to run/i)
@@ -69,7 +61,7 @@ describe('ChooseProtocolSlideout', () => {
   it('renders an available protocol option for every stored protocol if any', () => {
     render({
       robot: mockConnectableRobot,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       showSlideout: true,
     })
     screen.getByLabelText('protocol deck map')
@@ -79,10 +71,10 @@ describe('ChooseProtocolSlideout', () => {
     ).toBeNull()
   })
   it('renders an empty state if no protocol options', () => {
-    mockGetStoredProtocols.mockReturnValue([])
+    vi.mocked(getStoredProtocols).mockReturnValue([])
     render({
       robot: mockConnectableRobot,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       showSlideout: true,
     })
     expect(screen.queryByLabelText('protocol deck map')).toBeNull()
@@ -94,7 +86,7 @@ describe('ChooseProtocolSlideout', () => {
   it('calls createRunFromProtocolSource if CTA clicked', () => {
     render({
       robot: mockConnectableRobot,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       showSlideout: true,
     })
     const proceedButton = screen.getByRole('button', {
@@ -108,16 +100,16 @@ describe('ChooseProtocolSlideout', () => {
     expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
   })
   it('renders error state when there is a run creation error', () => {
-    mockUseCreateRunFromProtocol.mockReturnValue({
+    vi.mocked(useCreateRunFromProtocol).mockReturnValue({
       runCreationError: 'run creation error',
       createRunFromProtocolSource: mockCreateRunFromProtocol,
       isCreatingRun: false,
-      reset: jest.fn(),
+      reset: vi.fn(),
       runCreationErrorCode: 500,
     })
     render({
       robot: mockConnectableRobot,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       showSlideout: true,
     })
     const proceedButton = screen.getByRole('button', {
@@ -133,16 +125,16 @@ describe('ChooseProtocolSlideout', () => {
   })
 
   it('renders error state when run creation error code is 409', () => {
-    mockUseCreateRunFromProtocol.mockReturnValue({
+    vi.mocked(useCreateRunFromProtocol).mockReturnValue({
       runCreationError: 'Current run is not idle or stopped.',
       createRunFromProtocolSource: mockCreateRunFromProtocol,
       isCreatingRun: false,
-      reset: jest.fn(),
+      reset: vi.fn(),
       runCreationErrorCode: 409,
     })
     render({
       robot: mockConnectableRobot,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       showSlideout: true,
     })
     const proceedButton = screen.getByRole('button', {
