@@ -11,7 +11,7 @@ import { getLabwareOffDeck, getLabwareInColumn4 } from './utils'
 import type { LabwareEntity } from '@opentrons/step-generation'
 import type { DropdownOption, Options } from '@opentrons/components'
 import type { Selector } from '../../types'
-import {
+import type {
   AllTemporalPropertiesForTimelineFrame,
   SavedStepFormState,
 } from '../../step-forms'
@@ -39,7 +39,7 @@ export const _sortLabwareDropdownOptions = (options: Options): Options =>
     return a.name.localeCompare(b.name)
   })
 
-const getNickNames = (
+const getNickname = (
   nicknamesById: Record<string, string>,
   initialDeckSetup: AllTemporalPropertiesForTimelineFrame,
   labwareId: string,
@@ -65,7 +65,7 @@ const getNickNames = (
     labwareId
   )
 
-  let nickName = nicknamesById[labwareId]
+  let nickName: string = nicknamesById[labwareId]
   if (module != null) {
     nickName = `${nicknamesById[labwareId]} in ${module}`
   } else if (isOffDeck) {
@@ -109,8 +109,9 @@ export const getMoveLabwareOptions: Selector<Options> = createSelector(
             form.newLocation === wasteChuteLocation
         )
 
-        const isAdapter = labwareEntity.def.allowedRoles?.includes('adapter')
-        const nickName = getNickNames(
+        const isAdapter =
+          labwareEntity.def.allowedRoles?.includes('adapter') ?? false
+        const nickName = getNickname(
           nicknamesById,
           initialDeckSetup,
           labwareId,
@@ -168,8 +169,9 @@ export const getLabwareOptions: Selector<Options> = createSelector(
             form.newLocation === wasteChuteLocation
         )
 
-        const isAdapter = labwareEntity.def.allowedRoles?.includes('adapter')
-        const nickName = getNickNames(
+        const isAdapter =
+          labwareEntity.def.allowedRoles?.includes('adapter') ?? false
+        const nickName = getNickname(
           nicknamesById,
           initialDeckSetup,
           labwareId,
