@@ -476,12 +476,10 @@ export function ChooseRobotSlideout(
           paddingBottom={SPACING.spacing10}
           {...targetProps}
         >
-          Restore default values
+          {t('restore_defaults')}
         </Link>
         {!isRestoreDefaultsLinkEnabled && (
-          <Tooltip tooltipProps={tooltipProps}>
-            {'No custom values specified'}
-          </Tooltip>
+          <Tooltip tooltipProps={tooltipProps}>{t('no_custom_values')}</Tooltip>
         )}
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
