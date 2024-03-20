@@ -32,6 +32,7 @@ from opentrons.protocol_engine.state.pipettes import (
 )
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
+    robotPositionsDict,
 )
 
 from .command_fixtures import (
@@ -687,6 +688,12 @@ def test_add_pipette_config(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(

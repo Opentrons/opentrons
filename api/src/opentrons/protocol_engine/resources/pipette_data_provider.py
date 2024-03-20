@@ -1,6 +1,6 @@
 """Pipette config data providers."""
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict, Optional, TypedDict
 
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons_shared_data.pipette import (
@@ -19,6 +19,13 @@ from opentrons.hardware_control.nozzle_manager import (
 
 from ..types import FlowRates
 from ...types import Point
+
+
+class robotPositionsDict(TypedDict):
+    """Static positions in the robot of a pipette."""
+
+    left: Point
+    right: Point
 
 
 @dataclass(frozen=True)
@@ -40,6 +47,18 @@ class LoadedStaticPipetteData:
     nozzle_map: NozzleMap
     back_left_corner_offset: Point
     front_right_corner_offset: Point
+    robot_home_min_position: robotPositionsDict
+    robot_front_left_max_position: robotPositionsDict
+
+
+def _convert_robot_positions_dict(
+    robot_position: pipette_definition.PipetteMountPositions,
+) -> robotPositionsDict:
+    """Internally helper function for converting a robot positions dict."""
+    return robotPositionsDict(
+        left=Point(x=robot_position.left[0], y=robot_position.left[1], z=0),
+        right=Point(x=robot_position.right[0], y=robot_position.right[1], z=0),
+    )
 
 
 class VirtualPipetteDataProvider:
@@ -154,6 +173,8 @@ class VirtualPipetteDataProvider:
         nozzle_manager = NozzleConfigurationManager.build_from_config(config)
         pip_back_left = config.pipette_bounding_box_offsets.back_left_corner
         pip_front_right = config.pipette_bounding_box_offsets.front_right_corner
+        robot_home_position = config.robot_positions.robot_home_position
+        robot_front_left_position = config.robot_positions.robot_front_left_position
         return LoadedStaticPipetteData(
             model=str(pipette_model),
             display_name=config.display_name,
@@ -183,6 +204,10 @@ class VirtualPipetteDataProvider:
             front_right_corner_offset=Point(
                 pip_front_right[0], pip_front_right[1], pip_front_right[2]
             ),
+            robot_home_min_position=_convert_robot_positions_dict(robot_home_position),
+            robot_front_left_max_position=_convert_robot_positions_dict(
+                robot_front_left_position
+            ),
         )
 
     def get_virtual_pipette_static_config(
@@ -199,6 +224,10 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
     """Get the config for a pipette, given the state/config object from the HW API."""
     back_left_offset = pipette_dict["pipette_bounding_box_offsets"].back_left_corner
     front_right_offset = pipette_dict["pipette_bounding_box_offsets"].front_right_corner
+    robot_home_position = pipette_dict["robot_positions"].robot_home_position
+    robot_front_left_position = pipette_dict[
+        "robot_positions"
+    ].robot_front_left_position
     return LoadedStaticPipetteData(
         model=pipette_dict["model"],
         display_name=pipette_dict["display_name"],
@@ -224,5 +253,9 @@ def get_pipette_static_config(pipette_dict: PipetteDict) -> LoadedStaticPipetteD
         ),
         front_right_corner_offset=Point(
             front_right_offset[0], front_right_offset[1], front_right_offset[2]
+        ),
+        robot_home_min_position=_convert_robot_positions_dict(robot_home_position),
+        robot_front_left_max_position=_convert_robot_positions_dict(
+            robot_front_left_position
         ),
     )

@@ -20,6 +20,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
     SupportedTipsDefinition,
     PipetteBoundingBoxOffsetDefinition,
+    PipetteUniqueRobotGeometryDefinition,
 )
 from opentrons_shared_data.gripper import (
     GripperModel,
@@ -98,6 +99,7 @@ class PipetteDict(InstrumentDict):
     supported_tips: Dict[PipetteTipType, SupportedTipsDefinition]
     pipette_bounding_box_offsets: PipetteBoundingBoxOffsetDefinition
     current_nozzle_map: NozzleMap
+    robot_positions: PipetteUniqueRobotGeometryDefinition
 
 
 class PipetteStateDict(TypedDict):

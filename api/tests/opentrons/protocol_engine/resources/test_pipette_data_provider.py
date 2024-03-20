@@ -4,6 +4,8 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteMode
 from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteBoundingBoxOffsetDefinition,
+    PipetteUniqueRobotGeometryDefinition,
+    PipetteMountPositions,
 )
 
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -11,6 +13,7 @@ from opentrons.protocol_engine.types import FlowRates
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
     VirtualPipetteDataProvider,
+    robotPositionsDict,
 )
 
 from opentrons.protocol_engine.resources import pipette_data_provider as subject
@@ -58,6 +61,12 @@ def test_get_virtual_pipette_static_config(
         nozzle_map=result.nozzle_map,
         back_left_corner_offset=Point(0, 0, 10.45),
         front_right_corner_offset=Point(0, 0, 10.45),
+        robot_home_min_position=robotPositionsDict(
+            left=Point(0, 0, 0), right=Point(-35.0, 0.0, 0)
+        ),
+        robot_front_left_max_position=robotPositionsDict(
+            left=Point(411.74, 347.5, 0), right=Point(376.74, 347.5, 0)
+        ),
     )
 
 
@@ -86,6 +95,12 @@ def test_configure_virtual_pipette_for_volume(
         nozzle_map=result1.nozzle_map,
         back_left_corner_offset=Point(-8.0, -22.0, -259.15),
         front_right_corner_offset=Point(-8.0, -22.0, -259.15),
+        robot_home_min_position=robotPositionsDict(
+            left=Point(0.3, -4.3, 0), right=Point(-53.7, -4.3, 0)
+        ),
+        robot_front_left_max_position=robotPositionsDict(
+            left=Point(537.8, 401.515, 0), right=Point(483.8, 401.515, 0)
+        ),
     )
     subject_instance.configure_virtual_pipette_for_volume(
         "my-pipette", 1, result1.model
@@ -111,6 +126,12 @@ def test_configure_virtual_pipette_for_volume(
         nozzle_map=result2.nozzle_map,
         back_left_corner_offset=Point(-8.0, -22.0, -259.15),
         front_right_corner_offset=Point(-8.0, -22.0, -259.15),
+        robot_home_min_position=robotPositionsDict(
+            left=Point(0.3, -4.3, 0), right=Point(-53.7, -4.3, 0)
+        ),
+        robot_front_left_max_position=robotPositionsDict(
+            left=Point(537.8, 401.515, 0), right=Point(483.8, 401.515, 0)
+        ),
     )
 
 
@@ -139,6 +160,12 @@ def test_load_virtual_pipette_by_model_string(
         nozzle_map=result.nozzle_map,
         back_left_corner_offset=Point(-16.0, 43.15, 35.52),
         front_right_corner_offset=Point(16.0, -43.15, 35.52),
+        robot_home_min_position=robotPositionsDict(
+            left=Point(0, 0, 0), right=Point(-35.0, 0.0, 0)
+        ),
+        robot_front_left_max_position=robotPositionsDict(
+            left=Point(411.74, 347.5, 0), right=Point(376.74, 347.5, 0)
+        ),
     )
 
 
@@ -225,6 +252,12 @@ def test_get_pipette_static_config(
             backLeftCorner=[10, 20, 30],
             frontRightCorner=[40, 50, 60],
         ),
+        "robot_positions": PipetteUniqueRobotGeometryDefinition(
+            robotHomePosition=PipetteMountPositions(left=[0, 0], right=[0, 0]),
+            robotFrontLeftPosition=PipetteMountPositions(
+                left=[100, 100], right=[120, 110]
+            ),
+        ),
     }
 
     result = subject.get_pipette_static_config(pipette_dict)
@@ -253,4 +286,10 @@ def test_get_pipette_static_config(
         nozzle_map=dummy_nozzle_map,
         back_left_corner_offset=Point(10, 20, 30),
         front_right_corner_offset=Point(40, 50, 60),
+        robot_home_min_position=robotPositionsDict(
+            left=Point(0, 0, 0), right=Point(0, 0, 0)
+        ),
+        robot_front_left_max_position=robotPositionsDict(
+            left=Point(100, 100, 0), right=Point(120, 110, 0)
+        ),
     )

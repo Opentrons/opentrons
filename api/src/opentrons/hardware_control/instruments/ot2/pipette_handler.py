@@ -258,6 +258,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             result[
                 "pipette_bounding_box_offsets"
             ] = instr.config.pipette_bounding_box_offsets
+            result["robot_positions"] = instr.config.robot_positions
         return cast(PipetteDict, result)
 
     @property

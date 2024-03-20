@@ -8,6 +8,7 @@ from opentrons.protocol_engine.execution import (
 from opentrons.protocol_engine.types import FlowRates
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
+    robotPositionsDict,
 )
 
 from opentrons.protocol_engine.commands.configure_for_volume import (
@@ -49,6 +50,12 @@ async def test_configure_for_volume_implementation(
         nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI),
         back_left_corner_offset=Point(10, 20, 30),
         front_right_corner_offset=Point(40, 50, 60),
+        robot_home_min_position=robotPositionsDict(
+            left=Point(0, 0, 0), right=Point(0, 0, 0)
+        ),
+        robot_front_left_max_position=robotPositionsDict(
+            left=Point(100, 100, 0), right=Point(120, 110, 0)
+        ),
     )
 
     decoy.when(
