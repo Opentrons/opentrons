@@ -337,7 +337,7 @@ def ensure_and_convert_trash_bin_location(
 
 
 def ensure_and_convert_module_fixture_location(
-    deck_slot: Optional[Union[int, str]],
+    deck_slot: DeckSlotName,
     api_version: APIVersion,
     robot_type: RobotType,
     model: ModuleModel,
@@ -353,7 +353,7 @@ def ensure_and_convert_module_fixture_location(
 
     if isinstance(model, MagneticBlockModel):
         valid_slots = [
-            DeckSlotName(slot)
+            slot
             for slot in [
                 "A1",
                 "B1",
@@ -386,8 +386,7 @@ def ensure_and_convert_module_fixture_location(
 
     elif isinstance(model, HeaterShakerModuleModel):
         valid_slots = [
-            DeckSlotName(slot)
-            for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
+            slot for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
         ]
         addressable_areas = [
             "heaterShakerV1A1",
@@ -401,8 +400,7 @@ def ensure_and_convert_module_fixture_location(
         ]
     elif isinstance(model, TemperatureModuleModel):
         valid_slots = [
-            DeckSlotName(slot)
-            for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
+            slot for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
         ]
         addressable_areas = [
             "temperatureModuleV2A1",
