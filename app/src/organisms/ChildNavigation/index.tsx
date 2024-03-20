@@ -19,7 +19,6 @@ import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { SmallButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { StyledText } from '../../atoms/text'
-import { Chip } from '../../atoms/Chip'
 
 import type { IconName } from '@opentrons/components'
 import type { InlineNotificationProps } from '../../atoms/InlineNotification'

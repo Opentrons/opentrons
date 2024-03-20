@@ -96,7 +96,7 @@ const render = (path = '/protocols/fakeProtocolId') => {
 
 describe('ODDProtocolDetails', () => {
   beforeEach(() => {
-    vi.mocked(useRunTimeParameters).mockReturnValue([])
+    when(useRunTimeParameters).calledWith('fakeProtocolId').thenReturn([])
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
@@ -220,7 +220,9 @@ describe('ODDProtocolDetails', () => {
     expect(screen.getAllByTestId('Skeleton').length).toBeGreaterThan(0)
   })
   it('renders the parameters screen', () => {
-    vi.mocked(useRunTimeParameters).mockReturnValue(mockRunTimeParameterData)
+    when(useRunTimeParameters)
+      .calledWith('fakeProtocolId')
+      .thenReturn(mockRunTimeParameterData)
     render()
     fireEvent.click(screen.getByText('Start setup'))
     expect(vi.mocked(ProtocolSetupParameters)).toHaveBeenCalled()
