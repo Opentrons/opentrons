@@ -62,7 +62,6 @@ vi.mock('../../../redux/config')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})
-const PROTOCOL_ID = 'mockId'
 const MOCK_DATA = {
   data: {
     id: 'mockProtocol1',

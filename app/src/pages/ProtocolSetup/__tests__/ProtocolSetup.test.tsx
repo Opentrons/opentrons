@@ -194,6 +194,7 @@ describe('ProtocolSetup', () => {
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
     mockHistoryPush = vi.fn()
+    vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })

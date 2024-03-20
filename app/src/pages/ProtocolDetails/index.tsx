@@ -400,7 +400,6 @@ export function ProtocolDetails(): JSX.Element | null {
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
     )
   }
-
   const handleRunProtocol = (): void => {
     runTimeParameters.length > 0
       ? setShowParameters(true)
