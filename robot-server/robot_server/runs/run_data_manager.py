@@ -1,9 +1,9 @@
 """Manage current and historical run data."""
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-
+from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
 from opentrons.protocol_engine import (
     EngineStatus,
     LabwareOffsetCreate,
@@ -18,44 +18,91 @@ from robot_server.service.task_runner import TaskRunner
 from robot_server.service.notifications import RunsPublisher
 
 from .engine_store import EngineStore
-from .run_store import RunResource, RunStore
-from .run_models import Run
+from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
+from .run_models import Run, BadRun, RunLoadingError
 
 from opentrons.protocol_engine.types import DeckConfigurationType
+from opentrons.protocol_engine import ErrorOccurrence
 
 
 def _build_run(
-    run_resource: RunResource,
-    state_summary: Optional[StateSummary],
+    run_resource: Union[RunResource, BadRunResource],
+    state_summary: Union[StateSummary, BadStateSummary],
     current: bool,
-) -> Run:
+) -> Union[Run, BadRun]:
     # TODO(mc, 2022-05-16): improve persistence strategy
     # such that this default summary object is not needed
-    state_summary = state_summary or StateSummary.construct(
-        status=EngineStatus.STOPPED,
-        errors=[],
-        labware=[],
-        labwareOffsets=[],
-        pipettes=[],
-        modules=[],
-        liquids=[],
-    )
-    return Run.construct(
-        id=run_resource.run_id,
-        protocolId=run_resource.protocol_id,
-        createdAt=run_resource.created_at,
-        actions=run_resource.actions,
-        status=state_summary.status,
-        errors=state_summary.errors,
-        labware=state_summary.labware,
-        labwareOffsets=state_summary.labwareOffsets,
-        pipettes=state_summary.pipettes,
-        modules=state_summary.modules,
-        current=current,
-        completedAt=state_summary.completedAt,
-        startedAt=state_summary.startedAt,
-        liquids=state_summary.liquids,
-    )
+
+    if run_resource.ok and isinstance(state_summary, StateSummary):
+        return Run.construct(
+            id=run_resource.run_id,
+            protocolId=run_resource.protocol_id,
+            createdAt=run_resource.created_at,
+            actions=run_resource.actions,
+            status=state_summary.status,
+            errors=state_summary.errors,
+            labware=state_summary.labware,
+            labwareOffsets=state_summary.labwareOffsets,
+            pipettes=state_summary.pipettes,
+            modules=state_summary.modules,
+            current=current,
+            completedAt=state_summary.completedAt,
+            startedAt=state_summary.startedAt,
+            liquids=state_summary.liquids,
+        )
+    else:
+        errors: List[EnumeratedError] = []
+        if isinstance(state_summary, BadStateSummary):
+            state = StateSummary.construct(
+                status=EngineStatus.STOPPED,
+                errors=[],
+                labware=[],
+                labwareOffsets=[],
+                pipettes=[],
+                modules=[],
+                liquids=[],
+            )
+            errors.append(state_summary.dataError)
+        else:
+            state = state_summary
+        if not run_resource.ok:
+            errors.append(run_resource.error)
+
+        if len(errors) > 1:
+            run_loading_error = RunLoadingError.from_exc(
+                InvalidStoredData(
+                    message=(
+                        "Data on this run is not valid. The run may have been "
+                        "created on a future software version."
+                    ),
+                    wrapping=errors,
+                )
+            )
+        elif errors:
+            run_loading_error = RunLoadingError.from_exc(errors[0])
+        else:
+            # We should never get here
+            run_loading_error = RunLoadingError.from_exc(
+                AssertionError("Logic error in parsing invalid run.")
+            )
+
+        return BadRun.construct(
+            dataError=run_loading_error,
+            id=run_resource.run_id,
+            protocolId=run_resource.protocol_id,
+            createdAt=run_resource.created_at,
+            actions=run_resource.actions,
+            status=state.status,
+            errors=state.errors,
+            labware=state.labware,
+            labwareOffsets=state.labwareOffsets,
+            pipettes=state.pipettes,
+            modules=state.modules,
+            current=current,
+            completedAt=state.completedAt,
+            startedAt=state.startedAt,
+            liquids=state.liquids,
+        )
 
 
 class RunNotCurrentError(ValueError):
@@ -97,7 +144,7 @@ class RunDataManager:
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
         protocol: Optional[ProtocolResource],
-    ) -> Run:
+    ) -> Union[Run, BadRun]:
         """Create a new, current run.
 
         Args:
@@ -133,7 +180,7 @@ class RunDataManager:
         )
         await self._runs_publisher.begin_polling_engine_store(
             get_current_command=self.get_current_command,
-            get_state_summary=self._get_state_summary,
+            get_state_summary=self._get_good_state_summary,
             run_id=run_id,
         )
 
@@ -143,7 +190,7 @@ class RunDataManager:
             current=True,
         )
 
-    def get(self, run_id: str) -> Run:
+    def get(self, run_id: str) -> Union[Run, BadRun]:
         """Get a run resource.
 
         This method will pull from the current run or the historical runs,
@@ -192,7 +239,7 @@ class RunDataManager:
             self._engine_store.engine.state_view.labware.get_loaded_labware_definitions()
         )
 
-    def get_all(self, length: Optional[int]) -> List[Run]:
+    def get_all(self, length: Optional[int]) -> List[Union[Run, BadRun]]:
         """Get current and stored run resources.
 
         Results are ordered from oldest to newest.
@@ -226,7 +273,7 @@ class RunDataManager:
 
         self._run_store.remove(run_id=run_id)
 
-    async def update(self, run_id: str, current: Optional[bool]) -> Run:
+    async def update(self, run_id: str, current: Optional[bool]) -> Union[Run, BadRun]:
         """Get and potentially archive a run.
 
         Args:
@@ -249,7 +296,9 @@ class RunDataManager:
 
         if next_current is False:
             commands, state_summary = await self._engine_store.clear()
-            run_resource = self._run_store.update_run_state(
+            run_resource: Union[
+                RunResource, BadRunResource
+            ] = self._run_store.update_run_state(
                 run_id=run_id,
                 summary=state_summary,
                 commands=commands,
@@ -319,12 +368,12 @@ class RunDataManager:
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
 
-    def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
-        result: Optional[StateSummary]
-
+    def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         if run_id == self._engine_store.current_run_id:
-            result = self._engine_store.engine.state_view.get_summary()
+            return self._engine_store.engine.state_view.get_summary()
         else:
-            result = self._run_store.get_state_summary(run_id=run_id)
+            return self._run_store.get_state_summary(run_id=run_id)
 
-        return result
+    def _get_good_state_summary(self, run_id: str) -> Optional[StateSummary]:
+        summary = self._get_state_summary(run_id)
+        return summary if isinstance(summary, StateSummary) else None
