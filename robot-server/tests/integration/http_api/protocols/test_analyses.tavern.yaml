@@ -28,7 +28,7 @@ stages:
 
   - name: Check that the analysis summary is present in /protocols/:id; retry until it says it's completed
     max_retries: 5
-    delay_after: 1
+    delay_after: 5
     request:
       url: '{ot2_server_base_url}/protocols/{protocol_id}'
     response:

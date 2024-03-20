@@ -231,7 +231,7 @@ async def create_protocol(
                 protocol_analyzer.analyze,
                 protocol_resource=resource,
                 analysis_id=analysis_id,
-                run_time_param_overrides=parsed_rtp,
+                run_time_param_values=parsed_rtp,
             )
             analysis_store.add_pending(
                 protocol_id=cached_protocol_id,
@@ -299,7 +299,7 @@ async def create_protocol(
         protocol_analyzer.analyze,
         protocol_resource=protocol_resource,
         analysis_id=analysis_id,
-        run_time_param_overrides=parsed_rtp,
+        run_time_param_values=parsed_rtp,
     )
     pending_analysis = analysis_store.add_pending(
         protocol_id=protocol_id,

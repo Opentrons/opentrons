@@ -513,7 +513,7 @@ async def test_create_protocol(
             protocol_analyzer.analyze,
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
-            run_time_param_overrides=None,
+            run_time_param_values=None,
         ),
     )
 
@@ -615,7 +615,7 @@ async def test_create_protocol_with_run_time_params(
             protocol_analyzer.analyze,
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
-            run_time_param_overrides={"vol": 123, "dry_run": True, "mount": "left"},
+            run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
         ),
     )
 
@@ -725,7 +725,7 @@ async def test_create_existing_protocol_with_run_time_params(
             protocol_analyzer.analyze,
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
-            run_time_param_overrides={"vol": 123, "dry_run": True, "mount": "left"},
+            run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
         ),
         analysis_store.add_pending(
             protocol_id="the-og-proto-id",
