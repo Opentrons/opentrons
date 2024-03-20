@@ -4,7 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { AnalysisFailedModal } from '../AnalysisFailedModa'
+import { AnalysisFailedModal } from '../AnalysisFailedModal'
 import type * as ReactRouterDom from 'react-router-dom'
 
 const mockPush = vi.fn()
