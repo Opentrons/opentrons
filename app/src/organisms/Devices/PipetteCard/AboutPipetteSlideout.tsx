@@ -9,17 +9,15 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { Slideout } from '../../../atoms/Slideout'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'
-import type { PipetteData } from '@opentrons/api-client'
-import type { PipetteModelSpecs, PipetteMount } from '@opentrons/shared-data'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 interface AboutPipetteSlideoutProps {
   pipetteId: AttachedPipette['id']
   pipetteName: PipetteModelSpecs['displayName']
-  mount: PipetteMount
+  firmwareVersion?: string
   onCloseClick: () => unknown
   isExpanded: boolean
 }
@@ -27,14 +25,14 @@ interface AboutPipetteSlideoutProps {
 export const AboutPipetteSlideout = (
   props: AboutPipetteSlideoutProps
 ): JSX.Element | null => {
-  const { pipetteId, pipetteName, isExpanded, mount, onCloseClick } = props
+  const {
+    pipetteId,
+    pipetteName,
+    isExpanded,
+    firmwareVersion,
+    onCloseClick,
+  } = props
   const { i18n, t } = useTranslation(['device_details', 'shared'])
-  const { data: attachedInstruments } = useInstrumentsQuery()
-  const instrumentInfo =
-    attachedInstruments?.data?.find(
-      (i): i is PipetteData =>
-        i.instrumentType === 'pipette' && i.ok && i.mount === mount
-    ) ?? null
 
   return (
     <Slideout
@@ -52,7 +50,7 @@ export const AboutPipetteSlideout = (
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        {instrumentInfo?.firmwareVersion != null && (
+        {firmwareVersion != null && (
           <>
             <StyledText
               as="h6"
@@ -66,7 +64,7 @@ export const AboutPipetteSlideout = (
               paddingTop={SPACING.spacing4}
               paddingBottom={SPACING.spacing16}
             >
-              {instrumentInfo.firmwareVersion}
+              {firmwareVersion}
             </StyledText>
           </>
         )}
