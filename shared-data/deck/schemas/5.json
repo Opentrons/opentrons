@@ -292,6 +292,13 @@
               }
             }
           },
+          "fixtureGroup": {
+            "description": "The group of fixtures that must exist in the deck configuration if this fixture exists.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "height": {
             "description": "The vertical distance (mm) from the cutout fixture's origin to its tallest physical feature that an instrument could collide with.",
             "type": "number"

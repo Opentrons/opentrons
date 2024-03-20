@@ -67,6 +67,15 @@ class UnexpectedSerialNumberError:
     opentrons_module_serial_number: str
 
 
+@dataclass(frozen=True)
+class MissingGroupFixtureError:
+    """When a member of a fixture group has been mounted but other required members of that group have not."""
+
+    cutout_id: str
+    cutout_fixture_id: str
+    missing_fixture_id: str
+
+
 ConfigurationError = Union[
     UnoccupiedCutoutError,
     OvercrowdedCutoutError,
@@ -74,6 +83,7 @@ ConfigurationError = Union[
     UnrecognizedCutoutFixtureError,
     InvalidSerialNumberError,
     UnexpectedSerialNumberError,
+    MissingGroupFixtureError,
 ]
 
 
@@ -138,6 +148,21 @@ def get_configuration_errors(
                         cutout_fixture_id=placement.cutout_fixture_id,
                     )
                 )
+
+            for fixture_id in found_cutout_fixture["fixtureGroup"]:
+                result = [
+                    placement.cutout_fixture_id
+                    for placement in placements
+                    if fixture_id in placement.cutout_fixture_id
+                ]
+                if len(result) == 0:
+                    errors.add(
+                        MissingGroupFixtureError(
+                            cutout_id=placement.cutout_id,
+                            cutout_fixture_id=placement.cutout_fixture_id,
+                            missing_fixture_id=fixture_id,
+                        )
+                    )
 
     return errors
 
