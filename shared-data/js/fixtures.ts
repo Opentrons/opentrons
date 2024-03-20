@@ -40,9 +40,9 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
 } from './constants'
-import type { CutoutFixtureId, CutoutId, FlexModuleCutoutFixtureId, OT2CutoutId } from '../deck'
+import type { AddressableAreaName, CutoutFixtureId, CutoutId, FlexAddressableAreaName, FlexModuleCutoutFixtureId, OT2CutoutId } from '../deck'
 import type { AddressableArea, CoordinateTuple, DeckDefinition, ModuleModel } from './types'
-import type { LoadModuleCreateCommand } from '../command'
+import type { LoadModuleCreateCommand, ModuleLocation } from '../command'
 import { getModuleDisplayName } from './modules'
 
 export function getCutoutDisplayName(cutout: CutoutId): string {
@@ -122,10 +122,10 @@ export function getPositionFromSlotId(
   const slotPosition: CoordinateTuple | null =
     cutoutPosition != null
       ? [
-          cutoutPosition[0] + offsetFromCutoutFixture[0],
-          cutoutPosition[1] + offsetFromCutoutFixture[1],
-          cutoutPosition[2] + offsetFromCutoutFixture[2],
-        ]
+        cutoutPosition[0] + offsetFromCutoutFixture[0],
+        cutoutPosition[1] + offsetFromCutoutFixture[1],
+        cutoutPosition[2] + offsetFromCutoutFixture[2],
+      ]
       : null
 
   return slotPosition
@@ -142,29 +142,41 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
-export function getCutoutFixturesForModuleModel(
+export function getCutoutFixtureIdsForModuleModel(
   moduleModel: ModuleModel
 ): FlexModuleCutoutFixtureId[] {
   const moduleFixtures = MODULE_FIXTURES_BY_MODEL[moduleModel]
   return moduleFixtures ?? []
 }
 
-export function getAddressableAreaFromLoadedModule(
+export function getCutoutIdFromModuleLocation(
+  location: ModuleLocation,
+  deckDef: DeckDefinition
+): CutoutId | null {
+  return deckDef.locations.cutouts.find(
+    cutout => cutout.id.includes(location.slotName)
+  )?.id ?? null
+}
+
+export function getAddressableAreaNamesFromLoadedModule(
   params: LoadModuleCreateCommand['params'],
   deckDef: DeckDefinition
-): AddressableArea | null {
-  const moduleFixtures = getCutoutFixturesForModuleModel(params.model)
-  return (
-    deckDef.locations.addressableAreas.find(
-      addressableArea => addressableArea.id === slotId
+): AddressableAreaName[] {
+  const moduleFixtureIds = getCutoutFixtureIdsForModuleModel(params.model)
+  const cutoutId = getCutoutIdFromModuleLocation(params.location, deckDef)
+  return moduleFixtureIds.reduce<AddressableAreaName[]>((acc, cutoutFixtureId) => {
+    const cutoutFixture = deckDef.cutoutFixtures.find(
+      cf => cf.id === cutoutFixtureId 
     ) ?? null
-  )
+    const providedAddressableAreas = cutoutId != null ?cutoutFixture?.providesAddressableAreas[cutoutId] ?? [] : []
+    return [...acc, ...providedAddressableAreas]
+  }, [])
 }
 
 export function getFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureId | null
 ): string {
-  switch(cutoutFixtureId) {
+  switch (cutoutFixtureId) {
     case STAGING_AREA_RIGHT_SLOT_FIXTURE:
       return 'Staging area slot'
     case TRASH_BIN_ADAPTER_FIXTURE:
@@ -192,7 +204,7 @@ export function getFixtureDisplayName(
   }
 }
 
-const STANDARD_OT2_SLOTS = [
+const STANDARD_OT2_SLOTS: AddressableAreaName[]= [
   ADDRESSABLE_AREA_1,
   ADDRESSABLE_AREA_2,
   ADDRESSABLE_AREA_3,
@@ -206,7 +218,7 @@ const STANDARD_OT2_SLOTS = [
   ADDRESSABLE_AREA_11,
 ]
 
-const STANDARD_FLEX_SLOTS = [
+const STANDARD_FLEX_SLOTS: AddressableAreaName[] = [
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
   A3_ADDRESSABLE_AREA,
@@ -222,10 +234,10 @@ const STANDARD_FLEX_SLOTS = [
 ]
 
 export const isAddressableAreaStandardSlot = (
-  addressableAreaId: string,
+  addressableAreaName: AddressableAreaName,
   deckDef: DeckDefinition
 ): boolean =>
   (deckDef.robot.model === FLEX_ROBOT_TYPE
     ? STANDARD_FLEX_SLOTS
     : STANDARD_OT2_SLOTS
-  ).includes(addressableAreaId)
+  ).includes(addressableAreaName)

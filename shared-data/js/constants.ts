@@ -377,11 +377,11 @@ export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE: '
 export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE: 'stagingAreaSlotWithWasteChuteRightAdapterNoCover' =
   'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
 
-export const HEATERSHAKER_MODULE_V1_FIXTURE: 'heaterShakerModule' = 'heaterShakerModule'
-export const TEMPERATURE_MODULE_V2_FIXTURE: 'temperatureModule' = 'temperatureModule'
-export const MAGNETIC_BLOCK_V1_FIXTURE: 'magneticBlockModule' = 'magneticBlockModule'
-export const THERMOCYCLER_V2_REAR_FIXTURE: 'thermocyclerModuleRear' = 'thermocyclerModuleRear'
-export const THERMOCYCLER_V2_FRONT_FIXTURE: 'thermocyclerModuleFront' = 'thermocyclerModuleFront'
+export const HEATERSHAKER_MODULE_V1_FIXTURE: 'heaterShakerModuleV1' = 'heaterShakerModuleV1'
+export const TEMPERATURE_MODULE_V2_FIXTURE: 'temperatureModuleV2' = 'temperatureModuleV2'
+export const MAGNETIC_BLOCK_V1_FIXTURE: 'magneticBlockModuleV1' = 'magneticBlockModuleV1'
+export const THERMOCYCLER_V2_REAR_FIXTURE: 'thermocyclerModuleV2Rear' = 'thermocyclerModuleV2Rear'
+export const THERMOCYCLER_V2_FRONT_FIXTURE: 'thermocyclerModuleV2Front' = 'thermocyclerModuleV2Front'
 
 export const MODULE_FIXTURES_BY_MODEL: {[moduleModel in ModuleModel]?: FlexModuleCutoutFixtureId[]} = {
   [HEATERSHAKER_MODULE_V1]: [HEATERSHAKER_MODULE_V1_FIXTURE],

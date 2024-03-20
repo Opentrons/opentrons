@@ -1,5 +1,5 @@
 import { MOVABLE_TRASH_A3_ADDRESSABLE_AREA } from '../constants'
-import { getAddressableAreaFromSlotId } from '../fixtures'
+import { getAddressableAreaNamesFromLoadedModule, getAddressableAreaFromSlotId } from '../fixtures'
 import type { AddressableAreaName } from '../../deck'
 import type { ProtocolAnalysisOutput } from '../../protocol'
 import type { CompletedProtocolAnalysis, DeckDefinition } from '../types'
@@ -17,9 +17,7 @@ export function getAddressableAreasInProtocol(
         commandType === 'moveLabware' &&
         params.newLocation !== 'offDeck' &&
         'slotName' in params.newLocation &&
-        !acc.includes(
-          params.newLocation.slotName as AddressableAreaName
-        )
+        !acc.includes(params.newLocation.slotName as AddressableAreaName)
       ) {
         const addressableAreaName = getAddressableAreaFromSlotId(
           params.newLocation.slotName,
@@ -39,8 +37,7 @@ export function getAddressableAreasInProtocol(
       ) {
         return [...acc, params.newLocation.addressableAreaName]
       } else if (
-        (commandType === 'loadLabware' ||
-          commandType === 'loadModule') &&
+        commandType === 'loadLabware' &&
         params.location !== 'offDeck' &&
         'slotName' in params.location &&
         !acc.includes(params.location.slotName as AddressableAreaName)
@@ -60,6 +57,16 @@ export function getAddressableAreasInProtocol(
         } else {
           return [...acc, addressableAreaName]
         }
+      } else if (
+        commandType === 'loadModule' &&
+        !acc.includes(params.location.slotName as AddressableAreaName)
+      ) {
+        const addressableAreaNames = getAddressableAreaNamesFromLoadedModule(
+          params,
+          deckDef
+        )
+
+        return [...acc, ...addressableAreaNames]
       } else if (
         commandType === 'loadLabware' &&
         params.location !== 'offDeck' &&
