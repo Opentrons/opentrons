@@ -179,7 +179,7 @@ export function ProtocolSetupParameters({
     false
   )
   const parameters = runTimeParameters ?? []
-  const { createRun } = useCreateRunMutation({
+  const { createRun, isLoading } = useCreateRunMutation({
     onSuccess: data => {
       queryClient
         .invalidateQueries([host, 'runs'])
@@ -229,6 +229,8 @@ export function ProtocolSetupParameters({
         onClickBack={() => history.goBack()}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
+        iconName={isLoading ? 'ot-spinner' : undefined}
+        iconPlacement="startIcon"
         secondaryButtonProps={{
           buttonType: 'tertiaryLowLight',
           buttonText: t('restore_default'),
