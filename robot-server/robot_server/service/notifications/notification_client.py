@@ -3,7 +3,7 @@ import logging
 import paho.mqtt.client as mqtt
 from anyio import to_thread
 from fastapi import Depends
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Callable
 from enum import Enum
 
 from ..json_api import NotifyRefetchBody, NotifyUnsubscribeBody
@@ -76,6 +76,10 @@ class NotificationClient:
         """Disconnect the client from the MQTT broker."""
         self.client.loop_stop()
         await to_thread.run_sync(self.client.disconnect)
+
+    async def protocol_engine_callback_rename_this(self) -> None:
+        """Rename this"""
+        log.info("HITTING PROTOCOL ENGINE INVOCATION")
 
     async def publish_advise_refetch_async(self, topic: str) -> None:
         """Asynchronously publish a refetch message on a specific topic to the MQTT broker.
@@ -176,6 +180,10 @@ _notification_client_accessor: AppStateAccessor[NotificationClient] = AppStateAc
     NotificationClient
 ]("notification_client")
 
+_notify_robot_server_accessor: AppStateAccessor[Callable] = AppStateAccessor[Callable](
+    "notify_robot_server"
+)
+
 
 def initialize_notification_client(app_state: AppState) -> None:
     """Create a new `NotificationClient` and store it on `app_state`.
@@ -212,3 +220,14 @@ def get_notification_client(
         NotificationClient
     ] = _notification_client_accessor.get_from(app_state)
     return notification_client
+
+
+# It might be possible to be more specific on the type here. I'd also change the naming to be more specific to PE at this layer of the stack.
+# I think a better name might be "notify notification_client". Still, naming needs to be more PE focused here.
+def get_notify_robot_server(
+    app_state: AppState = Depends(get_app_state),
+) -> Callable:
+    """Return the singleton notification_client's protocol_engine_callback method."""
+    notification_client = get_notification_client(app_state)
+
+    return notification_client.protocol_engine_callback_rename_this

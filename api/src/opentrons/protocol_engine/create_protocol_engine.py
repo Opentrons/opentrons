@@ -20,6 +20,7 @@ async def create_protocol_engine(
     config: Config,
     load_fixed_trash: bool = False,
     deck_configuration: typing.Optional[DeckConfigurationType] = None,
+    notify_robot_server: typing.Optional[typing.Callable] = None,
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
 
@@ -28,6 +29,7 @@ async def create_protocol_engine(
         config: ProtocolEngine configuration.
         load_fixed_trash: Automatically load fixed trash labware in engine.
         deck_configuration: The initial deck configuration the engine will be instantiated with.
+        notify_robot_server: Notifies the robot server of internal state change.
     """
     deck_data = DeckDataProvider(config.deck_type)
     deck_definition = await deck_data.get_deck_definition()
@@ -45,6 +47,7 @@ async def create_protocol_engine(
         is_door_open=hardware_api.door_state is DoorState.OPEN,
         module_calibration_offsets=module_calibration_offsets,
         deck_configuration=deck_configuration,
+        notify_robot_server=notify_robot_server,
     )
 
     return ProtocolEngine(state_store=state_store, hardware_api=hardware_api)

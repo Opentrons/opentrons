@@ -1,6 +1,6 @@
 """Manage current and historical run data."""
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Callable
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -96,6 +96,7 @@ class RunDataManager:
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
+        notify_robot_server: Callable,
         protocol: Optional[ProtocolResource],
     ) -> Run:
         """Create a new, current run.
@@ -104,6 +105,7 @@ class RunDataManager:
             run_id: Identifier to assign the new run.
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
+            notify_robot_server: Utilized by the engine to notify the robot server of state changes.
 
         Returns:
             The run resource.
@@ -125,6 +127,7 @@ class RunDataManager:
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
             protocol=protocol,
+            notify_robot_server=notify_robot_server,
         )
         run_resource = self._run_store.insert(
             run_id=run_id,

@@ -3,6 +3,7 @@ from .notification_client import (
     get_notification_client,
     initialize_notification_client,
     clean_up_notification_client,
+    get_notify_robot_server,
 )
 from .publishers import (
     MaintenanceRunsPublisher,
@@ -22,6 +23,7 @@ __all__ = [
     "clean_up_notification_client",
     # for use by FastAPI
     "get_notification_client",
+    "get_notify_robot_server",
     "get_maintenance_runs_publisher",
     "get_runs_publisher",
 ]

@@ -1,6 +1,6 @@
 """Manage current maintenance run data."""
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Callable
 
 from opentrons.protocol_engine import (
     EngineStatus,
@@ -83,6 +83,7 @@ class MaintenanceRunDataManager:
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
+        notify_robot_server: Callable,
     ) -> MaintenanceRun:
         """Create a new, current maintenance run.
 
@@ -90,6 +91,7 @@ class MaintenanceRunDataManager:
             run_id: Identifier to assign the new run.
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
+            notify_robot_server: Utilized by the engine to notify the robot server of state changes.
 
         Returns:
             The run resource.
@@ -102,6 +104,7 @@ class MaintenanceRunDataManager:
             created_at=created_at,
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
+            notify_robot_server=notify_robot_server,
         )
 
         maintenance_run_data = _build_run(
