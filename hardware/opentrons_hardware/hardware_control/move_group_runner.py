@@ -506,7 +506,7 @@ class MoveScheduler:
         node_id = arbitration_id.parts.originating_node_id
         data = message.payload.data.value
         if data & MotorDriverErrorCode.over_temperature.value:
-            log.error(f"Motor driver error from node {node_id}")
+            log.error(f"Motor driver over-temperature error from node {node_id}")
             self._errors.append(
                 MotorDriverError(
                     detail={
@@ -516,7 +516,7 @@ class MoveScheduler:
                 )
             )
         if data & MotorDriverErrorCode.short_circuit.value:
-            log.error(f"Motor driver error from node {node_id}")
+            log.error(f"Motor driver short circuit error from node {node_id}")
             self._errors.append(
                 MotorDriverError(
                     detail={
@@ -526,7 +526,7 @@ class MoveScheduler:
                 )
             )
         if data & MotorDriverErrorCode.open_circuit.value:
-            log.error(f"Motor driver error from node {node_id}")
+            log.error(f"Motor driver open circuit error from node {node_id}")
             self._errors.append(
                 MotorDriverError(
                     detail={
