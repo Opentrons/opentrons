@@ -13,13 +13,16 @@ from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonExce
 from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorState
-from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+from opentrons.protocol_engine.actions.actions import (
+    ResumeFromRecoveryAction,
+    RunCommandAction,
+)
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 
 from ..actions import (
     Action,
     QueueCommandAction,
-    UpdateCommandAction,
+    SucceedCommandAction,
     FailCommandAction,
     PlayAction,
     PauseAction,
@@ -261,41 +264,55 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if action.request_hash is not None:
                 self._state.latest_command_hash = action.request_hash
 
-        # TODO(mc, 2021-12-28): replace "UpdateCommandAction" with explicit
-        # state change actions (e.g. RunCommandAction, SucceedCommandAction)
-        # to make a command's queue transition logic easier to follow
-        elif isinstance(action, UpdateCommandAction):
-            command = action.command
-            prev_entry = self._state.commands_by_id.get(command.id)
+        elif isinstance(action, RunCommandAction):
+            prev_entry = self._state.commands_by_id[action.command_id]
+            assert prev_entry.command.status == CommandStatus.QUEUED
 
-            if prev_entry is None:
-                index = len(self._state.all_command_ids)
-                self._state.all_command_ids.append(command.id)
-                self._state.commands_by_id[command.id] = CommandEntry(
-                    index=index,
-                    command=command,
-                )
-            else:
-                self._state.commands_by_id[command.id] = CommandEntry(
-                    index=prev_entry.index,
-                    command=command,
-                )
+            running_command = prev_entry.command.copy(
+                update={
+                    "status": CommandStatus.RUNNING,
+                    "startedAt": action.started_at,
+                }
+            )
 
-            self._state.queued_command_ids.discard(command.id)
-            self._state.queued_setup_command_ids.discard(command.id)
+            self._state.commands_by_id[action.command_id] = CommandEntry(
+                index=prev_entry.index, command=running_command
+            )
 
-            if command.status == CommandStatus.RUNNING:
-                self._state.running_command_id = command.id
-            elif self._state.running_command_id == command.id:
-                self._state.running_command_id = None
+            assert self._state.running_command_id is None
+            self._state.running_command_id = action.command_id
+
+            self._state.queued_command_ids.discard(action.command_id)
+            self._state.queued_setup_command_ids.discard(action.command_id)
+
+        elif isinstance(action, SucceedCommandAction):
+            prev_entry = self._state.commands_by_id[action.command.id]
+            assert prev_entry.command.status == CommandStatus.RUNNING
+
+            succeeded_command = action.command
+            assert succeeded_command.status == CommandStatus.SUCCEEDED
+
+            self._state.commands_by_id[action.command.id] = CommandEntry(
+                index=prev_entry.index,
+                command=succeeded_command,
+            )
+
+            assert self._state.running_command_id == action.command.id
+            self._state.running_command_id = None
+
+            self._state.queued_command_ids.discard(succeeded_command.id)
+            self._state.queued_setup_command_ids.discard(succeeded_command.id)
 
         elif isinstance(action, FailCommandAction):
+            prev_entry = self._state.commands_by_id[action.command_id]
+            assert prev_entry.command.status == CommandStatus.RUNNING
+
             error_occurrence = ErrorOccurrence.from_failed(
                 id=action.error_id,
                 createdAt=action.failed_at,
                 error=action.error,
             )
-            prev_entry = self._state.commands_by_id[action.command_id]
+
             # TODO(mc, 2022-06-06): add new "cancelled" status or similar
             self._update_to_failed(
                 command_id=action.command_id,
