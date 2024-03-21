@@ -344,7 +344,7 @@ class RunStore:
                 )
             )
         except ValidationError as e:
-            log.warning(f"Error retrieving state summary for {run_id}: {e}")
+            log.warning(f"Error retrieving state summary for {run_id}", exc_info=True)
             return BadStateSummary(
                 dataError=InvalidStoredData(
                     message="Could not load stored StateSummary",
