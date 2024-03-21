@@ -86,7 +86,7 @@ export function establishConnections(
             .then(client => {
               notifyLog.debug(`Successfully connected to ${robotName} on ${ip}`)
               void connectionStore
-                .setConnected(ip, client)
+                .setConnected(robotName, client)
                 .then(() => establishListeners(client, ip, robotName))
                 .catch((error: Error) => notifyLog.debug(error.message))
             })

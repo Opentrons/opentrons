@@ -9,7 +9,6 @@ import type { BrowserWindow } from 'electron'
 type FailedConnStatus = typeof FAILURE_STATUSES[keyof typeof FAILURE_STATUSES]
 
 interface HostData {
-  robotName: string
   client: mqtt.MqttClient | null
   subscriptions: Set<NotifyTopic>
   pendingSubs: Set<NotifyTopic>
@@ -18,7 +17,7 @@ interface HostData {
 }
 
 /**
- * Manages the internal state of MQTT connections to various robot hosts.
+ * @description Manages the internal state of MQTT connections to various robot hosts.
  */
 class ConnectionStore {
   private hostsByRobotName: Record<string, HostData> = {}
@@ -47,7 +46,6 @@ class ConnectionStore {
   }
 
   /**
-   *
    * @returns {FailedConnStatus} "ECONNREFUSED" is a proxy for a port block error and is only returned once
    * for analytics reasons. Afterward, a generic "ECONNFAILED" is returned.
    */
@@ -77,7 +75,6 @@ class ConnectionStore {
     return new Promise((resolve, reject) => {
       if (!this.isConnectingToBroker(robotName)) {
         this.hostsByRobotName[robotName] = {
-          robotName,
           client: null,
           subscriptions: new Set(),
           pendingSubs: new Set(),
@@ -114,9 +111,7 @@ class ConnectionStore {
   }
 
   /**
-   *
    * @description Marks the host as unreachable with an error status derived from the MQTT returned error object.
-   *
    */
   public setErrorStatus(ip: string, errorMessage: string): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -129,7 +124,7 @@ class ConnectionStore {
             ? FAILURE_STATUSES.ECONNREFUSED
             : FAILURE_STATUSES.ECONNFAILED
 
-          this.hostsByRobotName[ip].unreachableStatus = errorStatus
+          this.hostsByRobotName[robotName].unreachableStatus = errorStatus
           if (errorStatus === FAILURE_STATUSES.ECONNREFUSED) {
             this.knownPortBlockedIPs.add(ip)
           }
@@ -209,8 +204,7 @@ class ConnectionStore {
     )
   }
 
-  public isPendingSub(ip: string, topic: NotifyTopic): boolean {
-    const robotName = this.getRobotNameByIP(ip)
+  public isPendingSub(robotName: string, topic: NotifyTopic): boolean {
     if (robotName != null && robotName in this.hostsByRobotName) {
       const { pendingSubs } = this.hostsByRobotName[robotName]
       return pendingSubs.has(topic)
@@ -219,8 +213,7 @@ class ConnectionStore {
     }
   }
 
-  public isActiveSub(ip: string, topic: NotifyTopic): boolean {
-    const robotName = this.getRobotNameByIP(ip)
+  public isActiveSub(robotName: string, topic: NotifyTopic): boolean {
     if (robotName != null && robotName in this.hostsByRobotName) {
       const { subscriptions } = this.hostsByRobotName[robotName]
       return subscriptions.has(topic)
@@ -240,7 +233,6 @@ class ConnectionStore {
   }
 
   /**
-   *
    * @description A broker connection is terminated if it is errored or not present in the store.
    */
   public isConnectionTerminated(robotName: string): boolean {

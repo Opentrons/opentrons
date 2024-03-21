@@ -19,7 +19,7 @@ const CHECK_CONNECTION_INTERVAL = 500
 export function subscribe(ip: string, topic: NotifyTopic): Promise<void> {
   const robotName = connectionStore.getRobotNameByIP(ip)
 
-  if (connectionStore.isConnectionTerminated(ip)) {
+  if (robotName == null || connectionStore.isConnectionTerminated(robotName)) {
     const errorMessage = connectionStore.getFailedConnectionStatus(ip)
     if (errorMessage != null) {
       sendDeserialized({
@@ -38,8 +38,8 @@ export function subscribe(ip: string, topic: NotifyTopic): Promise<void> {
         }
 
         if (
-          !connectionStore.isActiveSub(ip, topic) &&
-          !connectionStore.isPendingSub(ip, topic)
+          !connectionStore.isActiveSub(robotName, topic) &&
+          !connectionStore.isPendingSub(robotName, topic)
         ) {
           connectionStore
             .setSubStatus(ip, topic, 'pending')
@@ -88,7 +88,7 @@ export function subscribe(ip: string, topic: NotifyTopic): Promise<void> {
 interface WaitUntilActiveOrErroredParams {
   connection: 'client' | 'subscription'
   ip: string
-  robotName: string | null
+  robotName: string
   topic?: NotifyTopic
 }
 
@@ -115,8 +115,8 @@ function waitUntilActiveOrErrored({
     const intervalId = setInterval(() => {
       const hasReceivedAck =
         connection === 'client'
-          ? connectionStore.isConnectedToBroker(ip)
-          : connectionStore.isActiveSub(ip, topic as NotifyTopic)
+          ? connectionStore.isConnectedToBroker(robotName)
+          : connectionStore.isActiveSub(robotName, topic as NotifyTopic)
       if (hasReceivedAck) {
         clearInterval(intervalId)
         resolve()
