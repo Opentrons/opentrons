@@ -33,9 +33,9 @@ describe('ViewOnlyParameters', () => {
       } as any)
     when(useToaster)
       .calledWith()
-      .thenReturn({
-        makeSnackBar: mockMakeSnackBar,
-      } as any)
+      .thenReturn(({
+        makeSnackbar: mockMakeSnackBar,
+      } as unknown) as any)
   })
   it('renders the parameters labels and mock data', () => {
     render(props)
@@ -49,6 +49,11 @@ describe('ViewOnlyParameters', () => {
     screen.getByText('Default Module Offsets')
     screen.getByText('Columns of Samples')
     screen.getByText('4 mL')
+  })
+  it('renders the snackbar from clicking on an item', () => {
+    render(props)
+    fireEvent.click(screen.getByText('4 mL'))
+    expect(mockMakeSnackBar).toBeCalledWith('Restart setup to edit')
   })
   it('renders the back icon and calls the prop', () => {
     render(props)
