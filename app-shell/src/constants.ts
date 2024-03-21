@@ -246,6 +246,7 @@ export const DISCOVERY_REMOVE: DISCOVERY_REMOVE_TYPE = 'discovery:REMOVE'
 
 export const CLEAR_CACHE: CLEAR_CACHE_TYPE = 'discovery:CLEAR_CACHE'
 export const HEALTH_STATUS_OK: 'ok' = 'ok'
+export const HEALTH_STATUS_NOT_OK: 'notOk' = 'notOk'
 export const FAILURE_STATUSES = {
   ECONNREFUSED: 'ECONNREFUSED',
   ECONNFAILED: 'ECONNFAILED',

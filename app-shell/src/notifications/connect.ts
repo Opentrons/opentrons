@@ -49,8 +49,8 @@ export function getHealthyRobotDataForNotifyConnections(
  */
 export function cleanUpUnreachableRobots(
   healthyRobots: RobotData[]
-): Promise<void> {
-  return new Promise(() => {
+): Promise<string[]> {
+  return new Promise((resolve, reject) => {
     const healthyRobotNames = healthyRobots.map(({ robotName }) => robotName)
     const healthyRobotNamesSet = new Set(healthyRobotNames)
     const unreachableRobots = connectionStore
@@ -59,18 +59,20 @@ export function cleanUpUnreachableRobots(
         return !healthyRobotNamesSet.has(robotName)
       })
     void closeConnectionsForcefullyFor(unreachableRobots)
+    resolve(unreachableRobots)
   })
 }
 
 export function establishConnections(
   healthyRobots: RobotData[]
-): Promise<void> {
-  return new Promise(() => {
+): Promise<RobotData[]> {
+  return new Promise((resolve, reject) => {
     const newConnections = healthyRobots.filter(({ ip, robotName }) => {
       if (connectionStore.isConnectedToBroker(robotName)) {
         return false
       } else {
         connectionStore.associateIPWithRobotName(ip, robotName)
+        // True when a robot is connecting.
         if (!connectionStore.isConnectionTerminated(robotName)) {
           return false
         } else {
@@ -99,6 +101,7 @@ export function establishConnections(
         })
         .catch((error: Error) => notifyLog.debug(error.message))
     })
+    resolve(newConnections)
   })
 }
 
@@ -193,9 +196,9 @@ function establishListeners(
 }
 
 export function closeConnectionsForcefullyFor(
-  hosts: string[]
+  robotNames: string[]
 ): Array<Promise<void>> {
-  return hosts.map(ip => {
+  return robotNames.map(ip => {
     const client = connectionStore.getClient(ip)
     return new Promise<void>((resolve, reject) => {
       if (client != null) {

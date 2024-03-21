@@ -191,6 +191,15 @@ class ConnectionStore {
     }
   }
 
+  /**
+   * @description Used for testing purposes.
+   */
+  public clearStore(): void {
+    this.hostsByRobotName = {}
+    this.robotNamesByIP = {}
+    this.browserWindow = null
+  }
+
   public isConnectedToBroker(robotName: string): boolean {
     return robotName != null
       ? this.hostsByRobotName[robotName]?.client?.connected ?? false
