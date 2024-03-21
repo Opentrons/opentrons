@@ -1,4 +1,5 @@
 """Tests for hepa/uv settings."""
+
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 import pytest
 from mock import AsyncMock
@@ -46,7 +47,10 @@ def create_hepa_fan_state_response(fan_on: bool, duty_cycle: int) -> MessageDefi
 
 
 def create_hepa_uv_state_response(
-    light_on: bool, duration: int, remaining_time: int
+    light_on: bool,
+    duration: int,
+    remaining_time: int,
+    uv_voltage: int,
 ) -> MessageDefinition:
     """Create a GetHepaUVStateResponse."""
     return md.GetHepaUVStateResponse(
@@ -54,6 +58,7 @@ def create_hepa_uv_state_response(
             uv_light_on=UInt8Field(light_on),
             uv_duration_s=UInt32Field(duration),
             remaining_time_s=UInt32Field(remaining_time),
+            uv_voltage_mv=UInt32Field(uv_voltage),
         )
     )
 
@@ -149,10 +154,14 @@ async def test_get_hepa_fan_state(
 @pytest.mark.parametrize(
     "response",
     [
-        (NodeId.host, create_hepa_uv_state_response(True, 900, 300), NodeId.hepa_uv),
-        (NodeId.host, create_hepa_uv_state_response(True, 0, 0), NodeId.hepa_uv),
-        (NodeId.host, create_hepa_uv_state_response(False, 0, 0), NodeId.hepa_uv),
-        (NodeId.host, create_hepa_uv_state_response(False, 900, 0), NodeId.hepa_uv),
+        (
+            NodeId.host,
+            create_hepa_uv_state_response(True, 900, 300, 3300),
+            NodeId.hepa_uv,
+        ),
+        (NodeId.host, create_hepa_uv_state_response(True, 0, 0, 33000), NodeId.hepa_uv),
+        (NodeId.host, create_hepa_uv_state_response(False, 0, 0, 0), NodeId.hepa_uv),
+        (NodeId.host, create_hepa_uv_state_response(False, 900, 0, 0), NodeId.hepa_uv),
     ],
 )
 async def test_get_hepa_uv_state(
@@ -186,6 +195,7 @@ async def test_get_hepa_uv_state(
             bool(payload.uv_light_on.value),
             int(payload.uv_duration_s.value),
             int(payload.remaining_time_s.value),
+            int(payload.uv_voltage_mv.value),
         )
         == res
     )

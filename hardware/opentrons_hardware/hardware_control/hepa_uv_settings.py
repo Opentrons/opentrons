@@ -44,6 +44,7 @@ class HepaUVState:
     uv_light_on: bool
     uv_duration_s: int
     remaining_time_s: int
+    uv_voltage_mv: int
 
 
 async def set_hepa_fan_state(
@@ -132,6 +133,7 @@ async def get_hepa_uv_state(can_messenger: CanMessenger) -> Optional[HepaUVState
                 uv_light_on=bool(message.payload.uv_light_on.value),
                 uv_duration_s=int(message.payload.uv_duration_s.value),
                 remaining_time_s=int(message.payload.remaining_time_s.value),
+                uv_voltage_mv=int(message.payload.uv_voltage_mv.value),
             )
 
     def _filter(arb_id: ArbitrationId) -> bool:

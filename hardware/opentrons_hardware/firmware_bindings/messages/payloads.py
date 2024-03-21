@@ -667,3 +667,4 @@ class GetHepaUVStatePayloadResponse(EmptyPayload):
     uv_duration_s: utils.UInt32Field
     uv_light_on: utils.UInt8Field
     remaining_time_s: utils.UInt32Field
+    uv_voltage_mv: utils.UInt32Field
