@@ -159,7 +159,8 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const selectedPipetteName = pipettesByMount[mount].pipetteName
   const selectedPipetteDefaultTipracks =
     selectedPipetteName != null
-      ? getPipetteSpecsV2(selectedPipetteName as PipetteName)?.liquids.default.defaultTipracks ?? []
+      ? getPipetteSpecsV2(selectedPipetteName as PipetteName)?.liquids.default
+          .defaultTipracks ?? []
       : []
   const tiprackOptions = getTiprackOptions({
     allLabware: allLabware,
@@ -172,7 +173,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
       ? !option.value.includes('custom_beta')
       : selectedPipetteDefaultTipracks.includes(option.value)
   )
-
+  console.log('defaultTiprackOptions', defaultTiprackOptions)
   const customTiprackOptions = tiprackOptions.filter(option =>
     option.value.includes('custom_beta')
   )
