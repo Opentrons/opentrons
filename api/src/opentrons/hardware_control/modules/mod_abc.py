@@ -91,6 +91,8 @@ class AbstractModule(abc.ABC):
             device_version = parse_version(self.device_info["version"])
             available_version = parse_version(self._bundled_fw.version)
             return cast(bool, available_version > device_version)
+        elif self.device_info and not self._bundled_fw:
+            return True
         return False
 
     async def wait_for_is_running(self) -> None:
