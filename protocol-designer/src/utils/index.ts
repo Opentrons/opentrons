@@ -225,7 +225,6 @@ export function getMatchingTipLiquidSpecs(
     const differenceB = Math.abs(tipB.defaultTipLength - tipLength)
     return differenceA - differenceB
   })[0]
-  console.log('matchingTipLiquidSpecs ', matchingTipLiquidSpecs)
   console.assert(
     matchingTipLiquidSpecs,
     `expected to find the tip liquid specs but could not with pipette tiprack displayname ${pipetteEntity.tiprackLabwareDef.metadata.displayName}`
