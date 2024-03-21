@@ -25,6 +25,7 @@ from opentrons.hardware_control.types import (
     SubSystem,
     InstrumentProbeType,
 )
+from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_pipette,
@@ -1382,7 +1383,7 @@ async def _test_liquid_probe(
                 plunger_speed=probe_cfg.plunger_speed,
                 sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
                 expected_liquid_height=0,  # FIXME: remove
-                log_pressure=False,  # FIXME: remove
+                output_option=OutputOptions.none,  # FIXME: remove
                 aspirate_while_sensing=False,  # FIXME: I heard this doesn't work
                 auto_zero_sensor=True,  # TODO: when would we want to adjust this?
                 num_baseline_reads=10,  # TODO: when would we want to adjust this?
