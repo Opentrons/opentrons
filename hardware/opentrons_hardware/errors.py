@@ -138,7 +138,7 @@ def raise_from_error_message(  # noqa: C901
         raise RoboticsControlError(
             message="Unexpected robotics error", detail=detail_dict
         )
-    
+
     if error_code in (ErrorCode.motor_driver_error_detected,):
         raise MotorDriverError(detail=detail_dict)
 

@@ -600,6 +600,7 @@ class ExecutionCancelledError(RoboticsControlError):
 
 class MotorDriverError(RoboticsControlError):
     """An error indicating that a motor driver is in error state."""
+
     def __init__(
         self,
         message: Optional[str] = None,

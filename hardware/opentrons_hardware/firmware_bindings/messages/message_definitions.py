@@ -348,9 +348,7 @@ class ReadMotorDriverResponse(BaseMessage):  # noqa: D101
 @dataclass
 class ReadMotorDriverErrorStatusRequest(BaseMessage):  # noqa: D101
     payload: payloads.EmptyPayload
-    payload_type: Type[
-        payloads.EmptyPayload
-    ] = payloads.EmptyPayload
+    payload_type: Type[payloads.EmptyPayload] = payloads.EmptyPayload
     message_id: Literal[
         MessageId.read_motor_driver_error_status_request
     ] = MessageId.read_motor_driver_error_status_request
