@@ -7,7 +7,7 @@ from typing import Union
 import fastapi
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.deck.models import DeckDefinitionV5
 
 from robot_server.errors.error_responses import ErrorBody
 from robot_server.hardware import get_deck_definition

@@ -6,6 +6,7 @@ from typing_extensions import Final
 import pytest
 
 from opentrons_shared_data import deck
+from opentrons_shared_data.deck.load import load as load_deck
 
 from robot_server.deck_configuration import defaults as subject
 from robot_server.deck_configuration import validation
@@ -20,7 +21,7 @@ DECK_DEFINITION_VERSION: Final = 5
 )
 def test_defaults(deck_definition_name: str) -> None:
     """Make sure there's a valid default for every possible deck definition."""
-    deck_definition = deck.load(deck_definition_name, DECK_DEFINITION_VERSION)
+    deck_definition = load_deck(deck_definition_name, DECK_DEFINITION_VERSION)
     result = subject.for_deck_definition(deck_definition_name)
     assert (
         validation.get_configuration_errors(

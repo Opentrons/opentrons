@@ -18,6 +18,7 @@ from traceback import format_exception_only, TracebackException
 from contextlib import contextmanager, suppress
 
 from opentrons_shared_data import deck
+from opentrons_shared_data.deck.load import load as load_deck
 from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
 
 from opentrons import initialize as initialize_api, should_use_ot3
@@ -381,9 +382,9 @@ async def get_deck_type() -> DeckType:
 
 async def get_deck_definition(
     deck_type: DeckType = Depends(get_deck_type),
-) -> deck.dev_types.DeckDefinitionV5:
+) -> deck.models.DeckDefinitionV5:
     """Return this robot's deck definition."""
-    return deck.load(deck_type, version=5)
+    return load_deck(deck_type, version=5)
 
 
 async def _postinit_ot2_tasks(

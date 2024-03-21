@@ -5,7 +5,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import DefaultDict, FrozenSet, List, Set, Tuple, Union, Optional
 
-from opentrons_shared_data.deck import dev_types as deck_types
+from opentrons_shared_data.deck.models import v5 as deck_types
 
 
 @dataclass(frozen=True)
@@ -101,7 +101,7 @@ def get_configuration_errors(  # noqa: C901
     for placement in placements:
         fixtures_by_cutout[placement.cutout_id].append(placement.cutout_fixture_id)
 
-    expected_cutouts = set(c["id"] for c in deck_definition["locations"]["cutouts"])
+    expected_cutouts = set(c.id for c in deck_definition.locations.cutouts)
     occupied_cutouts = set(fixtures_by_cutout.keys())
     errors.update(
         UnoccupiedCutoutError(cutout_id)
@@ -119,7 +119,7 @@ def get_configuration_errors(  # noqa: C901
         if isinstance(found_cutout_fixture, UnrecognizedCutoutFixtureError):
             errors.add(found_cutout_fixture)
         else:
-            allowed_cutout_ids = frozenset(found_cutout_fixture["mayMountTo"])
+            allowed_cutout_ids = frozenset(found_cutout_fixture.mayMountTo)
             if placement.cutout_id not in allowed_cutout_ids:
                 errors.add(
                     InvalidLocationError(
@@ -128,9 +128,10 @@ def get_configuration_errors(  # noqa: C901
                         allowed_cutout_ids=allowed_cutout_ids,
                     )
                 )
-            if found_cutout_fixture[
-                "expectOpentronsModuleSerialNumber"
-            ] is False and isinstance(placement.opentrons_module_serial_number, str):
+            if (
+                found_cutout_fixture.expectOpentronsModuleSerialNumber is False
+                and isinstance(placement.opentrons_module_serial_number, str)
+            ):
                 errors.add(
                     UnexpectedSerialNumberError(
                         cutout_id=placement.cutout_id,
@@ -139,7 +140,7 @@ def get_configuration_errors(  # noqa: C901
                     )
                 )
             elif (
-                found_cutout_fixture["expectOpentronsModuleSerialNumber"] is True
+                found_cutout_fixture.expectOpentronsModuleSerialNumber is True
                 and placement.opentrons_module_serial_number is None
             ):
                 errors.add(
@@ -149,7 +150,7 @@ def get_configuration_errors(  # noqa: C901
                     )
                 )
 
-            for fixture_id in found_cutout_fixture["fixtureGroup"]:
+            for fixture_id in found_cutout_fixture.fixtureGroup:
                 result = [
                     placement.cutout_fixture_id
                     for placement in placements
@@ -170,16 +171,16 @@ def get_configuration_errors(  # noqa: C901
 def _find_cutout_fixture(
     deck_definition: deck_types.DeckDefinitionV5, cutout_fixture_id: str
 ) -> Union[deck_types.CutoutFixture, UnrecognizedCutoutFixtureError]:
-    cutout_fixtures = deck_definition["cutoutFixtures"]
+    cutout_fixtures = deck_definition.cutoutFixtures
     try:
         return next(
             cutout_fixture
             for cutout_fixture in cutout_fixtures
-            if cutout_fixture["id"] == cutout_fixture_id
+            if cutout_fixture.id == cutout_fixture_id
         )
     except StopIteration:  # No match found.
         allowed_cutout_fixture_ids = frozenset(
-            cutout_fixture["id"] for cutout_fixture in cutout_fixtures
+            cutout_fixture.id for cutout_fixture in cutout_fixtures
         )
         return UnrecognizedCutoutFixtureError(
             cutout_fixture_id=cutout_fixture_id,

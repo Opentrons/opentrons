@@ -1,6 +1,6 @@
 """Unit tests for robot_server.deck_configuration.validation."""
 
-from opentrons_shared_data.deck import load as load_deck_definition
+from opentrons_shared_data.deck.load import load as load_deck_definition
 
 from robot_server.deck_configuration import validation as subject
 
