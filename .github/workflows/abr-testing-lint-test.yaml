@@ -10,7 +10,7 @@ on:
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
       - '.github/workflows/abr-testing-lint-test.yaml'
-      - '.github/actions/ython/**'
+      - '.github/actions/python/**'
     branches:
       - 'edge'
     tags-ignore:
