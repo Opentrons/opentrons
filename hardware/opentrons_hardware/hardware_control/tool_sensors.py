@@ -27,6 +27,19 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
     ErrorCode,
 )
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    SendAccumulatedPressureDataPayload,
+    BindSensorOutputRequestPayload,
+)
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorIdField,
+    SensorOutputBindingField,
+    SensorTypeField,
+)
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    BindSensorOutputRequest,
+    SendAccumulatedPressureDataRequest,
+)
 from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
 from opentrons_hardware.sensors.types import (
     SensorDataType,
@@ -47,6 +60,14 @@ from opentrons_hardware.hardware_control.types import MotorPositionStatus
 LOG = getLogger(__name__)
 PipetteProbeTarget = Literal[NodeId.pipette_left, NodeId.pipette_right]
 InstrumentProbeTarget = Union[PipetteProbeTarget, Literal[NodeId.gripper]]
+
+pressure_output_file_heading = [
+    "time(s)",
+    "Pressure(pascals)",
+    "z_velocity(mm/s)",
+    "plunger_velocity(mm/s)",
+    "threshold(pascals)",
+]
 
 # FIXME we should organize all of these functions to use the sensor drivers.
 # FIXME we should restrict some of these functions by instrument type.
@@ -91,7 +112,7 @@ def _build_pass_step(
     return move_group
 
 
-async def run_pass_output_to_csv(
+async def run_sync_buffer_to_csv(
     messenger: CanMessenger,
     sensor_driver: SensorDriver,
     pressure_sensor: PressureSensor,
@@ -100,22 +121,62 @@ async def run_pass_output_to_csv(
     threshold_pascals: float,
     head_node: NodeId,
     move_group: MoveGroupRunner,
-    data_file: Optional[str] = None,
+    log_file: str,
+    tool: PipetteProbeTarget,
+    sensor_id: SensorId,
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Runs the sensor pass move group and creates a csv file with the results."""
-    log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
-    file_heading = [
-        "time(s)",
-        "Pressure(pascals)",
-        "z_velocity(mm/s)",
-        "plunger_velocity(mm/s)",
-        "threshold(pascals)",
-    ]
     sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold_pascals]
     sensor_capturer = LogListener(
         mount=head_node,
         data_file=log_file,
-        file_heading=file_heading,
+        file_heading=pressure_output_file_heading,
+        sensor_metadata=sensor_metadata,
+    )
+    async with sensor_capturer:
+        print("starting move group runner")
+        positions = await move_group.run(can_messenger=messenger)
+        messenger.add_listener(sensor_capturer, None)
+        await messenger.send(
+            node_id=tool,
+            message=SendAccumulatedPressureDataRequest(
+                payload=SendAccumulatedPressureDataPayload(
+                    sensor_id=SensorIdField(sensor_id)
+                )
+            ),
+        )
+        await asyncio.sleep(10)
+        messenger.remove_listener(sensor_capturer)
+    await messenger.send(
+        node_id=tool,
+        message=BindSensorOutputRequest(
+            payload=BindSensorOutputRequestPayload(
+                sensor=SensorTypeField(SensorType.pressure),
+                sensor_id=SensorIdField(sensor_id),
+                binding=SensorOutputBindingField(SensorOutputBinding.none),
+            )
+        ),
+    )
+    return positions
+
+
+async def run_stream_output_to_csv(
+    messenger: CanMessenger,
+    sensor_driver: SensorDriver,
+    pressure_sensor: PressureSensor,
+    mount_speed: float,
+    plunger_speed: float,
+    threshold_pascals: float,
+    head_node: NodeId,
+    move_group: MoveGroupRunner,
+    log_file: str,
+) -> Dict[NodeId, MotorPositionStatus]:
+    """Runs the sensor pass move group and creates a csv file with the results."""
+    sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold_pascals]
+    sensor_capturer = LogListener(
+        mount=head_node,
+        data_file=log_file,
+        file_heading=pressure_output_file_heading,
         sensor_metadata=sensor_metadata,
     )
     binding = [SensorOutputBinding.sync, SensorOutputBinding.report]
@@ -130,12 +191,14 @@ async def run_pass_output_to_csv(
     return positions
 
 
-class OutputOptions(Enum):
+#str enum so it can be json serializable
+class OutputOptions(str, Enum):
     """Specifies where we should report sensor data to during a sensor pass."""
 
-    write_to_csv = auto()
-    can_bus_only = auto()
-    none = auto()
+    stream_to_csv = "STREAM"
+    sync_buffer_to_csv = "SYNC"
+    can_bus_only = "CAN"
+    none = "NONE"
 
 
 async def liquid_probe(
@@ -146,7 +209,7 @@ async def liquid_probe(
     plunger_speed: float,
     mount_speed: float,
     threshold_pascals: float,
-    output_format: OutputOptions = OutputOptions.can_bus_only,
+    output_option: OutputOptions,
     data_file: Optional[str] = None,
     auto_zero_sensor: bool = True,
     num_baseline_reads: int = 10,
@@ -173,13 +236,15 @@ async def liquid_probe(
         movers=[head_node, tool],
         distance={head_node: max_z_distance, tool: max_z_distance},
         speed={head_node: mount_speed, tool: plunger_speed},
-        stop_condition=MoveStopCondition.sync_line,
+        stop_condition=MoveStopCondition.sync_line
+        if output_option == OutputOptions.sync_buffer_to_csv
+        else MoveStopCondition.sync_line,
     )
 
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
-
-    if output_format == OutputOptions.write_to_csv:
-        return await run_pass_output_to_csv(
+    log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
+    if output_option == OutputOptions.stream_to_csv:
+        return await run_stream_output_to_csv(
             messenger,
             sensor_driver,
             pressure_sensor,
@@ -188,10 +253,23 @@ async def liquid_probe(
             threshold_pascals,
             head_node,
             sensor_runner,
-            data_file,
+            log_file,
         )
-
-    elif output_format == OutputOptions.can_bus_only:
+    elif output_option == OutputOptions.sync_buffer_to_csv:
+        return await run_sync_buffer_to_csv(
+            messenger,
+            sensor_driver,
+            pressure_sensor,
+            mount_speed,
+            plunger_speed,
+            threshold_pascals,
+            head_node,
+            sensor_runner,
+            log_file,
+            tool=tool,
+            sensor_id=sensor_id,
+        )
+    elif output_option == OutputOptions.can_bus_only:
         async with sensor_driver.bind_output(
             messenger,
             pressure_sensor,
