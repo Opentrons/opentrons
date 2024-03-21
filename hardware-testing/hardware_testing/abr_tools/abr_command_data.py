@@ -121,13 +121,20 @@ def module_commands(
     """Get module commands."""
     moduleCmdList = [
         "thermocycler/openLid",
-        "heaterShaker/closeLabwareLatch",
+        "thermocycler/waitForBlockTemperature",
+        "thermocycler/setTargetBlockTemperature",
+        "thermocycler/deactivateBlock",
+        "thermocycler/deactivateLid",
+        "thermocycler/setTargetLidTemperature",
         "thermocycler/closeLid",
+        "heaterShaker/closeLabwareLatch",
         "heaterShaker/openLabwareLatch",
         "heaterShaker/setAndWaitForShakeSpeed",
+        "heaterShaker/setTargetTemperature",
         "heaterShaker/deactivateShaker",
         "temperatureModule/setTargetTemperature",
         "temperatureModule/waitForTemperature",
+        "temperatureModule/deactivate",
     ]
     commandData: List[Dict[str, Any]] = file_results.get("commands", "")
     modules: List[Dict[str, Any]] = file_results.get("modules", {})
@@ -137,6 +144,7 @@ def module_commands(
         if isinstance(module, dict)
     ]
     group_totals = {}
+    start_times = {}
     for command in commandData:
         commandType = command["commandType"]
         if commandType in moduleCmdList:
@@ -152,7 +160,26 @@ def module_commands(
             )
             temp = command["params"].get("celsius", "")
             rpm = command["params"].get("rpm", "")
+            start_time = command["params"].get("startedAt", "")
+            end_time = command["params"].get("completedAt", "")            
             group_key = (commandType, module_serial, temp, rpm)
+            
+            if group_key not in start_times:
+                start_times[group_key] = {
+                    "commandType": commandType,
+                    "moduleSerial": module_serial,
+                    "startTime": start_time,
+                    "endTime": end_time, 
+                    "temp_C": temp,
+                    "speed_rpm": rpm,
+                }
+            else:
+                start_times[group_key]["commandType"] = commandType
+                start_times[group_key]["moduleSerial"] = module_serial
+                start_times[group_key]["startTime"] = start_time
+                start_times[group_key]["endTime"] = end_time
+                start_times[group_key]["temp_C"] = temp
+                start_times[group_key]["speed_rpm"] = rpm
             if group_key not in group_totals:
                 group_totals[group_key] = {
                     "commandType": commandType,
@@ -171,6 +198,22 @@ def module_commands(
                 group_totals[group_key]["create_to_start"] += create_to_start
                 group_totals[group_key]["start_to_complete"] += start_to_complete
                 group_totals[group_key]["count"] += 1
+        for group_key in start_times:
+            command = start_times[group_key]["commandType"]
+            command_split = command.split("/",1)[1]
+            deactivate_commands = ["thermocycler/deactivateBlock", "thermocycler/deactivateLid","temperatureModule/deactivate","heaterShaker/deactivateShaker"]
+            start_commands = ["thermocycler/setTargetLidTemperature", "thermocycler/setTargetBlockTemperature", "temperatureModule/setTargetTemperature", "heaterShaker/setTargetTemperature"]
+            if command_split == "deactivate": 
+                module_serial = start_times[group_key]["moduleSerial"]
+                off_time = start_times[group_key]["endTime"]
+                on_time  = next(
+                (
+                    start_times[group_key]["endTime"]
+                    for commands in start_times
+                    if start_times[group_key]["commands"] == module_id
+                ),
+                "",
+            )
     return group_totals
 
 
