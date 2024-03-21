@@ -14,7 +14,7 @@ class Placement:
 
     cutout_id: str
     cutout_fixture_id: str
-    opentrons_modules_serial_number: Optional[str]
+    opentrons_module_serial_number: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -87,7 +87,7 @@ ConfigurationError = Union[
 ]
 
 
-def get_configuration_errors(
+def get_configuration_errors(  # noqa: C901
     deck_definition: deck_types.DeckDefinitionV5,
     placements: List[Placement],
 ) -> Set[ConfigurationError]:
@@ -130,17 +130,17 @@ def get_configuration_errors(
                 )
             if found_cutout_fixture[
                 "expectOpentronsModuleSerialNumber"
-            ] == False and isinstance(placement.opentrons_modules_serial_number, str):
+            ] is False and isinstance(placement.opentrons_module_serial_number, str):
                 errors.add(
                     UnexpectedSerialNumberError(
                         cutout_id=placement.cutout_id,
                         cutout_fixture_id=placement.cutout_fixture_id,
-                        opentrons_module_serial_number=placement.opentrons_modules_serial_number,
+                        opentrons_module_serial_number=placement.opentrons_module_serial_number,
                     )
                 )
             elif (
-                found_cutout_fixture["expectOpentronsModuleSerialNumber"] == True
-                and placement.opentrons_modules_serial_number is None
+                found_cutout_fixture["expectOpentronsModuleSerialNumber"] is True
+                and placement.opentrons_module_serial_number is None
             ):
                 errors.add(
                     InvalidSerialNumberError(

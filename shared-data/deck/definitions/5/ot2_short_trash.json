@@ -361,6 +361,7 @@
   "cutoutFixtures": [
     {
       "id": "singleStandardSlot",
+      "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": [
         "cutout1",
         "cutout2",
@@ -390,15 +391,18 @@
         "cutout11": ["11"],
         "cutout12": ["12"]
       },
+      "fixtureGroup": [],
       "height": 0
     },
     {
       "id": "fixedTrashSlot",
+      "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": ["cutout12"],
       "displayName": "Fixed Trash",
       "providesAddressableAreas": {
         "cutout12": ["shortFixedTrash"]
       },
+      "fixtureGroup": [],
       "height": 58
     }
   ]

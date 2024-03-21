@@ -550,7 +550,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Magnetic Block Module in D1"
+        "displayName": "Magnetic Block in D1"
       },
       {
         "id": "magneticBlockV1C1",
@@ -561,7 +561,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Magnetic Block Module in C1"
+        "displayName": "Magnetic Block in C1"
       },
       {
         "id": "magneticBlockV1B1",
@@ -572,7 +572,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Magnetic Block Module in B1"
+        "displayName": "Magnetic Block in B1"
       },
       {
         "id": "magneticBlockV1A1",
@@ -583,7 +583,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Magnetic Block Module in A1"
+        "displayName": "Magnetic Block in A1"
       },
       {
         "id": "magneticBlockV1D2",
@@ -594,7 +594,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Magnetic Block Module in D2"
+        "displayName": "Magnetic Block in D2"
       },
       {
         "id": "magneticBlockV1C2",
@@ -605,7 +605,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Magnetic Block Module in C2"
+        "displayName": "Magnetic Block in C2"
       },
       {
         "id": "magneticBlockV1B2",
@@ -616,7 +616,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Magnetic Block Module in B2"
+        "displayName": "Magnetic Block in B2"
       },
       {
         "id": "magneticBlockV1A2",
@@ -627,7 +627,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Magnetic Block Module in A2"
+        "displayName": "Magnetic Block in A2"
       },
       {
         "id": "magneticBlockV1D3",
@@ -638,7 +638,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Magnetic Block Module in D3"
+        "displayName": "Magnetic Block in D3"
       },
       {
         "id": "magneticBlockV1C3",
@@ -649,7 +649,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Magnetic Block Module in C3"
+        "displayName": "Magnetic Block in C3"
       },
       {
         "id": "magneticBlockV1B3",
@@ -660,7 +660,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Magnetic Block Module in B3"
+        "displayName": "Magnetic Block in B3"
       },
       {
         "id": "magneticBlockV1A3",
@@ -671,7 +671,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Magnetic Block Module in A3"
+        "displayName": "Magnetic Block in A3"
       }
     ],
     "cutouts": [
@@ -891,7 +891,7 @@
       "mayMountTo": ["cutoutA1"],
       "displayName": "Rear Slot portion of the Thermocycler Moduler",
       "providesAddressableAreas": {
-        "cutoutA1": ["thermocyclerModuleV2"]
+        "cutoutA1": []
       },
       "fixtureGroup": ["thermocyclerModuleV2Rear", "thermocyclerModuleV2Front"],
       "height": 124.5
@@ -962,7 +962,7 @@
       "height": 40
     },
     {
-      "id": "magneticBlockModuleV1",
+      "id": "magneticBlockV1",
       "expectOpentronsModuleSerialNumber": false,
       "mayMountTo": [
         "cutoutD1",
@@ -978,7 +978,7 @@
         "cutoutB3",
         "cutoutA3"
       ],
-      "displayName": "Slot With a Magnetic Block Module",
+      "displayName": "Slot With a Magnetic Block",
       "providesAddressableAreas": {
         "cutoutD1": ["magneticBlockV1D1"],
         "cutoutC1": ["magneticBlockV1C1"],

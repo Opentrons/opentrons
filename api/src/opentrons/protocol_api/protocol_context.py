@@ -800,15 +800,10 @@ class ProtocolContext(CommandPublisher):
         if isinstance(deck_slot, StagingSlotName):
             raise ValueError("Cannot load a module onto a staging slot.")
 
-        addressable_area = validation.ensure_and_convert_module_fixture_location(
-            location, self._api_version, self._core.robot_type, requested_model
-        )
-
         module_core = self._core.load_module(
             model=requested_model,
             deck_slot=deck_slot,
             configuration=configuration,
-            addressable_area=addressable_area,
         )
 
         module_context = _create_module_context(

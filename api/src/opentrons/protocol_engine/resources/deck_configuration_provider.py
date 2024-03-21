@@ -17,7 +17,6 @@ from ..errors import (
     CutoutDoesNotExistError,
     FixtureDoesNotExistError,
     AddressableAreaDoesNotExistError,
-    FixtureDoesNotProvideAreasError,
 )
 
 
@@ -50,10 +49,7 @@ def get_provided_addressable_area_names(
     cutout_fixture = get_cutout_fixture(cutout_fixture_id, deck_definition)
     try:
         return cutout_fixture["providesAddressableAreas"][cutout_id]
-    except KeyError as exception:
-        # raise FixtureDoesNotProvideAreasError(
-        #     f"Cutout fixture {cutout_fixture['id']} does not provide addressable areas for {cutout_id}"
-        # ) from exception
+    except KeyError:
         return []
 
 

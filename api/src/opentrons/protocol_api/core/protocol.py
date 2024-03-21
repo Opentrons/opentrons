@@ -119,7 +119,6 @@ class AbstractProtocol(
         model: ModuleModel,
         deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
-        addressable_area: Optional[str],
     ) -> ModuleCoreType:
         ...
 

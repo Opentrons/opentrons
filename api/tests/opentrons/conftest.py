@@ -40,7 +40,6 @@ from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 from opentrons_shared_data.deck.dev_types import (
     RobotModel,
     DeckDefinitionV3,
-    DeckDefinitionV4,
     DeckDefinitionV5,
 )
 from opentrons_shared_data.deck import (

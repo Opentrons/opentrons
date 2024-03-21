@@ -73,40 +73,64 @@ _for_flex = models.DeckConfigurationRequest.construct(
 _for_ot2 = models.DeckConfigurationRequest.construct(
     cutoutFixtures=[
         models.CutoutFixture.construct(
-            cutoutId="cutout1", cutoutFixtureId="singleStandardSlot"
+            cutoutId="cutout1",
+            cutoutFixtureId="singleStandardSlot",
+            opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.construct(
-            cutoutId="cutout2", cutoutFixtureId="singleStandardSlot"
+            cutoutId="cutout2",
+            cutoutFixtureId="singleStandardSlot",
+            opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.construct(
-            cutoutId="cutout3", cutoutFixtureId="singleStandardSlot"
+            cutoutId="cutout3",
+            cutoutFixtureId="singleStandardSlot",
+            opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.construct(
-            cutoutId="cutout4", cutoutFixtureId="singleStandardSlot"
+            cutoutId="cutout4",
+            cutoutFixtureId="singleStandardSlot",
+            opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.construct(
-            cutoutId="cutout5", cutoutFixtureId="singleStandardSlot"
+            cutoutId="cutout5",
+            cutoutFixtureId="singleStandardSlot",
+            opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.construct(
-            cutoutId="cutout6", cutoutFixtureId="singleStandardSlot"
+            cutoutId="cutout6",
+            cutoutFixtureId="singleStandardSlot",
+            opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.construct(
-            cutoutId="cutout7", cutoutFixtureId="singleStandardSlot"
+            cutoutId="cutout7",
+            cutoutFixtureId="singleStandardSlot",
+            opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.construct(
-            cutoutId="cutout8", cutoutFixtureId="singleStandardSlot"
+            cutoutId="cutout8",
+            cutoutFixtureId="singleStandardSlot",
+            opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.construct(
-            cutoutId="cutout9", cutoutFixtureId="singleStandardSlot"
+            cutoutId="cutout9",
+            cutoutFixtureId="singleStandardSlot",
+            opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.construct(
-            cutoutId="cutout10", cutoutFixtureId="singleStandardSlot"
+            cutoutId="cutout10",
+            cutoutFixtureId="singleStandardSlot",
+            opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.construct(
-            cutoutId="cutout11", cutoutFixtureId="singleStandardSlot"
+            cutoutId="cutout11",
+            cutoutFixtureId="singleStandardSlot",
+            opentronsModuleSerialNumber=None,
         ),
         models.CutoutFixture.construct(
-            cutoutId="cutout12", cutoutFixtureId="fixedTrashSlot"
+            cutoutId="cutout12",
+            cutoutFixtureId="fixedTrashSlot",
+            opentronsModuleSerialNumber=None,
         ),
     ]
 )

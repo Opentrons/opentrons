@@ -337,7 +337,7 @@ def ensure_and_convert_trash_bin_location(
 
 
 def ensure_and_convert_module_fixture_location(
-    deck_slot: Optional[Union[int, str]],
+    deck_slot: DeckSlotName,
     api_version: APIVersion,
     robot_type: RobotType,
     model: ModuleModel,
@@ -353,7 +353,7 @@ def ensure_and_convert_module_fixture_location(
 
     if isinstance(model, MagneticBlockModel):
         valid_slots = [
-            DeckSlotName(slot)
+            slot
             for slot in [
                 "A1",
                 "B1",
@@ -386,8 +386,7 @@ def ensure_and_convert_module_fixture_location(
 
     elif isinstance(model, HeaterShakerModuleModel):
         valid_slots = [
-            DeckSlotName(slot)
-            for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
+            slot for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
         ]
         addressable_areas = [
             "heaterShakerV1A1",
@@ -401,8 +400,7 @@ def ensure_and_convert_module_fixture_location(
         ]
     elif isinstance(model, TemperatureModuleModel):
         valid_slots = [
-            DeckSlotName(slot)
-            for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
+            slot for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
         ]
         addressable_areas = [
             "temperatureModuleV2A1",
@@ -423,20 +421,7 @@ def ensure_and_convert_module_fixture_location(
         slot: addressable_area
         for slot, addressable_area in zip(valid_slots, addressable_areas)
     }
-    if isinstance(deck_slot, int) or isinstance(deck_slot, str):
-        slot_name_ot3 = ensure_and_convert_deck_slot(deck_slot, api_version, robot_type)
-        if not isinstance(slot_name_ot3, DeckSlotName):
-            raise ValueError("Staging areas not permitted for module fixtures.")
-        if slot_name_ot3 not in valid_slots:
-            raise InvalidFixtureLocationError(
-                f"Invalid location: {slot_name_ot3} for fixture: {model.name}."
-            )
-
-        return map_addressable_area[slot_name_ot3]
-    else:
-        raise ValueError(
-            "Location must be provided when loading modules except for the Thermocycler."
-        )
+    return map_addressable_area[deck_slot.name]
 
 
 def ensure_hold_time_seconds(

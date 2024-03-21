@@ -394,7 +394,6 @@ class ProtocolCore(
         model: ModuleModel,
         deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
-        addressable_area: Optional[str],
     ) -> Union[ModuleCore, NonConnectedModuleCore]:
         """Load a module into the protocol."""
         assert configuration is None, "Module `configuration` is deprecated"
@@ -412,6 +411,10 @@ class ProtocolCore(
         robot_type = self._engine_client.state.config.robot_type
         normalized_deck_slot = deck_slot.to_equivalent_for_robot_type(robot_type)
         self._ensure_module_location(normalized_deck_slot, module_type)
+
+        addressable_area = validation.ensure_and_convert_module_fixture_location(
+            deck_slot, self._api_version, robot_type, model
+        )
 
         if robot_type == "OT-3 Standard" and isinstance(addressable_area, str):
             result = self._engine_client.load_module(

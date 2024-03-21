@@ -13,7 +13,7 @@ def map_in(request: models.DeckConfigurationRequest) -> List[validation.Placemen
         validation.Placement(
             cutout_id=p.cutoutId,
             cutout_fixture_id=p.cutoutFixtureId,
-            opentrons_modules_serial_number=p.opentronsModuleSerialNumber,
+            opentrons_module_serial_number=p.opentronsModuleSerialNumber,
         )
         for p in request.cutoutFixtures
     ]
