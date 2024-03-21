@@ -18,7 +18,7 @@ LABWARE_ON_SCALE = "nest_1_reservoir_195ml"
 def run(ctx: ProtocolContext) -> None:
     """Run."""
     scale_labware = ctx.load_labware(LABWARE_ON_SCALE, SLOT_SCALE)
-    pipette = ctx.load_instrument("p1000_96", "left")
+    pipette = ctx.load_instrument("flex_96channel_1000", "left")
     for tip_size in SLOTS_TIPRACK.keys():
         tipracks = [
             ctx.load_labware(f"opentrons_flex_96_tiprack_{tip_size}uL_adp", slot)
