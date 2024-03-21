@@ -19,6 +19,8 @@ import {
   SINGLE_RIGHT_CUTOUTS,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
+  SINGLE_LEFT_CUTOUTS,
+  SINGLE_CENTER_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -28,7 +30,7 @@ import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetails
 import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { getTopPortalEl } from '../../App/portal'
 
-import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId, DeckConfiguration } from '@opentrons/shared-data'
 
 export function DeckConfigurationEditor(): JSX.Element {
   const { t, i18n } = useTranslation([
@@ -67,15 +69,16 @@ export function DeckConfigurationEditor(): JSX.Element {
   }
 
   const handleClickRemove = (cutoutId: CutoutId): void => {
+    let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
+    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+      replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
+    } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
+      replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
+    }
     setCurrentDeckConfig(prevDeckConfig =>
       prevDeckConfig.map(fixture =>
         fixture.cutoutId === cutoutId
-          ? {
-              ...fixture,
-              cutoutFixtureId: SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
-                ? SINGLE_RIGHT_SLOT_FIXTURE
-                : SINGLE_LEFT_SLOT_FIXTURE,
-            }
+          ? { ...fixture, cutoutFixtureId: replacementFixtureId, opentronsModuleSerialNumber: undefined }
           : fixture
       )
     )

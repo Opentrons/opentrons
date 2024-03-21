@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
@@ -6,54 +7,78 @@ import { TYPOGRAPHY } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
+  COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_1_X_ADJUSTMENT,
+  COLUMN_2_X_ADJUSTMENT,
   COLUMN_3_X_ADJUSTMENT,
+  FIXTURE_HEIGHT,
+  Y_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
-  FIXTURE_HEIGHT,
-  STAGING_AREA_FIXTURE_WIDTH,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
-  WASTE_CHUTE_DISPLAY_NAME,
-  Y_ADJUSTMENT,
 } from './constants'
 
 import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
 
-interface WasteChuteConfigFixtureProps {
+interface MagneticBlockFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   handleClickRemove?: (fixtureLocation: CutoutId) => void
-  hasStagingAreas?: boolean
 }
 
-export function WasteChuteConfigFixture(
-  props: WasteChuteConfigFixtureProps
-): JSX.Element {
-  const {
-    deckDefinition,
-    handleClickRemove,
-    fixtureLocation,
-    hasStagingAreas = false,
-  } = props
+const MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME = 'Mag Block'
 
-  const wasteChuteCutout = deckDefinition.locations.cutouts.find(
+export function MagneticBlockFixture(
+  props: MagneticBlockFixtureProps
+): JSX.Element {
+  const { deckDefinition, fixtureLocation, handleClickRemove } = props
+
+  const standardSlotCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
 
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
+   * the adjustment for x is different for right side/left side
    */
   const [xSlotPosition = 0, ySlotPosition = 0] =
-    wasteChuteCutout?.position ?? []
+    standardSlotCutout?.position ?? []
+  let x = xSlotPosition
+  let width = 0
+  switch (fixtureLocation) {
+    case 'cutoutA1':
+    case 'cutoutB1':
+    case 'cutoutC1':
+    case 'cutoutD1': {
+      x = xSlotPosition + COLUMN_1_X_ADJUSTMENT
+      width = COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
+      break
+    }
+    case 'cutoutA2':
+    case 'cutoutB2':
+    case 'cutoutC2':
+    case 'cutoutD2': {
+      x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
+      width = COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
+      break
+    }
+    case 'cutoutA3':
+    case 'cutoutB3':
+    case 'cutoutC3':
+    case 'cutoutD3': {
+      x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
+      width = COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
+      break
+    }
+  }
 
-  const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
   const y = ySlotPosition + Y_ADJUSTMENT
 
   return (
     <RobotCoordsForeignObject
-      width={
-        hasStagingAreas ? STAGING_AREA_FIXTURE_WIDTH : COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
-      }
+      width={width}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
@@ -70,11 +95,11 @@ export function WasteChuteConfigFixture(
         onClick={
           handleClickRemove != null
             ? () => handleClickRemove(fixtureLocation)
-            : () => {}
+            : () => { }
         }
       >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {WASTE_CHUTE_DISPLAY_NAME}
+          {MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />

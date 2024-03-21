@@ -29,6 +29,8 @@ import {
   SINGLE_SLOT_FIXTURES,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_LEFT_CUTOUTS,
 } from '@opentrons/shared-data'
 
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
@@ -39,7 +41,7 @@ import { AddFixtureModal } from './AddFixtureModal'
 import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
-import type { CutoutId } from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const RUN_REFETCH_INTERVAL = 5000
@@ -81,14 +83,16 @@ export function DeviceDetailsDeckConfiguration({
   }
 
   const handleClickRemove = (cutoutId: CutoutId): void => {
-    const isRightCutout = SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
-    const singleSlotFixture = isRightCutout
-      ? SINGLE_RIGHT_SLOT_FIXTURE
-      : SINGLE_LEFT_SLOT_FIXTURE
+    let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
+    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+      replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
+    } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
+      replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
+    }
 
     const newDeckConfig = deckConfig.map(fixture =>
       fixture.cutoutId === cutoutId
-        ? { ...fixture, cutoutFixtureId: singleSlotFixture }
+        ? { ...fixture, cutoutFixtureId: replacementFixtureId, opentronsModuleSerialNumber: undefined }
         : fixture
     )
 

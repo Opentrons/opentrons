@@ -1,60 +1,51 @@
 import * as React from 'react'
-
+import { TEMPERATURE_MODULE_V2, getModuleDisplayName } from '@opentrons/shared-data'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_3_X_ADJUSTMENT,
+  COLUMN_1_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
-  FIXTURE_HEIGHT,
-  STAGING_AREA_FIXTURE_WIDTH,
   COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
-  WASTE_CHUTE_DISPLAY_NAME,
   Y_ADJUSTMENT,
+  THERMOCYCLER_FIXTURE_HEIGHT,
 } from './constants'
 
 import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
 
-interface WasteChuteConfigFixtureProps {
+interface ThermocyclerFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   handleClickRemove?: (fixtureLocation: CutoutId) => void
-  hasStagingAreas?: boolean
 }
 
-export function WasteChuteConfigFixture(
-  props: WasteChuteConfigFixtureProps
-): JSX.Element {
-  const {
-    deckDefinition,
-    handleClickRemove,
-    fixtureLocation,
-    hasStagingAreas = false,
-  } = props
+const THERMOCYCLER_FIXTURE_DISPLAY_NAME = 'Thermocycler'
 
-  const wasteChuteCutout = deckDefinition.locations.cutouts.find(
+export function ThermocyclerFixture(
+  props: ThermocyclerFixtureProps
+): JSX.Element {
+  const { deckDefinition, handleClickRemove, fixtureLocation } = props
+
+  const cutoutDef = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
 
   /**
    * deck definition cutout position is the position of the single slot located within that cutout
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
+   * the adjustment for x is different for right side/left side
    */
-  const [xSlotPosition = 0, ySlotPosition = 0] =
-    wasteChuteCutout?.position ?? []
-
-  const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
+  const [xSlotPosition = 0, ySlotPosition = 0] = cutoutDef?.position ?? []
+  const x = xSlotPosition + COLUMN_1_X_ADJUSTMENT
   const y = ySlotPosition + Y_ADJUSTMENT
 
   return (
     <RobotCoordsForeignObject
-      width={
-        hasStagingAreas ? STAGING_AREA_FIXTURE_WIDTH : COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
-      }
-      height={FIXTURE_HEIGHT}
+      width={COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH}
+      height={THERMOCYCLER_FIXTURE_HEIGHT}
       x={x}
       y={y}
       flexProps={{ flex: '1' }}
@@ -74,7 +65,7 @@ export function WasteChuteConfigFixture(
         }
       >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {WASTE_CHUTE_DISPLAY_NAME}
+          {THERMOCYCLER_FIXTURE_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />

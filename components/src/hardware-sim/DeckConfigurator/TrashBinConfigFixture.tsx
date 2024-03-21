@@ -11,7 +11,7 @@ import {
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   FIXTURE_HEIGHT,
-  SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
   TRASH_BIN_DISPLAY_NAME,
   Y_ADJUSTMENT,
 } from './constants'
@@ -54,7 +54,7 @@ export function TrashBinConfigFixture(
 
   return (
     <RobotCoordsForeignObject
-      width={SINGLE_SLOT_FIXTURE_WIDTH}
+      width={COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
