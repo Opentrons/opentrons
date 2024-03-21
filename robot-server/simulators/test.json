@@ -33,7 +33,12 @@
         ]
       }
     ],
-    "heatershaker": [],
+    "heatershaker": [
+      {
+        "serial_number": "hs-123",
+        "calls": []
+      }
+    ],
     "tempdeck": [
       {
         "serial_number": "temp-123",
