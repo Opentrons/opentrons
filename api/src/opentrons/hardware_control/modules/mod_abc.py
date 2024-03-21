@@ -98,6 +98,8 @@ class AbstractModule(abc.ABC):
             except InvalidVersion:
                 available_version = parse_version("v0.0.0")
             return cast(bool, available_version > device_version)
+        elif self.device_info and not self._bundled_fw:
+            return True
         return False
 
     async def wait_for_is_running(self) -> None:
