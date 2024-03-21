@@ -56,7 +56,7 @@ class DeckConfigurationStore:  # noqa: D101
                     calibration_storage_types.CutoutFixturePlacement(
                         cutout_fixture_id=e.cutoutFixtureId,
                         cutout_id=e.cutoutId,
-                        opentrons_modules_serial_number=e.opentronsModuleSerialNumber,
+                        opentrons_module_serial_number=e.opentronsModuleSerialNumber,
                     )
                     for e in request.cutoutFixtures
                 ],
@@ -105,7 +105,7 @@ class DeckConfigurationStore:  # noqa: D101
                 models.CutoutFixture.construct(
                     cutoutFixtureId=e.cutout_fixture_id,
                     cutoutId=e.cutout_id,
-                    opentronsModuleSerialNumber=e.opentrons_modules_serial_number,
+                    opentronsModuleSerialNumber=e.opentrons_module_serial_number,
                 )
                 for e in cutout_fixtures_from_storage
             ]

@@ -500,6 +500,7 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         )
 
     def get_cutout_id_by_deck_slot_name(self, slot_name: DeckSlotName) -> str:
+        """Get the Cutout ID of a given Deck Slot by Deck Slot Name."""
         return DECK_SLOT_TO_CUTOUT_MAP[slot_name]
 
     def get_fixture_by_deck_slot_name(

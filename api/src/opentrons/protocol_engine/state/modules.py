@@ -958,7 +958,7 @@ class ModuleView(HasState[ModuleState]):
 
         return neighbor_slot in self._state.slot_by_module_id.values()
 
-    def select_hardware_module_to_load(
+    def select_hardware_module_to_load(  # noqa: C901
         self,
         model: ModuleModel,
         location: Union[DeckSlotLocation, AddressableAreaLocation],

@@ -421,20 +421,7 @@ def ensure_and_convert_module_fixture_location(
         slot: addressable_area
         for slot, addressable_area in zip(valid_slots, addressable_areas)
     }
-    if isinstance(deck_slot, int) or isinstance(deck_slot, str):
-        slot_name_ot3 = ensure_and_convert_deck_slot(deck_slot, api_version, robot_type)
-        if not isinstance(slot_name_ot3, DeckSlotName):
-            raise ValueError("Staging areas not permitted for module fixtures.")
-        if slot_name_ot3 not in valid_slots:
-            raise InvalidFixtureLocationError(
-                f"Invalid location: {slot_name_ot3} for fixture: {model.name}."
-            )
-
-        return map_addressable_area[slot_name_ot3]
-    else:
-        raise ValueError(
-            "Location must be provided when loading modules except for the Thermocycler."
-        )
+    return map_addressable_area[deck_slot.name]
 
 
 def ensure_hold_time_seconds(

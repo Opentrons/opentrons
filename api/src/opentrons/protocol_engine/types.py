@@ -819,7 +819,7 @@ NozzleLayoutConfigurationType = Union[
 # TODO This should instead contain a proper cutout fixture type
 DeckConfigurationType = List[
     Tuple[str, str, Optional[str]]
-]  # cutout_id, cutout_fixture_id, opentrons_modules_serial_number
+]  # cutout_id, cutout_fixture_id, opentrons_module_serial_number
 
 
 class TipPresenceStatus(str, Enum):

@@ -7,7 +7,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefDict,
@@ -85,15 +85,15 @@ from opentrons.protocols.api_support.deck_type import (
 
 
 @pytest.fixture(scope="session")
-def ot2_standard_deck_def() -> DeckDefinitionV4:
+def ot2_standard_deck_def() -> DeckDefinitionV5:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT2_DECK, 4)
+    return load_deck(STANDARD_OT2_DECK, 5)
 
 
 @pytest.fixture(scope="session")
-def ot3_standard_deck_def() -> DeckDefinitionV4:
+def ot3_standard_deck_def() -> DeckDefinitionV5:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 4)
+    return load_deck(STANDARD_OT3_DECK, 5)
 
 
 @pytest.fixture(autouse=True)
@@ -180,7 +180,7 @@ def test_api_version(
 
 
 def test_get_slot_definition(
-    ot2_standard_deck_def: DeckDefinitionV4, subject: ProtocolCore, decoy: Decoy
+    ot2_standard_deck_def: DeckDefinitionV5, subject: ProtocolCore, decoy: Decoy
 ) -> None:
     """It should return a deck slot's definition."""
     expected_slot_def = cast(
@@ -1177,7 +1177,7 @@ def test_load_module(
     engine_model: EngineModuleModel,
     expected_core_cls: Type[ModuleCore],
     subject: ProtocolCore,
-    deck_def: DeckDefinitionV4,
+    deck_def: DeckDefinitionV5,
     slot_name: DeckSlotName,
     robot_type: RobotType,
 ) -> None:
@@ -1311,7 +1311,7 @@ def test_load_module_raises_wrong_location(
     engine_model: EngineModuleModel,
     expected_core_cls: Type[ModuleCore],
     subject: ProtocolCore,
-    deck_def: DeckDefinitionV4,
+    deck_def: DeckDefinitionV5,
     slot_name: DeckSlotName,
     robot_type: RobotType,
 ) -> None:
@@ -1349,7 +1349,7 @@ def test_load_mag_block(
     mock_engine_client: EngineClient,
     mock_sync_hardware_api: SyncHardwareAPI,
     subject: ProtocolCore,
-    ot3_standard_deck_def: DeckDefinitionV4,
+    ot3_standard_deck_def: DeckDefinitionV5,
 ) -> None:
     """It should issue a load module engine command."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
@@ -1440,7 +1440,7 @@ def test_load_module_thermocycler_with_no_location(
     requested_model: ModuleModel,
     engine_model: EngineModuleModel,
     subject: ProtocolCore,
-    deck_def: DeckDefinitionV4,
+    deck_def: DeckDefinitionV5,
     expected_slot: DeckSlotName,
 ) -> None:
     """It should issue a load module engine command with location at 7."""
@@ -1590,7 +1590,7 @@ def test_get_deck_definition(
     decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
 ) -> None:
     """It should return the loaded deck definition from engine state."""
-    deck_definition = cast(DeckDefinitionV4, {"schemaVersion": "4"})
+    deck_definition = cast(DeckDefinitionV5, {"schemaVersion": "5"})
 
     decoy.when(mock_engine_client.state.labware.get_deck_definition()).then_return(
         deck_definition

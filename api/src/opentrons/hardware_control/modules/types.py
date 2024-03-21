@@ -9,7 +9,6 @@ from typing import (
     Tuple,
     Awaitable,
     Union,
-    Set,
     cast,
     TYPE_CHECKING,
 )

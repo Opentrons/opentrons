@@ -5,7 +5,7 @@ import pytest
 from decoy import Decoy
 from typing import cast, List, Tuple, Optional, NamedTuple
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -159,7 +159,7 @@ def test_get_labware_parent_position_on_module(
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
-    ot2_standard_deck_def: DeckDefinitionV4,
+    ot2_standard_deck_def: DeckDefinitionV5,
     subject: GeometryView,
 ) -> None:
     """It should return a module position for labware on a module."""
@@ -207,7 +207,7 @@ def test_get_labware_parent_position_on_labware(
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
-    ot2_standard_deck_def: DeckDefinitionV4,
+    ot2_standard_deck_def: DeckDefinitionV5,
     subject: GeometryView,
 ) -> None:
     """It should return a labware position for labware on a labware on a module."""
@@ -270,7 +270,7 @@ def test_module_calibration_offset_rotation(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
-    ot2_standard_deck_def: DeckDefinitionV4,
+    ot2_standard_deck_def: DeckDefinitionV5,
     subject: GeometryView,
 ) -> None:
     """Return the rotated module calibration offset if the module was moved from one side of the deck to the other."""
@@ -395,7 +395,7 @@ def test_get_module_labware_highest_z(
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
-    ot2_standard_deck_def: DeckDefinitionV4,
+    ot2_standard_deck_def: DeckDefinitionV5,
     subject: GeometryView,
 ) -> None:
     """It should get the absolute location of a labware's highest Z point."""
@@ -692,7 +692,7 @@ def test_get_highest_z_in_slot_with_single_module(
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
     subject: GeometryView,
-    ot2_standard_deck_def: DeckDefinitionV4,
+    ot2_standard_deck_def: DeckDefinitionV5,
 ) -> None:
     """It should get the highest Z in slot with just a single module."""
     # Case: Slot has a module that doesn't have any labware on it. Highest z is equal to module height.
@@ -820,7 +820,7 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
     addressable_area_view: AddressableAreaView,
     subject: GeometryView,
     well_plate_def: LabwareDefinition,
-    ot2_standard_deck_def: DeckDefinitionV4,
+    ot2_standard_deck_def: DeckDefinitionV5,
 ) -> None:
     """It should get the highest z in slot of labware on module.
 
@@ -1056,7 +1056,7 @@ def test_get_module_labware_well_position(
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
-    ot2_standard_deck_def: DeckDefinitionV4,
+    ot2_standard_deck_def: DeckDefinitionV5,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well top in a labware on module."""
@@ -1544,7 +1544,7 @@ def test_get_labware_grip_point(
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
-    ot2_standard_deck_def: DeckDefinitionV4,
+    ot2_standard_deck_def: DeckDefinitionV5,
     subject: GeometryView,
 ) -> None:
     """It should get the grip point of the labware at the specified location."""
@@ -1567,7 +1567,7 @@ def test_get_labware_grip_point_on_labware(
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
-    ot2_standard_deck_def: DeckDefinitionV4,
+    ot2_standard_deck_def: DeckDefinitionV5,
     subject: GeometryView,
 ) -> None:
     """It should get the grip point of a labware on another labware."""
@@ -1614,7 +1614,7 @@ def test_get_labware_grip_point_for_labware_on_module(
     labware_view: LabwareView,
     module_view: ModuleView,
     addressable_area_view: AddressableAreaView,
-    ot2_standard_deck_def: DeckDefinitionV4,
+    ot2_standard_deck_def: DeckDefinitionV5,
     subject: GeometryView,
 ) -> None:
     """It should return the grip point for labware directly on a module."""
