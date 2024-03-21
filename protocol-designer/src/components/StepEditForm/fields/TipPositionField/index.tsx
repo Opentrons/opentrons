@@ -33,7 +33,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
     updateValue,
     isIndeterminate,
     labwareId,
-    value: rawValue
+    value: rawValue,
   } = props
   const { t } = useTranslation('application')
   const [targetProps, tooltipProps] = useHoverTooltip()
