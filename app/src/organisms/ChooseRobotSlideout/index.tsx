@@ -136,11 +136,10 @@ export function ChooseRobotSlideout(
     robotType,
     showIdleOnly = false,
     multiSlideout,
-    runTimeParametersOverrides = [],
+    runTimeParametersOverrides,
+    setRunTimeParametersOverrides,
   } = props
 
-  const setRunTimeParametersOverrides =
-    props.setRunTimeParametersOverrides ?? (() => {})
   const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
@@ -331,8 +330,8 @@ export function ChooseRobotSlideout(
     </Flex>
   )
 
-  const runtimeParams = runTimeParametersOverrides.map(
-    (runtimeParam, index) => {
+  const runTimeParameters =
+    runTimeParametersOverrides?.map((runtimeParam, index) => {
       if ('choices' in runtimeParam) {
         const dropdownOptions = runtimeParam.choices.map(choice => {
           return { name: choice.displayName, value: choice.value }
@@ -358,7 +357,9 @@ export function ChooseRobotSlideout(
                 }
                 return parameter
               })
-              setRunTimeParametersOverrides(clone)
+              if (setRunTimeParametersOverrides != null) {
+                setRunTimeParametersOverrides(clone)
+              }
             }}
             title={runtimeParam.displayName}
             caption={runtimeParam.description}
@@ -367,13 +368,14 @@ export function ChooseRobotSlideout(
           />
         )
       } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
+        const value = runtimeParam.value as number
         return (
           <InputField
             key={runtimeParam.variableName}
             type="number"
             units={runtimeParam.suffix}
-            placeholder={runtimeParam.value as string}
-            value={runtimeParam.value as number}
+            placeholder={value.toString()}
+            value={value}
             title={runtimeParam.displayName}
             caption={runtimeParam.description}
             onChange={e => {
@@ -389,7 +391,9 @@ export function ChooseRobotSlideout(
                 }
                 return parameter
               })
-              setRunTimeParametersOverrides(clone)
+              if (setRunTimeParametersOverrides != null) {
+                setRunTimeParametersOverrides(clone)
+              }
             }}
           />
         )
@@ -421,14 +425,16 @@ export function ChooseRobotSlideout(
                       return parameter
                     }
                   )
-                  setRunTimeParametersOverrides(clone)
+                  if (setRunTimeParametersOverrides != null) {
+                    setRunTimeParametersOverrides(clone)
+                  }
                 }}
                 height="0.813rem"
-                label={runtimeParam.value ? 'on' : 'off'}
+                label={runtimeParam.value ? t('on') : t('off')}
                 paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
               />
               <StyledText as="p">
-                {runtimeParam.value ? 'On' : 'Off'}
+                {runtimeParam.value ? t('on') : t('off')}
               </StyledText>
             </Flex>
             <StyledText as="label" paddingTop={SPACING.spacing8}>
@@ -437,8 +443,7 @@ export function ChooseRobotSlideout(
           </Flex>
         )
       }
-    }
-  )
+    }) ?? null
 
   const ENABLED_LINK_CSS = css`
     ${TYPOGRAPHY.linkPSemiBold}
@@ -455,39 +460,47 @@ export function ChooseRobotSlideout(
     }
   `
 
-  const isRestoreDefaultsLinkEnabled = runTimeParametersOverrides.some(
-    parameter => parameter.value !== parameter.default
-  )
+  const isRestoreDefaultsLinkEnabled =
+    runTimeParametersOverrides?.some(
+      parameter => parameter.value !== parameter.default
+    ) ?? null
 
-  const pageTwoBody = (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      <Flex justifyContent={JUSTIFY_END}>
-        <Link
-          textAlign={TYPOGRAPHY.textAlignRight}
-          css={
-            isRestoreDefaultsLinkEnabled ? ENABLED_LINK_CSS : DISABLED_LINK_CSS
-          }
-          onClick={() => {
-            const clone = runTimeParametersOverrides.map(parameter => ({
-              ...parameter,
-              value: parameter.default,
-            }))
-            setRunTimeParametersOverrides(clone)
-          }}
-          paddingBottom={SPACING.spacing10}
-          {...targetProps}
-        >
-          {t('restore_defaults')}
-        </Link>
-        {!isRestoreDefaultsLinkEnabled && (
-          <Tooltip tooltipProps={tooltipProps}>{t('no_custom_values')}</Tooltip>
-        )}
+  const pageTwoBody =
+    runTimeParametersOverrides != null ? (
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex justifyContent={JUSTIFY_END}>
+          <Link
+            textAlign={TYPOGRAPHY.textAlignRight}
+            css={
+              isRestoreDefaultsLinkEnabled
+                ? ENABLED_LINK_CSS
+                : DISABLED_LINK_CSS
+            }
+            onClick={() => {
+              const clone = runTimeParametersOverrides.map(parameter => ({
+                ...parameter,
+                value: parameter.default,
+              }))
+              if (setRunTimeParametersOverrides != null) {
+                setRunTimeParametersOverrides(clone)
+              }
+            }}
+            paddingBottom={SPACING.spacing10}
+            {...targetProps}
+          >
+            {t('restore_defaults')}
+          </Link>
+          {!isRestoreDefaultsLinkEnabled && (
+            <Tooltip tooltipProps={tooltipProps}>
+              {t('no_custom_values')}
+            </Tooltip>
+          )}
+        </Flex>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          {runTimeParameters}
+        </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        {runtimeParams}
-      </Flex>
-    </Flex>
-  )
+    ) : null
 
   return multiSlideout != null && enableRunTimeParametersFF ? (
     <MultiSlideout

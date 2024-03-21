@@ -7,9 +7,9 @@ import {
   Flex,
   TYPOGRAPHY,
   SPACING,
-  RESPONSIVENESS,
 } from '@opentrons/components'
 import { css } from 'styled-components'
+import { StyledText } from '../text'
 
 import type { SelectProps, SelectOption } from './Select'
 import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
@@ -52,19 +52,6 @@ export interface SelectFieldProps {
   dropdownType?: 'rounded' | 'neutral'
 }
 
-const TITLE_STYLE = css`
-  color: ${COLORS.black90};
-  padding-bottom: ${SPACING.spacing8};
-  font-size: ${TYPOGRAPHY.fontSizeLabel};
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  line-height: ${TYPOGRAPHY.lineHeight12};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: ${TYPOGRAPHY.fontSize22};
-    font-weight: ${TYPOGRAPHY.fontWeightRegular};
-    line-height: ${TYPOGRAPHY.lineHeight28};
-  }
-`
-
 const CAPTION_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding-top: ${SPACING.spacing4};
@@ -99,7 +86,15 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      {title != null && <Flex css={TITLE_STYLE}>{title}</Flex>}
+      {title != null ? (
+        <StyledText
+          as="label"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          paddingBottom={SPACING.spacing8}
+        >
+          {title}
+        </StyledText>
+      ) : null}
       <Select
         id={id}
         name={name}

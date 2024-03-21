@@ -36,7 +36,7 @@ interface ChooseRobotToRunProtocolSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
   onCloseClick: () => void
   showSlideout: boolean
-  runTimeParameters: RunTimeParameter[]
+  runTimeParameters?: RunTimeParameter[]
 }
 
 export function ChooseRobotToRunProtocolSlideoutComponent(

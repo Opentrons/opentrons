@@ -23,12 +23,14 @@ export interface DropdownOption {
   value: string
 }
 
+export type DropdownBorder = 'rounded' | 'neutral'
+
 export interface DropdownMenuProps {
   filterOptions: DropdownOption[]
   onClick: (value: string) => void
   currentOption: DropdownOption
   width?: string
-  dropdownType?: 'rounded' | 'neutral'
+  dropdownType?: DropdownBorder
   title?: string
   caption?: string | null
 }
@@ -119,29 +121,25 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             {currentOption.name}
           </StyledText>
           {showDropdownMenu ? (
-            <Icon
-              height="0.75rem"
-              name="menu-down"
-              transform="rotate(180deg)"
-            />
+            <Icon size="1.2rem" name="menu-down" transform="rotate(180deg)" />
           ) : (
-            <Icon height="0.75rem" name="menu-down" />
+            <Icon size="1.2rem" name="menu-down" />
           )}
         </Flex>
         {showDropdownMenu && (
           <Flex
             zIndex={2}
             borderRadius={BORDERS.borderRadius8}
-            boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
+            boxShadow={BORDERS.tinyDropShadow}
             position={POSITION_ABSOLUTE}
             backgroundColor={COLORS.white}
             flexDirection={DIRECTION_COLUMN}
             width={width}
-            top={'2.5rem'}
+            top="2.5rem"
           >
             {filterOptions.map((option, index) => (
               <MenuItem
-                key={index}
+                key={`${option.name}-${index}`}
                 onClick={() => {
                   onClick(option.value)
                   setShowDropdownMenu(false)
