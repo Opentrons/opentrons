@@ -1,8 +1,4 @@
-import {
-  getWellsDepth,
-  LabwareDefinition2,
-  LOW_VOLUME_PIPETTES,
-} from '@opentrons/shared-data'
+import { getWellsDepth, LabwareDefinition2 } from '@opentrons/shared-data'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -19,6 +15,7 @@ import type {
   TransferArgs,
   InnerMixArgs,
 } from '@opentrons/step-generation'
+import { getMatchingTipLiquidSpecs } from '../../../utils'
 type MoveLiquidFields = HydratedMoveLiquidFormData['fields']
 
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
@@ -70,7 +67,6 @@ export const moveLiquidFormToArgs = (
     `moveLiquidFormToArgs called with stepType ${hydratedFormData.stepType}, expected "moveLiquid"`
   )
   const fields = hydratedFormData.fields
-  const pipetteSpec = fields.pipette.spec
   const pipetteId = fields.pipette.id
   const {
     volume,
@@ -175,33 +171,10 @@ export const moveLiquidFormToArgs = (
     'dispense_airGap_checkbox',
     'dispense_airGap_volume'
   )
-  const tipLength = fields.pipette.tiprackLabwareDef.parameters.tipLength ?? 0
-  if (tipLength === 0) {
-    console.error(
-      `expected to find a tiplength with tiprack ${fields.pipette.tiprackLabwareDef.metadata.displayName} but could not`
-    )
-  }
-  const isLowVolumePipette = LOW_VOLUME_PIPETTES.includes(fields.pipette.name)
-  const isUsingLowVolume = fields.volume < 5
-  const liquidType =
-    isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
-  const liquidSupportedTips = Object.values(
-    fields.pipette.spec.liquids[liquidType].supportedTips
+  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
+    fields.pipette,
+    fields.volume
   )
-
-  //  find the supported tip liquid specs that either exactly match
-  //  tipLength or are closest, this accounts for custom tipracks
-  const matchingTipLiquidSpecs = liquidSupportedTips.sort((tipA, tipB) => {
-    const differenceA = Math.abs(tipA.defaultTipLength - tipLength)
-    const differenceB = Math.abs(tipB.defaultTipLength - tipLength)
-    return differenceA - differenceB
-  })[0]
-
-  console.assert(
-    matchingTipLiquidSpecs,
-    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${fields.pipette.tiprackLabwareDef.metadata.displayName}`
-  )
-
   const commonFields = {
     pipette: pipetteId,
     volume,

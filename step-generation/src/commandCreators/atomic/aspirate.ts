@@ -157,13 +157,13 @@ export const aspirate: CommandCreator<AspirateParams> = (
   if (
     errors.length === 0 &&
     pipetteSpec &&
-    pipetteSpec.liquids['default'].maxVolume < volume
+    pipetteSpec.liquids.default.maxVolume < volume
   ) {
     errors.push(
       errorCreators.pipetteVolumeExceeded({
         actionName,
         volume,
-        maxVolume: pipetteSpec.liquids['default'].maxVolume,
+        maxVolume: pipetteSpec.liquids.default.maxVolume,
       })
     )
   }

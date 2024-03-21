@@ -1,4 +1,4 @@
-import { LOW_VOLUME_PIPETTES, getWellsDepth } from '@opentrons/shared-data'
+import { getWellsDepth } from '@opentrons/shared-data'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -10,40 +10,16 @@ import { getOrderedWells } from '../../utils'
 import { getMixDelayData } from './getDelayData'
 import { HydratedMixFormDataLegacy } from '../../../form-types'
 import { MixArgs } from '@opentrons/step-generation'
+import { getMatchingTipLiquidSpecs } from '../../../utils'
 type MixStepArgs = MixArgs
 export const mixFormToArgs = (
   hydratedFormData: HydratedMixFormDataLegacy
 ): MixStepArgs => {
   const { labware, pipette, dropTip_location, nozzles } = hydratedFormData
-  const tipLength = pipette.tiprackLabwareDef.parameters.tipLength ?? 0
-
-  if (tipLength === 0) {
-    console.error(
-      `expected to find a tiplength with tiprack ${pipette.tiprackLabwareDef.metadata.displayName} but could not`
-    )
-  }
-  
-  const isLowVolumePipette = LOW_VOLUME_PIPETTES.includes(pipette.name)
-  const isUsingLowVolume = hydratedFormData.volume < 5
-  const liquidType =
-    isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
-  const liquidSupportedTips = Object.values(
-    pipette.spec.liquids[liquidType].supportedTips
+  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
+    pipette,
+    hydratedFormData.volume
   )
-
-  //  find the supported tip liquid specs that either exactly match
-  //  tipLength or are closest, this accounts for custom tipracks
-  const matchingTipLiquidSpecs = liquidSupportedTips.sort((tipA, tipB) => {
-    const differenceA = Math.abs(tipA.defaultTipLength - tipLength)
-    const differenceB = Math.abs(tipB.defaultTipLength - tipLength)
-    return differenceA - differenceB
-  })[0]
-
-  console.assert(
-    matchingTipLiquidSpecs,
-    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${pipette.tiprackLabwareDef.metadata.displayName}`
-  )
-
   const unorderedWells = hydratedFormData.wells || []
   const orderFirst = hydratedFormData.mix_wellOrder_first
   const orderSecond = hydratedFormData.mix_wellOrder_second

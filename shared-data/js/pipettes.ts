@@ -118,6 +118,7 @@ export const getIncompatiblePipetteNames = (
 }
 
 export * from '../pipette/fixtures/name'
+export * from '../pipette/fixtures/index'
 
 const getChannelsFromString = (
   pipChannelString: PipChannelString

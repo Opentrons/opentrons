@@ -74,7 +74,10 @@ function getPipetteCapacityLegacy(
   const tiprackDef = getLegacyLabwareDef(pipette.tiprackModel)
 
   if (specs && tiprackDef && tiprackDef.metadata.tipVolume) {
-    return Math.min(specs.liquids['default'].maxVolume, tiprackDef.metadata.tipVolume)
+    return Math.min(
+      specs.liquids.default.maxVolume,
+      tiprackDef.metadata.tipVolume
+    )
   }
 
   console.assert(specs, `Expected spec for pipette ${JSON.stringify(pipette)}`)
