@@ -7,7 +7,7 @@ import {
 } from '@opentrons/components'
 import { touchScreenViewport } from '../../../DesignTokens/constants'
 import { InputField } from '../../InputField'
-import { NormalKeyboard } from '.'
+import { FullKeyboard } from '.'
 
 import '../index.css'
 import './index.css'
@@ -15,12 +15,12 @@ import './index.css'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Atoms/SoftwareKeyboard/NormalKeyboard',
-  component: NormalKeyboard,
+  title: 'ODD/Atoms/SoftwareKeyboard/FullKeyboard',
+  component: FullKeyboard,
   parameters: touchScreenViewport,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof NormalKeyboard>> = args => {
+const Template: Story<React.ComponentProps<typeof FullKeyboard>> = args => {
   const [showKeyboard, setShowKeyboard] = React.useState(false)
   const [value, setValue] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
@@ -36,7 +36,7 @@ const Template: Story<React.ComponentProps<typeof NormalKeyboard>> = args => {
       </form>
       <Flex position={POSITION_ABSOLUTE} top="20%" width="55rem">
         {showKeyboard && (
-          <NormalKeyboard
+          <FullKeyboard
             onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
           />
@@ -46,4 +46,4 @@ const Template: Story<React.ComponentProps<typeof NormalKeyboard>> = args => {
   )
 }
 
-export const NormalSoftwareKeyboard = Template.bind({})
+export const FullSoftwareKeyboard = Template.bind({})

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Keyboard from 'react-simple-keyboard'
-import { alphanumericLayout, customDisplay } from '../constants'
+import { alphanumericKeyboardLayout, customDisplay } from '../constants'
 
 interface AlphanumericKeyboardProps {
   onChange: (input: string) => void
@@ -40,7 +40,7 @@ export function AlphanumericKeyboard({
       onChange={onChange}
       onKeyPress={onKeyPress}
       layoutName={layoutName}
-      layout={alphanumericLayout}
+      layout={alphanumericKeyboardLayout}
       display={customDisplay}
       mergeDisplay={true}
       autoUseTouchEvents={true}

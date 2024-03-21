@@ -34,6 +34,7 @@ export function IndividualKey({
       autoUseTouchEvents={true}
       useButtonTag={true}
       {...numericalKeyboard}
+      width="100%"
     />
   )
 }

@@ -17,11 +17,6 @@ export default {
   title: 'ODD/Atoms/SoftwareKeyboard/IndividualKey',
   component: IndividualKey,
   parameters: touchScreenViewport,
-  argTypes: {
-    keyText: {
-      defaultValue: 'hello otie!',
-    },
-  },
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof IndividualKey>> = args => {
@@ -56,5 +51,5 @@ const Template: Story<React.ComponentProps<typeof IndividualKey>> = args => {
 
 export const Keyboard = Template.bind({})
 Keyboard.args = {
-  keyText: 'hello otie!',
+  keyText: 'hello!',
 }

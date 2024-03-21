@@ -1,6 +1,6 @@
 export const customDisplay = {
   '{numbers}': '123',
-  '{shift}': 'SHIFT',
+  '{shift}': 'ABC',
   '{space}': 'space',
   '{backspace}': 'del',
   '{abc}': 'abc',
@@ -9,7 +9,7 @@ export const customDisplay = {
 }
 
 // keyboard layout for Alphanumeric Keyboard
-export const alphanumericLayout = {
+export const alphanumericKeyboardLayout = {
   default: [
     'q w e r t y u i o p',
     '{numbers} a s d f g h j k l',
@@ -21,4 +21,32 @@ export const alphanumericLayout = {
     '{abc} Z X C V B N M {backspace}',
   ],
   numbers: ['1 2 3', '4 5 6', '7 8 9', '{abc} 0 {backspace}'],
+}
+
+// keyboard layout for Full Keyboard
+export const fullKeyboardLayout = {
+  default: [
+    'q w e r t y u i o p',
+    '{numbers} a s d f g h j k l',
+    '{shift} z x c v b n m {backspace}',
+    '{space}',
+  ],
+  shift: [
+    'Q W E R T Y U I O P',
+    '{numbers} A S D F G H J K L',
+    '{abc} Z X C V B N M {backspace}',
+    '{space}',
+  ],
+  symbols: [
+    '[ ] { } # % ^ +',
+    '{abc} _ \\ | < > · =',
+    "{numbers} . , ? ! ' * ~ {backspace}",
+    '{space}',
+  ],
+  numbers: [
+    '1 2 3 4 5 6 7 8 9 0',
+    '{abc} - / : ; ( ) $ & @ "',
+    "{symbols} . , ? ! ' * ~ {backspace}",
+    '{space}',
+  ],
 }
