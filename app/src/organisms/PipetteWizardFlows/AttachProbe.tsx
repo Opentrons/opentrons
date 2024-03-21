@@ -7,6 +7,7 @@ import {
   COLORS,
   SPACING,
   RESPONSIVENESS,
+  StyledText,
 } from '@opentrons/components'
 import {
   LEFT,
@@ -15,7 +16,6 @@ import {
   CreateCommand,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'

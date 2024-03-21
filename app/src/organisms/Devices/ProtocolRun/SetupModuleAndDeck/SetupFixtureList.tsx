@@ -13,13 +13,13 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import {
   SINGLE_SLOT_FIXTURES,
   getCutoutDisplayName,
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
 import { LocationConflictModal } from './LocationConflictModal'

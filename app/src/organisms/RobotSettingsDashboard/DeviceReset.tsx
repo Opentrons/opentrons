@@ -12,9 +12,9 @@ import {
   BORDERS,
   useConditionalConfirm,
   DIRECTION_ROW,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton, SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { ChildNavigation } from '../../organisms/ChildNavigation'

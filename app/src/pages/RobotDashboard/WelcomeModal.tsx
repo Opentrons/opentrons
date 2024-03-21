@@ -8,10 +8,10 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 

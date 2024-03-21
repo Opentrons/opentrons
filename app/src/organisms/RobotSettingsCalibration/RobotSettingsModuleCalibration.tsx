@@ -6,9 +6,9 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ModuleCalibrationItems } from './CalibrationDetails/ModuleCalibrationItems'
 
 import type { AttachedModule } from '@opentrons/api-client'

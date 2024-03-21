@@ -17,6 +17,7 @@ import {
   TYPOGRAPHY,
   POSITION_ABSOLUTE,
   DISPLAY_FLEX,
+  StyledText,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
@@ -32,7 +33,6 @@ import { DevicesEmptyState } from '../../../organisms/Devices/DevicesEmptyState'
 import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
 
 import { Divider } from '../../../atoms/structure'
-import { StyledText } from '../../../atoms/text'
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
 import type { State } from '../../../redux/types'

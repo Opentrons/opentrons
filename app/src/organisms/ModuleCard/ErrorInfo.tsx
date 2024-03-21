@@ -16,8 +16,8 @@ import {
   PrimaryButton,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { getTopPortalEl } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'

@@ -10,9 +10,9 @@ import {
   Icon,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 
 import type { InstrumentData } from '@opentrons/api-client'

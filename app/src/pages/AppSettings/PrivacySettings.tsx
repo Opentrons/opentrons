@@ -9,6 +9,7 @@ import {
   TYPOGRAPHY,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import {
@@ -16,7 +17,6 @@ import {
   getAnalyticsOptedIn,
 } from '../../redux/analytics'
 import { ToggleButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 
 import type { Dispatch, State } from '../../redux/types'
 

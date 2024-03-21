@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
 import {
   CompletedProtocolAnalysis,
   getLabwareDefURI,
@@ -30,6 +29,7 @@ import {
   ALIGN_FLEX_END,
   Icon,
   LocationIcon,
+  StyledText,
 } from '@opentrons/components'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import {

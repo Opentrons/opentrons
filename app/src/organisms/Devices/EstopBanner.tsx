@@ -6,10 +6,10 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'
-import { StyledText } from '../../atoms/text'
 import {
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,

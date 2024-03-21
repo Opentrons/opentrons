@@ -6,9 +6,9 @@ import {
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 import { EmptyStateLinks } from './EmptyStateLinks'
 export function ProtocolsEmptyState(): JSX.Element | null {

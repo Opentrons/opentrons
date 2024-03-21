@@ -9,12 +9,12 @@ import {
   SPACING,
   PrimaryButton,
   SecondaryButton,
+  StyledText,
 } from '@opentrons/components'
 import { getShellUpdateState } from '../../../../redux/shell'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 // import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 
-import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { Banner } from '../../../../atoms/Banner'
 import { LegacyModal } from '../../../../molecules/LegacyModal'

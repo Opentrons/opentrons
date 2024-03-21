@@ -6,8 +6,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   COLORS,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 
 export interface LabeledValueProps {
   label: string

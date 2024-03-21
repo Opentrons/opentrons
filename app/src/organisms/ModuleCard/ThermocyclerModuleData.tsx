@@ -11,8 +11,8 @@ import {
   WRAP,
   Box,
   DIRECTION_ROW,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 import type { ThermocyclerData } from '../../redux/modules/api-types'
 

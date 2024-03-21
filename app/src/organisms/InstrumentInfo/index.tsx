@@ -10,6 +10,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   JUSTIFY_CENTER,
+  StyledText,
 } from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,
@@ -17,7 +18,6 @@ import {
 } from '@opentrons/shared-data'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'

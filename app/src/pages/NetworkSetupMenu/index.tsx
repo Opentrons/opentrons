@@ -10,9 +10,9 @@ import {
   ALIGN_CENTER,
   DIRECTION_ROW,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 import { CardButton } from '../../molecules/CardButton'
 

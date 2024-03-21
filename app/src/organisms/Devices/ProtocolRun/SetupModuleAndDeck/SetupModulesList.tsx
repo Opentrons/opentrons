@@ -17,6 +17,7 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
   TOOLTIP_LEFT,
+  StyledText,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -33,7 +34,6 @@ import {
 import { Banner } from '../../../../atoms/Banner'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
-import { StyledText } from '../../../../atoms/text'
 import { Tooltip } from '../../../../atoms/Tooltip'
 import { useChainLiveCommands } from '../../../../resources/runs'
 import { ModuleSetupModal } from '../../../ModuleCard/ModuleSetupModal'
@@ -41,7 +41,6 @@ import { ModuleWizardFlows } from '../../../ModuleWizardFlows'
 import { getModulePrepCommands } from '../../getModulePrepCommands'
 import { getModuleTooHot } from '../../getModuleTooHot'
 import {
-  ModuleRenderInfoForProtocol,
   useIsFlex,
   useModuleRenderInfoForProtocolById,
   useRobot,
@@ -59,7 +58,10 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
-import type { ProtocolCalibrationStatus } from '../../hooks'
+import type {
+  ModuleRenderInfoForProtocol,
+  ProtocolCalibrationStatus,
+} from '../../hooks'
 
 interface SetupModulesListProps {
   robotName: string

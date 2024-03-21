@@ -12,6 +12,7 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import * as Config from '../../redux/config'
@@ -20,7 +21,6 @@ import { PrivacySettings } from './PrivacySettings'
 import { AdvancedSettings } from './AdvancedSettings'
 import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
 import { NavTab } from '../../molecules/NavTab'
-import { StyledText } from '../../atoms/text'
 import { Line } from '../../atoms/structure'
 
 import type { DesktopRouteParams, AppSettingsTab } from '../../App/types'

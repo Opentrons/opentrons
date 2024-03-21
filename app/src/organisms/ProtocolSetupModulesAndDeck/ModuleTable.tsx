@@ -13,6 +13,7 @@ import {
   LocationIcon,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
@@ -29,7 +30,6 @@ import {
 
 import { SmallButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
-import { StyledText } from '../../atoms/text'
 import { getModulePrepCommands } from '../../organisms/Devices/getModulePrepCommands'
 import { getModuleTooHot } from '../../organisms/Devices/getModuleTooHot'
 import { useRunCalibrationStatus } from '../../organisms/Devices/hooks'

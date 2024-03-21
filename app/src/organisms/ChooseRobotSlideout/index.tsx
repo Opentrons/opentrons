@@ -21,6 +21,7 @@ import {
   SIZE_4,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -36,7 +37,6 @@ import {
 import { Banner } from '../../atoms/Banner'
 import { Slideout } from '../../atoms/Slideout'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
-import { StyledText } from '../../atoms/text'
 import { AvailableRobotOption } from './AvailableRobotOption'
 
 import type { RobotType } from '@opentrons/shared-data'

@@ -16,13 +16,13 @@ import {
   POSITION_RELATIVE,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { useAuthorization } from '@opentrons/react-api-client'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
 import { ToggleButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { getConfig } from '../../redux/config'
 import {
   CONNECTABLE,

@@ -11,9 +11,9 @@ import {
   Icon,
   DIRECTION_ROW,
   LocationIcon,
+  StyledText,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import { LiquidsLabwareDetailsModal } from '../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
 import { getLocationInfoNames } from '../Devices/ProtocolRun/utils/getLocationInfoNames'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'

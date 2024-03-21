@@ -13,9 +13,8 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
 
 interface SetupStepProps {
   /** whether or not to show the full contents of the step */

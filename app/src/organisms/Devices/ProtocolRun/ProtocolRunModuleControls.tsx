@@ -7,8 +7,8 @@ import {
   SPACING,
   JUSTIFY_CENTER,
   DIRECTION_COLUMN,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 import { ModuleCard } from '../../ModuleCard'
 import { useModuleRenderInfoForProtocolById } from '../hooks'
 import type { BadPipette, PipetteData } from '@opentrons/api-client'

@@ -21,6 +21,7 @@ import {
   SIZE_AUTO,
   Box,
   JUSTIFY_FLEX_START,
+  StyledText,
 } from '@opentrons/components'
 import { getModuleDisplayName, MICRO_LITERS } from '@opentrons/shared-data'
 import {
@@ -29,7 +30,6 @@ import {
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '../../../../redux/analytics'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { StyledText } from '../../../../atoms/text'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import {

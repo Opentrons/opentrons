@@ -10,6 +10,7 @@ import {
   PrimaryButton,
   SecondaryButton,
   ALIGN_FLEX_END,
+  StyledText,
 } from '@opentrons/components'
 import {
   getPipetteNameSpecs,
@@ -22,7 +23,6 @@ import {
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'

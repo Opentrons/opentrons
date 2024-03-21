@@ -23,10 +23,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
   Link,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'

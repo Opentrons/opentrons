@@ -19,6 +19,7 @@ import {
   WELL_LABEL_OPTIONS,
   SIZE_AUTO,
   DISPLAY_FLEX,
+  StyledText,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
@@ -34,7 +35,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '../../../../atoms/buttons'
-import { StyledText } from '../../../../atoms/text'
 import { SecureLabwareModal } from './SecureLabwareModal'
 
 import type {

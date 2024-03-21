@@ -12,9 +12,9 @@ import {
   SIZE_AUTO,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 interface ProtocolStatsProps {

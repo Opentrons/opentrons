@@ -18,6 +18,7 @@ import {
   SecondaryButton,
   DIRECTION_COLUMN,
   Overlay,
+  StyledText,
 } from '@opentrons/components'
 
 import {
@@ -25,7 +26,6 @@ import {
   updateConfigValue,
 } from '../../redux/config'
 import { useSortedProtocols } from './hooks'
-import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { ChooseRobotToRunProtocolSlideout } from '../ChooseRobotToRunProtocolSlideout'
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'

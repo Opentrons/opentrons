@@ -6,9 +6,9 @@ import {
   SPACING,
   TYPOGRAPHY,
   SecondaryButton,
+  StyledText,
 } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 
 export interface ButtonProps {
   onClick?: () => unknown

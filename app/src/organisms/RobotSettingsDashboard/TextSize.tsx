@@ -15,9 +15,8 @@ import {
   TYPOGRAPHY,
   COLORS,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 

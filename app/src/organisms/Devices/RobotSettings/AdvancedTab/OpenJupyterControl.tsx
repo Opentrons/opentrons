@@ -7,12 +7,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import {
   useTrackEvent,
   ANALYTICS_JUPYTER_OPEN,
 } from '../../../../redux/analytics'
-import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 

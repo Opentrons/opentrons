@@ -14,8 +14,8 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
   PrimaryButton,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../../../atoms/text'
 import { LegacyModal } from '../../../../../molecules/LegacyModal'
 import {
   useDispatchApiRequest,

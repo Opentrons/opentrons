@@ -19,6 +19,7 @@ import {
   DISPLAY_NONE,
   RESPONSIVENESS,
   TEXT_TRANSFORM_UPPERCASE,
+  StyledText,
 } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
@@ -41,7 +42,6 @@ import {
   getModuleModelFromRunData,
   getModuleDisplayLocationFromRunData,
 } from './utils'
-import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import {
   getLoadedLabware,

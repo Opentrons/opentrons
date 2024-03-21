@@ -11,9 +11,9 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { Modal } from '../../../molecules/Modal'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'

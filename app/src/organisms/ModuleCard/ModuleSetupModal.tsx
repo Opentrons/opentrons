@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
-import { StyledText } from '../../atoms/text'
 import code from '../../assets/images/module_instruction_code.png'
 import {
   ALIGN_FLEX_END,
@@ -13,6 +12,7 @@ import {
   Icon,
   DIRECTION_ROW,
   Link,
+  StyledText,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'

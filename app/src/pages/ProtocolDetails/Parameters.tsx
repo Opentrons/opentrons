@@ -8,8 +8,8 @@ import {
   SPACING,
   TYPOGRAPHY,
   WRAP,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { useToaster } from '../../organisms/ToasterOven'
 import { useRunTimeParameters } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'

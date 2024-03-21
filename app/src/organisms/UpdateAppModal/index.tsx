@@ -15,6 +15,7 @@ import {
   BORDERS,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_SPACE_AROUND,
+  StyledText,
 } from '@opentrons/components'
 
 import {
@@ -32,7 +33,6 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
 import type { Dispatch } from '../../redux/types'
-import { StyledText } from '../../atoms/text'
 
 interface PlaceHolderErrorProps {
   errorMessage?: string

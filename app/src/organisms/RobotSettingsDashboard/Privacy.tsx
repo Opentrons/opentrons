@@ -7,9 +7,9 @@ import {
   SPACING,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { ROBOT_ANALYTICS_SETTING_ID } from '../../pages/RobotDashboard/AnalyticsOptInModal'
 import { RobotSettingButton } from '../../pages/RobotSettingsDashboard/RobotSettingButton'

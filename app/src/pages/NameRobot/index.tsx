@@ -19,6 +19,7 @@ import {
   TYPOGRAPHY,
   Icon,
   Btn,
+  StyledText,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
@@ -30,7 +31,6 @@ import {
   getLocalRobot,
 } from '../../redux/discovery'
 import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
-import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
 import { SmallButton } from '../../atoms/buttons'

@@ -17,11 +17,11 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   TEXT_TRANSFORM_CAPITALIZE,
+  StyledText,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { StyledText } from '../../atoms/text'
 import { i18n } from '../../i18n'
 
 const SUPPORT_EMAIL = 'support@opentrons.com'

@@ -10,9 +10,9 @@ import {
   SPACING,
   SPACING_AUTO,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 interface DisplayRobotNameProps {
   robotName: string

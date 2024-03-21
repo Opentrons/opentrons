@@ -19,9 +19,9 @@ import {
   PrimaryButton,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_AROUND,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton, MediumButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 // import { NeedHelpLink } from '../CalibrationPanels'

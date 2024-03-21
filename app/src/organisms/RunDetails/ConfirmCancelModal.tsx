@@ -12,6 +12,7 @@ import {
   Link,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import {
   RUN_STATUS_STOPPED,
@@ -20,7 +21,6 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { getModalPortalEl } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { useTrackProtocolRunEvent } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'

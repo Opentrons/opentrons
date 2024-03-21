@@ -8,9 +8,9 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { MediumButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 
 import screenImage from '../../assets/images/on-device-display/welcome_background.png'
 

@@ -3,8 +3,8 @@ import capitalize from 'lodash/capitalize'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { getPipetteNameSpecs, PipetteNameSpecs } from '@opentrons/shared-data'
-import { SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { SPACING, TYPOGRAPHY, StyledText } from '@opentrons/components'
 
 import {
   useDispatchApiRequests,
@@ -27,7 +27,6 @@ import {
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { StyledText } from '../../atoms/text'
 import { useAttachedPipettes } from '../Devices/hooks'
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
@@ -44,6 +43,7 @@ import {
   EIGHT_CHANNEL_STEPS,
 } from './constants'
 
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../redux/types'
 import type { Mount } from '../../redux/pipettes/types'
 import type { WizardStep } from './types'

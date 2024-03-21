@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { getGripperDisplayName, GripperModel } from '@opentrons/shared-data'
+import { SPACING, TYPOGRAPHY, StyledText } from '@opentrons/components'
+import { getGripperDisplayName } from '@opentrons/shared-data'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
 import { Banner } from '../../atoms/Banner'
-import { StyledText } from '../../atoms/text'
 import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 import { AboutGripperSlideout } from './AboutGripperSlideout'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 
 import type { BadGripper, GripperData } from '@opentrons/api-client'
+import type { GripperModel } from '@opentrons/shared-data'
 import type { GripperWizardFlowType } from '../GripperWizardFlows/types'
 
 interface GripperCardProps {

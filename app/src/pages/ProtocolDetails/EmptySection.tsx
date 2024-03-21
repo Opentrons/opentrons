@@ -9,9 +9,9 @@ import {
   TYPOGRAPHY,
   BORDERS,
   ALIGN_CENTER,
+  StyledText,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
 
 interface EmptySectionProps {
   section: 'hardware' | 'labware' | 'liquids' | 'parameters'

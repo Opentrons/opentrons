@@ -19,6 +19,7 @@ import {
   SecondaryButton,
   TYPOGRAPHY,
   RESPONSIVENESS,
+  StyledText,
 } from '@opentrons/components'
 import {
   getIsTiprack,
@@ -35,7 +36,6 @@ import levelProbeWithLabware from '../../assets/images/lpc_level_probe_with_labw
 import { getIsOnDevice } from '../../redux/config'
 import { getTopPortalEl } from '../../App/portal'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
 import { JogControls } from '../../molecules/JogControls'

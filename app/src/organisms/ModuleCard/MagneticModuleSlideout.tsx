@@ -11,6 +11,7 @@ import {
   TYPOGRAPHY,
   SPACING,
   JUSTIFY_END,
+  StyledText,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -22,7 +23,6 @@ import {
   MM,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { InputField } from '../../atoms/InputField'
 import { SubmitPrimaryButton } from '../../atoms/buttons'

@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { usePipettesQuery } from '@opentrons/react-api-client'
 import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
+import { usePipettesQuery } from '@opentrons/react-api-client'
 import {
   Icon,
   DIRECTION_ROW,
@@ -11,6 +10,7 @@ import {
   SPACING,
   SIZE_1,
   PrimaryButton,
+  StyledText,
 } from '@opentrons/components'
 import { DETACH } from './constants'
 

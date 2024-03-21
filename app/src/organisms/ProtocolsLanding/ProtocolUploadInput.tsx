@@ -8,8 +8,8 @@ import {
   Link,
   COLORS,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { UploadInput } from '../../molecules/UploadInput'
 import { addProtocol } from '../../redux/protocol-storage'
 import {

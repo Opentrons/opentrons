@@ -8,6 +8,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   COLORS,
+  StyledText,
 } from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,
@@ -17,7 +18,6 @@ import {
 } from '@opentrons/shared-data'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../atoms/text'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'

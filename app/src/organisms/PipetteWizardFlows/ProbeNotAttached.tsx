@@ -11,10 +11,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_END,
   ALIGN_CENTER,
+  StyledText,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 
 interface ProbeNotAttachedProps {

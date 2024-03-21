@@ -7,8 +7,8 @@ import {
   SPACING,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 export interface WellCountProps {
   count: number

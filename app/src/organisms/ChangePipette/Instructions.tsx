@@ -12,8 +12,8 @@ import {
   DIRECTION_ROW,
   ALIGN_FLEX_END,
   PrimaryButton,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { InstructionStep } from './InstructionStep'
 import { PipetteSelection } from './PipetteSelection'

@@ -12,11 +12,11 @@ import {
   ALIGN_START,
   PrimaryButton,
   COLORS,
+  StyledText,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { Slideout } from '../../atoms/Slideout'
 import { Banner } from '../../atoms/Banner'
-import { StyledText } from '../../atoms/text'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 
 import type { AttachedModule } from '../../redux/modules/types'

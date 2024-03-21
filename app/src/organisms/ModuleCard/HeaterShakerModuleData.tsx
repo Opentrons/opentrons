@@ -10,9 +10,9 @@ import {
   TYPOGRAPHY,
   SIZE_1,
   WRAP,
+  StyledText,
 } from '@opentrons/components'
 import { StatusLabel } from '../../atoms/StatusLabel'
-import { StyledText } from '../../atoms/text'
 import type {
   LatchStatus,
   SpeedStatus,

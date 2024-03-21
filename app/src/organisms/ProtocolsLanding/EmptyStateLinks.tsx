@@ -11,8 +11,8 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   WRAP,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 const PROTOCOL_LIBRARY_URL = 'https://library.opentrons.com'
 const PROTOCOL_DESIGNER_URL = 'https://designer.opentrons.com'

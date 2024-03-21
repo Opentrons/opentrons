@@ -21,6 +21,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   useLongPress,
+  StyledText,
 } from '@opentrons/components'
 import {
   useHost,
@@ -28,7 +29,6 @@ import {
 } from '@opentrons/react-api-client'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LongPressModal } from './LongPressModal'

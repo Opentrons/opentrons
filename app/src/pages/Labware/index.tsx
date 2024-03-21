@@ -20,9 +20,9 @@ import {
   Icon,
   ALIGN_FLEX_END,
   useOnClickOutside,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import {

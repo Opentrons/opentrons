@@ -20,9 +20,9 @@ import {
   TOOLTIP_TOP_START,
   TYPOGRAPHY,
   useHoverTooltip,
+  StyledText,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { Tooltip } from '../../atoms/Tooltip'
 import { getWellLabel } from './helpers/labels'

@@ -12,15 +12,15 @@ import {
   JUSTIFY_FLEX_END,
   PrimaryButton,
   SecondaryButton,
+  StyledText,
 } from '@opentrons/components'
 import { useAttachedModules } from '../hooks'
 import { LegacyModal } from '../../../molecules/LegacyModal'
-import { StyledText } from '../../../atoms/text'
-import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 interface HeaterShakerIsRunningModalProps {
   closeModal: () => void

@@ -13,9 +13,9 @@ import {
   COLORS,
   TYPOGRAPHY,
   SIZE_1,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'

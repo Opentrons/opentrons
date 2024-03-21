@@ -13,6 +13,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
@@ -28,7 +29,6 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { TertiaryButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'

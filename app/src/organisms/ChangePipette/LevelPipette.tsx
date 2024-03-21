@@ -11,8 +11,8 @@ import {
   SPACING,
   TYPOGRAPHY,
   PrimaryButton,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 import type { Mount } from '../../redux/pipettes/types'
 

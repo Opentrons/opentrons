@@ -13,10 +13,10 @@ import {
   SPACING,
   SPACING_AUTO,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { ERROR_TOAST, INFO_TOAST } from '../../../../atoms/Toast'
 import { useToaster } from '../../../../organisms/ToasterOven'

@@ -15,6 +15,7 @@ import {
   InstrumentDiagram,
   BORDERS,
   ALIGN_CENTER,
+  StyledText,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -31,7 +32,6 @@ import {
 
 import { LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
-import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { InstrumentCard } from '../../../molecules/InstrumentCard'

@@ -7,7 +7,7 @@ import {
   useCurrentMaintenanceRun,
   useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
-import { COLORS } from '@opentrons/components'
+import { COLORS, StyledText } from '@opentrons/components'
 import {
   getModuleType,
   getModuleDisplayName,
@@ -16,7 +16,6 @@ import {
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'

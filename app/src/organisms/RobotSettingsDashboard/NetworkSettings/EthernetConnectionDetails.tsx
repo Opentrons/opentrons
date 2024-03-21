@@ -12,9 +12,9 @@ import {
   COLORS,
   TYPOGRAPHY,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { getLocalRobot } from '../../../redux/discovery'

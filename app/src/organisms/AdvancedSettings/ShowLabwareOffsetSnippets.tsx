@@ -3,21 +3,22 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
-  Flex,
-  Box,
   ALIGN_CENTER,
+  Box,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ToggleButton } from '../../atoms/buttons'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   updateConfigValue,
 } from '../../redux/config'
-import { Dispatch } from '../../redux/types'
+
+import type { Dispatch } from '../../redux/types'
 
 export function ShowLabwareOffsetSnippets(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared'])

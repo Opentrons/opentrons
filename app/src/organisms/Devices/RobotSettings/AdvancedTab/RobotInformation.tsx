@@ -7,8 +7,8 @@ import {
   JUSTIFY_FLEX_START,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../../atoms/text'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import {
   getRobotSerialNumber,

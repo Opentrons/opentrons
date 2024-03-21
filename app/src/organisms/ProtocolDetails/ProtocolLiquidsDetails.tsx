@@ -14,9 +14,9 @@ import {
   Icon,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { LiquidsListItemDetails } from '../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
 
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'

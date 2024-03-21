@@ -15,9 +15,9 @@ import {
   PrimaryButton,
   AlertPrimaryButton,
   JUSTIFY_CENTER,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { CONNECTABLE } from '../../../../redux/discovery'

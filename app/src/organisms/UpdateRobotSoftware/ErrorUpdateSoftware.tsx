@@ -11,9 +11,8 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 interface ErrorUpdateSoftwareProps {
   errorMessage: string

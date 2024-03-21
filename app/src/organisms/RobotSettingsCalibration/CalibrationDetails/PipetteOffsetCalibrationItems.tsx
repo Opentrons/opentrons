@@ -10,9 +10,9 @@ import {
   COLORS,
   TYPOGRAPHY,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'

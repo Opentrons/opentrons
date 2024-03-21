@@ -7,6 +7,7 @@ import {
   SPACING,
   COLORS,
   DIRECTION_COLUMN,
+  StyledText,
 } from '@opentrons/components'
 import {
   CELSIUS,
@@ -17,7 +18,6 @@ import {
 import { Slideout } from '../../atoms/Slideout'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { InputField } from '../../atoms/InputField'
-import { StyledText } from '../../atoms/text'
 import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
 import type { TemperatureModule } from '../../redux/modules/types'
 

@@ -11,13 +11,13 @@ import {
   SPACING,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
+  StyledText,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,
   useModulesQuery,
 } from '@opentrons/react-api-client'
 import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import {
   useDeckCalibrationData,
   useIsFlex,

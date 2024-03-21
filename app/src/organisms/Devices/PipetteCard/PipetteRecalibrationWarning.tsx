@@ -6,8 +6,8 @@ import {
   TYPOGRAPHY,
   SPACING,
   Box,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 
 export const PipetteRecalibrationWarning = (): JSX.Element | null => {

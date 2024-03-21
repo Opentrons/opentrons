@@ -7,9 +7,8 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_START,
   Icon,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'
 

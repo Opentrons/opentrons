@@ -17,10 +17,10 @@ import {
   PrimaryButton,
   POSITION_ABSOLUTE,
   DISPLAY_FLEX,
+  StyledText,
 } from '@opentrons/components'
 
 import { startDiscovery } from '../../redux/discovery'
-import { StyledText } from '../../atoms/text'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'

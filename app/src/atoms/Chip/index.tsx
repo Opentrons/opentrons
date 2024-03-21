@@ -1,17 +1,16 @@
 import * as React from 'react'
 
 import {
-  BORDERS,
-  Flex,
-  DIRECTION_ROW,
   ALIGN_CENTER,
-  SPACING,
-  TYPOGRAPHY,
-  Icon,
+  BORDERS,
   COLORS,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../text'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 

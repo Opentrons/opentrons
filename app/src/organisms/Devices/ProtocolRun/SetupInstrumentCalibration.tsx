@@ -7,8 +7,8 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
 import { getShowPipetteCalibrationWarning } from '../utils'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'

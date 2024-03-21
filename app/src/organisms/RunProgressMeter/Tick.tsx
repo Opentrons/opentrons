@@ -10,11 +10,11 @@ import {
   COLORS,
   SPACING,
   DIRECTION_COLUMN,
+  StyledText,
 } from '@opentrons/components'
 
 import { Tooltip } from '../../atoms/Tooltip'
 import { getModalPortalEl } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
 import { useTranslation } from 'react-i18next'
 import type { IconName } from '@opentrons/components'
 

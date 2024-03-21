@@ -13,9 +13,9 @@ import {
   ALIGN_CENTER,
   TYPOGRAPHY,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { Chip } from '../../../atoms/Chip'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 

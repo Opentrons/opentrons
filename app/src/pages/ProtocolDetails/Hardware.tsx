@@ -11,6 +11,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   WRAP,
+  StyledText,
 } from '@opentrons/components'
 import {
   GRIPPER_V1,
@@ -21,7 +22,6 @@ import {
   getPipetteNameSpecs,
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import { useRequiredProtocolHardware } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'
 

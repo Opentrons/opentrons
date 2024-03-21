@@ -16,10 +16,10 @@ import {
   SPACING,
   TYPOGRAPHY,
   useHoverTooltip,
+  StyledText,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'

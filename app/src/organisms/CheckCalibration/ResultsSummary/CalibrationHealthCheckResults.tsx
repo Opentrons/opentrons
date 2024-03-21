@@ -7,9 +7,9 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
   COLORS,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 
 interface CalibrationHealthCheckResultsProps {

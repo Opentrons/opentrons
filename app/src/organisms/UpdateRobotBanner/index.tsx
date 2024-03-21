@@ -7,8 +7,8 @@ import {
   TYPOGRAPHY,
   Btn,
   DIRECTION_COLUMN,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { handleUpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'

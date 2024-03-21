@@ -15,6 +15,7 @@ import {
   SPACING,
   SecondaryButton,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import {
@@ -22,7 +23,6 @@ import {
   useWifiList,
 } from '../../../resources/networking/hooks'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
-import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
 
 import {

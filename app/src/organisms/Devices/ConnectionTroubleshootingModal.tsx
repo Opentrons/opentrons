@@ -10,9 +10,9 @@ import {
   TYPOGRAPHY,
   SPACING,
   PrimaryButton,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =

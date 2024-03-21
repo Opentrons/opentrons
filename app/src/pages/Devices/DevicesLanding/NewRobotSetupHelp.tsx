@@ -9,9 +9,9 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { getTopPortalEl } from '../../../App/portal'
 import { LegacyModal } from '../../../molecules/LegacyModal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'

@@ -11,9 +11,9 @@ import {
   TYPOGRAPHY,
   Icon,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 
 import type { RequestState } from '../../redux/robot-api/types'

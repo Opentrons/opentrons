@@ -15,9 +15,9 @@ import {
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
-import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 import { MediumButton } from '../../atoms/buttons'
 

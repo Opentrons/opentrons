@@ -9,9 +9,8 @@ import {
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
 import type { ModuleCalibrationWizardStepProps } from './types'

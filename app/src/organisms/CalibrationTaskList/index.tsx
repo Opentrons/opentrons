@@ -13,10 +13,10 @@ import {
   SPACING,
   TYPOGRAPHY,
   PrimaryButton,
+  StyledText,
 } from '@opentrons/components'
 
 import { StatusLabel } from '../../atoms/StatusLabel'
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { TaskList } from '../TaskList'
 

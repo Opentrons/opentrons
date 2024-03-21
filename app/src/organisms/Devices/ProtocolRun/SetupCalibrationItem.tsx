@@ -13,9 +13,9 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { useRunHasStarted } from '../hooks'
 import { formatTimestamp } from '../utils'
 

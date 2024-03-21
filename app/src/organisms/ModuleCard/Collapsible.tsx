@@ -8,10 +8,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   ALIGN_CENTER,
-  IconName,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import type { IconName } from '@opentrons/components'
 
 interface CollapsibleProps {
   expanded: boolean

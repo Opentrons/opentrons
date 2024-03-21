@@ -16,10 +16,10 @@ import {
   TYPOGRAPHY,
   COLORS,
   JUSTIFY_SPACE_BETWEEN,
+  StyledText,
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
-import { StyledText } from '../../../../atoms/text'
 import { LabwareOffsetTabs } from '../../../LabwareOffsetTabs'
 import { OffsetVector } from '../../../../molecules/OffsetVector'
 import { PythonLabwareOffsetSnippet } from '../../../../molecules/PythonLabwareOffsetSnippet'

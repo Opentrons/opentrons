@@ -9,6 +9,7 @@ import {
   SPACING,
   COLORS,
   PrimaryButton,
+  StyledText,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import {
@@ -22,7 +23,6 @@ import {
   ANALYTICS_RENAME_ROBOT,
 } from '../../../../../redux/analytics'
 import { Slideout } from '../../../../../atoms/Slideout'
-import { StyledText } from '../../../../../atoms/text'
 import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
 import { useIsFlex } from '../../../hooks'

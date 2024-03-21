@@ -10,9 +10,9 @@ import {
   TYPOGRAPHY,
   COLORS,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   getDevtoolsEnabled,

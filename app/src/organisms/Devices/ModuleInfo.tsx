@@ -11,16 +11,16 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import {
-  ModuleModel,
   getModuleDisplayName,
   getModuleDef2,
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
 import { useRunHasStarted } from './hooks'
+import type { ModuleModel } from '@opentrons/shared-data'
 import type { PhysicalPort } from '../../redux/modules/api-types'
 
 export interface ModuleInfoProps {

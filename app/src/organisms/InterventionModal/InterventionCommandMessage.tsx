@@ -11,8 +11,8 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 const INTERVENTION_COMMAND_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};

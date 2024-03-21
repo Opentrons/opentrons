@@ -13,12 +13,12 @@ import {
   PrimaryButton,
   CheckboxField,
   ALIGN_CENTER,
+  StyledText,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { StyledText } from '../../atoms/text'
-import { Dispatch } from '../../redux/types'
-import { UpdateConfigValueAction } from '../../redux/config/types'
 import { updateConfigValue } from '../../redux/config'
+import type { Dispatch } from '../../redux/types'
+import type { UpdateConfigValueAction } from '../../redux/config/types'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean

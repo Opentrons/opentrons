@@ -12,10 +12,10 @@ import {
   JUSTIFY_CENTER,
   ALIGN_CENTER,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 

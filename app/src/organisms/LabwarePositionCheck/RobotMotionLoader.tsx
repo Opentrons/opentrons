@@ -11,8 +11,8 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 interface RobotMotionLoaderProps {
   header?: string

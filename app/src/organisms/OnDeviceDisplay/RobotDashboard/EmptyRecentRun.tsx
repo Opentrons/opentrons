@@ -10,9 +10,8 @@ import {
   SPACING,
   TYPOGRAPHY,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
 
 import abstractImage from '../../../assets/images/on-device-display/empty_protocol_dashboard.png'
 

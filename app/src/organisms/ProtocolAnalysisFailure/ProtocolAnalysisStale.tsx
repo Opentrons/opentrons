@@ -10,9 +10,9 @@ import {
   Btn,
   TYPOGRAPHY,
   WRAP_REVERSE,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 
 import type { Dispatch } from '../../redux/types'

@@ -24,6 +24,7 @@ import {
   truncateString,
   TYPOGRAPHY,
   useConditionalConfirm,
+  StyledText,
 } from '@opentrons/components'
 import {
   useProtocolQuery,
@@ -38,7 +39,6 @@ import {
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
 import {
   ProtocolSetupTitleSkeleton,
   ProtocolSetupStepSkeleton,

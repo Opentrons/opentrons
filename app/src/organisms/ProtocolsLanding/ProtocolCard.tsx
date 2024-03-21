@@ -30,6 +30,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   WRAP,
+  StyledText,
 } from '@opentrons/components'
 
 import {
@@ -39,7 +40,6 @@ import {
 
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
-import { StyledText } from '../../atoms/text'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'

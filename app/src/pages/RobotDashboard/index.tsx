@@ -8,9 +8,9 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { Navigation } from '../../organisms/Navigation'
 import {
   EmptyRecentRun,

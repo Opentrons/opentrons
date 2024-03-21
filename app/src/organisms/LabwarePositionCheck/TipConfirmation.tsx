@@ -9,11 +9,11 @@ import {
   ALIGN_CENTER,
   COLORS,
   JUSTIFY_FLEX_END,
+  StyledText,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 
 import { NeedHelpLink } from '../CalibrationPanels'
-import { StyledText } from '../../atoms/text'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'

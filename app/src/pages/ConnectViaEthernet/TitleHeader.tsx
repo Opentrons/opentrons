@@ -12,9 +12,8 @@ import {
   POSITION_ABSOLUTE,
   TYPOGRAPHY,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 interface TitleHeaderProps {
   title: string

@@ -11,8 +11,8 @@ import {
   COLORS,
   Link,
   JUSTIFY_FLEX_END,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { getRobotApiVersion } from '../../../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'

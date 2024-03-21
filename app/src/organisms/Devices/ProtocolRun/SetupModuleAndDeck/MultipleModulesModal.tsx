@@ -14,10 +14,10 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_STRETCH,
+  StyledText,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { StyledText } from '../../../../atoms/text'
 import { getIsOnDevice } from '../../../../redux/config'
 import { Modal } from '../../../../molecules/Modal'
 import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'

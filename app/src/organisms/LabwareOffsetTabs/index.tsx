@@ -8,9 +8,8 @@ import {
   COLORS,
   BORDERS,
   RoundTab,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 import type { StyleProps } from '@opentrons/components'
 

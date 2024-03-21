@@ -7,8 +7,8 @@ import {
   PrimaryButton,
   TYPOGRAPHY,
   COLORS,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 
 interface AboutGripperSlideoutProps {

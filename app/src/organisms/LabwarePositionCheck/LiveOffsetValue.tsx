@@ -9,13 +9,14 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   SIZE_1,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
-import type { StyleProps } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '../../redux/config'
+
+import type { StyleProps } from '@opentrons/components'
 
 interface OffsetVectorProps extends StyleProps {
   x: number

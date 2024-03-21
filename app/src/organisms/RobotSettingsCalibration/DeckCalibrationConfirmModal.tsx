@@ -10,9 +10,9 @@ import {
   PrimaryButton,
   SPACING,
   Link,
+  StyledText,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { StyledText } from '../../atoms/text'
 
 interface DeckCalibrationConfirmModalProps {
   confirm: () => unknown

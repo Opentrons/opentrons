@@ -11,9 +11,8 @@ import {
   BORDERS,
   Icon,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
 
 export function ServerInitializing(): JSX.Element {
   const { t } = useTranslation('device_details')

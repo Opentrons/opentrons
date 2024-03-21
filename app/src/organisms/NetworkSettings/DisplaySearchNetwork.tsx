@@ -10,9 +10,8 @@ import {
   TYPOGRAPHY,
   COLORS,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 export function DisplaySearchNetwork(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])

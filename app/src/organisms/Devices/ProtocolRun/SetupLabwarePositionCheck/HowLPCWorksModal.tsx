@@ -10,10 +10,10 @@ import {
   ALIGN_FLEX_END,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { StyledText } from '../../../../atoms/text'
 
 const OFFSET_DATA_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

@@ -9,9 +9,9 @@ import {
   SPACING,
   TYPOGRAPHY,
   Box,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/buttons'
 import { updateSetting } from '../../../../redux/robot-settings'
 

@@ -22,6 +22,7 @@ import {
   ALIGN_FLEX_END,
   ALIGN_CENTER,
   JUSTIFY_SPACE_AROUND,
+  StyledText,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -32,7 +33,6 @@ import {
 } from '@opentrons/shared-data'
 import { i18n } from '../../i18n'
 import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
 import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
 import { LegacyModalShell } from '../../molecules/LegacyModal'

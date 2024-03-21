@@ -9,10 +9,10 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { Divider } from '../../../atoms/structure'
-import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
 import { useIsFlex, useIsRobotBusy, useRobot } from '../hooks'
 import {

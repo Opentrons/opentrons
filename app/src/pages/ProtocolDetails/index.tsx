@@ -21,6 +21,7 @@ import {
   SPACING,
   truncateString,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
@@ -31,7 +32,6 @@ import {
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
-import { StyledText } from '../../atoms/text'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,

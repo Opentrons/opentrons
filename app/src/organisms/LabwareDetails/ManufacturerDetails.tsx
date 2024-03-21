@@ -10,8 +10,8 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import type { LabwareBrand } from '../../pages/Labware/types'
 
 export interface ManufacturerDetailsProps {

@@ -11,8 +11,8 @@ import {
   COLORS,
   TYPOGRAPHY,
   PrimaryButton,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { AttachedModule } from '../../redux/modules/types'

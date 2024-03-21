@@ -15,10 +15,10 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { Slideout } from '../../atoms/Slideout'
 import { InputField } from '../../atoms/InputField'
-import { StyledText } from '../../atoms/text'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 
 import type { ThermocyclerModule } from '../../redux/modules/types'

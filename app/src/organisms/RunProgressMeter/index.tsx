@@ -16,6 +16,7 @@ import {
   ALIGN_CENTER,
   useHoverTooltip,
   TOOLTIP_LEFT,
+  StyledText,
 } from '@opentrons/components'
 import {
   RUN_STATUS_IDLE,
@@ -33,7 +34,6 @@ import {
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTopPortalEl } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'

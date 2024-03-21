@@ -12,11 +12,11 @@ import {
   useHoverTooltip,
   TOOLTIP_LEFT,
   DIRECTION_COLUMN,
+  StyledText,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
 import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import {

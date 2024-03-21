@@ -16,8 +16,8 @@ import {
   DIRECTION_ROW,
   ALIGN_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 import { OffsetVector } from '../../../molecules/OffsetVector'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

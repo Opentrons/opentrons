@@ -7,12 +7,12 @@ import {
   SPACING,
   PrimaryButton,
   SecondaryButton,
+  StyledText,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 
 import * as Sessions from '../../redux/sessions'
 import { NeedHelpLink } from './NeedHelpLink'
-import { StyledText } from '../../atoms/text'
 
 import type { CalibrationPanelProps } from './types'
 import type {

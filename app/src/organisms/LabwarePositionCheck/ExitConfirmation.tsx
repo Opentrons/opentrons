@@ -16,8 +16,8 @@ import {
   SecondaryButton,
   JUSTIFY_FLEX_END,
   TEXT_ALIGN_CENTER,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'

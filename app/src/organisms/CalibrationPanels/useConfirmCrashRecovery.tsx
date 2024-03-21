@@ -7,10 +7,10 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import { StyledText } from '../../atoms/text'
 import { ConfirmCrashRecovery } from './ConfirmCrashRecovery'
 
 import type { CalibrationPanelProps } from './types'

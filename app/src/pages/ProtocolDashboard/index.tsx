@@ -12,11 +12,11 @@ import {
   POSITION_STICKY,
   POSITION_STATIC,
   Box,
+  StyledText,
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Navigation } from '../../organisms/Navigation'
 import {
   getPinnedProtocolIds,

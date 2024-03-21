@@ -6,10 +6,10 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../atoms/text'
 import { useAttachedPipettes } from '../../organisms/Devices/hooks'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 

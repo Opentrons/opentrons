@@ -11,6 +11,7 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useSelector } from 'react-redux'
@@ -24,7 +25,6 @@ import {
 import { appShellRequestor } from '../../../redux/shell/remote'
 import { getRobotUpdateSession } from '../../../redux/robot-update'
 import { getDevtoolsEnabled } from '../../../redux/config'
-import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { useRobot } from '../../../organisms/Devices/hooks'
 import { Line } from '../../../atoms/structure'

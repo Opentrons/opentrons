@@ -3,8 +3,8 @@ import { describe, it, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
 import { TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { StyledText } from '..'
+import { renderWithProviders } from '../../../../../app/src/__testing-utils__'
 
 const render = (props: React.ComponentProps<typeof StyledText>) => {
   return renderWithProviders(<StyledText {...props} />)[0]

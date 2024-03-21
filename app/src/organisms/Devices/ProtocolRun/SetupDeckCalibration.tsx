@@ -11,10 +11,10 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../../atoms/buttons'
-import { StyledText } from '../../../atoms/text'
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 

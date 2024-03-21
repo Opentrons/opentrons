@@ -12,9 +12,9 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
   DISPLAY_FLEX,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { RadioButton } from '../../atoms/buttons'
 import { getLocalRobot } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'

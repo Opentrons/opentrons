@@ -19,12 +19,12 @@ import {
   TEXT_ALIGN_CENTER,
   Icon,
   ALIGN_FLEX_END,
+  StyledText,
 } from '@opentrons/components'
 // import { NeedHelpLink } from '../CalibrationPanels'
 import { SmallButton } from '../../atoms/buttons'
 import { Jog, JogControls } from '../../molecules/JogControls'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 
 // TODO: get help link article URL

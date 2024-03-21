@@ -8,9 +8,9 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
 import { updateSetting } from '../../../redux/robot-settings'
 import type { Dispatch } from '../../../redux/types'

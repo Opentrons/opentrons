@@ -33,6 +33,7 @@ import {
   SIZE_5,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -48,7 +49,6 @@ import {
 
 import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import {
   useTrackEvent,

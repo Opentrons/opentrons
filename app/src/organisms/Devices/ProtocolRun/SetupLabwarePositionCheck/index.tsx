@@ -13,6 +13,7 @@ import {
   SecondaryButton,
   PrimaryButton,
   COLORS,
+  StyledText,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -25,7 +26,6 @@ import {
 } from '../../hooks'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
-import { StyledText } from '../../../../atoms/text'
 import { getLatestCurrentOffsets } from './utils'
 import { useNotifyRunQuery } from '../../../../resources/runs'
 

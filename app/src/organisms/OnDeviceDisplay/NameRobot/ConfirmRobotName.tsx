@@ -10,9 +10,9 @@ import {
   SPACING,
   TYPOGRAPHY,
   COLORS,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { StepMeter } from '../../../atoms/StepMeter'
 import { MediumButton } from '../../../atoms/buttons'
 import screenImage from '../../../assets/images/on-device-display/odd_abstract@x2.png'

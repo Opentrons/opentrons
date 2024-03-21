@@ -6,10 +6,9 @@ import {
   DIRECTION_COLUMN,
   COLORS,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-
-import { StyledText } from '../../../atoms/text'
 
 import type { Mount } from '../../../redux/pipettes/types'
 import type { CalibrationCheckInstrument } from '../../../redux/sessions/types'

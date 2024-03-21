@@ -11,8 +11,8 @@ import {
   SPACING,
   TYPOGRAPHY,
   RESPONSIVENESS,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import type { Subsystem } from '@opentrons/api-client'
 

@@ -13,9 +13,9 @@ import {
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 
 interface DisplayConnectionStatusProps {

@@ -14,11 +14,11 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   ALIGN_FLEX_START,
+  StyledText,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { StatusLabel } from '../../atoms/StatusLabel'
-import { StyledText } from '../../atoms/text'
 
 import { useCalibrationTaskList } from '../Devices/hooks'
 

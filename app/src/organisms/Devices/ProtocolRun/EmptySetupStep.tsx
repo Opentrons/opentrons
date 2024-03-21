@@ -5,8 +5,8 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 
 interface EmptySetupStepProps {
   title: React.ReactNode

@@ -9,9 +9,9 @@ import {
   SPACING_AUTO,
   Box,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 
 interface DeviceResetProps {

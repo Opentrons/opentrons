@@ -11,9 +11,8 @@ import {
   TYPOGRAPHY,
   Icon,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 interface ConnectingNetworkProps {
   ssid: string

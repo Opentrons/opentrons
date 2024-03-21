@@ -13,10 +13,10 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
   WRAP_REVERSE,
+  StyledText,
 } from '@opentrons/components'
 
 import { analyzeProtocol } from '../../redux/protocol-storage'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { getTopPortalEl } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'

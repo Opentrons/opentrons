@@ -6,15 +6,15 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   ALIGN_CENTER,
+  StyledText,
 } from '@opentrons/components'
-import { getPipetteNameSpecs, RunTimeCommand } from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   getAddressableAreaDisplayName,
   getLabwareName,
   getLabwareDisplayLocation,
   getFinalLabwareLocation,
 } from './utils'
-import { StyledText } from '../../atoms/text'
 import { LoadCommandText } from './LoadCommandText'
 import { PipettingCommandText } from './PipettingCommandText'
 import { TemperatureCommandText } from './TemperatureCommandText'
@@ -23,6 +23,7 @@ import { MoveLabwareCommandText } from './MoveLabwareCommandText'
 import type {
   CompletedProtocolAnalysis,
   RobotType,
+  RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
 

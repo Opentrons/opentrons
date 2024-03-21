@@ -9,10 +9,10 @@ import {
   ALIGN_START,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  StyledText,
 } from '@opentrons/components'
 
 import { Banner } from '../../../atoms/Banner'
-import { StyledText } from '../../../atoms/text'
 
 export function ProtocolDropTipBanner(props: {
   onLaunchWizardClick: (setShowWizard: true) => void

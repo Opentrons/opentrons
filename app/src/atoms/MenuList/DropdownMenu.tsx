@@ -1,20 +1,20 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  Flex,
-  SPACING,
-  COLORS,
-  TYPOGRAPHY,
-  POSITION_ABSOLUTE,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
   Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 import { MenuItem } from './MenuItem'
 
 export interface DropdownOption {

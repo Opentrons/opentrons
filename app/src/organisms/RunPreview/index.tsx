@@ -15,9 +15,9 @@ import {
   BORDERS,
   COLORS,
   POSITION_FIXED,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useNotifyLastRunCommandKey } from '../../resources/runs'
 import { CommandText } from '../CommandText'

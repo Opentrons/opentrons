@@ -20,10 +20,10 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
   useInterval,
+  StyledText,
 } from '@opentrons/components'
 
 import { QuaternaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useIsFlex } from '../../organisms/Devices/hooks'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'

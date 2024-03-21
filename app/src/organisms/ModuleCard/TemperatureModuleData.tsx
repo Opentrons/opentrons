@@ -6,9 +6,9 @@ import {
   SPACING,
   COLORS,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { StatusLabel } from '../../atoms/StatusLabel'
-import { StyledText } from '../../atoms/text'
 import type { TemperatureStatus } from '../../redux/modules/api-types'
 
 interface TemperatureModuleProps {

@@ -2,27 +2,27 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import {
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  JUSTIFY_FLEX_END,
   JUSTIFY_CENTER,
-  SPACING,
-  TYPOGRAPHY,
-  RESPONSIVENESS,
-  ALIGN_CENTER,
-  StyleProps,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
-  JUSTIFY_FLEX_START,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import SuccessIcon from '../../assets/images/icon_success.png'
 import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
+
 import { Skeleton } from '../../atoms/Skeleton'
 import type { RobotType } from '@opentrons/shared-data'
-
+import type { StyleProps } from '@opentrons/components'
 interface Props extends StyleProps {
   iconColor: string
   header: string

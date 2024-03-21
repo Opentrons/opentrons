@@ -22,11 +22,11 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
   useOnClickOutside,
+  StyledText,
 } from '@opentrons/components'
 
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'

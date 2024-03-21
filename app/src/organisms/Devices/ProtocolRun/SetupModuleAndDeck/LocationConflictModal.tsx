@@ -19,6 +19,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
@@ -32,7 +33,6 @@ import {
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { StyledText } from '../../../../atoms/text'
 import { Modal } from '../../../../molecules/Modal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
 

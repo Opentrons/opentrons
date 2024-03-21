@@ -13,6 +13,7 @@ import {
   TYPOGRAPHY,
   SPACING,
   RESPONSIVENESS,
+  StyledText,
 } from '@opentrons/components'
 import {
   CreateCommand,
@@ -25,7 +26,6 @@ import {
   THERMOCYCLER_MODULE_MODELS,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { LEFT_SLOTS } from './constants'
 

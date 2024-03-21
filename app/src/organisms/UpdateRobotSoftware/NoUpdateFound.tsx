@@ -11,9 +11,9 @@ import {
   JUSTIFY_CENTER,
   BORDERS,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 
 export interface NoUpdateFoundProps {

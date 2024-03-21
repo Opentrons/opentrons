@@ -10,13 +10,13 @@ import {
   PrimaryButton,
   ALIGN_FLEX_END,
   ALIGN_CENTER,
+  StyledText,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'

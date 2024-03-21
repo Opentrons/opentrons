@@ -7,9 +7,9 @@ import {
   SPACING,
   TYPOGRAPHY,
   CheckboxField,
+  StyledText,
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
-import { StyledText } from '../../atoms/text'
 import styles from './styles.module.css'
 
 import type { Control } from 'react-hook-form'

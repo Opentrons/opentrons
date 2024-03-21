@@ -11,10 +11,10 @@ import {
   SPACING,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'
-import { StyledText } from '../../atoms/text'
 import { useCalibrationTaskList } from './hooks'
 
 interface CalibrationStatusBannerProps {

@@ -11,9 +11,8 @@ import {
   Icon,
   TYPOGRAPHY,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 export function CheckUpdates(): JSX.Element {
   const { t } = useTranslation('device_settings')

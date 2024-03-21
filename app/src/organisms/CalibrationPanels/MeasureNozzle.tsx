@@ -3,15 +3,15 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  Box,
-  Flex,
-  ALIGN_STRETCH,
   ALIGN_FLEX_END,
-  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_STRETCH,
+  Box,
   DIRECTION_COLUMN,
-  SPACING,
-  Mount,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import {
@@ -19,7 +19,6 @@ import {
   SMALL_STEP_SIZE_MM,
   MEDIUM_STEP_SIZE_MM,
 } from '../../molecules/JogControls'
-import { StyledText } from '../../atoms/text'
 import * as Sessions from '../../redux/sessions'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
@@ -39,6 +38,7 @@ import leftMultiBlockAssetHealth from '../../assets/videos/health-check/Left_Mul
 import rightMultiBlockAssetHealth from '../../assets/videos/health-check/Right_Multi_CalBlock_NO_TIP_(330x260)REV2.webm'
 import leftSingleBlockAssetHealth from '../../assets/videos/health-check/Left_Single_CalBlock_NO_TIP_(330x260)REV2.webm'
 import rightSingleBlockAssetHealth from '../../assets/videos/health-check/Right_Single_CalBlock_NO_TIP_(330x260)REV2.webm'
+import type { Mount } from '@opentrons/components'
 
 const assetMapTrash = {
   left: {

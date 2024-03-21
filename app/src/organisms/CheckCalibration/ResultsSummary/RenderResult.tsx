@@ -7,8 +7,8 @@ import {
   COLORS,
   SPACING,
   SIZE_1,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 
 interface RenderResultProps {
   isBadCal: boolean

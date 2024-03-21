@@ -14,9 +14,9 @@ import {
   SPACING,
   SIZE_1,
   DeckLocationSelect,
+  StyledText,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
-import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import type { ModuleCalibrationWizardStepProps } from './types'
 

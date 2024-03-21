@@ -14,9 +14,9 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { RobotSetupHeader } from '../../organisms/RobotSetupHeader'
 import { getLocalRobot } from '../../redux/discovery'

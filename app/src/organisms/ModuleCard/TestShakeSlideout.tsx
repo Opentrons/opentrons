@@ -19,6 +19,7 @@ import {
   useConditionalConfirm,
   PrimaryButton,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import {
@@ -34,7 +35,6 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
-import { StyledText } from '../../atoms/text'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
 import { ModuleSetupModal } from './ModuleSetupModal'

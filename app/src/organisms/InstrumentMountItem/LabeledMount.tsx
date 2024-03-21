@@ -13,8 +13,8 @@ import {
   DIRECTION_COLUMN,
   ALIGN_FLEX_START,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import type { Mount } from '../../redux/pipettes/types'
 
 const MountButton = styled.button<{ isAttached: boolean }>`

@@ -10,9 +10,9 @@ import {
   AlertPrimaryButton,
   Link,
   ALIGN_CENTER,
+  StyledText,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { StyledText } from '../../atoms/text'
 
 interface ConfirmDeleteProtocolModalProps {
   cancelDeleteProtocol: React.MouseEventHandler<HTMLAnchorElement> | undefined

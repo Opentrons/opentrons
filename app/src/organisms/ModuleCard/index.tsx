@@ -19,6 +19,7 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
   useOnClickOutside,
+  StyledText,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -46,7 +47,6 @@ import { UpdateBanner } from '../../molecules/UpdateBanner'
 import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
-import { StyledText } from '../../atoms/text'
 import { useChainLiveCommands } from '../../resources/runs'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { useIsFlex } from '../../organisms/Devices/hooks'

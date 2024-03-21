@@ -6,11 +6,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   ALIGN_STRETCH,
+  StyledText,
 } from '@opentrons/components'
 import uniq from 'lodash/uniq'
 
 import * as Sessions from '../../redux/sessions'
-import { StyledText } from '../../atoms/text'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { SessionCommandString } from '../../redux/sessions/types'
 import { useTranslation } from 'react-i18next'
