@@ -19,7 +19,7 @@ from robot_server.service.notifications import RunsPublisher
 
 from .engine_store import EngineStore
 from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
-from .run_models import Run, BadRun, RunLoadingError
+from .run_models import Run, BadRun, RunDataError
 
 from opentrons.protocol_engine.types import DeckConfigurationType
 
@@ -49,59 +49,59 @@ def _build_run(
             startedAt=state_summary.startedAt,
             liquids=state_summary.liquids,
         )
-    else:
-        errors: List[EnumeratedError] = []
-        if isinstance(state_summary, BadStateSummary):
-            state = StateSummary.construct(
-                status=EngineStatus.STOPPED,
-                errors=[],
-                labware=[],
-                labwareOffsets=[],
-                pipettes=[],
-                modules=[],
-                liquids=[],
-            )
-            errors.append(state_summary.dataError)
-        else:
-            state = state_summary
-        if not run_resource.ok:
-            errors.append(run_resource.error)
 
-        if len(errors) > 1:
-            run_loading_error = RunLoadingError.from_exc(
-                InvalidStoredData(
-                    message=(
-                        "Data on this run is not valid. The run may have been "
-                        "created on a future software version."
-                    ),
-                    wrapping=errors,
-                )
-            )
-        elif errors:
-            run_loading_error = RunLoadingError.from_exc(errors[0])
-        else:
-            # We should never get here
-            run_loading_error = RunLoadingError.from_exc(
-                AssertionError("Logic error in parsing invalid run.")
-            )
-
-        return BadRun.construct(
-            dataError=run_loading_error,
-            id=run_resource.run_id,
-            protocolId=run_resource.protocol_id,
-            createdAt=run_resource.created_at,
-            actions=run_resource.actions,
-            status=state.status,
-            errors=state.errors,
-            labware=state.labware,
-            labwareOffsets=state.labwareOffsets,
-            pipettes=state.pipettes,
-            modules=state.modules,
-            current=current,
-            completedAt=state.completedAt,
-            startedAt=state.startedAt,
-            liquids=state.liquids,
+    errors: List[EnumeratedError] = []
+    if isinstance(state_summary, BadStateSummary):
+        state = StateSummary.construct(
+            status=EngineStatus.STOPPED,
+            errors=[],
+            labware=[],
+            labwareOffsets=[],
+            pipettes=[],
+            modules=[],
+            liquids=[],
         )
+        errors.append(state_summary.dataError)
+    else:
+        state = state_summary
+    if not run_resource.ok:
+        errors.append(run_resource.error)
+
+    if len(errors) > 1:
+        run_loading_error = RunDataError.from_exc(
+            InvalidStoredData(
+                message=(
+                    "Data on this run is not valid. The run may have been "
+                    "created on a future software version."
+                ),
+                wrapping=errors,
+            )
+        )
+    elif errors:
+        run_loading_error = RunDataError.from_exc(errors[0])
+    else:
+        # We should never get here
+        run_loading_error = RunDataError.from_exc(
+            AssertionError("Logic error in parsing invalid run.")
+        )
+
+    return BadRun.construct(
+        dataError=run_loading_error,
+        id=run_resource.run_id,
+        protocolId=run_resource.protocol_id,
+        createdAt=run_resource.created_at,
+        actions=run_resource.actions,
+        status=state.status,
+        errors=state.errors,
+        labware=state.labware,
+        labwareOffsets=state.labwareOffsets,
+        pipettes=state.pipettes,
+        modules=state.modules,
+        current=current,
+        completedAt=state.completedAt,
+        startedAt=state.startedAt,
+        liquids=state.liquids,
+    )
 
 
 class RunNotCurrentError(ValueError):

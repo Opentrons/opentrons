@@ -24,7 +24,7 @@ from opentrons.protocol_engine import (
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
-from robot_server.runs.run_models import Run, BadRun, RunNotFoundError, RunLoadingError
+from robot_server.runs.run_models import Run, BadRun, RunNotFoundError, RunDataError
 from robot_server.runs.run_store import (
     RunStore,
     RunResource,
@@ -358,7 +358,7 @@ async def test_get_historical_run_no_data(
     run_id = "hello world"
 
     state_exc = InvalidStoredData("Oh no!")
-    run_error = RunLoadingError.from_exc(state_exc)
+    run_error = RunDataError.from_exc(state_exc)
     decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
     decoy.when(mock_run_store.get_state_summary(run_id=run_id)).then_return(
         BadStateSummary(dataError=state_exc)

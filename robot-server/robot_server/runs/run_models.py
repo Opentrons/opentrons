@@ -24,14 +24,14 @@ from robot_server.errors.error_responses import ErrorDetails
 from .action_models import RunAction
 
 
-class RunLoadingError(ErrorDetails):
+class RunDataError(ErrorDetails):
     """A model for an error loading a run."""
 
     title: str = Field(
         "Run Loading Error",
         description="A short, human readable name for this type of error",
     )
-    id: Literal["RunLoadingError"] = "RunLoadingError"
+    id: Literal["RunDataError"] = "RunDataError"
 
 
 # TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,
@@ -77,6 +77,7 @@ class RunCommandSummary(ResourceModel):
 class Run(ResourceModel):
     """Run resource model."""
 
+    ok: Literal[True] = True
     id: str = Field(..., description="Unique run identifier.")
     createdAt: datetime = Field(..., description="When the run was created")
     status: RunStatus = Field(..., description="Execution status of the run")
@@ -139,7 +140,8 @@ class Run(ResourceModel):
 class BadRun(ResourceModel):
     """Resource model representation for a bad run that could not be loaded."""
 
-    dataError: RunLoadingError = Field(..., description="Error from loading the data.")
+    ok: Literal[False] = False
+    dataError: RunDataError = Field(..., description="Error from loading the data.")
     id: str = Field(..., description="Unique run identifier.")
     createdAt: datetime = Field(..., description="When the run was created")
     status: RunStatus = Field(..., description="Execution status of the run")
@@ -150,7 +152,7 @@ class BadRun(ResourceModel):
             " There can be, at most, one current run."
         ),
     )
-    actions: Optional[List[RunAction]] = Field(
+    actions: List[RunAction] = Field(
         ...,
         description="Client-initiated run control actions, ordered oldest to newest. If these could not be loaded for this bad run, this will be null.",
     )

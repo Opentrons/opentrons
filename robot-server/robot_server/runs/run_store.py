@@ -69,7 +69,7 @@ class BadRunResource:
     run_id: str
     protocol_id: Optional[str]
     created_at: datetime
-    actions: Optional[List[RunAction]]
+    actions: List[RunAction]
     error: EnumeratedError
 
 
@@ -515,13 +515,13 @@ def _convert_row_to_run(
             for action_row in action_rows
         ]
     except Exception as be:
-        _log.warning("Error reading actions for run ID {run_id}:", exc_info=True)
+        log.warning("Error reading actions for run ID {run_id}:", exc_info=True)
         return BadRunResource(
             ok=False,
             run_id=run_id,
             created_at=created_at,
             protocol_id=protocol_id,
-            actions=None,
+            actions=[],
             error=InvalidStoredData(
                 message="This run has invalid or unknown actions. It has likely been saved in a future version of software.",
                 detail={"kind": "bad-actions"},
