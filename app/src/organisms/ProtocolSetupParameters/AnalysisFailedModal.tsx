@@ -2,11 +2,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import {
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -49,17 +49,21 @@ export function AnalysisFailedModal({
         gridGap={SPACING.spacing32}
         width="100%"
       >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           <StyledText as="p">{t('with_the_chosen_value')}</StyledText>
-          {errors.map((error, index) => (
-            <StyledText
-              key={index}
-              as="p"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >
-              {error}
-            </StyledText>
-          ))}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            borderRadius={BORDERS.borderRadius8}
+            backgroundColor={COLORS.grey35}
+            padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
+            overflowY="auto"
+          >
+            {errors.map((error, index) => (
+              <StyledText key={index} as="p">
+                {error}
+              </StyledText>
+            ))}
+          </Flex>
           <StyledText as="p">{t('restart_setup_and_try')}</StyledText>
         </Flex>
         <SmallButton
