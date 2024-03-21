@@ -3,14 +3,14 @@ import { describe, it, expect, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { NormalKeyboard } from '..'
+import { FullKeyboard } from '..'
 
-const render = (props: React.ComponentProps<typeof NormalKeyboard>) => {
-  return renderWithProviders(<NormalKeyboard {...props} />)[0]
+const render = (props: React.ComponentProps<typeof FullKeyboard>) => {
+  return renderWithProviders(<FullKeyboard {...props} />)[0]
 }
 
-describe('SoftwareKeyboard', () => {
-  it('should render the software keyboards', () => {
+describe('FullKeyboard', () => {
+  it('should render FullKeyboard keyboard', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
@@ -40,7 +40,7 @@ describe('SoftwareKeyboard', () => {
       'j',
       'k',
       'l',
-      'SHIFT',
+      'ABC',
       'z',
       'x',
       'c',
@@ -58,14 +58,14 @@ describe('SoftwareKeyboard', () => {
     })
   })
 
-  it('should render the software keyboards when hitting shift key', () => {
+  it('should render full keyboard when hitting ABC key', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
       keyboardRef: result.current,
     }
     render(props)
-    const shiftKey = screen.getByRole('button', { name: 'SHIFT' })
+    const shiftKey = screen.getByRole('button', { name: 'ABC' })
     fireEvent.click(shiftKey)
     const buttons = screen.getAllByRole('button')
     const expectedButtonNames = [
@@ -107,7 +107,7 @@ describe('SoftwareKeyboard', () => {
     })
   })
 
-  it('should render the software keyboards when hitting 123 key', () => {
+  it('should render full keyboard when hitting 123 key', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
@@ -128,6 +128,7 @@ describe('SoftwareKeyboard', () => {
       '8',
       '9',
       '0',
+      'abc',
       '-',
       '/',
       ':',
@@ -138,13 +139,14 @@ describe('SoftwareKeyboard', () => {
       '&',
       '@',
       '"',
-      'abc',
       '#+=',
       '.',
       ',',
       '?',
       '!',
       "'",
+      '*',
+      '~',
       'del',
       'space',
     ]
@@ -175,26 +177,23 @@ describe('SoftwareKeyboard', () => {
       '#',
       '%',
       '^',
-      '*',
       '+',
-      '=',
+      'abc',
       '_',
       '\\',
       '|',
-      '~',
       '<',
       '>',
-      '€',
-      '£',
-      '¥',
       '·',
-      'abc',
+      '=',
       '123',
       '.',
       ',',
       '?',
       '!',
       "'",
+      '*',
+      '~',
       'del',
       'space',
     ]
