@@ -6,23 +6,14 @@ from typing import (
     Optional,
     Union,
     Any,
-    TYPE_CHECKING,
 )
-from pydantic import BaseModel, conint, confloat, validator
+from pydantic import BaseModel, validator
 from abc import ABC
 
 
 from opentrons_shared_data.module.dev_types import ModuleType
 from ..constants import DeckVersionType
 from ..dev_types import RobotModel
-
-
-if TYPE_CHECKING:
-    _StrictNonNegativeInt = int
-    _StrictNonNegativeFloat = float
-else:
-    _StrictNonNegativeInt = conint(strict=True, ge=0)
-    _StrictNonNegativeFloat = confloat(strict=True, ge=0.0)
 
 
 UnitVectorVal = Literal[1, -1]
@@ -41,9 +32,9 @@ class Robot(BaseModel):
 
 
 class BoundingBox(BaseModel):
-    xDimension: _StrictNonNegativeFloat
-    yDimension: _StrictNonNegativeFloat
-    zDimension: _StrictNonNegativeFloat
+    xDimension: float
+    yDimension: float
+    zDimension: float
 
 
 class BasicInfoModel(BaseModel):
