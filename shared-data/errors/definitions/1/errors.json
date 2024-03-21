@@ -190,6 +190,10 @@
       "detail": "Tip Detector Not Created",
       "category": "roboticsInteractionError"
     },
+    "3019": {
+      "detail": "HEPA UV Failed",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"
