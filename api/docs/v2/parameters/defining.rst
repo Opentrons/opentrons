@@ -6,19 +6,43 @@
 Defining Parameters
 *******************
 
-.. dunno if this will be a named intro section or just some text at the top
+To use parameters, you need to define them in :ref:`a separate function <add-parameters>` within your protocol. Each parameter definition has two main purposes: to specify acceptable values, and to inform the protocol user what the parameter does.
 
-Parameters all have:
+Depending on the type of parameter, you'll need to specify some or all of the following.
 
-- A ``variable_name`` for referencing in code.
-- A ``display_name`` to label them in the Opentrons App or on the touchscreen.
-- An optional ``description`` to provide more information about how the parameter will affect the execution of the protocol.
-- A ``default`` value that the protocol will use if no changes are made during run setup.
+.. list-table::
+   :header-rows: 1
 
-Numeric and string parameters have additional attributes. See below.
+   * - Information
+     - Purpose
+   * - ``variable_name``
+     - A unique name for :ref:`referencing the parameter value <using-rtp>` elsewhere in the protocol.
+   * - ``display_name``
+     - A label for the parameter shown in the Opentrons App or on the touchscreen.
+   * - ``description``
+     - An optional longer explanation of what the parameter does, or how its values will affect the execution of the protocol.
+   * - ``default``
+     - The value the parameter will have if the user makes no changes to it during run setup.
+   * - ``minimum`` and ``maximum``
+     - For numeric parameters only. Allows free entry of any value within the range (inclusive). Both values are required. Can't be used at the same time as ``choices``.
+   * - ``choices``
+     - For numeric or string parameters. Provides a fixed list of values to choose from. Each choice has its own display name and value. Can't be used at the same time as ``minimum`` and ``maximum``.
+
+
+.. _add-parameters:
 
 The ``add_parameters()`` Function
 =================================
+
+All parameter definitions are contained in a Python function, which must be named ``add_parameters`` and takes a single argument. You must define ``add_parameters`` before the ``run`` function that contains protocol commands.
+
+The examples on this page assume the following definition, which uses the argument name ``parameters``. The type specification of the argument is optional.
+
+.. code-block::
+
+    def add_parameters(parameters: protocol_api.ProtocolContext.Parameters):
+    
+Within this function definition, call methods on ``parameters`` to define parameters. The next section demonstrates how each type of parameter has its own method.
 
 Types of Parameters
 ===================
@@ -37,6 +61,8 @@ An example boolean::
         description="Skip incubation delays and shorten mix steps."
     )
 
+.. versionadded:: 2.18
+
 Integer Parameters
 ------------------
 
@@ -52,6 +78,8 @@ An example integer::
         maximum=12,
         description="How many samples to process."
     )
+
+.. versionadded:: 2.18
 
 Float Parameters
 ----------------
@@ -73,6 +101,8 @@ An example float with choices::
         unit="µL"
     )
 
+.. versionadded:: 2.18
+
 String Parameters
 -----------------
 
@@ -90,3 +120,5 @@ An example string enumeration::
         default="flex_1channel_50",
         description="What pipette to use during the protocol.",
     )
+
+.. versionadded:: 2.18
