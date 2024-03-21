@@ -173,7 +173,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
       ? !option.value.includes('custom_beta')
       : selectedPipetteDefaultTipracks.includes(option.value)
   )
-  console.log('defaultTiprackOptions', defaultTiprackOptions)
+
   const customTiprackOptions = tiprackOptions.filter(option =>
     option.value.includes('custom_beta')
   )

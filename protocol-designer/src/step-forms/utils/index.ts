@@ -10,10 +10,7 @@ import {
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
 import { LabwareDefByDefURI } from '../../labware-defs'
-import type {
-  DeckSlotId,
-  ModuleType,
-} from '@opentrons/shared-data'
+import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentOnDeck,
   InitialDeckSetup,

@@ -232,8 +232,8 @@ const updatePatchOnPipetteChange = (
     let airGapVolume: string | null = null
 
     if (typeof newPipette === 'string' && newPipette in pipetteEntities) {
-      const pipetteSpec = pipetteEntities[newPipette].spec
-      airGapVolume = `${pipetteSpec.minVolume}`
+      const minVolume = getMinPipetteVolume(pipetteEntities[newPipette])
+      airGapVolume = minVolume.toString()
     }
 
     return {

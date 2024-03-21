@@ -46,9 +46,7 @@ export function FlowRateField(props: OP): JSX.Element {
       defaultFlowRate={defaultFlowRate}
       minFlowRate={0}
       //  TODO(jr, 3/21/24): update max flow rate to real value instead of volume
-      maxFlowRate={
-        pipette ? pipette.spec.liquids.default.maxVolume : Infinity
-      }
+      maxFlowRate={pipette ? pipette.spec.liquids.default.maxVolume : Infinity}
     />
   )
 }

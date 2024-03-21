@@ -208,7 +208,9 @@ export const transfer: CommandCreator<TransferArgs> = (
   const effectiveTransferVol =
     getPipetteWithTipMaxVol(args.pipette, invariantContext) -
     aspirateAirGapVolume
-  const liquidMinVolumes = Object.values(pipetteSpec.liquids).map(liquid => liquid.minVolume)
+  const liquidMinVolumes = Object.values(pipetteSpec.liquids).map(
+    liquid => liquid.minVolume
+  )
   //  account for minVolume for lowVolume pipettes
   const pipetteMinVol = Math.min(...liquidMinVolumes)
   const chunksPerSubTransfer = Math.ceil(args.volume / effectiveTransferVol)
