@@ -230,6 +230,10 @@ export const STAGING_AREA_CUTOUTS: CutoutId[] = [
   'cutoutD3',
 ]
 
+export const TEMPERATURE_MODULE_CUTOUTS: CutoutId[] = [ ...SINGLE_RIGHT_CUTOUTS, ...SINGLE_LEFT_CUTOUTS]
+export const HEATER_SHAKER_CUTOUTS: CutoutId[] = [ ...SINGLE_RIGHT_CUTOUTS, ...SINGLE_LEFT_CUTOUTS]
+export const THERMOCYCLER_MODULE_CUTOUTS: CutoutId[] = ['cutoutA1', 'cutoutB1']
+
 export const WASTE_CHUTE_CUTOUT: 'cutoutD3' = 'cutoutD3'
 
 export const A1_ADDRESSABLE_AREA: 'A1' = 'A1'
@@ -379,7 +383,7 @@ export const STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE: 
 
 export const HEATERSHAKER_MODULE_V1_FIXTURE: 'heaterShakerModuleV1' = 'heaterShakerModuleV1'
 export const TEMPERATURE_MODULE_V2_FIXTURE: 'temperatureModuleV2' = 'temperatureModuleV2'
-export const MAGNETIC_BLOCK_V1_FIXTURE: 'magneticBlockModuleV1' = 'magneticBlockModuleV1'
+export const MAGNETIC_BLOCK_V1_FIXTURE: 'magneticBlockV1' = 'magneticBlockV1'
 export const THERMOCYCLER_V2_REAR_FIXTURE: 'thermocyclerModuleV2Rear' = 'thermocyclerModuleV2Rear'
 export const THERMOCYCLER_V2_FRONT_FIXTURE: 'thermocyclerModuleV2Front' = 'thermocyclerModuleV2Front'
 

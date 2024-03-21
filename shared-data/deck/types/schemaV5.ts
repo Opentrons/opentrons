@@ -122,7 +122,7 @@ export type WasteChuteCutoutFixtureId =
 export type FlexModuleCutoutFixtureId = 
   | 'heaterShakerModuleV1'
   | 'temperatureModuleV2'
-  | 'magneticBlockModuleV1'
+  | 'magneticBlockV1'
   | 'thermocyclerModuleV2Rear'
   | 'thermocyclerModuleV2Front'
 
