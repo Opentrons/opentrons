@@ -15,6 +15,8 @@ from opentrons.hardware_control.modules.module_calibration import (
     save_module_calibration_offset,
 )
 from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.hardware_control.modules import SimulatingModuleAtPort
+
 from opentrons.types import Point
 from .types import AionotifyEvent, BoardRevision, OT3Mount
 from . import modules
@@ -84,6 +86,7 @@ class AttachedModulesControl:
         usb_port: types.USBPort,
         type: modules.ModuleType,
         sim_model: Optional[str] = None,
+        sim_serial_number: Optional[str] = None,
     ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
@@ -93,10 +96,14 @@ class AttachedModulesControl:
             hw_control_loop=self._api.loop,
             execution_manager=self._api._execution_manager,
             sim_model=sim_model,
+            sim_serial_number=sim_serial_number,
         )
 
     async def unregister_modules(
-        self, mods_at_ports: List[modules.ModuleAtPort]
+        self,
+        mods_at_ports: Union[
+            List[modules.ModuleAtPort], List[modules.SimulatingModuleAtPort]
+        ],
     ) -> None:
         """
         De-register Modules.
@@ -126,7 +133,9 @@ class AttachedModulesControl:
 
     async def register_modules(
         self,
-        new_mods_at_ports: Optional[List[modules.ModuleAtPort]] = None,
+        new_mods_at_ports: Optional[
+            Union[List[modules.ModuleAtPort], List[modules.SimulatingModuleAtPort]]
+        ] = None,
         removed_mods_at_ports: Optional[List[modules.ModuleAtPort]] = None,
     ) -> None:
         """
@@ -152,6 +161,9 @@ class AttachedModulesControl:
                 port=mod.port,
                 usb_port=mod.usb_port,
                 type=modules.MODULE_TYPE_BY_NAME[mod.name],
+                sim_serial_number=mod.serial_number
+                if isinstance(mod, SimulatingModuleAtPort)
+                else None,
             )
             self._available_modules.append(new_instance)
             log.info(

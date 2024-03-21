@@ -413,7 +413,7 @@ class OT3API(
             Dict[OT3Mount, Dict[str, Optional[str]]],
             Dict[top_types.Mount, Dict[str, Optional[str]]],
         ] = None,
-        attached_modules: Optional[List[str]] = None,
+        attached_modules: Optional[Dict[str, List[str]]] = None,
         config: Union[RobotConfig, OT3Config, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
@@ -427,7 +427,7 @@ class OT3API(
         if feature_flags is None:
             feature_flags = HardwareFeatureFlags()
 
-        checked_modules = attached_modules or []
+        checked_modules = attached_modules or {}
 
         checked_loop = use_or_initialize_loop(loop)
         if not isinstance(config, OT3Config):
