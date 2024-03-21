@@ -514,7 +514,7 @@ def _convert_row_to_run(
             )
             for action_row in action_rows
         ]
-    except BaseException as be:
+    except Exception as be:
         return BadRunResource(
             ok=False,
             run_id=run_id,
