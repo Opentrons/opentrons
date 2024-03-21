@@ -210,7 +210,18 @@ def _prepare_for_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
     if key == "config" and value:
         return robot_configs.build_config_ot2(value)
     if key == "attached_modules" and value:
-        return {k: [ModuleCall(**data) for data in v] for (k, v) in value.items()}
+        attached_modules: Dict[str, List[ModuleItem]] = {}
+        for key, item in value.items():
+            for obj in item:
+                attached_modules.setdefault(key, []).append(
+                    ModuleItem(
+                        serial_number=obj["serial_number"],
+                        calls=[ModuleCall(**data) for data in obj["calls"]],
+                    )
+                )
+
+        return attached_modules
+
     return value
 
 

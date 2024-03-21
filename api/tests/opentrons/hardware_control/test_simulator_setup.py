@@ -166,10 +166,24 @@ def test_persistence_ot2(tmpdir: str) -> None:
             Mount.RIGHT: {"id": "some id"},
         },
         attached_modules={
-            "magdeck": [simulator_setup.ModuleCall("engage", kwargs={"height": 3})],
+            "magdeck": [
+                simulator_setup.ModuleItem(
+                    serial_number="111",
+                    calls=[simulator_setup.ModuleCall("engage", kwargs={"height": 3})],
+                )
+            ],
             "tempdeck": [
-                simulator_setup.ModuleCall("set_temperature", kwargs={"celsius": 23}),
-                simulator_setup.ModuleCall("set_temperature", kwargs={"celsius": 24}),
+                simulator_setup.ModuleItem(
+                    serial_number="111",
+                    calls=[
+                        simulator_setup.ModuleCall(
+                            "set_temperature", kwargs={"celsius": 23}
+                        ),
+                        simulator_setup.ModuleCall(
+                            "set_temperature", kwargs={"celsius": 24}
+                        ),
+                    ],
+                )
             ],
         },
         config=robot_configs.build_config_ot2({}),
