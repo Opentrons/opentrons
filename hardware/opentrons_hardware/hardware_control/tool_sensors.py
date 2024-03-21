@@ -11,7 +11,7 @@ from typing import (
     AsyncContextManager,
     Optional,
 )
-from enum import Enum, auto
+from enum import Enum
 from logging import getLogger
 from numpy import float64
 from math import copysign
@@ -191,7 +191,7 @@ async def run_stream_output_to_csv(
     return positions
 
 
-#str enum so it can be json serializable
+# str enum so it can be json serializable
 class OutputOptions(str, Enum):
     """Specifies where we should report sensor data to during a sensor pass."""
 

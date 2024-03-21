@@ -318,7 +318,7 @@ class MoveGroupRunner:
                             * 1000.0
                             / interrupts_per_sec
                             / interrupts_per_sec
-                       )
+                        )
                         * (2**31)
                     )
                 ),
