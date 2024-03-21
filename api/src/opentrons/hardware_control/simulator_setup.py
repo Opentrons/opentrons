@@ -92,9 +92,10 @@ async def create_simulator(
     for attached_module in simulator.attached_modules:
         modules = setup.attached_modules[attached_module.name()]
         for module in modules:
-            for call in module.calls:
-                f = getattr(attached_module, call.function_name)
-                await f(*call.args, **call.kwargs)
+            if module.serial_number == attached_module.device_info.get("serial"):
+                for call in module.calls:
+                    f = getattr(attached_module, call.function_name)
+                    await f(*call.args, **call.kwargs)
 
     return simulator
 

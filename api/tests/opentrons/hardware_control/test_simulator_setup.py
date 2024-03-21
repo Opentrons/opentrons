@@ -60,7 +60,11 @@ async def test_with_magdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) -
                 simulator_setup.ModuleItem(
                     serial_number="123",
                     calls=[simulator_setup.ModuleCall("engage", kwargs={"height": 3})],
-                )
+                ),
+                simulator_setup.ModuleItem(
+                    serial_number="1234",
+                    calls=[simulator_setup.ModuleCall("engage", kwargs={"height": 5})],
+                ),
             ]
         }
     )
@@ -72,6 +76,11 @@ async def test_with_magdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) -
         "status": "engaged",
     }
     assert simulator.attached_modules[0].device_info["serial"] == "123"
+    assert simulator.attached_modules[1].live_data == {
+        "data": {"engaged": True, "height": 5},
+        "status": "engaged",
+    }
+    assert simulator.attached_modules[1].device_info["serial"] == "1234"
 
 
 async def test_with_thermocycler(
