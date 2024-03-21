@@ -71,6 +71,8 @@ class Eight_Channel_Partial_Pickup_Test:
         self.drop_position = None
         self.gauge_position = None
         self.trough_position = None
+        self.motor_current = None
+        self.pick_up_speed = None
         self.axes = [Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R]
         self.test_data ={
             "Time":"None",
@@ -131,7 +133,7 @@ class Eight_Channel_Partial_Pickup_Test:
     def file_setup(self):
         class_name = self.__class__.__name__
         self.test_name = class_name.lower()
-        self.test_tag = f"tips{self.tip_num}_cycles{self.cycles}"
+        self.test_tag = f"tips{self.tip_num}_current{int(self.motor_current*100)}_cycles{self.cycles}"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_date = "run-" + datetime.utcnow().strftime("%y-%m-%d")
@@ -152,6 +154,12 @@ class Eight_Channel_Partial_Pickup_Test:
         self.pipette_id = "SIMULATION" if self.simulate else self.api._pipette_handler.get_pipette(self.mount).pipette_id
         self.test_data["Pipette"] = str(self.pipette_id)
         self.test_data["Nozzles"] = str(self.tip_num)
+        self.motor_current = float(input("Motor Current (Amps) [Default = 550 mA]: ") or "0.55")
+        self.pick_up_speed = float(input("Pick-up Tip Speed (mm/s) [Default = 10 mm/s]: ") or "10")
+        await self._update_pick_up_current(self.api, self.mount, self.tip_num, self.motor_current)
+        await self._update_pick_up_speed(self.api, self.mount, self.tip_num, self.pick_up_speed)
+        self.test_data["Current"] = str(self.motor_current)
+        self.test_data["Speed"] = str(self.pick_up_speed)
 
     async def deck_setup(self):
         self.test_data["Gauge Slot"] = str(self.gauge_slot)
@@ -584,12 +592,6 @@ class Eight_Channel_Partial_Pickup_Test:
             await self.test_setup()
             if self.api and self.mount:
                 await self._home(self.api, self.mount)
-                motor_current = float(input("Motor Current (Amps) [Default = 550 mA]: ") or "0.55")
-                pick_up_speed = float(input("Pick-up Tip Speed (mm/s) [Default = 10 mm/s]: ") or "10")
-                await self._update_pick_up_current(self.api, self.mount, self.tip_num, motor_current)
-                await self._update_pick_up_speed(self.api, self.mount, self.tip_num, pick_up_speed)
-                self.test_data["Current"] = str(motor_current)
-                self.test_data["Speed"] = str(pick_up_speed)
                 if self.calibrate:
                     await self._calibrate_tiprack(self.api, self.mount)
                     await self._calibrate_trash(self.api, self.mount)
