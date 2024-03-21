@@ -49,7 +49,7 @@ export interface LegacyGoodRunData {
   labwareOffsets?: LabwareOffset[]
 }
 
-export interface KnownGoodRunData extends LegacyGoodRunData{
+export interface KnownGoodRunData extends LegacyGoodRunData {
   ok: true
 }
 
@@ -61,7 +61,6 @@ export interface KnownInvalidRunData extends LegacyGoodRunData {
 export type GoodRunData = KnownGoodRunData | LegacyGoodRunData
 
 export type RunData = GoodRunData | KnownInvalidRunData
-
 
 export interface VectorOffset {
   x: number
