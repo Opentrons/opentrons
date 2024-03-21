@@ -942,3 +942,19 @@ class InvalidProtocolData(GeneralError):
     ) -> None:
         """Build an InvalidProtocolData."""
         super().__init__(ErrorCodes.INVALID_PROTOCOL_DATA, message, detail, wrapping)
+
+
+class InvalidStoredData(GeneralError):
+    """An error indicating that some stored data is invalid.
+
+    This will usually be because it was saved by a future version of the software.
+    """
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidStoredData."""
+        super().__init__(ErrorCodes.INVALID_STORED_DATA, message, detail, wrapping)
