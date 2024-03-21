@@ -15,7 +15,7 @@
     "thermocycler": [
       {
         "serial_number": "therm-123",
-        "items": [
+        "calls": [
           {
             "function_name": "set_temperature",
             "kwargs": {
@@ -61,7 +61,7 @@
       },
       {
         "serial_number": "temp-1234",
-        "items": [
+        "calls": [
           {
             "function_name": "start_set_temperature",
             "kwargs": {
@@ -80,7 +80,7 @@
     "magdeck": [
       {
         "serial_number": "mag-123",
-        "items": [
+        "calls": [
           {
             "function_name": "engage",
             "kwargs": {
