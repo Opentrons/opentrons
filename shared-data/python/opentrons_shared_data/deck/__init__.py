@@ -112,6 +112,6 @@ def generate_schema(version: int) -> str:
         5: v5.DeckDefinitionV5,
     }
 
-    raw_json_schema = version_map[version].schema_json()
+    raw_json_schema = version_map[version]().schema_json()
     schema_as_dict = json.loads(raw_json_schema)
     return json.dumps(schema_as_dict, indent=2)

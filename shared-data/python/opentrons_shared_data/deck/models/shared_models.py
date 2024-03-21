@@ -1,8 +1,19 @@
-from typing import List, Literal, Dict, Tuple, Optional, Union, Any, TYPE_CHECKING
+from typing import (
+    List,
+    Literal,
+    Dict,
+    Tuple,
+    Optional,
+    Union,
+    Any,
+    TYPE_CHECKING,
+)
 from pydantic import BaseModel, conint, confloat, validator
+from abc import ABC
 
 
 from opentrons_shared_data.module.dev_types import ModuleType
+from ..constants import DeckVersionType
 from ..dev_types import RobotModel
 
 
@@ -12,6 +23,7 @@ if TYPE_CHECKING:
 else:
     _StrictNonNegativeInt = conint(strict=True, ge=0)
     _StrictNonNegativeFloat = confloat(strict=True, ge=0.0)
+
 
 UnitVectorVal = Literal[1, -1]
 UnitVector = Tuple[UnitVectorVal, UnitVectorVal, UnitVectorVal]
@@ -81,9 +93,9 @@ class GripperOffsets(BaseModel):
     dropOffset: AxisOffset
 
 
-class DeckDefinition(BaseModel):
+class DeckDefinition(BaseModel, ABC):
     otId: str
-    schemaVersion: Literal[3, 4, 5]
+    schemaVersion: DeckVersionType
     cornerOffsetFromOrigin: Position
     dimensions: Position
     metadata: Metadata
