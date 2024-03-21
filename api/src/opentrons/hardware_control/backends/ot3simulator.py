@@ -64,6 +64,8 @@ from opentrons.util.async_helpers import ensure_yield
 from .types import HWStopCondition
 from .flex_protocol import FlexBackend
 
+from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
+
 log = logging.getLogger(__name__)
 
 AXIS_TO_SUBSYSTEM = {
@@ -344,7 +346,8 @@ class OT3Simulator(FlexBackend):
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        log_pressure: bool = True,
+        output_format: OutputOptions = OutputOptions.none,
+        data_file: Optional[str] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,

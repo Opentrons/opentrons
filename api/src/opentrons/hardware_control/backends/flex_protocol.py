@@ -40,6 +40,7 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from ..dev_types import OT3AttachedInstruments
 from .types import HWStopCondition
+from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
 
 Cls = TypeVar("Cls")
 
@@ -146,7 +147,8 @@ class FlexBackend(Protocol):
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        log_pressure: bool = True,
+        output_format: OutputOptions = OutputOptions.none,
+        data_file: Optional[str] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,

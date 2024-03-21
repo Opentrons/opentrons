@@ -93,6 +93,8 @@ from opentrons_shared_data.errors.exceptions import (
 
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 
+from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
+
 
 @pytest.fixture
 def mock_config() -> OT3Config:
@@ -176,7 +178,7 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         plunger_speed=10,
         sensor_threshold_pascals=15,
         expected_liquid_height=109,
-        log_pressure=False,
+        output_option=OutputOptions.none,
         aspirate_while_sensing=False,
         auto_zero_sensor=False,
         num_baseline_reads=8,
@@ -715,7 +717,7 @@ async def test_liquid_probe(
         mount_speed=fake_liquid_settings.mount_speed,
         plunger_speed=fake_liquid_settings.plunger_speed,
         threshold_pascals=fake_liquid_settings.sensor_threshold_pascals,
-        log_pressure=fake_liquid_settings.log_pressure,
+        output_option=fake_liquid_settings.output_option,
     )
     move_groups = (mock_move_group_run.call_args_list[0][0][0]._move_groups)[0][0]
     head_node = axis_to_node(Axis.by_mount(mount))

@@ -1351,11 +1351,19 @@ class OT3Controller(FlexBackend):
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        log_pressure: bool = True,
+        output_option: OutputOptions = OutputOptions.none,
+        data_file: Optional[str] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> float:
+        if output_option == OutputOptions.sync_buffer_to_csv:
+            assert (
+                self._subsystem_manager.device_info[
+                    SubSystem.of_mount(mount)
+                ].revision.tertiary
+                == "1"
+            )
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
         positions = await liquid_probe(
@@ -1366,8 +1374,8 @@ class OT3Controller(FlexBackend):
             plunger_speed=plunger_speed,
             mount_speed=mount_speed,
             threshold_pascals=threshold_pascals,
-            output_format=OutputOptions.none,
-            data_file=None,
+            output_option=output_option,
+            data_file=data_file,
             auto_zero_sensor=auto_zero_sensor,
             num_baseline_reads=num_baseline_reads,
             sensor_id=sensor_id_for_instrument(probe),
