@@ -21,7 +21,6 @@ class ModuleCall:
     kwargs: Dict[str, Any] = field(default_factory=dict)
 
 
-# Name and kwargs for a module function
 @dataclass(frozen=True)
 class ModuleItem:
     serial_number: str
