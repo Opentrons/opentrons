@@ -41,27 +41,6 @@ CALIBRATION_SQUARE_EDGES: Dict[str, Offset] = {
 }
 
 
-@overload
-def load(name: str, version: "DeckSchemaVersion5") -> "DeckDefinitionV5":
-    ...
-
-
-@overload
-def load(name: str, version: "DeckSchemaVersion4") -> "DeckDefinitionV4":
-    ...
-
-
-@overload
-def load(name: str, version: "DeckSchemaVersion3") -> "DeckDefinitionV3":
-    ...
-
-
-def load(name: str, version: int = DEFAULT_DECK_DEFINITION_VERSION) -> "DeckDefinition":
-    return json.loads(  # type: ignore[no-any-return]
-        load_shared_data(f"deck/definitions/{version}/{name}.json")
-    )
-
-
 def load_schema(version: int) -> "DeckSchema":
     return cast(
         "DeckSchema", json.loads(load_shared_data(f"deck/schemas/{version}.json"))
@@ -115,3 +94,4 @@ def generate_schema(version: int) -> str:
     raw_json_schema = version_map[version]().schema_json()
     schema_as_dict = json.loads(raw_json_schema)
     return json.dumps(schema_as_dict, indent=2)
+

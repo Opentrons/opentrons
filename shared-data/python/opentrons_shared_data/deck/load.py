@@ -1,4 +1,4 @@
-from typing import Dict, Type
+from typing import Dict, Type, overload
 import json
 from pathlib import Path
 import pydantic
@@ -31,6 +31,18 @@ class InvalidDeckDefinition(Exception):
 
     pass
 
+
+@overload
+def load(name: str, version: DeckVersionType = DECK_DEF_V5) -> DeckDefinitionV5:
+    ...
+
+@overload
+def load(name: str, version: DeckVersionType = DECK_DEF_V4) -> DeckDefinitionV4:
+    ...
+
+@overload
+def load(name: str, version: DeckVersionType = DECK_DEF_V3) -> DeckDefinitionV3:
+    ...
 
 def load(
     name: str, version: DeckVersionType = DEFAULT_DECK_DEFINITION_VERSION

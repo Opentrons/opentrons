@@ -45,7 +45,7 @@ class AddressableArea(BasicInfoModel):
 
 
 class CutoutFixture(v4.CutoutFixture):
-    fixtureGroup: List[str] | None = None
+    fixtureGroup: List[str]
 
 
 class LocationsV5(BaseModel):
