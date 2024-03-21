@@ -515,6 +515,7 @@ def _convert_row_to_run(
             for action_row in action_rows
         ]
     except Exception as be:
+        _log.warning("Error reading actions for run ID {run_id}:", exc_info=True)
         return BadRunResource(
             ok=False,
             run_id=run_id,
