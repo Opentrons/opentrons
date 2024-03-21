@@ -15,7 +15,7 @@ from robot_server.runs.run_store import (
     RunStore,
     RunResource,
     CommandNotFoundError,
-    BadStateSummary
+    BadStateSummary,
 )
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType

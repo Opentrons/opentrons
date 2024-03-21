@@ -31,7 +31,7 @@ class RunLoadingError(ErrorDetails):
         "Run Loading Error",
         description="A short, human readable name for this type of error",
     )
-    id: Literal['RunLoadingError'] = "RunLoadingError"
+    id: Literal["RunLoadingError"] = "RunLoadingError"
 
 
 # TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,

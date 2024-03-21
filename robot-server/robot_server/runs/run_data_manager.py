@@ -22,7 +22,6 @@ from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
 from .run_models import Run, BadRun, RunLoadingError
 
 from opentrons.protocol_engine.types import DeckConfigurationType
-from opentrons.protocol_engine import ErrorOccurrence
 
 
 def _build_run(
