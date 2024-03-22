@@ -225,6 +225,10 @@
     "4007": {
       "detail": "API Command is misconfigured",
       "category": "generalError"
+    },
+    "4008": {
+      "detail": "Invalid stored data",
+      "category": "generalError"
     }
   }
 }

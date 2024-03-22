@@ -31,6 +31,8 @@ interface ChipProps extends StyleProps {
   text: string
   /** name constant of the text color and the icon color to display */
   type: ChipType
+  /** has icon */
+  hasIcon?: boolean
 }
 
 const CHIP_PROPS_BY_TYPE: Record<
@@ -81,13 +83,15 @@ const CHIP_PROPS_BY_TYPE: Record<
   },
 }
 
-export function Chip({
-  background,
-  iconName,
-  type,
-  text,
-  ...styleProps
-}: ChipProps): JSX.Element {
+export function Chip(props: ChipProps): JSX.Element {
+  const {
+    background,
+    iconName,
+    type,
+    text,
+    hasIcon = true,
+    ...styleProps
+  } = props
   const backgroundColor =
     background === false && type !== 'basic'
       ? COLORS.transparent
@@ -106,7 +110,7 @@ export function Chip({
       data-testid={`Chip_${type}`}
       {...styleProps}
     >
-      {type !== 'basic' && (
+      {type !== 'basic' && hasIcon ? (
         <Icon
           name={icon}
           color={CHIP_PROPS_BY_TYPE[type].iconColor}
@@ -114,7 +118,7 @@ export function Chip({
           size="1.5rem"
           data-testid="RenderResult_icon"
         />
-      )}
+      ) : null}
       <StyledText
         fontSize={TYPOGRAPHY.fontSize22}
         lineHeight={TYPOGRAPHY.lineHeight28}

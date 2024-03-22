@@ -16,6 +16,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     actions as pe_actions,
 )
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.resources import (
     ModuleDataProvider,
     pipette_data_provider,
@@ -158,6 +159,7 @@ def test_map_after_with_error_command() -> None:
                 LegacyContextCommandError,
                 match="oh no",
             ),
+            type=ErrorRecoveryType.FAIL_RUN,
         )
     ]
 
@@ -251,6 +253,7 @@ def test_command_stack() -> None:
             error_id=matchers.IsA(str),
             failed_at=matchers.IsA(datetime),
             error=matchers.ErrorMatching(LegacyContextCommandError, "oh no"),
+            type=ErrorRecoveryType.FAIL_RUN,
         ),
     ]
 

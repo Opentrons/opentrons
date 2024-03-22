@@ -103,11 +103,16 @@ def module_model_from_string(model_string: str) -> ModuleModel:
     raise ValueError(f"No such module model {model_string}")
 
 
-@dataclass
+@dataclass(kw_only=True)
 class ModuleAtPort:
     port: str
     name: str
     usb_port: USBPort = USBPort(name="", port_number=0)
+
+
+@dataclass(kw_only=True)
+class SimulatingModuleAtPort(ModuleAtPort):
+    serial_number: str
 
 
 class BundledFirmware(NamedTuple):

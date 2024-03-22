@@ -11,10 +11,13 @@ TEMP_DECK_MODELS = {
 
 
 class SimulatingDriver(AbstractTempDeckDriver):
-    def __init__(self, sim_model: Optional[str] = None):
+    def __init__(
+        self, sim_model: Optional[str] = None, serial_number: Optional[str] = None
+    ):
         self._temp = Temperature(target=None, current=0)
         self._port: Optional[str] = None
         self._model = TEMP_DECK_MODELS[sim_model] if sim_model else "temp_deck_v1.1"
+        self._serial_number = serial_number
 
     @ensure_yield
     async def set_temperature(self, celsius: float) -> None:
@@ -48,7 +51,7 @@ class SimulatingDriver(AbstractTempDeckDriver):
     @ensure_yield
     async def get_device_info(self) -> Dict[str, str]:
         return {
-            "serial": "dummySerialTD",
+            "serial": self._serial_number if self._serial_number else "dummySerialTD",
             "model": self._model,
             "version": "dummyVersionTD",
         }

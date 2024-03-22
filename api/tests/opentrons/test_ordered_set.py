@@ -145,3 +145,13 @@ def test_difference() -> None:
     b = {1, 9}
 
     assert (a - OrderedSet(b)) == (a - b) == OrderedSet([3, 4, 5, 2, 6, 5, 3, 5, 8, 7])
+
+
+def test_repr() -> None:
+    """It should return a meaningful repr string."""
+    subject = OrderedSet([1, 2, 3])
+    result = repr(subject)
+    assert "OrderedSet" in result
+    assert "1" in result
+    assert "2" in result
+    assert "3" in result

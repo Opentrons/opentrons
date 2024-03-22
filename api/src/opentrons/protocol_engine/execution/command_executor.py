@@ -11,6 +11,8 @@ from opentrons_shared_data.errors.exceptions import (
     PythonException,
 )
 
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+
 from ..state import StateStore
 from ..resources import ModelUtils
 from ..commands import (
@@ -82,6 +84,7 @@ class CommandExecutor:
         run_control: RunControlHandler,
         rail_lights: RailLightsHandler,
         status_bar: StatusBarHandler,
+        error_recovery_policy: ErrorRecoveryPolicy,
         model_utils: Optional[ModelUtils] = None,
         command_note_tracker_provider: Optional[CommandNoteTrackerProvider] = None,
     ) -> None:
@@ -102,6 +105,7 @@ class CommandExecutor:
         self._command_note_tracker_provider = (
             command_note_tracker_provider or _NoteTracker
         )
+        self._error_recovery_policy = error_recovery_policy
 
     async def execute(self, command_id: str) -> None:
         """Run a given command's execution procedure.
@@ -177,6 +181,17 @@ class CommandExecutor:
                     command_id=command_id,
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
+                    # todo(mm, 2024-03-13):
+                    # When a command fails recoverably, and we handle it with
+                    # WAIT_FOR_RECOVERY or CONTINUE, we want to update our logical
+                    # protocol state as if the command succeeded. (e.g. if a tip
+                    # pickup failed, pretend that it succeeded and that the tip is now
+                    # on the pipette.) However, this currently does the opposite,
+                    # acting as if the command never executed.
+                    type=self._error_recovery_policy(
+                        running_command,
+                        error,
+                    ),
                 )
             )
         else:

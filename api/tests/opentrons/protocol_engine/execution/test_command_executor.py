@@ -10,6 +10,10 @@ from pydantic import BaseModel
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.error_recovery_policy import (
+    ErrorRecoveryPolicy,
+    ErrorRecoveryType,
+)
 from opentrons.protocol_engine.errors.exceptions import (
     EStopActivatedError as PE_EStopActivatedError,
 )
@@ -132,6 +136,12 @@ def command_note_tracker_provider(decoy: Decoy) -> CommandNoteTrackerProvider:
     return decoy.mock(cls=CommandNoteTrackerProvider)
 
 
+@pytest.fixture
+def error_recovery_policy(decoy: Decoy) -> ErrorRecoveryPolicy:
+    """Get a mock error recovery policy."""
+    return decoy.mock(cls=ErrorRecoveryPolicy)
+
+
 def get_next_tracker(
     decoy: Decoy, provider: CommandNoteTrackerProvider
 ) -> CommandNoteTracker:
@@ -169,6 +179,7 @@ def subject(
     status_bar: StatusBarHandler,
     model_utils: ModelUtils,
     command_note_tracker_provider: CommandNoteTrackerProvider,
+    error_recovery_policy: ErrorRecoveryPolicy,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
     return CommandExecutor(
@@ -186,6 +197,7 @@ def subject(
         rail_lights=rail_lights,
         status_bar=status_bar,
         command_note_tracker_provider=command_note_tracker_provider,
+        error_recovery_policy=error_recovery_policy,
     )
 
 
@@ -357,6 +369,7 @@ async def test_execute_raises_protocol_engine_error(
     model_utils: ModelUtils,
     subject: CommandExecutor,
     command_note_tracker: CommandNoteTracker,
+    error_recovery_policy: ErrorRecoveryPolicy,
     command_error: Exception,
     expected_error: Any,
     unexpected_error: bool,
@@ -430,6 +443,10 @@ async def test_execute_raises_protocol_engine_error(
         datetime(year=2023, month=3, day=3),
     )
 
+    decoy.when(error_recovery_policy(matchers.Anything(), expected_error)).then_return(
+        ErrorRecoveryType.WAIT_FOR_RECOVERY
+    )
+
     await subject.execute("command-id")
 
     decoy.verify(
@@ -442,6 +459,7 @@ async def test_execute_raises_protocol_engine_error(
                 error_id="error-id",
                 failed_at=datetime(year=2023, month=3, day=3),
                 error=expected_error,
+                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
             )
         ),
     )
@@ -588,6 +606,7 @@ async def test_executor_forwards_notes_on_command_failure(
     model_utils: ModelUtils,
     subject: CommandExecutor,
     command_note_tracker: CommandNoteTracker,
+    error_recovery_policy: ErrorRecoveryPolicy,
 ) -> None:
     """It should handle an error occuring during execution."""
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
@@ -668,6 +687,9 @@ async def test_executor_forwards_notes_on_command_failure(
         datetime(year=2022, month=2, day=2),
         datetime(year=2023, month=3, day=3),
     )
+    decoy.when(
+        error_recovery_policy(matchers.Anything(), matchers.Anything())
+    ).then_return(ErrorRecoveryType.WAIT_FOR_RECOVERY)
     decoy.when(command_note_tracker.get_notes()).then_return(command_notes)
 
     await subject.execute("command-id")
@@ -685,6 +707,7 @@ async def test_executor_forwards_notes_on_command_failure(
                 error_id="error-id",
                 failed_at=datetime(year=2023, month=3, day=3),
                 error=matchers.ErrorMatching(PythonException, match="oh no"),
+                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
             )
         ),
     )

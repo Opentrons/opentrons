@@ -82,14 +82,14 @@ import {
   ANALYTICS_PROTOCOL_RUN_START,
   useTrackEvent,
 } from '../../redux/analytics'
-import { getIsHeaterShakerAttached } from '../../redux/config'
+import { getIsHeaterShakerAttached, useFeatureFlag } from '../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
 import { useNotifyRunQuery } from '../../resources/runs'
-import { ProtocolSetupParameters } from '../../organisms/ProtocolSetupParameters'
+import { ViewOnlyParameters } from '../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
@@ -257,7 +257,8 @@ function PrepareToRun({
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
-
+  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
+  const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
   // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
@@ -622,6 +623,12 @@ function PrepareToRun({
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
 
+  //  TODO(Jr, 3/20/24): wire up custom values
+  const hasCustomValues = false
+  const parametersDetail = hasCustomValues
+    ? t('custom_values')
+    : t('default_values')
+
   return (
     <>
       {/* Empty box to detect scrolling */}
@@ -723,6 +730,20 @@ function PrepareToRun({
               disabled={lpcDisabledReason != null}
               disabledReason={lpcDisabledReason}
             />
+            {enableRunTimeParametersFF ? (
+              <ProtocolSetupStep
+                onClickSetupStep={() => setSetupScreen('view only parameters')}
+                title={t('parameters')}
+                detail={t(
+                  hasRunTimeParameters
+                    ? parametersDetail
+                    : t('no_parameters_specified')
+                )}
+                subDetail={null}
+                status="general"
+                disabled={!hasRunTimeParameters}
+              />
+            ) : null}
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('labware')}
               title={t('labware')}
@@ -763,13 +784,13 @@ function PrepareToRun({
 }
 
 export type SetupScreens =
-  | 'run time parameters'
   | 'prepare to run'
   | 'instruments'
   | 'modules'
   | 'labware'
   | 'liquids'
   | 'deck configuration'
+  | 'view only parameters'
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
@@ -778,7 +799,6 @@ export function ProtocolSetup(): JSX.Element {
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
-  const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
 
   const handleProceedToRunClick = (): void => {
     trackEvent({
@@ -805,12 +825,9 @@ export function ProtocolSetup(): JSX.Element {
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
-    hasRunTimeParameters ? 'run time parameters' : 'prepare to run'
+    'prepare to run'
   )
   const setupComponentByScreen = {
-    'run time parameters': (
-      <ProtocolSetupParameters runId={runId} setSetupScreen={setSetupScreen} />
-    ),
     'prepare to run': (
       <PrepareToRun
         runId={runId}
@@ -844,6 +861,9 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         providedFixtureOptions={providedFixtureOptions}
       />
+    ),
+    'view only parameters': (
+      <ViewOnlyParameters runId={runId} setSetupScreen={setSetupScreen} />
     ),
   }
 
