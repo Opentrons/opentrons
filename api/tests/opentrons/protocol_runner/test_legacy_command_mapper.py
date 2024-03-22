@@ -70,7 +70,7 @@ def test_map_before_command() -> None:
     result = subject.map_command(legacy_command)
 
     assert result == [
-        pe_actions.UpdateCommandAction(
+        pe_actions.SucceedCommandAction(
             private_result=None,
             command=pe_commands.Custom.construct(
                 id="command.COMMENT-0",
@@ -110,7 +110,7 @@ def test_map_after_command() -> None:
     result = subject.map_command(legacy_command_end)
 
     assert result == [
-        pe_actions.UpdateCommandAction(
+        pe_actions.SucceedCommandAction(
             private_result=None,
             command=pe_commands.Custom.construct(
                 id="command.COMMENT-0",
@@ -204,7 +204,7 @@ def test_command_stack() -> None:
     ]
 
     assert result == [
-        pe_actions.UpdateCommandAction(
+        pe_actions.SucceedCommandAction(
             private_result=None,
             command=pe_commands.Custom.construct(
                 id="command.COMMENT-0",
@@ -218,7 +218,7 @@ def test_command_stack() -> None:
                 ),
             ),
         ),
-        pe_actions.UpdateCommandAction(
+        pe_actions.SucceedCommandAction(
             private_result=None,
             command=pe_commands.Custom.construct(
                 id="command.COMMENT-1",
@@ -232,7 +232,7 @@ def test_command_stack() -> None:
                 ),
             ),
         ),
-        pe_actions.UpdateCommandAction(
+        pe_actions.SucceedCommandAction(
             private_result=None,
             command=pe_commands.Custom.construct(
                 id="command.COMMENT-0",
@@ -444,7 +444,7 @@ def test_map_pause() -> None:
     ]
 
     assert result == [
-        pe_actions.UpdateCommandAction(
+        pe_actions.SucceedCommandAction(
             private_result=None,
             command=pe_commands.WaitForResume.construct(
                 id="command.PAUSE-0",
@@ -455,7 +455,7 @@ def test_map_pause() -> None:
                 params=pe_commands.WaitForResumeParams(message="hello world"),
             ),
         ),
-        pe_actions.UpdateCommandAction(
+        pe_actions.SucceedCommandAction(
             private_result=None,
             command=pe_commands.WaitForResume.construct(
                 id="command.PAUSE-0",

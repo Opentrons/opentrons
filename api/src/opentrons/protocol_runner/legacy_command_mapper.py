@@ -48,7 +48,6 @@ class LegacyContextCommandError(ProtocolEngineError):
     """An error returned when a PAPIv2 ProtocolContext command fails."""
 
     def __init__(self, wrapping_exc: BaseException) -> None:
-
         if isinstance(wrapping_exc, EnumeratedError):
             super().__init__(
                 wrapping_exc.code,
@@ -145,13 +144,19 @@ class LegacyCommandMapper:
         if stage == "before":
             count = self._command_count[command_type]
             command_id = f"{command_type}-{count}"
-            engine_command = self._build_initial_command(command, command_id, now)
+            running_command = self._build_initial_command(command, command_id, now)
 
             self._command_count[command_type] = count + 1
-            self._commands_by_broker_id[broker_id] = engine_command
+            self._commands_by_broker_id[broker_id] = running_command
 
+            # TODO
+            # results.append(pe_actions.QueueCommandAction(
+            #     command_id=command_id,
+            #     created_at=running_command.createdAt,
+            #     request=
+            # )
             results.append(
-                pe_actions.UpdateCommandAction(engine_command, private_result=None)
+                pe_actions.RunCommandAction(running_command, private_result=None)
             )
 
         elif stage == "after":
@@ -231,8 +236,9 @@ class LegacyCommandMapper:
                             "completedAt": now,
                         }
                     )
+                # TODO
                 results.append(
-                    pe_actions.UpdateCommandAction(
+                    pe_actions.SucceedCommandAction(
                         completed_command, private_result=None
                     )
                 )
@@ -273,14 +279,13 @@ class LegacyCommandMapper:
         command: legacy_command_types.CommandMessage,
         command_id: str,
         now: datetime,
-    ) -> pe_commands.Command:
-        engine_command: pe_commands.Command
+    ) -> pe_commands.CommandCreate:
         if command["name"] == legacy_command_types.PICK_UP_TIP:
-            engine_command = self._build_pick_up_tip_command(
+            return self._build_pick_up_tip_create(
                 command=command, command_id=command_id, now=now
             )
         elif command["name"] == legacy_command_types.DROP_TIP:
-            engine_command = self._build_drop_tip_command(
+            return self._build_drop_tip_create(
                 command=command, command_id=command_id, now=now
             )
 
@@ -288,15 +293,15 @@ class LegacyCommandMapper:
             command["name"] == legacy_command_types.ASPIRATE
             or command["name"] == legacy_command_types.DISPENSE
         ):
-            engine_command = self._build_liquid_handling_command(
+            return self._build_liquid_handling_create(
                 command=command, command_id=command_id, now=now
             )
         elif command["name"] == legacy_command_types.BLOW_OUT:
-            engine_command = self._build_blow_out_command(
+            return self._build_blow_out_create(
                 command=command, command_id=command_id, now=now
             )
         elif command["name"] == legacy_command_types.PAUSE:
-            engine_command = pe_commands.WaitForResume.construct(
+            return pe_commands.WaitForResumeCreate.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
@@ -307,7 +312,7 @@ class LegacyCommandMapper:
                 ),
             )
         else:
-            engine_command = pe_commands.Custom.construct(
+            return pe_commands.CustomCreate.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
@@ -319,9 +324,7 @@ class LegacyCommandMapper:
                 ),
             )
 
-        return engine_command
-
-    def _build_drop_tip_command(
+    def _build_drop_tip_create(
         self,
         command: legacy_command_types.DropTipMessage,
         command_id: str,
@@ -348,7 +351,7 @@ class LegacyCommandMapper:
             ),
         )
 
-    def _build_pick_up_tip_command(
+    def _build_pick_up_tip_create(
         self,
         command: legacy_command_types.PickUpTipMessage,
         command_id: str,
@@ -377,7 +380,7 @@ class LegacyCommandMapper:
             ),
         )
 
-    def _build_liquid_handling_command(
+    def _build_liquid_handling_create(
         self,
         command: Union[
             legacy_command_types.AspirateMessage, legacy_command_types.DispenseMessage
@@ -469,7 +472,7 @@ class LegacyCommandMapper:
                 ),
             )
 
-    def _build_blow_out_command(
+    def _build_blow_out_create(
         self,
         command: legacy_command_types.BlowOutMessage,
         command_id: str,
