@@ -312,10 +312,17 @@ def test_map_instrument_load(decoy: Decoy) -> None:
         pipette_data_provider.get_pipette_static_config(pipette_dict)
     ).then_return(pipette_config)
 
-    result = LegacyCommandMapper().map_equipment_load(input)
+    [
+        result_queue,
+        result_run,
+        result_complete,
+    ] = LegacyCommandMapper().map_equipment_load(input)
+
     pipette_id_captor = matchers.Captor()
 
-    assert result[0] == pe_commands.LoadPipette.construct(
+    assert isinstance(result_complete, pe_actions.SucceedCommandAction)
+
+    assert result_complete.command == pe_commands.LoadPipette.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=pe_commands.CommandStatus.SUCCEEDED,
@@ -327,7 +334,7 @@ def test_map_instrument_load(decoy: Decoy) -> None:
         ),
         result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id_captor),
     )
-    assert result[1] == pe_commands.LoadPipettePrivateResult(
+    assert result_complete.private_result == pe_commands.LoadPipettePrivateResult(
         pipette_id="pipette-0",
         serial_number="fizzbuzz",
         config=pipette_config,
