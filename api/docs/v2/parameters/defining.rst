@@ -8,25 +8,43 @@ Defining Parameters
 
 To use parameters, you need to define them in :ref:`a separate function <add-parameters>` within your protocol. Each parameter definition has two main purposes: to specify acceptable values, and to inform the protocol user what the parameter does.
 
-Depending on the type of parameter, you'll need to specify some or all of the following.
+Depending on the :ref:`type of parameter <rtp-types>`, you'll need to specify some or all of the following.
 
 .. list-table::
    :header-rows: 1
 
-   * - Information
-     - Purpose
+   * - Attribute
+     - Details
    * - ``variable_name``
-     - A unique name for :ref:`referencing the parameter value <using-rtp>` elsewhere in the protocol.
+     -
+        - A unique name for :ref:`referencing the parameter value <using-rtp>` elsewhere in the protocol.
+        - Must meet the usual requirements for `naming objects in Python <https://docs.python.org/3/reference/lexical_analysis.html#identifiers>`__.
    * - ``display_name``
-     - A label for the parameter shown in the Opentrons App or on the touchscreen.
+     -
+        - A label for the parameter shown in the Opentrons App or on the touchscreen.
+        - Maximum 30 characters.
    * - ``description``
      - An optional longer explanation of what the parameter does, or how its values will affect the execution of the protocol.
    * - ``default``
      - The value the parameter will have if the user makes no changes to it during run setup.
    * - ``minimum`` and ``maximum``
-     - For numeric parameters only. Allows free entry of any value within the range (inclusive). Both values are required. Can't be used at the same time as ``choices``.
+     -
+       - For numeric parameters only.
+       - Allows free entry of any value within the range (inclusive).
+       - Both values are required.
+       - Can't be used at the same time as ``choices``.
    * - ``choices``
-     - For numeric or string parameters. Provides a fixed list of values to choose from. Each choice has its own display name and value. Can't be used at the same time as ``minimum`` and ``maximum``.
+     -
+       - For numeric or string parameters.
+       - Provides a fixed list of values to choose from.
+       - Each choice has its own display name and value.
+       - Can't be used at the same time as ``minimum`` and ``maximum``.
+   * - ``units``
+     -
+       - Optional, for numeric parameters only.
+       - Displays after the number during run setup.
+       - Does not affect the parameter's value or protocol execution.
+
 
 
 .. _add-parameters:
@@ -41,84 +59,120 @@ The examples on this page assume the following definition, which uses the argume
 .. code-block::
 
     def add_parameters(parameters: protocol_api.ProtocolContext.Parameters):
-    
+
 Within this function definition, call methods on ``parameters`` to define parameters. The next section demonstrates how each type of parameter has its own method.
+
+.. _rtp-types:
 
 Types of Parameters
 ===================
 
+The API supports four types of parameters: Boolean (:py:class:`bool`), integer (:py:class:`int`), floating point number (:py:class:`float`), and string (:py:class:`str`). It is not possible to mix types within a single parameter.
+
 Boolean Parameters
 ------------------
 
-Boolean parameters are ``True`` or ``False``. During setup, they appear as *On* or *Off*, respectively. 
+Boolean parameters are ``True`` or ``False`` only.
 
-An example boolean::
+.. code-block::
 
     parameters.add_bool(
         variable_name="dry_run",
         display_name="Dry Run",
-        default=False,
-        description="Skip incubation delays and shorten mix steps."
+        description="Skip incubation delays and shorten mix steps.",
+        default=False
     )
+
+During run setup, users can toggle between the two values. In the Opentrons App, Boolean parameters appear as a toggle switch. On the touchscreen, they appear as *On* or *Off*, for ``True`` and ``False`` respectively.
 
 .. versionadded:: 2.18
 
 Integer Parameters
 ------------------
 
-Enter an integer within a range or choose from a list of options.
+Integer parameters either accept a range of numbers or a list of numbers. You must specify one or the other; you can't prompt for any integer.
 
-An example integer::
+To specify a range, include ``minimum`` and ``maximum``.
+
+.. code-block::
 
     parameters.add_int(
         variable_name="sample_count",
         display_name="Sample count",
-        default=6,
-        minimum=1,
-        maximum=12,
-        description="How many samples to process."
+        description="How many samples to process.",
+        default=24,
+        minimum=8,
+        maximum=48
     )
+
+During run setup, the user can enter any integer value from the minimum up to the maximum. Entering a value outside of the range will show an error. At that point, they can correct their custom value or restore the default value.
+
+To specify a list of numbers, include ``choices``. Each choice is a dictionary with entries for display name and value. The display names let you briefly explain the effect each choice will have.
+
+.. code-block::
+
+    parameters.add_int(
+        variable_name="volume",
+        display_name="Aspirate volume",
+        description="How much to aspirate from each sample.",
+        default=20,
+        choices=[
+            {"display_name": "Low (10 µL)", "value": 10},
+            {"display_name": "Medium (20 µL)", "value": 20},
+            {"display_name": "High (50 µL)", "value": 50},
+        ],
+        unit="µL"
+    )
+
+During run setup, the user can choose from a menu of the provided choices.
 
 .. versionadded:: 2.18
 
 Float Parameters
 ----------------
 
-Enter a floating point number within a range or choose from a list of options.
+Float parameters either accept a range of numbers or a list of numbers. You must specify one or the other; you can't prompt for any floating point number.
 
-An example float with choices::
+Specifying a range or list is done exactly the same as in the integer examples above. The only difference is that all values must be floating point numbers.
+
+.. code-block::
 
     parameters.add_float(
         variable_name="volume",
         display_name="Aspirate volume",
-        default=20.0,
+        description="How much to aspirate from each sample.",
+        default=5.0,
         choices=[
-            {"display_name": "Low (10.0 µL)", "value": 10.0},
-            {"display_name": "Medium (20.0 µL)", "value": 20.0},
-            {"display_name": "High (50.0 µL)", "value": 50.0},
+            {"display_name": "Low (2.5 µL)", "value": 2.5},
+            {"display_name": "Medium (5 µL)", "value": 5.0},
+            {"display_name": "High (10 µL)", "value": 10.0},
         ],
-        description="How many microliters to aspirate from each sample.",
         unit="µL"
     )
+
+Remember, you can't mix types in a parameter. So values of ``2.5``, ``5.0``, and ``10.0`` are valid, but ``2.5``, ``5``, and ``10`` will raise an error.
 
 .. versionadded:: 2.18
 
 String Parameters
 -----------------
 
-Enumerated only. Choose from a list of predefined strings.
+String parameters only accept a list of values. You can't currently prompt for free text entry of a string value.
 
-An example string enumeration::
+To specify a list of strings, include ``choices``. Each choice is a dictionary with entries for display name and value. In most cases, the display name and value *will not* match. A common use for string display names is to provide an easy-to-read version of an API load name. You can also use them to briefly explain the effect each choice will have.
+
+.. code-block::
 
     parameters.add_str(
         variable_name="pipette",
-        display_name="Pipette Name",
+        display_name="Pipette type",
         choices=[
-            {"display_name": "1-Channel 50µL", "value": "flex_1channel_50"},
-            {"display_name": "8-Channel 50µL", "value": "flex_8channel_50"},
+            {"display_name": "1-Channel 50 µL", "value": "flex_1channel_50"},
+            {"display_name": "8-Channel 50 µL", "value": "flex_8channel_50"},
         ],
         default="flex_1channel_50",
-        description="What pipette to use during the protocol.",
     )
+
+During run setup, the user can choose from a menu of the provided choices.
 
 .. versionadded:: 2.18
