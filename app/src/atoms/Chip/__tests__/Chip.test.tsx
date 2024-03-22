@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
-import { BORDERS, COLORS } from '@opentrons/components'
+import { BORDERS, COLORS, SPACING } from '@opentrons/components'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { Chip } from '..'
 
@@ -40,6 +40,7 @@ describe('Chip', () => {
     expect(chipText).toHaveStyle(`color: ${COLORS.green60}`)
     const icon = screen.getByLabelText('icon_mockSuccess')
     expect(icon).toHaveStyle(`color: ${COLORS.green60}`)
+    expect(icon).toHaveStyle(`width: 1.5rem`)
   })
 
   it('should render text, icon, no bgcolor with success colors and bg false', () => {
@@ -191,5 +192,35 @@ describe('Chip', () => {
     }
     render(props)
     expect(screen.queryByText('icon_mockInfo')).not.toBeInTheDocument()
+  })
+
+  it('render text with smaller padding and smaller icon when chip size is small and background is false', () => {
+    props = {
+      background: false,
+      text: 'mockInfo',
+      type: 'info',
+      chipSize: 'small',
+    }
+    render(props)
+    const chip = screen.getByTestId('Chip_info')
+    expect(chip).toHaveStyle(`padding: ${SPACING.spacing4} 0`)
+    const icon = screen.getByLabelText('icon_mockInfo')
+    expect(icon).toHaveStyle(`width: 1.25rem`)
+  })
+
+  it('render text with smaller padding and smaller icon when chip size is small and background is true', () => {
+    props = {
+      background: true,
+      text: 'mockInfo',
+      type: 'info',
+      chipSize: 'small',
+    }
+    render(props)
+    const chip = screen.getByTestId('Chip_info')
+    expect(chip).toHaveStyle(
+      `padding: ${SPACING.spacing4} ${SPACING.spacing10}`
+    )
+    const icon = screen.getByLabelText('icon_mockInfo')
+    expect(icon).toHaveStyle(`width: 1.25rem`)
   })
 })
