@@ -2,7 +2,7 @@ metadata = {
     "protocolName": "Golden RTP Examples",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.17"}
+requirements = {"robotType": "Flex", "apiLevel": "2.18"}
 
 
 def add_parameters(parameters):
