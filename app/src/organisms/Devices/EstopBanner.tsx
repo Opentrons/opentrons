@@ -5,8 +5,8 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'

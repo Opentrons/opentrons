@@ -12,8 +12,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_FIXED,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { InputField } from '../../atoms/InputField'

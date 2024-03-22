@@ -9,9 +9,9 @@ import {
   Flex,
   Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
-  StyledText,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 

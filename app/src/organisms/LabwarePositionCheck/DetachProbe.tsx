@@ -4,8 +4,8 @@ import { css } from 'styled-components'
 import {
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import {

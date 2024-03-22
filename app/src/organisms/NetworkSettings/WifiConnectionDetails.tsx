@@ -4,17 +4,17 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SPACING,
+  Flex,
   Icon,
-  COLORS,
-  TYPOGRAPHY,
-  ALIGN_CENTER,
   JUSTIFY_CENTER,
-  BORDERS,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { MediumButton } from '../../atoms/buttons'

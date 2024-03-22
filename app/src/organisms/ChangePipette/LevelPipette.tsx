@@ -8,10 +8,10 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  TYPOGRAPHY,
   PrimaryButton,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { Mount } from '../../redux/pipettes/types'

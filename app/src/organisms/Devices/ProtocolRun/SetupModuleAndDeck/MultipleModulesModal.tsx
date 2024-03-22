@@ -3,18 +3,18 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
-  Flex,
-  Link,
-  Icon,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
-  PrimaryButton,
   ALIGN_FLEX_END,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_STRETCH,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  PrimaryButton,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'

@@ -1,11 +1,11 @@
 import * as React from 'react'
 import {
-  Flex,
-  DIRECTION_COLUMN,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 interface EmptySetupStepProps {

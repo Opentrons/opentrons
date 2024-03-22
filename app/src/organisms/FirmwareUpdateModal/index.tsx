@@ -2,15 +2,15 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
   Flex,
   Icon,
-  RESPONSIVENESS,
   JUSTIFY_CENTER,
-  COLORS,
+  RESPONSIVENESS,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,

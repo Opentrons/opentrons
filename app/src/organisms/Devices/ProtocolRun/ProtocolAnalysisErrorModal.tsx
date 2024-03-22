@@ -8,8 +8,8 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../App/portal'

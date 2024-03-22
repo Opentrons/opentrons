@@ -17,8 +17,8 @@ import {
   Link,
   PrimaryButton,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Slideout } from '../../../../../atoms/Slideout'

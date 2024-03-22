@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  Icon,
-  Flex,
+  ALIGN_CENTER,
   Box,
   DIRECTION_COLUMN,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
-  ALIGN_CENTER,
   SPACING,
   StyledText,
 } from '@opentrons/components'

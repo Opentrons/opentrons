@@ -4,8 +4,8 @@ import isEqual from 'lodash/isEqual'
 import {
   DIRECTION_COLUMN,
   Flex,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,

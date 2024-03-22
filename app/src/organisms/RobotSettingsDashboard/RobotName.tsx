@@ -2,11 +2,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   Btn,
   DIRECTION_COLUMN,
-  JUSTIFY_FLEX_START,
+  Flex,
   Icon,
+  JUSTIFY_FLEX_START,
   StyledText,
 } from '@opentrons/components'
 

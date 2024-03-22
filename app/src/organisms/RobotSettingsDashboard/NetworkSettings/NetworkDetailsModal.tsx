@@ -2,16 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  TYPOGRAPHY,
+  ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  ALIGN_CENTER,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  BORDERS,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Modal } from '../../../molecules/Modal'

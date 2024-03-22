@@ -3,23 +3,23 @@ import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { POSITION_AND_BLOWOUT } from './constants'
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  RESPONSIVENESS,
-  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_FLEX_END,
+  ALIGN_FLEX_START,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
+  RESPONSIVENESS,
   SecondaryButton,
   SPACING,
-  ALIGN_FLEX_START,
-  JUSTIFY_FLEX_END,
-  TYPOGRAPHY,
-  COLORS,
-  TEXT_ALIGN_CENTER,
-  Icon,
-  ALIGN_FLEX_END,
   StyledText,
+  TEXT_ALIGN_CENTER,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 // import { NeedHelpLink } from '../CalibrationPanels'
 import { SmallButton } from '../../atoms/buttons'

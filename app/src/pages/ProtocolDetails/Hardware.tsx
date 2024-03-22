@@ -9,9 +9,9 @@ import {
   LocationIcon,
   ModuleIcon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
-  StyledText,
 } from '@opentrons/components'
 import {
   GRIPPER_V1,

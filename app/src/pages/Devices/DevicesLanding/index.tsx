@@ -4,20 +4,20 @@ import { useSelector } from 'react-redux'
 import partition from 'lodash/partition'
 
 import {
+  ALIGN_CENTER,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
+  Link,
+  POSITION_ABSOLUTE,
   SIZE_6,
   SPACING,
-  COLORS,
-  Link,
-  TYPOGRAPHY,
-  POSITION_ABSOLUTE,
-  DISPLAY_FLEX,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {

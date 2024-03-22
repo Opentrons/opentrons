@@ -5,20 +5,20 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  Btn,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  POSITION_FIXED,
-  JUSTIFY_CENTER,
-  POSITION_RELATIVE,
-  POSITION_ABSOLUTE,
-  COLORS,
-  TYPOGRAPHY,
+  Flex,
   Icon,
-  Btn,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
+  POSITION_FIXED,
+  POSITION_RELATIVE,
+  SPACING,
+  TYPOGRAPHY,
   StyledText,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'

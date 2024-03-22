@@ -2,18 +2,18 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  Icon,
   ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
-  SIZE_1,
   BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  SIZE_1,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { useRunHasStarted } from '../hooks'

@@ -11,8 +11,8 @@ import {
   JUSTIFY_CENTER,
   SIZE_AUTO,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'

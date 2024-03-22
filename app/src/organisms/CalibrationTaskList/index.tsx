@@ -10,10 +10,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  SPACING,
-  TYPOGRAPHY,
   PrimaryButton,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StatusLabel } from '../../atoms/StatusLabel'

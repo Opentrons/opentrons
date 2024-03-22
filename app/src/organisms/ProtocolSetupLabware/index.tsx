@@ -19,8 +19,8 @@ import {
   LocationIcon,
   MODULE_ICON_NAME_BY_TYPE,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,

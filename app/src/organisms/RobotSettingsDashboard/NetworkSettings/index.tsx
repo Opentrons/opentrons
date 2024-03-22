@@ -3,17 +3,17 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  COLORS,
-  Icon,
-  Btn,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  TYPOGRAPHY,
   BORDERS,
+  Btn,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Chip } from '../../../atoms/Chip'

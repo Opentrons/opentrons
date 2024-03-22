@@ -5,15 +5,15 @@ import { Trans, useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 
 import {
-  SPACING,
-  Icon,
-  Flex,
   Box,
-  DIRECTION_COLUMN,
   COLORS,
-  TYPOGRAPHY,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
   SIZE_1,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { MiniCard } from '../../molecules/MiniCard'

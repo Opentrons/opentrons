@@ -6,12 +6,12 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  Icon,
   Flex,
-  SPACING,
-  TYPOGRAPHY,
+  Icon,
   RESPONSIVENESS,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
 import type { Subsystem } from '@opentrons/api-client'

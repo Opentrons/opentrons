@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  Icon,
-  RobotCoordsForeignObject,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
+  RobotCoordsForeignObject,
   SPACING,
   TYPOGRAPHY,
   StyledText,

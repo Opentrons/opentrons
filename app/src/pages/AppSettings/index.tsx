@@ -11,8 +11,8 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import * as Config from '../../redux/config'

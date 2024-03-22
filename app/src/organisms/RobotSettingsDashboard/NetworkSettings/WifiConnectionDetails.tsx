@@ -14,8 +14,8 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { NetworkDetailsModal } from './NetworkDetailsModal'

@@ -11,9 +11,9 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useOnClickOutside,
-  StyledText,
 } from '@opentrons/components'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'

@@ -32,8 +32,8 @@ import {
   SIZE_1,
   SIZE_5,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,

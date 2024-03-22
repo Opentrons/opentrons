@@ -10,8 +10,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,

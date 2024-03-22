@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
-  Link,
   JUSTIFY_CENTER,
-  TYPOGRAPHY,
+  Link,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'

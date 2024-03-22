@@ -3,15 +3,15 @@ import { createPortal } from 'react-dom'
 import snakeCase from 'lodash/snakeCase'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  DIRECTION_ROW,
-  SPACING,
-  PrimaryButton,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'

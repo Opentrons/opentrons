@@ -2,16 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
-  Icon,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { MediumButton } from '../../atoms/buttons'

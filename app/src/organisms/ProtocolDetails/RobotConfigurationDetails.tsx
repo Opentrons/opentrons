@@ -10,8 +10,8 @@ import {
   ModuleIcon,
   SIZE_1,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,

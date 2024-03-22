@@ -2,15 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   ALIGN_CENTER,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
   Box,
-  SPACING,
+  COLORS,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   SPACING_AUTO,
-  TYPOGRAPHY,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../../../atoms/buttons'

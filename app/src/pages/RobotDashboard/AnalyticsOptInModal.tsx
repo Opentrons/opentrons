@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  Flex,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   SPACING,
   StyledText,
 } from '@opentrons/components'

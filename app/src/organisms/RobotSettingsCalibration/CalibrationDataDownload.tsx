@@ -3,15 +3,15 @@ import { saveAs } from 'file-saver'
 import { useTranslation, Trans } from 'react-i18next'
 
 import {
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
-  Link,
-  ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
   SPACING,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,

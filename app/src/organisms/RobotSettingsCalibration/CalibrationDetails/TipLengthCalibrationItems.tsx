@@ -7,8 +7,8 @@ import {
   BORDERS,
   COLORS,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { useAttachedPipettes } from '../../../organisms/Devices/hooks'

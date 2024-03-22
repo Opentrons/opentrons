@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  TYPOGRAPHY,
-  Icon,
-  Flex,
-  SPACING,
-  Link,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
-  WRAP,
+  Link,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 
 const PROTOCOL_LIBRARY_URL = 'https://library.opentrons.com'

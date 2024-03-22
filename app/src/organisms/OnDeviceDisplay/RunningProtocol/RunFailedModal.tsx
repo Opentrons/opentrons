@@ -11,8 +11,8 @@ import {
   Flex,
   OVERFLOW_AUTO,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 

@@ -2,10 +2,10 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'

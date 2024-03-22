@@ -44,10 +44,10 @@ import {
   SecondaryButton,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useHoverTooltip,
-  StyledText,
 } from '@opentrons/components'
 
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'

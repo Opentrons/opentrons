@@ -3,20 +3,20 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
-  COLORS,
-  BORDERS,
-  Flex,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  SPACING,
-  Icon,
-  SIZE_1,
-  Link,
   ALIGN_CENTER,
-  useHoverTooltip,
-  TOOLTIP_LEFT,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SIZE_1,
+  SPACING,
   StyledText,
+  TOOLTIP_LEFT,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import {
   RUN_STATUS_IDLE,
@@ -222,13 +222,12 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             {...targetProps}
             role="button"
             css={css`
-            ${TYPOGRAPHY.darkLinkH4SemiBold}
-            &:hover {
-              color: ${downloadIsDisabled ? COLORS.grey40 : COLORS.black90};
-            }
-            cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
-          }
-          `}
+              ${TYPOGRAPHY.darkLinkH4SemiBold}
+              &:hover {
+                color: ${downloadIsDisabled ? COLORS.grey40 : COLORS.black90};
+              }
+              cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
+            `}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={onDownloadClick}
           >

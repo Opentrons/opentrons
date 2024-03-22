@@ -2,14 +2,14 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  Btn,
-  TYPOGRAPHY,
   ALIGN_START,
+  Btn,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Banner } from '../../../atoms/Banner'

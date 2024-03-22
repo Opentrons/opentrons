@@ -2,11 +2,11 @@ import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  Link,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Link,
   SPACING,
   StyledText,
 } from '@opentrons/components'

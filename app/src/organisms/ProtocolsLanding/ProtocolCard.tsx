@@ -28,9 +28,9 @@ import {
   SIZE_2,
   SIZE_3,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
-  StyledText,
 } from '@opentrons/components'
 
 import {

@@ -2,14 +2,14 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import {
-  Icon,
+  ALIGN_CENTER,
+  COLORS,
   DIRECTION_ROW,
   Flex,
-  COLORS,
-  ALIGN_CENTER,
-  SPACING,
-  SIZE_1,
+  Icon,
   PrimaryButton,
+  SIZE_1,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
 import { DETACH } from './constants'

@@ -2,18 +2,18 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import {
+  ALIGN_CENTER,
+  CheckboxField,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
-  TEXT_ALIGN_CENTER,
-  SPACING,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
   Link,
   PrimaryButton,
-  CheckboxField,
-  ALIGN_CENTER,
+  SPACING,
   StyledText,
+  TEXT_ALIGN_CENTER,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { updateConfigValue } from '../../redux/config'

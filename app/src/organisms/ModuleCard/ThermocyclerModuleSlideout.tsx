@@ -14,8 +14,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Slideout } from '../../atoms/Slideout'
 import { InputField } from '../../atoms/InputField'

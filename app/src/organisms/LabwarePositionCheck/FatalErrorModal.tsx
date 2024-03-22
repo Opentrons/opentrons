@@ -3,21 +3,21 @@ import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  Icon,
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  PrimaryButton,
-  SPACING,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  BORDERS,
-  TYPOGRAPHY,
+  PrimaryButton,
   RESPONSIVENESS,
-  TEXT_ALIGN_CENTER,
-  ALIGN_CENTER,
-  ALIGN_FLEX_END,
-  TEXT_TRANSFORM_CAPITALIZE,
+  SPACING,
   StyledText,
+  TEXT_ALIGN_CENTER,
+  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
 import { LegacyModalShell } from '../../molecules/LegacyModal'

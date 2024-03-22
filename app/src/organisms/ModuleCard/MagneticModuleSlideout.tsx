@@ -2,16 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
-  Flex,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  COLORS,
   BORDERS,
-  TYPOGRAPHY,
-  SPACING,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
   JUSTIFY_END,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,

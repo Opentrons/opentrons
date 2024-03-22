@@ -16,8 +16,8 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { LegacyModal } from '../../../molecules/LegacyModal'

@@ -11,8 +11,8 @@ import {
   JUSTIFY_FLEX_END,
   Link,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   RUN_STATUS_STOPPED,

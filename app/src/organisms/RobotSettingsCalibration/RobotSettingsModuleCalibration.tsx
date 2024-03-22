@@ -5,8 +5,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ModuleCalibrationItems } from './CalibrationDetails/ModuleCalibrationItems'

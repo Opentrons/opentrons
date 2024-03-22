@@ -2,16 +2,16 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  COLORS,
-  Flex,
-  SPACING,
-  TYPOGRAPHY,
   BORDERS,
-  WRAP,
-  Icon,
+  COLORS,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   LocationIcon,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { LiquidsLabwareDetailsModal } from '../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'

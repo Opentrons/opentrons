@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
 import {
-  Flex,
   ALIGN_CENTER,
-  SPACING,
-  COLORS,
-  TYPOGRAPHY,
   BORDERS,
+  COLORS,
+  Flex,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { OverflowMenu } from './OverflowMenu'

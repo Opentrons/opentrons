@@ -16,11 +16,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
+  StyledText,
   truncateString,
   TYPOGRAPHY,
   useHoverTooltip,
   useInterval,
-  StyledText,
 } from '@opentrons/components'
 
 import { QuaternaryButton } from '../../atoms/buttons'

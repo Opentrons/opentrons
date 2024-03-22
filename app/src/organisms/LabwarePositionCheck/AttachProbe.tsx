@@ -3,8 +3,8 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,

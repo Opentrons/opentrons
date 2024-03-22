@@ -9,8 +9,8 @@ import {
   Flex,
   Icon,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 export function NoParameter(): JSX.Element {

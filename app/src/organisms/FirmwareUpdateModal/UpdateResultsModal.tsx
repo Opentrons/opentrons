@@ -9,8 +9,8 @@ import {
   Flex,
   Icon,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'

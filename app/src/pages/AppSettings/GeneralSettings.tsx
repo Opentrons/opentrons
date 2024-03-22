@@ -16,9 +16,9 @@ import {
   Link,
   SPACING_AUTO,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useMountEffect,
-  StyledText,
 } from '@opentrons/components'
 
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'

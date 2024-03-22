@@ -5,17 +5,17 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
-  Box,
-  Flex,
-  Icon,
-  useInterval,
   ALIGN_CENTER,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
-  SPACING,
+  Flex,
+  Icon,
   SecondaryButton,
-  TYPOGRAPHY,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
+  useInterval,
 } from '@opentrons/components'
 
 import {

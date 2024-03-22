@@ -2,15 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
   SPACING,
-  TYPOGRAPHY,
-  COLORS,
-  BORDERS,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 export function DisplaySearchNetwork(): JSX.Element {

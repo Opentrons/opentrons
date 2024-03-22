@@ -8,10 +8,10 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TEXT_TRANSFORM_CAPITALIZE,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
-  StyledText,
 } from '@opentrons/components'
 
 const INTERVENTION_COMMAND_STYLE = css`

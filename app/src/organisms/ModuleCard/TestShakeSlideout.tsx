@@ -4,22 +4,22 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
-  Flex,
-  TYPOGRAPHY,
-  SPACING,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  Icon,
   DIRECTION_ROW,
-  SIZE_AUTO,
-  ALIGN_FLEX_START,
+  Flex,
+  Icon,
   Link,
-  useHoverTooltip,
-  ALIGN_CENTER,
-  useConditionalConfirm,
   PrimaryButton,
-  BORDERS,
+  SIZE_AUTO,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
+  useConditionalConfirm,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import {

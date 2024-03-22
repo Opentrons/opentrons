@@ -6,14 +6,14 @@ import last from 'lodash/last'
 
 import { GET, request } from '@opentrons/api-client'
 import {
-  Flex,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   Box,
-  SPACING,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   SPACING_AUTO,
-  TYPOGRAPHY,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 

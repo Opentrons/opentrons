@@ -4,15 +4,15 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  Flex,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  SPACING_AUTO,
   Box,
-  useHoverTooltip,
-  TYPOGRAPHY,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING_AUTO,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'

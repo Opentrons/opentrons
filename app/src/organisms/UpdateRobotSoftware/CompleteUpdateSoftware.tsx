@@ -2,16 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
-  COLORS,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  Box,
   BORDERS,
-  TYPOGRAPHY,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ProgressBar } from '../../atoms/ProgressBar'

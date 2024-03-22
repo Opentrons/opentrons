@@ -2,13 +2,13 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 
 import {
-  Box,
-  SPACING,
-  Flex,
   ALIGN_CENTER,
+  Box,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ToggleButton } from '../../../atoms/buttons'

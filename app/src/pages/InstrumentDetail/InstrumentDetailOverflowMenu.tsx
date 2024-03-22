@@ -3,12 +3,12 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
+  COLORS,
   Flex,
   Icon,
   SPACING,
-  TYPOGRAPHY,
-  COLORS,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,

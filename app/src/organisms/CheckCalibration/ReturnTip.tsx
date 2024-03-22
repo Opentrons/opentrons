@@ -1,11 +1,11 @@
 import * as React from 'react'
 import {
-  Flex,
-  PrimaryButton,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   ALIGN_STRETCH,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
 import uniq from 'lodash/uniq'

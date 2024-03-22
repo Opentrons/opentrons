@@ -2,17 +2,17 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
-  Icon,
-  COLORS,
-  Flex,
   Box,
+  COLORS,
   DIRECTION_ROW,
-  SPACING,
-  TYPOGRAPHY,
+  Flex,
+  Icon,
   JUSTIFY_FLEX_END,
   PrimaryButton,
   SecondaryButton,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAttachedModules } from '../hooks'
 import { LegacyModal } from '../../../molecules/LegacyModal'

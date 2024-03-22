@@ -2,17 +2,17 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  Btn,
   COLORS,
   Flex,
-  Btn,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
-  SPACING,
-  TYPOGRAPHY,
-  RESPONSIVENESS,
   PrimaryButton,
+  RESPONSIVENESS,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'

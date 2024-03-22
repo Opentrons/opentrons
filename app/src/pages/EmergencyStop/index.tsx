@@ -3,16 +3,16 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Icon,
-  Flex,
-  SPACING,
-  COLORS,
-  BORDERS,
-  DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  TYPOGRAPHY,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
 

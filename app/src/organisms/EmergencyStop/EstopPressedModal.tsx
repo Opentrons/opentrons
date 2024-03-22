@@ -14,8 +14,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'

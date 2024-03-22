@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { OT3_PIPETTES } from '@opentrons/shared-data'
 import { PipetteSelect } from '../../molecules/PipetteSelect'

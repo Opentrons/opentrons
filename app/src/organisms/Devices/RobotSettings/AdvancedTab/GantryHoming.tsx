@@ -3,12 +3,12 @@ import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  SPACING,
   Box,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  TYPOGRAPHY,
   StyledText,
 } from '@opentrons/components'
 

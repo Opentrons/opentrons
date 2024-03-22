@@ -2,15 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
   SPACING,
-  TYPOGRAPHY,
-  BORDERS,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import abstractImage from '../../../assets/images/on-device-display/empty_protocol_dashboard.png'

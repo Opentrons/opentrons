@@ -1,10 +1,10 @@
 import * as React from 'react'
 import {
+  BORDERS,
   Box,
   SPACING,
-  BORDERS,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 import { getWellLabel } from './helpers/labels'

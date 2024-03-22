@@ -10,8 +10,8 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Modal } from '../../../molecules/Modal'
 

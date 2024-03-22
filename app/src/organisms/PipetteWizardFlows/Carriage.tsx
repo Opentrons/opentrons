@@ -3,8 +3,8 @@ import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
 import {
   COLORS,
-  SPACING,
   PrimaryButton,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'

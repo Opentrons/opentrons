@@ -16,8 +16,8 @@ import {
   Link,
   SIZE_4,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,

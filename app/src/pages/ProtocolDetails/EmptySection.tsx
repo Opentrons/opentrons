@@ -1,15 +1,15 @@
 import * as React from 'react'
 import {
-  JUSTIFY_CENTER,
+  ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  JUSTIFY_CENTER,
   SPACING,
-  TYPOGRAPHY,
-  BORDERS,
-  ALIGN_CENTER,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 

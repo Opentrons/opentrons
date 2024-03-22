@@ -5,8 +5,8 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'

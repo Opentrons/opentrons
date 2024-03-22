@@ -19,9 +19,9 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   truncateString,
   TYPOGRAPHY,
-  StyledText,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,

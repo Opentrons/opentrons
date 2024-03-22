@@ -1,15 +1,15 @@
 import * as React from 'react'
 import {
-  Flex,
-  Icon,
-  Link,
+  ALIGN_CENTER,
   Box,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  TYPOGRAPHY,
+  Link,
   SIZE_1,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '../../../atoms/structure'
 

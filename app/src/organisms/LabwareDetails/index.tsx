@@ -17,10 +17,10 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   SIZE_1,
   SPACING,
+  StyledText,
   TOOLTIP_TOP_START,
   TYPOGRAPHY,
   useHoverTooltip,
-  StyledText,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
 import { Slideout } from '../../atoms/Slideout'

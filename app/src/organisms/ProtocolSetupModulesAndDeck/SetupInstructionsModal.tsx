@@ -9,8 +9,8 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
 

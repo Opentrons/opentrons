@@ -3,15 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { Link as RouterLink } from 'react-router-dom'
 
 import {
-  Flex,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
-  StyledText,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'

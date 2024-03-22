@@ -3,23 +3,23 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Flex,
   ALIGN_CENTER,
-  Icon,
-  SPACING,
-  COLORS,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
   BORDERS,
   Box,
-  MoveLabwareOnDeck,
-  Module,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_NONE,
+  Flex,
+  Icon,
   LabwareRender,
   LocationIcon,
-  DISPLAY_NONE,
+  Module,
+  MoveLabwareOnDeck,
   RESPONSIVENESS,
-  TEXT_TRANSFORM_UPPERCASE,
+  SPACING,
   StyledText,
+  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,

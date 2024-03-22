@@ -14,10 +14,10 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
+  TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
-  TOOLTIP_LEFT,
-  StyledText,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,

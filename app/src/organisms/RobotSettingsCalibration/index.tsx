@@ -3,9 +3,9 @@ import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  SpinnerModalPage,
   AlertModal,
   SPACING,
+  SpinnerModalPage,
   StyledText,
 } from '@opentrons/components'
 import {

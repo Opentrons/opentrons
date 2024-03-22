@@ -3,20 +3,20 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Box,
-  Flex,
   ALIGN_CENTER,
   ALIGN_START,
   BORDERS,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAuthorization } from '@opentrons/react-api-client'
 

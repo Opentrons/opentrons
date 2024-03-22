@@ -3,21 +3,21 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
   Btn,
-  Flex,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  RESPONSIVENESS,
-  JUSTIFY_SPACE_BETWEEN,
+  Flex,
   JUSTIFY_CENTER,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
-  useDeckLocationSelect,
+  RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
+  useDeckLocationSelect,
 } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 

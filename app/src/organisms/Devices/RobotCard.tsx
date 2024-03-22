@@ -5,8 +5,8 @@ import { useHistory } from 'react-router-dom'
 
 import {
   ALIGN_START,
-  Box,
   BORDERS,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -16,9 +16,9 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
-  StyledText,
 } from '@opentrons/components'
 import {
   getGripperDisplayName,

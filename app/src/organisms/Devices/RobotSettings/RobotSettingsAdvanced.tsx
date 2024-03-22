@@ -3,11 +3,11 @@ import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
-  Box,
-  SPACING,
-  Flex,
   ALIGN_CENTER,
+  Box,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  SPACING,
   TYPOGRAPHY,
   StyledText,
 } from '@opentrons/components'

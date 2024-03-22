@@ -2,16 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  COLORS,
-  SPACING,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  Icon,
-  TYPOGRAPHY,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 export function CheckUpdates(): JSX.Element {

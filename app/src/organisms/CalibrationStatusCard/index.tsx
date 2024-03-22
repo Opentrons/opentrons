@@ -3,18 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { Link as RouterLink } from 'react-router-dom'
 
 import {
-  Flex,
-  Link,
-  SPACING,
-  TYPOGRAPHY,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
   BORDERS,
   COLORS,
-  JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
-  ALIGN_CENTER,
+  Flex,
   JUSTIFY_CENTER,
-  ALIGN_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'

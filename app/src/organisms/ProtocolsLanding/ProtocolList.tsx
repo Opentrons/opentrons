@@ -4,21 +4,21 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Box,
-  Flex,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  DIRECTION_ROW,
-  Icon,
-  TYPOGRAPHY,
   BORDERS,
-  POSITION_ABSOLUTE,
+  Box,
   COLORS,
-  SecondaryButton,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
   Overlay,
+  POSITION_ABSOLUTE,
+  SecondaryButton,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import {

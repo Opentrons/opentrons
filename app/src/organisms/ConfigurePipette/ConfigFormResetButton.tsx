@@ -3,10 +3,10 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
-  TYPOGRAPHY,
   SecondaryButton,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
 

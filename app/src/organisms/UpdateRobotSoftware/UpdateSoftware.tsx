@@ -10,8 +10,8 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ProgressBar } from '../../atoms/ProgressBar'

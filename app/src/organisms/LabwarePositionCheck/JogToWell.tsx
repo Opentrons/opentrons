@@ -4,22 +4,22 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
-  RobotWorkSpace,
+  JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
   PipetteRender,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  SPACING,
-  COLORS,
-  WELL_LABEL_OPTIONS,
-  ALIGN_FLEX_START,
   PrimaryButton,
-  SecondaryButton,
-  TYPOGRAPHY,
   RESPONSIVENESS,
+  RobotWorkSpace,
+  SecondaryButton,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
+  WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import {
   getIsTiprack,

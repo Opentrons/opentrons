@@ -20,11 +20,11 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   TEXT_ALIGN_RIGHT,
   truncateString,
   TYPOGRAPHY,
   useConditionalConfirm,
-  StyledText,
 } from '@opentrons/components'
 import {
   useProtocolQuery,

@@ -2,18 +2,18 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 import {
-  Flex,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DISPLAY_FLEX,
+  Flex,
   JUSTIFY_SPACE_AROUND,
   SIZE_4,
   SPACING,
-  TYPOGRAPHY,
-  DISPLAY_FLEX,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { useCurrentRunId } from '../ProtocolUpload/hooks'

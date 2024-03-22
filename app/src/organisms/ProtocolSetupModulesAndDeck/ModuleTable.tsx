@@ -12,8 +12,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {

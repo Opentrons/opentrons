@@ -4,14 +4,14 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  SPACING,
-  POSITION_STICKY,
   POSITION_STATIC,
-  Box,
+  POSITION_STICKY,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'

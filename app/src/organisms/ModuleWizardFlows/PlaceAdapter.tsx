@@ -10,10 +10,10 @@ import Thermocycler_PlaceAdapter from '../../assets/videos/module_wizard_flows/T
 
 import {
   Flex,
-  TYPOGRAPHY,
-  SPACING,
   RESPONSIVENESS,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   CreateCommand,

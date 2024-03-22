@@ -7,10 +7,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  SPACING,
-  TYPOGRAPHY,
   JUSTIFY_FLEX_END,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   parseLiquidsInLoadOrder,

@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   DIRECTION_ROW,
-  TYPOGRAPHY,
-  SPACING,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  TYPOGRAPHY,
   StyledText,
 } from '@opentrons/components'
 

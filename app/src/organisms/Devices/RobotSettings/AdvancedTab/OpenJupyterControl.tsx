@@ -6,8 +6,8 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useTrackEvent,

@@ -3,14 +3,14 @@ import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  SPACING,
-  TYPOGRAPHY,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StepMeter } from '../../../atoms/StepMeter'

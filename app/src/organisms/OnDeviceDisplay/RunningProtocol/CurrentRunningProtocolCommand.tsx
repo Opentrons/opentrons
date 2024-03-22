@@ -14,8 +14,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 

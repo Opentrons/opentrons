@@ -12,8 +12,8 @@ import {
   POSITION_FIXED,
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 

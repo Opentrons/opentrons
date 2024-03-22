@@ -2,9 +2,9 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
+  DIRECTION_COLUMN,
   Flex,
   SPACING,
-  DIRECTION_COLUMN,
   StyledText,
 } from '@opentrons/components'
 

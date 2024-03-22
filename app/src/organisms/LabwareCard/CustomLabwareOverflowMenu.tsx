@@ -19,10 +19,10 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useOnClickOutside,
-  StyledText,
 } from '@opentrons/components'
 
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'

@@ -16,8 +16,8 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   RobotWorkSpace,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'

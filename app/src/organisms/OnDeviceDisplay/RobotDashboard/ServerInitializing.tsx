@@ -2,16 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  COLORS,
-  JUSTIFY_CENTER,
-  TYPOGRAPHY,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   Icon,
+  JUSTIFY_CENTER,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 export function ServerInitializing(): JSX.Element {

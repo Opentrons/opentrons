@@ -3,19 +3,19 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  BORDERS,
+  Box,
   Btn,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  JUSTIFY_FLEX_START,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
+  Flex,
   Icon,
-  Box,
-  TYPOGRAPHY,
-  COLORS,
-  BORDERS,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_START,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type { SetSettingOption } from '../../pages/RobotSettingsDashboard'

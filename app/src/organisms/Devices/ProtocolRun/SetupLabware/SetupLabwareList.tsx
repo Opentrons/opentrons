@@ -2,11 +2,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
+  DIRECTION_COLUMN,
   Flex,
   SPACING,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
 import { LabwareListItem } from './LabwareListItem'

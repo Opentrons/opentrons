@@ -8,8 +8,8 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 

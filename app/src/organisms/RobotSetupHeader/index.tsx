@@ -10,8 +10,8 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'

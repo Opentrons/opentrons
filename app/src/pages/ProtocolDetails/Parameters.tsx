@@ -6,9 +6,9 @@ import {
   COLORS,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
-  StyledText,
 } from '@opentrons/components'
 import { useToaster } from '../../organisms/ToasterOven'
 import { useRunTimeParameters } from '../Protocols/hooks'

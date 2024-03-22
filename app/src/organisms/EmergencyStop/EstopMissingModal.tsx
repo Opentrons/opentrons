@@ -8,8 +8,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'

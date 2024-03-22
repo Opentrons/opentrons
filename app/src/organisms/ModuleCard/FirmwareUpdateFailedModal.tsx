@@ -2,16 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
+  COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  JUSTIFY_FLEX_END,
-  SPACING,
-  DIRECTION_COLUMN,
   Icon,
-  COLORS,
-  TYPOGRAPHY,
+  JUSTIFY_FLEX_END,
   PrimaryButton,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
 

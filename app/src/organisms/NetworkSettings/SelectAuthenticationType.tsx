@@ -3,16 +3,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  COLORS,
-  SPACING,
   Btn,
-  JUSTIFY_CENTER,
-  TYPOGRAPHY,
+  COLORS,
+  DIRECTION_COLUMN,
   DISPLAY_FLEX,
+  Flex,
+  JUSTIFY_CENTER,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { RadioButton } from '../../atoms/buttons'

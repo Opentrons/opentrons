@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  DIRECTION_COLUMN,
   Box,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_FLEX_START,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import {

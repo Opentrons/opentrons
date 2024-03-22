@@ -4,15 +4,15 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  Flex,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  COLORS,
-  TYPOGRAPHY,
-  BORDERS,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '../../../organisms/ChildNavigation'

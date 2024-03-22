@@ -15,8 +15,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { Divider } from '../../../../atoms/structure'

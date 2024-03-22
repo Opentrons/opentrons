@@ -6,10 +6,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Link,
-  TYPOGRAPHY,
   PrimaryButton,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../App/portal'

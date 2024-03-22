@@ -4,13 +4,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import {
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   SPACING,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  COLORS,
-  BORDERS,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ChildNavigation } from '../../organisms/ChildNavigation'

@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
+  BORDERS,
   Box,
   COLORS,
-  BORDERS,
+  DIRECTION_COLUMN,
+  Flex,
   RoundTab,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
 

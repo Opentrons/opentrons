@@ -11,9 +11,9 @@ import {
   Flex,
   Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
-  StyledText,
 } from '@opentrons/components'
 import {
   parseLabwareInfoByLiquidId,

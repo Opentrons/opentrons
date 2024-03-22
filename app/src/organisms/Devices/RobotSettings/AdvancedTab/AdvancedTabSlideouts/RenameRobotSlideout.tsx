@@ -4,11 +4,11 @@ import { useHistory } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   PrimaryButton,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'

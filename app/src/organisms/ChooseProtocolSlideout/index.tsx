@@ -21,8 +21,8 @@ import {
   ProtocolDeck,
   SIZE_1,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'

@@ -13,8 +13,8 @@ import {
   Flex,
   Icon,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
 import { LiquidsListItemDetails } from '../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'

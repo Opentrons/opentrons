@@ -3,15 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { Redirect, useParams } from 'react-router-dom'
 
 import {
-  Box,
-  Flex,
-  DIRECTION_COLUMN,
-  SIZE_6,
   BORDERS,
+  Box,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SIZE_6,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useSelector } from 'react-redux'

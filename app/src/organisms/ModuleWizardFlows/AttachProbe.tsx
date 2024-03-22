@@ -11,8 +11,8 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'

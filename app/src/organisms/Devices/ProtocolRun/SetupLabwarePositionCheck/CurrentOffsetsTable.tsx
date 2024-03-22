@@ -9,14 +9,14 @@ import {
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 import {
-  Flex,
-  DIRECTION_COLUMN,
   BORDERS,
-  SPACING,
-  TYPOGRAPHY,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'

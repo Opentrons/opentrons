@@ -13,13 +13,12 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  IconProps,
   ModuleIcon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useHoverTooltip,
   useOnClickOutside,
-  StyledText,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
@@ -71,6 +70,7 @@ import { ErrorInfo } from './ErrorInfo'
 import { ModuleSetupModal } from './ModuleSetupModal'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
+import type { IconProps } from '@opentrons/components'
 import type {
   AttachedModule,
   HeaterShakerModule,

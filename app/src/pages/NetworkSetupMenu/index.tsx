@@ -2,15 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
+  ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
-  ALIGN_CENTER,
   DIRECTION_ROW,
-  TYPOGRAPHY,
+  Flex,
+  JUSTIFY_CENTER,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StepMeter } from '../../atoms/StepMeter'

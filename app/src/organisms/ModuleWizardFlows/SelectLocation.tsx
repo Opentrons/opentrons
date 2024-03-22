@@ -9,12 +9,12 @@ import {
   CutoutConfig,
 } from '@opentrons/shared-data'
 import {
-  RESPONSIVENESS,
-  TYPOGRAPHY,
-  SPACING,
-  SIZE_1,
   DeckLocationSelect,
+  RESPONSIVENESS,
+  SIZE_1,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'

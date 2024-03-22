@@ -8,8 +8,8 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'

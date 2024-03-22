@@ -8,14 +8,14 @@ import {
 } from '@opentrons/api-client'
 import {
   Box,
-  Flex,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SPACING,
-  TYPOGRAPHY,
+  Flex,
   LabwareRender,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Modal } from '../../../../molecules/Modal'
 import { getIsOnDevice } from '../../../../redux/config'

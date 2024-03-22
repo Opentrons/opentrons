@@ -2,15 +2,15 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_FLEX_END,
   Btn,
   COLORS,
-  RESPONSIVENESS,
-  TYPOGRAPHY,
-  SPACING,
   PrimaryButton,
+  RESPONSIVENESS,
   SecondaryButton,
-  ALIGN_FLEX_END,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getPipetteNameSpecs,

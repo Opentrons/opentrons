@@ -2,13 +2,13 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import {
-  Flex,
-  SPACING,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
-  TYPOGRAPHY,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { MediumButton } from '../../atoms/buttons'
 

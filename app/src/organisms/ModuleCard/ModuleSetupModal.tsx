@@ -4,15 +4,15 @@ import { createPortal } from 'react-dom'
 import code from '../../assets/images/module_instruction_code.png'
 import {
   ALIGN_FLEX_END,
-  Flex,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
-  PrimaryButton,
-  Icon,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   Link,
+  PrimaryButton,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'

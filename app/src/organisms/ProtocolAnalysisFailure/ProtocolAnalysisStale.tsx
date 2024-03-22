@@ -3,14 +3,14 @@ import { useDispatch } from 'react-redux'
 import { useTranslation, Trans } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   Btn,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP_REVERSE,
-  StyledText,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'

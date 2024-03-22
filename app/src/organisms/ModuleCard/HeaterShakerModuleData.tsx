@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
   COLORS,
   DIRECTION_COLUMN,
-  SPACING,
-  Icon,
   DIRECTION_ROW,
-  TYPOGRAPHY,
+  Flex,
+  Icon,
   SIZE_1,
-  WRAP,
+  SPACING,
   StyledText,
+  TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 import { StatusLabel } from '../../atoms/StatusLabel'
 import type {

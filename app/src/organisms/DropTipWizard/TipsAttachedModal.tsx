@@ -4,10 +4,10 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   COLORS,
-  SPACING,
   DIRECTION_COLUMN,
+  Flex,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
 

@@ -19,9 +19,9 @@ import {
   OVERFLOW_WRAP_BREAK_WORD,
   SIZE_2,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useLongPress,
-  StyledText,
 } from '@opentrons/components'
 import {
   useHost,

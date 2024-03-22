@@ -13,8 +13,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 import {

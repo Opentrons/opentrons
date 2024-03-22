@@ -1,19 +1,19 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  BORDERS,
-  SPACING,
-  JUSTIFY_CENTER,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  TYPOGRAPHY,
-  TOOLTIP_LEFT,
-  useHoverTooltip,
-  SecondaryButton,
-  PrimaryButton,
+  BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  PrimaryButton,
+  SecondaryButton,
+  SPACING,
   StyledText,
+  TOOLTIP_LEFT,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'

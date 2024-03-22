@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_FLEX_START,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   Icon,
   SIZE_1,
-  TYPOGRAPHY,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
   SPACING,
-  ALIGN_FLEX_START,
-  COLORS,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import heaterShakerModule from '../../../assets/images/heater_shaker_module_transparent.png'

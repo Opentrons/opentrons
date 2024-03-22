@@ -11,8 +11,8 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { Divider } from '../../atoms/structure'

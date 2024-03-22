@@ -2,18 +2,18 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
   Box,
   Btn,
-  Flex,
-  Icon,
-  ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  COLORS,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 interface SetupStepProps {

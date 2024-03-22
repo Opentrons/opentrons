@@ -2,11 +2,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 

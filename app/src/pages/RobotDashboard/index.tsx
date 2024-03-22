@@ -7,8 +7,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Navigation } from '../../organisms/Navigation'

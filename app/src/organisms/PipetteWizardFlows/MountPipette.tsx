@@ -7,8 +7,8 @@ import {
 import {
   Flex,
   JUSTIFY_CENTER,
-  SPACING,
   SIZE_1,
+  SPACING,
   StyledText,
 } from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
