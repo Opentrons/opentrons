@@ -34,7 +34,7 @@ const Template: Story<React.ComponentProps<typeof FullKeyboard>> = args => {
           onFocus={() => setShowKeyboard(true)}
         />
       </form>
-      <Flex position={POSITION_ABSOLUTE} top="20%" width="55rem">
+      <Flex position={POSITION_ABSOLUTE} top="20%" left="0" width="64rem">
         {showKeyboard && (
           <FullKeyboard
             onChange={e => e != null && setValue(String(e))}

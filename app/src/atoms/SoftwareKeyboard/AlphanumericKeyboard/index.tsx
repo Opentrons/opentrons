@@ -45,6 +45,7 @@ export function AlphanumericKeyboard({
       mergeDisplay={true}
       autoUseTouchEvents={true}
       useButtonTag={true}
+      width="100%"
     />
   )
 }

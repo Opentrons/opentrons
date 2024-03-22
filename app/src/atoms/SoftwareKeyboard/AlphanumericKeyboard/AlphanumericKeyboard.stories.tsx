@@ -35,7 +35,7 @@ const Template: Story<
           onFocus={() => setShowKeyboard(true)}
         />
       </form>
-      <Flex position={POSITION_ABSOLUTE} top="20%" width="55rem">
+      <Flex position={POSITION_ABSOLUTE} top="20%" left="0" width="64rem">
         {showKeyboard && (
           <AlphanumericKeyboard
             onChange={(e: string) => e != null && setValue(String(e))}
