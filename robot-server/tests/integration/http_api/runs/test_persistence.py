@@ -16,7 +16,7 @@ class ClientServerFixture(NamedTuple):
         self.server.stop()
         assert await self.client.wait_until_dead(), "Server did not stop."
         self.server.start()
-        assert await self.client.wait_until_alive(), "Server never became available."
+        await self.client.wait_until_ready()
 
 
 @pytest.fixture
@@ -36,7 +36,7 @@ async def client_and_server(port: str) -> AsyncGenerator[ClientServerFixture, No
 
         with DevServer(port=port) as server:
             server.start()
-            assert await client.wait_until_alive(), "Server never became available."
+            await client.wait_until_ready()
 
             yield ClientServerFixture(client=client, server=server)
 

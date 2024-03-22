@@ -27,9 +27,7 @@ async def test_runs_auto_delete(
         ), "Dev Robot is running and must not be."
         with DevServer(port=port, maximum_runs=num_to_configure_as_maximum) as server:
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             created_run_ids = await _create_runs(
                 robot_client=robot_client, num_runs=num_to_upload

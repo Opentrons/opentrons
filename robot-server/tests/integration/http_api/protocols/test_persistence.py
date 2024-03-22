@@ -28,9 +28,7 @@ async def test_protocols_and_analyses_persist(
         ), "Dev Robot is running and must not be."
         with DevServer(port=port) as server:
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             # Must not be so high that the server runs out of room and starts
             # auto-deleting old protocols.
@@ -55,9 +53,7 @@ async def test_protocols_and_analyses_persist(
             assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
 
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             protocols_after_restart = (await robot_client.get_protocols()).json()[
                 "data"
@@ -94,9 +90,7 @@ async def test_protocol_labware_files_persist() -> None:
         ), "Dev Robot is running and must not be."
         with DevServer(port=port) as server:
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             protocol = await robot_client.post_protocol(
                 [
@@ -119,9 +113,7 @@ async def test_protocol_labware_files_persist() -> None:
             server.stop()
             assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             result = await robot_client.get_protocol(protocol_id)
             restarted_protocol_detail = result.json()["data"]

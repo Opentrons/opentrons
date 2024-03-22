@@ -32,9 +32,7 @@ async def test_protocols_auto_delete(
             port=port, maximum_unused_protocols=num_to_configure_as_maximum
         ) as server:
             server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready()
 
             uploaded_protocol_ids = await _upload_protocols(
                 robot_client=robot_client, num_protocols=num_to_upload
