@@ -80,7 +80,7 @@ for i in FORCE_TEST_RIGHT_SETTINGS:
 # Global variables
 thread_sensor = False
 force_output = []
-
+valid_fail = []
 
 def _connect_to_mark10_fixture(simulate: bool) -> Union[Mark10, SimMark10]:
     """Connect to the force Gauge."""
@@ -216,7 +216,6 @@ def check_force(
         qc_pass = True
     else:
         qc_pass = False
-
     _tag = _get_test_tag(current)
     report(
         mount.name,
@@ -229,7 +228,6 @@ def check_force(
             CSVResult.from_bool(qc_pass),
         ],
     )
-
     return qc_pass
 
 
@@ -301,10 +299,12 @@ async def _force_gauge(
                 avg_results.append(round(analyzed_avg, 1))
             else:
                 ui.print_error(
-                    "DATA INVALID - z-stage did not contact or guage not zeroed"
+                    "DATA INVALID - z-stage did not contact or guage not zeroed \n"
+                    f"Mount {mount.name} fail !"
                 )
+                valid_fail.append(mount.name)
                 qc_pass = False
-                break
+                return
 
             # we expect a stall has happened during pick up, so we want to
             # update the motor estimation
@@ -390,6 +390,14 @@ async def _main(arguments: argparse.Namespace) -> None:
 
     try:
         qc_pass = await _run(api, arguments, report)
+        await api.home(
+            [
+                Axis.X,
+                Axis.Y,
+                Axis.by_mount(OT3Mount.LEFT),
+                Axis.by_mount(OT3Mount.RIGHT),
+            ]
+        )
     except KeyboardInterrupt:
         print("Cancelled")
     except Exception as e:
@@ -400,6 +408,12 @@ async def _main(arguments: argparse.Namespace) -> None:
             ui.print_title("Test Done - PASSED")
         else:
             ui.print_title("Test Done - FAILED")
+        if len(valid_fail) == 0:
+            pass
+        else:
+            print("Data Invalid, Please Re-Test This Unit (数据验证失败, 请复测当前Z轴) !")
+            for item in valid_fail:
+                print(f"Mount {item} Fail")
         report.save_to_disk()
         report.print_results()
 
