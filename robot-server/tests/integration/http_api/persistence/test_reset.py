@@ -87,9 +87,7 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
     async with RobotClient.make(
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
-        assert (
-            await robot_client.wait_until_dead()
-        ), "Dev Robot is running and must not be."
+        assert await robot_client.dead(), "Dev Robot is running and must not be."
         with DevServer(port=port) as server:
             server.start()
             await robot_client.wait_until_ready()
@@ -108,7 +106,7 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
 
             # Restart to enact the reset.
             server.stop()
-            assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
+            assert await robot_client.dead(), "Dev Robot did not stop."
             server.start()
             await robot_client.wait_until_ready()
 
@@ -127,9 +125,7 @@ async def test_reset_is_available_even_with_corrupt_persistence_directory() -> N
     async with RobotClient.make(
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
-        assert (
-            await robot_client.wait_until_dead()
-        ), "Dev Robot is running and must not be."
+        assert await robot_client.dead(), "Dev Robot is running and must not be."
         with DevServer(port=port, persistence_directory=persistence_dir) as server:
             server.start()
             await _wait_until_initialization_failed(robot_client)
@@ -138,7 +134,7 @@ async def test_reset_is_available_even_with_corrupt_persistence_directory() -> N
 
             # Restart to enact the reset.
             server.stop()
-            assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
+            assert await robot_client.dead(), "Dev Robot did not stop."
             server.start()
             await robot_client.wait_until_ready()
 

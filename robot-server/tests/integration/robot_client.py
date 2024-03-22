@@ -82,13 +82,6 @@ class RobotClient:
             else:
                 return
 
-    async def _poll_for_dead(self) -> None:
-        """Poll GET /health until unreachable."""
-        while not await self.dead():
-            # Avoid spamming the server in case a request immediately
-            # returns some kind of "not ready."
-            await asyncio.sleep(0.1)
-
     async def wait_until_ready(self, timeout_sec: float = _STARTUP_WAIT) -> None:
         """Wait until the server is ready to handle general requests.
 
@@ -100,14 +93,6 @@ class RobotClient:
         will interpret it as a fatal initialization error and raise an exception.
         """
         await asyncio.wait_for(self._poll_for_ready(), timeout=timeout_sec)
-
-    async def wait_until_dead(self, timeout_sec: float = _SHUTDOWN_WAIT) -> bool:
-        """Retry GET /health and until unreachable."""
-        try:
-            await asyncio.wait_for(self._poll_for_dead(), timeout=timeout_sec)
-            return True
-        except asyncio.TimeoutError:
-            return False
 
     async def get_health(self) -> Response:
         """GET /health."""

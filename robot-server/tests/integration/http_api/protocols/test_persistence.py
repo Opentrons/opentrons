@@ -23,9 +23,7 @@ async def test_protocols_and_analyses_persist(
     async with RobotClient.make(
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
-        assert (
-            await robot_client.wait_until_dead()
-        ), "Dev Robot is running and must not be."
+        assert await robot_client.dead(), "Dev Robot is running and must not be."
         with DevServer(port=port) as server:
             server.start()
             await robot_client.wait_until_ready()
@@ -50,7 +48,7 @@ async def test_protocols_and_analyses_persist(
             analyses_before_restart = await _get_all_analyses(robot_client)
 
             server.stop()
-            assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
+            assert await robot_client.dead(), "Dev Robot did not stop."
 
             server.start()
             await robot_client.wait_until_ready()
@@ -85,9 +83,7 @@ async def test_protocol_labware_files_persist() -> None:
     async with RobotClient.make(
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
-        assert (
-            await robot_client.wait_until_dead()
-        ), "Dev Robot is running and must not be."
+        assert await robot_client.dead(), "Dev Robot is running and must not be."
         with DevServer(port=port) as server:
             server.start()
             await robot_client.wait_until_ready()
@@ -111,7 +107,7 @@ async def test_protocol_labware_files_persist() -> None:
             del protocol_detail["analysisSummaries"]
 
             server.stop()
-            assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
+            assert await robot_client.dead(), "Dev Robot did not stop."
             server.start()
             await robot_client.wait_until_ready()
 
