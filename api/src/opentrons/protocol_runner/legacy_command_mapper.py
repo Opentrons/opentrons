@@ -144,19 +144,26 @@ class LegacyCommandMapper:
         if stage == "before":
             count = self._command_count[command_type]
             command_id = f"{command_type}-{count}"
-            running_command = self._build_initial_command(command, command_id, now)
+            command_create, running_command = self._build_initial_command(
+                command, command_id, now
+            )
 
             self._command_count[command_type] = count + 1
             self._commands_by_broker_id[broker_id] = running_command
 
-            # TODO
-            # results.append(pe_actions.QueueCommandAction(
-            #     command_id=command_id,
-            #     created_at=running_command.createdAt,
-            #     request=
-            # )
             results.append(
-                pe_actions.RunCommandAction(running_command, private_result=None)
+                pe_actions.QueueCommandAction(
+                    command_id=command_id,
+                    created_at=running_command.createdAt,
+                    request=command_create,
+                    request_hash=None,
+                )
+            )
+            assert running_command.startedAt is not None
+            results.append(
+                pe_actions.RunCommandAction(
+                    running_command.id, started_at=running_command.startedAt
+                )
             )
 
         elif stage == "after":
@@ -236,7 +243,6 @@ class LegacyCommandMapper:
                             "completedAt": now,
                         }
                     )
-                # TODO
                 results.append(
                     pe_actions.SucceedCommandAction(
                         completed_command, private_result=None
@@ -279,29 +285,25 @@ class LegacyCommandMapper:
         command: legacy_command_types.CommandMessage,
         command_id: str,
         now: datetime,
-    ) -> pe_commands.CommandCreate:
+    ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
         if command["name"] == legacy_command_types.PICK_UP_TIP:
-            return self._build_pick_up_tip_create(
+            return self._build_pick_up_tip(
                 command=command, command_id=command_id, now=now
             )
         elif command["name"] == legacy_command_types.DROP_TIP:
-            return self._build_drop_tip_create(
-                command=command, command_id=command_id, now=now
-            )
+            return self._build_drop_tip(command=command, command_id=command_id, now=now)
 
         elif (
             command["name"] == legacy_command_types.ASPIRATE
             or command["name"] == legacy_command_types.DISPENSE
         ):
-            return self._build_liquid_handling_create(
+            return self._build_liquid_handling(
                 command=command, command_id=command_id, now=now
             )
         elif command["name"] == legacy_command_types.BLOW_OUT:
-            return self._build_blow_out_create(
-                command=command, command_id=command_id, now=now
-            )
+            return self._build_blow_out(command=command, command_id=command_id, now=now)
         elif command["name"] == legacy_command_types.PAUSE:
-            return pe_commands.WaitForResumeCreate.construct(
+            wait_for_resume_running = pe_commands.WaitForResume.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
@@ -311,8 +313,15 @@ class LegacyCommandMapper:
                     message=command["payload"]["userMessage"],
                 ),
             )
+            wait_for_resume_create: pe_commands.CommandCreate = (
+                pe_commands.WaitForResumeCreate.construct(
+                    key=wait_for_resume_running.key,
+                    params=wait_for_resume_running.params,
+                )
+            )
+            return wait_for_resume_create, wait_for_resume_running
         else:
-            return pe_commands.CustomCreate.construct(
+            custom_running = pe_commands.Custom.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
@@ -323,13 +332,18 @@ class LegacyCommandMapper:
                     legacyCommandText=command["payload"]["text"],
                 ),
             )
+            custom_create = pe_commands.CustomCreate.construct(
+                key=custom_running.key,
+                params=custom_running.params,
+            )
+            return custom_create, custom_running
 
-    def _build_drop_tip_create(
+    def _build_drop_tip(
         self,
         command: legacy_command_types.DropTipMessage,
         command_id: str,
         now: datetime,
-    ) -> pe_commands.Command:
+    ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         well = command["payload"]["location"]
         mount = MountType(pipette.mount)
@@ -338,7 +352,8 @@ class LegacyCommandMapper:
         well_name = well.well_name
         labware_id = self._labware_id_by_slot[slot]
         pipette_id = self._pipette_id_by_mount[mount]
-        return pe_commands.DropTip.construct(
+
+        running = pe_commands.DropTip.construct(
             id=command_id,
             key=command_id,
             status=pe_commands.CommandStatus.RUNNING,
@@ -350,13 +365,18 @@ class LegacyCommandMapper:
                 wellName=well_name,
             ),
         )
+        create = pe_commands.DropTipCreate.construct(
+            key=running.key,
+            params=running.params,
+        )
+        return create, running
 
-    def _build_pick_up_tip_create(
+    def _build_pick_up_tip(
         self,
         command: legacy_command_types.PickUpTipMessage,
         command_id: str,
         now: datetime,
-    ) -> pe_commands.Command:
+    ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         well = location
@@ -367,7 +387,7 @@ class LegacyCommandMapper:
         labware_id = self._labware_id_by_slot[slot]
         pipette_id = self._pipette_id_by_mount[mount]
 
-        return pe_commands.PickUpTip.construct(
+        running = pe_commands.PickUpTip.construct(
             id=command_id,
             key=command_id,
             status=pe_commands.CommandStatus.RUNNING,
@@ -379,15 +399,19 @@ class LegacyCommandMapper:
                 wellName=well_name,
             ),
         )
+        create = pe_commands.PickUpTipCreate.construct(
+            key=running.key, params=running.params
+        )
+        return create, running
 
-    def _build_liquid_handling_create(
+    def _build_liquid_handling(
         self,
         command: Union[
             legacy_command_types.AspirateMessage, legacy_command_types.DispenseMessage
         ],
         command_id: str,
         now: datetime,
-    ) -> pe_commands.Command:
+    ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         volume = command["payload"]["volume"]
@@ -411,7 +435,11 @@ class LegacyCommandMapper:
                 # or aspirate() with a volume of 0, which behaves roughly like
                 # move_to(). Protocol Engine aspirate and dispense commands must have
                 # volume > 0, so we can't map into those.
-                return pe_commands.MoveToWell.construct(
+                #
+                # TODO(mm, 2024-03-22): I don't think this has been true since
+                # https://github.com/Opentrons/opentrons/pull/14211. Can we just use
+                # aspirate and dispense commands now?
+                move_to_well_running = pe_commands.MoveToWell.construct(
                     id=command_id,
                     key=command_id,
                     status=pe_commands.CommandStatus.RUNNING,
@@ -423,9 +451,13 @@ class LegacyCommandMapper:
                         wellName=well_name,
                     ),
                 )
+                move_to_well_create = pe_commands.MoveToWellCreate.construct(
+                    key=move_to_well_running.key, params=move_to_well_running.params
+                )
+                return move_to_well_create, move_to_well_running
             elif command["name"] == legacy_command_types.ASPIRATE:
                 flow_rate = command["payload"]["rate"] * pipette.flow_rate.aspirate
-                return pe_commands.Aspirate.construct(
+                aspirate_running = pe_commands.Aspirate.construct(
                     id=command_id,
                     key=command_id,
                     status=pe_commands.CommandStatus.RUNNING,
@@ -441,9 +473,13 @@ class LegacyCommandMapper:
                         flowRate=flow_rate,
                     ),
                 )
+                aspirate_create = pe_commands.AspirateCreate.construct(
+                    key=aspirate_running.key, params=aspirate_running.params
+                )
+                return aspirate_create, aspirate_running
             else:
                 flow_rate = command["payload"]["rate"] * pipette.flow_rate.dispense
-                return pe_commands.Dispense.construct(
+                dispense_running = pe_commands.Dispense.construct(
                     id=command_id,
                     key=command_id,
                     status=pe_commands.CommandStatus.RUNNING,
@@ -459,8 +495,13 @@ class LegacyCommandMapper:
                         flowRate=flow_rate,
                     ),
                 )
+                dispense_create = pe_commands.DispenseCreate.construct(
+                    key=dispense_running.key, params=dispense_running.params
+                )
+                return dispense_create, dispense_running
+
         else:
-            return pe_commands.Custom.construct(
+            running = pe_commands.Custom.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
@@ -471,13 +512,17 @@ class LegacyCommandMapper:
                     legacyCommandText=command["payload"]["text"],
                 ),
             )
+            create = pe_commands.CustomCreate.construct(
+                key=running.key, params=running.params
+            )
+            return create, running
 
-    def _build_blow_out_create(
+    def _build_blow_out(
         self,
         command: legacy_command_types.BlowOutMessage,
         command_id: str,
         now: datetime,
-    ) -> pe_commands.Command:
+    ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         flow_rate = pipette.flow_rate.blow_out
@@ -495,7 +540,8 @@ class LegacyCommandMapper:
             mount = MountType(pipette.mount)
             well_name = well.well_name
             pipette_id = self._pipette_id_by_mount[mount]
-            return pe_commands.BlowOut.construct(
+
+            blow_out_running = pe_commands.BlowOut.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
@@ -509,10 +555,15 @@ class LegacyCommandMapper:
                     flowRate=flow_rate,
                 ),
             )
+            blow_out_create = pe_commands.BlowOutCreate.construct(
+                key=blow_out_running.key, params=blow_out_running.params
+            )
+            return blow_out_create, blow_out_running
+
         #   TODO:(jr, 15.08.2022): blow_out commands with no specified labware get filtered
         #   into custom. Refactor this in followup legacy command mapping
         else:
-            return pe_commands.Custom.construct(
+            custom_running = pe_commands.Custom.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
@@ -523,6 +574,10 @@ class LegacyCommandMapper:
                     legacyCommandText=command["payload"]["text"],
                 ),
             )
+            custom_create = pe_commands.CustomCreate.construct(
+                key=custom_running.key, params=custom_running.params
+            )
+            return custom_create, custom_running
 
     def _map_labware_load(
         self, labware_load_info: LegacyLabwareLoadInfo
