@@ -55,6 +55,14 @@ class LegacyContextPlugin(AbstractPlugin):
         # So if the protocol had to wait for the event loop to be free
         # every time it reported some activity,
         # it could visibly stall for a moment, making its motion jittery.
+        #
+        # TODO(mm, 2024-03-22): See if we can remove this non-blockingness now.
+        # It was one of several band-aids introduced in ~v5.0.0 to mitigate performance
+        # problems. v6.3.0 started running some Python protocols directly through
+        # Protocol Engine, without this plugin, and without any non-blocking queue.
+        # If performance is sufficient for those, that probably means the
+        # performance problems have been resolved in better ways elsewhere
+        # and we don't need this anymore.
         self._actions_to_dispatch = ThreadAsyncQueue[List[pe_actions.Action]]()
         self._action_dispatching_task: Optional[Task[None]] = None
 
