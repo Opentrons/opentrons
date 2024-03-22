@@ -113,3 +113,31 @@ def test_delete_all_tip_calibration(starting_calibration_data: Any) -> None:
     clear_tip_length_calibration()
     assert tip_lengths_for_pipette("pip1") == {}
     assert tip_lengths_for_pipette("pip2") == {}
+
+
+def test_uriless_calibrations_are_dropped(ot_config_tempdir: object) -> None:
+    """Legacy records without a `uri` field should be silently ignored."""
+
+    data = {
+        "ed323db6ca1ddf197aeb20667c1a7a91c89cfb2f931f45079d483928da056812": {
+            "tipLength": 123,
+            "lastModified": "2021-01-11T00:34:29.291073+00:00",
+            "source": "user",
+            "status": {"markedBad": False},
+        },
+        "130e17bb7b2f0c0472dcc01c1ff6f600ca1a6f9f86a90982df56c4bf43776824": {
+            "tipLength": 456,
+            "lastModified": "2021-05-12T22:16:14.249567+00:00",
+            "source": "user",
+            "status": {"markedBad": False},
+            "uri": "opentrons/opentrons_96_filtertiprack_200ul/1",
+        },
+    }
+
+    io.save_to_file(config.get_tip_length_cal_path(), "pipette1234", data)
+    result = tip_lengths_for_pipette("pipette1234")
+    assert len(result) == 1
+    assert (
+        result[LabwareUri("opentrons/opentrons_96_filtertiprack_200ul/1")].tipLength
+        == 456
+    )

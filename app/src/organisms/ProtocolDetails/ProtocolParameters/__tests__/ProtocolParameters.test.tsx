@@ -19,6 +19,7 @@ const mockRunTimeParameter: RunTimeParameter[] = [
       'to throw tip into the trash or to not throw tip into the trash',
     type: 'boolean',
     default: true,
+    value: true,
   },
   {
     displayName: 'EtoH Volume',
@@ -29,12 +30,14 @@ const mockRunTimeParameter: RunTimeParameter[] = [
     min: 1.5,
     max: 10.0,
     default: 6.5,
+    value: 6.5,
   },
   {
     displayName: 'Default Module Offsets',
     variableName: 'DEFAULT_OFFSETS',
     description: 'default module offsets for temp, H-S, and none',
     type: 'str',
+    value: 'none',
     choices: [
       {
         displayName: 'No offsets',
@@ -56,6 +59,7 @@ const mockRunTimeParameter: RunTimeParameter[] = [
     variableName: 'mont',
     description: 'pipette mount',
     type: 'str',
+    value: 'left',
     choices: [
       {
         displayName: 'Left',

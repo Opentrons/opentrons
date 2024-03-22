@@ -1149,6 +1149,7 @@ class InstrumentContext(publisher.CommandPublisher):
         self._core.home_plunger()
         return self
 
+    # TODO (spp, 2024-03-08): verify if ok to & change source & dest types to AdvancedLiquidHandling
     @publisher.publish(command=cmds.distribute)
     @requires_version(2, 0)
     def distribute(
@@ -1188,6 +1189,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
+    # TODO (spp, 2024-03-08): verify if ok to & change source & dest types to AdvancedLiquidHandling
     @publisher.publish(command=cmds.consolidate)
     @requires_version(2, 0)
     def consolidate(

@@ -91,8 +91,8 @@ export function CurrentOffsetsTable(
             <OffsetTableRow key={offset.id}>
               <OffsetTableDatum
                 css={`
-                  border-radius: ${BORDERS.borderRadius4} 0 0
-                    ${BORDERS.borderRadius4};
+                  border-radius: ${BORDERS.borderRadius8} 0 0
+                    ${BORDERS.borderRadius8};
                 `}
               >
                 {getDisplayLocation(
@@ -105,8 +105,8 @@ export function CurrentOffsetsTable(
               <OffsetTableDatum>{labwareDisplayName}</OffsetTableDatum>
               <OffsetTableDatum
                 css={`
-                  border-radius: 0 ${BORDERS.borderRadius4}
-                    ${BORDERS.borderRadius4} 0;
+                  border-radius: 0 ${BORDERS.borderRadius8}
+                    ${BORDERS.borderRadius8} 0;
                 `}
               >
                 <OffsetVector {...offset.vector} />

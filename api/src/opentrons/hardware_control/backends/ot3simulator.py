@@ -103,7 +103,7 @@ class OT3Simulator(FlexBackend):
     async def build(
         cls,
         attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
-        attached_modules: List[str],
+        attached_modules: Dict[str, List[str]],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
@@ -129,7 +129,7 @@ class OT3Simulator(FlexBackend):
     def __init__(
         self,
         attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
-        attached_modules: List[str],
+        attached_modules: Dict[str, List[str]],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
@@ -595,10 +595,16 @@ class OT3Simulator(FlexBackend):
 
     @ensure_yield
     async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
-        new_mods_at_ports = [
-            modules.ModuleAtPort(port=f"/dev/ot_module_sim_{mod}{str(idx)}", name=mod)
-            for idx, mod in enumerate(self._stubbed_attached_modules)
-        ]
+        new_mods_at_ports = []
+        for mod, serials in self._stubbed_attached_modules.items():
+            for serial in serials:
+                new_mods_at_ports.append(
+                    modules.SimulatingModuleAtPort(
+                        port=f"/dev/ot_module_sim_{mod}{str(serial)}",
+                        name=mod,
+                        serial_number=serial,
+                    )
+                )
         await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)
 
     @property

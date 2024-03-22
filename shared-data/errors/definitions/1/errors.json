@@ -190,6 +190,10 @@
       "detail": "Tip Detector Not Created",
       "category": "roboticsInteractionError"
     },
+    "3019": {
+      "detail": "HEPA UV Failed",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"
@@ -220,6 +224,10 @@
     },
     "4007": {
       "detail": "API Command is misconfigured",
+      "category": "generalError"
+    },
+    "4008": {
+      "detail": "Invalid stored data",
       "category": "generalError"
     }
   }

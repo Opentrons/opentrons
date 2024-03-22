@@ -13,6 +13,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     types as pe_types,
 )
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.resources import (
     ModelUtils,
     ModuleDataProvider,
@@ -248,6 +249,11 @@ class LegacyCommandMapper:
                         error_id=ModelUtils.generate_id(),
                         failed_at=now,
                         error=LegacyContextCommandError(command_error),
+                        # For legacy protocols, we don't attempt to support any kind
+                        # of error recovery at the Protocol Engine level.
+                        # These protocols only run on the OT-2, which doesn't have
+                        # any recoverable errors, anyway.
+                        type=ErrorRecoveryType.FAIL_RUN,
                     )
                 )
 

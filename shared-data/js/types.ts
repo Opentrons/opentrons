@@ -621,6 +621,7 @@ interface BaseRunTimeParameter {
   variableName: string
   description: string
   type: RunTimeParameterType
+  value: unknown
   suffix?: string
 }
 

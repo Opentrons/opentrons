@@ -183,4 +183,13 @@ describe('Chip', () => {
     const icon = screen.getByLabelText('icon_mockInfo')
     expect(icon).toHaveStyle(`color: ${COLORS.blue60}`)
   })
+  it('renders no icon when hasIcon is false', () => {
+    props = {
+      text: 'mockInfo',
+      hasIcon: false,
+      type: 'info',
+    }
+    render(props)
+    expect(screen.queryByText('icon_mockInfo')).not.toBeInTheDocument()
+  })
 })

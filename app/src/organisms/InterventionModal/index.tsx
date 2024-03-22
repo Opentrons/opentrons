@@ -156,7 +156,7 @@ export function InterventionModal({
   // reimplement when design system shares a modal component between desktop/ODD
   return isOnDevice ? (
     <Modal
-      border={`8px ${BORDERS.styleSolid} ${COLORS.blue50}`}
+      border={`${BORDERS.borderRadius8} ${BORDERS.styleSolid} ${COLORS.blue50}`}
       modalSize="large"
       header={{
         backgroundColor: COLORS.blue50,
