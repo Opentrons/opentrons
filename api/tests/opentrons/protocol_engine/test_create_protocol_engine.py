@@ -4,6 +4,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.deck import load as load_deck
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control import API as HardwareAPI
@@ -17,6 +18,30 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.types import DeckSlotLocation, LoadedLabware
 from opentrons.types import DeckSlotName
+
+from opentrons.protocols.api_support.deck_type import (
+    STANDARD_OT2_DECK,
+    SHORT_TRASH_DECK,
+    STANDARD_OT3_DECK,
+)
+
+
+@pytest.fixture(scope="session")
+def ot2_standard_deck_def() -> DeckDefinitionV5:
+    """Get the OT-2 standard deck definition."""
+    return load_deck(STANDARD_OT2_DECK, 5)
+
+
+@pytest.fixture(scope="session")
+def ot2_short_trash_deck_def() -> DeckDefinitionV5:
+    """Get the OT-2 with short trash standard deck definition."""
+    return load_deck(SHORT_TRASH_DECK, 5)
+
+
+@pytest.fixture(scope="session")
+def ot3_standard_deck_def() -> DeckDefinitionV5:
+    """Get the OT-2 standard deck definition."""
+    return load_deck(STANDARD_OT3_DECK, 5)
 
 
 @pytest.mark.parametrize(

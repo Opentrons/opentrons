@@ -278,10 +278,12 @@ class Deck(UserDict):  # type: ignore[type-arg]
         if isinstance(location, str) or isinstance(location, int):
             slot_def = self.get_slot_definition(str(location))
             compatible_modules = slot_def["compatibleModuleTypes"]
-            cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)
             if module_type.value in compatible_modules:
                 return location
-            elif cutout_fixture_id == slot_def["id"]:
+            elif (
+                self._definition["robot"]["model"] == "OT-3 Standard"
+                and ModuleType.to_module_fixture_id(module_type) == slot_def["id"]
+            ):
                 return location
             else:
                 raise ValueError(
