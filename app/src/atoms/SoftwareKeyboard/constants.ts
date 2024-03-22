@@ -39,14 +39,14 @@ export const fullKeyboardLayout = {
   ],
   symbols: [
     '[ ] { } # % ^ +',
-    '{abc} _ \\ | < > · =',
-    "{numbers} . , ? ! ' * ~ {backspace}",
+    '{numbers} _ \\ | < > · =',
+    "{abc} . , ? ! ' * ~ {backspace}",
     '{space}',
   ],
   numbers: [
     '1 2 3 4 5 6 7 8 9 0',
-    '{abc} - / : ; ( ) $ & @ "',
-    "{symbols} . , ? ! ' * ~ {backspace}",
+    '{symbols} - / : ; ( ) $ & @ "',
+    "{abc} . , ? ! ' * ~ {backspace}",
     '{space}',
   ],
 }
