@@ -190,17 +190,21 @@ class PythonAndLegacyRunner(AbstractRunner):
             equipment_broker=equipment_broker,
         )
         initial_home_command = pe_commands.HomeCreate(
+            # this command homes all axes, including pipette plugner and gripper jaw
             params=pe_commands.HomeParams(axes=None)
         )
-        # this command homes all axes, including pipette plunger and gripper jaw
-        self._protocol_engine.add_command(request=initial_home_command)
 
-        self._task_queue.set_run_func(
-            func=self._legacy_executor.execute,
-            protocol=protocol,
-            context=context,
-            run_time_param_values=run_time_param_values,
-        )
+        async def run_func() -> None:
+            await self._protocol_engine.add_and_execute_command(
+                request=initial_home_command
+            )
+            await self._legacy_executor.execute(
+                protocol=protocol,
+                context=context,
+                run_time_param_values=run_time_param_values,
+            )
+
+        self._task_queue.set_run_func(run_func)
 
     async def run(  # noqa: D102
         self,
