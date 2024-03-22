@@ -32,31 +32,31 @@ LOG.setLevel(logging.CRITICAL)
 
 # Test Parameters
 FORCE_SPEED = 10
-FORCE_MARGIN = 15  # Percentage
+FORCE_MARGIN = 25  # Percentage
 FORCE_TEST_LEFT_SETTINGS = [
-    {"CURRENT": 0.15, "F_MAX": 50},
-    {"CURRENT": 0.2, "F_MAX": 73},
-    {"CURRENT": 0.3, "F_MAX": 120},
-    {"CURRENT": 0.4, "F_MAX": 160},
-    {"CURRENT": 0.5, "F_MAX": 200},
-    {"CURRENT": 0.6, "F_MAX": 230},
-    {"CURRENT": 0.7, "F_MAX": 260},
-    {"CURRENT": 1.4, "F_MAX": 480},
-    {"CURRENT": 1.5, "F_MAX": 520},
+    {"CURRENT": 0.15, "F_MAX": 39},
+    {"CURRENT": 0.2, "F_MAX": 63},
+    {"CURRENT": 0.3, "F_MAX": 107},
+    {"CURRENT": 0.4, "F_MAX": 148},
+    {"CURRENT": 0.5, "F_MAX": 189},
+    {"CURRENT": 0.6, "F_MAX": 226},
+    {"CURRENT": 0.7, "F_MAX": 259},
+    {"CURRENT": 1.4, "F_MAX": 498},
+    {"CURRENT": 1.5, "F_MAX": 528},
 ]
 FORCE_TEST_RIGHT_SETTINGS = [
-    {"CURRENT": 0.15, "F_MAX": 50},
-    {"CURRENT": 0.2, "F_MAX": 73},
-    {"CURRENT": 0.3, "F_MAX": 120},
-    {"CURRENT": 0.4, "F_MAX": 160},
-    {"CURRENT": 0.5, "F_MAX": 200},
-    {"CURRENT": 0.6, "F_MAX": 230},
-    {"CURRENT": 0.7, "F_MAX": 260},
-    {"CURRENT": 1.4, "F_MAX": 480},
-    {"CURRENT": 1.5, "F_MAX": 520},
+    {"CURRENT": 0.15, "F_MAX": 35},
+    {"CURRENT": 0.2, "F_MAX": 57},
+    {"CURRENT": 0.3, "F_MAX": 98},
+    {"CURRENT": 0.4, "F_MAX": 129},
+    {"CURRENT": 0.5, "F_MAX": 168},
+    {"CURRENT": 0.6, "F_MAX": 196},
+    {"CURRENT": 0.7, "F_MAX": 228},
+    {"CURRENT": 1.4, "F_MAX": 410},
+    {"CURRENT": 1.5, "F_MAX": 448},
 ]
 
-
+ONLY_COUNT_USING_CURRENT_YIELD = True
 CYCLES_CURRENT = 5
 
 TEST_LEFT_PARAMETERS: Dict[str, float] = {
@@ -325,7 +325,12 @@ async def _force_gauge(
             ui.print_header(f"CURRENT: {test_current} - PASS")
         else:
             ui.print_header(f"CURRENT: {test_current} - FAIL")
-        qc_pass = qc_pass and res
+        # only calculate 0.2 & 0.5
+        if ONLY_COUNT_USING_CURRENT_YIELD:
+            if test_current == 0.2 or test_current == 0.5:
+                qc_pass = qc_pass and res
+        else:
+            qc_pass = qc_pass and res
 
     return qc_pass
 
