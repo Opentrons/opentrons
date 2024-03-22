@@ -123,16 +123,13 @@ class LegacyContextPlugin(AbstractPlugin):
             self._actions_to_dispatch.put(pe_action)
 
     def _handle_equipment_loaded(self, load_info: LegacyLoadInfo) -> None:
-        (
-            pe_command,
-            pe_private_result,
-        ) = self._legacy_command_mapper.map_equipment_load(load_info=load_info)
+        """Handle an equipment load reported by the APIv2 protocol.
 
-        self._actions_to_dispatch.put(
-            pe_actions.UpdateCommandAction(
-                command=pe_command, private_result=pe_private_result
-            )
-        )
+        Used as a broker callback, so this will run in the APIv2 protocol's thread.
+        """
+        pe_actions = self._legacy_command_mapper.map_equipment_load(load_info=load_info)
+        for pe_action in pe_actions:
+            self._actions_to_dispatch.put(pe_action)
 
     async def _dispatch_all_actions(self) -> None:
         """Dispatch all actions to the `ProtocolEngine`.

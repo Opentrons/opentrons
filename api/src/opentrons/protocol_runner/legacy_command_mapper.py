@@ -259,16 +259,14 @@ class LegacyCommandMapper:
 
         return results
 
-    def map_equipment_load(
-        self, load_info: LegacyLoadInfo
-    ) -> Tuple[pe_commands.Command, pe_commands.CommandPrivateResult]:
+    def map_equipment_load(self, load_info: LegacyLoadInfo) -> List[pe_actions.Action]:
         """Map a labware, instrument (pipette), or module load to a PE command."""
         if isinstance(load_info, LegacyLabwareLoadInfo):
-            return (self._map_labware_load(load_info), None)
+            return self._map_labware_load(load_info)
         elif isinstance(load_info, LegacyInstrumentLoadInfo):
             return self._map_instrument_load(load_info)
         elif isinstance(load_info, LegacyModuleLoadInfo):
-            return (self._map_module_load(load_info), None)
+            return self._map_module_load(load_info)
 
     def _build_initial_command(
         self,
@@ -525,7 +523,7 @@ class LegacyCommandMapper:
 
     def _map_labware_load(
         self, labware_load_info: LegacyLabwareLoadInfo
-    ) -> pe_commands.Command:
+    ) -> List[pe_actions.Action]:
         """Map a legacy labware load to a ProtocolEngine command."""
         now = ModelUtils.get_timestamp()
         count = self._command_count["LOAD_LABWARE"]
@@ -541,7 +539,7 @@ class LegacyCommandMapper:
         command_id = f"commands.LOAD_LABWARE-{count}"
         labware_id = f"labware-{count}"
 
-        load_labware_command = pe_commands.LoadLabware.construct(
+        succeeded_command = pe_commands.LoadLabware.construct(
             id=command_id,
             key=command_id,
             status=pe_commands.CommandStatus.SUCCEEDED,
@@ -563,18 +561,36 @@ class LegacyCommandMapper:
                 offsetId=labware_load_info.offset_id,
             ),
         )
+        queue_action = pe_actions.QueueCommandAction(
+            command_id=succeeded_command.id,
+            created_at=succeeded_command.createdAt,
+            request=pe_commands.LoadLabwareCreate.construct(
+                params=succeeded_command.params
+            ),
+            request_hash=None,
+        )
+        run_action = pe_actions.RunCommandAction(
+            command_id=succeeded_command.id,
+            # We just set this above, so we know it's not None.
+            started_at=succeeded_command.startedAt,  # type: ignore[arg-type]
+        )
+        succeed_action = pe_actions.SucceedCommandAction(
+            command=succeeded_command,
+            private_result=None,
+        )
 
         self._command_count["LOAD_LABWARE"] = count + 1
         if isinstance(location, pe_types.DeckSlotLocation):
             self._labware_id_by_slot[location.slotName] = labware_id
         elif isinstance(location, pe_types.ModuleLocation):
             self._labware_id_by_module_id[location.moduleId] = labware_id
-        return load_labware_command
+
+        return [queue_action, run_action, succeed_action]
 
     def _map_instrument_load(
         self,
         instrument_load_info: LegacyInstrumentLoadInfo,
-    ) -> Tuple[pe_commands.Command, pe_commands.CommandPrivateResult]:
+    ) -> List[pe_actions.Action]:
         """Map a legacy instrument (pipette) load to a ProtocolEngine command.
 
         Also creates a `AddPipetteConfigAction`, which is not necessary for the run,
@@ -586,7 +602,7 @@ class LegacyCommandMapper:
         pipette_id = f"pipette-{count}"
         mount = MountType(str(instrument_load_info.mount).lower())
 
-        load_pipette_command = pe_commands.LoadPipette.construct(
+        succeeded_command = pe_commands.LoadPipette.construct(
             id=command_id,
             key=command_id,
             status=pe_commands.CommandStatus.SUCCEEDED,
@@ -607,15 +623,32 @@ class LegacyCommandMapper:
                 instrument_load_info.pipette_dict
             ),
         )
+        queue_action = pe_actions.QueueCommandAction(
+            command_id=succeeded_command.id,
+            created_at=succeeded_command.createdAt,
+            request=pe_commands.LoadPipetteCreate.construct(
+                params=succeeded_command.params
+            ),
+            request_hash=None,
+        )
+        run_action = pe_actions.RunCommandAction(
+            command_id=succeeded_command.id,
+            # We just set this above, so we know it's not None.
+            started_at=succeeded_command.startedAt,  # type: ignore[arg-type]
+        )
+        succeed_action = pe_actions.SucceedCommandAction(
+            command=succeeded_command,
+            private_result=pipette_config_result,
+        )
 
         self._command_count["LOAD_PIPETTE"] = count + 1
         self._pipette_id_by_mount[mount] = pipette_id
 
-        return (load_pipette_command, pipette_config_result)
+        return [queue_action, run_action, succeed_action]
 
     def _map_module_load(
         self, module_load_info: LegacyModuleLoadInfo
-    ) -> pe_commands.Command:
+    ) -> List[pe_actions.Action]:
         """Map a legacy module load to a Protocol Engine command."""
         now = ModelUtils.get_timestamp()
 
@@ -634,7 +667,7 @@ class LegacyCommandMapper:
             loaded_model
         ) or self._module_data_provider.get_definition(loaded_model)
 
-        load_module_command = pe_commands.LoadModule.construct(
+        succeeded_command = pe_commands.LoadModule.construct(
             id=command_id,
             key=command_id,
             status=pe_commands.CommandStatus.SUCCEEDED,
@@ -655,7 +688,26 @@ class LegacyCommandMapper:
                 model=loaded_model,
             ),
         )
+        queue_action = pe_actions.QueueCommandAction(
+            command_id=succeeded_command.id,
+            created_at=succeeded_command.createdAt,
+            request=pe_commands.LoadModuleCreate.construct(
+                params=succeeded_command.params
+            ),
+            request_hash=None,
+        )
+        run_action = pe_actions.RunCommandAction(
+            command_id=succeeded_command.id,
+            # We just set this above, so we know it's not None.
+            started_at=succeeded_command.startedAt,  # type: ignore[arg-type]
+        )
+        succeed_action = pe_actions.SucceedCommandAction(
+            command=succeeded_command,
+            private_result=None,
+        )
+
         self._command_count["LOAD_MODULE"] = count + 1
         self._module_id_by_slot[module_load_info.deck_slot] = module_id
         self._module_definition_by_model[loaded_model] = loaded_definition
-        return load_module_command
+
+        return [queue_action, run_action, succeed_action]
