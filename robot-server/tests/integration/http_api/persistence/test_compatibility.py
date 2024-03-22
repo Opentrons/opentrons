@@ -152,14 +152,10 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
     async with RobotClient.make(
         base_url=f"http://localhost:{_PORT}", version="*"
     ) as robot_client:
-        assert (
-            await robot_client.wait_until_dead()
-        ), "Dev Robot is running and must not be."
+        assert await robot_client.dead(), "Dev Robot is running and must not be."
         with DevServer(port=_PORT, persistence_directory=snapshot.get_copy()) as server:
             server.start()
-            assert await robot_client.wait_until_alive(
-                _STARTUP_TIMEOUT
-            ), "Dev Robot never became available."
+            await robot_client.wait_until_ready(_STARTUP_TIMEOUT)
             all_protocols = (await robot_client.get_protocols()).json()["data"]
 
             assert len(all_protocols) == snapshot.expected_protocol_count
@@ -229,14 +225,10 @@ async def test_rerun_flex_dev_compat() -> None:
     async with RobotClient.make(
         base_url=f"http://localhost:{_PORT}", version="*"
     ) as client:
-        assert (
-            await client.wait_until_dead()
-        ), "Dev Robot is running but it should not be."
+        assert await client.dead(), "Dev Robot is running but it should not be."
         with DevServer(persistence_directory=snapshot.get_copy(), port=_PORT) as server:
             server.start()
-            assert await client.wait_until_alive(
-                _STARTUP_TIMEOUT
-            ), "Dev Robot never became available."
+            await client.wait_until_ready(_STARTUP_TIMEOUT)
 
             [protocol] = (await client.get_protocols()).json()["data"]
             new_run = (
