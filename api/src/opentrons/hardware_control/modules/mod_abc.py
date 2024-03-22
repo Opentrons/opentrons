@@ -76,7 +76,7 @@ class AbstractModule(abc.ABC):
             return None
         file_prefix = self.firmware_prefix()
 
-        MODULE_FW_RE = re.compile(f"^{file_prefix}@v(.*)[.](hex|bin).*$")
+        MODULE_FW_RE = re.compile(f"^{file_prefix}@v(.*)[.](hex|bin)$")
         for fw_resource in ROBOT_FIRMWARE_DIR.iterdir():  # type: ignore
             matches = MODULE_FW_RE.search(fw_resource.name)
             if matches:
