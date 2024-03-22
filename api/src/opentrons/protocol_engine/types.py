@@ -927,6 +927,7 @@ class EnumParameter(RTPBase):
         description="Default value of the parameter, to be used when there is no client-specified value.",
     )
 
+
 RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter]
 
 RunTimeParamValuesType = Dict[
