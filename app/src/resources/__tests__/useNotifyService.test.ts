@@ -8,6 +8,10 @@ import { useNotifyService } from '../useNotifyService'
 import { appShellListener } from '../../redux/shell/remote'
 import { useTrackEvent } from '../../redux/analytics'
 import { notifySubscribeAction } from '../../redux/shell'
+<<<<<<< HEAD
+=======
+import { useIsFlex } from '../../organisms/Devices/hooks/useIsFlex'
+>>>>>>> 1ba616651c (refactor(app-shell-odd): Utilize robot-server unsubscribe flags (#14724))
 
 import type { Mock } from 'vitest'
 import type { HostConfig } from '@opentrons/api-client'
@@ -50,7 +54,11 @@ describe('useNotifyService', () => {
     vi.mocked(appShellListener).mockClear()
 =======
     vi.mocked(useIsFlex).mockReturnValue(true)
+<<<<<<< HEAD
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+    vi.mocked(appShellListener).mockClear()
+>>>>>>> 1ba616651c (refactor(app-shell-odd): Utilize robot-server unsubscribe flags (#14724))
   })
 
   afterEach(() => {
@@ -70,7 +78,14 @@ describe('useNotifyService', () => {
     expect(mockDispatch).toHaveBeenCalledWith(
       notifySubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
     )
+<<<<<<< HEAD
     expect(appShellListener).toHaveBeenCalled()
+=======
+    expect(mockDispatch).not.toHaveBeenCalledWith(
+      notifyUnsubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
+    )
+    expect(mockAppShellListener).toHaveBeenCalled()
+>>>>>>> 1ba616651c (refactor(app-shell-odd): Utilize robot-server unsubscribe flags (#14724))
   })
 
   it('should not subscribe to notifications if forceHttpPolling is true', () => {

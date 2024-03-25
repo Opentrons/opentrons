@@ -146,8 +146,11 @@ export type NotifyTopic =
   | 'robot-server/runs/current_command'
   | 'robot-server/runs'
   | `robot-server/runs/${string}`
+<<<<<<< HEAD
   | 'robot-server/deck_configuration'
   | `robot-server/runs/pre_serialized_commands/${string}`
+=======
+>>>>>>> 1ba616651c (refactor(app-shell-odd): Utilize robot-server unsubscribe flags (#14724))
 
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'
@@ -171,6 +174,7 @@ export type ShellAction =
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
   | NotifySubscribeAction
+<<<<<<< HEAD
 
 export type IPCSafeFormDataEntry =
   | {
@@ -186,3 +190,5 @@ export type IPCSafeFormDataEntry =
     }
 
 export type IPCSafeFormData = IPCSafeFormDataEntry[]
+=======
+>>>>>>> 1ba616651c (refactor(app-shell-odd): Utilize robot-server unsubscribe flags (#14724))

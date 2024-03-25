@@ -12,7 +12,11 @@ import type {
 import { FAILURE_STATUSES } from '../constants'
 
 const VALID_NOTIFY_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
+<<<<<<< HEAD
   { refetch: true },
+=======
+  { refetchUsingHTTP: true },
+>>>>>>> 1ba616651c (refactor(app-shell-odd): Utilize robot-server unsubscribe flags (#14724))
   { unsubscribe: true },
 ]
 

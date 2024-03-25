@@ -59,6 +59,7 @@ export function useNotifyService<TData, TError = Error>({
         callback: onDataEvent,
       })
       dispatch(notifySubscribeAction(hostname, topic))
+<<<<<<< HEAD
       seenHostname.current = hostname
     } else {
       setRefetch('always')
@@ -66,6 +67,15 @@ export function useNotifyService<TData, TError = Error>({
 
     return () => {
       if (seenHostname.current != null) {
+=======
+      hasUsedNotifyService.current = true
+    } else {
+      setRefetchUsingHTTP('always')
+    }
+
+    return () => {
+      if (hasUsedNotifyService.current) {
+>>>>>>> 1ba616651c (refactor(app-shell-odd): Utilize robot-server unsubscribe flags (#14724))
         appShellListener({
           hostname: seenHostname.current,
           topic,

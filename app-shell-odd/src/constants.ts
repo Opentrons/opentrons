@@ -226,10 +226,13 @@ export const ROBOT_MASS_STORAGE_DEVICE_ENUMERATED: 'shell:ROBOT_MASS_STORAGE_DEV
 export const NOTIFY_SUBSCRIBE: 'shell:NOTIFY_SUBSCRIBE' =
   'shell:NOTIFY_SUBSCRIBE'
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 export const NOTIFY_UNSUBSCRIBE: 'shell:NOTIFY_UNSUBSCRIBE' =
   'shell:NOTIFY_UNSUBSCRIBE'
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+>>>>>>> 1ba616651c (refactor(app-shell-odd): Utilize robot-server unsubscribe flags (#14724))
 
 // copy
 // TODO(mc, 2020-05-11): i18n
@@ -256,10 +259,16 @@ export const HTTP_API_VERSION: 3 = 3
 export const SEND_READY_STATUS: 'shell:SEND_READY_STATUS' =
   'shell:SEND_READY_STATUS'
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1ba616651c (refactor(app-shell-odd): Utilize robot-server unsubscribe flags (#14724))
 
 export const FAILURE_STATUSES = {
   ECONNREFUSED: 'ECONNREFUSED',
   ECONNFAILED: 'ECONNFAILED',
 } as const
+<<<<<<< HEAD
 =======
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+>>>>>>> 1ba616651c (refactor(app-shell-odd): Utilize robot-server unsubscribe flags (#14724))
