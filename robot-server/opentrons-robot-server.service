@@ -4,7 +4,7 @@ Description=Opentrons Robot HTTP Server
 
 Requires=nginx.service
 After=nginx.service
-
+After=mosquitto.service
 After=opentrons-status-leds.service
 
 
