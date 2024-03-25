@@ -3,6 +3,7 @@ import concat from 'lodash/concat'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
 import find from 'lodash/find'
+import orderBy from 'lodash/orderBy'
 import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
 import semver from 'semver'
 
@@ -146,20 +147,36 @@ export const getDiscoveredRobots: (
     })
   }
 )
-
+// TOME: Just test this works on the slideouts, devices page, etc, and you're good to go! I think I'd rather just sort these compound selectors
+// since that's less TC intensive than sorting ALL the discovered robots each time.
 export const getConnectableRobots: GetConnectableRobots = createSelector(
   getDiscoveredRobots,
-  robots => robots.flatMap(r => (r.status === CONNECTABLE ? [r] : []))
+  robots =>
+    orderBy(
+      robots.flatMap(r => (r.status === CONNECTABLE ? [r] : [])),
+      [robot => robot.displayName.toLowerCase()],
+      ['asc']
+    )
 )
 
 export const getReachableRobots: GetReachableRobots = createSelector(
   getDiscoveredRobots,
-  robots => robots.flatMap(r => (r.status === REACHABLE ? [r] : []))
+  robots =>
+    orderBy(
+      robots.flatMap(r => (r.status === REACHABLE ? [r] : [])),
+      [robot => robot.displayName.toLowerCase()],
+      ['asc']
+    )
 )
 
 export const getUnreachableRobots: GetUnreachableRobots = createSelector(
   getDiscoveredRobots,
-  robots => robots.flatMap(r => (r.status === UNREACHABLE ? [r] : []))
+  robots =>
+    orderBy(
+      robots.flatMap(r => (r.status === UNREACHABLE ? [r] : [])),
+      [robot => robot.displayName.toLowerCase()],
+      ['asc']
+    )
 )
 
 export const getAllRobots: GetAllRobots = createSelector(
@@ -167,13 +184,22 @@ export const getAllRobots: GetAllRobots = createSelector(
   getReachableRobots,
   getUnreachableRobots,
   (cr: DiscoveredRobot[], rr: DiscoveredRobot[], ur: DiscoveredRobot[]) =>
-    concat<DiscoveredRobot>(cr, rr, ur)
+    orderBy(
+      concat<DiscoveredRobot>(cr, rr, ur),
+      [robot => robot.displayName.toLowerCase()],
+      ['asc']
+    )
 )
 
 export const getViewableRobots: GetViewableRobots = createSelector(
   getConnectableRobots,
   getReachableRobots,
-  (cr: ViewableRobot[], rr: ViewableRobot[]) => concat<ViewableRobot>(cr, rr)
+  (cr: ViewableRobot[], rr: ViewableRobot[]) =>
+    orderBy(
+      concat<ViewableRobot>(cr, rr),
+      [robot => robot.displayName.toLowerCase()],
+      ['asc']
+    )
 )
 
 export const getLocalRobot: GetLocalRobot = createSelector(
