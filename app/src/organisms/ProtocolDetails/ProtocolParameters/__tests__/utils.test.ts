@@ -47,7 +47,6 @@ describe('utils-formatRunTimeParameterValue', () => {
       default: 6.5,
     } as RunTimeParameter
     const result = formatRunTimeParameterValue(mockData, mockTFunction)
-
     expect(result).toEqual('6.5 mL')
   })
 
