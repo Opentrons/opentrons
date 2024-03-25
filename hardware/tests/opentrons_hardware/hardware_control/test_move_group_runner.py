@@ -1473,7 +1473,10 @@ class MockSendMoveDriverErrorCompleter:
                         parts=ArbitrationIdParts(originating_node_id=node)
                     )
                     self.call_count += 1
-                    self._listener(md.ReadMotorDriverErrorStatusResponse(payload=payload), arbitration_id)
+                    self._listener(
+                        md.ReadMotorDriverErrorStatusResponse(payload=payload),
+                        arbitration_id,
+                    )
 
     async def mock_ensure_send(
         self,
@@ -1485,8 +1488,8 @@ class MockSendMoveDriverErrorCompleter:
         """Mock ensure_send function."""
         await self.mock_send(node_id, message)
         return ErrorCode.ok
-    
-    
+
+
 async def test_single_move_driver_error(
     mock_can_messenger: AsyncMock, move_group_single: MoveGroups
 ) -> None:
