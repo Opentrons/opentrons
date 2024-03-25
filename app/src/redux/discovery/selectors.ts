@@ -147,8 +147,7 @@ export const getDiscoveredRobots: (
     })
   }
 )
-// TOME: Just test this works on the slideouts, devices page, etc, and you're good to go! I think I'd rather just sort these compound selectors
-// since that's less TC intensive than sorting ALL the discovered robots each time.
+
 export const getConnectableRobots: GetConnectableRobots = createSelector(
   getDiscoveredRobots,
   robots =>
