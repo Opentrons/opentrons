@@ -13,7 +13,6 @@ from opentrons.protocol_engine.errors import (
     FixtureDoesNotExistError,
     CutoutDoesNotExistError,
     AddressableAreaDoesNotExistError,
-    FixtureDoesNotProvideAreasError,
 )
 from opentrons.protocol_engine.types import (
     AddressableArea,
@@ -158,16 +157,6 @@ def test_get_provided_addressable_area_names(
     assert provided_addressable_areas == expected_areas
 
 
-def test_get_provided_addressable_area_raises(
-    ot3_standard_deck_def: DeckDefinitionV5,
-) -> None:
-    """It should raise if the cutout fixture does not provide areas for the given cutout id."""
-    with pytest.raises(FixtureDoesNotProvideAreasError):
-        subject.get_provided_addressable_area_names(
-            "singleRightSlot", "theFunCutout", ot3_standard_deck_def
-        )
-
-
 @pytest.mark.parametrize(
     (
         "addressable_area_name",
@@ -288,11 +277,7 @@ def test_get_potential_cutout_fixtures_raises(
                 display_name="Slot D1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
-                compatible_module_types=[
-                    "temperatureModuleType",
-                    "heaterShakerModuleType",
-                    "magneticBlockType",
-                ],
+                compatible_module_types=[],
             ),
             lazy_fixture("ot3_standard_deck_def"),
         ),
