@@ -142,19 +142,8 @@ export type NotifyTopic =
   | 'robot-server/runs'
   | `robot-server/runs/${string}`
 
-export type NotifyAction = 'subscribe' | 'unsubscribe'
-
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'
-  payload: {
-    hostname: string
-    topic: NotifyTopic
-  }
-  meta: { shell: true }
-}
-
-export interface NotifyUnsubscribeAction {
-  type: 'shell:NOTIFY_UNSUBSCRIBE'
   payload: {
     hostname: string
     topic: NotifyTopic
@@ -175,4 +164,3 @@ export type ShellAction =
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
   | NotifySubscribeAction
-  | NotifyUnsubscribeAction
