@@ -94,7 +94,7 @@ export function ViewOnlyParameters({
                 gridGap={SPACING.spacing8}
               >
                 <StyledText as="p" maxWidth="15rem" color={COLORS.grey60}>
-                  {formatRunTimeParameterValue(parameter)}
+                  {formatRunTimeParameterValue(parameter, t)}
                 </StyledText>
                 {hasCustomValue ? (
                   <Chip type="success" text={t('updated')} hasIcon={false} />

@@ -255,7 +255,7 @@ export function ProtocolRunRuntimeParameters({
                             gridGap={SPACING.spacing16}
                           >
                             <StyledText as="p">
-                              {formatRunTimeParameterValue(parameter)}
+                              {formatRunTimeParameterValue(parameter, t)}
                             </StyledText>
                             {/* ToDo (kk:03/19/2024) chip will be here with conditional render */}
                             {/* {index % 2 === 0 ? (

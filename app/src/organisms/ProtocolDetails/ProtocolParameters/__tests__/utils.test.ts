@@ -1,8 +1,22 @@
-import { describe, it, expect } from 'vitest'
-
+import { useTranslation } from 'react-i18next'
+import { describe, it, expect, vi } from 'vitest'
 import { formatRunTimeParameterValue } from '../utils'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
+
+const capitalizeFirstLetter = (str: string): string => {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+const mockTFunction = vi.fn(str => capitalizeFirstLetter(str))
+
+vi.mock('react-i18next', async importOriginal => {
+  const actual = await importOriginal<typeof useTranslation>()
+  return {
+    ...actual,
+    t: mockTFunction,
+  }
+})
 
 describe('utils-formatRunTimeParameterValue', () => {
   it('should return value with suffix when type is int', () => {
@@ -16,7 +30,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       max: 10,
       default: 6,
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData)
+    const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('6')
   })
 
@@ -32,7 +46,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       max: 10.0,
       default: 6.5,
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData)
+    const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('6.5 mL')
   })
 
@@ -55,7 +69,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       ],
       default: 'left',
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData)
+    const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('Left')
   })
 
@@ -68,7 +82,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       type: 'boolean',
       default: true,
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData)
+    const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('On')
   })
 
@@ -81,7 +95,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       type: 'boolean',
       default: false,
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData)
+    const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('Off')
   })
 })

@@ -118,7 +118,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
               </TableDatum>
               <TableDatum>
                 <Flex paddingLeft={SPACING.spacing24} color={COLORS.grey60}>
-                  {formatRunTimeParameterValue(parameter)}
+                  {formatRunTimeParameterValue(parameter, t)}
                 </Flex>
               </TableDatum>
               <TableDatum>

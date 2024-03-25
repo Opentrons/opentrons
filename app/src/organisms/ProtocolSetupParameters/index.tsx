@@ -228,7 +228,7 @@ export function ProtocolSetupParameters({
                 status="general"
                 title={parameter.displayName}
                 onClickSetupStep={() => console.log('TODO: wire this up')}
-                detail={formatRunTimeParameterValue(parameter)}
+                detail={formatRunTimeParameterValue(parameter, t)}
                 description={parameter.description}
                 fontSize="h4"
               />

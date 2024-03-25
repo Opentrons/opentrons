@@ -110,7 +110,7 @@ function ProtocolParameterItems({
               </StyledTableCell>
               <StyledTableCell isLast={index === runTimeParameters.length - 1}>
                 <StyledText as="p">
-                  {formatRunTimeParameterValue(parameter)}
+                  {formatRunTimeParameterValue(parameter, t)}
                 </StyledText>
               </StyledTableCell>
               <StyledTableCell isLast={index === runTimeParameters.length - 1}>

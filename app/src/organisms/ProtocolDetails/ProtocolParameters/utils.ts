@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 export const formatRunTimeParameterValue = (
-  runTimeParameter: RunTimeParameter
+  runTimeParameter: RunTimeParameter,
+  t: ReturnType<typeof useTranslation>['t']
 ): string => {
   const { type, default: defaultValue } = runTimeParameter
   const suffix =
@@ -15,7 +17,7 @@ export const formatRunTimeParameterValue = (
         ? `${defaultValue.toString()} ${suffix}`
         : defaultValue.toString()
     case 'boolean':
-      return Boolean(defaultValue) ? 'On' : 'Off'
+      return Boolean(defaultValue) ? t('on') : t('off')
     case 'str':
       if ('choices' in runTimeParameter && runTimeParameter.choices != null) {
         const choice = runTimeParameter.choices.find(
