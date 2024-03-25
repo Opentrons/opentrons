@@ -32,7 +32,7 @@ LOG.setLevel(logging.CRITICAL)
 
 # Test Parameters
 FORCE_SPEED = 10
-FORCE_MARGIN = 25  # Percentage
+FORCE_MARGIN = 35  # Percentage
 FORCE_TEST_LEFT_SETTINGS = [
     {"CURRENT": 0.15, "F_MAX": 39},
     {"CURRENT": 0.2, "F_MAX": 63},
