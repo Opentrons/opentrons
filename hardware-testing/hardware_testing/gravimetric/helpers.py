@@ -34,6 +34,7 @@ from .workarounds import get_sync_hw_api
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 import opentrons.protocol_engine.execution.pipetting as PE_pipetting
+from opentrons.protocol_engine.notes import CommandNoteAdder
 
 from opentrons.protocol_engine import (
     StateView,
@@ -238,7 +239,10 @@ def _override_ok_to_add_volume(self, volume_incr: float) -> bool:  # noqa: ANN00
 
 
 def _override_validate_asp_vol(
-    state_view: StateView, pipette_id: str, aspirate_volume: float
+    state_view: StateView,
+    pipette_id: str,
+    aspirate_volume: float,
+    command_note_adder: CommandNoteAdder,
 ) -> float:
     return aspirate_volume
 
