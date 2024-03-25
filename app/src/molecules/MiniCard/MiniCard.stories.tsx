@@ -1,17 +1,17 @@
 import * as React from 'react'
 import {
-  SPACING,
+  ALIGN_CENTER,
   Box,
   COLORS,
-  TYPOGRAPHY,
-  Flex,
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { MiniCard } from './'
 import { Slideout } from '../../atoms/Slideout'
-import { StyledText } from '../../atoms/text'
 
 import type { Story, Meta } from '@storybook/react'
 

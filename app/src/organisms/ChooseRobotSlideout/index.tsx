@@ -22,6 +22,7 @@ import {
   SIZE_1,
   SIZE_4,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -39,7 +40,6 @@ import {
 import { Banner } from '../../atoms/Banner'
 import { Slideout } from '../../atoms/Slideout'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
-import { StyledText } from '../../atoms/text'
 import { ToggleButton } from '../../atoms/buttons'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { InputField } from '../../atoms/InputField'

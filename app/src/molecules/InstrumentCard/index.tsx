@@ -1,24 +1,24 @@
 import * as React from 'react'
 
 import {
-  Box,
-  Flex,
-  InstrumentDiagram,
   ALIGN_FLEX_START,
   BORDERS,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  InstrumentDiagram,
   JUSTIFY_CENTER,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import flexGripper from '../../assets/images/flex_gripper.png'
 
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { StyledText } from '../../atoms/text'
 import { MenuOverlay } from './MenuOverlay'
 
 import type { InstrumentDiagramProps, StyleProps } from '@opentrons/components'

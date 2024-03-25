@@ -7,9 +7,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { NoParameter } from './NoParameter'
 import { formatRunTimeParameterValue } from './utils'

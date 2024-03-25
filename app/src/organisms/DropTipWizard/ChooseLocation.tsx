@@ -3,25 +3,25 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
   Btn,
-  Flex,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  RESPONSIVENESS,
-  JUSTIFY_SPACE_BETWEEN,
+  Flex,
   JUSTIFY_CENTER,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
-  useDeckLocationSelect,
+  RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
+  useDeckLocationSelect,
 } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 // import { NeedHelpLink } from '../CalibrationPanels'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'

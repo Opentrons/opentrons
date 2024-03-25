@@ -2,18 +2,18 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_FLEX_END,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
   Link,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  ALIGN_FLEX_END,
   PrimaryButton,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { StyledText } from '../../../../atoms/text'
 
 const OFFSET_DATA_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

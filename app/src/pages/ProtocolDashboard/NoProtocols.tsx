@@ -9,10 +9,9 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 import imgSrc from '../../assets/images/on-device-display/empty_protocol_dashboard.png'
 

@@ -3,18 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Btn,
-  Flex,
-  Icon,
   ALIGN_CENTER,
   BORDERS,
+  Btn,
   COLORS,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   POSITION_FIXED,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 

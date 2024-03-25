@@ -10,12 +10,12 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
-import { StyledText } from '../../atoms/text'
 
 import type { InlineNotificationProps } from '../../atoms/InlineNotification'
 

@@ -2,13 +2,13 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
 import { getShowPipetteCalibrationWarning } from '../utils'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'

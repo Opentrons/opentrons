@@ -13,8 +13,8 @@ import {
   JUSTIFY_SPACE_AROUND,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'

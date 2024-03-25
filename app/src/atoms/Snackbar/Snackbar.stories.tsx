@@ -7,8 +7,8 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 import { touchScreenViewport } from '../../DesignTokens/constants'
 
 import { Snackbar } from './index'

@@ -2,16 +2,16 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import {
+  Btn,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
-  Btn,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  StyleProps,
-  COLORS,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import type { StyleProps } from '@opentrons/components'
 
 const ACCORDION_STYLE = css`
   border-radius: 50%;

@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
-  PrimaryButton,
-  TYPOGRAPHY,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { StyledText } from '../../../atoms/text'
 import { Slideout } from '../../../atoms/Slideout'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'

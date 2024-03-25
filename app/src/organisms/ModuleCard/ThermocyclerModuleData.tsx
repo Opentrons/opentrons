@@ -2,17 +2,17 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StatusLabel } from '../../atoms/StatusLabel'
 import {
-  Flex,
-  TYPOGRAPHY,
-  FONT_WEIGHT_REGULAR,
-  DIRECTION_COLUMN,
-  COLORS,
-  SPACING,
-  WRAP,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  FONT_WEIGHT_REGULAR,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 import type { ThermocyclerData } from '../../redux/modules/api-types'
 

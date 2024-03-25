@@ -8,11 +8,11 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ChildNavigation } from '../ChildNavigation'
-import { StyledText } from '../../atoms/text'
 import { Chip } from '../../atoms/Chip'
 import { useToaster } from '../ToasterOven'
 import { mockData } from './index'

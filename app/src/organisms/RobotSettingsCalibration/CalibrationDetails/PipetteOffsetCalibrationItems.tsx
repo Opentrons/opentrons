@@ -4,15 +4,15 @@ import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
 import {
-  Flex,
   ALIGN_CENTER,
-  SPACING,
-  COLORS,
-  TYPOGRAPHY,
   BORDERS,
+  COLORS,
+  Flex,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'

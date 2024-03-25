@@ -1,8 +1,8 @@
 import * as React from 'react'
 import remark from 'remark'
 import reactRenderer from 'remark-react'
+import { StyledText } from '@opentrons/components'
 import styles from './styles.module.css'
-import { StyledText } from '../../atoms/text'
 export interface ReleaseNotesProps {
   source?: string | null
 }

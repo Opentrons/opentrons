@@ -2,9 +2,9 @@ import * as React from 'react'
 import { describe, it, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
-import { TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { TYPOGRAPHY } from '../../../ui-style-constants'
+import { renderWithProviders } from '../../../testing/utils'
+import { StyledText } from '..'
 
 const render = (props: React.ComponentProps<typeof StyledText>) => {
   return renderWithProviders(<StyledText {...props} />)[0]

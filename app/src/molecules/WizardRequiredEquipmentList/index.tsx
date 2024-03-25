@@ -14,11 +14,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
 import { equipmentImages } from './equipmentImages'

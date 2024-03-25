@@ -10,10 +10,10 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
   TEXT_ALIGN_RIGHT,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const INPUT_TYPE_TEXT = 'text' as const

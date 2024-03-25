@@ -4,35 +4,35 @@ import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
 import {
-  Box,
-  Flex,
-  Icon,
-  HandleKeypress,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  BORDERS,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_ROW,
-  ALIGN_FLEX_START,
   ALIGN_FLEX_END,
-  PrimaryButton,
-  TEXT_ALIGN_LEFT,
-  JUSTIFY_FLEX_START,
+  ALIGN_FLEX_START,
   ALIGN_STRETCH,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  HandleKeypress,
+  Icon,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TEXT_ALIGN_LEFT,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
+import { TouchControlButton } from './TouchControlButton'
 
 import type { IconName } from '@opentrons/components'
 import type { CSSProperties } from 'styled-components'
 import type { Jog, Plane, Sign, Bearing, Axis, StepSize } from './types'
-import { TouchControlButton } from './TouchControlButton'
 
 interface Control {
   bearing: Bearing

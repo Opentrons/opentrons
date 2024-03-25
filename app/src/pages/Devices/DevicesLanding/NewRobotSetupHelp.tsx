@@ -6,12 +6,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Link,
-  TYPOGRAPHY,
   PrimaryButton,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { getTopPortalEl } from '../../../App/portal'
 import { LegacyModal } from '../../../molecules/LegacyModal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'

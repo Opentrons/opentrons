@@ -11,13 +11,13 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { StyledText } from '../../atoms/text'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 import { formatLastCalibrated } from './CalibrationDetails/utils'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
