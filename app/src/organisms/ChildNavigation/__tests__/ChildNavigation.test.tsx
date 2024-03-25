@@ -1,16 +1,17 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { SmallButton } from '../../../atoms/buttons'
 import { ChildNavigation } from '..'
 
 const render = (props: React.ComponentProps<typeof ChildNavigation>) =>
   renderWithProviders(<ChildNavigation {...props} />)
 
-const mockOnClickBack = jest.fn()
-const mockOnClickButton = jest.fn()
-const mockOnClickSecondaryButton = jest.fn()
+const mockOnClickBack = vi.fn()
+const mockOnClickButton = vi.fn()
+const mockOnClickSecondaryButton = vi.fn()
 
 const mockSecondaryButtonProps: React.ComponentProps<typeof SmallButton> = {
   onClick: mockOnClickSecondaryButton,

@@ -128,7 +128,6 @@ class GetStatusResponsePayload(EmptyPayload):
     """Get status response."""
 
     status: utils.UInt8Field
-    data: utils.UInt32Field
 
 
 @dataclass(eq=False)
@@ -655,7 +654,7 @@ class GetHepaFanStatePayloadResponse(EmptyPayload):
 
 @dataclass(eq=False)
 class SetHepaUVStateRequestPayload(EmptyPayload):
-    """A request to set the state and duration in seconds of the hepa uv light."""
+    """A request to set the state and timeout in seconds of the hepa uv light."""
 
     uv_duration_s: utils.UInt32Field
     uv_light_on: utils.UInt8Field
@@ -663,7 +662,7 @@ class SetHepaUVStateRequestPayload(EmptyPayload):
 
 @dataclass(eq=False)
 class GetHepaUVStatePayloadResponse(EmptyPayload):
-    """A response with the state and duration in seconds of the hepa uv light."""
+    """A response with the state and timeout in seconds of the hepa uv light."""
 
     uv_duration_s: utils.UInt32Field
     uv_light_on: utils.UInt8Field

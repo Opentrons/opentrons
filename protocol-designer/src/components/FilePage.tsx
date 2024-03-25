@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
@@ -15,18 +16,19 @@ import {
   InputField,
 } from '@opentrons/components'
 import { resetScrollElements } from '../ui/steps/utils'
-import { Portal } from './portals/MainPageModalPortal'
 import { EditModulesCard } from './modules'
 import { EditModules } from './EditModules'
+
+import styles from './FilePage.module.css'
+import modalStyles from '../components/modals/modal.module.css'
+import formStyles from '../components/forms/forms.module.css'
 import { actions, selectors as fileSelectors } from '../file-data'
 import { actions as navActions } from '../navigation'
 import { actions as steplistActions } from '../steplist'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
 import { FilePipettesModal } from './modals/FilePipettesModal'
-import styles from './FilePage.css'
-import modalStyles from '../components/modals/modal.css'
-import formStyles from '../components/forms/forms.css'
+import { getTopPortalEl } from './portals/TopPortal'
 
 import type { ModuleType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
@@ -86,8 +88,25 @@ export const FilePage = (): JSX.Element => {
     handleSubmit,
     watch,
     control,
+    setValue,
     formState: { isDirty },
   } = useForm<FileMetadataFields>({ defaultValues: formValues })
+
+  //  to ensure that values from watch are up to date if the defaultValues
+  //  change
+  React.useEffect(() => {
+    setValue('protocolName', formValues.protocolName)
+    setValue('created', formValues.created)
+    setValue('lastModified', formValues.lastModified)
+    setValue('author', formValues.author)
+    setValue('description', formValues.description)
+  }, [
+    formValues.protocolName,
+    formValues.created,
+    formValues.lastModified,
+    formValues.author,
+    formValues.description,
+  ])
 
   const [created, lastModified, protocolName, author, description] = watch([
     'created',
@@ -235,18 +254,20 @@ export const FilePage = (): JSX.Element => {
           {t('continue_to_liquids')}
         </DeprecatedPrimaryButton>
       </div>
-
-      <Portal>
-        {isEditPipetteModalOpen && (
-          <FilePipettesModal closeModal={closeEditPipetteModal} />
-        )}
-        {moduleToEdit != null && (
-          <EditModules
-            moduleToEdit={moduleToEdit}
-            onCloseClick={closeEditModulesModal}
-          />
-        )}
-      </Portal>
+      {createPortal(
+        <>
+          {isEditPipetteModalOpen && (
+            <FilePipettesModal closeModal={closeEditPipetteModal} />
+          )}
+          {moduleToEdit != null && (
+            <EditModules
+              moduleToEdit={moduleToEdit}
+              onCloseClick={closeEditModulesModal}
+            />
+          )}
+        </>,
+        getTopPortalEl()
+      )}
     </div>
   )
 }

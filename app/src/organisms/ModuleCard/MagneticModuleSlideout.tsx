@@ -7,6 +7,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   COLORS,
+  BORDERS,
   TYPOGRAPHY,
   SPACING,
   JUSTIFY_END,
@@ -26,7 +27,6 @@ import { Slideout } from '../../atoms/Slideout'
 import { InputField } from '../../atoms/InputField'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 
-import type { TFunctionResult } from 'i18next'
 import type { MagneticModule } from '../../redux/modules/types'
 import type {
   MagneticModuleEngageMagnetCreateCommand,
@@ -79,9 +79,9 @@ export const MagneticModuleSlideout = (
   const moduleName = getModuleDisplayName(module.moduleModel)
   const info = getInfoByModel(module.moduleModel)
 
-  let max: number | TFunctionResult = 0
-  let labwareBottom: number | TFunctionResult = 0
-  let disengageHeight: number | TFunctionResult = 0
+  let max: string = '0'
+  let labwareBottom: string = '0'
+  let disengageHeight: string = '0'
 
   switch (info.version) {
     case 'GEN 1': {
@@ -170,6 +170,7 @@ export const MagneticModuleSlideout = (
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         padding={SPACING.spacing16}
+        borderRadius={BORDERS.borderRadius4}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}

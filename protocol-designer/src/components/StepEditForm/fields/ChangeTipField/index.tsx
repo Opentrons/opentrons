@@ -13,7 +13,7 @@ import {
 } from './getDisabledChangeTipOptions'
 import { ChangeTipOptions } from '@opentrons/step-generation'
 import { FieldProps } from '../../types'
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 
 const ALL_CHANGE_TIP_VALUES: ChangeTipOptions[] = [
   'always',

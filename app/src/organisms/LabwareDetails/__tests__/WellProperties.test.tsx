@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, expect, beforeEach } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockCircularLabwareWellGroupProperties } from '../../../redux/custom-labware/__fixtures__'
 import { WellProperties } from '../WellProperties'
@@ -21,28 +23,28 @@ describe('WellProperties', () => {
   })
 
   it('renders correct heading and label when wellBottomShape exists', () => {
-    const [{ getByText, getByRole }] = render(props)
+    render(props)
 
-    getByRole('heading', { name: 'max volume' })
-    getByText('0.01 mL')
-    getByRole('heading', { name: 'mockLabel shape' })
-    getByText('Flat_Bottom')
+    screen.getByRole('heading', { name: 'max volume' })
+    screen.getByText('0.01 mL')
+    screen.getByRole('heading', { name: 'mockLabel shape' })
+    screen.getByText('Flat_Bottom')
   })
 
   it('does not render wellBottomShape section when wellBottomShape is null', () => {
     props.wellProperties.metadata.wellBottomShape = undefined
-    const [{ queryByRole }] = render(props)
+    render(props)
 
     expect(
-      queryByRole('heading', { name: 'mockLabel shape' })
+      screen.queryByRole('heading', { name: 'mockLabel shape' })
     ).not.toBeInTheDocument()
   })
 
   it('renders correct label when volume is null', () => {
     props.wellProperties.totalLiquidVolume = null
-    const [{ queryByText, getByText }] = render(props)
+    render(props)
 
-    expect(queryByText('0.01 mL')).not.toBeInTheDocument()
-    getByText('various')
+    expect(screen.queryByText('0.01 mL')).not.toBeInTheDocument()
+    screen.getByText('various')
   })
 })

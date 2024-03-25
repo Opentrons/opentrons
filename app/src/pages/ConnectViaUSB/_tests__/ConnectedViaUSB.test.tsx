@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { vi, it, describe, expect, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
@@ -11,21 +11,18 @@ import { ConnectViaUSB } from '../../../pages/ConnectViaUSB'
 
 import type { UseQueryResult } from 'react-query'
 import type { ActiveConnections } from '@opentrons/api-client'
+import type * as ReactRouterDom from 'react-router-dom'
 
-const mockPush = jest.fn()
+const mockPush = vi.fn()
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof ReactRouterDom>()
   return {
-    ...reactRouterDom,
+    ...actual,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
-jest.mock('@opentrons/react-api-client')
-
-const mockUseConnectionsQuery = useConnectionsQuery as jest.MockedFunction<
-  typeof useConnectionsQuery
->
+vi.mock('@opentrons/react-api-client')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
@@ -40,15 +37,12 @@ const render = (): ReturnType<typeof renderWithProviders> => {
 
 describe('ConnectViaUSB', () => {
   beforeEach(() => {
-    when(mockUseConnectionsQuery)
-      .calledWith()
-      .mockReturnValue(({
-        data: { connections: [] },
-      } as unknown) as UseQueryResult<ActiveConnections>)
+    vi.mocked(useConnectionsQuery).mockReturnValue(({
+      data: { connections: [] },
+    } as unknown) as UseQueryResult<ActiveConnections>)
   })
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
 
   it('should render no connection text, button, and image', () => {
@@ -68,11 +62,9 @@ describe('ConnectViaUSB', () => {
   })
 
   it('should render successful connection text and button', () => {
-    when(mockUseConnectionsQuery)
-      .calledWith()
-      .mockReturnValue(({
-        data: { connections: [{ agent: 'com.opentrons.app.usb' }] },
-      } as unknown) as UseQueryResult<ActiveConnections>)
+    vi.mocked(useConnectionsQuery).mockReturnValue(({
+      data: { connections: [{ agent: 'com.opentrons.app.usb' }] },
+    } as unknown) as UseQueryResult<ActiveConnections>)
     const [{ getByText }] = render()
     getByText('USB')
     getByText('Successfully connected!')
@@ -83,11 +75,9 @@ describe('ConnectViaUSB', () => {
   })
 
   it('should route to the rename robot page when tapping continue button', () => {
-    when(mockUseConnectionsQuery)
-      .calledWith()
-      .mockReturnValue(({
-        data: { connections: [{ agent: 'com.opentrons.app.usb' }] },
-      } as unknown) as UseQueryResult<ActiveConnections>)
+    vi.mocked(useConnectionsQuery).mockReturnValue(({
+      data: { connections: [{ agent: 'com.opentrons.app.usb' }] },
+    } as unknown) as UseQueryResult<ActiveConnections>)
     const [{ getByText }] = render()
     const button = getByText('Continue')
     fireEvent.click(button)

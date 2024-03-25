@@ -1,3 +1,4 @@
+import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { getCommands } from '@opentrons/api-client'
 
 import { getPipettesWithTipAttached } from '../getPipettesWithTipAttached'
@@ -5,9 +6,7 @@ import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 import type { GetPipettesWithTipAttached } from '../getPipettesWithTipAttached'
 
-jest.mock('@opentrons/api-client')
-
-const mockGetCommands = getCommands as jest.MockedFunction<typeof getCommands>
+vi.mock('@opentrons/api-client')
 
 const mockAttachedInstruments = {
   data: [
@@ -154,7 +153,7 @@ describe('getPipettesWithTipAttached', () => {
       runRecord: mockRunRecord as any,
     }
 
-    mockGetCommands.mockResolvedValue({
+    vi.mocked(getCommands).mockResolvedValue({
       data: mockCommands,
     } as any)
   })

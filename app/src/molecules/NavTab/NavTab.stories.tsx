@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router'
+import { MemoryRouter } from 'react-router-dom'
 import {
   Flex,
   ALIGN_START,
@@ -24,6 +24,7 @@ const Template: Story<React.ComponentProps<typeof NavTab>> = args => (
   >
     <MemoryRouter initialEntries={['/general']}>
       <NavTab to="/general" tabName="General" />
+      <NavTab to="/privacy" tabName="Privacy" />
       <NavTab to="/advanced" tabName="Advanced" />
       <NavTab to="/feature-flags" tabName="Feature flags" />
     </MemoryRouter>

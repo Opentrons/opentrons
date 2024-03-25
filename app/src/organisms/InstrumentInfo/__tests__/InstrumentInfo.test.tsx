@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { mockPipetteData1Channel } from '../../../redux/pipettes/__fixtures__'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
@@ -8,26 +9,20 @@ import { GripperWizardFlows } from '../../GripperWizardFlows'
 import { InstrumentInfo } from '..'
 
 import type { GripperData } from '@opentrons/api-client'
+import type * as Dom from 'react-router-dom'
 
-const mockPush = jest.fn()
+const mockPush = vi.fn()
 
-jest.mock('../../PipetteWizardFlows')
-jest.mock('../../GripperWizardFlows')
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('../../PipetteWizardFlows')
+vi.mock('../../GripperWizardFlows')
+vi.mock('react-router-dom', async importOriginal => {
+  const reactRouterDom = await importOriginal<typeof Dom>()
   return {
     ...reactRouterDom,
     useHistory: () => ({ push: mockPush } as any),
   }
 })
 
-const mockPipetteWizardFlows = PipetteWizardFlows as jest.MockedFunction<
-  typeof PipetteWizardFlows
->
-
-const mockGripperWizardFlows = GripperWizardFlows as jest.MockedFunction<
-  typeof GripperWizardFlows
->
 const render = (props: React.ComponentProps<typeof InstrumentInfo>) => {
   return renderWithProviders(<InstrumentInfo {...props} />, {
     i18nInstance: i18n,
@@ -72,8 +67,12 @@ const mockGripperDataWithCalData: GripperData = {
 describe('InstrumentInfo', () => {
   let props: React.ComponentProps<typeof InstrumentInfo>
   beforeEach(() => {
-    mockPipetteWizardFlows.mockReturnValue(<div>mock PipetteWizardFlows</div>)
-    mockGripperWizardFlows.mockReturnValue(<div>mock GripperWizardFlows</div>)
+    vi.mocked(PipetteWizardFlows).mockReturnValue(
+      <div>mock PipetteWizardFlows</div>
+    )
+    vi.mocked(GripperWizardFlows).mockReturnValue(
+      <div>mock GripperWizardFlows</div>
+    )
     props = {
       instrument: mockGripperData,
     }

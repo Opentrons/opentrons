@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import { Portal } from '../../../../App/portal'
+import { getTopPortalEl } from '../../../../App/portal'
 import { WizardHeader } from '../../../../molecules/WizardHeader'
 import { LegacyModalShell } from '../../../../molecules/LegacyModal'
 import { CalibrateTipLength } from '../../../../organisms/CalibrateTipLength'
@@ -149,8 +150,8 @@ export function useDashboardCalibrateTipLength(
         : null
     )?.status === RobotApi.PENDING
 
-  let Wizard: JSX.Element | null = (
-    <Portal level="top">
+  let Wizard: JSX.Element | null = createPortal(
+    <>
       {showCalBlockModal && sessionParams.current != null ? (
         <AskForCalibrationBlockModal
           onResponse={hasBlock => {
@@ -182,7 +183,8 @@ export function useDashboardCalibrateTipLength(
         offsetInvalidationHandler={invalidateHandlerRef.current}
         allowChangeTipRack={sessionParams.current?.tipRackDefinition == null}
       />
-    </Portal>
+    </>,
+    getTopPortalEl()
   )
 
   if (

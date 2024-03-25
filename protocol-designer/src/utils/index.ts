@@ -10,21 +10,16 @@ import {
   isAddressableAreaStandardSlot,
   CutoutFixtureId,
   RobotType,
+  INTERACTIVE_WELL_DATA_ATTRIBUTE,
 } from '@opentrons/shared-data'
-import { WellGroup } from '@opentrons/components'
 import { BoundingRect, GenericRect } from '../collision-types'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/components/src/hardware-sim/Labware/labwareInternals/Well'
+import type { WellGroup } from '@opentrons/components'
 
-export const registerSelectors: (arg0: any) => void =
-  process.env.NODE_ENV === 'development'
-    ? // eslint-disable-next-line @typescript-eslint/no-var-requires
-      require('reselect-tools').registerSelectors
-    : (a: any) => {}
 export const uuid: () => string = uuidv1
 // Collision detection for SelectionRect / SelectableLabware
 export const rectCollision = (

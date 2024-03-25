@@ -1,59 +1,53 @@
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { createFile } from '../../file-data/selectors/fileCreator'
 import { getFileMetadata } from '../../file-data/selectors/fileFields'
 import { saveProtocolFile } from '../actions'
 import { saveFile as saveFileUtil } from '../utils'
-jest.mock('../../file-data/selectors/fileCreator')
-jest.mock('../../file-data/selectors/fileFields')
-jest.mock('../utils')
-const createFileSelectorMock = createFile as jest.MockedFunction<
-  typeof createFile
->
-const getFileMetadataMock = getFileMetadata as jest.MockedFunction<
-  typeof getFileMetadata
->
-const saveFileUtilMock = saveFileUtil as jest.MockedFunction<
-  typeof saveFileUtil
->
+
+vi.mock('../../file-data/selectors/fileCreator')
+vi.mock('../../file-data/selectors/fileFields')
+vi.mock('../utils')
+
 afterEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
 })
 describe('saveProtocolFile thunk', () => {
   it('should dispatch SAVE_PROTOCOL_FILE and then call saveFile util', () => {
     const fakeState = {}
     const mockFileData = {}
     let actionWasDispatched = false
-    createFileSelectorMock.mockImplementation(state => {
+    vi.mocked(createFile).mockImplementation(state => {
       expect(state).toBe(fakeState)
       expect(actionWasDispatched).toBe(true)
       return mockFileData as any
     })
-    getFileMetadataMock.mockImplementation(state => {
+    vi.mocked(getFileMetadata).mockImplementation(state => {
       expect(state).toBe(fakeState)
       expect(actionWasDispatched).toBe(true)
       return {
         protocolName: 'fooFileName',
       }
     })
-    saveFileUtilMock.mockImplementation((fileData, fileName) => {
+    vi.mocked(saveFileUtil).mockImplementation((fileData, fileName) => {
       expect(fileName).toEqual('fooFileName.json')
       expect(fileData).toBe(mockFileData)
     })
-    const dispatch: () => any = jest.fn().mockImplementation(action => {
+    const dispatch: () => any = vi.fn().mockImplementation(action => {
       expect(action).toEqual({
         type: 'SAVE_PROTOCOL_FILE',
       })
       actionWasDispatched = true
     })
-    const getState: () => any = jest.fn().mockImplementation(() => {
+    const getState: () => any = vi.fn().mockImplementation(() => {
       // once we call getState, the thunk should already have dispatched the action
       expect(actionWasDispatched).toBe(true)
       return fakeState
     })
     saveProtocolFile()(dispatch, getState)
     expect(dispatch).toHaveBeenCalled()
-    expect(createFileSelectorMock).toHaveBeenCalled()
-    expect(getFileMetadataMock).toHaveBeenCalled()
+    expect(vi.mocked(createFile)).toHaveBeenCalled()
+    expect(vi.mocked(getFileMetadata)).toHaveBeenCalled()
     expect(getState).toHaveBeenCalled()
-    expect(saveFileUtilMock).toHaveBeenCalled()
+    expect(vi.mocked(saveFileUtil)).toHaveBeenCalled()
   })
 })

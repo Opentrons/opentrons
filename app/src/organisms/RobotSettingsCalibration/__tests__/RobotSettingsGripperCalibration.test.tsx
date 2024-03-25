@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { i18n } from '../../../i18n'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
 import { formatLastCalibrated } from '../CalibrationDetails/utils'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
@@ -12,19 +12,9 @@ import { RobotSettingsGripperCalibration } from '../RobotSettingsGripperCalibrat
 
 import type { GripperData } from '@opentrons/api-client'
 
-jest.mock('../../../organisms/GripperWizardFlows')
-jest.mock('../CalibrationDetails/utils')
-jest.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
-
-const mockGripperWizardFlows = GripperWizardFlows as jest.MockedFunction<
-  typeof GripperWizardFlows
->
-const mockFormatLastCalibrated = formatLastCalibrated as jest.MockedFunction<
-  typeof formatLastCalibrated
->
-const mockUseIsEstopNotDisengaged = useIsEstopNotDisengaged as jest.MockedFunction<
-  typeof useIsEstopNotDisengaged
->
+vi.mock('../../../organisms/GripperWizardFlows')
+vi.mock('../CalibrationDetails/utils')
+vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockGripperData = {
   serialNumber: 'mockSerial123',
@@ -55,20 +45,13 @@ const render = (
 describe('RobotSettingsGripperCalibration', () => {
   let props: React.ComponentProps<typeof RobotSettingsGripperCalibration>
   beforeEach(() => {
-    mockFormatLastCalibrated.mockReturnValue('last calibrated 1/2/3')
-    mockGripperWizardFlows.mockReturnValue(<>Mock Wizard Flow</>)
-    when(mockUseIsEstopNotDisengaged)
-      .calledWith(ROBOT_NAME)
-      .mockReturnValue(false)
+    vi.mocked(formatLastCalibrated).mockReturnValue('last calibrated 1/2/3')
+    vi.mocked(GripperWizardFlows).mockReturnValue(<>Mock Wizard Flow</>)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
     props = {
       gripper: mockGripperData,
       robotName: ROBOT_NAME,
     }
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
-    resetAllWhenMocks()
   })
 
   it('renders a title and description - Gripper Calibration section', () => {
@@ -124,12 +107,10 @@ describe('RobotSettingsGripperCalibration', () => {
   })
 
   it('overflow menu is disabled when e-stop button is pressed', () => {
-    when(mockUseIsEstopNotDisengaged)
-      .calledWith(ROBOT_NAME)
-      .mockReturnValue(true)
-    const [{ getByRole }] = render(props)
+    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(true)
+    render(props)
     expect(
-      getByRole('button', {
+      screen.getByRole('button', {
         name: 'CalibrationOverflowMenu_button_gripperCalibration',
       })
     ).toBeDisabled()

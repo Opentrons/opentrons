@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
@@ -19,9 +20,6 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
-  LabwareDefinition2,
-  ModuleType,
-  ModuleModel,
   getModuleType,
   THERMOCYCLER_MODULE_V2,
   getAreSlotsHorizontallyAdjacent,
@@ -35,7 +33,7 @@ import {
   actions as labwareDefActions,
   selectors as labwareDefSelectors,
 } from '../../labware-defs'
-import { selectors as stepFormSelectors, ModuleOnDeck } from '../../step-forms'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
 import {
   getLabwareIsCompatible as _getLabwareIsCompatible,
@@ -45,16 +43,22 @@ import {
 import { getPipetteEntities } from '../../step-forms/selectors'
 import { getHas96Channel } from '../../utils'
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
-import { Portal } from '../portals/TopPortal'
+import { getTopPortalEl } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
 import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { LabwareItem } from './LabwareItem'
 import { LabwarePreview } from './LabwarePreview'
-import styles from './styles.css'
+import styles from './styles.module.css'
 
+import type {
+  LabwareDefinition2,
+  ModuleType,
+  ModuleModel,
+} from '@opentrons/shared-data'
 import type { DeckSlot, ThunkDispatch } from '../../types'
 import type { LabwareDefByDefURI } from '../../labware-defs'
+import type { ModuleOnDeck } from '../../step-forms'
 
 export interface Props {
   onClose: (e?: any) => unknown
@@ -448,12 +452,13 @@ export function LabwareSelectionModal(): JSX.Element | null {
 
   return (
     <>
-      <Portal>
+      {createPortal(
         <LabwarePreview
           labwareDef={previewedLabware}
           moduleCompatibility={moduleCompatibility}
-        />
-      </Portal>
+        />,
+        getTopPortalEl()
+      )}
       {blockingCustomLabwareHint}
       <div
         ref={wrapperRef}

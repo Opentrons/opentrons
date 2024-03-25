@@ -119,7 +119,7 @@ const ERROR_MESSAGE_STYLE = css`
   margin-bottom: ${SPACING.spacing16};
   padding: ${`${SPACING.spacing8} ${SPACING.spacing12}`};
   background-color: ${COLORS.grey30};
-  border-radius: ${BORDERS.borderRadiusSize1};
+  border-radius: ${BORDERS.borderRadius8};
   overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
 
   ::-webkit-scrollbar-thumb {

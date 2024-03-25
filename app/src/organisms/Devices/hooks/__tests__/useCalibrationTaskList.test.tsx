@@ -2,7 +2,8 @@ import * as React from 'react'
 import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import {
   useDeleteCalibrationMutation,
@@ -32,40 +33,24 @@ import { i18n } from '../../../../i18n'
 import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
 
-jest.mock('../')
-jest.mock('@opentrons/react-api-client')
+vi.mock('../')
+vi.mock('@opentrons/react-api-client')
 
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
->
-const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as jest.MockedFunction<
-  typeof useAllTipLengthCalibrationsQuery
->
-const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrationsQuery as jest.MockedFunction<
-  typeof useAllPipetteOffsetCalibrationsQuery
->
-const mockUseCalibrationStatusQuery = useCalibrationStatusQuery as jest.MockedFunction<
-  typeof useCalibrationStatusQuery
->
-const mockUseDeleteCalibrationMutation = useDeleteCalibrationMutation as jest.MockedFunction<
-  typeof useDeleteCalibrationMutation
->
-
-const mockPipOffsetCalLauncher = jest.fn()
-const mockTipLengthCalLauncher = jest.fn()
-const mockDeckCalLauncher = jest.fn()
+const mockPipOffsetCalLauncher = vi.fn()
+const mockTipLengthCalLauncher = vi.fn()
+const mockDeckCalLauncher = vi.fn()
 
 describe('useCalibrationTaskList hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   let store: Store<State>
-  const mockDeleteCalibration = jest.fn()
+  const mockDeleteCalibration = vi.fn()
 
   beforeEach(() => {
-    mockUseDeleteCalibrationMutation.mockReturnValue({
+    vi.mocked(useDeleteCalibrationMutation).mockReturnValue({
       deleteCalibration: mockDeleteCalibration,
     } as any)
-    store = createStore(jest.fn(), {})
-    store.dispatch = jest.fn()
+    store = createStore(vi.fn(), {})
+    store.dispatch = vi.fn()
     wrapper = ({ children }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
@@ -73,26 +58,25 @@ describe('useCalibrationTaskList hook', () => {
     )
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns a task list with 3 tasks: Deck Calibration, Left Mount, and Right Mount', () => {
     const tasks = ['Deck Calibration', 'Left Mount', 'Right Mount']
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockCompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockCompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompletePipetteOffsetCalibrations },
       } as any)
 
@@ -115,20 +99,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns a null active index when all calibrations are complete', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockCompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockCompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompletePipetteOffsetCalibrations },
       } as any)
 
@@ -144,20 +128,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns "Empty" for a mount without an attached pipette', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockSingleAttachedPipetteResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockSingleAttachedPipetteResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockCompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockCompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompletePipetteOffsetCalibrations },
       } as any)
     const { result } = renderHook(
@@ -176,20 +160,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns the the correct active when Deck Calibration is needed', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockIncompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockIncompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompletePipetteOffsetCalibrations },
       } as any)
     const { result } = renderHook(
@@ -208,20 +192,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns the the correct active when Deck Recalibration is needed', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockBadDeckCalibration } as any) // markedBad === true
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockBadDeckCalibration } as any) // markedBad === true
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompletePipetteOffsetCalibrations },
       } as any)
     const { result } = renderHook(
@@ -240,20 +224,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns the the correct active index when a pipette is missing Offset Calibrations', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockCompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockCompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockIncompletePipetteOffsetCalibrations },
       } as any) // right mount marked as bad
     const { result } = renderHook(
@@ -272,20 +256,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns the the correct active index when both pipettes have bad Offset Calibrations', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockCompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockCompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockBadPipetteOffsetCalibrations },
       } as any)
     const { result } = renderHook(
@@ -304,20 +288,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns the the correct active index when a pipette is missing Tip Length Calibrations', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockCompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockCompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockIncompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompletePipetteOffsetCalibrations },
       } as any)
     const { result } = renderHook(
@@ -336,18 +320,18 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns the the correct active index when both pipettes have bad Tip Length Calibrations', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockCompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockCompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: { data: mockBadTipLengthCalibrations } } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+      .thenReturn({ data: { data: mockBadTipLengthCalibrations } } as any)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompletePipetteOffsetCalibrations },
       } as any)
     const { result } = renderHook(
@@ -366,18 +350,18 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns the the correct active index when both tlc and poc are bad', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockCompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockCompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: { data: mockBadTipLengthCalibrations } } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+      .thenReturn({ data: { data: mockBadTipLengthCalibrations } } as any)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockBadPipetteOffsetCalibrations },
       } as any)
     const { result } = renderHook(
@@ -396,20 +380,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns the the correct active index when both deck and poc are bad', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockBadDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockBadDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockBadPipetteOffsetCalibrations },
       } as any)
     const { result } = renderHook(
@@ -428,18 +412,18 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns the the correct active index when all calibrations are marked bad', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockBadDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockBadDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: { data: mockBadTipLengthCalibrations } } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+      .thenReturn({ data: { data: mockBadTipLengthCalibrations } } as any)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockBadPipetteOffsetCalibrations },
       } as any)
     const { result } = renderHook(
@@ -458,20 +442,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns the earliest encountered task as the active index when multiple tasks require calibrations', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockIncompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockIncompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockIncompletePipetteOffsetCalibrations },
       } as any) // right mount marked as bad
     const { result } = renderHook(
@@ -490,20 +474,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns descriptions for tasks that need to be completed', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: null } as any) // null deck response
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: null } as any) // null deck response
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockIncompleteTipLengthCalibrations },
       } as any) // left calibration missing
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockIncompletePipetteOffsetCalibrations },
       } as any) // right mount marked as bad
     const { result } = renderHook(
@@ -530,20 +514,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('returns timestamps for tasks that have been completed', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockCompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockCompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompletePipetteOffsetCalibrations },
       } as any)
     const { result } = renderHook(
@@ -570,20 +554,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('passes the launcher function to cta onclick handlers for recalibration', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockCompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockCompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockCompletePipetteOffsetCalibrations },
       } as any)
 
@@ -612,20 +596,20 @@ describe('useCalibrationTaskList hook', () => {
   })
 
   it('passes the launcher function to cta onclick handlers for calibration', () => {
-    when(mockUseAttachedPipettes)
+    when(vi.mocked(useAttachedPipettes))
       .calledWith()
-      .mockReturnValue(mockAttachedPipettesResponse)
-    when(mockUseCalibrationStatusQuery)
+      .thenReturn(mockAttachedPipettesResponse)
+    when(vi.mocked(useCalibrationStatusQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({ data: mockIncompleteDeckCalibration } as any)
-    when(mockUseAllTipLengthCalibrationsQuery)
+      .thenReturn({ data: mockIncompleteDeckCalibration } as any)
+    when(vi.mocked(useAllTipLengthCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockIncompleteTipLengthCalibrations },
       } as any)
-    when(mockUseAllPipetteOffsetCalibrationsQuery)
+    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith({ refetchInterval: 5000 })
-      .mockReturnValue({
+      .thenReturn({
         data: { data: mockIncompletePipetteOffsetCalibrations },
       } as any)
 

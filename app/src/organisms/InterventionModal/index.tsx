@@ -59,7 +59,7 @@ const MODAL_STYLE = {
   maxHeight: '100%',
   width: '47rem',
   border: `6px ${BORDERS.styleSolid} ${COLORS.blue50}`,
-  borderRadius: BORDERS.radiusSoftCorners,
+  borderRadius: BORDERS.borderRadius8,
   boxShadow: BORDERS.smallDropShadow,
 } as const
 
@@ -78,10 +78,8 @@ const CONTENT_STYLE = {
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
   gridGap: SPACING.spacing24,
-  padding: `${SPACING.spacing32}`,
-  borderRadius: `0px 0px ${String(BORDERS.radiusSoftCorners)} ${String(
-    BORDERS.radiusSoftCorners
-  )}`,
+  padding: SPACING.spacing32,
+  borderRadius: BORDERS.borderRadius8,
 } as const
 
 const FOOTER_STYLE = {
@@ -158,7 +156,7 @@ export function InterventionModal({
   // reimplement when design system shares a modal component between desktop/ODD
   return isOnDevice ? (
     <Modal
-      border={`8px ${BORDERS.styleSolid} ${COLORS.blue50}`}
+      border={`${BORDERS.borderRadius8} ${BORDERS.styleSolid} ${COLORS.blue50}`}
       modalSize="large"
       header={{
         backgroundColor: COLORS.blue50,
@@ -196,7 +194,7 @@ export function InterventionModal({
       <Flex {...BASE_STYLE} zIndex={10}>
         <Box
           {...MODAL_STYLE}
-          onClick={e => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation()
           }}
         >

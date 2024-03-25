@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { screen } from '@testing-library/react'
+import { describe, it, beforeEach } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { WellCount } from '../WellCount'
 
@@ -19,9 +21,8 @@ describe('WellCount', () => {
   })
 
   it('renders correct label and count', () => {
-    const [{ getByText }] = render(props)
-
-    getByText('mockLabel Count')
-    getByText('1')
+    render(props)
+    screen.getByText('mockLabel Count')
+    screen.getByText('1')
   })
 })

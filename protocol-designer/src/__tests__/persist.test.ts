@@ -1,17 +1,20 @@
+import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
+import type { MockInstance } from 'vitest'
+
 import * as persist from '../persist'
 
 describe('persist', () => {
-  let getItemSpy: jest.SpyInstance<any, unknown[]>
-  let setItemSpy: jest.SpyInstance<any, unknown[]>
+  let getItemSpy: MockInstance<unknown[], unknown>
+  let setItemSpy: MockInstance<unknown[], unknown>
 
   beforeEach(() => {
     const LocalStorageProto = Object.getPrototypeOf(global.localStorage)
-    getItemSpy = jest.spyOn(LocalStorageProto, 'getItem')
-    setItemSpy = jest.spyOn(LocalStorageProto, 'setItem')
+    getItemSpy = vi.spyOn(LocalStorageProto, 'getItem')
+    setItemSpy = vi.spyOn(LocalStorageProto, 'setItem')
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     localStorage.clear()
   })
 

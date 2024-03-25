@@ -32,8 +32,12 @@ class TipLengthModel(BaseModel):
         default_factory=CalibrationStatus,
         description="The status of the calibration data.",
     )
-    uri: typing.Union[LabwareUri, Literal[""]] = Field(
-        ..., description="The tiprack URI associated with the tip length data."
+    # Old data may have a `uri` field, replaced later by `definitionHash`.
+    # uri: typing.Union[LabwareUri, Literal[""]] = Field(
+    #    ..., description="The tiprack URI associated with the tip length data."
+    # )
+    definitionHash: str = Field(
+        ..., description="The tiprack hash associated with the tip length data."
     )
 
     @validator("tipLength")

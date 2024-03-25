@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { BORDERS, SPACING } from '../ui-style-constants'
-import { COLORS } from '../helix-design-system'
+import { SPACING } from '../ui-style-constants'
+import { BORDERS, COLORS } from '../helix-design-system'
 import { StyleProps, styleProps } from '../primitives'
 import {
   POSITION_FIXED,
@@ -104,7 +104,7 @@ const ModalArea = styled.div<
   overflow-y: ${OVERFLOW_AUTO};
   max-height: 100%;
   width: 100%;
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius8};
   box-shadow: ${BORDERS.smallDropShadow};
   height: ${({ isFullPage }) => (isFullPage ? '100%' : 'auto')};
   background-color: ${COLORS.white};

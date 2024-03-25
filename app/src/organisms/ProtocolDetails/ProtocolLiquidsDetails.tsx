@@ -7,6 +7,7 @@ import {
 } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -67,15 +68,15 @@ export const ProtocolLiquidsDetails = (
         })
       ) : (
         <Flex
-          paddingTop={SPACING.spacing16}
-          paddingBottom={SPACING.spacing32}
-          textAlign={TYPOGRAPHY.textAlignCenter}
+          padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
+          alignItems={ALIGN_CENTER}
           gridGap={SPACING.spacing12}
           flexDirection={DIRECTION_COLUMN}
+          backgroundColor={COLORS.grey30}
+          borderRadius={BORDERS.borderRadius8}
         >
           <Icon
-            color={COLORS.grey30}
-            alignSelf={ALIGN_CENTER}
+            color={COLORS.grey50}
             size="1.25rem"
             name="ot-alert"
             aria-label="ProtocolLIquidsDetails_noLiquidsIcon"

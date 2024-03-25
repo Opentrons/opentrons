@@ -94,7 +94,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   return (
     <Box
       backgroundColor={COLORS.white}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadius8}
       cursor="pointer"
       minWidth="36rem"
       padding={SPACING.spacing16}
@@ -168,8 +168,22 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       >
         {
           {
-            missing: <Icon name="ot-spinner" spin size={SIZE_3} />,
-            loading: <Icon name="ot-spinner" spin size={SIZE_3} />,
+            missing: (
+              <Icon
+                name="ot-spinner"
+                color={COLORS.grey60}
+                spin
+                size={SIZE_3}
+              />
+            ),
+            loading: (
+              <Icon
+                name="ot-spinner"
+                color={COLORS.grey60}
+                spin
+                size={SIZE_3}
+              />
+            ),
             error: <Box size="6rem" backgroundColor={COLORS.grey30} />,
             stale: <Box size="6rem" backgroundColor={COLORS.grey30} />,
             complete:
@@ -208,7 +222,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         </Flex>
         {/* data section */}
         {analysisStatus === 'loading' ? (
-          <StyledText as="p" flex="1" color={COLORS.grey50}>
+          <StyledText as="p" flex="1" color={COLORS.grey60}>
             {t('loading_data')}
           </StyledText>
         ) : (
@@ -303,7 +317,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               justifyContent={JUSTIFY_FLEX_END}
               data-testid={`ProtocolCard_date_${protocolDisplayName}`}
             >
-              <StyledText as="label" color={COLORS.grey50}>
+              <StyledText as="label" color={COLORS.grey60}>
                 {`${t('updated')} ${format(
                   new Date(modified),
                   'M/d/yy HH:mm'

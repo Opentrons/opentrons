@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { when } from 'vitest-when'
+import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { Provider } from 'react-redux'
-import { createStore, Store } from 'redux'
+import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
@@ -10,13 +11,11 @@ import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 
 import { useRobot } from '..'
 
-jest.mock('../../../../redux/discovery')
+import type { Store } from 'redux'
 
-const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as jest.MockedFunction<
-  typeof getDiscoverableRobotByName
->
+vi.mock('../../../../redux/discovery')
 
-const store: Store<any> = createStore(jest.fn(), {})
+const store: Store<any> = createStore(vi.fn(), {})
 
 describe('useRobot hook', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
@@ -31,14 +30,13 @@ describe('useRobot hook', () => {
     )
   })
   afterEach(() => {
-    resetAllWhenMocks()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('returns null when given a robot name that is not discoverable', () => {
-    when(mockGetDiscoverableRobotByName)
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
-      .mockReturnValue(null)
+      .thenReturn(null)
 
     const { result } = renderHook(() => useRobot('otie'), { wrapper })
 
@@ -46,9 +44,9 @@ describe('useRobot hook', () => {
   })
 
   it('returns robot when given a discoverable robot name', () => {
-    when(mockGetDiscoverableRobotByName)
+    when(vi.mocked(getDiscoverableRobotByName))
       .calledWith(undefined as any, 'otie')
-      .mockReturnValue(mockConnectableRobot)
+      .thenReturn(mockConnectableRobot)
 
     const { result } = renderHook(() => useRobot('otie'), {
       wrapper,

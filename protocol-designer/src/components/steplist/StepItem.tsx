@@ -32,7 +32,7 @@ import { MixHeader } from './MixHeader'
 import { ModuleStepItems, ModuleStepItemRow } from './ModuleStepItems'
 import { PauseStepItems } from './PauseStepItems'
 import { SourceDestSubstep } from './SourceDestSubstep'
-import styles from './StepItem.css'
+import styles from './StepItem.module.css'
 
 import {
   SubstepIdentifier,

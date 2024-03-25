@@ -24,7 +24,7 @@ const StyledLabel = styled.label`
   width: 100%;
   padding: ${SPACING.spacing32};
   border: 2px dashed ${COLORS.grey30};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   text-align: center;
   background-color: ${COLORS.white};
 

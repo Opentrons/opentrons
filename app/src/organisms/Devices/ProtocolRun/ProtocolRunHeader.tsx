@@ -14,7 +14,7 @@ import {
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RunStatus,
+  RUN_STATUS_AWAITING_RECOVERY,
 } from '@opentrons/api-client'
 import {
   useModulesQuery,
@@ -52,6 +52,7 @@ import {
 
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import { getRobotSettings } from '../../../redux/robot-settings'
+import { getRobotSerialNumber } from '../../../redux/discovery'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { ProtocolDropTipBanner } from './ProtocolDropTipBanner'
 import { DropTipWizard } from '../../DropTipWizard'
@@ -93,6 +94,7 @@ import {
   useRobotAnalyticsData,
   useIsFlex,
   useModuleCalibrationStatus,
+  useRobot,
 } from '../hooks'
 import { getPipettesWithTipAttached } from '../../DropTipWizard/getPipettesWithTipAttached'
 import { formatTimestamp } from '../utils'
@@ -105,9 +107,9 @@ import { getIsFixtureMismatch } from '../../../resources/deck_configuration/util
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../resources/runs'
 
-import type { Run, RunError } from '@opentrons/api-client'
+import type { Run, RunError, RunStatus } from '@opentrons/api-client'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -124,6 +126,7 @@ const CANCELLABLE_STATUSES = [
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
+  RUN_STATUS_AWAITING_RECOVERY,
 ]
 const RUN_OVER_STATUSES: RunStatus[] = [
   RUN_STATUS_FAILED,
@@ -171,6 +174,7 @@ export function ProtocolRunHeader({
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipettesWithTip[]
   >([])
+  const [closeTerminalBanner, setCloseTerminalBanner] = React.useState(false)
   const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
@@ -256,6 +260,12 @@ export function ProtocolRunHeader({
     }
   }, [runStatus, isRunCurrent, runId, closeCurrentRun])
 
+  React.useEffect(() => {
+    if (runStatus === RUN_STATUS_IDLE) {
+      setCloseTerminalBanner(false)
+    }
+  }, [runStatus])
+
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
 
@@ -300,6 +310,7 @@ export function ProtocolRunHeader({
       properties: robotAnalyticsData ?? undefined,
     })
     closeCurrentRun()
+    setCloseTerminalBanner(true)
   }
 
   return (
@@ -315,7 +326,7 @@ export function ProtocolRunHeader({
       <Flex
         ref={protocolRunHeaderRef}
         backgroundColor={COLORS.white}
-        borderRadius={BORDERS.borderRadiusSize2}
+        borderRadius={BORDERS.borderRadius8}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
         marginBottom={SPACING.spacing16}
@@ -364,7 +375,7 @@ export function ProtocolRunHeader({
         CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning">{t('shared:close_robot_door')}</Banner>
         ) : null}
-        {mostRecentRunId === runId ? (
+        {mostRecentRunId === runId && !closeTerminalBanner ? (
           <TerminalRunBanner
             {...{
               runStatus,
@@ -419,6 +430,7 @@ export function ProtocolRunHeader({
             display="grid"
             gridTemplateColumns="4fr 6fr 4fr"
             padding={SPACING.spacing8}
+            borderRadius={BORDERS.borderRadius4}
           >
             <LabeledValue
               label={t('protocol_start')}
@@ -630,8 +642,14 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
       runStatus != null &&
       CANCELLABLE_STATUSES.includes(runStatus))
+  const robot = useRobot(robotName)
+  const robotSerialNumber =
+    robot?.status != null ? getRobotSerialNumber(robot) : null ?? ''
   const handleProceedToRunClick = (): void => {
-    trackEvent({ name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN, properties: {} })
+    trackEvent({
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+      properties: { robotSerialNumber },
+    })
     play()
   }
   const configBypassHeaterShakerAttachmentConfirmation = useSelector(
@@ -727,9 +745,11 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
       reset()
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-        properties: { sourceLocation: 'RunRecordDetail' },
+        properties: { sourceLocation: 'RunRecordDetail', robotSerialNumber },
       })
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+      trackProtocolRunEvent({
+        name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+      })
     }
   }
 

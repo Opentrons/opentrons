@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
 
 import {
   COLORS,
@@ -13,20 +12,16 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Navigation } from '../../organisms/Navigation'
-import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
 } from '../../organisms/OnDeviceDisplay/RobotDashboard'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
-import {
-  getAnalyticsOptInSeen,
-  getAnalyticsOptedIn,
-} from '../../redux/analytics'
+import { AnalyticsOptInModal } from './AnalyticsOptInModal'
 import { WelcomeModal } from './WelcomeModal'
 import { RunData } from '@opentrons/api-client'
 import { ServerInitializing } from '../../organisms/OnDeviceDisplay/RobotDashboard/ServerInitializing'
-import { useNotifyAllRunsQuery } from '../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../resources/runs'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 
@@ -43,14 +38,10 @@ export function RobotDashboard(): JSX.Element {
   const [showWelcomeModal, setShowWelcomeModal] = React.useState<boolean>(
     unfinishedUnboxingFlowRoute !== null
   )
-
-  const seen = useSelector(getAnalyticsOptInSeen)
-  const hasOptedIn = useSelector(getAnalyticsOptedIn)
-  const history = useHistory()
-
-  if (!seen || !hasOptedIn) {
-    history.push('/privacy-policy')
-  }
+  const [
+    showAnalyticsOptInModal,
+    setShowAnalyticsOptInModal,
+  ] = React.useState<boolean>(false)
 
   const recentRunsOfUniqueProtocols = (allRunsQueryData?.data ?? [])
     .reverse() // newest runs first
@@ -90,14 +81,22 @@ export function RobotDashboard(): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Navigation routes={onDeviceDisplayRoutes} />
+      <Navigation />
       <Flex
         paddingX={SPACING.spacing40}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
       >
         {showWelcomeModal ? (
-          <WelcomeModal setShowWelcomeModal={setShowWelcomeModal} />
+          <WelcomeModal
+            setShowAnalyticsOptInModal={setShowAnalyticsOptInModal}
+            setShowWelcomeModal={setShowWelcomeModal}
+          />
+        ) : null}
+        {showAnalyticsOptInModal ? (
+          <AnalyticsOptInModal
+            setShowAnalyticsOptInModal={setShowAnalyticsOptInModal}
+          />
         ) : null}
         {contents}
       </Flex>

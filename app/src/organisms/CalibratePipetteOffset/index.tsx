@@ -1,5 +1,6 @@
 // Pipette Offset Calibration Orchestration Component
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 
@@ -21,7 +22,7 @@ import {
 } from '../../organisms/CalibrationPanels'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 
 import type { Mount } from '@opentrons/components'
 import type {
@@ -121,51 +122,50 @@ export function CalibratePipetteOffset(
     currentStep != null && currentStep in PANEL_BY_STEP
       ? PANEL_BY_STEP[currentStep]
       : null
-  return (
-    <Portal level="top">
-      <LegacyModalShell
-        width="47rem"
-        header={
-          <WizardHeader
-            title={t('pipette_offset_calibration')}
-            currentStep={
-              STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0
-            }
-            totalSteps={STEPS_IN_ORDER.length - 1}
-            onExit={confirmExit}
-          />
-        }
-      >
-        {showSpinner || currentStep == null || Panel == null ? (
-          <LoadingState />
-        ) : showConfirmExit ? (
-          <ConfirmExit
-            exit={confirmExit}
-            back={cancelExit}
-            heading={t('progress_will_be_lost', {
-              sessionType: t('pipette_offset_calibration'),
-            })}
-            body={t('confirm_exit_before_completion', {
-              sessionType: t('pipette_offset_calibration'),
-            })}
-          />
-        ) : (
-          <Panel
-            sendCommands={sendCommands}
-            cleanUpAndExit={cleanUpAndExit}
-            tipRack={tipRack}
-            isMulti={isMulti}
-            mount={instrument?.mount.toLowerCase() as Mount}
-            calBlock={calBlock}
-            currentStep={currentStep}
-            sessionType={session.sessionType}
-            robotName={robotName}
-            supportedCommands={supportedCommands}
-            defaultTipracks={instrument?.defaultTipracks}
-          />
-        )}
-      </LegacyModalShell>
-    </Portal>
+  return createPortal(
+    <LegacyModalShell
+      width="47rem"
+      header={
+        <WizardHeader
+          title={t('pipette_offset_calibration')}
+          currentStep={
+            STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0
+          }
+          totalSteps={STEPS_IN_ORDER.length - 1}
+          onExit={confirmExit}
+        />
+      }
+    >
+      {showSpinner || currentStep == null || Panel == null ? (
+        <LoadingState />
+      ) : showConfirmExit ? (
+        <ConfirmExit
+          exit={confirmExit}
+          back={cancelExit}
+          heading={t('progress_will_be_lost', {
+            sessionType: t('pipette_offset_calibration'),
+          })}
+          body={t('confirm_exit_before_completion', {
+            sessionType: t('pipette_offset_calibration'),
+          })}
+        />
+      ) : (
+        <Panel
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
+          tipRack={tipRack}
+          isMulti={isMulti}
+          mount={instrument?.mount.toLowerCase() as Mount}
+          calBlock={calBlock}
+          currentStep={currentStep}
+          sessionType={session.sessionType}
+          robotName={robotName}
+          supportedCommands={supportedCommands}
+          defaultTipracks={instrument?.defaultTipracks}
+        />
+      )}
+    </LegacyModalShell>,
+    getTopPortalEl()
   )
 }
 

@@ -1,6 +1,7 @@
 import * as React from 'react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { MenuList } from '..'
 
 const render = (props: React.ComponentProps<typeof MenuList>) => {
@@ -25,7 +26,7 @@ describe('MenuList', () => {
     props = {
       ...props,
       isOnDevice: true,
-      onClick: jest.fn(),
+      onClick: vi.fn(),
     }
     render(props)
     fireEvent.click(screen.getByLabelText('BackgroundOverlay_ModalShell'))

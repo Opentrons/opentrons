@@ -1,10 +1,10 @@
-# Opentrons Protocol Designer Beta
+# Opentrons Protocol Designer
 
 ## Overview
 
 Protocol Designer is a tool for scientists and technicians to create protocols for their [OT-2 personal pipetting robot][ot-2] without having to write any code. It provides visual feedback including liquid tracking and tip tracking to allow users to see exactly what their protocol will do at each step. The protocols are saved to Opentrons JSON Protocol files, which can be uploaded to the Opentrons Desktop App to run on a robot.
 
-Protocol Designer Beta is optimized for [Chrome][chrome] browser. Other browsers are not fully supported.
+Protocol Designer is optimized for [Chrome][chrome] browser. Other browsers are not fully supported.
 
 ## Build setup for development
 

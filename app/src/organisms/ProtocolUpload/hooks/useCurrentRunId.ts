@@ -1,4 +1,4 @@
-import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../resources/runs'
 
 import type { AxiosError } from 'axios'
 import type { UseAllRunsQueryOptions } from '@opentrons/react-api-client/src/runs/useAllRunsQuery'

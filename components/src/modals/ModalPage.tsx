@@ -5,7 +5,7 @@ import cx from 'classnames'
 import { Box } from '../primitives'
 import { TitleBar } from '../structure'
 import { Overlay } from './Overlay'
-import styles from './modals.css'
+import styles from './modals.module.css'
 
 import type { TitleBarProps } from '../structure'
 

@@ -130,3 +130,9 @@ class OrderedSet(Generic[_SetElementT]):
         The elements that aren't removed retain their original relative order.
         """
         return OrderedSet(e for e in self if e not in other)
+
+    def __repr__(self) -> str:  # noqa: D105
+        # Use repr() on the keys view in case it's super long and Python is smart
+        # enough to abbreviate it.
+        elements_str = repr(self._elements.keys())
+        return f"OrderedSet({elements_str})"

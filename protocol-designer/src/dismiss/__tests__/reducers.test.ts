@@ -1,5 +1,8 @@
-import { _allReducers, DismissedWarningState } from '../reducers'
+import { describe, it, expect, beforeEach } from 'vitest'
+import { _allReducers } from '../reducers'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
+import type { DismissedWarningState } from '../reducers'
+
 const { dismissedWarnings } = _allReducers
 
 let initialState: DismissedWarningState

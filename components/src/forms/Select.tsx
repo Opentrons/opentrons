@@ -7,7 +7,7 @@ import cx from 'classnames'
 
 import { Icon } from '../icons'
 import { POSITION_ABSOLUTE, POSITION_FIXED } from '../styles'
-import styles from './Select.css'
+import styles from './Select.module.css'
 
 import type {
   Props as ReactSelectProps,

@@ -82,7 +82,7 @@ Close and re-open your terminal to confirm `nvs` is installed.
 nvs --version
 ```
 
-Now we can use nvs to install Node.js v18 and switch on `auto` mode, which will make sure Node.js v18 is used any time we're in the `opentrons` project directory.
+Now we can use `nvs` to install the currently required Node.js version set in `.nvmrc`. The `auto` command selects the correct version of Node.js any time we're in the `opentrons` project directory. Without `auto`, we would have to manually run `use` or `install` each time we work on the project.
 
 ```shell
 nvs add 18
@@ -148,7 +148,7 @@ eval "$(pyenv init -)"
 # ...
 ```
 
-#### 3. Install `jpeg` if on ARM Mac (M1)
+#### 3. Install `jpeg` if on ARM Mac (M1/M2/M3)
 
 `/hardware` depends on the Python library Pillow. On ARM Macs, `pip` will build Pillow from source, which requires [jpeg](https://formulae.brew.sh/formula/jpeg) to be installed.
 

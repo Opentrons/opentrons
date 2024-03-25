@@ -1,11 +1,14 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
+import { vi, it, describe, expect } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { CheckPipettesButton } from '../CheckPipettesButton'
 import { ConfirmPipette } from '../ConfirmPipette'
+import { LevelingVideo } from '../LevelPipette'
 
 import type {
   PipetteModelSpecs,
@@ -13,11 +16,14 @@ import type {
 } from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'
 
-jest.mock('../CheckPipettesButton')
-
-const mockCheckPipettesButton = CheckPipettesButton as jest.MockedFunction<
-  typeof CheckPipettesButton
->
+vi.mock('../CheckPipettesButton')
+vi.mock('../LevelPipette', async importOriginal => {
+  const actual = await importOriginal<typeof LevelingVideo>()
+  return {
+    ...actual,
+    LevelingVideo: vi.fn(),
+  }
+})
 
 const render = (props: React.ComponentProps<typeof ConfirmPipette>) => {
   return renderWithProviders(<ConfirmPipette {...props} />, {
@@ -93,15 +99,15 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: 'P10',
       displayCategory: 'GEN1',
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
@@ -122,15 +128,15 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: 'P10',
       displayCategory: 'GEN1',
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
@@ -159,15 +165,15 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
@@ -196,15 +202,15 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: MOCK_ACTUAL_PIPETTE,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
@@ -229,15 +235,15 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
@@ -266,15 +272,15 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: MOCK_WANTED_PIPETTE,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
@@ -295,15 +301,15 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: null,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: MOCK_WANTED_PIPETTE,
       confirmPipetteLevel: true,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
@@ -319,7 +325,9 @@ describe('ConfirmPipette', () => {
   })
 
   it('Should show unable to detect pipette when a pipette is not connected', () => {
-    mockCheckPipettesButton.mockReturnValue(<div>mock re-check connection</div>)
+    vi.mocked(CheckPipettesButton).mockReturnValue(
+      <div>mock re-check connection</div>
+    )
     props = {
       robotName: 'otie',
       success: false,
@@ -329,15 +337,15 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
@@ -366,15 +374,15 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: {} as PipetteOffsetCalibration,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 
@@ -396,15 +404,15 @@ describe('ConfirmPipette', () => {
       actualPipetteOffset: null,
       displayName: '',
       displayCategory: null,
-      tryAgain: jest.fn(),
-      exit: jest.fn(),
-      toCalibrationDashboard: jest.fn(),
+      tryAgain: vi.fn(),
+      exit: vi.fn(),
+      toCalibrationDashboard: vi.fn(),
       mount: LEFT,
-      setWrongWantedPipette: jest.fn(),
+      setWrongWantedPipette: vi.fn(),
       wrongWantedPipette: null,
       confirmPipetteLevel: false,
-      nextStep: jest.fn(),
-      setConfirmPipetteLevel: jest.fn(),
+      nextStep: vi.fn(),
+      setConfirmPipetteLevel: vi.fn(),
       isDisabled: false,
     }
 

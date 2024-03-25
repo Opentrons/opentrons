@@ -2704,7 +2704,7 @@
             "class": "AttributeError",
             "name": "pair_with",
             "obj": "P300 Single-Channel GEN2 on left mount",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 69, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_P300S_Twinning_Error.py\", line 23, in run\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 112, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_P300S_Twinning_Error.py\", line 23, in run\n"
           },
           "errorType": "PythonException",
           "wrappedErrors": []
@@ -2786,5 +2786,6 @@
       "pipetteName": "p300_single_gen2"
     }
   ],
-  "robotType": "OT-2 Standard"
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": []
 }

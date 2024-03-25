@@ -3,7 +3,7 @@ import { app, ipcMain } from 'electron'
 import dns from 'dns'
 import fse from 'fs-extra'
 import path from 'path'
-import { createUi } from './ui'
+import { createUi, waitForRobotServerAndShowMainWindow } from './ui'
 import { createLogger } from './log'
 import { registerDiscovery } from './discovery'
 import {
@@ -23,7 +23,11 @@ import {
 } from './config'
 import systemd from './systemd'
 import { watchForMassStorage } from './usb'
-import { registerNotify, closeAllNotifyConnections } from './notify'
+import {
+  registerNotify,
+  establishBrokerConnection,
+  closeBrokerConnection,
+} from './notifications'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
@@ -33,8 +37,6 @@ import type { Dispatch, Logger } from './types'
  * setting the default to IPv4 fixes the issue
  * https://github.com/node-fetch/node-fetch/issues/1624
  */
-// TODO(bh, 2024-1-30): @types/node needs to be updated to address this type error. updating @types/node will also require updating our typescript version
-// @ts-expect-error
 dns.setDefaultResultOrder('ipv4first')
 
 systemd.sendStatus('starting app')
@@ -60,7 +62,7 @@ if (config.devtools) app.once('ready', installDevtools)
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
-  closeAllNotifyConnections()
+  closeBrokerConnection()
     .then(() => {
       app.quit()
     })
@@ -98,7 +100,7 @@ function startUp(): void {
 
   mainWindow = createUi(dispatch)
   rendererLogger = createRendererLogger()
-
+  void establishBrokerConnection()
   mainWindow.once('closed', () => (mainWindow = null))
 
   log.info('Fetching latest software version')
@@ -124,10 +126,18 @@ function startUp(): void {
   log.silly('Global references', { mainWindow, rendererLogger })
 
   ipcMain.once('dispatch', () => {
+    log.info('First dispatch, showing')
     systemd.sendStatus('started')
     systemd.ready()
     const stopWatching = watchForMassStorage(dispatch)
     ipcMain.once('quit', stopWatching)
+    // TODO: This is where we render the main window for the first time. See ui.ts
+    // in the createUI function for more.
+    if (!!!mainWindow) {
+      log.error('mainWindow went away before show')
+    } else {
+      waitForRobotServerAndShowMainWindow(dispatch, mainWindow)
+    }
   })
 }
 

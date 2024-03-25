@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ClearDeckModal } from '../ClearDeckModal'
 
@@ -13,7 +15,7 @@ describe('ClearDeckModal', () => {
   let props: React.ComponentProps<typeof ClearDeckModal>
   beforeEach(() => {
     props = {
-      onContinueClick: jest.fn(),
+      onContinueClick: vi.fn(),
     }
   })
   it('renders the correct information when pipette is not attached', () => {

@@ -1,8 +1,11 @@
 import * as React from 'react'
+import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { fireEvent } from '@testing-library/react'
-import { when } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { useHistory } from 'react-router-dom'
+
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { getHasCalibrationBlock } from '../../../redux/config'
 import { getMovementStatus } from '../../../redux/robot-controls'
@@ -23,65 +26,33 @@ import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
-const mockPush = jest.fn()
+const mockPush = vi.fn()
 
-jest.mock('react-router-dom', () => {
-  const reactRouterDom = jest.requireActual('react-router-dom')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof useHistory>()
   return {
-    ...reactRouterDom,
-    useHistory: () => ({ push: mockPush } as any),
+    ...actual,
+    useHistory: () => ({ push: mockPush }),
   }
 })
 
-jest.mock('@opentrons/shared-data', () => {
-  const actualSharedData = jest.requireActual('@opentrons/shared-data')
+vi.mock('@opentrons/shared-data', async importOriginal => {
+  const actual = await importOriginal<typeof getPipetteNameSpecs>()
   return {
-    ...actualSharedData,
-    getPipetteNameSpecs: jest.fn(),
+    ...actual,
+    getPipetteNameSpecs: vi.fn(),
   }
 })
-jest.mock('../../../redux/config')
-jest.mock('../../../redux/robot-controls')
-jest.mock('../../../redux/calibration')
-jest.mock('../../../redux/robot-api')
-jest.mock('../PipetteSelection')
-jest.mock('../ExitModal')
-jest.mock('../../../molecules/InProgressModal/InProgressModal')
-jest.mock('../ConfirmPipette')
-jest.mock('../../Devices/hooks')
-
-const mockGetPipetteNameSpecs = getPipetteNameSpecs as jest.MockedFunction<
-  typeof getPipetteNameSpecs
->
-const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
-  typeof useAttachedPipettes
->
-const mockGetMovementStatus = getMovementStatus as jest.MockedFunction<
-  typeof getMovementStatus
->
-const mockGetCalibrationForPipette = getCalibrationForPipette as jest.MockedFunction<
-  typeof getCalibrationForPipette
->
-const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction<
-  typeof getHasCalibrationBlock
->
-const mockGetRequestById = getRequestById as jest.MockedFunction<
-  typeof getRequestById
->
-const mockUseDispatchApiRequests = useDispatchApiRequests as jest.MockedFunction<
-  typeof useDispatchApiRequests
->
-const mockPipetteSelection = PipetteSelection as jest.MockedFunction<
-  typeof PipetteSelection
->
-const mockInProgress = InProgressModal as jest.MockedFunction<
-  typeof InProgressModal
->
-const mockConfirmPipette = ConfirmPipette as jest.MockedFunction<
-  typeof ConfirmPipette
->
-
-const mockExitModal = ExitModal as jest.MockedFunction<typeof ExitModal>
+vi.mock('../../../redux/config')
+vi.mock('../../../redux/robot-controls')
+vi.mock('../../../redux/calibration')
+vi.mock('../../../redux/robot-api')
+vi.mock('../PipetteSelection')
+vi.mock('../ExitModal')
+vi.mock('../../../molecules/InProgressModal/InProgressModal')
+vi.mock('../ConfirmPipette')
+vi.mock('../../Devices/hooks')
+vi.mock('../../../assets/images')
 
 const render = (props: React.ComponentProps<typeof ChangePipette>) => {
   return renderWithProviders(<ChangePipette {...props} />, {
@@ -114,36 +85,36 @@ describe('ChangePipette', () => {
     props = {
       robotName: 'otie',
       mount: 'left',
-      closeModal: jest.fn(),
+      closeModal: vi.fn(),
     }
-    dispatchApiRequest = jest.fn()
-    mockUseAttachedPipettes.mockReturnValue({ left: null, right: null })
-    mockGetRequestById.mockReturnValue(null)
-    mockGetCalibrationForPipette.mockReturnValue(null)
-    mockGetHasCalibrationBlock.mockReturnValue(false)
-    mockGetMovementStatus.mockReturnValue(null)
-    mockGetPipetteNameSpecs.mockReturnValue(null)
-    when(mockUseDispatchApiRequests).mockReturnValue([
+    dispatchApiRequest = vi.fn()
+    vi.mocked(useAttachedPipettes).mockReturnValue({ left: null, right: null })
+    vi.mocked(getRequestById).mockReturnValue(null)
+    vi.mocked(getCalibrationForPipette).mockReturnValue(null)
+    vi.mocked(getHasCalibrationBlock).mockReturnValue(false)
+    vi.mocked(getMovementStatus).mockReturnValue(null)
+    vi.mocked(getPipetteNameSpecs).mockReturnValue(null)
+    vi.mocked(useDispatchApiRequests).mockReturnValue([
       dispatchApiRequest,
       ['id'],
     ])
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders the in progress modal when the movement status is moving', () => {
-    mockGetMovementStatus.mockReturnValue('moving')
-    mockInProgress.mockReturnValue(<div>mock in progress modal</div>)
+    vi.mocked(getMovementStatus).mockReturnValue('moving')
+    vi.mocked(InProgressModal).mockReturnValue(
+      <div>mock in progress modal</div>
+    )
     const { getByText } = render(props)
     getByText('Attach a pipette')
     getByText('mock in progress modal')
   })
 
   it('renders the wizard pages for attaching a pipette and clicking on the exit button will render the exit modal', () => {
-    mockPipetteSelection.mockReturnValue(<div>mock pipette selection</div>)
-    mockExitModal.mockReturnValue(<div>mock exit modal</div>)
+    vi.mocked(PipetteSelection).mockReturnValue(
+      <div>mock pipette selection</div>
+    )
+    vi.mocked(ExitModal).mockReturnValue(<div>mock exit modal</div>)
 
     const { getByText, getByLabelText, getByRole } = render(props)
     //  Clear deck modal page
@@ -171,7 +142,9 @@ describe('ChangePipette', () => {
   })
 
   it('the go back button functions as expected', () => {
-    mockPipetteSelection.mockReturnValue(<div>mock pipette selection</div>)
+    vi.mocked(PipetteSelection).mockReturnValue(
+      <div>mock pipette selection</div>
+    )
 
     const { getByText, getByRole } = render(props)
     //  Clear deck modal page
@@ -186,7 +159,9 @@ describe('ChangePipette', () => {
   })
 
   it('renders the wizard pages for attaching a pipette and goes through flow', () => {
-    mockPipetteSelection.mockReturnValue(<div>mock pipette selection</div>)
+    vi.mocked(PipetteSelection).mockReturnValue(
+      <div>mock pipette selection</div>
+    )
     const { getByText, getByRole } = render(props)
     //  Clear deck modal page
     const cont = getByRole('button', { name: 'Get started' })
@@ -197,8 +172,8 @@ describe('ChangePipette', () => {
   })
 
   it('renders the wizard pages for detaching a single channel pipette and exits on the 2nd page rendering exit modal', () => {
-    mockExitModal.mockReturnValue(<div>mock exit modal</div>)
-    mockGetRequestById.mockReturnValue({
+    vi.mocked(ExitModal).mockReturnValue(<div>mock exit modal</div>)
+    vi.mocked(getRequestById).mockReturnValue({
       status: SUCCESS,
       response: {
         method: 'POST',
@@ -207,7 +182,7 @@ describe('ChangePipette', () => {
         status: 200,
       },
     })
-    mockUseAttachedPipettes.mockReturnValue({
+    vi.mocked(useAttachedPipettes).mockReturnValue({
       left: mockAttachedPipettes as AttachedPipette,
       right: null,
     })
@@ -251,8 +226,8 @@ describe('ChangePipette', () => {
   })
 
   it('renders the wizard pages for detaching a single channel pipette and goes through the whole flow', () => {
-    mockConfirmPipette.mockReturnValue(<div>mock confirm pipette</div>)
-    mockUseAttachedPipettes.mockReturnValue({
+    vi.mocked(ConfirmPipette).mockReturnValue(<div>mock confirm pipette</div>)
+    vi.mocked(useAttachedPipettes).mockReturnValue({
       left: mockAttachedPipettes as AttachedPipette,
       right: null,
     })

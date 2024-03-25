@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import {
@@ -38,7 +39,7 @@ import {
 import { FloatingActionButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { Portal } from '../../App/portal'
+import { getTopPortalEl } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -211,59 +212,62 @@ export function ProtocolSetupLabware({
   const selectedLabwareLocation = selectedLabware?.location
   return (
     <>
-      <Portal level="top">
-        {showDeckMapModal ? (
-          <LabwareMapViewModal
-            mostRecentAnalysis={mostRecentAnalysis}
-            deckDef={deckDef}
-            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-            handleLabwareClick={handleLabwareClick}
-            onCloseClick={() => setShowDeckMapModal(false)}
-            initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
-          />
-        ) : null}
-        {showLabwareDetailsModal && selectedLabware != null ? (
-          <Modal
-            onOutsideClick={() => {
-              setShowLabwareDetailsModal(false)
-              setSelectedLabware(null)
-            }}
-          >
-            <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing48}>
-              <LabwareThumbnail
-                viewBox={`${selectedLabware.cornerOffsetFromSlot.x} ${selectedLabware.cornerOffsetFromSlot.y} ${selectedLabware.dimensions.xDimension} ${selectedLabware.dimensions.yDimension}`}
-              >
-                <LabwareRender definition={selectedLabware} />
-              </LabwareThumbnail>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                alignItems={ALIGN_FLEX_START}
-                gridGap={SPACING.spacing12}
-              >
-                <Flex gridGap={SPACING.spacing4}>{location}</Flex>
-                <StyledText
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  fontSize={TYPOGRAPHY.fontSize22}
+      {createPortal(
+        <>
+          {showDeckMapModal ? (
+            <LabwareMapViewModal
+              mostRecentAnalysis={mostRecentAnalysis}
+              deckDef={deckDef}
+              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+              handleLabwareClick={handleLabwareClick}
+              onCloseClick={() => setShowDeckMapModal(false)}
+              initialLoadedLabwareByAdapter={initialLoadedLabwareByAdapter}
+            />
+          ) : null}
+          {showLabwareDetailsModal && selectedLabware != null ? (
+            <Modal
+              onOutsideClick={() => {
+                setShowLabwareDetailsModal(false)
+                setSelectedLabware(null)
+              }}
+            >
+              <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing48}>
+                <LabwareThumbnail
+                  viewBox={`${selectedLabware.cornerOffsetFromSlot.x} ${selectedLabware.cornerOffsetFromSlot.y} ${selectedLabware.dimensions.xDimension} ${selectedLabware.dimensions.yDimension}`}
                 >
-                  {getLabwareDisplayName(selectedLabware)}
-                </StyledText>
-                <StyledText as="p" color={COLORS.grey60}>
-                  {selectedLabware.nickName}
-                  {selectedLabwareLocation != null &&
-                  selectedLabwareLocation !== 'offDeck' &&
-                  'labwareId' in selectedLabwareLocation
-                    ? t('on_adapter', {
-                        adapterName: mostRecentAnalysis?.labware.find(
-                          l => l.id === selectedLabwareLocation.labwareId
-                        )?.displayName,
-                      })
-                    : null}
-                </StyledText>
+                  <LabwareRender definition={selectedLabware} />
+                </LabwareThumbnail>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  alignItems={ALIGN_FLEX_START}
+                  gridGap={SPACING.spacing12}
+                >
+                  <Flex gridGap={SPACING.spacing4}>{location}</Flex>
+                  <StyledText
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    fontSize={TYPOGRAPHY.fontSize22}
+                  >
+                    {getLabwareDisplayName(selectedLabware)}
+                  </StyledText>
+                  <StyledText as="p" color={COLORS.grey60}>
+                    {selectedLabware.nickName}
+                    {selectedLabwareLocation != null &&
+                    selectedLabwareLocation !== 'offDeck' &&
+                    'labwareId' in selectedLabwareLocation
+                      ? t('on_adapter', {
+                          adapterName: mostRecentAnalysis?.labware.find(
+                            l => l.id === selectedLabwareLocation.labwareId
+                          )?.displayName,
+                        })
+                      : null}
+                  </StyledText>
+                </Flex>
               </Flex>
-            </Flex>
-          </Modal>
-        ) : null}
-      </Portal>
+            </Modal>
+          ) : null}
+        </>,
+        getTopPortalEl()
+      )}
       <ODDBackButton
         label={t('labware')}
         onClick={() => setSetupScreen('prepare to run')}
@@ -410,7 +414,7 @@ function LabwareLatch({
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.blue35}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius16}
       css={labwareLatchStyles}
       color={isLatchLoading ? COLORS.grey60 : COLORS.black90}
       height="6.5rem"
@@ -543,7 +547,7 @@ function RowLabware({
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.grey35}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius8}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       gridGap={SPACING.spacing32}
     >

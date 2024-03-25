@@ -1,3 +1,4 @@
+import { describe, expect, it, beforeEach } from 'vitest'
 import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -14,17 +15,14 @@ import {
   getLabwareOptions,
   _sortLabwareDropdownOptions,
 } from '../selectors'
-import { LabwareEntities } from '../../../../../step-generation/src/types'
-import { LabwareDefinition2 } from '../../../../../shared-data/lib/js/types.d'
-import _fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
-import _fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import _fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import _fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import {
+  fixture_tiprack_1000_ul,
+  fixture_tiprack_10_ul,
+  fixture_96_plate,
+  fixture_trash,
+} from '@opentrons/shared-data/labware/fixtures/2'
 
-const fixtureTiprack1000ul = _fixture_tiprack_1000_ul as LabwareDefinition2
-const fixtureTiprack10ul = _fixture_tiprack_10_ul as LabwareDefinition2
-const fixture96Plate = _fixture_96_plate as LabwareDefinition2
-const fixtureTrash = _fixture_trash as LabwareDefinition2
+import type { LabwareEntities } from '@opentrons/step-generation'
 
 describe('labware selectors', () => {
   let names: Record<string, string>
@@ -37,25 +35,25 @@ describe('labware selectors', () => {
   beforeEach(() => {
     trash = {
       [mockTrash]: {
-        def: { ...fixtureTrash },
+        def: fixture_trash,
       } as any,
     }
 
     tipracks = {
       tiprack100Id: {
         id: 'tiprack100Id',
-        def: { ...fixtureTiprack1000ul },
+        def: fixture_tiprack_1000_ul,
       } as any,
       tiprack10Id: {
         id: 'tiprack10Id',
-        def: { ...fixtureTiprack10ul },
+        def: fixture_tiprack_10_ul,
       } as any,
     }
 
     otherLabware = {
       wellPlateId: {
         id: 'wellPlateId',
-        def: { ...fixture96Plate },
+        def: fixture_96_plate,
       } as any,
     }
 
@@ -72,22 +70,18 @@ describe('labware selectors', () => {
 
   describe('getDisposalOptions', () => {
     it('returns an empty list when additionalEquipment is NOT provided', () => {
-      expect(
-        // @ts-expect-error(sa, 2021-6-15): resultFunc
-        getDisposalOptions.resultFunc([])
-      ).toEqual([])
+      expect(getDisposalOptions.resultFunc({}, null)).toEqual([])
     })
     it('returns empty list when trash bin is NOT present', () => {
       const additionalEquipmentEntities = {
         stagingArea: {
-          name: 'stagingArea',
+          name: 'stagingArea' as const,
           location: 'cutoutB3',
           id: 'stagingAreaId',
         },
       }
       expect(
-        // @ts-expect-error(sa, 2021-6-15): resultFunc
-        getDisposalOptions.resultFunc(additionalEquipmentEntities)
+        getDisposalOptions.resultFunc(additionalEquipmentEntities, null)
       ).toEqual([])
     })
     it('filters out additional equipment that is not trash when a trash is present', () => {
@@ -178,39 +172,6 @@ describe('labware selectors', () => {
           {}
         )
       ).toEqual([
-        { name: 'Source Plate', value: 'wellPlateId' },
-        { name: 'Trash', value: mockTrash },
-      ])
-    })
-
-    it('should return labware options for move labware with tips and trash', () => {
-      const labwareEntities = {
-        ...tipracks,
-        ...trash,
-        ...otherLabware,
-      }
-      const initialDeckSetup = {
-        labware: labwareEntities,
-        modules: {},
-        pipettes: {},
-      }
-
-      const presavedStepForm = {
-        stepType: 'moveLabware',
-      }
-      expect(
-        //  @ts-expect-error(jr, 7/17/23): resultFunc doesn't exist on type Selector<Options>
-        getLabwareOptions.resultFunc(
-          labwareEntities,
-          names,
-          initialDeckSetup,
-          presavedStepForm,
-          {},
-          {}
-        )
-      ).toEqual([
-        { name: 'Opentrons Tip Rack 10 µL', value: 'tiprack10Id' },
-        { name: 'Opentrons Tip Rack 1000 µL', value: 'tiprack100Id' },
         { name: 'Source Plate', value: 'wellPlateId' },
         { name: 'Trash', value: mockTrash },
       ])
@@ -351,7 +312,7 @@ describe('labware selectors', () => {
         )
       ).toEqual([
         { name: 'Trash', value: mockTrash },
-        { name: 'Well Plate', value: 'wellPlateId' },
+        { name: 'Well Plate in Magnetic Module', value: 'wellPlateId' },
       ])
     })
   })

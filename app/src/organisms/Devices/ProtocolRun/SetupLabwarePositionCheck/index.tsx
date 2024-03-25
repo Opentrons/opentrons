@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
+  BORDERS,
   SPACING,
   JUSTIFY_CENTER,
   DIRECTION_COLUMN,
@@ -26,7 +27,7 @@ import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
 import { StyledText } from '../../../../atoms/text'
 import { getLatestCurrentOffsets } from './utils'
-import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../../resources/runs'
 
 import type { LabwareOffset } from '@opentrons/api-client'
 
@@ -104,6 +105,7 @@ export function SetupLabwarePositionCheck(
           backgroundColor={COLORS.grey10}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
+          borderRadius={BORDERS.borderRadius8}
         >
           <StyledText as="p">
             {i18n.format(t('no_labware_offset_data'), 'capitalize')}

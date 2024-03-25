@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { resetAllWhenMocks, when } from 'jest-when'
-import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
+import { it, describe, beforeEach, vi, afterEach, expect } from 'vitest'
 import { FLEX_ROBOT_TYPE, HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { useProtocolMetadata } from '../../Devices/hooks'
@@ -10,18 +9,16 @@ import { PickUpTip } from '../PickUpTip'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
 import type { CommandData } from '@opentrons/api-client'
+import {
+  nestedTextMatcher,
+  renderWithProviders,
+} from '../../../__testing-utils__'
+import type { Mock } from 'vitest'
 
-jest.mock('../../Devices/hooks')
-jest.mock('../../../redux/config')
+vi.mock('../../Devices/hooks')
+vi.mock('../../../redux/config')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
-
-const mockUseProtocolMetaData = useProtocolMetadata as jest.MockedFunction<
-  typeof useProtocolMetadata
->
-const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
-  typeof getIsOnDevice
->
 
 const render = (props: React.ComponentProps<typeof PickUpTip>) => {
   return renderWithProviders(<PickUpTip {...props} />, {
@@ -31,11 +28,11 @@ const render = (props: React.ComponentProps<typeof PickUpTip>) => {
 
 describe('PickUpTip', () => {
   let props: React.ComponentProps<typeof PickUpTip>
-  let mockChainRunCommands: jest.Mock
+  let mockChainRunCommands: Mock
 
   beforeEach(() => {
-    mockChainRunCommands = jest.fn().mockImplementation(() => Promise.resolve())
-    mockGetIsOnDevice.mockReturnValue(false)
+    mockChainRunCommands = vi.fn().mockImplementation(() => Promise.resolve())
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
     props = {
       section: SECTIONS.PICK_UP_TIP,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
@@ -43,11 +40,11 @@ describe('PickUpTip', () => {
       definitionUri: mockCompletedAnalysis.labware[0].definitionUri,
       location: { slotName: 'D1' },
       protocolData: mockCompletedAnalysis,
-      proceed: jest.fn(),
+      proceed: vi.fn(),
       chainRunCommands: mockChainRunCommands,
-      handleJog: jest.fn(),
-      registerPosition: jest.fn(),
-      setFatalError: jest.fn(),
+      handleJog: vi.fn(),
+      registerPosition: vi.fn(),
+      setFatalError: vi.fn(),
       workingOffsets: [],
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
@@ -55,11 +52,12 @@ describe('PickUpTip', () => {
       protocolHasModules: false,
       currentStepIndex: 1,
     }
-    mockUseProtocolMetaData.mockReturnValue({ robotType: 'OT-3 Standard' })
+    vi.mocked(useProtocolMetadata).mockReturnValue({
+      robotType: 'OT-3 Standard',
+    })
   })
   afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.resetAllMocks()
   })
   it('renders correct copy when preparing space on desktop if protocol has modules', () => {
     props.protocolHasModules = true
@@ -74,7 +72,7 @@ describe('PickUpTip', () => {
     screen.getByRole('button', { name: 'Confirm placement' })
   })
   it('renders correct copy when preparing space on touchscreen if protocol has modules', () => {
-    mockGetIsOnDevice.mockReturnValue(true)
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
     props.protocolHasModules = true
     render(props)
     screen.getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
@@ -94,7 +92,7 @@ describe('PickUpTip', () => {
     screen.getByRole('button', { name: 'Confirm placement' })
   })
   it('renders correct copy when preparing space on touchscreen if protocol has no modules', () => {
-    mockGetIsOnDevice.mockReturnValue(true)
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
     render(props)
     screen.getByRole('heading', { name: 'Prepare tip rack in Slot D1' })
     screen.getByText('Clear all deck slots of labware')
@@ -122,7 +120,7 @@ describe('PickUpTip', () => {
     screen.getByRole('link', { name: 'Need help?' })
   })
   it('renders correct copy when confirming position on touchscreen', () => {
-    mockGetIsOnDevice.mockReturnValue(true)
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
     render({
       ...props,
       workingOffsets: [
@@ -144,12 +142,9 @@ describe('PickUpTip', () => {
     )
   })
   it('executes correct chained commands when confirm placement CTA is clicked', () => {
-    when(mockChainRunCommands)
-      .calledWith(
-        [{ commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } }],
-        false
-      )
-      .mockImplementation(() => Promise.resolve([{} as CommandData]))
+    vi.mocked(mockChainRunCommands).mockImplementation(() =>
+      Promise.resolve([{} as CommandData])
+    )
     render(props)
     const confirm = screen.getByRole('button', { name: 'Confirm placement' })
     fireEvent.click(confirm)
@@ -183,66 +178,18 @@ describe('PickUpTip', () => {
   })
 
   it('executes correct chained commands when confirm position CTA is clicked and user tries again', async () => {
-    when(mockChainRunCommands)
-      .calledWith(
-        [{ commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } }],
-        false
-      )
-      .mockImplementation(() =>
-        Promise.resolve([
-          {
-            data: {
-              commandType: 'savePosition',
-              result: { position: mockStartPosition },
-            },
-          },
-          {},
-          {},
-        ])
-      )
-
-    when(mockChainRunCommands)
-      .calledWith(
-        [
-          {
+    vi.mocked(mockChainRunCommands).mockImplementation(() =>
+      Promise.resolve([
+        {
+          data: {
             commandType: 'savePosition',
-            params: { pipetteId: 'pipetteId1' },
+            result: { position: mockStartPosition },
           },
-          {
-            commandType: 'pickUpTip',
-            params: {
-              pipetteId: 'pipetteId1',
-              labwareId: 'labwareId1',
-              wellName: 'A1',
-              wellLocation: { origin: 'top', offset: { x: 9, y: 18, z: 27 } },
-            },
-          },
-          {
-            command: {
-              commandType: 'dropTip',
-              params: {
-                pipetteId: 'pipetteId1',
-                labwareId: 'labwareId1',
-                wellName: 'A1',
-              },
-            },
-            waitUntilComplete: true,
-          },
-        ],
-        false
-      )
-      .mockImplementation(() =>
-        Promise.resolve([
-          {
-            data: {
-              commandType: 'savePosition',
-              result: { position: mockStartPosition },
-            },
-          },
-          {},
-          {},
-        ])
-      )
+        },
+        {},
+        {},
+      ])
+    )
 
     render({
       ...props,
@@ -261,6 +208,8 @@ describe('PickUpTip', () => {
     expect(props.handleJog).toHaveBeenCalled()
     const confirm = screen.getByRole('button', { name: 'Confirm position' })
     fireEvent.click(confirm)
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenNthCalledWith(
         1,
@@ -309,6 +258,8 @@ describe('PickUpTip', () => {
     })
     const tryAgain = screen.getByRole('button', { name: 'Try again' })
     fireEvent.click(tryAgain)
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenNthCalledWith(
         3,
@@ -342,63 +293,18 @@ describe('PickUpTip', () => {
     })
   })
   it('proceeds after confirm position and pick up tip', async () => {
-    when(mockChainRunCommands)
-      .calledWith(
-        [{ commandType: 'savePosition', params: { pipetteId: 'pipetteId1' } }],
-        false
-      )
-      .mockImplementation(() =>
-        Promise.resolve([
-          {
-            data: {
-              commandType: 'savePosition',
-              result: { position: mockStartPosition },
-            },
-          },
-          {},
-          {},
-        ])
-      )
-
-    when(mockChainRunCommands)
-      .calledWith(
-        [
-          {
+    vi.mocked(mockChainRunCommands).mockImplementation(() =>
+      Promise.resolve([
+        {
+          data: {
             commandType: 'savePosition',
-            params: { pipetteId: 'pipetteId1' },
+            result: { position: mockStartPosition },
           },
-          {
-            commandType: 'pickUpTip',
-            params: {
-              pipetteId: 'pipetteId1',
-              labwareId: 'labwareId1',
-              wellName: 'A1',
-              wellLocation: { origin: 'top', offset: { x: 9, y: 18, z: 27 } },
-            },
-          },
-          {
-            commandType: 'dropTip',
-            params: {
-              pipetteId: 'pipetteId1',
-              labwareId: 'labwareId1',
-              wellName: 'A1',
-            },
-          },
-        ],
-        false
-      )
-      .mockImplementation(() =>
-        Promise.resolve([
-          {
-            data: {
-              commandType: 'savePosition',
-              result: { position: mockStartPosition },
-            },
-          },
-          {},
-          {},
-        ])
-      )
+        },
+        {},
+        {},
+      ])
+    )
     render({
       ...props,
       workingOffsets: [
@@ -413,6 +319,8 @@ describe('PickUpTip', () => {
 
     const confirm = screen.getByRole('button', { name: 'Confirm position' })
     fireEvent.click(confirm)
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenNthCalledWith(
         1,
@@ -461,6 +369,8 @@ describe('PickUpTip', () => {
     })
     const yesButton = screen.getByRole('button', { name: 'Yes' })
     fireEvent.click(yesButton)
+    await new Promise((resolve, reject) => setTimeout(resolve))
+
     await waitFor(() => {
       expect(props.chainRunCommands).toHaveBeenNthCalledWith(
         3,

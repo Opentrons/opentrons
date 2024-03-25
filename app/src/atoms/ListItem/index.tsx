@@ -42,7 +42,7 @@ export function ListItem(props: ListItemProps): JSX.Element {
       height="max-content"
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       backgroundColor={listItemProps.backgroundColor}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
       {...styleProps}
     >
       {children}

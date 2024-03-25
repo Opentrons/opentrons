@@ -10,15 +10,15 @@ import {
   BORDERS,
   JUSTIFY_CENTER,
   COLORS,
-  StyleProps,
   TYPOGRAPHY,
   useHoverTooltip,
   Tooltip,
 } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 
 const EQUIPMENT_OPTION_STYLE = css`
   background-color: ${COLORS.white};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius8};
   border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
 
   &:hover {
@@ -40,6 +40,7 @@ const EQUIPMENT_OPTION_SELECTED_STYLE = css`
   &:hover {
     background-color: ${COLORS.blue10};
     border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2);
   }
 `
 
@@ -92,7 +93,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             ? BORDERS.activeLineBorder
             : BORDERS.lineBorder
         }
-        borderRadius={BORDERS.borderRadiusSize2}
+        borderRadius={BORDERS.borderRadius8}
         cursor={disabled ? 'auto' : 'pointer'}
         backgroundColor={disabled ? COLORS.grey30 : COLORS.transparent}
         onClick={disabled ? undefined : onClick}

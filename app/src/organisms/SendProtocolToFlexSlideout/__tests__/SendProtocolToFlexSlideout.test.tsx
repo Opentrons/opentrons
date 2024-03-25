@@ -1,13 +1,13 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
 import { fireEvent, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 import { StaticRouter } from 'react-router-dom'
-import { when, resetAllWhenMocks } from 'jest-when'
 
 import {
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
-} from '@opentrons/discovery-client/src/__fixtures__'
+} from '../../../../../discovery-client/src/fixtures'
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
 import { mockSuccessQueryResults } from '../../../__fixtures__'
@@ -22,6 +22,8 @@ import {
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
 } from '../../../redux/discovery'
+import { getValidCustomLabwareFiles } from '../../../redux/custom-labware'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { getRobotUpdateDisplayInfo } from '../../../redux/robot-update'
 import {
   mockConnectableRobot,
@@ -32,52 +34,24 @@ import { getNetworkInterfaces } from '../../../redux/networking'
 import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { SendProtocolToFlexSlideout } from '..'
-import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../resources/runs'
 
-import type { State } from '../../../redux/types'
-import { getValidCustomLabwareFiles } from '../../../redux/custom-labware'
+import type * as ApiClient from '@opentrons/react-api-client'
 
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../organisms/ToasterOven')
-jest.mock('../../../redux/robot-update')
-jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/networking')
-jest.mock('../../../redux/custom-labware')
-jest.mock('../../../redux/protocol-storage/selectors')
-jest.mock('../../../resources/runs/useNotifyAllRunsQuery')
-
-const mockGetBuildrootUpdateDisplayInfo = getRobotUpdateDisplayInfo as jest.MockedFunction<
-  typeof getRobotUpdateDisplayInfo
->
-const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
-  typeof getConnectableRobots
->
-const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
-  typeof getReachableRobots
->
-const mockGetUnreachableRobots = getUnreachableRobots as jest.MockedFunction<
-  typeof getUnreachableRobots
->
-const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
-const mockStartDiscovery = startDiscovery as jest.MockedFunction<
-  typeof startDiscovery
->
-const mockUseToaster = useToaster as jest.MockedFunction<typeof useToaster>
-const mockUseNotifyAllRunsQuery = useNotifyAllRunsQuery as jest.MockedFunction<
-  typeof useNotifyAllRunsQuery
->
-const mockUseCreateProtocolMutation = useCreateProtocolMutation as jest.MockedFunction<
-  typeof useCreateProtocolMutation
->
-const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as jest.MockedFunction<
-  typeof getIsProtocolAnalysisInProgress
->
-const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
-  typeof getNetworkInterfaces
->
-const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<
-  typeof getValidCustomLabwareFiles
->
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ApiClient>()
+  return {
+    ...actual,
+    useCreateProtocolMutation: vi.fn(),
+  }
+})
+vi.mock('../../../organisms/ToasterOven')
+vi.mock('../../../redux/robot-update')
+vi.mock('../../../redux/discovery')
+vi.mock('../../../redux/networking')
+vi.mock('../../../redux/custom-labware')
+vi.mock('../../../redux/protocol-storage/selectors')
+vi.mock('../../../resources/runs')
 
 const render = (
   props: React.ComponentProps<typeof SendProtocolToFlexSlideout>
@@ -111,58 +85,55 @@ const mockUnreachableOT3 = {
   robotModel: ROBOT_MODEL_OT3,
 }
 
-const mockMakeSnackbar = jest.fn()
-const mockMakeToast = jest.fn()
-const mockEatToast = jest.fn()
-const mockMutateAsync = jest.fn()
+const mockMakeSnackbar = vi.fn()
+const mockMakeToast = vi.fn()
+const mockEatToast = vi.fn()
+const mockMutateAsync = vi.fn()
 const mockCustomLabwareFile: File = { path: 'fake_custom_labware_path' } as any
 
 describe('SendProtocolToFlexSlideout', () => {
   beforeEach(() => {
-    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: '',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    mockGetConnectableRobots.mockReturnValue([mockConnectableOT3])
-    mockGetUnreachableRobots.mockReturnValue([mockUnreachableOT3])
-    mockGetReachableRobots.mockReturnValue([mockReachableOT3])
-    mockGetScanning.mockReturnValue(false)
-    mockStartDiscovery.mockReturnValue({ type: 'mockStartDiscovery' } as any)
-    mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
-    when(mockUseToaster).calledWith().mockReturnValue({
+    vi.mocked(getConnectableRobots).mockReturnValue([mockConnectableOT3])
+    vi.mocked(getUnreachableRobots).mockReturnValue([mockUnreachableOT3])
+    vi.mocked(getReachableRobots).mockReturnValue([mockReachableOT3])
+    vi.mocked(getScanning).mockReturnValue(false)
+    vi.mocked(startDiscovery).mockReturnValue({
+      type: 'mockStartDiscovery',
+    } as any)
+    vi.mocked(getIsProtocolAnalysisInProgress).mockReturnValue(false)
+    vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: mockMakeSnackbar,
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })
-    when(mockUseNotifyAllRunsQuery)
-      .calledWith(expect.any(Object), expect.any(Object), expect.any(Object))
-      .mockReturnValue(
-        mockSuccessQueryResults({
-          data: [],
-          links: {},
-        })
-      )
-    when(mockUseCreateProtocolMutation)
-      .calledWith(expect.any(Object), expect.any(Object))
-      .mockReturnValue({ mutateAsync: mockMutateAsync } as any)
-    when(mockMutateAsync).mockImplementation(() => Promise.resolve())
-    when(mockGetNetworkInterfaces)
-      .calledWith({} as State, expect.any(String))
-      .mockReturnValue({ wifi: null, ethernet: null })
-    when(mockGetValidCustomLabwareFiles)
-      .calledWith({} as State)
-      .mockReturnValue([mockCustomLabwareFile])
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue(
+      mockSuccessQueryResults({
+        data: [],
+        links: {},
+      })
+    )
+    vi.mocked(useCreateProtocolMutation).mockReturnValue({
+      mutateAsync: mockMutateAsync,
+    } as any)
+    vi.mocked(mockMutateAsync).mockImplementation(() => Promise.resolve())
+    vi.mocked(getNetworkInterfaces).mockReturnValue({
+      wifi: null,
+      ethernet: null,
+    })
+    vi.mocked(getValidCustomLabwareFiles).mockReturnValue([
+      mockCustomLabwareFile,
+    ])
   })
 
   it('renders slideout title and button', () => {
     render({
       storedProtocolData: storedProtocolDataFixture,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
     })
     screen.getByText('Send protocol to Opentrons Flex')
@@ -172,38 +143,34 @@ describe('SendProtocolToFlexSlideout', () => {
   it('renders an available robot option for every connectable OT-3, and link for other robots', () => {
     render({
       storedProtocolData: storedProtocolDataFixture,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
     })
-    mockGetUnreachableRobots.mockReturnValue([
+    vi.mocked(getUnreachableRobots).mockReturnValue([
       { ...mockUnreachableRobot, robotModel: 'OT-3 Standard' },
     ])
-    mockGetReachableRobots.mockReturnValue([
+    vi.mocked(getReachableRobots).mockReturnValue([
       { ...mockReachableRobot, robotModel: 'OT-3 Standard' },
     ])
     screen.getByText('opentrons-robot-name')
     screen.getByText('2 unavailable robots are not listed.')
   })
   it('does render a robot option for a busy OT-3', () => {
-    when(mockUseNotifyAllRunsQuery)
-      .calledWith(expect.any(Object), expect.any(Object), {
-        hostname: mockConnectableOT3.ip,
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue(
+      mockSuccessQueryResults({
+        data: [],
+        links: { current: { href: 'a current run' } },
       })
-      .mockReturnValue(
-        mockSuccessQueryResults({
-          data: [],
-          links: { current: { href: 'a current run' } },
-        })
-      )
+    )
     render({
       storedProtocolData: storedProtocolDataFixture,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
     })
     expect(screen.getByText('opentrons-robot-name')).toBeInTheDocument()
   })
   it('does not render an available robot option for a connectable OT-2', () => {
-    mockGetConnectableRobots.mockReturnValue([
+    vi.mocked(getConnectableRobots).mockReturnValue([
       mockConnectableOT3,
       {
         ...mockConnectableRobot,
@@ -213,16 +180,16 @@ describe('SendProtocolToFlexSlideout', () => {
     ])
     render({
       storedProtocolData: storedProtocolDataFixture,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
     })
     expect(screen.queryByText('ot-2-robot-name')).not.toBeInTheDocument()
   })
   it('if scanning, show robots, but do not show link to other devices', () => {
-    mockGetScanning.mockReturnValue(true)
+    vi.mocked(getScanning).mockReturnValue(true)
     render({
       storedProtocolData: storedProtocolDataFixture,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
     })
     screen.getByText('opentrons-robot-name')
@@ -233,22 +200,22 @@ describe('SendProtocolToFlexSlideout', () => {
   it('if not scanning, show refresh button, start discovery if clicked', () => {
     const { dispatch } = render({
       storedProtocolData: storedProtocolDataFixture,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
     })[1]
     const refresh = screen.getByRole('button', { name: 'refresh' })
     fireEvent.click(refresh)
-    expect(mockStartDiscovery).toHaveBeenCalled()
+    expect(startDiscovery).toHaveBeenCalled()
     expect(dispatch).toHaveBeenCalledWith({ type: 'mockStartDiscovery' })
   })
   it('defaults to first available robot and allows an available robot to be selected', () => {
-    mockGetConnectableRobots.mockReturnValue([
+    vi.mocked(getConnectableRobots).mockReturnValue([
       { ...mockConnectableOT3, name: 'otherRobot', ip: 'otherIp' },
       mockConnectableOT3,
     ])
     render({
       storedProtocolData: storedProtocolDataFixture,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
     })
     const proceedButton = screen.getByRole('button', { name: 'Send' })
@@ -266,16 +233,14 @@ describe('SendProtocolToFlexSlideout', () => {
     })
   })
   it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
-    when(mockGetBuildrootUpdateDisplayInfo)
-      .calledWith(({} as any) as State, 'opentrons-robot-name')
-      .mockReturnValue({
-        autoUpdateAction: 'upgrade',
-        autoUpdateDisabledReason: null,
-        updateFromFileDisabledReason: null,
-      })
+    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
     render({
       storedProtocolData: storedProtocolDataFixture,
-      onCloseClick: jest.fn(),
+      onCloseClick: vi.fn(),
       isExpanded: true,
     })
     const proceedButton = screen.getByRole('button', { name: 'Send' })

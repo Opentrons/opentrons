@@ -16,9 +16,8 @@ import {
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { TipPositionModal } from './TipPositionModal'
 import { getDefaultMmFromBottom } from './utils'
-import stepFormStyles from '../../StepEditForm.css'
-import styles from './TipPositionInput.css'
-
+import stepFormStyles from '../../StepEditForm.module.css'
+import styles from './TipPositionInput.module.css'
 import type { FieldProps } from '../../types'
 
 interface TipPositionFieldProps extends FieldProps {
@@ -34,6 +33,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
     updateValue,
     isIndeterminate,
     labwareId,
+    value: rawValue,
   } = props
   const { t } = useTranslation('application')
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -70,7 +70,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
   const isTouchTipField = getIsTouchTipField(name)
   const isDelayPositionField = getIsDelayPositionField(name)
   let value: string | number = '0'
-  const mmFromBottom = typeof value === 'number' ? value : null
+  const mmFromBottom = typeof rawValue === 'number' ? rawValue : null
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
     value =

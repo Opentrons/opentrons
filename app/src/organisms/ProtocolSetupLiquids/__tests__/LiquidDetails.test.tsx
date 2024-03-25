@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { screen, fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, beforeEach, vi } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { getLocationInfoNames } from '../../Devices/ProtocolRun/utils/getLocationInfoNames'
@@ -13,19 +15,10 @@ import {
 } from '../fixtures'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
-jest.mock('../../Devices/ProtocolRun/SetupLiquids/utils')
-jest.mock('../../Devices/ProtocolRun/utils/getLocationInfoNames')
-jest.mock('../../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal')
+vi.mock('../../Devices/ProtocolRun/SetupLiquids/utils')
+vi.mock('../../Devices/ProtocolRun/utils/getLocationInfoNames')
+vi.mock('../../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal')
 
-const mockGetLocationInfoNames = getLocationInfoNames as jest.MockedFunction<
-  typeof getLocationInfoNames
->
-const mockgetTotalVolumePerLiquidId = getTotalVolumePerLiquidId as jest.MockedFunction<
-  typeof getTotalVolumePerLiquidId
->
-const mockLiquidsLabwareDetailsModal = LiquidsLabwareDetailsModal as jest.MockedFunction<
-  typeof LiquidsLabwareDetailsModal
->
 const render = (props: React.ComponentProps<typeof LiquidDetails>) => {
   return renderWithProviders(<LiquidDetails {...props} />, {
     i18nInstance: i18n,
@@ -46,12 +39,12 @@ describe('LiquidDetails', () => {
         displayColor: '#ff4888',
       },
     }
-    mockgetTotalVolumePerLiquidId.mockReturnValue(50)
-    mockGetLocationInfoNames.mockReturnValue({
+    vi.mocked(getTotalVolumePerLiquidId).mockReturnValue(50)
+    vi.mocked(getLocationInfoNames).mockReturnValue({
       slotName: '4',
       labwareName: 'mock labware name',
     })
-    mockLiquidsLabwareDetailsModal.mockReturnValue(<div>mock modal</div>)
+    vi.mocked(LiquidsLabwareDetailsModal).mockReturnValue(<div>mock modal</div>)
   })
 
   it('renders the total volume of the liquid, sample display name, clicking on arrow renders the modal', () => {

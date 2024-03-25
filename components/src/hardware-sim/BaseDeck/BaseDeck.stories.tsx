@@ -1,7 +1,7 @@
 import * as React from 'react'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 import {
+  fixture96Plate,
+  fixtureTiprack1000ul,
   FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
@@ -54,34 +54,34 @@ export const BaseDeck: Story = {
     labwareOnDeck: [
       {
         labwareLocation: { slotName: 'C2' },
-        definition: fixture_96_plate as LabwareDefinition2,
+        definition: fixture96Plate as LabwareDefinition2,
       },
       {
         labwareLocation: { slotName: 'C3' },
-        definition: fixture_tiprack_1000_ul as LabwareDefinition2,
+        definition: fixtureTiprack1000ul as LabwareDefinition2,
       },
     ],
     modulesOnDeck: [
       {
         moduleLocation: { slotName: 'B1' },
         moduleModel: THERMOCYCLER_MODULE_V2,
-        nestedLabwareDef: fixture_96_plate as LabwareDefinition2,
+        nestedLabwareDef: fixture96Plate as LabwareDefinition2,
         innerProps: { lidMotorState: 'open' },
       },
       {
         moduleLocation: { slotName: 'D1' },
         moduleModel: TEMPERATURE_MODULE_V2,
-        nestedLabwareDef: fixture_96_plate as LabwareDefinition2,
+        nestedLabwareDef: fixture96Plate as LabwareDefinition2,
       },
       {
         moduleLocation: { slotName: 'B3' },
         moduleModel: HEATERSHAKER_MODULE_V1,
-        nestedLabwareDef: fixture_96_plate as LabwareDefinition2,
+        nestedLabwareDef: fixture96Plate as LabwareDefinition2,
       },
       {
         moduleLocation: { slotName: 'D2' },
         moduleModel: MAGNETIC_BLOCK_V1,
-        nestedLabwareDef: fixture_96_plate as LabwareDefinition2,
+        nestedLabwareDef: fixture96Plate as LabwareDefinition2,
       },
     ],
     darkFill: 'rebeccapurple',

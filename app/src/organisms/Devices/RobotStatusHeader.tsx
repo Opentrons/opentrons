@@ -34,7 +34,7 @@ import {
   OPENTRONS_USB,
 } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../resources/runs'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
@@ -78,7 +78,10 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
 
   const runningProtocolBanner: JSX.Element | null =
     currentRunId != null && currentRunStatus != null && displayName != null ? (
-      <Flex alignItems={ALIGN_CENTER} onClick={e => e.stopPropagation()}>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      >
         <StyledText
           as="label"
           paddingRight={SPACING.spacing8}
@@ -157,7 +160,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText
           as="h6"
-          color={COLORS.grey50}
+          color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing2}
           textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -189,7 +192,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
                   aria-label={iconName}
                   paddingTop={SPACING.spacing4}
                   name={iconName}
-                  color={COLORS.grey50}
+                  color={COLORS.grey60}
                   size="1.25rem"
                 />
               </Btn>

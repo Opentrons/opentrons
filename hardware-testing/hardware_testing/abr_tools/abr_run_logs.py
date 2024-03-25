@@ -1,35 +1,11 @@
 """ABR Run Log Pull."""
-from .abr_robots import ABR_IPS
 from typing import Set, Dict, Any
-
 import argparse
 import os
 import json
 import traceback
 import requests
-
-
-def get_run_ids_from_storage(storage_directory: str) -> Set[str]:
-    """Read all files in storage directory, extracts run id, adds to set."""
-    os.makedirs(storage_directory, exist_ok=True)
-    list_of_files = os.listdir(storage_directory)
-    run_ids = set()
-    for this_file in list_of_files:
-        read_file = os.path.join(storage_directory, this_file)
-        try:
-            file_results = json.load(open(read_file))
-        except json.JSONDecodeError:
-            print(f"Ignoring unparsable file {read_file}.")
-            continue
-        run_id = file_results["run_id"]
-        run_ids.add(run_id)
-    return run_ids
-
-
-def get_unseen_run_ids(runs: Set[str], runs_from_storage: Set[str]) -> Set[str]:
-    """Subtracts runs from storage from current runs being read."""
-    runs_to_save = runs - runs_from_storage
-    return runs_to_save
+from . import read_robot_logs
 
 
 def get_run_ids_from_robot(ip: str) -> Set[str]:
@@ -83,14 +59,18 @@ def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
         f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
     )
     health_data = response.json()
-    robot_name = health_data["name"]
-    try:
-        robot_serial = health_data["robot_serial"]
-    except UnboundLocalError:
-        robot_serial = "unknown"
-    run["robot_name"] = robot_name
+    run["robot_name"] = health_data.get("name", "")
+    run["API_Version"] = health_data.get("api_version", "")
+    run["robot_serial"] = health_data.get("robot_serial", "")
     run["run_id"] = one_run
-    run["robot_serial"] = robot_serial
+
+    # Instruments Attached
+    response = requests.get(
+        f"http://{ip}:31950/instruments", headers={"opentrons-version": "3"}
+    )
+    instrument_data = response.json()
+    for instrument in instrument_data["data"]:
+        run[instrument["mount"]] = instrument["serialNumber"]
     return run
 
 
@@ -98,12 +78,9 @@ def save_runs(runs_to_save: Set[str], ip: str, storage_directory: str) -> None:
     """Saves runs to user given storage directory."""
     for a_run in runs_to_save:
         data = get_run_data(a_run, ip)
-        robot_name = data["robot_name"]
-        data_file_name = data["robot_name"] + "_" + data["run_id"] + ".json"
+        data_file_name = ip + "_" + data["run_id"] + ".json"
         json.dump(data, open(os.path.join(storage_directory, data_file_name), mode="w"))
-    print(
-        f"Saved {len(runs_to_save)} run(s) from robot {robot_name} with IP address {ip}."
-    )
+    print(f"Saved {len(runs_to_save)} run(s) from robot with IP address {ip}.")
 
 
 def get_all_run_logs(storage_directory: str) -> None:
@@ -113,11 +90,16 @@ def get_all_run_logs(storage_directory: str) -> None:
     Read each robot's list of unique run log IDs and compare them to all IDs in storage.
     Any ID that is not in storage, download the run log and put it in storage.
     """
-    runs_from_storage = get_run_ids_from_storage(storage_directory)
-    for ip in ABR_IPS:
+    ip_json_file = os.path.join(storage_directory, "IPs.json")
+    ip_file = json.load(open(ip_json_file))
+    ip_address_list = ip_file["ip_address_list"]
+    print(ip_address_list)
+
+    runs_from_storage = read_robot_logs.get_run_ids_from_storage(storage_directory)
+    for ip in ip_address_list:
         try:
             runs = get_run_ids_from_robot(ip)
-            runs_to_save = get_unseen_run_ids(runs, runs_from_storage)
+            runs_to_save = read_robot_logs.get_unseen_run_ids(runs, runs_from_storage)
             save_runs(runs_to_save, ip, storage_directory)
         except Exception:
             print(f"Failed to read IP address: {ip}.")

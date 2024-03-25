@@ -1,4 +1,5 @@
 import logging
+from typing import Optional, Dict, Union
 
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.execution.execute_python import run_python
@@ -16,7 +17,12 @@ from opentrons.protocols.api_support.types import APIVersion
 MODULE_LOG = logging.getLogger(__name__)
 
 
-def run_protocol(protocol: Protocol, context: ProtocolContext) -> None:
+def run_protocol(
+    protocol: Protocol,
+    context: ProtocolContext,
+    # TODO (spp, 2024-03-20): move RunTimeParamValuesType to a top level types and use here
+    run_time_param_overrides: Optional[Dict[str, Union[float, bool, str]]] = None,
+) -> None:
     """Run a protocol.
 
     :param protocol: The :py:class:`.protocols.types.Protocol` to execute

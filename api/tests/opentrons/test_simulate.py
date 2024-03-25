@@ -90,6 +90,13 @@ def test_simulate_without_filename(protocol: Protocol, protocol_file: str) -> No
                 "Dropping tip into H12 of Opentrons OT-2 96 Tip Rack 1000 µL on slot 1",
             ],
         ),
+        (
+            "ot2_drop_tip.py",
+            [
+                "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 300 µL on slot 5",
+                "Dropping tip into Trash Bin on slot 12",
+            ],
+        ),
     ],
 )
 def test_simulate_function_apiv2_run_log(

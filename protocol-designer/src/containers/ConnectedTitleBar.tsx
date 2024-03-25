@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { TitleBar, Icon, IconName } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import styles from './TitleBar.css'
+import styles from './TitleBar.module.css'
 import { START_TERMINAL_TITLE, END_TERMINAL_TITLE } from '../constants'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as uiLabwareSelectors } from '../ui/labware'
@@ -109,10 +109,9 @@ export const ConnectedTitleBar = (): JSX.Element => {
           getLabwareDisplayName(labwareEntity.def).replace('µL', 'uL')
         backButtonLabel = 'Deck'
       }
-
+      title = title || fileName || ''
       if (selectedTerminalId === START_TERMINAL_ITEM_ID) {
         subtitle = START_TERMINAL_TITLE
-        title = title || fileName || ''
       } else if (selectedTerminalId === END_TERMINAL_ITEM_ID) {
         subtitle = END_TERMINAL_TITLE
         if (drilledDownLabwareId) {

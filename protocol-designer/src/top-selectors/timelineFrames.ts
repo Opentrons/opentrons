@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import assert from 'assert'
+
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { getActiveItem } from '../ui/steps/selectors'
@@ -69,7 +69,7 @@ const _timelineFrameHelper = (beforeActiveItem: boolean) => (
     }
   }
 
-  assert(
+  console.assert(
     timelineIdx !== -1,
     `timelineFrameForActiveItem got unhandled terminal id: "${activeItem.id}"`
   )

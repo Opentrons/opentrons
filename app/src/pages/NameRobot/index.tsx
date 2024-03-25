@@ -2,7 +2,6 @@ import * as React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { css } from 'styled-components'
 import { useHistory } from 'react-router-dom'
 
 import {
@@ -19,6 +18,7 @@ import {
   COLORS,
   TYPOGRAPHY,
   Icon,
+  Btn,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
@@ -40,14 +40,6 @@ import { ConfirmRobotName } from '../../organisms/OnDeviceDisplay/NameRobot/Conf
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'
-
-const INPUT_FIELD_ODD_STYLE = css`
-  padding-top: ${SPACING.spacing32};
-  padding-bottom: ${SPACING.spacing32};
-  font-size: 2.5rem;
-  line-height: 3.25rem;
-  text-align: center;
-`
 
 interface FormValues {
   newRobotName: string
@@ -186,7 +178,7 @@ export function NameRobot(): JSX.Element {
       ) : (
         <>
           {isUnboxingFlowOngoing ? (
-            <StepMeter totalSteps={5} currentStep={4} />
+            <StepMeter totalSteps={6} currentStep={5} />
           ) : null}
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -201,7 +193,20 @@ export function NameRobot(): JSX.Element {
               }
               position={POSITION_RELATIVE}
             >
-              <Flex position={POSITION_ABSOLUTE} left="0"></Flex>
+              <Flex position={POSITION_ABSOLUTE} left="0">
+                <Btn
+                  data-testid="name_back_button"
+                  onClick={() => {
+                    if (isUnboxingFlowOngoing) {
+                      history.push('/emergency-stop')
+                    } else {
+                      history.push('/robot-settings')
+                    }
+                  }}
+                >
+                  <Icon name="back" size="3rem" color={COLORS.black90} />
+                </Btn>
+              </Flex>
               <Flex marginLeft={isUnboxingFlowOngoing ? '0' : '4rem'}>
                 <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
                   {isUnboxingFlowOngoing
@@ -259,10 +264,10 @@ export function NameRobot(): JSX.Element {
                     id="newRobotName"
                     name="newRobotName"
                     type="text"
-                    readOnly
                     value={field.value}
                     error={fieldState.error?.message && ''}
-                    css={INPUT_FIELD_ODD_STYLE}
+                    textAlign={TYPOGRAPHY.textAlignCenter}
+                    onBlur={e => e.target.focus()}
                   />
                 )}
               />

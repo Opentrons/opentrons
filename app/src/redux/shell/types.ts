@@ -6,26 +6,30 @@ export interface Remote {
   ipcRenderer: {
     invoke: (channel: string, ...args: unknown[]) => Promise<any>
     send: (channel: string, ...args: unknown[]) => void
-    on: (
-      channel: string,
-      listener: (
-        event: IpcMainEvent,
-        hostname: string,
-        topic: NotifyTopic,
-        message: NotifyResponseData | NotifyNetworkError,
-        ...args: unknown[]
-      ) => void
-    ) => void
+    on: (channel: string, listener: IpcListener) => void
+    off: (channel: string, listener: IpcListener) => void
   }
 }
 
-interface NotifyRefetchData {
+export type IpcListener = (
+  event: IpcMainEvent,
+  hostname: string,
+  topic: NotifyTopic,
+  message: NotifyResponseData | NotifyNetworkError,
+  ...args: unknown[]
+) => void
+
+export interface NotifyRefetchData {
   refetchUsingHTTP: boolean
-  statusCode: never
 }
 
+export interface NotifyUnsubscribeData {
+  unsubscribe: boolean
+}
+
+export type NotifyBrokerResponses = NotifyRefetchData | NotifyUnsubscribeData
 export type NotifyNetworkError = 'ECONNFAILED' | 'ECONNREFUSED'
-export type NotifyResponseData = NotifyRefetchData | NotifyNetworkError
+export type NotifyResponseData = NotifyBrokerResponses | NotifyNetworkError
 
 interface File {
   sha512: string
@@ -132,24 +136,14 @@ export interface RobotMassStorageDeviceRemoved {
 }
 
 export type NotifyTopic =
+  | 'ALL_TOPICS'
   | 'robot-server/maintenance_runs/current_run'
   | 'robot-server/runs/current_command'
   | 'robot-server/runs'
   | `robot-server/runs/${string}`
 
-export type NotifyAction = 'subscribe' | 'unsubscribe'
-
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'
-  payload: {
-    hostname: string
-    topic: NotifyTopic
-  }
-  meta: { shell: true }
-}
-
-export interface NotifyUnsubscribeAction {
-  type: 'shell:NOTIFY_UNSUBSCRIBE'
   payload: {
     hostname: string
     topic: NotifyTopic
@@ -170,4 +164,3 @@ export type ShellAction =
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
   | NotifySubscribeAction
-  | NotifyUnsubscribeAction

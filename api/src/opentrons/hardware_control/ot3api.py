@@ -33,9 +33,6 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.errors.exceptions import (
-    StallOrCollisionDetectedError,
-)
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs
@@ -246,6 +243,7 @@ class OT3API(
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
         self._gantry_load = GantryLoad.LOW_THROUGHPUT
+        self._configured_since_update = True
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
@@ -258,13 +256,15 @@ class OT3API(
         the last moved mount.
         """
         realmount = OT3Mount.from_mount(mount)
-        if not self._last_moved_mount or realmount == self._last_moved_mount:
-            return False
-
-        return (
+        if realmount == OT3Mount.GRIPPER or (
             realmount == OT3Mount.LEFT
             and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
-        ) or (realmount == OT3Mount.GRIPPER)
+        ):
+            ax = Axis.by_mount(realmount)
+            if ax in self.engaged_axes.keys():
+                return not self.engaged_axes[ax]
+
+        return False
 
     @property
     def door_state(self) -> DoorState:
@@ -413,7 +413,7 @@ class OT3API(
             Dict[OT3Mount, Dict[str, Optional[str]]],
             Dict[top_types.Mount, Dict[str, Optional[str]]],
         ] = None,
-        attached_modules: Optional[List[str]] = None,
+        attached_modules: Optional[Dict[str, List[str]]] = None,
         config: Union[RobotConfig, OT3Config, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
@@ -427,7 +427,7 @@ class OT3API(
         if feature_flags is None:
             feature_flags = HardwareFeatureFlags()
 
-        checked_modules = attached_modules or []
+        checked_modules = attached_modules or {}
 
         checked_loop = use_or_initialize_loop(loop)
         if not isinstance(config, OT3Config):
@@ -508,6 +508,10 @@ class OT3API(
     ) -> AsyncIterator[UpdateStatus]:
         """Start the firmware update for one or more subsystems and return update progress iterator."""
         subsystems = subsystems or set()
+        if SubSystem.head in subsystems:
+            await self.disengage_axes([Axis.Z_L, Axis.Z_R])
+        if SubSystem.gripper in subsystems:
+            await self.disengage_axes([Axis.Z_G])
         # start the updates and yield the progress
         async with self._motion_lock:
             try:
@@ -525,6 +529,8 @@ class OT3API(
                     message="Update failed because of uncaught error",
                     wrapping=[PythonException(e)],
                 ) from e
+            finally:
+                self._configured_since_update = False
 
     # Incidentals (i.e. not motion) API
 
@@ -646,16 +652,21 @@ class OT3API(
 
     # TODO (spp, 2023-01-31): add unit tests
     async def cache_instruments(
-        self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
+        self,
+        require: Optional[Dict[top_types.Mount, PipetteName]] = None,
+        skip_if_would_block: bool = False,
     ) -> None:
         """
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
-        skip_configure = await self._cache_instruments(require)
-        if not skip_configure:
-            self._log.info("Instrument model cache updated, reconfiguring")
-            await self._configure_instruments()
+        if skip_if_would_block and self._motion_lock.locked():
+            return
+        async with self._motion_lock:
+            skip_configure = await self._cache_instruments(require)
+            if not skip_configure or not self._configured_since_update:
+                self._log.info("Reconfiguring instrument cache")
+                await self._configure_instruments()
 
     async def _cache_instruments(  # noqa: C901
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
@@ -675,11 +686,11 @@ class OT3API(
             # We should also check version here once we're comfortable.
             if not pipette_load_name.supported_pipette(name):
                 raise RuntimeError(f"{name} is not a valid pipette name")
-        async with self._motion_lock:
-            # we're not actually checking the required instrument except in the context
-            # of simulation and it feels like a lot of work for this function
-            # actually be doing.
-            found = await self._backend.get_attached_instruments(checked_require)
+
+        # we're not actually checking the required instrument except in the context
+        # of simulation and it feels like a lot of work for this function
+        # actually be doing.
+        found = await self._backend.get_attached_instruments(checked_require)
 
         if OT3Mount.GRIPPER in found.keys():
             # Is now a gripper, ask if it's ok to skip
@@ -725,8 +736,9 @@ class OT3API(
     async def _configure_instruments(self) -> None:
         """Configure instruments"""
         await self.set_gantry_load(self._gantry_load_from_instruments())
-        await self.refresh_positions()
+        await self.refresh_positions(acquire_lock=False)
         await self.reset_tip_detectors(False)
+        self._configured_since_update = True
 
     async def reset_tip_detectors(
         self,
@@ -981,9 +993,11 @@ class OT3API(
             OT3Mount.from_mount(mount), self._current_position, critical_point
         )
 
-    async def refresh_positions(self) -> None:
+    async def refresh_positions(self, acquire_lock: bool = True) -> None:
         """Request and update both the motor and encoder positions from backend."""
-        async with self._motion_lock:
+        async with contextlib.AsyncExitStack() as stack:
+            if acquire_lock:
+                await stack.enter_async_context(self._motion_lock)
             await self._backend.update_motor_status()
             await self._cache_current_position()
             await self._cache_encoder_position()
@@ -1304,29 +1318,34 @@ class OT3API(
         Disengage the 96-channel and gripper mount if retracted. Re-engage
         the 96-channel or gripper mount if it is about to move.
         """
-        if self.is_idle_mount(mount):
-            # home the left/gripper mount if it is current disengaged
-            await self.home_z(mount)
-
-        if mount != self._last_moved_mount and self._last_moved_mount:
-            await self.retract(self._last_moved_mount, 10)
-
-            # disengage Axis.Z_L motor and engage the brake to lower power
-            # consumption and reduce the chance of the 96-channel pipette dropping
-            if (
-                self.gantry_load == GantryLoad.HIGH_THROUGHPUT
-                and self._last_moved_mount == OT3Mount.LEFT
-            ):
-                await self.disengage_axes([Axis.Z_L])
-
-            # disegnage Axis.Z_G when we can to reduce the chance of
-            # the gripper dropping
-            if self._last_moved_mount == OT3Mount.GRIPPER:
-                await self.disengage_axes([Axis.Z_G])
-
-        if mount != OT3Mount.GRIPPER:
+        last_moved = self._last_moved_mount
+        # if gripper exists and it's not the moving mount, it should retract
+        if (
+            self.has_gripper()
+            and mount != OT3Mount.GRIPPER
+            and not self.is_idle_mount(OT3Mount.GRIPPER)
+        ):
+            await self.retract(OT3Mount.GRIPPER, 10)
+            await self.disengage_axes([Axis.Z_G])
             await self.idle_gripper()
 
+        # if 96-channel pipette is attached and not being moved, it should retract
+        if (
+            mount != OT3Mount.LEFT
+            and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and not self.is_idle_mount(OT3Mount.LEFT)
+        ):
+            await self.retract(OT3Mount.LEFT, 10)
+            await self.disengage_axes([Axis.Z_L])
+
+        # if the last moved mount is not covered in neither of the above scenario,
+        # simply retract the last moved mount
+        if last_moved and not self.is_idle_mount(last_moved) and mount != last_moved:
+            await self.retract(last_moved, 10)
+
+        # finally, home the current left/gripper mount to prepare for movement
+        if self.is_idle_mount(mount):
+            await self.home_z(mount)
         self._last_moved_mount = mount
 
     async def prepare_for_mount_movement(
@@ -1466,6 +1485,22 @@ class OT3API(
         target_pos = {axis: self._backend.home_position()[axis]}
         return origin_pos, target_pos
 
+    async def _enable_before_update_estimation(self, axis: Axis) -> None:
+        enabled = await self._backend.is_motor_engaged(axis)
+
+        if not enabled:
+            if axis == Axis.Z_L and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+                # we're here if the left mount has been idle and the brake is engaged
+                # we want to temporarily increase its hold current to prevent the z
+                # stage from dropping when switching off the ebrake
+                async with self._backend.increase_z_l_hold_current():
+                    await self.engage_axes([axis])
+            else:
+                await self.engage_axes([axis])
+
+        # now that motor is enabled, we can update position estimation
+        await self._update_position_estimation([axis])
+
     @_adjust_high_throughput_z_current
     async def _home_axis(self, axis: Axis) -> None:
         """
@@ -1487,22 +1522,12 @@ class OT3API(
         assert axis not in [Axis.G, Axis.Q]
 
         encoder_ok = self._backend.check_encoder_status([axis])
-        motor_ok = self._backend.check_motor_status([axis])
-
         if encoder_ok:
-            # ensure stepper position can be updated after boot
-            if axis == Axis.Z_L and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
-                # we're here if the left mount has been idle and the brake is engaged
-                # we want to temporarily increase its hold current to prevent the z
-                # stage from dropping when switching off the ebrake
-                async with self._backend.increase_z_l_hold_current():
-                    await self.engage_axes([axis])
-            else:
-                await self.engage_axes([axis])
-            await self._update_position_estimation([axis])
-            # refresh motor and encoder statuses after position estimation update
-            motor_ok = self._backend.check_motor_status([axis])
-            encoder_ok = self._backend.check_encoder_status([axis])
+            # enable motor (if needed) and update estimation
+            await self._enable_before_update_estimation(axis)
+
+        # refresh motor status after position estimation update
+        motor_ok = self._backend.check_motor_status([axis])
 
         if Axis.to_kind(axis) == OT3AxisKind.P:
             await self._set_plunger_current_and_home(axis, motor_ok, encoder_ok)
@@ -1521,19 +1546,12 @@ class OT3API(
                 axis_home_dist = 20.0
             if origin[axis] - target_pos[axis] > axis_home_dist:
                 target_pos[axis] += axis_home_dist
-                try:
-                    await self._backend.move(
-                        origin,
-                        target_pos,
-                        speed=400,
-                        stop_condition=HWStopCondition.none,
-                    )
-                except StallOrCollisionDetectedError:
-                    self._log.warning(
-                        f"Stall on {axis} during fast home, encoder may have missed an overflow"
-                    )
-                    await self.refresh_positions()
-
+                await self._backend.move(
+                    origin,
+                    target_pos,
+                    speed=400,
+                    stop_condition=HWStopCondition.none,
+                )
             await self._backend.home([axis], self.gantry_load)
         else:
             # both stepper and encoder positions are invalid, must home
@@ -1541,22 +1559,21 @@ class OT3API(
 
     async def _home(self, axes: Sequence[Axis]) -> None:
         """Home one axis at a time."""
-        async with self._motion_lock:
-            for axis in axes:
-                try:
-                    if axis == Axis.G:
-                        await self.home_gripper_jaw()
-                    elif axis == Axis.Q:
-                        await self._backend.home([axis], self.gantry_load)
-                    else:
-                        await self._home_axis(axis)
-                except BaseException as e:
-                    self._log.exception(f"Homing failed: {e}")
-                    self._current_position.clear()
-                    raise
+        for axis in axes:
+            try:
+                if axis == Axis.G:
+                    await self.home_gripper_jaw()
+                elif axis == Axis.Q:
+                    await self._backend.home([axis], self.gantry_load)
                 else:
-                    await self._cache_current_position()
-                    await self._cache_encoder_position()
+                    await self._home_axis(axis)
+            except BaseException as e:
+                self._log.exception(f"Homing failed: {e}")
+                self._current_position.clear()
+                raise
+            else:
+                await self._cache_current_position()
+                await self._cache_encoder_position()
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
@@ -1587,7 +1604,8 @@ class OT3API(
             if (ax in checked_axes and self._backend.axis_is_present(ax))
         ]
         self._log.info(f"home was called with {axes} generating sequence {home_seq}")
-        await self._home(home_seq)
+        async with self._motion_lock:
+            await self._home(home_seq)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""

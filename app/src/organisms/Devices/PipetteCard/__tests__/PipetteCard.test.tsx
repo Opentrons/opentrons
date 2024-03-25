@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
+import { when } from 'vitest-when'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { describe, it, vi, beforeEach, expect } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { renderWithProviders } from '../../../../__testing-utils__'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 import {
   useCurrentSubsystemUpdateQuery,
@@ -25,44 +27,15 @@ import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
-jest.mock('../PipetteOverflowMenu')
-jest.mock('../../../../redux/config')
-jest.mock('../../../CalibratePipetteOffset/useCalibratePipetteOffset')
-jest.mock('../../../CalibrateTipLength')
-jest.mock('../../hooks')
-jest.mock('../AboutPipetteSlideout')
-jest.mock('../../../../redux/robot-api')
-jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../redux/pipettes')
-
-const mockPipetteOverflowMenu = PipetteOverflowMenu as jest.MockedFunction<
-  typeof PipetteOverflowMenu
->
-const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction<
-  typeof getHasCalibrationBlock
->
-const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
-  typeof useCalibratePipetteOffset
->
-const mockAskForCalibrationBlockModal = AskForCalibrationBlockModal as jest.MockedFunction<
-  typeof AskForCalibrationBlockModal
->
-const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
-  typeof useDeckCalibrationData
->
-const mockAboutPipettesSlideout = AboutPipetteSlideout as jest.MockedFunction<
-  typeof AboutPipetteSlideout
->
-const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
-  typeof useDispatchApiRequest
->
-const mockUseIsFlex = useIsFlex as jest.MockedFunction<typeof useIsFlex>
-const mockUseCurrentSubsystemUpdateQuery = useCurrentSubsystemUpdateQuery as jest.MockedFunction<
-  typeof useCurrentSubsystemUpdateQuery
->
-const mockUsePipetteSettingsQuery = usePipetteSettingsQuery as jest.MockedFunction<
-  typeof usePipetteSettingsQuery
->
+vi.mock('../PipetteOverflowMenu')
+vi.mock('../../../../redux/config')
+vi.mock('../../../CalibratePipetteOffset/useCalibratePipetteOffset')
+vi.mock('../../../CalibrateTipLength')
+vi.mock('../../hooks')
+vi.mock('../AboutPipetteSlideout')
+vi.mock('../../../../redux/robot-api')
+vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../redux/pipettes')
 
 const render = (props: React.ComponentProps<typeof PipetteCard>) => {
   return renderWithProviders(<PipetteCard {...props} />, {
@@ -77,8 +50,8 @@ describe('PipetteCard', () => {
   let props: React.ComponentProps<typeof PipetteCard>
 
   beforeEach(() => {
-    startWizard = jest.fn()
-    dispatchApiRequest = jest.fn()
+    startWizard = vi.fn()
+    dispatchApiRequest = vi.fn()
     props = {
       pipetteModelSpecs: mockLeftSpecs,
       mount: LEFT,
@@ -90,36 +63,32 @@ describe('PipetteCard', () => {
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
-    when(mockUseIsFlex).calledWith(mockRobotName).mockReturnValue(false)
-    when(mockAboutPipettesSlideout).mockReturnValue(
+    when(useIsFlex).calledWith(mockRobotName).thenReturn(false)
+    vi.mocked(AboutPipetteSlideout).mockReturnValue(
       <div>mock about slideout</div>
     )
-    when(mockUseDeckCalibrationData).calledWith(mockRobotName).mockReturnValue({
+    when(useDeckCalibrationData).calledWith(mockRobotName).thenReturn({
       isDeckCalibrated: true,
       deckCalibrationData: mockDeckCalData,
     })
-    when(mockPipetteOverflowMenu).mockReturnValue(
+    vi.mocked(PipetteOverflowMenu).mockReturnValue(
       <div>mock pipette overflow menu</div>
     )
-    when(mockGetHasCalibrationBlock).mockReturnValue(null)
-    when(mockUseCalibratePipetteOffset).mockReturnValue([startWizard, null])
-    when(mockAskForCalibrationBlockModal).mockReturnValue(
+    vi.mocked(getHasCalibrationBlock).mockReturnValue(null)
+    vi.mocked(useCalibratePipetteOffset).mockReturnValue([startWizard, null])
+    vi.mocked(AskForCalibrationBlockModal).mockReturnValue(
       <div>Mock AskForCalibrationBlockModal</div>
     )
-    when(mockUseDispatchApiRequest).mockReturnValue([
+    vi.mocked(useDispatchApiRequest).mockReturnValue([
       dispatchApiRequest,
       ['id'],
     ])
-    mockUseCurrentSubsystemUpdateQuery.mockReturnValue({
+    vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({
       data: undefined,
     } as any)
-    when(mockUsePipetteSettingsQuery)
+    when(usePipetteSettingsQuery)
       .calledWith({ refetchInterval: 5000, enabled: true })
-      .mockReturnValue({} as any)
-  })
-  afterEach(() => {
-    jest.resetAllMocks()
-    resetAllWhenMocks()
+      .thenReturn({} as any)
   })
 
   it('renders information for a left pipette', () => {
@@ -228,7 +197,7 @@ describe('PipetteCard', () => {
     screen.getByText('Empty')
   })
   it('does not render banner to calibrate for ot2 pipette if not calibrated', () => {
-    when(mockUseIsFlex).calledWith(mockRobotName).mockReturnValue(false)
+    when(useIsFlex).calledWith(mockRobotName).thenReturn(false)
     props = {
       pipetteModelSpecs: mockLeftSpecs,
       mount: LEFT,
@@ -243,7 +212,7 @@ describe('PipetteCard', () => {
     expect(screen.queryByText('Calibrate now')).toBeNull()
   })
   it('renders banner to calibrate for ot3 pipette if not calibrated', () => {
-    when(mockUseIsFlex).calledWith(mockRobotName).mockReturnValue(true)
+    when(useIsFlex).calledWith(mockRobotName).thenReturn(true)
     props = {
       pipetteModelSpecs: { ...mockLeftSpecs, name: 'p300_single_flex' },
       mount: LEFT,
@@ -299,7 +268,7 @@ describe('PipetteCard', () => {
     )
   })
   it('renders firmware update in progress state if pipette is bad and update in progress', () => {
-    when(mockUseCurrentSubsystemUpdateQuery).mockReturnValue({
+    vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({
       data: { data: { updateProgress: 50 } as any },
     } as any)
     props = {

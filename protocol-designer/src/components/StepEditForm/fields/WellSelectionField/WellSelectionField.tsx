@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { FormGroup, InputField } from '@opentrons/components'
@@ -9,9 +10,9 @@ import {
   getWellSelectionLabwareKey,
 } from '../../../../ui/steps'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { Portal } from '../../../portals/MainPageModalPortal'
+import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import { WellSelectionModal } from './WellSelectionModal'
-import styles from '../../StepEditForm.css'
+import styles from '../../StepEditForm.module.css'
 
 import type { NozzleType } from '../../../../types'
 import type { FieldProps } from '../../types'
@@ -95,7 +96,7 @@ export const WellSelectionField = (props: Props): JSX.Element => {
         onClick={handleOpen}
         error={errorToShow}
       />
-      <Portal>
+      {createPortal(
         <WellSelectionModal
           isOpen={wellSelectionLabwareKey === modalKey}
           key={modalKey}
@@ -106,8 +107,9 @@ export const WellSelectionField = (props: Props): JSX.Element => {
           updateValue={updateValue}
           value={selectedWells}
           nozzleType={nozzleType}
-        />
-      </Portal>
+        />,
+        getMainPagePortalEl()
+      )}
     </FormGroup>
   )
 }

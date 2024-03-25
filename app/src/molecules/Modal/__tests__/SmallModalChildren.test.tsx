@@ -1,13 +1,15 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi } from 'vitest'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { SmallModalChildren } from '../SmallModalChildren'
 
 const props = {
   header: 'header',
   subText: 'subText',
   buttonText: 'buttonText',
-  handleCloseMaxPinsAlert: jest.fn(),
+  handleCloseMaxPinsAlert: vi.fn(),
 }
 const render = () => {
   return renderWithProviders(<SmallModalChildren {...props} />)

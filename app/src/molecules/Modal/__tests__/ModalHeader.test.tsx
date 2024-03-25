@@ -1,6 +1,9 @@
 import * as React from 'react'
+import '@testing-library/jest-dom/vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../__testing-utils__'
 import { ModalHeader } from '../ModalHeader'
 
 const render = (props: React.ComponentProps<typeof ModalHeader>) => {
@@ -15,8 +18,8 @@ describe('ModalHeader', () => {
     }
   })
   it('should render the title', () => {
-    const { getByText } = render(props)
-    getByText('title')
+    render(props)
+    screen.getByText('title')
   })
   it('shoulder render the optional props', () => {
     props = {
@@ -24,7 +27,7 @@ describe('ModalHeader', () => {
       hasExitIcon: true,
       iconName: 'information',
       iconColor: COLORS.black90,
-      onClick: jest.fn(),
+      onClick: vi.fn(),
     }
     render(props)
     expect(screen.getByLabelText('icon_information')).toHaveStyle(

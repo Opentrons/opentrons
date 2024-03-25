@@ -1,12 +1,13 @@
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 
 import {
   useInstrumentsQuery,
   useCurrentAllSubsystemUpdatesQuery,
   useSubsystemUpdateQuery,
 } from '@opentrons/react-api-client'
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
-import { Portal } from '../../App/portal'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
+import { getTopPortalEl } from '../../App/portal'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateNeededModal } from './UpdateNeededModal'
@@ -122,14 +123,14 @@ export function FirmwareUpdateTakeover(): JSX.Element {
           setInitiatedSubsystemUpdate={setInitiatedSubsystemUpdate}
         />
       ) : null}
-      {externalsubsystemUpdateData != null && maintenanceRunData == null ? (
-        <Portal level="top">
-          <UpdateInProgressModal
-            percentComplete={externalsubsystemUpdateData.data.updateProgress}
-            subsystem={externalsubsystemUpdateData.data.subsystem}
-          />
-        </Portal>
-      ) : null}
+      {externalsubsystemUpdateData != null && maintenanceRunData == null
+        ? createPortal(
+            <UpdateInProgressModal
+              subsystem={externalsubsystemUpdateData.data.subsystem}
+            />,
+            getTopPortalEl()
+          )
+        : null}
     </>
   )
 }

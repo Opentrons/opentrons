@@ -1,6 +1,4 @@
 // access main process remote modules via attachments to `global`
-import assert from 'assert'
-
 import type { AxiosRequestConfig } from 'axios'
 import type { ResponsePromise } from '@opentrons/api-client'
 import type { Remote, NotifyTopic, NotifyResponseData } from './types'
@@ -9,17 +7,16 @@ const emptyRemote: Remote = {} as any
 
 export const remote: Remote = new Proxy(emptyRemote, {
   get(_target, propName: string): unknown {
-    assert(
-      global.APP_SHELL_REMOTE,
-      'Expected APP_SHELL_REMOTE to be attached to global scope; is app-shell/src/preload.js properly configured?'
+    console.assert(
+      (global as any).APP_SHELL_REMOTE,
+      'Expected APP_SHELL_REMOTE to be attached to global scope; is app-shell/src/preload.ts properly configured?'
     )
 
-    assert(
-      propName in global.APP_SHELL_REMOTE,
-      `Expected APP_SHELL_REMOTE.${propName} to exist, is app-shell/src/preload.js properly configured?`
+    console.assert(
+      propName in (global as any).APP_SHELL_REMOTE,
+      `Expected APP_SHELL_REMOTE.${propName} to exist, is app-shell/src/preload.ts properly configured?`
     )
-    // @ts-expect-error TODO we know that propName is 'ipcRenderer' but TS can't narrow it down
-    return global.APP_SHELL_REMOTE[propName] as Remote
+    return (global as any).APP_SHELL_REMOTE[propName] as Remote
   },
 })
 
@@ -37,17 +34,50 @@ export function appShellRequestor<Data>(
   return remote.ipcRenderer.invoke('usb:request', configProxy)
 }
 
-export function appShellListener(
-  hostname: string | null,
-  topic: NotifyTopic,
+interface CallbackStore {
+  [hostname: string]: {
+    [topic in NotifyTopic]: Array<(data: NotifyResponseData) => void>
+  }
+}
+const callbackStore: CallbackStore = {}
+
+interface AppShellListener {
+  hostname: string
+  topic: NotifyTopic
   callback: (data: NotifyResponseData) => void
-): void {
-  remote.ipcRenderer.on(
-    'notify',
-    (_, shellHostname, shellTopic, shellMessage) => {
-      if (hostname === shellHostname && topic === shellTopic) {
-        callback(shellMessage)
+  isDismounting?: boolean
+}
+export function appShellListener({
+  hostname,
+  topic,
+  callback,
+  isDismounting = false,
+}: AppShellListener): CallbackStore {
+  if (isDismounting) {
+    const callbacks = callbackStore[hostname]?.[topic]
+    if (callbacks != null) {
+      callbackStore[hostname][topic] = callbacks.filter(cb => cb !== callback)
+      if (!callbackStore[hostname][topic].length) {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete callbackStore[hostname][topic]
+        if (!Object.keys(callbackStore[hostname]).length) {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete callbackStore[hostname]
+        }
       }
     }
-  )
+  } else {
+    callbackStore[hostname] = callbackStore[hostname] ?? {}
+    callbackStore[hostname][topic] ??= []
+    callbackStore[hostname][topic].push(callback)
+  }
+  return callbackStore
 }
+
+// Instantiate the notify listener at runtime.
+remote.ipcRenderer.on(
+  'notify',
+  (_, shellHostname, shellTopic, shellMessage) => {
+    callbackStore[shellHostname]?.[shellTopic]?.forEach(cb => cb(shellMessage))
+  }
+)

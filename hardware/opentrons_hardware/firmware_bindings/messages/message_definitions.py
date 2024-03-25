@@ -157,6 +157,17 @@ class GetStatusResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class GearStatusResponse(BaseMessage):  # noqa: D101
+    payload: payloads.GetStatusResponsePayload
+    payload_type: Type[
+        payloads.GetStatusResponsePayload
+    ] = payloads.GetStatusResponsePayload
+    message_id: Literal[
+        MessageId.get_gear_status_response
+    ] = MessageId.get_gear_status_response
+
+
+@dataclass
 class MoveRequest(BaseMessage):  # noqa: D101
     payload: payloads.MoveRequestPayload
     payload_type: Type[payloads.MoveRequestPayload] = payloads.MoveRequestPayload

@@ -1,11 +1,14 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
+import { it, expect, describe } from 'vitest'
+
 import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   MoveToAddressableAreaForDropTipRunTimeCommand,
 } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { CommandText } from '../'
 import { mockRobotSideAnalysis } from '../__fixtures__'
@@ -304,7 +307,7 @@ describe('CommandText', () => {
       />,
       { i18nInstance: i18n }
     )[0]
-    getByText('Dropping tip into Trash Bin in D3')
+    getByText('Moving to Trash Bin in D3')
   })
   it('renders correct text for moveToAddressableArea for slots', () => {
     const { getByText } = renderWithProviders(

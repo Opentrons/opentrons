@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ModuleSetupModal } from '../ModuleSetupModal'
 
@@ -13,31 +15,35 @@ const render = (props: React.ComponentProps<typeof ModuleSetupModal>) => {
 describe('ModuleSetupModal', () => {
   let props: React.ComponentProps<typeof ModuleSetupModal>
   beforeEach(() => {
-    props = { close: jest.fn(), moduleDisplayName: 'mockModuleDisplayName' }
+    props = { close: vi.fn(), moduleDisplayName: 'mockModuleDisplayName' }
   })
 
   it('should render the correct header', () => {
-    const { getByRole } = render(props)
-    getByRole('heading', { name: 'mockModuleDisplayName Setup Instructions' })
+    render(props)
+    screen.getByRole('heading', {
+      name: 'mockModuleDisplayName Setup Instructions',
+    })
   })
   it('should render the correct body', () => {
-    const { getByText } = render(props)
-    getByText(
+    render(props)
+    screen.getByText(
       'For step-by-step instructions on setting up your module, consult the Quickstart Guide that came in its box. You can also click the link below or scan the QR code to visit the modules section of the Opentrons Help Center.'
     )
   })
   it('should render a link to the learn more page', () => {
-    const { getByRole } = render(props)
+    render(props)
     expect(
-      getByRole('link', {
-        name: 'mockModuleDisplayName setup instructions',
-      }).getAttribute('href')
+      screen
+        .getByRole('link', {
+          name: 'mockModuleDisplayName setup instructions',
+        })
+        .getAttribute('href')
     ).toBe('https://support.opentrons.com/s/modules')
   })
   it('should call close when the close button is pressed', () => {
-    const { getByRole } = render(props)
+    render(props)
     expect(props.close).not.toHaveBeenCalled()
-    const closeButton = getByRole('button', { name: 'Close' })
+    const closeButton = screen.getByRole('button', { name: 'Close' })
     fireEvent.click(closeButton)
     expect(props.close).toHaveBeenCalled()
   })

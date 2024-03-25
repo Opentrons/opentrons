@@ -19,6 +19,7 @@ MessageDefinition = Union[
     defs.StopRequest,
     defs.GetStatusRequest,
     defs.GetStatusResponse,
+    defs.GearStatusResponse,
     defs.EnableMotorRequest,
     defs.DisableMotorRequest,
     defs.MoveRequest,

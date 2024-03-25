@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Flex,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
   SPACING,
   COLORS,
   PrimaryButton,
@@ -185,13 +184,6 @@ export function RenameRobotSlideout({
         <StyledText as="p" marginBottom={SPACING.spacing16}>
           {t('rename_robot_input_limitation_detail')}
         </StyledText>
-        <StyledText
-          as="label"
-          css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing8}
-        >
-          {t('robot_name')}
-        </StyledText>
         <Controller
           control={control}
           name="newRobotName"
@@ -208,6 +200,7 @@ export function RenameRobotSlideout({
               value={field.value}
               error={fieldState.error?.message && ' '}
               onBlur={field.onBlur}
+              title={t('robot_name')}
             />
           )}
         />

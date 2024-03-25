@@ -66,7 +66,7 @@ const FOOTER_BUTTON_STYLE = css`
   text-transform: lowercase;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
-  border-radius: ${BORDERS.borderRadiusSize1};
+  border-radius: ${BORDERS.borderRadius8};
   margin-top: ${SPACING.spacing16};
   margin-bottom: ${SPACING.spacing16};
 
@@ -79,12 +79,13 @@ const UpdateAppBanner = styled(Banner)`
 `
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius8};
   background: ${COLORS.grey30};
   width: 17.12rem;
 `
 const LEGACY_MODAL_STYLE = css`
   width: 40rem;
+  margin-left: 5.336rem;
 `
 
 const RESTART_APP_AFTER_TIME = 5000

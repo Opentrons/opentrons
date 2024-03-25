@@ -276,6 +276,9 @@ class OT3PipetteHandler:
             result[
                 "default_push_out_volume"
             ] = instr.active_tip_settings.default_push_out_volume
+            result[
+                "pipette_bounding_box_offsets"
+            ] = instr.config.pipette_bounding_box_offsets
         return cast(PipetteDict, result)
 
     @property

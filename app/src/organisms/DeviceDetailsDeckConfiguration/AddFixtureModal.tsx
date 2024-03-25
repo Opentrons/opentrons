@@ -175,7 +175,7 @@ export function AddFixtureModal({
                         flexDirection={DIRECTION_ROW}
                         alignItems={ALIGN_CENTER}
                         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-                        css={FIXTURE_BUTTON_STYLE}
+                        css={FIXTURE_BUTTON_STYLE_ODD}
                       >
                         <StyledText
                           as="p"
@@ -216,7 +216,7 @@ export function AddFixtureModal({
                         justifyContent={JUSTIFY_SPACE_BETWEEN}
                         padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
                         backgroundColor={COLORS.grey20}
-                        borderRadius={BORDERS.borderRadiusSize1}
+                        borderRadius={BORDERS.borderRadius4}
                       >
                         <StyledText css={TYPOGRAPHY.pSemiBold}>
                           {fixtureDisplayName}
@@ -250,10 +250,10 @@ export function AddFixtureModal({
   )
 }
 
-const FIXTURE_BUTTON_STYLE = css`
+const FIXTURE_BUTTON_STYLE_ODD = css`
   background-color: ${COLORS.grey35};
   cursor: default;
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius16};
   box-shadow: none;
 
   &:focus {

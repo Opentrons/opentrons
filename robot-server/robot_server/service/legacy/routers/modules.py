@@ -63,14 +63,18 @@ async def get_modules(
     description=(
         "Command a module to take an action. Valid actions "
         "depend on the specific module attached, which is "
-        "the model value from GET /modules/{serial}/data or "
-        "GET /modules"
+        "the model value from `GET /modules/{serial}/data` or "
+        "`GET /modules`."
+        "\n\n"
+        "**Deprecated:** Removed with `Opentrons-Version: 3`."
+        " Use `POST /commands` instead."
     ),
     response_model=SerialCommandResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
         status.HTTP_404_NOT_FOUND: {"model": LegacyErrorResponse},
     },
+    deprecated=True,
 )
 async def post_serial_command(
     command: SerialCommand,
@@ -158,7 +162,6 @@ async def post_serial_update(
                 modules.update_firmware(
                     matching_module,
                     matching_module.bundled_fw.path,
-                    asyncio.get_event_loop(),
                 ),
                 100,
             )

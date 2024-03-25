@@ -34,7 +34,7 @@ export function ConnectViaUSB(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={5} currentStep={1} />
+      <StepMeter totalSteps={6} currentStep={2} />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -71,7 +71,7 @@ export function ConnectViaUSB(): JSX.Element {
             <Flex
               alignItems={ALIGN_CENTER}
               backgroundColor={COLORS.green35}
-              borderRadius={BORDERS.borderRadiusSize3}
+              borderRadius={BORDERS.borderRadius12}
               height="18.5rem"
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing32}
@@ -105,7 +105,7 @@ export function ConnectViaUSB(): JSX.Element {
           <Flex
             alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.grey35}
-            borderRadius={BORDERS.borderRadiusSize3}
+            borderRadius={BORDERS.borderRadius12}
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing32}
             height="25.25rem"

@@ -39,7 +39,10 @@ class DeckConfigurationRequest(pydantic.BaseModel):
     """A request to set the robot's deck configuration."""
 
     cutoutFixtures: List[CutoutFixture] = pydantic.Field(
-        description="A full list of all the cutout fixtures that are mounted onto the deck."
+        description=(
+            "A full list of all the cutout fixtures that are mounted onto the deck."
+            " The order is arbitrary."
+        )
     )
 
 
@@ -47,7 +50,10 @@ class DeckConfigurationResponse(pydantic.BaseModel):
     """A response for the robot's current deck configuration."""
 
     cutoutFixtures: List[CutoutFixture] = pydantic.Field(
-        description="A full list of all the cutout fixtures that are mounted onto the deck."
+        description=(
+            "A full list of all the cutout fixtures that are mounted onto the deck."
+            " The order is arbitrary."
+        )
     )
     lastModifiedAt: Optional[datetime] = pydantic.Field(
         description=(
