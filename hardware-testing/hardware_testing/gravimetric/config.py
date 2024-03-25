@@ -3,9 +3,8 @@ from dataclasses import dataclass
 from typing import List, Dict, Tuple
 from typing_extensions import Final
 from enum import Enum
-from opentrons.config.types import LiquidProbeSettings
+from opentrons.config.types import LiquidProbeSettings, OutputOptions
 from opentrons.protocol_api.labware import Well
-from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
 
 
 class ConfigType(Enum):

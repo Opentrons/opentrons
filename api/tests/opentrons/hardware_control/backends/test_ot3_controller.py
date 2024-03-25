@@ -35,7 +35,12 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallbackFilter,
     CanMessenger,
 )
-from opentrons.config.types import OT3Config, GantryLoad, LiquidProbeSettings
+from opentrons.config.types import (
+    OT3Config,
+    GantryLoad,
+    LiquidProbeSettings,
+    OutputOptions,
+)
 from opentrons.config.robot_configs import build_config_ot3
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -92,8 +97,6 @@ from opentrons_shared_data.errors.exceptions import (
 )
 
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
-
-from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
 
 
 @pytest.fixture

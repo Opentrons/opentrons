@@ -3,7 +3,6 @@ from dataclasses import dataclass, asdict, fields
 from typing import Dict, Tuple, TypeVar, Generic, List, cast, Optional
 from typing_extensions import TypedDict, Literal
 from opentrons.hardware_control.types import OT3AxisKind
-from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
 
 
 class AxisDict(TypedDict):
@@ -115,6 +114,16 @@ class CapacitivePassSettings:
 @dataclass(frozen=True)
 class ZSenseSettings:
     pass_settings: CapacitivePassSettings
+
+
+# str enum so it can be json serializable
+class OutputOptions(str, Enum):
+    """Specifies where we should report sensor data to during a sensor pass."""
+
+    stream_to_csv = "STREAM"
+    sync_buffer_to_csv = "SYNC"
+    can_bus_only = "CAN"
+    none = "NONE"
 
 
 @dataclass

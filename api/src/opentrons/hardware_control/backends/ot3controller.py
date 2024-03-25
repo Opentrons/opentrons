@@ -25,7 +25,7 @@ from typing import (
     Union,
     Mapping,
 )
-from opentrons.config.types import OT3Config, GantryLoad
+from opentrons.config.types import OT3Config, GantryLoad, OutputOptions
 from opentrons.config import gripper_config
 from .ot3utils import (
     axis_convert,
@@ -161,7 +161,6 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_pass,
     liquid_probe,
     check_overpressure,
-    OutputOptions,
 )
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,

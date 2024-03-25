@@ -11,13 +11,13 @@ from typing import (
     AsyncContextManager,
     Optional,
 )
-from enum import Enum
 from logging import getLogger
 from numpy import float64
 from math import copysign
 from typing_extensions import Literal
 
 from opentrons_shared_data.errors.exceptions import CanbusCommunicationError
+from opentrons.config.types import OutputOptions
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -189,16 +189,6 @@ async def run_stream_output_to_csv(
         messenger.remove_listener(sensor_capturer)
 
     return positions
-
-
-# str enum so it can be json serializable
-class OutputOptions(str, Enum):
-    """Specifies where we should report sensor data to during a sensor pass."""
-
-    stream_to_csv = "STREAM"
-    sync_buffer_to_csv = "SYNC"
-    can_bus_only = "CAN"
-    none = "NONE"
 
 
 async def liquid_probe(

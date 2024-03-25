@@ -18,14 +18,13 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.constants import SensorType, SensorId
 
-from opentrons.config.types import LiquidProbeSettings
+from opentrons.config.types import LiquidProbeSettings, OutputOptions
 from opentrons.hardware_control.types import (
     TipStateType,
     FailedTipStateCheck,
     SubSystem,
     InstrumentProbeType,
 )
-from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_pipette,

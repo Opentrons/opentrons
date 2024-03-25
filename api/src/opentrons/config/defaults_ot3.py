@@ -15,9 +15,9 @@ from .types import (
     LiquidProbeSettings,
     ZSenseSettings,
     EdgeSenseSettings,
+    OutputOptions,
 )
 
-from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
 
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]

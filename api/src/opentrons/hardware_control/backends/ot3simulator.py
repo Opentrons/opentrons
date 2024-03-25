@@ -17,7 +17,7 @@ from typing import (
     Mapping,
 )
 
-from opentrons.config.types import OT3Config, GantryLoad
+from opentrons.config.types import OT3Config, GantryLoad, OutputOptions
 from opentrons.config import gripper_config
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
@@ -64,7 +64,6 @@ from opentrons.util.async_helpers import ensure_yield
 from .types import HWStopCondition
 from .flex_protocol import FlexBackend
 
-from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
 
 log = logging.getLogger(__name__)
 

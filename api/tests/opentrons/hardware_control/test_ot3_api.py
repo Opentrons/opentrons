@@ -25,6 +25,7 @@ from opentrons.config.types import (
     GantryLoad,
     CapacitivePassSettings,
     LiquidProbeSettings,
+    OutputOptions,
 )
 from opentrons.hardware_control.dev_types import (
     AttachedGripper,
@@ -95,7 +96,6 @@ from opentrons.hardware_control.modules import (
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.backends.types import HWStopCondition
 
-from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
 
 # TODO (spp, 2023-08-22): write tests for ot3api.stop & ot3api.halt
 

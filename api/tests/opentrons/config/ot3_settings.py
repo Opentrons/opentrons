@@ -1,4 +1,4 @@
-from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
+from opentrons.config.types import OutputOptions
 
 ot3_dummy_settings = {
     "name": "Marie Curie",

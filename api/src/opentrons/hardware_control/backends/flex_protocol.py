@@ -15,7 +15,7 @@ from typing import (
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
-from opentrons.config.types import GantryLoad
+from opentrons.config.types import GantryLoad, OutputOptions
 from opentrons.hardware_control.types import (
     BoardRevision,
     Axis,
@@ -40,7 +40,6 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from ..dev_types import OT3AttachedInstruments
 from .types import HWStopCondition
-from opentrons_hardware.hardware_control.tool_sensors import OutputOptions
 
 Cls = TypeVar("Cls")
 
