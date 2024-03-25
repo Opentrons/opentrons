@@ -662,7 +662,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             actual_asp_list_all = []
             actual_disp_list_all = []
             ui.print_title(f"{volume} uL")
-
+            resources.pipette.configure_for_volume(volume)
             trial_asp_dict: Dict[int, List[float]] = {
                 trial: [] for trial in range(cfg.trials)
             }
