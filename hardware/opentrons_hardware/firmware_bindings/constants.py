@@ -191,6 +191,8 @@ class MessageId(int, Enum):
     write_motor_current_request = 0x33
     read_motor_current_request = 0x34
     read_motor_current_response = 0x35
+    read_motor_driver_error_status_request = 0x36
+    read_motor_driver_error_status_response = 0x37
 
     set_brushed_motor_vref_request = 0x40
     set_brushed_motor_pwm_request = 0x41
@@ -265,6 +267,7 @@ class MessageId(int, Enum):
 class ErrorSeverity(int, Enum):
     """Error Severity levels."""
 
+    none = 0x0
     warning = 0x1
     recoverable = 0x2
     unrecoverable = 0x3
@@ -290,6 +293,16 @@ class ErrorCode(int, Enum):
     over_pressure = 0x0D
     door_open = 0x0E
     reed_open = 0x0F
+    motor_driver_error_detected = 0x10
+
+
+@unique
+class MotorDriverErrorCode(int, Enum):
+    """Motor driver error codes."""
+
+    over_temperature = 0x2000000
+    short_circuit = 0x18000000
+    open_circuit = 0x60000000
 
 
 @unique

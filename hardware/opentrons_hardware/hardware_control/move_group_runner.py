@@ -13,6 +13,7 @@ from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     MotionFailedError,
     PythonException,
+    MotorDriverError,
 )
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
@@ -22,6 +23,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     ErrorSeverity,
     GearMotorId,
     MoveAckId,
+    MotorDriverErrorCode,
     SensorId,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
@@ -39,6 +41,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     TipActionResponse,
     ErrorMessage,
     StopRequest,
+    ReadMotorDriverErrorStatusResponse,
     AddSensorLinearMoveRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
@@ -526,6 +529,42 @@ class MoveScheduler:
             # pick up groups they don't care about, and need to not fail.
             pass
 
+    def _handle_motor_driver_error(
+        self, message: ReadMotorDriverErrorStatusResponse, arbitration_id: ArbitrationId
+    ) -> None:
+        node_id = arbitration_id.parts.originating_node_id
+        data = message.payload.data.value
+        if data & MotorDriverErrorCode.over_temperature.value:
+            log.error(f"Motor driver over-temperature error from node {node_id}")
+            self._errors.append(
+                MotorDriverError(
+                    detail={
+                        "node": NodeId(node_id).name,
+                        "error": "over temperature",
+                    }
+                )
+            )
+        if data & MotorDriverErrorCode.short_circuit.value:
+            log.error(f"Motor driver short circuit error from node {node_id}")
+            self._errors.append(
+                MotorDriverError(
+                    detail={
+                        "node": NodeId(node_id).name,
+                        "error": "short circuit",
+                    }
+                )
+            )
+        if data & MotorDriverErrorCode.open_circuit.value:
+            log.error(f"Motor driver open circuit error from node {node_id}")
+            self._errors.append(
+                MotorDriverError(
+                    detail={
+                        "node": NodeId(node_id).name,
+                        "error": "open circuit",
+                    }
+                )
+            )
+
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
@@ -539,6 +578,8 @@ class MoveScheduler:
                 self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
+        elif isinstance(message, ReadMotorDriverErrorStatusResponse):
+            self._handle_motor_driver_error(message, arbitration_id)
 
     def _handle_tip_action_motors(self, message: TipActionResponse) -> bool:
         gear_id = GearMotorId(message.payload.gear_motor_id.value)
