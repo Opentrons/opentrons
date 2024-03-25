@@ -37,6 +37,7 @@ def subject(api_version: APIVersion) -> ParameterContext:
 def test_add_int(decoy: Decoy, subject: ParameterContext) -> None:
     """It should create and add an int parameter definition."""
     param_def = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
+    decoy.when(param_def.variable_name).then_return("my cool variable")
     decoy.when(
         mock_parameter_definition.create_int_parameter(
             display_name="abc",
@@ -59,12 +60,13 @@ def test_add_int(decoy: Decoy, subject: ParameterContext) -> None:
         description="blah blah blah",
         unit="foot candles",
     )
-    assert param_def is subject._parameters["xyz"]
+    assert param_def is subject._parameters["my cool variable"]
 
 
 def test_add_float(decoy: Decoy, subject: ParameterContext) -> None:
     """It should create and add a float parameter definition."""
     param_def = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
+    decoy.when(param_def.variable_name).then_return("my cooler variable")
     decoy.when(
         mock_parameter_definition.create_float_parameter(
             display_name="abc",
@@ -87,12 +89,13 @@ def test_add_float(decoy: Decoy, subject: ParameterContext) -> None:
         description="blah blah blah",
         unit="lux",
     )
-    assert param_def is subject._parameters["xyz"]
+    assert param_def is subject._parameters["my cooler variable"]
 
 
 def test_add_bool(decoy: Decoy, subject: ParameterContext) -> None:
     """It should create and add a boolean parameter definition."""
     param_def = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
+    decoy.when(param_def.variable_name).then_return("my coolest variable")
     decoy.when(
         mock_parameter_definition.create_bool_parameter(
             display_name="cba",
@@ -111,12 +114,13 @@ def test_add_bool(decoy: Decoy, subject: ParameterContext) -> None:
         default=False,
         description="lorem ipsum",
     )
-    assert param_def is subject._parameters["zxy"]
+    assert param_def is subject._parameters["my coolest variable"]
 
 
 def test_add_string(decoy: Decoy, subject: ParameterContext) -> None:
     """It should create and add a string parameter definition."""
     param_def = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
+    decoy.when(param_def.variable_name).then_return("my slightly less cool variable")
     decoy.when(
         mock_parameter_definition.create_str_parameter(
             display_name="jkl",
@@ -133,4 +137,4 @@ def test_add_string(decoy: Decoy, subject: ParameterContext) -> None:
         choices=[{"display_name": "bar", "value": "aaa"}],
         description="fee foo fum",
     )
-    assert param_def is subject._parameters["qwerty"]
+    assert param_def is subject._parameters["my slightly less cool variable"]
