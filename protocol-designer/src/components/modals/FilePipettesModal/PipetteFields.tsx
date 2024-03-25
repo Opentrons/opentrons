@@ -117,7 +117,7 @@ export function PipetteFields(props: Props): JSX.Element {
         mount={mount}
         tiprackOptions={tiprackOptions}
         values={values}
-        onSetFieldValue={(field: string, value: any) => {
+        onSetFieldValue={(field: string, value: string[]) => {
           //  @ts-expect-error: TS can't figure out this type with react-hook-form
           setValue(field, value)
           trigger(`pipettesByMount.${mount}.tiprackDefURI`)

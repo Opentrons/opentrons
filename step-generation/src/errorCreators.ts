@@ -257,7 +257,7 @@ export const cannotMoveWithGripper = (): CommandCreatorError => {
   }
 }
 
-export function noTipSelected(): CommandCreatorError {
+export const noTipSelected = (): CommandCreatorError => {
   return {
     type: 'NO_TIP_SELECTED',
     message: 'No tips were selected for this step',

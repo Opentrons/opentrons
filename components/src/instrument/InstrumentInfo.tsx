@@ -53,14 +53,15 @@ export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
           }
           value={props.description}
         />
-        {props.tiprackModels &&
-          props.tiprackModels.map((model, index) => (
-            <InfoItem
-              key={index}
-              title={index === 0 ? 'tip racks' : null}
-              value={model}
-            />
-          ))}
+        {props.tiprackModels != null
+          ? props.tiprackModels.map((model, index) => (
+              <InfoItem
+                key={`tiprackModel-${index}`}
+                title={index === 0 ? 'tip racks' : null}
+                value={model}
+              />
+            ))
+          : null}
       </Flex>
 
       {props.children}

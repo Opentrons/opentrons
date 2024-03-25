@@ -7,7 +7,8 @@ import styles from '../StepEditForm.module.css'
 
 import type { FieldProps } from '../types'
 
-export const TiprackField = (props: FieldProps): JSX.Element => {
+export function TiprackField(props: FieldProps): JSX.Element {
+  const { name, value, onFieldBlur, onFieldFocus, updateValue } = props
   const { t } = useTranslation('form')
   const options = useSelector(uiLabwareSelectors.getTiprackOptions)
 
@@ -18,12 +19,12 @@ export const TiprackField = (props: FieldProps): JSX.Element => {
     >
       <DropdownField
         options={options}
-        name={props.name}
-        value={String(props.value) != null ? String(props.value) : null}
-        onBlur={props.onFieldBlur}
-        onFocus={props.onFieldFocus}
+        name={name}
+        value={String(value) != null ? String(value) : null}
+        onBlur={onFieldBlur}
+        onFocus={onFieldFocus}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-          props.updateValue(e.currentTarget.value)
+          updateValue(e.currentTarget.value)
         }}
       />
     </FormGroup>

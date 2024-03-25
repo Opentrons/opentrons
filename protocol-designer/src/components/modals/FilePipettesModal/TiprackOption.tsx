@@ -35,7 +35,7 @@ export function TiprackOption(props: TiprackOptionProps): JSX.Element {
         size="1.25rem"
         name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
       />
-      <Text fontSize="12px">{text}</Text>
+      <Text fontSize="0.75rem">{text}</Text>
     </Flex>
   )
 }
