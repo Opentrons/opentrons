@@ -25,3 +25,8 @@ div:nth-child(4) .hg-button.hg-standardBtn:nth-child(1) {
   background-color: #fff;
   cursor: pointer;
 }
+
+.simple-keyboard .hg-button:active {
+  color: #16212d;
+  background-color: #dedede; /* grey30 */
+}

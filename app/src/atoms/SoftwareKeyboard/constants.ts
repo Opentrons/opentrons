@@ -38,15 +38,15 @@ export const fullKeyboardLayout = {
     '{space}',
   ],
   symbols: [
-    '[ ] { } # % ^ +',
-    '{numbers} _ \\ | < > · =',
-    "{abc} . , ? ! ' * ~ {backspace}",
+    '[ ] { } % ^ +',
+    '{abc} _ \\ | < > # =',
+    "{numbers} . , ? ! ' * ~ {backspace}",
     '{space}',
   ],
   numbers: [
     '1 2 3 4 5 6 7 8 9 0',
-    '{symbols} - / : ; ( ) $ & @ "',
-    "{abc} . , ? ! ' * ~ {backspace}",
+    '{abc} - / : ; ( ) $ & @ "',
+    "{symbols} . , ? ! ' * ~ {backspace}",
     '{space}',
   ],
 }

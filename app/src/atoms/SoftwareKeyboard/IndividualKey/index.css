@@ -8,3 +8,8 @@
   font-weight: 600;
   line-height: 24px;
 }
+
+.simple-keyboard .hg-button:active {
+  color: #16212d;
+  background-color: #dedede; /* grey30 */
+}
