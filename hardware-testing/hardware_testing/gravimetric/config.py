@@ -194,7 +194,11 @@ def _get_liquid_probe_settings(
         plunger_speed=lqid_cfg["plunger_speed"],
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
         expected_liquid_height=110,
+<<<<<<< HEAD
         output_option=OutputOptions.sync_only,
+=======
+        output_option=OutputOptions.stream_to_csv,
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
         aspirate_while_sensing=False,
         auto_zero_sensor=True,
         num_baseline_reads=10,

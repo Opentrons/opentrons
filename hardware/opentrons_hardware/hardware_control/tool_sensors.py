@@ -106,7 +106,10 @@ def _build_pass_step(
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=pipette_nodes,
         stop_condition=MoveStopCondition.sensor_report,
+<<<<<<< HEAD
         sensor_to_use=sensor_to_use,
+=======
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
     )
     for node in pipette_nodes:
         move_group[node] = pipette_move[node]
@@ -116,11 +119,16 @@ def _build_pass_step(
 async def run_sync_buffer_to_csv(
     messenger: CanMessenger,
     sensor_driver: SensorDriver,
+<<<<<<< HEAD
+=======
+    pressure_sensor: PressureSensor,
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
     mount_speed: float,
     plunger_speed: float,
     threshold_pascals: float,
     head_node: NodeId,
     move_group: MoveGroupRunner,
+<<<<<<< HEAD
     log_files: Dict[SensorId, str],
     tool: PipetteProbeTarget,
 ) -> Dict[NodeId, MotorPositionStatus]:
@@ -156,31 +164,82 @@ async def run_sync_buffer_to_csv(
                 )
             ),
         )
+=======
+    log_file: str,
+    tool: PipetteProbeTarget,
+    sensor_id: SensorId,
+) -> Dict[NodeId, MotorPositionStatus]:
+    """Runs the sensor pass move group and creates a csv file with the results."""
+    sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold_pascals]
+    sensor_capturer = LogListener(
+        mount=head_node,
+        data_file=log_file,
+        file_heading=pressure_output_file_heading,
+        sensor_metadata=sensor_metadata,
+    )
+    async with sensor_capturer:
+        print("starting move group runner")
+        positions = await move_group.run(can_messenger=messenger)
+        messenger.add_listener(sensor_capturer, None)
+        await messenger.send(
+            node_id=tool,
+            message=SendAccumulatedPressureDataRequest(
+                payload=SendAccumulatedPressureDataPayload(
+                    sensor_id=SensorIdField(sensor_id)
+                )
+            ),
+        )
+        await asyncio.sleep(10)
+        messenger.remove_listener(sensor_capturer)
+    await messenger.send(
+        node_id=tool,
+        message=BindSensorOutputRequest(
+            payload=BindSensorOutputRequestPayload(
+                sensor=SensorTypeField(SensorType.pressure),
+                sensor_id=SensorIdField(sensor_id),
+                binding=SensorOutputBindingField(SensorOutputBinding.none),
+            )
+        ),
+    )
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
     return positions
 
 
 async def run_stream_output_to_csv(
     messenger: CanMessenger,
     sensor_driver: SensorDriver,
+<<<<<<< HEAD
     pressure_sensors: Dict[SensorId, PressureSensor],
+=======
+    pressure_sensor: PressureSensor,
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
     mount_speed: float,
     plunger_speed: float,
     threshold_pascals: float,
     head_node: NodeId,
     move_group: MoveGroupRunner,
+<<<<<<< HEAD
     log_files: Dict[SensorId, str],
+=======
+    log_file: str,
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Runs the sensor pass move group and creates a csv file with the results."""
     sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold_pascals]
     sensor_capturer = LogListener(
         mount=head_node,
+<<<<<<< HEAD
         data_file=log_files[
             next(iter(log_files))
         ],  # hardcode to the first file, need to think more on this
+=======
+        data_file=log_file,
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
         file_heading=pressure_output_file_heading,
         sensor_metadata=sensor_metadata,
     )
     binding = [SensorOutputBinding.sync, SensorOutputBinding.report]
+<<<<<<< HEAD
     binding_field = SensorOutputBindingField.from_flags(binding)
     for sensor_id in pressure_sensors.keys():
         sensor_info = pressure_sensors[sensor_id].sensor
@@ -284,6 +343,17 @@ async def _run_with_binding(
             ),
         )
     return result
+=======
+
+    async with sensor_driver.bind_output(messenger, pressure_sensor, binding):
+        messenger.add_listener(sensor_capturer, None)
+
+        async with sensor_capturer:
+            positions = await move_group.run(can_messenger=messenger)
+        messenger.remove_listener(sensor_capturer)
+
+    return positions
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
 
 
 async def liquid_probe(
@@ -297,7 +367,12 @@ async def liquid_probe(
     csv_output: bool = False,
     sync_buffer_output: bool = False,
     can_bus_only_output: bool = False,
+<<<<<<< HEAD
     data_files: Optional[Dict[SensorId, str]] = None,
+=======
+    # output_option: OutputOptions,
+    data_file: Optional[str] = None,
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
     auto_zero_sensor: bool = True,
     num_baseline_reads: int = 10,
     sensor_id: SensorId = SensorId.S0,
@@ -316,6 +391,17 @@ async def liquid_probe(
         auto_zero_sensor,
     )
 
+<<<<<<< HEAD
+=======
+    if auto_zero_sensor:
+        pressure_baseline = await sensor_driver.get_baseline(
+            messenger, pressure_sensor, num_baseline_reads
+        )
+        LOG.debug(f"found baseline pressure: {pressure_baseline} pascals")
+
+    await sensor_driver.send_stop_threshold(messenger, pressure_sensor)
+
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
     sensor_group = _build_pass_step(
         movers=[head_node, tool],
         distance={head_node: max_z_distance, tool: max_z_distance},
@@ -325,16 +411,25 @@ async def liquid_probe(
     )
 
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
+<<<<<<< HEAD
+=======
+    log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
     if csv_output:
         return await run_stream_output_to_csv(
             messenger,
             sensor_driver,
+<<<<<<< HEAD
             pressure_sensors,
+=======
+            pressure_sensor,
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
             mount_speed,
             plunger_speed,
             threshold_pascals,
             head_node,
             sensor_runner,
+<<<<<<< HEAD
             log_files,
         )
     elif sync_buffer_output:
@@ -359,6 +454,43 @@ async def liquid_probe(
         return await _run_with_binding(
             messenger, pressure_sensors, sensor_runner, binding
         )
+=======
+            log_file,
+        )
+    elif sync_buffer_output:
+        return await run_sync_buffer_to_csv(
+            messenger,
+            sensor_driver,
+            pressure_sensor,
+            mount_speed,
+            plunger_speed,
+            threshold_pascals,
+            head_node,
+            sensor_runner,
+            log_file,
+            tool=tool,
+            sensor_id=sensor_id,
+        )
+    elif can_bus_only_output:
+        async with sensor_driver.bind_output(
+            messenger,
+            pressure_sensor,
+            [
+                SensorOutputBinding.sync,
+                SensorOutputBinding.report,
+            ],
+        ):
+            return await sensor_runner.run(can_messenger=messenger)
+    else:  # none
+        async with sensor_driver.bind_output(
+            messenger,
+            pressure_sensor,
+            [
+                SensorOutputBinding.sync,
+            ],
+        ):
+            return await sensor_runner.run(can_messenger=messenger)
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
 
 
 async def check_overpressure(

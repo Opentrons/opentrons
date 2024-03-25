@@ -193,6 +193,38 @@ async def test_liquid_probe(
         data=SensorDataType.build(threshold_pascals * 65536, sensor_info.sensor_type),
         mode=SensorThresholdMode.absolute,
     )
+<<<<<<< HEAD
+=======
+    mock_bind_output.assert_called_once()
+    assert mock_bind_output.call_args_list[0][0][3] == [SensorOutputBinding.sync]
+
+    with patch(
+        "opentrons_hardware.hardware_control.tool_sensors", LogListener
+    ) as mock_log:
+
+        mock_log.__aenter__ = AsyncMock(return_value=mock_log)  # type: ignore
+        mock_log.__aexit__ = AsyncMock(return_value=None)  # type: ignore
+
+        await liquid_probe(
+            messenger=mock_messenger,
+            tool=target_node,
+            head_node=motor_node,
+            max_z_distance=40,
+            mount_speed=10,
+            plunger_speed=8,
+            threshold_pascals=threshold_pascals,
+            csv_output=False,
+            sync_buffer_output=False,
+            can_bus_only_output=False,
+            auto_zero_sensor=True,
+            num_baseline_reads=8,
+            sensor_id=SensorId.S0,
+        )
+        mock_bind_output.assert_called()
+        assert mock_bind_output.call_args_list[1][0][3] == [
+            SensorOutputBinding.sync,
+        ]
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
 
 
 @pytest.mark.parametrize(

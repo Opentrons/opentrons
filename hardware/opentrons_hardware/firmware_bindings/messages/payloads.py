@@ -683,7 +683,10 @@ class GetHepaUVStatePayloadResponse(EmptyPayload):
     uv_duration_s: utils.UInt32Field
     uv_light_on: utils.UInt8Field
     remaining_time_s: utils.UInt32Field
+<<<<<<< HEAD
     uv_current_ma: utils.UInt16Field
+=======
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
 
 
 @dataclass(eq=False)

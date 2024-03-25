@@ -23,7 +23,11 @@ from opentrons_hardware.firmware_bindings.constants import (
     ErrorSeverity,
     GearMotorId,
     MoveAckId,
+<<<<<<< HEAD
     MotorDriverErrorCode,
+=======
+    SensorId,
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -40,7 +44,10 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     TipActionResponse,
     ErrorMessage,
     StopRequest,
+<<<<<<< HEAD
     ReadMotorDriverErrorStatusResponse,
+=======
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
     AddSensorLinearMoveRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
@@ -307,7 +314,10 @@ class MoveGroupRunner:
             return HomeRequest(payload=home_payload)
         elif step.move_type == MoveType.sensor:
             # stop_condition = step.stop_condition.value
+<<<<<<< HEAD
             assert step.sensor_id is not None
+=======
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
             stop_condition = MoveStopCondition.sync_line
             sensor_move_payload = AddSensorLinearMoveBasePayload(
                 request_stop_condition=MoveStopConditionField(stop_condition),
@@ -328,7 +338,11 @@ class MoveGroupRunner:
                 velocity_mm=Int32Field(
                     int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
                 ),
+<<<<<<< HEAD
                 sensor_id=SensorIdField(step.sensor_id),
+=======
+                sensor_id=SensorIdField(SensorId.S0),
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
             )
             return AddSensorLinearMoveRequest(payload=sensor_move_payload)
         else:

@@ -1357,7 +1357,11 @@ class OT3Controller(FlexBackend):
         plunger_speed: float,
         threshold_pascals: float,
         output_option: OutputOptions = OutputOptions.can_bus_only,
+<<<<<<< HEAD
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
+=======
+        data_file: Optional[str] = None,
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -1378,6 +1382,7 @@ class OT3Controller(FlexBackend):
         can_bus_only_output = bool(
             output_option.value & OutputOptions.can_bus_only.value
         )
+<<<<<<< HEAD
         data_files_transposed = (
             None
             if data_files is None
@@ -1386,6 +1391,8 @@ class OT3Controller(FlexBackend):
                 for probe in data_files.keys()
             }
         )
+=======
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
         positions = await liquid_probe(
             messenger=self._messenger,
             tool=tool,
@@ -1397,7 +1404,11 @@ class OT3Controller(FlexBackend):
             csv_output=csv_output,
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,
+<<<<<<< HEAD
             data_files=data_files_transposed,
+=======
+            data_file=data_file,
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
             auto_zero_sensor=auto_zero_sensor,
             num_baseline_reads=num_baseline_reads,
             sensor_id=sensor_id_for_instrument(probe),

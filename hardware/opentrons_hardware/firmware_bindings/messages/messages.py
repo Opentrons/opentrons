@@ -111,7 +111,10 @@ MessageDefinition = Union[
     defs.GetHepaUVStateResponse,
     defs.SendAccumulatedPressureDataRequest,
     defs.AddSensorLinearMoveRequest,
+<<<<<<< HEAD
     defs.SendAccumulatedPressureDataRequest,
+=======
+>>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
 ]
 
 
