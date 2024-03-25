@@ -244,6 +244,7 @@ class EngineStore:
         """
         engine = self.engine
         state_view = engine.state_view
+        runner = self.runner
 
         if state_view.commands.get_is_okay_to_clear():
             await engine.finish(
@@ -256,6 +257,12 @@ class EngineStore:
 
         run_data = state_view.get_summary()
         commands = state_view.commands.get_all()
+        run_time_parameters = []
+        if isinstance(runner, PythonAndLegacyRunner):
+            run_time_parameters = runner.run_time_parameters
+
         self._runner_engine_pair = None
 
-        return RunResult(state_summary=run_data, commands=commands)
+        return RunResult(
+            state_summary=run_data, commands=commands, parameters=run_time_parameters
+        )

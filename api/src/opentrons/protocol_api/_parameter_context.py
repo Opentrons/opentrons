@@ -4,7 +4,11 @@ from typing import List, Optional, Union, Dict
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parameters import parameter_definition, validation
-from opentrons.protocols.parameters.types import ParameterChoice
+from opentrons.protocols.parameters.types import (
+    ParameterChoice,
+    ParameterDefinitionError,
+)
+from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
 
 from ._parameters import Parameters
 
@@ -150,9 +154,7 @@ class ParameterContext:
         )
         self._parameters[parameter.variable_name] = parameter
 
-    def set_parameters(
-        self, parameter_overrides: Dict[str, Union[float, bool, str]]
-    ) -> None:
+    def set_parameters(self, parameter_overrides: RunTimeParamValuesType) -> None:
         """Sets parameters to values given by client, validating them as well.
 
         :meta private:
@@ -163,13 +165,21 @@ class ParameterContext:
             try:
                 parameter = self._parameters[variable_name]
             except KeyError:
-                raise ValueError("put some error here")
+                raise ParameterDefinitionError(
+                    f"Parameter {variable_name} is not defined as a parameter for this protocol."
+                )
             validated_value = validation.ensure_value_type(
                 override_value, parameter.parameter_type
             )
             parameter.value = validated_value
 
-    def export_parameters(self) -> Parameters:
+    def export_parameters_for_analysis(self) -> List[RunTimeParameter]:
+        return [
+            parameter.as_protocol_engine_type()
+            for parameter in self._parameters.values()
+        ]
+
+    def export_parameters_for_protocol(self) -> Parameters:
         """Exports all parameters into a protocol run usable parameters object.
 
         :meta private:

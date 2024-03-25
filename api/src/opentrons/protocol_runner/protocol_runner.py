@@ -39,6 +39,7 @@ from .legacy_wrappers import (
 from ..protocol_engine.types import (
     PostRunHardwareState,
     DeckConfigurationType,
+    RunTimeParameter,
     RunTimeParamValuesType,
 )
 
@@ -48,6 +49,7 @@ class RunResult(NamedTuple):
 
     commands: List[Command]
     state_summary: StateSummary
+    parameters: List[RunTimeParameter]
 
 
 class AbstractRunner(ABC):
@@ -155,6 +157,11 @@ class PythonAndLegacyRunner(AbstractRunner):
         # api level version upon a protocol loading.
         self._parameter_context = ParameterContext(api_version=MAX_SUPPORTED_VERSION)
 
+    @property
+    def run_time_parameters(self) -> List[RunTimeParameter]:
+        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        return self._parameter_context.export_parameters_for_analysis()
+
     async def load(
         self,
         protocol_source: ProtocolSource,
@@ -230,7 +237,10 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return RunResult(commands=commands, state_summary=run_data)
+        parameters = self._parameter_context.export_parameters_for_analysis()
+        return RunResult(
+            commands=commands, state_summary=run_data, parameters=parameters
+        )
 
 
 class JsonRunner(AbstractRunner):
@@ -334,7 +344,7 @@ class JsonRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return RunResult(commands=commands, state_summary=run_data)
+        return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
 
 class LiveRunner(AbstractRunner):
@@ -375,7 +385,7 @@ class LiveRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return RunResult(commands=commands, state_summary=run_data)
+        return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
 
 AnyRunner = Union[PythonAndLegacyRunner, JsonRunner, LiveRunner]

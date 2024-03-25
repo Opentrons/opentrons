@@ -148,6 +148,7 @@ async def test_analyze(
                 labwareOffsets=[],
                 liquids=[],
             ),
+            parameters=[],
         )
     )
 

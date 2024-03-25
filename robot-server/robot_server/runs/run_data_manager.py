@@ -294,7 +294,7 @@ class RunDataManager:
         next_current = current if current is False else True
 
         if next_current is False:
-            commands, state_summary = await self._engine_store.clear()
+            commands, state_summary, parameters = await self._engine_store.clear()
             run_resource: Union[
                 RunResource, BadRunResource
             ] = self._run_store.update_run_state(
