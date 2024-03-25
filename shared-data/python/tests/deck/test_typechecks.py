@@ -5,7 +5,11 @@ from opentrons_shared_data.deck import (
     list_names as list_deck_definition_names,
     load as load_deck_definition,
 )
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, DeckDefinitionV4, DeckDefinitionV5
+from opentrons_shared_data.deck.dev_types import (
+    DeckDefinitionV3,
+    DeckDefinitionV4,
+    DeckDefinitionV5,
+)
 
 
 @pytest.mark.parametrize("defname", list_deck_definition_names(version=3))
