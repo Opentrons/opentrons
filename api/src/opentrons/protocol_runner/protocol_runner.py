@@ -82,6 +82,11 @@ class AbstractRunner(ABC):
         """
         return self._broker
 
+    @property
+    def run_time_parameters(self) -> List[RunTimeParameter]:
+        """Parameter definitions defined by protocol, if any. Currently only for python protocols."""
+        return []
+
     def was_started(self) -> bool:
         """Whether the run has been started.
 

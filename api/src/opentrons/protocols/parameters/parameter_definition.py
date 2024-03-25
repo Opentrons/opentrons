@@ -121,7 +121,6 @@ class ParameterDefinition(Generic[ParamType]):
         parameter: RunTimeParameter
         if self._type is bool:
             parameter = BooleanParameter(
-                type="bool",
                 displayName=self._display_name,
                 variableName=self._variable_name,
                 description=self._description,
