@@ -198,7 +198,8 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
             assert all_run_ids == [r.id for r in snapshot.expected_runs]
 
             for expected_run in snapshot.expected_runs:
-                await robot_client.get_run(run_id=expected_run.id)
+                run = (await robot_client.get_run(run_id=expected_run.id)).json()
+                assert run["data"].get("dataError") is None
 
                 all_command_summaries = (
                     await robot_client.get_run_commands(
