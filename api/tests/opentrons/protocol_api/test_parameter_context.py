@@ -59,7 +59,7 @@ def test_add_int(decoy: Decoy, subject: ParameterContext) -> None:
         description="blah blah blah",
         unit="foot candles",
     )
-    assert param_def in subject._parameters
+    assert param_def is subject._parameters["xyz"]
 
 
 def test_add_float(decoy: Decoy, subject: ParameterContext) -> None:
@@ -87,7 +87,7 @@ def test_add_float(decoy: Decoy, subject: ParameterContext) -> None:
         description="blah blah blah",
         unit="lux",
     )
-    assert param_def in subject._parameters
+    assert param_def is subject._parameters["xyz"]
 
 
 def test_add_bool(decoy: Decoy, subject: ParameterContext) -> None:
@@ -111,7 +111,7 @@ def test_add_bool(decoy: Decoy, subject: ParameterContext) -> None:
         default=False,
         description="lorem ipsum",
     )
-    assert param_def in subject._parameters
+    assert param_def is subject._parameters["zxy"]
 
 
 def test_add_string(decoy: Decoy, subject: ParameterContext) -> None:
@@ -133,4 +133,4 @@ def test_add_string(decoy: Decoy, subject: ParameterContext) -> None:
         choices=[{"display_name": "bar", "value": "aaa"}],
         description="fee foo fum",
     )
-    assert param_def in subject._parameters
+    assert param_def is subject._parameters["qwerty"]

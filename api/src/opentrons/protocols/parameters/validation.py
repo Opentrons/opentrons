@@ -1,7 +1,8 @@
 import keyword
-from typing import List, Optional
+from typing import List, Optional, Union, Literal
 
 from .types import (
+    AllowedTypes,
     ParamType,
     ParameterChoice,
     ParameterNameError,
@@ -51,6 +52,58 @@ def ensure_unit_string_length(unit: Optional[str]) -> Optional[str]:
             f"Description {unit} greater than {UNIT_MAX_LEN} characters."
         )
     return unit
+
+
+def ensure_value_type(
+    value: Union[float, bool, str], parameter_type: type
+) -> AllowedTypes:
+    """Ensures that the value type coming in from the client matches the given type."""
+    validated_value: AllowedTypes
+    if isinstance(value, float) and parameter_type is int and value.is_integer():
+        validated_value = int(value)
+    else:
+        validated_value = value
+    return validated_value
+
+
+def ensure_enum_type(value: AllowedTypes) -> Union[float, str]:
+    """Ensure that the value that is sent over from the client is the expected type."""
+    validated_value: Union[float, bool, str]
+    if isinstance(value, int):
+        validated_value = float(value)
+    elif isinstance(value, bool):
+        raise ParameterValueError("Cannot send a boolean value as an enum type")
+    else:
+        validated_value = value
+    return validated_value
+
+
+def convert_type_string_for_enum(
+    parameter_type: type,
+) -> Literal["int", "float", "str"]:
+    """Converts a type object into a string for an enumerated parameter."""
+    if parameter_type is int:
+        return "int"
+    elif parameter_type is float:
+        return "float"
+    elif parameter_type is str:
+        return "str"
+    else:
+        raise ParameterValueError(
+            f"Cannot resolve parameter type {parameter_type} for an enumerated parameter."
+        )
+
+
+def convert_type_string_for_num_param(parameter_type: type) -> Literal["int", "float"]:
+    """Converts a type object into a string for an enumerated parameter."""
+    if parameter_type is int:
+        return "int"
+    elif parameter_type is float:
+        return "float"
+    else:
+        raise ParameterValueError(
+            f"Cannot resolve parameter type {parameter_type} for a number parameter."
+        )
 
 
 def _validate_choices(
@@ -116,7 +169,7 @@ def validate_type(value: ParamType, parameter_type: type) -> None:
     """Validate parameter value is the correct type."""
     if not isinstance(value, parameter_type):
         raise ParameterValueError(
-            f"Default parameter value has type {type(value)} must match type {parameter_type}."
+            f"Parameter value has type {type(value)} must match type {parameter_type}."
         )
 
 
