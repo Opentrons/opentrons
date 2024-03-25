@@ -18,7 +18,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.constants import SensorType, SensorId
 
-from opentrons.config.types import LiquidProbeSettings
+from opentrons.config.types import LiquidProbeSettings, OutputOptions
 from opentrons.hardware_control.types import (
     TipStateType,
     FailedTipStateCheck,
@@ -1382,7 +1382,7 @@ async def _test_liquid_probe(
                 plunger_speed=probe_cfg.plunger_speed,
                 sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
                 expected_liquid_height=0,  # FIXME: remove
-                log_pressure=False,  # FIXME: remove
+                output_option=OutputOptions.can_bus_only,  # FIXME: remove
                 aspirate_while_sensing=False,  # FIXME: I heard this doesn't work
                 auto_zero_sensor=True,  # TODO: when would we want to adjust this?
                 num_baseline_reads=10,  # TODO: when would we want to adjust this?
