@@ -74,7 +74,7 @@ async def _assert_run_persisted(
     assert get_persisted_run_response.json()["data"] == expected_run_data
 
 
-async def test_runs_persist_through_untimely_restart(
+async def test_untimely_restart_marks_runs_bad(
     client_and_server: ClientServerFixture,
 ) -> None:
     """Test that a run persists even if the server was restarted before the run was
@@ -92,11 +92,24 @@ async def test_runs_persist_through_untimely_restart(
     expected_run = deepcopy(run)
     expected_run["status"] = "stopped"
     expected_run["current"] = False
+    expected_run["ok"] = False
+    expected_run["dataError"] = {
+        "id": "RunDataError",
+        "title": "Run Data Error",
+        "detail": "There was no engine state data for this run.",
+        "meta": {
+            "code": "4008",
+            "detail": {},
+            "message": "There was no engine state data for this run.",
+            "type": "InvalidStoredData",
+            "wrapping": [],
+        },
+        "errorCode": "4008",
+    }
 
     # reboot the server
     await client_and_server.restart()
 
-    # make sure the run persisted as we expect
     await _assert_run_persisted(robot_client=client, expected_run_data=expected_run)
 
 
