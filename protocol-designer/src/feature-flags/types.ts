@@ -29,6 +29,7 @@ export type FlagTypes =
   | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
   | 'OT_PD_ALLOW_ALL_TIPRACKS'
   | 'OT_PD_ENABLE_MULTI_TIP'
+  | 'OT_PD_ENABLE_MOAM'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
