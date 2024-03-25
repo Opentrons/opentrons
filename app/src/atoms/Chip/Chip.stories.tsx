@@ -20,6 +20,13 @@ export default {
       },
       defaultValue: true,
     },
+    chipSize: {
+      options: ['medium', 'small'],
+      control: {
+        type: 'select',
+      },
+      defaultValue: 'medium',
+    },
   },
   component: Chip,
   parameters: touchScreenViewport,
@@ -45,4 +52,5 @@ ChipComponent.args = {
   type: 'basic',
   text: 'Chip component',
   hasIcon: true,
+  chipSize: 'medium',
 }

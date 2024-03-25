@@ -123,7 +123,12 @@ export function ViewOnlyParameters({
                   {getDefault(parameter)}
                 </StyledText>
                 {hasCustomValue ? (
-                  <Chip type="success" text={t('updated')} hasIcon={false} />
+                  <Chip
+                    type="success"
+                    text={t('updated')}
+                    hasIcon={false}
+                    chipSize="small"
+                  />
                 ) : null}
               </Flex>
             </Flex>
