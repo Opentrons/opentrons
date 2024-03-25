@@ -2,9 +2,8 @@ import abc
 import asyncio
 import logging
 import re
-from pkg_resources import parse_version
-from typing import ClassVar, Mapping, Optional, cast, TypeVar
-from packaging.version import InvalidVersion
+from typing import ClassVar, Mapping, Optional, TypeVar
+from packaging.version import InvalidVersion, parse
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.drivers.rpi_drivers.types import USBPort
 
@@ -88,16 +87,15 @@ class AbstractModule(abc.ABC):
     def has_available_update(self) -> bool:
         """Return whether a newer firmware file is available"""
         if self.device_info and self._bundled_fw:
-            # try catch this
             try:
-                device_version = parse_version(self.device_info["version"])
+                device_version = parse(self.device_info["version"])
             except InvalidVersion:
-                device_version = parse_version("v0.0.0")
+                device_version = parse("v0.0.0")
             try:
-                available_version = parse_version(self._bundled_fw.version)
+                available_version = parse(self._bundled_fw.version)
             except InvalidVersion:
-                available_version = parse_version("v0.0.0")
-            return cast(bool, available_version > device_version)
+                available_version = parse("v0.0.0")
+            return available_version > device_version
         return False
 
     async def wait_for_is_running(self) -> None:
