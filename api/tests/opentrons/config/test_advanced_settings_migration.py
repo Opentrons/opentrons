@@ -379,6 +379,7 @@ def v31_config(v30_config: Dict[str, Any]) -> Dict[str, Any]:
     )
     return r
 
+
 @pytest.fixture
 def v32_config(v31_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v31_config.copy()

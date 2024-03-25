@@ -698,6 +698,7 @@ def _migrate30to31(previous: SettingsMap) -> SettingsMap:
     newmap["enableErrorRecoveryExperiments"] = None
     return newmap
 
+
 def _migrate31to32(previous: SettingsMap) -> SettingsMap:
     """Migrate to version 32 of the feature flags file.
 
