@@ -134,7 +134,6 @@ export function Chip(props: ChipProps): JSX.Element {
           color={CHIP_PROPS_BY_TYPE[type].iconColor}
           aria-label={`icon_${text}`}
           size={chipSize === 'medium' ? '1.5rem' : '1.25rem'}
-          data-testid={`RenderResult_icon_${chipSize}`}
         />
       ) : null}
       <StyledText
