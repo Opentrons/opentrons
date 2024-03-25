@@ -9,6 +9,7 @@ import anyio
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
 from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api import ParameterContext, MAX_SUPPORTED_VERSION
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -150,6 +151,9 @@ class PythonAndLegacyRunner(AbstractRunner):
             drop_tips_after_run=drop_tips_after_run,
             post_run_hardware_state=post_run_hardware_state,
         )
+        # We need to define this here so we can use it throughout this class, but it will be recreated with the proper
+        # api level version upon a protocol loading.
+        self._parameter_context = ParameterContext(api_version=MAX_SUPPORTED_VERSION)
 
     async def load(
         self,
@@ -171,6 +175,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         protocol = self._legacy_file_reader.read(
             protocol_source, labware_definitions, python_parse_mode
         )
+        self._parameter_context = ParameterContext(api_version=protocol.api_level)
         equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
@@ -199,6 +204,7 @@ class PythonAndLegacyRunner(AbstractRunner):
             func=self._legacy_executor.execute,
             protocol=protocol,
             context=context,
+            parameter_context=self._parameter_context,
             run_time_param_values=run_time_param_values,
         )
 
