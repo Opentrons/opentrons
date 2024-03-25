@@ -8,7 +8,6 @@ from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
     MotionFailedError,
     EStopActivatedError,
-    MotorDriverError,
 )
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
