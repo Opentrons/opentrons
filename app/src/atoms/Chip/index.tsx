@@ -1,14 +1,14 @@
 import * as React from 'react'
-
+import { css } from 'styled-components'
 import {
-  BORDERS,
-  Flex,
-  DIRECTION_ROW,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
   SPACING,
   TYPOGRAPHY,
-  Icon,
-  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../text'
@@ -23,6 +23,8 @@ export type ChipType =
   | 'success'
   | 'warning'
 
+type ChipSize = 'medium' | 'small'
+
 interface ChipProps extends StyleProps {
   /** Display background color? */
   background?: boolean
@@ -34,6 +36,8 @@ interface ChipProps extends StyleProps {
   type: ChipType
   /** has icon */
   hasIcon?: boolean
+  /** Chip size medium is the default size */
+  chipSize?: ChipSize
 }
 
 const CHIP_PROPS_BY_TYPE: Record<
@@ -91,6 +95,7 @@ export function Chip(props: ChipProps): JSX.Element {
     type,
     text,
     hasIcon = true,
+    chipSize = 'medium',
     ...styleProps
   } = props
   const backgroundColor =
@@ -98,16 +103,28 @@ export function Chip(props: ChipProps): JSX.Element {
       ? COLORS.transparent
       : CHIP_PROPS_BY_TYPE[type].backgroundColor
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
+
+  const TOUCHSCREEN_MEDIUM_CONTAINER_STYLE = css`
+    padding: ${SPACING.spacing8} ${background === false ? 0 : SPACING.spacing16};
+    grid-gap: ${SPACING.spacing8};
+  `
+
+  const TOUCHSCREEN_SMALL_CONTAINER_STYLE = css`
+    padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing10};
+    grid-gap: ${SPACING.spacing4};
+  `
+
   return (
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={backgroundColor}
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
-      padding={`${SPACING.spacing8} ${
-        background === false ? 0 : SPACING.spacing16
-      }`}
-      gridGap={SPACING.spacing8}
+      css={
+        chipSize === 'medium'
+          ? TOUCHSCREEN_MEDIUM_CONTAINER_STYLE
+          : TOUCHSCREEN_SMALL_CONTAINER_STYLE
+      }
       data-testid={`Chip_${type}`}
       {...styleProps}
     >
@@ -116,14 +133,15 @@ export function Chip(props: ChipProps): JSX.Element {
           name={icon}
           color={CHIP_PROPS_BY_TYPE[type].iconColor}
           aria-label={`icon_${text}`}
-          size="1.5rem"
-          data-testid="RenderResult_icon"
+          size={chipSize === 'medium' ? '1.5rem' : '1.25rem'}
         />
       ) : null}
       <StyledText
-        fontSize={TYPOGRAPHY.fontSize22}
-        lineHeight={TYPOGRAPHY.lineHeight28}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        css={
+          chipSize === 'medium'
+            ? TYPOGRAPHY.bodyTextSemiBold
+            : TYPOGRAPHY.smallBodyTextSemiBold
+        }
         color={CHIP_PROPS_BY_TYPE[type].textColor}
       >
         {text}

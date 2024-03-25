@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-dynamic-delete */
 import type mqtt from 'mqtt'
 
 import { FAILURE_STATUSES } from '../constants'

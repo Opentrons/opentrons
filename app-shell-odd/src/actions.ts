@@ -76,7 +76,6 @@ import {
   VALUE_UPDATED,
   VIEW_PROTOCOL_SOURCE_FOLDER,
   NOTIFY_SUBSCRIBE,
-  NOTIFY_UNSUBSCRIBE,
   ROBOT_MASS_STORAGE_DEVICE_ADDED,
   ROBOT_MASS_STORAGE_DEVICE_ENUMERATED,
   ROBOT_MASS_STORAGE_DEVICE_REMOVED,
@@ -105,7 +104,6 @@ import type {
   AppRestartAction,
   NotifySubscribeAction,
   NotifyTopic,
-  NotifyUnsubscribeAction,
   ReloadUiAction,
   RobotMassStorageDeviceAdded,
   RobotMassStorageDeviceEnumerated,
@@ -421,18 +419,6 @@ export const notifySubscribeAction = (
   topic: NotifyTopic
 ): NotifySubscribeAction => ({
   type: NOTIFY_SUBSCRIBE,
-  payload: {
-    hostname,
-    topic,
-  },
-  meta: { shell: true },
-})
-
-export const notifyUnsubscribeAction = (
-  hostname: string,
-  topic: NotifyTopic
-): NotifyUnsubscribeAction => ({
-  type: NOTIFY_UNSUBSCRIBE,
   payload: {
     hostname,
     topic,

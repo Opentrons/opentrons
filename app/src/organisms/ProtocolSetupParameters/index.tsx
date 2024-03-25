@@ -13,6 +13,7 @@ import {
 import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
 import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
+import { formatRunTimeParameterValue } from '../ProtocolDetails/ProtocolParameters/utils'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
@@ -171,7 +172,7 @@ export function ProtocolSetupParameters({
   labwareOffsets,
   runTimeParameters,
 }: ProtocolSetupParametersProps): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t } = useTranslation('protocol_setup')
   const history = useHistory()
   const host = useHost()
   const queryClient = useQueryClient()
@@ -191,32 +192,6 @@ export function ProtocolSetupParameters({
   })
   const handleConfirmValues = (): void => {
     createRun({ protocolId, labwareOffsets })
-  }
-
-  const getDefault = (parameter: RunTimeParameter): string => {
-    const { type, default: defaultValue } = parameter
-    const suffix =
-      'suffix' in parameter && parameter.suffix != null ? parameter.suffix : ''
-    switch (type) {
-      case 'int':
-      case 'float':
-        return `${defaultValue.toString()} ${suffix}`
-      case 'boolean':
-        return Boolean(defaultValue)
-          ? i18n.format(t('on'), 'capitalize')
-          : i18n.format(t('off'), 'capitalize')
-      case 'str':
-        if ('choices' in parameter && parameter.choices != null) {
-          const choice = parameter.choices.find(
-            choice => choice.value === defaultValue
-          )
-          if (choice != null) {
-            return choice.displayName
-          }
-        }
-        break
-    }
-    return ''
   }
 
   return (
@@ -253,7 +228,7 @@ export function ProtocolSetupParameters({
                 status="general"
                 title={parameter.displayName}
                 onClickSetupStep={() => console.log('TODO: wire this up')}
-                detail={getDefault(parameter)}
+                detail={formatRunTimeParameterValue(parameter, t)}
                 description={parameter.description}
                 fontSize="h4"
               />

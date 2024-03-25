@@ -16,8 +16,8 @@ import { StyledText } from '../../atoms/text'
 import { Chip } from '../../atoms/Chip'
 import { useToaster } from '../ToasterOven'
 import { mockData } from './index'
+import { formatRunTimeParameterValue } from '../ProtocolDetails/ProtocolParameters/utils'
 
-import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 
 export interface ViewOnlyParametersProps {
@@ -29,7 +29,7 @@ export function ViewOnlyParameters({
   runId,
   setSetupScreen,
 }: ViewOnlyParametersProps): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t } = useTranslation('protocol_setup')
   const { makeSnackbar } = useToaster()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const handleOnClick = (): void => {
@@ -38,32 +38,6 @@ export function ViewOnlyParameters({
 
   //  TODO(jr, 3/18/24): remove mockData
   const parameters = mostRecentAnalysis?.runTimeParameters ?? mockData
-
-  const getDefault = (parameter: RunTimeParameter): string => {
-    const { type, default: defaultValue } = parameter
-    const suffix =
-      'suffix' in parameter && parameter.suffix != null ? parameter.suffix : ''
-    switch (type) {
-      case 'int':
-      case 'float':
-        return `${defaultValue.toString()} ${suffix}`
-      case 'boolean':
-        return Boolean(defaultValue)
-          ? i18n.format(t('on'), 'capitalize')
-          : i18n.format(t('off'), 'capitalize')
-      case 'str':
-        if ('choices' in parameter && parameter.choices != null) {
-          const choice = parameter.choices.find(
-            choice => choice.value === defaultValue
-          )
-          if (choice != null) {
-            return choice.displayName
-          }
-        }
-        break
-    }
-    return ''
-  }
 
   return (
     <>
@@ -120,10 +94,15 @@ export function ViewOnlyParameters({
                 gridGap={SPACING.spacing8}
               >
                 <StyledText as="p" maxWidth="15rem" color={COLORS.grey60}>
-                  {getDefault(parameter)}
+                  {formatRunTimeParameterValue(parameter, t)}
                 </StyledText>
                 {hasCustomValue ? (
-                  <Chip type="success" text={t('updated')} hasIcon={false} />
+                  <Chip
+                    type="success"
+                    text={t('updated')}
+                    hasIcon={false}
+                    chipSize="small"
+                  />
                 ) : null}
               </Flex>
             </Flex>
