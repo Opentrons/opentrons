@@ -2,9 +2,8 @@ import abc
 import asyncio
 import logging
 import re
-from pkg_resources import parse_version
-from typing import ClassVar, Mapping, Optional, cast, TypeVar
-
+from typing import ClassVar, Mapping, Optional, TypeVar
+from packaging.version import InvalidVersion, parse
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.drivers.rpi_drivers.types import USBPort
 
