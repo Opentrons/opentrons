@@ -5,11 +5,11 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  TYPOGRAPHY,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { css } from 'styled-components'
-import { StyledText } from '../text'
 
 import type { SelectProps, SelectOption } from './Select'
 import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
