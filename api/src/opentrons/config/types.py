@@ -117,13 +117,13 @@ class ZSenseSettings:
 
 
 # str enum so it can be json serializable
-class OutputOptions(str, Enum):
+class OutputOptions(int, Enum):
     """Specifies where we should report sensor data to during a sensor pass."""
 
-    stream_to_csv = "STREAM"
-    sync_buffer_to_csv = "SYNC"
-    can_bus_only = "CAN"
-    none = "NONE"
+    stream_to_csv = 0x1
+    sync_buffer_to_csv = 0x2
+    can_bus_only = 0x4
+    sync_only = 0x8
 
 
 @dataclass

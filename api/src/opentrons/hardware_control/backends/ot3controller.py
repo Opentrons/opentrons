@@ -1350,7 +1350,7 @@ class OT3Controller(FlexBackend):
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        output_option: OutputOptions = OutputOptions.none,
+        output_option: OutputOptions = OutputOptions.can_bus_only,
         data_file: Optional[str] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
@@ -1365,6 +1365,13 @@ class OT3Controller(FlexBackend):
             )
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
+        csv_output = bool(output_option.value & OutputOptions.stream_to_csv.value)
+        sync_buffer_output = bool(
+            output_option.value & OutputOptions.sync_buffer_to_csv.value
+        )
+        can_bus_only_output = bool(
+            output_option.value & OutputOptions.can_bus_only.value
+        )
         positions = await liquid_probe(
             messenger=self._messenger,
             tool=tool,
@@ -1373,7 +1380,9 @@ class OT3Controller(FlexBackend):
             plunger_speed=plunger_speed,
             mount_speed=mount_speed,
             threshold_pascals=threshold_pascals,
-            output_option=output_option,
+            csv_output=csv_output,
+            sync_buffer_output=sync_buffer_output,
+            can_bus_only_output=can_bus_only_output,
             data_file=data_file,
             auto_zero_sensor=auto_zero_sensor,
             num_baseline_reads=num_baseline_reads,

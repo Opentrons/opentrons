@@ -17,7 +17,6 @@ from math import copysign
 from typing_extensions import Literal
 
 from opentrons_shared_data.errors.exceptions import CanbusCommunicationError
-from opentrons.config.types import OutputOptions
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -199,7 +198,10 @@ async def liquid_probe(
     plunger_speed: float,
     mount_speed: float,
     threshold_pascals: float,
-    output_option: OutputOptions,
+    csv_output: bool = False,
+    sync_buffer_output: bool = False,
+    can_bus_only_output: bool = False,
+    # output_option: OutputOptions,
     data_file: Optional[str] = None,
     auto_zero_sensor: bool = True,
     num_baseline_reads: int = 10,
@@ -226,14 +228,12 @@ async def liquid_probe(
         movers=[head_node, tool],
         distance={head_node: max_z_distance, tool: max_z_distance},
         speed={head_node: mount_speed, tool: plunger_speed},
-        stop_condition=MoveStopCondition.sync_line
-        if output_option == OutputOptions.sync_buffer_to_csv
-        else MoveStopCondition.sync_line,
+        stop_condition=MoveStopCondition.sync_line,
     )
 
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
     log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
-    if output_option == OutputOptions.stream_to_csv:
+    if csv_output:
         return await run_stream_output_to_csv(
             messenger,
             sensor_driver,
@@ -245,7 +245,7 @@ async def liquid_probe(
             sensor_runner,
             log_file,
         )
-    elif output_option == OutputOptions.sync_buffer_to_csv:
+    elif sync_buffer_output:
         return await run_sync_buffer_to_csv(
             messenger,
             sensor_driver,
@@ -259,7 +259,7 @@ async def liquid_probe(
             tool=tool,
             sensor_id=sensor_id,
         )
-    elif output_option == OutputOptions.can_bus_only:
+    elif can_bus_only_output:
         async with sensor_driver.bind_output(
             messenger,
             pressure_sensor,

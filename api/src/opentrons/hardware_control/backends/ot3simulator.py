@@ -345,7 +345,7 @@ class OT3Simulator(FlexBackend):
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        output_format: OutputOptions = OutputOptions.none,
+        output_format: OutputOptions = OutputOptions.can_bus_only,
         data_file: Optional[str] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
