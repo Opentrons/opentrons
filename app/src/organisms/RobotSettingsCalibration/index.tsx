@@ -2,7 +2,12 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { SpinnerModalPage, AlertModal, SPACING } from '@opentrons/components'
+import {
+  AlertModal,
+  SPACING,
+  SpinnerModalPage,
+  StyledText,
+} from '@opentrons/components'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
@@ -13,7 +18,6 @@ import {
 
 import { getTopPortalEl } from '../../App/portal'
 import { Line } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { CalibrateDeck } from '../../organisms/CalibrateDeck'
 import { CalibrationStatusCard } from '../../organisms/CalibrationStatusCard'
 import { CheckCalibration } from '../../organisms/CheckCalibration'

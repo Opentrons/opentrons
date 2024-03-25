@@ -11,6 +11,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -20,7 +21,6 @@ import { PrivacySettings } from './PrivacySettings'
 import { AdvancedSettings } from './AdvancedSettings'
 import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
 import { NavTab } from '../../molecules/NavTab'
-import { StyledText } from '../../atoms/text'
 import { Line } from '../../atoms/structure'
 
 import type { DesktopRouteParams, AppSettingsTab } from '../../App/types'

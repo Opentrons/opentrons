@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { Redirect, useParams } from 'react-router-dom'
 
 import {
-  Box,
-  Flex,
-  DIRECTION_COLUMN,
-  SIZE_6,
   BORDERS,
+  Box,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SIZE_6,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
@@ -24,7 +25,6 @@ import {
 import { appShellRequestor } from '../../../redux/shell/remote'
 import { getRobotUpdateSession } from '../../../redux/robot-update'
 import { getDevtoolsEnabled } from '../../../redux/config'
-import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { useRobot } from '../../../organisms/Devices/hooks'
 import { Line } from '../../../atoms/structure'

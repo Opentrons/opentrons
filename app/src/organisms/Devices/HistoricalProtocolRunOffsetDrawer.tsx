@@ -2,14 +2,15 @@ import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  Box,
   BORDERS,
-  SPACING,
+  Box,
   COLORS,
-  TYPOGRAPHY,
-  JUSTIFY_FLEX_START,
   DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_FLEX_START,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getLabwareDefURI,
@@ -17,7 +18,6 @@ import {
   getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckCalibrationData } from './hooks'

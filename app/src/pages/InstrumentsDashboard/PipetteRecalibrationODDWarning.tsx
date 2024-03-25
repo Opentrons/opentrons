@@ -10,8 +10,8 @@ import {
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
   const { t } = useTranslation('instruments_dashboard')

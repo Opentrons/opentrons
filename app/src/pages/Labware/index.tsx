@@ -4,25 +4,25 @@ import startCase from 'lodash/startCase'
 import { css } from 'styled-components'
 
 import {
-  Box,
-  Flex,
-  Link,
-  SPACING,
-  COLORS,
-  BORDERS,
-  TYPOGRAPHY,
-  POSITION_ABSOLUTE,
-  DIRECTION_COLUMN,
-  SecondaryButton,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
-  Icon,
   ALIGN_FLEX_END,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  POSITION_ABSOLUTE,
+  SecondaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import {
@@ -72,7 +72,6 @@ const SORT_BY_BUTTON_STYLE = css`
   &:active,
   &:focus {
     background-color: ${COLORS.grey40};
-  }
   }
 `
 

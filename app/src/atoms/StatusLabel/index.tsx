@@ -2,16 +2,16 @@ import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 
 import {
-  Flex,
-  Icon,
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  Flex,
+  Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../text'
 interface StatusLabelProps {
   status: string
   backgroundColor: string

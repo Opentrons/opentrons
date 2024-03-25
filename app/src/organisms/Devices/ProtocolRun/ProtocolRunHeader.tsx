@@ -36,7 +36,6 @@ import {
   DISPLAY_FLEX,
   Flex,
   Icon,
-  IconName,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
@@ -45,6 +44,7 @@ import {
   SecondaryButton,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useHoverTooltip,
@@ -68,7 +68,6 @@ import {
   ANALYTICS_PROTOCOL_RUN_RESUME,
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
-import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useCloseCurrentRun,
@@ -110,9 +109,10 @@ import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunI
 import { useNotifyRunQuery } from '../../../resources/runs'
 
 import type { Run, RunError, RunStatus } from '@opentrons/api-client'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { IconName } from '@opentrons/components'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 interface PipettesWithTip {
   mount: 'left' | 'right'

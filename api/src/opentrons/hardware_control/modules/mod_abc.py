@@ -4,7 +4,7 @@ import logging
 import re
 from pkg_resources import parse_version
 from typing import ClassVar, Mapping, Optional, cast, TypeVar
-
+from packaging.version import InvalidVersion
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.drivers.rpi_drivers.types import USBPort
 
@@ -32,6 +32,7 @@ class AbstractModule(abc.ABC):
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
+        sim_serial_number: Optional[str] = None,
     ) -> "AbstractModule":
         """Modules should always be created using this factory.
 
@@ -87,8 +88,15 @@ class AbstractModule(abc.ABC):
     def has_available_update(self) -> bool:
         """Return whether a newer firmware file is available"""
         if self.device_info and self._bundled_fw:
-            device_version = parse_version(self.device_info["version"])
-            available_version = parse_version(self._bundled_fw.version)
+            # try catch this
+            try:
+                device_version = parse_version(self.device_info["version"])
+            except InvalidVersion:
+                device_version = parse_version("v0.0.0")
+            try:
+                available_version = parse_version(self._bundled_fw.version)
+            except InvalidVersion:
+                available_version = parse_version("v0.0.0")
             return cast(bool, available_version > device_version)
         return False
 

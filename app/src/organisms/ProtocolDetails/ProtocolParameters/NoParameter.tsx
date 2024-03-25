@@ -9,9 +9,9 @@ import {
   Flex,
   Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 
 export function NoParameter(): JSX.Element {
   const { t } = useTranslation('protocol_details')

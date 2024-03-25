@@ -28,6 +28,7 @@ stages:
       json:
         data:
           id: !anystr
+          ok: True
           createdAt: !anystr
           status: idle
           current: True
@@ -229,6 +230,7 @@ stages:
         data:
           # Unchanged from when we originally POSTed the resource:
           id: '{run_id}'
+          ok: True
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
           startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
           liquids: []

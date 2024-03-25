@@ -8,11 +8,11 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TEXT_TRANSFORM_CAPITALIZE,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 const INTERVENTION_COMMAND_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};

@@ -6,13 +6,14 @@ import {
   COLORS,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { useToaster } from '../../organisms/ToasterOven'
 import { useRunTimeParameters } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'
+import { formatRunTimeParameterValue } from '../../organisms/ProtocolDetails/ProtocolParameters/utils'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const Table = styled('table')`
@@ -85,30 +86,6 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
     }
   }
 
-  const getDefault = (parameter: RunTimeParameter): string => {
-    const { type, default: defaultValue } = parameter
-    const suffix =
-      'suffix' in parameter && parameter.suffix != null ? parameter.suffix : ''
-    switch (type) {
-      case 'int':
-      case 'float':
-        return `${defaultValue.toString()} ${suffix}`
-      case 'boolean':
-        return Boolean(defaultValue) ? t('on') : t('off')
-      case 'str':
-        if ('choices' in parameter && parameter.choices != null) {
-          const choice = parameter.choices.find(
-            choice => choice.value === defaultValue
-          )
-          if (choice != null) {
-            return choice.displayName
-          }
-        }
-        break
-    }
-    return ''
-  }
-
   return runTimeParameters.length > 0 ? (
     <Table onClick={makeSnack} data-testid="Parameters_table">
       <thead>
@@ -141,7 +118,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
               </TableDatum>
               <TableDatum>
                 <Flex paddingLeft={SPACING.spacing24} color={COLORS.grey60}>
-                  {getDefault(parameter)}
+                  {formatRunTimeParameterValue(parameter, t)}
                 </Flex>
               </TableDatum>
               <TableDatum>

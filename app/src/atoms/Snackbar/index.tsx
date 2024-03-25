@@ -2,15 +2,14 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import {
-  Flex,
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../text'
 
 import type { StyleProps } from '@opentrons/components'
 

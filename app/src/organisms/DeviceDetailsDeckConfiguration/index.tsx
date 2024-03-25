@@ -16,6 +16,7 @@ import {
   Link,
   SIZE_4,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -32,7 +33,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 import { AddFixtureModal } from './AddFixtureModal'

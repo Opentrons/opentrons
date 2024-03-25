@@ -3,16 +3,17 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   ALIGN_FLEX_END,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SPACING,
-  TYPOGRAPHY,
-  COLORS,
+  Flex,
   Icon,
   Link,
   PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { ManualIpHostnameForm } from './ManualIpHostnameForm'
@@ -20,7 +21,6 @@ import { ManualIpHostnameList } from './ManualIpHostnameList'
 import { Slideout } from '../../atoms/Slideout'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { getScanning, startDiscovery } from '../../redux/discovery'
 
 import type { Dispatch, State } from '../../redux/types'

@@ -4,17 +4,17 @@ import styled, { css } from 'styled-components'
 
 import {
   Btn,
-  Icon,
   COLORS,
-  TYPOGRAPHY,
   Flex,
-  JUSTIFY_FLEX_START,
+  Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_FLEX_START,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 
 const IpItem = styled.div`
   flex: 1 1 auto;

@@ -6,20 +6,20 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
-  COLORS,
-  BORDERS,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getFixtureDisplayName } from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { StyledText } from '../../../../atoms/text'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 

@@ -3,25 +3,25 @@ import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  DIRECTION_ROW,
-  COLORS,
-  BORDERS,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  RESPONSIVENESS,
-  JUSTIFY_FLEX_START,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
   DISPLAY_INLINE_BLOCK,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
-  JUSTIFY_FLEX_END,
-  JUSTIFY_SPACE_AROUND,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton, MediumButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 // import { NeedHelpLink } from '../CalibrationPanels'

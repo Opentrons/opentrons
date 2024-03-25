@@ -11,9 +11,12 @@ MAG_DECK_MODELS = {
 
 
 class SimulatingDriver(AbstractMagDeckDriver):
-    def __init__(self, sim_model: Optional[str] = None) -> None:
+    def __init__(
+        self, sim_model: Optional[str] = None, serial_number: Optional[str] = None
+    ) -> None:
         self._height = 0.0
         self._model = MAG_DECK_MODELS[sim_model] if sim_model else "mag_deck_v1.1"
+        self._serial_number = serial_number
 
     @ensure_yield
     async def probe_plate(self) -> None:
@@ -30,7 +33,7 @@ class SimulatingDriver(AbstractMagDeckDriver):
     @ensure_yield
     async def get_device_info(self) -> Dict[str, str]:
         return {
-            "serial": "dummySerialMD",
+            "serial": self._serial_number if self._serial_number else "dummySerialMD",
             "model": self._model,
             "version": "dummyVersionMD",
         }

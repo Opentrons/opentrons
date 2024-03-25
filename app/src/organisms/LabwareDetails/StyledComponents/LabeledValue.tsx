@@ -1,13 +1,13 @@
 import * as React from 'react'
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  COLORS,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 
 export interface LabeledValueProps {
   label: string

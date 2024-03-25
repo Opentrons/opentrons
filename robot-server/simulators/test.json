@@ -12,43 +12,74 @@
   "attached_modules": {
     "thermocycler": [
       {
-        "function_name": "set_temperature",
-        "kwargs": {
-          "temperature": 3,
-          "hold_time_seconds": 1,
-          "hold_time_minutes": 2,
-          "ramp_rate": 4,
-          "volume": 5
-        }
-      },
-      {
-        "function_name": "set_lid_temperature",
-        "kwargs": {
-          "temperature": 4
-        }
+        "serial_number": "therm-123",
+        "calls": [
+          {
+            "function_name": "set_temperature",
+            "kwargs": {
+              "temperature": 3,
+              "hold_time_seconds": 1,
+              "hold_time_minutes": 2,
+              "ramp_rate": 4,
+              "volume": 5
+            }
+          },
+          {
+            "function_name": "set_lid_temperature",
+            "kwargs": {
+              "temperature": 4
+            }
+          }
+        ]
       }
     ],
-    "heatershaker": [],
+    "heatershaker": [
+      {
+        "serial_number": "hs-123",
+        "calls": []
+      }
+    ],
     "tempdeck": [
       {
-        "function_name": "start_set_temperature",
-        "kwargs": {
-          "celsius": 3
-        }
-      },
-      {
-        "function_name": "await_temperature",
-        "kwargs": {
-          "awaiting_temperature": null
-        }
+        "serial_number": "temp-123",
+        "calls": [
+          {
+            "function_name": "start_set_temperature",
+            "kwargs": {
+              "celsius": 3
+            }
+          },
+          {
+            "function_name": "await_temperature",
+            "kwargs": {
+              "awaiting_temperature": null
+            }
+          }
+        ]
       }
     ],
     "magdeck": [
       {
-        "function_name": "engage",
-        "kwargs": {
-          "height": 4
-        }
+        "serial_number": "mag-123",
+        "calls": [
+          {
+            "function_name": "engage",
+            "kwargs": {
+              "height": 4
+            }
+          }
+        ]
+      },
+      {
+        "serial_number": "mag-1234",
+        "calls": [
+          {
+            "function_name": "engage",
+            "kwargs": {
+              "height": 4
+            }
+          }
+        ]
       }
     ]
   }

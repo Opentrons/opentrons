@@ -8,9 +8,9 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import type { ModalHeaderBaseProps } from '../Modal/types'
 
 export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {

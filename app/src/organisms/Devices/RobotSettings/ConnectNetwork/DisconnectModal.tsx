@@ -4,20 +4,20 @@ import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
 import {
-  Flex,
-  Link,
-  Icon,
+  AlertPrimaryButton,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
-  JUSTIFY_FLEX_END,
-  SPACING,
-  TYPOGRAPHY,
-  PrimaryButton,
-  AlertPrimaryButton,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  Link,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { CONNECTABLE } from '../../../../redux/discovery'

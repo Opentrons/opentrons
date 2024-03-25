@@ -2,9 +2,8 @@ import * as React from 'react'
 import { CSSProp } from 'styled-components'
 
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
-import { useInterval, TYPOGRAPHY } from '@opentrons/components'
+import { useInterval, TYPOGRAPHY, StyledText } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 import { EMPTY_TIMESTAMP } from '../constants'
 

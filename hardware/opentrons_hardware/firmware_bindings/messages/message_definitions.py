@@ -205,6 +205,19 @@ class AddLinearMoveRequest(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class AddSensorLinearMoveRequest(BaseMessage):
+    """Sensor Linear Move Request."""
+
+    payload: payloads.AddSensorLinearMoveBasePayload
+    payload_type: Type[
+        payloads.AddSensorLinearMoveBasePayload
+    ] = payloads.AddSensorLinearMoveBasePayload
+    message_id: Literal[
+        MessageId.add_sensor_move_request
+    ] = MessageId.add_sensor_move_request
+
+
+@dataclass
 class GetMoveGroupRequest(BaseMessage):  # noqa: D101
     payload: payloads.MoveGroupRequestPayload
     payload_type: Type[
@@ -1008,3 +1021,16 @@ class GetHepaUVStateResponse(BaseMessage):
     message_id: Literal[
         MessageId.get_hepa_uv_state_response
     ] = MessageId.get_hepa_uv_state_response
+
+
+@dataclass
+class SendAccumulatedPressureDataRequest(BaseMessage):
+    """Send all the saved sensor data."""
+
+    payload: payloads.SendAccumulatedPressureDataPayload
+    payload_type: Type[
+        payloads.SendAccumulatedPressureDataPayload
+    ] = payloads.SendAccumulatedPressureDataPayload
+    message_id: Literal[
+        MessageId.send_accumulated_pressure_data
+    ] = MessageId.send_accumulated_pressure_data

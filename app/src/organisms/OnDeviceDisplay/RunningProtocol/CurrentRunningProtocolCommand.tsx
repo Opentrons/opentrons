@@ -14,11 +14,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { StyledText } from '../../../atoms/text'
 import { CommandText } from '../../CommandText'
 import { RunTimer } from '../../Devices/ProtocolRun/RunTimer'
 import { PlayPauseButton } from './PlayPauseButton'

@@ -1,22 +1,8 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  CompletedProtocolAnalysis,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
-import { StyledText } from '../../../atoms/text'
-import { RobotMotionLoader } from '../RobotMotionLoader'
-import { getPrepCommands } from './getPrepCommands'
-import { useChainRunCommands } from '../../../resources/runs'
-import type { RegisterPositionAction } from '../types'
-import type { Jog } from '../../../molecules/JogControls'
-import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
-import { getLatestCurrentOffsets } from '../../Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
-import { getIsOnDevice } from '../../../redux/config'
-import { NeedHelpLink } from '../../CalibrationPanels'
-import { useSelector } from 'react-redux'
-import { TwoUpTileLayout } from '../TwoUpTileLayout'
+import { css } from 'styled-components'
+
 import {
   ALIGN_CENTER,
   Box,
@@ -28,16 +14,32 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LabwareOffset } from '@opentrons/api-client'
-import { css } from 'styled-components'
+import { RobotMotionLoader } from '../RobotMotionLoader'
+import { getPrepCommands } from './getPrepCommands'
+import { useChainRunCommands } from '../../../resources/runs'
+import type { RegisterPositionAction } from '../types'
+import type { Jog } from '../../../molecules/JogControls'
+import { WizardRequiredEquipmentList } from '../../../molecules/WizardRequiredEquipmentList'
+import { getLatestCurrentOffsets } from '../../Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
+import { getIsOnDevice } from '../../../redux/config'
+import { NeedHelpLink } from '../../CalibrationPanels'
+import { useSelector } from 'react-redux'
+import { TwoUpTileLayout } from '../TwoUpTileLayout'
 import { getTopPortalEl } from '../../../App/portal'
 import { LegacyModalShell } from '../../../molecules/LegacyModal'
 import { SmallButton } from '../../../atoms/buttons'
 import { CALIBRATION_PROBE } from '../../PipetteWizardFlows/constants'
 import { TerseOffsetTable } from '../ResultsSummary'
 import { getLabwareDefinitionsFromCommands } from '../utils/labware'
+
+import type { LabwareOffset } from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 
 export const INTERVAL_MS = 3000
 

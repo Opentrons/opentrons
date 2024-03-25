@@ -4,19 +4,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  Flex,
-  Icon,
-  NewPrimaryBtn,
-  JUSTIFY_FLEX_END,
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_FLEX_END,
+  NewPrimaryBtn,
   SPACING,
-  BORDERS,
+  StyledText,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../../../atoms/text'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { ProgressBar } from '../../../../atoms/ProgressBar'
 import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'

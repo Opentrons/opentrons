@@ -3,11 +3,16 @@ import { capitalize } from 'lodash'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Trans, useTranslation } from 'react-i18next'
 
-import { Flex, COLORS, SPACING, DIRECTION_COLUMN } from '@opentrons/components'
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 
 import { useCloseCurrentRun } from '../ProtocolUpload/hooks'
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { DropTipWizard } from '.'
 

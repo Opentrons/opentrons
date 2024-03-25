@@ -2,14 +2,14 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
   COLORS,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 
 interface CalibrationHealthCheckResultsProps {
