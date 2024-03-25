@@ -22,6 +22,7 @@ import { useFeatureFlag } from '../../../redux/config'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
 import { useNotifyService } from '../../../resources/useNotifyService'
+import { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
@@ -40,6 +41,60 @@ const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
 }
 
 const mockSetSelectedRobot = vi.fn()
+
+const mockRunTimeParameters: RunTimeParameter[] = [
+  {
+    displayName: 'Dry Run',
+    value: false,
+    variableName: 'DRYRUN',
+    description: 'Is this a dry or wet run? Wet is true, dry is false',
+    type: 'boolean',
+    default: false,
+  },
+  {
+    value: 4,
+    displayName: 'Columns of Samples',
+    variableName: 'COLUMNS',
+    description: 'How many columns do you want?',
+    type: 'int',
+    min: 1,
+    max: 14,
+    default: 4,
+  },
+  {
+    value: 6.5,
+    displayName: 'EtoH Volume',
+    variableName: 'ETOH_VOLUME',
+    description: '70% ethanol volume',
+    type: 'float',
+    suffix: 'mL',
+    min: 1.5,
+    max: 10.0,
+    default: 6.5,
+  },
+  {
+    value: 'none',
+    displayName: 'Default Module Offsets',
+    variableName: 'DEFAULT_OFFSETS',
+    description: 'default module offsets for temp, H-S, and none',
+    type: 'str',
+    choices: [
+      {
+        displayName: 'No offsets',
+        value: 'none',
+      },
+      {
+        displayName: 'temp offset',
+        value: '1',
+      },
+      {
+        displayName: 'heater-shaker offset',
+        value: '2',
+      },
+    ],
+    default: 'none',
+  },
+]
 
 describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
@@ -155,6 +210,26 @@ describe('ChooseRobotSlideout', () => {
     })
     screen.getByText('Step 2 / 2')
   })
+
+  mockRunTimeParameters.forEach((param, index) => {
+    it('renders runtime parameter with title and caption', () => {
+      render({
+        onCloseClick: vi.fn(),
+        isExpanded: true,
+        isSelectedRobotOnDifferentSoftwareVersion: false,
+        selectedRobot: null,
+        setSelectedRobot: mockSetSelectedRobot,
+        title: 'choose robot slideout title',
+        robotType: 'OT-2 Standard',
+        multiSlideout: { currentPage: 2 },
+        runTimeParametersOverrides: [param],
+      })
+
+      screen.getByText(param.displayName)
+      screen.getByText(param.description)
+    })
+  })
+
   it('defaults to first available robot and allows an available robot to be selected', () => {
     vi.mocked(getConnectableRobots).mockReturnValue([
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },

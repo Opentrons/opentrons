@@ -20,6 +20,7 @@ import type {
   CSSObjectWithLabel,
   DropdownIndicatorProps,
 } from 'react-select'
+import type { DropdownBorder } from '../MenuList/DropdownMenu'
 
 export interface SelectOption {
   value: string
@@ -31,29 +32,36 @@ export type SelectProps = ReactSelectProps<SelectOption>
 
 interface SelectComponentProps extends SelectProps {
   width?: string
+  dropdownType?: DropdownBorder
 }
 
 const VOID_STYLE: unknown = undefined
 const NO_STYLE_FN = (): CSSObjectWithLabel => VOID_STYLE as CSSObjectWithLabel
 
 export function Select(props: SelectComponentProps): JSX.Element {
+  const { dropdownType, menuIsOpen, width } = props
   const CLEAR_DEFAULT_STYLES_AND_SET_NEW_STYLES: StylesConfig<SelectOption> = {
     clearIndicator: NO_STYLE_FN,
     control: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      borderRadius: BORDERS.borderRadiusFull,
-      border: BORDERS.lineBorder,
-      width: props.width ?? 'auto',
+      borderRadius:
+        dropdownType === 'rounded'
+          ? BORDERS.borderRadiusFull
+          : BORDERS.borderRadius4,
+      border: `1px ${BORDERS.styleSolid} ${
+        menuIsOpen ? COLORS.blue50 : COLORS.grey50
+      }`,
+      width: width ?? 'auto',
       height: SPACING.spacing16,
       borderColor: COLORS.grey30,
       boxShadow: 'none',
       padding: SPACING.spacing6,
       flexDirection: DIRECTION_ROW,
       '&:hover': {
-        borderColor: COLORS.grey60,
+        borderColor: COLORS.grey50,
       },
       '&:active': {
-        borderColor: COLORS.grey60,
+        borderColor: COLORS.blue50,
       },
     }),
     container: (styles: CSSObjectWithLabel) => ({
@@ -83,7 +91,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     menu: (styles: CSSObjectWithLabel) => ({
       ...styles,
       backgroundColor: COLORS.white,
-      width: props.width != null ? props.width : 'auto',
+      width: width != null ? width : 'auto',
       boxShadowcha: '0px 1px 3px rgba(0, 0, 0, 0.2)',
       borderRadius: '4px 4px 0px 0px',
       marginTop: SPACING.spacing4,
@@ -155,9 +163,9 @@ function DropdownIndicator(
         width={SPACING.spacing20}
       >
         {Boolean(props.selectProps.menuIsOpen) ? (
-          <Icon transform="rotate(180deg)" name="menu-down" height="1.25rem" />
+          <Icon transform="rotate(180deg)" name="menu-down" height="1rem" />
         ) : (
-          <Icon name="menu-down" height="1.25rem" />
+          <Icon name="menu-down" height="1rem" />
         )}
       </Box>
     </components.DropdownIndicator>
