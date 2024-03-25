@@ -802,7 +802,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 acceptable_d = trials[volume][channel][0].acceptable_d
                 print(f"acceptable cv {acceptable_cv} acceptable_d {acceptable_d}")
                 print(f"dispense cv {dispense_cv} aspirate_cv {aspirate_cv}")
-                print(f"dispense d {dispense_cv} aspirate_d {aspirate_d}")
+                print(f"dispense d {dispense_d} aspirate_d {aspirate_d}")
                 if (
                     not cfg.ignore_fail
                     and acceptable_cv is not None
