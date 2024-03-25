@@ -2,11 +2,11 @@ import { DropdownOption } from '../../../components/lib/forms/DropdownField.d'
 import {
   getPipetteSpecsV2,
   getTiprackVolume,
-  PipetteName,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
-import { Options } from '@opentrons/components'
-import { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
+import type { PipetteName } from '@opentrons/shared-data'
+import type { Options } from '@opentrons/components'
+import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
 const supportedPipetteNames: PipetteName[] = [
   'p10_single',
   'p10_multi',
@@ -33,11 +33,11 @@ export const pipetteOptions: Options = supportedPipetteNames
   )
 
 // NOTE: this is similar to getPipetteWithTipMaxVol, the fns
-export function getPipetteCapacity(
+export const getPipetteCapacity = (
   pipetteEntity: PipetteEntity,
   labwareEntities: LabwareEntities,
   tipRack?: string | null
-): number {
+): number => {
   const spec = pipetteEntity.spec
   const tiprackDefs = pipetteEntity.tiprackLabwareDef
   const tipRackDefUri =

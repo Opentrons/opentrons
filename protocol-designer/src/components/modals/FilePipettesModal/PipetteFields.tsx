@@ -38,7 +38,7 @@ import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../../types'
 import type { FormState as TypeFormState } from './index'
 
-export interface Props {
+export interface PipetteFieldsProps {
   values: FormPipettesByMount
   setValue: UseFormSetValue<TypeFormState>
   trigger: UseFormTrigger<TypeFormState>
@@ -59,7 +59,7 @@ interface TiprackSelectProps {
   robotType: RobotType
 }
 
-export function PipetteFields(props: Props): JSX.Element {
+export function PipetteFields(props: PipetteFieldsProps): JSX.Element {
   const { values, setValue, trigger, robotType } = props
   const { t } = useTranslation(['modal', 'button'])
   const allowAllTipracks = useSelector(getAllowAllTipracks)
@@ -70,9 +70,9 @@ export function PipetteFields(props: Props): JSX.Element {
 
   React.useEffect(() => {
     if (has96Channel) {
-      values.right = { pipetteName: null, tiprackDefURI: [] }
+      values.right = { pipetteName: null, tiprackDefURI: null }
     }
-  }, [values.left])
+  }, [has96Channel, values.left])
 
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     const { tabIndex, mount } = props
@@ -117,7 +117,7 @@ export function PipetteFields(props: Props): JSX.Element {
         mount={mount}
         tiprackOptions={tiprackOptions}
         values={values}
-        onSetFieldValue={(field: string, value: string[]) => {
+        onSetFieldValue={(field: string, value: string[]): void => {
           //  @ts-expect-error: TS can't figure out this type with react-hook-form
           setValue(field, value)
           trigger(`pipettesByMount.${mount}.tiprackDefURI`)

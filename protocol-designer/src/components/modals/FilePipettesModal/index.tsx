@@ -366,7 +366,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
         ) // this is mostly for flow
         // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
         return formPipette &&
-          formPipette.pipetteName &&
+          formPipette.pipetteName != null &&
           formPipette.tiprackDefURI != null &&
           (mount === 'left' || mount === 'right')
           ? [

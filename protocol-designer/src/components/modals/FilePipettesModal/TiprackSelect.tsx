@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { Mount, Flex, DIRECTION_COLUMN } from '@opentrons/components'
+import { Flex, DIRECTION_COLUMN } from '@opentrons/components'
 import { TiprackOption } from './TiprackOption'
-import { FormPipettesByMount } from '../../../step-forms'
-
+import type { Mount } from '@opentrons/components'
+import type { FormPipettesByMount } from '../../../step-forms'
 import type { TiprackOption as TiprackOptionType } from '../utils'
 
 interface TiprackSelectProps {
@@ -26,7 +26,9 @@ export const TiprackSelect = (
     }
   }, [selectedValues, onSetFieldValue, tiprackOptions])
 
-  return selectedPipetteName != null ? (
+  if (selectedPipetteName == null) return null
+
+  return (
     <Flex height="15rem" overflowY="scroll" flexDirection={DIRECTION_COLUMN}>
       {tiprackOptions.map(option => (
         <TiprackOption
@@ -45,5 +47,5 @@ export const TiprackSelect = (
         />
       ))}
     </Flex>
-  ) : null
+  )
 }

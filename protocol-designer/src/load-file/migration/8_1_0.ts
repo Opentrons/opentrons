@@ -57,16 +57,16 @@ export const migrateFile = (
   const pipettingSavedStepsWithTipRack = pipettingSavedSteps.reduce(
     (acc, item) => {
       const tipRackUri = tiprackAssignments[item.pipette]
-      const tiprackLoadname =
+      const tiprackLoadName =
         labwareDefinitions[tipRackUri]?.parameters.loadName
-      if (tiprackLoadname == null) {
+      if (tiprackLoadName == null) {
         console.error(
           `expected to find tiprack definition with labwareDefintionURI ${tipRackUri} but could not`
         )
       }
       const tiprackIds = loadLabwareCommands
-        .filter(command => command.params.loadName === tiprackLoadname)
-        .map(command => command.params.labwareId as string)
+        .filter(command => command.params.loadName === tiprackLoadName)
+        .map(command => command.params.labwareId)
 
       acc[item.id] = { ...item, tipRack: tiprackIds[0] }
       return acc
