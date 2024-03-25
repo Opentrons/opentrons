@@ -369,6 +369,7 @@ export function ChooseRobotSlideout(
         )
       } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
         const value = runtimeParam.value as number
+        const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
         return (
           <InputField
             key={runtimeParam.variableName}
@@ -378,6 +379,7 @@ export function ChooseRobotSlideout(
             value={value}
             title={runtimeParam.displayName}
             caption={runtimeParam.description}
+            id={id}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
@@ -403,7 +405,11 @@ export function ChooseRobotSlideout(
             flexDirection={DIRECTION_COLUMN}
             key={runtimeParam.variableName}
           >
-            <StyledText as="labelSemiBold" paddingBottom={SPACING.spacing8}>
+            <StyledText
+              as="label"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              paddingBottom={SPACING.spacing8}
+            >
               {runtimeParam.displayName}
             </StyledText>
             <Flex
@@ -445,25 +451,10 @@ export function ChooseRobotSlideout(
       }
     }) ?? null
 
-  const ENABLED_LINK_CSS = css`
-    ${TYPOGRAPHY.linkPSemiBold}
-    cursor: pointer;
-  `
-
-  const DISABLED_LINK_CSS = css`
-    ${TYPOGRAPHY.linkPSemiBold}
-    color: ${COLORS.grey50};
-    cursor: default;
-
-    &:hover {
-      color: ${COLORS.grey50};
-    }
-  `
-
   const isRestoreDefaultsLinkEnabled =
     runTimeParametersOverrides?.some(
       parameter => parameter.value !== parameter.default
-    ) ?? null
+    ) ?? false
 
   const pageTwoBody =
     runTimeParametersOverrides != null ? (
@@ -524,3 +515,18 @@ export function ChooseRobotSlideout(
     </Slideout>
   )
 }
+
+const ENABLED_LINK_CSS = css`
+  ${TYPOGRAPHY.linkPSemiBold}
+  cursor: pointer;
+`
+
+const DISABLED_LINK_CSS = css`
+  ${TYPOGRAPHY.linkPSemiBold}
+  color: ${COLORS.grey50};
+  cursor: default;
+
+  &:hover {
+    color: ${COLORS.grey50};
+  }
+`

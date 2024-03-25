@@ -66,37 +66,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
 
   const mockRunTimeParameters: RunTimeParameter[] = [
     {
-      value: false,
       displayName: 'Dry Run',
+      value: false,
       variableName: 'DRYRUN',
       description: 'Is this a dry or wet run? Wet is true, dry is false',
       type: 'boolean',
       default: false,
-    },
-    {
-      value: true,
-      displayName: 'Use Gripper',
-      variableName: 'USE_GRIPPER',
-      description: 'For using the gripper.',
-      type: 'boolean',
-      default: true,
-    },
-    {
-      value: true,
-      displayName: 'Trash Tips',
-      variableName: 'TIP_TRASH',
-      description:
-        'to throw tip into the trash or to not throw tip into the trash',
-      type: 'boolean',
-      default: true,
-    },
-    {
-      value: true,
-      displayName: 'Deactivate Temperatures',
-      variableName: 'DEACTIVATE_TEMP',
-      description: 'deactivate temperature on the module',
-      type: 'boolean',
-      default: true,
     },
     {
       value: 4,
@@ -107,16 +82,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       min: 1,
       max: 14,
       default: 4,
-    },
-    {
-      value: 6,
-      displayName: 'PCR Cycles',
-      variableName: 'PCR_CYCLES',
-      description: 'number of PCR cycles on a thermocycler',
-      type: 'int',
-      min: 1,
-      max: 10,
-      default: 6,
     },
     {
       value: 6.5,
@@ -150,60 +115,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
         },
       ],
       default: 'none',
-    },
-    {
-      value: 'left',
-      displayName: 'pipette mount',
-      variableName: 'mont',
-      description: 'pipette mount',
-      type: 'str',
-      choices: [
-        {
-          displayName: 'Left',
-          value: 'left',
-        },
-        {
-          displayName: 'Right',
-          value: 'right',
-        },
-      ],
-      default: 'left',
-    },
-    {
-      value: 'flex',
-      displayName: 'short test case',
-      variableName: 'short 2 options',
-      description: 'this play 2 short options',
-      type: 'str',
-      choices: [
-        {
-          displayName: 'OT-2',
-          value: 'ot2',
-        },
-        {
-          displayName: 'Flex',
-          value: 'flex',
-        },
-      ],
-      default: 'flex',
-    },
-    {
-      value: 'flex',
-      displayName: 'long test case',
-      variableName: 'long 2 options',
-      description: 'this play 2 long options',
-      type: 'str',
-      choices: [
-        {
-          displayName: 'I am kind of long text version',
-          value: 'ot2',
-        },
-        {
-          displayName: 'I am kind of long text version. Today is 3/15',
-          value: 'flex',
-        },
-      ],
-      default: 'flex',
     },
   ]
   const [
