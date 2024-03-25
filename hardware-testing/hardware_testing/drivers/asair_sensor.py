@@ -92,7 +92,7 @@ def BuildAsairSensor(simulate: bool, autosearch: bool = True) -> AsairSensorBase
                     ui.print_info(f"Trying to connect to env sensor on port {port}")
                     sensor = AsairSensor.connect(port)
                     ser_id = sensor.get_serial()
-                    if len(ser_id) != 0:
+                    if ser_id == " ":
                         ui.print_info(f"Found env sensor {ser_id} on port {port}")
                         return sensor
                 except:  # noqa: E722
