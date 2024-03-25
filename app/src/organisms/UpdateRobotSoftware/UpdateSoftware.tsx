@@ -10,10 +10,10 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ProgressBar } from '../../atoms/ProgressBar'
 
 interface UpdateSoftwareProps {

@@ -10,15 +10,16 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
 // import { Chip } from '../../../atoms/Chip'
 import { NoParameter } from '../../ProtocolDetails/ProtocolParameters/NoParameter'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { formatRunTimeParameterValue } from '../../ProtocolDetails/ProtocolParameters/utils'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -171,39 +172,11 @@ interface ProtocolRunRuntimeParametersProps {
 export function ProtocolRunRuntimeParameters({
   runId,
 }: ProtocolRunRuntimeParametersProps): JSX.Element {
-  const { i18n, t } = useTranslation('protocol_setup')
+  const { t } = useTranslation('protocol_setup')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   // ToDo (kk:03/18/2024) mockData will be replaced with []
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? mockData
   const hasParameter = runTimeParameters.length > 0
-
-  const formattedValue = (runTimeParameter: RunTimeParameter): string => {
-    const { type, default: defaultValue } = runTimeParameter
-    const suffix =
-      'suffix' in runTimeParameter && runTimeParameter.suffix != null
-        ? runTimeParameter.suffix
-        : ''
-    switch (type) {
-      case 'int':
-      case 'float':
-        return `${defaultValue.toString()} ${suffix}`
-      case 'boolean':
-        return Boolean(defaultValue)
-          ? i18n.format(t('on'), 'capitalize')
-          : i18n.format(t('off'), 'capitalize')
-      case 'str':
-        if ('choices' in runTimeParameter && runTimeParameter.choices != null) {
-          const choice = runTimeParameter.choices.find(
-            choice => choice.value === defaultValue
-          )
-          if (choice != null) {
-            return choice.displayName
-          }
-        }
-        break
-    }
-    return ''
-  }
 
   // ToDo (kk:03/19/2024) this will be replaced with the boolean from values check result
   const dummyBoolean = true
@@ -282,7 +255,7 @@ export function ProtocolRunRuntimeParameters({
                             gridGap={SPACING.spacing16}
                           >
                             <StyledText as="p">
-                              {formattedValue(parameter)}
+                              {formatRunTimeParameterValue(parameter, t)}
                             </StyledText>
                             {/* ToDo (kk:03/19/2024) chip will be here with conditional render */}
                             {/* {index % 2 === 0 ? (

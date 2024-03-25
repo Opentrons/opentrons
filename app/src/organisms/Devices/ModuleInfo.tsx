@@ -1,26 +1,26 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  Icon,
-  RobotCoordsForeignObject,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
+  RobotCoordsForeignObject,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import {
-  ModuleModel,
   getModuleDisplayName,
   getModuleDef2,
   MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
 import { useRunHasStarted } from './hooks'
+import type { ModuleModel } from '@opentrons/shared-data'
 import type { PhysicalPort } from '../../redux/modules/api-types'
 
 export interface ModuleInfoProps {

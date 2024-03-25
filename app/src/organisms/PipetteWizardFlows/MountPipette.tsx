@@ -4,8 +4,13 @@ import {
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
-import { Flex, JUSTIFY_CENTER, SPACING, SIZE_1 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import {
+  Flex,
+  JUSTIFY_CENTER,
+  SIZE_1,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { Skeleton } from '../../atoms/Skeleton'

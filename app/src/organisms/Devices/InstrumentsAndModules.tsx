@@ -9,18 +9,18 @@ import {
 } from '@opentrons/react-api-client'
 
 import {
-  Flex,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
   SIZE_3,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'

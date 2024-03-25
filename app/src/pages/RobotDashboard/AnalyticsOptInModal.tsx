@@ -3,15 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  Flex,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { updateConfigValue } from '../../redux/config'
 import { getLocalRobot } from '../../redux/discovery'

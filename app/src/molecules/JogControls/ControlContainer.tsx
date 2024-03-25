@@ -4,11 +4,11 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
   Flex,
+  JUSTIFY_CENTER,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import type { StyleProps } from '@opentrons/components'
 
 interface ControlContainerProps extends StyleProps {

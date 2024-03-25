@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import { useHost } from '@opentrons/react-api-client'
 
 import { appShellListener } from '../redux/shell/remote'
-import { notifySubscribeAction, notifyUnsubscribeAction } from '../redux/shell'
+import { notifySubscribeAction } from '../redux/shell'
 import {
   useTrackEvent,
   ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
@@ -62,13 +62,12 @@ export function useNotifyService<TData, TError = Error>({
       })
       dispatch(notifySubscribeAction(hostname, topic))
       hasUsedNotifyService.current = true
-    } else setRefetchUsingHTTP('always')
+    } else {
+      setRefetchUsingHTTP('always')
+    }
 
     return () => {
       if (hasUsedNotifyService.current) {
-        if (hostname != null) {
-          dispatch(notifyUnsubscribeAction(hostname, topic))
-        }
         appShellListener({
           hostname: hostname as string,
           topic,

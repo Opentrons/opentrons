@@ -3,21 +3,21 @@ import { saveAs } from 'file-saver'
 import { useTranslation, Trans } from 'react-i18next'
 
 import {
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
-  Link,
-  ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,
   useModulesQuery,
 } from '@opentrons/react-api-client'
 import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import {
   useDeckCalibrationData,
   useIsFlex,

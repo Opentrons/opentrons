@@ -5,17 +5,17 @@ import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
-  COLORS,
-  SIZE_2,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SIZE_2,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { addManualIp } from '../../redux/config'
 import { startDiscovery } from '../../redux/discovery'
 

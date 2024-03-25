@@ -14,6 +14,19 @@ export default {
       },
       defaultValue: 'basic',
     },
+    hasIcon: {
+      control: {
+        type: 'boolean',
+      },
+      defaultValue: true,
+    },
+    chipSize: {
+      options: ['medium', 'small'],
+      control: {
+        type: 'select',
+      },
+      defaultValue: 'medium',
+    },
   },
   component: Chip,
   parameters: touchScreenViewport,
@@ -38,4 +51,6 @@ export const ChipComponent = Template.bind({})
 ChipComponent.args = {
   type: 'basic',
   text: 'Chip component',
+  hasIcon: true,
+  chipSize: 'medium',
 }

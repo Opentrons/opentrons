@@ -14,9 +14,9 @@ class ClientServerFixture(NamedTuple):
 
     async def restart(self) -> None:
         self.server.stop()
-        assert await self.client.wait_until_dead(), "Server did not stop."
+        assert await self.client.dead(), "Server did not stop."
         self.server.start()
-        assert await self.client.wait_until_alive(), "Server never became available."
+        await self.client.wait_until_ready()
 
 
 @pytest.fixture
@@ -32,11 +32,11 @@ async def client_and_server(port: str) -> AsyncGenerator[ClientServerFixture, No
         base_url=f"http://localhost:{port}",
         version="*",
     ) as client:
-        assert await client.wait_until_dead(), "Server is running and must not be."
+        assert await client.dead(), "Server is running and must not be."
 
         with DevServer(port=port) as server:
             server.start()
-            assert await client.wait_until_alive(), "Server never became available."
+            await client.wait_until_ready()
 
             yield ClientServerFixture(client=client, server=server)
 

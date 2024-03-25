@@ -7,11 +7,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { NoParameter } from './NoParameter'
+import { formatRunTimeParameterValue } from './utils'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -63,33 +64,6 @@ function ProtocolParameterItems({
   runTimeParameters,
 }: ProtocolParameterItemsProps): JSX.Element {
   const { t } = useTranslation('protocol_details')
-
-  const formattedValue = (runTimeParameter: RunTimeParameter): string => {
-    const { type, default: defaultValue } = runTimeParameter
-    const suffix =
-      'suffix' in runTimeParameter && runTimeParameter.suffix != null
-        ? runTimeParameter.suffix
-        : ''
-    switch (type) {
-      case 'int':
-      case 'float':
-        return `${defaultValue.toString()} ${suffix}`
-      case 'boolean':
-        return Boolean(defaultValue) ? t('on') : t('off')
-      case 'str':
-        if ('choices' in runTimeParameter && runTimeParameter.choices != null) {
-          const choice = runTimeParameter.choices.find(
-            choice => choice.value === defaultValue
-          )
-          if (choice != null) {
-            return choice.displayName
-          }
-        }
-        break
-    }
-    return ''
-  }
-
   const formatRange = (
     runTimeParameter: RunTimeParameter,
     minMax: string
@@ -135,7 +109,9 @@ function ProtocolParameterItems({
                 <StyledText as="p">{parameter.displayName}</StyledText>
               </StyledTableCell>
               <StyledTableCell isLast={index === runTimeParameters.length - 1}>
-                <StyledText as="p">{formattedValue(parameter)}</StyledText>
+                <StyledText as="p">
+                  {formatRunTimeParameterValue(parameter, t)}
+                </StyledText>
               </StyledTableCell>
               <StyledTableCell isLast={index === runTimeParameters.length - 1}>
                 <StyledText as="p">

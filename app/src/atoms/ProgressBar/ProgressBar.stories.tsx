@@ -1,14 +1,14 @@
 import * as React from 'react'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   SecondaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../text'
 import { ProgressBar } from './index'
 
 import type { Story, Meta } from '@storybook/react'

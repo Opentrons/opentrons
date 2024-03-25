@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Flex,
-  TYPOGRAPHY,
-  SPACING,
-  RadioGroup,
   DIRECTION_COLUMN,
+  Flex,
+  RadioGroup,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import {
   resetUseTrashSurfaceForTipCal,
   setUseTrashSurfaceForTipCal,

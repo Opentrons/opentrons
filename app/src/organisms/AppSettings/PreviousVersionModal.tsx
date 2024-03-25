@@ -4,13 +4,13 @@ import {
   Box,
   Flex,
   JUSTIFY_FLEX_END,
-  SPACING,
   PrimaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { StyledText } from '../../atoms/text'
 
 export const UNINSTALL_APP_URL =
   'https://support.opentrons.com/s/article/Uninstall-the-Opentrons-App'

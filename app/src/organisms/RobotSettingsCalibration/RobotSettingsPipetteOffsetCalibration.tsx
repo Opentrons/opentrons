@@ -2,14 +2,14 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../atoms/text'
 import {
   useAttachedPipettesFromInstrumentsQuery,
   useIsFlex,

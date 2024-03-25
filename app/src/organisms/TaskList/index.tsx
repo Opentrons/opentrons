@@ -1,9 +1,6 @@
 import * as React from 'react'
 
 import {
-  Flex,
-  Icon,
-  Link,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
@@ -11,15 +8,18 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   FLEX_NONE,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'

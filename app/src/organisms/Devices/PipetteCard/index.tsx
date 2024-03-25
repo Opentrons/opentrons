@@ -3,18 +3,19 @@ import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Box,
-  Flex,
-  DIRECTION_ROW,
-  ALIGN_START,
-  DIRECTION_COLUMN,
-  SPACING,
-  TYPOGRAPHY,
-  COLORS,
-  useOnClickOutside,
-  InstrumentDiagram,
-  BORDERS,
   ALIGN_CENTER,
+  ALIGN_START,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  InstrumentDiagram,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+  useOnClickOutside,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -31,7 +32,6 @@ import {
 
 import { LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
-import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { InstrumentCard } from '../../../molecules/InstrumentCard'

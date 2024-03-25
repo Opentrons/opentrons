@@ -3,22 +3,23 @@ import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
 import {
-  Flex,
-  SPACING,
-  Icon,
+  ALIGN_CENTER,
+  BORDERS,
+  Btn,
   COLORS,
-  DIRECTION_ROW,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
+  DIRECTION_ROW,
+  DISPLAY_FLEX,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
   LabwareRender,
-  Btn,
-  BORDERS,
-  WELL_LABEL_OPTIONS,
   SIZE_AUTO,
-  DISPLAY_FLEX,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+  WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
@@ -34,7 +35,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '../../../../atoms/buttons'
-import { StyledText } from '../../../../atoms/text'
 import { SecureLabwareModal } from './SecureLabwareModal'
 
 import type {

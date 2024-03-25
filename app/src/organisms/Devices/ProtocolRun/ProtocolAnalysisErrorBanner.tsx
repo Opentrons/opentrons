@@ -3,20 +3,20 @@ import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
+  ALIGN_CENTER,
   Btn,
   Flex,
-  ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
-  SPACING,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../App/portal'
 import { Banner } from '../../../atoms/Banner'
 import { LegacyModal } from '../../../molecules/LegacyModal'
-import { StyledText } from '../../../atoms/text'
 
 import type { AnalysisError } from '@opentrons/shared-data'
 

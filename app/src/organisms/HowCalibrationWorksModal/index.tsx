@@ -4,22 +4,22 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Box,
-  Flex,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  Box,
   DIRECTION_COLUMN,
+  Flex,
+  PrimaryButton,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
-  PrimaryButton,
+  StyledText,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
 import RobotCalHelpImage from '../../assets/images/robot_calibration_help.png'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
 const ROBOT_CAL_HELP_ARTICLE =

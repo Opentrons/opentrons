@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   Box,
@@ -14,12 +16,11 @@ import {
   Overlay,
   POSITION_FIXED,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
-import { StyledText } from '../text'
-import { useTranslation } from 'react-i18next'
 
 export interface MultiSlideoutSpecs {
   currentStep: number

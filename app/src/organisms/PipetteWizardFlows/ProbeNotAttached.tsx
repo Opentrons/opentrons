@@ -1,20 +1,20 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
   Btn,
+  COLORS,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 import { css } from 'styled-components'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 
 interface ProbeNotAttachedProps {
