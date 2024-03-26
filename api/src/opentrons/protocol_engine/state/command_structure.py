@@ -12,7 +12,7 @@ from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
 
 @dataclass(frozen=True)
 class CommandEntry:
-    """An command entry in state, including its index in the list."""
+    """A command entry in state, including its index in the list."""
 
     command: Command
     index: int
@@ -20,6 +20,9 @@ class CommandEntry:
 
 @dataclass  # dataclass for __eq__() autogeneration.
 class CommandStructure:
+    _commands_by_id: Dict[str, CommandEntry]
+    """All command resources, in insertion order, mapped by their unique IDs."""
+
     _queued_command_ids: OrderedSet[str]
     """The IDs of queued commands, in FIFO order"""
 
@@ -29,14 +32,13 @@ class CommandStructure:
     _running_command_id: Optional[str]
     """The ID of the currently running command, if any"""
 
-    _commands_by_id: Dict[str, CommandEntry]
-    """All command resources, in insertion order, mapped by their unique IDs."""
+    _recently_dequeued_command_id: Optional[str]
+    """ID of the most recent command that was dequeued, if any"""
 
-    _failed_command: Optional[CommandEntry]
-    """The command, if any, that made the run fail and the index in the command list."""
+    _failed_command_id: Optional[str]
+    """ID of the command that made the run fail, if any"""
 
     def __init__(self) -> None:
-        self._running_command_id = None
         self._queued_command_ids = OrderedSet()
         self._queued_setup_command_ids = OrderedSet()
         self._commands_by_id = OrderedDict()
@@ -73,8 +75,17 @@ class CommandStructure:
         else:
             return self._commands_by_id[self._running_command_id]
 
+    def get_recently_dequeued_command(self) -> Optional[CommandEntry]:
+        if self._recently_dequeued_command_id is None:
+            return None
+        else:
+            return self._commands_by_id[self._recently_dequeued_command_id]
+
     def get_failed_command(self) -> Optional[CommandEntry]:
-        return self._failed_command
+        if self._failed_command_id is None:
+            return None
+        else:
+            return self._commands_by_id[self._failed_command_id]
 
     def get_queued_command_ids(self) -> OrderedSet[str]:
         return self._queued_command_ids
@@ -101,9 +112,9 @@ class CommandStructure:
         prev_entry = self.get_if_present(command.id)
 
         if prev_entry is None:
-            index = self.length()
+            next_index = self.length()
             self._commands_by_id[command.id] = CommandEntry(
-                index=index,
+                index=next_index,
                 command=command,
             )
         else:
@@ -118,6 +129,8 @@ class CommandStructure:
             self._running_command_id = command.id
         elif self._running_command_id == command.id:
             self._running_command_id = None
+            if command.status != CommandStatus.QUEUED:
+                self._recently_dequeued_command_id = command.id
 
     def fail(
         self, command_id: str, error_occurrence: ErrorOccurrence, failed_at: datetime
@@ -138,7 +151,7 @@ class CommandStructure:
             ),
         )
 
-        self._failed_command = self._commands_by_id[command_id]
+        self._failed_command_id = command_id
         if prev_entry.command.intent == CommandIntent.SETUP:
             other_command_ids_to_fail = self._queued_setup_command_ids
             self._queued_setup_command_ids.clear()

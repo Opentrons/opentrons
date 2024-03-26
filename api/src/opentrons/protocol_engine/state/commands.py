@@ -362,6 +362,7 @@ class CommandView(HasState[CommandState]):
             elif len(queued_command_ids) > 0:
                 # Get the most recently executed command,
                 # which we can find just before the first queued command.
+                # TOME: This finds the most recently executed command, which is what's before the first queued command by looking at the index property.
                 cursor = (
                     self._state.command_structure.get(queued_command_ids.head()).index
                     - 1
@@ -427,13 +428,15 @@ class CommandView(HasState[CommandState]):
     # Not to be confused with the ?cursor param to GET /runs/commands, which:
     # - HTTP docs say "MOST RECENTLY EXECUTED"
     # - Docs in this file say "MOST RECENTLY EXECUTED"
-    # - Implementation returns MOST RECENTLY EXECUTED
+    # - Implementation returns MOST RECENTLY EXECUTED -- NO, this actually returns currently running or MOST RECENTLY EXECUTED.
     def get_current(self) -> Optional[CurrentCommand]:
         """Return the "current" command, if any.
 
         The "current" command is the command that is currently executing,
         or the most recent command to have completed.
         """
+
+        # TOME: This returns either the running command, like above (although that actually computes the index),
         running_command = self._state.command_structure.get_running_command()
         if running_command:
             return CurrentCommand(
@@ -443,7 +446,13 @@ class CommandView(HasState[CommandState]):
                 index=running_command.index,
             )
 
-        # TOME: You can perhaps update this in the new store dynamically and just have this as a property? Is that difficult to do?
+        # TOME: Is the reason this is different is because it assumes the queue can have no command? It really seems to me
+        # that this logic is the same as get slice but way more time complex. If that's the case, you can probably move this into
+        # one method in command_structure, following the outline of get slice. Maybe return the command itself? Yeah, that
+        # seems good.
+
+        # This also means we should update the docs. We can also not make the lastRunCommandId take a cursor? Or we can.
+
         # TODO(mc, 2022-02-07): this is O(n) in the worst case for no good reason.
         # Resolve prior to JSONv6 support, where this will matter.
         for reverse_index, cid in enumerate(
@@ -512,6 +521,28 @@ class CommandView(HasState[CommandState]):
         """Get whether the protocol is running & queued commands should be executed."""
         return self._state.queue_status == QueueStatus.RUNNING
 
+    def get_final_command(self) -> Optional[Command]:
+        """Get the most recent command that has reached its final `status`. See get_command_is_final."""
+
+        # Here's what to do:
+        # 1) If run requested to stop, just return the last command in the store.
+        # 2) Iterate from the known most recently completed command IN THE FULL STORE forward until you hit QUEUED or
+        # the end of the store (so check status). The command before that point is what you want.
+
+        queued_commands = self._state.command_structure.get_queued_command_ids()
+        queued_setup_commands = (
+            self._state.command_structure.get_queued_setup_command_ids()
+        )
+        # TOME: Definitely ask for feedback here. I think a major difference is you have to check both queues, not just a single queue. I could be wrong about this, but that seems to be the case.
+        # You have the second part of the logic done -- returning the final command.
+        if self._state.run_result is not None:
+            return (
+                queued_commands.tail(None)
+                if queued_commands.tail(None).index
+                > queued_setup_commands.tail(None).index
+                else queued_setup_commands.tail(None)
+            )
+
     def get_command_is_final(self, command_id: str) -> bool:
         """Get whether a given command has reached its final `status`.
 
@@ -526,7 +557,8 @@ class CommandView(HasState[CommandState]):
             command_id: Command to check.
         """
         status = self.get(command_id).status
-
+        # TOME: This is the difference - if a command is queued and the run result is not None. I still think this belongs here,
+        # since, it's a run level concern. I don't think you should iterate backwards, just to be consistent with what exists.
         return (
             status == CommandStatus.SUCCEEDED
             or status == CommandStatus.FAILED
