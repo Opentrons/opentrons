@@ -1,5 +1,5 @@
 import pytest
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from opentrons.protocols.parameters.types import (
     AllowedTypes,
@@ -127,6 +127,70 @@ def test_validate_options_raises_name_error() -> None:
             [{"display_name": "Lorem ipsum dolor sit amet nam.", "value": "a"}],
             str,
         )
+
+
+@pytest.mark.parametrize(
+    ["value", "param_type", "result"],
+    [
+        (1.0, int, 1),
+        (1.1, int, 1.1),
+        (2.0, float, 2.0),
+        (2.2, float, 2.2),
+        ("3.0", str, "3.0"),
+        (True, bool, True),
+    ],
+)
+def test_ensure_value_type(
+    value: Union[float, bool, str], param_type: type, result: AllowedTypes
+) -> None:
+    """It should ensure the correct type is there, converting an float to ints."""
+    assert result == subject.ensure_value_type(value, param_type)
+
+
+@pytest.mark.parametrize(
+    ["value", "result"],
+    [(123, 123.0), (123.4, 123.4), (456.0, 456.0), ("789", "789")],
+)
+def test_ensure_enum_type(value: AllowedTypes, result: Union[float, str]) -> None:
+    """It should ensure the value is in the format of a valid enum choice value."""
+    assert result == subject.ensure_enum_type(value)
+
+
+def test_ensure_enum_type_raises() -> None:
+    """It should raise if given a bool for enum value."""
+    with pytest.raises(ParameterValueError):
+        subject.ensure_enum_type(True)
+
+
+@pytest.mark.parametrize(
+    ["param_type", "result"],
+    [(int, "int"), (float, "float"), (str, "str")],
+)
+def test_convert_type_string_for_enum(param_type: type, result: str) -> None:
+    """It should convert the type into a string for the EnumParameter model."""
+    assert result == subject.convert_type_string_for_enum(param_type)
+
+
+def test_convert_type_string_for_enum_raises() -> None:
+    """It should raise if given a bool to convert to an enum type string."""
+    with pytest.raises(ParameterValueError):
+        subject.convert_type_string_for_enum(bool)
+
+
+@pytest.mark.parametrize(["param_type", "result"], [(int, "int"), (float, "float")])
+def test_convert_type_string_for_num_param(param_type: type, result: str) -> None:
+    """It should convert the type into a string for the NumberParameter model."""
+    assert result == subject.convert_type_string_for_num_param(param_type)
+
+
+@pytest.mark.parametrize(
+    "param_type",
+    [str, bool],
+)
+def test_convert_type_string_for_num_param_raises(param_type: type) -> None:
+    """It should raise if given a bool or str to convert to an enum type string."""
+    with pytest.raises(ParameterValueError):
+        subject.convert_type_string_for_num_param(param_type)
 
 
 @pytest.mark.parametrize(

@@ -69,10 +69,10 @@ def ensure_value_type(
 def ensure_enum_type(value: AllowedTypes) -> Union[float, str]:
     """Ensure that the value that is sent over from the client is the expected type."""
     validated_value: Union[float, bool, str]
-    if isinstance(value, int):
-        validated_value = float(value)
-    elif isinstance(value, bool):
+    if isinstance(value, bool):
         raise ParameterValueError("Cannot send a boolean value as an enum type")
+    elif isinstance(value, int):
+        validated_value = float(value)
     else:
         validated_value = value
     return validated_value
