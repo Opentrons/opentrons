@@ -5,6 +5,14 @@ name = "pypi"
 
 [packages]
 abr-testing = { editable = true, path = "." }
+google-api-python-client = "==2.0"
+httplib2 = "==0.220"
+oauth2client = "==4.1.3"
+gspread = "==6.0.2"
+hardware-testing = {editable = true, path = "../hardware-testing"}
+opentrons = {editable = true, path = "./../api", extras=['flex-hardware']}
+opentrons-shared-data = {editable = true, path = "./../shared-data/python"}
+opentrons-hardware = {editable = true, path = "./../hardware", extras=['FLEX']}
 
 [dev-packages]
 atomicwrites = "==1.4.1"
