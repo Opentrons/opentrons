@@ -6,7 +6,9 @@ import { StyledText } from '../StyledText'
 import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Icon } from '../../icons'
+import { isTouchscreen } from '../../ui-style-constants/responsiveness'
 
+import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
@@ -19,6 +21,8 @@ export type ChipType =
   | 'warning'
 
 type ChipSize = 'medium' | 'small'
+
+type ChipConfig = 'web-medium' | 'web-small' | 'touch-medium' | 'touch-small'
 
 interface ChipProps extends StyleProps {
   /** Display background color? */
@@ -83,6 +87,17 @@ const CHIP_PROPS_BY_TYPE: Record<
   },
 }
 
+const WEB_MEDIUM_TEXT_STYLE = css`
+  font-size: ${TYPOGRAPHY.fontSizeH4};
+  line-height: ${TYPOGRAPHY.lineHeight20};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+`
+const WEB_SMALL_TEXT_STYLE = css`
+  font-size: ${TYPOGRAPHY.fontSizeLabel};
+  line-height: ${TYPOGRAPHY.lineHeight12};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+`
+
 export function Chip(props: ChipProps): JSX.Element {
   const {
     background,
@@ -98,6 +113,11 @@ export function Chip(props: ChipProps): JSX.Element {
       ? COLORS.transparent
       : CHIP_PROPS_BY_TYPE[type].backgroundColor
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
+  const chipConfig: ChipConfig = `${
+    isTouchscreen ? 'touch' : 'web'
+  }-${chipSize}`
+
+  console.log(`chipConfig`, chipConfig)
 
   const TOUCHSCREEN_MEDIUM_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing8} ${background === false ? 0 : SPACING.spacing16};
@@ -109,17 +129,53 @@ export function Chip(props: ChipProps): JSX.Element {
     grid-gap: ${SPACING.spacing4};
   `
 
+  const WEB_MEDIUM_CONTAINER_STYLE = css`
+    padding: ${SPACING.spacing2} ${background === false ? 0 : SPACING.spacing8};
+    grid-gap: ${SPACING.spacing4};
+  `
+
+  const WEB_SMALL_CONTAINER_STYLE = css`
+    padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing6};
+    grid-gap: ${SPACING.spacing4};
+  `
+
+  const CHIP_PROPS_BY_SIZE_AND_PLATFORM: Record<
+    ChipConfig,
+    {
+      containerStyle: FlattenSimpleInterpolation
+      textStyle: FlattenSimpleInterpolation
+      size: string
+    }
+  > = {
+    'web-medium': {
+      containerStyle: WEB_MEDIUM_CONTAINER_STYLE,
+      textStyle: WEB_MEDIUM_TEXT_STYLE,
+      size: '1rem',
+    },
+    'web-small': {
+      containerStyle: WEB_SMALL_CONTAINER_STYLE,
+      textStyle: WEB_SMALL_TEXT_STYLE,
+      size: '0.75rem',
+    },
+    'touch-medium': {
+      containerStyle: TOUCHSCREEN_MEDIUM_CONTAINER_STYLE,
+      textStyle: TYPOGRAPHY.bodyTextSemiBold,
+      size: '1.5rem',
+    },
+    'touch-small': {
+      containerStyle: TOUCHSCREEN_SMALL_CONTAINER_STYLE,
+      textStyle: TYPOGRAPHY.smallBodyTextSemiBold,
+      size: '1.25rem',
+    },
+  }
+
   return (
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={backgroundColor}
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
-      css={
-        chipSize === 'medium'
-          ? TOUCHSCREEN_MEDIUM_CONTAINER_STYLE
-          : TOUCHSCREEN_SMALL_CONTAINER_STYLE
-      }
+      css={CHIP_PROPS_BY_SIZE_AND_PLATFORM[chipConfig].containerStyle}
       data-testid={`Chip_${type}`}
       {...styleProps}
     >
@@ -128,15 +184,11 @@ export function Chip(props: ChipProps): JSX.Element {
           name={icon}
           color={CHIP_PROPS_BY_TYPE[type].iconColor}
           aria-label={`icon_${text}`}
-          size={chipSize === 'medium' ? '1.5rem' : '1.25rem'}
+          size={CHIP_PROPS_BY_SIZE_AND_PLATFORM[chipConfig].size}
         />
       ) : null}
       <StyledText
-        css={
-          chipSize === 'medium'
-            ? TYPOGRAPHY.bodyTextSemiBold
-            : TYPOGRAPHY.smallBodyTextSemiBold
-        }
+        css={CHIP_PROPS_BY_SIZE_AND_PLATFORM[chipConfig].textStyle}
         color={CHIP_PROPS_BY_TYPE[type].textColor}
       >
         {text}
