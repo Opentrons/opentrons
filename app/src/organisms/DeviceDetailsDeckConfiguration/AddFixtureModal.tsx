@@ -28,7 +28,6 @@ import {
   HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_CENTER_CUTOUTS,
-  SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_CUTOUTS,
   SINGLE_RIGHT_CUTOUTS,
   STAGING_AREA_CUTOUTS,
@@ -39,9 +38,7 @@ import {
   THERMOCYCLER_MODULE_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
-  THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
@@ -59,8 +56,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
-
-const GENERIC_WASTE_CHUTE_OPTION = 'WASTE_CHUTE'
+import { AttachedModule } from '@opentrons/api-client'
 
 type CutoutContents = Omit<CutoutConfig, 'cutoutId'>
 
@@ -106,11 +102,11 @@ export function AddFixtureModal({
     width: '26.75rem',
   }
 
-  const [configuredMods, unconfiguredMods] = partition(modulesData?.data, attachedMod => (
-    deckConfig.some(({ opentronsModuleSerialNumber }) => (
+  const unconfiguredMods = modulesData?.data.filter(attachedMod => (
+    !deckConfig.some(({ opentronsModuleSerialNumber }) => (
       attachedMod.serialNumber === opentronsModuleSerialNumber
     ))
-  ))
+  )) ?? []
 
   let availableFixtures: CutoutContents[] = []
   if (optionStage === 'fixtureOptions') {

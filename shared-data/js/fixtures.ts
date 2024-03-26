@@ -44,7 +44,6 @@ import type {
   AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
-  FlexAddressableAreaName,
   FlexModuleCutoutFixtureId,
   OT2CutoutId,
 } from '../deck'

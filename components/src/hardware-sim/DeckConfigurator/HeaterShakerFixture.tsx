@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { HEATERSHAKER_MODULE_V1, getModuleDisplayName } from '@opentrons/shared-data'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'

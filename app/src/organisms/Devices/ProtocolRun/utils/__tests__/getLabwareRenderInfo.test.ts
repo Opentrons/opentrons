@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { transfer_settings, ot2DeckDefV4 } from '@opentrons/shared-data'
+import { transfer_settings, ot2DeckDefV5 } from '@opentrons/shared-data'
 import { getLabwareRenderInfo } from '../getLabwareRenderInfo'
 import type {
   CompletedProtocolAnalysis,
@@ -8,7 +8,7 @@ import type {
 } from '@opentrons/shared-data'
 
 const protocolWithMagTempTC = (transfer_settings as unknown) as CompletedProtocolAnalysis
-const standardDeckDef = ot2DeckDefV4 as any
+const standardDeckDef = ot2DeckDefV5 as any
 
 describe('getLabwareRenderInfo', () => {
   it('should gather labware coordinates', () => {

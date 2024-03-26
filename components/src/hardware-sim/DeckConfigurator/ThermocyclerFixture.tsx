@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { TEMPERATURE_MODULE_V2, getModuleDisplayName } from '@opentrons/shared-data'
 import { Icon } from '../../icons'
 import { Btn, Text } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
