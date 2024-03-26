@@ -338,7 +338,7 @@ class CommandView(HasState[CommandState]):
         Replacing a command (to change its status, for example) keeps its place in the
         ordering.
         """
-        return self._state.command_structure.get_all()
+        return self._state.command_structure.get_all_commands()
 
     def get_slice(
         self,
@@ -358,6 +358,7 @@ class CommandView(HasState[CommandState]):
         if cursor is None:
             if running_command is not None:
                 cursor = running_command.index
+                # TOME: This defines the last command.
             elif len(queued_command_ids) > 0:
                 # Get the most recently executed command,
                 # which we can find just before the first queued command.
@@ -442,6 +443,7 @@ class CommandView(HasState[CommandState]):
                 index=running_command.index,
             )
 
+        # TOME: You can perhaps update this in the new store dynamically and just have this as a property? Is that difficult to do?
         # TODO(mc, 2022-02-07): this is O(n) in the worst case for no good reason.
         # Resolve prior to JSONv6 support, where this will matter.
         for reverse_index, cid in enumerate(
@@ -547,7 +549,7 @@ class CommandView(HasState[CommandState]):
         )
 
         if no_command_running and no_command_to_execute:
-            for command in self._state.command_structure.get_all():
+            for command in self._state.command_structure.get_all_commands():
                 if command.error and command.intent != CommandIntent.SETUP:
                     # TODO(tz, 7-11-23): avoid raising an error and return the status instead
                     raise ProtocolCommandFailedError(

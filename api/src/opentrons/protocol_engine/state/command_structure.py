@@ -8,7 +8,6 @@ from opentrons.protocol_engine.commands.command import CommandIntent, CommandSta
 from opentrons.protocol_engine.commands.command_unions import Command
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
-from opentrons.protocol_engine.state.commands import CommandSlice
 
 
 @dataclass(frozen=True)
@@ -21,9 +20,6 @@ class CommandEntry:
 
 @dataclass  # dataclass for __eq__() autogeneration.
 class CommandStructure:
-    _all_command_ids: List[str]
-    """All command IDs, in insertion order."""
-
     _queued_command_ids: OrderedSet[str]
     """The IDs of queued commands, in FIFO order"""
 
@@ -40,17 +36,16 @@ class CommandStructure:
     """The command, if any, that made the run fail and the index in the command list."""
 
     def __init__(self) -> None:
-        self._all_command_ids = []
         self._running_command_id = None
         self._queued_command_ids = OrderedSet()
         self._queued_setup_command_ids = OrderedSet()
         self._commands_by_id = OrderedDict()
 
     def length(self) -> int:
-        return len(self._all_command_ids)
+        return len(self._commands_by_id)
 
     def has(self, command_id: str) -> bool:
-        return command_id in self._all_command_ids
+        return command_id in self._commands_by_id
 
     def get(self, command_id: str) -> CommandEntry:
         try:
@@ -61,15 +56,16 @@ class CommandStructure:
     def get_if_present(self, command_id: str) -> Optional[CommandEntry]:
         return self._commands_by_id.get(command_id)
 
-    def get_all(self) -> List[Command]:
-        return [self._commands_by_id[cid].command for cid in self._all_command_ids]
+    def get_all_commands(self) -> List[Command]:
+        commands = list(self._commands_by_id.values())
+        return [command.command for command in commands]
 
     def get_all_ids(self) -> List[str]:
-        return [*self._all_command_ids]
+        return list(self._commands_by_id.keys())
 
     def get_slice(self, start: int, stop: int) -> List[Command]:
-        command_ids = self._all_command_ids[start:stop]
-        return [self._commands_by_id[command_id].command for command_id in command_ids]
+        commands = list(self._commands_by_id.values())[start:stop]
+        return [command.command for command in commands]
 
     def get_running_command(self) -> Optional[CommandEntry]:
         if self._running_command_id is None:
@@ -90,8 +86,7 @@ class CommandStructure:
         assert queued_command.status == CommandStatus.QUEUED
         assert not self.has(queued_command.id)
 
-        next_index = len(self._all_command_ids)
-        self._all_command_ids.append(queued_command.id)
+        next_index = self.length()
         self._commands_by_id[queued_command.id] = CommandEntry(
             index=next_index,
             command=queued_command,
@@ -106,8 +101,7 @@ class CommandStructure:
         prev_entry = self.get_if_present(command.id)
 
         if prev_entry is None:
-            index = len(self._all_command_ids)
-            self._all_command_ids.append(command.id)
+            index = self.length()
             self._commands_by_id[command.id] = CommandEntry(
                 index=index,
                 command=command,
