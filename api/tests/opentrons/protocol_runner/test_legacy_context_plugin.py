@@ -1,4 +1,5 @@
 """Tests for the PythonAndLegacyRunner's LegacyContextPlugin."""
+import unittest.mock
 import pytest
 from anyio import to_thread
 from decoy import Decoy, matchers
@@ -198,37 +199,22 @@ async def test_equipment_broker_messages(
 
     handler: Callable[[LegacyLabwareLoadInfo], None] = labware_handler_captor.value
 
-    load_info = LegacyLabwareLoadInfo(
-        labware_definition=minimal_labware_def,
-        labware_namespace="some_namespace",
-        labware_load_name="some_load_name",
-        labware_display_name=None,
-        labware_version=123,
-        deck_slot=DeckSlotName.SLOT_1,
-        on_module=False,
-        offset_id=None,
-    )
+    load_info = unittest.mock.sentinel.load_info
 
-    engine_command = pe_commands.Custom(
-        id="command-id",
-        key="command-key",
-        status=pe_commands.CommandStatus.RUNNING,
-        createdAt=datetime(year=2021, month=1, day=1),
-        params=pe_commands.CustomParams(message="hello"),  # type: ignore[call-arg]
-    )
+    action_1 = unittest.mock.sentinel.action_1
+    action_2 = unittest.mock.sentinel.action_2
+    action_3 = unittest.mock.sentinel.action_3
 
     decoy.when(
         mock_legacy_command_mapper.map_equipment_load(load_info=load_info)
-    ).then_return(
-        [pe_actions.SucceedCommandAction(command=engine_command, private_result=None)]
-    )
+    ).then_return([action_1, action_2, action_3])
 
     await to_thread.run_sync(handler, load_info)
 
     await subject.teardown()
 
     decoy.verify(
-        mock_action_dispatcher.dispatch(
-            pe_actions.SucceedCommandAction(command=engine_command, private_result=None)
-        ),
+        mock_action_dispatcher.dispatch(action_1),
+        mock_action_dispatcher.dispatch(action_2),
+        mock_action_dispatcher.dispatch(action_3),
     )
