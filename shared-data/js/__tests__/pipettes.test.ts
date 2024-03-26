@@ -77,7 +77,7 @@ describe('pipette data accessors', () => {
         channels: 1,
         displayCategory: 'FLEX',
         displayName: 'Flex 1-Channel 1000 μL',
-        dropTipConfigurations: { plungerEject: { current: 1, speed: 15 } },
+        dropTipConfigurations: { plungerEject: { current: 1, speed: 10 } },
         liquids: {
           default: {
             $otSharedSchema:
@@ -118,7 +118,7 @@ describe('pipette data accessors', () => {
         plungerHomingConfigurations: { current: 1, speed: 30 },
         plungerMotorConfigurations: { idle: 0.3, run: 1 },
         plungerPositionsConfigurations: {
-          default: { blowout: 76.5, bottom: 71.5, drop: 90.5, top: 0 },
+          default: { blowout: 76.5, bottom: 71.5, drop: 90.5, top: 0.5 },
         },
         quirks: [],
         shaftDiameter: 4.5,
