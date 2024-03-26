@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { formatRunTimeParameterValue } from '@opentrons/shared-data'
-import { BORDERS } from '../helix-design-system/'
+import { BORDERS } from '../helix-design-system'
 import { SPACING, TYPOGRAPHY } from '../ui-style-constants/index'
 import { StyledText } from '../atoms/StyledText'
 
