@@ -3,13 +3,19 @@ import inspect
 import pytest
 from decoy import Decoy
 from typing_extensions import Final
+from packaging.version import Version
 
 from opentrons.calibration_storage.ot3.models.v1 import CalibrationStatus
 from opentrons.calibration_storage.types import SourceType
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort, PortGroup
-from opentrons.hardware_control.modules import MagDeck, ModuleType, MagneticStatus
-from opentrons.hardware_control.modules import module_calibration
+from opentrons.hardware_control.modules import (
+    MagDeck,
+    ModuleType,
+    MagneticStatus,
+    module_calibration,
+)
+from opentrons.hardware_control.modules.mod_abc import parse_fw_version
 
 from opentrons.types import Point
 from opentrons.protocol_engine import ModuleModel
@@ -24,7 +30,6 @@ from robot_server.modules.module_models import (
     ModuleCalibrationData,
     UsbPort,
 )
-
 
 _HTTP_API_VERSION: Final = 3
 
@@ -69,6 +74,24 @@ async def test_get_modules_empty(
 
     assert result.content.data == []
     assert result.status_code == 200
+
+
+@pytest.mark.parametrize(
+    argnames=["device_version", "expected_result"],
+    argvalues=[
+        ["v1.0.4", Version("v1.0.4")],
+        ["v0.5.6", Version("v0.5.6")],
+        ["v1.0.4-dhfs", Version("v0.0.0")],
+        ["v3.0.dshjfd", Version("v0.0.0")],
+    ],
+)
+async def test_catch_invalid_fw_version(
+    decoy: Decoy,
+    device_version: str,
+    expected_result: bool,
+) -> None:
+    """Assert that invalid firmware versions prompt a valid Version object of v0.0.0."""
+    assert parse_fw_version(device_version) == expected_result
 
 
 async def test_get_modules_maps_data_and_id(
