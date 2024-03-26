@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Flex, COLORS, ICON_DATA_BY_NAME, SPACING } from '@opentrons/components'
+import { Flex, COLORS, SPACING } from '@opentrons/components'
 import { touchScreenViewport } from '../../DesignTokens/constants'
 import { Chip } from '.'
 import type { Story, Meta } from '@storybook/react'
@@ -28,7 +28,7 @@ export default {
       defaultValue: 'medium',
     },
     iconName: {
-      options: Object.keys(ICON_DATA_BY_NAME),
+      options: ['connection-status', 'ot-check', 'ot-alert'],
       control: {
         type: 'select',
       },
