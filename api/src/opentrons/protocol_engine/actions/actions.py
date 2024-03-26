@@ -6,8 +6,7 @@ reactions in objects that subscribe to the pipeline, like the StateStore.
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Union
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from typing import List, Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import DoorState
@@ -16,6 +15,8 @@ from opentrons.hardware_control.modules import LiveData
 from opentrons_shared_data.errors import EnumeratedError
 
 from ..commands import Command, CommandCreate, CommandPrivateResult
+from ..error_recovery_policy import ErrorRecoveryType
+from ..notes.notes import CommandNote
 from ..types import (
     LabwareOffsetCreate,
     ModuleDefinition,
@@ -156,6 +157,7 @@ class FailCommandAction:
     error_id: str
     failed_at: datetime
     error: EnumeratedError
+    notes: List[CommandNote]
     type: ErrorRecoveryType
 
 

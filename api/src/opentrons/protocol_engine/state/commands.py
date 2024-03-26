@@ -18,6 +18,7 @@ from opentrons.protocol_engine.actions.actions import (
     RunCommandAction,
 )
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from opentrons.protocol_engine.notes.notes import CommandNote
 
 from ..actions import (
     Action,
@@ -318,6 +319,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 command_id=action.command_id,
                 failed_at=action.failed_at,
                 error_occurrence=error_occurrence,
+                notes=action.notes,
             )
 
             self._state.failed_command = self._state.commands_by_id[action.command_id]
@@ -326,7 +328,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 other_command_ids_to_fail = self._state.queued_setup_command_ids
                 for id in other_command_ids_to_fail:
                     self._update_to_failed(
-                        command_id=id, failed_at=action.failed_at, error_occurrence=None
+                        command_id=id,
+                        failed_at=action.failed_at,
+                        error_occurrence=None,
+                        notes=None,
                     )
                 self._state.queued_setup_command_ids.clear()
             elif (
@@ -342,6 +347,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                             command_id=id,
                             failed_at=action.failed_at,
                             error_occurrence=None,
+                            notes=None,
                         )
                     self._state.queued_command_ids.clear()
                 else:
@@ -427,13 +433,18 @@ class CommandStore(HasState[CommandState], HandlesActions):
         command_id: str,
         failed_at: datetime,
         error_occurrence: Optional[ErrorOccurrence],
+        notes: Optional[List[CommandNote]],
     ) -> None:
         prev_entry = self._state.commands_by_id[command_id]
         updated_command = prev_entry.command.copy(
             update={
                 "completedAt": failed_at,
                 "status": CommandStatus.FAILED,
-                **({"error": error_occurrence} if error_occurrence else {}),
+                **({"error": error_occurrence} if error_occurrence is not None else {}),
+                # Assume we're not overwriting any existing notes because they can
+                # only be added when a command completes, and if we're failing this
+                # command, it wouldn't have completed before now.
+                **({"notes": notes} if notes is not None else {}),
             }
         )
         self._state.commands_by_id[command_id] = CommandEntry(
