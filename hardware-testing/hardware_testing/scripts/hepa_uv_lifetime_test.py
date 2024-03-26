@@ -39,7 +39,7 @@ MAX_RUN_TIME: int = 86400  # 24hrs
 try:
     ROBOT_NAME = subprocess.check_output(["hostnamectl", "--pretty"]).decode().strip()
 except Exception:
-    ROBOT_NAME = "HepaLifetime"
+    ROBOT_NAME = "HepaLife"
 
 
 log = logging.getLogger(ROBOT_NAME)
@@ -104,6 +104,7 @@ async def run_hepa_fan(
     fan_on: bool = False
     cycle: int = 1
     sleep_time: int = 0
+    success: bool = False
     while not event.is_set():
         try:
             if not run_forever and cycle > cycles:
@@ -119,7 +120,6 @@ async def run_hepa_fan(
                 success = await api.set_hepa_fan_state(
                     turn_on=True, duty_cycle=fan_duty_cycle
                 )
-                result["HEPA"][cycle] = success  # type: ignore
                 if not success:
                     log.error("Hepa Task: FAILED to turn ON fan.")
                     break
@@ -129,7 +129,6 @@ async def run_hepa_fan(
             if fan_off_time:
                 log.info(f"Hepa Task: Turning off fan for {fan_off_time} seconds")
                 success = await api.set_hepa_fan_state(turn_on=False, duty_cycle=0)
-                result["HEPA"][cycle] = success  # type: ignore
                 if not success:
                     log.error("Hepa Task: FAILED to turn OFF fan.")
                     break
@@ -155,7 +154,8 @@ async def run_hepa_fan(
     await asyncio.shield(_turn_off_fan(api))
 
     elapsed_time = datetime.datetime.now() - start_time
-    log.info(f"Hepa Task: Elapsed time={elapsed_time}")
+    log.info(f"Hepa Task: Cycles={cycle}, Elapsed time={elapsed_time}")
+    result["HEPA"] = {"elapsed_time": elapsed_time, "cycles": cycle, "success": success}  # type: ignore
 
 
 async def run_hepa_uv(
@@ -181,6 +181,7 @@ async def run_hepa_uv(
 
     uv_light_on: bool = False
     cycle: int = 1
+    success: bool = False
     while not event.is_set():
         try:
             if cycle > cycles:
@@ -197,7 +198,6 @@ async def run_hepa_uv(
                 success = await api.set_hepa_uv_state(
                     turn_on=True, uv_duration_s=light_on_time
                 )
-                result["UV"][cycle] = success  # type: ignore
                 if not success:
                     log.error("UV Task: FAILED to turned ON uv light.")
                     break
@@ -209,7 +209,6 @@ async def run_hepa_uv(
                     f"UV Task: Turning off the UV Light for {light_off_time} seconds"
                 )
                 success = await api.set_hepa_uv_state(turn_on=False, uv_duration_s=0)
-                result["UV"][cycle] = success  # type: ignore
                 if not success:
                     log.error("UV Task: FAILED to turned OFF uv light.")
                     break
@@ -225,7 +224,8 @@ async def run_hepa_uv(
     await asyncio.shield(_turn_off_uv(api))
 
     elapsed_time = datetime.datetime.now() - start_time
-    log.info(f"UV Task: Elapsed time={elapsed_time}")
+    log.info(f"UV Task: Cycles={cycle}, Elapsed time={elapsed_time}")
+    result["UV"] = {"elapsed_time": elapsed_time, "cycles": cycle, "success": success}  # type: ignore
 
 
 async def _control_task(
@@ -238,11 +238,12 @@ async def _control_task(
     """Checks robot status and cancels tasks."""
 
     def _handle_hepa_error(message: MessageDefinition, arbitration_id: ArbitrationId):
+        log.error(f"HEPA ERROR: {message}")
         if isinstance(message, ErrorMessage):
             try:
                 raise_from_error_message(message)
             except HepaUVFailedError as e:
-                log.info(f"HepaUV Failed, stopping UV task: {e}")
+                log.info(f"HepaUV Failed, canceling UV task: {e}")
                 uv_task.cancel()
 
     try:
@@ -260,7 +261,7 @@ async def _control_task(
                     event.set()
                     return
                 elif run_forever:
-                    log.info(f"Leave FAN on for {MAX_RUN_TIME} before ending script")
+                    log.info(f"Leave FAN on for {MAX_RUN_TIME}s before ending script")
                     await asyncio.sleep(MAX_RUN_TIME)
                     event.set()
                     return
@@ -314,20 +315,24 @@ async def _main(args: argparse.Namespace) -> None:
 
     # start the tasks
     try:
-        task = asyncio.gather(control_task, hepa_fan_task, hepa_uv_task)
-        await task
+        await asyncio.gather(control_task, hepa_fan_task, hepa_uv_task)
     finally:
         log.info("===================== RESULT ======================")
         for task, data in RESULT.items():
-            for cycle, success in data.items():
+            cycles = data.get("cycles")
+            if cycles is not None:
+                elapsed = data.get("elapsed_time", 0)
+                success = data.get("success", False)
                 msg = "PASSED" if success else "FAILED"
-                log.info(f"{task}: cycle={cycle} result={msg}")
-
+                log.info(f"{task}: cycles={cycles} elapsed={elapsed} {msg}")
         log.info("===================== RESULT =======================")
 
 
 def log_config(log_level: int) -> Dict:
     """Configure logging."""
+
+    dt = datetime.datetime.now().strftime("%Y%m%d%H%M")
+    filename: str = f"/var/log/hepauv_lifetime_{ROBOT_NAME}_{dt}.log"
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -339,7 +344,7 @@ def log_config(log_level: int) -> Dict:
             "main_log_handler": {
                 "class": "logging.handlers.RotatingFileHandler",
                 "formatter": "basic",
-                "filename": "/var/log/hepauv_lifetime.log",
+                "filename": filename,
                 "maxBytes": 5000000,
                 "level": log_level,
                 "backupCount": 3,
@@ -373,7 +378,7 @@ if __name__ == "__main__":
         help=(
             "Developer logging level. At DEBUG or below, logs are written "
             "to console; at INFO or above, logs are only written to "
-            "/var/log/hepauv_lifetime.log"
+            "/var/log/hepa_lifetime_(robot_name)_(datetime).log"
         ),
         type=str,
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
