@@ -266,6 +266,7 @@ class ProtocolEngine:
                 error_id=self._model_utils.generate_id(),
                 failed_at=self._model_utils.get_timestamp(),
                 error=EStopActivatedError(message="Estop Activated"),
+                notes=[],
                 type=ErrorRecoveryType.FAIL_RUN,
             )
             self._action_dispatcher.dispatch(fail_action)
@@ -279,6 +280,7 @@ class ProtocolEngine:
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
                     error=EStopActivatedError(message="Estop Activated"),
+                    notes=[],
                     type=ErrorRecoveryType.FAIL_RUN,
                 )
                 self._action_dispatcher.dispatch(fail_action)

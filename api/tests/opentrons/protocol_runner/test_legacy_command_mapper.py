@@ -159,6 +159,7 @@ def test_map_after_with_error_command() -> None:
                 LegacyContextCommandError,
                 match="oh no",
             ),
+            notes=[],
             type=ErrorRecoveryType.FAIL_RUN,
         )
     ]
@@ -253,6 +254,7 @@ def test_command_stack() -> None:
             error_id=matchers.IsA(str),
             failed_at=matchers.IsA(datetime),
             error=matchers.ErrorMatching(LegacyContextCommandError, "oh no"),
+            notes=[],
             type=ErrorRecoveryType.FAIL_RUN,
         ),
     ]

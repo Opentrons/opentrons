@@ -9,6 +9,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import RunCommandAction
+from opentrons.protocol_engine.notes.notes import CommandNote
 from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.types import DoorState
 
@@ -446,6 +447,14 @@ def test_command_failure_clears_queues() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
+        notes=[
+            CommandNote(
+                noteKind="noteKind",
+                shortMessage="shortMessage",
+                longMessage="longMessage",
+                source="source",
+            )
+        ],
         type=ErrorRecoveryType.FAIL_RUN,
     )
 
@@ -459,6 +468,14 @@ def test_command_failure_clears_queues() -> None:
             errorType="ProtocolEngineError",
             detail="oh no",
         ),
+        notes=[
+            CommandNote(
+                noteKind="noteKind",
+                shortMessage="shortMessage",
+                longMessage="longMessage",
+                source="source",
+            )
+        ],
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
         completedAt=datetime(year=2023, month=3, day=3),
@@ -542,6 +559,14 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
+        notes=[
+            CommandNote(
+                noteKind="noteKind",
+                shortMessage="shortMessage",
+                longMessage="longMessage",
+                source="source",
+            )
+        ],
         type=ErrorRecoveryType.FAIL_RUN,
     )
     expected_failed_cmd_2 = commands.WaitForResume(
@@ -554,6 +579,14 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
             detail="oh no",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
         ),
+        notes=[
+            CommandNote(
+                noteKind="noteKind",
+                shortMessage="shortMessage",
+                longMessage="longMessage",
+                source="source",
+            )
+        ],
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
         completedAt=datetime(year=2023, month=3, day=3),
@@ -626,6 +659,14 @@ def test_nonfatal_command_failure() -> None:
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError(message="oh no"),
+        notes=[
+            CommandNote(
+                noteKind="noteKind",
+                shortMessage="shortMessage",
+                longMessage="longMessage",
+                source="source",
+            )
+        ],
         type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
     )
 
@@ -639,6 +680,14 @@ def test_nonfatal_command_failure() -> None:
             errorType="ProtocolEngineError",
             detail="oh no",
         ),
+        notes=[
+            CommandNote(
+                noteKind="noteKind",
+                shortMessage="shortMessage",
+                longMessage="longMessage",
+                source="source",
+            )
+        ],
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
         completedAt=datetime(year=2023, month=3, day=3),
@@ -1174,7 +1223,14 @@ def test_command_store_handles_command_failed() -> None:
         params=commands.CommentParams(message="hello, world"),
         result=None,
         error=expected_error_occurrence,
-        notes=None,
+        notes=[
+            CommandNote(
+                noteKind="noteKind",
+                shortMessage="shortMessage",
+                longMessage="longMessage",
+                source="source",
+            )
+        ],
     )
 
     subject = CommandStore(is_door_open=False, config=_make_config())
@@ -1202,6 +1258,14 @@ def test_command_store_handles_command_failed() -> None:
             error_id=expected_error_occurrence.id,
             failed_at=expected_error_occurrence.createdAt,
             error=errors.ProtocolEngineError(message="oh no"),
+            notes=[
+                CommandNote(
+                    noteKind="noteKind",
+                    shortMessage="shortMessage",
+                    longMessage="longMessage",
+                    source="source",
+                )
+            ],
             type=ErrorRecoveryType.FAIL_RUN,
         )
     )

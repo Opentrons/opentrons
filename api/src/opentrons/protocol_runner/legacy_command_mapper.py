@@ -261,6 +261,7 @@ class LegacyCommandMapper:
                         error_id=ModelUtils.generate_id(),
                         failed_at=now,
                         error=LegacyContextCommandError(command_error),
+                        notes=[],
                         # For legacy protocols, we don't attempt to support any kind
                         # of error recovery at the Protocol Engine level.
                         # These protocols only run on the OT-2, which doesn't have
