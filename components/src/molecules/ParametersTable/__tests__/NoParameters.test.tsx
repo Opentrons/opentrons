@@ -2,8 +2,8 @@ import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 
-import { renderWithProviders } from '../../testing/utils'
-import { BORDERS, COLORS } from '../../helix-design-system'
+import { renderWithProviders } from '../../../testing/utils'
+import { BORDERS, COLORS } from '../../../helix-design-system'
 import { NoParameters } from '../NoParameters'
 
 const render = (props: React.ComponentProps<typeof NoParameters>) => {

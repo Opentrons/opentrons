@@ -1,11 +1,11 @@
 import * as React from 'react'
 
-import { BORDERS, COLORS } from '../helix-design-system'
-import { SPACING, TYPOGRAPHY } from '../ui-style-constants/index'
-import { StyledText } from '../atoms/StyledText'
-import { Icon } from '../icons'
-import { Flex } from '../primitives'
-import { ALIGN_CENTER, DIRECTION_COLUMN } from '../styles'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
+import { StyledText } from '../../atoms/StyledText'
+import { Icon } from '../../icons'
+import { Flex } from '../../primitives'
+import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 
 interface NoParametersProps {
   t?: any

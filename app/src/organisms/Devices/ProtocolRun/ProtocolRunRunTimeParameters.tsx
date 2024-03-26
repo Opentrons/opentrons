@@ -10,10 +10,10 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  NoParameters,
   SPACING,
   StyledText,
   TYPOGRAPHY,
+  NoParameters,
 } from '@opentrons/components'
 
 import { Banner } from '../../../atoms/Banner'

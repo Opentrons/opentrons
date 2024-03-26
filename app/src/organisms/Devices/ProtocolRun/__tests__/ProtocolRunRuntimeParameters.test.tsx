@@ -14,10 +14,9 @@ import type {
   CompletedProtocolAnalysis,
   RunTimeParameter,
 } from '@opentrons/shared-data'
-import type * as Components from '@opentrons/components'
 
 vi.mock('@opentrons/components', async importOriginal => {
-  const actual = await importOriginal<typeof Components>()
+  const actual = await importOriginal<typeof NoParameters>()
   return {
     ...actual,
     NoParameters: vi.fn(),
