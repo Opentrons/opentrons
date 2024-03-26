@@ -114,6 +114,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                 pipetteId={formData.pipette}
                 flowRateType="aspirate"
                 volume={propsForFields.volume.value}
+                tiprack={propsForFields.tiprack.value}
               />
               <TipPositionField
                 {...propsForFields.mix_mmFromBottom}
@@ -159,6 +160,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                 pipetteId={formData.pipette}
                 flowRateType="dispense"
                 volume={propsForFields.volume.value}
+                tiprack={propsForFields.tiprack.value}
               />
             </div>
             <div className={styles.checkbox_column}>

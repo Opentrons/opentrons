@@ -85,6 +85,7 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
                 pipetteId={getPipetteIdForForm()}
                 flowRateType="aspirate"
                 volume={propsForFields.volume.value}
+                tiprack={propsForFields.tiprack.value}
               />
               <TipPositionField
                 {...propsForFields.mix_mmFromBottom}
@@ -127,6 +128,7 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
                 pipetteId={getPipetteIdForForm()}
                 flowRateType="dispense"
                 volume={propsForFields.volume.value}
+                tiprack={propsForFields.tiprack.value}
               />
             </Box>
             <DelayFields
