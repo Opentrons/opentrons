@@ -124,7 +124,8 @@ class QueueCommandAction:
 class RunCommandAction:
     """Mark a given command as running.
 
-    The command must be queued immediately prior to this action.
+    At the time of dispatching this action, the command must be queued,
+    and no other command may be running.
     """
 
     command_id: str
@@ -135,7 +136,7 @@ class RunCommandAction:
 class SucceedCommandAction:
     """Mark a given command as succeeded.
 
-    The command must be running immediately prior to this action.
+    At the time of dispatching this action, the command must be running.
     """
 
     command: Command
@@ -148,7 +149,7 @@ class SucceedCommandAction:
 class FailCommandAction:
     """Mark a given command as failed.
 
-    The command must be running immediately prior to this action.
+    At the time of dispatching this action, the command must be running.
     """
 
     command_id: str
