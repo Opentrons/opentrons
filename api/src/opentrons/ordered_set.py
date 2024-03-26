@@ -100,38 +100,6 @@ class OrderedSet(Generic[_SetElementT]):
             else:
                 return default_value
 
-    @overload
-    def tail(self) -> _SetElementT:
-        ...
-
-    @overload
-    def tail(
-        self, default_value: _DefaultValueT
-    ) -> Union[_SetElementT, _DefaultValueT]:
-        ...
-
-    def tail(
-        self, default_value: Union[_DefaultValueT, _NOT_SPECIFIED] = _NOT_SPECIFIED()
-    ) -> Union[_SetElementT, _DefaultValueT]:
-        """Get the tail (newest-added element) of the set.
-
-        Args:
-            default_value: A value to return if set is empty.
-
-        Returns:
-            The tail of the set, or the default value, if specified.
-
-        Raises:
-            IndexError: set is empty and default was not specified.
-        """
-        try:
-            return next(reversed(self._elements))
-        except StopIteration:
-            if isinstance(default_value, _NOT_SPECIFIED):
-                raise IndexError("Set is empty") from None
-            else:
-                return default_value
-
     def __iter__(self) -> Iterator[_SetElementT]:
         """Enable iteration over all elements in the set.
 

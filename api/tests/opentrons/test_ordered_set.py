@@ -138,21 +138,6 @@ def test_head() -> None:
     assert subject.head(default_value=42) == 42
 
 
-def test_tail() -> None:
-    """It should return the tail of the set."""
-    subject = OrderedSet([1, 2])
-    assert subject.tail() == 2
-
-    subject.remove(2)
-    assert subject.tail() == 1
-
-    subject.remove(1)
-    with pytest.raises(IndexError, match="Set is empty"):
-        subject.tail()
-
-    assert subject.tail(default_value=42) == 42
-
-
 def test_difference() -> None:
     """It should return the set difference, preserving order."""
     a = OrderedSet([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9])
