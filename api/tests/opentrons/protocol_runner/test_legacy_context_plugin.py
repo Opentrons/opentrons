@@ -219,7 +219,9 @@ async def test_equipment_broker_messages(
 
     decoy.when(
         mock_legacy_command_mapper.map_equipment_load(load_info=load_info)
-    ).then_return((engine_command, None))
+    ).then_return(
+        [pe_actions.SucceedCommandAction(command=engine_command, private_result=None)]
+    )
 
     await to_thread.run_sync(handler, load_info)
 
