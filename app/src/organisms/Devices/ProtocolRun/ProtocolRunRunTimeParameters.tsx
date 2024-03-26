@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -12,14 +13,13 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
+  NoParameters,
 } from '@opentrons/components'
 
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
 // import { Chip } from '../../../atoms/Chip'
-import { NoParameter } from '../../ProtocolDetails/ProtocolParameters/NoParameter'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { formatRunTimeParameterValue } from '../../ProtocolDetails/ProtocolParameters/utils'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -221,7 +221,7 @@ export function ProtocolRunRuntimeParameters({
       </Flex>
       {!hasParameter ? (
         <Flex padding={SPACING.spacing16}>
-          <NoParameter />
+          <NoParameters t={t} />
         </Flex>
       ) : (
         <>
