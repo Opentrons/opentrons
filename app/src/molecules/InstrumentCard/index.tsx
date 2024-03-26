@@ -2,6 +2,7 @@ import * as React from 'react'
 
 import {
   ALIGN_FLEX_START,
+  ALIGN_CENTER,
   BORDERS,
   Box,
   COLORS,
@@ -80,13 +81,19 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         </Flex>
       ) : null}
       {instrumentDiagramProps?.pipetteSpecs != null ? (
-        <InstrumentDiagram
-          pipetteSpecs={instrumentDiagramProps.pipetteSpecs}
-          mount={instrumentDiagramProps.mount}
-          transform="scale(0.3)"
-          size="3.125rem"
-          transformOrigin="20% -10%"
-        />
+        <Flex
+          alignItems={ALIGN_CENTER}
+          width="3.75rem"
+          height="3.375rem"
+          paddingRight={SPACING.spacing8}
+        >
+          <InstrumentDiagram
+            pipetteSpecs={instrumentDiagramProps.pipetteSpecs}
+            mount={instrumentDiagramProps.mount}
+            transform="scale(0.3)"
+            transformOrigin={'-5% 52%'}
+          />
+        </Flex>
       ) : null}
       <Flex
         alignItems={ALIGN_FLEX_START}
