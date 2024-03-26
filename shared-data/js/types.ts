@@ -400,11 +400,11 @@ export interface PipetteV2GeneralSpecs {
   displayCategory: PipetteDisplayCategory
   pickUpTipConfigurations: {
     pressFit: {
-      speedByTipCount: Record<number, string>
+      speedByTipCount: Record<string, number>
       presses: number
       increment: number
-      distanceByTipCount: Record<number, string>
-      currentByTipCount: Record<number, string>
+      distanceByTipCount: Record<string, number>
+      currentByTipCount: Record<string, number>
     }
   }
   dropTipConfigurations: {
@@ -435,7 +435,7 @@ export interface PipetteV2GeneralSpecs {
     partialTipSupported: boolean
     availableConfigurations: number[] | null
   }
-  channels: number
+  channels: PipetteChannels
   shaftDiameter: number
   shaftULperMM: number
   backCompatNames: string[]
@@ -463,36 +463,33 @@ export interface PipetteV2GeometrySpecs {
   nozzleMap: Record<string, number[]>
 }
 
-type TipData = [number, number, number]
-interface SupportedTips {
-  [tipType: string]: {
-    aspirate: {
-      default: {
-        1: TipData
-      }
-    }
-    defaultAspirateFlowRate: {
-      default: number
-      valuesByApiLevel: Record<string, number>
-    }
-    defaultBlowOutFlowRate: {
-      default: number
-      valuesByApiLevel: Record<string, number>
-    }
-    defaultDispenseFlowRate: {
-      default: number
-      valuesByApiLevel: Record<string, number>
-    }
-    defaultFlowAcceleration: number
-    defaultPushOutVolume: number
-    defaultReturnTipHeight: number
-    defaultTipLength: number
-    dispense: {
-      default: {
-        1: TipData
-      }
-    }
+export interface SupportedTip {
+  aspirate: {
+    default: Record<string, number[][]>
   }
+  defaultAspirateFlowRate: {
+    default: number
+    valuesByApiLevel: Record<string, number>
+  }
+  defaultBlowOutFlowRate: {
+    default: number
+    valuesByApiLevel: Record<string, number>
+  }
+  defaultDispenseFlowRate: {
+    default: number
+    valuesByApiLevel: Record<string, number>
+  }
+  defaultPushOutVolume: number
+  defaultTipLength: number
+  dispense: {
+    default: Record<string, number[][]>
+  }
+  defaultReturnTipHeight?: number
+  defaultFlowAcceleration?: number
+}
+
+export interface SupportedTips {
+  [tipType: string]: SupportedTip
 }
 
 export interface PipetteV2LiquidSpecs {
