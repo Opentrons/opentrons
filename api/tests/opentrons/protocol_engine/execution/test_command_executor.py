@@ -10,7 +10,6 @@ from pydantic import BaseModel
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.actions.actions import RunCommandAction
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
     ErrorRecoveryType,
@@ -22,6 +21,7 @@ from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
+    RunCommandAction,
     SucceedCommandAction,
     FailCommandAction,
 )
