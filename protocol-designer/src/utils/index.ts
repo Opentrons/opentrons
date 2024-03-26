@@ -203,11 +203,9 @@ export function getMatchingTipLiquidSpecs(
   volume: number,
   tiprack: string
 ): SupportedTip {
-  console.log('tiprack', tiprack)
   const matchingLabwareDef = Object.values(
     pipetteEntity.tiprackLabwareDef
   ).find(def => tiprack.includes(def.parameters.loadName))
-  console.log('matchingLabwareDef', matchingLabwareDef)
 
   console.assert(
     matchingLabwareDef,
