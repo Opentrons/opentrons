@@ -10405,5 +10405,6 @@
       "pipetteName": "p1000_96"
     }
   ],
-  "robotType": "OT-3 Standard"
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
 }

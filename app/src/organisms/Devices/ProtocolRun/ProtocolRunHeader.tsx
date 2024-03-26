@@ -14,7 +14,7 @@ import {
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RunStatus,
+  RUN_STATUS_AWAITING_RECOVERY,
 } from '@opentrons/api-client'
 import {
   useModulesQuery,
@@ -36,7 +36,6 @@ import {
   DISPLAY_FLEX,
   Flex,
   Icon,
-  IconName,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
@@ -45,6 +44,7 @@ import {
   SecondaryButton,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useHoverTooltip,
@@ -68,7 +68,6 @@ import {
   ANALYTICS_PROTOCOL_RUN_RESUME,
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
-import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useCloseCurrentRun,
@@ -107,12 +106,13 @@ import { getIsFixtureMismatch } from '../../../resources/deck_configuration/util
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../resources/runs'
 
-import type { Run, RunError } from '@opentrons/api-client'
+import type { Run, RunError, RunStatus } from '@opentrons/api-client'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { IconName } from '@opentrons/components'
 import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 interface PipettesWithTip {
   mount: 'left' | 'right'
@@ -126,6 +126,7 @@ const CANCELLABLE_STATUSES = [
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
+  RUN_STATUS_AWAITING_RECOVERY,
 ]
 const RUN_OVER_STATUSES: RunStatus[] = [
   RUN_STATUS_FAILED,
@@ -325,7 +326,7 @@ export function ProtocolRunHeader({
       <Flex
         ref={protocolRunHeaderRef}
         backgroundColor={COLORS.white}
-        borderRadius={BORDERS.borderRadiusSize2}
+        borderRadius={BORDERS.borderRadius8}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
         marginBottom={SPACING.spacing16}
@@ -429,6 +430,7 @@ export function ProtocolRunHeader({
             display="grid"
             gridTemplateColumns="4fr 6fr 4fr"
             padding={SPACING.spacing8}
+            borderRadius={BORDERS.borderRadius4}
           >
             <LabeledValue
               label={t('protocol_start')}

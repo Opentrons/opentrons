@@ -3,9 +3,9 @@ import { renderHook } from '@testing-library/react'
 import { describe, it, afterEach, expect, vi } from 'vitest'
 
 import { useCurrentRunId } from '../useCurrentRunId'
-import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 
-vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+vi.mock('../../../../resources/runs')
 
 describe('useCurrentRunId hook', () => {
   afterEach(() => {

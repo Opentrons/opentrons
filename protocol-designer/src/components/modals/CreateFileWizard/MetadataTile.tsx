@@ -115,7 +115,7 @@ const DescriptionField = styled.textarea`
   min-height: 5rem;
   width: 100%;
   border: ${BORDERS.lineBorder};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   padding: ${SPACING.spacing8};
   font-size: ${TYPOGRAPHY.fontSizeP};
   resize: none;

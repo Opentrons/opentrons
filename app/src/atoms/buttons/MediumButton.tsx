@@ -6,13 +6,13 @@ import {
   Btn,
   COLORS,
   DIRECTION_ROW,
-  Icon,
-  SPACING,
-  TYPOGRAPHY,
   DISPLAY_FLEX,
+  Icon,
   JUSTIFY_CENTER,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 
 import type { IconName, StyleProps } from '@opentrons/components'
@@ -107,8 +107,8 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
       .defaultBackgroundColor};
     border-radius: ${buttonCategory === 'rounded'
-      ? BORDERS.borderRadiusSize5
-      : BORDERS.borderRadiusSize4};
+      ? BORDERS.borderRadius40
+      : BORDERS.borderRadius16};
     box-shadow: none;
     color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     cursor: default;

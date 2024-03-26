@@ -256,13 +256,15 @@ class OT3API(
         the last moved mount.
         """
         realmount = OT3Mount.from_mount(mount)
-        if not self._last_moved_mount or realmount == self._last_moved_mount:
-            return False
-
-        return (
+        if realmount == OT3Mount.GRIPPER or (
             realmount == OT3Mount.LEFT
             and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
-        ) or (realmount == OT3Mount.GRIPPER)
+        ):
+            ax = Axis.by_mount(realmount)
+            if ax in self.engaged_axes.keys():
+                return not self.engaged_axes[ax]
+
+        return False
 
     @property
     def door_state(self) -> DoorState:
@@ -411,7 +413,7 @@ class OT3API(
             Dict[OT3Mount, Dict[str, Optional[str]]],
             Dict[top_types.Mount, Dict[str, Optional[str]]],
         ] = None,
-        attached_modules: Optional[List[str]] = None,
+        attached_modules: Optional[Dict[str, List[str]]] = None,
         config: Union[RobotConfig, OT3Config, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
@@ -425,7 +427,7 @@ class OT3API(
         if feature_flags is None:
             feature_flags = HardwareFeatureFlags()
 
-        checked_modules = attached_modules or []
+        checked_modules = attached_modules or {}
 
         checked_loop = use_or_initialize_loop(loop)
         if not isinstance(config, OT3Config):
@@ -1317,29 +1319,33 @@ class OT3API(
         the 96-channel or gripper mount if it is about to move.
         """
         last_moved = self._last_moved_mount
-        if self.is_idle_mount(mount):
-            # home the left/gripper mount if it is current disengaged
-            await self.home_z(mount)
-
-        if mount != last_moved and last_moved:
-            await self.retract(last_moved, 10)
-
-            # disengage Axis.Z_L motor and engage the brake to lower power
-            # consumption and reduce the chance of the 96-channel pipette dropping
-            if (
-                self.gantry_load == GantryLoad.HIGH_THROUGHPUT
-                and last_moved == OT3Mount.LEFT
-            ):
-                await self.disengage_axes([Axis.Z_L])
-
-            # disegnage Axis.Z_G when we can to reduce the chance of
-            # the gripper dropping
-            if last_moved == OT3Mount.GRIPPER:
-                await self.disengage_axes([Axis.Z_G])
-
-        if mount != OT3Mount.GRIPPER:
+        # if gripper exists and it's not the moving mount, it should retract
+        if (
+            self.has_gripper()
+            and mount != OT3Mount.GRIPPER
+            and not self.is_idle_mount(OT3Mount.GRIPPER)
+        ):
+            await self.retract(OT3Mount.GRIPPER, 10)
+            await self.disengage_axes([Axis.Z_G])
             await self.idle_gripper()
 
+        # if 96-channel pipette is attached and not being moved, it should retract
+        if (
+            mount != OT3Mount.LEFT
+            and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
+            and not self.is_idle_mount(OT3Mount.LEFT)
+        ):
+            await self.retract(OT3Mount.LEFT, 10)
+            await self.disengage_axes([Axis.Z_L])
+
+        # if the last moved mount is not covered in neither of the above scenario,
+        # simply retract the last moved mount
+        if last_moved and not self.is_idle_mount(last_moved) and mount != last_moved:
+            await self.retract(last_moved, 10)
+
+        # finally, home the current left/gripper mount to prepare for movement
+        if self.is_idle_mount(mount):
+            await self.home_z(mount)
         self._last_moved_mount = mount
 
     async def prepare_for_mount_movement(
@@ -1479,6 +1485,22 @@ class OT3API(
         target_pos = {axis: self._backend.home_position()[axis]}
         return origin_pos, target_pos
 
+    async def _enable_before_update_estimation(self, axis: Axis) -> None:
+        enabled = await self._backend.is_motor_engaged(axis)
+
+        if not enabled:
+            if axis == Axis.Z_L and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
+                # we're here if the left mount has been idle and the brake is engaged
+                # we want to temporarily increase its hold current to prevent the z
+                # stage from dropping when switching off the ebrake
+                async with self._backend.increase_z_l_hold_current():
+                    await self.engage_axes([axis])
+            else:
+                await self.engage_axes([axis])
+
+        # now that motor is enabled, we can update position estimation
+        await self._update_position_estimation([axis])
+
     @_adjust_high_throughput_z_current
     async def _home_axis(self, axis: Axis) -> None:
         """
@@ -1500,22 +1522,12 @@ class OT3API(
         assert axis not in [Axis.G, Axis.Q]
 
         encoder_ok = self._backend.check_encoder_status([axis])
-        motor_ok = self._backend.check_motor_status([axis])
-
         if encoder_ok:
-            # ensure stepper position can be updated after boot
-            if axis == Axis.Z_L and self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
-                # we're here if the left mount has been idle and the brake is engaged
-                # we want to temporarily increase its hold current to prevent the z
-                # stage from dropping when switching off the ebrake
-                async with self._backend.increase_z_l_hold_current():
-                    await self.engage_axes([axis])
-            else:
-                await self.engage_axes([axis])
-            await self._update_position_estimation([axis])
-            # refresh motor and encoder statuses after position estimation update
-            motor_ok = self._backend.check_motor_status([axis])
-            encoder_ok = self._backend.check_encoder_status([axis])
+            # enable motor (if needed) and update estimation
+            await self._enable_before_update_estimation(axis)
+
+        # refresh motor status after position estimation update
+        motor_ok = self._backend.check_motor_status([axis])
 
         if Axis.to_kind(axis) == OT3AxisKind.P:
             await self._set_plunger_current_and_home(axis, motor_ok, encoder_ok)
@@ -1547,22 +1559,21 @@ class OT3API(
 
     async def _home(self, axes: Sequence[Axis]) -> None:
         """Home one axis at a time."""
-        async with self._motion_lock:
-            for axis in axes:
-                try:
-                    if axis == Axis.G:
-                        await self.home_gripper_jaw()
-                    elif axis == Axis.Q:
-                        await self._backend.home([axis], self.gantry_load)
-                    else:
-                        await self._home_axis(axis)
-                except BaseException as e:
-                    self._log.exception(f"Homing failed: {e}")
-                    self._current_position.clear()
-                    raise
+        for axis in axes:
+            try:
+                if axis == Axis.G:
+                    await self.home_gripper_jaw()
+                elif axis == Axis.Q:
+                    await self._backend.home([axis], self.gantry_load)
                 else:
-                    await self._cache_current_position()
-                    await self._cache_encoder_position()
+                    await self._home_axis(axis)
+            except BaseException as e:
+                self._log.exception(f"Homing failed: {e}")
+                self._current_position.clear()
+                raise
+            else:
+                await self._cache_current_position()
+                await self._cache_encoder_position()
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
@@ -1593,7 +1604,8 @@ class OT3API(
             if (ax in checked_axes and self._backend.axis_is_present(ax))
         ]
         self._log.info(f"home was called with {axes} generating sequence {home_seq}")
-        await self._home(home_seq)
+        async with self._motion_lock:
+            await self._home(home_seq)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
@@ -2560,7 +2572,8 @@ class OT3API(
             probe_settings.mount_speed,
             (probe_settings.plunger_speed * plunger_direction),
             probe_settings.sensor_threshold_pascals,
-            probe_settings.log_pressure,
+            probe_settings.output_option,
+            probe_settings.data_file,
             probe_settings.auto_zero_sensor,
             probe_settings.num_baseline_reads,
             probe=probe if probe else InstrumentProbeType.PRIMARY,

@@ -1,19 +1,18 @@
 import * as React from 'react'
 import {
-  Flex,
-  Icon,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 export interface InfoMessageProps {
   title: string
@@ -26,7 +25,7 @@ export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
       backgroundColor={COLORS.blue30}
       flexDirection={DIRECTION_ROW}
       alignItems={body != null ? ALIGN_FLEX_START : ALIGN_CENTER}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadius4}
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing16}
       data-testid={`InfoMessage_${title}`}

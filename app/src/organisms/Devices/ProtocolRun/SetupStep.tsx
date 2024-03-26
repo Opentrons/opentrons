@@ -2,20 +2,19 @@ import * as React from 'react'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
   Box,
   Btn,
-  Flex,
-  Icon,
-  ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  COLORS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
 
 interface SetupStepProps {
   /** whether or not to show the full contents of the step */

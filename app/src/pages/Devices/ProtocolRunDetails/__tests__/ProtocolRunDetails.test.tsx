@@ -17,11 +17,13 @@ import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/Pro
 import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunPreviewComponent } from '../../../../organisms/RunPreview'
+import { ProtocolRunRuntimeParameters } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
-import { ProtocolRunDetails } from '..'
-import { ModuleModel, ModuleType } from '@opentrons/shared-data'
-
 import { mockRobotSideAnalysis } from '../../../../organisms/CommandText/__fixtures__'
+import { useFeatureFlag } from '../../../../redux/config'
+import { ProtocolRunDetails } from '..'
+
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 vi.mock(
   '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -32,6 +34,10 @@ vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup')
 vi.mock('../../../../organisms/RunPreview')
 vi.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
 vi.mock('../../../../organisms/ProtocolUpload/hooks')
+vi.mock(
+  '../../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
+)
+vi.mock('../../../../redux/config')
 
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 
@@ -69,6 +75,7 @@ const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
 
 describe('ProtocolRunDetails', () => {
   beforeEach(() => {
+    vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(useRobot).mockReturnValue(mockConnectableRobot)
     vi.mocked(useRunStatuses).mockReturnValue({
       isRunRunning: false,
@@ -85,6 +92,9 @@ describe('ProtocolRunDetails', () => {
     )
     vi.mocked(ProtocolRunModuleControls).mockReturnValue(
       <div>Mock ProtocolRunModuleControls</div>
+    )
+    vi.mocked(ProtocolRunRuntimeParameters).mockReturnValue(
+      <div>Mock ProtocolRunRuntimeParameters</div>
     )
     vi.mocked(useModuleRenderInfoForProtocolById).mockReturnValue({
       [mockMagneticModule.moduleId]: {
@@ -212,5 +222,28 @@ describe('ProtocolRunDetails', () => {
 
     screen.getByText('Mock RunPreview')
     expect(screen.queryByText('Mock ProtocolRunSetup')).toBeFalsy()
+  })
+
+  it('renders Parameters tab when runtime parameters ff is on', () => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
+
+    screen.getByText('Setup')
+    screen.getByText('Parameters')
+    screen.getByText('Module Controls')
+    screen.getByText('Run Preview')
+  })
+
+  it('renders protocol run parameters when the parameters tab is clicked', () => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    render(`/devices/otie/protocol-runs/${RUN_ID}`)
+
+    const parametersTab = screen.getByText('Parameters')
+    const runTab = screen.getByText('Run Preview')
+    fireEvent.click(runTab)
+    screen.getByText('Mock RunPreview')
+    expect(screen.queryByText('Mock ProtocolRunRuntimeParameters')).toBeFalsy()
+    fireEvent.click(parametersTab)
+    screen.getByText('Mock ProtocolRunRuntimeParameters')
   })
 })

@@ -10,6 +10,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -21,7 +22,6 @@ import {
 
 import { SmallButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
-import { StyledText } from '../../atoms/text'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
 import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
@@ -191,7 +191,7 @@ function FixtureTableItem({
         backgroundColor={
           isCurrentFixtureCompatible ? COLORS.green35 : COLORS.yellow35
         }
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius8}
         gridGap={SPACING.spacing24}
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
         marginBottom={lastItem ? SPACING.spacing68 : 'none'}

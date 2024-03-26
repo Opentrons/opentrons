@@ -3,7 +3,7 @@ import values from 'lodash/values'
 import find from 'lodash/find'
 import mapValues from 'lodash/mapValues'
 import {
-  getPipetteNameSpecs,
+  getPipetteSpecsV2,
   GEN_ONE_MULTI_PIPETTES,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -11,7 +11,7 @@ import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
 import { LabwareDefByDefURI } from '../../labware-defs'
 import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
-import {
+import type {
   AdditionalEquipmentOnDeck,
   InitialDeckSetup,
   ModuleOnDeck,
@@ -89,7 +89,7 @@ export function denormalizePipetteEntities(
     pipetteInvariantProperties,
     (acc: PipetteEntities, pipette: NormalizedPipette): PipetteEntities => {
       const pipetteId = pipette.id
-      const spec = getPipetteNameSpecs(pipette.name)
+      const spec = getPipetteSpecsV2(pipette.name)
 
       if (!spec) {
         throw new Error(
@@ -120,6 +120,7 @@ export const getSlotIdsBlockedBySpanning = (
 
   return []
 }
+//  TODO(jr, 3/13/24): refactor this util it is messy and confusing
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string,
@@ -127,7 +128,15 @@ export const getSlotIsEmpty = (
      since labware/wasteChute can still go on top of staging areas  **/
   includeStagingAreas?: boolean
 ): boolean => {
+  //   special-casing the TC's slot A1 for the Flex
   if (
+    slot === 'cutoutA1' &&
+    Object.values(initialDeckSetup.modules).find(
+      module => module.type === THERMOCYCLER_MODULE_TYPE
+    )
+  ) {
+    return false
+  } else if (
     slot === SPAN7_8_10_11_SLOT &&
     TC_SPAN_SLOTS.some(slot => !getSlotIsEmpty(initialDeckSetup, slot))
   ) {
@@ -157,11 +166,15 @@ export const getSlotIsEmpty = (
       return additionalEquipment.location?.includes(slot) && includeStaging
     }
   })
-
   return (
     [
       ...values(initialDeckSetup.modules).filter(
-        (moduleOnDeck: ModuleOnDeck) => moduleOnDeck.slot === slot
+        (moduleOnDeck: ModuleOnDeck) => {
+          const cutoutForSlotOt2 = slotToCutoutOt2Map[slot]
+          return cutoutForSlotOt2 != null
+            ? moduleOnDeck.slot === slot
+            : slot.includes(moduleOnDeck.slot)
+        }
       ),
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot

@@ -4,19 +4,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  Flex,
-  Icon,
-  NewPrimaryBtn,
-  JUSTIFY_FLEX_END,
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_FLEX_END,
+  NewPrimaryBtn,
   SPACING,
-  BORDERS,
+  StyledText,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../../../atoms/text'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { ProgressBar } from '../../../../atoms/ProgressBar'
 import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
@@ -41,7 +41,7 @@ import type { RobotInitializationStatus } from '../../../../resources/health/hoo
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
   margin-bottom: ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius8};
   background: ${COLORS.grey30};
   width: 17.12rem;
 `

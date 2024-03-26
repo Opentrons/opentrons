@@ -9,11 +9,11 @@ import {
   Flex,
   Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
@@ -77,7 +77,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
           <Flex
             height="12.5rem"
             backgroundColor={COLORS.grey35}
-            borderRadius={BORDERS.borderRadiusSize3}
+            borderRadius={BORDERS.borderRadius12}
             flexDirection={DIRECTION_COLUMN}
             color={COLORS.grey60}
             padding={SPACING.spacing24}

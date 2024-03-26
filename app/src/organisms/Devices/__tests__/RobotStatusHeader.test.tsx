@@ -19,7 +19,7 @@ import {
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { useIsFlex } from '../hooks'
 import { RobotStatusHeader } from '../RobotStatusHeader'
-import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../resources/runs'
 
 import type { DiscoveryClientRobotAddress } from '../../../redux/discovery/types'
 import type { SimpleInterfaceStatus } from '../../../redux/networking/types'
@@ -31,7 +31,7 @@ vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/networking')
 vi.mock('../hooks')
-vi.mock('../../../resources/runs/useNotifyRunQuery')
+vi.mock('../../../resources/runs')
 
 const MOCK_OTIE = {
   name: 'otie',

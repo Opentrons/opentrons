@@ -4,7 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../../styles'
 import { renderWithProviders } from '../../../testing/utils'
-import { COLORS } from '../../../helix-design-system'
+import { BORDERS, COLORS } from '../../../helix-design-system'
 import { TYPOGRAPHY, SPACING } from '../../../ui-style-constants'
 import { CheckboxField } from '..'
 
@@ -43,7 +43,9 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey60)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
+    expect(checkBoxIcon).toHaveStyle(
+      `border-radius: ${String(BORDERS.borderRadius2)}`
+    )
     expect(checkBoxIcon).toHaveStyle(
       `justify-content: ${String(JUSTIFY_CENTER)}`
     )
@@ -82,7 +84,9 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.blue60)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
+    expect(checkBoxIcon).toHaveStyle(
+      `border-radius: ${String(BORDERS.borderRadius2)}`
+    )
     expect(checkBoxIcon).toHaveStyle(
       `justify-content: ${String(JUSTIFY_CENTER)}`
     )
@@ -97,7 +101,9 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`min-width: 1.25rem`)
     expect(checkBoxIcon).toHaveStyle(`color: ${String(COLORS.grey60)}`)
     expect(checkBoxIcon).toHaveStyle(`display: flex`)
-    expect(checkBoxIcon).toHaveStyle(`border-radius: 1px`)
+    expect(checkBoxIcon).toHaveStyle(
+      `border-radius: ${String(BORDERS.borderRadius2)}`
+    )
     expect(checkBoxIcon).toHaveStyle(
       `justify-content: ${String(JUSTIFY_CENTER)}`
     )

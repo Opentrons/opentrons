@@ -18,6 +18,7 @@ stages:
       json:
         data:
           id: !anystr
+          ok: True
           status: idle
           current: true
       save:
@@ -84,6 +85,7 @@ stages:
       status_code: 200
       json:
         data:
+          ok: True
           actions: []
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
           current: True
@@ -139,7 +141,14 @@ stages:
       status_code: 200
       json:
         links:
-          current: !anydict
+          current:
+            href: !anystr
+            meta:
+              runId: !anystr
+              commandId: !anystr
+              index: 3
+              key: !anystr
+              createdAt: !anystr
         meta:
           cursor: 0
           totalLength: 4

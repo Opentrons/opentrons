@@ -2,11 +2,12 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  Flex,
-  TYPOGRAPHY,
   COLORS,
-  SPACING,
+  Flex,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   LEFT,
@@ -15,7 +16,6 @@ import {
   CreateCommand,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'

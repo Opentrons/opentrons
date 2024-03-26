@@ -84,3 +84,26 @@ stages:
         # We need to make sure we get the Content-Type right because FastAPI won't do it for us.
         Content-Type: application/json
       json: !force_format_include '{analysis_data}'
+
+  - name: Check that uploading the same protocol with run-time parameter values triggers re-analysis
+    # This test must be executed after the analysis of the previous upload is completed.
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      data:
+        runTimeParameterValues: '{{"volume": 123, "dry_run": true, "pipette": "p10_single"}}'
+      files:
+        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: '{protocol_id}'
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+            - id: !anystr
+              status: pending

@@ -13,9 +13,9 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  IconProps,
   ModuleIcon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useHoverTooltip,
   useOnClickOutside,
@@ -46,8 +46,7 @@ import { UpdateBanner } from '../../molecules/UpdateBanner'
 import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
-import { StyledText } from '../../atoms/text'
-import { useChainLiveCommands } from '../../resources/runs/hooks'
+import { useChainLiveCommands } from '../../resources/runs'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { useIsFlex } from '../../organisms/Devices/hooks'
 import { getModuleTooHot } from '../Devices/getModuleTooHot'
@@ -71,6 +70,7 @@ import { ErrorInfo } from './ErrorInfo'
 import { ModuleSetupModal } from './ModuleSetupModal'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
+import type { IconProps } from '@opentrons/components'
 import type {
   AttachedModule,
   HeaterShakerModule,
@@ -249,7 +249,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      borderRadius={BORDERS.borderRadiusSize2}
+      borderRadius={BORDERS.borderRadius8}
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >

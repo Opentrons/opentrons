@@ -4,20 +4,21 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
+  BORDERS,
   Btn,
   COLORS,
-  BORDERS,
-  DISPLAY_FLEX,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  TYPOGRAPHY,
+  DISPLAY_FLEX,
+  Flex,
   Icon,
-  ALIGN_FLEX_START,
   JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
@@ -31,7 +32,6 @@ import {
   toggleDevtools,
   toggleHistoricOffsets,
 } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { getRobotSettings, updateSetting } from '../../redux/robot-settings'
 import { UNREACHABLE } from '../../redux/discovery/constants'
@@ -207,7 +207,7 @@ function FeatureFlags(): JSX.Element {
           marginBottom={SPACING.spacing8}
           backgroundColor={COLORS.grey35}
           padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
-          borderRadius={BORDERS.borderRadiusSize4}
+          borderRadius={BORDERS.borderRadius16}
           display={DISPLAY_FLEX}
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing24}
@@ -251,7 +251,7 @@ export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.transparent}
       padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
-      borderRadius={BORDERS.borderRadiusSize4}
+      borderRadius={BORDERS.borderRadius16}
     >
       <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
         {props.isOn ? t('on') : t('off')}

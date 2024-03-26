@@ -2,6 +2,12 @@
 from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import Dict, Optional, Union
+from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+from opentrons.protocol_engine.error_recovery_policy import (
+    ErrorRecoveryPolicy,
+    ErrorRecoveryType,
+    error_recovery_by_ff,
+)
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -89,6 +95,7 @@ class ProtocolEngine:
         hardware_stopper: Optional[HardwareStopper] = None,
         door_watcher: Optional[DoorWatcher] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
+        error_recovery_policy: ErrorRecoveryPolicy = error_recovery_by_ff,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -112,6 +119,7 @@ class ProtocolEngine:
             hardware_api=hardware_api,
             state_store=self._state_store,
             action_dispatcher=self._action_dispatcher,
+            error_recovery_policy=error_recovery_policy,
         )
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api,
@@ -158,6 +166,13 @@ class ProtocolEngine:
         )
         self._action_dispatcher.dispatch(action)
         self._hardware_api.pause(HardwarePauseType.PAUSE)
+
+    def resume_from_recovery(self) -> None:
+        """Resume normal protocol execution after the engine was `AWAITING_RECOVERY`."""
+        action = self._state_store.commands.validate_action_allowed(
+            ResumeFromRecoveryAction()
+        )
+        self._action_dispatcher.dispatch(action)
 
     def add_command(self, request: commands.CommandCreate) -> commands.Command:
         """Add a command to the `ProtocolEngine`'s queue.
@@ -238,32 +253,33 @@ class ProtocolEngine:
         case will expect the protocol runner to `finish()` the engine, whereas the
         maintenance run will be put into a state wherein the engine can be discarded.
         """
+
+        # todo
+        #
+        ## Notes
+        # Reading:
+        # - Get single command by ID
+        # - Get all commands, ordered
+        # - Get slice of commands by integer index, potentially starting from "currently running or most recently executed" (but see confusing docs)
+        # - Get "current" (currently running, or most recently completed) command (but see confusing docs)
+        #   - May need to change for fixup commands
+        # - Get "next to execute" (first queued setup command or first queued protocol command)
+        #   - Will need to change for fixup commands
+        # == / !=, mostly for tests
+        # Writing:
+        # - Enqueue a new command
+        # - Update command for its new state
+        # Steps for this PR:
+        # 1. Naively move everything into this file
+        # ?. Resolve get_current()/get_slice() discrepancy
+        # ?. Add .tail to OrderedSet to support existing JSONv6 performance bug
+        # ?. General state deduplication and cleanup.
+        # "Most recently executed" unfortunately does not mean "most recent to have internally entered a completed state," because of mid-JSON-run failures.
+        # Resolve todo about separate actions for separate state transitions, instead of a single UpdateCommandAction
         if self._state_store.commands.get_is_stopped():
             return
         current_id = (
-            # todo
-            #
-            ## Notes
-            # Reading:
-            # - Get single command by ID
-            # - Get all commands, ordered
-            # - Get slice of commands by integer index, potentially starting from "currently running or most recently executed" (but see confusing docs)
-            # - Get "current" (currently running, or most recently completed) command (but see confusing docs)
-            #   - May need to change for fixup commands
-            # - Get "next to execute" (first queued setup command or first queued protocol command)
-            #   - Will need to change for fixup commands
-            # == / !=, mostly for tests
-            # Writing:
-            # - Enqueue a new command
-            # - Update command for its new state
-            # Steps for this PR:
-            # 1. Naively move everything into this file
-            # ?. Resolve get_current()/get_slice() discrepancy
-            # ?. Add .tail to OrderedSet to support existing JSONv6 performance bug
-            # ?. General state deduplication and cleanup.
-            # "Most recently executed" unfortunately does not mean "most recent to have internally entered a completed state," because of mid-JSON-run failures.
-            # Resolve todo about separate actions for separate state transitions, instead of a single UpdateCommandAction
-            self._state_store.commands.state.running_command_id
+            self._state_store.commands.get_running_command_id()
             or self._state_store.commands.state.queued_command_ids.head(None)
         )
 
@@ -273,12 +289,12 @@ class ProtocolEngine:
                 error_id=self._model_utils.generate_id(),
                 failed_at=self._model_utils.get_timestamp(),
                 error=EStopActivatedError(message="Estop Activated"),
+                type=ErrorRecoveryType.FAIL_RUN,
             )
             self._action_dispatcher.dispatch(fail_action)
 
             # In the case where the running command was a setup command - check if there
             # are any pending *run* commands and, if so, clear them all
-            # todo
             current_id = self._state_store.commands.state.queued_command_ids.head(None)
             if current_id is not None:
                 fail_action = FailCommandAction(
@@ -286,6 +302,7 @@ class ProtocolEngine:
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
                     error=EStopActivatedError(message="Estop Activated"),
+                    type=ErrorRecoveryType.FAIL_RUN,
                 )
                 self._action_dispatcher.dispatch(fail_action)
             self._queue_worker.cancel()
@@ -331,12 +348,12 @@ class ProtocolEngine:
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
 
-        Raises:
-            CommandExecutionFailedError: if any protocol command failed.
+        If a command encountered a fatal error, it's raised as an exception.
         """
         await self._state_store.wait_for(
             condition=self._state_store.commands.get_all_commands_final
         )
+        self._state_store.commands.raise_fatal_command_error()
 
     async def finish(
         self,

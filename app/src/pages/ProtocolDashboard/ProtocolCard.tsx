@@ -19,6 +19,7 @@ import {
   OVERFLOW_WRAP_BREAK_WORD,
   SIZE_2,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
@@ -28,11 +29,10 @@ import {
 } from '@opentrons/react-api-client'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LongPressModal } from './LongPressModal'
-import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { formatTimeWithUtcLabel } from '../../resources/runs'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -157,7 +157,7 @@ export function ProtocolCard(props: {
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
       backgroundColor={isFailedAnalysis ? COLORS.red35 : COLORS.grey35}
-      borderRadius={BORDERS.borderRadiusSize4}
+      borderRadius={BORDERS.borderRadius16}
       marginBottom={SPACING.spacing8}
       gridGap={SPACING.spacing48}
       onClick={() => handleProtocolClick(longpress, protocol.id)}

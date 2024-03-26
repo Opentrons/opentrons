@@ -6,13 +6,13 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  Icon,
   Flex,
-  SPACING,
-  TYPOGRAPHY,
+  Icon,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import type { Subsystem } from '@opentrons/api-client'
 
@@ -41,7 +41,7 @@ export function UpdateInProgressModal(
         height="17.25rem"
         width="100%"
         backgroundColor={COLORS.grey35}
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing32}
         justifyContent={ALIGN_CENTER}

@@ -2,16 +2,16 @@ import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 
 import {
-  Flex,
-  Icon,
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  Flex,
+  Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../text'
 interface StatusLabelProps {
   status: string
   backgroundColor: string
@@ -43,7 +43,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
     <Flex>
       <Flex
         backgroundColor={backgroundColor}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius4}
         gridGap={SPACING.spacing4}
         paddingX={SPACING.spacing6}
         paddingY={SPACING.spacing2}

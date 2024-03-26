@@ -5,14 +5,17 @@ from typing import List, Optional, Type
 import pytest
 from decoy import Decoy
 from sqlalchemy.engine import Engine
+from unittest import mock
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.errors.codes import ErrorCodes
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
 from robot_server.runs.run_store import (
     RunStore,
     RunResource,
     CommandNotFoundError,
+    BadStateSummary,
 )
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
@@ -162,6 +165,7 @@ def test_update_run_state(
     subject: RunStore,
     state_summary: StateSummary,
     protocol_commands: List[pe_commands.Command],
+    mock_runs_publisher: mock.Mock,
 ) -> None:
     """It should be able to update a run state to the store."""
     action = RunAction(
@@ -190,6 +194,7 @@ def test_update_run_state(
     )
 
     assert result == RunResource(
+        ok=True,
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
@@ -197,6 +202,9 @@ def test_update_run_state(
     )
     assert run_summary_result == state_summary
     assert commands_result.commands == protocol_commands
+    mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
+        run_id="run-id"
+    )
 
 
 def test_update_state_run_not_found(
@@ -222,6 +230,7 @@ def test_add_run(subject: RunStore) -> None:
     )
 
     assert result == RunResource(
+        ok=True,
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
@@ -262,6 +271,7 @@ def test_get_run_no_actions(subject: RunStore) -> None:
     result = subject.get("run-id")
 
     assert result == RunResource(
+        ok=True,
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
@@ -288,6 +298,7 @@ def test_get_run(subject: RunStore) -> None:
     result = subject.get(run_id="run-id")
 
     assert result == RunResource(
+        ok=True,
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
@@ -309,6 +320,7 @@ def test_get_run_missing(subject: RunStore) -> None:
             1,
             [
                 RunResource(
+                    ok=True,
                     run_id="run-id-2",
                     protocol_id=None,
                     created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
@@ -320,12 +332,14 @@ def test_get_run_missing(subject: RunStore) -> None:
             20,
             [
                 RunResource(
+                    ok=True,
                     run_id="run-id-1",
                     protocol_id=None,
                     created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
                     actions=[],
                 ),
                 RunResource(
+                    ok=True,
                     run_id="run-id-2",
                     protocol_id=None,
                     created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
@@ -337,12 +351,14 @@ def test_get_run_missing(subject: RunStore) -> None:
             None,
             [
                 RunResource(
+                    ok=True,
                     run_id="run-id-1",
                     protocol_id=None,
                     created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
                     actions=[],
                 ),
                 RunResource(
+                    ok=True,
                     run_id="run-id-2",
                     protocol_id=None,
                     created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
@@ -372,7 +388,7 @@ def test_get_all_runs(
     assert result == expected_result
 
 
-def test_remove_run(subject: RunStore) -> None:
+def test_remove_run(subject: RunStore, mock_runs_publisher: mock.Mock) -> None:
     """It can remove a previously stored run entry."""
     action = RunAction(
         actionType=RunActionType.PLAY,
@@ -389,6 +405,9 @@ def test_remove_run(subject: RunStore) -> None:
     subject.remove(run_id="run-id")
 
     assert subject.get_all(length=20) == []
+    mock_runs_publisher.publish_runs_advise_unsubscribe.assert_called_once_with(
+        run_id="run-id"
+    )
 
 
 def test_remove_run_missing_id(subject: RunStore) -> None:
@@ -409,7 +428,9 @@ def test_insert_actions_no_run(subject: RunStore) -> None:
         subject.insert_action(run_id="run-id-996", action=action)
 
 
-def test_get_state_summary(subject: RunStore, state_summary: StateSummary) -> None:
+def test_get_state_summary(
+    subject: RunStore, state_summary: StateSummary, mock_runs_publisher: mock.Mock
+) -> None:
     """It should be able to get store run data."""
     subject.insert(
         run_id="run-id",
@@ -419,6 +440,9 @@ def test_get_state_summary(subject: RunStore, state_summary: StateSummary) -> No
     subject.update_run_state(run_id="run-id", summary=state_summary, commands=[])
     result = subject.get_state_summary(run_id="run-id")
     assert result == state_summary
+    mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
+        run_id="run-id"
+    )
 
 
 def test_get_state_summary_failure(
@@ -434,7 +458,8 @@ def test_get_state_summary_failure(
         run_id="run-id", summary=invalid_state_summary, commands=[]
     )
     result = subject.get_state_summary(run_id="run-id")
-    assert result is None
+    assert isinstance(result, BadStateSummary)
+    assert result.dataError.code == ErrorCodes.INVALID_STORED_DATA
 
 
 def test_get_state_summary_none(subject: RunStore) -> None:
@@ -445,7 +470,8 @@ def test_get_state_summary_none(subject: RunStore) -> None:
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
     result = subject.get_state_summary(run_id="run-id")
-    assert result is None
+    assert isinstance(result, BadStateSummary)
+    assert result.dataError.code == ErrorCodes.INVALID_STORED_DATA
 
 
 def test_has_run_id(subject: RunStore) -> None:

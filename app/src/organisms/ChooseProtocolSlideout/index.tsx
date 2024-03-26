@@ -21,6 +21,7 @@ import {
   ProtocolDeck,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -29,7 +30,6 @@ import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
 import { Slideout } from '../../atoms/Slideout'
-import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
@@ -39,6 +39,16 @@ import { getAnalysisStatus } from '../ProtocolsLanding/utils'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
+
+export const CARD_OUTLINE_BORDER_STYLE = css`
+  border-style: ${BORDERS.styleSolid};
+  border-width: 1px;
+  border-color: ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius4};
+  &:hover {
+    border-color: ${COLORS.grey55};
+  }
+`
 
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]
@@ -360,7 +370,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
       minHeight="11rem"
       padding={SPACING.spacing16}
       css={css`
-        ${BORDERS.cardOutlineBorder}
+        ${CARD_OUTLINE_BORDER_STYLE}
         &:hover {
           border-color: ${COLORS.grey30};
         }

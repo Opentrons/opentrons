@@ -20,12 +20,19 @@ import {
 import { i18n } from '../../../i18n'
 import { useHardwareStatusText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useMissingProtocolHardware } from '../../Protocols/hooks'
-import { formatTimeWithUtcLabel } from '../../../resources/runs/utils'
+import {
+  useMissingProtocolHardware,
+  useRunTimeParameters,
+} from '../../Protocols/hooks'
+import { ProtocolSetupParameters } from '../../../organisms/ProtocolSetupParameters'
+import { useFeatureFlag } from '../../../redux/config'
+import { formatTimeWithUtcLabel } from '../../../resources/runs'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
+import { Parameters } from '../Parameters'
+import { mockRunTimeParameterData } from '../fixtures'
 
 // Mock IntersectionObserver
 class IntersectionObserver {
@@ -39,7 +46,7 @@ Object.defineProperty(window, 'IntersectionObserver', {
   configurable: true,
   value: IntersectionObserver,
 })
-
+vi.mock('../../../organisms/ProtocolSetupParameters')
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
@@ -50,10 +57,11 @@ vi.mock('../../Protocols/hooks')
 vi.mock('../Deck')
 vi.mock('../Hardware')
 vi.mock('../Labware')
+vi.mock('../Parameters')
+vi.mock('../../../redux/config')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})
-
 const MOCK_DATA = {
   data: {
     id: 'mockProtocol1',
@@ -88,6 +96,8 @@ const render = (path = '/protocols/fakeProtocolId') => {
 
 describe('ODDProtocolDetails', () => {
   beforeEach(() => {
+    when(useRunTimeParameters).calledWith('fakeProtocolId').thenReturn([])
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
@@ -181,7 +191,11 @@ describe('ODDProtocolDetails', () => {
     vi.mocked(Hardware).mockReturnValue(<div>Mock Hardware</div>)
     vi.mocked(Labware).mockReturnValue(<div>Mock Labware</div>)
     vi.mocked(Deck).mockReturnValue(<div>Mock Initial Deck Layout</div>)
+    vi.mocked(Parameters).mockReturnValue(<div>Mock Parameters</div>)
+
     render()
+    const parametersButton = screen.getByRole('button', { name: 'Parameters' })
+    fireEvent.click(parametersButton)
     const hardwareButton = screen.getByRole('button', { name: 'Hardware' })
     fireEvent.click(hardwareButton)
     screen.getByText('Mock Hardware')
@@ -204,5 +218,13 @@ describe('ODDProtocolDetails', () => {
     } as any)
     render()
     expect(screen.getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+  })
+  it('renders the parameters screen', () => {
+    when(useRunTimeParameters)
+      .calledWith('fakeProtocolId')
+      .thenReturn(mockRunTimeParameterData)
+    render()
+    fireEvent.click(screen.getByText('Start setup'))
+    expect(vi.mocked(ProtocolSetupParameters)).toHaveBeenCalled()
   })
 })

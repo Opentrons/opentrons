@@ -10,13 +10,13 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import {
   useStopRunMutation,
   useDismissCurrentRunMutation,
 } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'

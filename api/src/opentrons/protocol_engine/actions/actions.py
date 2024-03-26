@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import Optional, Union
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import DoorState
@@ -59,6 +60,13 @@ class StopAction:
     """
 
     from_estop: bool = False
+
+
+@dataclass(frozen=True)
+class ResumeFromRecoveryAction:
+    """See `ProtocolEngine.resume_from_recovery()`."""
+
+    pass
 
 
 @dataclass(frozen=True)
@@ -122,18 +130,13 @@ class UpdateCommandAction:
 
 @dataclass(frozen=True)
 class FailCommandAction:
-    """Mark a given command as failed.
+    """Mark a given command as failed."""
 
-    The given command and all currently queued commands will be marked
-    as failed due to the given error.
-    """
-
-    # TODO(mc, 2021-11-12): we'll likely need to add the command params
-    # to this payload for state reaction purposes
     command_id: str
     error_id: str
     failed_at: datetime
     error: EnumeratedError
+    type: ErrorRecoveryType
 
 
 @dataclass(frozen=True)
@@ -203,6 +206,7 @@ Action = Union[
     PlayAction,
     PauseAction,
     StopAction,
+    ResumeFromRecoveryAction,
     FinishAction,
     HardwareStoppedAction,
     DoorChangeAction,

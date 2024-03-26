@@ -95,7 +95,7 @@ import { getIsFixtureMismatch } from '../../../../resources/deck_configuration/u
 import { useDeckConfigurationCompatibility } from '../../../../resources/deck_configuration/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useMostRecentRunId } from '../../../ProtocolUpload/hooks/useMostRecentRunId'
-import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../../resources/runs'
 import type { UseQueryResult } from 'react-query'
 import type * as ReactRouterDom from 'react-router-dom'
 import type { Mock } from 'vitest'
@@ -148,7 +148,7 @@ vi.mock('../../../../resources/deck_configuration/utils')
 vi.mock('../../../../resources/deck_configuration/hooks')
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('../../../ProtocolUpload/hooks/useMostRecentRunId')
-vi.mock('../../../../resources/runs/useNotifyRunQuery')
+vi.mock('../../../../resources/runs')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'

@@ -5,11 +5,13 @@ import {
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 
-import { useCreateTargetedMaintenanceRunMutation } from '../../resources/runs/hooks'
+import {
+  useCreateTargetedMaintenanceRunMutation,
+  useNotifyRunQuery,
+} from '../../resources/runs'
 import { LabwarePositionCheck } from '.'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
 
 import type { RobotType } from '@opentrons/shared-data'
 

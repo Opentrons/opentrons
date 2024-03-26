@@ -16,15 +16,9 @@ context('Reservoirs', () => {
         .children()
         .first()
         .trigger('mousedown')
-      cy.get('*[class^="Dropdown__option_label"]').contains('Reservoir').click()
+      cy.get('*[class^="_option_label"]').contains('Reservoir').click()
       cy.contains('Reservoir').click({ force: true })
       cy.contains('start creating labware').click({ force: true })
-    })
-
-    it('contains a button to the testing guide', () => {
-      cy.contains('labware test guide')
-        .should('have.prop', 'href')
-        .and('to.have.string', 'labwareDefinition_testGuide')
     })
 
     it('does not have a preview image', () => {
@@ -224,19 +218,6 @@ context('Reservoirs', () => {
         cy.get("input[placeholder='testpro_10_reservoir_250ul']").should(
           'exist'
         )
-
-        // Test pipette
-        cy.contains('Test Pipette is a required field').should('exist')
-        // TODO(IL, 2021-05-15): give Dropdown component semantic selectors for E2E
-        cy.get('label')
-          .contains('Test Pipette')
-          .children()
-          .first()
-          .trigger('mousedown')
-        cy.get('*[class^="Dropdown__option_label"]')
-          .contains(/P10.*Single-Channel.*GEN1/)
-          .click()
-        cy.contains('Test Pipette is a required field').should('not.exist')
 
         // All fields present
         cy.get('button[class*="_export_button_"]').click({ force: true })

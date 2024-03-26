@@ -394,6 +394,121 @@ export interface FlowRateSpec {
   max: number
 }
 
+export interface PipetteV2GeneralSpecs {
+  displayName: string
+  model: string
+  displayCategory: PipetteDisplayCategory
+  pickUpTipConfigurations: {
+    pressFit: {
+      speedByTipCount: Record<string, number>
+      presses: number
+      increment: number
+      distanceByTipCount: Record<string, number>
+      currentByTipCount: Record<string, number>
+    }
+  }
+  dropTipConfigurations: {
+    plungerEject: {
+      current: number
+      speed: number
+    }
+  }
+  plungerMotorConfigurations: {
+    idle: number
+    run: number
+  }
+  plungerPositionsConfigurations: {
+    default: {
+      top: number
+      bottom: number
+      blowout: number
+      drop: number
+    }
+  }
+  availableSensors: {
+    sensors: string[]
+    capacitive?: { count: number }
+    environment?: { count: number }
+    pressure?: { count: number }
+  }
+  partialTipConfigurations: {
+    partialTipSupported: boolean
+    availableConfigurations: number[] | null
+  }
+  channels: PipetteChannels
+  shaftDiameter: number
+  shaftULperMM: number
+  backCompatNames: string[]
+  backlashDistance: number
+  quirks: string[]
+  plungerHomingConfigurations: {
+    current: number
+    speed: number
+  }
+}
+
+interface NozzleInfo {
+  key: string
+  orderedNozzles: string[]
+}
+export interface PipetteV2GeometrySpecs {
+  nozzleOffset: number[]
+  pipetteBoundingBoxOffsets: {
+    backLeftCorner: number[]
+    frontRightCorner: number[]
+  }
+  pathTo3D: string
+  orderedRows: Record<number, NozzleInfo>
+  orderedColumns: Record<number, NozzleInfo>
+  nozzleMap: Record<string, number[]>
+}
+
+export interface SupportedTip {
+  aspirate: {
+    default: Record<string, number[][]>
+  }
+  defaultAspirateFlowRate: {
+    default: number
+    valuesByApiLevel: Record<string, number>
+  }
+  defaultBlowOutFlowRate: {
+    default: number
+    valuesByApiLevel: Record<string, number>
+  }
+  defaultDispenseFlowRate: {
+    default: number
+    valuesByApiLevel: Record<string, number>
+  }
+  defaultPushOutVolume: number
+  defaultTipLength: number
+  dispense: {
+    default: Record<string, number[][]>
+  }
+  defaultReturnTipHeight?: number
+  defaultFlowAcceleration?: number
+}
+
+export interface SupportedTips {
+  [tipType: string]: SupportedTip
+}
+
+export interface PipetteV2LiquidSpecs {
+  $otSharedSchema: string
+  supportedTips: SupportedTips
+  defaultTipOverlapDictionary: Record<string, number>
+  maxVolume: number
+  minVolume: number
+  defaultTipracks: string[]
+}
+
+export type GenericAndGeometrySpecs = PipetteV2GeneralSpecs &
+  PipetteV2GeometrySpecs
+
+export interface PipetteV2Specs extends GenericAndGeometrySpecs {
+  $otSharedSchema: string
+  liquids: Record<string, PipetteV2LiquidSpecs>
+}
+
 export interface PipetteNameSpecs {
   name: string
   displayName: string
@@ -475,6 +590,40 @@ export interface AnalysisError {
   createdAt: string
 }
 
+interface IntParameter {
+  min: number
+  max: number
+  default: number
+}
+
+interface Choice {
+  displayName: string
+  value: unknown
+}
+
+interface ChoiceParameter {
+  choices: Choice[]
+  default: string
+}
+
+interface BooleanParameter {
+  default: boolean
+}
+
+type RunTimeParameterType = 'int' | 'float' | 'str' | 'boolean'
+
+type ParameterType = IntParameter | ChoiceParameter | BooleanParameter
+interface BaseRunTimeParameter {
+  displayName: string
+  variableName: string
+  description: string
+  type: RunTimeParameterType
+  value: unknown
+  suffix?: string
+}
+
+export type RunTimeParameter = BaseRunTimeParameter & ParameterType
+
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
   id: string
@@ -487,6 +636,7 @@ export interface CompletedProtocolAnalysis {
   commands: RunTimeCommand[]
   errors: AnalysisError[]
   robotType?: RobotType | null
+  runTimeParameters?: RunTimeParameter[]
 }
 
 export interface ResourceFile {

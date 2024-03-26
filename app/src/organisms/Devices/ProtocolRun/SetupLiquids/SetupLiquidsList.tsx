@@ -7,20 +7,21 @@ import {
 } from '@opentrons/api-client'
 
 import {
-  Flex,
-  SPACING,
-  Icon,
-  COLORS,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  JUSTIFY_CENTER,
-  SIZE_1,
-  BORDERS,
   ALIGN_CENTER,
-  SIZE_AUTO,
+  BORDERS,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
   JUSTIFY_FLEX_START,
+  SIZE_1,
+  SIZE_AUTO,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName, MICRO_LITERS } from '@opentrons/shared-data'
 import {
@@ -29,7 +30,6 @@ import {
   ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
 } from '../../../../redux/analytics'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { StyledText } from '../../../../atoms/text'
 import { getLocationInfoNames } from '../utils/getLocationInfoNames'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import {
@@ -53,7 +53,17 @@ const LIQUID_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;
   border-color: ${COLORS.grey30};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius8};
+`
+
+export const CARD_OUTLINE_BORDER_STYLE = css`
+  border-style: ${BORDERS.styleSolid};
+  border-width: 1px;
+  border-color: ${COLORS.grey30};
+  border-radius: ${BORDERS.borderRadius8};
+  &:hover {
+    border-color: ${COLORS.grey55};
+  }
 `
 
 export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
@@ -109,7 +119,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
   const trackEvent = useTrackEvent()
 
   const LIQUID_CARD_STYLE = css`
-    ${BORDERS.cardOutlineBorder}
+    ${CARD_OUTLINE_BORDER_STYLE}
 
     &:hover {
       cursor: pointer;
@@ -319,7 +329,7 @@ export const LiquidsListItemDetails = (
       </Flex>
       <Flex
         backgroundColor={COLORS.black90 + '1A'}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius8}
         height="max-content"
         paddingY={SPACING.spacing4}
         paddingX={SPACING.spacing8}

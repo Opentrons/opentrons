@@ -180,7 +180,9 @@ async def test_liquid_probe(
         mount_speed=10,
         plunger_speed=8,
         threshold_pascals=threshold_pascals,
-        log_pressure=False,
+        csv_output=False,
+        sync_buffer_output=False,
+        can_bus_only_output=False,
         auto_zero_sensor=True,
         num_baseline_reads=8,
         sensor_id=SensorId.S0,
@@ -209,7 +211,9 @@ async def test_liquid_probe(
             mount_speed=10,
             plunger_speed=8,
             threshold_pascals=threshold_pascals,
-            log_pressure=True,
+            csv_output=False,
+            sync_buffer_output=False,
+            can_bus_only_output=False,
             auto_zero_sensor=True,
             num_baseline_reads=8,
             sensor_id=SensorId.S0,
@@ -217,7 +221,6 @@ async def test_liquid_probe(
         mock_bind_output.assert_called()
         assert mock_bind_output.call_args_list[1][0][3] == [
             SensorOutputBinding.sync,
-            SensorOutputBinding.report,
         ]
 
 

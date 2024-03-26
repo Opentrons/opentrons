@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
-  Flex,
   Box,
-  SIZE_2,
-  TYPOGRAPHY,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  SIZE_2,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import {
@@ -16,7 +17,6 @@ import {
   getAnalyticsOptedIn,
 } from '../../redux/analytics'
 import { ToggleButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 
 import type { Dispatch, State } from '../../redux/types'
 

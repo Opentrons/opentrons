@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
+import { StyledText } from '@opentrons/components'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { BODY_STYLE, SECTIONS } from './constants'

@@ -11,7 +11,7 @@ import {
   useIsFlex,
   useRunPipetteInfoByMount,
 } from '..'
-import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../../resources/runs'
 
 import type { PipetteInfo } from '..'
 import { Provider } from 'react-redux'
@@ -20,7 +20,7 @@ import { createStore } from 'redux'
 vi.mock('../useDeckCalibrationStatus')
 vi.mock('../useIsFlex')
 vi.mock('../useRunPipetteInfoByMount')
-vi.mock('../../../../resources/runs/useNotifyRunQuery')
+vi.mock('../../../../resources/runs')
 
 let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
 

@@ -92,7 +92,7 @@ export const OffDeckLabwareSlideout = (
     >
       {offDeck == null ? (
         <Flex
-          borderRadius={BORDERS.borderRadiusSize2}
+          borderRadius={BORDERS.borderRadius8}
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.grey30}
           flexDirection={DIRECTION_COLUMN}

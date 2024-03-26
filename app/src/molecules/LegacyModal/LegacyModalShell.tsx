@@ -107,12 +107,12 @@ const ModalArea = styled.div<
   overflow-y: ${OVERFLOW_AUTO};
   max-height: 100%;
   width: 100%;
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius8};
   box-shadow: ${BORDERS.smallDropShadow};
   height: ${({ isFullPage }) => (isFullPage ? '100%' : 'auto')};
   background-color: ${COLORS.white};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    border-radius: ${BORDERS.borderRadiusSize4};
+    border-radius: ${BORDERS.borderRadius16};
   }
   ${styleProps};
 `

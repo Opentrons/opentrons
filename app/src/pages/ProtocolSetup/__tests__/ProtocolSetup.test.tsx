@@ -44,6 +44,7 @@ import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchL
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import { mockProtocolModuleInfo } from '../../../organisms/ProtocolSetupInstruments/__fixtures__'
 import {
+  useProtocolHasRunTimeParameters,
   useRunControls,
   useRunStatus,
 } from '../../../organisms/RunTimeControl/hooks'
@@ -51,8 +52,11 @@ import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttachedModal'
 import { ProtocolSetup } from '../../../pages/ProtocolSetup'
-import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../resources/runs'
+import { useFeatureFlag } from '../../../redux/config'
+import { ViewOnlyParameters } from '../../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import { mockRunTimeParameterData } from '../../ProtocolDetails/fixtures'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -93,6 +97,8 @@ vi.mock('react-router-dom', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../redux/config')
+vi.mock('../../../organisms/ProtocolSetupParameters/ViewOnlyParameters')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
@@ -107,7 +113,7 @@ vi.mock('../../../redux/discovery/selectors')
 vi.mock('../ConfirmAttachedModal')
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../resources/deck_configuration/hooks')
-vi.mock('../../../resources/runs/useNotifyRunQuery')
+vi.mock('../../../resources/runs')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -188,6 +194,7 @@ describe('ProtocolSetup', () => {
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
     mockHistoryPush = vi.fn()
+    vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })
@@ -275,6 +282,7 @@ describe('ProtocolSetup', () => {
         makeSnackbar: MOCK_MAKE_SNACKBAR,
       } as unknown) as any)
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
+    vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(false)
     when(vi.mocked(useTrackProtocolRunEvent))
       .calledWith(RUN_ID, ROBOT_NAME)
       .thenReturn({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
@@ -339,6 +347,32 @@ describe('ProtocolSetup', () => {
     screen.getByText('1 initial liquid')
     fireEvent.click(screen.getByText('Liquids'))
     expect(vi.mocked(ProtocolSetupLiquids)).toHaveBeenCalled()
+  })
+
+  it('should launch view only parameters screen when click parameters', () => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(true)
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: {
+        ...mockRobotSideAnalysis,
+        runTimeParameters: mockRunTimeParameterData,
+      },
+    } as any)
+    when(vi.mocked(getProtocolModulesInfo))
+      .calledWith(
+        {
+          ...mockRobotSideAnalysis,
+          runTimeParameters: mockRunTimeParameterData,
+        },
+        flexDeckDefV4 as any
+      )
+      .thenReturn(mockProtocolModuleInfo)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
+      .calledWith([], mockProtocolModuleInfo)
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
+    render(`/runs/${RUN_ID}/setup/`)
+    fireEvent.click(screen.getByText('Parameters'))
+    expect(vi.mocked(ViewOnlyParameters)).toHaveBeenCalled()
   })
 
   it('should launch LPC when clicked', () => {

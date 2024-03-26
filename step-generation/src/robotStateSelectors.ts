@@ -1,7 +1,6 @@
 import assert from 'assert'
 // TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
 import min from 'lodash/min'
-import sortBy from 'lodash/sortBy'
 import {
   getTiprackVolume,
   THERMOCYCLER_MODULE_TYPE,
@@ -10,19 +9,40 @@ import {
   COLUMN,
   ALL,
 } from '@opentrons/shared-data'
+import { COLUMN_4_SLOTS } from './constants'
 import type {
   InvariantContext,
   ModuleTemporalProperties,
   RobotState,
   ThermocyclerModuleState,
-} from './'
+} from './types'
+
 export function sortLabwareBySlot(
   labwareState: RobotState['labware']
 ): string[] {
-  return sortBy<string>(Object.keys(labwareState), (id: string) =>
-    parseInt(labwareState[id].slot)
+  const sortedLabware = Object.keys(labwareState).sort(
+    (idA: string, idB: string) => {
+      const slotA = parseInt(labwareState[idA].slot)
+      const slotB = parseInt(labwareState[idB].slot)
+      if (
+        COLUMN_4_SLOTS.includes(labwareState[idA].slot) &&
+        COLUMN_4_SLOTS.includes(labwareState[idB].slot)
+      ) {
+        return idA.localeCompare(idB)
+      }
+      if (COLUMN_4_SLOTS.includes(labwareState[idA].slot)) {
+        return 1
+      }
+      if (COLUMN_4_SLOTS.includes(labwareState[idB].slot)) {
+        return -1
+      }
+      return slotA - slotB
+    }
   )
+
+  return sortedLabware
 }
+
 export function _getNextTip(args: {
   pipetteId: string
   tiprackId: string
@@ -166,7 +186,7 @@ export function getPipetteWithTipMaxVol(
   // NOTE: this fn assumes each pipette is assigned to exactly one tiprack type,
   // across the entire timeline
   const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
-  const pipetteMaxVol = pipetteEntity.spec.maxVolume
+  const pipetteMaxVol = pipetteEntity.spec.liquids.default.maxVolume
   const tiprackDef = pipetteEntity.tiprackLabwareDef
   const tiprackTipVol = getTiprackVolume(tiprackDef)
 

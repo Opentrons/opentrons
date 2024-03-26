@@ -22,7 +22,7 @@
 
 .new_file_modal {
   line-height: 1.5;
-  height: 100%;
+  max-height: 100%;
   padding: 2rem;
   min-height: 38rem;
 

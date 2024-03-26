@@ -3,19 +3,20 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
-  COLORS,
-  BORDERS,
-  Flex,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  SPACING,
-  Icon,
-  SIZE_1,
-  Link,
   ALIGN_CENTER,
-  useHoverTooltip,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SIZE_1,
+  SPACING,
+  StyledText,
   TOOLTIP_LEFT,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import {
   RUN_STATUS_IDLE,
@@ -33,7 +34,6 @@ import {
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTopPortalEl } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
@@ -42,7 +42,7 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 import { useDownloadRunLog, useRobotType } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
 import { isInterventionCommand } from '../InterventionModal/utils'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../resources/runs'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -222,13 +222,12 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             {...targetProps}
             role="button"
             css={css`
-            ${TYPOGRAPHY.darkLinkH4SemiBold}
-            &:hover {
-              color: ${downloadIsDisabled ? COLORS.grey40 : COLORS.black90};
-            }
-            cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
-          }
-          `}
+              ${TYPOGRAPHY.darkLinkH4SemiBold}
+              &:hover {
+                color: ${downloadIsDisabled ? COLORS.grey40 : COLORS.black90};
+              }
+              cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
+            `}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={onDownloadClick}
           >
@@ -259,14 +258,14 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             outerStyles={css`
               height: 0.375rem;
               background-color: ${COLORS.grey30};
-              border-radius: ${BORDERS.radiusSoftCorners};
+              border-radius: ${BORDERS.borderRadius4};
               position: relative;
               overflow: initial;
             `}
             innerStyles={css`
               height: 0.375rem;
               background-color: ${COLORS.grey60};
-              border-radius: ${BORDERS.radiusSoftCorners};
+              border-radius: ${BORDERS.borderRadius4};
             `}
           >
             <InterventionTicks

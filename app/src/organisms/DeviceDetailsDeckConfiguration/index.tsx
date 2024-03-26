@@ -16,6 +16,7 @@ import {
   Link,
   SIZE_4,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -31,8 +32,7 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
-import { StyledText } from '../../atoms/text'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { Banner } from '../../atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 import { AddFixtureModal } from './AddFixtureModal'
@@ -118,7 +118,7 @@ export function DeviceDetailsDeckConfiguration({
       <Flex
         alignItems={ALIGN_FLEX_START}
         backgroundColor={COLORS.white}
-        borderRadius={BORDERS.radiusSoftCorners}
+        borderRadius={BORDERS.borderRadius8}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
         width="100%"
@@ -209,6 +209,7 @@ export function DeviceDetailsDeckConfiguration({
                     <Flex
                       key={fixture.cutoutId}
                       backgroundColor={COLORS.grey20}
+                      borderRadius={BORDERS.borderRadius4}
                       gridGap={SPACING.spacing60}
                       padding={SPACING.spacing8}
                       width="100%"

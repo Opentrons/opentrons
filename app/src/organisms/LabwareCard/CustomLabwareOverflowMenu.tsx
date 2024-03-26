@@ -19,6 +19,7 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
   useOnClickOutside,
@@ -26,7 +27,6 @@ import {
 
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'

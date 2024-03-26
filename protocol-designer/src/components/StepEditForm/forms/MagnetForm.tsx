@@ -59,7 +59,9 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
             {...propsForFields.magnetAction}
             options={[
               {
-                name: t('step_edit_form.field.magnetAction.options.engage'),
+                name: t(
+                  'form:step_edit_form.field.magnetAction.options.engage'
+                ),
                 value: 'engage',
               },
             ]}
@@ -68,7 +70,9 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
             {...propsForFields.magnetAction}
             options={[
               {
-                name: t('step_edit_form.field.magnetAction.options.disengage'),
+                name: t(
+                  'form:step_edit_form.field.magnetAction.options.disengage'
+                ),
                 value: 'disengage',
               },
             ]}
@@ -76,7 +80,7 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
         </FormGroup>
         {magnetAction === 'engage' && (
           <FormGroup
-            label={t('step_edit_form.field.engageHeight.label')}
+            label={t('form:step_edit_form.field.engageHeight.label')}
             className={styles.magnet_form_group}
           >
             <TextField

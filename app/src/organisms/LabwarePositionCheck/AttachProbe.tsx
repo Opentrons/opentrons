@@ -1,19 +1,23 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import {
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
   getPipetteNameSpecs,
   CreateCommand,
 } from '@opentrons/shared-data'
 import { css } from 'styled-components'
-import { StyledText } from '../../atoms/text'
 import { ProbeNotAttached } from '../PipetteWizardFlows/ProbeNotAttached'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
-import { useChainRunCommands } from '../../resources/runs/hooks'
+import { useChainRunCommands } from '../../resources/runs'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
 import type { Jog } from '../../molecules/JogControls/types'

@@ -1,9 +1,14 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { EXTENSION } from '@opentrons/shared-data'
-import { COLORS, TYPOGRAPHY, SPACING, Flex } from '@opentrons/components'
+import {
+  COLORS,
+  TYPOGRAPHY,
+  SPACING,
+  Flex,
+  StyledText,
+} from '@opentrons/components'
 import { css } from 'styled-components'
-import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -19,7 +24,7 @@ import calibratingFrontJaw from '../../assets/videos/gripper-wizards/CALIBRATING
 import calibratingRearJaw from '../../assets/videos/gripper-wizards/CALIBRATING_REAR_JAW.webm'
 
 import type { Coordinates } from '@opentrons/shared-data'
-import type { CreateMaintenanceCommand } from '../../resources/runs/hooks'
+import type { CreateMaintenanceCommand } from '../../resources/runs'
 import type { GripperWizardStepProps, MovePinStep } from './types'
 
 interface MovePinProps extends GripperWizardStepProps, MovePinStep {

@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../text'
+import { StyledText, TYPOGRAPHY } from '@opentrons/components'
 import { Banner } from './index'
 import type { Story, Meta } from '@storybook/react'
 
@@ -10,7 +9,7 @@ export default {
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof Banner>> = args => (
-  <Banner {...args} />
+  <Banner {...args}>{'Banner component'}</Banner>
 )
 
 export const Primary = Template.bind({})

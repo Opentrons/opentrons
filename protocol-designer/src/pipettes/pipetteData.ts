@@ -1,6 +1,6 @@
 import { DropdownOption } from '../../../components/lib/forms/DropdownField.d'
 import {
-  getPipetteNameSpecs,
+  getPipetteSpecsV2,
   getTiprackVolume,
   PipetteName,
 } from '@opentrons/shared-data'
@@ -18,12 +18,12 @@ const supportedPipetteNames: PipetteName[] = [
 // TODO: should a version of pipetteOptions be moved to shared-data,
 // and used for both PD and Run App?
 export const pipetteOptions: Options = supportedPipetteNames
-  .map((name: PipetteName) => {
-    const pipette = getPipetteNameSpecs(name)
+  .map(name => {
+    const pipette = getPipetteSpecsV2(name)
     return pipette
       ? {
           name: pipette.displayName,
-          value: pipette.name,
+          value: name as string,
         }
       : null
   })
@@ -38,7 +38,10 @@ export function getPipetteCapacity(pipetteEntity: PipetteEntity): number {
   const tiprackDef = pipetteEntity.tiprackLabwareDef
 
   if (spec && tiprackDef) {
-    return Math.min(spec.maxVolume, getTiprackVolume(tiprackDef))
+    return Math.min(
+      spec.liquids.default.maxVolume,
+      getTiprackVolume(tiprackDef)
+    )
   }
 
   console.assert(
@@ -49,11 +52,25 @@ export function getPipetteCapacity(pipetteEntity: PipetteEntity): number {
   )
   return NaN
 }
+
 export function getMinPipetteVolume(pipetteEntity: PipetteEntity): number {
   const spec = pipetteEntity.spec
 
-  if (spec) {
-    return spec.minVolume
+  const minVolumes =
+    spec != null
+      ? Object.values(spec.liquids).map(liquid => liquid.minVolume)
+      : []
+  let recommendedMinimumDisposalVol: number = 0
+  if (minVolumes.length === 1) {
+    recommendedMinimumDisposalVol = minVolumes[0]
+    //  to accommodate for lowVolume
+  } else {
+    const lowestVolume = Math.min(...minVolumes)
+    recommendedMinimumDisposalVol = lowestVolume
+  }
+
+  if (spec != null) {
+    return recommendedMinimumDisposalVol
   }
 
   console.assert(

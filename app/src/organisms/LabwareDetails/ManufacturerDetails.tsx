@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
   Box,
-  Icon,
-  Link,
   COLORS,
-  SPACING,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import type { LabwareBrand } from '../../pages/Labware/types'
 
 export interface ManufacturerDetailsProps {

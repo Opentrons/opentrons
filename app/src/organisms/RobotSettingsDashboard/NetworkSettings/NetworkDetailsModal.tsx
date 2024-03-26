@@ -2,18 +2,18 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  TYPOGRAPHY,
+  ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  ALIGN_CENTER,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  BORDERS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { Modal } from '../../../molecules/Modal'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
@@ -78,7 +78,7 @@ function ListItem({ itemName, itemValue }: ListItemProps): JSX.Element {
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       backgroundColor={COLORS.grey40}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius8}
     >
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {itemName}

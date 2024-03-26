@@ -16,9 +16,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 import type { IconName } from '@opentrons/components'
 
@@ -27,7 +26,7 @@ const SETTING_BUTTON_STYLE = css`
   margin-bottom: ${SPACING.spacing8};
   background-color: ${COLORS.grey35};
   padding: ${SPACING.spacing20} ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize4};
+  border-radius: ${BORDERS.borderRadius16};
 
   &:active {
     background-color: ${COLORS.grey50};

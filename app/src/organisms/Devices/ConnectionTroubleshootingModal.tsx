@@ -3,16 +3,16 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
   ALIGN_FLEX_END,
+  Box,
   DIRECTION_COLUMN,
   Flex,
-  Box,
   Link,
-  TYPOGRAPHY,
-  SPACING,
   PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =

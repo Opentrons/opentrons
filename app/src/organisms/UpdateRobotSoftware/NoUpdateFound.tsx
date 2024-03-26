@@ -2,18 +2,18 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  COLORS,
-  Icon,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 
 export interface NoUpdateFoundProps {
@@ -36,7 +36,7 @@ export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
         padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
       >
         <Icon

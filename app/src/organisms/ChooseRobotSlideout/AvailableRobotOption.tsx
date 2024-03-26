@@ -5,17 +5,17 @@ import { Trans, useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 
 import {
-  SPACING,
-  Icon,
-  Flex,
   Box,
-  DIRECTION_COLUMN,
   COLORS,
-  TYPOGRAPHY,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
   SIZE_1,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
@@ -23,7 +23,7 @@ import { appShellRequestor } from '../../redux/shell/remote'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
 import { RobotBusyStatusAction } from '.'
-import { useNotifyAllRunsQuery } from '../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../resources/runs'
 
 import type { IconName } from '@opentrons/components'
 import type { Runs } from '@opentrons/api-client'

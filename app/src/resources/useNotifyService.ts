@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import { useHost } from '@opentrons/react-api-client'
 
 import { appShellListener } from '../redux/shell/remote'
-import { notifySubscribeAction, notifyUnsubscribeAction } from '../redux/shell'
+import { notifySubscribeAction } from '../redux/shell'
 import {
   useTrackEvent,
   ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
@@ -55,14 +55,25 @@ export function useNotifyService<TData, TError = Error>({
     if (shouldUseNotifications) {
       // Always fetch on initial mount.
       setRefetchUsingHTTP('once')
-      appShellListener(hostname, topic, onDataEvent)
+      appShellListener({
+        hostname,
+        topic,
+        callback: onDataEvent,
+      })
       dispatch(notifySubscribeAction(hostname, topic))
       hasUsedNotifyService.current = true
-    } else setRefetchUsingHTTP('always')
+    } else {
+      setRefetchUsingHTTP('always')
+    }
 
     return () => {
-      if (hasUsedNotifyService.current && hostname != null) {
-        dispatch(notifyUnsubscribeAction(hostname, topic))
+      if (hasUsedNotifyService.current) {
+        appShellListener({
+          hostname: hostname as string,
+          topic,
+          callback: onDataEvent,
+          isDismounting: true,
+        })
       }
     }
   }, [topic, host, shouldUseNotifications])
@@ -77,7 +88,7 @@ export function useNotifyService<TData, TError = Error>({
           properties: {},
         })
       }
-    } else if ('refetchUsingHTTP' in data) {
+    } else if ('refetchUsingHTTP' in data || 'unsubscribe' in data) {
       setRefetchUsingHTTP('once')
     }
   }

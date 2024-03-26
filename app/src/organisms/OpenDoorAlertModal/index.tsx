@@ -10,10 +10,10 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 
 export function OpenDoorAlertModal(): JSX.Element {
@@ -22,7 +22,7 @@ export function OpenDoorAlertModal(): JSX.Element {
     <Modal>
       <Flex
         backgroundColor={COLORS.grey35}
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius12}
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing24}
         alignItems={ALIGN_CENTER}

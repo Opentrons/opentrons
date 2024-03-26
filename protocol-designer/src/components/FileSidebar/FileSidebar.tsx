@@ -243,7 +243,8 @@ export function v8WarningContent(t: any): JSX.Element {
 }
 export function FileSidebar(): JSX.Element {
   const fileData = useSelector(fileDataSelectors.createFile)
-  const canDownload = useSelector(selectors.getCurrentPage)
+  const currentPage = useSelector(selectors.getCurrentPage)
+  const canDownload = currentPage !== 'file-splash'
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const modulesOnDeck = initialDeckSetup.modules
   const pipettesOnDeck = initialDeckSetup.pipettes

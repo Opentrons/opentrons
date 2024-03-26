@@ -10,7 +10,7 @@ import {
 
 export const QuaternaryButton = styled(NewSecondaryBtn)`
   background-color: ${COLORS.white};
-  border-radius: ${BORDERS.radiusRoundEdge};
+  border-radius: ${BORDERS.borderRadiusFull};
   box-shadow: none;
   color: ${COLORS.blue50};
   overflow: no-wrap;

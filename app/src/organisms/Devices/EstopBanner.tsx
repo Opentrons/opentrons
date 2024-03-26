@@ -5,11 +5,11 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'
-import { StyledText } from '../../atoms/text'
 import {
   NOT_PRESENT,
   PHYSICALLY_ENGAGED,

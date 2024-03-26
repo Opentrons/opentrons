@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { TYPOGRAPHY, BORDERS, SPACING } from '../ui-style-constants'
-import { COLORS } from '../helix-design-system'
+import { TYPOGRAPHY, SPACING } from '../ui-style-constants'
+import { COLORS, BORDERS } from '../helix-design-system'
 import { POSITION_RELATIVE } from '../styles'
 import { Btn } from '../primitives'
 
@@ -10,7 +10,7 @@ const defaultTabStyle = css`
   color: ${COLORS.black90};
   background-color: ${COLORS.purple30};
   border: 0px ${BORDERS.styleSolid} ${COLORS.purple30};
-  border-radius: ${BORDERS.borderRadiusSize2};
+  border-radius: ${BORDERS.borderRadius8};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   position: ${POSITION_RELATIVE};
 

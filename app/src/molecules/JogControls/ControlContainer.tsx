@@ -4,11 +4,11 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
   Flex,
+  JUSTIFY_CENTER,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import type { StyleProps } from '@opentrons/components'
 
 interface ControlContainerProps extends StyleProps {
@@ -18,7 +18,7 @@ interface ControlContainerProps extends StyleProps {
 
 const CONTROL_CHILDREN_STYLES = css`
   background-color: ${COLORS.grey10};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   padding: ${SPACING.spacing16};
   width: 100%;
   height: 9.75rem;

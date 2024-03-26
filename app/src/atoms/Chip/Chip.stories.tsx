@@ -1,11 +1,40 @@
 import * as React from 'react'
-import { Flex, COLORS, SPACING } from '@opentrons/components'
+import { Flex, COLORS, ICON_DATA_BY_NAME, SPACING } from '@opentrons/components'
 import { touchScreenViewport } from '../../DesignTokens/constants'
 import { Chip } from '.'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Chip',
+  argTypes: {
+    type: {
+      options: ['basic', 'error', 'info', 'neutral', 'success', 'warning'],
+      control: {
+        type: 'select',
+      },
+      defaultValue: 'basic',
+    },
+    hasIcon: {
+      control: {
+        type: 'boolean',
+      },
+      defaultValue: true,
+    },
+    chipSize: {
+      options: ['medium', 'small'],
+      control: {
+        type: 'select',
+      },
+      defaultValue: 'medium',
+    },
+    iconName: {
+      options: Object.keys(ICON_DATA_BY_NAME),
+      control: {
+        type: 'select',
+      },
+      defaultValue: 'ot-alert',
+    },
+  },
   component: Chip,
   parameters: touchScreenViewport,
 } as Meta
@@ -25,32 +54,10 @@ const Template: Story<ChipStorybookProps> = ({ ...args }) => (
   </Flex>
 )
 
-export const Basic = Template.bind({})
-Basic.args = {
+export const ChipComponent = Template.bind({})
+ChipComponent.args = {
   type: 'basic',
-  text: 'Basic chip text',
-}
-
-export const Error = Template.bind({})
-Error.args = {
-  type: 'error',
-  text: 'Not connected',
-}
-
-export const Success = Template.bind({})
-Success.args = {
-  type: 'success',
-  text: 'Connected',
-}
-
-export const Warning = Template.bind({})
-Warning.args = {
-  type: 'warning',
-  text: 'Missing 1 module',
-}
-
-export const Neutral = Template.bind({})
-Neutral.args = {
-  type: 'neutral',
-  text: 'Not connected',
+  text: 'Chip component',
+  hasIcon: true,
+  chipSize: 'medium',
 }

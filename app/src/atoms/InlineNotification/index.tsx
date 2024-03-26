@@ -1,20 +1,19 @@
 import * as React from 'react'
 import {
-  Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  IconProps,
-  Flex,
-  DIRECTION_ROW,
   ALIGN_CENTER,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
   BORDERS,
   Btn,
+  COLORS,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 
-import type { StyleProps } from '@opentrons/components'
+import type { IconProps, StyleProps } from '@opentrons/components'
 
 type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
 
@@ -46,8 +45,8 @@ const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
   },
   neutral: {
     icon: { name: 'information' },
-    backgroundColor: COLORS.grey30,
-    color: COLORS.grey60,
+    backgroundColor: COLORS.blue30,
+    color: COLORS.blue60,
   },
   success: {
     icon: { name: 'ot-check' },
@@ -72,7 +71,7 @@ export function InlineNotification(
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={INLINE_NOTIFICATION_PROPS_BY_TYPE[type].backgroundColor}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
       data-testid={`InlineNotification_${type}`}
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing12}
@@ -94,7 +93,7 @@ export function InlineNotification(
           >
             {fullHeading}
           </span>
-          {message && fullmessage}
+          {message != null && fullmessage}
         </StyledText>
       </Flex>
       {onCloseClick && (
