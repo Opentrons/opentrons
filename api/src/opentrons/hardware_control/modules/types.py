@@ -68,7 +68,7 @@ class ModuleType(str, Enum):
     def to_module_fixture_id(cls, module_type: ModuleType) -> str:
         if module_type == ModuleType.THERMOCYCLER:
             # Thermocyclers are "loaded" in B1 only
-            return "thermocyclerModuleFrontV2"
+            return "thermocyclerModuleV2Front"
         if module_type == ModuleType.TEMPERATURE:
             return "temperatureModuleV2"
         if module_type == ModuleType.HEATER_SHAKER:

@@ -421,7 +421,7 @@ def ensure_and_convert_module_fixture_location(
         slot: addressable_area
         for slot, addressable_area in zip(valid_slots, addressable_areas)
     }
-    return map_addressable_area[deck_slot.name]
+    return map_addressable_area[deck_slot.value]
 
 
 def ensure_hold_time_seconds(

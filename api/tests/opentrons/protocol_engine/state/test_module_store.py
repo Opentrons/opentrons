@@ -83,12 +83,14 @@ def get_addressable_area_view(
 
 def test_initial_state() -> None:
     """It should initialize the module state."""
+    addressable_area_view = get_addressable_area_view(
+        deck_configuration=None,
+        use_simulated_deck_config=True,
+    )
+
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
-        ),
+        addressable_area_view=addressable_area_view,
     )
 
     assert subject.state == ModuleState(
@@ -99,10 +101,7 @@ def test_initial_state() -> None:
         substate_by_module_id={},
         module_offset_by_serial={},
         additional_slots_occupied_by_module_id={},
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
-        ),
+        addressable_area_view=addressable_area_view,
     )
 
 
@@ -201,12 +200,14 @@ def test_load_module(
         ),
     )
 
+    addressable_area_view = get_addressable_area_view(
+        deck_configuration=None,
+        use_simulated_deck_config=True,
+    )
+
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
-        ),
+        addressable_area_view=addressable_area_view,
     )
     subject.handle_action(action)
 
@@ -223,10 +224,7 @@ def test_load_module(
         substate_by_module_id={"module-id": expected_substate},
         module_offset_by_serial={},
         additional_slots_occupied_by_module_id={},
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
-        ),
+        addressable_area_view=addressable_area_view,
     )
 
 
@@ -359,12 +357,14 @@ def test_add_module_action(
         module_live_data=live_data,
     )
 
+    addressable_area_view = get_addressable_area_view(
+        deck_configuration=None,
+        use_simulated_deck_config=True,
+    )
+
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
-        ),
+        addressable_area_view=addressable_area_view,
     )
     subject.handle_action(action)
 
@@ -381,10 +381,7 @@ def test_add_module_action(
         substate_by_module_id={"module-id": expected_substate},
         module_offset_by_serial={},
         additional_slots_occupied_by_module_id={},
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
-        ),
+        addressable_area_view=addressable_area_view,
     )
 
 

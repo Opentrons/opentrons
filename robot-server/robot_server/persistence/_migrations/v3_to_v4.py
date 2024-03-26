@@ -19,6 +19,6 @@ class Migration3To4(Migration):  # noqa: D101
         """Migrate the persistence directory from schema 3 to 4."""
         for item in source_dir.iterdir():
             if item.is_dir():
-                shutil.copytree(src=item, dst=dest_dir)
+                shutil.copytree(src=item, dst=dest_dir / item.name)
             else:
-                shutil.copy(src=item, dst=dest_dir)
+                shutil.copy(src=item, dst=dest_dir / item.name)

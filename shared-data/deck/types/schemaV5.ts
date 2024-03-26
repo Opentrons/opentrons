@@ -119,7 +119,7 @@ export type WasteChuteCutoutFixtureId =
   | 'stagingAreaSlotWithWasteChuteRightAdapterCovered'
   | 'stagingAreaSlotWithWasteChuteRightAdapterNoCover'
 
-export type FlexModuleCutoutFixtureId = 
+export type FlexModuleCutoutFixtureId =
   | 'heaterShakerModuleV1'
   | 'temperatureModuleV2'
   | 'magneticBlockV1'
@@ -135,6 +135,6 @@ export type CutoutFixtureId =
   | StagingAreaRightSlotFixtureId
   | TrashBinAdapterCutoutFixtureId
   | WasteChuteCutoutFixtureId
-  | FlexModuleCutoutFixtureId 
+  | FlexModuleCutoutFixtureId
   | OT2SingleStandardSlot
   | OT2FixedTrashSlot
