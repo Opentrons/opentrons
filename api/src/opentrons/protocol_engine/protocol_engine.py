@@ -241,6 +241,28 @@ class ProtocolEngine:
         if self._state_store.commands.get_is_stopped():
             return
         current_id = (
+            # todo
+            #
+            ## Notes
+            # Reading:
+            # - Get single command by ID
+            # - Get all commands, ordered
+            # - Get slice of commands by integer index, potentially starting from "currently running or most recently executed" (but see confusing docs)
+            # - Get "current" (currently running, or most recently completed) command (but see confusing docs)
+            #   - May need to change for fixup commands
+            # - Get "next to execute" (first queued setup command or first queued protocol command)
+            #   - Will need to change for fixup commands
+            # == / !=, mostly for tests
+            # Writing:
+            # - Enqueue a new command
+            # - Update command for its new state
+            # Steps for this PR:
+            # 1. Naively move everything into this file
+            # ?. Resolve get_current()/get_slice() discrepancy
+            # ?. Add .tail to OrderedSet to support existing JSONv6 performance bug
+            # ?. General state deduplication and cleanup.
+            # "Most recently executed" unfortunately does not mean "most recent to have internally entered a completed state," because of mid-JSON-run failures.
+            # Resolve todo about separate actions for separate state transitions, instead of a single UpdateCommandAction
             self._state_store.commands.state.running_command_id
             or self._state_store.commands.state.queued_command_ids.head(None)
         )
@@ -256,6 +278,7 @@ class ProtocolEngine:
 
             # In the case where the running command was a setup command - check if there
             # are any pending *run* commands and, if so, clear them all
+            # todo
             current_id = self._state_store.commands.state.queued_command_ids.head(None)
             if current_id is not None:
                 fail_action = FailCommandAction(

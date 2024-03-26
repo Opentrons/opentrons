@@ -1,14 +1,11 @@
 """Protocol engine commands sub-state."""
 from __future__ import annotations
-from collections import OrderedDict
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, Union
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
-
-from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorState
 
@@ -38,6 +35,10 @@ from ..errors import (
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
+from .command_structure import (
+    CommandEntry,
+    CommandStructure,
+)
 from .config import Config
 
 
@@ -88,32 +89,11 @@ class CurrentCommand:
     index: int
 
 
-@dataclass(frozen=True)
-class CommandEntry:
-    """An command entry in state, including its index in the list."""
-
-    command: Command
-    index: int
-
-
 @dataclass
 class CommandState:
     """State of all protocol engine command resources."""
 
-    all_command_ids: List[str]
-    """All command IDs, in insertion order."""
-
-    queued_command_ids: OrderedSet[str]
-    """The IDs of queued commands, in FIFO order"""
-
-    queued_setup_command_ids: OrderedSet[str]
-    """The IDs of queued setup commands, in FIFO order"""
-
-    running_command_id: Optional[str]
-    """The ID of the currently running command, if any"""
-
-    commands_by_id: Dict[str, CommandEntry]
-    """All command resources, in insertion order, mapped by their unique IDs."""
+    command_structure: CommandStructure
 
     queue_status: QueueStatus
     """Whether the engine is currently pulling new commands off the queue to execute.
@@ -152,9 +132,6 @@ class CommandState:
     are stored on the individual commands themselves.
     """
 
-    failed_command: Optional[CommandEntry]
-    """The command, if any, that made the run fail and the index in the command list."""
-
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
 
@@ -182,17 +159,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
         """Initialize a CommandStore and its state."""
         self._config = config
         self._state = CommandState(
+            command_structure=CommandStructure(),
             queue_status=QueueStatus.SETUP,
             is_door_blocking=is_door_open and config.block_on_door_open,
             run_result=None,
-            running_command_id=None,
-            all_command_ids=[],
-            queued_command_ids=OrderedSet(),
-            queued_setup_command_ids=OrderedSet(),
-            commands_by_id=OrderedDict(),
             run_error=None,
             finish_error=None,
-            failed_command=None,
             run_completed_at=None,
             run_started_at=None,
             latest_command_hash=None,
@@ -202,8 +174,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def handle_action(self, action: Action) -> None:  # noqa: C901
         """Modify state in reaction to an action."""
         if isinstance(action, QueueCommandAction):
-            assert action.command_id not in self._state.commands_by_id
-
             # TODO(mc, 2021-06-22): mypy has trouble with this automatic
             # request > command mapping, figure out how to type precisely
             # (or wait for a future mypy version that can figure it out).
@@ -221,17 +191,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 status=CommandStatus.QUEUED,
             )
 
-            next_index = len(self._state.all_command_ids)
-            self._state.all_command_ids.append(action.command_id)
-            self._state.commands_by_id[queued_command.id] = CommandEntry(
-                index=next_index,
-                command=queued_command,
-            )
-
-            if action.request.intent == CommandIntent.SETUP:
-                self._state.queued_setup_command_ids.add(queued_command.id)
-            else:
-                self._state.queued_command_ids.add(queued_command.id)
+            self._state.command_structure.add_queued(queued_command)
 
             if action.request_hash is not None:
                 self._state.latest_command_hash = action.request_hash
@@ -240,29 +200,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         # state change actions (e.g. RunCommandAction, SucceedCommandAction)
         # to make a command's queue transition logic easier to follow
         elif isinstance(action, UpdateCommandAction):
-            command = action.command
-            prev_entry = self._state.commands_by_id.get(command.id)
-
-            if prev_entry is None:
-                index = len(self._state.all_command_ids)
-                self._state.all_command_ids.append(command.id)
-                self._state.commands_by_id[command.id] = CommandEntry(
-                    index=index,
-                    command=command,
-                )
-            else:
-                self._state.commands_by_id[command.id] = CommandEntry(
-                    index=prev_entry.index,
-                    command=command,
-                )
-
-            self._state.queued_command_ids.discard(command.id)
-            self._state.queued_setup_command_ids.discard(command.id)
-
-            if command.status == CommandStatus.RUNNING:
-                self._state.running_command_id = command.id
-            elif self._state.running_command_id == command.id:
-                self._state.running_command_id = None
+            self.state.command_structure.update(action.command)
 
         elif isinstance(action, FailCommandAction):
             error_occurrence = ErrorOccurrence.from_failed(
@@ -270,48 +208,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 createdAt=action.failed_at,
                 error=action.error,
             )
-            prev_entry = self._state.commands_by_id[action.command_id]
-            self._state.commands_by_id[action.command_id] = CommandEntry(
-                index=prev_entry.index,
-                # TODO(mc, 2022-06-06): add new "cancelled" status or similar
-                # and don't set `completedAt` in commands other than the
-                # specific one that failed
-                command=prev_entry.command.copy(
-                    update={
-                        "error": error_occurrence,
-                        "completedAt": action.failed_at,
-                        "status": CommandStatus.FAILED,
-                    }
-                ),
+            self._state.command_structure.fail(
+                command_id=action.command_id,
+                error_occurrence=error_occurrence,
+                failed_at=action.failed_at,
             )
-
-            self._state.failed_command = self._state.commands_by_id[action.command_id]
-            if prev_entry.command.intent == CommandIntent.SETUP:
-                other_command_ids_to_fail = [
-                    *[i for i in self._state.queued_setup_command_ids],
-                ]
-                self._state.queued_setup_command_ids.clear()
-            else:
-                other_command_ids_to_fail = [
-                    *[i for i in self._state.queued_command_ids],
-                ]
-                self._state.queued_command_ids.clear()
-
-            for command_id in other_command_ids_to_fail:
-                prev_entry = self._state.commands_by_id[command_id]
-
-                self._state.commands_by_id[command_id] = CommandEntry(
-                    index=prev_entry.index,
-                    command=prev_entry.command.copy(
-                        update={
-                            "completedAt": action.failed_at,
-                            "status": CommandStatus.FAILED,
-                        }
-                    ),
-                )
-
-            if self._state.running_command_id == action.command_id:
-                self._state.running_command_id = None
 
         elif isinstance(action, PlayAction):
             if not self._state.run_result:
@@ -428,10 +329,7 @@ class CommandView(HasState[CommandState]):
 
     def get(self, command_id: str) -> Command:
         """Get a command by its unique identifier."""
-        try:
-            return self._state.commands_by_id[command_id].command
-        except KeyError:
-            raise CommandDoesNotExistError(f"Command {command_id} does not exist")
+        return self._state.command_structure.get(command_id).command
 
     def get_all(self) -> List[Command]:
         """Get a list of all commands in state.
@@ -440,10 +338,7 @@ class CommandView(HasState[CommandState]):
         Replacing a command (to change its status, for example) keeps its place in the
         ordering.
         """
-        return [
-            self._state.commands_by_id[cid].command
-            for cid in self._state.all_command_ids
-        ]
+        return self._state.command_structure.get_all()
 
     def get_slice(
         self,
@@ -453,36 +348,42 @@ class CommandView(HasState[CommandState]):
         """Get a subset of commands around a given cursor.
 
         If the cursor is omitted, a cursor will be selected automatically
-        based on the currently running or most recently executed command."
+        based on the currently running or most recently executed command.
         """
-        # TODO(mc, 2022-01-31): this is not the most performant way to implement
-        # this; if this becomes a problem, change or the underlying data structure
-        # to something that isn't just an OrderedDict
-        all_command_ids = self._state.all_command_ids
-        commands_by_id = self._state.commands_by_id
-        running_command_id = self._state.running_command_id
-        queued_command_ids = self._state.queued_command_ids
-        total_length = len(all_command_ids)
+        running_command = self._state.command_structure.get_running_command()
+        queued_command_ids = self._state.command_structure.get_queued_command_ids()
+        failed_command = self._state.command_structure.get_failed_command()
+        total_length = self._state.command_structure.length()
 
         if cursor is None:
-            if running_command_id is not None:
-                cursor = commands_by_id[running_command_id].index
+            if running_command is not None:
+                cursor = running_command.index
             elif len(queued_command_ids) > 0:
-                cursor = commands_by_id[queued_command_ids.head()].index - 1
+                # Get the most recently executed command,
+                # which we can find just before the first queued command.
+                cursor = (
+                    self._state.command_structure.get(queued_command_ids.head()).index
+                    - 1
+                )
             elif (
                 self._state.run_result
                 and self._state.run_result == RunResult.FAILED
-                and self._state.failed_command
+                and failed_command
             ):
-                cursor = self._state.failed_command.index
+                # Currently, if the run fails, we mark all the commands we didn't
+                # reach as failed. This makes command status alone insufficient to
+                # find the most recent command that actually executed, so we need to
+                # store that separately.
+                cursor = failed_command.index
             else:
                 cursor = total_length - length
 
         # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor, total_length - 1))
         stop = min(total_length, actual_cursor + length)
-        command_ids = all_command_ids[actual_cursor:stop]
-        commands = [commands_by_id[cid].command for cid in command_ids]
+        commands = self._state.command_structure.get_slice(
+            start=actual_cursor, stop=stop
+        )
 
         return CommandSlice(
             commands=commands,
@@ -516,31 +417,43 @@ class CommandView(HasState[CommandState]):
         else:
             return run_error or finish_error
 
+    # TODO: Why is this different from get_slice()?
+    # TODO:
+    # - GET /runs/commands docs say that links.current is "currently running or NEXT QUEUED", and attempts to implement that via this.
+    # - These docs say that this implements "currently [running] or MOST RECENT TO HAVE COMPLETED"
+    # - This actual implementation returns currently running or MOST RECENT TO HAVE COMPLETED.
+    #
+    # Not to be confused with the ?cursor param to GET /runs/commands, which:
+    # - HTTP docs say "MOST RECENTLY EXECUTED"
+    # - Docs in this file say "MOST RECENTLY EXECUTED"
+    # - Implementation returns MOST RECENTLY EXECUTED
     def get_current(self) -> Optional[CurrentCommand]:
         """Return the "current" command, if any.
 
         The "current" command is the command that is currently executing,
         or the most recent command to have completed.
         """
-        if self._state.running_command_id:
-            entry = self._state.commands_by_id[self._state.running_command_id]
+        running_command = self._state.command_structure.get_running_command()
+        if running_command:
             return CurrentCommand(
-                command_id=entry.command.id,
-                command_key=entry.command.key,
-                created_at=entry.command.createdAt,
-                index=entry.index,
+                command_id=running_command.command.id,
+                command_key=running_command.command.key,
+                created_at=running_command.command.createdAt,
+                index=running_command.index,
             )
 
         # TODO(mc, 2022-02-07): this is O(n) in the worst case for no good reason.
         # Resolve prior to JSONv6 support, where this will matter.
-        for reverse_index, cid in enumerate(reversed(self._state.all_command_ids)):
+        for reverse_index, cid in enumerate(
+            reversed(self._state.command_structure.get_all_ids())
+        ):
             if self.get_command_is_final(cid):
-                entry = self._state.commands_by_id[cid]
+                entry = self._state.command_structure.get(cid)
                 return CurrentCommand(
                     command_id=entry.command.id,
                     command_key=entry.command.key,
                     created_at=entry.command.createdAt,
-                    index=len(self._state.all_command_ids) - reverse_index - 1,
+                    index=self._state.command_structure.length() - reverse_index - 1,
                 )
 
         return None
@@ -559,13 +472,15 @@ class CommandView(HasState[CommandState]):
             raise RunStoppedError("Engine was stopped")
 
         # if there is a setup command queued, prioritize it
-        next_setup_cmd = self._state.queued_setup_command_ids.head(None)
+        next_setup_cmd = self._state.command_structure.get_queued_command_ids().head(
+            None
+        )
         if self._state.queue_status != QueueStatus.PAUSED and next_setup_cmd:
             return next_setup_cmd
 
         # if the queue is running, return the next protocol command
         if self._state.queue_status == QueueStatus.RUNNING:
-            return self._state.queued_command_ids.head(None)
+            return self._state.command_structure.get_queued_command_ids().head(None)
 
         # otherwise we've got nothing to do
         return None
@@ -576,8 +491,8 @@ class CommandView(HasState[CommandState]):
             return True
         elif (
             self.get_status() == EngineStatus.IDLE
-            and self._state.running_command_id is None
-            and len(self._state.queued_setup_command_ids) == 0
+            and self._state.command_structure.get_running_command() is None
+            and len(self._state.command_structure.get_queued_setup_command_ids()) == 0
         ):
             return True
         else:
@@ -625,15 +540,14 @@ class CommandView(HasState[CommandState]):
             CommandExecutionFailedError: if any added command failed, and its `intent` wasn't
             `setup`.
         """
-        no_command_running = self._state.running_command_id is None
+        no_command_running = self._state.command_structure.get_running_command() is None
         no_command_to_execute = (
             self._state.run_result is not None
-            or len(self._state.queued_command_ids) == 0
+            or len(self._state.command_structure.get_queued_command_ids()) == 0
         )
 
         if no_command_running and no_command_to_execute:
-            for command_id in self._state.all_command_ids:
-                command = self._state.commands_by_id[command_id].command
+            for command in self._state.command_structure.get_all():
                 if command.error and command.intent != CommandIntent.SETUP:
                     # TODO(tz, 7-11-23): avoid raising an error and return the status instead
                     raise ProtocolCommandFailedError(
