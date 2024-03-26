@@ -77,7 +77,7 @@ export function ProtocolWithLastRun({
     conflictedSlots,
   } = useMissingProtocolHardware(protocolData.id)
   const history = useHistory()
-  const isOk = !(runData?.ok === false)
+  const isOk = 'ok' in runData ? !(runData?.ok === false) : true
   const isReadyToBeReRun = isOk && missingProtocolHardware.length === 0
   const chipText = useRerunnableStatusText(
     isOk,
