@@ -21,12 +21,7 @@ import { DropTipWizard } from '../../DropTipWizard'
 
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
-import type {
-  BadPipette,
-  Mount,
-  PipetteData,
-  HostConfig,
-} from '@opentrons/api-client'
+import type { BadPipette, Mount, PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type {
   PipetteWizardFlow,
@@ -66,7 +61,7 @@ export function FlexPipetteCard({
   isEstopNotDisengaged,
 }: FlexPipetteCardProps): JSX.Element {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
-  const host = useHost() as HostConfig
+  const host = useHost()
 
   const [
     showAboutPipetteSlideout,
@@ -258,7 +253,7 @@ export function FlexPipetteCard({
           closeFlow={() => setShowDropTipWizard(false)}
         />
       ) : null}
-      {attachedPipette?.ok && showAboutPipetteSlideout && (
+      {attachedPipette?.ok && showAboutPipetteSlideout ? (
         <AboutPipetteSlideout
           pipetteId={attachedPipette.serialNumber}
           pipetteName={pipetteDisplayName ?? attachedPipette.instrumentName}
@@ -266,7 +261,7 @@ export function FlexPipetteCard({
           isExpanded={showAboutPipetteSlideout}
           onCloseClick={() => setShowAboutPipetteSlideout(false)}
         />
-      )}
+      ) : null}
       {showChoosePipette ? (
         <ChoosePipette
           proceed={handleAttach}

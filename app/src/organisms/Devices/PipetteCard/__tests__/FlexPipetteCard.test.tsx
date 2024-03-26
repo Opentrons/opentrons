@@ -4,6 +4,7 @@ import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { useCurrentSubsystemUpdateQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
+import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
 import { handlePipetteWizardFlows } from '../../../PipetteWizardFlows'
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { FlexPipetteCard } from '../FlexPipetteCard'
@@ -11,7 +12,6 @@ import { ChoosePipette } from '../../../PipetteWizardFlows/ChoosePipette'
 import { DropTipWizard } from '../../../DropTipWizard'
 
 import type { PipetteData } from '@opentrons/api-client'
-import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
 
 vi.mock('../../../PipetteWizardFlows')
 vi.mock('../../../PipetteWizardFlows/ChoosePipette')

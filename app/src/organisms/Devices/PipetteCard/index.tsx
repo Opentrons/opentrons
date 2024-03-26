@@ -142,7 +142,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                   pipetteSpecs={pipetteModelSpecs}
                   mount={mount}
                   transform="scale(0.3)"
-                  transformOrigin={'20% 52%'}
+                  transformOrigin="20% 52%"
                 />
               </Flex>
             ) : null}
