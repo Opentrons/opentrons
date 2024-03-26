@@ -180,6 +180,7 @@ class LegacyCommandMapper:
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 elif isinstance(running_command, pe_commands.DropTip):
@@ -190,6 +191,7 @@ class LegacyCommandMapper:
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 elif isinstance(running_command, pe_commands.Aspirate):
@@ -203,6 +205,7 @@ class LegacyCommandMapper:
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 elif isinstance(running_command, pe_commands.Dispense):
@@ -216,6 +219,7 @@ class LegacyCommandMapper:
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 elif isinstance(running_command, pe_commands.BlowOut):
@@ -226,6 +230,7 @@ class LegacyCommandMapper:
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 elif isinstance(running_command, pe_commands.Custom):
@@ -234,6 +239,7 @@ class LegacyCommandMapper:
                             "result": pe_commands.CustomResult.construct(),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 else:
@@ -241,6 +247,7 @@ class LegacyCommandMapper:
                         update={
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 results.append(
@@ -612,6 +619,7 @@ class LegacyCommandMapper:
                 version=labware_load_info.labware_version,
                 displayName=labware_load_info.labware_display_name,
             ),
+            notes=[],
             result=pe_commands.LoadLabwareResult.construct(
                 labwareId=labware_id,
                 definition=LabwareDefinition.parse_obj(
@@ -672,6 +680,7 @@ class LegacyCommandMapper:
                 pipetteName=PipetteNameType(instrument_load_info.instrument_load_name),
                 mount=mount,
             ),
+            notes=[],
             result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id),
         )
         serial = instrument_load_info.pipette_dict.get("pipette_id", None) or ""
@@ -740,6 +749,7 @@ class LegacyCommandMapper:
                 ),
                 moduleId=module_id,
             ),
+            notes=[],
             result=pe_commands.LoadModuleResult.construct(
                 moduleId=module_id,
                 serialNumber=module_load_info.module_serial,
