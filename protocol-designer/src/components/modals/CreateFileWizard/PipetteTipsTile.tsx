@@ -182,10 +182,9 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
 
   React.useEffect(() => {
     if (selectedValues.length === 0) {
-      setValue(
-        `pipettesByMount.${mount}.tiprackDefURI`,
-        [tiprackOptions[0]?.value] ?? ['']
-      )
+      setValue(`pipettesByMount.${mount}.tiprackDefURI`, [
+        tiprackOptions[0]?.value ?? '',
+      ])
     }
   }, [selectedValues, setValue, tiprackOptions])
 
