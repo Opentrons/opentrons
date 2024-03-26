@@ -37,6 +37,8 @@ from opentrons.protocol_engine.actions import (
     DoorChangeAction,
 )
 
+from opentrons.protocol_engine.state.command_structure import CommandStructure
+
 from .command_fixtures import (
     create_queued_command,
     create_running_command,
@@ -72,16 +74,12 @@ def test_initial_state(
     subject = CommandStore(is_door_open=is_door_open, config=config)
 
     assert subject.state == CommandState(
+        command_structure=CommandStructure(),
         queue_status=QueueStatus.SETUP,
         run_completed_at=None,
         run_started_at=None,
         is_door_blocking=expected_is_door_blocking,
         run_result=None,
-        running_command_id=None,
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        all_command_ids=[],
-        commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
         failed_command=None,
@@ -1139,11 +1137,6 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         run_result=RunResult.STOPPED,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
         failed_command=None,
