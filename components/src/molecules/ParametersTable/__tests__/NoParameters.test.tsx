@@ -2,28 +2,25 @@ import * as React from 'react'
 import { screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 
-import { BORDERS, COLORS } from '@opentrons/components'
+import { renderWithProviders } from '../../../testing/utils'
+import { BORDERS, COLORS } from '../../../helix-design-system'
+import { NoParameters } from '../NoParameters'
 
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-
-import { NoParameter } from '../NoParameter'
-
-const render = () => {
-  return renderWithProviders(<NoParameter />, {
-    i18nInstance: i18n,
-  })
+const render = (props: React.ComponentProps<typeof NoParameters>) => {
+  return renderWithProviders(<NoParameters {...props} />)
 }
 
-describe('NoParameter', () => {
+const tMock = (key: string) => key
+
+describe('NoParameters', () => {
   it('should render text and icon with proper color', () => {
-    render()
+    render({})
     screen.getByLabelText('alert')
     screen.getByText('No parameters specified in this protocol')
   })
 
   it('should have proper styles', () => {
-    render()
+    render({})
     expect(screen.getByTestId('NoRunTimeParameter')).toHaveStyle(
       `background-color: ${COLORS.grey30}`
     )
@@ -33,5 +30,12 @@ describe('NoParameter', () => {
     expect(screen.getByLabelText('alert')).toHaveStyle(
       `color: ${COLORS.grey60}`
     )
+  })
+
+  it('should render the raw i18n value if a t is provided', () => {
+    render({
+      t: tMock,
+    })
+    screen.getByText('no_parameters')
   })
 })

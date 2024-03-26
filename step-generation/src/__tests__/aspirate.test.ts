@@ -4,7 +4,7 @@ import { expectTimelineError } from '../__utils__/testMatchers'
 import { aspirate } from '../commandCreators/atomic/aspirate'
 import {
   getLabwareDefURI,
-  getPipetteNameSpecs,
+  getPipetteSpecsV2,
   fixtureTiprack10ul as tip10,
   fixtureTiprack1000ul as tip1000,
 } from '@opentrons/shared-data'
@@ -35,7 +35,7 @@ import type { InvariantContext, RobotState } from '../'
 const fixtureTiprack10ul = tip10 as LabwareDefinition2
 const fixtureTiprack1000ul = tip1000 as LabwareDefinition2
 const FLEX_PIPETTE = 'p1000_single_flex'
-const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
+const FlexPipetteNameSpecs = getPipetteSpecsV2(FLEX_PIPETTE)
 
 vi.mock('../utils/thermocyclerPipetteCollision')
 vi.mock('../utils/heaterShakerCollision')

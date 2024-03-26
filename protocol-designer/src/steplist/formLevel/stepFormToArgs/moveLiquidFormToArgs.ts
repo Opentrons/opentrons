@@ -15,6 +15,7 @@ import type {
   TransferArgs,
   InnerMixArgs,
 } from '@opentrons/step-generation'
+import { getMatchingTipLiquidSpecs } from '../../../utils'
 type MoveLiquidFields = HydratedMoveLiquidFormData['fields']
 
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
@@ -66,7 +67,6 @@ export const moveLiquidFormToArgs = (
     `moveLiquidFormToArgs called with stepType ${hydratedFormData.stepType}, expected "moveLiquid"`
   )
   const fields = hydratedFormData.fields
-  const pipetteSpec = fields.pipette.spec
   const pipetteId = fields.pipette.id
   const {
     volume,
@@ -171,21 +171,28 @@ export const moveLiquidFormToArgs = (
     'dispense_airGap_checkbox',
     'dispense_airGap_volume'
   )
+  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
+    fields.pipette,
+    fields.volume
+  )
   const commonFields = {
     pipette: pipetteId,
     volume,
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
     aspirateFlowRateUlSec:
-      fields.aspirate_flowRate || pipetteSpec.defaultAspirateFlowRate.value,
+      fields.aspirate_flowRate ||
+      matchingTipLiquidSpecs.defaultAspirateFlowRate.default,
     dispenseFlowRateUlSec:
-      fields.dispense_flowRate || pipetteSpec.defaultDispenseFlowRate.value,
+      fields.dispense_flowRate ||
+      matchingTipLiquidSpecs.defaultDispenseFlowRate.default,
     aspirateOffsetFromBottomMm:
       fields.aspirate_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
     dispenseOffsetFromBottomMm:
       fields.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     blowoutFlowRateUlSec:
-      fields.dispense_flowRate || pipetteSpec.defaultBlowOutFlowRate.value,
+      fields.dispense_flowRate ||
+      matchingTipLiquidSpecs.defaultBlowOutFlowRate.default,
     blowoutOffsetFromTopMm,
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),

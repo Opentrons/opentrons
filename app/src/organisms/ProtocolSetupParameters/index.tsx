@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
 import { useQueryClient } from 'react-query'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -13,7 +14,6 @@ import {
 import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
 import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
-import { formatRunTimeParameterValue } from '../ProtocolDetails/ProtocolParameters/utils'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'

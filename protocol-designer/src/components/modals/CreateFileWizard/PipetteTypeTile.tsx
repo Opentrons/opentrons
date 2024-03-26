@@ -18,9 +18,9 @@ import {
   OT2_ROBOT_TYPE,
   OT3_PIPETTES,
   getAllPipetteNames,
-  getPipetteNameSpecs,
   LEFT,
   RIGHT,
+  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 
 import { GoBack } from './GoBack'
@@ -141,7 +141,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
       )
       .map(name => ({
         value: name,
-        name: getPipetteNameSpecs(name)?.displayName ?? '',
+        name: getPipetteSpecsV2(name)?.displayName ?? '',
       }))
     const noneOption = allowNoPipette ? [{ name: 'None', value: '' }] : []
     return display96Channel
@@ -180,7 +180,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
                 imageStyle={css`
                   max-height: 3rem;
                 `}
-                pipetteSpecs={getPipetteNameSpecs(o.value as PipetteName)}
+                pipetteSpecs={getPipetteSpecsV2(o.value as PipetteName)}
               />
             )
           }

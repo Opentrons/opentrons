@@ -15,7 +15,7 @@ import uniq from 'lodash/uniq'
 
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 import { get96Channel384WellPlateWells, getLabwareDefURI, orderWells } from '.'
-import type { LabwareDefinition2, PipetteNameSpecs } from '../types'
+import type { LabwareDefinition2, PipetteV2Specs } from '../types'
 
 type WellSetByPrimaryWell = string[][]
 
@@ -51,7 +51,7 @@ export interface WellSetHelpers {
   ) => string[] | null | undefined
 
   canPipetteUseLabware: (
-    pipetteSpec: PipetteNameSpecs,
+    pipetteSpec: PipetteV2Specs,
     labwareDef?: LabwareDefinition2,
     trashName?: string
   ) => boolean
@@ -123,7 +123,7 @@ export const makeWellSetHelpers = (): WellSetHelpers => {
   }
 
   const canPipetteUseLabware = (
-    pipetteSpec: PipetteNameSpecs,
+    pipetteSpec: PipetteV2Specs,
     labwareDef?: LabwareDefinition2,
     trashName?: string
   ): boolean => {

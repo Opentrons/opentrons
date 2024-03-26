@@ -28,7 +28,7 @@ class RunDataError(ErrorDetails):
     """A model for an error loading a run."""
 
     title: str = Field(
-        "Run Loading Error",
+        "Run Data Error",
         description="A short, human readable name for this type of error",
     )
     id: Literal["RunDataError"] = "RunDataError"

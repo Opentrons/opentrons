@@ -118,6 +118,10 @@
       "detail": "Gripper Pickup Failed",
       "category": "roboticsControlError"
     },
+    "2016": {
+      "detail": "Motor Driver Error",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"

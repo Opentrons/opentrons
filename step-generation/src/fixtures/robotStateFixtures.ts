@@ -4,17 +4,17 @@ import {
   getLabwareDefURI,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  fixtureP10Single as _fixtureP10Single,
-  fixtureP10Multi as _fixtureP10Multi,
-  fixtureP300Single as _fixtureP300Single,
-  fixtureP300Multi as _fixtureP300Multi,
-  fixtureP100096 as _fixtureP100096,
   fixture96Plate as _fixture96Plate,
   fixture12Trough as _fixture12Trough,
   fixtureTiprack10ul as _fixtureTiprack10ul,
   fixtureTiprack300ul as _fixtureTiprack300ul,
   fixtureTiprack1000ul as _fixtureTiprack1000ul,
   fixtureTiprackAdapter as _fixtureTiprackAdapter,
+  fixtureP10SingleV2Specs,
+  fixtureP10MultiV2Specs,
+  fixtureP300SingleV2Specs,
+  fixtureP300MultiV2Specs,
+  fixtureP100096V2Specs,
 } from '@opentrons/shared-data'
 
 import {
@@ -43,12 +43,6 @@ import type {
   RobotState,
   RobotStateAndWarnings,
 } from '../'
-
-const fixtureP10Single = _fixtureP10Single
-const fixtureP10Multi = _fixtureP10Multi
-const fixtureP300Single = _fixtureP300Single
-const fixtureP300Multi = _fixtureP300Multi
-const fixtureP100096 = _fixtureP100096
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2
@@ -157,7 +151,7 @@ export function makeContext(): InvariantContext {
 
       tiprackDefURI: getLabwareDefURI(fixtureTiprack10ul),
       tiprackLabwareDef: fixtureTiprack10ul,
-      spec: fixtureP10Single,
+      spec: fixtureP10SingleV2Specs,
     },
     p10MultiId: {
       name: 'p10_multi',
@@ -165,7 +159,7 @@ export function makeContext(): InvariantContext {
 
       tiprackDefURI: getLabwareDefURI(fixtureTiprack10ul),
       tiprackLabwareDef: fixtureTiprack10ul,
-      spec: fixtureP10Multi,
+      spec: fixtureP10MultiV2Specs,
     },
     [DEFAULT_PIPETTE]: {
       name: 'p300_single',
@@ -173,7 +167,7 @@ export function makeContext(): InvariantContext {
 
       tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
       tiprackLabwareDef: fixtureTiprack300ul,
-      spec: fixtureP300Single,
+      spec: fixtureP300SingleV2Specs,
     },
     [MULTI_PIPETTE]: {
       name: 'p300_multi',
@@ -181,7 +175,7 @@ export function makeContext(): InvariantContext {
 
       tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
       tiprackLabwareDef: fixtureTiprack300ul,
-      spec: fixtureP300Multi,
+      spec: fixtureP300MultiV2Specs,
     },
     [PIPETTE_96]: {
       name: 'p1000_96',
@@ -189,7 +183,7 @@ export function makeContext(): InvariantContext {
 
       tiprackDefURI: getLabwareDefURI(fixtureTiprack1000ul),
       tiprackLabwareDef: fixtureTiprack1000ul,
-      spec: fixtureP100096,
+      spec: fixtureP100096V2Specs,
     },
   }
   return {

@@ -151,7 +151,7 @@ export const selectAllSteps = (): ThunkAction<
     type: 'SELECT_MULTIPLE_STEPS',
     payload: {
       stepIds: allStepIds,
-      // @ts-expect-error(sa, 2021-6-15): find could return undefined, need to null check PipetteNameSpecs
+      // @ts-expect-error(sa, 2021-6-15): find could return undefined, need to null check PipetteSpecsV2
       lastSelected: last(allStepIds),
     },
   }

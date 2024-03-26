@@ -118,6 +118,7 @@ export const getIncompatiblePipetteNames = (
 }
 
 export * from '../pipette/fixtures/name'
+export * from '../pipette/fixtures/index'
 
 const getChannelsFromString = (
   pipChannelString: PipChannelString
@@ -165,6 +166,10 @@ model, and version in order to return the correct pipette schema v2 json files.
 export const getPipetteSpecsV2 = (
   name: PipetteName | PipetteModel
 ): PipetteV2Specs | null => {
+  if (name == null) {
+    return null
+  }
+
   const nameSplit = name.split('_')
   const pipetteModel = nameSplit[0] // ex: p300
   const channels = getChannelsFromString(nameSplit[1] as PipChannelString) //  ex: single -> single_channel

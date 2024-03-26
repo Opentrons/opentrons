@@ -67,6 +67,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
           {...propsForFields[addFieldNamePrefix('flowRate')]}
           pipetteId={getPipetteIdForForm()}
           flowRateType={prefix}
+          volume={propsForFields.volume.value}
         />
         <TipPositionField
           {...propsForFields[addFieldNamePrefix('mmFromBottom')]}

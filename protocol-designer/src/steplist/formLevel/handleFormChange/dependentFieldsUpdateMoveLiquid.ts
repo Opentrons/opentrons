@@ -1,11 +1,15 @@
 import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
+import {
+  getMinPipetteVolume,
+  getPipetteCapacity,
+} from '../../../pipettes/pipetteData'
 import { getWellRatio } from '../../utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
@@ -25,10 +29,6 @@ import type {
 } from '@opentrons/step-generation'
 import { FormData, StepFieldName } from '../../../form-types'
 import { FormPatch } from '../../actions/types'
-import {
-  getMinPipetteVolume,
-  getPipetteCapacity,
-} from '../../../pipettes/pipetteData'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>
@@ -232,8 +232,8 @@ const updatePatchOnPipetteChange = (
     let airGapVolume: string | null = null
 
     if (typeof newPipette === 'string' && newPipette in pipetteEntities) {
-      const pipetteSpec = pipetteEntities[newPipette].spec
-      airGapVolume = `${pipetteSpec.minVolume}`
+      const minVolume = getMinPipetteVolume(pipetteEntities[newPipette])
+      airGapVolume = minVolume.toString()
     }
 
     return {
@@ -366,14 +366,25 @@ const updatePatchDisposalVolumeFields = (
   ) {
     // @ts-expect-error(sa, 2021-6-14): appliedPatch.pipette does not exist. Address in #3161
     const pipetteEntity = pipetteEntities[appliedPatch.pipette]
-    const pipetteSpec = getPipetteNameSpecs(pipetteEntity.name)
-    const recommendedMinimumDisposalVol =
-      (pipetteSpec && pipetteSpec.minVolume) || 0
+    const pipetteSpec = getPipetteSpecsV2(pipetteEntity.name)
+    const minVolumes =
+      pipetteSpec != null
+        ? Object.values(pipetteSpec.liquids).map(liquid => liquid.minVolume)
+        : []
+    let recommendedMinimumDisposalVol: string = '0'
+    if (minVolumes.length === 1) {
+      recommendedMinimumDisposalVol = minVolumes[0].toString()
+      //  to accommodate for lowVolume
+    } else {
+      const lowestVolume = Math.min(...minVolumes)
+      recommendedMinimumDisposalVol = lowestVolume.toString()
+    }
+
     // reset to recommended vol. Expects `clampDisposalVolume` to reduce it if needed
     return {
       ...patch,
       disposalVolume_checkbox: true,
-      disposalVolume_volume: String(recommendedMinimumDisposalVol || 0),
+      disposalVolume_volume: recommendedMinimumDisposalVol,
     }
   }
 

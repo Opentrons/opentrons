@@ -1,13 +1,12 @@
 import * as React from 'react'
-import { describe, it, vi, beforeEach, afterEach } from 'vitest'
+import { renderWithProviders } from '../../../testing/utils'
+import { describe, it, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
-import { ProtocolParameters } from '..'
+import { ParametersTable } from '../index'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
+const tMock = (key: string) => key
 const mockRunTimeParameter: RunTimeParameter[] = [
   {
     displayName: 'Trash Tips',
@@ -71,29 +70,17 @@ const mockRunTimeParameter: RunTimeParameter[] = [
   },
 ]
 
-const render = (props: React.ComponentProps<typeof ProtocolParameters>) => {
-  return renderWithProviders(<ProtocolParameters {...props} />, {
-    i18nInstance: i18n,
-  })
+const render = (props: React.ComponentProps<typeof ParametersTable>) => {
+  return renderWithProviders(<ParametersTable {...props} />)
 }
 
-describe('ProtocolParameters', () => {
-  let props: React.ComponentProps<typeof ProtocolParameters>
+describe('ParametersTabl', () => {
+  let props: React.ComponentProps<typeof ParametersTable>
 
   beforeEach(() => {
     props = {
       runTimeParameters: mockRunTimeParameter,
     }
-  })
-
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it('should render banner when RunTimeParameters are existing', () => {
-    render(props)
-    screen.getByText('Listed values are view-only')
-    screen.getByText('Start setup to customize values')
   })
 
   it('should render table header', () => {
@@ -122,11 +109,11 @@ describe('ProtocolParameters', () => {
     screen.getByText('Left, Right')
   })
 
-  it('should render empty display when protocol does not have any parameter', () => {
-    props = {
-      runTimeParameters: [],
-    }
+  it('should render the raw i18n values if a t prop is provided', () => {
+    props.t = tMock
     render(props)
-    screen.getByText('No parameters specified in this protocol')
+    screen.getByText('name')
+    screen.getByText('default_value')
+    screen.getByText('range')
   })
 })

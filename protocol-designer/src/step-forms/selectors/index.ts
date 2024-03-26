@@ -4,7 +4,6 @@ import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
 import { createSelector, Selector } from 'reselect'
 import {
-  getPipetteNameSpecs,
   getLabwareDisplayName,
   getLabwareDefURI,
   MAGNETIC_MODULE_TYPE,
@@ -13,6 +12,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   PipetteName,
   MAGNETIC_BLOCK_TYPE,
+  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 import {
   AdditionalEquipmentEntities,
@@ -346,7 +346,7 @@ export const getPermittedTipracks: Selector<
 )
 
 function _getPipetteDisplayName(name: PipetteName): string {
-  const pipetteSpecs = getPipetteNameSpecs(name)
+  const pipetteSpecs = getPipetteSpecsV2(name)
   if (!pipetteSpecs) return 'Unknown Pipette'
   return pipetteSpecs.displayName
 }

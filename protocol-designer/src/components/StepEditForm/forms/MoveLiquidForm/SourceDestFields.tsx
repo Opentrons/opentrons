@@ -37,6 +37,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
   const { className, formData, prefix, propsForFields } = props
   const { t } = useTranslation(['form', 'application'])
+
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -90,6 +91,7 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           {...propsForFields[addFieldNamePrefix('flowRate')]}
           pipetteId={formData.pipette}
           flowRateType={prefix}
+          volume={propsForFields.volume.value}
         />
         <TipPositionField
           {...propsForFields[addFieldNamePrefix('mmFromBottom')]}

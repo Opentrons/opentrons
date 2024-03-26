@@ -2,7 +2,7 @@ import { when } from 'vitest-when'
 import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
 import {
   getLabwareDefURI,
-  getPipetteNameSpecs,
+  getPipetteSpecsV2,
   fixtureTiprack1000ul as _fixtureTiprack1000ul,
 } from '@opentrons/shared-data'
 import { heaterShakerOpenLatch } from '../commandCreators/atomic/heaterShakerOpenLatch'
@@ -20,7 +20,7 @@ vi.mock('../utils/heaterShakerCollision')
 
 const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
 const FLEX_PIPETTE = 'p1000_single_flex'
-const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
+const FlexPipetteNameSpecs = getPipetteSpecsV2(FLEX_PIPETTE)
 
 describe('heaterShakerOpenLatch', () => {
   const HEATER_SHAKER_ID = 'heaterShakerId'

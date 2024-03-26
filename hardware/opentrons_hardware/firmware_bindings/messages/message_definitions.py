@@ -359,6 +359,26 @@ class ReadMotorDriverResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class ReadMotorDriverErrorStatusRequest(BaseMessage):  # noqa: D101
+    payload: payloads.EmptyPayload
+    payload_type: Type[payloads.EmptyPayload] = payloads.EmptyPayload
+    message_id: Literal[
+        MessageId.read_motor_driver_error_status_request
+    ] = MessageId.read_motor_driver_error_status_request
+
+
+@dataclass
+class ReadMotorDriverErrorStatusResponse(BaseMessage):  # noqa: D101
+    payload: payloads.ReadMotorDriverErrorStatusResponsePayload
+    payload_type: Type[
+        payloads.ReadMotorDriverErrorStatusResponsePayload
+    ] = payloads.ReadMotorDriverErrorStatusResponsePayload
+    message_id: Literal[
+        MessageId.read_motor_driver_error_status_response
+    ] = MessageId.read_motor_driver_error_status_response
+
+
+@dataclass
 class WriteMotorCurrentRequest(BaseMessage):  # noqa: D101
     payload: payloads.MotorCurrentPayload
     payload_type: Type[payloads.MotorCurrentPayload] = payloads.MotorCurrentPayload

@@ -7,6 +7,8 @@ After=nginx.service
 
 After=opentrons-status-leds.service
 
+Wants=mosquitto.service
+After=mosquitto.service
 
 [Service]
 

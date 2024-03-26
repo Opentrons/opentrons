@@ -151,7 +151,7 @@ describe('CreateFileWizard', () => {
     screen.getByText('Step 2 / 7')
     //  select flex pipette
     fireEvent.click(
-      screen.getByLabelText('EquipmentOption_flex_Flex 1-Channel 50 μL')
+      screen.getByLabelText('EquipmentOption_flex_Flex 1-Channel 1000 μL')
     )
     next = screen.getByRole('button', { name: 'Next' })
     fireEvent.click(next)

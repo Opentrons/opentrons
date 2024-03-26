@@ -37,7 +37,7 @@ const values = {
   },
   pipettesByMount: {
     left: {
-      pipetteName: 'p50_single_flex',
+      pipetteName: 'p1000_single_flex',
       tiprackDefURI: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
     },
     right: { pipetteName: null, tiprackDefURI: null },
@@ -98,10 +98,10 @@ describe('PipetteTipsTile', () => {
   afterEach(() => {
     cleanup()
   })
-  it('renders default tiprack options for 50uL flex pipette and btn ctas work', () => {
+  it('renders default tiprack options for 1000uL flex pipette and btn ctas work', () => {
     render(props)
-    screen.getByText('Choose tips for Flex 1-Channel 50 μL')
-    screen.getByText('mock EquipmentOption')
+    screen.getByText('Choose tips for Flex 1-Channel 1000 μL')
+    screen.getAllByText('mock EquipmentOption')
     screen.getByText('Go back')
     fireEvent.click(screen.getByRole('button', { name: 'GoBack_button' }))
     expect(props.goBack).toHaveBeenCalled()
@@ -131,15 +131,15 @@ describe('PipetteTipsTile', () => {
       },
     ])
     render(props)
-    screen.getByText('Choose tips for Flex 1-Channel 50 μL')
+    screen.getByText('Choose tips for Flex 1-Channel 1000 μL')
     fireEvent.click(screen.getByLabelText('PipetteTipsTile_customTipButton'))
     screen.getByText('Custom tips')
-    expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(2)
+    expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(3)
   })
-  it('renders all tiprack options for 50uL flex pipette when all tipracks are true', () => {
+  it('renders all tiprack options for 1000uL flex pipette when all tipracks are true', () => {
     vi.mocked(getAllowAllTipracks).mockReturnValue(true)
     render(props)
-    screen.getByText('Choose tips for Flex 1-Channel 50 μL')
+    screen.getByText('Choose tips for Flex 1-Channel 1000 μL')
     expect(screen.getAllByText('mock EquipmentOption')).toHaveLength(2)
   })
   it('renders default options for 10uL ot-2 pipette', () => {

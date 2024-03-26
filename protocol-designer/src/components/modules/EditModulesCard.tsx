@@ -7,8 +7,8 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   ModuleType,
   PipetteName,
-  getPipetteNameSpecs,
   FLEX_ROBOT_TYPE,
+  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
@@ -85,8 +85,8 @@ export function EditModulesCard(props: Props): JSX.Element {
   const showHeaterShakerPipetteCollisions =
     isHeaterShakerOnDeck &&
     [
-      getPipetteNameSpecs(pipettesByMount.left.pipetteName as PipetteName),
-      getPipetteNameSpecs(pipettesByMount.right.pipetteName as PipetteName),
+      getPipetteSpecsV2(pipettesByMount.left.pipetteName as PipetteName),
+      getPipetteSpecsV2(pipettesByMount.right.pipetteName as PipetteName),
     ].some(pipetteSpecs => pipetteSpecs?.channels !== 1)
 
   const warningsEnabled = !moduleRestrictionsDisabled

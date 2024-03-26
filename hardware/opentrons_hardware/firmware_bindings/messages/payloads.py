@@ -266,6 +266,14 @@ class ReadMotorDriverRegisterResponsePayload(EmptyPayload):
 
 
 @dataclass(eq=False)
+class ReadMotorDriverErrorStatusResponsePayload(EmptyPayload):
+    """Read motor driver error status response payload."""
+
+    reg_addr: utils.UInt8Field
+    data: utils.UInt32Field
+
+
+@dataclass(eq=False)
 class MotorCurrentPayload(EmptyPayload):
     """Read motor current register payload."""
 

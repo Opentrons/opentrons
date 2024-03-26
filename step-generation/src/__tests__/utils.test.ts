@@ -9,14 +9,12 @@ import {
   getIsLabwareAboveHeight,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   HEATERSHAKER_MODULE_TYPE,
-  PipetteNameSpecs,
   fixtureTrash as _fixtureTrash,
   fixture96Plate as _fixture96Plate,
   fixtureTiprack10ul as _fixtureTiprack10ul,
   fixtureTiprack300ul as _fixtureTiprack300ul,
-  fixtureP10Single,
-  fixtureP300Multi,
-  pipetteNameSpecFixtures,
+  fixtureP10SingleV2Specs,
+  fixtureP300MultiV2Specs,
 } from '@opentrons/shared-data'
 import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../constants'
 import {
@@ -275,14 +273,14 @@ describe('makeInitialRobotState', () => {
             p10SingleId: {
               id: 'p10SingleId',
               name: 'p10_single',
-              spec: fixtureP10Single,
+              spec: fixtureP10SingleV2Specs,
               tiprackDefURI: getLabwareDefURI(fixtureTiprack10ul),
               tiprackLabwareDef: fixtureTiprack10ul,
             },
             p300MultiId: {
               id: 'p300MultiId',
               name: 'p300_multi',
-              spec: fixtureP300Multi,
+              spec: fixtureP300MultiV2Specs,
               tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
               tiprackLabwareDef: fixtureTiprack300ul,
             },
@@ -878,7 +876,7 @@ describe('getIsHeaterShakerEastWestWithLatchOpen', () => {
 describe('getIsHeaterShakerEastWestMultiChannelPipette', () => {
   let slot: string
   let modules: RobotState['modules']
-  let pipetteSpecs: PipetteNameSpecs
+  let pipetteSpecs: SharedData.PipetteV2Specs
   beforeEach(() => {
     slot = '2'
     modules = {
@@ -892,7 +890,7 @@ describe('getIsHeaterShakerEastWestMultiChannelPipette', () => {
         },
       },
     }
-    pipetteSpecs = pipetteNameSpecFixtures.p10_multi as PipetteNameSpecs
+    pipetteSpecs = SharedData.fixtureP10MultiV2Specs
   })
   it('should return true when there is a heater shaker east west and the pipette is a multi channel', () => {
     expect(
@@ -900,13 +898,13 @@ describe('getIsHeaterShakerEastWestMultiChannelPipette', () => {
     ).toBe(true)
   })
   it('should return false when there the pipette is not a multi channel', () => {
-    pipetteSpecs = pipetteNameSpecFixtures.p1000_single as PipetteNameSpecs
+    pipetteSpecs = SharedData.fixtureP1000SingleV2Specs
     expect(
       getIsHeaterShakerEastWestMultiChannelPipette(modules, slot, pipetteSpecs)
     ).toBe(false)
   })
   it('should return false when the HS is not next to the slot', () => {
-    pipetteSpecs = pipetteNameSpecFixtures.p1000_single as PipetteNameSpecs
+    pipetteSpecs = SharedData.fixtureP1000SingleV2Specs
     slot = '11'
     expect(
       getIsHeaterShakerEastWestMultiChannelPipette(modules, slot, pipetteSpecs)
@@ -916,7 +914,7 @@ describe('getIsHeaterShakerEastWestMultiChannelPipette', () => {
 describe('getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette', () => {
   let slot: string
   let modules: RobotState['modules']
-  let pipetteSpecs: PipetteNameSpecs
+  let pipetteSpecs: SharedData.PipetteV2Specs
   let labwareEntity: LabwareEntity
   beforeEach(() => {
     slot = '4'
@@ -931,7 +929,7 @@ describe('getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette', () =>
         },
       },
     }
-    pipetteSpecs = pipetteNameSpecFixtures.p10_multi as PipetteNameSpecs
+    pipetteSpecs = SharedData.fixtureP10MultiV2Specs
     labwareEntity = {
       id: 'fixture96PlateId',
       labwareDefURI: getLabwareDefURI(fixture96Plate),

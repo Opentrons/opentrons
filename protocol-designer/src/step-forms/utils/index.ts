@@ -3,7 +3,7 @@ import values from 'lodash/values'
 import find from 'lodash/find'
 import mapValues from 'lodash/mapValues'
 import {
-  getPipetteNameSpecs,
+  getPipetteSpecsV2,
   GEN_ONE_MULTI_PIPETTES,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -89,7 +89,7 @@ export function denormalizePipetteEntities(
     pipetteInvariantProperties,
     (acc: PipetteEntities, pipette: NormalizedPipette): PipetteEntities => {
       const pipetteId = pipette.id
-      const spec = getPipetteNameSpecs(pipette.name)
+      const spec = getPipetteSpecsV2(pipette.name)
 
       if (!spec) {
         throw new Error(

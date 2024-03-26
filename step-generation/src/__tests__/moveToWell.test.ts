@@ -1,6 +1,6 @@
 import { when } from 'vitest-when'
 import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { moveToWell } from '../commandCreators/atomic/moveToWell'
 import {
@@ -27,7 +27,7 @@ vi.mock('../utils/thermocyclerPipetteCollision')
 vi.mock('../utils/heaterShakerCollision')
 
 const FLEX_PIPETTE = 'p1000_single_flex'
-const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
+const FlexPipetteNameSpecs = getPipetteSpecsV2(FLEX_PIPETTE)
 
 describe('moveToWell', () => {
   let robotStateWithTip: RobotState

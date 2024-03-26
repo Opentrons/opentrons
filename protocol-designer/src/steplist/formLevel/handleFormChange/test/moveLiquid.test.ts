@@ -1,9 +1,5 @@
 import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest'
 import {
-  fixtureP10Single,
-  fixtureP300Single,
-} from '@opentrons/shared-data/pipette/fixtures/name'
-import {
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
@@ -15,7 +11,11 @@ import {
   dependentFieldsUpdateMoveLiquid,
   updatePatchBlowoutFields,
 } from '../dependentFieldsUpdateMoveLiquid'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import {
+  fixtureP10SingleV2Specs,
+  fixtureP300SingleV2Specs,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type {
   PipetteEntities,
   LabwareEntities,
@@ -33,14 +33,14 @@ beforeEach(() => {
   pipetteEntities = {
     pipetteId: {
       name: 'p10_single',
-      spec: fixtureP10Single,
+      spec: fixtureP10SingleV2Specs,
       // @ts-expect-error(sa, 2021-6-15): tiprackModel does not exist on PipetteEntity
       tiprackModel: 'tiprack-10ul',
       tiprackLabwareDef: fixtureTiprack10ul,
     },
     otherPipetteId: {
       name: 'p300_single_gen2',
-      spec: fixtureP300Single,
+      spec: fixtureP300SingleV2Specs,
       // @ts-expect-error(sa, 2021-6-15): tiprackModel does not exist on PipetteEntity
       tiprackModel: 'tiprack-300ul',
       tiprackLabwareDef: fixtureTiprack300ul,

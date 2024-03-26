@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 import cx from 'classnames'
 import {
   FLEX_ROBOT_TYPE,
-  getPipetteNameSpecs,
+  getPipetteSpecsV2,
   PipetteName,
 } from '@opentrons/shared-data'
 import { InstrumentDiagram } from '@opentrons/components'
@@ -32,11 +32,10 @@ export function PipetteDiagram(props: Props): JSX.Element {
 function PipetteGroup(props: Props): JSX.Element {
   const { leftPipette, rightPipette } = props
   const robotType = useSelector(getRobotType)
-  const leftSpecs =
-    leftPipette && getPipetteNameSpecs(leftPipette as PipetteName)
+  const leftSpecs = leftPipette && getPipetteSpecsV2(leftPipette as PipetteName)
   const has96Channel = leftPipette === 'p1000_96'
   const rightSpecs =
-    rightPipette && getPipetteNameSpecs(rightPipette as PipetteName)
+    rightPipette && getPipetteSpecsV2(rightPipette as PipetteName)
   return (
     <>
       {leftPipette && leftSpecs ? (

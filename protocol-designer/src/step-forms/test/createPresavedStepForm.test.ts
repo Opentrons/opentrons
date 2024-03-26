@@ -6,8 +6,8 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
+  fixtureP10SingleV2Specs,
 } from '@opentrons/shared-data'
-import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
 import { getStateAndContextTempTCModules } from '@opentrons/step-generation'
 import {
@@ -28,7 +28,7 @@ beforeEach(() => {
   const leftPipette = {
     name: 'p10_single',
     id: 'leftPipetteId',
-    spec: fixtureP10Single,
+    spec: fixtureP10SingleV2Specs,
     tiprackLabwareDef: fixture_tiprack_10_ul,
   }
   const labwareOnMagModule = {
