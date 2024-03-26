@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 from typing_extensions import assert_never
 
 from opentrons.ordered_set import OrderedSet
@@ -9,7 +9,6 @@ from opentrons.protocol_engine.commands.command import CommandIntent, CommandSta
 from opentrons.protocol_engine.commands.command_unions import Command
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 
 
 @dataclass(frozen=True)
@@ -22,6 +21,8 @@ class CommandEntry:
 
 @dataclass  # dataclass for __eq__() autogeneration.
 class CommandStructure:
+    """Command state container for command data."""
+
     _commands_by_id: Dict[str, CommandEntry]
     """All command resources, in insertion order, mapped by their unique IDs."""
 
@@ -34,11 +35,8 @@ class CommandStructure:
     _running_command_id: Optional[str]
     """The ID of the currently running command, if any"""
 
-    _recently_dequeued_command_id: Optional[str]
+    recent_dequeued_command_id: Optional[str]
     """ID of the most recent command that was dequeued, if any"""
-
-    _failed_command_id: Optional[str]
-    """ID of the command that made the run fail, if any"""
 
     def __init__(self) -> None:
         self._queued_command_ids = OrderedSet()
@@ -86,10 +84,10 @@ class CommandStructure:
 
     def get_recent_dequeued_command(self) -> Optional[CommandEntry]:
         """Get the command most recently dequeued from all queues."""
-        if self._recently_dequeued_command_id is None:
+        if self.recent_dequeued_command_id is None:
             return None
         else:
-            return self._commands_by_id[self._recently_dequeued_command_id]
+            return self._commands_by_id[self.recent_dequeued_command_id]
 
     def get_running_command(self) -> Optional[CommandEntry]:
         if self._running_command_id is None:
@@ -109,99 +107,32 @@ class CommandStructure:
     def get_queued_setup_command_ids(self) -> OrderedSet[str]:
         return self._queued_setup_command_ids
 
-    def add_queued(self, queued_command: Command) -> None:
-        assert queued_command.status == CommandStatus.QUEUED
-        assert not self.has(queued_command.id)
+    def set_command_entry(self, command_id: str, command_entry: CommandEntry) -> None:
+        self._commands_by_id[command_id] = command_entry
 
-        next_index = self.length()
-        self._commands_by_id[queued_command.id] = CommandEntry(
-            index=next_index,
-            command=queued_command,
-        )
+    def set_recent_dequeued_command_id(self, command_id: str) -> None:
+        self.recent_dequeued_command_id = command_id
 
-        if queued_command.intent == CommandIntent.SETUP:
-            self._queued_setup_command_ids.add(queued_command.id)
-        else:
-            self._queued_command_ids.add(queued_command.id)
+    def set_running_command_id(self, command_id: Union[str, None]):
+        self._running_command_id = command_id
 
-    def update(self, command: Command) -> None:
-        prev_entry = self.get_if_present(command.id)
-
-        if prev_entry is None:
-            next_index = self.length()
-            self._commands_by_id[command.id] = CommandEntry(
-                index=next_index,
-                command=command,
-            )
-        else:
-            self._commands_by_id[command.id] = CommandEntry(
-                index=prev_entry.index, command=command
-            )
-
-        self._queued_command_ids.discard(command.id)
-        self._queued_setup_command_ids.discard(command.id)
-
-        if command.status == CommandStatus.RUNNING:
-            self._running_command_id = command.id
-        elif self._running_command_id == command.id:
-            self._running_command_id = None
-            if command.status != CommandStatus.QUEUED:
-                self._recently_dequeued_command_id = command.id
-
-    def fail(
-        self,
-        command_id: str,
-        error_occurrence: ErrorOccurrence,
-        failed_at: datetime,
-        recovery_type: ErrorRecoveryType,
-    ) -> None:
-        prev_entry = self._commands_by_id[command_id]
-        self._commands_by_id[command_id] = CommandEntry(
-            index=prev_entry.index,
-            # TODO(mc, 2022-06-06): add new "cancelled" status or similar
-            # and don't set `completedAt` in commands other than the specific
-            # one that failed
-            # https://opentrons.atlassian.net/browse/EXEC-14
-            command=prev_entry.command.copy(
-                update={
-                    "error": error_occurrence,
-                    "completedAt": failed_at,
-                    "status": CommandStatus.FAILED,
-                }
-            ),
-        )
-
+    def set_failed_command_id(self, command_id: str):
         self._failed_command_id = command_id
-        # TOME: This is a circular import and will require resolution. I think you'll have to move this stuff back to commands.
-        if prev_entry.command.intent == CommandIntent.SETUP:
-            other_command_ids_to_fail = self._queued_setup_command_ids
-            self._queued_setup_command_ids.clear()
-        elif (
-            prev_entry.command.intent == CommandIntent.PROTOCOL
-            or prev_entry.command.intent is None
-        ):
-            if recovery_type == ErrorRecoveryType.WAIT_FOR_RECOVERY:
-                self._queue_status = QueueStatus.AWAITING_RECOVERY
-            elif recovery_type == ErrorRecoveryType.FAIL_RUN:
-                other_command_ids_to_fail = self._queued_command_ids
-                self._queued_command_ids.clear()
-            else:
-                assert_never(recovery_type)
-        else:
-            assert_never(prev_entry.command.intent)
 
-        for command_id in other_command_ids_to_fail:
-            prev_entry = self._commands_by_id[command_id]
+    def add_to_queued_command_ids(self, command_id: str) -> None:
+        self._queued_command_ids.add(command_id)
 
-            self._commands_by_id[command_id] = CommandEntry(
-                index=prev_entry.index,
-                command=prev_entry.command.copy(
-                    update={
-                        "completedAt": failed_at,
-                        "status": CommandStatus.FAILED,
-                    }
-                ),
-            )
+    def add_to_queued_setup_command_ids(self, command_id: str) -> None:
+        self._queued_setup_command_ids.add(command_id)
 
-        if self._running_command_id == command_id:
-            self._running_command_id = None
+    def clear_queued_command_ids(self) -> None:
+        self._queued_command_ids.clear()
+
+    def clear_queued_setup_command_ids(self) -> None:
+        self._queued_setup_command_ids.clear()
+
+    def remove_from_queued_command_ids(self, command_id: str) -> None:
+        self._queued_command_ids.discard(command_id)
+
+    def remove_from_queued_setup_command_ids(self, command_id: str) -> None:
+        self._queued_setup_command_ids.discard(command_id)
