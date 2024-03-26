@@ -221,7 +221,7 @@ export function ProtocolRunRuntimeParameters({
       </Flex>
       {!hasParameter ? (
         <Flex padding={SPACING.spacing16}>
-          <NoParameters />
+          <NoParameters t={t} />
         </Flex>
       ) : (
         <>
