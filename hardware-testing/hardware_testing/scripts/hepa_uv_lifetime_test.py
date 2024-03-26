@@ -7,10 +7,11 @@ import logging
 import logging.config
 import subprocess
 
-from typing import Any, Optional, Dict
+from typing import Any, Optional, Dict, cast
 
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.types import (
     SubSystem,
     HepaFanState,
@@ -52,7 +53,7 @@ async def _turn_off_fan(api: OT3API) -> None:
         log.info("Turning off Hepa Fan.")
         await api.set_hepa_fan_state(turn_on=False)
 
-    hepa_fan_state: Optional[HepaFanState] = await api.get_hepa_fan_state()
+    hepa_fan_state = await api.get_hepa_fan_state()
     if hepa_fan_state:
         assert not hepa_fan_state.fan_on, "Hepa Fan did not turn OFF!"
 
@@ -64,7 +65,7 @@ async def _turn_off_uv(api: OT3API) -> None:
         log.info("Turning off Hepa UV Light.")
         await api.set_hepa_uv_state(turn_on=False)
 
-    hepa_uv_state: Optional[HepaUVState] = await api.get_hepa_uv_state()
+    hepa_uv_state = await api.get_hepa_uv_state()
     if hepa_uv_state:
         assert not hepa_uv_state.light_on, "Hepa UV did not turn OFF!"
 
@@ -141,7 +142,7 @@ async def run_hepa_fan(
                 cycle += 1
             else:
                 sleep_time += 1
-            
+
             # report elasped time every 10 minutes
             if sleep_time == 600:
                 elapsed_time = datetime.datetime.now() - start_time
@@ -159,7 +160,12 @@ async def run_hepa_fan(
 
 
 async def run_hepa_uv(
-    api: OT3API, on_time: int, off_time: int, cycles: int, result: Dict[str, Any], event: asyncio.Event,
+    api: OT3API,
+    on_time: int,
+    off_time: int,
+    cycles: int,
+    result: Dict[str, Any],
+    event: asyncio.Event,
 ) -> None:
     """Coroutine that will run the hepa uv light."""
     light_on_time = max(0, min(on_time, MAX_UV_DOSAGE))
@@ -238,7 +244,6 @@ async def _control_task(
     """Checks robot status and cancels tasks."""
 
     def _handle_hepa_error(message: MessageDefinition, arbitration_id: ArbitrationId):
-        log.error(f"HEPA ERROR: {message}")
         if isinstance(message, ErrorMessage):
             try:
                 raise_from_error_message(message)
@@ -247,7 +252,7 @@ async def _control_task(
                 uv_task.cancel()
 
     try:
-        api._backend._messenger.add_listener(_handle_hepa_error)
+        cast(OT3Controller, api._backend)._messenger.add_listener(_handle_hepa_error)
         while not event.is_set():
             # Make sure the door is closed
             if api.door_state == DoorState.OPEN:
@@ -268,7 +273,7 @@ async def _control_task(
 
             await asyncio.sleep(1)
     finally:
-        api._backend._messenger.remove_listener(_handle_hepa_error)
+        cast(OT3Controller, api._backend)._messenger.remove_listener(_handle_hepa_error)
 
 
 async def _main(args: argparse.Namespace) -> None:
@@ -289,7 +294,7 @@ async def _main(args: argparse.Namespace) -> None:
 
     stop_event = asyncio.Event()
 
-    RESULT = {
+    RESULT: Dict[str, Any] = {
         "HEPA": {},
         "UV": {},
     }
@@ -297,19 +302,23 @@ async def _main(args: argparse.Namespace) -> None:
     # create tasks
     hepa_fan_task = asyncio.create_task(
         run_hepa_fan(
-            api, args.fan_duty_cycle, args.fan_on_time, args.fan_off_time, args.cycles, RESULT, stop_event
+            api,
+            args.fan_duty_cycle,
+            args.fan_on_time,
+            args.fan_off_time,
+            args.cycles,
+            RESULT,
+            stop_event,
         )
     )
     hepa_uv_task = asyncio.create_task(
-        run_hepa_uv(api, args.uv_on_time, args.uv_off_time, args.cycles, RESULT, stop_event)
+        run_hepa_uv(
+            api, args.uv_on_time, args.uv_off_time, args.cycles, RESULT, stop_event
+        )
     )
     control_task = asyncio.create_task(
         _control_task(
-            api,
-            hepa_fan_task,
-            args.fan_on_time == -1,
-            hepa_uv_task,
-            stop_event
+            api, hepa_fan_task, args.fan_on_time == -1, hepa_uv_task, stop_event
         )
     )
 
