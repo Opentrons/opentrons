@@ -179,7 +179,7 @@ export function ProtocolWithLastRun({
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Chip
           paddingLeft="0"
-          type={isReadyToBeReRun ? 'success' : 'warning'}
+          type={isOk ? (isReadyToBeReRun ? 'success' : 'warning') : 'error'}
           background={false}
           text={i18n.format(chipText, 'capitalize')}
         />
