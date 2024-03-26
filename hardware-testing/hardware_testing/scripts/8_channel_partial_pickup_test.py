@@ -32,27 +32,29 @@ from hardware_testing.drivers import mitutoyo_digimatic_indicator
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 8-Channel Partial Tip Pick-up Test')
     arg_parser.add_argument('-m', '--mount', choices=['left','right'], required=False, help='Sets the pipette mount', default='left')
-    arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=10)
+    arg_parser.add_argument('-p', '--pipette', choices=['P50','P1K'], required=False, help='Sets the pipette type', default='P1K')
+    arg_parser.add_argument('-i', '--tip_size', choices=['T50','T200','T1K'], required=False, help='Sets tip size', default='T1K')
     arg_parser.add_argument('-n', '--tip_num', type=int, required=False, help='Sets the number of tips', default=8)
-    arg_parser.add_argument('-i', '--tip_size', type=str, required=False, help='Sets tip size', default='T1K')
+    arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=10)
     arg_parser.add_argument('-g', '--gauge_slot', type=str, required=False, help='Sets the gauge slot', default='D2')
-    arg_parser.add_argument('-p', '--tiprack_slot', type=str, help='Sets the tiprack slot', default='B1')
-    arg_parser.add_argument('-r', '--trough_slot', type=str, help='Sets the trough slot', default='D3')
-    arg_parser.add_argument('-t', '--trash_slot', type=str, help='Sets the trash slot', default='A3')
-    arg_parser.add_argument('-f', '--feel_slot', type=str, help='Sets the feel tip slot', default='D1')
-    arg_parser.add_argument('-v', '--volume', type=float, help='Sets the leak test volume', default=1000)
-    arg_parser.add_argument('-o', '--liquid_offset', type=float, help='Sets the liquid offset for aspiration', default=25)
+    arg_parser.add_argument('-k', '--tiprack_slot', type=str, required=False, help='Sets the tiprack slot', default='B1')
+    arg_parser.add_argument('-r', '--trough_slot', type=str, required=False, help='Sets the trough slot', default='D3')
+    arg_parser.add_argument('-t', '--trash_slot', type=str, required=False, help='Sets the trash slot', default='A3')
+    arg_parser.add_argument('-f', '--feel_slot', type=str, required=False, help='Sets the feel tip slot', default='D1')
+    arg_parser.add_argument('-v', '--volume', type=float, required=False, help='Sets the leak test volume', default=1000)
+    arg_parser.add_argument('-o', '--liquid_offset', type=float, required=False, help='Sets the liquid offset for aspiration', default=25)
     arg_parser.add_argument('-a', '--calibrate', action="store_true", required=False, help='Calibrates tiprack position')
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Eight_Channel_Partial_Pickup_Test:
     def __init__(
-        self, simulate: bool, calibrate: bool, cycles: int, tip_num: int, gauge_slot: str, tiprack_slot: str, trough_slot: str, trash_slot: str, feel_slot: str, tip_size: str, volume: float, liquid_offset: float
+        self, simulate: bool, calibrate: bool, cycles: int, pipette: str, tip_num: int, gauge_slot: str, tiprack_slot: str, trough_slot: str, trash_slot: str, feel_slot: str, tip_size: str, volume: float, liquid_offset: float
     ) -> None:
         self.simulate = simulate
         self.calibrate = calibrate
         self.cycles = cycles
+        self.pipette = pipette
         self.tip_num = tip_num
         self.tip_size = tip_size
         self.gauge_slot = gauge_slot
@@ -71,8 +73,10 @@ class Eight_Channel_Partial_Pickup_Test:
         self.drop_position = None
         self.gauge_position = None
         self.trough_position = None
+        self.feel_position = None
         self.motor_current = None
         self.pick_up_speed = None
+        self.max_volume = None
         self.axes = [Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R]
         self.test_data ={
             "Time":"None",
@@ -108,18 +112,10 @@ class Eight_Channel_Partial_Pickup_Test:
             "T200":58.35,
             "T50":57.9,
         }
+        self.nozzles = [i+"1" for i in reversed(list(string.ascii_uppercase))][-8:]
         self.nozzle_file = "nozzle_offsets.csv"
         self.nozzle_offset = False
-        self.nozzle_offsets = {
-            "H1":"None",
-            "G1":"None",
-            "F1":"None",
-            "E1":"None",
-            "D1":"None",
-            "C1":"None",
-            "B1":"None",
-            "A1":"None",
-        }
+        self.nozzle_offsets = {nozzle:"None" for nozzle in self.nozzles}
 
     async def test_setup(self):
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
@@ -133,7 +129,7 @@ class Eight_Channel_Partial_Pickup_Test:
     def file_setup(self):
         class_name = self.__class__.__name__
         self.test_name = class_name.lower()
-        self.test_tag = f"tips{self.tip_num}_current{int(self.motor_current*100)}_cycles{self.cycles}"
+        self.test_tag = f"{self.pipette}_{self.tip_size}_V{int(self.volume)}_N{self.tip_num}_C{int(self.motor_current*1000)}_R{self.cycles}"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_date = "run-" + datetime.utcnow().strftime("%y-%m-%d")
@@ -149,17 +145,28 @@ class Eight_Channel_Partial_Pickup_Test:
             data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=self.nozzle_file, data=self.nozzle_header)
 
     async def pipette_setup(self):
+        if self.tip_size == "T50":
+            self.max_volume = 50
+        elif self.tip_size == "T200":
+            self.max_volume = 200
+        elif self.tip_size == "T1K":
+            self.max_volume = 1000
+        if self.volume > self.max_volume:
+            self.volume = self.max_volume
         await self.api.cache_instruments()
         self.mount = OT3Mount.LEFT if args.mount == "left" else OT3Mount.RIGHT
         self.pipette_id = "SIMULATION" if self.simulate else self.api._pipette_handler.get_pipette(self.mount).pipette_id
-        self.test_data["Pipette"] = str(self.pipette_id)
-        self.test_data["Nozzles"] = str(self.tip_num)
         self.motor_current = float(input("Motor Current (Amps) [Default = 550 mA]: ") or "0.55")
         self.pick_up_speed = float(input("Pick-up Tip Speed (mm/s) [Default = 10 mm/s]: ") or "10")
-        await self._update_pick_up_current(self.api, self.mount, self.tip_num, self.motor_current)
-        await self._update_pick_up_speed(self.api, self.mount, self.tip_num, self.pick_up_speed)
         self.test_data["Current"] = str(self.motor_current)
         self.test_data["Speed"] = str(self.pick_up_speed)
+        self.test_data["Pipette"] = str(self.pipette_id)
+        self.test_data["Nozzles"] = str(self.tip_num)
+        await self._update_pick_up_current(self.api, self.mount, self.tip_num, self.motor_current)
+        await self._update_pick_up_speed(self.api, self.mount, self.tip_num, self.pick_up_speed)
+        await self._update_nozzle_manager(self.api, self.mount, self.tip_num)
+        pipette = _get_pipette_from_mount(self.api, self.mount)
+        print(f"Pipette Settings: {pipette.get_pick_up_configuration_for_tip_count(self.tip_num)}")
 
     async def deck_setup(self):
         self.test_data["Gauge Slot"] = str(self.gauge_slot)
@@ -180,6 +187,11 @@ class Eight_Channel_Partial_Pickup_Test:
 
     def dict_values_to_line(self, dict):
         return str.join(",", list(dict.values()))+"\n"
+
+    async def _update_nozzle_manager(
+        self, api: OT3API, mount: OT3Mount, tip_num: int
+    ) -> None:
+        await api.update_nozzle_configuration_for_mount(mount, self.nozzles[tip_num - 1], self.nozzles[0])
 
     def getch(self):
         """
@@ -391,6 +403,9 @@ class Eight_Channel_Partial_Pickup_Test:
         self.deck_slot['deck_slot'][self.trough_slot]['Z'] = trough_loc.z
         self._save_config(self.calibration_path + self.calibration_file, self.deck_slot)
         self.trough_position = trough_loc
+        self.feel_position = Point(self.deck_slot['deck_slot'][self.feel_slot]['X'],
+                                    self.deck_slot['deck_slot'][self.feel_slot]['Y'],
+                                    self.deck_slot['deck_slot'][self.feel_slot]['Z'])
 
     async def _get_nozzles_offset(
         self, api: OT3API, mount: OT3Mount
@@ -415,7 +430,7 @@ class Eight_Channel_Partial_Pickup_Test:
                         self.deck_slot['deck_slot'][self.gauge_slot]['Y'] - y_offset,
                         self.deck_slot['deck_slot'][self.gauge_slot]['Z'])
         if nozzle == 1:
-            cp = CriticalPoint.TIP
+            cp = CriticalPoint.NOZZLE
             await self._move_to_point(api, mount, gauge_loc, cp)
         else:
             await api.move_to(mount, gauge_loc)
@@ -439,15 +454,14 @@ class Eight_Channel_Partial_Pickup_Test:
         test_data = self.dict_values_to_line(self.test_data)
         data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=self.test_file, data=test_data)
 
-    async def _pick_up_tip(
+    async def _pick_up_tips(
         self, api: OT3API, mount: OT3Mount, cycle
     ) -> None:
         await api.home_z()
         cp = CriticalPoint.NOZZLE
         print(f"\nPicking up Tips at Column {cycle}/12!")
-        tiprack_loc = Point(self.deck_slot['deck_slot'][self.tiprack_slot]['X'] + self.tip_distance*(cycle - 1),
-                            self.deck_slot['deck_slot'][self.tiprack_slot]['Y'] - self.tip_distance*(self.tip_num - 8),
-                            self.deck_slot['deck_slot'][self.tiprack_slot]['Z'])
+        x_offset = self.tip_distance*(cycle - 1)
+        tiprack_loc = self.tiprack_position._replace(x=self.tiprack_position.x + x_offset)
         await self._move_to_point(api, mount, tiprack_loc, cp)
         initial_press = await api.encoder_current_position_ot3(mount, cp)
         print(f"Initial Press Position: {initial_press[Axis.by_mount(mount)]}")
@@ -461,9 +475,7 @@ class Eight_Channel_Partial_Pickup_Test:
     ) -> None:
         self.test_data["Tip"] = str(tip)
         y_offset = self.tip_distance*(tip - 1)
-        tip_loc = Point(self.deck_slot['deck_slot'][self.gauge_slot]['X'],
-                        self.deck_slot['deck_slot'][self.gauge_slot]['Y'] - y_offset,
-                        self.deck_slot['deck_slot'][self.gauge_slot]['Z'])
+        tip_loc = self.gauge_position._replace(y=self.gauge_position.y - y_offset)
         if tip == 1:
             cp = CriticalPoint.TIP
             await self._move_to_point(api, mount, tip_loc, cp)
@@ -473,8 +485,8 @@ class Eight_Channel_Partial_Pickup_Test:
     async def _measure_gauge(
         self, api: OT3API, mount: OT3Mount, axis: str
     ) -> float:
-        print(f"Measuring {axis} Gauge...")
         # Jog gauge
+        print(f"Reading {axis} Gauge...")
         await api.move_rel(mount, self.gauge_offsets[axis], speed=10)
         # Read gauge
         gauge = self.gauges[axis].read_stable(timeout=20)
@@ -506,10 +518,7 @@ class Eight_Channel_Partial_Pickup_Test:
     ) -> None:
         await api.home_z(mount)
         cp = CriticalPoint.TIP
-        feel_loc = Point(self.deck_slot['deck_slot'][self.feel_slot]['X'],
-                            self.deck_slot['deck_slot'][self.feel_slot]['Y'],
-                            self.deck_slot['deck_slot'][self.feel_slot]['Z'])
-        await self._move_to_point(api, mount, feel_loc, cp)
+        await self._move_to_point(api, mount, self.feel_position, cp)
         input("\nFeel the Tip!\n[Press ENTER to Finish]")
         feel_result = float(input("\nFeel Test Result [Default = 1]: \n1 = Pass \n2 = Fail \nAnswer:") or "1")
         self.test_data["Feel"] = str(feel_result)
@@ -536,22 +545,27 @@ class Eight_Channel_Partial_Pickup_Test:
             data = {}
         return data
 
-    def _load_config(self):
+    def _load_config(self, tip_num):
+        y_offset = self.tip_distance*(8 - tip_num)
         self.tiprack_position = Point(self.deck_slot['deck_slot'][self.tiprack_slot]['X'],
                                     self.deck_slot['deck_slot'][self.tiprack_slot]['Y'],
                                     self.deck_slot['deck_slot'][self.tiprack_slot]['Z'])
 
         self.drop_position = Point(self.deck_slot['deck_slot'][self.trash_slot]['X'],
-                                    self.deck_slot['deck_slot'][self.trash_slot]['Y'],
+                                    self.deck_slot['deck_slot'][self.trash_slot]['Y'] - y_offset,
                                     self.deck_slot['deck_slot'][self.trash_slot]['Z'])
 
         self.gauge_position = Point(self.deck_slot['deck_slot'][self.gauge_slot]['X'],
-                                    self.deck_slot['deck_slot'][self.gauge_slot]['Y'],
+                                    self.deck_slot['deck_slot'][self.gauge_slot]['Y'] - y_offset,
                                     self.deck_slot['deck_slot'][self.gauge_slot]['Z'])
 
         self.trough_position = Point(self.deck_slot['deck_slot'][self.trough_slot]['X'],
-                                    self.deck_slot['deck_slot'][self.trough_slot]['Y'],
+                                    self.deck_slot['deck_slot'][self.trough_slot]['Y'] - y_offset,
                                     self.deck_slot['deck_slot'][self.trough_slot]['Z'])
+
+        self.feel_position = Point(self.deck_slot['deck_slot'][self.feel_slot]['X'],
+                                    self.deck_slot['deck_slot'][self.feel_slot]['Y'] - y_offset,
+                                    self.deck_slot['deck_slot'][self.feel_slot]['Z'])
 
     async def _countdown(
         self, count_time: float
@@ -598,7 +612,7 @@ class Eight_Channel_Partial_Pickup_Test:
                     await self._calibrate_gauge(self.api, self.mount)
                     await self._calibrate_trough(self.api, self.mount)
                 else:
-                    self._load_config()
+                    self._load_config(self.tip_num)
                 if self.nozzle_offset:
                     await self._get_nozzles_offset(self.api, self.mount)
                 for i in range(self.cycles):
@@ -606,9 +620,9 @@ class Eight_Channel_Partial_Pickup_Test:
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
                     await self._home(self.api, self.mount)
                     if self.calibrate and cycle > 1:
-                        await self._pick_up_tip(self.api, self.mount, cycle)
+                        await self._pick_up_tips(self.api, self.mount, cycle)
                     if not self.calibrate:
-                        await self._pick_up_tip(self.api, self.mount, cycle)
+                        await self._pick_up_tips(self.api, self.mount, cycle)
                     for j in range(self.tip_num):
                         tip = j + 1
                         print(f"\n-> Measuring Tip {tip}/{self.tip_num}")
@@ -636,5 +650,5 @@ if __name__ == '__main__':
     print("\nOT-3 8-Channel Partial Tip Pick-up Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Eight_Channel_Partial_Pickup_Test(args.simulate, args.calibrate, args.cycles, args.tip_num, args.gauge_slot, args.tiprack_slot, args.trough_slot, args.trash_slot, args.feel_slot, args.tip_size, args.volume, args.liquid_offset)
+    test = Eight_Channel_Partial_Pickup_Test(args.simulate, args.calibrate, args.cycles, args.pipette, args.tip_num, args.gauge_slot, args.tiprack_slot, args.trough_slot, args.trash_slot, args.feel_slot, args.tip_size, args.volume, args.liquid_offset)
     asyncio.run(test.run())
