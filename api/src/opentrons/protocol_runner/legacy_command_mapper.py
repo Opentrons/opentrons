@@ -624,7 +624,7 @@ class LegacyCommandMapper:
             command_id=succeeded_command.id,
             created_at=succeeded_command.createdAt,
             request=pe_commands.LoadLabwareCreate.construct(
-                params=succeeded_command.params
+                key=succeeded_command.key, params=succeeded_command.params
             ),
             request_hash=None,
         )
@@ -686,7 +686,7 @@ class LegacyCommandMapper:
             command_id=succeeded_command.id,
             created_at=succeeded_command.createdAt,
             request=pe_commands.LoadPipetteCreate.construct(
-                params=succeeded_command.params
+                key=succeeded_command.key, params=succeeded_command.params
             ),
             request_hash=None,
         )
@@ -751,7 +751,7 @@ class LegacyCommandMapper:
             command_id=succeeded_command.id,
             created_at=succeeded_command.createdAt,
             request=pe_commands.LoadModuleCreate.construct(
-                params=succeeded_command.params
+                key=succeeded_command.key, params=succeeded_command.params
             ),
             request_hash=None,
         )
