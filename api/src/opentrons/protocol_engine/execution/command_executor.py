@@ -1,7 +1,7 @@
 """Command side-effect execution logic container."""
 import asyncio
 from logging import getLogger
-from typing import Optional
+from typing import Optional, List, Dict, Any, Protocol
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -11,6 +11,8 @@ from opentrons_shared_data.errors.exceptions import (
     PythonException,
 )
 
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+
 from ..state import StateStore
 from ..resources import ModelUtils
 from ..commands import (
@@ -18,10 +20,12 @@ from ..commands import (
     AbstractCommandImpl,
     CommandResult,
     CommandPrivateResult,
+    Command,
 )
 from ..actions import ActionDispatcher, UpdateCommandAction, FailCommandAction
 from ..errors import RunStoppedError
 from ..errors.exceptions import EStopActivatedError as PE_EStopActivatedError
+from ..notes import CommandNote, CommandNoteTracker
 from .equipment import EquipmentHandler
 from .movement import MovementHandler
 from .gantry_mover import GantryMover
@@ -34,6 +38,29 @@ from .status_bar import StatusBarHandler
 
 
 log = getLogger(__name__)
+
+
+class CommandNoteTrackerProvider(Protocol):
+    """The correct shape for a function that provides a CommandNoteTracker.
+
+    This function will be called by the executor once for each call to execute().
+    It is mostly useful for testing harnesses.
+    """
+
+    def __call__(self) -> CommandNoteTracker:
+        """Provide a new CommandNoteTracker."""
+        ...
+
+
+class _NoteTracker(CommandNoteTracker):
+    def __init__(self) -> None:
+        self._notes: List[CommandNote] = []
+
+    def __call__(self, note: CommandNote) -> None:
+        self._notes.append(note)
+
+    def get_notes(self) -> List[CommandNote]:
+        return self._notes
 
 
 class CommandExecutor:
@@ -57,7 +84,9 @@ class CommandExecutor:
         run_control: RunControlHandler,
         rail_lights: RailLightsHandler,
         status_bar: StatusBarHandler,
+        error_recovery_policy: ErrorRecoveryPolicy,
         model_utils: Optional[ModelUtils] = None,
+        command_note_tracker_provider: Optional[CommandNoteTrackerProvider] = None,
     ) -> None:
         """Initialize the CommandExecutor with access to its dependencies."""
         self._hardware_api = hardware_api
@@ -73,6 +102,10 @@ class CommandExecutor:
         self._rail_lights = rail_lights
         self._model_utils = model_utils or ModelUtils()
         self._status_bar = status_bar
+        self._command_note_tracker_provider = (
+            command_note_tracker_provider or _NoteTracker
+        )
+        self._error_recovery_policy = error_recovery_policy
 
     async def execute(self, command_id: str) -> None:
         """Run a given command's execution procedure.
@@ -82,6 +115,7 @@ class CommandExecutor:
                 command itself will be looked up from state.
         """
         command = self._state_store.commands.get(command_id=command_id)
+        note_tracker = self._command_note_tracker_provider()
         command_impl = command._ImplementationCls(
             state_view=self._state_store,
             hardware_api=self._hardware_api,
@@ -94,6 +128,7 @@ class CommandExecutor:
             run_control=self._run_control,
             rail_lights=self._rail_lights,
             status_bar=self._status_bar,
+            command_note_adder=note_tracker,
         )
 
         started_at = self._model_utils.get_timestamp()
@@ -128,6 +163,17 @@ class CommandExecutor:
                 error = PE_EStopActivatedError(message=str(error), wrapping=[error])
             elif not isinstance(error, EnumeratedError):
                 error = PythonException(error)
+            notes_update = _append_notes_if_notes(
+                running_command, note_tracker.get_notes()
+            )
+
+            if notes_update:
+                command_with_new_notes = running_command.copy(update=notes_update)
+                self._action_dispatcher.dispatch(
+                    UpdateCommandAction(
+                        command=command_with_new_notes, private_result=None
+                    )
+                )
 
             self._action_dispatcher.dispatch(
                 FailCommandAction(
@@ -135,18 +181,39 @@ class CommandExecutor:
                     command_id=command_id,
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
+                    # todo(mm, 2024-03-13):
+                    # When a command fails recoverably, and we handle it with
+                    # WAIT_FOR_RECOVERY or CONTINUE, we want to update our logical
+                    # protocol state as if the command succeeded. (e.g. if a tip
+                    # pickup failed, pretend that it succeeded and that the tip is now
+                    # on the pipette.) However, this currently does the opposite,
+                    # acting as if the command never executed.
+                    type=self._error_recovery_policy(
+                        running_command,
+                        error,
+                    ),
                 )
             )
         else:
-            completed_command = running_command.copy(
-                update={
-                    "result": result,
-                    "status": CommandStatus.SUCCEEDED,
-                    "completedAt": self._model_utils.get_timestamp(),
-                }
-            )
+            update = {
+                "result": result,
+                "status": CommandStatus.SUCCEEDED,
+                "completedAt": self._model_utils.get_timestamp(),
+                **_append_notes_if_notes(running_command, note_tracker.get_notes()),
+            }
+            completed_command = running_command.copy(update=update)
             self._action_dispatcher.dispatch(
                 UpdateCommandAction(
                     command=completed_command, private_result=private_result
                 ),
             )
+
+
+def _append_notes_if_notes(
+    running_command: Command, notes: List[CommandNote]
+) -> Dict[str, Any]:
+    if not notes:
+        return {}
+    if running_command.notes is None:
+        return {"notes": notes}
+    return {"notes": running_command.notes + notes}

@@ -3,18 +3,19 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Box,
-  Flex,
   ALIGN_CENTER,
   ALIGN_START,
   BORDERS,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAuthorization } from '@opentrons/react-api-client'
@@ -22,7 +23,6 @@ import { useAuthorization } from '@opentrons/react-api-client'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
 import { ToggleButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { getConfig } from '../../redux/config'
 import {
   CONNECTABLE,

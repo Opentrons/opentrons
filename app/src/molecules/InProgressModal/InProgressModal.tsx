@@ -5,14 +5,14 @@ import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
   Flex,
   Icon,
-  RESPONSIVENESS,
   JUSTIFY_CENTER,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { getIsOnDevice } from '../../redux/config'
 
 interface Props {
@@ -46,7 +46,8 @@ const BODY_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderRegular}
     color: ${COLORS.grey60}
-    `
+  }
+`
 const MODAL_STYLE = css`
   align-items: ${ALIGN_CENTER};
   flex-direction: ${DIRECTION_COLUMN};

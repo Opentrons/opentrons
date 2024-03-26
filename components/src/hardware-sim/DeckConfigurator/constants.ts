@@ -1,8 +1,8 @@
 import { css } from 'styled-components'
 
-import { COLORS } from '../../helix-design-system'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, RESPONSIVENESS, SPACING } from '../../ui-style-constants'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
 /**
  * These are Flex deck configurator-only values to position a foreign object
@@ -29,7 +29,7 @@ export const CONFIG_STYLE_READ_ONLY = css`
   display: ${DISPLAY_FLEX};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.grey50};
-  border-radius: ${BORDERS.borderRadiusSize1};
+  border-radius: ${BORDERS.borderRadius4};
   color: ${COLORS.white};
   grid-gap: ${SPACING.spacing8};
   justify-content: ${JUSTIFY_CENTER};

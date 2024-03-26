@@ -1,19 +1,19 @@
 import * as React from 'react'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  PrimaryButton,
-  SecondaryButton,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   ALIGN_CENTER,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  SecondaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 
 import { NeedHelpLink } from '../CalibrationPanels'
-import { StyledText } from '../../atoms/text'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'

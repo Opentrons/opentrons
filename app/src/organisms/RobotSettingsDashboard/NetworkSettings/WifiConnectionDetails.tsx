@@ -14,10 +14,10 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { NetworkDetailsModal } from './NetworkDetailsModal'
 import { DisplayWifiList } from '../../NetworkSettings'
 import { getLocalRobot } from '../../../redux/discovery'
@@ -88,7 +88,7 @@ export function WifiConnectionDetails({
               width="100%"
               padding={SPACING.spacing24}
               backgroundColor={COLORS.green35}
-              borderRadius={BORDERS.borderRadiusSize3}
+              borderRadius={BORDERS.borderRadius12}
               onClick={() => setShowNetworkDetailModal(true)}
               alignItems={ALIGN_CENTER}
             >

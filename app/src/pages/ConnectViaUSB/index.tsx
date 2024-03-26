@@ -2,22 +2,22 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import {
-  Flex,
-  SPACING,
-  COLORS,
-  DIRECTION_ROW,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  Btn,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  Icon,
-  POSITION_RELATIVE,
-  POSITION_ABSOLUTE,
   BORDERS,
+  Btn,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
-import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 import { MediumButton } from '../../atoms/buttons'
 
@@ -71,7 +71,7 @@ export function ConnectViaUSB(): JSX.Element {
             <Flex
               alignItems={ALIGN_CENTER}
               backgroundColor={COLORS.green35}
-              borderRadius={BORDERS.borderRadiusSize3}
+              borderRadius={BORDERS.borderRadius12}
               height="18.5rem"
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing32}
@@ -105,7 +105,7 @@ export function ConnectViaUSB(): JSX.Element {
           <Flex
             alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.grey35}
-            borderRadius={BORDERS.borderRadiusSize3}
+            borderRadius={BORDERS.borderRadius12}
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing32}
             height="25.25rem"

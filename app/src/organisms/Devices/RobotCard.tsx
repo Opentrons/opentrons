@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom'
 
 import {
   ALIGN_START,
+  BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -15,11 +16,11 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import {
-  GripperModel,
   getGripperDisplayName,
   getModuleDisplayName,
   getPipetteModelSpecs,
@@ -33,7 +34,6 @@ import {
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
-import { StyledText } from '../../atoms/text'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
@@ -42,9 +42,10 @@ import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
 
+import type { GripperData } from '@opentrons/api-client'
+import type { GripperModel } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { State } from '../../redux/types'
-import { GripperData } from '@opentrons/api-client'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -62,6 +63,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
     <Flex
       alignItems={ALIGN_START}
       backgroundColor={COLORS.white}
+      borderRadius={BORDERS.borderRadius8}
       cursor="pointer"
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing16}

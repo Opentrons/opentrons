@@ -128,7 +128,6 @@ class GetStatusResponsePayload(EmptyPayload):
     """Get status response."""
 
     status: utils.UInt8Field
-    data: utils.UInt32Field
 
 
 @dataclass(eq=False)
@@ -261,6 +260,14 @@ class MotorDriverRegisterDataPayload(MotorDriverRegisterPayload):
 @dataclass(eq=False)
 class ReadMotorDriverRegisterResponsePayload(EmptyPayload):
     """Read motor driver register response payload."""
+
+    reg_addr: utils.UInt8Field
+    data: utils.UInt32Field
+
+
+@dataclass(eq=False)
+class ReadMotorDriverErrorStatusResponsePayload(EmptyPayload):
+    """Read motor driver error status response payload."""
 
     reg_addr: utils.UInt8Field
     data: utils.UInt32Field
@@ -482,6 +489,13 @@ class BindSensorOutputResponsePayload(SensorPayload):
 
 
 @dataclass(eq=False)
+class AddSensorLinearMoveBasePayload(AddLinearMoveRequestPayload):
+    """A request to add a linear move that also requires sensor reading for its duration."""
+
+    sensor_id: SensorIdField
+
+
+@dataclass(eq=False)
 class PipetteInfoResponsePayload(EmptyPayload):
     """A response carrying data about an attached pipette."""
 
@@ -668,3 +682,10 @@ class GetHepaUVStatePayloadResponse(EmptyPayload):
     uv_duration_s: utils.UInt32Field
     uv_light_on: utils.UInt8Field
     remaining_time_s: utils.UInt32Field
+
+
+@dataclass(eq=False)
+class SendAccumulatedPressureDataPayload(EmptyPayload):
+    """Send queued readings from a sensor."""
+
+    sensor_id: SensorIdField

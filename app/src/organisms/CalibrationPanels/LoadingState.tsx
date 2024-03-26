@@ -1,14 +1,14 @@
 import * as React from 'react'
 import {
-  Icon,
-  Flex,
-  COLORS,
-  SIZE_4,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  SIZE_4,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 interface LoadingStateProps {
   header?: string

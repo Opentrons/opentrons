@@ -8269,7 +8269,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8280,7 +8280,7 @@
       },
       "result": {
         "position": {
-          "x": 466.25,
+          "x": 434.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8372,7 +8372,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8383,7 +8383,7 @@
       },
       "result": {
         "position": {
-          "x": 402.25,
+          "x": 434.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8475,7 +8475,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8486,7 +8486,7 @@
       },
       "result": {
         "position": {
-          "x": 466.25,
+          "x": 434.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8578,7 +8578,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8589,7 +8589,7 @@
       },
       "result": {
         "position": {
-          "x": 402.25,
+          "x": 434.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8681,7 +8681,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8692,7 +8692,7 @@
       },
       "result": {
         "position": {
-          "x": 466.25,
+          "x": 434.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8784,7 +8784,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8795,7 +8795,7 @@
       },
       "result": {
         "position": {
-          "x": 402.25,
+          "x": 434.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8887,7 +8887,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8898,7 +8898,7 @@
       },
       "result": {
         "position": {
-          "x": 466.25,
+          "x": 434.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8990,7 +8990,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9001,7 +9001,7 @@
       },
       "result": {
         "position": {
-          "x": 402.25,
+          "x": 434.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -9093,7 +9093,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9104,7 +9104,7 @@
       },
       "result": {
         "position": {
-          "x": 466.25,
+          "x": 434.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -9196,7 +9196,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9207,7 +9207,7 @@
       },
       "result": {
         "position": {
-          "x": 402.25,
+          "x": 434.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -9299,7 +9299,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9310,7 +9310,7 @@
       },
       "result": {
         "position": {
-          "x": 466.25,
+          "x": 434.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -9402,7 +9402,7 @@
       "commandType": "moveToAddressableAreaForDropTip",
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": true,
+        "alternateDropLocation": false,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9413,7 +9413,7 @@
       },
       "result": {
         "position": {
-          "x": 402.25,
+          "x": 434.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -12670,5 +12670,6 @@
       "pipetteName": "p1000_96"
     }
   ],
-  "robotType": "OT-3 Standard"
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
 }

@@ -34,7 +34,7 @@ import { getNetworkInterfaces } from '../../../redux/networking'
 import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { SendProtocolToFlexSlideout } from '..'
-import { useNotifyAllRunsQuery } from '../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../resources/runs'
 
 import type * as ApiClient from '@opentrons/react-api-client'
 
@@ -51,7 +51,7 @@ vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/networking')
 vi.mock('../../../redux/custom-labware')
 vi.mock('../../../redux/protocol-storage/selectors')
-vi.mock('../../../resources/runs/useNotifyAllRunsQuery')
+vi.mock('../../../resources/runs')
 
 const render = (
   props: React.ComponentProps<typeof SendProtocolToFlexSlideout>

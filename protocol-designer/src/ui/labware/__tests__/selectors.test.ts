@@ -177,39 +177,6 @@ describe('labware selectors', () => {
       ])
     })
 
-    it('should return labware options for move labware with tips and trash', () => {
-      const labwareEntities = {
-        ...tipracks,
-        ...trash,
-        ...otherLabware,
-      }
-      const initialDeckSetup = {
-        labware: labwareEntities,
-        modules: {},
-        pipettes: {},
-      }
-
-      const presavedStepForm = {
-        stepType: 'moveLabware',
-      }
-      expect(
-        //  @ts-expect-error(jr, 7/17/23): resultFunc doesn't exist on type Selector<Options>
-        getLabwareOptions.resultFunc(
-          labwareEntities,
-          names,
-          initialDeckSetup,
-          presavedStepForm,
-          {},
-          {}
-        )
-      ).toEqual([
-        { name: 'Opentrons Tip Rack 10 µL', value: 'tiprack10Id' },
-        { name: 'Opentrons Tip Rack 1000 µL', value: 'tiprack100Id' },
-        { name: 'Source Plate', value: 'wellPlateId' },
-        { name: 'Trash', value: mockTrash },
-      ])
-    })
-
     it('should return labware options with module prefixes when a labware is on module', () => {
       const labware = {
         wellPlateId: {
@@ -345,7 +312,7 @@ describe('labware selectors', () => {
         )
       ).toEqual([
         { name: 'Trash', value: mockTrash },
-        { name: 'Well Plate', value: 'wellPlateId' },
+        { name: 'Well Plate in Magnetic Module', value: 'wellPlateId' },
       ])
     })
   })

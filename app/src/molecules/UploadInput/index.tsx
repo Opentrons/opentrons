@@ -2,19 +2,19 @@ import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  Icon,
-  Flex,
-  SPACING,
+  ALIGN_CENTER,
   BORDERS,
   COLORS,
-  SIZE_3,
   DIRECTION_COLUMN,
-  ALIGN_CENTER,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
-  TYPOGRAPHY,
   PrimaryButton,
+  SIZE_3,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 const StyledLabel = styled.label`
   display: flex;
@@ -24,7 +24,7 @@ const StyledLabel = styled.label`
   width: 100%;
   padding: ${SPACING.spacing32};
   border: 2px dashed ${COLORS.grey30};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   text-align: center;
   background-color: ${COLORS.white};
 

@@ -10,6 +10,10 @@ from pydantic import BaseModel
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.error_recovery_policy import (
+    ErrorRecoveryPolicy,
+    ErrorRecoveryType,
+)
 from opentrons.protocol_engine.errors.exceptions import (
     EStopActivatedError as PE_EStopActivatedError,
 )
@@ -40,8 +44,12 @@ from opentrons.protocol_engine.execution import (
     RailLightsHandler,
     StatusBarHandler,
 )
+from opentrons.protocol_engine.execution.command_executor import (
+    CommandNoteTrackerProvider,
+)
 
 from opentrons_shared_data.errors.exceptions import EStopActivatedError, PythonException
+from opentrons.protocol_engine.notes import CommandNoteTracker, CommandNote
 
 
 @pytest.fixture
@@ -123,6 +131,39 @@ def status_bar(decoy: Decoy) -> StatusBarHandler:
 
 
 @pytest.fixture
+def command_note_tracker_provider(decoy: Decoy) -> CommandNoteTrackerProvider:
+    """Get a mock tracker provider."""
+    return decoy.mock(cls=CommandNoteTrackerProvider)
+
+
+@pytest.fixture
+def error_recovery_policy(decoy: Decoy) -> ErrorRecoveryPolicy:
+    """Get a mock error recovery policy."""
+    return decoy.mock(cls=ErrorRecoveryPolicy)
+
+
+def get_next_tracker(
+    decoy: Decoy, provider: CommandNoteTrackerProvider
+) -> CommandNoteTracker:
+    """Get the next tracker provided by a provider, in code without being a fixture.
+
+    This is useful for testing the execution of multiple commands, each of which will get
+    a different tracker instance.
+    """
+    new_tracker = decoy.mock(cls=CommandNoteTracker)
+    decoy.when(provider()).then_return(new_tracker)
+    return new_tracker
+
+
+@pytest.fixture
+def command_note_tracker(
+    decoy: Decoy, command_note_tracker_provider: CommandNoteTrackerProvider
+) -> CommandNoteTracker:
+    """Get the tracker that the provider will provide."""
+    return get_next_tracker(decoy, command_note_tracker_provider)
+
+
+@pytest.fixture
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
@@ -137,6 +178,8 @@ def subject(
     rail_lights: RailLightsHandler,
     status_bar: StatusBarHandler,
     model_utils: ModelUtils,
+    command_note_tracker_provider: CommandNoteTrackerProvider,
+    error_recovery_policy: ErrorRecoveryPolicy,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
     return CommandExecutor(
@@ -153,6 +196,8 @@ def subject(
         model_utils=model_utils,
         rail_lights=rail_lights,
         status_bar=status_bar,
+        command_note_tracker_provider=command_note_tracker_provider,
+        error_recovery_policy=error_recovery_policy,
     )
 
 
@@ -184,6 +229,7 @@ async def test_execute(
     rail_lights: RailLightsHandler,
     status_bar: StatusBarHandler,
     model_utils: ModelUtils,
+    command_note_tracker: CommandNoteTracker,
     subject: CommandExecutor,
 ) -> None:
     """It should be able to execute a command."""
@@ -256,6 +302,7 @@ async def test_execute(
             run_control=run_control,
             rail_lights=rail_lights,
             status_bar=status_bar,
+            command_note_adder=command_note_tracker,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]
@@ -321,6 +368,8 @@ async def test_execute_raises_protocol_engine_error(
     status_bar: StatusBarHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
+    command_note_tracker: CommandNoteTracker,
+    error_recovery_policy: ErrorRecoveryPolicy,
     command_error: Exception,
     expected_error: Any,
     unexpected_error: bool,
@@ -380,6 +429,7 @@ async def test_execute_raises_protocol_engine_error(
             run_control=run_control,
             rail_lights=rail_lights,
             status_bar=status_bar,
+            command_note_adder=command_note_tracker,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]
@@ -391,6 +441,10 @@ async def test_execute_raises_protocol_engine_error(
     decoy.when(model_utils.get_timestamp()).then_return(
         datetime(year=2022, month=2, day=2),
         datetime(year=2023, month=3, day=3),
+    )
+
+    decoy.when(error_recovery_policy(matchers.Anything(), expected_error)).then_return(
+        ErrorRecoveryType.WAIT_FOR_RECOVERY
     )
 
     await subject.execute("command-id")
@@ -405,6 +459,255 @@ async def test_execute_raises_protocol_engine_error(
                 error_id="error-id",
                 failed_at=datetime(year=2023, month=3, day=3),
                 error=expected_error,
+                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+            )
+        ),
+    )
+
+
+async def test_executor_forwards_notes_on_command_success(
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    mock_gantry_mover: GantryMover,
+    labware_movement: LabwareMovementHandler,
+    pipetting: PipettingHandler,
+    mock_tip_handler: TipHandler,
+    run_control: RunControlHandler,
+    rail_lights: RailLightsHandler,
+    status_bar: StatusBarHandler,
+    model_utils: ModelUtils,
+    command_note_tracker: CommandNoteTracker,
+    subject: CommandExecutor,
+) -> None:
+    """It should be able to add notes during OK execution to command updates."""
+    TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
+    command_impl = decoy.mock(cls=_TestCommandImpl)
+
+    class _TestCommand(BaseCommand[_TestCommandParams, _TestCommandResult]):
+        commandType: str = "testCommand"
+        params: _TestCommandParams
+        result: Optional[_TestCommandResult]
+
+        @property
+        def _ImplementationCls(self) -> Type[_TestCommandImpl]:
+            return TestCommandImplCls
+
+    command_params = _TestCommandParams()
+    command_result = _TestCommandResult()
+
+    queued_command = cast(
+        Command,
+        _TestCommand(
+            id="command-id",
+            key="command-key",
+            createdAt=datetime(year=2021, month=1, day=1),
+            status=CommandStatus.QUEUED,
+            params=command_params,
+        ),
+    )
+
+    command_notes = [
+        CommandNote(
+            noteKind="warning",
+            shortMessage="hello",
+            longMessage="test command note",
+            source="test",
+        )
+    ]
+
+    running_command = cast(
+        Command,
+        _TestCommand(
+            id="command-id",
+            key="command-key",
+            createdAt=datetime(year=2021, month=1, day=1),
+            startedAt=datetime(year=2022, month=2, day=2),
+            status=CommandStatus.RUNNING,
+            params=command_params,
+        ),
+    )
+
+    completed_command = cast(
+        Command,
+        _TestCommand(
+            id="command-id",
+            key="command-key",
+            createdAt=datetime(year=2021, month=1, day=1),
+            startedAt=datetime(year=2022, month=2, day=2),
+            completedAt=datetime(year=2023, month=3, day=3),
+            status=CommandStatus.SUCCEEDED,
+            params=command_params,
+            result=command_result,
+            notes=command_notes,
+        ),
+    )
+
+    decoy.when(state_store.commands.get(command_id="command-id")).then_return(
+        queued_command
+    )
+
+    decoy.when(
+        queued_command._ImplementationCls(
+            state_view=state_store,
+            hardware_api=hardware_api,
+            equipment=equipment,
+            movement=movement,
+            gantry_mover=mock_gantry_mover,
+            labware_movement=labware_movement,
+            pipetting=pipetting,
+            tip_handler=mock_tip_handler,
+            run_control=run_control,
+            rail_lights=rail_lights,
+            status_bar=status_bar,
+            command_note_adder=command_note_tracker,
+        )
+    ).then_return(
+        command_impl  # type: ignore[arg-type]
+    )
+
+    decoy.when(await command_impl.execute(command_params)).then_return(command_result)
+
+    decoy.when(model_utils.get_timestamp()).then_return(
+        datetime(year=2022, month=2, day=2),
+        datetime(year=2023, month=3, day=3),
+    )
+    decoy.when(command_note_tracker.get_notes()).then_return(command_notes)
+
+    await subject.execute("command-id")
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            UpdateCommandAction(private_result=None, command=running_command)
+        ),
+        action_dispatcher.dispatch(
+            UpdateCommandAction(private_result=None, command=completed_command)
+        ),
+    )
+
+
+async def test_executor_forwards_notes_on_command_failure(
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    mock_gantry_mover: GantryMover,
+    labware_movement: LabwareMovementHandler,
+    pipetting: PipettingHandler,
+    mock_tip_handler: TipHandler,
+    run_control: RunControlHandler,
+    rail_lights: RailLightsHandler,
+    status_bar: StatusBarHandler,
+    model_utils: ModelUtils,
+    subject: CommandExecutor,
+    command_note_tracker: CommandNoteTracker,
+    error_recovery_policy: ErrorRecoveryPolicy,
+) -> None:
+    """It should handle an error occuring during execution."""
+    TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
+    command_impl = decoy.mock(cls=_TestCommandImpl)
+
+    class _TestCommand(BaseCommand[_TestCommandParams, _TestCommandResult]):
+        commandType: str = "testCommand"
+        params: _TestCommandParams
+        result: Optional[_TestCommandResult]
+
+        @property
+        def _ImplementationCls(self) -> Type[_TestCommandImpl]:
+            return TestCommandImplCls
+
+    command_params = _TestCommandParams()
+    command_notes = [
+        CommandNote(
+            noteKind="warning",
+            shortMessage="hello",
+            longMessage="test command note",
+            source="test",
+        )
+    ]
+
+    queued_command = cast(
+        Command,
+        _TestCommand(
+            id="command-id",
+            key="command-key",
+            createdAt=datetime(year=2021, month=1, day=1),
+            status=CommandStatus.QUEUED,
+            params=command_params,
+        ),
+    )
+
+    running_command = cast(
+        Command,
+        _TestCommand(
+            id="command-id",
+            key="command-key",
+            createdAt=datetime(year=2021, month=1, day=1),
+            startedAt=datetime(year=2022, month=2, day=2),
+            status=CommandStatus.RUNNING,
+            params=command_params,
+        ),
+    )
+    running_command_with_notes = running_command.copy(update={"notes": command_notes})
+
+    decoy.when(state_store.commands.get(command_id="command-id")).then_return(
+        queued_command
+    )
+
+    decoy.when(
+        queued_command._ImplementationCls(
+            state_view=state_store,
+            hardware_api=hardware_api,
+            equipment=equipment,
+            movement=movement,
+            gantry_mover=mock_gantry_mover,
+            labware_movement=labware_movement,
+            pipetting=pipetting,
+            tip_handler=mock_tip_handler,
+            run_control=run_control,
+            rail_lights=rail_lights,
+            status_bar=status_bar,
+            command_note_adder=command_note_tracker,
+        )
+    ).then_return(
+        command_impl  # type: ignore[arg-type]
+    )
+
+    decoy.when(await command_impl.execute(command_params)).then_raise(
+        RuntimeError("oh no")
+    )
+
+    decoy.when(model_utils.generate_id()).then_return("error-id")
+    decoy.when(model_utils.get_timestamp()).then_return(
+        datetime(year=2022, month=2, day=2),
+        datetime(year=2023, month=3, day=3),
+    )
+    decoy.when(
+        error_recovery_policy(matchers.Anything(), matchers.Anything())
+    ).then_return(ErrorRecoveryType.WAIT_FOR_RECOVERY)
+    decoy.when(command_note_tracker.get_notes()).then_return(command_notes)
+
+    await subject.execute("command-id")
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            UpdateCommandAction(private_result=None, command=running_command)
+        ),
+        action_dispatcher.dispatch(
+            UpdateCommandAction(private_result=None, command=running_command_with_notes)
+        ),
+        action_dispatcher.dispatch(
+            FailCommandAction(
+                command_id="command-id",
+                error_id="error-id",
+                failed_at=datetime(year=2023, month=3, day=3),
+                error=matchers.ErrorMatching(PythonException, match="oh no"),
+                type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
             )
         ),
     )

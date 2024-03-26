@@ -4,17 +4,17 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  COLORS,
-  SPACING,
   BORDERS,
-  useConditionalConfirm,
+  COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+  useConditionalConfirm,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton, SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
@@ -40,7 +40,7 @@ const OptionButton = styled.input`
 
 const OptionLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize4};
+  border-radius: ${BORDERS.borderRadius16};
   color: ${({ isSelected }) =>
     isSelected === true ? COLORS.white : COLORS.black90};
   background: ${({ isSelected }) =>

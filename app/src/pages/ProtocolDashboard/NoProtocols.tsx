@@ -9,10 +9,9 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 import imgSrc from '../../assets/images/on-device-display/empty_protocol_dashboard.png'
 
@@ -25,7 +24,7 @@ export function NoProtocols(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       height="27.25rem"
       justifyContent={JUSTIFY_CENTER}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
     >
       <img
         alt={t('nothing_here_yet')}

@@ -14,6 +14,9 @@ extend-ignore =
     ANN102
     # do not require docstring for __init__, put them on the class
     D107,
+    # Don't forbid the function signature from being mentioned in the first line of the
+    # docstring. It tends to raise false positives when referring to other functions.
+    D402,
 
 # configure flake8-docstrings
 # https://pypi.org/project/flake8-docstrings/

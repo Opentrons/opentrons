@@ -11,6 +11,7 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -20,7 +21,6 @@ import { PrivacySettings } from './PrivacySettings'
 import { AdvancedSettings } from './AdvancedSettings'
 import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
 import { NavTab } from '../../molecules/NavTab'
-import { StyledText } from '../../atoms/text'
 import { Line } from '../../atoms/structure'
 
 import type { DesktopRouteParams, AppSettingsTab } from '../../App/types'
@@ -50,7 +50,7 @@ export function AppSettings(): JSX.Element {
         backgroundColor={COLORS.white}
         height="100%"
         width="100%"
-        borderRadius={BORDERS.borderRadiusSize2}
+        borderRadius={BORDERS.borderRadius8}
         minHeight="95%"
       >
         <Box padding={SPACING.spacing16} paddingBottom="0">

@@ -10,13 +10,13 @@ import singleFlexSrc from './single-channel-flex.png'
 import eightChannelFlexSrc from './eight-channel-flex.png'
 import ninetySixSrc from './ninety-six-channel-gen1.png'
 
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import type { PipetteV2Specs } from '@opentrons/shared-data'
 import type { Mount } from '../robot-types'
 import type { StyleProps } from '..'
 
 export interface InstrumentDiagramProps extends StyleProps {
   mount: Mount
-  pipetteSpecs?: Pick<PipetteNameSpecs, 'displayCategory' | 'channels'> | null
+  pipetteSpecs?: Pick<PipetteV2Specs, 'displayCategory' | 'channels'> | null
   className?: string
   imageStyle?: FlattenSimpleInterpolation
 }

@@ -8,10 +8,9 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -74,7 +73,7 @@ const Template: Story<ColorsStorybookProps> = args => {
           gridGap={SPACING.spacing4}
           width="20rem"
           height="6rem"
-          borderRadius={BORDERS.borderRadiusSize2}
+          borderRadius={BORDERS.borderRadius8}
           onClick={() => handleClick(color[0])}
           style={{ cursor: 'pointer' }}
           border={`2px solid ${COLORS.black90}`}

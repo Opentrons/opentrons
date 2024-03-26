@@ -4,8 +4,8 @@ import { css } from 'styled-components'
 import { Icon } from '../../icons'
 import { Btn } from '../../primitives'
 import { ALIGN_CENTER, DISPLAY_FLEX, JUSTIFY_CENTER } from '../../styles'
-import { BORDERS, RESPONSIVENESS } from '../../ui-style-constants'
-import { COLORS } from '../../helix-design-system'
+import { RESPONSIVENESS } from '../../ui-style-constants'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
@@ -98,7 +98,7 @@ const EMPTY_CONFIG_STYLE = css`
   justify-content: ${JUSTIFY_CENTER};
   background-color: ${COLORS.blue30};
   border: 3px dashed ${COLORS.blue50};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   width: 100%;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

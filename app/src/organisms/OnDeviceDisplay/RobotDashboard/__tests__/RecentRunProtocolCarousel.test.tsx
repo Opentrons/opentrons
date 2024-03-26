@@ -3,14 +3,14 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 import { RecentRunProtocolCard, RecentRunProtocolCarousel } from '..'
 
 import type { RunData } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../RecentRunProtocolCard')
-vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+vi.mock('../../../../resources/runs')
 
 const mockRun = {
   actions: [],

@@ -2,20 +2,20 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  Icon,
   ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
-  SIZE_1,
   BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { useRunHasStarted } from '../hooks'
 import { formatTimestamp } from '../utils'
 
@@ -55,7 +55,7 @@ export function SetupCalibrationItem({
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadius4}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       minHeight="2.5rem" // 40px

@@ -19,6 +19,7 @@ import {
   LocationIcon,
   MODULE_ICON_NAME_BY_TYPE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -37,7 +38,6 @@ import {
 } from '@opentrons/react-api-client'
 
 import { FloatingActionButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { getTopPortalEl } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
@@ -414,7 +414,7 @@ function LabwareLatch({
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.blue35}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius16}
       css={labwareLatchStyles}
       color={isLatchLoading ? COLORS.grey60 : COLORS.black90}
       height="6.5rem"
@@ -547,7 +547,7 @@ function RowLabware({
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.grey35}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius8}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       gridGap={SPACING.spacing32}
     >

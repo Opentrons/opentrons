@@ -74,7 +74,7 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
           width="8.75rem"
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
-          borderRadius={BORDERS.borderRadiusSize3}
+          borderRadius={BORDERS.borderRadius12}
           marginRight={SPACING.spacing8}
           marginBottom={SPACING.spacing8}
           padding={SPACING.spacing16}

@@ -7,12 +7,12 @@ import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
 import { useHost, useCreateRunMutation } from '@opentrons/react-api-client'
 
 import { useCloneRun } from '../useCloneRun'
-import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../../resources/runs'
 
 import type { HostConfig } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('../../../../resources/runs/useNotifyRunQuery')
+vi.mock('../../../../resources/runs')
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID: string = 'run_id'

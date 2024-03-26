@@ -1,30 +1,36 @@
 import * as React from 'react'
 import {
-  JUSTIFY_CENTER,
+  ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
-  BORDERS,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
 
 interface EmptySectionProps {
-  section: 'hardware' | 'labware' | 'liquids'
+  section: 'hardware' | 'labware' | 'liquids' | 'parameters'
 }
 
 export const EmptySection = (props: EmptySectionProps): JSX.Element => {
   const { section } = props
   const { t, i18n } = useTranslation('protocol_details')
 
+  let sectionText: string = t('not_in_protocol', { section: section })
+  if (section === 'liquids') {
+    sectionText = t('liquids_not_in_protocol')
+  } else if (section === 'parameters') {
+    sectionText = t('no_parameters')
+  }
   return (
     <Flex
       backgroundColor={COLORS.grey35}
-      borderRadius={BORDERS.borderRadiusSize3}
+      borderRadius={BORDERS.borderRadius12}
       width="100%"
       height="12.625rem"
       padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
@@ -40,12 +46,7 @@ export const EmptySection = (props: EmptySectionProps): JSX.Element => {
         aria-label="EmptySection_ot-alert"
       />
       <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {i18n.format(
-          section === 'liquids'
-            ? t('liquids_not_in_protocol')
-            : t('not_in_protocol', { section: section }),
-          'capitalize'
-        )}
+        {i18n.format(sectionText, 'capitalize')}
       </StyledText>
     </Flex>
   )

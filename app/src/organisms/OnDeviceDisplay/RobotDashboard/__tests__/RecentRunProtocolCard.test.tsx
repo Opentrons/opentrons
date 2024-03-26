@@ -18,7 +18,7 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useHardwareStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
-import { useNotifyAllRunsQuery } from '../../../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 import {
   useRobotInitializationStatus,
   INIT_STATUS,
@@ -34,7 +34,7 @@ vi.mock('../../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../../organisms/ProtocolUpload/hooks')
 vi.mock('../../../../redux/analytics')
 vi.mock('../hooks')
-vi.mock('../../../../resources/runs/useNotifyAllRunsQuery')
+vi.mock('../../../../resources/runs')
 vi.mock('../../../../resources/health/hooks')
 
 const RUN_ID = 'mockRunId'

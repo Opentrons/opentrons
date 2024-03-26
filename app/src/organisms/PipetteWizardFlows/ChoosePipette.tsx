@@ -5,23 +5,24 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
   BORDERS,
   COLORS,
-  Flex,
-  SPACING,
-  TYPOGRAPHY,
   DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
-  POSITION_ABSOLUTE,
-  JUSTIFY_FLEX_END,
-  JUSTIFY_SPACE_BETWEEN,
-  RESPONSIVENESS,
   DIRECTION_ROW,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
   JUSTIFY_FLEX_START,
-  PrimaryButton,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
   JUSTIFY_SPACE_AROUND,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -32,7 +33,6 @@ import {
 } from '@opentrons/shared-data'
 import { i18n } from '../../i18n'
 import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
 import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
@@ -51,7 +51,7 @@ import type { SelectablePipettes } from './types'
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
   border: 1px solid ${COLORS.grey30};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius8};
   height: 14.5625rem;
   width: 14.5625rem;
   cursor: pointer;
@@ -70,7 +70,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     justify-content: ${JUSTIFY_FLEX_START};
     background-color: ${COLORS.blue35};
     border-width: 0;
-    border-radius: ${BORDERS.borderRadiusSize4};
+    border-radius: ${BORDERS.borderRadius16};
     padding: ${SPACING.spacing24};
     height: 5.25rem;
     width: 57.8125rem;

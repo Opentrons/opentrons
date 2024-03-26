@@ -4,15 +4,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import {
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   SPACING,
-  DIRECTION_COLUMN,
+  StyledText,
   TYPOGRAPHY,
-  COLORS,
-  BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   getDevtoolsEnabled,
@@ -33,7 +33,7 @@ const SettingButton = styled.input`
 
 const SettingButtonLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize4};
+  border-radius: ${BORDERS.borderRadius16};
   cursor: pointer;
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.blue50 : COLORS.blue35};

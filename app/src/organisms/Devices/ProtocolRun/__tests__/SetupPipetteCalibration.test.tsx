@@ -9,13 +9,13 @@ import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtur
 import { useRunPipetteInfoByMount } from '../../hooks'
 import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
-import { useNotifyRunQuery } from '../../../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../../../resources/runs'
 
 import type { PipetteInfo } from '../../hooks'
 
 vi.mock('../../hooks')
 vi.mock('../SetupPipetteCalibrationItem')
-vi.mock('../../../../resources/runs/useNotifyRunQuery')
+vi.mock('../../../../resources/runs')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'

@@ -70,3 +70,9 @@ def require_estop() -> bool:
     return not advs.get_setting_with_env_overload(
         "estopNotRequired", RobotTypeEnum.FLEX
     )
+
+
+def enable_error_recovery_experiments() -> bool:
+    return advs.get_setting_with_env_overload(
+        "enableErrorRecoveryExperiments", RobotTypeEnum.FLEX
+    )

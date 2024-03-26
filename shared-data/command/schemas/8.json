@@ -612,7 +612,7 @@
         "frontRightNozzle": {
           "title": "Frontrightnozzle",
           "description": "The front right nozzle in your configuration.",
-          "pattern": "[A-Z][0-100]",
+          "pattern": "[A-Z]\\d{1,2}",
           "type": "string"
         }
       },

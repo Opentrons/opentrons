@@ -20,6 +20,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   TEXT_ALIGN_RIGHT,
   truncateString,
   TYPOGRAPHY,
@@ -38,7 +39,6 @@ import {
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
 import {
   ProtocolSetupTitleSkeleton,
   ProtocolSetupStepSkeleton,
@@ -54,7 +54,7 @@ import {
 import {
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
-} from '../../pages/Protocols/hooks'
+} from '../Protocols/hooks'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModulesAndDeck } from '../../organisms/ProtocolSetupModulesAndDeck'
@@ -69,25 +69,27 @@ import {
   getProtocolUsesGripper,
 } from '../../organisms/ProtocolSetupInstruments/utils'
 import {
+  useProtocolHasRunTimeParameters,
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
 import { useToaster } from '../../organisms/ToasterOven'
 import { useIsHeaterShakerInProtocol } from '../../organisms/ModuleCard/hooks'
-import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { getLabwareSetupItemGroups } from '../Protocols/utils'
 import { getLocalRobot, getRobotSerialNumber } from '../../redux/discovery'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_START,
   useTrackEvent,
 } from '../../redux/analytics'
-import { getIsHeaterShakerAttached } from '../../redux/config'
-import { ConfirmAttachedModal } from '../../pages/ProtocolSetup/ConfirmAttachedModal'
+import { getIsHeaterShakerAttached, useFeatureFlag } from '../../redux/config'
+import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
-import { CloseButton, PlayButton } from '../../pages/ProtocolSetup/Buttons'
+import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
-import { useNotifyRunQuery } from '../../resources/runs/useNotifyRunQuery'
+import { useNotifyRunQuery } from '../../resources/runs'
+import { ViewOnlyParameters } from '../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
@@ -110,6 +112,12 @@ interface ProtocolSetupStepProps {
   disabled?: boolean
   // display the reason the setup step is disabled
   disabledReason?: string | null
+  //  optional description
+  description?: string
+  //  optional removal of the icon
+  hasIcon?: boolean
+  //  optional enlarge the font size
+  fontSize?: string
 }
 
 export function ProtocolSetupStep({
@@ -120,6 +128,9 @@ export function ProtocolSetupStep({
   subDetail,
   disabled = false,
   disabledReason,
+  description,
+  hasIcon = true,
+  fontSize = 'p',
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
     ready: COLORS.green35,
@@ -154,6 +165,8 @@ export function ProtocolSetupStep({
     }
   `
 
+  const isToggle = detail === 'On' || detail === 'Off'
+
   return (
     <Btn
       onClick={() =>
@@ -166,7 +179,7 @@ export function ProtocolSetupStep({
         backgroundColor={
           disabled ? COLORS.grey35 : backgroundColorByStepStatus[status]
         }
-        borderRadius={BORDERS.borderRadiusSize4}
+        borderRadius={BORDERS.borderRadius16}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
         css={PUSHED_STATE_STYLE}
@@ -178,25 +191,40 @@ export function ProtocolSetupStep({
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
         ) : null}
-        <StyledText
-          as="h4"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={disabled ? COLORS.grey50 : COLORS.black90}
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          textAlign={TYPOGRAPHY.textAlignLeft}
         >
-          {title}
-        </StyledText>
-        <Flex flex="1" justifyContent={JUSTIFY_END}>
           <StyledText
-            as="p"
+            as="h4"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            color={disabled ? COLORS.grey50 : COLORS.black90}
+          >
+            {title}
+          </StyledText>
+          <StyledText as="h4" color={COLORS.grey50} maxWidth="35rem">
+            {description}
+          </StyledText>
+        </Flex>
+        <Flex
+          flex="1"
+          justifyContent={JUSTIFY_END}
+          padding={
+            isToggle ? `${SPACING.spacing12} ${SPACING.spacing10}` : 'undefined'
+          }
+        >
+          <StyledText
+            as={fontSize}
             textAlign={TEXT_ALIGN_RIGHT}
             color={disabled ? COLORS.grey50 : COLORS.black90}
+            maxWidth="20rem"
           >
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
             {subDetail}
           </StyledText>
         </Flex>
-        {disabled ? null : (
+        {disabled || !hasIcon ? null : (
           <Icon
             marginLeft={SPACING.spacing8}
             name="more"
@@ -229,7 +257,8 @@ function PrepareToRun({
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
-
+  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
+  const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
   // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
@@ -594,6 +623,12 @@ function PrepareToRun({
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
 
+  //  TODO(Jr, 3/20/24): wire up custom values
+  const hasCustomValues = false
+  const parametersDetail = hasCustomValues
+    ? t('custom_values')
+    : t('default_values')
+
   return (
     <>
       {/* Empty box to detect scrolling */}
@@ -695,6 +730,20 @@ function PrepareToRun({
               disabled={lpcDisabledReason != null}
               disabledReason={lpcDisabledReason}
             />
+            {enableRunTimeParametersFF ? (
+              <ProtocolSetupStep
+                onClickSetupStep={() => setSetupScreen('view only parameters')}
+                title={t('parameters')}
+                detail={t(
+                  hasRunTimeParameters
+                    ? parametersDetail
+                    : t('no_parameters_specified')
+                )}
+                subDetail={null}
+                status="general"
+                disabled={!hasRunTimeParameters}
+              />
+            ) : null}
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('labware')}
               title={t('labware')}
@@ -741,6 +790,7 @@ export type SetupScreens =
   | 'labware'
   | 'liquids'
   | 'deck configuration'
+  | 'view only parameters'
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
@@ -811,6 +861,9 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         providedFixtureOptions={providedFixtureOptions}
       />
+    ),
+    'view only parameters': (
+      <ViewOnlyParameters runId={runId} setSetupScreen={setSetupScreen} />
     ),
   }
 

@@ -36,7 +36,7 @@ from robot_server.protocols.router import ProtocolNotFound
 
 from ..run_models import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter
-from ..run_models import Run, RunCreate, RunUpdate
+from ..run_models import Run, BadRun, RunCreate, RunUpdate
 from ..engine_store import EngineConflictError
 from ..run_data_manager import RunDataManager, RunNotCurrentError
 from ..dependencies import get_run_data_manager, get_run_auto_deleter
@@ -99,7 +99,7 @@ class AllRunsLinks(BaseModel):
 async def get_run_data_from_url(
     runId: str,
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-) -> Run:
+) -> Union[Run, BadRun]:
     """Get the data of a run.
 
     Args:
@@ -144,7 +144,7 @@ async def create_run(
     deck_configuration_store: DeckConfigurationStore = Depends(
         get_deck_configuration_store
     ),
-) -> PydanticResponse[SimpleBody[Run]]:
+) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
 
     Arguments:
@@ -206,7 +206,7 @@ async def create_run(
         "Get a list of all active and inactive runs, in order from oldest to newest."
     ),
     responses={
-        status.HTTP_200_OK: {"model": MultiBody[Run, AllRunsLinks]},
+        status.HTTP_200_OK: {"model": MultiBody[Union[Run, BadRun], AllRunsLinks]},
     },
 )
 async def get_runs(
@@ -220,7 +220,7 @@ async def get_runs(
         ),
     ),
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
+) -> PydanticResponse[MultiBody[Union[Run, BadRun], AllRunsLinks]]:
     """Get all runs, in order from least-recently to most-recently created.
 
     Args:
@@ -248,13 +248,13 @@ async def get_runs(
     summary="Get a run",
     description="Get a specific run by its unique identifier.",
     responses={
-        status.HTTP_200_OK: {"model": SimpleBody[Run]},
+        status.HTTP_200_OK: {"model": SimpleBody[Union[Run, BadRun]]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
 )
 async def get_run(
     run_data: Run = Depends(get_run_data_from_url),
-) -> PydanticResponse[SimpleBody[Run]]:
+) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Get a run by its ID.
 
     Args:
@@ -316,7 +316,7 @@ async def update_run(
     runId: str,
     request_body: RequestModel[RunUpdate],
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
-) -> PydanticResponse[SimpleBody[Run]]:
+) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Update a run by its ID.
 
     Args:

@@ -10,15 +10,15 @@ import {
   POSITION_ABSOLUTE,
   COLORS,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
-  CreateMaintenanceRunType,
   useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 
-import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs/useNotifyCurrentMaintenanceRun'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -27,9 +27,7 @@ import { getIsOnDevice } from '../../redux/config'
 import {
   useChainMaintenanceCommands,
   useCreateTargetedMaintenanceRunMutation,
-} from '../../resources/runs/hooks'
-import { StyledText } from '../../atoms/text'
-import { Jog } from '../../molecules/JogControls'
+} from '../../resources/runs'
 import { ExitConfirmation } from './ExitConfirmation'
 import { getAddressableAreaFromConfig } from './getAddressableAreaFromConfig'
 import { getDropTipWizardSteps } from './getDropTipWizardSteps'
@@ -47,6 +45,7 @@ import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
 
 import type { PipetteData } from '@opentrons/api-client'
+import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
   PipetteModelSpecs,
   RobotType,
@@ -54,6 +53,7 @@ import type {
   AddressableAreaName,
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { Jog } from '../../molecules/JogControls'
 
 const RUN_REFETCH_INTERVAL_MS = 5000
 const JOG_COMMAND_TIMEOUT_MS = 10000
@@ -522,7 +522,7 @@ export const DropTipWizardComponent = (
         top="16px"
         border={BORDERS.lineBorder}
         boxShadow={BORDERS.shadowSmall}
-        borderRadius={BORDERS.borderRadiusSize4}
+        borderRadius={BORDERS.borderRadius16}
         position={POSITION_ABSOLUTE}
         backgroundColor={COLORS.white}
       >

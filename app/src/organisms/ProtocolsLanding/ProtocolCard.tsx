@@ -28,6 +28,7 @@ import {
   SIZE_2,
   SIZE_3,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -39,7 +40,6 @@ import {
 
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
-import { StyledText } from '../../atoms/text'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalysisStale'
@@ -94,7 +94,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   return (
     <Box
       backgroundColor={COLORS.white}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadius8}
       cursor="pointer"
       minWidth="36rem"
       padding={SPACING.spacing16}

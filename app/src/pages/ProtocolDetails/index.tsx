@@ -19,6 +19,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -31,7 +32,6 @@ import {
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
-import { StyledText } from '../../atoms/text'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
@@ -44,19 +44,25 @@ import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
+  useFeatureFlag,
 } from '../../redux/config'
-import { useMissingProtocolHardware } from '../Protocols/hooks'
+import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import {
+  useMissingProtocolHardware,
+  useRunTimeParameters,
+} from '../Protocols/hooks'
+import { ProtocolSetupParameters } from '../../organisms/ProtocolSetupParameters'
+import { Parameters } from './Parameters'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
-import { formatTimeWithUtcLabel } from '../../resources/runs/utils'
+import { formatTimeWithUtcLabel } from '../../resources/runs'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { Dispatch } from '../../redux/types'
 import type { OnDeviceRouteParams } from '../../App/types'
-import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
 interface ProtocolHeaderProps {
   title?: string | null
@@ -156,13 +162,23 @@ const ProtocolHeader = ({
 
 const protocolSectionTabOptions = [
   'Summary',
+  'Parameters',
+  'Hardware',
+  'Labware',
+  'Liquids',
+  'Deck',
+] as const
+const protocolSectionTabOptionsWithoutParameters = [
+  'Summary',
   'Hardware',
   'Labware',
   'Liquids',
   'Deck',
 ] as const
 
-type TabOption = typeof protocolSectionTabOptions[number]
+type TabOption =
+  | typeof protocolSectionTabOptions[number]
+  | typeof protocolSectionTabOptionsWithoutParameters[number]
 
 interface ProtocolSectionTabsProps {
   currentOption: TabOption
@@ -173,9 +189,13 @@ const ProtocolSectionTabs = ({
   currentOption,
   setCurrentOption,
 }: ProtocolSectionTabsProps): JSX.Element => {
+  const enableRtpFF = useFeatureFlag('enableRunTimeParameters')
+  const options = enableRtpFF
+    ? protocolSectionTabOptions
+    : protocolSectionTabOptionsWithoutParameters
   return (
     <Flex gridGap={SPACING.spacing8}>
-      {protocolSectionTabOptions.map(option => {
+      {options.map(option => {
         return (
           <TabbedButton
             isSelected={option === currentOption}
@@ -220,7 +240,7 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
       </StyledText>
       <Flex
         backgroundColor={COLORS.grey35}
-        borderRadius={BORDERS.borderRadiusSize1}
+        borderRadius={BORDERS.borderRadius8}
         marginTop={SPACING.spacing24}
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
@@ -256,6 +276,9 @@ const ProtocolSectionContent = ({
         />
       )
       break
+    case 'Parameters':
+      protocolSection = <Parameters protocolId={protocolId} />
+      break
     case 'Hardware':
       protocolSection = <Hardware protocolId={protocolId} />
       break
@@ -285,6 +308,7 @@ export function ProtocolDetails(): JSX.Element | null {
     'protocol_info',
     'shared',
   ])
+  const enableRtpFF = useFeatureFlag('enableRunTimeParameters')
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const {
     missingProtocolHardware,
@@ -294,14 +318,19 @@ export function ProtocolDetails(): JSX.Element | null {
     missingProtocolHardware,
     conflictedSlots
   )
+  const runTimeParameters = useRunTimeParameters(protocolId)
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
   const host = useHost()
   const { makeSnackbar } = useToaster()
+  const [showParameters, setShowParameters] = React.useState<boolean>(false)
   const queryClient = useQueryClient()
   const [currentOption, setCurrentOption] = React.useState<TabOption>(
-    protocolSectionTabOptions[0]
+    enableRtpFF
+      ? protocolSectionTabOptions[0]
+      : protocolSectionTabOptionsWithoutParameters[0]
   )
+
   const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)
   const {
     data: protocolRecord,
@@ -371,9 +400,10 @@ export function ProtocolDetails(): JSX.Element | null {
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
     )
   }
-
   const handleRunProtocol = (): void => {
-    createRun({ protocolId, labwareOffsets })
+    runTimeParameters.length > 0
+      ? setShowParameters(true)
+      : createRun({ protocolId, labwareOffsets })
   }
   const [
     showConfirmDeleteProtocol,
@@ -415,8 +445,13 @@ export function ProtocolDetails(): JSX.Element | null {
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
   }
-
-  return (
+  return showParameters ? (
+    <ProtocolSetupParameters
+      protocolId={protocolId}
+      labwareOffsets={labwareOffsets}
+      runTimeParameters={runTimeParameters}
+    />
+  ) : (
     <>
       {showConfirmDeleteProtocol ? (
         <Flex alignItems={ALIGN_CENTER}>

@@ -6,19 +6,20 @@ import {
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
-  Flex,
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_END,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SecondaryButton,
-  Icon,
-  DIRECTION_ROW,
-  COLORS,
-  JUSTIFY_END,
-  ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  BORDERS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
@@ -32,7 +33,6 @@ import {
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { StyledText } from '../../../../atoms/text'
 import { Modal } from '../../../../molecules/Modal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
 
@@ -185,7 +185,7 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 alignItems={ALIGN_CENTER}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                borderRadius={BORDERS.borderRadiusSize3}
+                borderRadius={BORDERS.borderRadius4}
               >
                 <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                   {t('protocol_specifies')}
@@ -201,7 +201,7 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 alignItems={ALIGN_CENTER}
-                borderRadius={BORDERS.borderRadiusSize3}
+                borderRadius={BORDERS.borderRadius4}
               >
                 <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                   {t('currently_configured')}
@@ -288,6 +288,7 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
                 alignItems={ALIGN_CENTER}
+                borderRadius={BORDERS.borderRadius4}
               >
                 <StyledText as="label" width={SPACING.spacing120}>
                   {t('protocol_specifies')}
@@ -302,6 +303,7 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
                 alignItems={ALIGN_CENTER}
+                borderRadius={BORDERS.borderRadius4}
               >
                 <StyledText as="label" width={SPACING.spacing120}>
                   {t('currently_configured')}

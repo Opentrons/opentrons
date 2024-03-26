@@ -180,9 +180,13 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
       //  TODO(jr, 8/31/23): this is a bit hacky since the TCGEN2 slot is only B1 instead of B1 and A1
       //  so we have to manually check if slot A1 has issues as well as looking at selectedSlot
       //  this probably deserves a more elegant refactor
-      (selectedModel === THERMOCYCLER_MODULE_V2 && hasSlotIssue('A1')) ||
-      hasSlotIssue(selectedSlot)
+      selectedModel === THERMOCYCLER_MODULE_V2 &&
+      hasSlotIssue('A1')
     ) {
+      errors.selectedSlot = t('module_placement.SLOT_OCCUPIED_TC.body', {
+        selectedSlot,
+      })
+    } else if (hasSlotIssue(selectedSlot)) {
       errors.selectedSlot = t('module_placement.SLOT_OCCUPIED.body', {
         selectedSlot,
       })
@@ -342,64 +346,68 @@ const EditModulesModalComponent = (
           height="3.125rem"
           alignItems={ALIGN_CENTER}
         >
-          <Flex gridGap={SPACING.spacing8}>
-            <FormGroup label="Model">
-              <Box width="4rem">
-                <ModelDropdown
-                  fieldName="selectedModel"
-                  tabIndex={0}
-                  options={getModuleOptionsForRobotType(
-                    MODELS_FOR_MODULE_TYPE[moduleType],
-                    robotType
-                  )}
-                  field={field}
-                  fieldState={fieldState}
-                />
-              </Box>
-            </FormGroup>
-            {showSlotOption && (
-              <>
-                {!enableSlotSelection && (
-                  <Tooltip {...tooltipProps}>{slotOptionTooltip}</Tooltip>
-                )}
-
-                <Box {...targetProps} height="3.125rem">
-                  <FormGroup label="Position">
-                    <Box
-                      width={robotType === FLEX_ROBOT_TYPE ? '8rem' : '18rem'}
-                    >
-                      <Controller
-                        name="selectedSlot"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                          <SlotDropdown
-                            fieldName="selectedSlot"
-                            options={getAllModuleSlotsByType(
-                              moduleType,
-                              robotType
-                            )}
-                            disabled={!enableSlotSelection}
-                            tabIndex={1}
-                            field={field}
-                            fieldState={fieldState}
-                          />
-                        )}
-                      />
-                    </Box>
-                  </FormGroup>
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+              <FormGroup label="Model">
+                <Box width="4rem">
+                  <ModelDropdown
+                    fieldName="selectedModel"
+                    tabIndex={0}
+                    options={getModuleOptionsForRobotType(
+                      MODELS_FOR_MODULE_TYPE[moduleType],
+                      robotType
+                    )}
+                    field={field}
+                    fieldState={fieldState}
+                  />
                 </Box>
-              </>
-            )}
+              </FormGroup>
+              {showSlotOption && (
+                <>
+                  {!enableSlotSelection && (
+                    <Tooltip {...tooltipProps}>{slotOptionTooltip}</Tooltip>
+                  )}
+
+                  <Box {...targetProps} height="3.125rem">
+                    <FormGroup label="Position">
+                      <Box
+                        width={robotType === FLEX_ROBOT_TYPE ? '8rem' : '18rem'}
+                      >
+                        <Controller
+                          name="selectedSlot"
+                          control={control}
+                          render={({ field, fieldState }) => (
+                            <SlotDropdown
+                              fieldName="selectedSlot"
+                              options={getAllModuleSlotsByType(
+                                moduleType,
+                                robotType
+                              )}
+                              disabled={!enableSlotSelection}
+                              tabIndex={1}
+                              field={field}
+                              fieldState={fieldState}
+                            />
+                          )}
+                        />
+                      </Box>
+                    </FormGroup>
+                  </Box>
+                </>
+              )}
+            </Flex>
+            <Box>
+              {slotIssue ? (
+                <PDAlert
+                  alertType="warning"
+                  title={t('alert:module_placement.SLOT_OCCUPIED.title')}
+                  //  TODO(Jr, 3/18/24): add decription back: validation.selectedSlot
+                  //  when we fix designs in the future
+                  description={''}
+                />
+              ) : null}
+            </Box>
           </Flex>
-          <Box>
-            {slotIssue ? (
-              <PDAlert
-                alertType="warning"
-                title={validation.selectedSlot}
-                description={''}
-              />
-            ) : null}
-          </Box>
         </Flex>
 
         {robotType === OT2_ROBOT_TYPE ? (

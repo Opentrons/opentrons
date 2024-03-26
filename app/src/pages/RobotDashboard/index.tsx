@@ -7,10 +7,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { Navigation } from '../../organisms/Navigation'
 import {
   EmptyRecentRun,
@@ -21,7 +21,7 @@ import { AnalyticsOptInModal } from './AnalyticsOptInModal'
 import { WelcomeModal } from './WelcomeModal'
 import { RunData } from '@opentrons/api-client'
 import { ServerInitializing } from '../../organisms/OnDeviceDisplay/RobotDashboard/ServerInitializing'
-import { useNotifyAllRunsQuery } from '../../resources/runs/useNotifyAllRunsQuery'
+import { useNotifyAllRunsQuery } from '../../resources/runs'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 

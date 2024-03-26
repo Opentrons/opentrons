@@ -21,6 +21,7 @@ from opentrons.protocol_engine.types import ModuleDefinition
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
+from opentrons.protocol_engine.notes import CommandNoteAdder
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -230,3 +231,9 @@ def supported_tip_fixture() -> pipette_definition.SupportedTipsDefinition:
         dispense=pipette_definition.ulPerMMDefinition(default={"1": [(0, 0, 0)]}),
         defaultPushOutVolume=3,
     )
+
+
+@pytest.fixture
+def mock_command_note_adder(decoy: Decoy) -> CommandNoteAdder:
+    """Get a command note adder."""
+    return decoy.mock(cls=CommandNoteAdder)

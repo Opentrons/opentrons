@@ -12,6 +12,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
@@ -29,7 +30,6 @@ import {
 
 import { SmallButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
-import { StyledText } from '../../atoms/text'
 import { getModulePrepCommands } from '../../organisms/Devices/getModulePrepCommands'
 import { getModuleTooHot } from '../../organisms/Devices/getModuleTooHot'
 import { useRunCalibrationStatus } from '../../organisms/Devices/hooks'
@@ -37,7 +37,7 @@ import { LocationConflictModal } from '../../organisms/Devices/ProtocolRun/Setup
 import { ModuleWizardFlows } from '../../organisms/ModuleWizardFlows'
 import { useToaster } from '../../organisms/ToasterOven'
 import { getLocalRobot } from '../../redux/discovery'
-import { useChainLiveCommands } from '../../resources/runs/hooks'
+import { useChainLiveCommands } from '../../resources/runs'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
@@ -312,7 +312,7 @@ function ModuleTableItem({
             ? COLORS.grey35
             : COLORS.yellow35
         }
-        borderRadius={BORDERS.borderRadiusSize3}
+        borderRadius={BORDERS.borderRadius8}
         cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
         gridGap={SPACING.spacing24}
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}

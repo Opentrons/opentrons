@@ -21,6 +21,8 @@ export function useNotifyRunQuery<TError = Error>(
     setRefetchUsingHTTP,
   ] = React.useState<HTTPRefetchFrequency>(null)
 
+  const isEnabled = options.enabled !== false && runId != null
+
   useNotifyService({
     topic: `robot-server/runs/${runId}` as NotifyTopic,
     setRefetchUsingHTTP,
@@ -29,7 +31,7 @@ export function useNotifyRunQuery<TError = Error>(
 
   const httpResponse = useRunQuery(runId, {
     ...options,
-    enabled: options?.enabled !== false && refetchUsingHTTP != null,
+    enabled: isEnabled && refetchUsingHTTP != null,
     onSettled:
       refetchUsingHTTP === 'once'
         ? () => setRefetchUsingHTTP(null)

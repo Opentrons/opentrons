@@ -4,22 +4,22 @@ import { useTranslation } from 'react-i18next'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
 
 import {
-  Flex,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   DISPLAY_NONE,
-  SPACING,
-  PrimaryButton,
-  TYPOGRAPHY,
-  BORDERS,
-  COLORS,
+  Flex,
   POSITION_FIXED,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyLastRunCommandKey } from '../../resources/runs/useNotifyLastRunCommandKey'
+import { useNotifyLastRunCommandKey } from '../../resources/runs'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
@@ -117,7 +117,7 @@ export const RunPreviewComponent = (
                   index === jumpedIndex ? '#F5E3FF' : backgroundColor
                 }
                 color={COLORS.black90}
-                borderRadius={BORDERS.radiusSoftCorners}
+                borderRadius={BORDERS.borderRadius4}
                 padding={SPACING.spacing8}
                 css={css`
                   transition: background-color ${COLOR_FADE_MS}ms ease-out,

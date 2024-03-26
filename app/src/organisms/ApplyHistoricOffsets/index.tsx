@@ -4,25 +4,26 @@ import { useSelector } from 'react-redux'
 import pick from 'lodash/pick'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  Flex,
-  Link,
-  Icon,
-  DIRECTION_COLUMN,
-  SPACING,
-  TYPOGRAPHY,
-  SIZE_1,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   CheckboxField,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SIZE_1,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
+import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import {
   LegacyModalHeader,
   LegacyModalShell,
 } from '../../molecules/LegacyModal'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
-import { StyledText } from '../../atoms/text'
 import { getLabwareDefinitionsFromCommands } from '../LabwarePositionCheck/utils/labware'
 import { LabwareOffsetTable } from './LabwareOffsetTable'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../redux/config'
@@ -32,7 +33,6 @@ import type {
   LoadedModule,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import { ExternalLink } from '../../atoms/Link/ExternalLink'
 
 const HOW_OFFSETS_WORK_SUPPORT_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'

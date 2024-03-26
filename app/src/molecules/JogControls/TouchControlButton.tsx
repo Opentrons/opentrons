@@ -7,7 +7,7 @@ export const TouchControlButton = styled.button<{ selected: boolean }>`
   background-color: ${({ selected }) =>
     selected ? COLORS.blue50 : COLORS.blue35};
   cursor: default;
-  border-radius: ${BORDERS.borderRadiusSize4};
+  border-radius: ${BORDERS.borderRadius16};
   box-shadow: none;
   padding: ${SPACING.spacing8} ${SPACING.spacing20};
 

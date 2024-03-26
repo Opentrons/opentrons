@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   COLORS,
-  Flex,
-  SPACING,
-  JUSTIFY_CENTER,
   DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 import { ModuleCard } from '../../ModuleCard'
 import { useModuleRenderInfoForProtocolById } from '../hooks'
 import type { BadPipette, PipetteData } from '@opentrons/api-client'

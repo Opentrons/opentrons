@@ -16,11 +16,11 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { StyledText } from '../../../atoms/text'
 import { CommandText } from '../../CommandText'
 import { CommandIcon } from '../../RunPreview/CommandIcon'
 import { PlayPauseButton } from './PlayPauseButton'
@@ -232,7 +232,7 @@ export function RunningProtocolCommandList({
                     fontSize="1.375rem"
                     lineHeight="1.75rem"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    borderRadius={BORDERS.borderRadiusSize2}
+                    borderRadius={BORDERS.borderRadius8}
                     gridGap="0.875rem"
                   >
                     <CommandIcon command={command} size="2rem" />

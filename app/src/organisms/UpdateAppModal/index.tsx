@@ -6,15 +6,16 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  SPACING,
   Flex,
+  JUSTIFY_SPACE_AROUND,
+  JUSTIFY_SPACE_BETWEEN,
   NewPrimaryBtn,
   NewSecondaryBtn,
-  BORDERS,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_SPACE_AROUND,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import {
@@ -32,7 +33,6 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
 import type { Dispatch } from '../../redux/types'
-import { StyledText } from '../../atoms/text'
 
 interface PlaceHolderErrorProps {
   errorMessage?: string
@@ -66,7 +66,7 @@ const FOOTER_BUTTON_STYLE = css`
   text-transform: lowercase;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
-  border-radius: ${BORDERS.borderRadiusSize1};
+  border-radius: ${BORDERS.borderRadius8};
   margin-top: ${SPACING.spacing16};
   margin-bottom: ${SPACING.spacing16};
 
@@ -79,7 +79,7 @@ const UpdateAppBanner = styled(Banner)`
 `
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadiusSize3};
+  border-radius: ${BORDERS.borderRadius8};
   background: ${COLORS.grey30};
   width: 17.12rem;
 `

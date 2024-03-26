@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { useTranslation } from 'react-i18next'
+
 import {
   ALIGN_CENTER,
   Box,
@@ -14,19 +16,24 @@ import {
   Overlay,
   POSITION_FIXED,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Divider } from '../structure'
-import { StyledText } from '../text'
 
+export interface MultiSlideoutSpecs {
+  currentStep: number
+  maxSteps: number
+}
 export interface SlideoutProps {
   title: string | React.ReactElement
   children: React.ReactNode
-  onCloseClick: () => unknown
+  onCloseClick: () => void
   //  isExpanded is for collapse and expand animation
   isExpanded?: boolean
   footer?: React.ReactNode
+  multiSlideoutSpecs?: MultiSlideoutSpecs
 }
 
 const SHARED_STYLE = css`
@@ -108,10 +115,17 @@ const CLOSE_ICON_STYLE = css`
 `
 
 export const Slideout = (props: SlideoutProps): JSX.Element => {
-  const { isExpanded, title, onCloseClick, children, footer } = props
+  const {
+    isExpanded,
+    title,
+    onCloseClick,
+    children,
+    footer,
+    multiSlideoutSpecs,
+  } = props
+  const { t } = useTranslation('shared')
   const slideOutRef = React.useRef<HTMLDivElement>(null)
   const [isReachedBottom, setIsReachedBottom] = React.useState<boolean>(false)
-
   const hasBeenExpanded = React.useRef<boolean>(isExpanded ?? false)
   const handleScroll = (): void => {
     if (slideOutRef.current == null) return
@@ -166,6 +180,19 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
+          {multiSlideoutSpecs === undefined ? null : (
+            <StyledText
+              as="p"
+              color={COLORS.grey60}
+              alignItems={ALIGN_CENTER}
+              paddingX={SPACING.spacing16}
+            >
+              {t('step', {
+                current: multiSlideoutSpecs.currentStep,
+                max: multiSlideoutSpecs.maxSteps,
+              })}
+            </StyledText>
+          )}
           {typeof title === 'string' ? (
             <Flex
               flexDirection={DIRECTION_ROW}

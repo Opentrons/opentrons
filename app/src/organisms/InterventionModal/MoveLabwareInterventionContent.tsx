@@ -3,22 +3,23 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Flex,
   ALIGN_CENTER,
-  Icon,
-  SPACING,
-  COLORS,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
   BORDERS,
   Box,
-  MoveLabwareOnDeck,
-  Module,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_NONE,
+  Flex,
+  Icon,
   LabwareRender,
   LocationIcon,
-  DISPLAY_NONE,
+  Module,
+  MoveLabwareOnDeck,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
   TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
@@ -41,7 +42,6 @@ import {
   getModuleModelFromRunData,
   getModuleDisplayLocationFromRunData,
 } from './utils'
-import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import {
   getLoadedLabware,
@@ -55,10 +55,10 @@ const LABWARE_DESCRIPTION_STYLE = css`
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing16};
   background-color: ${COLORS.grey20};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     background-color: ${COLORS.grey35};
-    border-radius: ${BORDERS.borderRadiusSize3};
+    border-radius: ${BORDERS.borderRadius8};
   }
 `
 

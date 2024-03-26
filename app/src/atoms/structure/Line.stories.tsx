@@ -5,9 +5,10 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
+
 import { Line } from './index'
 import type { Story, Meta } from '@storybook/react'
 

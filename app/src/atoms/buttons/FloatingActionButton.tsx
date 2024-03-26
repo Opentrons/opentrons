@@ -3,18 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Btn,
-  Flex,
-  Icon,
   ALIGN_CENTER,
   BORDERS,
+  Btn,
   COLORS,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   POSITION_FIXED,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 
@@ -39,7 +39,7 @@ export function FloatingActionButton(
   const contentColor = disabled ? COLORS.grey50 : COLORS.white
   const FLOATING_ACTION_BUTTON_STYLE = css`
     background-color: ${COLORS.purple50};
-    border-radius: ${BORDERS.borderRadiusSize5};
+    border-radius: ${BORDERS.borderRadius40};
     box-shadow: ${BORDERS.shadowBig};
     color: ${contentColor};
     cursor: default;

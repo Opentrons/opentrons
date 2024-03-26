@@ -32,8 +32,10 @@ import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 import { RunningProtocol } from '..'
-import { useNotifyLastRunCommandKey } from '../../../resources/runs/useNotifyLastRunCommandKey'
-import { useNotifyRunQuery } from '../../../resources/runs/useNotifyRunQuery'
+import {
+  useNotifyLastRunCommandKey,
+  useNotifyRunQuery,
+} from '../../../resources/runs'
 
 import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses } from '@opentrons/api-client'
@@ -50,9 +52,7 @@ vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal')
 vi.mock('../../../organisms/OpenDoorAlertModal')
-vi.mock('../../../resources/runs/useNotifyLastRunCommandKey')
-vi.mock('../../../resources/runs/useNotifyRunQuery')
-
+vi.mock('../../../resources/runs')
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'
 const PROTOCOL_ID = 'protocol_id'

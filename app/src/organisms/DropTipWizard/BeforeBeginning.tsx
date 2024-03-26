@@ -3,25 +3,25 @@ import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  DIRECTION_ROW,
-  COLORS,
-  BORDERS,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  RESPONSIVENESS,
-  JUSTIFY_FLEX_START,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
   DISPLAY_INLINE_BLOCK,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
-  JUSTIFY_FLEX_END,
-  JUSTIFY_SPACE_AROUND,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton, MediumButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 // import { NeedHelpLink } from '../CalibrationPanels'
@@ -187,7 +187,7 @@ export const BeforeBeginning = (
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
   border: 1px solid ${COLORS.grey30};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius8};
   height: 12.5625rem;
   width: 14.5625rem;
   cursor: pointer;
@@ -205,7 +205,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     justify-content: ${JUSTIFY_FLEX_START};
     background-color: ${COLORS.blue35};
     border-width: 0;
-    border-radius: ${BORDERS.borderRadiusSize4};
+    border-radius: ${BORDERS.borderRadius16};
     padding: ${SPACING.spacing24};
     height: 5.25rem;
     width: 57.8125rem;

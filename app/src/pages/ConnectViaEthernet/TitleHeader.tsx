@@ -2,19 +2,18 @@ import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Flex,
-  Btn,
-  Icon,
-  DIRECTION_ROW,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  POSITION_RELATIVE,
+  Btn,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
   POSITION_ABSOLUTE,
-  TYPOGRAPHY,
+  POSITION_RELATIVE,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 interface TitleHeaderProps {
   title: string

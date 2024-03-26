@@ -4,19 +4,20 @@ import { useSelector } from 'react-redux'
 import partition from 'lodash/partition'
 
 import {
+  ALIGN_CENTER,
   Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
+  Link,
+  POSITION_ABSOLUTE,
   SIZE_6,
   SPACING,
-  COLORS,
-  Link,
+  StyledText,
   TYPOGRAPHY,
-  POSITION_ABSOLUTE,
-  DISPLAY_FLEX,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
@@ -32,7 +33,6 @@ import { DevicesEmptyState } from '../../../organisms/Devices/DevicesEmptyState'
 import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
 
 import { Divider } from '../../../atoms/structure'
-import { StyledText } from '../../../atoms/text'
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
 import type { State } from '../../../redux/types'

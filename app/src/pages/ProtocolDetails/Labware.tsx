@@ -9,12 +9,12 @@ import {
   Flex,
   Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
 import { useRequiredProtocolLabware } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'
 
@@ -42,12 +42,12 @@ const TableDatum = styled('td')`
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
-    border-top-left-radius: ${BORDERS.borderRadiusSize4};
-    border-bottom-left-radius: ${BORDERS.borderRadiusSize4};
+    border-top-left-radius: ${BORDERS.borderRadius16};
+    border-bottom-left-radius: ${BORDERS.borderRadius16};
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.borderRadiusSize4};
-    border-bottom-right-radius: ${BORDERS.borderRadiusSize4};
+    border-top-right-radius: ${BORDERS.borderRadius16};
+    border-bottom-right-radius: ${BORDERS.borderRadius16};
   }
 `
 

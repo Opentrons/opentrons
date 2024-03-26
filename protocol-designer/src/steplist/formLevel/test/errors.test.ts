@@ -8,7 +8,11 @@ describe('volumeTooHigh', () => {
     fieldsWithPipette = {
       pipette: {
         spec: {
-          maxVolume: 10,
+          liquids: {
+            default: {
+              maxVolume: 10,
+            },
+          },
         },
         tiprackLabwareDef: { ...fixture_tiprack_10_ul }, // max tip volume is 10 ul
       },
@@ -35,7 +39,7 @@ describe('volumeTooHigh', () => {
     }
     // @ts-expect-error(sa, 2021-6-15): volumeTooHigh might return null, need to null check before property access
     expect(volumeTooHigh(fields).title).toBe(
-      `Volume is greater than maximum pipette/tip volume (${fields.pipette.spec.maxVolume} ul)`
+      `Volume is greater than maximum pipette/tip volume (${fields.pipette.spec.liquids.default.maxVolume} ul)`
     )
     // @ts-expect-error(sa, 2021-6-15): volumeTooHigh might return null, need to null check before property access
     expect(volumeTooHigh(fields).dependentFields).toEqual(['pipette', 'volume'])

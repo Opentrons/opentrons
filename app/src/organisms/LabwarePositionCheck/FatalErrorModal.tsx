@@ -3,25 +3,25 @@ import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  Icon,
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  PrimaryButton,
-  SPACING,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  BORDERS,
-  TYPOGRAPHY,
+  PrimaryButton,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
-  ALIGN_CENTER,
-  ALIGN_FLEX_END,
   TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { StyledText } from '../../atoms/text'
 import { i18n } from '../../i18n'
 
 const SUPPORT_EMAIL = 'support@opentrons.com'
@@ -102,7 +102,7 @@ const ErrorTextArea = styled.textarea`
   width: 30rem;
   background-color: #f8f8f8;
   border: ${BORDERS.lineBorder};
-  border-radius: ${BORDERS.radiusSoftCorners};
+  border-radius: ${BORDERS.borderRadius4};
   padding: ${SPACING.spacing8};
   margin: ${SPACING.spacing16} 0;
   font-size: ${TYPOGRAPHY.fontSizeCaption};
