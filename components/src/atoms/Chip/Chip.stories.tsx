@@ -3,6 +3,7 @@ import * as React from 'react'
 import { Flex } from '../../primitives'
 import { COLORS } from '../../helix-design-system'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
+import { ICON_DATA_BY_NAME } from '../../icons'
 import { Chip } from '.'
 import type { Story, Meta } from '@storybook/react'
 
@@ -15,6 +16,26 @@ export default {
         type: 'select',
       },
       defaultValue: 'basic',
+    },
+    hasIcon: {
+      control: {
+        type: 'boolean',
+      },
+      defaultValue: true,
+    },
+    chipSize: {
+      options: ['medium', 'small'],
+      control: {
+        type: 'select',
+      },
+      defaultValue: 'medium',
+    },
+    iconName: {
+      options: Object.keys(ICON_DATA_BY_NAME),
+      control: {
+        type: 'select',
+      },
+      defaultValue: 'ot-alert',
     },
   },
   component: Chip,
@@ -40,4 +61,6 @@ export const ChipComponent = Template.bind({})
 ChipComponent.args = {
   type: 'basic',
   text: 'Chip component',
+  hasIcon: true,
+  chipSize: 'medium',
 }

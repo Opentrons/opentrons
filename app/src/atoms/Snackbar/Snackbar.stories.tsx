@@ -7,9 +7,9 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
   SPACING,
+  StyledText,
   VIEWPORT,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 
 import { Snackbar } from './index'
 import type { Story, Meta } from '@storybook/react'

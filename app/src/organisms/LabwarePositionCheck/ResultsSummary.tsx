@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
 import {
   CompletedProtocolAnalysis,
   getLabwareDefURI,
@@ -16,20 +15,21 @@ import {
 } from '@opentrons/shared-data'
 import { NeedHelpLink } from '../CalibrationPanels'
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  TYPOGRAPHY,
-  COLORS,
+  LocationIcon,
+  MODULE_ICON_NAME_BY_TYPE,
   PrimaryButton,
   RESPONSIVENESS,
-  MODULE_ICON_NAME_BY_TYPE,
-  BORDERS,
-  ALIGN_FLEX_END,
-  Icon,
-  LocationIcon,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import {

@@ -1,6 +1,10 @@
 import * as React from 'react'
-import { Flex, PrimaryButton, VIEWPORT } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import {
+  Flex,
+  PrimaryButton,
+  StyledText,
+  VIEWPORT,
+} from '@opentrons/components'
 import { BackgroundOverlay } from './index'
 import type { Story, Meta } from '@storybook/react'
 

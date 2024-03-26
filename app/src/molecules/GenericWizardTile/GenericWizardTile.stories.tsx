@@ -4,10 +4,10 @@ import { createStore } from 'redux'
 import {
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
   PrimaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
 import { LegacyModalShell } from '../LegacyModal'
 import { WizardHeader } from '../WizardHeader'

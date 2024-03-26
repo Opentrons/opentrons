@@ -5,16 +5,17 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
-  Box,
-  Flex,
-  Icon,
-  useInterval,
   ALIGN_CENTER,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
-  SPACING,
+  Flex,
+  Icon,
   SecondaryButton,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
+  useInterval,
 } from '@opentrons/components'
 
 import {
@@ -22,7 +23,6 @@ import {
   useWifiList,
 } from '../../../resources/networking/hooks'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
-import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
 
 import {

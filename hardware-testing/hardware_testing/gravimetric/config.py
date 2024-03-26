@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List, Dict, Tuple
 from typing_extensions import Final
 from enum import Enum
-from opentrons.config.types import LiquidProbeSettings
+from opentrons.config.types import LiquidProbeSettings, OutputOptions
 from opentrons.protocol_api.labware import Well
 
 
@@ -194,7 +194,7 @@ def _get_liquid_probe_settings(
         plunger_speed=lqid_cfg["plunger_speed"],
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
         expected_liquid_height=110,
-        log_pressure=True,
+        output_option=OutputOptions.stream_to_csv,
         aspirate_while_sensing=False,
         auto_zero_sensor=True,
         num_baseline_reads=10,

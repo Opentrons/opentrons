@@ -11,11 +11,11 @@ import {
   Flex,
   OVERFLOW_AUTO,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal'
 

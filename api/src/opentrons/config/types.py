@@ -1,6 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass, asdict, fields
-from typing import Dict, Tuple, TypeVar, Generic, List, cast
+from typing import Dict, Tuple, TypeVar, Generic, List, cast, Optional
 from typing_extensions import TypedDict, Literal
 from opentrons.hardware_control.types import OT3AxisKind
 
@@ -116,6 +116,16 @@ class ZSenseSettings:
     pass_settings: CapacitivePassSettings
 
 
+# str enum so it can be json serializable
+class OutputOptions(int, Enum):
+    """Specifies where we should report sensor data to during a sensor pass."""
+
+    stream_to_csv = 0x1
+    sync_buffer_to_csv = 0x2
+    can_bus_only = 0x4
+    sync_only = 0x8
+
+
 @dataclass
 class LiquidProbeSettings:
     starting_mount_height: float
@@ -125,11 +135,11 @@ class LiquidProbeSettings:
     plunger_speed: float
     sensor_threshold_pascals: float
     expected_liquid_height: float
-    log_pressure: bool
+    output_option: OutputOptions
     aspirate_while_sensing: bool
     auto_zero_sensor: bool
     num_baseline_reads: int
-    data_file: str
+    data_file: Optional[str]
 
 
 @dataclass(frozen=True)

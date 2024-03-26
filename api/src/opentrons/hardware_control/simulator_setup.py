@@ -22,12 +22,18 @@ class ModuleCall:
 
 
 @dataclass(frozen=True)
+class ModuleItem:
+    serial_number: str
+    calls: List[ModuleCall] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
 class OT2SimulatorSetup:
     machine: Literal["OT-2 Standard"] = "OT-2 Standard"
     attached_instruments: Dict[Mount, Dict[str, Optional[str]]] = field(
         default_factory=dict
     )
-    attached_modules: Dict[str, List[ModuleCall]] = field(default_factory=dict)
+    attached_modules: Dict[str, List[ModuleItem]] = field(default_factory=dict)
     config: Optional[RobotConfig] = None
     strict_attached_instruments: bool = True
 
@@ -38,7 +44,7 @@ class OT3SimulatorSetup:
     attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]] = field(
         default_factory=dict
     )
-    attached_modules: Dict[str, List[ModuleCall]] = field(default_factory=dict)
+    attached_modules: Dict[str, List[ModuleItem]] = field(default_factory=dict)
     config: Optional[OT3Config] = None
     strict_attached_instruments: bool = True
 
@@ -52,7 +58,10 @@ async def _simulator_for_setup(
     if setup.machine == "OT-2 Standard":
         return await API.build_hardware_simulator(
             attached_instruments=setup.attached_instruments,
-            attached_modules=list(setup.attached_modules.keys()),
+            attached_modules={
+                k: [m.serial_number for m in v]
+                for k, v in setup.attached_modules.items()
+            },
             config=setup.config,
             strict_attached_instruments=setup.strict_attached_instruments,
             loop=loop,
@@ -63,7 +72,10 @@ async def _simulator_for_setup(
 
         return await OT3API.build_hardware_simulator(
             attached_instruments=setup.attached_instruments,
-            attached_modules=list(setup.attached_modules.keys()),
+            attached_modules={
+                k: [m.serial_number for m in v]
+                for k, v in setup.attached_modules.items()
+            },
             config=setup.config,
             strict_attached_instruments=setup.strict_attached_instruments,
             loop=loop,
@@ -77,10 +89,12 @@ async def create_simulator(
     """Create a simulator"""
     simulator = await _simulator_for_setup(setup, loop)
     for attached_module in simulator.attached_modules:
-        calls = setup.attached_modules[attached_module.name()]
-        for call in calls:
-            f = getattr(attached_module, call.function_name)
-            await f(*call.args, **call.kwargs)
+        modules = setup.attached_modules[attached_module.name()]
+        for module in modules:
+            if module.serial_number == attached_module.device_info.get("serial"):
+                for call in module.calls:
+                    f = getattr(attached_module, call.function_name)
+                    await f(*call.args, **call.kwargs)
 
     return simulator
 
@@ -99,7 +113,10 @@ def _thread_manager_for_setup(
         return ThreadManager(
             API.build_hardware_simulator,
             attached_instruments=setup.attached_instruments,
-            attached_modules=list(setup.attached_modules.keys()),
+            attached_modules={
+                k: [m.serial_number for m in v]
+                for k, v in setup.attached_modules.items()
+            },
             config=setup.config,
             strict_attached_instruments=setup.strict_attached_instruments,
             feature_flags=HardwareFeatureFlags.build_from_ff(),
@@ -110,7 +127,10 @@ def _thread_manager_for_setup(
         return ThreadManager(
             OT3API.build_hardware_simulator,
             attached_instruments=setup.attached_instruments,
-            attached_modules=list(setup.attached_modules.keys()),
+            attached_modules={
+                k: [m.serial_number for m in v]
+                for k, v in setup.attached_modules.items()
+            },
             config=setup.config,
             strict_attached_instruments=setup.strict_attached_instruments,
             feature_flags=HardwareFeatureFlags.build_from_ff(),
@@ -125,10 +145,11 @@ async def create_simulator_thread_manager(
     await thread_manager.managed_thread_ready_async()
 
     for attached_module in thread_manager.wrapped().attached_modules:
-        calls = setup.attached_modules[attached_module.name()]
-        for call in calls:
-            f = getattr(attached_module, call.function_name)
-            await f(*call.args, **call.kwargs)
+        modules = setup.attached_modules[attached_module.name()]
+        for module in modules:
+            for call in module.calls:
+                f = getattr(attached_module, call.function_name)
+                await f(*call.args, **call.kwargs)
 
     return thread_manager
 
@@ -188,7 +209,18 @@ def _prepare_for_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
     if key == "config" and value:
         return robot_configs.build_config_ot2(value)
     if key == "attached_modules" and value:
-        return {k: [ModuleCall(**data) for data in v] for (k, v) in value.items()}
+        attached_modules: Dict[str, List[ModuleItem]] = {}
+        for key, item in value.items():
+            for obj in item:
+                attached_modules.setdefault(key, []).append(
+                    ModuleItem(
+                        serial_number=obj["serial_number"],
+                        calls=[ModuleCall(**data) for data in obj["calls"]],
+                    )
+                )
+
+        return attached_modules
+
     return value
 
 
@@ -198,5 +230,15 @@ def _prepare_for_ot3_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
     if key == "config" and value:
         return robot_configs.build_config_ot3(value)
     if key == "attached_modules" and value:
-        return {k: [ModuleCall(**data) for data in v] for (k, v) in value.items()}
+        attached_modules: Dict[str, List[ModuleItem]] = {}
+        for key, item in value.items():
+            for obj in item:
+                attached_modules.setdefault(key, []).append(
+                    ModuleItem(
+                        serial_number=obj["serial_number"],
+                        calls=[ModuleCall(**data) for data in obj["calls"]],
+                    )
+                )
+
+        return attached_modules
     return value

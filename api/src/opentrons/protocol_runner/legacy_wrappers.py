@@ -20,6 +20,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 from opentrons.protocol_reader import ProtocolSource, ProtocolFileRole
 from opentrons.util.broker import Broker
 
@@ -168,9 +169,13 @@ class LegacyExecutor:
     """Interface to execute Protocol API v2 protocols in a child thread."""
 
     @staticmethod
-    async def execute(protocol: LegacyProtocol, context: LegacyProtocolContext) -> None:
+    async def execute(
+        protocol: LegacyProtocol,
+        context: LegacyProtocolContext,
+        run_time_param_values: Optional[RunTimeParamValuesType],
+    ) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
-        await to_thread.run_sync(run_protocol, protocol, context)
+        await to_thread.run_sync(run_protocol, protocol, context, run_time_param_values)
 
 
 __all__ = [

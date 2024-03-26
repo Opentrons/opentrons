@@ -31,6 +31,7 @@ stages:
       json:
         data:
           id: !anystr
+          ok: True
           createdAt: !anystr
           status: idle
           current: True

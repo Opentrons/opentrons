@@ -4,16 +4,17 @@ import { Trans, useTranslation } from 'react-i18next'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
 import {
+  ALIGN_CENTER,
+  Box,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  SPACING,
-  TYPOGRAPHY,
-  Box,
-  COLORS,
   Link,
   PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
@@ -26,7 +27,6 @@ import {
 import { Select } from '../../atoms/SelectField/Select'
 import { Banner } from '../../atoms/Banner'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { NeedHelpLink } from './NeedHelpLink'
 import { ChosenTipRackRender } from './ChosenTipRackRender'
 

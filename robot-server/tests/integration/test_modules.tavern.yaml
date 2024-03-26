@@ -85,6 +85,20 @@ stages:
             data:
               height: !anyfloat
               engaged: !anybool
+          - name: magdeck
+            displayName: magdeck
+            moduleModel: magneticModuleV1
+            port: !anystr
+            usbPort: !anydict
+            serial: !anystr
+            model: !anystr
+            revision: !anystr
+            fwVersion: !anystr
+            hasAvailableUpdate: !anybool
+            status: !anystr
+            data:
+              height: !anyfloat
+              engaged: !anybool
   - name: Get all the modules
     request:
       url: '{ot2_server_base_url}/modules'
@@ -150,6 +164,22 @@ stages:
               status: !anystr
               currentTemperature: !anyfloat
               targetTemperature: !anyfloat
+          - id: !anystr
+            serialNumber: !anystr
+            firmwareVersion: !anystr
+            hardwareRevision: !anystr
+            hasAvailableUpdate: !anybool
+            moduleType: magneticModuleType
+            moduleModel: magneticModuleV1
+            usbPort:
+              port: !anyint
+              hub: !anybool
+              portGroup: !anystr
+              path: !anystr
+            data:
+              status: !anystr
+              height: !anyfloat
+              engaged: !anybool
           - id: !anystr
             serialNumber: !anystr
             firmwareVersion: !anystr

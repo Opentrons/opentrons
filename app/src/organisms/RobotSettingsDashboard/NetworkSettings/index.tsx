@@ -13,10 +13,10 @@ import {
   Flex,
   Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 
 import type { IconName, ChipType } from '@opentrons/components'

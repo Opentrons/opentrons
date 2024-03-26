@@ -1,4 +1,5 @@
 """Router for /protocols endpoints."""
+import json
 import logging
 from textwrap import dedent
 from datetime import datetime
@@ -165,6 +166,14 @@ async def create_protocol(
             " protocol resources on the robot."
         ),
     ),
+    run_time_parameter_values: Optional[str] = Form(
+        default=None,
+        description="Key-value pairs of run-time parameters defined in a protocol."
+        " Note that this is expected to be a string holding a JSON object."
+        " Also, if this data is included in the request, the server will"
+        " always trigger an analysis (for now).",
+        alias="runTimeParameterValues",
+    ),
     protocol_directory: Path = Depends(get_protocol_directory),
     protocol_store: ProtocolStore = Depends(get_protocol_store),
     analysis_store: AnalysisStore = Depends(get_analysis_store),
@@ -184,6 +193,7 @@ async def create_protocol(
     Arguments:
         files: List of uploaded files, from form-data.
         key: Optional key for client-side tracking
+        run_time_parameter_values: Key value pairs of run-time parameters defined in a protocol.
         protocol_directory: Location to store uploaded files.
         protocol_store: In-memory database of protocol resources.
         analysis_store: In-memory database of protocol analyses.
@@ -205,11 +215,34 @@ async def create_protocol(
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
 
+    if isinstance(run_time_parameter_values, str):
+        # We have to do this isinstance check because if `runTimeParameterValues` is
+        # not specified in the request, then it gets assigned a Form(None) value
+        # instead of just a None. \(O.o)/
+        # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
+        #  so we can validate the data contents and return a better error response.
+        parsed_rtp = json.loads(run_time_parameter_values)
+    else:
+        parsed_rtp = None
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
     if cached_protocol_id is not None:
+        # Protocol exists in database
         resource = protocol_store.get(protocol_id=cached_protocol_id)
+        if parsed_rtp:
+            # This protocol exists in database but needs to be re-analyzed with the
+            # passed-in RTP overrides
+            task_runner.run(
+                protocol_analyzer.analyze,
+                protocol_resource=resource,
+                analysis_id=analysis_id,
+                run_time_param_values=parsed_rtp,
+            )
+            analysis_store.add_pending(
+                protocol_id=cached_protocol_id,
+                analysis_id=analysis_id,
+            )
         analyses = analysis_store.get_summaries_by_protocol(
             protocol_id=cached_protocol_id
         )
@@ -228,7 +261,8 @@ async def create_protocol(
         )
 
         log.info(
-            f'Protocol with id "{cached_protocol_id}" with same contents already exists. returning existing protocol data in response payload'
+            f'Protocol with id "{cached_protocol_id}" with same contents already exists.'
+            f" Returning existing protocol data in response payload."
         )
 
         return await PydanticResponse.create(
@@ -238,7 +272,6 @@ async def create_protocol(
         )
 
     try:
-        # Can make the passed in RTPs as part of protocolSource returned here
         source = await protocol_reader.save(
             files=buffered_files,
             directory=protocol_directory / protocol_id,
@@ -272,6 +305,7 @@ async def create_protocol(
         protocol_analyzer.analyze,
         protocol_resource=protocol_resource,
         analysis_id=analysis_id,
+        run_time_param_values=parsed_rtp,
     )
     pending_analysis = analysis_store.add_pending(
         protocol_id=protocol_id,

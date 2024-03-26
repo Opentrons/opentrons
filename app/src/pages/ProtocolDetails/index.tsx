@@ -20,6 +20,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -31,7 +32,6 @@ import {
 } from '@opentrons/react-api-client'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
@@ -47,7 +47,11 @@ import {
   useFeatureFlag,
 } from '../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useMissingProtocolHardware } from '../Protocols/hooks'
+import {
+  useMissingProtocolHardware,
+  useRunTimeParameters,
+} from '../Protocols/hooks'
+import { ProtocolSetupParameters } from '../../organisms/ProtocolSetupParameters'
 import { Parameters } from './Parameters'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
@@ -314,10 +318,12 @@ export function ProtocolDetails(): JSX.Element | null {
     missingProtocolHardware,
     conflictedSlots
   )
+  const runTimeParameters = useRunTimeParameters(protocolId)
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
   const host = useHost()
   const { makeSnackbar } = useToaster()
+  const [showParameters, setShowParameters] = React.useState<boolean>(false)
   const queryClient = useQueryClient()
   const [currentOption, setCurrentOption] = React.useState<TabOption>(
     enableRtpFF
@@ -394,9 +400,10 @@ export function ProtocolDetails(): JSX.Element | null {
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
     )
   }
-
   const handleRunProtocol = (): void => {
-    createRun({ protocolId, labwareOffsets })
+    runTimeParameters.length > 0
+      ? setShowParameters(true)
+      : createRun({ protocolId, labwareOffsets })
   }
   const [
     showConfirmDeleteProtocol,
@@ -438,8 +445,13 @@ export function ProtocolDetails(): JSX.Element | null {
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
   }
-
-  return (
+  return showParameters ? (
+    <ProtocolSetupParameters
+      protocolId={protocolId}
+      labwareOffsets={labwareOffsets}
+      runTimeParameters={runTimeParameters}
+    />
+  ) : (
     <>
       {showConfirmDeleteProtocol ? (
         <Flex alignItems={ALIGN_CENTER}>

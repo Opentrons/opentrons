@@ -12,9 +12,9 @@ import {
   SPACING,
   TYPOGRAPHY,
   useInterval,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { EMPTY_TIMESTAMP } from '../Devices/constants'
 import { formatInterval } from '../RunTimeControl/utils'
 import { InterventionCommandMessage } from './InterventionCommandMessage'

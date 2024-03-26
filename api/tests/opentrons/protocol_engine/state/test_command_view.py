@@ -243,8 +243,8 @@ def test_get_all_commands_final() -> None:
     assert subject.get_all_commands_final() is False
 
 
-def test_get_all_complete_fatal_command_failure() -> None:
-    """It should raise an error if any protocol commands failed."""
+def test_raise_fatal_command_error() -> None:
+    """It should raise the fatal command error."""
     completed_command = create_succeeded_command(command_id="command-id-1")
     failed_command = create_failed_command(
         command_id="command-id-2",
@@ -264,10 +264,10 @@ def test_get_all_complete_fatal_command_failure() -> None:
     )
 
     with pytest.raises(ProtocolCommandFailedError):
-        subject.get_all_commands_final()
+        subject.raise_fatal_command_error()
 
 
-def test_get_all_complete_setup_not_fatal() -> None:
+def test_raise_fatal_command_error_tolerates_failed_setup_commands() -> None:
     """It should not call setup command fatal."""
     completed_command = create_succeeded_command(command_id="command-id-1")
     failed_command = create_failed_command(
@@ -288,8 +288,7 @@ def test_get_all_complete_setup_not_fatal() -> None:
         commands=[completed_command, failed_command],
     )
 
-    result = subject.get_all_commands_final()
-    assert result is True
+    subject.raise_fatal_command_error()  # Should not raise.
 
 
 def test_get_is_stopped() -> None:

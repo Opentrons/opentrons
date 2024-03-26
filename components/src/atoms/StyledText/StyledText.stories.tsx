@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { StyledText } from './index'
+import { StyledText } from './'
+import { TYPOGRAPHY } from '../../ui-style-constants'
 import type { Story, Meta } from '@storybook/react'
-import { TYPOGRAPHY } from '@opentrons/components'
 
 export default {
-  title: 'App/Atoms/StyledText',
+  title: 'Library/Atoms/StyledText',
   component: StyledText,
 } as Meta
 

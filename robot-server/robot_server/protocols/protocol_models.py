@@ -1,7 +1,7 @@
 """Protocol file models."""
 from datetime import datetime
 from pydantic import BaseModel, Extra, Field
-from typing import Any, List, Optional, Dict, Union
+from typing import Any, List, Optional
 
 from opentrons.protocol_reader import (
     ProtocolType as ProtocolType,
@@ -109,6 +109,3 @@ class Protocol(ResourceModel):
             " See `POST /protocols`."
         ),
     )
-
-
-RunTimeParameterDict = Dict[str, Union[str, int, float, bool]]

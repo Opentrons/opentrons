@@ -14,6 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
@@ -26,7 +27,6 @@ import {
   RunStatus,
 } from '@opentrons/api-client'
 
-import { StyledText } from '../../../atoms/text'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons//constants'
 import { useTrackEvent } from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'

@@ -28,7 +28,7 @@ def test_build_fail_raises_exception():
 def test_module_cache_add_entry():
     """Test that _cached_modules updates correctly."""
 
-    mod_names = ["tempdeck"]
+    mod_names = {"tempdeck": ["111"]}
     thread_manager = ThreadManager(
         API.build_hardware_simulator, attached_modules=mod_names
     )
@@ -49,7 +49,7 @@ def test_module_cache_add_entry():
 
 async def test_module_cache_remove_entry():
     """Test that module entry gets removed from cache when module detaches."""
-    mod_names = ["tempdeck", "magdeck"]
+    mod_names = {"tempdeck": ["111"], "magdeck": ["222"]}
     thread_manager = ThreadManager(
         API.build_hardware_simulator, attached_modules=mod_names
     )
@@ -63,7 +63,7 @@ async def test_module_cache_remove_entry():
     future = asyncio.run_coroutine_threadsafe(
         thread_manager._backend.module_controls.register_modules(
             removed_mods_at_ports=[
-                ModuleAtPort(port="/dev/ot_module_sim_tempdeck0", name="tempdeck")
+                ModuleAtPort(port="/dev/ot_module_sim_tempdeck111", name="tempdeck")
             ]
         ),
         loop,

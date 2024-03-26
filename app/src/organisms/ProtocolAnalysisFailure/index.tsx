@@ -4,19 +4,19 @@ import { useDispatch } from 'react-redux'
 import { useTranslation, Trans } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   Btn,
+  Flex,
   JUSTIFY_FLEX_END,
-  TYPOGRAPHY,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
   WRAP_REVERSE,
 } from '@opentrons/components'
 
 import { analyzeProtocol } from '../../redux/protocol-storage'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { getTopPortalEl } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'

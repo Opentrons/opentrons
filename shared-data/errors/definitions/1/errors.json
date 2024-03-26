@@ -118,6 +118,10 @@
       "detail": "Gripper Pickup Failed",
       "category": "roboticsControlError"
     },
+    "2016": {
+      "detail": "Motor Driver Error",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"
@@ -224,6 +228,10 @@
     },
     "4007": {
       "detail": "API Command is misconfigured",
+      "category": "generalError"
+    },
+    "4008": {
+      "detail": "Invalid stored data",
       "category": "generalError"
     }
   }

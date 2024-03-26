@@ -1,7 +1,11 @@
 import * as React from 'react'
-import { TYPOGRAPHY, PrimaryBtn, COLORS } from '@opentrons/components'
+import {
+  COLORS,
+  PrimaryBtn,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { MultiSlideout } from './MultiSlideout'
-import { StyledText } from '../text'
 
 import type { Story, Meta } from '@storybook/react'
 

@@ -13,6 +13,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
@@ -29,7 +30,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { getModulePrepCommands } from '../../organisms/Devices/getModulePrepCommands'
 import { getModuleTooHot } from '../../organisms/Devices/getModuleTooHot'
 import { useRunCalibrationStatus } from '../../organisms/Devices/hooks'

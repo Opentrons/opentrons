@@ -4,8 +4,8 @@ import {
   Flex,
   SPACING,
   VIEWPORT,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 import { ListItem } from '.'
 import type { Story, Meta } from '@storybook/react'
 

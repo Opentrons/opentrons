@@ -6,20 +6,20 @@ import { NavLink, Redirect, useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
 import {
-  Box,
-  Flex,
-  useHoverTooltip,
-  DIRECTION_COLUMN,
-  POSITION_RELATIVE,
-  OVERFLOW_SCROLL,
-  SIZE_6,
   BORDERS,
+  Box,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  OVERFLOW_SCROLL,
+  POSITION_RELATIVE,
+  SIZE_6,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useModuleRenderInfoForProtocolById,
