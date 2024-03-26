@@ -2,12 +2,14 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional
+from typing_extensions import assert_never
 
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.commands.command import CommandIntent, CommandStatus
 from opentrons.protocol_engine.commands.command_unions import Command
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 
 
 @dataclass(frozen=True)
@@ -55,6 +57,15 @@ class CommandStructure:
         except KeyError:
             raise CommandDoesNotExistError(f"Command {command_id} does not exist")
 
+    def get_next_command(self, command_id: str) -> Optional[CommandEntry]:
+        """Get the command which follows the command associated with the given ID"""
+        try:
+            index = self._commands_by_id[command_id].index
+            commands_by_id_list = list(self._commands_by_id.keys())
+            return self._commands_by_id[commands_by_id_list[index + 1]]
+        except KeyError:
+            raise CommandDoesNotExistError(f"Command {command_id} does not exist")
+
     def get_if_present(self, command_id: str) -> Optional[CommandEntry]:
         return self._commands_by_id.get(command_id)
 
@@ -69,17 +80,22 @@ class CommandStructure:
         commands = list(self._commands_by_id.values())[start:stop]
         return [command.command for command in commands]
 
+    def get_recent_added_command(self) -> Optional[CommandEntry]:
+        """Get the command most recently added to _commands_by_id."""
+        return next(reversed(self._commands_by_id.values()))
+
+    def get_recent_dequeued_command(self) -> Optional[CommandEntry]:
+        """Get the command most recently dequeued from all queues."""
+        if self._recently_dequeued_command_id is None:
+            return None
+        else:
+            return self._commands_by_id[self._recently_dequeued_command_id]
+
     def get_running_command(self) -> Optional[CommandEntry]:
         if self._running_command_id is None:
             return None
         else:
             return self._commands_by_id[self._running_command_id]
-
-    def get_recently_dequeued_command(self) -> Optional[CommandEntry]:
-        if self._recently_dequeued_command_id is None:
-            return None
-        else:
-            return self._commands_by_id[self._recently_dequeued_command_id]
 
     def get_failed_command(self) -> Optional[CommandEntry]:
         if self._failed_command_id is None:
@@ -133,7 +149,11 @@ class CommandStructure:
                 self._recently_dequeued_command_id = command.id
 
     def fail(
-        self, command_id: str, error_occurrence: ErrorOccurrence, failed_at: datetime
+        self,
+        command_id: str,
+        error_occurrence: ErrorOccurrence,
+        failed_at: datetime,
+        recovery_type: ErrorRecoveryType,
     ) -> None:
         prev_entry = self._commands_by_id[command_id]
         self._commands_by_id[command_id] = CommandEntry(
@@ -152,12 +172,23 @@ class CommandStructure:
         )
 
         self._failed_command_id = command_id
+        # TOME: This is a circular import and will require resolution. I think you'll have to move this stuff back to commands.
         if prev_entry.command.intent == CommandIntent.SETUP:
             other_command_ids_to_fail = self._queued_setup_command_ids
             self._queued_setup_command_ids.clear()
+        elif (
+            prev_entry.command.intent == CommandIntent.PROTOCOL
+            or prev_entry.command.intent is None
+        ):
+            if recovery_type == ErrorRecoveryType.WAIT_FOR_RECOVERY:
+                self._queue_status = QueueStatus.AWAITING_RECOVERY
+            elif recovery_type == ErrorRecoveryType.FAIL_RUN:
+                other_command_ids_to_fail = self._queued_command_ids
+                self._queued_command_ids.clear()
+            else:
+                assert_never(recovery_type)
         else:
-            other_command_ids_to_fail = self._queued_command_ids
-            self._queued_command_ids.clear()
+            assert_never(prev_entry.command.intent)
 
         for command_id in other_command_ids_to_fail:
             prev_entry = self._commands_by_id[command_id]
