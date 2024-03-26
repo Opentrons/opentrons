@@ -175,7 +175,7 @@ export const moveLiquidFormToArgs = (
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     fields.pipette,
     fields.volume,
-    tipRack,
+    tipRack
   )
   const commonFields = {
     pipette: pipetteId,
