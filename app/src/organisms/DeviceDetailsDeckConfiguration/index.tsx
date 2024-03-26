@@ -92,7 +92,11 @@ export function DeviceDetailsDeckConfiguration({
 
     const newDeckConfig = deckConfig.map(fixture =>
       fixture.cutoutId === cutoutId
-        ? { ...fixture, cutoutFixtureId: replacementFixtureId, opentronsModuleSerialNumber: undefined }
+        ? {
+            ...fixture,
+            cutoutFixtureId: replacementFixtureId,
+            opentronsModuleSerialNumber: undefined,
+          }
         : fixture
     )
 

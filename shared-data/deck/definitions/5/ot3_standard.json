@@ -894,7 +894,7 @@
         "cutoutA1": []
       },
       "fixtureGroup": ["thermocyclerModuleV2Rear", "thermocyclerModuleV2Front"],
-      "height": 124.5
+      "height": 211.91
     },
     {
       "id": "thermocyclerModuleV2Front",
@@ -905,7 +905,7 @@
         "cutoutB1": ["thermocyclerModuleV2"]
       },
       "fixtureGroup": ["thermocyclerModuleV2Rear", "thermocyclerModuleV2Front"],
-      "height": 124.5
+      "height": 170.66
     },
     {
       "id": "heaterShakerModuleV1",
@@ -932,7 +932,7 @@
         "cutoutA3": ["heaterShakerV1A3"]
       },
       "fixtureGroup": [],
-      "height": 40
+      "height": 82
     },
     {
       "id": "temperatureModuleV2",
@@ -959,7 +959,7 @@
         "cutoutA3": ["temperatureModuleV2A3"]
       },
       "fixtureGroup": [],
-      "height": 40
+      "height": 84
     },
     {
       "id": "magneticBlockV1",
@@ -994,7 +994,7 @@
         "cutoutA3": ["magneticBlockV1A3"]
       },
       "fixtureGroup": [],
-      "height": 40
+      "height": 45
     }
   ],
   "gripperOffsets": {

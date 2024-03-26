@@ -94,7 +94,7 @@ export function MagneticBlockFixture(
         onClick={
           handleClickRemove != null
             ? () => handleClickRemove(fixtureLocation)
-            : () => { }
+            : () => {}
         }
       >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>

@@ -52,7 +52,9 @@ export function WasteChuteConfigFixture(
   return (
     <RobotCoordsForeignObject
       width={
-        hasStagingAreas ? STAGING_AREA_FIXTURE_WIDTH : COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
+        hasStagingAreas
+          ? STAGING_AREA_FIXTURE_WIDTH
+          : COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
       }
       height={FIXTURE_HEIGHT}
       x={x}

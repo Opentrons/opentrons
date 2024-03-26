@@ -30,7 +30,11 @@ import { DeckFixtureSetupInstructionsModal } from '../../organisms/DeviceDetails
 import { DeckConfigurationDiscardChangesModal } from '../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { getTopPortalEl } from '../../App/portal'
 
-import type { CutoutFixtureId, CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckConfiguration,
+} from '@opentrons/shared-data'
 
 export function DeckConfigurationEditor(): JSX.Element {
   const { t, i18n } = useTranslation([
@@ -78,7 +82,11 @@ export function DeckConfigurationEditor(): JSX.Element {
     setCurrentDeckConfig(prevDeckConfig =>
       prevDeckConfig.map(fixture =>
         fixture.cutoutId === cutoutId
-          ? { ...fixture, cutoutFixtureId: replacementFixtureId, opentronsModuleSerialNumber: undefined }
+          ? {
+              ...fixture,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
           : fixture
       )
     )

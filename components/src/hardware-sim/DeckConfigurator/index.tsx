@@ -11,7 +11,7 @@ import {
   THERMOCYCLER_V2_FRONT_FIXTURE,
   HEATERSHAKER_MODULE_V1_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
-  MAGNETIC_BLOCK_V1_FIXTURE
+  MAGNETIC_BLOCK_V1_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'

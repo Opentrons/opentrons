@@ -73,7 +73,7 @@ export function TemperatureModuleFixture(
         onClick={
           handleClickRemove != null
             ? () => handleClickRemove(fixtureLocation)
-            : () => { }
+            : () => {}
         }
       >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>

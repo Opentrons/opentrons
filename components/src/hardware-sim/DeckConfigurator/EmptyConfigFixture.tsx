@@ -44,7 +44,7 @@ export function EmptyConfigFixture(
     standardSlotCutout?.position ?? []
   let x = xSlotPosition
   let width = 0
-  switch(fixtureLocation) {
+  switch (fixtureLocation) {
     case 'cutoutA1':
     case 'cutoutB1':
     case 'cutoutC1':
