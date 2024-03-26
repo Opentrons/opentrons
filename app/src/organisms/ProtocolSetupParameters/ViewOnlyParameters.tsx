@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -13,7 +14,6 @@ import {
 } from '@opentrons/components'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ChildNavigation } from '../ChildNavigation'
-import { Chip } from '../../atoms/Chip'
 import { useToaster } from '../ToasterOven'
 import { mockData } from './index'
 import { formatRunTimeParameterValue } from '../ProtocolDetails/ProtocolParameters/utils'
