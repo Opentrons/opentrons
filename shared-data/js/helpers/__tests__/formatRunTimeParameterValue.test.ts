@@ -1,22 +1,13 @@
-import { useTranslation } from 'react-i18next'
 import { describe, it, expect, vi } from 'vitest'
-import { formatRunTimeParameterValue } from '../utils'
+import { formatRunTimeParameterValue } from '../formatRunTimeParameterValue'
 
-import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { RunTimeParameter } from '../../types'
 
 const capitalizeFirstLetter = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 const mockTFunction = vi.fn(str => capitalizeFirstLetter(str))
-
-vi.mock('react-i18next', async importOriginal => {
-  const actual = await importOriginal<typeof useTranslation>()
-  return {
-    ...actual,
-    t: mockTFunction,
-  }
-})
 
 describe('utils-formatRunTimeParameterValue', () => {
   it('should return value with suffix when type is int', () => {
