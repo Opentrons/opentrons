@@ -258,6 +258,7 @@ class JsonRunner(AbstractRunner):
         )
 
         self._hardware_api.should_taskify_movement_execution(taskify=False)
+        self._queued_commands: List[pe_commands.CommandCreate] = []
 
     async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a JSONv6+ ProtocolSource into managed ProtocolEngine."""
@@ -306,10 +307,12 @@ class JsonRunner(AbstractRunner):
         self._protocol_engine.add_command(request=initial_home_command)
 
         for command in commands:
-            self._protocol_engine.add_command(request=command)
-            await _yield()
+            self._queued_commands.append(command)
 
-        self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
+        self._task_queue.add_commands_and_execute(self._queued_commands)
+        self._task_queue.set_run_func(
+            func=self._protocol_engine.add_and_execute_command
+        )
 
     async def run(  # noqa: D102
         self,
@@ -321,6 +324,11 @@ class JsonRunner(AbstractRunner):
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
             await self.load(protocol_source)
+
+        # for command in self._queued_commands:
+        #     await self._protocol_engine.add_and_execute_command(request=command)
+        #     # await self._protocol_engine.wait_for_command(command_id=command.id)
+        #     await _yield()
 
         self.play(deck_configuration=deck_configuration)
         self._task_queue.start()
