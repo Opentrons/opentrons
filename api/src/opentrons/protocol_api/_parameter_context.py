@@ -174,6 +174,12 @@ class ParameterContext:
             parameter.value = validated_value
 
     def export_parameters_for_analysis(self) -> List[RunTimeParameter]:
+        """Exports all parameters into a protocol engine models for reporting in analysis.
+
+        :meta private:
+
+        This is intended for Opentrons internal use only and is not a guaranteed API.
+        """
         return [
             parameter.as_protocol_engine_type()
             for parameter in self._parameters.values()
