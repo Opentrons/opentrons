@@ -1,7 +1,7 @@
 """Command side-effect execution logic container."""
 import asyncio
 from logging import getLogger
-from typing import Optional, List, Dict, Any, Protocol
+from typing import Optional, List, Protocol
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -20,7 +20,6 @@ from ..commands import (
     AbstractCommandImpl,
     CommandResult,
     CommandPrivateResult,
-    Command,
 )
 from ..actions import (
     ActionDispatcher,
