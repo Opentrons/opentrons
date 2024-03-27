@@ -12,6 +12,7 @@ from opentrons.protocols.parameters import (
     parameter_definition as mock_parameter_definition,
     validation as mock_validation,
 )
+from opentrons.protocols.parameters.types import ParameterDefinitionError
 from opentrons.protocol_engine.types import BooleanParameter
 
 from opentrons.protocol_api._parameter_context import ParameterContext
@@ -159,6 +160,12 @@ def test_set_parameters(decoy: Decoy, subject: ParameterContext) -> None:
     subject.set_parameters({"foo": "bar"})
 
     assert param_def.value == "rhubarb"
+
+
+def test_set_parameters_raises(decoy: Decoy, subject: ParameterContext) -> None:
+    """It should raise if the given parameter is not defined."""
+    with pytest.raises(ParameterDefinitionError):
+        subject.set_parameters({"foo": "bar"})
 
 
 def test_export_parameters_for_analysis(
