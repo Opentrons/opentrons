@@ -1,11 +1,11 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700');
+@import url('https://fonts.googleapis.com/css?family=Public+Sans:300,400,400i,600,700');
 
 /* OT NAV */
 
 body {
     padding: 0;
     margin: 0;
-    font-family: "Open Sans", "sans-serif";
+    font-family: "Public Sans", "sans-serif";
 }
 
 .highlight-none, .mi, .literal {
@@ -35,7 +35,12 @@ div.document [id] {
 
 div.body p {
     line-height: 20pt;
-    font-family: "Open Sans", "sans-serif";
+    font-family: "Public Sans", "sans-serif";
+}
+
+pre, tt, code {
+    font-size: 0.9em;
+    font-family: "Roboto Mono", "Consolas", "Lucida Console", monospace;
 }
 
 div.body h1 {
@@ -90,7 +95,12 @@ div.body h2,
 div.body h3,
 div.body h4,
 div.body h5 {
-    font-family: "Open Sans", "sans-serif";
+    font-family: "Public Sans", "sans-serif";
+}
+
+/* Links need an extra pixel of padding when body font is Public Sans */
+a.reference {
+    padding-bottom: 1px;
 }
 
 /* Suppressing the display of the toctrees rendered in the doc body means we
@@ -193,13 +203,13 @@ div.body p.caption {
 
 ul {
     /* margin-left: 0; */
-    font-family: "Open Sans", "sans-serif";
+    font-family: "Public Sans", "sans-serif";
 }
 
 ul ul {
     list-style-type: circle;
     margin-left: 30px;
-    font-family: "Open Sans", "sans-serif";
+    font-family: "Public Sans", "sans-serif";
 }
 
 @media screen and (min-device-width: 320px)and (max-device-width: 640px) {
