@@ -10,7 +10,10 @@ from opentrons.protocol_api import (
 )
 from opentrons.protocols.parameters import (
     parameter_definition as mock_parameter_definition,
+    validation as mock_validation,
 )
+from opentrons.protocol_engine.types import BooleanParameter
+
 from opentrons.protocol_api._parameter_context import ParameterContext
 
 
@@ -20,6 +23,12 @@ def _mock_parameter_definition_creates(
 ) -> None:
     for name, func in inspect.getmembers(mock_parameter_definition, inspect.isfunction):
         monkeypatch.setattr(mock_parameter_definition, name, decoy.mock(func=func))
+
+
+@pytest.fixture(autouse=True)
+def _patch_parameter_validation(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    for name, func in inspect.getmembers(mock_validation, inspect.isfunction):
+        monkeypatch.setattr(mock_validation, name, decoy.mock(func=func))
 
 
 @pytest.fixture
@@ -138,3 +147,44 @@ def test_add_string(decoy: Decoy, subject: ParameterContext) -> None:
         description="fee foo fum",
     )
     assert param_def is subject._parameters["my slightly less cool variable"]
+
+
+def test_set_parameters(decoy: Decoy, subject: ParameterContext) -> None:
+    """It should set the parameter values."""
+    param_def = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
+    decoy.when(param_def.parameter_type).then_return(bool)
+    decoy.when(mock_validation.ensure_value_type("bar", bool)).then_return("rhubarb")
+    subject._parameters["foo"] = param_def
+
+    subject.set_parameters({"foo": "bar"})
+
+    assert param_def.value == "rhubarb"
+
+
+def test_export_parameters_for_analysis(
+    decoy: Decoy, subject: ParameterContext
+) -> None:
+    """It should export the parameters as protocol engine types."""
+    param_def = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
+    boolean_param = decoy.mock(cls=BooleanParameter)
+    decoy.when(param_def.as_protocol_engine_type()).then_return(boolean_param)
+    subject._parameters["foo"] = param_def
+
+    assert subject.export_parameters_for_analysis() == [boolean_param]
+
+
+def test_export_parameters_for_protocol(
+    decoy: Decoy, subject: ParameterContext
+) -> None:
+    """It should export the parameters as a Parameters object with the parameters as dynamic attributes."""
+    param_def_1 = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
+    param_def_2 = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
+    decoy.when(param_def_1.variable_name).then_return("x")
+    decoy.when(param_def_1.value).then_return("a")
+    decoy.when(param_def_2.variable_name).then_return("y")
+    decoy.when(param_def_2.value).then_return(1.23)
+    subject._parameters = {"foo": param_def_1, "bar": param_def_2}
+
+    result = subject.export_parameters_for_protocol()
+    assert result.x == "a"  # type: ignore [attr-defined]
+    assert result.y == 1.23  # type: ignore [attr-defined]
