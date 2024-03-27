@@ -10,7 +10,6 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
-  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import type { IconName, StyleProps } from '@opentrons/components'
@@ -38,8 +37,6 @@ interface ChipProps extends StyleProps {
   hasIcon?: boolean
   /** Chip size medium is the default size */
   chipSize?: ChipSize
-  /** is on device */
-  isOnDevice?: boolean
 }
 
 const CHIP_PROPS_BY_TYPE: Record<
@@ -98,7 +95,6 @@ export function Chip(props: ChipProps): JSX.Element {
     text,
     hasIcon = true,
     chipSize = 'medium',
-    isOnDevice = true,
     ...styleProps
   } = props
   const backgroundColor =
@@ -108,33 +104,14 @@ export function Chip(props: ChipProps): JSX.Element {
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
 
   const TOUCHSCREEN_MEDIUM_CONTAINER_STYLE = css`
-    padding: ${SPACING.spacing2} ${background === false ? 0 : SPACING.spacing8};
-    grid-gap: ${SPACING.spacing4};
-
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      padding: ${SPACING.spacing8}
-        ${background === false ? 0 : SPACING.spacing16};
-      grid-gap: ${SPACING.spacing16};
-    }
+    padding: ${SPACING.spacing8} ${background === false ? 0 : SPACING.spacing16};
+    grid-gap: ${SPACING.spacing8};
   `
 
   const TOUCHSCREEN_SMALL_CONTAINER_STYLE = css`
-    padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing6};
+    padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing10};
     grid-gap: ${SPACING.spacing4};
-
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      padding: ${SPACING.spacing4}
-        ${background === false ? 0 : SPACING.spacing8};
-      grid-gap: ${SPACING.spacing4};
-    }
   `
-
-  let iconSize
-  if (chipSize === 'medium') {
-    iconSize = isOnDevice ? '1.5rem' : '1rem'
-  } else {
-    iconSize = isOnDevice ? '1.25rem' : '0.75rem'
-  }
 
   return (
     <Flex
@@ -155,13 +132,16 @@ export function Chip(props: ChipProps): JSX.Element {
           name={icon}
           color={CHIP_PROPS_BY_TYPE[type].iconColor}
           aria-label={`icon_${text}`}
-          size={iconSize}
+          size={chipSize === 'medium' ? '1.5rem' : '1.25rem'}
         />
       ) : null}
       <StyledText
-        as={chipSize === 'medium' ? 'p' : 'label'}
+        css={
+          chipSize === 'medium'
+            ? TYPOGRAPHY.bodyTextSemiBold
+            : TYPOGRAPHY.smallBodyTextSemiBold
+        }
         color={CHIP_PROPS_BY_TYPE[type].textColor}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {text}
       </StyledText>
