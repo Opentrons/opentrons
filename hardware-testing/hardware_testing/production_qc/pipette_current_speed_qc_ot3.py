@@ -283,7 +283,8 @@ async def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
     ]
     if not found:
         return await _get_next_pipette_mount(api)
-    return found[0]
+    # return found[0]
+    return found
 
 
 async def _reset_gantry(api: OT3API) -> None:
@@ -316,22 +317,23 @@ async def _main(is_simulating: bool, trials: int, continue_after_stall: bool) ->
 
     # test each attached pipette
     while True:
-        mount = await _get_next_pipette_mount(api)
-        if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
-            continue
+        mount_list = await _get_next_pipette_mount(api)
+        for mount in mount_list:
+            if not api.is_simulator and not ui.get_user_answer(f"QC {mount.name} pipette"):
+                continue
 
-        report = _build_csv_report(trials=trials)
-        dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
-        helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
+            report = _build_csv_report(trials=trials)
+            dut = helpers_ot3.DeviceUnderTest.by_mount(mount)
+            helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut)
 
-        await _test_plunger(
-            api, mount, report, trials=trials, continue_after_stall=continue_after_stall
-        )
-        ui.print_title("DONE")
-        report.save_to_disk()
-        report.print_results()
-        if api.is_simulator:
-            break
+            await _test_plunger(
+                api, mount, report, trials=trials, continue_after_stall=continue_after_stall
+            )
+            ui.print_title("DONE")
+            report.save_to_disk()
+            report.print_results()
+            if api.is_simulator:
+                break
 
 
 if __name__ == "__main__":
