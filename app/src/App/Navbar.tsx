@@ -16,6 +16,7 @@ import {
   Link,
   SIZE_2,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -23,7 +24,6 @@ import logoSvg from '../assets/images/logo_nav.svg'
 import logoSvgThree from '../assets/images/logo_nav_three.svg'
 
 import { NAV_BAR_WIDTH } from './constants'
-import { StyledText } from '../atoms/text'
 
 import type { RouteProps } from './types'
 

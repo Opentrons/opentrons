@@ -2,17 +2,17 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
   Box,
-  SPACING,
-  TYPOGRAPHY,
   COLORS,
-  Link,
+  Flex,
   JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { getRobotApiVersion } from '../../../../redux/discovery'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'

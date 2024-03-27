@@ -8,12 +8,14 @@ from sqlalchemy.engine import Engine
 from unittest import mock
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.errors.codes import ErrorCodes
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
 from robot_server.runs.run_store import (
     RunStore,
     RunResource,
     CommandNotFoundError,
+    BadStateSummary,
 )
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
@@ -192,6 +194,7 @@ def test_update_run_state(
     )
 
     assert result == RunResource(
+        ok=True,
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
@@ -227,6 +230,7 @@ def test_add_run(subject: RunStore) -> None:
     )
 
     assert result == RunResource(
+        ok=True,
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
@@ -267,6 +271,7 @@ def test_get_run_no_actions(subject: RunStore) -> None:
     result = subject.get("run-id")
 
     assert result == RunResource(
+        ok=True,
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
@@ -293,6 +298,7 @@ def test_get_run(subject: RunStore) -> None:
     result = subject.get(run_id="run-id")
 
     assert result == RunResource(
+        ok=True,
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
@@ -314,6 +320,7 @@ def test_get_run_missing(subject: RunStore) -> None:
             1,
             [
                 RunResource(
+                    ok=True,
                     run_id="run-id-2",
                     protocol_id=None,
                     created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
@@ -325,12 +332,14 @@ def test_get_run_missing(subject: RunStore) -> None:
             20,
             [
                 RunResource(
+                    ok=True,
                     run_id="run-id-1",
                     protocol_id=None,
                     created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
                     actions=[],
                 ),
                 RunResource(
+                    ok=True,
                     run_id="run-id-2",
                     protocol_id=None,
                     created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
@@ -342,12 +351,14 @@ def test_get_run_missing(subject: RunStore) -> None:
             None,
             [
                 RunResource(
+                    ok=True,
                     run_id="run-id-1",
                     protocol_id=None,
                     created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
                     actions=[],
                 ),
                 RunResource(
+                    ok=True,
                     run_id="run-id-2",
                     protocol_id=None,
                     created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
@@ -447,7 +458,8 @@ def test_get_state_summary_failure(
         run_id="run-id", summary=invalid_state_summary, commands=[]
     )
     result = subject.get_state_summary(run_id="run-id")
-    assert result is None
+    assert isinstance(result, BadStateSummary)
+    assert result.dataError.code == ErrorCodes.INVALID_STORED_DATA
 
 
 def test_get_state_summary_none(subject: RunStore) -> None:
@@ -458,7 +470,8 @@ def test_get_state_summary_none(subject: RunStore) -> None:
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
     result = subject.get_state_summary(run_id="run-id")
-    assert result is None
+    assert isinstance(result, BadStateSummary)
+    assert result.dataError.code == ErrorCodes.INVALID_STORED_DATA
 
 
 def test_has_run_id(subject: RunStore) -> None:

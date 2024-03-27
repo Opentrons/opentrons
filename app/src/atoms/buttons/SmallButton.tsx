@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  TYPOGRAPHY,
-  COLORS,
-  SPACING,
+  ALIGN_CENTER,
   BORDERS,
   Btn,
+  COLORS,
+  DIRECTION_ROW,
   Flex,
   Icon,
-  DIRECTION_ROW,
-  ALIGN_CENTER,
   JUSTIFY_CENTER,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 import { ODD_FOCUS_VISIBLE } from './constants'
 import type { IconName, StyleProps } from '@opentrons/components'
 

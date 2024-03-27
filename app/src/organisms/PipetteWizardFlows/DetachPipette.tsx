@@ -4,19 +4,19 @@ import { css } from 'styled-components'
 import { RIGHT, WEIGHT_OF_96_CHANNEL } from '@opentrons/shared-data'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
-  Btn,
-  PrimaryButton,
-  Flex,
-  TYPOGRAPHY,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_END,
   ALIGN_CENTER,
-  SPACING,
-  SIZE_1,
+  ALIGN_FLEX_END,
+  Btn,
+  COLORS,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
   RESPONSIVENESS,
+  SIZE_1,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'

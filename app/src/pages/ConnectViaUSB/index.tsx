@@ -2,22 +2,22 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import {
-  Flex,
-  SPACING,
-  COLORS,
-  DIRECTION_ROW,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  Btn,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  Icon,
-  POSITION_RELATIVE,
-  POSITION_ABSOLUTE,
   BORDERS,
+  Btn,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useConnectionsQuery } from '@opentrons/react-api-client'
-import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 import { MediumButton } from '../../atoms/buttons'
 

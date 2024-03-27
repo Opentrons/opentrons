@@ -6,7 +6,7 @@ reactions in objects that subscribe to the pipeline, like the StateStore.
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import DoorState
@@ -15,6 +15,8 @@ from opentrons.hardware_control.modules import LiveData
 from opentrons_shared_data.errors import EnumeratedError
 
 from ..commands import Command, CommandCreate, CommandPrivateResult
+from ..error_recovery_policy import ErrorRecoveryType
+from ..notes.notes import CommandNote
 from ..types import (
     LabwareOffsetCreate,
     ModuleDefinition,
@@ -120,10 +122,27 @@ class QueueCommandAction:
 
 
 @dataclass(frozen=True)
-class UpdateCommandAction:
-    """Update a given command."""
+class RunCommandAction:
+    """Mark a given command as running.
+
+    At the time of dispatching this action, the command must be queued,
+    and no other command may be running.
+    """
+
+    command_id: str
+    started_at: datetime
+
+
+@dataclass(frozen=True)
+class SucceedCommandAction:
+    """Mark a given command as succeeded.
+
+    At the time of dispatching this action, the command must be running.
+    """
 
     command: Command
+    """The command in its new succeeded state."""
+
     private_result: CommandPrivateResult
 
 
@@ -131,16 +150,15 @@ class UpdateCommandAction:
 class FailCommandAction:
     """Mark a given command as failed.
 
-    The given command and all currently queued commands will be marked
-    as failed due to the given error.
+    At the time of dispatching this action, the command must be running.
     """
 
-    # TODO(mc, 2021-11-12): we'll likely need to add the command params
-    # to this payload for state reaction purposes
     command_id: str
     error_id: str
     failed_at: datetime
     error: EnumeratedError
+    notes: List[CommandNote]
+    type: ErrorRecoveryType
 
 
 @dataclass(frozen=True)
@@ -215,7 +233,8 @@ Action = Union[
     HardwareStoppedAction,
     DoorChangeAction,
     QueueCommandAction,
-    UpdateCommandAction,
+    RunCommandAction,
+    SucceedCommandAction,
     FailCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,

@@ -1,11 +1,14 @@
 // Named arguments to createFile selector. This data would be the result of several selectors.
-import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import {
   fixture_96_plate,
   fixture_tiprack_10_ul,
   fixture_trash,
 } from '@opentrons/shared-data/labware/fixtures/2'
-import { OT2_ROBOT_TYPE, OT2_STANDARD_DECKID } from '@opentrons/shared-data'
+import {
+  OT2_ROBOT_TYPE,
+  OT2_STANDARD_DECKID,
+  fixtureP10SingleV2Specs,
+} from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareLiquidState,
@@ -53,7 +56,7 @@ export const pipetteEntities: PipetteEntities = {
   pipetteId: {
     id: 'pipetteId',
     name: 'p10_single',
-    spec: fixtureP10Single,
+    spec: fixtureP10SingleV2Specs,
     tiprackDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
     tiprackLabwareDef: fixtureTiprack10ul,
   },

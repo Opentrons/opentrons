@@ -2,17 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
-  COLORS,
-  BORDERS,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 export function DisplaySearchNetwork(): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])

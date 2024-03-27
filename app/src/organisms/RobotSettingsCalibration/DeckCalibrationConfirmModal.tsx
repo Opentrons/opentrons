@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  JUSTIFY_FLEX_END,
   ALIGN_CENTER,
   COLORS,
-  TYPOGRAPHY,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_FLEX_END,
+  Link,
   PrimaryButton,
   SPACING,
-  Link,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { StyledText } from '../../atoms/text'
 
 interface DeckCalibrationConfirmModalProps {
   confirm: () => unknown

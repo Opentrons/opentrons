@@ -5,20 +5,21 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  Btn,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  POSITION_FIXED,
-  JUSTIFY_CENTER,
-  POSITION_RELATIVE,
-  POSITION_ABSOLUTE,
-  COLORS,
-  TYPOGRAPHY,
+  Flex,
   Icon,
-  Btn,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
+  POSITION_FIXED,
+  POSITION_RELATIVE,
+  SPACING,
+  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
@@ -30,7 +31,6 @@ import {
   getLocalRobot,
 } from '../../redux/discovery'
 import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
-import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
 import { SmallButton } from '../../atoms/buttons'

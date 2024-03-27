@@ -1,21 +1,24 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
+import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
+import { useQueryClient } from 'react-query'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
 } from '@opentrons/components'
+
 import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
-import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { SetupScreens } from '../../pages/ProtocolSetup'
+import type { LabwareOffsetCreateData } from '@opentrons/api-client'
 
-const mockData: RunTimeParameter[] = [
+export const mockData: RunTimeParameter[] = [
   {
     value: false,
     displayName: 'Dry Run',
@@ -158,54 +161,37 @@ const mockData: RunTimeParameter[] = [
   },
 ]
 
-export interface ProtocolSetupParametersProps {
-  runId: string
-  setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+interface ProtocolSetupParametersProps {
+  protocolId: string
+  runTimeParameters?: RunTimeParameter[]
+  labwareOffsets?: LabwareOffsetCreateData[]
 }
 
 export function ProtocolSetupParameters({
-  runId,
-  setSetupScreen,
+  protocolId,
+  labwareOffsets,
+  runTimeParameters,
 }: ProtocolSetupParametersProps): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t } = useTranslation('protocol_setup')
   const history = useHistory()
-  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const host = useHost()
+  const queryClient = useQueryClient()
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
-
+  const parameters = runTimeParameters ?? []
+  //    TODO(jr, 3/20/24): modify useCreateRunMutation to take in optional run time parameters
+  const { createRun, isLoading } = useCreateRunMutation({
+    onSuccess: data => {
+      queryClient
+        .invalidateQueries([host, 'runs'])
+        .catch((e: Error) =>
+          console.error(`could not invalidate runs cache: ${e.message}`)
+        )
+    },
+  })
   const handleConfirmValues = (): void => {
-    setSetupScreen('prepare to run')
-    //  TODO(jr, 3/18/24): wire up reanalysis of protocol
-  }
-
-  //  TODO(jr, 3/18/24): remove mockData
-  const parameters = mostRecentAnalysis?.runTimeParameters ?? mockData
-
-  const getDefault = (parameter: RunTimeParameter): string => {
-    const { type, default: defaultValue } = parameter
-    const suffix =
-      'suffix' in parameter && parameter.suffix != null ? parameter.suffix : ''
-    switch (type) {
-      case 'int':
-      case 'float':
-        return `${defaultValue.toString()} ${suffix}`
-      case 'boolean':
-        return Boolean(defaultValue)
-          ? i18n.format(t('on'), 'capitalize')
-          : i18n.format(t('off'), 'capitalize')
-      case 'str':
-        if ('choices' in parameter && parameter.choices != null) {
-          const choice = parameter.choices.find(
-            choice => choice.value === defaultValue
-          )
-          if (choice != null) {
-            return choice.displayName
-          }
-        }
-        break
-    }
-    return ''
+    createRun({ protocolId, labwareOffsets })
   }
 
   return (
@@ -219,6 +205,8 @@ export function ProtocolSetupParameters({
         onClickBack={() => history.goBack()}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
+        iconName={isLoading ? 'ot-spinner' : undefined}
+        iconPlacement="startIcon"
         secondaryButtonProps={{
           buttonType: 'tertiaryLowLight',
           buttonText: t('restore_default'),
@@ -232,15 +220,15 @@ export function ProtocolSetupParameters({
         gridGap={SPACING.spacing8}
         paddingX={SPACING.spacing8}
       >
-        {parameters.map(parameter => {
+        {parameters.map((parameter, index) => {
           return (
-            <React.Fragment key={parameter.displayName}>
+            <React.Fragment key={`${parameter.displayName}_${index}`}>
               <ProtocolSetupStep
                 hasIcon={!(parameter.type === 'boolean')}
                 status="general"
                 title={parameter.displayName}
                 onClickSetupStep={() => console.log('TODO: wire this up')}
-                detail={getDefault(parameter)}
+                detail={formatRunTimeParameterValue(parameter, t)}
                 description={parameter.description}
                 fontSize="h4"
               />

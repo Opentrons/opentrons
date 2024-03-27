@@ -12,10 +12,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   POSITION_FIXED,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'

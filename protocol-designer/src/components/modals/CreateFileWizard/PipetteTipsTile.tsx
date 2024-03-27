@@ -23,7 +23,7 @@ import {
   Btn,
   JUSTIFY_END,
 } from '@opentrons/components'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
@@ -72,8 +72,7 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
   const tileHeader = t('choose_tips_for_pipette', {
     pipetteName:
       firstPipetteName != null
-        ? getPipetteNameSpecs(firstPipetteName as PipetteName)?.displayName ??
-          ''
+        ? getPipetteSpecsV2(firstPipetteName as PipetteName)?.displayName ?? ''
         : '',
   })
 
@@ -160,8 +159,8 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const selectedPipetteName = pipettesByMount[mount].pipetteName
   const selectedPipetteDefaultTipracks =
     selectedPipetteName != null
-      ? getPipetteNameSpecs(selectedPipetteName as PipetteName)
-          ?.defaultTipracks ?? []
+      ? getPipetteSpecsV2(selectedPipetteName as PipetteName)?.liquids.default
+          .defaultTipracks ?? []
       : []
   const tiprackOptions = getTiprackOptions({
     allLabware: allLabware,

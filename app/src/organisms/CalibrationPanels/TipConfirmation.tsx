@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   PrimaryButton,
   SecondaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 
 import * as Sessions from '../../redux/sessions'
 import { NeedHelpLink } from './NeedHelpLink'
-import { StyledText } from '../../atoms/text'
 
 import type { CalibrationPanelProps } from './types'
 import type {

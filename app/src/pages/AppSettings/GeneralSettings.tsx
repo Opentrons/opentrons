@@ -16,6 +16,7 @@ import {
   Link,
   SPACING_AUTO,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useMountEffect,
 } from '@opentrons/components'
@@ -23,7 +24,6 @@ import {
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import {
   CURRENT_VERSION,

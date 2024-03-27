@@ -53,54 +53,46 @@ class RobotClient:
                     base_url=base_url,
                 )
 
-    async def alive(self) -> bool:
-        """Is /health reachable?"""
-        try:
-            await self.get_health()
-            return True
-        except (httpx.ConnectError, httpx.HTTPStatusError):
-            return False
-
     async def dead(self) -> bool:
         """Is /health unreachable?"""
         try:
             await self.get_health()
-            return False
-        except httpx.HTTPStatusError:
-            return False
         except httpx.ConnectError:
-            pass
-
-        return True
-
-    async def _poll_for_alive(self) -> None:
-        """Retry GET /health until reachable."""
-        while not await self.alive():
-            # Avoid spamming the server in case a request immediately
-            # returns some kind of "not ready."
-            await asyncio.sleep(0.1)
-
-    async def _poll_for_dead(self) -> None:
-        """Poll GET /health until unreachable."""
-        while not await self.dead():
-            # Avoid spamming the server in case a request immediately
-            # returns some kind of "not ready."
-            await asyncio.sleep(0.1)
-
-    async def wait_until_alive(self, timeout_sec: float = _STARTUP_WAIT) -> bool:
-        try:
-            await asyncio.wait_for(self._poll_for_alive(), timeout=timeout_sec)
             return True
-        except asyncio.TimeoutError:
+        except httpx.HTTPStatusError:
+            # If it's alive enough to return an error code, it's not dead.
+            return False
+        else:
+            # If it's alive enough to return a success code, it's super not dead.
             return False
 
-    async def wait_until_dead(self, timeout_sec: float = _SHUTDOWN_WAIT) -> bool:
-        """Retry GET /health and until unreachable."""
-        try:
-            await asyncio.wait_for(self._poll_for_dead(), timeout=timeout_sec)
-            return True
-        except asyncio.TimeoutError:
-            return False
+    async def _poll_for_ready(self) -> None:
+        """Retry GET /health until ready."""
+        while True:
+            try:
+                await self.get_health()
+            except httpx.ConnectError:
+                await asyncio.sleep(0.1)  # Wait, then keep polling.
+            except httpx.HTTPStatusError as e:
+                error_is_because_still_initializing = e.response.status_code == 503
+                if error_is_because_still_initializing:
+                    await asyncio.sleep(0.1)  # Wait, then keep polling.
+                else:
+                    raise
+            else:
+                return
+
+    async def wait_until_ready(self, timeout_sec: float = _STARTUP_WAIT) -> None:
+        """Wait until the server is ready to handle general requests.
+
+        "Ready to handle general requests" means it's accepting HTTP connections
+        and it's returning a "ready" status from its `/health` endpoint.
+
+        If the `/health` endpoint returns a "still busy initializing" response, this
+        will keep waiting. If it returns any other kind of error response, this
+        will interpret it as a fatal initialization error and raise an exception.
+        """
+        await asyncio.wait_for(self._poll_for_ready(), timeout=timeout_sec)
 
     async def get_health(self) -> Response:
         """GET /health."""

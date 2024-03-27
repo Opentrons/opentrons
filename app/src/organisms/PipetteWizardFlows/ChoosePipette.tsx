@@ -5,23 +5,24 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
   BORDERS,
   COLORS,
-  Flex,
-  SPACING,
-  TYPOGRAPHY,
   DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
-  POSITION_ABSOLUTE,
-  JUSTIFY_FLEX_END,
-  JUSTIFY_SPACE_BETWEEN,
-  RESPONSIVENESS,
   DIRECTION_ROW,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
   JUSTIFY_FLEX_START,
-  PrimaryButton,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
   JUSTIFY_SPACE_AROUND,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   EIGHT_CHANNEL,
@@ -32,7 +33,6 @@ import {
 } from '@opentrons/shared-data'
 import { i18n } from '../../i18n'
 import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
 import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
 import { LegacyModalShell } from '../../molecules/LegacyModal'

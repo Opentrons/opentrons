@@ -4,19 +4,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SPACING,
+  Flex,
   Icon,
-  COLORS,
-  TYPOGRAPHY,
-  ALIGN_CENTER,
   JUSTIFY_CENTER,
-  BORDERS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { RobotSetupHeader } from '../../organisms/RobotSetupHeader'
 import { getLocalRobot } from '../../redux/discovery'

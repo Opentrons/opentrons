@@ -302,7 +302,7 @@ describe('discovery selectors', () => {
       name: 'getConnectableRobots grabs robots with connectable status',
       selector: discovery.getConnectableRobots,
       state: MOCK_STATE,
-      expected: [EXPECTED_FOO, EXPECTED_BAR, EXPECTED_FIZZBUZZ],
+      expected: [EXPECTED_BAR, EXPECTED_FIZZBUZZ, EXPECTED_FOO],
     },
     {
       name: 'getReachableRobots grabs robots with reachable status',
@@ -314,7 +314,7 @@ describe('discovery selectors', () => {
       name: 'getUnreachableRobots grabs robots with unreachable status',
       selector: discovery.getUnreachableRobots,
       state: MOCK_STATE,
-      expected: [EXPECTED_FIZZ, EXPECTED_BUZZ],
+      expected: [EXPECTED_BUZZ, EXPECTED_FIZZ],
     },
     {
       name: 'display name removes opentrons- from connectable robot names',
@@ -412,10 +412,10 @@ describe('discovery selectors', () => {
       selector: discovery.getViewableRobots,
       state: MOCK_STATE,
       expected: [
-        EXPECTED_FOO,
         EXPECTED_BAR,
-        EXPECTED_FIZZBUZZ,
         EXPECTED_BAZ,
+        EXPECTED_FIZZBUZZ,
+        EXPECTED_FOO,
         EXPECTED_QUX,
       ],
     },

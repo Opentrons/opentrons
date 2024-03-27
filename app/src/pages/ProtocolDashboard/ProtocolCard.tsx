@@ -19,6 +19,7 @@ import {
   OVERFLOW_WRAP_BREAK_WORD,
   SIZE_2,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
@@ -28,7 +29,6 @@ import {
 } from '@opentrons/react-api-client'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LongPressModal } from './LongPressModal'

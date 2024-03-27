@@ -19,7 +19,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
-  getPipetteNameSpecs,
+  getPipetteSpecsV2,
   PipetteName,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V2,
@@ -105,8 +105,8 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
   const showHeaterShakerPipetteCollisions =
     hasHeaterShakerSelected &&
     [
-      getPipetteNameSpecs(left.pipetteName as PipetteName),
-      getPipetteNameSpecs(right.pipetteName as PipetteName),
+      getPipetteSpecsV2(left.pipetteName as PipetteName),
+      getPipetteSpecsV2(right.pipetteName as PipetteName),
     ].some(pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1)
 
   const crashablePipetteSelected = getIsCrashablePipetteSelected(

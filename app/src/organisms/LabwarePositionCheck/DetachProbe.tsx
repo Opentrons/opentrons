@@ -1,8 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { css } from 'styled-components'
-import { StyledText } from '../../atoms/text'
+import {
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import {
   CompletedProtocolAnalysis,

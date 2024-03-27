@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
+  DIRECTION_COLUMN,
   Flex,
   SPACING,
-  DIRECTION_COLUMN,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { ROBOT_ANALYTICS_SETTING_ID } from '../../pages/RobotDashboard/AnalyticsOptInModal'
 import { RobotSettingButton } from '../../pages/RobotSettingsDashboard/RobotSettingButton'
