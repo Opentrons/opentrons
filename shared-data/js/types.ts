@@ -599,13 +599,13 @@ export interface NumberParameter {
 
 interface Choice {
   displayName: string
-  value: unknown
+  value: RunTimeParameterType
 }
 
 interface ChoiceParameter {
   type: RunTimeParameterType
   choices: Choice[]
-  default: string
+  default: RunTimeParameterType
 }
 
 interface BooleanParameter {
