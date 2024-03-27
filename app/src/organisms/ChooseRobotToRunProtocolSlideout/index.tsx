@@ -242,19 +242,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
               protocol_name: protocolDisplayName,
             })
       }
-      // title={
-      //   enableRunTimeParametersFF && runTimeParameters.length > 0
-      //     ? currentPage === 1
-      //       ? t('choose_robot_to_run', {
-      //           protocol_name: protocolDisplayName,
-      //         })
-      //       : t('select_parameters_for_robot', {
-      //           robot_name: selectedRobot?.name,
-      //         })
-      //     : t('choose_robot_to_run', {
-      //         protocol_name: protocolDisplayName,
-      //       })
-      // }
       runTimeParametersOverrides={runTimeParametersOverrides}
       setRunTimeParametersOverrides={setRunTimeParametersOverrides}
       footer={
