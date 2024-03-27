@@ -2,7 +2,7 @@
 import asyncio
 import logging
 from functools import partial
-from typing import Any, Awaitable, Callable, Optional, List
+from typing import Any, Awaitable, Callable, Optional
 from typing_extensions import Protocol as Callback
 
 log = logging.getLogger(__name__)
@@ -42,10 +42,9 @@ class TaskQueue:
             Callable[[Optional[Exception]], Any]
         ] = None  # CleanupFunc = cleanup_func
 
-        self._run_func: Optional[Callable[[Any], Any]] = None
+        self._run_func: Optional[Callable[[], Any]] = None
         self._run_task: Optional["asyncio.Task[None]"] = None
         self._ok_to_join_event: asyncio.Event = asyncio.Event()
-        self._commands_to_execute: List[Any] = []
 
     def set_cleanup_func(
         self,
@@ -69,11 +68,6 @@ class TaskQueue:
         """
         self._run_func = partial(func, **kwargs)
 
-    def add_commands_and_execute(self, commands: List[Any]) -> None:
-        print(commands)
-        for command in commands:
-            self._commands_to_execute.append(command)
-
     def start(self) -> None:
         """Start running tasks in the queue."""
         self._ok_to_join_event.set()
@@ -93,9 +87,7 @@ class TaskQueue:
 
         try:
             if self._run_func is not None:
-                if self._commands_to_execute:
-                    for command in self._commands_to_execute:
-                        await self._run_func(command)
+                await self._run_func()
         except Exception as e:
             log.exception("Exception raised by protocol")
             error = e
