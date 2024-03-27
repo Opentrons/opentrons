@@ -229,9 +229,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 index=next_index,
                 command=queued_command,
             )
-            self._state.command_history.set_command_entry(
-                queued_command.id, updated_command
-            )
+            self._state.command_history.add(queued_command.id, updated_command)
 
             if queued_command.intent == CommandIntent.SETUP:
                 self._state.command_history.add_to_setup_queue(queued_command.id)
@@ -257,7 +255,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             else:
                 updated_command = CommandEntry(index=prev_entry.index, command=command)
 
-            self._state.command_history.set_command_entry(command.id, updated_command)
+            self._state.command_history.add(command.id, updated_command)
             self._state.command_history.remove_id_from_queue(command.id)
             self._state.command_history.remove_id_from_setup_queue(command.id)
 
@@ -417,7 +415,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 **({"error": error_occurrence} if error_occurrence else {}),
             }
         )
-        self._state.command_history.set_command_entry(
+        self._state.command_history.add(
             command_id=prev_entry.command.id,
             command_entry=CommandEntry(index=prev_entry.index, command=updated_command),
         )

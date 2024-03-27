@@ -115,10 +115,6 @@ class CommandHistory:
         """Get the IDs of all queued setup commands, in FIFO order."""
         return self._queued_setup_command_ids
 
-    def set_command_entry(self, command_id: str, command_entry: CommandEntry) -> None:
-        """Create or update a command entry within the CommandStructure."""
-        self._commands_by_id[command_id] = command_entry
-
     def set_recent_dequeued_command_id(self, command_id: str) -> None:
         """Set the ID of the most recently dequeued command."""
         self._recent_dequeued_command_id = command_id
@@ -126,6 +122,10 @@ class CommandHistory:
     def set_running_command_id(self, command_id: Optional[str]) -> None:
         """Set the ID of the currently running command."""
         self._running_command_id = command_id
+
+    def add(self, command_id: str, command_entry: CommandEntry) -> None:
+        """Create or update a command entry within the CommandStructure."""
+        self._commands_by_id[command_id] = command_entry
 
     def add_to_queue(self, command_id: str) -> None:
         """Add new ID to the queued commands structure."""
