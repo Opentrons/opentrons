@@ -12,6 +12,7 @@ import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
+// ToDo (kk:03/26/2024) basic will be removed when we add Tag component
 export type ChipType =
   | 'basic'
   | 'error'
@@ -125,7 +126,7 @@ export function Chip(props: ChipProps): JSX.Element {
   `
 
   const TOUCHSCREEN_SMALL_CONTAINER_STYLE = css`
-    padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing10};
+    padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing8};
     grid-gap: ${SPACING.spacing4};
   `
 
