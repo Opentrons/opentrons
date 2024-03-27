@@ -38,9 +38,9 @@ from ..errors import (
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
-from .command_structure import (
+from .command_history import (
     CommandEntry,
-    CommandStructure,
+    CommandHistory,
 )
 from .config import Config
 
@@ -112,7 +112,7 @@ class CurrentCommand:
 class CommandState:
     """State of all protocol engine command resources."""
 
-    command_structure: CommandStructure
+    command_history: CommandHistory
 
     queue_status: QueueStatus
     """Whether the engine is currently pulling new commands off the queue to execute.
@@ -186,7 +186,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         """Initialize a CommandStore and its state."""
         self._config = config
         self._state = CommandState(
-            command_structure=CommandStructure(),
+            command_history=CommandHistory(),
             queue_status=QueueStatus.SETUP,
             is_door_blocking=is_door_open and config.block_on_door_open,
             run_result=None,
@@ -220,21 +220,21 @@ class CommandStore(HasState[CommandState], HandlesActions):
             )
 
             assert queued_command.status == CommandStatus.QUEUED
-            assert not self._state.command_structure.has(queued_command.id)
+            assert not self._state.command_history.has(queued_command.id)
 
-            next_index = self._state.command_structure.length()
+            next_index = self._state.command_history.length()
             updated_command = CommandEntry(
                 index=next_index,
                 command=queued_command,
             )
-            self._state.command_structure.set_command_entry(
+            self._state.command_history.set_command_entry(
                 queued_command.id, updated_command
             )
 
             if queued_command.intent == CommandIntent.SETUP:
-                self._state.command_structure.add_to_setup_queue(queued_command.id)
+                self._state.command_history.add_to_setup_queue(queued_command.id)
             else:
-                self._state.command_structure.add_to_setup_queue(queued_command.id)
+                self._state.command_history.add_to_setup_queue(queued_command.id)
 
             if action.request_hash is not None:
                 self._state.latest_command_hash = action.request_hash
@@ -244,10 +244,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
         # to make a command's queue transition logic easier to follow
         elif isinstance(action, UpdateCommandAction):
             command = action.command
-            prev_entry = self._state.command_structure.get_if_present(command.id)
+            prev_entry = self._state.command_history.get_if_present(command.id)
 
             if prev_entry is None:
-                next_index = self._state.command_structure.length()
+                next_index = self._state.command_history.length()
                 updated_command = CommandEntry(
                     index=next_index,
                     command=command,
@@ -255,15 +255,15 @@ class CommandStore(HasState[CommandState], HandlesActions):
             else:
                 updated_command = CommandEntry(index=prev_entry.index, command=command)
 
-            self._state.command_structure.set_command_entry(command.id, updated_command)
-            self._state.command_structure.remove_id_from_queue(command.id)
-            self._state.command_structure.remove_id_from_setup_queue(command.id)
+            self._state.command_history.set_command_entry(command.id, updated_command)
+            self._state.command_history.remove_id_from_queue(command.id)
+            self._state.command_history.remove_id_from_setup_queue(command.id)
 
             if command.status == CommandStatus.RUNNING:
-                self._state.command_structure.set_running_command_id(command.id)
-            elif self._state.command_structure.get_running_command() == command.id:
-                self._state.command_structure.set_running_command_id(None)
-                self._state.command_structure.set_recent_dequeued_command_id(command.id)
+                self._state.command_history.set_running_command_id(command.id)
+            elif self._state.command_history.get_running_command() == command.id:
+                self._state.command_history.set_running_command_id(None)
+                self._state.command_history.set_recent_dequeued_command_id(command.id)
 
         elif isinstance(action, FailCommandAction):
             error_occurrence = ErrorOccurrence.from_failed(
@@ -272,7 +272,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 error=action.error,
             )
             # TODO(mc, 2022-06-06): add new "cancelled" status or similar
-            prev_entry = self.state.command_structure.get(action.command_id)
+            prev_entry = self.state.command_history.get(action.command_id)
             # TODO(mc, 2022-06-06): add new "cancelled" status or similar
             # and don't set `completedAt` in commands other than the specific
             # one that failed
@@ -283,15 +283,15 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 error_occurrence=error_occurrence,
             )
 
-            self._state.failed_command = self._state.command_structure.get(
+            self._state.failed_command = self._state.command_history.get(
                 action.command_id
             )
 
             if prev_entry.command.intent == CommandIntent.SETUP:
                 other_command_ids_to_fail = (
-                    self._state.command_structure.get_setup_queue_ids()
+                    self._state.command_history.get_setup_queue_ids()
                 )
-                self._state.command_structure.clear_setup_queue()
+                self._state.command_history.clear_setup_queue()
             elif (
                 prev_entry.command.intent == CommandIntent.PROTOCOL
                 or prev_entry.command.intent is None
@@ -300,16 +300,16 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.queue_status = QueueStatus.AWAITING_RECOVERY
                 elif action.type == ErrorRecoveryType.FAIL_RUN:
                     other_command_ids_to_fail = (
-                        self._state.command_structure.get_queue_ids()
+                        self._state.command_history.get_queue_ids()
                     )
-                    self._state.command_structure.clear_queue()
+                    self._state.command_history.clear_queue()
                 else:
                     assert_never(action.type)
             else:
                 assert_never(prev_entry.command.intent)
 
             for command_id in other_command_ids_to_fail:
-                prev_entry = self._state.command_structure.get(command_id)
+                prev_entry = self._state.command_history.get(command_id)
                 self._update_to_failed(
                     prev_entry=prev_entry,
                     failed_at=action.failed_at,
@@ -317,10 +317,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 )
 
             if (
-                self._state.command_structure.get_running_command().command.id
+                self._state.command_history.get_running_command().command.id
                 == action.command_id
             ):
-                self._state.command_structure.set_running_command_id(None)
+                self._state.command_history.set_running_command_id(None)
 
         elif isinstance(action, PlayAction):
             if not self._state.run_result:
@@ -405,7 +405,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 **({"error": error_occurrence} if error_occurrence else {}),
             }
         )
-        self._state.command_structure.set_command_entry(
+        self._state.command_history.set_command_entry(
             prev_entry.command.id, updated_command
         )
 
@@ -459,7 +459,7 @@ class CommandView(HasState[CommandState]):
 
     def get(self, command_id: str) -> Command:
         """Get a command by its unique identifier."""
-        return self._state.command_structure.get(command_id).command
+        return self._state.command_history.get(command_id).command
 
     def get_all(self) -> List[Command]:
         """Get a list of all commands in state.
@@ -468,7 +468,7 @@ class CommandView(HasState[CommandState]):
         Replacing a command (to change its status, for example) keeps its place in the
         ordering.
         """
-        return self._state.command_structure.get_all_commands()
+        return self._state.command_history.get_all_commands()
 
     def get_slice(
         self,
@@ -480,9 +480,9 @@ class CommandView(HasState[CommandState]):
         If the cursor is omitted, a cursor will be selected automatically
         based on the currently running or most recently executed command.
         """
-        running_command = self._state.command_structure.get_running_command()
-        queued_command_ids = self._state.command_structure.get_queue_ids()
-        total_length = self._state.command_structure.length()
+        running_command = self._state.command_history.get_running_command()
+        queued_command_ids = self._state.command_history.get_queue_ids()
+        total_length = self._state.command_history.length()
 
         if cursor is None:
             if running_command is not None:
@@ -492,8 +492,7 @@ class CommandView(HasState[CommandState]):
                 # Get the most recently executed command,
                 # which we can find just before the first queued command.
                 cursor = (
-                    self._state.command_structure.get(queued_command_ids.head()).index
-                    - 1
+                    self._state.command_history.get(queued_command_ids.head()).index - 1
                 )
             elif (
                 self._state.run_result
@@ -511,9 +510,7 @@ class CommandView(HasState[CommandState]):
         # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor, total_length - 1))
         stop = min(total_length, actual_cursor + length)
-        commands = self._state.command_structure.get_slice(
-            start=actual_cursor, stop=stop
-        )
+        commands = self._state.command_history.get_slice(start=actual_cursor, stop=stop)
 
         return CommandSlice(
             commands=commands,
@@ -553,7 +550,7 @@ class CommandView(HasState[CommandState]):
         The "current" command is the command that is currently executing,
         or the most recent command to have completed.
         """
-        running_command = self._state.command_structure.get_running_command()
+        running_command = self._state.command_history.get_running_command()
         if running_command:
             return CurrentCommand(
                 command_id=running_command.command.id,
@@ -587,13 +584,13 @@ class CommandView(HasState[CommandState]):
             raise RunStoppedError("Engine was stopped")
 
         # if there is a setup command queued, prioritize it
-        next_setup_cmd = self._state.command_structure.get_queue_ids().head(None)
+        next_setup_cmd = self._state.command_history.get_queue_ids().head(None)
         if self._state.queue_status != QueueStatus.PAUSED and next_setup_cmd:
             return next_setup_cmd
 
         # if the queue is running, return the next protocol command
         if self._state.queue_status == QueueStatus.RUNNING:
-            return self._state.command_structure.get_queue_ids().head(None)
+            return self._state.command_history.get_queue_ids().head(None)
 
         # otherwise we've got nothing to do
         return None
@@ -604,8 +601,8 @@ class CommandView(HasState[CommandState]):
             return True
         elif (
             self.get_status() == EngineStatus.IDLE
-            and self._state.command_structure.get_running_command() is None
-            and len(self._state.command_structure.get_setup_queue_ids()) == 0
+            and self._state.command_history.get_running_command() is None
+            and len(self._state.command_history.get_setup_queue_ids()) == 0
         ):
             return True
         else:
@@ -628,14 +625,12 @@ class CommandView(HasState[CommandState]):
         run_requested_to_stop = self._state.run_result is not None
 
         if run_requested_to_stop:
-            final_command = self._state.command_structure.get_tail_command()
+            final_command = self._state.command_history.get_tail_command()
         else:
-            final_command = (
-                self._state.command_structure.get_recently_dequeued_command()
-            )
+            final_command = self._state.command_history.get_recently_dequeued_command()
             # This iteration is effectively O(1) as we'll only ever have to iterate one or two times at most.
             while final_command is not None:
-                next_command = self._state.command_structure.get_next(
+                next_command = self._state.command_history.get_next(
                     final_command.command.id
                 )
                 if (
@@ -681,13 +676,13 @@ class CommandView(HasState[CommandState]):
             CommandExecutionFailedError: if any added command failed, and its `intent` wasn't
             `setup`.
         """
-        no_command_running = self._state.command_structure.get_running_command() is None
+        no_command_running = self._state.command_history.get_running_command() is None
         run_requested_to_stop = self._state.run_result is not None
         no_command_to_execute = (
             run_requested_to_stop
             # TODO(mm, 2024-03-15): This ignores queued setup commands,
             # which seems questionable?
-            or len(self._state.command_structure.get_queue_ids()) == 0
+            or len(self._state.command_history.get_queue_ids()) == 0
         )
 
         return no_command_running and no_command_to_execute

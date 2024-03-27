@@ -29,7 +29,7 @@ from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOc
 
 from opentrons_shared_data.errors.codes import ErrorCodes
 
-from opentrons.protocol_engine.state.command_structure import CommandStructure
+from opentrons.protocol_engine.state.command_history import CommandHistory
 
 from .command_fixtures import (
     create_queued_command,
@@ -62,7 +62,7 @@ def get_command_view(
     }
 
     state = CommandState(
-        command_structure=CommandStructure(),
+        command_history=CommandHistory(),
         queue_status=queue_status,
         run_completed_at=run_completed_at,
         is_door_blocking=is_door_blocking,

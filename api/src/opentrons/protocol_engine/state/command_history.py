@@ -17,7 +17,7 @@ class CommandEntry:
 
 
 @dataclass  # dataclass for __eq__() autogeneration.
-class CommandStructure:
+class CommandHistory:
     """Command state container for command data."""
 
     _commands_by_id: Dict[str, CommandEntry]

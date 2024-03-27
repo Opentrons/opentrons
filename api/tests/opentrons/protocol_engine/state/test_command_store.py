@@ -37,7 +37,7 @@ from opentrons.protocol_engine.actions import (
     DoorChangeAction,
 )
 
-from opentrons.protocol_engine.state.command_structure import CommandStructure
+from opentrons.protocol_engine.state.command_history import CommandHistory
 
 from .command_fixtures import (
     create_queued_command,
@@ -74,7 +74,7 @@ def test_initial_state(
     subject = CommandStore(is_door_open=is_door_open, config=config)
 
     assert subject.state == CommandState(
-        command_structure=CommandStructure(),
+        command_history=CommandHistory(),
         queue_status=QueueStatus.SETUP,
         run_completed_at=None,
         run_started_at=None,
