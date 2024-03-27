@@ -322,9 +322,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     error_occurrence=None,
                 )
 
+            running_command = self._state.command_history.get_running_command()
             if (
-                self._state.command_history.get_running_command().command.id
-                == action.command_id
+                running_command is not None
+                and running_command.command.id == action.command_id
             ):
                 self._state.command_history.set_running_command_id(None)
 
@@ -404,12 +405,15 @@ class CommandStore(HasState[CommandState], HandlesActions):
         failed_at: datetime,
         error_occurrence: Optional[ErrorOccurrence],
     ) -> None:
-        updated_command = prev_entry.command.copy(
-            update={
-                "completedAt": failed_at,
-                "status": CommandStatus.FAILED,
-                **({"error": error_occurrence} if error_occurrence else {}),
-            }
+        updated_command = CommandEntry(
+            index=prev_entry.index,
+            command=prev_entry.command.copy(
+                update={
+                    "completedAt": failed_at,
+                    "status": CommandStatus.FAILED,
+                    **({"error": error_occurrence} if error_occurrence else {}),
+                }
+            ),
         )
         self._state.command_history.set_command_entry(
             prev_entry.command.id, updated_command
@@ -645,7 +649,7 @@ class CommandView(HasState[CommandState]):
         if run_requested_to_stop:
             final_command = self._state.command_history.get_tail_command()
         else:
-            final_command = self._state.command_history.get_recently_dequeued_command()
+            final_command = self._state.command_history.get_recent_dequeued_command()
             # This iteration is effectively O(1) as we'll only ever have to iterate one or two times at most.
             while final_command is not None:
                 next_command = self._state.command_history.get_next(

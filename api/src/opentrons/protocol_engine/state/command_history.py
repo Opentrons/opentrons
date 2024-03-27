@@ -1,7 +1,7 @@
 """Protocol Engine CommandStore sub-state."""
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.commands.command_unions import Command
@@ -32,13 +32,15 @@ class CommandHistory:
     _running_command_id: Optional[str]
     """The ID of the currently running command, if any"""
 
-    recent_dequeued_command_id: Optional[str]
+    _recent_dequeued_command_id: Optional[str]
     """ID of the most recent command that was dequeued, if any"""
 
     def __init__(self) -> None:
         self._queued_command_ids = OrderedSet()
         self._queued_setup_command_ids = OrderedSet()
         self._commands_by_id = OrderedDict()
+        self._running_command_id = None
+        self._recent_dequeued_command_id = None
 
     def length(self) -> int:
         """Get the length of all elements added to the CommandStructure."""
@@ -86,14 +88,17 @@ class CommandHistory:
 
     def get_tail_command(self) -> Optional[CommandEntry]:
         """Get the command most recently added."""
-        return next(reversed(self._commands_by_id.values()))
-
-    def get_recently_dequeued_command(self) -> Optional[CommandEntry]:
-        """Get the command most recently dequeued from all queues."""
-        if self.recent_dequeued_command_id is None:
-            return None
+        if self._commands_by_id:
+            return next(reversed(self._commands_by_id.values()))
         else:
-            return self._commands_by_id[self.recent_dequeued_command_id]
+            return None
+
+    def get_recent_dequeued_command(self) -> Optional[CommandEntry]:
+        """Get the command most recently dequeued from all queues."""
+        if self._recent_dequeued_command_id is not None:
+            return self._commands_by_id[self._recent_dequeued_command_id]
+        else:
+            return None
 
     def get_running_command(self) -> Optional[CommandEntry]:
         """Get the command currently running, if any."""
@@ -116,9 +121,9 @@ class CommandHistory:
 
     def set_recent_dequeued_command_id(self, command_id: str) -> None:
         """Set the ID of the most recently dequeued command."""
-        self.recent_dequeued_command_id = command_id
+        self._recent_dequeued_command_id = command_id
 
-    def set_running_command_id(self, command_id: Union[str, None]) -> None:
+    def set_running_command_id(self, command_id: Optional[str]) -> None:
         """Set the ID of the currently running command."""
         self._running_command_id = command_id
 
