@@ -146,7 +146,7 @@ if __name__ == "__main__":
         print("Connected to google drive.")
     except json.decoder.JSONDecodeError:
         print(
-            "Credentials file is damaged. Re-download credentials file from https://console.cloud.google.com/apis/credentials"
+            "Credential file is damaged. Get from https://console.cloud.google.com/apis/credentials"
         )
         sys.exit()
     get_all_run_logs(storage_directory)

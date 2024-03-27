@@ -1,20 +1,21 @@
+"""Google Drive Tool."""
 import os
-import oauth2client
-from oauth2client.service_account import ServiceAccountCredentials
+from typing import Set, Any
+from oauth2client.service_account import ServiceAccountCredentials  # type: ignore[import]
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
-"""This module requires a creditials.json file before getting started.
-The following link provides a step by step tutorial on how to get startd."""
+"""Google Drive Tool.
+
+This module requires a credentials.json file before getting started.
+Retrieve from https://console.cloud.google.com/apis/credentials."""
 
 
 class google_drive:
-    """
-    This module was designed for the ABR team to automate run log data upload to google drive.
-    A credentials file is needed to start.
-    """
+    """Google Drive Tool."""
 
-    def __init__(self, credentials, folder_name, parent_folder):
+    def __init__(self, credentials: Any, folder_name: str, parent_folder: Any) -> None:
+        """Connects to google drive via credentials file."""
         self.scope = ["https://www.googleapis.com/auth/drive"]
         self.credentials = ServiceAccountCredentials.from_json_keyfile_name(
             credentials, self.scope
@@ -23,32 +24,17 @@ class google_drive:
         self.folder_name = folder_name
         self.parent_folder = parent_folder
 
-    def create_folder(self):
-        """Create a folder in Google Drive and return its ID."""
-        folder_metadata = {
-            "name": self.folder_name,
-            "mimeType": "application/vnd.google-apps.folder",
-            "parents": [self.parent_folder] if self.parent_folder else [],
-        }
-
-        created_folder = (
-            self.drive_service.files()
-            .create(body=folder_metadata, fields="id")
-            .execute()
-        )
-
-        print(f'Created Folder ID: {created_folder["id"]}')
-        return created_folder["id"]
-
-    def list_folder(self, delete=False):
+    def list_folder(self, delete: Any = False) -> Set[str]:
         """List folders and files in Google Drive."""
         file_names = set()
-        page_token = None
+        page_token: str = ""
         while True:
             results = (
                 self.drive_service.files()
                 .list(
                     q=f"'{self.parent_folder}' in parents and trashed=false"
+                    if self.parent_folder
+                    else ""  # type: ignore
                     if self.parent_folder
                     else None,
                     pageSize=1000,
@@ -65,15 +51,15 @@ class google_drive:
                 if delete:
                     self.delete_files(item["id"])
                 file_names.add(item_name)
-            page_token = results.get("nextPageToken")
-            if not page_token:
+            page_token = results.get("nextPageToken", "")
+            if len(page_token) < 1:
                 break
             if not file_names:
                 print("No folders or files found in Google Drive.")
         print(f"{len(file_names)} item(s) in Google Drive")
         return file_names
 
-    def delete_files(self, file_or_folder_id: str):
+    def delete_files(self, file_or_folder_id: str) -> None:
         """Delete a file or folder in Google Drive by ID."""
         try:
             self.drive_service.files().delete(fileId=file_or_folder_id).execute()
@@ -82,24 +68,25 @@ class google_drive:
             print(f"Error deleting file/folder with ID: {file_or_folder_id}")
             print(f"Error details: {str(e)}")
 
-    def upload_file(self, file_path: str):
+    def upload_file(self, file_path: str) -> str:
         """Upload file to Google Drive."""
         file_metadata = {
             "name": os.path.basename(file_path),
-            "parents": [self.parent_folder] if self.parent_folder else [],
+            "mimeType": "application/vnd.google-apps.folder",
+            "parents": [self.parent_folder] if self.parent_folder else "",
         }
 
         media = MediaFileUpload(file_path, resumable=True)
 
         uploaded_file = (
             self.drive_service.files()
-            .create(body=file_metadata, media_body=media, fields="id")
+            .create(body=file_metadata, media_body=media, fields="id")  # type: ignore
             .execute()
         )
 
         return uploaded_file["id"]
 
-    def upload_missing_files(self, storage_directory: str, missing_files: set):
+    def upload_missing_files(self, storage_directory: str, missing_files: set) -> None:
         """Upload missing files to Google Drive."""
         uploaded_files = []
         for file in missing_files:
@@ -112,11 +99,12 @@ class google_drive:
         files = google_drive.list_folder(self)
         file_names = [file for file in files]
         for uploaded_file in uploaded_files:
-            if uploaded_file["name"] in file_names:
+            this_name = uploaded_file["name"]
+            if this_name in file_names:
                 print(
-                    f"File '{uploaded_file['name']}' was successfully uploaded with ID: {uploaded_file['id']}"
+                    f"File '{this_name}' was successfully uploaded with ID: {uploaded_file['id']}"
                 )
             else:
                 print(
-                    f"File '{uploaded_file['name']}' was not found in the list of files after uploading."
+                    f"File '{this_name}' was not found in the list of files after uploading."
                 )

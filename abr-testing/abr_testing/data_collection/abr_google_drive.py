@@ -3,7 +3,7 @@ import argparse
 import os
 import sys
 import json
-import gspread # type: ignore[import]
+import gspread  # type: ignore[import]
 from datetime import datetime, timedelta
 from abr_testing.data_collection import read_robot_logs
 from typing import Set, Dict, Any
@@ -148,7 +148,7 @@ if __name__ == "__main__":
         print("Connected to google drive.")
     except json.decoder.JSONDecodeError:
         print(
-            "Credentials file is damaged. Re-download credentials file from https://console.cloud.google.com/apis/credentials"
+            "Credential file is damaged. Get from https://console.cloud.google.com/apis/credentials"
         )
         sys.exit()
     # Get run ids on google sheet
@@ -161,7 +161,7 @@ if __name__ == "__main__":
         print("ERROR: Check google sheet name. Check credentials file.")
         sys.exit()
     run_ids_on_gs = google_sheet.get_column(2)
-
+    run_ids_on_gs = set(run_ids_on_gs)
     # Read Google Drive .json files
     google_drive_files = google_drive.list_folder()
     google_drive_files_json = [
@@ -180,7 +180,6 @@ if __name__ == "__main__":
 
     # Run ids in google_drive_folder
     run_ids_on_gd = read_robot_logs.get_run_ids_from_google_drive(google_drive)
-    run_ids_on_gd = set()
     missing_runs_from_gs = read_robot_logs.get_unseen_run_ids(
         run_ids_on_gd, run_ids_on_gs
     )

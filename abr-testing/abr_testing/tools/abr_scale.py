@@ -1,9 +1,8 @@
 """ABR Scale Reader."""
 import os
-import sys
 import datetime
-from hardware_testing.drivers import find_port, list_ports_and_select
-from hardware_testing.drivers.radwag import RadwagScale
+from hardware_testing.drivers import find_port, list_ports_and_select  # type: ignore[import]
+from hardware_testing.drivers.radwag import RadwagScale  # type: ignore[import]
 from typing import Any, List
 import argparse
 import csv

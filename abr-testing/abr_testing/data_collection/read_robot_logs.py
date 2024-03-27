@@ -12,7 +12,9 @@ import time as t
 import json
 
 
-def create_abr_data_sheet(storage_directory: str, file_name: str, headers: List) -> str:
+def create_abr_data_sheet(
+    storage_directory: str, file_name: str, headers: List[str]
+) -> str:
     """Creates csv file to log ABR data."""
     file_name_csv = file_name + ".csv"
     print(file_name_csv)
@@ -70,7 +72,7 @@ def write_to_local_and_google_sheet(
     storage_directory: str,
     file_name: str,
     google_sheet: Any,
-    header,
+    header: List[str],
 ) -> None:
     """Write data dictionary to google sheet and local csv."""
     sheet_location = os.path.join(storage_directory, file_name)

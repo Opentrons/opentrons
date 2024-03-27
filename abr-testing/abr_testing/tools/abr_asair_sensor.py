@@ -1,7 +1,7 @@
 """ABR Temperature Humidity Sensors."""
 
-from hardware_testing import data
-from hardware_testing.drivers import asair_sensor
+from hardware_testing import data  # type: ignore[import]
+from hardware_testing.drivers import asair_sensor  # type: ignore[import]
 import datetime
 import time as t
 from typing import List
