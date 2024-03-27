@@ -1,28 +1,25 @@
 import * as React from 'react'
 import Keyboard from 'react-simple-keyboard'
+import { numericalKeyboardLayout, numericalCustom } from '../constants'
 
-const customDisplay = {
-  '{backspace}': 'del',
-}
 interface NumericalKeyboardProps {
   onChange: (input: string) => void
   keyboardRef: React.MutableRefObject<null>
   isDecimal?: boolean
+  allowNegative?: boolean
 }
 
-const decimalOffKeyboard = ['1 2 3', '4 5 6', '7 8 9', ' 0 {backspace}']
-const decimalOnKeyboard = ['1 2 3', '4 5 6', '7 8 9', '. 0 {backspace}']
-
+// the default keyboard layout intKeyboard that doesn't have decimal point and hyphen.
 export function NumericalKeyboard({
   onChange,
   keyboardRef,
   isDecimal = false,
+  allowNegative = false,
 }: NumericalKeyboardProps): JSX.Element {
-  const numericalKeyboard = {
-    layout: {
-      default: isDecimal ? decimalOnKeyboard : decimalOffKeyboard,
-    },
-  }
+  const layoutName = `${isDecimal ? 'float' : 'int'}${
+    allowNegative ? 'NegKeyboard' : 'Keyboard'
+  }`
+
   return (
     /*
      *  autoUseTouchEvents: for Flex on-device app
@@ -32,17 +29,11 @@ export function NumericalKeyboard({
       keyboardRef={r => (keyboardRef.current = r)}
       theme={'hg-theme-default oddTheme1 numerical-keyboard'}
       onChange={onChange}
-      layoutName="default"
-      buttonTheme={[
-        {
-          class: 'hg-decimal-point',
-          buttons: '.',
-        },
-      ]}
-      display={customDisplay}
+      display={numericalCustom}
       autoUseTouchEvents={true}
       useButtonTag={true}
-      {...numericalKeyboard}
+      layoutName={layoutName}
+      layout={numericalKeyboardLayout}
     />
   )
 }

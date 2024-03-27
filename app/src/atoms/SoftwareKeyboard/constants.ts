@@ -50,3 +50,22 @@ export const fullKeyboardLayout = {
     '{space}',
   ],
 }
+
+// Numerical keyboard layout
+export const numericalKeyboardLayout = {
+  // int without negative value
+  intKeyboard: ['1 2 3', '4 5 6', '7 8 9', '0 {backspace}'],
+
+  // int with negative value
+  intNegKeyboard: ['1 2 3', '4 5 6', '7 8 9', '0 - {backspace}'],
+
+  // float without negative value,
+  floatKeyboard: ['1 2 3', '4 5 6', '7 8 9', '0 . {backspace}'],
+
+  // float with negative value
+  floatNegKeyboard: ['1 2 3', '4 5 6', '7 8 9', '0 . - {backspace}'],
+}
+
+export const numericalCustom = {
+  '{backspace}': 'del',
+}

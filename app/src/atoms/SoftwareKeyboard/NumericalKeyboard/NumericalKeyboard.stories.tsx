@@ -25,6 +25,13 @@ export default {
       },
       defaultValue: false,
     },
+    allowNegative: {
+      control: {
+        type: 'boolean',
+        options: [true, false],
+      },
+      defaultValue: false,
+    },
   },
 } as Meta
 
@@ -46,13 +53,19 @@ const Template: Story<
           }}
         />
       </form>
-      <Flex position={POSITION_ABSOLUTE} top="20%" width="15rem">
+      <Flex
+        position={POSITION_ABSOLUTE}
+        top="20%"
+        width="22.5rem"
+        height="21.25rem"
+      >
         {showKeyboard && (
           <NumericalKeyboard
             // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
             onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
             isDecimal={args.isDecimal}
+            allowNegative={args.allowNegative}
           />
         )}
       </Flex>
@@ -63,4 +76,5 @@ const Template: Story<
 export const Keyboard = Template.bind({})
 Keyboard.args = {
   isDecimal: false,
+  allowNegative: false,
 }
