@@ -16,7 +16,7 @@ import {
 
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
-import { Chip } from '../../../atoms/Chip'
+// import { Chip } from '../../../atoms/Chip'
 import { NoParameter } from '../../ProtocolDetails/ProtocolParameters/NoParameter'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { formatRunTimeParameterValue } from '../../ProtocolDetails/ProtocolParameters/utils'
@@ -25,7 +25,7 @@ import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const mockData: RunTimeParameter[] = [
   {
-    value: true,
+    value: false,
     displayName: 'Dry Run',
     variableName: 'DRYRUN',
     description: 'Is this a dry or wet run? Wet is true, dry is false',
@@ -175,13 +175,11 @@ export function ProtocolRunRuntimeParameters({
   const { t } = useTranslation('protocol_setup')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   // ToDo (kk:03/18/2024) mockData will be replaced with []
-  const runTimeParameters = mockData
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? mockData
   const hasParameter = runTimeParameters.length > 0
 
   // ToDo (kk:03/19/2024) this will be replaced with the boolean from values check result
-  const hasCustomValues = runTimeParameters.some(
-    param => param.value !== param.default
-  )
+  const dummyBoolean = true
 
   // ToDO (kk:03/18/2024) Need to add Chip to updated runTime parameter value
   // This part will be implemented in a following PR since need to runTime parameter slideout
@@ -202,7 +200,7 @@ export function ProtocolRunRuntimeParameters({
           </StyledText>
           {hasParameter ? (
             <StyledText as="label" color={COLORS.grey60}>
-              {hasCustomValues ? t('custom_values') : t('default_values')}
+              {dummyBoolean ? t('custom_values') : t('default_values')}
             </StyledText>
           ) : null}
         </Flex>
@@ -259,15 +257,10 @@ export function ProtocolRunRuntimeParameters({
                             <StyledText as="p">
                               {formatRunTimeParameterValue(parameter, t)}
                             </StyledText>
-                            {parameter.value !== parameter.default ? (
-                              <Chip
-                                text={t('updated')}
-                                type="success"
-                                hasIcon={false}
-                                chipSize="small"
-                                isOnDevice={false}
-                              />
-                            ) : null}
+                            {/* ToDo (kk:03/19/2024) chip will be here with conditional render */}
+                            {/* {index % 2 === 0 ? (
+                              <Chip text={t('updated')} type="success" />
+                            ) : null} */}
                           </Flex>
                         </StyledTableCell>
                       </StyledTableRow>
@@ -302,7 +295,6 @@ interface StyledTableRowProps {
 const StyledTableRow = styled.tr<StyledTableRowProps>`
   padding: ${SPACING.spacing8};
   border-bottom: ${props => (props.isLast ? 'none' : BORDERS.lineBorder)};
-  align-items: ${ALIGN_CENTER};
 `
 
 interface StyledTableCellProps {
@@ -311,5 +303,6 @@ interface StyledTableCellProps {
 
 const StyledTableCell = styled.td<StyledTableCellProps>`
   padding-left: ${SPACING.spacing8};
-  height: 2.25rem;
+  padding-top: ${SPACING.spacing12};
+  padding-bottom: ${props => (props.isLast ? 0 : SPACING.spacing12)};
 `
