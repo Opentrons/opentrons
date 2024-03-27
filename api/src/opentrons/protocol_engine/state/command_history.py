@@ -118,7 +118,7 @@ class CommandHistory:
         """Set the ID of the most recently dequeued command."""
         self.recent_dequeued_command_id = command_id
 
-    def set_running_command_id(self, command_id: Union[str, None]):
+    def set_running_command_id(self, command_id: Union[str, None]) -> None:
         """Set the ID of the currently running command."""
         self._running_command_id = command_id
 

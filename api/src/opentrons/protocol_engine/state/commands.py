@@ -4,10 +4,12 @@ from __future__ import annotations
 import enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, Union
 from typing_extensions import assert_never
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
+
+from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
@@ -259,9 +261,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.command_history.remove_id_from_queue(command.id)
             self._state.command_history.remove_id_from_setup_queue(command.id)
 
+            running_command = self._state.command_history.get_running_command()
+
             if command.status == CommandStatus.RUNNING:
                 self._state.command_history.set_running_command_id(command.id)
-            elif self._state.command_history.get_running_command() == command.id:
+            elif (
+                running_command is not None and running_command.command.id == command.id
+            ):
                 self._state.command_history.set_running_command_id(None)
                 self._state.command_history.set_recent_dequeued_command_id(command.id)
 
@@ -544,6 +550,18 @@ class CommandView(HasState[CommandState]):
         else:
             return run_error or finish_error
 
+    def get_running_command_id(self) -> Optional[str]:
+        """Return the ID of the command that's currently running, if there is one."""
+        running_command = self._state.command_history.get_running_command()
+        if running_command is not None:
+            return running_command.command.id
+        else:
+            return None
+
+    def get_queued_command_ids(self) -> OrderedSet[str]:
+        """Get the IDs of all queued commands, in FIFO order."""
+        return self._state.command_history.get_queue_ids()
+
     def get_current(self) -> Optional[CurrentCommand]:
         """Return the "current" command, if any.
 
@@ -701,8 +719,8 @@ class CommandView(HasState[CommandState]):
         # TODO(mm, 2024-03-14): This is a slow O(n) scan. When a long run ends and
         # we reach this loop, it can disrupt the robot server.
         # https://opentrons.atlassian.net/browse/EXEC-55
-        for command_id in self._state.all_command_ids:
-            command = self._state.commands_by_id[command_id].command
+        for command_id in self._state.command_history.get_all_ids():
+            command = self._state.command_history.get(command_id).command
             if command.error and command.intent != CommandIntent.SETUP:
                 raise ProtocolCommandFailedError(
                     original_error=command.error, message=command.error.detail
