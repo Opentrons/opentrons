@@ -107,18 +107,18 @@ export function Chip(props: ChipProps): JSX.Element {
       : CHIP_PROPS_BY_TYPE[type].backgroundColor
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
 
-  const TOUCHSCREEN_MEDIUM_CONTAINER_STYLE = css`
+  const MEDIUM_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing2} ${background === false ? 0 : SPACING.spacing8};
     grid-gap: ${SPACING.spacing4};
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       padding: ${SPACING.spacing8}
         ${background === false ? 0 : SPACING.spacing16};
-      grid-gap: ${SPACING.spacing16};
+      grid-gap: ${SPACING.spacing8};
     }
   `
 
-  const TOUCHSCREEN_SMALL_CONTAINER_STYLE = css`
+  const SMALL_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing6};
     grid-gap: ${SPACING.spacing4};
 
@@ -143,9 +143,7 @@ export function Chip(props: ChipProps): JSX.Element {
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
       css={
-        chipSize === 'medium'
-          ? TOUCHSCREEN_MEDIUM_CONTAINER_STYLE
-          : TOUCHSCREEN_SMALL_CONTAINER_STYLE
+        chipSize === 'medium' ? MEDIUM_CONTAINER_STYLE : SMALL_CONTAINER_STYLE
       }
       data-testid={`Chip_${type}`}
       {...styleProps}

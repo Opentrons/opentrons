@@ -18,7 +18,7 @@ import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
 import { Chip } from '../../../atoms/Chip'
 import { NoParameter } from '../../ProtocolDetails/ProtocolParameters/NoParameter'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+// import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { formatRunTimeParameterValue } from '../../ProtocolDetails/ProtocolParameters/utils'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
@@ -173,14 +173,15 @@ export function ProtocolRunRuntimeParameters({
   runId,
 }: ProtocolRunRuntimeParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  // ToDo (kk:03/18/2024) mockData will be replaced with []
+  // const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  // todo (nd:03/27/2024) resolve runTimeParameters to analysis's runTimeParameters object once available
+  // const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
   const runTimeParameters = mockData
   const hasParameter = runTimeParameters.length > 0
 
   // ToDo (kk:03/19/2024) this will be replaced with the boolean from values check result
   const hasCustomValues = runTimeParameters.some(
-    param => param.value !== param.default
+    parameter => parameter.value !== parameter.default
   )
 
   // ToDO (kk:03/18/2024) Need to add Chip to updated runTime parameter value

@@ -217,9 +217,7 @@ describe('Chip', () => {
     }
     render(props)
     const chip = screen.getByTestId('Chip_info')
-    expect(chip).toHaveStyle(
-      `padding: ${SPACING.spacing4} ${SPACING.spacing10}`
-    )
+    expect(chip).toHaveStyle(`padding: ${SPACING.spacing4} ${SPACING.spacing6}`)
     const icon = screen.getByLabelText('icon_mockInfo')
     expect(icon).toHaveStyle(`width: 1.25rem`)
   })

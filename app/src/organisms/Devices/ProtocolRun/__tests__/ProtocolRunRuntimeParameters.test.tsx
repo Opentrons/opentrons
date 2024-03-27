@@ -100,7 +100,30 @@ describe('ProtocolRunRuntimeParameters', () => {
     vi.resetAllMocks()
   })
 
-  it('should render title, and banner when RunTimeParameters are note empty', () => {
+  it('should render title, and banner when RunTimeParameters are note empty and all values are default', () => {
+    render(props)
+    screen.getByText('Parameters')
+    screen.getByText('Default values')
+    screen.getByText('Values are view-only')
+    screen.getByText('Cancel the run and restart setup to edit')
+    screen.getByText('Name')
+    screen.getByText('Value')
+  })
+
+  it('should render title, and banner when RunTimeParameters are note empty and some value is changed', () => {
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
+      runTimeParameters: [
+        ...mockRunTimeParameterData,
+        {
+          displayName: 'Dry Run',
+          variableName: 'DRYRUN',
+          description: 'Is this a dry or wet run? Wet is true, dry is false',
+          type: 'boolean',
+          default: false,
+          value: true,
+        },
+      ],
+    } as CompletedProtocolAnalysis)
     render(props)
     screen.getByText('Parameters')
     screen.getByText('Custom values')
