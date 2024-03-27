@@ -211,7 +211,7 @@ describe('ChooseRobotSlideout', () => {
     screen.getByText('Step 2 / 2')
   })
 
-  mockRunTimeParameters.forEach((param, index) => {
+  mockRunTimeParameters.forEach(param => {
     it('renders runtime parameter with title and caption', () => {
       render({
         onCloseClick: vi.fn(),
@@ -226,7 +226,11 @@ describe('ChooseRobotSlideout', () => {
       })
 
       screen.getByText(param.displayName)
-      screen.getByText(param.description)
+      if (param.type === 'boolean' || 'choices' in param) {
+        screen.getByText(param.description)
+      } else {
+        screen.getByText(`${param.min}-${param.max}`)
+      }
     })
   })
 

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -12,6 +13,7 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
+  NoParameters,
 } from '@opentrons/components'
 
 import { Banner } from '../../../atoms/Banner'
@@ -224,7 +226,7 @@ export function ProtocolRunRuntimeParameters({
       </Flex>
       {!hasParameter ? (
         <Flex padding={SPACING.spacing16}>
-          <NoParameter />
+          <NoParameters t={t} />
         </Flex>
       ) : (
         <>

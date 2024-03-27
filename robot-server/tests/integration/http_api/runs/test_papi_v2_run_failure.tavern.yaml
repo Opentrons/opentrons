@@ -101,6 +101,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: failed
+            notes: []
             error:
               id: !anystr
               errorType: LegacyContextCommandError

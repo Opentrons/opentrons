@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   BORDERS,
   COLORS,
@@ -13,7 +14,6 @@ import {
 import { useToaster } from '../../organisms/ToasterOven'
 import { useRunTimeParameters } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'
-import { formatRunTimeParameterValue } from '../../organisms/ProtocolDetails/ProtocolParameters/utils'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const Table = styled('table')`

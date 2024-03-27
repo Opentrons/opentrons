@@ -3,9 +3,9 @@ import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 
+import { NoParameters } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { NoParameter } from '../../../ProtocolDetails/ProtocolParameters/NoParameter'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
@@ -15,7 +15,13 @@ import type {
   RunTimeParameter,
 } from '@opentrons/shared-data'
 
-vi.mock('../../../ProtocolDetails/ProtocolParameters/NoParameter')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof NoParameters>()
+  return {
+    ...actual,
+    NoParameters: vi.fn(),
+  }
+})
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
 const RUN_ID = 'mockId'
@@ -88,7 +94,7 @@ describe('ProtocolRunRuntimeParameters', () => {
     props = {
       runId: RUN_ID,
     }
-    vi.mocked(NoParameter).mockReturnValue(<div>mock NoParameter</div>)
+    vi.mocked(NoParameters).mockReturnValue(<div>mock NoParameter</div>)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({
