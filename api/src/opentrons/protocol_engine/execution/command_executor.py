@@ -144,16 +144,16 @@ class CommandExecutor:
 
         try:
             log.debug(
-                f"Executing {queued_command.id}, {queued_command.commandType}, {queued_command.params}"
+                f"Executing {running_command.id}, {running_command.commandType}, {running_command.params}"
             )
             if isinstance(command_impl, AbstractCommandImpl):
-                result: CommandResult = await command_impl.execute(queued_command.params)  # type: ignore[arg-type]
+                result: CommandResult = await command_impl.execute(running_command.params)  # type: ignore[arg-type]
                 private_result: Optional[CommandPrivateResult] = None
             else:
-                result, private_result = await command_impl.execute(queued_command.params)  # type: ignore[arg-type]
+                result, private_result = await command_impl.execute(running_command.params)  # type: ignore[arg-type]
 
         except (Exception, asyncio.CancelledError) as error:
-            log.warning(f"Execution of {queued_command.id} failed", exc_info=error)
+            log.warning(f"Execution of {running_command.id} failed", exc_info=error)
             # TODO(mc, 2022-11-14): mark command as stopped rather than failed
             # https://opentrons.atlassian.net/browse/RCORE-390
             if isinstance(error, asyncio.CancelledError):
@@ -166,7 +166,7 @@ class CommandExecutor:
             self._action_dispatcher.dispatch(
                 FailCommandAction(
                     error=error,
-                    command_id=command_id,
+                    command_id=running_command.id,
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
                     notes=note_tracker.get_notes(),
@@ -190,9 +190,9 @@ class CommandExecutor:
                 "completedAt": self._model_utils.get_timestamp(),
                 "notes": note_tracker.get_notes(),
             }
-            completed_command = running_command.copy(update=update)
+            succeeded_command = running_command.copy(update=update)
             self._action_dispatcher.dispatch(
                 SucceedCommandAction(
-                    command=completed_command, private_result=private_result
+                    command=succeeded_command, private_result=private_result
                 ),
             )
