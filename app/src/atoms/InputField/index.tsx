@@ -8,12 +8,15 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   RESPONSIVENESS,
   SPACING,
   StyledText,
   TEXT_ALIGN_RIGHT,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
+import { Tooltip } from '../Tooltip'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const INPUT_TYPE_TEXT = 'text' as const
@@ -38,6 +41,8 @@ export interface InputFieldProps {
   error?: string | null
   /** optional title */
   title?: string | null
+  /** optional text for tooltip */
+  tooltipText?: string
   /** optional caption. hidden when `error` is given */
   caption?: string | null
   /** appears to the right of the caption. Used for character limits, eg '0/45' */
@@ -93,11 +98,13 @@ function Input(props: InputFieldProps): JSX.Element {
     textAlign = TYPOGRAPHY.textAlignLeft,
     size = 'small',
     title,
+    tooltipText,
     ...inputProps
   } = props
   const error = props.error != null
   const value = props.isIndeterminate ?? false ? '' : props.value ?? ''
   const placeHolder = props.isIndeterminate ?? false ? '-' : props.placeholder
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const OUTER_CSS = css`
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -230,9 +237,23 @@ function Input(props: InputFieldProps): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-      {props.title != null ? (
-        <Flex as="label" htmlFor={inputProps.id} css={TITLE_STYLE}>
-          {props.title}
+      {title != null ? (
+        <Flex gridGap={SPACING.spacing8}>
+          <Flex as="label" htmlFor={props.id} css={TITLE_STYLE}>
+            {title}
+          </Flex>
+          {tooltipText != null ? (
+            <>
+              <Flex {...targetProps}>
+                <Icon
+                  name="information"
+                  size={SPACING.spacing12}
+                  color={COLORS.grey60}
+                />
+              </Flex>
+              <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
+            </>
+          ) : null}
         </Flex>
       ) : null}
       <Flex width="100%" flexDirection={DIRECTION_COLUMN} css={OUTER_CSS}>
