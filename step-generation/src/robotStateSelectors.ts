@@ -186,7 +186,7 @@ export function getPipetteWithTipMaxVol(
   // NOTE: this fn assumes each pipette is assigned to exactly one tiprack type,
   // across the entire timeline
   const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
-  const pipetteMaxVol = pipetteEntity.spec.maxVolume
+  const pipetteMaxVol = pipetteEntity.spec.liquids.default.maxVolume
   const tiprackDef = pipetteEntity.tiprackLabwareDef
   const tiprackTipVol = getTiprackVolume(tiprackDef)
 

@@ -54,7 +54,7 @@ from ..commands import (
     temperature_module,
     thermocycler,
 )
-from ..actions import Action, UpdateCommandAction, AddModuleAction
+from ..actions import Action, SucceedCommandAction, AddModuleAction
 from .abstract_store import HasState, HandlesActions
 from .module_substates import (
     MagneticModuleSubState,
@@ -195,7 +195,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, UpdateCommandAction):
+        if isinstance(action, SucceedCommandAction):
             self._handle_command(action.command)
 
         elif isinstance(action, AddModuleAction):

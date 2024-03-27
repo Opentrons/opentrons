@@ -32,7 +32,7 @@ import { useTrackEvent } from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
-import { useHardwareStatusText } from './hooks'
+import { useRerunnableStatusText } from './hooks'
 import {
   useRobotInitializationStatus,
   INIT_STATUS,
@@ -77,8 +77,10 @@ export function ProtocolWithLastRun({
     conflictedSlots,
   } = useMissingProtocolHardware(protocolData.id)
   const history = useHistory()
-  const isReadyToBeReRun = missingProtocolHardware.length === 0
-  const chipText = useHardwareStatusText(
+  const isOk = 'ok' in runData ? !(runData?.ok === false) : true
+  const isReadyToBeReRun = isOk && missingProtocolHardware.length === 0
+  const chipText = useRerunnableStatusText(
+    isOk,
     missingProtocolHardware,
     conflictedSlots
   )
@@ -162,7 +164,13 @@ export function ProtocolWithLastRun({
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing24}
       gridGap={SPACING.spacing24}
-      backgroundColor={isReadyToBeReRun ? COLORS.green35 : COLORS.yellow35}
+      backgroundColor={
+        isOk
+          ? isReadyToBeReRun
+            ? COLORS.green35
+            : COLORS.yellow35
+          : COLORS.red35
+      }
       width="25.8125rem"
       height="24.5rem"
       borderRadius={BORDERS.borderRadius16}
@@ -171,7 +179,7 @@ export function ProtocolWithLastRun({
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Chip
           paddingLeft="0"
-          type={isReadyToBeReRun ? 'success' : 'warning'}
+          type={isOk ? (isReadyToBeReRun ? 'success' : 'warning') : 'error'}
           background={false}
           text={i18n.format(chipText, 'capitalize')}
         />

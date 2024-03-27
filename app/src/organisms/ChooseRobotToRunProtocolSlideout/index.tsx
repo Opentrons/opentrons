@@ -63,7 +63,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   )
 
   // TODO: (nd: 3/20/24) remove stubs and pull parameters from analysis
-
   const mockRunTimeParameters: RunTimeParameter[] = [
     {
       displayName: 'Dry Run',
@@ -117,10 +116,11 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       default: 'none',
     },
   ]
+  const runTimeParameters: RunTimeParameter[] = mockRunTimeParameters
   const [
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
-  ] = React.useState<RunTimeParameter[]>(mockRunTimeParameters)
+  ] = React.useState<RunTimeParameter[]>(runTimeParameters)
 
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis,
@@ -231,14 +231,22 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
         isSelectedRobotOnDifferentSoftwareVersion
       }
       onCloseClick={onCloseClick}
-      title={t('choose_robot_to_run', {
-        protocol_name: protocolDisplayName,
-      })}
+      title={
+        enableRunTimeParametersFF &&
+        runTimeParameters.length > 0 &&
+        currentPage === 2
+          ? t('select_parameters_for_robot', {
+              robot_name: selectedRobot?.name,
+            })
+          : t('choose_robot_to_run', {
+              protocol_name: protocolDisplayName,
+            })
+      }
       runTimeParametersOverrides={runTimeParametersOverrides}
       setRunTimeParametersOverrides={setRunTimeParametersOverrides}
       footer={
         <Flex flexDirection={DIRECTION_COLUMN}>
-          {enableRunTimeParametersFF ? (
+          {enableRunTimeParametersFF && runTimeParameters.length > 0 ? (
             currentPage === 1 ? (
               <>
                 <ApplyHistoricOffsets

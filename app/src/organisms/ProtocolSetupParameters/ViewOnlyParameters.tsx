@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -16,7 +17,6 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import { ChildNavigation } from '../ChildNavigation'
 import { useToaster } from '../ToasterOven'
 import { mockData } from './index'
-import { formatRunTimeParameterValue } from '../ProtocolDetails/ProtocolParameters/utils'
 
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 

@@ -13,7 +13,7 @@ import {
 import {
   sortWells,
   LabwareDefinition2,
-  PipetteNameSpecs,
+  PipetteV2Specs,
 } from '@opentrons/shared-data'
 
 import { arrayToWellGroup } from '../../../../utils'
@@ -54,7 +54,7 @@ interface WellSelectionModalComponentProps {
   updateHighlightedWells: (wellGroup: WellGroup) => unknown
   wellContents: ContentsByWell
   labwareDef?: LabwareDefinition2 | null
-  pipetteSpec?: PipetteNameSpecs | null
+  pipetteSpec?: PipetteV2Specs | null
 }
 
 const WellSelectionModalComponent = (

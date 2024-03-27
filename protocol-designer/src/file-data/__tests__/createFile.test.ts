@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import Ajv from 'ajv'
 import {
   commandSchemaV8,
+  fixtureP10SingleV2Specs,
+  fixtureP300SingleV2Specs,
   labwareSchemaV2,
   protocolSchemaV8,
 } from '@opentrons/shared-data'
@@ -11,10 +13,6 @@ import {
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
-import {
-  fixtureP10Single,
-  fixtureP300Single,
-} from '@opentrons/shared-data/pipette/fixtures/name'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import { createFile, getLabwareDefinitionsInUse } from '../selectors'
 import {
@@ -126,7 +124,7 @@ describe('getLabwareDefinitionsInUse util', () => {
         id: 'somePipetteId',
         // @ts-expect-error(sa, 2021-6-18): not a valid pipette name
         name: 'foo',
-        spec: fixtureP10Single,
+        spec: fixtureP10SingleV2Specs,
         tiprackLabwareDef: assignedTiprackOnDeckDef as LabwareDefinition2,
         tiprackDefURI: 'assignedTiprackOnDeckURI',
       },
@@ -134,7 +132,7 @@ describe('getLabwareDefinitionsInUse util', () => {
         id: 'otherPipetteId',
         // @ts-expect-error(sa, 2021-6-18): not a valid pipette name
         name: 'foo',
-        spec: fixtureP300Single,
+        spec: fixtureP300SingleV2Specs,
         tiprackLabwareDef: assignedTiprackNotOnDeckDef as LabwareDefinition2,
         tiprackDefURI: 'assignedTiprackNotOnDeckURI',
       },
