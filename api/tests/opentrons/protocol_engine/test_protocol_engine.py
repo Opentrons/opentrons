@@ -780,6 +780,7 @@ async def test_estop_during_command(
         error_id=error_id,
         failed_at=timestamp,
         error=EStopActivatedError(message="Estop Activated"),
+        notes=[],
         type=ErrorRecoveryType.FAIL_RUN,
     )
     expected_action_2 = FailCommandAction(
@@ -787,6 +788,7 @@ async def test_estop_during_command(
         error_id=error_id,
         failed_at=timestamp,
         error=EStopActivatedError(message="Estop Activated"),
+        notes=[],
         type=ErrorRecoveryType.FAIL_RUN,
     )
 

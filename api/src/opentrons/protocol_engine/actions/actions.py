@@ -6,8 +6,7 @@ reactions in objects that subscribe to the pipeline, like the StateStore.
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Union
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from typing import List, Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import DoorState
@@ -16,6 +15,8 @@ from opentrons.hardware_control.modules import LiveData
 from opentrons_shared_data.errors import EnumeratedError
 
 from ..commands import Command, CommandCreate, CommandPrivateResult
+from ..error_recovery_policy import ErrorRecoveryType
+from ..notes.notes import CommandNote
 from ..types import (
     LabwareOffsetCreate,
     ModuleDefinition,
@@ -121,21 +122,42 @@ class QueueCommandAction:
 
 
 @dataclass(frozen=True)
-class UpdateCommandAction:
-    """Update a given command."""
+class RunCommandAction:
+    """Mark a given command as running.
+
+    At the time of dispatching this action, the command must be queued,
+    and no other command may be running.
+    """
+
+    command_id: str
+    started_at: datetime
+
+
+@dataclass(frozen=True)
+class SucceedCommandAction:
+    """Mark a given command as succeeded.
+
+    At the time of dispatching this action, the command must be running.
+    """
 
     command: Command
+    """The command in its new succeeded state."""
+
     private_result: CommandPrivateResult
 
 
 @dataclass(frozen=True)
 class FailCommandAction:
-    """Mark a given command as failed."""
+    """Mark a given command as failed.
+
+    At the time of dispatching this action, the command must be running.
+    """
 
     command_id: str
     error_id: str
     failed_at: datetime
     error: EnumeratedError
+    notes: List[CommandNote]
     type: ErrorRecoveryType
 
 
@@ -211,7 +233,8 @@ Action = Union[
     HardwareStoppedAction,
     DoorChangeAction,
     QueueCommandAction,
-    UpdateCommandAction,
+    RunCommandAction,
+    SucceedCommandAction,
     FailCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,

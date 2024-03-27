@@ -6,7 +6,7 @@ from typing import Dict, Optional, List, Union
 from .abstract_store import HasState, HandlesActions
 from ..actions import (
     Action,
-    UpdateCommandAction,
+    SucceedCommandAction,
     ResetTipsAction,
 )
 from ..commands import (
@@ -64,7 +64,7 @@ class TipStore(HasState[TipState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, UpdateCommandAction):
+        if isinstance(action, SucceedCommandAction):
             if isinstance(action.private_result, PipetteConfigUpdateResultMixin):
                 pipette_id = action.private_result.pipette_id
                 config = action.private_result.config
