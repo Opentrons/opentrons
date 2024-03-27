@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import partition from 'lodash/partition'
 
 import {
   ALIGN_CENTER,
@@ -40,6 +39,7 @@ import {
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
+  WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
@@ -56,7 +56,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
-import { AttachedModule } from '@opentrons/api-client'
 
 type CutoutContents = Omit<CutoutConfig, 'cutoutId'>
 
@@ -67,6 +66,12 @@ interface AddFixtureModalProps {
   providedFixtureOptions?: CutoutFixtureId[]
   isOnDevice?: boolean
 }
+type OptionStage =
+  | 'modulesOrFixtures'
+  | 'fixtureOptions'
+  | 'moduleOptions'
+  | 'wasteChuteOptions'
+  | 'providedOptions'
 
 export function AddFixtureModal({
   cutoutId,
@@ -78,13 +83,24 @@ export function AddFixtureModal({
   const { t } = useTranslation(['device_details', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { data: modulesData } = useModulesQuery()
+  const unconfiguredMods =
+    modulesData?.data.filter(
+      attachedMod =>
+        !deckConfig.some(
+          ({ opentronsModuleSerialNumber }) =>
+            attachedMod.serialNumber === opentronsModuleSerialNumber
+        )
+    ) ?? []
   const deckConfig = useDeckConfigurationQuery()?.data ?? []
-  const [optionStage, setOptionStage] = React.useState<
-    | 'modulesOrFixtures'
-    | 'fixtureOptions'
-    | 'moduleOptions'
-    | 'wasteChuteOptions'
-  >('modulesOrFixtures')
+  
+  let initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only mag block (a module) can be configured in column 2
+    ? 'moduleOptions'
+    : 'modulesOrFixtures'
+  if (providedFixtureOptions != null) { // only show provided options if given as props
+    initialStage = 'providedOptions'
+  }
+  const [optionStage, setOptionStage] = React.useState<OptionStage>(initialStage)
+
   const [showWasteChuteOptions, setShowWasteChuteOptions] = React.useState(
     false
   )
@@ -107,35 +123,33 @@ export function AddFixtureModal({
     width: '26.75rem',
   }
 
-  const unconfiguredMods =
-    modulesData?.data.filter(
-      attachedMod =>
-        !deckConfig.some(
-          ({ opentronsModuleSerialNumber }) =>
-            attachedMod.serialNumber === opentronsModuleSerialNumber
-        )
-    ) ?? []
 
-  let availableFixtures: CutoutContents[] = []
-  if (optionStage === 'fixtureOptions') {
+  let availableOptions: CutoutContents[] = []
+
+  if (providedFixtureOptions != null) {
+    availableOptions = providedFixtureOptions?.map(o => ({
+      cutoutFixtureId: o,
+      opentronsModuleSerialNumber: undefined,
+    })) 
+  } else if (optionStage === 'fixtureOptions') {
     if (
       SINGLE_RIGHT_CUTOUTS.includes(cutoutId) ||
       SINGLE_LEFT_CUTOUTS.includes(cutoutId)
     ) {
-      availableFixtures = [
-        ...availableFixtures,
+      availableOptions = [
+        ...availableOptions,
         { cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE },
       ]
     }
     if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
-      availableFixtures = [
-        ...availableFixtures,
+      availableOptions = [
+        ...availableOptions,
         { cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE },
       ]
     }
   } else if (optionStage === 'moduleOptions') {
-    availableFixtures = [
-      ...availableFixtures,
+    availableOptions = [
+      ...availableOptions,
       { cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE },
     ]
     if (unconfiguredMods.length > 0) {
@@ -146,7 +160,7 @@ export function AddFixtureModal({
             cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
             opentronsModuleSerialNumber: mod.serialNumber,
           }))
-        availableFixtures = [...availableFixtures, ...unconfiguredTCs]
+        availableOptions = [...availableOptions, ...unconfiguredTCs]
       }
       if (
         HEATER_SHAKER_CUTOUTS.includes(cutoutId) &&
@@ -158,7 +172,7 @@ export function AddFixtureModal({
             cutoutFixtureId: HEATERSHAKER_MODULE_V1_FIXTURE,
             opentronsModuleSerialNumber: mod.serialNumber,
           }))
-        availableFixtures = [...availableFixtures, ...unconfiguredHeaterShakers]
+        availableOptions = [...availableOptions, ...unconfiguredHeaterShakers]
       }
       if (
         TEMPERATURE_MODULE_CUTOUTS.includes(cutoutId) &&
@@ -170,14 +184,14 @@ export function AddFixtureModal({
             cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
             opentronsModuleSerialNumber: mod.serialNumber,
           }))
-        availableFixtures = [
-          ...availableFixtures,
+        availableOptions = [
+          ...availableOptions,
           ...unconfiguredTemperatureModules,
         ]
       }
     }
   } else if (optionStage === 'wasteChuteOptions') {
-    availableFixtures = WASTE_CHUTE_FIXTURES.map(fixture => ({
+    availableOptions = WASTE_CHUTE_FIXTURES.map(fixture => ({
       cutoutFixtureId: fixture,
     }))
   }
@@ -195,12 +209,6 @@ export function AddFixtureModal({
 
     setShowAddFixtureModal(false)
   }
-
-  const fixtureOptions =
-    providedFixtureOptions?.map(o => ({
-      cutoutFixtureId: o,
-      opentronsModuleSerialNumber: undefined,
-    })) ?? availableFixtures
 
   let nextStageOptions = null
   if (optionStage === 'modulesOrFixtures') {
@@ -228,12 +236,12 @@ export function AddFixtureModal({
         />
       </>
     )
-  } else if (optionStage === 'fixtureOptions') {
+  } else if (optionStage === 'fixtureOptions' && cutoutId === WASTE_CHUTE_CUTOUT) {
     nextStageOptions = (
       <>
         <FixtureOption
           key="wasteChuteStageOption"
-          optionName="Waste Chute"
+          optionName="Waste chute"
           buttonText={t('select_options')}
           onClickHandler={() => {
             setOptionStage('wasteChuteOptions')
@@ -269,7 +277,7 @@ export function AddFixtureModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {fixtureOptions.map(cutoutContents => (
+              {availableOptions.map(cutoutContents => (
                 <FixtureOption
                   key={cutoutContents.cutoutFixtureId}
                   optionName={getFixtureDisplayName(
@@ -289,7 +297,7 @@ export function AddFixtureModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {fixtureOptions.map(cutoutContents => (
+              {availableOptions.map(cutoutContents => (
                 <FixtureOption
                   key={cutoutContents.cutoutFixtureId}
                   optionName={getFixtureDisplayName(

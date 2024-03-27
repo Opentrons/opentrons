@@ -364,7 +364,7 @@ describe('ProtocolSetup', () => {
           ...mockRobotSideAnalysis,
           runTimeParameters: mockRunTimeParameterData,
         },
-        flexDeckDefV4 as any
+        flexDeckDefV5 as any
       )
       .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getUnmatchedModulesForProtocol))
