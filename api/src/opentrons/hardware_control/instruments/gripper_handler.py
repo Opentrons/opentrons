@@ -65,33 +65,6 @@ class GripperHandler:
     def gripper(self, gripper: Optional[Gripper] = None) -> None:
         self._gripper = gripper
 
-    def reset_instrument_offset(self, to_default: bool) -> None:
-        """
-        Temporarily reset the gripper offsets to default values.
-        """
-        gripper = self.get_gripper()
-        gripper.reset_offset(to_default)
-
-    def save_instrument_offset(self, delta: Point) -> GripperCalibrationOffset:
-        """
-        Save a new instrument offset.
-        :param delta: The offset to set for the pipette.
-        """
-        gripper = self.get_gripper()
-        self._log.info(f"Saving gripper {gripper.gripper_id} offset: {delta}")
-        return gripper.save_offset(delta)
-
-    def get_critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
-        if not self._gripper:
-            raise GripperNotPresentError()
-        if cp_override == CriticalPoint.MOUNT:
-            raise InvalidCriticalPoint(
-                cp_override.name,
-                "gripper",
-                "The gripper mount may not be moved directly.",
-            )
-        return self._gripper.critical_point(cp_override)
-
     def get_gripper_dict(self) -> Optional[GripperDict]:
         if not self._gripper:
             # TODO (spp, 2023-04-19): Should this raise an error if fetching info of
