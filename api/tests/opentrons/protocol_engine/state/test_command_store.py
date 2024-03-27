@@ -44,6 +44,7 @@ from .command_fixtures import (
     create_running_command,
     create_succeeded_command,
     create_failed_command,
+    create_failed_command_entry,
 )
 
 
@@ -229,12 +230,11 @@ def test_command_store_queues_commands(
     subject = CommandStore(is_door_open=False, config=_make_config())
     subject.handle_action(action)
 
-    assert subject.state.commands_by_id == {
-        "command-id": CommandEntry(index=0, command=expected_command),
-    }
-
-    assert subject.state.all_command_ids == ["command-id"]
-    assert subject.state.queued_command_ids == OrderedSet(["command-id"])
+    assert subject.state.command_history.get("command-id") == CommandEntry(
+        index=0, command=expected_command
+    )
+    assert subject.state.command_history.get_all_ids() == ["command-id"]
+    assert subject.state.command_history.get_queue_ids() == OrderedSet(["command-id"])
 
 
 def test_command_queue_with_hash() -> None:
@@ -253,7 +253,7 @@ def test_command_queue_with_hash() -> None:
         )
     )
 
-    assert subject.state.commands_by_id["command-id-1"].command.key == "abc123"
+    assert subject.state.command_history.get("command-id-1").command.key == "abc123"
     assert subject.state.latest_command_hash == "abc123"
 
     subject.handle_action(
@@ -294,18 +294,18 @@ def test_command_queue_and_unqueue() -> None:
     subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(queue_1)
-    assert subject.state.queued_command_ids == OrderedSet(["command-id-1"])
+    assert subject.state.command_history.get_queue_ids() == OrderedSet(["command-id-1"])
 
     subject.handle_action(queue_2)
-    assert subject.state.queued_command_ids == OrderedSet(
+    assert subject.state.command_history.get_queue_ids() == OrderedSet(
         ["command-id-1", "command-id-2"]
     )
 
     subject.handle_action(update_2)
-    assert subject.state.queued_command_ids == OrderedSet(["command-id-1"])
+    assert subject.state.command_history.get_queue_ids() == OrderedSet(["command-id-1"])
 
     subject.handle_action(update_1)
-    assert subject.state.queued_command_ids == OrderedSet()
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
 
 
 def test_setup_command_queue_and_unqueue() -> None:
@@ -340,18 +340,22 @@ def test_setup_command_queue_and_unqueue() -> None:
     subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(queue_1)
-    assert subject.state.queued_setup_command_ids == OrderedSet(["command-id-1"])
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet(
+        ["command-id-1"]
+    )
 
     subject.handle_action(queue_2)
-    assert subject.state.queued_setup_command_ids == OrderedSet(
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet(
         ["command-id-1", "command-id-2"]
     )
 
     subject.handle_action(update_2)
-    assert subject.state.queued_setup_command_ids == OrderedSet(["command-id-1"])
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet(
+        ["command-id-1"]
+    )
 
     subject.handle_action(update_1)
-    assert subject.state.queued_setup_command_ids == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
 
 
 def test_setup_queue_action_updates_command_intent() -> None:
@@ -379,7 +383,7 @@ def test_setup_queue_action_updates_command_intent() -> None:
     subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(queue_cmd)
-    assert subject.state.commands_by_id["command-id-1"] == CommandEntry(
+    assert subject.state.command_history.get("command-id-1") == CommandEntry(
         index=0, command=expected_pause_cmd
     )
 
@@ -404,13 +408,15 @@ def test_running_command_id() -> None:
     subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(queue)
-    assert subject.state.running_command_id is None
+    assert subject.state.command_history.get_running_command() is None
 
     subject.handle_action(running_update)
-    assert subject.state.running_command_id == "command-id-1"
+    assert (
+        subject.state.command_history.get_running_command().command.id == "command-id-1"
+    )
 
     subject.handle_action(completed_update)
-    assert subject.state.running_command_id is None
+    assert subject.state.command_history.get_running_command() is None
 
 
 def test_running_command_no_queue() -> None:
@@ -427,12 +433,14 @@ def test_running_command_no_queue() -> None:
     subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(running_update)
-    assert subject.state.all_command_ids == ["command-id-1"]
-    assert subject.state.running_command_id == "command-id-1"
+    assert subject.state.command_history.get_all_ids() == ["command-id-1"]
+    assert (
+        subject.state.command_history.get_running_command().command.id == "command-id-1"
+    )
 
     subject.handle_action(completed_update)
-    assert subject.state.all_command_ids == ["command-id-1"]
-    assert subject.state.running_command_id is None
+    assert subject.state.command_history.get_all_ids() == ["command-id-1"]
+    assert subject.state.command_history.get_running_command() is None
 
 
 def test_command_failure_clears_queues() -> None:
@@ -505,13 +513,18 @@ def test_command_failure_clears_queues() -> None:
     subject.handle_action(running_1)
     subject.handle_action(fail_1)
 
-    assert subject.state.running_command_id is None
-    assert subject.state.queued_command_ids == OrderedSet()
-    assert subject.state.all_command_ids == ["command-id-1", "command-id-2"]
-    assert subject.state.commands_by_id == {
-        "command-id-1": CommandEntry(index=0, command=expected_failed_1),
-        "command-id-2": CommandEntry(index=1, command=expected_failed_2),
-    }
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_all_ids() == [
+        "command-id-1",
+        "command-id-2",
+    ]
+    assert subject.state.command_history.get("command-id-1") == CommandEntry(
+        index=0, command=expected_failed_1
+    )
+    assert subject.state.command_history.get("command-id-2") == CommandEntry(
+        index=1, command=expected_failed_2
+    )
 
 
 def test_setup_command_failure_only_clears_setup_command_queue() -> None:
@@ -611,19 +624,23 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
     subject.handle_action(running_cmd_2)
     subject.handle_action(failed_action_cmd_2)
 
-    assert subject.state.running_command_id is None
-    assert subject.state.queued_setup_command_ids == OrderedSet()
-    assert subject.state.queued_command_ids == OrderedSet(["command-id-1"])
-    assert subject.state.all_command_ids == [
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_queue_ids() == OrderedSet(["command-id-1"])
+    assert subject.state.command_history.get_all_ids() == [
         "command-id-1",
         "command-id-2",
         "command-id-3",
     ]
-    assert subject.state.commands_by_id == {
-        "command-id-1": CommandEntry(index=0, command=cmd_1_non_setup),
-        "command-id-2": CommandEntry(index=1, command=expected_failed_cmd_2),
-        "command-id-3": CommandEntry(index=2, command=expected_failed_cmd_3),
-    }
+    assert subject.state.command_history.get("command-id-1") == CommandEntry(
+        index=0, command=cmd_1_non_setup
+    )
+    assert subject.state.command_history.get("command-id-2") == CommandEntry(
+        index=1, command=expected_failed_cmd_2
+    )
+    assert subject.state.command_history.get("command-id-3") == CommandEntry(
+        index=2, command=expected_failed_cmd_3
+    )
 
 
 def test_nonfatal_command_failure() -> None:
@@ -701,13 +718,18 @@ def test_nonfatal_command_failure() -> None:
     subject.handle_action(run_1)
     subject.handle_action(fail_1)
 
-    assert subject.state.running_command_id is None
-    assert subject.state.queued_command_ids == OrderedSet(["command-id-2"])
-    assert subject.state.all_command_ids == ["command-id-1", "command-id-2"]
-    assert subject.state.commands_by_id == {
-        "command-id-1": CommandEntry(index=0, command=expected_failed_1),
-        "command-id-2": CommandEntry(index=1, command=expected_queued_2),
-    }
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_queue_ids() == OrderedSet(["command-id-2"])
+    assert subject.state.command_history.get_all_ids() == [
+        "command-id-1",
+        "command-id-2",
+    ]
+    assert subject.state.command_history.get("command-id-1") == CommandEntry(
+        index=0, command=expected_failed_1
+    )
+    assert subject.state.command_history.get("command-id-2") == CommandEntry(
+        index=1, command=expected_queued_2
+    )
 
 
 def test_command_store_preserves_handle_order() -> None:
@@ -720,24 +742,34 @@ def test_command_store_preserves_handle_order() -> None:
     subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(UpdateCommandAction(private_result=None, command=command_a))
-    assert subject.state.all_command_ids == ["command-id-1"]
-    assert subject.state.commands_by_id == {
-        "command-id-1": CommandEntry(index=0, command=command_a),
-    }
+    assert subject.state.command_history.get_all_ids() == ["command-id-1"]
+    assert subject.state.command_history.get("command-id-1") == CommandEntry(
+        index=0, command=command_a
+    )
 
     subject.handle_action(UpdateCommandAction(private_result=None, command=command_b))
-    assert subject.state.all_command_ids == ["command-id-1", "command-id-2"]
-    assert subject.state.commands_by_id == {
-        "command-id-1": CommandEntry(index=0, command=command_a),
-        "command-id-2": CommandEntry(index=1, command=command_b),
-    }
+    assert subject.state.command_history.get_all_ids() == [
+        "command-id-1",
+        "command-id-2",
+    ]
+    assert subject.state.command_history.get("command-id-1") == CommandEntry(
+        index=0, command=command_a
+    )
+    assert subject.state.command_history.get("command-id-2") == CommandEntry(
+        index=1, command=command_b
+    )
 
     subject.handle_action(UpdateCommandAction(private_result=None, command=command_c))
-    assert subject.state.all_command_ids == ["command-id-1", "command-id-2"]
-    assert subject.state.commands_by_id == {
-        "command-id-1": CommandEntry(index=0, command=command_c),
-        "command-id-2": CommandEntry(index=1, command=command_b),
-    }
+    assert subject.state.command_history.get_all_ids() == [
+        "command-id-1",
+        "command-id-2",
+    ]
+    assert subject.state.command_history.get("command-id-1") == CommandEntry(
+        index=0, command=command_c
+    )
+    assert subject.state.command_history.get("command-id-2") == CommandEntry(
+        index=1, command=command_b
+    )
 
 
 @pytest.mark.parametrize("pause_source", PauseSource)
@@ -747,16 +779,12 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
     subject.handle_action(PauseAction(source=pause_source))
 
     assert subject.state == CommandState(
+        command_history=CommandHistory(),
         queue_status=QueueStatus.PAUSED,
         run_result=None,
         run_completed_at=None,
         run_started_at=None,
         is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
         failed_command=None,
@@ -776,15 +804,11 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     )
 
     assert subject.state == CommandState(
+        command_history=CommandHistory(),
         queue_status=QueueStatus.RUNNING,
         run_result=None,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
         failed_command=None,
@@ -792,6 +816,10 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         latest_command_hash=None,
         stopped_by_estop=False,
     )
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_all_ids() == []
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
 
 
 def test_command_store_handles_finish_action() -> None:
@@ -806,15 +834,11 @@ def test_command_store_handles_finish_action() -> None:
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
+        command_history=CommandHistory(),
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.SUCCEEDED,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
         failed_command=None,
@@ -822,6 +846,10 @@ def test_command_store_handles_finish_action() -> None:
         latest_command_hash=None,
         stopped_by_estop=False,
     )
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_all_ids() == []
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
 
 
 def test_command_store_handles_finish_action_with_stopped() -> None:
@@ -851,15 +879,11 @@ def test_command_store_handles_stop_action(from_estop: bool) -> None:
     subject.handle_action(StopAction(from_estop=from_estop))
 
     assert subject.state == CommandState(
+        command_history=CommandHistory(),
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.STOPPED,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
         failed_command=None,
@@ -867,6 +891,10 @@ def test_command_store_handles_stop_action(from_estop: bool) -> None:
         latest_command_hash=None,
         stopped_by_estop=from_estop,
     )
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_all_ids() == []
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
 
 
 def test_command_store_cannot_restart_after_should_stop() -> None:
@@ -880,15 +908,11 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
     )
 
     assert subject.state == CommandState(
+        command_history=CommandHistory(),
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.SUCCEEDED,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
         failed_command=None,
@@ -896,6 +920,10 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         latest_command_hash=None,
         stopped_by_estop=False,
     )
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_all_ids() == []
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
 
 
 def test_command_store_save_started_completed_run_timestamp() -> None:
@@ -972,15 +1000,11 @@ def test_command_store_wraps_unknown_errors() -> None:
     )
 
     assert subject.state == CommandState(
+        command_history=CommandHistory(),
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.FAILED,
         run_completed_at=datetime(year=2022, month=2, day=2),
         is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
         run_error=errors.ErrorOccurrence(
             id="error-id-1",
             createdAt=datetime(year=2021, month=1, day=1),
@@ -1026,6 +1050,10 @@ def test_command_store_wraps_unknown_errors() -> None:
         latest_command_hash=None,
         stopped_by_estop=False,
     )
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_all_ids() == []
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
 
 
 def test_command_store_preserves_enumerated_errors() -> None:
@@ -1059,15 +1087,11 @@ def test_command_store_preserves_enumerated_errors() -> None:
     )
 
     assert subject.state == CommandState(
+        command_history=CommandHistory(),
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.FAILED,
         run_completed_at=datetime(year=2022, month=2, day=2),
         is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
         run_error=errors.ErrorOccurrence(
             id="error-id-1",
             createdAt=datetime(year=2021, month=1, day=1),
@@ -1087,6 +1111,10 @@ def test_command_store_preserves_enumerated_errors() -> None:
         latest_command_hash=None,
         stopped_by_estop=False,
     )
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_all_ids() == []
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
 
 
 def test_command_store_ignores_stop_after_graceful_finish() -> None:
@@ -1102,15 +1130,11 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
     subject.handle_action(StopAction())
 
     assert subject.state == CommandState(
+        command_history=CommandHistory(),
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.SUCCEEDED,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
         failed_command=None,
@@ -1118,6 +1142,10 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         latest_command_hash=None,
         stopped_by_estop=False,
     )
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_all_ids() == []
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
 
 
 def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
@@ -1133,6 +1161,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     subject.handle_action(FinishAction())
 
     assert subject.state == CommandState(
+        command_history=CommandHistory(),
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.STOPPED,
         run_completed_at=None,
@@ -1144,6 +1173,10 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         latest_command_hash=None,
         stopped_by_estop=False,
     )
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_all_ids() == []
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
 
 
 def test_command_store_handles_command_failed() -> None:
@@ -1176,25 +1209,28 @@ def test_command_store_handles_command_failed() -> None:
         )
     )
 
+    failed_command_entry = CommandEntry(index=0, command=expected_failed_command)
+    command_history = CommandHistory()
+    command_history.set_command_entry("command-id", failed_command_entry)
+
     assert subject.state == CommandState(
+        command_history=command_history,
         queue_status=QueueStatus.SETUP,
         run_result=None,
         run_completed_at=None,
         is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=["command-id"],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id={
-            "command-id": CommandEntry(index=0, command=expected_failed_command),
-        },
         run_error=None,
         finish_error=None,
-        failed_command=CommandEntry(index=0, command=expected_failed_command),
+        failed_command=failed_command_entry,
         run_started_at=None,
         latest_command_hash=None,
         stopped_by_estop=False,
     )
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_all_ids() == ["command-id"]
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get("command-id") == failed_command_entry
 
 
 def test_handles_hardware_stopped() -> None:
@@ -1206,15 +1242,11 @@ def test_handles_hardware_stopped() -> None:
     )
 
     assert subject.state == CommandState(
+        command_history=CommandHistory(),
         queue_status=QueueStatus.PAUSED,
         run_result=RunResult.STOPPED,
         run_completed_at=completed_at,
         is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
         run_error=None,
         finish_error=None,
         failed_command=None,
@@ -1222,6 +1254,10 @@ def test_handles_hardware_stopped() -> None:
         latest_command_hash=None,
         stopped_by_estop=False,
     )
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_all_ids() == []
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
 
 
 @pytest.mark.parametrize(

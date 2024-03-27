@@ -236,7 +236,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if queued_command.intent == CommandIntent.SETUP:
                 self._state.command_history.add_to_setup_queue(queued_command.id)
             else:
-                self._state.command_history.add_to_setup_queue(queued_command.id)
+                self._state.command_history.add_to_queue(queued_command.id)
 
             if action.request_hash is not None:
                 self._state.latest_command_hash = action.request_hash
@@ -277,7 +277,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 createdAt=action.failed_at,
                 error=action.error,
             )
-            # TODO(mc, 2022-06-06): add new "cancelled" status or similar
             prev_entry = self.state.command_history.get(action.command_id)
             # TODO(mc, 2022-06-06): add new "cancelled" status or similar
             # and don't set `completedAt` in commands other than the specific
@@ -297,6 +296,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 other_command_ids_to_fail = (
                     self._state.command_history.get_setup_queue_ids()
                 )
+                for command_id in other_command_ids_to_fail:
+                    prev_entry = self._state.command_history.get(command_id)
+                    self._update_to_failed(
+                        prev_entry=prev_entry,
+                        failed_at=action.failed_at,
+                        error_occurrence=None,
+                    )
                 self._state.command_history.clear_setup_queue()
             elif (
                 prev_entry.command.intent == CommandIntent.PROTOCOL
@@ -308,19 +314,18 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     other_command_ids_to_fail = (
                         self._state.command_history.get_queue_ids()
                     )
+                    for command_id in other_command_ids_to_fail:
+                        prev_entry = self._state.command_history.get(command_id)
+                        self._update_to_failed(
+                            prev_entry=prev_entry,
+                            failed_at=action.failed_at,
+                            error_occurrence=None,
+                        )
                     self._state.command_history.clear_queue()
                 else:
                     assert_never(action.type)
             else:
                 assert_never(prev_entry.command.intent)
-
-            for command_id in other_command_ids_to_fail:
-                prev_entry = self._state.command_history.get(command_id)
-                self._update_to_failed(
-                    prev_entry=prev_entry,
-                    failed_at=action.failed_at,
-                    error_occurrence=None,
-                )
 
             running_command = self._state.command_history.get_running_command()
             if (
@@ -405,18 +410,16 @@ class CommandStore(HasState[CommandState], HandlesActions):
         failed_at: datetime,
         error_occurrence: Optional[ErrorOccurrence],
     ) -> None:
-        updated_command = CommandEntry(
-            index=prev_entry.index,
-            command=prev_entry.command.copy(
-                update={
-                    "completedAt": failed_at,
-                    "status": CommandStatus.FAILED,
-                    **({"error": error_occurrence} if error_occurrence else {}),
-                }
-            ),
+        updated_command = prev_entry.command.copy(
+            update={
+                "completedAt": failed_at,
+                "status": CommandStatus.FAILED,
+                **({"error": error_occurrence} if error_occurrence else {}),
+            }
         )
         self._state.command_history.set_command_entry(
-            prev_entry.command.id, updated_command
+            command_id=prev_entry.command.id,
+            command_entry=CommandEntry(index=prev_entry.index, command=updated_command),
         )
 
     @staticmethod
