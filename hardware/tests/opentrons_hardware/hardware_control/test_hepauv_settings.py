@@ -25,6 +25,7 @@ from opentrons_hardware.hardware_control.hepa_uv_settings import (
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
+    UInt16Field,
     UInt32Field,
 )
 from tests.conftest import CanLoopback
@@ -50,7 +51,7 @@ def create_hepa_uv_state_response(
     light_on: bool,
     duration: int,
     remaining_time: int,
-    uv_voltage: int,
+    uv_current: int,
 ) -> MessageDefinition:
     """Create a GetHepaUVStateResponse."""
     return md.GetHepaUVStateResponse(
@@ -58,7 +59,7 @@ def create_hepa_uv_state_response(
             uv_light_on=UInt8Field(light_on),
             uv_duration_s=UInt32Field(duration),
             remaining_time_s=UInt32Field(remaining_time),
-            uv_voltage_mv=UInt32Field(uv_voltage),
+            uv_current_ma=UInt16Field(uv_current),
         )
     )
 
@@ -195,7 +196,7 @@ async def test_get_hepa_uv_state(
             bool(payload.uv_light_on.value),
             int(payload.uv_duration_s.value),
             int(payload.remaining_time_s.value),
-            int(payload.uv_voltage_mv.value),
+            int(payload.uv_current_ma.value),
         )
         == res
     )
