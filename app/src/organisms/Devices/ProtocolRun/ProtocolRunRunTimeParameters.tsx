@@ -13,6 +13,8 @@ import {
   StyledText,
   TYPOGRAPHY,
   NoParameters,
+  useHoverTooltip,
+  Icon,
 } from '@opentrons/components'
 
 import { Banner } from '../../../atoms/Banner'
@@ -22,6 +24,7 @@ import { Chip } from '../../../atoms/Chip'
 import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import { Tooltip } from '../../../atoms/Tooltip'
 
 const mockData: RunTimeParameter[] = [
   {
@@ -237,43 +240,13 @@ export function ProtocolRunRuntimeParameters({
               </thead>
               <tbody>
                 {runTimeParameters.map(
-                  (parameter: RunTimeParameter, index: number) => {
-                    return (
-                      <StyledTableRow
-                        isLast={index === runTimeParameters.length - 1}
-                        key={`runTimeParameter-${index}`}
-                      >
-                        <StyledTableCell
-                          isLast={index === runTimeParameters.length - 1}
-                        >
-                          <StyledText as="p">
-                            {parameter.displayName}
-                          </StyledText>
-                        </StyledTableCell>
-                        <StyledTableCell
-                          isLast={index === runTimeParameters.length - 1}
-                        >
-                          <Flex
-                            flexDirection={DIRECTION_ROW}
-                            gridGap={SPACING.spacing16}
-                          >
-                            <StyledText as="p">
-                              {formatRunTimeParameterValue(parameter, t)}
-                            </StyledText>
-                            {parameter.value !== parameter.default ? (
-                              <Chip
-                                text={t('updated')}
-                                type="success"
-                                hasIcon={false}
-                                chipSize="small"
-                                isOnDevice={false}
-                              />
-                            ) : null}
-                          </Flex>
-                        </StyledTableCell>
-                      </StyledTableRow>
+                  (parameter: RunTimeParameter, index: number) =>
+                    StyledTableRowComponent(
+                      parameter,
+                      index,
+                      runTimeParameters.length,
+                      t
                     )
-                  }
                 )}
               </tbody>
             </StyledTable>
@@ -281,6 +254,57 @@ export function ProtocolRunRuntimeParameters({
         </>
       )}
     </>
+  )
+}
+
+const StyledTableRowComponent = (
+  parameter: RunTimeParameter,
+  index: number,
+  runTimeParametersLength: number,
+  t: any
+): JSX.Element => {
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  return (
+    <StyledTableRow
+      isLast={index === runTimeParametersLength - 1}
+      key={`runTimeParameter-${index}`}
+    >
+      <StyledTableCell isLast={index === runTimeParametersLength - 1}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+          <StyledText as="p">{parameter.displayName}</StyledText>
+          {parameter.description != null ? (
+            <>
+              <Flex {...targetProps} alignItems={ALIGN_CENTER}>
+                <Icon
+                  name="information"
+                  size={SPACING.spacing12}
+                  color={COLORS.grey60}
+                />
+              </Flex>
+              <Tooltip tooltipProps={tooltipProps}>
+                {parameter.description}
+              </Tooltip>
+            </>
+          ) : null}
+        </Flex>
+      </StyledTableCell>
+      <StyledTableCell isLast={index === runTimeParametersLength - 1}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+          <StyledText as="p">
+            {formatRunTimeParameterValue(parameter, t)}
+          </StyledText>
+          {parameter.value !== parameter.default ? (
+            <Chip
+              text={t('updated')}
+              type="success"
+              hasIcon={false}
+              chipSize="small"
+              isOnDevice={false}
+            />
+          ) : null}
+        </Flex>
+      </StyledTableCell>
+    </StyledTableRow>
   )
 }
 
