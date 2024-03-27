@@ -165,14 +165,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           location,
           definitionUri,
         }))
-      : [],
-    runTimeParametersOverrides.reduce(
-      (acc, param) =>
-        param.value !== param.default
-          ? { ...acc, [param.variableName]: param.value }
-          : acc,
-      {}
-    )
+      : []
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
