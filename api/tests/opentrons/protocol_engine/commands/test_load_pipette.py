@@ -11,6 +11,7 @@ from opentrons.protocol_engine.types import FlowRates
 from opentrons.protocol_engine.execution import LoadedPipetteData, EquipmentHandler
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
+    robotPositionsDict,
 )
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.commands.load_pipette import (
@@ -45,6 +46,12 @@ async def test_load_pipette_implementation(
         nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI),
         back_left_corner_offset=Point(x=1, y=2, z=3),
         front_right_corner_offset=Point(x=4, y=5, z=6),
+        robot_home_min_position=robotPositionsDict(
+            left=Point(0, 0, 0), right=Point(0, 0, 0)
+        ),
+        robot_front_left_max_position=robotPositionsDict(
+            left=Point(100, 100, 0), right=Point(120, 110, 0)
+        ),
     )
     data = LoadPipetteParams(
         pipetteName=PipetteNameType.P300_SINGLE,
@@ -103,6 +110,12 @@ async def test_load_pipette_implementation_96_channel(
         nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
         back_left_corner_offset=Point(x=1, y=2, z=3),
         front_right_corner_offset=Point(x=4, y=5, z=6),
+        robot_home_min_position=robotPositionsDict(
+            left=Point(0, 0, 0), right=Point(0, 0, 0)
+        ),
+        robot_front_left_max_position=robotPositionsDict(
+            left=Point(100, 100, 0), right=Point(120, 110, 0)
+        ),
     )
 
     decoy.when(

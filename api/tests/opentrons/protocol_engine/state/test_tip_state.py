@@ -17,6 +17,7 @@ from opentrons.protocol_engine.state.tips import TipStore, TipView
 from opentrons.protocol_engine.types import FlowRates, DeckPoint
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
+    robotPositionsDict,
 )
 from opentrons.types import Point
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -147,6 +148,12 @@ def test_get_next_tip_returns_none(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
@@ -207,6 +214,12 @@ def test_get_next_tip_returns_first_tip(
             nozzle_map=get_default_nozzle_map(pipette_name_type),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
@@ -261,6 +274,12 @@ def test_get_next_tip_used_starting_tip(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
@@ -349,6 +368,12 @@ def test_get_next_tip_skips_picked_up_tip(
             nozzle_map=get_default_nozzle_map(pipette_name_type),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
@@ -403,6 +428,12 @@ def test_get_next_tip_with_starting_tip(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
@@ -477,6 +508,12 @@ def test_get_next_tip_with_starting_tip_8_channel(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
@@ -552,6 +589,12 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
@@ -627,6 +670,12 @@ def test_get_next_tip_with_column_and_starting_tip(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_MULTI_GEN2),
             back_left_corner_offset=Point(0, 0, 0),
             front_right_corner_offset=Point(0, 0, 0),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
@@ -679,6 +728,12 @@ def test_reset_tips(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
 
@@ -731,6 +786,12 @@ def test_handle_pipette_config_action(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
@@ -814,6 +875,12 @@ def test_drop_tip(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
@@ -919,6 +986,12 @@ def test_active_channels(
             nozzle_map=nozzle_map,
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
@@ -984,6 +1057,12 @@ def test_next_tip_uses_active_channels(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
@@ -1064,6 +1143,12 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
             nozzle_map=get_default_nozzle_map(PipetteNameType.P1000_96),
             back_left_corner_offset=Point(x=1, y=2, z=3),
             front_right_corner_offset=Point(x=4, y=5, z=6),
+            robot_home_min_position=robotPositionsDict(
+                left=Point(0, 0, 0), right=Point(0, 0, 0)
+            ),
+            robot_front_left_max_position=robotPositionsDict(
+                left=Point(100, 100, 0), right=Point(120, 110, 0)
+            ),
         ),
     )
     subject.handle_action(
