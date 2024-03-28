@@ -70,13 +70,15 @@ async def _main(arguments: argparse.Namespace) -> None:
             #Determines if the MetOne Device is running
             operation = True
             try:
+                i = 0
                 while operation:
                     stats = instrument.operation_status()
                     if stats == "Stop":
                         operation = False
-                    print(stats)
+                    print(stats,str(i)+"S")
                     print('\r', end='')
                     await asyncio.sleep(1)
+                    i += 1
             except Exception as errval:
                 print("errval",errval)
             #print out the data
@@ -101,7 +103,7 @@ async def _main(arguments: argparse.Namespace) -> None:
                 particle_count_2 = int(record_dict['Count2(M3)'])
                 test_result = \
                         determine_criterion(particle_count_1, particle_count_2)
-                print(record_dict)
+                #print(record_dict)
                 test_data['Time(Date Time)']=time_dict[number] #record_dict['Time']
                 test_data['Size1(um)']=record_dict['Size1']
                 test_data['Count1(M3)']=record_dict['Count1(M3)']
@@ -114,7 +116,7 @@ async def _main(arguments: argparse.Namespace) -> None:
         
 
         if not arguments.skip_uv:
-            input("PLACE THE UV METER ON THE SLOT B3 TO START TEST(将紫外线计放置在插槽B3上开始测试)")
+            input("PLACE THE UV METER ON THE SLOT B3 TO START TEST(将紫外线计放置在插槽B3上开始测试):")
             #UV
             await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
             test_data2={
