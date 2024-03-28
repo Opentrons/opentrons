@@ -109,7 +109,7 @@ export function Chip(props: ChipProps): JSX.Element {
   `
 
   const TOUCHSCREEN_SMALL_CONTAINER_STYLE = css`
-    padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing10};
+    padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing8};
     grid-gap: ${SPACING.spacing4};
   `
 
