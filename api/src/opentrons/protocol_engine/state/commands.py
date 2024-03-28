@@ -747,15 +747,12 @@ class CommandView(HasState[CommandState]):
         fatal error of the overall coming from anywhere in the Python script,
         including in between commands.
         """
-        # TODO(mm, 2024-03-14): This is a slow O(n) scan. When a long run ends and
-        # we reach this loop, it can disrupt the robot server.
-        # https://opentrons.atlassian.net/browse/EXEC-55
-        for command_id in self._state.command_history.get_all_ids():
-            command = self._state.command_history.get(command_id).command
-            if command.error and command.intent != CommandIntent.SETUP:
-                raise ProtocolCommandFailedError(
-                    original_error=command.error, message=command.error.detail
-                )
+        failed_command = self.state.failed_command
+        if failed_command and failed_command.command.intent != CommandIntent.SETUP:
+            raise ProtocolCommandFailedError(
+                original_error=failed_command.command.error,
+                message=failed_command.command.error.detail,
+            )
 
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""

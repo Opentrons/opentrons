@@ -273,6 +273,7 @@ def test_raise_fatal_command_error() -> None:
     subject = get_command_view(
         queued_command_ids=[],
         running_command_id=None,
+        failed_command=CommandEntry(index=1, command=failed_command),
         commands=[completed_command, failed_command],
     )
 
