@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 
 import { InputField } from '../../atoms/InputField'
-import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
+import { FullKeyboard } from '../../atoms/SoftwareKeyboard'
 import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 
 interface SetWifiCredProps {
@@ -78,7 +78,7 @@ export function SetWifiCred({
         </Flex>
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-        <NormalKeyboard
+        <FullKeyboard
           onChange={e => e != null && setPassword(String(e))}
           keyboardRef={keyboardRef}
         />

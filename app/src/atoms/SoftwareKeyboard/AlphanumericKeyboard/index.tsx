@@ -1,36 +1,22 @@
 import * as React from 'react'
 import Keyboard from 'react-simple-keyboard'
-import { customDisplay } from '../constants'
+import { alphanumericKeyboardLayout, customDisplay } from '../constants'
 
-interface CustomKeyboardProps {
+interface AlphanumericKeyboardProps {
   onChange: (input: string) => void
   keyboardRef: React.MutableRefObject<any>
 }
 
-const customLayout = {
-  default: [
-    'q w e r t y u i o p',
-    'a s d f g h j k l',
-    '{shift} z x c v b n m {backspace}',
-    '{numbers}',
-  ],
-  shift: [
-    'Q W E R T Y U I O P',
-    'A S D F G H J K L',
-    '{abc} Z X C V B N M {backspace}',
-    '{numbers}',
-  ],
-  numbers: ['1 2 3', '4 5 6', '7 8 9', '{abc} 0 {backspace}'],
-}
-
-export function CustomKeyboard({
+export function AlphanumericKeyboard({
   onChange,
   keyboardRef,
-}: CustomKeyboardProps): JSX.Element {
+}: AlphanumericKeyboardProps): JSX.Element {
   const [layoutName, setLayoutName] = React.useState<string>('default')
   const onKeyPress = (button: string): void => {
-    if (button === '{shift}' || button === '{lock}') handleShift()
-    if (button === '{numbers}' || button === '{abc}') handleNumber()
+    console.log(button)
+    if (button === '{ABC}') handleShift()
+    if (button === '{numbers}') handleNumber()
+    if (button === '{abc}') handleUnShift()
   }
 
   const handleShift = (): void => {
@@ -38,7 +24,13 @@ export function CustomKeyboard({
   }
 
   const handleNumber = (): void => {
-    setLayoutName(layoutName === 'default' ? 'numbers' : 'default')
+    setLayoutName(
+      layoutName === 'default' || layoutName === 'shift' ? 'numbers' : 'default'
+    )
+  }
+
+  const handleUnShift = (): void => {
+    setLayoutName('default')
   }
 
   return (
@@ -48,11 +40,12 @@ export function CustomKeyboard({
       onChange={onChange}
       onKeyPress={onKeyPress}
       layoutName={layoutName}
-      layout={customLayout}
+      layout={alphanumericKeyboardLayout}
       display={customDisplay}
       mergeDisplay={true}
       autoUseTouchEvents={true}
       useButtonTag={true}
+      width="100%"
     />
   )
 }

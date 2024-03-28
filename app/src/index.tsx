@@ -15,10 +15,10 @@ import { uiInitialized } from './redux/shell'
 import { history } from './redux/reducer'
 import { store } from './redux/store'
 
-import '../src/atoms/SoftwareKeyboard/index.css'
-import '../src/atoms/SoftwareKeyboard/CustomKeyboard/index.css'
-import '../src/atoms/SoftwareKeyboard/NormalKeyboard/index.css'
-import '../src/atoms/SoftwareKeyboard/Numpad/index.css'
+import '../src/atoms/SoftwareKeyboard/AlphanumericKeyboard'
+import '../src/atoms/SoftwareKeyboard/FullKeyboard/index.css'
+import '../src/atoms/SoftwareKeyboard/IndividualKey/index.css'
+import '../src/atoms/SoftwareKeyboard/NumericalKeyboard/index.css'
 
 // component tree
 import { App } from './App'

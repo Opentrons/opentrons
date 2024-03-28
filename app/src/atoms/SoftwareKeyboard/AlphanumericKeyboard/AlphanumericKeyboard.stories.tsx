@@ -1,26 +1,27 @@
 import * as React from 'react'
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   POSITION_ABSOLUTE,
   SPACING,
 } from '@opentrons/components'
 import { touchScreenViewport } from '../../../DesignTokens/constants'
 import { InputField } from '../../InputField'
-import { NormalKeyboard } from '.'
-
+import { AlphanumericKeyboard } from '.'
 import '../index.css'
 import './index.css'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Atoms/SoftwareKeyboard/NormalKeyboard',
-  component: NormalKeyboard,
+  title: 'ODD/Atoms/SoftwareKeyboard/AlphanumericKeyboard',
+  component: AlphanumericKeyboard,
   parameters: touchScreenViewport,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof NormalKeyboard>> = args => {
+const Template: Story<
+  React.ComponentProps<typeof AlphanumericKeyboard>
+> = args => {
   const [showKeyboard, setShowKeyboard] = React.useState(false)
   const [value, setValue] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
@@ -34,10 +35,10 @@ const Template: Story<React.ComponentProps<typeof NormalKeyboard>> = args => {
           onFocus={() => setShowKeyboard(true)}
         />
       </form>
-      <Flex position={POSITION_ABSOLUTE} top="20%" width="55rem">
+      <Flex position={POSITION_ABSOLUTE} top="20%" left="0" width="64rem">
         {showKeyboard && (
-          <NormalKeyboard
-            onChange={e => e != null && setValue(String(e))}
+          <AlphanumericKeyboard
+            onChange={(e: string) => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
           />
         )}
@@ -46,4 +47,4 @@ const Template: Story<React.ComponentProps<typeof NormalKeyboard>> = args => {
   )
 }
 
-export const NormalSoftwareKeyboard = Template.bind({})
+export const AlphanumericSoftwareKeyboard = Template.bind({})

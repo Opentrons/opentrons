@@ -3,53 +3,35 @@ import { describe, it, expect, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { NormalKeyboard } from '..'
+import { NumericalKeyboard } from '..'
 
-const render = (props: React.ComponentProps<typeof NormalKeyboard>) => {
-  return renderWithProviders(<NormalKeyboard {...props} />)[0]
+const render = (props: React.ComponentProps<typeof NumericalKeyboard>) => {
+  return renderWithProviders(<NumericalKeyboard {...props} />)[0]
 }
 
-describe('SoftwareKeyboard', () => {
-  it('should render the software keyboards', () => {
+describe('NumericalKeyboard', () => {
+  it('should render numerical keyboard isDecimal: false and hasHyphen: false', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
       keyboardRef: result.current,
+      isDecimal: false,
+      hasHyphen: false,
     }
     render(props)
     const buttons = screen.getAllByRole('button')
-
     const expectedButtonNames = [
-      'q',
-      'w',
-      'e',
-      'r',
-      't',
-      'y',
-      'u',
-      'i',
-      'o',
-      'p',
-      '123',
-      'a',
-      's',
-      'd',
-      'f',
-      'g',
-      'h',
-      'j',
-      'k',
-      'l',
-      'SHIFT',
-      'z',
-      'x',
-      'c',
-      'v',
-      'b',
-      'n',
-      'm',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '0',
       'del',
-      'space',
     ]
 
     buttons.forEach((button, index) => {
@@ -58,64 +40,15 @@ describe('SoftwareKeyboard', () => {
     })
   })
 
-  it('should render the software keyboards when hitting shift key', () => {
+  it('should render numerical keyboard isDecimal: false and hasHyphen: true', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
       keyboardRef: result.current,
+      isDecimal: false,
+      hasHyphen: true,
     }
     render(props)
-    const shiftKey = screen.getByRole('button', { name: 'SHIFT' })
-    fireEvent.click(shiftKey)
-    const buttons = screen.getAllByRole('button')
-    const expectedButtonNames = [
-      'Q',
-      'W',
-      'E',
-      'R',
-      'T',
-      'Y',
-      'U',
-      'I',
-      'O',
-      'P',
-      '123',
-      'A',
-      'S',
-      'D',
-      'F',
-      'G',
-      'H',
-      'J',
-      'K',
-      'L',
-      'abc',
-      'Z',
-      'X',
-      'C',
-      'V',
-      'B',
-      'N',
-      'M',
-      'del',
-      'space',
-    ]
-
-    buttons.forEach((button, index) => {
-      const expectedName = expectedButtonNames[index]
-      expect(button).toHaveTextContent(expectedName)
-    })
-  })
-
-  it('should render the software keyboards when hitting 123 key', () => {
-    const { result } = renderHook(() => React.useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
-    render(props)
-    const numberKey = screen.getByRole('button', { name: '123' })
-    fireEvent.click(numberKey)
     const buttons = screen.getAllByRole('button')
     const expectedButtonNames = [
       '1',
@@ -129,24 +62,7 @@ describe('SoftwareKeyboard', () => {
       '9',
       '0',
       '-',
-      '/',
-      ':',
-      ';',
-      '(',
-      ')',
-      '$',
-      '&',
-      '@',
-      '"',
-      'abc',
-      '#+=',
-      '.',
-      ',',
-      '?',
-      '!',
-      "'",
       'del',
-      'space',
     ]
 
     buttons.forEach((button, index) => {
@@ -155,48 +71,29 @@ describe('SoftwareKeyboard', () => {
     })
   })
 
-  it('should render the software keyboards when hitting #+= key', () => {
+  it('should render numerical keyboard isDecimal: true and hasHyphen: false', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
       keyboardRef: result.current,
+      isDecimal: true,
+      hasHyphen: false,
     }
     render(props)
-    const numberKey = screen.getByRole('button', { name: '123' })
-    fireEvent.click(numberKey)
-    const symbolKey = screen.getByRole('button', { name: '#+=' })
-    fireEvent.click(symbolKey)
     const buttons = screen.getAllByRole('button')
     const expectedButtonNames = [
-      '[',
-      ']',
-      '{',
-      '}',
-      '#',
-      '%',
-      '^',
-      '*',
-      '+',
-      '=',
-      '_',
-      '\\',
-      '|',
-      '~',
-      '<',
-      '>',
-      '€',
-      '£',
-      '¥',
-      '·',
-      'abc',
-      '123',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '0',
       '.',
-      ',',
-      '?',
-      '!',
-      "'",
       'del',
-      'space',
     ]
 
     buttons.forEach((button, index) => {
@@ -205,15 +102,77 @@ describe('SoftwareKeyboard', () => {
     })
   })
 
-  it('should call mock function when clicking a key', () => {
+  it('should render numerical keyboard isDecimal: true and hasHyphen: true', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
       keyboardRef: result.current,
+      isDecimal: true,
+      hasHyphen: true,
     }
     render(props)
-    const aKey = screen.getByRole('button', { name: 'a' })
-    fireEvent.click(aKey)
+    const buttons = screen.getAllByRole('button')
+    const expectedButtonNames = [
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '0',
+      '.',
+      '-',
+      'del',
+    ]
+
+    buttons.forEach((button, index) => {
+      const expectedName = expectedButtonNames[index]
+      expect(button).toHaveTextContent(expectedName)
+    })
+  })
+
+  it('should call mock function when clicking num key', () => {
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: vi.fn(),
+      keyboardRef: result.current,
+      isDecimal: false,
+      hasHyphen: false,
+    }
+    render(props)
+    const numKey = screen.getByRole('button', { name: '1' })
+    fireEvent.click(numKey)
+    expect(props.onChange).toHaveBeenCalled()
+  })
+
+  it('should call mock function when clicking decimal point key', () => {
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: vi.fn(),
+      keyboardRef: result.current,
+      isDecimal: true,
+      hasHyphen: false,
+    }
+    render(props)
+    const numKey = screen.getByRole('button', { name: '.' })
+    fireEvent.click(numKey)
+    expect(props.onChange).toHaveBeenCalled()
+  })
+
+  it('should call mock function when clicking hyphen key', () => {
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: vi.fn(),
+      keyboardRef: result.current,
+      isDecimal: true,
+      hasHyphen: true,
+    }
+    render(props)
+    const numKey = screen.getByRole('button', { name: '-' })
+    fireEvent.click(numKey)
     expect(props.onChange).toHaveBeenCalled()
   })
 })
