@@ -19,6 +19,7 @@ import {
   LocationIcon,
   MODULE_ICON_NAME_BY_TYPE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -37,7 +38,6 @@ import {
 } from '@opentrons/react-api-client'
 
 import { FloatingActionButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { getTopPortalEl } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'

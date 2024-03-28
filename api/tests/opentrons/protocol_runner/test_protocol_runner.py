@@ -478,21 +478,30 @@ async def test_load_legacy_python(
         run_time_param_values=None,
     )
 
+    run_func_captor = matchers.Captor()
+
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
-        protocol_engine.add_command(
+        task_queue.set_run_func(run_func_captor),
+    )
+
+    assert broker_captor.value is legacy_python_runner_subject.broker
+
+    # Verify that the run func calls the right things:
+    run_func = run_func_captor.value
+    await run_func()
+    decoy.verify(
+        await protocol_engine.add_and_execute_command(
             request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
         ),
-        task_queue.set_run_func(
-            func=legacy_executor.execute,
+        await legacy_executor.execute(
             protocol=legacy_protocol,
             context=legacy_context,
             parameter_context=legacy_python_runner_subject._parameter_context,
             run_time_param_values=None,
         ),
     )
-    assert broker_captor.value is legacy_python_runner_subject.broker
 
 
 async def test_load_python_with_pe_papi_core(
@@ -613,14 +622,22 @@ async def test_load_legacy_json(
         run_time_param_values=None,
     )
 
+    run_func_captor = matchers.Captor()
+
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
-        protocol_engine.add_command(
+        task_queue.set_run_func(run_func_captor),
+    )
+
+    # Verify that the run func calls the right things:
+    run_func = run_func_captor.value
+    await run_func()
+    decoy.verify(
+        await protocol_engine.add_and_execute_command(
             request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
         ),
-        task_queue.set_run_func(
-            func=legacy_executor.execute,
+        await legacy_executor.execute(
             protocol=legacy_protocol,
             context=legacy_context,
             parameter_context=legacy_python_runner_subject._parameter_context,

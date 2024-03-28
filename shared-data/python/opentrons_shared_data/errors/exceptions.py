@@ -598,6 +598,19 @@ class ExecutionCancelledError(RoboticsControlError):
         super().__init__(ErrorCodes.EXECUTION_CANCELLED, message, detail, wrapping)
 
 
+class MotorDriverError(RoboticsControlError):
+    """An error indicating that a motor driver is in error state."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a MotorDriverError."""
+        super().__init__(ErrorCodes.MOTOR_DRIVER_ERROR, message, detail, wrapping)
+
+
 class LabwareDroppedError(RoboticsInteractionError):
     """An error indicating that the gripper dropped labware it was holding."""
 

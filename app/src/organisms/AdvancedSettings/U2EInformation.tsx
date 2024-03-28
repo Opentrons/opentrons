@@ -11,11 +11,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Link,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'
-import { StyledText } from '../../atoms/text'
 import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,

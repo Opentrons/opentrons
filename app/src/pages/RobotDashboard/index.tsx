@@ -7,10 +7,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { Navigation } from '../../organisms/Navigation'
 import {
   EmptyRecentRun,

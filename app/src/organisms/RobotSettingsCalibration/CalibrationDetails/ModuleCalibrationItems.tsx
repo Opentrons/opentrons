@@ -2,10 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
-import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import {
+  BORDERS,
+  COLORS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { StyledText } from '../../../atoms/text'
 import { formatLastCalibrated } from './utils'
 import { ModuleCalibrationOverflowMenu } from './ModuleCalibrationOverflowMenu'
 

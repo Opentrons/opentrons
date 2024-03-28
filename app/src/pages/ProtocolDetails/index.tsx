@@ -19,6 +19,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -31,7 +32,6 @@ import {
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
-import { StyledText } from '../../atoms/text'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,

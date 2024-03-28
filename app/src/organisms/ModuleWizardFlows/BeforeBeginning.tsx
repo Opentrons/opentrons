@@ -8,8 +8,7 @@ import {
   THERMOCYCLER_MODULE_MODELS,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-
-import { StyledText } from '../../atoms/text'
+import { StyledText } from '@opentrons/components'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 

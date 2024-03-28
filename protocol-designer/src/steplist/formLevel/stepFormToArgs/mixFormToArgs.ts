@@ -10,11 +10,16 @@ import { getOrderedWells } from '../../utils'
 import { getMixDelayData } from './getDelayData'
 import { HydratedMixFormDataLegacy } from '../../../form-types'
 import { MixArgs } from '@opentrons/step-generation'
+import { getMatchingTipLiquidSpecs } from '../../../utils'
 type MixStepArgs = MixArgs
 export const mixFormToArgs = (
   hydratedFormData: HydratedMixFormDataLegacy
 ): MixStepArgs => {
   const { labware, pipette, dropTip_location, nozzles } = hydratedFormData
+  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
+    pipette,
+    hydratedFormData.volume
+  )
   const unorderedWells = hydratedFormData.wells || []
   const orderFirst = hydratedFormData.mix_wellOrder_first
   const orderSecond = hydratedFormData.mix_wellOrder_second
@@ -33,10 +38,11 @@ export const mixFormToArgs = (
   const times = hydratedFormData.times || 0
   const aspirateFlowRateUlSec =
     hydratedFormData.aspirate_flowRate ||
-    pipette.spec.defaultAspirateFlowRate.value
+    matchingTipLiquidSpecs?.defaultAspirateFlowRate.default
   const dispenseFlowRateUlSec =
     hydratedFormData.dispense_flowRate ||
-    pipette.spec.defaultDispenseFlowRate.value
+    matchingTipLiquidSpecs?.defaultDispenseFlowRate.default
+
   // NOTE: for mix, there is only one tip offset field,
   // and it applies to both aspirate and dispense
   const aspirateOffsetFromBottomMm =
@@ -56,7 +62,8 @@ export const mixFormToArgs = (
   // Blowout settings
   const blowoutFlowRateUlSec =
     hydratedFormData.dispense_flowRate ??
-    pipette.spec.defaultBlowOutFlowRate.value
+    matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default
+
   const blowoutOffsetFromTopMm = blowoutLocation
     ? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
     : 0
@@ -86,9 +93,9 @@ export const mixFormToArgs = (
     changeTip,
     blowoutLocation,
     pipette: pipette.id,
-    aspirateFlowRateUlSec,
-    dispenseFlowRateUlSec,
-    blowoutFlowRateUlSec,
+    aspirateFlowRateUlSec: aspirateFlowRateUlSec ?? 0,
+    dispenseFlowRateUlSec: dispenseFlowRateUlSec ?? 0,
+    blowoutFlowRateUlSec: blowoutFlowRateUlSec ?? 0,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
     blowoutOffsetFromTopMm,

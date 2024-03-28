@@ -8,8 +8,8 @@ import {
   Flex,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Modal } from '../../molecules/Modal'
 import { LegacyModal } from '../../molecules/LegacyModal'

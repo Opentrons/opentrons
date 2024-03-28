@@ -25,7 +25,7 @@ from typing import (
     Union,
     Mapping,
 )
-from opentrons.config.types import OT3Config, GantryLoad
+from opentrons.config.types import OT3Config, GantryLoad, OutputOptions
 from opentrons.config import gripper_config
 from .ot3utils import (
     axis_convert,
@@ -1350,25 +1350,43 @@ class OT3Controller(FlexBackend):
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        log_pressure: bool = True,
+        output_option: OutputOptions = OutputOptions.can_bus_only,
+        data_file: Optional[str] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> float:
+        if output_option == OutputOptions.sync_buffer_to_csv:
+            assert (
+                self._subsystem_manager.device_info[
+                    SubSystem.of_mount(mount)
+                ].revision.tertiary
+                == "1"
+            )
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
+        csv_output = bool(output_option.value & OutputOptions.stream_to_csv.value)
+        sync_buffer_output = bool(
+            output_option.value & OutputOptions.sync_buffer_to_csv.value
+        )
+        can_bus_only_output = bool(
+            output_option.value & OutputOptions.can_bus_only.value
+        )
         positions = await liquid_probe(
-            self._messenger,
-            tool,
-            head_node,
-            max_z_distance,
-            plunger_speed,
-            mount_speed,
-            threshold_pascals,
-            log_pressure,
-            auto_zero_sensor,
-            num_baseline_reads,
-            sensor_id_for_instrument(probe),
+            messenger=self._messenger,
+            tool=tool,
+            head_node=head_node,
+            max_z_distance=max_z_distance,
+            plunger_speed=plunger_speed,
+            mount_speed=mount_speed,
+            threshold_pascals=threshold_pascals,
+            csv_output=csv_output,
+            sync_buffer_output=sync_buffer_output,
+            can_bus_only_output=can_bus_only_output,
+            data_file=data_file,
+            auto_zero_sensor=auto_zero_sensor,
+            num_baseline_reads=num_baseline_reads,
+            sensor_id=sensor_id_for_instrument(probe),
         )
         for node, point in positions.items():
             self._position.update({node: point.motor_position})

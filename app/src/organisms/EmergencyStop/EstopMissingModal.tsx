@@ -8,11 +8,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'

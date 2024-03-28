@@ -14,12 +14,12 @@ import {
   Icon,
   Link,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Line } from '../../../atoms/structure'
-import { StyledText } from '../../../atoms/text'
 import { InfoMessage } from '../../../molecules/InfoMessage'
 import { INCOMPATIBLE, INEXACT_MATCH } from '../../../redux/pipettes'
 import {

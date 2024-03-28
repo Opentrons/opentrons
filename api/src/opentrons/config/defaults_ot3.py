@@ -15,7 +15,9 @@ from .types import (
     LiquidProbeSettings,
     ZSenseSettings,
     EdgeSenseSettings,
+    OutputOptions,
 )
+
 
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
@@ -28,7 +30,7 @@ DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     plunger_speed=5,
     sensor_threshold_pascals=40,
     expected_liquid_height=110,
-    log_pressure=True,
+    output_option=OutputOptions.stream_to_csv,
     aspirate_while_sensing=False,
     auto_zero_sensor=True,
     num_baseline_reads=10,
@@ -290,7 +292,7 @@ def _build_default_liquid_probe(
         expected_liquid_height=from_conf.get(
             "expected_liquid_height", default.expected_liquid_height
         ),
-        log_pressure=from_conf.get("log_pressure", default.log_pressure),
+        output_option=from_conf.get("output_option", default.output_option),
         aspirate_while_sensing=from_conf.get(
             "aspirate_while_sensing", default.aspirate_while_sensing
         ),

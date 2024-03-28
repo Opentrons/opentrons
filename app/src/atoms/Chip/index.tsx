@@ -8,10 +8,9 @@ import {
   Flex,
   Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../text'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 

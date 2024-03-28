@@ -8,9 +8,9 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 

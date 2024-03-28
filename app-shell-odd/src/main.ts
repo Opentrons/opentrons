@@ -23,7 +23,11 @@ import {
 } from './config'
 import systemd from './systemd'
 import { watchForMassStorage } from './usb'
-import { registerNotify, closeAllNotifyConnections } from './notify'
+import {
+  registerNotify,
+  establishBrokerConnection,
+  closeBrokerConnection,
+} from './notifications'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
@@ -58,7 +62,7 @@ if (config.devtools) app.once('ready', installDevtools)
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
-  closeAllNotifyConnections()
+  closeBrokerConnection()
     .then(() => {
       app.quit()
     })
@@ -96,7 +100,7 @@ function startUp(): void {
 
   mainWindow = createUi(dispatch)
   rendererLogger = createRendererLogger()
-
+  void establishBrokerConnection()
   mainWindow.once('closed', () => (mainWindow = null))
 
   log.info('Fetching latest software version')

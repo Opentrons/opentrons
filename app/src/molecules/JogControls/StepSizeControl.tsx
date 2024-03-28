@@ -2,26 +2,26 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import {
-  HandleKeypress,
-  TYPOGRAPHY,
-  COLORS,
-  SPACING,
-  Icon,
-  DIRECTION_COLUMN,
-  Flex,
-  DIRECTION_ROW,
-  TEXT_TRANSFORM_CAPITALIZE,
-  Box,
-  PrimaryButton,
-  BORDERS,
   ALIGN_FLEX_START,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  HandleKeypress,
+  Icon,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
+import { TouchControlButton } from './TouchControlButton'
 
 import type { StepSize } from './types'
-import { TouchControlButton } from './TouchControlButton'
 
 const JUMP_SIZE_SUBTITLE = '- / +'
 const JUMP_SIZE_ICON_STYLE = css`

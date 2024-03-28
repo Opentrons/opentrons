@@ -8,11 +8,11 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../../App/portal'
-import { StyledText } from '../../../atoms/text'
 import { LegacyModal } from '../../../molecules/LegacyModal'
 
 import type { AnalysisError } from '@opentrons/shared-data'

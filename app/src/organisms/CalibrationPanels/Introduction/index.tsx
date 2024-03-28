@@ -9,10 +9,10 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
   SecondaryButton,
+  StyledText,
 } from '@opentrons/components'
 
 import * as Sessions from '../../../redux/sessions'
-import { StyledText } from '../../../atoms/text'
 import { NeedHelpLink } from '../NeedHelpLink'
 import { ChooseTipRack } from '../ChooseTipRack'
 

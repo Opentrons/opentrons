@@ -1,17 +1,17 @@
 import * as React from 'react'
 import {
-  JUSTIFY_CENTER,
+  ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
-  BORDERS,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
-import { StyledText } from '../../atoms/text'
 
 interface EmptySectionProps {
   section: 'hardware' | 'labware' | 'liquids' | 'parameters'

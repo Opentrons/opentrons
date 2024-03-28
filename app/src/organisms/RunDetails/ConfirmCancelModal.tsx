@@ -11,6 +11,7 @@ import {
   JUSTIFY_FLEX_END,
   Link,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -20,7 +21,6 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { getModalPortalEl } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { useTrackProtocolRunEvent } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'

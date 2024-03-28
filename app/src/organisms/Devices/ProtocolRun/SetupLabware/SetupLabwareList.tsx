@@ -2,25 +2,25 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
+  DIRECTION_COLUMN,
   Flex,
   SPACING,
-  DIRECTION_COLUMN,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { RunTimeCommand } from '@opentrons/shared-data'
-import { StyledText } from '../../../../atoms/text'
 import { getLabwareSetupItemGroups } from '../../../../pages/Protocols/utils'
 import { LabwareListItem } from './LabwareListItem'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 import { getNestedLabwareInfo } from './getNestedLabwareInfo'
 
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 const HeaderRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 5.2fr 5.3fr;
-  grip-gap: ${SPACING.spacing8};
+  grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing8};
 `
 interface SetupLabwareListProps {

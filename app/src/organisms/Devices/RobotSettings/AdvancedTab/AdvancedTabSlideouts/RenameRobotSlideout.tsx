@@ -4,11 +4,12 @@ import { useHistory } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   PrimaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import {
@@ -22,7 +23,6 @@ import {
   ANALYTICS_RENAME_ROBOT,
 } from '../../../../../redux/analytics'
 import { Slideout } from '../../../../../atoms/Slideout'
-import { StyledText } from '../../../../../atoms/text'
 import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
 import { useIsFlex } from '../../../hooks'

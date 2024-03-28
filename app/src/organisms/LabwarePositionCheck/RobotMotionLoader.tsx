@@ -1,18 +1,18 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import {
-  Icon,
-  Flex,
-  COLORS,
-  RESPONSIVENESS,
-  TYPOGRAPHY,
-  SIZE_4,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  RESPONSIVENESS,
+  SIZE_4,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 interface RobotMotionLoaderProps {
   header?: string

@@ -59,6 +59,7 @@ class ErrorCodes(Enum):
     POSITION_UNKNOWN = _code_from_dict_entry("2013")
     EXECUTION_CANCELLED = _code_from_dict_entry("2014")
     FAILED_GRIPPER_PICKUP_ERROR = _code_from_dict_entry("2015")
+    MOTOR_DRIVER_ERROR = _code_from_dict_entry("2016")
     ROBOTICS_INTERACTION_ERROR = _code_from_dict_entry("3000")
     LABWARE_DROPPED = _code_from_dict_entry("3001")
     LABWARE_NOT_PICKED_UP = _code_from_dict_entry("3002")

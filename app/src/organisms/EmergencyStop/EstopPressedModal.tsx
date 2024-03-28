@@ -14,6 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -24,7 +25,6 @@ import { Banner } from '../../atoms/Banner'
 import { Chip } from '../../atoms/Chip'
 import { ListItem } from '../../atoms/ListItem'
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'

@@ -2,18 +2,17 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  COLORS,
-  JUSTIFY_CENTER,
-  TYPOGRAPHY,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   Icon,
+  JUSTIFY_CENTER,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { StyledText } from '../../../atoms/text'
 
 export function ServerInitializing(): JSX.Element {
   const { t } = useTranslation('device_details')

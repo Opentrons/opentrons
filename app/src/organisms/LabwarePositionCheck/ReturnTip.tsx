@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
   CreateCommand,
@@ -10,7 +15,6 @@ import {
   MoveLabwareCreateCommand,
   RobotType,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { useChainRunCommands } from '../../resources/runs'
 import {
