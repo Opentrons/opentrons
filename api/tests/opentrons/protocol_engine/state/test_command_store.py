@@ -1287,7 +1287,7 @@ def test_command_store_handles_command_failed() -> None:
 
     failed_command_entry = CommandEntry(index=0, command=expected_failed_command)
     command_history = CommandHistory()
-    command_history.add("command-id", failed_command_entry)
+    command_history._add("command-id", failed_command_entry)
 
     assert subject.state == CommandState(
         command_history=command_history,

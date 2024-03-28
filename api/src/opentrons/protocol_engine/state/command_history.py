@@ -4,8 +4,9 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 from opentrons.ordered_set import OrderedSet
-from opentrons.protocol_engine.commands.command_unions import Command
 from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
+
+from ..commands import Command, CommandStatus, CommandIntent
 
 
 @dataclass(frozen=True)
@@ -120,24 +121,6 @@ class CommandHistory:
         """Get the IDs of all queued setup commands, in FIFO order."""
         return self._queued_setup_command_ids
 
-    def set_running_command_id(self, command_id: Optional[str]) -> None:
-        """Set the ID of the currently running command."""
-        self._running_command_id = command_id
-
-    def add(self, command_id: str, command_entry: CommandEntry) -> None:
-        """Create or update a command entry."""
-        if command_id not in self._commands_by_id:
-            self._all_command_ids.append(command_id)
-        self._commands_by_id[command_id] = command_entry
-
-    def add_to_queue(self, command_id: str) -> None:
-        """Add new ID to the queued."""
-        self._queued_command_ids.add(command_id)
-
-    def add_to_setup_queue(self, command_id: str) -> None:
-        """Add a new ID to the queued setup."""
-        self._queued_setup_command_ids.add(command_id)
-
     def clear_queue(self) -> None:
         """Clears all commands within the queued command ids structure."""
         self._queued_command_ids.clear()
@@ -146,13 +129,106 @@ class CommandHistory:
         """Clears all commands within the queued setup command ids structure."""
         self._queued_setup_command_ids.clear()
 
-    def remove_queue_id(self, command_id: str) -> None:
+    def set_command_queued(self, command: Command) -> None:
+        """Validate and mark a command as queued in the command history."""
+        assert command.status == CommandStatus.QUEUED
+        assert not self.has(command.id)
+
+        next_index = self.length()
+        updated_command = CommandEntry(
+            index=next_index,
+            command=command,
+        )
+        self._add(command.id, updated_command)
+
+        if command.intent == CommandIntent.SETUP:
+            self._add_to_setup_queue(command.id)
+        else:
+            self._add_to_queue(command.id)
+
+    def set_command_running(self, command: Command) -> None:
+        """Validate and mark a command as running in the command history."""
+        prev_entry = self.get(command.id)
+
+        assert prev_entry.command.status == CommandStatus.QUEUED
+        assert command.status == CommandStatus.RUNNING
+
+        self._add(
+            command.id,
+            CommandEntry(index=prev_entry.index, command=command),
+        )
+
+        assert self.get_running_command() is None
+        self._set_running_command_id(command.id)
+
+        self._remove_queue_id(command.id)
+        self._remove_setup_queue_id(command.id)
+
+    def set_command_succeeded(self, command: Command) -> None:
+        """Validate and mark a command as succeeded in the command history."""
+        prev_entry = self.get(command.id)
+        assert prev_entry.command.status == CommandStatus.RUNNING
+        assert command.status == CommandStatus.SUCCEEDED
+
+        self._add(
+            command.id,
+            CommandEntry(
+                index=prev_entry.index,
+                command=command,
+            ),
+        )
+
+        running_command_entry = self.get_running_command()
+        assert running_command_entry is not None
+        assert running_command_entry.command.id == command.id
+        self._set_running_command_id(None)
+
+        self._remove_queue_id(command.id)
+        self._remove_setup_queue_id(command.id)
+
+    def set_command_failed(self, command: Command) -> None:
+        """Validate and mark a command as failed in the command history."""
+        prev_entry = self.get(command.id)
+        assert (
+            prev_entry.command.status == CommandStatus.RUNNING
+            or prev_entry.command.status == CommandStatus.QUEUED
+        )
+        assert command.status == CommandStatus.FAILED
+
+        index = self.get(command.id).index
+        self._add(
+            command_id=command.id,
+            command_entry=CommandEntry(index=index, command=command),
+        )
+
+        running_command_entry = self.get_running_command()
+        if (
+            running_command_entry is not None
+            and running_command_entry.command.id == command.id
+        ):
+            self._set_running_command_id(None)
+
+    def _add(self, command_id: str, command_entry: CommandEntry) -> None:
+        """Create or update a command entry."""
+        if command_id not in self._commands_by_id:
+            self._all_command_ids.append(command_id)
+        self._commands_by_id[command_id] = command_entry
+
+    def _add_to_queue(self, command_id: str) -> None:
+        """Add new ID to the queued."""
+        self._queued_command_ids.add(command_id)
+
+    def _add_to_setup_queue(self, command_id: str) -> None:
+        """Add a new ID to the queued setup."""
+        self._queued_setup_command_ids.add(command_id)
+
+    def _remove_queue_id(self, command_id: str) -> None:
         """Remove a specific command from the queued command ids structure."""
         self._queued_command_ids.discard(command_id)
         if command_id in self._queued_command_ids:
             self._set_dequeued_command_id(command_id)
 
-    def remove_setup_queue_id(self, command_id: str) -> None:
+    def _remove_setup_queue_id(self, command_id: str) -> None:
         """Remove a specific command from the queued setup command ids structure."""
         self._queued_setup_command_ids.discard(command_id)
         if command_id in self._queued_setup_command_ids:
@@ -161,3 +237,7 @@ class CommandHistory:
     def _set_dequeued_command_id(self, command_id: str) -> None:
         """Set the ID of the most recently dequeued command."""
         self._dequeued_command_id = command_id
+
+    def _set_running_command_id(self, command_id: Optional[str]) -> None:
+        """Set the ID of the currently running command."""
+        self._running_command_id = command_id

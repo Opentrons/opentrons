@@ -58,16 +58,16 @@ def get_command_view(
     command_history = CommandHistory()
 
     if running_command_id:
-        command_history.set_running_command_id(running_command_id)
+        command_history._set_running_command_id(running_command_id)
     if queued_command_ids:
         for command_id in queued_command_ids:
-            command_history.add_to_queue(command_id)
+            command_history._add_to_queue(command_id)
     if queued_setup_command_ids:
         for command_id in queued_setup_command_ids:
-            command_history.add_to_setup_queue(command_id)
+            command_history._add_to_setup_queue(command_id)
     if commands:
         for index, command in enumerate(commands):
-            command_history.add(
+            command_history._add(
                 command_id=command.id,
                 command_entry=CommandEntry(index=index, command=command),
             )
