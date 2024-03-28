@@ -78,6 +78,8 @@ def _parse_and_set_parameters(
     new_globs["__param_context"] = parameter_context
     try:
         exec("add_parameters(__param_context)", new_globs)
+        if run_time_param_overrides is not None:
+            parameter_context.set_parameters(run_time_param_overrides)
     except Exception as e:
         _raise_pretty_protocol_error(exception=e, filename=filename)
     return parameter_context.export_parameters_for_protocol()
