@@ -173,7 +173,7 @@ def test_convert_type_string_for_num_param(param_type: type, result: str) -> Non
     [str, bool],
 )
 def test_convert_type_string_for_num_param_raises(param_type: type) -> None:
-    """It should raise if given a bool or str to convert to an enum type string."""
+    """It should raise if given a bool or str to convert to a number type string."""
     with pytest.raises(ParameterValueError):
         subject.convert_type_string_for_num_param(param_type)
 
