@@ -1,5 +1,6 @@
 """Protocol run control and management."""
 import asyncio
+import logging
 from typing import List, NamedTuple, Optional, Union
 
 from abc import ABC, abstractmethod
@@ -40,6 +41,8 @@ from ..protocol_engine.types import (
     DeckConfigurationType,
     RunTimeParamValuesType,
 )
+
+log = logging.getLogger(__name__)
 
 
 class RunResult(NamedTuple):
@@ -325,9 +328,18 @@ class JsonRunner(AbstractRunner):
         if protocol_source:
             await self.load(protocol_source)
 
-        asyncio.create_task(self._run())
+        _ok_to_join_event = asyncio.Event()
+
+        _ok_to_join_event.set()
+
+        run_task = asyncio.create_task(self._run())
 
         self.play(deck_configuration=deck_configuration)
+
+        _ok_to_join_event.wait()
+
+        await run_task
+
         # self._task_queue.start()
         # await self._task_queue.join()
 
