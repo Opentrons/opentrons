@@ -32,6 +32,9 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_CUTOUTS,
+  getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
+  SINGLE_CENTER_CUTOUTS,
 } from '@opentrons/shared-data'
 
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
@@ -68,6 +71,7 @@ export function DeviceDetailsDeckConfiguration({
   const deckConfig =
     useDeckConfigurationQuery({ refetchInterval: DECK_CONFIG_REFETCH_INTERVAL })
       .data ?? []
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { isRunRunning } = useRunStatuses()
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
@@ -90,16 +94,31 @@ export function DeviceDetailsDeckConfiguration({
       replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
     }
 
-    const newDeckConfig = deckConfig.map(fixture =>
-      fixture.cutoutId === cutoutId
-        ? {
-            ...fixture,
+    const fixtureGroup = deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)?.fixtureGroup ?? []
+
+    let newDeckConfig = deckConfig
+    if (fixtureGroup.length > 0) {
+      newDeckConfig = deckConfig.map(cutoutConfig => (
+        fixtureGroup.includes(cutoutConfig.cutoutFixtureId)
+          ? {
+            ...cutoutConfig,
             cutoutFixtureId: replacementFixtureId,
             opentronsModuleSerialNumber: undefined,
           }
-        : fixture
-    )
-
+          : cutoutConfig
+      ))
+    } else {
+      newDeckConfig = deckConfig.map(cutoutConfig => (
+        cutoutConfig.cutoutId === cutoutId
+          ? {
+            ...cutoutConfig,
+            cutoutFixtureId: replacementFixtureId,
+            opentronsModuleSerialNumber: undefined,
+          }
+          : cutoutConfig
+      ))
+    }
+    console.table({fixtureGroup, newDeckConfig})
     updateDeckConfiguration(newDeckConfig)
   }
 
@@ -213,9 +232,9 @@ export function DeviceDetailsDeckConfiguration({
                   <StyledText>{t('fixture')}</StyledText>
                 </Flex>
                 {fixtureDisplayList.length > 0 ? (
-                  fixtureDisplayList.map(fixture => (
+                  fixtureDisplayList.map(({ cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => (
                     <Flex
-                      key={fixture.cutoutId}
+                      key={cutoutId}
                       backgroundColor={COLORS.grey20}
                       borderRadius={BORDERS.borderRadius4}
                       gridGap={SPACING.spacing60}
@@ -224,10 +243,10 @@ export function DeviceDetailsDeckConfiguration({
                       css={TYPOGRAPHY.labelRegular}
                     >
                       <StyledText>
-                        {getCutoutDisplayName(fixture.cutoutId)}
+                        {getCutoutDisplayName(cutoutId)}
                       </StyledText>
                       <StyledText>
-                        {getFixtureDisplayName(fixture.cutoutFixtureId)}
+                        {getFixtureDisplayName(cutoutFixtureId)}
                       </StyledText>
                     </Flex>
                   ))

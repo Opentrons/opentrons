@@ -133,10 +133,10 @@ export function getPositionFromSlotId(
   const slotPosition: CoordinateTuple | null =
     cutoutPosition != null
       ? [
-          cutoutPosition[0] + offsetFromCutoutFixture[0],
-          cutoutPosition[1] + offsetFromCutoutFixture[1],
-          cutoutPosition[2] + offsetFromCutoutFixture[2],
-        ]
+        cutoutPosition[0] + offsetFromCutoutFixture[0],
+        cutoutPosition[1] + offsetFromCutoutFixture[1],
+        cutoutPosition[2] + offsetFromCutoutFixture[2],
+      ]
       : null
 
   return slotPosition
@@ -209,15 +209,23 @@ export function getFixtureDisplayName(
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
       return 'Waste chute with staging area slot and cover'
     case HEATERSHAKER_MODULE_V1_FIXTURE:
-      return `${getModuleDisplayName(HEATERSHAKER_MODULE_V1)} in USB-${usbPortNumber}`
+      return usbPortNumber != null
+        ? `${getModuleDisplayName(HEATERSHAKER_MODULE_V1)} in USB-${usbPortNumber}`
+        : getModuleDisplayName(HEATERSHAKER_MODULE_V1)
     case TEMPERATURE_MODULE_V2_FIXTURE:
-      return `${getModuleDisplayName(TEMPERATURE_MODULE_V2)} in USB-${usbPortNumber}`
+      return usbPortNumber != null
+        ? `${getModuleDisplayName(TEMPERATURE_MODULE_V2)} in USB-${usbPortNumber}`
+        : getModuleDisplayName(TEMPERATURE_MODULE_V2)
     case MAGNETIC_BLOCK_V1_FIXTURE:
       return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)}`
     case THERMOCYCLER_V2_REAR_FIXTURE:
-      return `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in USB-${usbPortNumber}`
+      return usbPortNumber != null
+        ? `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in USB-${usbPortNumber}`
+        : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
     case THERMOCYCLER_V2_FRONT_FIXTURE:
-      return `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in USB-${usbPortNumber}`
+      return usbPortNumber != null
+        ? `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in USB-${usbPortNumber}`
+        : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
     default:
       return 'Slot'
   }
