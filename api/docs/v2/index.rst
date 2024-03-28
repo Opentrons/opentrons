@@ -17,6 +17,7 @@ Welcome
     new_atomic_commands
     new_complex_commands
     robot_position
+    runtime_parameters
     new_advanced_running
     new_examples
     adapting_ot2_flex
