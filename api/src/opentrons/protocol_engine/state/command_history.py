@@ -64,8 +64,8 @@ class CommandHistory:
 
     def get_next(self, command_id: str) -> Optional[CommandEntry]:
         """Get the command which follows the command associated with the given ID, if any."""
+        index = self.get(command_id).index
         try:
-            index = self._commands_by_id[command_id].index
             return self._commands_by_id[self._all_command_ids[index + 1]]
         except KeyError:
             raise CommandDoesNotExistError(f"Command {command_id} does not exist")
