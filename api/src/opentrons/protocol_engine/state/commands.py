@@ -262,8 +262,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             assert self._state.command_history.get_running_command() is None
             self._state.command_history.set_running_command_id(action.command_id)
 
-            self._state.command_history.remove_id_from_queue(action.command_id)
-            self._state.command_history.remove_id_from_setup_queue(action.command_id)
+            self._state.command_history.remove_queue_id(action.command_id)
+            self._state.command_history.remove_setup_queue_id(action.command_id)
 
         elif isinstance(action, SucceedCommandAction):
             prev_entry = self._state.command_history.get(action.command.id)
@@ -285,8 +285,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             assert running_command_entry.command == action.command
             self._state.command_history.set_running_command_id(None)
 
-            self._state.command_history.remove_id_from_queue(succeeded_command.id)
-            self._state.command_history.remove_id_from_setup_queue(succeeded_command.id)
+            self._state.command_history.remove_queue_id(succeeded_command.id)
+            self._state.command_history.remove_setup_queue_id(succeeded_command.id)
 
         elif isinstance(action, FailCommandAction):
             prev_entry = self.state.command_history.get(action.command_id)
@@ -525,7 +525,6 @@ class CommandView(HasState[CommandState]):
         if cursor is None:
             if running_command is not None:
                 cursor = running_command.index
-                # TOME: This defines the last command.
             elif len(queued_command_ids) > 0:
                 # Get the most recently executed command,
                 # which we can find just before the first queued command.
@@ -590,8 +589,8 @@ class CommandView(HasState[CommandState]):
         else:
             return None
 
-    def get_queued_command_ids(self) -> OrderedSet[str]:
-        """Get the IDs of all queued commands, in FIFO order."""
+    def get_queue_ids(self) -> OrderedSet[str]:
+        """Get the IDs of all queued protocol commands, in FIFO order."""
         return self._state.command_history.get_queue_ids()
 
     def get_current(self) -> Optional[CurrentCommand]:
@@ -677,7 +676,7 @@ class CommandView(HasState[CommandState]):
         if run_requested_to_stop:
             final_command = self._state.command_history.get_tail_command()
         else:
-            final_command = self._state.command_history.get_recent_dequeued_command()
+            final_command = self._state.command_history.get_dequeued_command()
             # This iteration is effectively O(1) as we'll only ever have to iterate one or two times at most.
             while final_command is not None:
                 next_command = self._state.command_history.get_next(

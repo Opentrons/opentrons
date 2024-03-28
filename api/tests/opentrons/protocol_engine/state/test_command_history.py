@@ -117,11 +117,11 @@ def test_get_tail_command(command_history: CommandHistory) -> None:
 
 def test_get_recently_dequeued_command(command_history: CommandHistory) -> None:
     """It should return the most recently dequeued command."""
-    assert command_history.get_recent_dequeued_command() is None
+    assert command_history.get_dequeued_command() is None
     command_entry = create_queued_command_entry()
     command_history.add("0", command_entry)
-    command_history.set_recent_dequeued_command_id("0")
-    assert command_history.get_recent_dequeued_command() == command_entry
+    command_history.set_dequeued_command_id("0")
+    assert command_history.get_dequeued_command() == command_entry
 
 
 def test_get_running_command(command_history: CommandHistory) -> None:
@@ -160,8 +160,8 @@ def test_set_recent_dequeued_command_id(command_history: CommandHistory) -> None
     """It should set the ID of the most recently dequeued command."""
     command_entry = create_queued_command_entry()
     command_history.add("0", command_entry)
-    command_history.set_recent_dequeued_command_id("0")
-    assert command_history.get_recent_dequeued_command() == command_entry
+    command_history.set_dequeued_command_id("0")
+    assert command_history.get_dequeued_command() == command_entry
 
 
 def test_set_running_command_id(command_history: CommandHistory) -> None:
@@ -204,7 +204,7 @@ def test_remove_id_from_queue(command_history: CommandHistory) -> None:
     """It should remove the given ID from the queue."""
     command_history.add_to_queue("0")
     command_history.add_to_queue("1")
-    command_history.remove_id_from_queue("0")
+    command_history.remove_queue_id("0")
     assert command_history.get_queue_ids() == OrderedSet(["1"])
 
 
@@ -212,5 +212,5 @@ def test_remove_id_from_setup_queue(command_history: CommandHistory) -> None:
     """It should remove the given ID from the setup queue."""
     command_history.add_to_setup_queue("0")
     command_history.add_to_setup_queue("1")
-    command_history.remove_id_from_setup_queue("0")
+    command_history.remove_setup_queue_id("0")
     assert command_history.get_setup_queue_ids() == OrderedSet(["1"])
