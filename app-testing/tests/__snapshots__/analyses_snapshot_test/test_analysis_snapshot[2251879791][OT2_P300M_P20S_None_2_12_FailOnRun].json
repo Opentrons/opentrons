@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "300ul tips",
         "loadName": "opentrons_96_tiprack_300ul",
@@ -1154,6 +1156,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "20ul tips",
         "loadName": "opentrons_96_tiprack_20ul",
@@ -2300,6 +2303,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p20_single_gen2"
@@ -2309,6 +2313,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p300_multi_gen2"
@@ -2318,6 +2323,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "dye container",
         "loadName": "nest_12_reservoir_15ml",
@@ -2558,6 +2564,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "one comment",
         "legacyCommandType": "command.COMMENT"

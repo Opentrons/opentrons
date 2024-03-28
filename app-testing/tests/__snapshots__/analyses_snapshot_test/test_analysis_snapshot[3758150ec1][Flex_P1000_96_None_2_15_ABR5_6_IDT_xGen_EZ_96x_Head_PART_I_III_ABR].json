@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "THIS IS A DRY RUN",
         "legacyCommandType": "command.COMMENT"
@@ -17,6 +19,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "USED TIPS WILL BE RE-RACKED",
         "legacyCommandType": "command.COMMENT"
@@ -26,6 +29,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "location": {
@@ -1193,6 +1197,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_2ml_deep",
         "location": {
@@ -2459,6 +2464,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "location": {
@@ -3626,6 +3632,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "C1"
@@ -3680,6 +3687,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_2ml_deep",
         "location": {
@@ -4946,6 +4954,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_ot3_96_tiprack_50ul_rss",
         "location": {
@@ -6091,6 +6100,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "location": {
@@ -7258,6 +7268,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_2ml_deep",
         "location": {
@@ -8524,6 +8535,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_ot3_96_tiprack_200ul_rss",
         "location": {
@@ -9669,6 +9681,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_2ml_deep",
         "location": {
@@ -10935,6 +10948,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p1000_96"
@@ -10944,6 +10958,7 @@
     },
     {
       "commandType": "waitForResume",
+      "notes": [],
       "params": {
         "message": "Ready"
       },
@@ -10952,6 +10967,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "==============================================",
         "legacyCommandType": "command.COMMENT"
@@ -10961,6 +10977,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Fragmenting / End Repair / A-Tailing",
         "legacyCommandType": "command.COMMENT"
@@ -10970,6 +10987,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "==============================================",
         "legacyCommandType": "command.COMMENT"
@@ -10979,6 +10997,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Adding FRERAT",
         "legacyCommandType": "command.COMMENT"

@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "THIS IS A REACTION RUN",
         "legacyCommandType": "command.COMMENT"
@@ -17,6 +19,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "D1"
@@ -466,6 +469,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "location": {},
@@ -1631,6 +1635,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_200ul",
         "location": {
@@ -2782,6 +2787,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "D3"
@@ -3233,6 +3239,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "location": {},
@@ -4398,6 +4405,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "C1"
@@ -4452,6 +4460,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_2ml_deep",
         "location": {
@@ -5718,6 +5727,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_200ul",
         "location": {
@@ -6869,6 +6879,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "B1"
@@ -6977,6 +6988,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_50ul",
         "location": {
@@ -8128,6 +8140,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p1000_multi_flex"
@@ -8137,6 +8150,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p50_multi_flex"
@@ -8146,6 +8160,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -8154,6 +8169,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "SETTING THERMO and TEMP BLOCK Temperature",
         "legacyCommandType": "command.COMMENT"
@@ -8163,6 +8179,7 @@
     },
     {
       "commandType": "thermocycler/setTargetBlockTemperature",
+      "notes": [],
       "params": {
         "celsius": 4.0,
         "holdTimeSeconds": 0.0
@@ -8174,12 +8191,14 @@
     },
     {
       "commandType": "thermocycler/waitForBlockTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/setTargetLidTemperature",
+      "notes": [],
       "params": {
         "celsius": 100.0
       },
@@ -8190,12 +8209,14 @@
     },
     {
       "commandType": "thermocycler/waitForLidTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "temperatureModule/setTargetTemperature",
+      "notes": [],
       "params": {
         "celsius": 4.0
       },
@@ -8206,18 +8227,21 @@
     },
     {
       "commandType": "temperatureModule/waitForTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "waitForResume",
+      "notes": [],
       "params": {
         "message": "Ready"
       },
@@ -8226,12 +8250,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "==============================================",
         "legacyCommandType": "command.COMMENT"
@@ -8241,6 +8267,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Tagment",
         "legacyCommandType": "command.COMMENT"
@@ -8250,6 +8277,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "==============================================",
         "legacyCommandType": "command.COMMENT"
@@ -8259,6 +8287,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> ADDING TAGMIX",
         "legacyCommandType": "command.COMMENT"
@@ -8268,6 +8297,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -8293,6 +8323,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -8318,6 +8349,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -8343,6 +8375,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -8368,6 +8401,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -8393,6 +8427,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -8418,6 +8453,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -8443,6 +8479,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 20.0,
@@ -8468,6 +8505,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 20.0,
@@ -8493,6 +8531,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -8516,6 +8555,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 40.0,
@@ -8541,6 +8581,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -8564,6 +8605,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 20.0,
@@ -8589,6 +8631,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 20.0,
@@ -8614,6 +8657,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -8637,6 +8681,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 40.0,
@@ -8662,6 +8707,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 40.0,
@@ -8687,6 +8733,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -8710,6 +8757,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 20.0,
@@ -8735,6 +8783,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 20.0,
@@ -8760,6 +8809,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -8783,6 +8833,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 40.0,
@@ -8808,6 +8859,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -8831,6 +8883,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -8854,6 +8907,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -8877,6 +8931,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -8900,6 +8955,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -8923,6 +8979,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -8948,6 +9005,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -8973,6 +9031,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -8998,6 +9057,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -9023,6 +9083,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -9048,6 +9109,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -9073,6 +9135,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -9098,6 +9161,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 20.0,
@@ -9123,6 +9187,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 20.0,
@@ -9148,6 +9213,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9171,6 +9237,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 40.0,
@@ -9196,6 +9263,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9219,6 +9287,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 20.0,
@@ -9244,6 +9313,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 20.0,
@@ -9269,6 +9339,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9292,6 +9363,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 40.0,
@@ -9317,6 +9389,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 40.0,
@@ -9342,6 +9415,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9365,6 +9439,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 20.0,
@@ -9390,6 +9465,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 20.0,
@@ -9415,6 +9491,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9438,6 +9515,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 40.0,
@@ -9463,6 +9541,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -9486,6 +9565,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9509,6 +9589,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9532,6 +9613,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9555,6 +9637,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -9578,6 +9661,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -9603,6 +9687,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -9628,6 +9713,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -9653,6 +9739,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -9678,6 +9765,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -9703,6 +9791,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -9728,6 +9817,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 30.0,
@@ -9753,6 +9843,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 20.0,
@@ -9778,6 +9869,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 20.0,
@@ -9803,6 +9895,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9826,6 +9919,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 40.0,
@@ -9851,6 +9945,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9874,6 +9969,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 20.0,
@@ -9899,6 +9995,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 20.0,
@@ -9924,6 +10021,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9947,6 +10045,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 40.0,
@@ -9972,6 +10071,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 40.0,
@@ -9997,6 +10097,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -10020,6 +10121,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 20.0,
@@ -10045,6 +10147,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 20.0,
@@ -10070,6 +10173,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -10093,6 +10197,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 40.0,
@@ -10118,6 +10223,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -10141,6 +10247,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -10164,6 +10271,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -10187,6 +10295,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -10210,6 +10319,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -10233,6 +10343,7 @@
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "notes": [],
       "params": {
         "rpm": 1800.0
       },
@@ -10243,6 +10354,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 300.0
       },
@@ -10251,12 +10363,14 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -10265,6 +10379,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -10284,18 +10399,21 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/closeLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/runProfile",
+      "notes": [],
       "params": {
         "blockMaxVolumeUl": 50.0,
         "profile": [
@@ -10310,6 +10428,7 @@
     },
     {
       "commandType": "thermocycler/setTargetBlockTemperature",
+      "notes": [],
       "params": {
         "celsius": 10.0,
         "holdTimeSeconds": 0.0
@@ -10321,18 +10440,21 @@
     },
     {
       "commandType": "thermocycler/waitForBlockTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Adding TAGSTOP",
         "legacyCommandType": "command.COMMENT"
@@ -10342,6 +10464,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -10367,6 +10490,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -10392,6 +10516,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -10417,6 +10542,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -10440,6 +10566,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10465,6 +10592,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10490,6 +10618,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10515,6 +10644,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10540,6 +10670,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10565,6 +10696,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10590,6 +10722,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10615,6 +10748,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10640,6 +10774,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10665,6 +10800,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10690,6 +10826,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10715,6 +10852,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10740,6 +10878,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10765,6 +10904,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10790,6 +10930,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10815,6 +10956,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10840,6 +10982,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10865,6 +11008,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10890,6 +11034,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10915,6 +11060,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -10940,6 +11086,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -10963,6 +11110,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -10988,6 +11136,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -11013,6 +11162,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -11038,6 +11188,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -11061,6 +11212,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11086,6 +11238,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11111,6 +11264,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11136,6 +11290,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11161,6 +11316,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11186,6 +11342,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11211,6 +11368,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11236,6 +11394,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11261,6 +11420,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11286,6 +11446,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11311,6 +11472,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11336,6 +11498,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11361,6 +11524,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11386,6 +11550,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11411,6 +11576,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11436,6 +11602,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11461,6 +11628,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11486,6 +11654,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11511,6 +11680,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11536,6 +11706,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11561,6 +11732,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -11584,6 +11756,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -11609,6 +11782,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -11634,6 +11808,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -11659,6 +11834,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -11682,6 +11858,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11707,6 +11884,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11732,6 +11910,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11757,6 +11936,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11782,6 +11962,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11807,6 +11988,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11832,6 +12014,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11857,6 +12040,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11882,6 +12066,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11907,6 +12092,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11932,6 +12118,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11957,6 +12144,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -11982,6 +12170,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -12007,6 +12196,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -12032,6 +12222,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -12057,6 +12248,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -12082,6 +12274,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -12107,6 +12300,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -12132,6 +12326,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -12157,6 +12352,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 20.0,
@@ -12182,6 +12378,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -12205,12 +12402,14 @@
     },
     {
       "commandType": "thermocycler/closeLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/runProfile",
+      "notes": [],
       "params": {
         "blockMaxVolumeUl": 50.0,
         "profile": [
@@ -12225,6 +12424,7 @@
     },
     {
       "commandType": "thermocycler/setTargetBlockTemperature",
+      "notes": [],
       "params": {
         "celsius": 10.0,
         "holdTimeSeconds": 0.0
@@ -12236,18 +12436,21 @@
     },
     {
       "commandType": "thermocycler/waitForBlockTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -12267,6 +12470,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 240.0
       },
@@ -12275,6 +12479,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "==============================================",
         "legacyCommandType": "command.COMMENT"
@@ -12284,6 +12489,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Cleanup",
         "legacyCommandType": "command.COMMENT"
@@ -12293,6 +12499,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "==============================================",
         "legacyCommandType": "command.COMMENT"
@@ -12302,6 +12509,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Removing Supernatant",
         "legacyCommandType": "command.COMMENT"
@@ -12311,6 +12519,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -12336,6 +12545,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -12359,6 +12569,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -12384,6 +12595,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -12392,6 +12604,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -12415,6 +12628,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -12440,6 +12654,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -12463,6 +12678,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -12488,6 +12704,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -12496,6 +12713,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -12519,6 +12737,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -12544,6 +12763,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -12567,6 +12787,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -12592,6 +12813,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -12615,6 +12837,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -12640,6 +12863,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -12648,6 +12872,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -12671,6 +12896,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -12696,6 +12922,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -12719,6 +12946,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -12744,6 +12972,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -12752,6 +12981,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -12775,6 +13005,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -12800,6 +13031,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -12823,6 +13055,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -12848,6 +13081,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -12871,6 +13105,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -12896,6 +13131,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -12904,6 +13140,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -12927,6 +13164,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -12952,6 +13190,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -12975,6 +13214,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -13000,6 +13240,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -13008,6 +13249,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -13031,6 +13273,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -13056,6 +13299,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -13079,6 +13323,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -13087,6 +13332,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -13106,12 +13352,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Wash ",
         "legacyCommandType": "command.COMMENT"
@@ -13121,6 +13369,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -13146,6 +13395,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -13171,6 +13421,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -13194,6 +13445,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -13219,6 +13471,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -13244,6 +13497,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -13269,6 +13523,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -13294,6 +13549,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -13319,6 +13575,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -13342,6 +13599,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -13350,6 +13608,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -13373,6 +13632,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -13398,6 +13658,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -13421,6 +13682,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -13446,6 +13708,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -13471,6 +13734,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -13494,6 +13758,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -13519,6 +13784,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -13544,6 +13810,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -13569,6 +13836,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -13594,6 +13862,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -13619,6 +13888,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -13642,6 +13912,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -13650,6 +13921,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -13673,6 +13945,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -13698,6 +13971,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -13721,6 +13995,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -13746,6 +14021,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -13771,6 +14047,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -13794,6 +14071,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -13819,6 +14097,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -13844,6 +14123,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -13869,6 +14149,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -13894,6 +14175,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -13919,6 +14201,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -13942,6 +14225,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -13950,6 +14234,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -13973,6 +14258,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -13998,6 +14284,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -14021,12 +14308,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "notes": [],
       "params": {
         "rpm": 1600.0
       },
@@ -14037,6 +14326,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 180.0
       },
@@ -14045,12 +14335,14 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -14059,6 +14351,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -14067,6 +14360,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -14086,12 +14380,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 180.0
       },
@@ -14100,6 +14396,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Remove Wash",
         "legacyCommandType": "command.COMMENT"
@@ -14109,6 +14406,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -14134,6 +14432,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -14157,6 +14456,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -14182,6 +14482,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -14205,6 +14506,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -14213,6 +14515,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -14238,6 +14541,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -14263,6 +14567,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -14286,6 +14591,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -14294,6 +14600,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -14317,6 +14624,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -14342,6 +14650,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -14365,6 +14674,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -14390,6 +14700,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -14413,6 +14724,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -14438,6 +14750,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -14461,6 +14774,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -14469,6 +14783,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -14494,6 +14809,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -14519,6 +14835,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -14542,6 +14859,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -14550,6 +14868,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -14573,6 +14892,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -14598,6 +14918,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -14621,6 +14942,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -14646,6 +14968,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -14669,6 +14992,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -14694,6 +15018,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -14717,6 +15042,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -14725,6 +15051,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -14750,6 +15077,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -14775,6 +15103,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -14798,6 +15127,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -14806,6 +15136,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -14829,6 +15160,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -14854,6 +15186,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -14877,6 +15210,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -14885,6 +15219,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -14904,12 +15239,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Wash ",
         "legacyCommandType": "command.COMMENT"
@@ -14919,6 +15256,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -14944,6 +15282,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -14969,6 +15308,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -14992,6 +15332,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -15017,6 +15358,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -15042,6 +15384,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -15067,6 +15410,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -15092,6 +15436,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -15117,6 +15462,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -15140,6 +15486,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -15148,6 +15495,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -15171,6 +15519,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -15196,6 +15545,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -15219,6 +15569,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -15244,6 +15595,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -15269,6 +15621,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -15292,6 +15645,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -15317,6 +15671,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -15342,6 +15697,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -15367,6 +15723,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -15392,6 +15749,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -15417,6 +15775,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -15440,6 +15799,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -15448,6 +15808,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -15471,6 +15832,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -15496,6 +15858,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -15519,6 +15882,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -15544,6 +15908,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -15569,6 +15934,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -15592,6 +15958,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -15617,6 +15984,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -15642,6 +16010,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -15667,6 +16036,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -15692,6 +16062,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -15717,6 +16088,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -15740,6 +16112,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -15748,6 +16121,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -15771,6 +16145,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -15796,6 +16171,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -15819,12 +16195,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "notes": [],
       "params": {
         "rpm": 1600.0
       },
@@ -15835,6 +16213,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 180.0
       },
@@ -15843,12 +16222,14 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -15857,6 +16238,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -15865,6 +16247,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -15884,12 +16267,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 180.0
       },
@@ -15898,6 +16283,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Remove Wash",
         "legacyCommandType": "command.COMMENT"
@@ -15907,6 +16293,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -15932,6 +16319,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -15955,6 +16343,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -15980,6 +16369,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -16003,6 +16393,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -16011,6 +16402,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -16036,6 +16428,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -16061,6 +16454,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -16084,6 +16478,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -16092,6 +16487,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -16115,6 +16511,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -16140,6 +16537,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -16163,6 +16561,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -16188,6 +16587,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -16211,6 +16611,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -16236,6 +16637,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -16259,6 +16661,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -16267,6 +16670,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -16292,6 +16696,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -16317,6 +16722,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -16340,6 +16746,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -16348,6 +16755,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -16371,6 +16779,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -16396,6 +16805,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -16419,6 +16829,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -16444,6 +16855,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -16467,6 +16879,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -16492,6 +16905,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -16515,6 +16929,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -16523,6 +16938,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -16548,6 +16964,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -16573,6 +16990,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -16596,6 +17014,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -16604,6 +17023,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -16627,6 +17047,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -16652,6 +17073,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -16675,6 +17097,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -16683,6 +17106,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -16702,12 +17126,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Wash ",
         "legacyCommandType": "command.COMMENT"
@@ -16717,6 +17143,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -16742,6 +17169,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -16767,6 +17195,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -16790,6 +17219,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -16815,6 +17245,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -16840,6 +17271,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -16865,6 +17297,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -16890,6 +17323,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -16915,6 +17349,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -16938,6 +17373,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -16946,6 +17382,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -16969,6 +17406,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -16994,6 +17432,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -17017,6 +17456,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -17042,6 +17482,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -17067,6 +17508,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -17090,6 +17532,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -17115,6 +17558,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -17140,6 +17584,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -17165,6 +17610,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -17190,6 +17636,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -17215,6 +17662,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -17238,6 +17686,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -17246,6 +17695,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -17269,6 +17719,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -17294,6 +17745,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -17317,6 +17769,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -17342,6 +17795,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -17367,6 +17821,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -17390,6 +17845,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -17415,6 +17871,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -17440,6 +17897,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -17465,6 +17923,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -17490,6 +17949,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 90.0,
@@ -17515,6 +17975,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -17538,6 +17999,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -17546,6 +18008,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -17569,6 +18032,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -17594,6 +18058,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -17617,12 +18082,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "notes": [],
       "params": {
         "rpm": 1600.0
       },
@@ -17633,6 +18100,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 180.0
       },
@@ -17641,12 +18109,14 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -17655,6 +18125,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -17663,6 +18134,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -17682,12 +18154,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 180.0
       },
@@ -17696,6 +18170,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Remove Wash",
         "legacyCommandType": "command.COMMENT"
@@ -17705,6 +18180,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -17730,6 +18206,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -17753,6 +18230,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -17778,6 +18256,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -17801,6 +18280,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -17809,6 +18289,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -17834,6 +18315,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -17859,6 +18341,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -17882,6 +18365,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -17890,6 +18374,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -17913,6 +18398,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -17938,6 +18424,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -17961,6 +18448,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -17986,6 +18474,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -18009,6 +18498,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -18034,6 +18524,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -18057,6 +18548,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -18065,6 +18557,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -18090,6 +18583,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -18115,6 +18609,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -18138,6 +18633,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -18146,6 +18642,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -18169,6 +18666,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -18194,6 +18692,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -18217,6 +18716,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -18242,6 +18742,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -18265,6 +18766,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -18290,6 +18792,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -18313,6 +18816,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -18321,6 +18825,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -18346,6 +18851,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -18371,6 +18877,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -18394,6 +18901,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -18402,6 +18910,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -18425,6 +18934,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 20.0,
@@ -18450,6 +18960,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -18473,6 +18984,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 60.0
       },
@@ -18481,6 +18993,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Removing Residual Wash",
         "legacyCommandType": "command.COMMENT"
@@ -18490,6 +19003,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -18515,6 +19029,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -18538,6 +19053,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 20.0,
@@ -18563,6 +19079,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -18586,6 +19103,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -18611,6 +19129,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -18634,6 +19153,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 20.0,
@@ -18659,6 +19179,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -18682,6 +19203,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -18707,6 +19229,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -18730,6 +19253,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 20.0,
@@ -18755,6 +19279,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -18778,6 +19303,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 30.0
       },
@@ -18786,6 +19312,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -18794,6 +19321,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -18813,12 +19341,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Adding EPM",
         "legacyCommandType": "command.COMMENT"
@@ -18828,6 +19358,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -18853,6 +19384,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 40.0,
@@ -18878,6 +19410,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -18901,6 +19434,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -18926,6 +19460,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -18949,6 +19484,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -18974,6 +19510,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -18997,6 +19534,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19022,6 +19560,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19045,6 +19584,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19070,6 +19610,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19093,6 +19634,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19118,6 +19660,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19141,6 +19684,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19166,6 +19710,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19189,6 +19734,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19214,6 +19760,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19237,6 +19784,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19262,6 +19810,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19287,6 +19836,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -19310,6 +19860,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19333,6 +19884,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19356,6 +19908,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19379,6 +19932,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -19402,6 +19956,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -19427,6 +19982,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 40.0,
@@ -19452,6 +20008,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19475,6 +20032,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19500,6 +20058,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19523,6 +20082,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19548,6 +20108,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19571,6 +20132,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19596,6 +20158,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19619,6 +20182,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19644,6 +20208,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19667,6 +20232,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19692,6 +20258,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19715,6 +20282,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19740,6 +20308,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19763,6 +20332,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19788,6 +20358,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19811,6 +20382,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19836,6 +20408,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -19861,6 +20434,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -19884,6 +20458,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19907,6 +20482,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19930,6 +20506,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -19953,6 +20530,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -19976,6 +20554,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -20001,6 +20580,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 40.0,
@@ -20026,6 +20606,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -20049,6 +20630,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -20074,6 +20656,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -20097,6 +20680,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -20122,6 +20706,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -20145,6 +20730,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -20170,6 +20756,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -20193,6 +20780,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -20218,6 +20806,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -20241,6 +20830,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -20266,6 +20856,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -20289,6 +20880,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -20314,6 +20906,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -20337,6 +20930,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -20362,6 +20956,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -20385,6 +20980,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -20410,6 +21006,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 35.0,
@@ -20435,6 +21032,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -20458,6 +21056,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -20481,6 +21080,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -20504,6 +21104,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -20527,6 +21128,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -20550,12 +21152,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "notes": [],
       "params": {
         "rpm": 2000.0
       },
@@ -20566,6 +21170,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 180.0
       },
@@ -20574,12 +21179,14 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -20588,6 +21195,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -20596,6 +21204,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -20615,12 +21224,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Adding Barcodes",
         "legacyCommandType": "command.COMMENT"
@@ -20630,6 +21241,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -20655,6 +21267,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 2.0,
         "volume": 10.0,
@@ -20680,6 +21293,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -20705,6 +21319,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -20730,6 +21345,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -20755,6 +21371,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -20780,6 +21397,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -20805,6 +21423,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -20830,6 +21449,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -20855,6 +21475,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -20878,6 +21499,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -20903,6 +21525,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 2.0,
         "volume": 10.0,
@@ -20928,6 +21551,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -20953,6 +21577,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -20978,6 +21603,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -21003,6 +21629,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -21028,6 +21655,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -21053,6 +21681,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -21078,6 +21707,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -21103,6 +21733,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -21126,6 +21757,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -21151,6 +21783,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 2.0,
         "volume": 10.0,
@@ -21176,6 +21809,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -21201,6 +21835,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -21226,6 +21861,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -21251,6 +21887,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -21276,6 +21913,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -21301,6 +21939,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -21326,6 +21965,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 8.0,
         "volume": 10.0,
@@ -21351,6 +21991,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -21374,6 +22015,7 @@
     },
     {
       "commandType": "thermocycler/setTargetLidTemperature",
+      "notes": [],
       "params": {
         "celsius": 100.0
       },
@@ -21384,18 +22026,21 @@
     },
     {
       "commandType": "thermocycler/waitForLidTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/closeLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/runProfile",
+      "notes": [],
       "params": {
         "blockMaxVolumeUl": 50.0,
         "profile": [
@@ -21414,6 +22059,7 @@
     },
     {
       "commandType": "thermocycler/runProfile",
+      "notes": [],
       "params": {
         "blockMaxVolumeUl": 50.0,
         "profile": [
@@ -21484,6 +22130,7 @@
     },
     {
       "commandType": "thermocycler/runProfile",
+      "notes": [],
       "params": {
         "blockMaxVolumeUl": 50.0,
         "profile": [
@@ -21498,6 +22145,7 @@
     },
     {
       "commandType": "thermocycler/setTargetBlockTemperature",
+      "notes": [],
       "params": {
         "celsius": 10.0,
         "holdTimeSeconds": 0.0
@@ -21509,18 +22157,21 @@
     },
     {
       "commandType": "thermocycler/waitForBlockTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "==============================================",
         "legacyCommandType": "command.COMMENT"
@@ -21530,6 +22181,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Cleanup",
         "legacyCommandType": "command.COMMENT"
@@ -21539,6 +22191,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "==============================================",
         "legacyCommandType": "command.COMMENT"
@@ -21548,6 +22201,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -21556,6 +22210,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -21575,12 +22230,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Adding H20 and SAMPLE",
         "legacyCommandType": "command.COMMENT"
@@ -21590,6 +22247,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -21615,6 +22273,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 40.0,
@@ -21640,6 +22299,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 40.0,
@@ -21665,6 +22325,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 45.0,
@@ -21690,6 +22351,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 45.0,
@@ -21715,6 +22377,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -21738,6 +22401,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -21763,6 +22427,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 40.0,
@@ -21788,6 +22453,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 40.0,
@@ -21813,6 +22479,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 45.0,
@@ -21838,6 +22505,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 45.0,
@@ -21863,6 +22531,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -21886,6 +22555,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -21911,6 +22581,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 40.0,
@@ -21936,6 +22607,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 40.0,
@@ -21961,6 +22633,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 45.0,
@@ -21986,6 +22659,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 45.0,
@@ -22011,6 +22685,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -22034,6 +22709,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> ADDING AMPure (0.8x)",
         "legacyCommandType": "command.COMMENT"
@@ -22043,6 +22719,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -22068,6 +22745,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -22093,6 +22771,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -22118,6 +22797,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -22143,6 +22823,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -22168,6 +22849,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -22193,6 +22875,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -22218,6 +22901,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 45.0,
@@ -22243,6 +22927,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 45.0,
@@ -22268,6 +22953,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -22291,6 +22977,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -22316,6 +23003,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -22339,6 +23027,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -22364,6 +23053,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -22389,6 +23079,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -22412,6 +23103,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 30.0,
@@ -22437,6 +23129,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -22462,6 +23155,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -22485,6 +23179,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -22510,6 +23205,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -22535,6 +23231,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -22558,6 +23255,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 30.0,
@@ -22583,6 +23281,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -22606,6 +23305,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -22629,6 +23329,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -22652,6 +23353,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -22675,6 +23377,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -22698,6 +23401,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -22723,6 +23427,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -22748,6 +23453,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -22773,6 +23479,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -22798,6 +23505,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -22823,6 +23531,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -22848,6 +23557,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -22873,6 +23583,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 45.0,
@@ -22898,6 +23609,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 45.0,
@@ -22923,6 +23635,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -22946,6 +23659,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -22971,6 +23685,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -22994,6 +23709,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -23019,6 +23735,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -23044,6 +23761,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23067,6 +23785,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 30.0,
@@ -23092,6 +23811,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -23117,6 +23837,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23140,6 +23861,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -23165,6 +23887,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -23190,6 +23913,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23213,6 +23937,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 30.0,
@@ -23238,6 +23963,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -23261,6 +23987,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23284,6 +24011,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23307,6 +24035,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23330,6 +24059,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -23353,6 +24083,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -23378,6 +24109,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -23403,6 +24135,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -23428,6 +24161,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -23453,6 +24187,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -23478,6 +24213,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -23503,6 +24239,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 55.0,
@@ -23528,6 +24265,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 45.0,
@@ -23553,6 +24291,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 45.0,
@@ -23578,6 +24317,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23601,6 +24341,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -23626,6 +24367,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23649,6 +24391,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -23674,6 +24417,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -23699,6 +24443,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23722,6 +24467,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 30.0,
@@ -23747,6 +24493,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -23772,6 +24519,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23795,6 +24543,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -23820,6 +24569,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 60.0,
@@ -23845,6 +24595,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23868,6 +24619,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "volume": 30.0,
@@ -23893,6 +24645,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -23916,6 +24669,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23939,6 +24693,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23962,6 +24717,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -23985,6 +24741,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -24008,6 +24765,7 @@
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "notes": [],
       "params": {
         "rpm": 1800.0
       },
@@ -24018,6 +24776,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 300.0
       },
@@ -24026,12 +24785,14 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": false
@@ -24040,6 +24801,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -24059,12 +24821,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 240.0
       },
@@ -24073,6 +24837,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Removing Supernatant",
         "legacyCommandType": "command.COMMENT"
@@ -24082,6 +24847,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -24107,6 +24873,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24130,6 +24897,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -24155,6 +24923,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -24163,6 +24932,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24186,6 +24956,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -24211,6 +24982,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24234,6 +25006,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -24259,6 +25032,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -24267,6 +25041,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -24290,6 +25065,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24313,6 +25089,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24336,6 +25113,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -24359,6 +25137,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -24384,6 +25163,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24407,6 +25187,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -24432,6 +25213,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -24440,6 +25222,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24463,6 +25246,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -24488,6 +25272,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24511,6 +25296,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -24536,6 +25322,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -24544,6 +25331,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -24567,6 +25355,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24590,6 +25379,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24613,6 +25403,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -24636,6 +25427,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -24661,6 +25453,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24684,6 +25477,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -24709,6 +25503,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -24717,6 +25512,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24740,6 +25536,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -24765,6 +25562,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24788,6 +25586,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -24813,6 +25612,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -24821,6 +25621,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -24844,6 +25645,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24867,6 +25669,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24890,6 +25693,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -24913,6 +25717,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> ETOH Wash",
         "legacyCommandType": "command.COMMENT"
@@ -24922,6 +25727,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -24947,6 +25753,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 150.0,
@@ -24972,6 +25779,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -24995,6 +25803,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25018,6 +25827,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25041,6 +25851,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25064,6 +25875,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 150.0,
@@ -25089,6 +25901,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -25097,6 +25910,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -25120,6 +25934,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25143,6 +25958,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25166,6 +25982,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25189,6 +26006,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 150.0,
@@ -25214,6 +26032,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25237,6 +26056,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25260,6 +26080,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25283,6 +26104,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25306,6 +26128,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 150.0,
@@ -25331,6 +26154,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -25339,6 +26163,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -25362,6 +26187,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25385,6 +26211,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25408,6 +26235,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25431,6 +26259,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 150.0,
@@ -25456,6 +26285,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25479,6 +26309,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25502,6 +26333,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25525,6 +26357,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25548,6 +26381,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 150.0,
@@ -25573,6 +26407,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -25581,6 +26416,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -25604,6 +26440,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25627,6 +26464,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25650,6 +26488,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25673,6 +26512,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -25696,6 +26536,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 30.0
       },
@@ -25704,6 +26545,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Remove ETOH Wash",
         "legacyCommandType": "command.COMMENT"
@@ -25713,6 +26555,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -25738,6 +26581,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25761,6 +26605,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -25786,6 +26631,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -25794,6 +26640,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25817,6 +26664,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -25842,6 +26690,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25865,6 +26714,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -25890,6 +26740,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -25898,6 +26749,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -25921,6 +26773,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25944,6 +26797,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -25967,6 +26821,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -25990,6 +26845,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -26015,6 +26871,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26038,6 +26895,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -26063,6 +26921,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -26071,6 +26930,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26094,6 +26954,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -26119,6 +26980,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26142,6 +27004,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -26167,6 +27030,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -26175,6 +27039,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -26198,6 +27063,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26221,6 +27087,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26244,6 +27111,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -26267,6 +27135,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -26292,6 +27161,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26315,6 +27185,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -26340,6 +27211,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -26348,6 +27220,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26371,6 +27244,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -26396,6 +27270,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26419,6 +27294,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -26444,6 +27320,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -26452,6 +27329,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -26475,6 +27353,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26498,6 +27377,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26521,6 +27401,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -26544,6 +27425,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> ETOH Wash",
         "legacyCommandType": "command.COMMENT"
@@ -26553,6 +27435,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -26578,6 +27461,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 150.0,
@@ -26603,6 +27487,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26626,6 +27511,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26649,6 +27535,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26672,6 +27559,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26695,6 +27583,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 150.0,
@@ -26720,6 +27609,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -26728,6 +27618,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -26751,6 +27642,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26774,6 +27666,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26797,6 +27690,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26820,6 +27714,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 150.0,
@@ -26845,6 +27740,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26868,6 +27764,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26891,6 +27788,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26914,6 +27812,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -26937,6 +27836,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 150.0,
@@ -26962,6 +27862,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -26970,6 +27871,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -26993,6 +27895,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27016,6 +27919,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27039,6 +27943,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27062,6 +27967,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 150.0,
@@ -27087,6 +27993,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27110,6 +28017,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27133,6 +28041,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27156,6 +28065,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27179,6 +28089,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 150.0,
@@ -27204,6 +28115,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -27212,6 +28124,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -27235,6 +28148,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27258,6 +28172,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27281,6 +28196,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27304,6 +28220,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -27327,6 +28244,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 30.0
       },
@@ -27335,6 +28253,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Remove ETOH Wash",
         "legacyCommandType": "command.COMMENT"
@@ -27344,6 +28263,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -27369,6 +28289,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27392,6 +28313,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -27417,6 +28339,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -27425,6 +28348,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27448,6 +28372,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -27473,6 +28398,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27496,6 +28422,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -27521,6 +28448,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -27529,6 +28457,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -27552,6 +28481,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27575,6 +28505,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27598,6 +28529,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -27621,6 +28553,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -27646,6 +28579,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27669,6 +28603,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -27694,6 +28629,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -27702,6 +28638,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27725,6 +28662,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -27750,6 +28688,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27773,6 +28712,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -27798,6 +28738,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -27806,6 +28747,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -27829,6 +28771,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27852,6 +28795,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27875,6 +28819,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -27898,6 +28843,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -27923,6 +28869,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -27946,6 +28893,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -27971,6 +28919,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -27979,6 +28928,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28002,6 +28952,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 100.0,
@@ -28027,6 +28978,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28050,6 +29002,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 200.0,
@@ -28075,6 +29028,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -28083,6 +29037,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -28106,6 +29061,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28129,6 +29085,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28152,6 +29109,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -28175,6 +29133,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 120.0
       },
@@ -28183,6 +29142,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Removing Residual ETOH",
         "legacyCommandType": "command.COMMENT"
@@ -28192,6 +29152,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -28217,6 +29178,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28240,6 +29202,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 50.0,
@@ -28265,6 +29228,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 50.0,
@@ -28290,6 +29254,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -28298,6 +29263,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -28321,6 +29287,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28344,6 +29311,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28367,6 +29335,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -28390,6 +29359,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -28415,6 +29385,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28438,6 +29409,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 50.0,
@@ -28463,6 +29435,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 50.0,
@@ -28488,6 +29461,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -28496,6 +29470,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -28519,6 +29494,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28542,6 +29518,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28565,6 +29542,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -28588,6 +29566,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -28613,6 +29592,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28636,6 +29616,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 50.0,
@@ -28661,6 +29642,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 50.0,
@@ -28686,6 +29668,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 6.0
       },
@@ -28694,6 +29677,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -28717,6 +29701,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28740,6 +29725,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28763,6 +29749,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -28786,6 +29773,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 60.0
       },
@@ -28794,6 +29782,7 @@
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": false
@@ -28802,6 +29791,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -28821,12 +29811,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Adding RSB",
         "legacyCommandType": "command.COMMENT"
@@ -28836,6 +29828,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -28861,6 +29854,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -28886,6 +29880,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28909,6 +29904,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -28934,6 +29930,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -28957,6 +29954,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -28982,6 +29980,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29005,6 +30004,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29030,6 +30030,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29053,6 +30054,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29078,6 +30080,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29101,6 +30104,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29126,6 +30130,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29149,6 +30154,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29174,6 +30180,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29197,6 +30204,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29222,6 +30230,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29245,6 +30254,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29270,6 +30280,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29295,6 +30306,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -29318,6 +30330,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29341,6 +30354,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29364,6 +30378,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29387,6 +30402,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -29410,6 +30426,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -29435,6 +30452,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29460,6 +30478,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29483,6 +30502,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29508,6 +30528,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29531,6 +30552,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29556,6 +30578,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29579,6 +30602,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29604,6 +30628,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29627,6 +30652,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29652,6 +30678,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29675,6 +30702,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29700,6 +30728,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29723,6 +30752,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29748,6 +30778,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29771,6 +30802,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29796,6 +30828,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29819,6 +30852,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29844,6 +30878,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -29869,6 +30904,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -29892,6 +30928,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29915,6 +30952,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29938,6 +30976,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -29961,6 +31000,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -29984,6 +31024,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -30009,6 +31050,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -30034,6 +31076,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30057,6 +31100,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -30082,6 +31126,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30105,6 +31150,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -30130,6 +31176,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30153,6 +31200,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -30178,6 +31226,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30201,6 +31250,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -30226,6 +31276,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30249,6 +31300,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -30274,6 +31326,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30297,6 +31350,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -30322,6 +31376,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30345,6 +31400,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -30370,6 +31426,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30393,6 +31450,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -30418,6 +31476,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 32.0,
@@ -30443,6 +31502,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 80.0,
         "wellLocation": {
@@ -30466,6 +31526,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30489,6 +31550,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30512,6 +31574,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30535,6 +31598,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -30558,6 +31622,7 @@
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "notes": [],
       "params": {
         "rpm": 1600.0
       },
@@ -30568,6 +31633,7 @@
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 60.0
       },
@@ -30576,12 +31642,14 @@
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": false
@@ -30590,6 +31658,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "dropOffset": {
           "x": 0.0,
@@ -30609,12 +31678,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "waitForDuration",
+      "notes": [],
       "params": {
         "seconds": 180.0
       },
@@ -30623,6 +31694,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "--> Transferring Supernatant",
         "legacyCommandType": "command.COMMENT"
@@ -30632,6 +31704,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -30657,6 +31730,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30680,6 +31754,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 31.0,
@@ -30705,6 +31780,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 31.0,
@@ -30730,6 +31806,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -30753,6 +31830,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -30778,6 +31856,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30801,6 +31880,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 31.0,
@@ -30826,6 +31906,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 31.0,
@@ -30851,6 +31932,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -30874,6 +31956,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -30899,6 +31982,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -30922,6 +32006,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 40.0,
         "volume": 31.0,
@@ -30947,6 +32032,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 31.0,
@@ -30972,6 +32058,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
