@@ -607,7 +607,7 @@ class CommandView(HasState[CommandState]):
             raise RunStoppedError("Engine was stopped")
 
         # if there is a setup command queued, prioritize it
-        next_setup_cmd = self._state.command_history.get_queue_ids().head(None)
+        next_setup_cmd = self._state.command_history.get_setup_queue_ids().head(None)
         if self._state.queue_status != QueueStatus.PAUSED and next_setup_cmd:
             return next_setup_cmd
 

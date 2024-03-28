@@ -4,8 +4,6 @@ from contextlib import nullcontext as does_not_raise
 from datetime import datetime
 from typing import List, NamedTuple, Optional, Sequence, Type, Union
 
-from opentrons.ordered_set import OrderedSet
-
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.actions import (
     PlayAction,
@@ -55,14 +53,25 @@ def get_command_view(
     latest_command_hash: Optional[str] = None,
 ) -> CommandView:
     """Get a command view test subject."""
-    all_command_ids = [command.id for command in commands]
-    commands_by_id = {
-        command.id: CommandEntry(index=index, command=command)
-        for index, command in enumerate(commands)
-    }
+    command_history = CommandHistory()
+
+    if running_command_id:
+        command_history.set_running_command_id(running_command_id)
+    if queued_command_ids:
+        for command_id in queued_command_ids:
+            command_history.add_to_queue(command_id)
+    if queued_setup_command_ids:
+        for command_id in queued_setup_command_ids:
+            command_history.add_to_setup_queue(command_id)
+    if commands:
+        for index, command in enumerate(commands):
+            command_history.add(
+                command_id=command.id,
+                command_entry=CommandEntry(index=index, command=command),
+            )
 
     state = CommandState(
-        command_history=CommandHistory(),
+        command_history=command_history,
         queue_status=queue_status,
         run_completed_at=run_completed_at,
         is_door_blocking=is_door_blocking,
@@ -229,6 +238,8 @@ def test_get_command_is_final_when_run_has_result(run_result: RunResult) -> None
 
 def test_get_all_commands_final() -> None:
     """It should return True if no commands queued or running."""
+    running_command = create_running_command(command_id="running-command-id")
+
     subject = get_command_view(queued_command_ids=[])
     assert subject.get_all_commands_final() is True
 
@@ -236,7 +247,9 @@ def test_get_all_commands_final() -> None:
     assert subject.get_all_commands_final() is False
 
     subject = get_command_view(
-        queued_command_ids=[], running_command_id="running-command-id"
+        queued_command_ids=[],
+        running_command_id="running-command-id",
+        commands=[running_command],
     )
     assert subject.get_all_commands_final() is False
 
@@ -696,7 +709,11 @@ def test_get_okay_to_clear(subject: CommandView, expected_is_okay: bool) -> None
 
 def test_get_running_command_id() -> None:
     """It should return the running command ID."""
-    subject_with_running = get_command_view(running_command_id="command-id")
+    running_command = create_running_command(command_id="command-id")
+
+    subject_with_running = get_command_view(
+        running_command_id="command-id", commands=[running_command]
+    )
     assert subject_with_running.get_running_command_id() == "command-id"
 
     subject_without_running = get_command_view(running_command_id=None)
@@ -739,6 +756,8 @@ def test_get_current() -> None:
         created_at=datetime(year=2022, month=2, day=2),
     )
     subject = get_command_view(commands=[command_1, command_2])
+    subject.state.command_history.set_recent_dequeued_command_id(command_1.id)
+
     assert subject.get_current() == CurrentCommand(
         index=1,
         command_id="command-id-2",
@@ -757,6 +776,8 @@ def test_get_current() -> None:
         created_at=datetime(year=2022, month=2, day=2),
     )
     subject = get_command_view(commands=[command_1, command_2])
+    subject.state.command_history.set_recent_dequeued_command_id(command_1.id)
+
     assert subject.get_current() == CurrentCommand(
         index=1,
         command_id="command-id-2",
