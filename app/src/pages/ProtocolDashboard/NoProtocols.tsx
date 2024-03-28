@@ -16,7 +16,7 @@ import {
 import imgSrc from '../../assets/images/on-device-display/empty_protocol_dashboard.png'
 
 export function NoProtocols(): JSX.Element {
-  const { t } = useTranslation('protocol_info')
+  const { t } = useTranslation(['protocol_info', 'branded'])
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -41,7 +41,7 @@ export function NoProtocols(): JSX.Element {
         {t('nothing_here_yet')}
       </StyledText>
       <StyledText as="h4" color={COLORS.grey60}>
-        {t('send_a_protocol_to_store')}
+        {t('branded:send_a_protocol_to_store')}
       </StyledText>
     </Flex>
   )

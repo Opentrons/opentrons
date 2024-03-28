@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '../../__testing-utils__'
 import { i18n } from '../../i18n'
+import { OnDeviceLocalizationProvider } from '../../LocalizationProvider'
 import { ConnectViaEthernet } from '../../pages/ConnectViaEthernet'
 import { ConnectViaUSB } from '../../pages/ConnectViaUSB'
 import { ConnectViaWifi } from '../../pages/ConnectViaWifi'
@@ -29,8 +30,10 @@ import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
 import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 
+import type { OnDeviceLocalizationProviderProps } from '../../LocalizationProvider'
 import type { OnDeviceDisplaySettings } from '../../redux/config/schema-types'
 
+vi.mock('../../LocalizationProvider')
 vi.mock('../../pages/Welcome')
 vi.mock('../../pages/NetworkSetupMenu')
 vi.mock('../../pages/ConnectViaEthernet')
@@ -83,6 +86,12 @@ describe('OnDeviceDisplayApp', () => {
         },
       },
     } as any)
+    // TODO(bh, 2024-03-27): implement testing of branded and anonymous i18n, but for now pass through
+    vi.mocked(
+      OnDeviceLocalizationProvider
+    ).mockImplementation((props: OnDeviceLocalizationProviderProps) => (
+      <>{props.children}</>
+    ))
   })
   afterEach(() => {
     vi.resetAllMocks()

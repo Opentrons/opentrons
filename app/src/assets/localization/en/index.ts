@@ -1,5 +1,7 @@
 import shared from './shared.json'
+import anonymous from './anonymous.json'
 import app_settings from './app_settings.json'
+import branded from './branded.json'
 import change_pipette from './change_pipette.json'
 import protocol_command_text from './protocol_command_text.json'
 import device_details from './device_details.json'
@@ -32,7 +34,9 @@ import top_navigation from './top_navigation.json'
 
 export const en = {
   shared,
+  anonymous,
   app_settings,
+  branded,
   change_pipette,
   protocol_command_text,
   device_details,
