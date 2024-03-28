@@ -171,6 +171,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
     >
       {pipetteOptions.map(o => (
         <EquipmentOption
+          robotType={fields.robotType}
           key={o.name}
           isSelected={currentValue === o.value}
           image={

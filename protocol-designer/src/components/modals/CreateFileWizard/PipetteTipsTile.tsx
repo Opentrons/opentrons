@@ -147,8 +147,9 @@ interface PipetteTipsFieldProps extends UseFormReturn<FormState> {
 }
 
 function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
-  const { mount, watch, setValue } = props
+  const { mount, watch, setValue, getValues } = props
   const { t } = useTranslation('modal')
+  const { fields } = getValues()
   const pipettesByMount = watch('pipettesByMount')
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
@@ -197,6 +198,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
       <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
         {defaultTiprackOptions.map(o => (
           <EquipmentOption
+            robotType={fields.robotType}
             key={o.name}
             isSelected={selectedValues.includes(o.value)}
             text={o.name}
@@ -261,6 +263,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
             >
               {customTiprackOptions.map(o => (
                 <EquipmentOption
+                  robotType={fields.robotType}
                   key={o.name}
                   isSelected={selectedValues.includes(o.value)}
                   text={o.name}

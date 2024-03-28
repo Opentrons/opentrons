@@ -1,8 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
-import type {
-  FormPipettesByMount,
-  FormModulesByType,
-} from '../../../step-forms'
+import type { FormPipettesByMount, FormModules } from '../../../step-forms'
 
 import type { NewProtocolFields } from '../../../load-file'
 
@@ -17,7 +14,7 @@ export type AdditionalEquipment =
 export interface FormState {
   fields: NewProtocolFields
   pipettesByMount: FormPipettesByMount
-  modulesByType: FormModulesByType
+  modules: FormModules | null
   additionalEquipment: AdditionalEquipment[]
 }
 

@@ -28,11 +28,11 @@ export interface FormPipettesByMount {
 }
 // =========== MODULES ========
 export interface FormModule {
-  onDeck: boolean
-  model: ModuleModel | null
+  model: ModuleModel
+  type: ModuleType
   slot: DeckSlot
 }
-export type FormModulesByType = Record<ModuleType, FormModule>
+export type FormModules = Record<number, FormModule>
 export type ModuleEntities = Record<string, ModuleEntity>
 // NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'
 export interface MagneticModuleState {

@@ -42,12 +42,7 @@ const values = {
     },
     right: { pipetteName: null, tiprackDefURI: null },
   } as FormPipettesByMount,
-  modulesByType: {
-    heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-    magneticBlockType: { onDeck: false, model: null, slot: '2' },
-    temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-    thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-  },
+  modules: {},
   additionalEquipment: ['gripper'],
 } as FormState
 
@@ -55,6 +50,7 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
   goBack: vi.fn(),
   proceed: vi.fn(),
   watch: vi.fn((name: keyof typeof values) => values[name]) as any,
+  getValues: vi.fn(() => values) as any,
 }
 
 const fixtureTipRack10ul = {
@@ -154,12 +150,7 @@ describe('PipetteTipsTile', () => {
         },
         right: { pipetteName: null, tiprackDefURI: null },
       } as FormPipettesByMount,
-      modulesByType: {
-        heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-        magneticBlockType: { onDeck: false, model: null, slot: '2' },
-        temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-        thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-      },
+      modules: {},
       additionalEquipment: ['gripper'],
     } as FormState
 
