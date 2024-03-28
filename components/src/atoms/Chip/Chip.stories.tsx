@@ -3,12 +3,11 @@ import * as React from 'react'
 import { Flex } from '../../primitives'
 import { COLORS } from '../../helix-design-system'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { ICON_DATA_BY_NAME } from '../../icons'
 import { Chip } from '.'
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
-  title: 'Library/Atoms/Chip',
+const meta: Meta<typeof Chip> = {
+  title: 'ODD/Atoms/Chip',
   argTypes: {
     type: {
       options: ['basic', 'error', 'info', 'neutral', 'success', 'warning'],
@@ -31,7 +30,7 @@ export default {
       defaultValue: 'medium',
     },
     iconName: {
-      options: Object.keys(ICON_DATA_BY_NAME),
+      options: ['connection-status', 'ot-check', 'ot-alert'],
       control: {
         type: 'select',
       },
@@ -40,27 +39,27 @@ export default {
   },
   component: Chip,
   parameters: VIEWPORT.touchScreenViewport,
-} as Meta
-
-interface ChipStorybookProps extends React.ComponentProps<typeof Chip> {
-  backgroundColor: string
+  decorators: [
+    Story => (
+      <Flex
+        padding={SPACING.spacing16}
+        backgroundColor={COLORS.grey50}
+        width="59rem"
+      >
+        <Story />
+      </Flex>
+    ),
+  ],
 }
 
-// Note: 59rem(944px) is the size of ODD
-const Template: Story<ChipStorybookProps> = ({ ...args }) => (
-  <Flex
-    padding={SPACING.spacing16}
-    backgroundColor={COLORS.white}
-    width="59rem"
-  >
-    <Chip {...args} />
-  </Flex>
-)
+export default meta
+type Story = StoryObj<typeof Chip>
 
-export const ChipComponent = Template.bind({})
-ChipComponent.args = {
-  type: 'basic',
-  text: 'Chip component',
-  hasIcon: true,
-  chipSize: 'medium',
+export const ChipComponent: Story = {
+  args: {
+    type: 'basic',
+    text: 'Chip component',
+    hasIcon: true,
+    chipSize: 'medium',
+  },
 }
