@@ -37,7 +37,12 @@ def run_protocol(
             # this in analysis which is the reason we'd pass it to this function
             if parameter_context is None:
                 parameter_context = ParameterContext(protocol.api_level)
-            run_python(protocol, context, parameter_context, run_time_param_overrides)
+            run_python(
+                proto=protocol,
+                context=context,
+                parameter_context=parameter_context,
+                run_time_param_overrides=run_time_param_overrides,
+            )
         else:
             raise RuntimeError(f"Unsupported python API version: {protocol.api_level}")
     else:

@@ -57,22 +57,16 @@ def ensure_unit_string_length(unit: Optional[str]) -> Optional[str]:
 def ensure_value_type(
     value: Union[float, bool, str], parameter_type: type
 ) -> AllowedTypes:
-    """Ensures that the value type coming in from the client matches the given type."""
+    """Ensures that the value type coming in from the client matches the given type.
+
+    This does not guarantee that the value will be the correct type for the given parameter, only that any data coming
+    in is in the format that we expect. For now, the only transformation it is doing is converting integers represented
+    as floating points to integers. If something is labelled as an int but is not actually an integer, that will be
+    caught when it is attempted to be set as the parameter value and will raise the appropriate error there.
+    """
     validated_value: AllowedTypes
     if isinstance(value, float) and parameter_type is int and value.is_integer():
         validated_value = int(value)
-    else:
-        validated_value = value
-    return validated_value
-
-
-def ensure_enum_type(value: AllowedTypes) -> Union[float, str]:
-    """Ensure that the value that is sent over from the client is the expected type."""
-    validated_value: Union[float, bool, str]
-    if isinstance(value, bool):
-        raise ParameterValueError("Cannot send a boolean value as an enum type")
-    elif isinstance(value, int):
-        validated_value = float(value)
     else:
         validated_value = value
     return validated_value
@@ -95,7 +89,7 @@ def convert_type_string_for_enum(
 
 
 def convert_type_string_for_num_param(parameter_type: type) -> Literal["int", "float"]:
-    """Converts a type object into a string for an enumerated parameter."""
+    """Converts a type object into a string for a number parameter."""
     if parameter_type is int:
         return "int"
     elif parameter_type is float:

@@ -9,7 +9,7 @@ import anyio
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.protocol_api import ParameterContext, MAX_SUPPORTED_VERSION
+from opentrons.protocol_api import ParameterContext
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -158,14 +158,14 @@ class PythonAndLegacyRunner(AbstractRunner):
             drop_tips_after_run=drop_tips_after_run,
             post_run_hardware_state=post_run_hardware_state,
         )
-        # We need to define this here so we can use it throughout this class, but it will be recreated with the proper
-        # api level version upon a protocol loading.
-        self._parameter_context = ParameterContext(api_version=MAX_SUPPORTED_VERSION)
+        self._parameter_context: Optional[ParameterContext] = None
 
     @property
     def run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
-        return self._parameter_context.export_parameters_for_analysis()
+        if self._parameter_context is not None:
+            return self._parameter_context.export_parameters_for_analysis()
+        return []
 
     async def load(
         self,
@@ -246,7 +246,7 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        parameters = self._parameter_context.export_parameters_for_analysis()
+        parameters = self.run_time_parameters
         return RunResult(
             commands=commands, state_summary=run_data, parameters=parameters
         )

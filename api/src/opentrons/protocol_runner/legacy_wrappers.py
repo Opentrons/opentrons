@@ -173,7 +173,7 @@ class LegacyExecutor:
     async def execute(
         protocol: LegacyProtocol,
         context: LegacyProtocolContext,
-        parameter_context: ParameterContext,
+        parameter_context: Optional[ParameterContext],
         run_time_param_values: Optional[RunTimeParamValuesType],
     ) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""

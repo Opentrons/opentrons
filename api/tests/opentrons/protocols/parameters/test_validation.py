@@ -143,23 +143,8 @@ def test_validate_options_raises_name_error() -> None:
 def test_ensure_value_type(
     value: Union[float, bool, str], param_type: type, result: AllowedTypes
 ) -> None:
-    """It should ensure the correct type is there, converting an float to ints."""
+    """It should ensure the correct type is there, converting floats to ints."""
     assert result == subject.ensure_value_type(value, param_type)
-
-
-@pytest.mark.parametrize(
-    ["value", "result"],
-    [(123, 123.0), (123.4, 123.4), (456.0, 456.0), ("789", "789")],
-)
-def test_ensure_enum_type(value: AllowedTypes, result: Union[float, str]) -> None:
-    """It should ensure the value is in the format of a valid enum choice value."""
-    assert result == subject.ensure_enum_type(value)
-
-
-def test_ensure_enum_type_raises() -> None:
-    """It should raise if given a bool for enum value."""
-    with pytest.raises(ParameterValueError):
-        subject.ensure_enum_type(True)
 
 
 @pytest.mark.parametrize(

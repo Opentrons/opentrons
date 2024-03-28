@@ -131,7 +131,7 @@ class ParameterDefinition(Generic[ParamType]):
             choices = [
                 EnumChoice(
                     displayName=str(choice["display_name"]),
-                    value=validation.ensure_enum_type(choice["value"]),
+                    value=choice["value"],
                 )
                 for choice in self._choices
             ]
@@ -141,8 +141,8 @@ class ParameterDefinition(Generic[ParamType]):
                 variableName=self._variable_name,
                 description=self._description,
                 choices=choices,
-                value=validation.ensure_enum_type(self._value),
-                default=validation.ensure_enum_type(self._default),
+                value=self._value,
+                default=self._default,
             )
         elif self._minimum is not None and self._maximum is not None:
             parameter = NumberParameter(

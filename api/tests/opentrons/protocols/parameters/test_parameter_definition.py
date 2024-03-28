@@ -286,10 +286,6 @@ def test_as_protocol_engine_enum_parameter(decoy: Decoy) -> None:
         ],
     )
     parameter_def.value = "green"
-
-    decoy.when(mock_validation.ensure_enum_type("blue")).then_return("aquamarine")
-    decoy.when(mock_validation.ensure_enum_type("red")).then_return("crimson")
-    decoy.when(mock_validation.ensure_enum_type("green")).then_return("forest")
     decoy.when(mock_validation.convert_type_string_for_enum(str)).then_return("float")
 
     assert parameter_def.as_protocol_engine_type() == EnumParameter(
@@ -297,12 +293,12 @@ def test_as_protocol_engine_enum_parameter(decoy: Decoy) -> None:
         displayName="my cool name",
         variableName="my variable",
         choices=[
-            EnumChoice(displayName="Lapis lazuli", value="aquamarine"),
-            EnumChoice(displayName="Vermilion", value="crimson"),
-            EnumChoice(displayName="Celadon", value="forest"),
+            EnumChoice(displayName="Lapis lazuli", value="blue"),
+            EnumChoice(displayName="Vermilion", value="red"),
+            EnumChoice(displayName="Celadon", value="green"),
         ],
-        value="forest",
-        default="crimson",
+        value="green",
+        default="red",
     )
 
 
