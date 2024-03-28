@@ -197,4 +197,4 @@ class MaintenanceEngineStore:
         commands = state_view.commands.get_all()
         self._runner_engine_pair = None
 
-        return RunResult(state_summary=run_data, commands=commands)
+        return RunResult(state_summary=run_data, commands=commands, parameters=[])

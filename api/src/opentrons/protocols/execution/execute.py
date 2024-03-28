@@ -1,7 +1,8 @@
 import logging
-from typing import Optional, Dict, Union
+from typing import Optional
 
-from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_api import ProtocolContext, ParameterContext
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 from opentrons.protocols.execution.execute_python import run_python
 from opentrons.protocols.execution.json_dispatchers import (
     pipette_command_map,
@@ -20,17 +21,28 @@ MODULE_LOG = logging.getLogger(__name__)
 def run_protocol(
     protocol: Protocol,
     context: ProtocolContext,
-    # TODO (spp, 2024-03-20): move RunTimeParamValuesType to a top level types and use here
-    run_time_param_overrides: Optional[Dict[str, Union[float, bool, str]]] = None,
+    parameter_context: Optional[ParameterContext] = None,
+    run_time_param_overrides: Optional[RunTimeParamValuesType] = None,
 ) -> None:
     """Run a protocol.
 
     :param protocol: The :py:class:`.protocols.types.Protocol` to execute
-    :param context: The context to use.
+    :param context: The protocol context to use.
+    :param parameter_context: The parameter context to use.
+    :param run_time_param_overrides: Any parameter values that are potentially overriding the defaults
     """
     if isinstance(protocol, PythonProtocol):
         if protocol.api_level >= APIVersion(2, 0):
-            run_python(protocol, context)
+            # If this is None here then we're either running simulate or execute, in any case we don't need to report
+            # this in analysis which is the reason we'd pass it to this function
+            if parameter_context is None:
+                parameter_context = ParameterContext(protocol.api_level)
+            run_python(
+                proto=protocol,
+                context=context,
+                parameter_context=parameter_context,
+                run_time_param_overrides=run_time_param_overrides,
+            )
         else:
             raise RuntimeError(f"Unsupported python API version: {protocol.api_level}")
     else:

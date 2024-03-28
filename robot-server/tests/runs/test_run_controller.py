@@ -153,6 +153,7 @@ async def test_create_play_action_to_start(
         RunResult(
             commands=protocol_commands,
             state_summary=engine_state_summary,
+            parameters=[],
         )
     )
 
