@@ -101,7 +101,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
       />
     )
   } else if (showCheckbox && disabled) {
-    iconInfo = <Flex width="1.5rem"></Flex>
+    iconInfo = <Flex width="1.5rem" />
   }
 
   return (

@@ -26,7 +26,7 @@ const values = {
     robotType: OT2_ROBOT_TYPE,
   },
   pipettesByMount: {
-    left: { pipetteName: 'p1000_single_flex', tiprackDefURI: 'mocktip' },
+    left: { pipetteName: 'p1000_single_flex', tiprackDefURI: ['mocktip'] },
     right: { pipetteName: null, tiprackDefURI: null },
   } as FormPipettesByMount,
   modules: {},

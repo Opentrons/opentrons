@@ -1,8 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
-import type {
-  FormPipettesByMount,
-  FormModules,
-} from '../../../step-forms'
+import type { FormPipettesByMount, FormModules } from '../../../step-forms'
 
 import type { NewProtocolFields } from '../../../load-file'
 
