@@ -242,7 +242,13 @@ class ProtocolEngine:
         await self.wait_for_command(command.id)
         return self._state_store.commands.get(command.id)
 
-    def estop(self, maintenance_run: bool) -> None:
+    def estop(
+        self,
+        # TODO(mm, 2024-03-26): Maintenance runs are a robot-server concept that
+        # ProtocolEngine should not have to know about. Can this be simplified or
+        # defined in other terms?
+        maintenance_run: bool,
+    ) -> None:
         """Signal to the engine that an estop event occurred.
 
         If there are any queued commands for the engine, they will be marked
@@ -267,6 +273,7 @@ class ProtocolEngine:
                 error_id=self._model_utils.generate_id(),
                 failed_at=self._model_utils.get_timestamp(),
                 error=EStopActivatedError(message="Estop Activated"),
+                notes=[],
                 type=ErrorRecoveryType.FAIL_RUN,
             )
             self._action_dispatcher.dispatch(fail_action)
@@ -280,6 +287,7 @@ class ProtocolEngine:
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
                     error=EStopActivatedError(message="Estop Activated"),
+                    notes=[],
                     type=ErrorRecoveryType.FAIL_RUN,
                 )
                 self._action_dispatcher.dispatch(fail_action)

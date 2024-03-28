@@ -66,6 +66,7 @@
   "robot_is_busy": "{{robotName}} is busy",
   "robot": "robot",
   "run_protocol": "Run protocol",
+  "select_parameters_for_robot": "Select parameters for {{robot_name}}",
   "send": "Send",
   "sending": "Sending",
   "show_in_folder": "Show in folder",

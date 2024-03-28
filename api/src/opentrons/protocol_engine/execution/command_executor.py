@@ -1,7 +1,7 @@
 """Command side-effect execution logic container."""
 import asyncio
 from logging import getLogger
-from typing import Optional, List, Dict, Any, Protocol
+from typing import Optional, List, Protocol
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -20,9 +20,13 @@ from ..commands import (
     AbstractCommandImpl,
     CommandResult,
     CommandPrivateResult,
-    Command,
 )
-from ..actions import ActionDispatcher, UpdateCommandAction, FailCommandAction
+from ..actions import (
+    ActionDispatcher,
+    RunCommandAction,
+    SucceedCommandAction,
+    FailCommandAction,
+)
 from ..errors import RunStoppedError
 from ..errors.exceptions import EStopActivatedError as PE_EStopActivatedError
 from ..notes import CommandNote, CommandNoteTracker
@@ -114,9 +118,9 @@ class CommandExecutor:
             command_id: The identifier of the command to execute. The
                 command itself will be looked up from state.
         """
-        command = self._state_store.commands.get(command_id=command_id)
+        queued_command = self._state_store.commands.get(command_id=command_id)
         note_tracker = self._command_note_tracker_provider()
-        command_impl = command._ImplementationCls(
+        command_impl = queued_command._ImplementationCls(
             state_view=self._state_store,
             hardware_api=self._hardware_api,
             equipment=self._equipment,
@@ -132,29 +136,24 @@ class CommandExecutor:
         )
 
         started_at = self._model_utils.get_timestamp()
-        running_command = command.copy(
-            update={
-                "status": CommandStatus.RUNNING,
-                "startedAt": started_at,
-            }
-        )
 
         self._action_dispatcher.dispatch(
-            UpdateCommandAction(command=running_command, private_result=None)
+            RunCommandAction(command_id=queued_command.id, started_at=started_at)
         )
+        running_command = self._state_store.commands.get(queued_command.id)
 
         try:
             log.debug(
-                f"Executing {command.id}, {command.commandType}, {command.params}"
+                f"Executing {running_command.id}, {running_command.commandType}, {running_command.params}"
             )
             if isinstance(command_impl, AbstractCommandImpl):
-                result: CommandResult = await command_impl.execute(command.params)  # type: ignore[arg-type]
+                result: CommandResult = await command_impl.execute(running_command.params)  # type: ignore[arg-type]
                 private_result: Optional[CommandPrivateResult] = None
             else:
-                result, private_result = await command_impl.execute(command.params)  # type: ignore[arg-type]
+                result, private_result = await command_impl.execute(running_command.params)  # type: ignore[arg-type]
 
         except (Exception, asyncio.CancelledError) as error:
-            log.warning(f"Execution of {command.id} failed", exc_info=error)
+            log.warning(f"Execution of {running_command.id} failed", exc_info=error)
             # TODO(mc, 2022-11-14): mark command as stopped rather than failed
             # https://opentrons.atlassian.net/browse/RCORE-390
             if isinstance(error, asyncio.CancelledError):
@@ -163,24 +162,14 @@ class CommandExecutor:
                 error = PE_EStopActivatedError(message=str(error), wrapping=[error])
             elif not isinstance(error, EnumeratedError):
                 error = PythonException(error)
-            notes_update = _append_notes_if_notes(
-                running_command, note_tracker.get_notes()
-            )
-
-            if notes_update:
-                command_with_new_notes = running_command.copy(update=notes_update)
-                self._action_dispatcher.dispatch(
-                    UpdateCommandAction(
-                        command=command_with_new_notes, private_result=None
-                    )
-                )
 
             self._action_dispatcher.dispatch(
                 FailCommandAction(
                     error=error,
-                    command_id=command_id,
+                    command_id=running_command.id,
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
+                    notes=note_tracker.get_notes(),
                     # todo(mm, 2024-03-13):
                     # When a command fails recoverably, and we handle it with
                     # WAIT_FOR_RECOVERY or CONTINUE, we want to update our logical
@@ -199,21 +188,11 @@ class CommandExecutor:
                 "result": result,
                 "status": CommandStatus.SUCCEEDED,
                 "completedAt": self._model_utils.get_timestamp(),
-                **_append_notes_if_notes(running_command, note_tracker.get_notes()),
+                "notes": note_tracker.get_notes(),
             }
-            completed_command = running_command.copy(update=update)
+            succeeded_command = running_command.copy(update=update)
             self._action_dispatcher.dispatch(
-                UpdateCommandAction(
-                    command=completed_command, private_result=private_result
+                SucceedCommandAction(
+                    command=succeeded_command, private_result=private_result
                 ),
             )
-
-
-def _append_notes_if_notes(
-    running_command: Command, notes: List[CommandNote]
-) -> Dict[str, Any]:
-    if not notes:
-        return {}
-    if running_command.notes is None:
-        return {"notes": notes}
-    return {"notes": running_command.notes + notes}
