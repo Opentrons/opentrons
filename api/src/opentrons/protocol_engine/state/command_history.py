@@ -20,6 +20,9 @@ class CommandEntry:
 class CommandHistory:
     """Command state container for command data."""
 
+    _all_command_ids: List[str]
+    """All command IDs, in insertion order."""
+
     _commands_by_id: Dict[str, CommandEntry]
     """All command resources, in insertion order, mapped by their unique IDs."""
 
@@ -36,6 +39,7 @@ class CommandHistory:
     """ID of the most recent command that was dequeued, if any"""
 
     def __init__(self) -> None:
+        self._all_command_ids = []
         self._queued_command_ids = OrderedSet()
         self._queued_setup_command_ids = OrderedSet()
         self._commands_by_id = OrderedDict()
@@ -61,8 +65,7 @@ class CommandHistory:
         """Get the command which follows the command associated with the given ID, if any."""
         try:
             index = self._commands_by_id[command_id].index
-            commands_by_id_list = list(self._commands_by_id.keys())
-            return self._commands_by_id[commands_by_id_list[index + 1]]
+            return self._commands_by_id[self._all_command_ids[index + 1]]
         except KeyError:
             raise CommandDoesNotExistError(f"Command {command_id} does not exist")
         except IndexError:
@@ -74,17 +77,19 @@ class CommandHistory:
 
     def get_all_commands(self) -> List[Command]:
         """Get all commands."""
-        commands = list(self._commands_by_id.values())
-        return [command.command for command in commands]
+        return [
+            self._commands_by_id[command_id].command
+            for command_id in self._all_command_ids
+        ]
 
     def get_all_ids(self) -> List[str]:
         """Get all command IDs."""
-        return list(self._commands_by_id.keys())
+        return self._all_command_ids
 
     def get_slice(self, start: int, stop: int) -> List[Command]:
         """Get a list of commands between start and stop."""
-        commands = list(self._commands_by_id.values())[start:stop]
-        return [command.command for command in commands]
+        commands = self._all_command_ids[start:stop]
+        return [self._commands_by_id[command].command for command in commands]
 
     def get_tail_command(self) -> Optional[CommandEntry]:
         """Get the command most recently added."""
@@ -115,16 +120,14 @@ class CommandHistory:
         """Get the IDs of all queued setup commands, in FIFO order."""
         return self._queued_setup_command_ids
 
-    def set_dequeued_command_id(self, command_id: str) -> None:
-        """Set the ID of the most recently dequeued command."""
-        self._dequeued_command_id = command_id
-
     def set_running_command_id(self, command_id: Optional[str]) -> None:
         """Set the ID of the currently running command."""
         self._running_command_id = command_id
 
     def add(self, command_id: str, command_entry: CommandEntry) -> None:
         """Create or update a command entry."""
+        if command_id not in self._commands_by_id:
+            self._all_command_ids.append(command_id)
         self._commands_by_id[command_id] = command_entry
 
     def add_to_queue(self, command_id: str) -> None:
@@ -146,7 +149,15 @@ class CommandHistory:
     def remove_queue_id(self, command_id: str) -> None:
         """Remove a specific command from the queued command ids structure."""
         self._queued_command_ids.discard(command_id)
+        if command_id in self._queued_command_ids:
+            self._set_dequeued_command_id(command_id)
 
     def remove_setup_queue_id(self, command_id: str) -> None:
         """Remove a specific command from the queued setup command ids structure."""
         self._queued_setup_command_ids.discard(command_id)
+        if command_id in self._queued_setup_command_ids:
+            self._set_dequeued_command_id(command_id)
+
+    def _set_dequeued_command_id(self, command_id: str) -> None:
+        """Set the ID of the most recently dequeued command."""
+        self._dequeued_command_id = command_id

@@ -282,7 +282,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
             running_command_entry = self._state.command_history.get_running_command()
             assert running_command_entry is not None
-            assert running_command_entry.command == action.command
+            assert running_command_entry.command.id == action.command.id
             self._state.command_history.set_running_command_id(None)
 
             self._state.command_history.remove_queue_id(succeeded_command.id)

@@ -120,7 +120,7 @@ def test_get_recently_dequeued_command(command_history: CommandHistory) -> None:
     assert command_history.get_dequeued_command() is None
     command_entry = create_queued_command_entry()
     command_history.add("0", command_entry)
-    command_history.set_dequeued_command_id("0")
+    command_history._set_dequeued_command_id("0")
     assert command_history.get_dequeued_command() == command_entry
 
 
@@ -160,7 +160,7 @@ def test_set_recent_dequeued_command_id(command_history: CommandHistory) -> None
     """It should set the ID of the most recently dequeued command."""
     command_entry = create_queued_command_entry()
     command_history.add("0", command_entry)
-    command_history.set_dequeued_command_id("0")
+    command_history._set_dequeued_command_id("0")
     assert command_history.get_dequeued_command() == command_entry
 
 

@@ -759,7 +759,7 @@ def test_get_current() -> None:
         created_at=datetime(year=2022, month=2, day=2),
     )
     subject = get_command_view(commands=[command_1, command_2])
-    subject.state.command_history.set_dequeued_command_id(command_1.id)
+    subject.state.command_history._set_dequeued_command_id(command_1.id)
 
     assert subject.get_current() == CurrentCommand(
         index=1,
@@ -779,7 +779,7 @@ def test_get_current() -> None:
         created_at=datetime(year=2022, month=2, day=2),
     )
     subject = get_command_view(commands=[command_1, command_2])
-    subject.state.command_history.set_dequeued_command_id(command_1.id)
+    subject.state.command_history._set_dequeued_command_id(command_1.id)
 
     assert subject.get_current() == CurrentCommand(
         index=1,
