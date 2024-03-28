@@ -777,3 +777,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._engine_client.configure_nozzle_layout(
             pipette_id=self._pipette_id, configuration_params=configuration_model
         )
+
+    def retract(self) -> None:
+        """Retract this instrument to the top of the gantry."""
+        z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
+        self._engine_client.home([z_axis])

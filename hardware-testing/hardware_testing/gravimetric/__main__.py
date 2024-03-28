@@ -2,10 +2,8 @@
 from json import load as json_load
 from pathlib import Path
 import argparse
-from time import time
 from typing import List, Union, Dict, Optional, Any, Tuple
 from dataclasses import dataclass
-from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_api import ProtocolContext
 from . import report
 import subprocess
@@ -42,16 +40,15 @@ from .config import (
 from .measurement.record import GravimetricRecorder
 from .measurement import DELAY_FOR_MEASUREMENT
 from .measurement.scale import Scale
-from .measurement.environment import read_environment_data
 from .trial import TestResources, _change_pipettes
 from .tips import get_tips
 from hardware_testing.drivers import asair_sensor
 from opentrons.protocol_api import InstrumentContext
+from opentrons.protocol_engine.types import LabwareOffset
 
-# FIXME: bump to v2.15 to utilize protocol engine
-API_LEVEL = "2.13"
+API_LEVEL = "2.18"
 
-LABWARE_OFFSETS: List[dict] = []
+LABWARE_OFFSETS: List[LabwareOffset] = []
 
 # Keyed by pipette volume, channel count, and tip volume in that order
 GRAVIMETRIC_CFG = {
@@ -89,6 +86,19 @@ GRAVIMETRIC_CFG_INCREMENT = {
         },
     },
 }
+
+PIPETTE_MODEL_NAME = {
+    50: {
+        1: "p50_single_flex",
+        8: "p50_multi_flex",
+    },
+    1000: {
+        1: "p1000_single_flex",
+        8: "p1000_multi_flex",
+        96: "p1000_96_flex",
+    },
+}
+
 
 PHOTOMETRIC_CFG = {
     50: {
@@ -148,22 +158,18 @@ class RunArgs:
             ui.print_info(
                 "Starting opentrons-robot-server, so we can http GET labware offsets"
             )
-            offsets = workarounds.http_get_all_labware_offsets()
-            ui.print_info(f"found {len(offsets)} offsets:")
-            for offset in offsets:
-                ui.print_info(f"\t{offset['createdAt']}:")
-                ui.print_info(f"\t\t{offset['definitionUri']}")
-                ui.print_info(f"\t\t{offset['vector']}")
-                LABWARE_OFFSETS.append(offset)
+            LABWARE_OFFSETS.extend(workarounds.http_get_all_labware_offsets())
+            ui.print_info(f"found {len(LABWARE_OFFSETS)} offsets:")
+            for offset in LABWARE_OFFSETS:
+                ui.print_info(f"\t{offset.createdAt}:")
+                ui.print_info(f"\t\t{offset.definitionUri}")
+                ui.print_info(f"\t\t{offset.vector}")
         # gather the custom labware (for simulation)
         custom_defs = {}
         if args.simulate:
             labware_dir = Path(__file__).parent.parent / "labware"
             custom_def_uris = [
                 "radwag_pipette_calibration_vial",
-                "opentrons_flex_96_tiprack_50ul_adp",
-                "opentrons_flex_96_tiprack_200ul_adp",
-                "opentrons_flex_96_tiprack_1000ul_adp",
             ]
             for def_uri in custom_def_uris:
                 with open(labware_dir / def_uri / "1.json", "r") as f:
@@ -172,9 +178,12 @@ class RunArgs:
         _ctx = helpers.get_api_context(
             API_LEVEL,  # type: ignore[attr-defined]
             is_simulating=args.simulate,
-            deck_version="2",
+            pipette_left=PIPETTE_MODEL_NAME[args.pipette][args.channels],
             extra_labware=custom_defs,
         )
+        for offset in LABWARE_OFFSETS:
+            engine = _ctx._core._engine_client._transport._engine  # type: ignore[attr-defined]
+            engine.state_view._labware_store._add_labware_offset(offset)
         return _ctx
 
     @classmethod
@@ -301,7 +310,7 @@ class RunArgs:
                 trials=trials,
                 name=name,
                 robot_serial=robot_serial,
-                fw_version=_ctx._core.get_hardware().fw_version,
+                fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
             )
         else:
             if args.increment:
@@ -334,7 +343,7 @@ class RunArgs:
                 name=name,
                 environment_sensor=environment_sensor,
                 trials=trials,
-                fw_version=_ctx._core.get_hardware().fw_version,
+                fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
             )
 
         return RunArgs(
@@ -387,7 +396,6 @@ def build_gravimetric_cfg(
         pipette_channels=run_args.pipette_channels,
         tip_volume=tip_volume,
         trials=run_args.trials,
-        labware_offsets=LABWARE_OFFSETS,
         labware_on_scale=run_args.protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
         slot_scale=run_args.protocol_cfg.SLOT_SCALE,  # type: ignore[attr-defined]
         slots_tiprack=run_args.protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
@@ -436,7 +444,6 @@ def build_photometric_cfg(
         increment=False,
         tip_volume=tip_volume,
         trials=run_args.trials,
-        labware_offsets=LABWARE_OFFSETS,
         photoplate=run_args.protocol_cfg.PHOTOPLATE_LABWARE,  # type: ignore[attr-defined]
         photoplate_slot=run_args.protocol_cfg.SLOT_PLATE,  # type: ignore[attr-defined]
         reservoir=run_args.protocol_cfg.RESERVOIR_LABWARE,  # type: ignore[attr-defined]
@@ -569,7 +576,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mode", type=str, choices=["", "default", "lowVolumeDefault"], default=""
     )
-    parser.add_argument("--pre-heat", action="store_true")
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     if not run_args.ctx.is_simulating():
@@ -580,47 +586,12 @@ if __name__ == "__main__":
             shell=True,
         )
         sleep(1)
-    hw = run_args.ctx._core.get_hardware()
+    hw = workarounds.get_sync_hw_api(run_args.ctx)
     try:
         if not run_args.ctx.is_simulating() and not args.photometric:
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("homing...")
         run_args.ctx.home()
-
-        if args.pre_heat:
-            ui.print_header("PRE-HEAT")
-            mnt = OT3Mount.LEFT
-            hw.add_tip(mnt, 1)
-            hw.prepare_for_aspirate(mnt)
-            env_data = read_environment_data(
-                mnt.name.lower(), hw.is_simulator, run_args.environment_sensor
-            )
-            start_temp = env_data.celsius_pipette
-            temp_limit = min(start_temp + 3.0, 28.0)
-            max_pre_heat_seconds = 60 * 10
-            now = time()
-            start_time = now
-            while (
-                now - start_time < max_pre_heat_seconds
-                and env_data.celsius_pipette < temp_limit
-            ):
-                ui.print_info(
-                    f"pre-heat {int(now - start_time)} seconds "
-                    f"({max_pre_heat_seconds} limit): "
-                    f"{round(env_data.celsius_pipette, 2)} C "
-                    f"({round(temp_limit, 2)} C limit)"
-                )
-                # NOTE: moving slowly helps make sure full current is sent to coils
-                hw.aspirate(mnt, rate=0.1)
-                hw.dispense(mnt, rate=0.1, push_out=0)
-                env_data = read_environment_data(
-                    mnt.name.lower(), hw.is_simulator, run_args.environment_sensor
-                )
-                if run_args.ctx.is_simulating():
-                    now += 1
-                else:
-                    now = time()
-            hw.remove_tip(mnt)
 
         for tip, volumes in run_args.volumes:
             if args.channels == 96 and not run_args.ctx.is_simulating():
@@ -634,5 +605,5 @@ if __name__ == "__main__":
         _change_pipettes(run_args.ctx, run_args.pipette)
         if not run_args.ctx.is_simulating():
             serial_logger.terminate()
-            del hw._backend.eeprom_driver._gpio
+            del hw._backend.eeprom_driver._gpio  # still need this?
     print("done\n\n")

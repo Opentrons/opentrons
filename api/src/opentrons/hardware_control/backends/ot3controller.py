@@ -1647,3 +1647,8 @@ class OT3Controller(FlexBackend):
             if res
             else None
         )
+
+    def _update_tip_state(self, mount: OT3Mount, status: bool) -> None:
+        """This is something we only use in the simulator.
+        It is required so that PE simulations using ot3api don't break."""
+        pass
