@@ -14,6 +14,7 @@ import type {
   HostConfig,
   LabwareOffsetCreateData,
   Protocol,
+  RuntimeParameterCreateData,
 } from '@opentrons/api-client'
 import type { UseCreateRunMutationOptions } from '@opentrons/react-api-client/src/runs/useCreateRunMutation'
 import type { CreateProtocolVariables } from '@opentrons/react-api-client/src/protocols/useCreateProtocolMutation'
@@ -35,7 +36,8 @@ export interface UseCreateRun {
 export function useCreateRunFromProtocol(
   options: UseCreateRunMutationOptions,
   hostOverride?: HostConfig | null,
-  labwareOffsets?: LabwareOffsetCreateData[]
+  labwareOffsets?: LabwareOffsetCreateData[],
+  runTimeParameterValues?: RuntimeParameterCreateData
 ): UseCreateRun {
   const contextHost = useHost()
   const host =
@@ -74,7 +76,11 @@ export function useCreateRunFromProtocol(
   } = useCreateProtocolMutation(
     {
       onSuccess: data => {
-        createRun({ protocolId: data.data.id, labwareOffsets })
+        createRun({
+          protocolId: data.data.id,
+          labwareOffsets,
+          runTimeParameterValues,
+        })
       },
     },
     host

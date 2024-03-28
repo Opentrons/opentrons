@@ -125,6 +125,10 @@ export interface LabwareOffsetCreateData {
   vector: VectorOffset
 }
 
+export interface RuntimeParameterCreateData {
+  [key: string]: string | boolean | number
+}
+
 export interface CommandData {
   data: RunTimeCommand
 }
