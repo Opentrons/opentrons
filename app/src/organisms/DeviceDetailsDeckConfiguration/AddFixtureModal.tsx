@@ -38,6 +38,7 @@ import {
   THERMOCYCLER_MODULE_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_FIXTURES,
@@ -57,7 +58,7 @@ import type {
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
-type CutoutContents = Omit<CutoutConfig, 'cutoutId'>
+// type CutoutContents = Omit<CutoutConfig, 'cutoutId'>
 
 interface AddFixtureModalProps {
   cutoutId: CutoutId
@@ -83,6 +84,7 @@ export function AddFixtureModal({
   const { t } = useTranslation(['device_details', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { data: modulesData } = useModulesQuery()
+  const deckConfig = useDeckConfigurationQuery()?.data ?? []
   const unconfiguredMods =
     modulesData?.data.filter(
       attachedMod =>
@@ -91,8 +93,7 @@ export function AddFixtureModal({
             attachedMod.serialNumber === opentronsModuleSerialNumber
         )
     ) ?? []
-  const deckConfig = useDeckConfigurationQuery()?.data ?? []
-  
+
   let initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only mag block (a module) can be configured in column 2
     ? 'moduleOptions'
     : 'modulesOrFixtures'
@@ -120,13 +121,14 @@ export function AddFixtureModal({
   }
 
 
-  let availableOptions: CutoutContents[] = []
+  let availableOptions: CutoutConfig[][] = []
 
   if (providedFixtureOptions != null) {
-    availableOptions = providedFixtureOptions?.map(o => ({
+    availableOptions = providedFixtureOptions?.map(o => ([{
+      cutoutId,
       cutoutFixtureId: o,
       opentronsModuleSerialNumber: undefined,
-    })) 
+    }]))
   } else if (optionStage === 'fixtureOptions') {
     if (
       SINGLE_RIGHT_CUTOUTS.includes(cutoutId) ||
@@ -134,28 +136,45 @@ export function AddFixtureModal({
     ) {
       availableOptions = [
         ...availableOptions,
-        { cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE },
+        [{
+          cutoutId,
+          cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE
+        }],
       ]
     }
     if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
       availableOptions = [
         ...availableOptions,
-        { cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE },
+        [{
+          cutoutId,
+          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE
+        }],
       ]
     }
   } else if (optionStage === 'moduleOptions') {
     availableOptions = [
       ...availableOptions,
-      { cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE },
+      [{
+        cutoutId,
+        cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE
+      }],
     ]
     if (unconfiguredMods.length > 0) {
       if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
         const unconfiguredTCs = unconfiguredMods
           .filter(mod => mod.moduleModel === THERMOCYCLER_MODULE_V2)
-          .map(mod => ({
-            cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
-            opentronsModuleSerialNumber: mod.serialNumber,
-          }))
+          .map(mod => ([
+            {
+              cutoutId: THERMOCYCLER_MODULE_CUTOUTS[0],
+              cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+            {
+              cutoutId: THERMOCYCLER_MODULE_CUTOUTS[1],
+              cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            }
+          ]))
         availableOptions = [...availableOptions, ...unconfiguredTCs]
       }
       if (
@@ -164,10 +183,11 @@ export function AddFixtureModal({
       ) {
         const unconfiguredHeaterShakers = unconfiguredMods
           .filter(mod => mod.moduleModel === HEATERSHAKER_MODULE_V1)
-          .map(mod => ({
+          .map(mod => ([{
+            cutoutId,
             cutoutFixtureId: HEATERSHAKER_MODULE_V1_FIXTURE,
             opentronsModuleSerialNumber: mod.serialNumber,
-          }))
+          }]))
         availableOptions = [...availableOptions, ...unconfiguredHeaterShakers]
       }
       if (
@@ -176,10 +196,11 @@ export function AddFixtureModal({
       ) {
         const unconfiguredTemperatureModules = unconfiguredMods
           .filter(mod => mod.moduleModel === TEMPERATURE_MODULE_V2)
-          .map(mod => ({
+          .map(mod => ([{
+            cutoutId,
             cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
             opentronsModuleSerialNumber: mod.serialNumber,
-          }))
+          }]))
         availableOptions = [
           ...availableOptions,
           ...unconfiguredTemperatureModules,
@@ -187,18 +208,19 @@ export function AddFixtureModal({
       }
     }
   } else if (optionStage === 'wasteChuteOptions') {
-    availableOptions = WASTE_CHUTE_FIXTURES.map(fixture => ({
+    availableOptions = WASTE_CHUTE_FIXTURES.map(fixture => ([{
+      cutoutId,
       cutoutFixtureId: fixture,
-    }))
+    }]))
   }
 
-  const handleAddODD = (cutoutContents: CutoutContents): void => {
+  const handleAddODD = (cutoutConfigs: CutoutConfig[]): void => {
     if (setCurrentDeckConfig != null)
       setCurrentDeckConfig(
         (prevDeckConfig: DeckConfiguration): DeckConfiguration =>
           prevDeckConfig.map((fixture: CutoutConfig) =>
             fixture.cutoutId === cutoutId
-              ? { ...fixture, ...cutoutContents }
+              ? { ...fixture, ...cutoutConfigs }
               : fixture
           )
       )
@@ -248,12 +270,11 @@ export function AddFixtureModal({
     )
   }
 
-  const handleAddDesktop = (cutoutContents: CutoutContents): void => {
-    const newDeckConfig = deckConfig.map(fixture =>
-      fixture.cutoutId === cutoutId
-        ? { ...fixture, ...cutoutContents }
-        : fixture
-    )
+  const handleAddDesktop = (addedCutoutConfigs: CutoutConfig[]): void => {
+    const newDeckConfig = deckConfig.map(fixture => {
+      const replacementCutoutConfig = addedCutoutConfigs.find(c => c.cutoutId === fixture.cutoutId)
+      return replacementCutoutConfig ?? fixture
+    })
 
     updateDeckConfiguration(newDeckConfig)
     setShowAddFixtureModal(false)
@@ -273,14 +294,14 @@ export function AddFixtureModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {availableOptions.map(cutoutContents => (
+              {availableOptions.map(cutoutConfigs => (
                 <FixtureOption
-                  key={cutoutContents.cutoutFixtureId}
+                  key={cutoutConfigs[0].cutoutFixtureId}
                   optionName={getFixtureDisplayName(
-                    cutoutContents.cutoutFixtureId
+                    cutoutConfigs[0].cutoutFixtureId
                   )}
                   buttonText={t('add')}
-                  onClickHandler={() => handleAddODD(cutoutContents)}
+                  onClickHandler={() => handleAddODD(cutoutConfigs)}
                   isOnDevice={isOnDevice}
                 />
               ))}
@@ -293,14 +314,15 @@ export function AddFixtureModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {availableOptions.map(cutoutContents => (
+              {availableOptions.map(cutoutConfigs => (
                 <FixtureOption
-                  key={cutoutContents.cutoutFixtureId}
+                  key={cutoutConfigs[0].cutoutFixtureId}
                   optionName={getFixtureDisplayName(
-                    cutoutContents.cutoutFixtureId
+                    cutoutConfigs[0].cutoutFixtureId,
+                    (modulesData?.data ?? []).find(m => m.serialNumber === cutoutConfigs[0].opentronsModuleSerialNumber)?.usbPort.port
                   )}
                   buttonText={t('add')}
-                  onClickHandler={() => handleAddDesktop(cutoutContents)}
+                  onClickHandler={() => handleAddDesktop(cutoutConfigs)}
                   isOnDevice={isOnDevice}
                 />
               ))}

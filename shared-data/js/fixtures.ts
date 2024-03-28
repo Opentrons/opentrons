@@ -192,7 +192,8 @@ export function getAddressableAreaNamesFromLoadedModule(
 }
 
 export function getFixtureDisplayName(
-  cutoutFixtureId: CutoutFixtureId | null
+  cutoutFixtureId: CutoutFixtureId | null,
+  usbPortNumber?: number
 ): string {
   switch (cutoutFixtureId) {
     case STAGING_AREA_RIGHT_SLOT_FIXTURE:
@@ -208,15 +209,15 @@ export function getFixtureDisplayName(
     case STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE:
       return 'Waste chute with staging area slot and cover'
     case HEATERSHAKER_MODULE_V1_FIXTURE:
-      return getModuleDisplayName(HEATERSHAKER_MODULE_V1)
+      return `${getModuleDisplayName(HEATERSHAKER_MODULE_V1)} in USB-${usbPortNumber}`
     case TEMPERATURE_MODULE_V2_FIXTURE:
-      return getModuleDisplayName(TEMPERATURE_MODULE_V2)
+      return `${getModuleDisplayName(TEMPERATURE_MODULE_V2)} in USB-${usbPortNumber}`
     case MAGNETIC_BLOCK_V1_FIXTURE:
-      return getModuleDisplayName(MAGNETIC_BLOCK_V1)
+      return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)}`
     case THERMOCYCLER_V2_REAR_FIXTURE:
-      return getModuleDisplayName(THERMOCYCLER_MODULE_V2)
+      return `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in USB-${usbPortNumber}`
     case THERMOCYCLER_V2_FRONT_FIXTURE:
-      return getModuleDisplayName(THERMOCYCLER_MODULE_V2)
+      return `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in USB-${usbPortNumber}`
     default:
       return 'Slot'
   }

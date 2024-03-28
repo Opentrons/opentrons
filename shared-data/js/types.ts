@@ -275,6 +275,7 @@ export interface CutoutFixture {
   mayMountTo: CutoutId[]
   displayName: string
   providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
+  fixtureGroup: CutoutFixtureId[]
   height: number
 }
 
@@ -712,7 +713,7 @@ export type StatusBarAnimations = StatusBarAnimation[]
 
 export interface CutoutConfig {
   cutoutId: CutoutId
-  cutoutFixtureId: CutoutFixtureId | null
+  cutoutFixtureId: CutoutFixtureId 
   opentronsModuleSerialNumber?: string
 }
 

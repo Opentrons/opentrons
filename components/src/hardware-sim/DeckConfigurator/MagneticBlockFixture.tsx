@@ -18,12 +18,13 @@ import {
   CONFIG_STYLE_READ_ONLY,
 } from './constants'
 
-import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId, DeckDefinition } from '@opentrons/shared-data'
 
 interface MagneticBlockFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  handleClickRemove?: (fixtureLocation: CutoutId) => void
+  cutoutFixtureId: CutoutFixtureId
+  handleClickRemove?: (fixtureLocation: CutoutId, cutoutFixtureId: CutoutFixtureId) => void
 }
 
 const MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME = 'Mag Block'
@@ -31,7 +32,7 @@ const MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME = 'Mag Block'
 export function MagneticBlockFixture(
   props: MagneticBlockFixtureProps
 ): JSX.Element {
-  const { deckDefinition, fixtureLocation, handleClickRemove } = props
+  const { deckDefinition, fixtureLocation, handleClickRemove, cutoutFixtureId } = props
 
   const standardSlotCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
@@ -93,7 +94,7 @@ export function MagneticBlockFixture(
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null
-            ? () => handleClickRemove(fixtureLocation)
+            ? () => handleClickRemove(fixtureLocation, cutoutFixtureId)
             : () => {}
         }
       >

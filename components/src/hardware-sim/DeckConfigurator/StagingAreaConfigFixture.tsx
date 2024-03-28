@@ -15,18 +15,19 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
-import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId, DeckDefinition } from '@opentrons/shared-data'
 
 interface StagingAreaConfigFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  handleClickRemove?: (fixtureLocation: CutoutId) => void
+  cutoutFixtureId: CutoutFixtureId
+  handleClickRemove?: (fixtureLocation: CutoutId, cutoutFixtureId: CutoutFixtureId) => void
 }
 
 export function StagingAreaConfigFixture(
   props: StagingAreaConfigFixtureProps
 ): JSX.Element {
-  const { deckDefinition, handleClickRemove, fixtureLocation } = props
+  const { deckDefinition, handleClickRemove, fixtureLocation, cutoutFixtureId } = props
 
   const stagingAreaCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
@@ -60,7 +61,7 @@ export function StagingAreaConfigFixture(
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null
-            ? () => handleClickRemove(fixtureLocation)
+            ? () => handleClickRemove(fixtureLocation, cutoutFixtureId)
             : () => {}
         }
       >

@@ -16,12 +16,13 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
-import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId, DeckDefinition } from '@opentrons/shared-data'
 
 interface WasteChuteConfigFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  handleClickRemove?: (fixtureLocation: CutoutId) => void
+  cutoutFixtureId: CutoutFixtureId
+  handleClickRemove?: (fixtureLocation: CutoutId, cutoutFixtureId: CutoutFixtureId) => void
   hasStagingAreas?: boolean
 }
 
@@ -32,6 +33,7 @@ export function WasteChuteConfigFixture(
     deckDefinition,
     handleClickRemove,
     fixtureLocation,
+    cutoutFixtureId,
     hasStagingAreas = false,
   } = props
 
@@ -71,7 +73,7 @@ export function WasteChuteConfigFixture(
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null
-            ? () => handleClickRemove(fixtureLocation)
+            ? () => handleClickRemove(fixtureLocation, cutoutFixtureId)
             : () => {}
         }
       >

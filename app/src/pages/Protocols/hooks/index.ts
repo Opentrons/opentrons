@@ -13,6 +13,7 @@ import {
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   RunTimeParameter,
+  getCutoutFixtureIdsForModuleModel,
 } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
@@ -126,8 +127,7 @@ export const useRequiredProtocolHardwareFromAnalysis = (
         hasSlotConflict: deckConfig.some(
           ({ cutoutId, cutoutFixtureId }) =>
             cutoutId === getCutoutIdForSlotName(location.slotName, deckDef) &&
-            cutoutFixtureId != null &&
-            !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+            cutoutFixtureId != getCutoutFixtureIdsForModuleModel(model)[0]
         ),
       }
     }

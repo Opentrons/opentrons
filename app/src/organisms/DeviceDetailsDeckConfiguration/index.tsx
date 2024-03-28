@@ -82,7 +82,7 @@ export function DeviceDetailsDeckConfiguration({
     setShowAddFixtureModal(true)
   }
 
-  const handleClickRemove = (cutoutId: CutoutId): void => {
+  const handleClickRemove = (cutoutId: CutoutId, cutoutFixtureId: CutoutFixtureId): void => {
     let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
     if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
       replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
