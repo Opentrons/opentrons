@@ -30,12 +30,7 @@ const values = {
     left: { pipetteName: null, tiprackDefURI: null },
     right: { pipetteName: null, tiprackDefURI: null },
   } as FormPipettesByMount,
-  modulesByType: {
-    heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-    magneticBlockType: { onDeck: false, model: null, slot: '2' },
-    temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-    thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-  },
+  modules: {},
   additionalEquipment: ['gripper'],
 } as FormState
 
@@ -94,12 +89,7 @@ describe('PipetteTypeTile', () => {
         left: { pipetteName: null, tiprackDefURI: null },
         right: { pipetteName: null, tiprackDefURI: null },
       } as FormPipettesByMount,
-      modulesByType: {
-        heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-        magneticBlockType: { onDeck: false, model: null, slot: '2' },
-        temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-        thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-      },
+      modules: {},
       additionalEquipment: ['gripper'],
     } as FormState
 

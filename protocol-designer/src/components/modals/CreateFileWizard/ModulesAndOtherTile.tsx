@@ -35,6 +35,7 @@ import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import gripperImage from '../../../images/flex_gripper.png'
 import wasteChuteImage from '../../../images/waste_chute.png'
 import trashBinImage from '../../../images/flex_trash_bin.png'
+import { uuid } from '../../../utils'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { CrashInfoBox, ModuleDiagram } from '../../modules'
 import { ModuleFields } from '../FilePipettesModal/ModuleFields'
@@ -48,7 +49,6 @@ import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
 import type { AdditionalEquipment, WizardTileProps } from './types'
-import { uuid } from '../../../utils'
 
 export const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
   [THERMOCYCLER_MODULE_V2]: 'B1',
@@ -64,20 +64,10 @@ export const FLEX_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
 ]
 
 export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
-  const {
-    formState,
-    getValues,
-    setValue,
-    goBack,
-    proceed,
-    control,
-    trigger,
-    watch,
-  } = props
+  const { getValues, goBack, proceed, watch } = props
   const { t } = useTranslation(['modal', 'tooltip'])
   const { fields, pipettesByMount, additionalEquipment } = getValues()
   const modules = watch('modules')
-  const { errors, touchedFields } = formState
   const robotType = fields.robotType
   const moduleRestrictionsDisabled = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
@@ -106,12 +96,20 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
         ) != null
       : false
 
+  const leftPipetteSpecs =
+    left.pipetteName != null && left.pipetteName !== ''
+      ? getPipetteSpecsV2(left.pipetteName as PipetteName)
+      : undefined
+  const rightPipetteSpecs =
+    right.pipetteName != null && right.pipetteName !== ''
+      ? getPipetteSpecsV2(right.pipetteName as PipetteName)
+      : undefined
+
   const showHeaterShakerPipetteCollisions =
     hasHeaterShakerSelected &&
-    [
-      getPipetteSpecsV2(left.pipetteName as PipetteName),
-      getPipetteSpecsV2(right.pipetteName as PipetteName),
-    ].some(pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1)
+    [leftPipetteSpecs, rightPipetteSpecs].some(
+      pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1
+    )
 
   const crashablePipetteSelected = getIsCrashablePipetteSelected(
     pipettesByMount
@@ -140,20 +138,11 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           gridGap={SPACING.spacing32}
         >
           <Text as="h2">{t('choose_additional_items')}</Text>
-          {/* {robotType === OT2_ROBOT_TYPE ? (
-            <ModuleFields
-              // @ts-expect-error
-              errors={errors?.modulesByType ?? null}
-              values={modulesByType}
-              onSetFieldValue={setValue}
-              // @ts-expect-error
-              touched={touchedFields.modulesByType ?? null}
-              control={control}
-              trigger={trigger}
-            />
-          ) : ( */}
-          <FlexModuleFields {...props} />
-          {/* )} */}
+          {robotType === OT2_ROBOT_TYPE ? (
+            <ModuleFields {...props} />
+          ) : (
+            <FlexModuleFields {...props} />
+          )}
           {robotType === OT2_ROBOT_TYPE && moduleRestrictionsDisabled !== true
             ? modCrashWarning
             : null}
@@ -196,11 +185,9 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
 }
 
 function FlexModuleFields(props: WizardTileProps): JSX.Element {
-  const { getValues, watch, setValue } = props
-  const { fields } = getValues()
+  const { watch, setValue } = props
   const modules = watch('modules')
   const additionalEquipment = watch('additionalEquipment')
-  const isFlex = fields.robotType === FLEX_ROBOT_TYPE
   const moduleTypesOnDeck =
     modules != null ? Object.values(modules).map(module => module.type) : []
   const trashBinDisabled = getTrashBinOptionDisabled({
@@ -229,6 +216,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         const moduleOnDeck = moduleTypesOnDeck.includes(moduleType)
         return (
           <EquipmentOption
+            robotType={FLEX_ROBOT_TYPE}
             key={moduleModel}
             isSelected={moduleOnDeck}
             image={<ModuleDiagram type={moduleType} model={moduleModel} />}
@@ -266,6 +254,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         )
       })}
       <EquipmentOption
+        robotType={FLEX_ROBOT_TYPE}
         onClick={() => handleSetEquipmentOption('gripper')}
         isSelected={additionalEquipment.includes('gripper')}
         image={
@@ -277,35 +266,31 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         text="Gripper"
         showCheckbox
       />
-      {isFlex ? (
-        <>
-          <EquipmentOption
-            onClick={() => handleSetEquipmentOption('wasteChute')}
-            isSelected={additionalEquipment.includes('wasteChute')}
-            image={
-              <AdditionalItemImage
-                src={wasteChuteImage}
-                alt="Opentrons Waste Chute"
-              />
-            }
-            text="Waste Chute"
-            showCheckbox
+
+      <EquipmentOption
+        robotType={FLEX_ROBOT_TYPE}
+        onClick={() => handleSetEquipmentOption('wasteChute')}
+        isSelected={additionalEquipment.includes('wasteChute')}
+        image={
+          <AdditionalItemImage
+            src={wasteChuteImage}
+            alt="Opentrons Waste Chute"
           />
-          <EquipmentOption
-            onClick={() => handleSetEquipmentOption('trashBin')}
-            isSelected={additionalEquipment.includes('trashBin')}
-            image={
-              <AdditionalItemImage
-                src={trashBinImage}
-                alt="Opentrons Trash Bin"
-              />
-            }
-            text="Trash Bin"
-            showCheckbox
-            disabled={trashBinDisabled}
-          />
-        </>
-      ) : null}
+        }
+        text="Waste Chute"
+        showCheckbox
+      />
+      <EquipmentOption
+        robotType={FLEX_ROBOT_TYPE}
+        onClick={() => handleSetEquipmentOption('trashBin')}
+        isSelected={additionalEquipment.includes('trashBin')}
+        image={
+          <AdditionalItemImage src={trashBinImage} alt="Opentrons Trash Bin" />
+        }
+        text="Trash Bin"
+        showCheckbox
+        disabled={trashBinDisabled}
+      />
     </Flex>
   )
 }

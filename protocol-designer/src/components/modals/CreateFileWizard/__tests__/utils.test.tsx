@@ -1,6 +1,8 @@
 import {
   FLEX_ROBOT_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { it, describe, expect } from 'vitest'
 import {
@@ -8,11 +10,8 @@ import {
   getLastCheckedEquipment,
   getTrashSlot,
 } from '../utils'
-import type {
-  FormModulesByType,
-  FormPipettesByMount,
-} from '../../../../step-forms'
-import type { FormState } from '../types'
+import type { FormPipettesByMount } from '../../../../step-forms'
+import type { AdditionalEquipment, FormState } from '../types'
 
 let MOCK_FORM_STATE = {
   fields: {
@@ -25,49 +24,41 @@ let MOCK_FORM_STATE = {
     left: { pipetteName: 'mockPipetteName', tiprackDefURI: ['mocktip'] },
     right: { pipetteName: null, tiprackDefURI: null },
   } as FormPipettesByMount,
-  modulesByType: {
-    heaterShakerModuleType: { onDeck: false, model: null, slot: 'D1' },
-    magneticBlockType: { onDeck: false, model: null, slot: 'D2' },
-    temperatureModuleType: { onDeck: false, model: null, slot: 'C1' },
-    thermocyclerModuleType: { onDeck: false, model: null, slot: 'B1' },
-  } as FormModulesByType,
+  modules: {},
   additionalEquipment: [],
 } as FormState
 
 describe('getLastCheckedEquipment', () => {
   it('should return null when there is no trash bin', () => {
-    const result = getLastCheckedEquipment(MOCK_FORM_STATE)
+    const result = getLastCheckedEquipment({
+      additionalEquipment: [],
+      moduleTypesOnDeck: [],
+    })
     expect(result).toBe(null)
   })
   it('should return null if not all the modules or staging areas are selected', () => {
-    MOCK_FORM_STATE = {
-      ...MOCK_FORM_STATE,
-      additionalEquipment: ['trashBin'],
-      modulesByType: {
-        ...MOCK_FORM_STATE.modulesByType,
-        temperatureModuleType: { onDeck: true, model: null, slot: 'C1' },
-      },
+    const LastCheckedProps = {
+      additionalEquipment: [
+        'trashBin',
+        'stagingArea_cutoutD3',
+      ] as AdditionalEquipment[],
+      moduleTypesOnDeck: [THERMOCYCLER_MODULE_TYPE],
     }
-    const result = getLastCheckedEquipment(MOCK_FORM_STATE)
+    const result = getLastCheckedEquipment(LastCheckedProps)
     expect(result).toBe(null)
   })
   it('should return temperature module if other modules and staging areas are selected', () => {
-    MOCK_FORM_STATE = {
-      ...MOCK_FORM_STATE,
+    const LastCheckedProps = {
       additionalEquipment: [
         'trashBin',
         'stagingArea_cutoutA3',
         'stagingArea_cutoutB3',
         'stagingArea_cutoutC3',
         'stagingArea_cutoutD3',
-      ],
-      modulesByType: {
-        ...MOCK_FORM_STATE.modulesByType,
-        heaterShakerModuleType: { onDeck: true, model: null, slot: 'D1' },
-        thermocyclerModuleType: { onDeck: true, model: null, slot: 'B1' },
-      },
+      ] as AdditionalEquipment[],
+      moduleTypesOnDeck: [THERMOCYCLER_MODULE_TYPE, HEATERSHAKER_MODULE_TYPE],
     }
-    const result = getLastCheckedEquipment(MOCK_FORM_STATE)
+    const result = getLastCheckedEquipment(LastCheckedProps)
     expect(result).toBe(TEMPERATURE_MODULE_TYPE)
   })
 })
@@ -87,6 +78,6 @@ describe('getTrashSlot', () => {
       additionalEquipment: ['stagingArea_cutoutA3'],
     }
     const result = getTrashSlot(MOCK_FORM_STATE)
-    expect(result).toBe('cutoutB3')
+    expect(result).toBe('cutoutA1')
   })
 })

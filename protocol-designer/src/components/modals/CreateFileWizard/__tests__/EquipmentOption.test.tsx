@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen, cleanup } from '@testing-library/react'
 import { BORDERS, COLORS } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { i18n } from '../../../../localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { EquipmentOption } from '../EquipmentOption'
@@ -21,6 +22,7 @@ describe('EquipmentOption', () => {
       onClick: vi.fn(),
       isSelected: false,
       text: 'mockText',
+      robotType: FLEX_ROBOT_TYPE,
     }
   })
   afterEach(() => {

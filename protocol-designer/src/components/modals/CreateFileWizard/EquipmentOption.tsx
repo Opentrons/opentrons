@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import {
   Flex,
   Text,
@@ -15,6 +17,7 @@ import {
   Tooltip,
 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
+import type { RobotType } from '@opentrons/shared-data'
 
 const EQUIPMENT_OPTION_STYLE = css`
   background-color: ${COLORS.white};
@@ -58,6 +61,7 @@ interface EquipmentOptionProps extends StyleProps {
   onClick: React.MouseEventHandler
   isSelected: boolean
   text: React.ReactNode
+  robotType: RobotType
   image?: React.ReactNode
   showCheckbox?: boolean
   disabled?: boolean
@@ -70,6 +74,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     image = null,
     showCheckbox = false,
     disabled = false,
+    robotType,
     ...styleProps
   } = props
   const { t } = useTranslation('tooltip')
@@ -80,7 +85,25 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     equpimentOptionStyle = EQUIPMENT_OPTION_DISABLED_STYLE
   } else if (isSelected) {
     equpimentOptionStyle = EQUIPMENT_OPTION_SELECTED_STYLE
-  } else equpimentOptionStyle = EQUIPMENT_OPTION_STYLE
+  } else {
+    equpimentOptionStyle = EQUIPMENT_OPTION_STYLE
+  }
+  let iconInfo: JSX.Element | null = null
+  if (showCheckbox && !disabled) {
+    iconInfo = (
+      <Icon
+        aria-label={`EquipmentOption_${
+          isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'
+        }`}
+        color={isSelected ? COLORS.blue50 : COLORS.grey50}
+        size="1.5rem"
+        name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
+      />
+    )
+  } else if (showCheckbox && disabled) {
+    iconInfo = <Flex width="1.5rem"></Flex>
+  }
+
   return (
     <>
       <Flex
@@ -101,16 +124,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         {...targetProps}
         css={equpimentOptionStyle}
       >
-        {showCheckbox ? (
-          <Icon
-            aria-label={`EquipmentOption_${
-              isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'
-            }`}
-            color={isSelected ? COLORS.blue50 : COLORS.grey50}
-            size="1.5rem"
-            name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
-          />
-        ) : null}
+        {iconInfo}
         <Flex
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
@@ -128,7 +142,11 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
       </Flex>
       {disabled ? (
         <Tooltip {...tooltipProps}>
-          {t('disabled_no_space_additional_items')}
+          {t(
+            robotType === FLEX_ROBOT_TYPE
+              ? 'disabled_no_space_additional_items'
+              : 'disabled_you_can_add_one_type'
+          )}
         </Tooltip>
       ) : null}
     </>

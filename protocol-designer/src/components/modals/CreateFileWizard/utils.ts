@@ -84,7 +84,7 @@ export const getTrashBinOptionDisabled = (props: LastCheckedProps): boolean => {
   const allModulesInSideSlotsOnDeck =
     moduleTypesOnDeck.includes(HEATERSHAKER_MODULE_TYPE) &&
     moduleTypesOnDeck.includes(TEMPERATURE_MODULE_TYPE) &&
-    moduleTypesOnDeck.includes(HEATERSHAKER_MODULE_TYPE)
+    moduleTypesOnDeck.includes(THERMOCYCLER_MODULE_TYPE)
 
   return allStagingAreasInUse && allModulesInSideSlotsOnDeck
 }
