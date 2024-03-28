@@ -278,12 +278,7 @@ async def calibrate_tiprack(api, home_position, mount):
     cp = CriticalPoint.TIP
     await asyncio.sleep(1)
     home_with_tip = await api.current_position(mount, cp)
-    print("Calibrate Drop Tip Position")
-    drop_tip_loc = await jog(api, home_with_tip, cp)
-    drop_tip_loc = Point(drop_tip_loc[Axis.X],
-                        drop_tip_loc[Axis.Y],
-                        drop_tip_loc[Axis.by_mount(mount)])
-    return tiprack_loc, drop_tip_loc
+    return tiprack_loc
 
 async def update_nozzle_manager(api, mount, tip_count):
     if args.nozzles == 1:
@@ -354,40 +349,75 @@ async def _main() -> None:
             measurements = []
             measurement_map = {}
             # num_of_columns = 12
-            num_of_columns = int(args.nozzles/8)
-            for tip in range(1, number_of_channels + 1):
-                cp = CriticalPoint.NOZZLE
-                nozzle_count += 1
-                nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
-                # nozzle_position = Point(nozzle_loc[Axis.X],
-                                        nozzle_loc[Axis.Y] + y_offset,
-                                        nozzle_loc[Axis.by_mount(mount)])
-                await move_to_point(hw_api, mount, nozzle_position, cp)
-                await asyncio.sleep(1)
-                nozzle_measurement = gauge.read()
-                measurement_map.update({nozzle_count: nozzle_measurement})
-                print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
-                print("\r", end="")
-                measurements.append(nozzle_measurement)
-                if nozzle_count % num_of_columns == 0:
-                    d_str = ''
-                    for m in measurements:
-                        d_str += str(m) + ','
-                    d_str = d_str[:-1] + '\n'
-                    print(f"{d_str}")
-                    data.append_data_to_file(test_n, test_f, d_str)
-                    # Reset Measurements list
-                    measurements = []
-                    print("\r\n")
-                x_offset -= 9
-                if nozzle_count % num_of_columns == 0:
-                    y_offset += 9
-                if nozzle_count % num_of_columns == 0:
-                    x_offset = 0
-            print(f'Nozzle Measurements: {measurement_map}')
+
+            if args.columns:
+                num_of_columns = int(args.nozzles/8)
+                for tip in range(1, number_of_channels + 1):
+                    cp = CriticalPoint.NOZZLE
+                    nozzle_count += 1
+                    nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
+                    # nozzle_position = Point(nozzle_loc[Axis.X],
+                                            nozzle_loc[Axis.Y] + y_offset,
+                                            nozzle_loc[Axis.by_mount(mount)])
+                    await move_to_point(hw_api, mount, nozzle_position, cp)
+                    await asyncio.sleep(1)
+                    nozzle_measurement = gauge.read()
+                    measurement_map.update({nozzle_count: nozzle_measurement})
+                    print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
+                    print("\r", end="")
+                    measurements.append(nozzle_measurement)
+                    if nozzle_count % num_of_columns == 0:
+                        d_str = ''
+                        for m in measurements:
+                            d_str += str(m) + ','
+                        d_str = d_str[:-1] + '\n'
+                        print(f"{d_str}")
+                        data.append_data_to_file(test_n, test_f, d_str)
+                        # Reset Measurements list
+                        measurements = []
+                        print("\r\n")
+                    x_offset -= 9
+                    if nozzle_count % num_of_columns == 0:
+                        y_offset += 9
+                    if nozzle_count % num_of_columns == 0:
+                        x_offset = 0
+                print(f'Nozzle Measurements: {measurement_map}')
+            else:
+                num_of_columns = 12
+                num_of_rows = args.rows * num_of_columns
+                for tip in range(1, number_of_channels + 1):
+                    cp = CriticalPoint.NOZZLE
+                    nozzle_count += 1
+                    nozzle_position = Point(nozzle_loc[Axis.X] + x_offset,
+                    # nozzle_position = Point(nozzle_loc[Axis.X],
+                                            nozzle_loc[Axis.Y] + y_offset,
+                                            nozzle_loc[Axis.by_mount(mount)])
+                    await move_to_point(hw_api, mount, nozzle_position, cp)
+                    await asyncio.sleep(1)
+                    nozzle_measurement = gauge.read()
+                    measurement_map.update({nozzle_count: nozzle_measurement})
+                    print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
+                    print("\r", end="")
+                    measurements.append(nozzle_measurement)
+                    if nozzle_count % num_of_columns == 0:
+                        d_str = ''
+                        for m in measurements:
+                            d_str += str(m) + ','
+                        d_str = d_str[:-1] + '\n'
+                        print(f"{d_str}")
+                        data.append_data_to_file(test_n, test_f, d_str)
+                        # Reset Measurements list
+                        measurements = []
+                        print("\r\n")
+                    x_offset -= 9
+                    if nozzle_count % num_of_columns == 0:
+                        y_offset += 9
+                    if nozzle_count % num_of_columns == 0:
+                        x_offset = 0
+                print(f'Nozzle Measurements: {measurement_map}')
         # Calibrate to tiprack
         if (args.calibrate):
-            pickup_loc, droptip_loc = await calibrate_tiprack(hw_api, home_position, mount)
+            pickup_loc = await calibrate_tiprack(hw_api, home_position, mount)
             deck_slot['deck_slot'][args.tiprack_slot][Axis.X.name] = pickup_loc.x
             deck_slot['deck_slot'][args.tiprack_slot][Axis.Y.name] = pickup_loc.y
             deck_slot['deck_slot'][args.tiprack_slot]['Z'] = pickup_loc.z
@@ -561,6 +591,7 @@ if __name__ == "__main__":
     parser.add_argument("--calibrate", action="store_true")
     parser.add_argument("--measure_nozzles", action="store_true")
     parser.add_argument("--columns", action="store_true")
+    parser.add_argument("--rows", type=float, default=1)
     parser.add_argument("--tip_size", type=str, default="T1K", help="Tip Size")
     parser.add_argument("--max_z_distance", type=float, default=40)
     parser.add_argument("--nozzles", type=int, default=96)
