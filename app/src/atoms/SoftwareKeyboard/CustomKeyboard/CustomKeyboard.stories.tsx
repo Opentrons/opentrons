@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
-  DIRECTION_COLUMN,
   Flex,
+  DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   SPACING,
   VIEWPORT,
@@ -16,7 +16,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Atoms/SoftwareKeyboard/CustomKeyboard',
   component: CustomKeyboard,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof CustomKeyboard>> = args => {
