@@ -101,10 +101,6 @@ export function AddFixtureModal({
   }
   const [optionStage, setOptionStage] = React.useState<OptionStage>(initialStage)
 
-  const [showWasteChuteOptions, setShowWasteChuteOptions] = React.useState(
-    false
-  )
-
   const modalHeader: ModalHeaderBaseProps = {
     title: t('add_to_slot', {
       slotName: getCutoutDisplayName(cutoutId),
@@ -311,9 +307,9 @@ export function AddFixtureModal({
               {nextStageOptions}
             </Flex>
           </Flex>
-          {showWasteChuteOptions ? (
+          {optionStage === 'wasteChuteOptions' ? (
             <Btn
-              onClick={() => setShowWasteChuteOptions(false)}
+              onClick={() => setOptionStage('fixtureOptions')}
               aria-label="back"
               paddingX={SPACING.spacing16}
               marginTop={'1.44rem'}

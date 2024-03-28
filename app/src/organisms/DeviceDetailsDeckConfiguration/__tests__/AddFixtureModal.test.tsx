@@ -166,16 +166,18 @@ describe('Desktop AddFixtureModal', () => {
 
 
 
-  it('should call a mock function when clicking add button', () => {
+  it('should call update deck config when add button is clicked', () => {
     props = { ...props, cutoutId: 'cutoutA1' }
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Add' }))
+    fireEvent.click(screen.getAllByText('Select options')[1])
+    fireEvent.click(screen.getByText('Add'))
     expect(mockUpdateDeckConfiguration).toHaveBeenCalled()
   })
 
   it('should display appropriate Waste Chute options when the generic Waste Chute button is clicked', () => {
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Select options' }))
+    fireEvent.click(screen.getAllByText('Select options')[0]) // click fixtures
+    fireEvent.click(screen.getByRole('button', { name: 'Select options' })) // click waste chute options
     expect(screen.getAllByRole('button', { name: 'Add' }).length).toBe(
       WASTE_CHUTE_FIXTURES.length
     )
@@ -188,6 +190,7 @@ describe('Desktop AddFixtureModal', () => {
 
   it('should allow a user to exit the Waste Chute submenu by clicking "go back"', () => {
     render(props)
+    fireEvent.click(screen.getAllByText('Select options')[0]) // click fixtures
     fireEvent.click(screen.getByRole('button', { name: 'Select options' }))
 
     fireEvent.click(screen.getByText('Go back'))
