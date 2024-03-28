@@ -10,13 +10,13 @@ const render = (props: React.ComponentProps<typeof NumericalKeyboard>) => {
 }
 
 describe('NumericalKeyboard', () => {
-  it('should render numerical keyboard isDecimal: false and allowNegative: false', () => {
+  it('should render numerical keyboard isDecimal: false and hasHyphen: false', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
       keyboardRef: result.current,
       isDecimal: false,
-      allowNegative: false,
+      hasHyphen: false,
     }
     render(props)
     const buttons = screen.getAllByRole('button')
@@ -40,13 +40,13 @@ describe('NumericalKeyboard', () => {
     })
   })
 
-  it('should render numerical keyboard isDecimal: false and allowNegative: true', () => {
+  it('should render numerical keyboard isDecimal: false and hasHyphen: true', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
       keyboardRef: result.current,
       isDecimal: false,
-      allowNegative: true,
+      hasHyphen: true,
     }
     render(props)
     const buttons = screen.getAllByRole('button')
@@ -71,13 +71,13 @@ describe('NumericalKeyboard', () => {
     })
   })
 
-  it('should render numerical keyboard isDecimal: true and allowNegative: false', () => {
+  it('should render numerical keyboard isDecimal: true and hasHyphen: false', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
       keyboardRef: result.current,
       isDecimal: true,
-      allowNegative: false,
+      hasHyphen: false,
     }
     render(props)
     const buttons = screen.getAllByRole('button')
@@ -102,13 +102,13 @@ describe('NumericalKeyboard', () => {
     })
   })
 
-  it('should render numerical keyboard isDecimal: true and allowNegative: true', () => {
+  it('should render numerical keyboard isDecimal: true and hasHyphen: true', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
       keyboardRef: result.current,
       isDecimal: true,
-      allowNegative: true,
+      hasHyphen: true,
     }
     render(props)
     const buttons = screen.getAllByRole('button')
@@ -140,7 +140,7 @@ describe('NumericalKeyboard', () => {
       onChange: vi.fn(),
       keyboardRef: result.current,
       isDecimal: false,
-      allowNegative: false,
+      hasHyphen: false,
     }
     render(props)
     const numKey = screen.getByRole('button', { name: '1' })
@@ -154,7 +154,7 @@ describe('NumericalKeyboard', () => {
       onChange: vi.fn(),
       keyboardRef: result.current,
       isDecimal: true,
-      allowNegative: false,
+      hasHyphen: false,
     }
     render(props)
     const numKey = screen.getByRole('button', { name: '.' })
@@ -168,7 +168,7 @@ describe('NumericalKeyboard', () => {
       onChange: vi.fn(),
       keyboardRef: result.current,
       isDecimal: true,
-      allowNegative: true,
+      hasHyphen: true,
     }
     render(props)
     const numKey = screen.getByRole('button', { name: '-' })

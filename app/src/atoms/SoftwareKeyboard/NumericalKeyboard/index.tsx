@@ -6,7 +6,7 @@ interface NumericalKeyboardProps {
   onChange: (input: string) => void
   keyboardRef: React.MutableRefObject<null>
   isDecimal?: boolean
-  allowNegative?: boolean
+  hasHyphen?: boolean
 }
 
 // the default keyboard layout intKeyboard that doesn't have decimal point and hyphen.
@@ -14,10 +14,10 @@ export function NumericalKeyboard({
   onChange,
   keyboardRef,
   isDecimal = false,
-  allowNegative = false,
+  hasHyphen = false,
 }: NumericalKeyboardProps): JSX.Element {
   const layoutName = `${isDecimal ? 'float' : 'int'}${
-    allowNegative ? 'NegKeyboard' : 'Keyboard'
+    hasHyphen ? 'NegKeyboard' : 'Keyboard'
   }`
 
   return (

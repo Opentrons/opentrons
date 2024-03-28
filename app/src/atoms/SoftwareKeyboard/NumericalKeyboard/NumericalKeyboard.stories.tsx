@@ -25,7 +25,7 @@ export default {
       },
       defaultValue: false,
     },
-    allowNegative: {
+    hasHyphen: {
       control: {
         type: 'boolean',
         options: [true, false],
@@ -65,7 +65,7 @@ const Template: Story<
             onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
             isDecimal={args.isDecimal}
-            allowNegative={args.allowNegative}
+            hasHyphen={args.hasHyphen}
           />
         )}
       </Flex>
@@ -76,5 +76,5 @@ const Template: Story<
 export const Keyboard = Template.bind({})
 Keyboard.args = {
   isDecimal: false,
-  allowNegative: false,
+  hasHyphen: false,
 }
