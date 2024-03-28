@@ -23,7 +23,7 @@ import {
   Btn,
   JUSTIFY_END,
 } from '@opentrons/components'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
@@ -72,8 +72,7 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
   const tileHeader = t('choose_tips_for_pipette', {
     pipetteName:
       firstPipetteName != null
-        ? getPipetteNameSpecs(firstPipetteName as PipetteName)?.displayName ??
-          ''
+        ? getPipetteSpecsV2(firstPipetteName as PipetteName)?.displayName ?? ''
         : '',
   })
 
@@ -160,8 +159,8 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const selectedPipetteName = pipettesByMount[mount].pipetteName
   const selectedPipetteDefaultTipracks =
     selectedPipetteName != null
-      ? getPipetteNameSpecs(selectedPipetteName as PipetteName)
-          ?.defaultTipracks ?? []
+      ? getPipetteSpecsV2(selectedPipetteName as PipetteName)?.liquids.default
+          .defaultTipracks ?? []
       : []
   const tiprackOptions = getTiprackOptions({
     allLabware: allLabware,
@@ -179,16 +178,15 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
     option.value.includes('custom_beta')
   )
 
-  const currentValue = pipettesByMount[mount].tiprackDefURI
+  const selectedValues = pipettesByMount[mount].tiprackDefURI ?? []
 
   React.useEffect(() => {
-    if (currentValue === undefined) {
-      setValue(
-        `pipettesByMount.${mount}.tiprackDefURI`,
-        tiprackOptions[0]?.value ?? ''
-      )
+    if (selectedValues.length === 0) {
+      setValue(`pipettesByMount.${mount}.tiprackDefURI`, [
+        tiprackOptions[0]?.value ?? '',
+      ])
     }
-  }, [currentValue, setValue, tiprackOptions])
+  }, [selectedValues, setValue, tiprackOptions])
 
   return (
     <Flex
@@ -200,13 +198,20 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
         {defaultTiprackOptions.map(o => (
           <EquipmentOption
             key={o.name}
-            isSelected={currentValue === o.value}
+            isSelected={selectedValues.includes(o.value)}
             text={o.name}
             onClick={() => {
-              setValue(`pipettesByMount.${mount}.tiprackDefURI`, o.value)
+              const updatedValues = selectedValues?.includes(o.value)
+                ? selectedValues.filter(value => value !== o.value)
+                : [...(selectedValues ?? []), o.value]
+              setValue(
+                `pipettesByMount.${mount}.tiprackDefURI`,
+                updatedValues.slice(0, 3)
+              )
             }}
             width="21.75rem"
             minHeight="4rem"
+            showCheckbox
           />
         ))}
       </Flex>
@@ -257,13 +262,20 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               {customTiprackOptions.map(o => (
                 <EquipmentOption
                   key={o.name}
-                  isSelected={currentValue === o.value}
+                  isSelected={selectedValues.includes(o.value)}
                   text={o.name}
                   onClick={() => {
-                    setValue(`pipettesByMount.${mount}.tiprackDefURI`, o.value)
+                    const updatedValues = selectedValues?.includes(o.value)
+                      ? selectedValues.filter(value => value !== o.value)
+                      : [...(selectedValues ?? []), o.value]
+                    setValue(
+                      `pipettesByMount.${mount}.tiprackDefURI`,
+                      updatedValues.slice(0, 3)
+                    )
                   }}
                   width="21.75rem"
                   minHeight="4rem"
+                  showCheckbox
                 />
               ))}
             </Flex>

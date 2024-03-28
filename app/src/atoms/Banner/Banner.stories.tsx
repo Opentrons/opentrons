@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../text'
+import { StyledText, TYPOGRAPHY } from '@opentrons/components'
 import { Banner } from './index'
 import type { Story, Meta } from '@storybook/react'
 

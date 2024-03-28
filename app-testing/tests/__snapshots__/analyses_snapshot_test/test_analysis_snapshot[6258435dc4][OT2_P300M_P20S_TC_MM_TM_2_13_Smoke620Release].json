@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "300ul tips",
         "loadName": "opentrons_96_tiprack_300ul",
@@ -1154,6 +1156,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "20ul tips",
         "loadName": "opentrons_96_tiprack_20ul",
@@ -2300,6 +2303,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p20_single_gen2"
@@ -2309,6 +2313,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p300_multi_gen2"
@@ -2318,6 +2323,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "9"
@@ -2528,6 +2534,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "4"
@@ -2567,6 +2574,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "7"
@@ -2675,6 +2683,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "Temperature-Controlled plate",
         "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul",
@@ -3833,6 +3842,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "location": {},
@@ -4979,6 +4989,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "location": {},
@@ -6125,6 +6136,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "4 tubes",
         "loadName": "cpx_4_tuberack_100ul",
@@ -6242,6 +6254,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "logo destination",
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
@@ -7391,6 +7404,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "dye container",
         "loadName": "nest_12_reservoir_15ml",
@@ -7631,6 +7645,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -7656,6 +7671,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -7681,6 +7697,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -7706,6 +7723,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -7729,6 +7747,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -7754,6 +7773,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -7779,6 +7799,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -7802,6 +7823,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -7827,6 +7849,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -7852,6 +7875,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -7875,6 +7899,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -7900,6 +7925,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -7925,6 +7951,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -7948,6 +7975,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -7973,6 +8001,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -7998,6 +8027,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8021,6 +8051,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8046,6 +8077,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8071,6 +8103,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8094,6 +8127,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8119,6 +8153,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8144,6 +8179,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8167,6 +8203,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8192,6 +8229,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8217,6 +8255,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8240,6 +8279,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8265,6 +8305,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8290,6 +8331,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8313,6 +8355,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8338,6 +8381,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8363,6 +8407,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8386,6 +8431,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8411,6 +8457,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8436,6 +8483,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8459,6 +8507,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8484,6 +8533,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8509,6 +8559,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8532,6 +8583,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8557,6 +8609,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8582,6 +8635,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8605,6 +8659,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8630,6 +8685,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8655,6 +8711,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8678,6 +8735,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8703,6 +8761,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8728,6 +8787,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8751,6 +8811,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8776,6 +8837,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8801,6 +8863,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8824,6 +8887,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8849,6 +8913,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8874,6 +8939,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8897,6 +8963,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -8920,6 +8987,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Waiting for Temperature Module to reach temperature 25.0 °C (rounded off to nearest integer)",
         "legacyCommandType": "command.TEMPDECK_AWAIT_TEMP"
@@ -8929,6 +8997,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -8938,6 +9007,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -8947,6 +9017,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -8956,6 +9027,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -8965,6 +9037,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -8974,6 +9047,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -8983,6 +9057,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -8992,6 +9067,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9001,6 +9077,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9010,6 +9087,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9019,6 +9097,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9028,6 +9107,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9037,6 +9117,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9046,6 +9127,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9055,6 +9137,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9064,6 +9147,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9073,6 +9157,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9082,6 +9167,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9091,6 +9177,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9100,6 +9187,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9109,6 +9197,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9118,6 +9207,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9127,6 +9217,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9136,6 +9227,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9145,6 +9237,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9154,6 +9247,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9163,6 +9257,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9172,6 +9267,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9181,6 +9277,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9190,6 +9287,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9199,6 +9297,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9208,6 +9307,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9217,6 +9317,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Engaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_ENGAGE"
@@ -9226,6 +9327,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 0.3 seconds",
         "legacyCommandType": "command.DELAY"
@@ -9235,6 +9337,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Disengaging Magnetic Module",
         "legacyCommandType": "command.MAGDECK_DISENGAGE"
@@ -9244,6 +9347,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Opening Thermocycler lid",
         "legacyCommandType": "command.THERMOCYCLER_OPEN"
@@ -9253,6 +9357,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Closing Thermocycler lid",
         "legacyCommandType": "command.THERMOCYCLER_CLOSE"
@@ -9262,6 +9367,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Setting Thermocycler lid temperature to 38.0 °C",
         "legacyCommandType": "command.THERMOCYCLER_SET_LID_TEMP"
@@ -9271,6 +9377,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Setting Thermocycler well block temperature to 28.0 °C with a hold time of 5 seconds",
         "legacyCommandType": "command.THERMOCYCLER_SET_BLOCK_TEMP"
@@ -9280,6 +9387,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Deactivating Thermocycler well block heating",
         "legacyCommandType": "command.THERMOCYCLER_DEACTIVATE_BLOCK"
@@ -9289,6 +9397,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Deactivating Thermocycler lid heating",
         "legacyCommandType": "command.THERMOCYCLER_DEACTIVATE_LID"
@@ -9298,6 +9407,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Opening Thermocycler lid",
         "legacyCommandType": "command.THERMOCYCLER_OPEN"
@@ -9307,6 +9417,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -9332,6 +9443,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -9357,6 +9469,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -9382,6 +9495,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -9405,6 +9519,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -9430,6 +9545,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 15.0,
@@ -9455,6 +9571,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 15.0,
@@ -9480,6 +9597,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -9503,6 +9621,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -9528,6 +9647,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 10.0,
@@ -9553,6 +9673,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 11.34,
         "volume": 10.0,
@@ -9578,6 +9699,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -9601,6 +9723,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -9626,6 +9749,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 94.0,
         "volume": 75.0,
@@ -9651,6 +9775,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 94.0,
         "volume": 60.0,
@@ -9676,6 +9801,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {

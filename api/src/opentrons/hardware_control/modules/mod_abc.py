@@ -32,6 +32,7 @@ class AbstractModule(abc.ABC):
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
+        sim_serial_number: Optional[str] = None,
     ) -> "AbstractModule":
         """Modules should always be created using this factory.
 

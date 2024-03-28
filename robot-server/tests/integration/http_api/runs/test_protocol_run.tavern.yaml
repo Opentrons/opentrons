@@ -28,6 +28,7 @@ stages:
       json:
         data:
           id: !anystr
+          ok: True
           createdAt: !anystr
           status: idle
           current: True
@@ -170,11 +171,13 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
-            params: { }
+            notes: []
+            params: {}
           - id: !anystr
             key: !anystr
             commandType: loadLabware
             status: succeeded
+            notes: []
             params:
               location:
                 slotName: '1'
@@ -200,6 +203,7 @@ stages:
           key: !anystr
           commandType: loadLabware
           status: succeeded
+          notes: []
           params:
             location:
               slotName: '1'
@@ -229,6 +233,7 @@ stages:
         data:
           # Unchanged from when we originally POSTed the resource:
           id: '{run_id}'
+          ok: True
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
           startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
           liquids: []

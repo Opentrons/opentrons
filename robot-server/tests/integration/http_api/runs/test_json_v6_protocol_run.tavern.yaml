@@ -31,6 +31,7 @@ stages:
       json:
         data:
           id: !anystr
+          ok: True
           createdAt: !anystr
           status: idle
           current: True
@@ -103,7 +104,7 @@ stages:
             commandType: home
             createdAt: !anystr
             status: queued
-            params: { }
+            params: {}
           - id: !anystr
             key: !anystr
             commandType: loadPipette
@@ -291,6 +292,7 @@ stages:
             completedAt: '{setup_command_completed_at}'
             status: succeeded
             params: {}
+            notes: []
 
   - name: Play the run
     request:
@@ -346,7 +348,8 @@ stages:
             commandType: home
             key: !anystr
             status: succeeded
-            params: { }
+            notes: []
+            params: {}
             startedAt: !anystr
             completedAt: !anystr
           - id: !anystr
@@ -356,6 +359,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteName: p10_single
               mount: left
@@ -367,6 +371,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               model: magneticModuleV1
               location:
@@ -379,6 +384,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               model: temperatureModuleV2
               location:
@@ -391,6 +397,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               location:
                 moduleId: temperatureModuleId
@@ -406,6 +413,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               location:
                 moduleId: magneticModuleId
@@ -421,6 +429,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               location:
                 slotName: '8'
@@ -436,6 +445,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               labwareId: sourcePlateId
               liquidId: waterId
@@ -449,6 +459,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteId: pipetteId
               labwareId: tipRackId
@@ -466,6 +477,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteId: pipetteId
               labwareId: sourcePlateId
@@ -485,6 +497,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteId: pipetteId
               labwareId: destPlateId
@@ -504,6 +517,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteId: pipetteId
               labwareId: destPlateId
@@ -522,6 +536,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteId: pipetteId
               labwareId: destPlateId
@@ -542,6 +557,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteId: pipetteId
               labwareId: fixedTrash
@@ -561,6 +577,7 @@ stages:
             startedAt: '{setup_command_started_at}'
             completedAt: '{setup_command_completed_at}'
             status: succeeded
+            notes: []
             params: {}
 
   - name: Verify commands succeeded with pageLength and cursor
@@ -590,6 +607,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               location:
                 moduleId: magneticModuleId
@@ -605,6 +623,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               location:
                 slotName: '8'

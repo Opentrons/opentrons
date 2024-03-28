@@ -10,11 +10,11 @@ import type {
   LabwareDefinition2,
   ModuleType,
   ModuleModel,
-  PipetteNameSpecs,
   PipetteName,
   NozzleConfigurationStyle,
   LabwareLocation,
   PipetteMount as Mount,
+  PipetteV2Specs,
 } from '@opentrons/shared-data'
 import type {
   AtomicProfileStep,
@@ -108,7 +108,7 @@ export interface NormalizedPipetteById {
   [pipetteId: string]: {
     name: PipetteName
     id: string
-    tiprackDefURI: string
+    tiprackDefURI: string[]
   }
 }
 
@@ -131,8 +131,8 @@ export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteByI
 // when they are de-normalized, the definitions they reference are baked in
 // =========== PIPETTES ========
 export type PipetteEntity = NormalizedPipette & {
-  tiprackLabwareDef: LabwareDefinition2
-  spec: PipetteNameSpecs
+  tiprackLabwareDef: LabwareDefinition2[]
+  spec: PipetteV2Specs
 }
 
 export interface PipetteEntities {
@@ -166,6 +166,7 @@ interface CommonArgs {
 // ===== Processed form types. Used as args to call command creator fns =====
 
 export type SharedTransferLikeArgs = CommonArgs & {
+  tipRack: string // tipRackDefUri
   pipette: string // PipetteId
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
   sourceLabware: string
@@ -261,6 +262,7 @@ export type DistributeArgs = SharedTransferLikeArgs & {
 
 export type MixArgs = CommonArgs & {
   commandCreatorFnName: 'mix'
+  tipRack: string // tipRackDefUri
   labware: string
   pipette: string
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
@@ -518,6 +520,7 @@ export type ErrorType =
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'NO_TIP_ON_PIPETTE'
+  | 'NO_TIP_SELECTED'
   | 'PIPETTE_DOES_NOT_EXIST'
   | 'PIPETTE_HAS_TIP'
   | 'PIPETTE_VOLUME_EXCEEDED'

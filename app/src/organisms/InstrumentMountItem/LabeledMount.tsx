@@ -3,18 +3,18 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import {
   ALIGN_CENTER,
-  Flex,
-  SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
-  TYPOGRAPHY,
-  COLORS,
-  JUSTIFY_SPACE_BETWEEN,
-  Icon,
-  DIRECTION_COLUMN,
   ALIGN_FLEX_START,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
+  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import type { Mount } from '../../redux/pipettes/types'
 
 const MountButton = styled.button<{ isAttached: boolean }>`

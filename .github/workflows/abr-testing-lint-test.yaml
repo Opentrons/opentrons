@@ -1,0 +1,59 @@
+# This workflow runs test and lint on branch pushes that touch the abr-testing
+# project or its dependencies.
+
+name: 'abr-testing lint/test'
+on:
+  push:
+    paths:
+      - 'Makefile'
+      - 'abr-testing/**'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
+      - '.github/workflows/abr-testing-lint-test.yaml'
+      - '.github/actions/python/**'
+    branches:
+      - 'edge'
+    tags-ignore:
+      - '*'
+  pull_request:
+    paths:
+      - 'abr-testing/**'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
+      - '.github/workflows/abr-testing-lint-test.yaml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint-test:
+    runs-on: 'windows-latest'
+    steps:
+      - name: Checkout opentrons repo
+        uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: 'actions/setup-node@v3'
+        with:
+          node-version: '12'
+      - name: Setup Python
+        uses: 'actions/setup-python@v4'
+        with:
+          python-version: '3.10'
+      - name: Set up abr-testing project
+        uses: './.github/actions/python/setup'
+        with:
+          project: 'abr-testing'
+      - name: lint
+        run:
+          make -C abr-testing lint
+      - name: test
+        run:
+          make -C abr-testing test

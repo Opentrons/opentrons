@@ -8,11 +8,15 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
   TEXT_ALIGN_RIGHT,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
+import { Tooltip } from '../Tooltip'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const INPUT_TYPE_TEXT = 'text' as const
@@ -37,6 +41,8 @@ export interface InputFieldProps {
   error?: string | null
   /** optional title */
   title?: string | null
+  /** optional text for tooltip */
+  tooltipText?: string
   /** optional caption. hidden when `error` is given */
   caption?: string | null
   /** appears to the right of the caption. Used for character limits, eg '0/45' */
@@ -92,11 +98,13 @@ function Input(props: InputFieldProps): JSX.Element {
     textAlign = TYPOGRAPHY.textAlignLeft,
     size = 'small',
     title,
+    tooltipText,
     ...inputProps
   } = props
   const error = props.error != null
   const value = props.isIndeterminate ?? false ? '' : props.value ?? ''
   const placeHolder = props.isIndeterminate ?? false ? '-' : props.placeholder
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
   const OUTER_CSS = css`
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -183,7 +191,7 @@ function Input(props: InputFieldProps): JSX.Element {
   `
 
   const FORM_BOTTOM_SPACE_STYLE = css`
-    padding-bottom: ${SPACING.spacing4};
+    padding: ${SPACING.spacing4} 0rem;
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       padding-bottom: 0;
     }
@@ -229,41 +237,75 @@ function Input(props: InputFieldProps): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-      {props.title != null ? (
-        <Flex css={TITLE_STYLE}>{props.title}</Flex>
+      {title != null ? (
+        <Flex gridGap={SPACING.spacing8}>
+          <Flex as="label" htmlFor={props.id} css={TITLE_STYLE}>
+            {title}
+          </Flex>
+          {tooltipText != null ? (
+            <>
+              <Flex {...targetProps}>
+                <Icon
+                  name="information"
+                  size={SPACING.spacing12}
+                  color={COLORS.grey60}
+                />
+              </Flex>
+              <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
+            </>
+          ) : null}
+        </Flex>
       ) : null}
       <Flex width="100%" flexDirection={DIRECTION_COLUMN} css={OUTER_CSS}>
         <Flex
           css={INPUT_FIELD}
           alignItems={ALIGN_CENTER}
-          as="label"
-          for={inputProps.id}
+          onClick={() => {
+            if (props.id != null) {
+              document.getElementById(props.id)?.focus()
+            }
+          }}
         >
           <input
             {...inputProps}
             data-testid={props.id}
             value={value}
             placeholder={placeHolder}
+            onWheel={event => event.currentTarget.blur()} // prevent value change with scrolling
           />
           {props.units != null ? (
             <Flex css={UNITS_STYLE}>{props.units}</Flex>
           ) : null}
         </Flex>
-        <Flex
-          color={COLORS.grey60}
-          fontSize={TYPOGRAPHY.fontSizeLabel}
-          paddingTop={SPACING.spacing4}
-          flexDirection={DIRECTION_COLUMN}
-        >
-          {props.caption != null ? (
-            <Flex css={FORM_BOTTOM_SPACE_STYLE}>{props.caption}</Flex>
-          ) : null}
-          {props.secondaryCaption != null ? (
-            <Flex css={FORM_BOTTOM_SPACE_STYLE}>{props.secondaryCaption}</Flex>
-          ) : null}
-          <Flex css={ERROR_TEXT_STYLE}>{props.error}</Flex>
-        </Flex>
+        {props.error != null ? (
+          <Flex
+            color={COLORS.grey60}
+            fontSize={TYPOGRAPHY.fontSizeLabel}
+            paddingTop={SPACING.spacing4}
+            flexDirection={DIRECTION_COLUMN}
+          >
+            <Flex css={ERROR_TEXT_STYLE}>{props.error}</Flex>
+          </Flex>
+        ) : null}
       </Flex>
+      {props.caption != null ? (
+        <StyledText
+          as="label"
+          css={FORM_BOTTOM_SPACE_STYLE}
+          color={COLORS.grey60}
+        >
+          {props.caption}
+        </StyledText>
+      ) : null}
+      {props.secondaryCaption != null ? (
+        <StyledText
+          as="label"
+          css={FORM_BOTTOM_SPACE_STYLE}
+          color={COLORS.grey60}
+        >
+          {props.secondaryCaption}
+        </StyledText>
+      ) : null}
     </Flex>
   )
 }

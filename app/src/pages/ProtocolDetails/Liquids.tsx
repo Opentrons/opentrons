@@ -11,6 +11,7 @@ import {
   Flex,
   Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -19,7 +20,6 @@ import {
   parseLiquidsInLoadOrder,
 } from '@opentrons/api-client'
 import { getTotalVolumePerLiquidId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
-import { StyledText } from '../../atoms/text'
 import { EmptySection } from './EmptySection'
 
 import {

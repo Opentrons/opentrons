@@ -12,6 +12,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -19,7 +20,6 @@ import {
   getCutoutDisplayName,
   getFixtureDisplayName,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../../../atoms/text'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
 import { LocationConflictModal } from './LocationConflictModal'

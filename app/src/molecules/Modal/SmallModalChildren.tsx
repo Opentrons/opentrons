@@ -4,10 +4,10 @@ import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '.'
 

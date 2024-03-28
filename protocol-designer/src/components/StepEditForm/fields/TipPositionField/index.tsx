@@ -33,6 +33,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
     updateValue,
     isIndeterminate,
     labwareId,
+    value: rawValue,
   } = props
   const { t } = useTranslation('application')
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -69,7 +70,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
   const isTouchTipField = getIsTouchTipField(name)
   const isDelayPositionField = getIsDelayPositionField(name)
   let value: string | number = '0'
-  const mmFromBottom = typeof value === 'number' ? value : null
+  const mmFromBottom = typeof rawValue === 'number' ? rawValue : null
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
     value =

@@ -1,12 +1,12 @@
 import * as React from 'react'
 import {
-  Flex,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  SPACING,
+  Flex,
   PrimaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 import { Toast } from './index'
 import type { Story, Meta } from '@storybook/react'
 

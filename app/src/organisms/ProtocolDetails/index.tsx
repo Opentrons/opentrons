@@ -32,6 +32,7 @@ import {
   SIZE_1,
   SIZE_5,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -48,7 +49,6 @@ import {
 
 import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import {
   useTrackEvent,
@@ -394,6 +394,7 @@ export function ProtocolDetails(
             onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={props}
+            runTimeParameters={runTimeParameters}
           />
           <SendProtocolToFlexSlideout
             isExpanded={showSendProtocolToFlexSlideout}

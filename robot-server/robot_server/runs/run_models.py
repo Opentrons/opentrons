@@ -1,7 +1,7 @@
 """Request and response models for run resources."""
 from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Literal
 
 from opentrons.protocol_engine import (
     CommandStatus,
@@ -20,7 +20,18 @@ from opentrons.protocol_engine import (
 )
 from opentrons_shared_data.errors import GeneralError
 from robot_server.service.json_api import ResourceModel
+from robot_server.errors.error_responses import ErrorDetails
 from .action_models import RunAction
+
+
+class RunDataError(ErrorDetails):
+    """A model for an error loading a run."""
+
+    title: str = Field(
+        "Run Data Error",
+        description="A short, human readable name for this type of error",
+    )
+    id: Literal["RunDataError"] = "RunDataError"
 
 
 # TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,
@@ -66,6 +77,7 @@ class RunCommandSummary(ResourceModel):
 class Run(ResourceModel):
     """Run resource model."""
 
+    ok: Literal[True] = True
     id: str = Field(..., description="Unique run identifier.")
     createdAt: datetime = Field(..., description="When the run was created")
     status: RunStatus = Field(..., description="Execution status of the run")
@@ -79,6 +91,70 @@ class Run(ResourceModel):
     actions: List[RunAction] = Field(
         ...,
         description="Client-initiated run control actions, ordered oldest to newest.",
+    )
+    errors: List[ErrorOccurrence] = Field(
+        ...,
+        description=(
+            "The run's fatal error, if there was one."
+            " For historical reasons, this is an array,"
+            " but it won't have more than one element."
+        ),
+    )
+    pipettes: List[LoadedPipette] = Field(
+        ...,
+        description="Pipettes that have been loaded into the run.",
+    )
+    modules: List[LoadedModule] = Field(
+        ...,
+        description="Modules that have been loaded into the run.",
+    )
+    labware: List[LoadedLabware] = Field(
+        ...,
+        description="Labware that has been loaded into the run.",
+    )
+    liquids: List[Liquid] = Field(
+        ...,
+        description="Liquids loaded to the run.",
+    )
+    labwareOffsets: List[LabwareOffset] = Field(
+        ...,
+        description="Labware offsets to apply as labware are loaded.",
+    )
+    protocolId: Optional[str] = Field(
+        None,
+        description=(
+            "Protocol resource being run, if any. If not present, the run may"
+            " still be used to execute protocol commands over HTTP."
+        ),
+    )
+    completedAt: Optional[datetime] = Field(
+        None,
+        description="Run completed at timestamp.",
+    )
+    startedAt: Optional[datetime] = Field(
+        None,
+        description="Run started at timestamp.",
+    )
+
+
+class BadRun(ResourceModel):
+    """Resource model representation for a bad run that could not be loaded."""
+
+    ok: Literal[False] = False
+    dataError: RunDataError = Field(..., description="Error from loading the data.")
+    id: str = Field(..., description="Unique run identifier.")
+    createdAt: datetime = Field(..., description="When the run was created")
+    status: RunStatus = Field(..., description="Execution status of the run")
+    current: bool = Field(
+        ...,
+        description=(
+            "Whether this run is currently controlling the robot."
+            " There can be, at most, one current run."
+        ),
+    )
+    actions: List[RunAction] = Field(
+        ...,
+        description="Client-initiated run control actions, ordered oldest to newest. If these could not be loaded for this bad run, this will be null.",
     )
     errors: List[ErrorOccurrence] = Field(
         ...,

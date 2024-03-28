@@ -120,6 +120,14 @@ async def test_analyze(
         mount=MountType.LEFT,
     )
 
+    analysis_parameter = pe_types.BooleanParameter(
+        displayName="Display Name",
+        variableName="variable_name",
+        type="bool",
+        value=False,
+        default=True,
+    )
+
     json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
 
     decoy.when(
@@ -131,7 +139,9 @@ async def test_analyze(
 
     decoy.when(
         await json_runner.run(
-            deck_configuration=[], protocol_source=protocol_resource.source
+            deck_configuration=[],
+            protocol_source=protocol_resource.source,
+            run_time_param_values=None,
         )
     ).then_return(
         protocol_runner.RunResult(
@@ -146,19 +156,21 @@ async def test_analyze(
                 labwareOffsets=[],
                 liquids=[],
             ),
+            parameters=[analysis_parameter],
         )
     )
 
     await subject.analyze(
         protocol_resource=protocol_resource,
         analysis_id="analysis-id",
+        run_time_param_values=None,
     )
 
     decoy.verify(
         await analysis_store.update(
             analysis_id="analysis-id",
             robot_type=robot_type,
-            run_time_parameters=[],
+            run_time_parameters=[analysis_parameter],
             commands=[analysis_command],
             labware=[analysis_labware],
             modules=[],
@@ -217,7 +229,9 @@ async def test_analyze_updates_pending_on_error(
 
     decoy.when(
         await json_runner.run(
-            deck_configuration=[], protocol_source=protocol_resource.source
+            deck_configuration=[],
+            protocol_source=protocol_resource.source,
+            run_time_param_values=None,
         )
     ).then_raise(raised_exception)
 
@@ -232,6 +246,7 @@ async def test_analyze_updates_pending_on_error(
     await subject.analyze(
         protocol_resource=protocol_resource,
         analysis_id="analysis-id",
+        run_time_param_values=None,
     )
 
     decoy.verify(

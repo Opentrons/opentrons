@@ -2,22 +2,22 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
+  AlertPrimaryButton,
+  ALIGN_CENTER,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  SPACING,
-  SIZE_3,
-  AlertPrimaryButton,
   JUSTIFY_CENTER,
-  COLORS,
-  TYPOGRAPHY,
+  JUSTIFY_FLEX_END,
   RESPONSIVENESS,
   SecondaryButton,
-  JUSTIFY_FLEX_END,
+  SIZE_3,
+  SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { useSelector } from 'react-redux'
 import { getIsOnDevice } from '../../redux/config'
 import { SmallButton } from '../../atoms/buttons'

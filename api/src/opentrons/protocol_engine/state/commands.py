@@ -1,22 +1,29 @@
 """Protocol engine commands sub-state."""
 from __future__ import annotations
+
+import enum
 from collections import OrderedDict
-from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional, Union
+from typing_extensions import assert_never
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
 
 from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorState
-from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+from opentrons.protocol_engine.actions.actions import (
+    ResumeFromRecoveryAction,
+    RunCommandAction,
+)
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from opentrons.protocol_engine.notes.notes import CommandNote
 
 from ..actions import (
     Action,
     QueueCommandAction,
-    UpdateCommandAction,
+    SucceedCommandAction,
     FailCommandAction,
     PlayAction,
     PauseAction,
@@ -42,27 +49,43 @@ from .abstract_store import HasState, HandlesActions
 from .config import Config
 
 
-class QueueStatus(str, Enum):
-    """Execution status of the command queue.
+class QueueStatus(enum.Enum):
+    """Execution status of the command queue."""
 
-    Properties:
-        SETUP: The engine has been created, but the run has not yet started.
-            New protocol commands may be enqueued but will wait to execute.
-            New setup commands may be enqueued and will execute immediately.
-        RUNNING: The queue is running though protocol commands.
-            New protocol commands may be enqueued and will execute immediately.
-            New setup commands may not be enqueued.
-        PAUSED: Execution of protocol commands has been paused.
-            New protocol commands may be enqueued but wait to execute.
-            New setup commands may not be enqueued.
+    SETUP = enum.auto()
+    """The engine has been created, but the run has not yet started.
+
+    New protocol commands may be enqueued, but will wait to execute.
+    New setup commands may be enqueued and will execute immediately.
+    New fixup commands may not be enqueued.
     """
 
-    SETUP = "setup"
-    RUNNING = "running"
-    PAUSED = "paused"
+    RUNNING = enum.auto()
+    """The queue is running through protocol commands.
+
+    New protocol commands may be enqueued and will execute immediately.
+    New setup commands may not be enqueued.
+    New fixup commands may not be enqueued.
+    """
+
+    PAUSED = enum.auto()
+    """Execution of protocol commands has been paused.
+
+    New protocol commands may be enqueued, but will wait to execute.
+    New setup commands may not be enqueued.
+    New fixup commands may not be enqueued.
+    """
+
+    AWAITING_RECOVERY = enum.auto()
+    """A protocol command has encountered a recoverable error.
+
+    New protocol commands may be enqueued, but will wait to execute.
+    New setup commands may not be enqueued.
+    New fixup commands may be enqueued and will execute immediately.
+    """
 
 
-class RunResult(str, Enum):
+class RunResult(str, enum.Enum):
     """Result of the run."""
 
     SUCCEEDED = "succeeded"
@@ -120,7 +143,7 @@ class CommandState:
     """Whether the engine is currently pulling new commands off the queue to execute.
 
     A command may still be executing, and the robot may still be in motion,
-    even if INACTIVE.
+    even if PAUSED.
     """
 
     run_started_at: Optional[datetime]
@@ -154,7 +177,12 @@ class CommandState:
     """
 
     failed_command: Optional[CommandEntry]
-    """The command, if any, that made the run fail and the index in the command list."""
+    """The most recent command failure, if any."""
+    # TODO(mm, 2024-03-19): This attribute is currently only used to help robot-server
+    # with pagination, but "the failed command" is an increasingly nuanced idea, now
+    # that we're doing error recovery. See if we can implement robot-server pagination
+    # atop simpler concepts, like "the last command that ran" or "the next command that
+    # would run."
 
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
@@ -237,46 +265,61 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if action.request_hash is not None:
                 self._state.latest_command_hash = action.request_hash
 
-        # TODO(mc, 2021-12-28): replace "UpdateCommandAction" with explicit
-        # state change actions (e.g. RunCommandAction, SucceedCommandAction)
-        # to make a command's queue transition logic easier to follow
-        elif isinstance(action, UpdateCommandAction):
-            command = action.command
-            prev_entry = self._state.commands_by_id.get(command.id)
+        elif isinstance(action, RunCommandAction):
+            prev_entry = self._state.commands_by_id[action.command_id]
+            assert prev_entry.command.status == CommandStatus.QUEUED
 
-            if prev_entry is None:
-                index = len(self._state.all_command_ids)
-                self._state.all_command_ids.append(command.id)
-                self._state.commands_by_id[command.id] = CommandEntry(
-                    index=index,
-                    command=command,
-                )
-            else:
-                self._state.commands_by_id[command.id] = CommandEntry(
-                    index=prev_entry.index,
-                    command=command,
-                )
+            running_command = prev_entry.command.copy(
+                update={
+                    "status": CommandStatus.RUNNING,
+                    "startedAt": action.started_at,
+                }
+            )
 
-            self._state.queued_command_ids.discard(command.id)
-            self._state.queued_setup_command_ids.discard(command.id)
+            self._state.commands_by_id[action.command_id] = CommandEntry(
+                index=prev_entry.index, command=running_command
+            )
 
-            if command.status == CommandStatus.RUNNING:
-                self._state.running_command_id = command.id
-            elif self._state.running_command_id == command.id:
-                self._state.running_command_id = None
+            assert self._state.running_command_id is None
+            self._state.running_command_id = action.command_id
+
+            self._state.queued_command_ids.discard(action.command_id)
+            self._state.queued_setup_command_ids.discard(action.command_id)
+
+        elif isinstance(action, SucceedCommandAction):
+            prev_entry = self._state.commands_by_id[action.command.id]
+            assert prev_entry.command.status == CommandStatus.RUNNING
+
+            succeeded_command = action.command
+            assert succeeded_command.status == CommandStatus.SUCCEEDED
+
+            self._state.commands_by_id[action.command.id] = CommandEntry(
+                index=prev_entry.index,
+                command=succeeded_command,
+            )
+
+            assert self._state.running_command_id == action.command.id
+            self._state.running_command_id = None
+
+            self._state.queued_command_ids.discard(succeeded_command.id)
+            self._state.queued_setup_command_ids.discard(succeeded_command.id)
 
         elif isinstance(action, FailCommandAction):
+            prev_entry = self._state.commands_by_id[action.command_id]
+            assert prev_entry.command.status == CommandStatus.RUNNING
+
             error_occurrence = ErrorOccurrence.from_failed(
                 id=action.error_id,
                 createdAt=action.failed_at,
                 error=action.error,
             )
-            prev_entry = self._state.commands_by_id[action.command_id]
+
             # TODO(mc, 2022-06-06): add new "cancelled" status or similar
             self._update_to_failed(
                 command_id=action.command_id,
                 failed_at=action.failed_at,
                 error_occurrence=error_occurrence,
+                notes=action.notes,
             )
 
             self._state.failed_command = self._state.commands_by_id[action.command_id]
@@ -285,16 +328,32 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 other_command_ids_to_fail = self._state.queued_setup_command_ids
                 for id in other_command_ids_to_fail:
                     self._update_to_failed(
-                        command_id=id, failed_at=action.failed_at, error_occurrence=None
+                        command_id=id,
+                        failed_at=action.failed_at,
+                        error_occurrence=None,
+                        notes=None,
                     )
                 self._state.queued_setup_command_ids.clear()
+            elif (
+                prev_entry.command.intent == CommandIntent.PROTOCOL
+                or prev_entry.command.intent is None
+            ):
+                if action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY:
+                    self._state.queue_status = QueueStatus.AWAITING_RECOVERY
+                elif action.type == ErrorRecoveryType.FAIL_RUN:
+                    other_command_ids_to_fail = self._state.queued_command_ids
+                    for id in other_command_ids_to_fail:
+                        self._update_to_failed(
+                            command_id=id,
+                            failed_at=action.failed_at,
+                            error_occurrence=None,
+                            notes=None,
+                        )
+                    self._state.queued_command_ids.clear()
+                else:
+                    assert_never(action.type)
             else:
-                other_command_ids_to_fail = self._state.queued_command_ids
-                for id in other_command_ids_to_fail:
-                    self._update_to_failed(
-                        command_id=id, failed_at=action.failed_at, error_occurrence=None
-                    )
-                self._state.queued_command_ids.clear()
+                assert_never(prev_entry.command.intent)
 
             if self._state.running_command_id == action.command_id:
                 self._state.running_command_id = None
@@ -312,6 +371,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
         elif isinstance(action, PauseAction):
             self._state.queue_status = QueueStatus.PAUSED
+
+        elif isinstance(action, ResumeFromRecoveryAction):
+            self._state.queue_status = QueueStatus.RUNNING
 
         elif isinstance(action, StopAction):
             if not self._state.run_result:
@@ -359,6 +421,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if self._config.block_on_door_open:
                 if action.door_state == DoorState.OPEN:
                     self._state.is_door_blocking = True
+                    # todo(mm, 2024-03-19): It's unclear how the door should interact
+                    # with error recovery (QueueStatus.AWAITING_RECOVERY).
                     if self._state.queue_status != QueueStatus.SETUP:
                         self._state.queue_status = QueueStatus.PAUSED
                 elif action.door_state == DoorState.CLOSED:
@@ -369,13 +433,18 @@ class CommandStore(HasState[CommandState], HandlesActions):
         command_id: str,
         failed_at: datetime,
         error_occurrence: Optional[ErrorOccurrence],
+        notes: Optional[List[CommandNote]],
     ) -> None:
         prev_entry = self._state.commands_by_id[command_id]
         updated_command = prev_entry.command.copy(
             update={
                 "completedAt": failed_at,
                 "status": CommandStatus.FAILED,
-                **({"error": error_occurrence} if error_occurrence else {}),
+                **({"error": error_occurrence} if error_occurrence is not None else {}),
+                # Assume we're not overwriting any existing notes because they can
+                # only be added when a command completes, and if we're failing this
+                # command, it wouldn't have completed before now.
+                **({"notes": notes} if notes is not None else {}),
             }
         )
         self._state.commands_by_id[command_id] = CommandEntry(
@@ -618,10 +687,12 @@ class CommandView(HasState[CommandState]):
         """
         status = self.get(command_id).status
 
+        run_requested_to_stop = self._state.run_result is not None
+
         return (
             status == CommandStatus.SUCCEEDED
             or status == CommandStatus.FAILED
-            or (status == CommandStatus.QUEUED and self._state.run_result is not None)
+            or (status == CommandStatus.QUEUED and run_requested_to_stop)
         )
 
     def get_all_commands_final(self) -> bool:
@@ -634,25 +705,36 @@ class CommandView(HasState[CommandState]):
             `setup`.
         """
         no_command_running = self._state.running_command_id is None
+        run_requested_to_stop = self._state.run_result is not None
         no_command_to_execute = (
-            self._state.run_result is not None
+            run_requested_to_stop
+            # TODO(mm, 2024-03-15): This ignores queued setup commands,
+            # which seems questionable?
             or len(self._state.queued_command_ids) == 0
         )
 
-        if no_command_running and no_command_to_execute:
-            # TODO(mm, 2024-03-14): This is a slow O(n) scan. When a long run ends and
-            # we reach this loop, it can disrupt the robot server.
-            # https://opentrons.atlassian.net/browse/EXEC-55
-            for command_id in self._state.all_command_ids:
-                command = self._state.commands_by_id[command_id].command
-                if command.error and command.intent != CommandIntent.SETUP:
-                    # TODO(tz, 7-11-23): avoid raising an error and return the status instead
-                    raise ProtocolCommandFailedError(
-                        original_error=command.error, message=command.error.detail
-                    )
-            return True
-        else:
-            return False
+        return no_command_running and no_command_to_execute
+
+    def raise_fatal_command_error(self) -> None:
+        """Raise the run's fatal command error, if there was one, as an exception.
+
+        The "fatal command error" is the error from any non-setup command.
+        It's intended to be used as the fatal error of the overall run
+        (see `ProtocolEngine.finish()`) for JSON and live HTTP protocols.
+
+        This isn't useful for Python protocols, which have to account for the
+        fatal error of the overall coming from anywhere in the Python script,
+        including in between commands.
+        """
+        # TODO(mm, 2024-03-14): This is a slow O(n) scan. When a long run ends and
+        # we reach this loop, it can disrupt the robot server.
+        # https://opentrons.atlassian.net/browse/EXEC-55
+        for command_id in self._state.all_command_ids:
+            command = self._state.commands_by_id[command_id].command
+            if command.error and command.intent != CommandIntent.SETUP:
+                raise ProtocolCommandFailedError(
+                    original_error=command.error, message=command.error.detail
+                )
 
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
@@ -694,38 +776,47 @@ class CommandView(HasState[CommandState]):
             SetupCommandNotAllowedError: The engine is running, so a setup command
                 may not be added.
         """
-        if self.get_status() == EngineStatus.AWAITING_RECOVERY:
-            # While we're developing error recovery, we'll conservatively disallow
-            # all actions, to avoid putting the engine in weird undefined states.
-            # We'll allow specific actions here as we flesh things out and add support
-            # for them.
-            raise NotImplementedError()
-
-        if isinstance(action, ResumeFromRecoveryAction):
-            # https://opentrons.atlassian.net/browse/EXEC-301
-            raise NotImplementedError()
-
         if self._state.run_result is not None:
             raise RunStoppedError("The run has already stopped.")
 
         elif isinstance(action, PlayAction):
             if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
                 raise RobotDoorOpenError("Front door or top window is currently open.")
+            elif self.get_status() == EngineStatus.AWAITING_RECOVERY:
+                raise NotImplementedError()
+            else:
+                return action
 
         elif isinstance(action, PauseAction):
             if not self.get_is_running():
                 raise PauseNotAllowedError("Cannot pause a run that is not running.")
+            elif self.get_status() == EngineStatus.AWAITING_RECOVERY:
+                raise NotImplementedError()
+            else:
+                return action
 
-        elif (
-            isinstance(action, QueueCommandAction)
-            and action.request.intent == CommandIntent.SETUP
-        ):
-            if self._state.queue_status != QueueStatus.SETUP:
+        elif isinstance(action, QueueCommandAction):
+            if (
+                action.request.intent == CommandIntent.SETUP
+                and self._state.queue_status != QueueStatus.SETUP
+            ):
                 raise SetupCommandNotAllowedError(
                     "Setup commands are not allowed after run has started."
                 )
+            else:
+                return action
 
-        return action
+        elif isinstance(action, ResumeFromRecoveryAction):
+            if self.get_status() != EngineStatus.AWAITING_RECOVERY:
+                raise NotImplementedError()
+            else:
+                return action
+
+        elif isinstance(action, StopAction):
+            return action
+
+        else:
+            assert_never(action)
 
     def get_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
@@ -762,6 +853,11 @@ class CommandView(HasState[CommandState]):
             else:
                 return EngineStatus.PAUSED
 
+        elif self._state.queue_status == QueueStatus.AWAITING_RECOVERY:
+            return EngineStatus.AWAITING_RECOVERY
+
+        # todo(mm, 2024-03-19): Does this intentionally return idle if QueueStatus is
+        # SETUP and we're currently a setup command?
         return EngineStatus.IDLE
 
     def get_latest_command_hash(self) -> Optional[str]:

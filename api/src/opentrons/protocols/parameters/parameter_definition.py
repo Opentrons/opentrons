@@ -10,6 +10,13 @@ from opentrons.protocols.parameters.types import (
     ParameterValueError,
 )
 from opentrons.protocols.parameters import validation
+from opentrons.protocol_engine.types import (
+    RunTimeParameter,
+    NumberParameter,
+    BooleanParameter,
+    EnumParameter,
+    EnumChoice,
+)
 
 
 class ParameterDefinition(Generic[ParamType]):
@@ -103,6 +110,58 @@ class ParameterDefinition(Generic[ParamType]):
     def variable_name(self) -> str:
         """The in-protocol variable name of the parameter."""
         return self._variable_name
+
+    @property
+    def parameter_type(self) -> type:
+        """The python type of the parameter."""
+        return self._type
+
+    def as_protocol_engine_type(self) -> RunTimeParameter:
+        """Returns parameter as a Protocol Engine type to send to client."""
+        parameter: RunTimeParameter
+        if self._type is bool:
+            parameter = BooleanParameter(
+                displayName=self._display_name,
+                variableName=self._variable_name,
+                description=self._description,
+                value=bool(self._value),
+                default=bool(self._default),
+            )
+        elif self._choices is not None:
+            choices = [
+                EnumChoice(
+                    displayName=str(choice["display_name"]),
+                    value=choice["value"],
+                )
+                for choice in self._choices
+            ]
+            parameter = EnumParameter(
+                type=validation.convert_type_string_for_enum(self._type),
+                displayName=self._display_name,
+                variableName=self._variable_name,
+                description=self._description,
+                choices=choices,
+                value=self._value,
+                default=self._default,
+            )
+        elif self._minimum is not None and self._maximum is not None:
+            parameter = NumberParameter(
+                type=validation.convert_type_string_for_num_param(self._type),
+                displayName=self._display_name,
+                variableName=self._variable_name,
+                description=self._description,
+                suffix=self._unit,
+                min=float(self._minimum),
+                max=float(self._maximum),
+                value=float(self._value),
+                default=float(self._default),
+            )
+        else:
+            raise ParameterDefinitionError(
+                f"Cannot resolve parameter {self._display_name} to protocol engine type."
+            )
+
+        return parameter
 
 
 def create_int_parameter(

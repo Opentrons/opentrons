@@ -16,9 +16,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
-
-import { StyledText } from '../../atoms/text'
 
 import type { IconName } from '@opentrons/components'
 

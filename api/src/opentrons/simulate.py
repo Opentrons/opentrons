@@ -866,7 +866,9 @@ def _run_file_non_pe(
     context.home()
     with scraper.scrape():
         try:
-            execute.run_protocol(protocol, context)
+            # TODO (spp, 2024-03-18): use true run-time param overrides once enabled
+            #  for cli protocol simulation/ execution
+            execute.run_protocol(protocol, context, run_time_param_overrides=None)
             if (
                 isinstance(protocol, PythonProtocol)
                 and protocol.api_level >= APIVersion(2, 0)

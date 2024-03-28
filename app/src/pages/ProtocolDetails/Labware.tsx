@@ -9,12 +9,12 @@ import {
   Flex,
   Icon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
 import { useRequiredProtocolLabware } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'
 

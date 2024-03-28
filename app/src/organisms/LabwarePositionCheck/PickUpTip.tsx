@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
-import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { PrepareSpace } from './PrepareSpace'
-import { JogToWell } from './JogToWell'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
   CreateCommand,
@@ -18,6 +19,9 @@ import {
   MoveLabwareCreateCommand,
   RobotType,
 } from '@opentrons/shared-data'
+import { RobotMotionLoader } from './RobotMotionLoader'
+import { PrepareSpace } from './PrepareSpace'
+import { JogToWell } from './JogToWell'
 import { useChainRunCommands } from '../../resources/runs'
 import { UnorderedList } from '../../molecules/UnorderedList'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'

@@ -598,6 +598,19 @@ class ExecutionCancelledError(RoboticsControlError):
         super().__init__(ErrorCodes.EXECUTION_CANCELLED, message, detail, wrapping)
 
 
+class MotorDriverError(RoboticsControlError):
+    """An error indicating that a motor driver is in error state."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a MotorDriverError."""
+        super().__init__(ErrorCodes.MOTOR_DRIVER_ERROR, message, detail, wrapping)
+
+
 class LabwareDroppedError(RoboticsInteractionError):
     """An error indicating that the gripper dropped labware it was holding."""
 
@@ -676,6 +689,19 @@ class UnexpectedTipAttachError(RoboticsInteractionError):
         checked_detail["mount"] = mount
         message = f"Cannot perform {action} with a tip already attached."
         super().__init__(ErrorCodes.UNEXPECTED_TIP_ATTACH, message, detail, wrapping)
+
+
+class HepaUVFailedError(RoboticsInteractionError):
+    """An error indicating that the HEPA UV module has errored."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an HepaUVFailedError."""
+        super().__init__(ErrorCodes.HEPA_UV_FAILED, message, detail, wrapping)
 
 
 class FirmwareUpdateRequiredError(RoboticsInteractionError):
@@ -929,3 +955,19 @@ class InvalidProtocolData(GeneralError):
     ) -> None:
         """Build an InvalidProtocolData."""
         super().__init__(ErrorCodes.INVALID_PROTOCOL_DATA, message, detail, wrapping)
+
+
+class InvalidStoredData(GeneralError):
+    """An error indicating that some stored data is invalid.
+
+    This will usually be because it was saved by a future version of the software.
+    """
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidStoredData."""
+        super().__init__(ErrorCodes.INVALID_STORED_DATA, message, detail, wrapping)

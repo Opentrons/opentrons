@@ -3,16 +3,16 @@ import { useDispatch } from 'react-redux'
 import { useTranslation, Trans } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   Btn,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP_REVERSE,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 
 import type { Dispatch } from '../../redux/types'

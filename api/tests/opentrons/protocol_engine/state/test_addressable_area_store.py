@@ -8,7 +8,7 @@ from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.commands import Command
 from opentrons.protocol_engine.actions import (
-    UpdateCommandAction,
+    SucceedCommandAction,
     AddAddressableAreaAction,
 )
 from opentrons.protocol_engine.state import Config
@@ -178,7 +178,7 @@ def test_addressable_area_referencing_commands_load_on_simulated_deck(
 ) -> None:
     """It should check and store the addressable area when referenced in a command."""
     simulated_subject.handle_action(
-        UpdateCommandAction(private_result=None, command=command)
+        SucceedCommandAction(private_result=None, command=command)
     )
     assert expected_area in simulated_subject.state.loaded_addressable_areas_by_name
 
@@ -244,7 +244,7 @@ def test_addressable_area_referencing_commands_load(
     subject: AddressableAreaStore,
 ) -> None:
     """It should check that the addressable area is in the deck config."""
-    subject.handle_action(UpdateCommandAction(private_result=None, command=command))
+    subject.handle_action(SucceedCommandAction(private_result=None, command=command))
     assert expected_area in subject.state.loaded_addressable_areas_by_name
 
 

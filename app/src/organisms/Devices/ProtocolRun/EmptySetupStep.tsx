@@ -1,12 +1,12 @@
 import * as React from 'react'
 import {
-  Flex,
-  DIRECTION_COLUMN,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 
 interface EmptySetupStepProps {
   title: React.ReactNode

@@ -243,7 +243,7 @@ export function CreateFileWizard(): JSX.Element | null {
       }
       // auto-generate tipracks for pipettes
       const newTiprackModels: string[] = uniq(
-        pipettes.map(pipette => pipette.tiprackDefURI)
+        pipettes.flatMap(pipette => pipette.tiprackDefURI)
       )
       newTiprackModels.forEach((tiprackDefURI, index) => {
         const ot2Slots = index === 0 ? '2' : '5'
@@ -353,7 +353,8 @@ const initialFormState: FormState = {
 
 const pipetteValidationShape = Yup.object().shape({
   pipetteName: Yup.string().nullable(),
-  tiprackDefURI: Yup.string()
+  tiprackDefURI: Yup.array()
+    .of(Yup.string())
     .nullable()
     .when('pipetteName', {
       is: (val: string | null): boolean => Boolean(val),
