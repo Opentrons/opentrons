@@ -771,9 +771,7 @@ async def test_estop_during_command(
     decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(state_store.commands.get_is_stopped()).then_return(False)
     decoy.when(state_store.commands.get_running_command_id()).then_return(command_id)
-    decoy.when(state_store.commands.state.queued_command_ids).then_return(
-        fake_command_set
-    )
+    decoy.when(state_store.commands.get_queue_ids()).then_return(fake_command_set)
 
     expected_action = FailCommandAction(
         command_id=command_id,
@@ -819,6 +817,7 @@ async def test_estop_without_command(
     decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(state_store.commands.get_is_stopped()).then_return(False)
     decoy.when(state_store.commands.get_running_command_id()).then_return(None)
+    decoy.when(state_store.commands.get_queue_ids()).then_return(OrderedSet())
 
     expected_stop = StopAction(from_estop=True)
     expected_hardware_stop = HardwareStoppedAction(
