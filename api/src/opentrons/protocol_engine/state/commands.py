@@ -748,7 +748,11 @@ class CommandView(HasState[CommandState]):
         including in between commands.
         """
         failed_command = self.state.failed_command
-        if failed_command and failed_command.command.intent != CommandIntent.SETUP:
+        if (
+            failed_command
+            and failed_command.command.error
+            and failed_command.command.intent != CommandIntent.SETUP
+        ):
             raise ProtocolCommandFailedError(
                 original_error=failed_command.command.error,
                 message=failed_command.command.error.detail,
