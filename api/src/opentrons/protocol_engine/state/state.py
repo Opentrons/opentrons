@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
+from typing import Callable, Dict, List, Optional, Sequence, TypeVar
+from typing_extensions import ParamSpec
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 
@@ -30,7 +31,9 @@ from .config import Config
 from .state_summary import StateSummary
 from ..types import DeckConfigurationType
 
-ReturnT = TypeVar("ReturnT")
+
+_ParamsT = ParamSpec("_ParamsT")
+_ReturnT = TypeVar("_ReturnT")
 
 
 @dataclass(frozen=True)
@@ -207,10 +210,10 @@ class StateStore(StateView, ActionHandler):
 
     async def wait_for(
         self,
-        condition: Callable[..., Optional[ReturnT]],
-        *args: Any,
-        **kwargs: Any,
-    ) -> ReturnT:
+        condition: Callable[_ParamsT, Optional[_ReturnT]],
+        *args: _ParamsT.args,
+        **kwargs: _ParamsT.kwargs,
+    ) -> _ReturnT:
         """Wait for a condition to become true, checking whenever state changes.
 
         If the condition is already true, return immediately.
