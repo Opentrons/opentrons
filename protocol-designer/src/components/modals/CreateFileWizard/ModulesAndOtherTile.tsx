@@ -48,6 +48,7 @@ import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
 import type { AdditionalEquipment, WizardTileProps } from './types'
+import { uuid } from '../../../utils'
 
 export const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
   [THERMOCYCLER_MODULE_V2]: 'B1',
@@ -75,7 +76,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
   } = props
   const { t } = useTranslation(['modal', 'tooltip'])
   const { fields, pipettesByMount, additionalEquipment } = getValues()
-  const modulesByType = watch('modulesByType')
+  const modules = watch('modules')
   const { errors, touchedFields } = formState
   const robotType = fields.robotType
   const moduleRestrictionsDisabled = useSelector(
@@ -91,16 +92,19 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
   const { left, right } = pipettesByMount
 
   const hasCrashableMagnetModuleSelected = getCrashableModuleSelected(
-    modulesByType,
+    modules,
     MAGNETIC_MODULE_TYPE
   )
   const hasCrashableTemperatureModuleSelected = getCrashableModuleSelected(
-    modulesByType,
+    modules,
     TEMPERATURE_MODULE_TYPE
   )
-  const hasHeaterShakerSelected = Boolean(
-    modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
-  )
+  const hasHeaterShakerSelected =
+    modules != null
+      ? Object.values(modules).find(
+          module => module.type === HEATERSHAKER_MODULE_TYPE
+        ) != null
+      : false
 
   const showHeaterShakerPipetteCollisions =
     hasHeaterShakerSelected &&
@@ -136,7 +140,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           gridGap={SPACING.spacing32}
         >
           <Text as="h2">{t('choose_additional_items')}</Text>
-          {robotType === OT2_ROBOT_TYPE ? (
+          {/* {robotType === OT2_ROBOT_TYPE ? (
             <ModuleFields
               // @ts-expect-error
               errors={errors?.modulesByType ?? null}
@@ -147,9 +151,9 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
               control={control}
               trigger={trigger}
             />
-          ) : (
-            <FlexModuleFields {...props} />
-          )}
+          ) : ( */}
+          <FlexModuleFields {...props} />
+          {/* )} */}
           {robotType === OT2_ROBOT_TYPE && moduleRestrictionsDisabled !== true
             ? modCrashWarning
             : null}
@@ -194,12 +198,14 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
 function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const { getValues, watch, setValue } = props
   const { fields } = getValues()
-  const modulesByType = watch('modulesByType')
+  const modules = watch('modules')
   const additionalEquipment = watch('additionalEquipment')
   const isFlex = fields.robotType === FLEX_ROBOT_TYPE
+  const moduleTypesOnDeck =
+    modules != null ? Object.values(modules).map(module => module.type) : []
   const trashBinDisabled = getTrashBinOptionDisabled({
     additionalEquipment,
-    modulesByType,
+    moduleTypesOnDeck,
   })
 
   const handleSetEquipmentOption = (equipment: AdditionalEquipment): void => {
@@ -220,30 +226,39 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
     <Flex flexWrap={WRAP} gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
       {FLEX_SUPPORTED_MODULE_MODELS.map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
+        const moduleOnDeck = moduleTypesOnDeck.includes(moduleType)
         return (
           <EquipmentOption
             key={moduleModel}
-            isSelected={modulesByType[moduleType].onDeck}
+            isSelected={moduleOnDeck}
             image={<ModuleDiagram type={moduleType} model={moduleModel} />}
             text={getModuleDisplayName(moduleModel)}
             disabled={
               getLastCheckedEquipment({
                 additionalEquipment,
-                modulesByType,
+                moduleTypesOnDeck,
               }) === moduleType
             }
             onClick={() => {
-              if (modulesByType[moduleType].onDeck) {
-                setValue(`modulesByType.${moduleType}.onDeck`, false)
-                setValue(`modulesByType.${moduleType}.model`, null)
-                setValue(`modulesByType.${moduleType}.slot`, '')
+              if (moduleOnDeck) {
+                const updatedModulesByType =
+                  modules != null
+                    ? Object.fromEntries(
+                        Object.entries(modules).filter(
+                          ([key, value]) => value.type !== moduleType
+                        )
+                      )
+                    : {}
+                setValue('modules', updatedModulesByType)
               } else {
-                setValue(`modulesByType.${moduleType}.onDeck`, true)
-                setValue(`modulesByType.${moduleType}.model`, moduleModel)
-                setValue(
-                  `modulesByType.${moduleType}.slot`,
-                  DEFAULT_SLOT_MAP[moduleModel] ?? ''
-                )
+                setValue('modules', {
+                  ...modules,
+                  [uuid()]: {
+                    model: moduleModel,
+                    type: moduleType,
+                    slot: DEFAULT_SLOT_MAP[moduleModel] ?? '',
+                  },
+                })
               }
             }}
             showCheckbox
