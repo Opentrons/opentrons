@@ -4,11 +4,9 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { StyledText } from '../StyledText'
 import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Icon } from '../../icons'
-import { isTouchscreen } from '../../ui-style-constants/responsiveness'
 
-import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
@@ -22,8 +20,6 @@ export type ChipType =
   | 'warning'
 
 type ChipSize = 'medium' | 'small'
-
-type ChipConfig = 'web-medium' | 'web-small' | 'touch-medium' | 'touch-small'
 
 interface ChipProps extends StyleProps {
   /** Display background color? */
@@ -88,17 +84,6 @@ const CHIP_PROPS_BY_TYPE: Record<
   },
 }
 
-const WEB_MEDIUM_TEXT_STYLE = css`
-  font-size: ${TYPOGRAPHY.fontSizeH4};
-  line-height: ${TYPOGRAPHY.lineHeight20};
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-`
-const WEB_SMALL_TEXT_STYLE = css`
-  font-size: ${TYPOGRAPHY.fontSizeLabel};
-  line-height: ${TYPOGRAPHY.lineHeight12};
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-`
-
 export function Chip(props: ChipProps): JSX.Element {
   const {
     background,
@@ -114,61 +99,46 @@ export function Chip(props: ChipProps): JSX.Element {
       ? COLORS.transparent
       : CHIP_PROPS_BY_TYPE[type].backgroundColor
   const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
-  const chipConfig: ChipConfig = `${
-    isTouchscreen ? 'touch' : 'web'
-  }-${chipSize}`
 
-  console.log(`chipConfig`, chipConfig)
-
-  const TOUCHSCREEN_MEDIUM_CONTAINER_STYLE = css`
-    padding: ${SPACING.spacing8} ${background === false ? 0 : SPACING.spacing16};
-    grid-gap: ${SPACING.spacing8};
-  `
-
-  const TOUCHSCREEN_SMALL_CONTAINER_STYLE = css`
-    padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing8};
-    grid-gap: ${SPACING.spacing4};
-  `
-
-  const WEB_MEDIUM_CONTAINER_STYLE = css`
+  const MEDIUM_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing2} ${background === false ? 0 : SPACING.spacing8};
     grid-gap: ${SPACING.spacing4};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      padding: ${SPACING.spacing8}
+        ${background === false ? 0 : SPACING.spacing16};
+      grid-gap: ${SPACING.spacing8};
+    }
   `
 
-  const WEB_SMALL_CONTAINER_STYLE = css`
+  const SMALL_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing6};
     grid-gap: ${SPACING.spacing4};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      padding: ${SPACING.spacing4}
+        ${background === false ? 0 : SPACING.spacing8};
+      grid-gap: ${SPACING.spacing4};
+    }
   `
 
-  const CHIP_PROPS_BY_SIZE_AND_PLATFORM: Record<
-    ChipConfig,
-    {
-      containerStyle: FlattenSimpleInterpolation
-      textStyle: FlattenSimpleInterpolation
-      size: string
+  const ICON_STYLE = css`
+    width: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
+    /* height: ${chipSize === 'medium' ? '1rem' : '0.75rem'}; */
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
+      /* height: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'}; */
     }
-  > = {
-    'web-medium': {
-      containerStyle: WEB_MEDIUM_CONTAINER_STYLE,
-      textStyle: WEB_MEDIUM_TEXT_STYLE,
-      size: '1rem',
-    },
-    'web-small': {
-      containerStyle: WEB_SMALL_CONTAINER_STYLE,
-      textStyle: WEB_SMALL_TEXT_STYLE,
-      size: '0.75rem',
-    },
-    'touch-medium': {
-      containerStyle: TOUCHSCREEN_MEDIUM_CONTAINER_STYLE,
-      textStyle: TYPOGRAPHY.bodyTextSemiBold,
-      size: '1.5rem',
-    },
-    'touch-small': {
-      containerStyle: TOUCHSCREEN_SMALL_CONTAINER_STYLE,
-      textStyle: TYPOGRAPHY.smallBodyTextSemiBold,
-      size: '1.25rem',
-    },
-  }
+  `
+
+  const TEXT_STYLE = css`
+    ${chipSize === 'medium' ? WEB_MEDIUM_TEXT_STYLE : WEB_SMALL_TEXT_STYLE}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      ${chipSize === 'medium'
+        ? TYPOGRAPHY.bodyTextSemiBold
+        : TYPOGRAPHY.smallBodyTextSemiBold}
+    }
+  `
+
+  console.log(window.innerHeight, innerWidth)
 
   return (
     <Flex
@@ -176,7 +146,9 @@ export function Chip(props: ChipProps): JSX.Element {
       backgroundColor={backgroundColor}
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
-      css={CHIP_PROPS_BY_SIZE_AND_PLATFORM[chipConfig].containerStyle}
+      css={
+        chipSize === 'medium' ? MEDIUM_CONTAINER_STYLE : SMALL_CONTAINER_STYLE
+      }
       data-testid={`Chip_${type}`}
       {...styleProps}
     >
@@ -185,15 +157,23 @@ export function Chip(props: ChipProps): JSX.Element {
           name={icon}
           color={CHIP_PROPS_BY_TYPE[type].iconColor}
           aria-label={`icon_${text}`}
-          size={CHIP_PROPS_BY_SIZE_AND_PLATFORM[chipConfig].size}
+          css={ICON_STYLE}
         />
       ) : null}
-      <StyledText
-        css={CHIP_PROPS_BY_SIZE_AND_PLATFORM[chipConfig].textStyle}
-        color={CHIP_PROPS_BY_TYPE[type].textColor}
-      >
+      <StyledText css={TEXT_STYLE} color={CHIP_PROPS_BY_TYPE[type].textColor}>
         {text}
       </StyledText>
     </Flex>
   )
 }
+
+const WEB_MEDIUM_TEXT_STYLE = css`
+  font-size: ${TYPOGRAPHY.fontSizeH4};
+  line-height: ${TYPOGRAPHY.lineHeight20};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+`
+const WEB_SMALL_TEXT_STYLE = css`
+  font-size: ${TYPOGRAPHY.fontSizeLabel};
+  line-height: ${TYPOGRAPHY.lineHeight12};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+`

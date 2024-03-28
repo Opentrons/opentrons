@@ -7,7 +7,7 @@ import { Chip } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof Chip> = {
-  title: 'ODD/Atoms/Chip',
+  title: 'Library/Atoms/Chip',
   argTypes: {
     type: {
       options: ['basic', 'error', 'info', 'neutral', 'success', 'warning'],
