@@ -1,6 +1,6 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Optional, overload
+from typing import Optional, overload, Union
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -44,6 +44,7 @@ from ..types import (
     LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
+    AddressableAreaLocation,
 )
 
 
@@ -252,7 +253,7 @@ class EquipmentHandler:
     async def load_magnetic_block(
         self,
         model: ModuleModel,
-        location: DeckSlotLocation,
+        location: Union[DeckSlotLocation, AddressableAreaLocation],
         module_id: Optional[str],
     ) -> LoadedModuleData:
         """Ensure the required magnetic block is attached.
@@ -283,7 +284,7 @@ class EquipmentHandler:
     async def load_module(
         self,
         model: ModuleModel,
-        location: DeckSlotLocation,
+        location: Union[DeckSlotLocation, AddressableAreaLocation],
         module_id: Optional[str],
     ) -> LoadedModuleData:
         """Ensure the required module is attached.
@@ -318,9 +319,7 @@ class EquipmentHandler:
             ]
 
             attached_module = self._state_store.modules.select_hardware_module_to_load(
-                model=model,
-                location=location,
-                attached_modules=attached_modules,
+                model=model, location=location, attached_modules=attached_modules
             )
 
         else:

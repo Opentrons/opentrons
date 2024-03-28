@@ -8,10 +8,13 @@ import { RESPONSIVENESS } from '../../ui-style-constants'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
+  COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
+  COLUMN_2_X_ADJUSTMENT,
   COLUMN_3_X_ADJUSTMENT,
   FIXTURE_HEIGHT,
-  SINGLE_SLOT_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
@@ -39,22 +42,40 @@ export function EmptyConfigFixture(
    */
   const [xSlotPosition = 0, ySlotPosition = 0] =
     standardSlotCutout?.position ?? []
-
-  const isColumnOne =
-    fixtureLocation === 'cutoutA1' ||
-    fixtureLocation === 'cutoutB1' ||
-    fixtureLocation === 'cutoutC1' ||
-    fixtureLocation === 'cutoutD1'
-  const xAdjustment = isColumnOne
-    ? COLUMN_1_X_ADJUSTMENT
-    : COLUMN_3_X_ADJUSTMENT
-  const x = xSlotPosition + xAdjustment
+  let x = xSlotPosition
+  let width = 0
+  switch (fixtureLocation) {
+    case 'cutoutA1':
+    case 'cutoutB1':
+    case 'cutoutC1':
+    case 'cutoutD1': {
+      x = xSlotPosition + COLUMN_1_X_ADJUSTMENT
+      width = COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
+      break
+    }
+    case 'cutoutA2':
+    case 'cutoutB2':
+    case 'cutoutC2':
+    case 'cutoutD2': {
+      x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
+      width = COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
+      break
+    }
+    case 'cutoutA3':
+    case 'cutoutB3':
+    case 'cutoutC3':
+    case 'cutoutD3': {
+      x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
+      width = COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
+      break
+    }
+  }
 
   const y = ySlotPosition + Y_ADJUSTMENT
 
   return (
     <RobotCoordsForeignObject
-      width={SINGLE_SLOT_FIXTURE_WIDTH}
+      width={width}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}

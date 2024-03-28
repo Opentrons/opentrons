@@ -30,6 +30,11 @@ import {
   SINGLE_SLOT_FIXTURES,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_LEFT_CUTOUTS,
+  getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
+  SINGLE_CENTER_CUTOUTS,
 } from '@opentrons/shared-data'
 
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
@@ -39,7 +44,7 @@ import { AddFixtureModal } from './AddFixtureModal'
 import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
-import type { CutoutId } from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const RUN_REFETCH_INTERVAL = 5000
@@ -66,6 +71,7 @@ export function DeviceDetailsDeckConfiguration({
   const deckConfig =
     useDeckConfigurationQuery({ refetchInterval: DECK_CONFIG_REFETCH_INTERVAL })
       .data ?? []
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { isRunRunning } = useRunStatuses()
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
@@ -80,18 +86,39 @@ export function DeviceDetailsDeckConfiguration({
     setShowAddFixtureModal(true)
   }
 
-  const handleClickRemove = (cutoutId: CutoutId): void => {
-    const isRightCutout = SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
-    const singleSlotFixture = isRightCutout
-      ? SINGLE_RIGHT_SLOT_FIXTURE
-      : SINGLE_LEFT_SLOT_FIXTURE
+  const handleClickRemove = (cutoutId: CutoutId, cutoutFixtureId: CutoutFixtureId): void => {
+    let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
+    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+      replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
+    } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
+      replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
+    }
 
-    const newDeckConfig = deckConfig.map(fixture =>
-      fixture.cutoutId === cutoutId
-        ? { ...fixture, cutoutFixtureId: singleSlotFixture }
-        : fixture
-    )
+    const fixtureGroup = deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)?.fixtureGroup ?? []
 
+    let newDeckConfig = deckConfig
+    if (fixtureGroup.length > 0) {
+      newDeckConfig = deckConfig.map(cutoutConfig => (
+        fixtureGroup.includes(cutoutConfig.cutoutFixtureId)
+          ? {
+            ...cutoutConfig,
+            cutoutFixtureId: replacementFixtureId,
+            opentronsModuleSerialNumber: undefined,
+          }
+          : cutoutConfig
+      ))
+    } else {
+      newDeckConfig = deckConfig.map(cutoutConfig => (
+        cutoutConfig.cutoutId === cutoutId
+          ? {
+            ...cutoutConfig,
+            cutoutFixtureId: replacementFixtureId,
+            opentronsModuleSerialNumber: undefined,
+          }
+          : cutoutConfig
+      ))
+    }
+    console.table({fixtureGroup, newDeckConfig})
     updateDeckConfiguration(newDeckConfig)
   }
 
@@ -205,9 +232,9 @@ export function DeviceDetailsDeckConfiguration({
                   <StyledText>{t('fixture')}</StyledText>
                 </Flex>
                 {fixtureDisplayList.length > 0 ? (
-                  fixtureDisplayList.map(fixture => (
+                  fixtureDisplayList.map(({ cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => (
                     <Flex
-                      key={fixture.cutoutId}
+                      key={cutoutId}
                       backgroundColor={COLORS.grey20}
                       borderRadius={BORDERS.borderRadius4}
                       gridGap={SPACING.spacing60}
@@ -216,10 +243,10 @@ export function DeviceDetailsDeckConfiguration({
                       css={TYPOGRAPHY.labelRegular}
                     >
                       <StyledText>
-                        {getCutoutDisplayName(fixture.cutoutId)}
+                        {getCutoutDisplayName(cutoutId)}
                       </StyledText>
                       <StyledText>
-                        {getFixtureDisplayName(fixture.cutoutFixtureId)}
+                        {getFixtureDisplayName(cutoutFixtureId)}
                       </StyledText>
                     </Flex>
                   ))

@@ -7,7 +7,7 @@ from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.protocols.models import LabwareDefinition
@@ -57,21 +57,21 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
 
 
 @pytest.fixture(scope="session")
-def ot2_standard_deck_def() -> DeckDefinitionV4:
+def ot2_standard_deck_def() -> DeckDefinitionV5:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT2_DECK, 4)
+    return load_deck(STANDARD_OT2_DECK, 5)
 
 
 @pytest.fixture(scope="session")
-def ot2_short_trash_deck_def() -> DeckDefinitionV4:
+def ot2_short_trash_deck_def() -> DeckDefinitionV5:
     """Get the OT-2 short-trash deck definition."""
-    return load_deck(SHORT_TRASH_DECK, 4)
+    return load_deck(SHORT_TRASH_DECK, 5)
 
 
 @pytest.fixture(scope="session")
-def ot3_standard_deck_def() -> DeckDefinitionV4:
+def ot3_standard_deck_def() -> DeckDefinitionV5:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 4)
+    return load_deck(STANDARD_OT3_DECK, 5)
 
 
 @pytest.fixture(scope="session")

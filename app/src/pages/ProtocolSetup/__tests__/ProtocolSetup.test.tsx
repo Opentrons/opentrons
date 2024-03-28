@@ -20,7 +20,7 @@ import {
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  flexDeckDefV4,
+  flexDeckDefV5,
 } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
@@ -229,14 +229,14 @@ describe('ProtocolSetup', () => {
       .calledWith(RUN_ID)
       .thenReturn(CREATED_AT)
     when(vi.mocked(getProtocolModulesInfo))
-      .calledWith(mockEmptyAnalysis, flexDeckDefV4 as any)
+      .calledWith(mockEmptyAnalysis, flexDeckDefV5 as any)
       .thenReturn([])
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], [])
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     when(vi.mocked(getDeckDefFromRobotType))
       .calledWith('OT-3 Standard')
-      .thenReturn(flexDeckDefV4 as any)
+      .thenReturn(flexDeckDefV5 as any)
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { staleTime: Infinity })
       .thenReturn({
@@ -320,7 +320,7 @@ describe('ProtocolSetup', () => {
       data: mockRobotSideAnalysis,
     } as any)
     when(vi.mocked(getProtocolModulesInfo))
-      .calledWith(mockRobotSideAnalysis, flexDeckDefV4 as any)
+      .calledWith(mockRobotSideAnalysis, flexDeckDefV5 as any)
       .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
@@ -337,7 +337,7 @@ describe('ProtocolSetup', () => {
     when(vi.mocked(getProtocolModulesInfo))
       .calledWith(
         { ...mockRobotSideAnalysis, liquids: mockLiquids },
-        flexDeckDefV4 as any
+        flexDeckDefV5 as any
       )
       .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getUnmatchedModulesForProtocol))
@@ -364,7 +364,7 @@ describe('ProtocolSetup', () => {
           ...mockRobotSideAnalysis,
           runTimeParameters: mockRunTimeParameterData,
         },
-        flexDeckDefV4 as any
+        flexDeckDefV5 as any
       )
       .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getUnmatchedModulesForProtocol))

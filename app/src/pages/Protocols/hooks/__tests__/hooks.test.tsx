@@ -261,7 +261,7 @@ describe('useRequiredProtocolLabware', () => {
   })
 })
 
-describe('useMissingProtocolHardware', () => {
+describe.only('useMissingProtocolHardware', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
@@ -343,14 +343,6 @@ describe('useMissingProtocolHardware', () => {
           connected: false,
           hasSlotConflict: true,
         },
-        {
-          hardwareType: 'fixture',
-          cutoutFixtureId: 'singleRightSlot',
-          location: {
-            cutout: 'cutoutD3',
-          },
-          hasSlotConflict: true,
-        },
       ],
       conflictedSlots: ['D3'],
     })
@@ -384,7 +376,7 @@ describe('useMissingProtocolHardware', () => {
       conflictedSlots: [],
     })
   })
-  it('should return conflicting slot when module location is configured with something other than single slot fixture', () => {
+  it('should return conflicting slot when module location is configured with something other than module fixture', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [

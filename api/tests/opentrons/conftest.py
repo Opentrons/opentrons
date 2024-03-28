@@ -40,7 +40,7 @@ from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 from opentrons_shared_data.deck.dev_types import (
     RobotModel,
     DeckDefinitionV3,
-    DeckDefinitionV4,
+    DeckDefinitionV5,
 )
 from opentrons_shared_data.deck import (
     load as load_deck,
@@ -256,7 +256,7 @@ def deck_definition_name(robot_model: RobotModel) -> str:
 
 
 @pytest.fixture
-def deck_definition(deck_definition_name: str) -> DeckDefinitionV4:
+def deck_definition(deck_definition_name: str) -> DeckDefinitionV5:
     return load_deck(deck_definition_name, DEFAULT_DECK_DEFINITION_VERSION)
 
 

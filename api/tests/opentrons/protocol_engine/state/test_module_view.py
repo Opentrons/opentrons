@@ -4,7 +4,21 @@ from math import isclose
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union, Any, List
+from typing import (
+    ContextManager,
+    Dict,
+    NamedTuple,
+    Optional,
+    Type,
+    Union,
+    Any,
+    List,
+    Set,
+    cast,
+)
+
+from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 
 from opentrons_shared_data import load_shared_data
 from opentrons.types import DeckSlotName, MountType
@@ -19,11 +33,18 @@ from opentrons.protocol_engine.types import (
     ModuleOffsetData,
     HeaterShakerLatchStatus,
     LabwareMovementOffsetData,
+    AddressableArea,
+    DeckConfigurationType,
+    PotentialCutoutFixture,
 )
 from opentrons.protocol_engine.state.modules import (
     ModuleView,
     ModuleState,
     HardwareModule,
+)
+from opentrons.protocol_engine.state.addressable_areas import (
+    AddressableAreaView,
+    AddressableAreaState,
 )
 
 from opentrons.protocol_engine.state.module_substates import (
@@ -37,6 +58,30 @@ from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleId,
     ModuleSubStateType,
 )
+
+
+def get_addressable_area_view(
+    loaded_addressable_areas_by_name: Optional[Dict[str, AddressableArea]] = None,
+    potential_cutout_fixtures_by_cutout_id: Optional[
+        Dict[str, Set[PotentialCutoutFixture]]
+    ] = None,
+    deck_definition: Optional[DeckDefinitionV5] = None,
+    deck_configuration: Optional[DeckConfigurationType] = None,
+    robot_type: RobotType = "OT-3 Standard",
+    use_simulated_deck_config: bool = False,
+) -> AddressableAreaView:
+    """Get a labware view test subject."""
+    state = AddressableAreaState(
+        loaded_addressable_areas_by_name=loaded_addressable_areas_by_name or {},
+        potential_cutout_fixtures_by_cutout_id=potential_cutout_fixtures_by_cutout_id
+        or {},
+        deck_definition=deck_definition or cast(DeckDefinitionV5, {"otId": "fake"}),
+        deck_configuration=deck_configuration or [],
+        robot_type=robot_type,
+        use_simulated_deck_config=use_simulated_deck_config,
+    )
+
+    return AddressableAreaView(state=state)
 
 
 def make_module_view(
@@ -60,6 +105,10 @@ def make_module_view(
         module_offset_by_serial=module_offset_by_serial or {},
         additional_slots_occupied_by_module_id=additional_slots_occupied_by_module_id
         or {},
+        addressable_area_view=get_addressable_area_view(
+            deck_configuration=None,
+            use_simulated_deck_config=True,
+        ),
     )
 
     return ModuleView(state=state)

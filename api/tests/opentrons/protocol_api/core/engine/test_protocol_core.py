@@ -7,7 +7,10 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
+from opentrons_shared_data.deck.dev_types import (
+    DeckDefinitionV5,
+    SlotDefV3,
+)
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefDict,
@@ -85,15 +88,15 @@ from opentrons.protocols.api_support.deck_type import (
 
 
 @pytest.fixture(scope="session")
-def ot2_standard_deck_def() -> DeckDefinitionV4:
+def ot2_standard_deck_def() -> DeckDefinitionV5:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT2_DECK, 4)
+    return load_deck(STANDARD_OT2_DECK, 5)
 
 
 @pytest.fixture(scope="session")
-def ot3_standard_deck_def() -> DeckDefinitionV4:
+def ot3_standard_deck_def() -> DeckDefinitionV5:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 4)
+    return load_deck(STANDARD_OT3_DECK, 5)
 
 
 @pytest.fixture(autouse=True)
@@ -180,7 +183,7 @@ def test_api_version(
 
 
 def test_get_slot_definition(
-    ot2_standard_deck_def: DeckDefinitionV4, subject: ProtocolCore, decoy: Decoy
+    ot2_standard_deck_def: DeckDefinitionV5, subject: ProtocolCore, decoy: Decoy
 ) -> None:
     """It should return a deck slot's definition."""
     expected_slot_def = cast(
@@ -1154,7 +1157,7 @@ def test_add_labware_definition(
             EngineModuleModel.THERMOCYCLER_MODULE_V2,
             ThermocyclerModuleCore,
             lazy_fixture("ot3_standard_deck_def"),
-            DeckSlotName.SLOT_A1,
+            DeckSlotName.SLOT_B1,
             "OT-3 Standard",
         ),
         (
@@ -1177,7 +1180,7 @@ def test_load_module(
     engine_model: EngineModuleModel,
     expected_core_cls: Type[ModuleCore],
     subject: ProtocolCore,
-    deck_def: DeckDefinitionV4,
+    deck_def: DeckDefinitionV5,
     slot_name: DeckSlotName,
     robot_type: RobotType,
 ) -> None:
@@ -1193,12 +1196,22 @@ def test_load_module(
         [mock_hw_mod_1, mock_hw_mod_2]
     )
 
-    decoy.when(subject.get_slot_definition(slot_name)).then_return(
-        cast(
-            SlotDefV3,
-            {"compatibleModuleTypes": [ModuleType.from_model(requested_model)]},
+    if robot_type == "OT-2 Standard":
+        decoy.when(subject.get_slot_definition(slot_name)).then_return(
+            cast(
+                SlotDefV3,
+                {"compatibleModuleTypes": [ModuleType.from_model(requested_model)]},
+            )
         )
-    )
+    else:
+        decoy.when(
+            mock_engine_client.state.addressable_areas.state.deck_definition
+        ).then_return(deck_def)
+        decoy.when(
+            mock_engine_client.state.addressable_areas.get_cutout_id_by_deck_slot_name(
+                slot_name
+            )
+        ).then_return("cutout" + slot_name.value)
 
     decoy.when(mock_engine_client.state.config.robot_type).then_return(robot_type)
 
@@ -1270,14 +1283,6 @@ def test_load_module(
             "OT-3 Standard",
         ),
         (
-            MagneticModuleModel.MAGNETIC_V2,
-            EngineModuleModel.MAGNETIC_MODULE_V2,
-            MagneticModuleCore,
-            lazy_fixture("ot3_standard_deck_def"),
-            DeckSlotName.SLOT_A2,
-            "OT-3 Standard",
-        ),
-        (
             ThermocyclerModuleModel.THERMOCYCLER_V1,
             EngineModuleModel.THERMOCYCLER_MODULE_V1,
             ThermocyclerModuleCore,
@@ -1311,7 +1316,7 @@ def test_load_module_raises_wrong_location(
     engine_model: EngineModuleModel,
     expected_core_cls: Type[ModuleCore],
     subject: ProtocolCore,
-    deck_def: DeckDefinitionV4,
+    deck_def: DeckDefinitionV5,
     slot_name: DeckSlotName,
     robot_type: RobotType,
 ) -> None:
@@ -1327,13 +1332,92 @@ def test_load_module_raises_wrong_location(
 
     decoy.when(mock_engine_client.state.config.robot_type).then_return(robot_type)
 
-    decoy.when(subject.get_slot_definition(slot_name)).then_return(
-        cast(SlotDefV3, {"compatibleModuleTypes": []})
-    )
+    if robot_type == "OT-2 Standard":
+        decoy.when(subject.get_slot_definition(slot_name)).then_return(
+            cast(SlotDefV3, {"compatibleModuleTypes": []})
+        )
+    else:
+        decoy.when(
+            mock_engine_client.state.addressable_areas.state.deck_definition
+        ).then_return(deck_def)
+        decoy.when(
+            mock_engine_client.state.addressable_areas.get_cutout_id_by_deck_slot_name(
+                slot_name
+            )
+        ).then_return("cutout" + slot_name.value)
 
     with pytest.raises(
         ValueError,
         match=f"A {ModuleType.from_model(requested_model).value} cannot be loaded into slot {slot_name}",
+    ):
+        subject.load_module(
+            model=requested_model,
+            deck_slot=slot_name,
+            configuration=None,
+        )
+
+
+@pytest.mark.parametrize(
+    (
+        "requested_model",
+        "engine_model",
+        "expected_core_cls",
+        "deck_def",
+        "slot_name",
+        "robot_type",
+    ),
+    [
+        (
+            MagneticModuleModel.MAGNETIC_V2,
+            EngineModuleModel.MAGNETIC_MODULE_V2,
+            MagneticModuleCore,
+            lazy_fixture("ot3_standard_deck_def"),
+            DeckSlotName.SLOT_A2,
+            "OT-3 Standard",
+        ),
+    ],
+)
+def test_load_module_raises_module_fixture_id_does_not_exist(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_sync_hardware_api: SyncHardwareAPI,
+    requested_model: ModuleModel,
+    engine_model: EngineModuleModel,
+    expected_core_cls: Type[ModuleCore],
+    subject: ProtocolCore,
+    deck_def: DeckDefinitionV5,
+    slot_name: DeckSlotName,
+    robot_type: RobotType,
+) -> None:
+    """It should issue a load module engine command and raise an error for unmatched fixtures."""
+    mock_hw_mod_1 = decoy.mock(cls=AbstractModule)
+    mock_hw_mod_2 = decoy.mock(cls=AbstractModule)
+
+    decoy.when(mock_hw_mod_1.device_info).then_return({"serial": "abc123"})
+    decoy.when(mock_hw_mod_2.device_info).then_return({"serial": "xyz789"})
+    decoy.when(mock_sync_hardware_api.attached_modules).then_return(
+        [mock_hw_mod_1, mock_hw_mod_2]
+    )
+
+    decoy.when(mock_engine_client.state.config.robot_type).then_return(robot_type)
+
+    if robot_type == "OT-2 Standard":
+        decoy.when(subject.get_slot_definition(slot_name)).then_return(
+            cast(SlotDefV3, {"compatibleModuleTypes": []})
+        )
+    else:
+        decoy.when(
+            mock_engine_client.state.addressable_areas.state.deck_definition
+        ).then_return(deck_def)
+        decoy.when(
+            mock_engine_client.state.addressable_areas.get_cutout_id_by_deck_slot_name(
+                slot_name
+            )
+        ).then_return("cutout" + slot_name.value)
+
+    with pytest.raises(
+        ValueError,
+        match=f"Module Type {ModuleType.from_model(requested_model).value} does not have a related fixture ID.",
     ):
         subject.load_module(
             model=requested_model,
@@ -1349,7 +1433,7 @@ def test_load_mag_block(
     mock_engine_client: EngineClient,
     mock_sync_hardware_api: SyncHardwareAPI,
     subject: ProtocolCore,
-    ot3_standard_deck_def: DeckDefinitionV4,
+    ot3_standard_deck_def: DeckDefinitionV5,
 ) -> None:
     """It should issue a load module engine command."""
     definition = ModuleDefinition.construct()  # type: ignore[call-arg]
@@ -1366,6 +1450,14 @@ def test_load_mag_block(
             },
         )
     )
+    decoy.when(
+        mock_engine_client.state.addressable_areas.state.deck_definition
+    ).then_return(ot3_standard_deck_def)
+    decoy.when(
+        mock_engine_client.state.addressable_areas.get_cutout_id_by_deck_slot_name(
+            DeckSlotName.SLOT_A2
+        )
+    ).then_return("cutout" + DeckSlotName.SLOT_A2.value)
 
     decoy.when(
         mock_engine_client.load_module(
@@ -1440,7 +1532,7 @@ def test_load_module_thermocycler_with_no_location(
     requested_model: ModuleModel,
     engine_model: EngineModuleModel,
     subject: ProtocolCore,
-    deck_def: DeckDefinitionV4,
+    deck_def: DeckDefinitionV5,
     expected_slot: DeckSlotName,
 ) -> None:
     """It should issue a load module engine command with location at 7."""
@@ -1450,12 +1542,14 @@ def test_load_module_thermocycler_with_no_location(
     decoy.when(mock_hw_mod.device_info).then_return({"serial": "xyz789"})
     decoy.when(mock_sync_hardware_api.attached_modules).then_return([mock_hw_mod])
     decoy.when(mock_engine_client.state.config.robot_type).then_return("OT-3 Standard")
-    decoy.when(subject.get_slot_definition(expected_slot)).then_return(
-        cast(
-            SlotDefV3,
-            {"compatibleModuleTypes": [ModuleType.from_model(requested_model)]},
+    decoy.when(
+        mock_engine_client.state.addressable_areas.state.deck_definition
+    ).then_return(deck_def)
+    decoy.when(
+        mock_engine_client.state.addressable_areas.get_cutout_id_by_deck_slot_name(
+            expected_slot
         )
-    )
+    ).then_return("cutout" + expected_slot.value)
 
     decoy.when(
         mock_engine_client.load_module(
@@ -1590,7 +1684,7 @@ def test_get_deck_definition(
     decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
 ) -> None:
     """It should return the loaded deck definition from engine state."""
-    deck_definition = cast(DeckDefinitionV4, {"schemaVersion": "4"})
+    deck_definition = cast(DeckDefinitionV5, {"schemaVersion": "5"})
 
     decoy.when(mock_engine_client.state.labware.get_deck_definition()).then_return(
         deck_definition

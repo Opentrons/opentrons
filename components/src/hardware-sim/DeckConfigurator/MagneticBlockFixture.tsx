@@ -6,31 +6,35 @@ import { TYPOGRAPHY } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
+  COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
   COLUMN_1_X_ADJUSTMENT,
+  COLUMN_2_X_ADJUSTMENT,
   COLUMN_3_X_ADJUSTMENT,
+  FIXTURE_HEIGHT,
+  Y_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
-  FIXTURE_HEIGHT,
-  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
-  TRASH_BIN_DISPLAY_NAME,
-  Y_ADJUSTMENT,
 } from './constants'
 
 import type { CutoutFixtureId, CutoutId, DeckDefinition } from '@opentrons/shared-data'
 
-interface TrashBinConfigFixtureProps {
+interface MagneticBlockFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
   handleClickRemove?: (fixtureLocation: CutoutId, cutoutFixtureId: CutoutFixtureId) => void
 }
 
-export function TrashBinConfigFixture(
-  props: TrashBinConfigFixtureProps
-): JSX.Element {
-  const { deckDefinition, handleClickRemove, fixtureLocation, cutoutFixtureId } = props
+const MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME = 'Mag Block'
 
-  const trashBinCutout = deckDefinition.locations.cutouts.find(
+export function MagneticBlockFixture(
+  props: MagneticBlockFixtureProps
+): JSX.Element {
+  const { deckDefinition, fixtureLocation, handleClickRemove, cutoutFixtureId } = props
+
+  const standardSlotCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
   )
 
@@ -39,23 +43,42 @@ export function TrashBinConfigFixture(
    * so, to get the position of the cutout itself we must add an adjustment to the slot position
    * the adjustment for x is different for right side/left side
    */
-  const [xSlotPosition = 0, ySlotPosition = 0] = trashBinCutout?.position ?? []
-
-  const isColumnOne =
-    fixtureLocation === 'cutoutA1' ||
-    fixtureLocation === 'cutoutB1' ||
-    fixtureLocation === 'cutoutC1' ||
-    fixtureLocation === 'cutoutD1'
-  const xAdjustment = isColumnOne
-    ? COLUMN_1_X_ADJUSTMENT
-    : COLUMN_3_X_ADJUSTMENT
-  const x = xSlotPosition + xAdjustment
+  const [xSlotPosition = 0, ySlotPosition = 0] =
+    standardSlotCutout?.position ?? []
+  let x = xSlotPosition
+  let width = 0
+  switch (fixtureLocation) {
+    case 'cutoutA1':
+    case 'cutoutB1':
+    case 'cutoutC1':
+    case 'cutoutD1': {
+      x = xSlotPosition + COLUMN_1_X_ADJUSTMENT
+      width = COLUMN_1_SINGLE_SLOT_FIXTURE_WIDTH
+      break
+    }
+    case 'cutoutA2':
+    case 'cutoutB2':
+    case 'cutoutC2':
+    case 'cutoutD2': {
+      x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
+      width = COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
+      break
+    }
+    case 'cutoutA3':
+    case 'cutoutB3':
+    case 'cutoutC3':
+    case 'cutoutD3': {
+      x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
+      width = COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
+      break
+    }
+  }
 
   const y = ySlotPosition + Y_ADJUSTMENT
 
   return (
     <RobotCoordsForeignObject
-      width={COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH}
+      width={width}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
@@ -76,7 +99,7 @@ export function TrashBinConfigFixture(
         }
       >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {TRASH_BIN_DISPLAY_NAME}
+          {MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME}
         </Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />

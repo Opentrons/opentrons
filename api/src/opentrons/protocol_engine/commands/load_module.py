@@ -1,11 +1,16 @@
 """Implementation, request models, and response models for the load module command."""
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..types import DeckSlotLocation, ModuleModel, ModuleDefinition
+from ..types import (
+    DeckSlotLocation,
+    ModuleModel,
+    ModuleDefinition,
+    AddressableAreaLocation,
+)
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -37,7 +42,7 @@ class LoadModuleParams(BaseModel):
     # single deck slot precludes loading a Thermocycler in its special "shifted slightly
     # to the left" position. This is okay for now because neither the Python Protocol
     # API nor Protocol Designer attempt to support it, either.
-    location: DeckSlotLocation = Field(
+    location: Union[DeckSlotLocation, AddressableAreaLocation] = Field(
         ...,
         description=(
             "The location into which this module should be loaded."
@@ -104,9 +109,14 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
 
     async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
         """Check that the requested module is attached and assign its identifier."""
-        self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
-            params.location.slotName.id
-        )
+        if isinstance(params.location, DeckSlotLocation):
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                params.location.slotName.id
+            )
+        elif isinstance(params.location, AddressableAreaLocation):
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                params.location.addressableAreaName
+            )
 
         verified_location = self._state_view.geometry.ensure_location_not_occupied(
             params.location

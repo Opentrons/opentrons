@@ -1,7 +1,7 @@
 """Addressable area state store tests."""
 import pytest
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons_shared_data.labware.labware_definition import Parameters
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
@@ -35,24 +35,24 @@ from .command_fixtures import (
 
 def _make_deck_config() -> DeckConfigurationType:
     return [
-        ("cutoutA1", "singleLeftSlot"),
-        ("cutoutB1", "singleLeftSlot"),
-        ("cutoutC1", "singleLeftSlot"),
-        ("cutoutD1", "singleLeftSlot"),
-        ("cutoutA2", "singleCenterSlot"),
-        ("cutoutB2", "singleCenterSlot"),
-        ("cutoutC2", "singleCenterSlot"),
-        ("cutoutD2", "singleCenterSlot"),
-        ("cutoutA3", "trashBinAdapter"),
-        ("cutoutB3", "singleRightSlot"),
-        ("cutoutC3", "stagingAreaRightSlot"),
-        ("cutoutD3", "wasteChuteRightAdapterNoCover"),
+        ("cutoutA1", "singleLeftSlot", None),
+        ("cutoutB1", "singleLeftSlot", None),
+        ("cutoutC1", "singleLeftSlot", None),
+        ("cutoutD1", "singleLeftSlot", None),
+        ("cutoutA2", "singleCenterSlot", None),
+        ("cutoutB2", "singleCenterSlot", None),
+        ("cutoutC2", "singleCenterSlot", None),
+        ("cutoutD2", "singleCenterSlot", None),
+        ("cutoutA3", "trashBinAdapter", None),
+        ("cutoutB3", "singleRightSlot", None),
+        ("cutoutC3", "stagingAreaRightSlot", None),
+        ("cutoutD3", "wasteChuteRightAdapterNoCover", None),
     ]
 
 
 @pytest.fixture
 def simulated_subject(
-    ot3_standard_deck_def: DeckDefinitionV4,
+    ot3_standard_deck_def: DeckDefinitionV5,
 ) -> AddressableAreaStore:
     """Get an AddressableAreaStore test subject, under simulated deck conditions."""
     return AddressableAreaStore(
@@ -68,7 +68,7 @@ def simulated_subject(
 
 @pytest.fixture
 def subject(
-    ot3_standard_deck_def: DeckDefinitionV4,
+    ot3_standard_deck_def: DeckDefinitionV5,
 ) -> AddressableAreaStore:
     """Get an AddressableAreaStore test subject."""
     return AddressableAreaStore(
@@ -83,7 +83,7 @@ def subject(
 
 
 def test_initial_state_simulated(
-    ot3_standard_deck_def: DeckDefinitionV4,
+    ot3_standard_deck_def: DeckDefinitionV5,
     simulated_subject: AddressableAreaStore,
 ) -> None:
     """It should create the Addressable Area store with no loaded addressable areas."""
@@ -98,7 +98,7 @@ def test_initial_state_simulated(
 
 
 def test_initial_state(
-    ot3_standard_deck_def: DeckDefinitionV4,
+    ot3_standard_deck_def: DeckDefinitionV5,
     subject: AddressableAreaStore,
 ) -> None:
     """It should create the Addressable Area store with loaded addressable areas."""
