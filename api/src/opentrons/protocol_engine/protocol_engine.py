@@ -242,6 +242,27 @@ class ProtocolEngine:
         await self.wait_for_command(command.id)
         return self._state_store.commands.get(command.id)
 
+    async def add_and_execute_command_wait_for_recovery(
+        self, request: commands.CommandCreate
+    ) -> None:
+        """Like `add_and_execute_command()`, except wait for error recovery.
+
+        Unlike `add_and_execute_command()`, if the command fails, this will not
+        immediately return the failed command. Instead, if the error is recoverable,
+        it will wait until error recovery has completed (e.g. when some other task
+        calls `self.resume_from_recovery()`).
+        """
+        command = self.add_command(request)
+        await self.wait_for_command(command_id=command.id)
+        await self._state_store.wait_for(
+            # Per the warnings on `wait_for()`, we want our condition function to
+            # specifically check that *this* command's recovery has completed,
+            # rather than just checking that the overall run state
+            # != "awaiting-recovery."
+            self.state_view.commands.get_command_recovery_complete,
+            command_id=command.id,
+        )
+
     def estop(
         self,
         # TODO(mm, 2024-03-26): Maintenance runs are a robot-server concept that

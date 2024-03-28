@@ -715,6 +715,26 @@ class CommandView(HasState[CommandState]):
 
         return no_command_running and no_command_to_execute
 
+    def get_command_recovery_complete(self, command_id: str) -> bool:
+        """Return whether we're finished with error recovery for the given command.
+
+        If the given command didn't have a recovery phase (because it hasn't completed
+        yet, or because it succeeded without an error, or because it failed with an
+        error that wasn't recoverable), that counts as `True`.
+
+        If the given command did have a recovery phase, but it was interrupted by a
+        stop, that also counts as `True`.
+        """
+        command_is_most_recent_to_fail = (
+            self._state.failed_command is not None
+            and command_id == self._state.failed_command.command.id
+        )
+        if command_is_most_recent_to_fail:
+            recovery_is_ongoing = self.get_status() == EngineStatus.AWAITING_RECOVERY
+            return not recovery_is_ongoing
+        else:
+            return True
+
     def raise_fatal_command_error(self) -> None:
         """Raise the run's fatal command error, if there was one, as an exception.
 
