@@ -85,4 +85,5 @@ names = Literal[
     "Flex_None_None_2_16_AnalysisError_TrashBinInCol2",
     "Flex_None_None_2_16_AnalysisError_AccessToFixedTrashProp",
     "Flex_P1000_96_Gripper_2_16_TriggerPrepareForMountMovement",
+    "Flex_None_None_2_18_GoldenRTP",
 ]

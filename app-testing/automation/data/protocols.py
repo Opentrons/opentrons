@@ -783,3 +783,12 @@ class Protocols:
         app_error=False,
         robot_error=False,
     )
+
+    Flex_None_None_2_18_GoldenRTP: Protocol = Protocol(
+        file_name="Flex_None_None_2_18_GoldenRTP",
+        file_extension="py",
+        protocol_name="Golden RTP Examples",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
