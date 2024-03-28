@@ -7,6 +7,7 @@ import { formatDistance } from 'date-fns'
 import {
   BORDERS,
   COLORS,
+  Chip,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -26,7 +27,6 @@ import {
   RunStatus,
 } from '@opentrons/api-client'
 
-import { Chip } from '../../../atoms/Chip'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons//constants'
 import { useTrackEvent } from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'

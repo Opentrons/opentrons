@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { Flex, SPACING } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { Flex, SPACING, VIEWPORT } from '@opentrons/components'
 import { GlobalStyle } from '../../atoms/GlobalStyle'
 import { CardButton } from '.'
 
@@ -10,7 +9,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Molecules/CardButton',
   component: CardButton,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <>

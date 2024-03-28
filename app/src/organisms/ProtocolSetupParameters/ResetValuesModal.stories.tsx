@@ -1,6 +1,5 @@
 import * as React from 'react'
-
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { VIEWPORT } from '@opentrons/components'
 import { ResetValuesModal } from './ResetValuesModal'
 
 import type { Story, Meta } from '@storybook/react'
@@ -8,7 +7,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Organisms/ResetValuesModal',
   component: ResetValuesModal,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof ResetValuesModal>> = args => (

@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { VIEWPORT } from '@opentrons/components'
 import { LargeButton } from './'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Buttons/LargeButton',
   argTypes: { onClick: { action: 'clicked' } },
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const LargeButtonTemplate: Story<

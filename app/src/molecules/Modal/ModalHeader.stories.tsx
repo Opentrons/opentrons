@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { COLORS } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { COLORS, VIEWPORT } from '@opentrons/components'
 import { ModalHeader } from './ModalHeader'
 import type { Story, Meta } from '@storybook/react'
 
@@ -24,7 +23,7 @@ export default {
     },
     onClick: { action: 'clicked' },
   },
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof ModalHeader>> = args => (

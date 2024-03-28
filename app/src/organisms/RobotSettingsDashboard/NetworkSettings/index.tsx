@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -16,12 +17,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Chip } from '../../../atoms/Chip'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 
-import type { IconName } from '@opentrons/components'
+import type { IconName, ChipType } from '@opentrons/components'
 import type { NetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
-import type { ChipType } from '../../../atoms/Chip'
 import type { SetSettingOption } from '../../../pages/RobotSettingsDashboard'
 
 export type ConnectionType = 'wifi' | 'ethernet' | 'usb'
