@@ -200,13 +200,25 @@ export const getCutoutIdByAddressableArea = (
 
 export function getMatchingTipLiquidSpecs(
   pipetteEntity: PipetteEntity,
-  volume: number
+  volume: number,
+  tiprack: string
 ): SupportedTip {
-  const tipLength = pipetteEntity.tiprackLabwareDef.parameters.tipLength ?? 0
+  const matchingLabwareDef = Object.values(
+    pipetteEntity.tiprackLabwareDef
+  ).find(def => tiprack.includes(def.parameters.loadName))
+
+  console.assert(
+    matchingLabwareDef,
+    `expected to find a matching labware def with tiprack ${tiprack} but could not`
+  )
+
+  const tipLength = matchingLabwareDef?.parameters.tipLength ?? 0
 
   if (tipLength === 0) {
     console.error(
-      `expected to find a tiplength with tiprack ${pipetteEntity.tiprackLabwareDef.metadata.displayName} but could not`
+      `expected to find a tiplength with tiprack ${
+        matchingLabwareDef?.metadata.displayName ?? 'unknown displayName'
+      } but could not`
     )
   }
 
@@ -227,7 +239,9 @@ export function getMatchingTipLiquidSpecs(
   })[0]
   console.assert(
     matchingTipLiquidSpecs,
-    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${pipetteEntity.tiprackLabwareDef.metadata.displayName}`
+    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
+      matchingLabwareDef?.metadata.displayName ?? 'unknown displayname'
+    }`
   )
 
   return matchingTipLiquidSpecs

@@ -19,8 +19,8 @@ import {
   AdditionalEquipmentEntity,
 } from '@opentrons/step-generation'
 export interface FormPipette {
-  pipetteName: string | null | undefined
-  tiprackDefURI: string | null | undefined
+  pipetteName?: string | null
+  tiprackDefURI?: string[] | null
 }
 export interface FormPipettesByMount {
   left: FormPipette

@@ -3,6 +3,7 @@ import assert from 'assert'
 import min from 'lodash/min'
 import {
   getTiprackVolume,
+  getLabwareDefURI,
   THERMOCYCLER_MODULE_TYPE,
   orderWells,
   NozzleConfigurationStyle,
@@ -88,6 +89,7 @@ interface NextTiprackInfo {
 }
 export function getNextTiprack(
   pipetteId: string,
+  tipRack: string,
   invariantContext: InvariantContext,
   robotState: RobotState,
   nozzles?: NozzleConfigurationStyle
@@ -113,11 +115,11 @@ export function getNextTiprack(
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
       const isOnDeck = robotState.labware[labwareId].slot != null
-      return (
-        isOnDeck &&
-        pipetteEntity.tiprackDefURI ===
-          invariantContext.labwareEntities[labwareId]?.labwareDefURI
-      )
+      const labwareIdDefUri =
+        invariantContext.labwareEntities[labwareId].labwareDefURI
+      const tipRackDefUri =
+        invariantContext.labwareEntities[tipRack].labwareDefURI
+      return isOnDeck && labwareIdDefUri === tipRackDefUri
     }
   )
   const is96Channel = pipetteEntity.spec.channels === 96
@@ -181,14 +183,23 @@ export function getNextTiprack(
 }
 export function getPipetteWithTipMaxVol(
   pipetteId: string,
-  invariantContext: InvariantContext
+  invariantContext: InvariantContext,
+  tipRack: string
 ): number {
   // NOTE: this fn assumes each pipette is assigned to exactly one tiprack type,
   // across the entire timeline
   const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
   const pipetteMaxVol = pipetteEntity.spec.liquids.default.maxVolume
   const tiprackDef = pipetteEntity.tiprackLabwareDef
-  const tiprackTipVol = getTiprackVolume(tiprackDef)
+  const tipRackDefUri = invariantContext.labwareEntities[tipRack].labwareDefURI
+  let chosenTipRack = null
+  for (const def of tiprackDef) {
+    if (getLabwareDefURI(def) === tipRackDefUri) {
+      chosenTipRack = def
+      break
+    }
+  }
+  const tiprackTipVol = getTiprackVolume(chosenTipRack ?? tiprackDef[0])
 
   if (!pipetteMaxVol || !tiprackTipVol) {
     assert(

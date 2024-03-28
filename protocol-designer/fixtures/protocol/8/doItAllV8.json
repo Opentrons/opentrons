@@ -13,7 +13,7 @@
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "8.0.0",
+    "version": "8.1.0",
     "data": {
       "_internalAppBuildDate": "Thu, 21 Mar 2024 18:51:59 GMT",
       "defaultValues": {
@@ -23,7 +23,9 @@
         "blowout_mmFromTop": 0
       },
       "pipetteTiprackAssignments": {
-        "9fcd50d9-92b2-45ac-acf1-e2cf773feffc": "opentrons/opentrons_flex_96_tiprack_1000ul/1"
+        "9fcd50d9-92b2-45ac-acf1-e2cf773feffc": [
+          "opentrons/opentrons_flex_96_tiprack_1000ul/1"
+        ]
       },
       "dismissedWarnings": { "form": {}, "timeline": {} },
       "ingredients": {
@@ -109,6 +111,7 @@
         "d2f74144-a7bf-4ba2-aaab-30d70b2b62c7": {
           "pipette": "9fcd50d9-92b2-45ac-acf1-e2cf773feffc",
           "volume": "100",
+          "tipRack": "f2d371ea-5146-4c89-8200-9c056a7f321a:opentrons/opentrons_flex_96_tiprack_1000ul/1",
           "changeTip": "always",
           "path": "single",
           "aspirate_wells_grouped": false,

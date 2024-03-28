@@ -95,7 +95,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       prevRobotState,
       invariantContext,
       args.sourceLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     return {
@@ -117,7 +118,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       prevRobotState,
       invariantContext,
       args.destLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     return {
@@ -153,7 +155,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   } = args
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const maxWellsPerChunk = Math.floor(
-    getPipetteWithTipMaxVol(args.pipette, invariantContext) /
+    getPipetteWithTipMaxVol(args.pipette, invariantContext, args.tipRack) /
       (args.volume + aspirateAirGapVolume)
   )
   const sourceLabwareDef =
@@ -217,6 +219,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   flowRate: aspirateFlowRateUlSec,
                   offsetFromBottomMm: airGapOffsetSourceWell,
                   isAirGap: true,
+                  tipRack: args.tipRack,
                 }),
                 ...(aspirateDelay != null
                   ? [
@@ -273,6 +276,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               well: sourceWell,
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
+              tipRack: args.tipRack,
             }),
             ...delayAfterAspirateCommands,
             ...touchTipAfterAspirateCommand,
@@ -290,6 +294,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           curryCommandCreator(replaceTip, {
             pipette: args.pipette,
             dropTipLocation,
+            tipRack: args.tipRack,
           }),
         ]
       }
@@ -320,6 +325,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               dispenseFlowRateUlSec,
               aspirateDelaySeconds: aspirateDelay?.seconds,
               dispenseDelaySeconds: dispenseDelay?.seconds,
+              tipRack: args.tipRack,
             })
           : []
       const preWetTipCommands = args.preWetTip // Pre-wet tip is equivalent to a single mix, with volume equal to the consolidate volume.
@@ -335,6 +341,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             dispenseFlowRateUlSec,
             aspirateDelaySeconds: aspirateDelay?.seconds,
             dispenseDelaySeconds: dispenseDelay?.seconds,
+            tipRack: args.tipRack,
           })
         : []
       //  can not mix in a waste chute
@@ -352,6 +359,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               dispenseFlowRateUlSec,
               aspirateDelaySeconds: aspirateDelay?.seconds,
               dispenseDelaySeconds: dispenseDelay?.seconds,
+              tipRack: args.tipRack,
             })
           : []
 
@@ -423,6 +431,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 destWell: destinationWell,
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
+                tipRack: args.tipRack,
               }),
               ...(aspirateDelay != null
                 ? [

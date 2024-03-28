@@ -18,7 +18,8 @@ export const mixFormToArgs = (
   const { labware, pipette, dropTip_location, nozzles } = hydratedFormData
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     pipette,
-    hydratedFormData.volume
+    hydratedFormData.volume,
+    hydratedFormData.tipRack
   )
   const unorderedWells = hydratedFormData.wells || []
   const orderFirst = hydratedFormData.mix_wellOrder_first
@@ -100,6 +101,7 @@ export const mixFormToArgs = (
     dispenseOffsetFromBottomMm,
     blowoutOffsetFromTopMm,
     aspirateDelaySeconds,
+    tipRack: hydratedFormData.tipRack,
     dispenseDelaySeconds,
     dropTipLocation: dropTip_location,
     nozzles,
