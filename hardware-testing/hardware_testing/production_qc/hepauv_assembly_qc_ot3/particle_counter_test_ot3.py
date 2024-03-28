@@ -29,13 +29,13 @@ async def _main(arguments: argparse.Namespace) -> None:
         operator = input("Enter Operator Name(输入测试者名称):: ").strip()
         HEPASN = input("Enter HEPA/UV Barcode Number(输入HEPA/UV条码):: ").strip()
 
-        input("CLEAN OT3FLEX,PRESS ENTER TO CONTINUE(清洁0T3后,按回车键开始测试)").strip()
+        input("CLEAN OT3FLEX,CLOSE DOOR,PRESS ENTER TO CONTINUE(清洁0T3后,关闭OT3门,按回车键开始测试)").strip()
 
         api = await helpers_ot3.build_async_ot3_hardware_api(
             is_simulating=arguments.simulate, use_defaults=True
         )
         # home and move to attach position
-        await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+        await api.home()
         instrument = BuildAsairGT521S()
         uvinstrument = BuildAsairUV()
         INTSN = instrument.serial_number().strip("SS").replace(' ', '')
@@ -113,12 +113,13 @@ async def _main(arguments: argparse.Namespace) -> None:
                 test_data['Sample Time(sec)']=record_dict['Sample Time']
                 test_data['PASS/FAIL'] = test_result
                 csv_cb.write(list(test_data.values()))
+            input("TURN OFF FAN,PRESS ENTER TO CONTINUE.(关闭风扇后,按回车键继续)")
         
 
         if not arguments.skip_uv:
-            input("PLACE THE UV METER ON THE SLOT B3 TO START TEST(将紫外线计放置在插槽B3上开始测试):")
+            input("PLACE THE UV METER ON THE SLOT B3 TO START TEST(将紫外线计放置在插槽B3上开始测试)")
             #UV
-            await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+            await api.home()
             test_data2={
                         'SLOT': None,
                         'uvdata': None,
@@ -191,7 +192,7 @@ async def _main(arguments: argparse.Namespace) -> None:
                     await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
 
                 #获取数据UV get uv data
-                aa = input("Press open UV to continue...(打开UV灯后,回车继续)")
+                aa = input("Test Slot {} Press open UV to continue...(开始测试位置{} 打开UV灯后,回车继续)".format(grip_slot2,grip_slot2))
 
                 for i in range(10):
                     await asyncio.sleep(1)
@@ -222,12 +223,13 @@ async def _main(arguments: argparse.Namespace) -> None:
             # MOVE TO SLOT
             await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos + Point(0, 0, 10))
             await api.ungrip()
-            await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+            await api.home()
 
     except Exception as err:
         print("err:",err)
     finally:
-        await api.home([Axis.X, Axis.Y, Axis.Z_L,Axis.Z_G,Axis.G])
+        await api.retract(mount)
+        await api.home()
         print(f"CSV: {csv_props.name}")
 
 async def UV_test(simulating: bool):
