@@ -21,6 +21,7 @@ import {
 } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
+  useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
@@ -35,6 +36,7 @@ import {
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
   SINGLE_CENTER_CUTOUTS,
+  getFixtureGroupForCutoutFixture,
 } from '@opentrons/shared-data'
 
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
@@ -44,13 +46,17 @@ import { AddFixtureModal } from './AddFixtureModal'
 import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
-import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
+import type { CutoutConfig, CutoutFixtureId, CutoutId, DeckConfiguration } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const RUN_REFETCH_INTERVAL = 5000
 
 interface DeviceDetailsDeckConfigurationProps {
   robotName: string
+}
+
+function getDisplayLocationForFixtureGroup(cutouts: CutoutId[]): string {
+  return cutouts.map(cutoutId => getCutoutDisplayName(cutoutId)).join(" + ")
 }
 
 export function DeviceDetailsDeckConfiguration({
@@ -68,6 +74,7 @@ export function DeviceDetailsDeckConfiguration({
     null
   )
 
+  const { data: modulesData } = useModulesQuery()
   const deckConfig =
     useDeckConfigurationQuery({ refetchInterval: DECK_CONFIG_REFETCH_INTERVAL })
       .data ?? []
@@ -118,16 +125,34 @@ export function DeviceDetailsDeckConfiguration({
           : cutoutConfig
       ))
     }
-    console.table({fixtureGroup, newDeckConfig})
     updateDeckConfiguration(newDeckConfig)
   }
 
   // do not show standard slot in fixture display list
-  const fixtureDisplayList = deckConfig.filter(
-    fixture =>
-      fixture.cutoutFixtureId != null &&
-      !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
-  )
+  const { displayList: fixtureDisplayList } = deckConfig.reduce<{ displayList: { displayLocation: string, displayName: string }[], groupedCutoutIds: CutoutId[] }>(
+    (acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => {
+      if (cutoutFixtureId == null || SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)) {
+        return acc
+      }
+      const displayName = getFixtureDisplayName(cutoutFixtureId, modulesData?.data.find(m => m.serialNumber === opentronsModuleSerialNumber)?.usbPort.port)
+      const fixtureGroup = getFixtureGroupForCutoutFixture(cutoutFixtureId, deckDef.cutoutFixtures)
+      if (fixtureGroup.length > 1) {
+        const groupedCutoutIds = fixtureGroup.map(groupedFixtureId => deckConfig.find(cc => cc.cutoutFixtureId === groupedFixtureId)?.cutoutId).filter((cc): cc is CutoutId => cc !== null)
+        const displayLocation = getDisplayLocationForFixtureGroup(groupedCutoutIds)
+        if (acc.groupedCutoutIds.includes(cutoutId)) {
+          return acc // only list grouped fixtures once
+        } else {
+          return {
+            displayList: [...acc.displayList, { displayLocation, displayName }],
+            groupedCutoutIds: [...acc.groupedCutoutIds, ...groupedCutoutIds]
+          }
+        }
+      }
+      return {
+        ...acc,
+        displayList: [...acc.displayList, { displayLocation: getDisplayLocationForFixtureGroup([cutoutId]), displayName }]
+      }
+    }, { displayList: [], groupedCutoutIds: [] })
 
   return (
     <>
@@ -232,9 +257,9 @@ export function DeviceDetailsDeckConfiguration({
                   <StyledText>{t('fixture')}</StyledText>
                 </Flex>
                 {fixtureDisplayList.length > 0 ? (
-                  fixtureDisplayList.map(({ cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => (
+                  fixtureDisplayList.map(({ displayLocation, displayName }) => (
                     <Flex
-                      key={cutoutId}
+                      key={displayLocation}
                       backgroundColor={COLORS.grey20}
                       borderRadius={BORDERS.borderRadius4}
                       gridGap={SPACING.spacing60}
@@ -242,12 +267,8 @@ export function DeviceDetailsDeckConfiguration({
                       width="100%"
                       css={TYPOGRAPHY.labelRegular}
                     >
-                      <StyledText>
-                        {getCutoutDisplayName(cutoutId)}
-                      </StyledText>
-                      <StyledText>
-                        {getFixtureDisplayName(cutoutFixtureId)}
-                      </StyledText>
+                      <StyledText>{displayLocation}</StyledText>
+                      <StyledText>{displayName}</StyledText>
                     </Flex>
                   ))
                 ) : (
