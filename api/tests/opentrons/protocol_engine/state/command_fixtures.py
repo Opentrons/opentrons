@@ -7,7 +7,6 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
-from opentrons.protocol_engine.state import CommandEntry
 from opentrons.protocol_engine.types import (
     DeckPoint,
     ModuleModel,
@@ -110,34 +109,6 @@ def create_succeeded_command(
             result=result or BaseModel(),
         ),
     )
-
-
-def create_queued_command_entry(
-    command_id: str = "command-id", index: int = 0
-) -> CommandEntry:
-    """Create a command entry for a queued command."""
-    return CommandEntry(create_queued_command(command_id=command_id), index)
-
-
-def create_running_command_entry(
-    command_id: str = "command-id", index: int = 0
-) -> CommandEntry:
-    """Create a command entry for a running command."""
-    return CommandEntry(create_running_command(command_id=command_id), index)
-
-
-def create_failed_command_entry(
-    command_id: str = "command-id", index: int = 0
-) -> CommandEntry:
-    """Create a command entry for a failed command."""
-    return CommandEntry(create_failed_command(command_id=command_id), index)
-
-
-def create_succeeded_command_entry(
-    command_id: str = "command-id", index: int = 0
-) -> CommandEntry:
-    """Create a command entry for a succeeded command."""
-    return CommandEntry(create_succeeded_command(command_id=command_id), index)
 
 
 def create_load_labware_command(

@@ -18,11 +18,13 @@ from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandView,
     CommandSlice,
-    CommandEntry,
     CurrentCommand,
     RunResult,
     QueueStatus,
 )
+
+from opentrons.protocol_engine.state.command_history import CommandEntry
+
 from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence
 
 from opentrons_shared_data.errors.codes import ErrorCodes

@@ -255,6 +255,7 @@ class ProtocolEngine:
         """
         if self._state_store.commands.get_is_stopped():
             return
+
         current_id = (
             self._state_store.commands.get_running_command_id()
             or self._state_store.commands.get_queued_command_ids().head(None)

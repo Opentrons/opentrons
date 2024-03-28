@@ -1,6 +1,5 @@
 """Tests for the command lifecycle state."""
 import pytest
-from collections import OrderedDict
 from datetime import datetime
 from typing import NamedTuple, Type
 
@@ -18,10 +17,10 @@ from opentrons.protocol_engine.state import Config
 from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandStore,
-    CommandEntry,
     RunResult,
     QueueStatus,
 )
+from opentrons.protocol_engine.state.command_history import CommandEntry
 
 from opentrons.protocol_engine.actions import (
     QueueCommandAction,
@@ -44,7 +43,6 @@ from .command_fixtures import (
     create_running_command,
     create_succeeded_command,
     create_failed_command,
-    create_failed_command_entry,
 )
 
 
@@ -411,9 +409,9 @@ def test_running_command_id() -> None:
     assert subject.state.command_history.get_running_command() is None
 
     subject.handle_action(running_update)
-    assert (
-        subject.state.command_history.get_running_command().command.id == "command-id-1"
-    )
+    running_command = subject.state.command_history.get_running_command()
+    assert running_command is not None
+    assert running_command.command.id == "command-id-1"
 
     subject.handle_action(completed_update)
     assert subject.state.command_history.get_running_command() is None
@@ -433,10 +431,10 @@ def test_running_command_no_queue() -> None:
     subject = CommandStore(is_door_open=False, config=_make_config())
 
     subject.handle_action(running_update)
+    running_command = subject.state.command_history.get_running_command()
     assert subject.state.command_history.get_all_ids() == ["command-id-1"]
-    assert (
-        subject.state.command_history.get_running_command().command.id == "command-id-1"
-    )
+    assert running_command is not None
+    assert running_command.command.id == "command-id-1"
 
     subject.handle_action(completed_update)
     assert subject.state.command_history.get_all_ids() == ["command-id-1"]
