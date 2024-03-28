@@ -119,6 +119,7 @@ describe('protocol storage directory utilities', () => {
         pipettes: [],
         modules: [],
         labware: [],
+        runTimeParameters: [],
       })
     })
   })

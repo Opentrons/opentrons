@@ -41,6 +41,7 @@ describe('write failed analysis', () => {
           modules: [],
           pipettes: [],
           liquids: [],
+          runTimeParameters: [],
         })
       })
   })

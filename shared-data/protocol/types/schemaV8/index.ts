@@ -4,6 +4,7 @@ import type {
   LoadedLabware,
   LoadedModule,
   Liquid,
+  RunTimeParameter,
 } from '../../../js'
 import type { CommandAnnotation } from '../../../commandAnnotation/types'
 import type { LabwareDefinition2, RobotType } from '../../../js/types'
@@ -136,6 +137,7 @@ export interface ProtocolAnalysisOutput {
   modules: LoadedModule[]
   liquids: Liquid[]
   errors: AnalysisError[]
+  runTimeParameters: RunTimeParameter[]
   robotType?: RobotType
 }
 

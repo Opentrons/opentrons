@@ -394,7 +394,6 @@ export function ProtocolDetails(
             onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={props}
-            runTimeParameters={runTimeParameters}
           />
           <SendProtocolToFlexSlideout
             isExpanded={showSendProtocolToFlexSlideout}

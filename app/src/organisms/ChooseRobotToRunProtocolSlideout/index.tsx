@@ -36,7 +36,6 @@ interface ChooseRobotToRunProtocolSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
   onCloseClick: () => void
   showSlideout: boolean
-  runTimeParameters?: RunTimeParameter[]
 }
 
 export function ChooseRobotToRunProtocolSlideoutComponent(
@@ -63,6 +62,8 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   )
 
   // TODO: (nd: 3/20/24) remove stubs and pull parameters from analysis
+  // const runTimeParameters =
+  //   storedProtocolData.mostRecentAnalysis?.runTimeParameters ?? []
   const mockRunTimeParameters: RunTimeParameter[] = [
     {
       displayName: 'Dry Run',
@@ -223,18 +224,19 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     </PrimaryButton>
   )
 
+  const hasRunTimeParameters =
+    enableRunTimeParametersFF && runTimeParameters.length > 0
+
   return (
     <ChooseRobotSlideout
-      multiSlideout={{ currentPage }}
+      multiSlideout={hasRunTimeParameters ? { currentPage } : undefined}
       isExpanded={showSlideout}
       isSelectedRobotOnDifferentSoftwareVersion={
         isSelectedRobotOnDifferentSoftwareVersion
       }
       onCloseClick={onCloseClick}
       title={
-        enableRunTimeParametersFF &&
-        runTimeParameters.length > 0 &&
-        currentPage === 2
+        hasRunTimeParameters && currentPage === 2
           ? t('select_parameters_for_robot', {
               robot_name: selectedRobot?.name,
             })
@@ -246,7 +248,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       setRunTimeParametersOverrides={setRunTimeParametersOverrides}
       footer={
         <Flex flexDirection={DIRECTION_COLUMN}>
-          {enableRunTimeParametersFF && runTimeParameters.length > 0 ? (
+          {hasRunTimeParameters ? (
             currentPage === 1 ? (
               <>
                 <ApplyHistoricOffsets

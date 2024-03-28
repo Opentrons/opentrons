@@ -36,6 +36,6 @@ describe('NoParameters', () => {
     render({
       t: tMock,
     })
-    screen.getByText('no_parameters')
+    screen.getByText('no_parameters_specified')
   })
 })
