@@ -619,9 +619,15 @@ class CommandView(HasState[CommandState]):
         run_requested_to_stop = self._state.run_result is not None
 
         if run_requested_to_stop:
-            final_command = self._state.command_history.get_tail_command()
+            tail_command = self._state.command_history.get_tail_command()
+            if not tail_command:
+                return None
+            if tail_command.command.status != CommandStatus.RUNNING:
+                return tail_command
+            else:
+                return self._state.command_history.get_prev(tail_command.command.id)
         else:
-            final_command = self._state.command_history.get_dequeued_command()
+            final_command = self._state.command_history.get_terminal_command()
             # This iteration is effectively O(1) as we'll only ever have to iterate one or two times at most.
             while final_command is not None:
                 next_command = self._state.command_history.get_next(
