@@ -20,7 +20,7 @@ import {
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
 import { Chip } from '../../../atoms/Chip'
-// import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
@@ -176,10 +176,10 @@ export function ProtocolRunRuntimeParameters({
   runId,
 }: ProtocolRunRuntimeParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  // const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   // todo (nd:03/27/2024) resolve runTimeParameters to analysis's runTimeParameters object once available
-  // const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
-  const runTimeParameters = mockData
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  // const runTimeParameters = mockData
   const hasParameter = runTimeParameters.length > 0
 
   // ToDo (kk:03/19/2024) this will be replaced with the boolean from values check result
@@ -227,7 +227,7 @@ export function ProtocolRunRuntimeParameters({
       </Flex>
       {!hasParameter ? (
         <Flex padding={SPACING.spacing16}>
-          <NoParameters t={t} />
+          <NoParameters t={t} textKey="no_parameters_specified_in_protocol" />
         </Flex>
       ) : (
         <>
@@ -240,13 +240,14 @@ export function ProtocolRunRuntimeParameters({
               </thead>
               <tbody>
                 {runTimeParameters.map(
-                  (parameter: RunTimeParameter, index: number) =>
-                    StyledTableRowComponent(
-                      parameter,
-                      index,
-                      runTimeParameters.length,
-                      t
-                    )
+                  (parameter: RunTimeParameter, index: number) => (
+                    <StyledTableRowComponent
+                      parameter={parameter}
+                      index={index}
+                      runTimeParametersLength={runTimeParameters.length}
+                      t={t}
+                    />
+                  )
                 )}
               </tbody>
             </StyledTable>
@@ -257,12 +258,17 @@ export function ProtocolRunRuntimeParameters({
   )
 }
 
-const StyledTableRowComponent = (
-  parameter: RunTimeParameter,
-  index: number,
-  runTimeParametersLength: number,
+interface StyledTableRowComponentProps {
+  parameter: RunTimeParameter
+  index: number
+  runTimeParametersLength: number
   t: any
+}
+
+const StyledTableRowComponent = (
+  props: StyledTableRowComponentProps
 ): JSX.Element => {
+  const { parameter, index, runTimeParametersLength, t } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (
     <StyledTableRow
@@ -272,20 +278,15 @@ const StyledTableRowComponent = (
       <StyledTableCell isLast={index === runTimeParametersLength - 1}>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
           <StyledText as="p">{parameter.displayName}</StyledText>
-          {parameter.description != null ? (
-            <>
-              <Flex {...targetProps} alignItems={ALIGN_CENTER}>
-                <Icon
-                  name="information"
-                  size={SPACING.spacing12}
-                  color={COLORS.grey60}
-                />
-              </Flex>
-              <Tooltip tooltipProps={tooltipProps}>
-                {parameter.description}
-              </Tooltip>
-            </>
-          ) : null}
+          <Flex {...targetProps} alignItems={ALIGN_CENTER}>
+            <Icon
+              name="information"
+              size={SPACING.spacing12}
+              color={COLORS.grey60}
+              data-testid="Icon"
+            />
+          </Flex>
+          <Tooltip tooltipProps={tooltipProps}>{parameter.description}</Tooltip>
         </Flex>
       </StyledTableCell>
       <StyledTableCell isLast={index === runTimeParametersLength - 1}>
