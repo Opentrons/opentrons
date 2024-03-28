@@ -52,7 +52,7 @@ from ..types import (
 )
 from ..actions import (
     Action,
-    UpdateCommandAction,
+    SucceedCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
 )
@@ -152,7 +152,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, UpdateCommandAction):
+        if isinstance(action, SucceedCommandAction):
             self._handle_command(action.command)
 
         elif isinstance(action, AddLabwareOffsetAction):

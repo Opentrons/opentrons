@@ -2,14 +2,17 @@ import * as React from 'react'
 import { when } from 'vitest-when'
 import { it, describe, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { ProtocolSetupParameters } from '..'
-import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { mockRunTimeParameterData } from '../../../pages/ProtocolDetails/fixtures'
 import type * as ReactRouterDom from 'react-router-dom'
+import type { HostConfig } from '@opentrons/api-client'
 
 const mockGoBack = vi.fn()
+
+vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<typeof ReactRouterDom>()
@@ -18,8 +21,8 @@ vi.mock('react-router-dom', async importOriginal => {
     useHistory: () => ({ goBack: mockGoBack } as any),
   }
 })
-
-const RUN_ID = 'mockId'
+const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
+const mockCreateRun = vi.fn()
 const render = (
   props: React.ComponentProps<typeof ProtocolSetupParameters>
 ) => {
@@ -32,14 +35,14 @@ describe('ProtocolSetupParameters', () => {
 
   beforeEach(() => {
     props = {
-      runId: 'mockId',
-      setSetupScreen: vi.fn(),
+      protocolId: 'mockId',
+      labwareOffsets: [],
+      runTimeParameters: mockRunTimeParameterData,
     }
-    when(vi.mocked(useMostRecentCompletedAnalysis))
-      .calledWith(RUN_ID)
-      .thenReturn({
-        runTimeParameters: mockRunTimeParameterData,
-      } as any)
+    vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
+    when(vi.mocked(useCreateRunMutation))
+      .calledWith(expect.anything())
+      .thenReturn({ createRun: mockCreateRun } as any)
   })
   it('renders the parameters labels and mock data', () => {
     render(props)
@@ -54,10 +57,10 @@ describe('ProtocolSetupParameters', () => {
     fireEvent.click(screen.getAllByRole('button')[0])
     expect(mockGoBack).toHaveBeenCalled()
   })
-  it('renders the confirm values button and clicking on it calls correct stuff', () => {
+  it('renders the confirm values button and clicking on it creates a run', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
-    expect(props.setSetupScreen).toHaveBeenCalled()
+    expect(mockCreateRun).toHaveBeenCalled()
   })
   it('renders the reset values modal', () => {
     render(props)

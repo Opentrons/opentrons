@@ -3,14 +3,14 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
-  Link,
   JUSTIFY_CENTER,
-  TYPOGRAPHY,
+  Link,
   SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import { StyledText } from '../../atoms/text'
 import { ConfirmCrashRecovery } from './ConfirmCrashRecovery'
 
 import type { CalibrationPanelProps } from './types'

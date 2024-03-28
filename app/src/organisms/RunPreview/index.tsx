@@ -4,20 +4,20 @@ import { useTranslation } from 'react-i18next'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
 
 import {
-  Flex,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   DISPLAY_NONE,
-  SPACING,
-  PrimaryButton,
-  TYPOGRAPHY,
-  BORDERS,
-  COLORS,
+  Flex,
   POSITION_FIXED,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useNotifyLastRunCommandKey } from '../../resources/runs'
 import { CommandText } from '../CommandText'

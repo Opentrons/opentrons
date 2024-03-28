@@ -9,8 +9,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
-import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/buttons'
 import { useLEDLights } from '../../hooks'
 

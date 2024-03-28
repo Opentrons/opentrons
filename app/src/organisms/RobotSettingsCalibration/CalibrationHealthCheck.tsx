@@ -4,19 +4,19 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
+  TOOLTIP_LEFT,
   TYPOGRAPHY,
   useHoverTooltip,
-  TOOLTIP_LEFT,
-  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '../../App/portal'
 import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import {

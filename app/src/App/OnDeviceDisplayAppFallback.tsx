@@ -9,14 +9,14 @@ import type { FallbackProps } from 'react-error-boundary'
 
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
   SPACING,
-  COLORS,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../atoms/text'
 import { MediumButton } from '../atoms/buttons'
 import { Modal } from '../molecules/Modal'
 import { appRestart, sendLog } from '../redux/shell'

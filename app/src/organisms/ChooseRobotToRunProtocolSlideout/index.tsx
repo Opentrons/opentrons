@@ -23,11 +23,11 @@ import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
-
 import type { StyleProps } from '@opentrons/components'
 import type { State } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]
@@ -36,6 +36,7 @@ interface ChooseRobotToRunProtocolSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
   onCloseClick: () => void
   showSlideout: boolean
+  runTimeParameters?: RunTimeParameter[]
 }
 
 export function ChooseRobotToRunProtocolSlideoutComponent(
@@ -60,6 +61,66 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     storedProtocolData,
     selectedRobot?.name ?? ''
   )
+
+  // TODO: (nd: 3/20/24) remove stubs and pull parameters from analysis
+  const mockRunTimeParameters: RunTimeParameter[] = [
+    {
+      displayName: 'Dry Run',
+      value: false,
+      variableName: 'DRYRUN',
+      description: 'Is this a dry or wet run? Wet is true, dry is false',
+      type: 'boolean',
+      default: false,
+    },
+    {
+      value: 4,
+      displayName: 'Columns of Samples',
+      variableName: 'COLUMNS',
+      description: 'How many columns do you want?',
+      type: 'int',
+      min: 1,
+      max: 14,
+      default: 4,
+    },
+    {
+      value: 6.5,
+      displayName: 'EtoH Volume',
+      variableName: 'ETOH_VOLUME',
+      description: '70% ethanol volume',
+      type: 'float',
+      suffix: 'mL',
+      min: 1.5,
+      max: 10.0,
+      default: 6.5,
+    },
+    {
+      value: 'none',
+      displayName: 'Default Module Offsets',
+      variableName: 'DEFAULT_OFFSETS',
+      description: 'default module offsets for temp, H-S, and none',
+      type: 'str',
+      choices: [
+        {
+          displayName: 'No offsets',
+          value: 'none',
+        },
+        {
+          displayName: 'temp offset',
+          value: '1',
+        },
+        {
+          displayName: 'heater-shaker offset',
+          value: '2',
+        },
+      ],
+      default: 'none',
+    },
+  ]
+  const runTimeParameters: RunTimeParameter[] = mockRunTimeParameters
+  const [
+    runTimeParametersOverrides,
+    setRunTimeParametersOverrides,
+  ] = React.useState<RunTimeParameter[]>(runTimeParameters)
 
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis,
@@ -170,12 +231,22 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
         isSelectedRobotOnDifferentSoftwareVersion
       }
       onCloseClick={onCloseClick}
-      title={t('choose_robot_to_run', {
-        protocol_name: protocolDisplayName,
-      })}
+      title={
+        enableRunTimeParametersFF &&
+        runTimeParameters.length > 0 &&
+        currentPage === 2
+          ? t('select_parameters_for_robot', {
+              robot_name: selectedRobot?.name,
+            })
+          : t('choose_robot_to_run', {
+              protocol_name: protocolDisplayName,
+            })
+      }
+      runTimeParametersOverrides={runTimeParametersOverrides}
+      setRunTimeParametersOverrides={setRunTimeParametersOverrides}
       footer={
         <Flex flexDirection={DIRECTION_COLUMN}>
-          {enableRunTimeParametersFF ? (
+          {enableRunTimeParametersFF && runTimeParameters.length > 0 ? (
             currentPage === 1 ? (
               <>
                 <ApplyHistoricOffsets

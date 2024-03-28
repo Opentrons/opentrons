@@ -2,14 +2,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import {
-  DIRECTION_COLUMN,
-  Flex,
   BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
-  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,
@@ -17,7 +18,6 @@ import {
 } from '@opentrons/shared-data'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'

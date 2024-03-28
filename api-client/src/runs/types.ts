@@ -5,7 +5,7 @@ import type {
   ModuleModel,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { ResourceLink } from '../types'
+import type { ResourceLink, ErrorDetails } from '../types'
 export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const
@@ -33,7 +33,7 @@ export type RunStatus =
   | typeof RUN_STATUS_BLOCKED_BY_OPEN_DOOR
   | typeof RUN_STATUS_AWAITING_RECOVERY
 
-export interface RunData {
+export interface LegacyGoodRunData {
   id: string
   createdAt: string
   completedAt?: string
@@ -48,6 +48,19 @@ export interface RunData {
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
 }
+
+export interface KnownGoodRunData extends LegacyGoodRunData {
+  ok: true
+}
+
+export interface KnownInvalidRunData extends LegacyGoodRunData {
+  ok: false
+  dataError: ErrorDetails
+}
+
+export type GoodRunData = KnownGoodRunData | LegacyGoodRunData
+
+export type RunData = GoodRunData | KnownInvalidRunData
 
 export interface VectorOffset {
   x: number

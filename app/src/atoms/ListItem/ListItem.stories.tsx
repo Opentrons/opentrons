@@ -1,7 +1,11 @@
 import * as React from 'react'
-import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 import { touchScreenViewport } from '../../DesignTokens/constants'
-import { StyledText } from '../text'
 import { ListItem } from '.'
 import type { Story, Meta } from '@storybook/react'
 

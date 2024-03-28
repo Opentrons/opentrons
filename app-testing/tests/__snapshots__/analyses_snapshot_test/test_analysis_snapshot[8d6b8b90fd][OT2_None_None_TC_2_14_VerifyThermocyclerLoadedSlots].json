@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "7"
@@ -169,5 +171,6 @@
     }
   ],
   "pipettes": [],
-  "robotType": "OT-2 Standard"
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": []
 }

@@ -10,11 +10,11 @@ import {
   POSITION_ABSOLUTE,
   COLORS,
   BORDERS,
+  StyledText,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
-  CreateMaintenanceRunType,
   useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 
@@ -28,8 +28,6 @@ import {
   useChainMaintenanceCommands,
   useCreateTargetedMaintenanceRunMutation,
 } from '../../resources/runs'
-import { StyledText } from '../../atoms/text'
-import { Jog } from '../../molecules/JogControls'
 import { ExitConfirmation } from './ExitConfirmation'
 import { getAddressableAreaFromConfig } from './getAddressableAreaFromConfig'
 import { getDropTipWizardSteps } from './getDropTipWizardSteps'
@@ -47,6 +45,7 @@ import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
 
 import type { PipetteData } from '@opentrons/api-client'
+import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
   PipetteModelSpecs,
   RobotType,
@@ -54,6 +53,7 @@ import type {
   AddressableAreaName,
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { Jog } from '../../molecules/JogControls'
 
 const RUN_REFETCH_INTERVAL_MS = 5000
 const JOG_COMMAND_TIMEOUT_MS = 10000

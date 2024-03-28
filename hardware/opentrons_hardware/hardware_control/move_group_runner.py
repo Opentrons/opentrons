@@ -13,6 +13,7 @@ from opentrons_shared_data.errors.exceptions import (
     EStopActivatedError,
     MotionFailedError,
     PythonException,
+    MotorDriverError,
 )
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
@@ -22,6 +23,8 @@ from opentrons_hardware.firmware_bindings.constants import (
     ErrorSeverity,
     GearMotorId,
     MoveAckId,
+    MotorDriverErrorCode,
+    SensorId,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -38,6 +41,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     TipActionResponse,
     ErrorMessage,
     StopRequest,
+    ReadMotorDriverErrorStatusResponse,
+    AddSensorLinearMoveRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
@@ -46,6 +51,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     GripperMoveRequestPayload,
     TipActionRequestPayload,
     EmptyPayload,
+    AddSensorLinearMoveBasePayload,
 )
 from .constants import (
     interrupts_per_sec,
@@ -69,6 +75,7 @@ from opentrons_hardware.firmware_bindings.utils import (
 from opentrons_hardware.firmware_bindings.messages.fields import (
     PipetteTipActionTypeField,
     MoveStopConditionField,
+    SensorIdField,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motor_position_status import (
@@ -299,6 +306,31 @@ class MoveGroupRunner:
                 ),
             )
             return HomeRequest(payload=home_payload)
+        elif step.move_type == MoveType.sensor:
+            # stop_condition = step.stop_condition.value
+            stop_condition = MoveStopCondition.sync_line
+            sensor_move_payload = AddSensorLinearMoveBasePayload(
+                request_stop_condition=MoveStopConditionField(stop_condition),
+                group_id=UInt8Field(group),
+                seq_id=UInt8Field(seq),
+                duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
+                acceleration_um=Int32Field(
+                    int(
+                        (
+                            step.acceleration_mm_sec_sq
+                            * 1000.0
+                            / interrupts_per_sec
+                            / interrupts_per_sec
+                        )
+                        * (2**31)
+                    )
+                ),
+                velocity_mm=Int32Field(
+                    int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
+                ),
+                sensor_id=SensorIdField(SensorId.S0),
+            )
+            return AddSensorLinearMoveRequest(payload=sensor_move_payload)
         else:
             stop_cond = step.stop_condition.value
             if self._ignore_stalls:
@@ -497,6 +529,42 @@ class MoveScheduler:
             # pick up groups they don't care about, and need to not fail.
             pass
 
+    def _handle_motor_driver_error(
+        self, message: ReadMotorDriverErrorStatusResponse, arbitration_id: ArbitrationId
+    ) -> None:
+        node_id = arbitration_id.parts.originating_node_id
+        data = message.payload.data.value
+        if data & MotorDriverErrorCode.over_temperature.value:
+            log.error(f"Motor driver over-temperature error from node {node_id}")
+            self._errors.append(
+                MotorDriverError(
+                    detail={
+                        "node": NodeId(node_id).name,
+                        "error": "over temperature",
+                    }
+                )
+            )
+        if data & MotorDriverErrorCode.short_circuit.value:
+            log.error(f"Motor driver short circuit error from node {node_id}")
+            self._errors.append(
+                MotorDriverError(
+                    detail={
+                        "node": NodeId(node_id).name,
+                        "error": "short circuit",
+                    }
+                )
+            )
+        if data & MotorDriverErrorCode.open_circuit.value:
+            log.error(f"Motor driver open circuit error from node {node_id}")
+            self._errors.append(
+                MotorDriverError(
+                    detail={
+                        "node": NodeId(node_id).name,
+                        "error": "open circuit",
+                    }
+                )
+            )
+
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
@@ -510,6 +578,8 @@ class MoveScheduler:
                 self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
+        elif isinstance(message, ReadMotorDriverErrorStatusResponse):
+            self._handle_motor_driver_error(message, arbitration_id)
 
     def _handle_tip_action_motors(self, message: TipActionResponse) -> bool:
         gear_id = GearMotorId(message.payload.gear_motor_id.value)

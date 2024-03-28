@@ -13,6 +13,13 @@ from opentrons.protocols.parameters.parameter_definition import (
     create_str_parameter,
 )
 
+from opentrons.protocol_engine.types import (
+    NumberParameter,
+    BooleanParameter,
+    EnumParameter,
+    EnumChoice,
+)
+
 
 @pytest.fixture(autouse=True)
 def _patch_parameter_validation(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -237,3 +244,94 @@ def test_str_parameter_default_raises_not_in_allowed_values() -> None:
             default="waldo",
             choices=[{"display_name": "where's", "value": "odlaw"}],
         )
+
+
+def test_as_protocol_engine_boolean_parameter(decoy: Decoy) -> None:
+    """It should return a protocol engine BooleanParameter model."""
+    decoy.when(mock_validation.ensure_display_name("foo")).then_return("my cool name")
+    decoy.when(mock_validation.ensure_variable_name("bar")).then_return("my variable")
+    decoy.when(mock_validation.ensure_description("describe this")).then_return("1 2 3")
+
+    parameter_def = create_bool_parameter(
+        display_name="foo",
+        variable_name="bar",
+        default=False,
+        choices=[{"display_name": "uhh", "value": False}],
+        description="describe this",
+    )
+
+    assert parameter_def.as_protocol_engine_type() == BooleanParameter(
+        type="bool",
+        displayName="my cool name",
+        variableName="my variable",
+        description="1 2 3",
+        value=False,
+        default=False,
+    )
+
+
+def test_as_protocol_engine_enum_parameter(decoy: Decoy) -> None:
+    """It should return a protocol engine EnumParameter model."""
+    decoy.when(mock_validation.ensure_display_name("foo")).then_return("my cool name")
+    decoy.when(mock_validation.ensure_variable_name("bar")).then_return("my variable")
+
+    parameter_def = create_str_parameter(
+        display_name="foo",
+        variable_name="bar",
+        default="red",
+        choices=[
+            {"display_name": "Lapis lazuli", "value": "blue"},
+            {"display_name": "Vermilion", "value": "red"},
+            {"display_name": "Celadon", "value": "green"},
+        ],
+    )
+    parameter_def.value = "green"
+    decoy.when(mock_validation.convert_type_string_for_enum(str)).then_return("float")
+
+    assert parameter_def.as_protocol_engine_type() == EnumParameter(
+        type="float",
+        displayName="my cool name",
+        variableName="my variable",
+        choices=[
+            EnumChoice(displayName="Lapis lazuli", value="blue"),
+            EnumChoice(displayName="Vermilion", value="red"),
+            EnumChoice(displayName="Celadon", value="green"),
+        ],
+        value="green",
+        default="red",
+    )
+
+
+def test_as_protocol_engine_number_parameter(decoy: Decoy) -> None:
+    """It should return a protocol engine NumberParameter model."""
+    decoy.when(mock_validation.ensure_display_name("foo")).then_return("my cool name")
+    decoy.when(mock_validation.ensure_variable_name("bar")).then_return("my variable")
+    decoy.when(mock_validation.ensure_description("a b c")).then_return("1 2 3")
+    decoy.when(mock_validation.ensure_unit_string_length("test")).then_return("microns")
+
+    parameter_def = create_int_parameter(
+        display_name="foo",
+        variable_name="bar",
+        default=42,
+        minimum=1,
+        maximum=100,
+        description="a b c",
+        unit="test",
+    )
+
+    parameter_def.value = 60
+    decoy.when(mock_validation.convert_type_string_for_num_param(int)).then_return(
+        "int"
+    )
+
+    assert parameter_def.as_protocol_engine_type() == NumberParameter(
+        type="int",
+        displayName="my cool name",
+        variableName="my variable",
+        description="1 2 3",
+        suffix="microns",
+        min=1.0,
+        max=100.0,
+        value=60.0,
+        default=42.0,
+    )

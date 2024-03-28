@@ -110,7 +110,7 @@ export function RunSummary(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const { reset } = useRunControls(runId)
+  const { reset, isResetRunLoading } = useRunControls(runId)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
@@ -163,13 +163,15 @@ export function RunSummary(): JSX.Element {
         setPipettesWithTip
       ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
     } else {
-      setShowRunAgainSpinner(true)
-      reset()
-      trackEvent({
-        name: 'proceedToRun',
-        properties: { sourceLocation: 'RunSummary' },
-      })
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+      if (!isResetRunLoading) {
+        setShowRunAgainSpinner(true)
+        reset()
+        trackEvent({
+          name: 'proceedToRun',
+          properties: { sourceLocation: 'RunSummary' },
+        })
+        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+      }
     }
   }
 

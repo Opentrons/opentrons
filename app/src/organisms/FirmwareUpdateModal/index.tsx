@@ -2,22 +2,22 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
+  COLORS,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
   Flex,
   Icon,
-  RESPONSIVENESS,
   JUSTIFY_CENTER,
-  COLORS,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,
   useSubsystemUpdateQuery,
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
-import { StyledText } from '../../atoms/text'
-import { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
+import type { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
 
 interface FirmwareUpdateModalProps {
   description: string

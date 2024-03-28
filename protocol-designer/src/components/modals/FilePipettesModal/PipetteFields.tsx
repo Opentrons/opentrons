@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Control,
-  Controller,
   FormState,
   UseFormSetValue,
   UseFormTrigger,
@@ -10,7 +9,6 @@ import {
 import { useTranslation } from 'react-i18next'
 import isEmpty from 'lodash/isEmpty'
 import {
-  DropdownField,
   FormGroup,
   PipetteSelect,
   OutlineButton,
@@ -30,6 +28,7 @@ import { FormPipettesByMount } from '../../../step-forms'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { getTiprackOptions } from '../utils'
 import { PipetteDiagram } from './PipetteDiagram'
+import { TiprackSelect } from './TiprackSelect'
 
 import styles from './FilePipettesModal.module.css'
 import formStyles from '../../forms/forms.module.css'
@@ -39,7 +38,7 @@ import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../../types'
 import type { FormState as TypeFormState } from './index'
 
-export interface Props {
+export interface PipetteFieldsProps {
   values: FormPipettesByMount
   setValue: UseFormSetValue<TypeFormState>
   trigger: UseFormTrigger<TypeFormState>
@@ -60,8 +59,8 @@ interface TiprackSelectProps {
   robotType: RobotType
 }
 
-export function PipetteFields(props: Props): JSX.Element {
-  const { values, formState, setValue, trigger, control, robotType } = props
+export function PipetteFields(props: PipetteFieldsProps): JSX.Element {
+  const { values, setValue, trigger, robotType } = props
   const { t } = useTranslation(['modal', 'button'])
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
@@ -73,7 +72,7 @@ export function PipetteFields(props: Props): JSX.Element {
     if (has96Channel) {
       values.right = { pipetteName: null, tiprackDefURI: null }
     }
-  }, [values.left])
+  }, [has96Channel, values.left])
 
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     const { tabIndex, mount } = props
@@ -112,43 +111,17 @@ export function PipetteFields(props: Props): JSX.Element {
       allowAllTipracks: allowAllTipracks,
       selectedPipetteName: selectedPipetteName,
     })
-    const { errors, touchedFields } = formState
-    const touched =
-      touchedFields.pipettesByMount &&
-      touchedFields.pipettesByMount[mount] != null
-
-    const tiprackDefURIError =
-      errors.pipettesByMount &&
-      errors.pipettesByMount[mount]?.tiprackDefURI != null
 
     return (
-      <Controller
-        control={control}
-        name={`pipettesByMount.${mount}.tiprackDefURI`}
-        render={({ field }) => (
-          <DropdownField
-            error={
-              touched && tiprackDefURIError
-                ? //  @ts-expect-error: TS can't tell that pipettesByMount
-                  //  won't be undefined
-                  errors.pipettesByMount[mount]?.tiprackDefURI?.message
-                : null
-            }
-            tabIndex={initialTabIndex + 2}
-            disabled={
-              isEmpty(values[mount].pipetteName) ||
-              (mount === RIGHT && has96Channel)
-            }
-            options={tiprackOptions}
-            value={values[mount].tiprackDefURI}
-            name={`pipettesByMount.${mount}.tiprackDefURI`}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              field.onChange(e)
-              trigger(`pipettesByMount.${mount}.tiprackDefURI`)
-            }}
-            onBlur={field.onBlur}
-          />
-        )}
+      <TiprackSelect
+        mount={mount}
+        tiprackOptions={tiprackOptions}
+        values={values}
+        onSetFieldValue={(field: string, value: string[]): void => {
+          //  @ts-expect-error: TS can't figure out this type with react-hook-form
+          setValue(field, value)
+          trigger(`pipettesByMount.${mount}.tiprackDefURI`)
+        }}
       />
     )
   }

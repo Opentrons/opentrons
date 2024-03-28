@@ -10,10 +10,10 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 
 export function OpenDoorAlertModal(): JSX.Element {

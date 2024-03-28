@@ -3,30 +3,30 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  Box,
-  Flex,
-  COLORS,
-  SPACING,
-  POSITION_FIXED,
-  POSITION_ABSOLUTE,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  POSITION_RELATIVE,
-  OVERFLOW_AUTO,
-  POSITION_STICKY,
-  BORDERS,
-  DISPLAY_FLEX,
-  DIRECTION_COLUMN,
   ALIGN_FLEX_START,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
+  Flex,
   Icon,
-  PrimaryButton,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
   Link,
+  OVERFLOW_AUTO,
+  POSITION_ABSOLUTE,
+  POSITION_FIXED,
+  POSITION_RELATIVE,
+  POSITION_STICKY,
+  PrimaryButton,
+  SPACING,
+  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'

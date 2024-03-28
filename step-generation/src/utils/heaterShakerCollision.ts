@@ -8,7 +8,7 @@ import {
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
 } from '@opentrons/shared-data'
 
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import type { PipetteV2Specs } from '@opentrons/shared-data'
 
 import type {
   LabwareEntities,
@@ -32,7 +32,7 @@ export const getIsHeaterShakerEastWestWithLatchOpen = (
 export const getIsHeaterShakerEastWestMultiChannelPipette = (
   hwModules: RobotState['modules'],
   slot: DeckSlot,
-  pipetteSpecs: PipetteNameSpecs
+  pipetteSpecs: PipetteV2Specs
 ): boolean =>
   pipetteSpecs.channels !== 1 &&
   some(
@@ -45,7 +45,7 @@ export const getIsHeaterShakerEastWestMultiChannelPipette = (
 export const getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = (
   hwModules: RobotState['modules'],
   slot: DeckSlot,
-  pipetteSpecs: PipetteNameSpecs,
+  pipetteSpecs: PipetteV2Specs,
   labwareEntity: LabwareEntity
 ): boolean =>
   pipetteSpecs.channels !== 1 &&

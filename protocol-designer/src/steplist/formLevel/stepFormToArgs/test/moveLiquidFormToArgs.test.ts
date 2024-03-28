@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { getLabwareDefURI } from '@opentrons/shared-data'
-import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+import {
+  fixtureP10SingleV2Specs,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 import {
   fixture_12_trough,
   fixture_96_plate,
@@ -42,11 +44,21 @@ describe('move liquid step form -> command creator args', () => {
       description: null,
 
       fields: {
-        // @ts-expect-error(sa, 2021-6-15): not a valid PipetteEntity
         pipette: {
           id: 'pipetteId',
-          spec: fixtureP10Single,
-        },
+          spec: fixtureP10SingleV2Specs,
+          tiprackLabwareDef: [
+            {
+              parameters: {
+                tipLength: 10,
+                loadName: 'mockTiprack',
+              },
+              metadata: {
+                displayName: 'mock display name',
+              },
+            },
+          ] as any,
+        } as any,
         volume: 10,
         path: 'single',
         changeTip: 'always',
@@ -56,6 +68,7 @@ describe('move liquid step form -> command creator args', () => {
           type: sourceLabwareType,
           def: sourceLabwareDef,
         },
+        tipRack: 'mockTiprack',
         aspirate_wells: [ASPIRATE_WELL],
         aspirate_wellOrder_first: 'l2r',
         aspirate_wellOrder_second: 't2b',

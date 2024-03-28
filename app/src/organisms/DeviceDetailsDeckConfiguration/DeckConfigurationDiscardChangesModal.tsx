@@ -7,13 +7,13 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 
-import { ModalHeaderBaseProps } from '../../molecules/Modal/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface DeckConfigurationDiscardChangesModalProps {
   setShowConfirmationModal: (showConfirmationModal: boolean) => void

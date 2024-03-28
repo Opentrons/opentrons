@@ -3,16 +3,16 @@ import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
-  Box,
-  SPACING,
-  Flex,
   ALIGN_CENTER,
+  Box,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { Divider } from '../../../atoms/structure'
-import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
 import { useIsFlex, useIsRobotBusy, useRobot } from '../hooks'
 import {

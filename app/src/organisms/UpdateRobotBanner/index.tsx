@@ -2,13 +2,13 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  SPACING,
-  TYPOGRAPHY,
   Btn,
   DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { handleUpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'

@@ -10,16 +10,6 @@ import os
 import argparse
 
 
-def _get_user_input(lst: List[str], some_string: str) -> str:
-    variable = input(some_string)
-    while variable not in lst:
-        print(
-            f"Your input was {variable}. Expected input is one of the following: {lst}"
-        )
-        variable = input(some_string)
-    return variable
-
-
 class _ABRAsairSensor:
     def __init__(self, robot: str, duration: int, frequency: int) -> None:
         try:
@@ -79,6 +69,7 @@ class _ABRAsairSensor:
                 temp,
                 rh,
             ]
+
             results_list.append(row)
             # Check if duration elapsed
             elapsed_time = datetime.datetime.now() - start_time
@@ -86,6 +77,8 @@ class _ABRAsairSensor:
                 break
             # write to google sheet
             try:
+                if google_sheet.creditals.access_token_expired:
+                    google_sheet.gc.login()
                 google_sheet.write_header(header)
                 google_sheet.update_row_index()
                 google_sheet.write_to_row(row)
@@ -108,22 +101,6 @@ class _ABRAsairSensor:
 
 
 if __name__ == "__main__":
-    robot_list: List = [
-        "DVT1ABR1",
-        "DVT1ABR2",
-        "DVT1ABR3",
-        "DVT1ABR4",
-        "DVT2ABR5",
-        "DVT2ABR6",
-        "PVT1ABR7",
-        "PVT1ABR8",
-        "PVT1ABR9",
-        "PVT1ABR10",
-        "PVT1ABR11",
-        "PVT1ABR12",
-        "ROOM_339",
-        "Room_340",
-    ]
     parser = argparse.ArgumentParser(description="Starts Temp/RH Sensor.")
     parser.add_argument(
         "robot", metavar="ROBOT", type=str, nargs=1, help="ABR Robot Name"

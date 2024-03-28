@@ -22,11 +22,11 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   ModuleType,
   ModuleModel,
-  getPipetteNameSpecs,
   PipetteName,
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_TYPE,
   OT2_ROBOT_TYPE,
+  getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
 import { PipetteFields } from './PipetteFields'
@@ -119,7 +119,8 @@ const initialFormState: FormState = {
 
 const pipetteValidationShape = Yup.object().shape({
   pipetteName: Yup.string().nullable(),
-  tiprackDefURI: Yup.string()
+  tiprackDefURI: Yup.array()
+    .of(Yup.string())
     .nullable()
     .when('pipetteName', {
       is: (val: string | null): boolean => Boolean(val),
@@ -172,7 +173,7 @@ const makeUpdatePipettes = (
     [pipetteId: string]: {
       mount: string
       name: PipetteName
-      tiprackDefURI: string
+      tiprackDefURI: string[]
       id: string
     }
   } = {}
@@ -253,9 +254,14 @@ const makeUpdatePipettes = (
     nextPipettes,
     (nextPipette: typeof nextPipettes[keyof typeof nextPipettes]) => {
       const newPipetteId = nextPipette.id
+      const nextTips = nextPipette.tiprackDefURI
+      const oldTips =
+        newPipetteId in prevPipettes
+          ? prevPipettes[newPipetteId].tiprackDefURI
+          : null
       const tiprackChanged =
-        newPipetteId in prevPipettes &&
-        nextPipette.tiprackDefURI !== prevPipettes[newPipetteId].tiprackDefURI
+        oldTips != null &&
+        nextTips.every((item, index) => item !== oldTips[index])
       return tiprackChanged
     }
   ).map(pipette => pipette.id)
@@ -360,8 +366,8 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
         ) // this is mostly for flow
         // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
         return formPipette &&
-          formPipette.pipetteName &&
-          formPipette.tiprackDefURI &&
+          formPipette.pipetteName != null &&
+          formPipette.tiprackDefURI != null &&
           (mount === 'left' || mount === 'right')
           ? [
               ...acc,
@@ -455,8 +461,8 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
   const showHeaterShakerPipetteCollisions =
     hasHeaterShakerSelected &&
     [
-      getPipetteNameSpecs(left.pipetteName as PipetteName),
-      getPipetteNameSpecs(right.pipetteName as PipetteName),
+      getPipetteSpecsV2(left.pipetteName as PipetteName),
+      getPipetteSpecsV2(right.pipetteName as PipetteName),
     ].some(pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1)
 
   const crashablePipetteSelected = getIsCrashablePipetteSelected(
@@ -512,7 +518,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
               </OutlineButton>
               <OutlineButton
                 disabled={!pipetteSelectionIsValid}
-                onClick={handleSubmit(handleFormSubmit)}
+                type="submit"
                 tabIndex={6}
                 className={styles.button}
               >
@@ -524,7 +530,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
           {showEditPipetteConfirmation ? (
             <StepChangesConfirmModal
               onCancel={() => setShowEditPipetteConfirmation(false)}
-              onConfirm={handleSubmit(handleFormSubmit)}
+              onConfirm={() => handleSubmit(handleFormSubmit)()}
             />
           ) : null}
         </div>

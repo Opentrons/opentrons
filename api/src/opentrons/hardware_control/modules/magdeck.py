@@ -53,13 +53,16 @@ class MagDeck(mod_abc.AbstractModule):
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
+        sim_serial_number: Optional[str] = None,
     ) -> "MagDeck":
         """Factory function."""
         driver: AbstractMagDeckDriver
         if not simulating:
             driver = await MagDeckDriver.create(port=port, loop=hw_control_loop)
         else:
-            driver = SimulatingDriver(sim_model=sim_model)
+            driver = SimulatingDriver(
+                sim_model=sim_model, serial_number=sim_serial_number
+            )
 
         mod = cls(
             port=port,

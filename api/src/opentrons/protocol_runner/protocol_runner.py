@@ -9,6 +9,7 @@ import anyio
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
 from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api import ParameterContext
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -35,7 +36,12 @@ from .legacy_wrappers import (
     LegacyExecutor,
     LegacyLoadInfo,
 )
-from ..protocol_engine.types import PostRunHardwareState, DeckConfigurationType
+from ..protocol_engine.types import (
+    PostRunHardwareState,
+    DeckConfigurationType,
+    RunTimeParameter,
+    RunTimeParamValuesType,
+)
 
 
 class RunResult(NamedTuple):
@@ -43,6 +49,7 @@ class RunResult(NamedTuple):
 
     commands: List[Command]
     state_summary: StateSummary
+    parameters: List[RunTimeParameter]
 
 
 class AbstractRunner(ABC):
@@ -74,6 +81,11 @@ class AbstractRunner(ABC):
         Otherwise, it's a no-op.
         """
         return self._broker
+
+    @property
+    def run_time_parameters(self) -> List[RunTimeParameter]:
+        """Parameter definitions defined by protocol, if any. Currently only for python protocols."""
+        return []
 
     def was_started(self) -> bool:
         """Whether the run has been started.
@@ -110,6 +122,7 @@ class AbstractRunner(ABC):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
+        run_time_param_values: Optional[RunTimeParamValuesType] = None,
     ) -> RunResult:
         """Run a given protocol to completion."""
 
@@ -139,17 +152,26 @@ class PythonAndLegacyRunner(AbstractRunner):
         self._legacy_executor = legacy_executor or LegacyExecutor()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
-        self._task_queue = (
-            task_queue or TaskQueue()
-        )  # cleanup_func=protocol_engine.finish))
+        self._task_queue = task_queue or TaskQueue()
         self._task_queue.set_cleanup_func(
             func=protocol_engine.finish,
             drop_tips_after_run=drop_tips_after_run,
             post_run_hardware_state=post_run_hardware_state,
         )
+        self._parameter_context: Optional[ParameterContext] = None
+
+    @property
+    def run_time_parameters(self) -> List[RunTimeParameter]:
+        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        if self._parameter_context is not None:
+            return self._parameter_context.export_parameters_for_analysis()
+        return []
 
     async def load(
-        self, protocol_source: ProtocolSource, python_parse_mode: PythonParseMode
+        self,
+        protocol_source: ProtocolSource,
+        python_parse_mode: PythonParseMode,
+        run_time_param_values: Optional[RunTimeParamValuesType],
     ) -> None:
         """Load a Python or JSONv5(& older) ProtocolSource into managed ProtocolEngine."""
         labware_definitions = await protocol_reader.extract_labware_definitions(
@@ -165,6 +187,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         protocol = self._legacy_file_reader.read(
             protocol_source, labware_definitions, python_parse_mode
         )
+        self._parameter_context = ParameterContext(api_version=protocol.api_level)
         equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
@@ -184,28 +207,37 @@ class PythonAndLegacyRunner(AbstractRunner):
             equipment_broker=equipment_broker,
         )
         initial_home_command = pe_commands.HomeCreate(
+            # this command homes all axes, including pipette plunger and gripper jaw
             params=pe_commands.HomeParams(axes=None)
         )
-        # this command homes all axes, including pipette plugner and gripper jaw
-        self._protocol_engine.add_command(request=initial_home_command)
 
-        self._task_queue.set_run_func(
-            func=self._legacy_executor.execute,
-            protocol=protocol,
-            context=context,
-        )
+        async def run_func() -> None:
+            await self._protocol_engine.add_and_execute_command(
+                request=initial_home_command
+            )
+            await self._legacy_executor.execute(
+                protocol=protocol,
+                context=context,
+                parameter_context=self._parameter_context,
+                run_time_param_values=run_time_param_values,
+            )
+
+        self._task_queue.set_run_func(run_func)
 
     async def run(  # noqa: D102
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
+        run_time_param_values: Optional[RunTimeParamValuesType] = None,
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
-        # currently `protocol_source` arg is only used by tests
+        # currently `protocol_source` arg is only used by tests & protocol analyzer
         if protocol_source:
             await self.load(
-                protocol_source=protocol_source, python_parse_mode=python_parse_mode
+                protocol_source=protocol_source,
+                python_parse_mode=python_parse_mode,
+                run_time_param_values=run_time_param_values,
             )
 
         self.play(deck_configuration=deck_configuration)
@@ -214,7 +246,10 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return RunResult(commands=commands, state_summary=run_data)
+        parameters = self.run_time_parameters
+        return RunResult(
+            commands=commands, state_summary=run_data, parameters=parameters
+        )
 
 
 class JsonRunner(AbstractRunner):
@@ -305,6 +340,7 @@ class JsonRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
+        run_time_param_values: Optional[RunTimeParamValuesType] = None,
     ) -> RunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
@@ -317,7 +353,7 @@ class JsonRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return RunResult(commands=commands, state_summary=run_data)
+        return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
 
 class LiveRunner(AbstractRunner):
@@ -348,6 +384,7 @@ class LiveRunner(AbstractRunner):
         self,
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
+        run_time_param_values: Optional[RunTimeParamValuesType] = None,
     ) -> RunResult:
         assert protocol_source is None
         await self._hardware_api.home()
@@ -357,7 +394,7 @@ class LiveRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return RunResult(commands=commands, state_summary=run_data)
+        return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
 
 AnyRunner = Union[PythonAndLegacyRunner, JsonRunner, LiveRunner]

@@ -2,19 +2,19 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_FLEX_END,
-  TYPOGRAPHY,
-  SPACING,
   PrimaryButton,
   SecondaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getShellUpdateState } from '../../../../redux/shell'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 // import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 
-import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { Banner } from '../../../../atoms/Banner'
 import { LegacyModal } from '../../../../molecules/LegacyModal'

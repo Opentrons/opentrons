@@ -2,8 +2,12 @@ import * as React from 'react'
 import omit from 'lodash/omit'
 import isEqual from 'lodash/isEqual'
 import { Trans, useTranslation } from 'react-i18next'
-import { DIRECTION_COLUMN, Flex, TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'

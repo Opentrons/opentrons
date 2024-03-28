@@ -15,5 +15,9 @@
   "OT_PD_ENABLE_MULTI_TIP": {
     "title": "Enable multi tiprack support",
     "description": "Allow users to select multiple tipracks per pipette"
+  },
+  "OT_PD_ENABLE_MOAM": {
+    "title": "Enable multiples of a module",
+    "description": "Allow users to select multiples of a module"
   }
 }

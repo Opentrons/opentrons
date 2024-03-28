@@ -3,26 +3,26 @@ import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_ROW,
-  TYPOGRAPHY,
-  COLORS,
-  Btn,
-  JUSTIFY_FLEX_END,
-  JUSTIFY_START,
-  JUSTIFY_CENTER,
-  PrimaryButton,
-  RESPONSIVENESS,
-  DISPLAY_INLINE_BLOCK,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  Btn,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  DISPLAY_INLINE_BLOCK,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_START,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { NeedHelpLink } from '../../organisms/CalibrationPanels'
 import { SmallButton } from '../../atoms/buttons'

@@ -15,11 +15,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { Divider } from '../../../../atoms/structure'
-import { StyledText } from '../../../../atoms/text'
 import {
   useTrackEvent,
   ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL,

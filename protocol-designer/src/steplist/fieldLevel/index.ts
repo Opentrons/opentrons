@@ -398,6 +398,9 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     getErrors: composeErrors(requiredField),
     hydrate: getLabwareLocation,
   },
+  tipRack: {
+    getErrors: composeErrors(requiredField),
+  },
 }
 const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
   // profile step fields

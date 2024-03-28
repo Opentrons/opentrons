@@ -2,18 +2,18 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_FLEX_END,
   Btn,
   COLORS,
-  TYPOGRAPHY,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
-  ALIGN_FLEX_END,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { InstructionStep } from './InstructionStep'
 import { PipetteSelection } from './PipetteSelection'
