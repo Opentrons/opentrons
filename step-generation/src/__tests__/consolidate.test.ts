@@ -1350,6 +1350,8 @@ describe('consolidate single-channel', () => {
             seconds: 12,
           },
         },
+        // Blowout to trash
+        ...blowoutInPlaceHelper(),
         // Touch tip (disp)
         {
           commandType: 'touchTip',
@@ -1370,8 +1372,6 @@ describe('consolidate single-channel', () => {
         // No Dispense > Air Gap here because we're re-using the tip
         // for the next chunk
 
-        // Blowout to trash
-        ...blowoutInPlaceHelper(),
         // Second chunk: source well A3
         // pre-wet
         {
@@ -1596,6 +1596,8 @@ describe('consolidate single-channel', () => {
             seconds: 12,
           },
         },
+        // Blowout to trash
+        ...blowoutInPlaceHelper(),
         // Touch tip (disp)
         {
           commandType: 'touchTip',
@@ -1612,9 +1614,6 @@ describe('consolidate single-channel', () => {
             },
           },
         },
-
-        // Blowout to trash
-        ...blowoutInPlaceHelper(),
         // Dispense > air gap in dest well
         {
           commandType: 'aspirate',
@@ -1992,6 +1991,23 @@ describe('consolidate single-channel', () => {
             seconds: 12,
           },
         },
+        // Blowout to dest well
+        {
+          commandType: 'blowout',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            flowRate: 2.3,
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 13.84,
+              },
+            },
+          },
+        },
         // Touch tip (disp)
         {
           commandType: 'touchTip',
@@ -2011,24 +2027,6 @@ describe('consolidate single-channel', () => {
 
         // No Dispense > Air Gap here because we're re-using the tip
         // for the next chunk
-
-        // Blowout to dest well
-        {
-          commandType: 'blowout',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            flowRate: 2.3,
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 13.84,
-              },
-            },
-          },
-        },
 
         // Second chunk: source well A3
         // pre-wet
@@ -2254,22 +2252,6 @@ describe('consolidate single-channel', () => {
             seconds: 12,
           },
         },
-        // Touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
-          },
-        },
         // Blowout to dest
         {
           commandType: 'blowout',
@@ -2283,6 +2265,22 @@ describe('consolidate single-channel', () => {
               origin: 'bottom',
               offset: {
                 z: 13.84,
+              },
+            },
+          },
+        },
+        // Touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
               },
             },
           },
@@ -2661,23 +2659,6 @@ describe('consolidate single-channel', () => {
             seconds: 12,
           },
         },
-        // Touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
-          },
-        },
-
         // Blowout to dest well
         {
           commandType: 'blowout',
@@ -2691,6 +2672,22 @@ describe('consolidate single-channel', () => {
               origin: 'bottom',
               offset: {
                 z: 13.84,
+              },
+            },
+          },
+        },
+        // Touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
               },
             },
           },
@@ -2958,22 +2955,6 @@ describe('consolidate single-channel', () => {
             seconds: 12,
           },
         },
-        // Touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
-          },
-        },
         // Blowout to dest
         {
           commandType: 'blowout',
@@ -2987,6 +2968,22 @@ describe('consolidate single-channel', () => {
               origin: 'bottom',
               offset: {
                 z: 13.84,
+              },
+            },
+          },
+        },
+        // Touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
               },
             },
           },

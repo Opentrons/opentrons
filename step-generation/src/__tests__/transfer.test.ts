@@ -1383,22 +1383,6 @@ describe('advanced options', () => {
             seconds: 12,
           },
         },
-        // touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
-          },
-        },
         // no dispense > air gap, because tip will be reused
         // blowout
         {
@@ -1416,6 +1400,22 @@ describe('advanced options', () => {
           params: {
             pipetteId: 'p300SingleId',
             flowRate: 2.3,
+          },
+        },
+        // touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
+              },
+            },
           },
         },
         // next chunk from A1: remaining volume
@@ -1669,22 +1669,6 @@ describe('advanced options', () => {
             seconds: 12,
           },
         },
-        // touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
-          },
-        },
         {
           commandType: 'moveToAddressableArea',
           key: expect.any(String),
@@ -1700,6 +1684,22 @@ describe('advanced options', () => {
           params: {
             pipetteId: 'p300SingleId',
             flowRate: 2.3,
+          },
+        },
+        // touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
+              },
+            },
           },
         },
         // use the dispense > air gap here before moving to trash
@@ -2041,22 +2041,6 @@ describe('advanced options', () => {
             seconds: 12,
           },
         },
-        // touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
-          },
-        },
         // blowout
         {
           commandType: 'blowout',
@@ -2070,6 +2054,22 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 13.84,
+              },
+            },
+          },
+        },
+        // touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
               },
             },
           },
@@ -2326,22 +2326,6 @@ describe('advanced options', () => {
             seconds: 12,
           },
         },
-        // touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
-          },
-        },
         // blowout to dest well
         {
           commandType: 'blowout',
@@ -2355,6 +2339,22 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 13.84,
+              },
+            },
+          },
+        },
+        // touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
               },
             },
           },
@@ -2727,22 +2727,6 @@ describe('advanced options', () => {
             seconds: 12,
           },
         },
-        // touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
-          },
-        },
         // blowout
         {
           commandType: 'blowout',
@@ -2756,6 +2740,22 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 13.84,
+              },
+            },
+          },
+        },
+        // touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
               },
             },
           },
@@ -3013,22 +3013,6 @@ describe('advanced options', () => {
             seconds: 12,
           },
         },
-        // touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
-          },
-        },
         // blowout
         {
           commandType: 'blowout',
@@ -3042,6 +3026,22 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 13.84,
+              },
+            },
+          },
+        },
+        // touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
               },
             },
           },
@@ -3412,22 +3412,6 @@ describe('advanced options', () => {
             seconds: 12,
           },
         },
-        // touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
-          },
-        },
         // blowout
         {
           commandType: 'blowout',
@@ -3441,6 +3425,22 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 13.84,
+              },
+            },
+          },
+        },
+        // touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
               },
             },
           },
@@ -3747,22 +3747,6 @@ describe('advanced options', () => {
             seconds: 12,
           },
         },
-        // touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
-          },
-        },
         // blowout
         {
           commandType: 'blowout',
@@ -3776,6 +3760,22 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 13.84,
+              },
+            },
+          },
+        },
+        // touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
               },
             },
           },
