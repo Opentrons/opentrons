@@ -77,6 +77,58 @@ class uv_Driver:
             "CRC": hex(crc)
         }
 
+    def get_stable_uv(self):
+        datalist = []
+        for i in range(3):
+
+            modbus_data_hex = ''
+            self.particle_counter.flush()
+            self.particle_counter.flushInput()
+            try:
+                # Modbus RTU 请求帧数据（示例数据） 
+                # 01 04 01 C4 00 04 B1 C8 
+                request_frame = bytearray([0x01, 0x04, 0x01, 0xC4, 0x00, 0x04,0xB1, 0xC8])
+                # 发送请求
+                self.particle_counter.write(request_frame)
+                # 延时等待响应
+                time.sleep(0.1)
+                # 读取响应数据
+                response_frame = self.particle_counter.read_all()
+                print("Modbus响应帧:", response_frame.hex())
+                modbus_data_hex = response_frame.hex()
+
+            except Exception as e:
+                print(f"发生错误: {e}")
+                
+            # 将十六进制字符串转换为字节数组
+            modbus_data_bytes = bytes.fromhex(modbus_data_hex)
+
+            # 解析 Modbus 数据
+            device_address = modbus_data_bytes[0]
+            function_code = modbus_data_bytes[1]
+            byte_count = modbus_data_bytes[2]
+            
+            uvdatahex = modbus_data_bytes[3:7]  # 去除设备地址、功能码、字节计数和 CRC 校验
+            Tempvalhex = modbus_data_bytes[7:-2]
+
+            uvdata = int.from_bytes(uvdatahex, byteorder='big', signed=False)  # 将数据转换为十进制
+            Tempval = int.from_bytes(Tempvalhex, byteorder='big', signed=False)  # 将数据转换为十进制
+            if uvdata != 0:
+                uvdata = round(int(str(uvdata)[:-4]) / 100,1)
+            if Tempval != 0:
+                Tempval = round(int(str(Tempval)[:-4]) / 100,1)
+
+            crc = int.from_bytes(modbus_data_bytes[-2:], byteorder='big')  # 获取 CRC 校验值
+            datalist.append(uvdata)
+            # return {
+            #     "Device Address": hex(device_address),
+            #     "Function Code": hex(function_code),
+            #     "Byte Count": hex(byte_count),
+            #     "uvdata": uvdata,
+            #     "Tempval": Tempval,
+            #     "CRC": hex(crc)
+            # }
+        return max(datalist)
 
 if __name__ == '__main__':
     port = "/dev/tty.usbserial-130"

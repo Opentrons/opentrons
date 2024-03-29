@@ -115,11 +115,11 @@ async def _main(arguments: argparse.Namespace) -> None:
                 csv_cb.write(list(test_data.values()))
             input("TURN OFF FAN,PRESS ENTER TO CONTINUE.(关闭风扇后,按回车键继续)")
         
-
+        await api.home()
         if not arguments.skip_uv:
-            input("PLACE THE UV METER ON THE SLOT B3 TO START TEST(将紫外线计放置在插槽B3上开始测试)")
+            input("PLACE THE UV METER ON THE SLOT B3 TO START TEST(将紫外线计放置在插槽B2上开始测试)")
             #UV
-            await api.home()
+            
             test_data2={
                         'SLOT': None,
                         'uvdata': None,
@@ -194,18 +194,19 @@ async def _main(arguments: argparse.Namespace) -> None:
                 #获取数据UV get uv data
                 aa = input("Test Slot {} Press open UV to continue...(开始测试位置{} 打开UV灯后,回车继续)".format(grip_slot2,grip_slot2))
 
-                for i in range(10):
+                for i in range(11):
                     await asyncio.sleep(1)
                     print(i+1,"S")
-                alldata = uvinstrument.get_uv_()
-                intdatadict = uvinstrument.parse_modbus_data(alldata)
+                # alldata = uvinstrument.get_uv_()
+                # intdatadict = uvinstrument.parse_modbus_data(alldata)
+                intdatadict = uvinstrument.get_stable_uv()
                 print(intdatadict)
                 aa = input("Press close UV to continue...(关闭UV灯后,回车继续)")
 
                 
 
                 test_data2['SLOT']=slot_name[grip_slot2]
-                test_data2['uvdata']=intdatadict['uvdata']
+                test_data2['uvdata']=intdatadict
                 csv_cb.write(list(test_data2.values()))
 
                 # LOOP THROUGH FORCES
