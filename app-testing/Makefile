@@ -72,4 +72,5 @@ TARGET ?= edge
 build-opentrons-analysis:
 	@echo "Building docker image for $(TARGET)"
 	@echo "If you want to build a different version, run 'make build-docker TARGET=<version>'"
-	docker build --build-arg OPENTRONS_VERSION=$(TARGET) -t opentrons-analysis:$(TARGET) citools/.
+	@echo "Cache is always busted to ensure latest version of the code is used"
+	docker build --build-arg OPENTRONS_VERSION=$(TARGET) --build-arg CACHEBUST=$(date +%s) -t opentrons-analysis:$(TARGET) citools/.
