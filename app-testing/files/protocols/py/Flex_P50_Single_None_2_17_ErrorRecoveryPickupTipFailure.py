@@ -1,3 +1,8 @@
+metadata = {
+    "protocolName": "Error Recovery Testing Protocol - Pickup Tip Failure",
+    "author": "Derek Maggio <derek.maggio@opentrons.com>",
+}
+
 requirements = {"robotType": "Flex", "apiLevel": "2.17"}
 
 
