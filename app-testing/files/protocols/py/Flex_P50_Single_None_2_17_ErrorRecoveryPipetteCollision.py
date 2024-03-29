@@ -22,4 +22,3 @@ def run(ctx):
 
     # After error recovery, pipette should be un-crashed (if that is a word)
     left_pipette.pick_up_tip(tip_rack)
-    
