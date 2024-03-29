@@ -1,3 +1,5 @@
 .env
 results
 analysis_results/*.json
+files/protocols/py/generated_protocols
+!files/protocols/py/generated_protocols/.keepme

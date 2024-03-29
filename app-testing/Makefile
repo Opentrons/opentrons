@@ -8,26 +8,26 @@ black-check:
 
 .PHONY: ruff
 ruff:
-	python -m pipenv run python -m ruff . --fix --unsafe-fixes
+	python -m pipenv run python -m ruff check --fix
 
 .PHONY: ruff-check
 ruff-check:
-	python -m pipenv run python -m ruff .
+	python -m pipenv run python -m ruff check
 
 .PHONY: mypy
 mypy:
 	python -m pipenv run python -m mypy conftest.py automation tests citools
 
 .PHONY: lint
-lint:
-	$(MAKE) black-check
-	$(MAKE) ruff-check
-	$(MAKE) mypy
+lint: black-check ruff-check mypy
 
 .PHONY: format
-format:
+format: 
+	@echo runnning black
 	$(MAKE) black
+	@echo running ruff
 	$(MAKE) ruff
+	@echo formatting the readme with yarn prettier
 	$(MAKE) format-readme
 
 .PHONY: test-ci

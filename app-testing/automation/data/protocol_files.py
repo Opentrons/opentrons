@@ -1,4 +1,5 @@
 """Define the possible names of protocol files to use in testing."""
+
 from typing import Literal
 
 names = Literal[
@@ -86,4 +87,14 @@ names = Literal[
     "Flex_None_None_2_16_AnalysisError_AccessToFixedTrashProp",
     "Flex_P1000_96_Gripper_2_16_TriggerPrepareForMountMovement",
     "Flex_None_None_2_18_GoldenRTP",
+    "Flex_None_None_2_18_BadTypesInRTP",  # The one with overrides, children below
+    "Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_display_name",
+    "Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_variable_name",
+    "Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_choice_display_name",
+    "Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_choice_value",
+    "Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_default",
+    "Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_description",
+    "Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_minimum",
+    "Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_maximum",
+    "Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_unit",
 ]

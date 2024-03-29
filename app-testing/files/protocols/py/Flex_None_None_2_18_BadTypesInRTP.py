@@ -1,3 +1,7 @@
+# I am going to get added to in the test runner
+# type_to_test = wrong_type_in_display_name
+# protocol.override_variable_name = type_to_test
+
 metadata = {
     "protocolName": "Description Too Long 2.18",
 }
@@ -5,14 +9,23 @@ metadata = {
 requirements = {"robotType": "Flex", "apiLevel": "2.18"}
 
 
-# change me to test that a bad description is caught
-# for each type of parameter we can add.
-type_to_test = 1
+# change me to test that a bad type is caught
+# for each field of parameter.
+# protocol.overrides is a list of these strings
+wrong_type_in_display_name: str = "wrong_type_in_display_name"
+wrong_type_in_variable_name: str = "wrong_type_in_variable_name"
+wrong_type_in_choice_display_name: str = "wrong_type_in_choice_display_name"
+wrong_type_in_choice_value: str = "wrong_type_in_choice_value"
+wrong_type_in_default: str = "wrong_type_in_default"
+wrong_type_in_description: str = "wrong_type_in_description"
+wrong_type_in_minimum: str = "wrong_type_in_minimum"
+wrong_type_in_maximum: str = "wrong_type_in_maximum"
+wrong_type_in_unit: str = "wrong_type_in_unit"  # we going unit or suffix?
 
 
 def add_parameters(parameters):
     match type_to_test:
-        case 1:  # Wrong type in display_name
+        case str() if type_to_test == wrong_type_in_display_name:
             parameters.add_int(
                 display_name=5,
                 variable_name="dilutions",
@@ -21,7 +34,7 @@ def add_parameters(parameters):
                 maximum=3,
                 description="This is a description.",
             )
-        case 2:  # Wrong type in variable_name
+        case str() if type_to_test == wrong_type_in_variable_name:
             parameters.add_float(
                 display_name="Mixing Volume in µL",
                 variable_name={},
@@ -33,7 +46,7 @@ def add_parameters(parameters):
                 ],
                 description="This is a description.",
             )
-        case 3:  # Wrong type in choice display_name
+        case str() if type_to_test == wrong_type_in_choice_display_name:
             parameters.add_str(
                 display_name="Pipette Name",
                 variable_name="pipette",
@@ -44,7 +57,7 @@ def add_parameters(parameters):
                 default="flex_1channel_50",
                 description="This is a description.",
             )
-        case 4:  # Wrong type in choice value
+        case str() if type_to_test == wrong_type_in_choice_value:
             parameters.add_str(
                 display_name="Pipette Name",
                 variable_name="pipette",
@@ -55,7 +68,7 @@ def add_parameters(parameters):
                 default="flex_1channel_50",
                 description="This is a description.",
             )
-        case 5:  # Wrong type in default
+        case str() if type_to_test == wrong_type_in_default:
             parameters.add_str(
                 display_name="Pipette Name",
                 variable_name="pipette",
@@ -66,7 +79,7 @@ def add_parameters(parameters):
                 default=6,
                 description="This is a description.",
             )
-        case 6:  # Wrong type in description
+        case str() if type_to_test == wrong_type_in_description:
             parameters.add_str(
                 display_name="Pipette Name",
                 variable_name="pipette",
@@ -77,7 +90,7 @@ def add_parameters(parameters):
                 default=6,
                 description=(),
             )
-        case 7:  # Wrong type in minimum
+        case str() if type_to_test == wrong_type_in_minimum:
             parameters.add_int(
                 display_name="Dilutions",
                 variable_name="dilutions",
@@ -86,7 +99,7 @@ def add_parameters(parameters):
                 maximum=3,
                 description="This is a description.",
             )
-        case 8:  # Wrong type in maximum
+        case str() if type_to_test == wrong_type_in_maximum:
             parameters.add_int(
                 display_name="Dilutions",
                 variable_name="dilutions",
@@ -95,7 +108,7 @@ def add_parameters(parameters):
                 maximum="3",
                 description="This is a description.",
             )
-        case 9:  # Wrong type in unit
+        case str() if type_to_test == wrong_type_in_unit:
             parameters.add_int(
                 display_name="Dilutions",
                 variable_name="dilutions",
