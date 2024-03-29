@@ -6,6 +6,7 @@ from fastapi import Depends
 from typing import Any, Dict, Optional, Callable
 from enum import Enum
 
+from change_notifier import ChangeNotifier
 from ..json_api import NotifyRefetchBody, NotifyUnsubscribeBody
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -48,8 +49,10 @@ class NotificationClient:
         protocol_version: int = mqtt.MQTTv5,
         default_qos: MQTT_QOS = MQTT_QOS.QOS_1,
         retain_message: bool = False,
+        change_notifier: Optional[ChangeNotifier] = None,
     ) -> None:
         """Returns a configured MQTT client."""
+        self.change_notifier = change_notifier or ChangeNotifier()
         self._host = host
         self._port = port
         self._keepalive = keepalive
@@ -79,7 +82,7 @@ class NotificationClient:
 
     def protocol_engine_callback_rename_this(self) -> None:
         """Rename this"""
-        log.info("HITTING PROTOCOL ENGINE INVOCATION")
+        self.change_notifier.notify()
 
     async def publish_advise_refetch_async(self, topic: str) -> None:
         """Asynchronously publish a refetch message on a specific topic to the MQTT broker.
