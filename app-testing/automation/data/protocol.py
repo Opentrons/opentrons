@@ -7,6 +7,7 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
+from automation.data.protocol_category import ProtocolCategory
 from automation.data.protocol_files import names
 from automation.resources.robot_data import module_types
 
@@ -34,6 +35,9 @@ class Protocol(BaseModel):
     override_variable_name: Optional[str] = Field(description="The variable name to override", default=None)
     override_value: Optional[str] = Field(description="The value of the override", default=None)
     from_override: bool = Field(description="Is this protocol generated from an override", default=False)
+    # remove the default to none once all the protocols are mapped
+    # and the file path function is updated to use the category
+    category: Optional[ProtocolCategory] = Field(description="The category of the protocol to map to the folder structure", default=None)
 
     @property
     def file_path(self) -> Path:

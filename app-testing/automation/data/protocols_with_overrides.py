@@ -1,3 +1,4 @@
+from automation.data.protocol_category import ProtocolCategory
 from automation.data.protocol_with_overrides import ProtocolWithOverrides
 
 
@@ -21,4 +22,5 @@ class ProtocolsWithOverrides:
             "wrong_type_in_maximum",
             "wrong_type_in_unit",  # we going unit or suffix?
         ],
+        category=ProtocolCategory(robot="Flex", outcome="Error"),
     )
