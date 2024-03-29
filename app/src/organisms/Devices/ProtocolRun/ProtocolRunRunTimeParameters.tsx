@@ -128,21 +128,33 @@ const StyledTableRowComponent = (
       isLast={index === runTimeParametersLength - 1}
       key={`runTimeParameter-${index}`}
     >
-      <StyledTableCell isLast={index === runTimeParametersLength - 1}>
+      <StyledTableCell
+        isLast={index === runTimeParametersLength - 1}
+        width="278px"
+      >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
           <StyledText as="p">{parameter.displayName}</StyledText>
-          <Flex {...targetProps} alignItems={ALIGN_CENTER}>
-            <Icon
-              name="information"
-              size={SPACING.spacing12}
-              color={COLORS.grey60}
-              data-testid="Icon"
-            />
-          </Flex>
-          <Tooltip tooltipProps={tooltipProps}>{parameter.description}</Tooltip>
+          {parameter.description != null ? (
+            <>
+              <Flex {...targetProps} alignItems={ALIGN_CENTER}>
+                <Icon
+                  name="information"
+                  size={SPACING.spacing12}
+                  color={COLORS.grey60}
+                  data-testid="Icon"
+                />
+              </Flex>
+              <Tooltip tooltipProps={tooltipProps}>
+                {parameter.description}
+              </Tooltip>
+            </>
+          ) : null}
         </Flex>
       </StyledTableCell>
-      <StyledTableCell isLast={index === runTimeParametersLength - 1}>
+      <StyledTableCell
+        width="278px"
+        isLast={index === runTimeParametersLength - 1}
+      >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
           <StyledText as="p">
             {formatRunTimeParameterValue(parameter, t)}
@@ -153,7 +165,6 @@ const StyledTableRowComponent = (
               type="success"
               hasIcon={false}
               chipSize="small"
-              isOnDevice={false}
             />
           ) : null}
         </Flex>
