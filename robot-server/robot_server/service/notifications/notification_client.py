@@ -77,7 +77,7 @@ class NotificationClient:
         self.client.loop_stop()
         await to_thread.run_sync(self.client.disconnect)
 
-    async def protocol_engine_callback_rename_this(self) -> None:
+    def protocol_engine_callback_rename_this(self) -> None:
         """Rename this"""
         log.info("HITTING PROTOCOL ENGINE INVOCATION")
 
