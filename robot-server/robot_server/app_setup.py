@@ -35,8 +35,8 @@ from .runs.dependencies import (
     mark_light_control_startup_finished,
 )
 
-from .service.notifications import (
-    initialize_notification_client,
+from service.notifications import (
+    initialize_notifications,
     clean_up_notification_client,
 )
 
@@ -106,7 +106,7 @@ async def on_startup() -> None:
             fbl_mark_persistence_init_complete
         ],
     )
-    initialize_notification_client(
+    await initialize_notifications(
         app_state=app.state,
     )
 

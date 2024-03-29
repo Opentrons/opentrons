@@ -17,3 +17,6 @@ class ChangeNotifier:
         """Wait until the next state change notification."""
         self._event.clear()
         await self._event.wait()
+
+    def clear(self) -> None:
+        self._event.clear()

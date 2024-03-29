@@ -45,8 +45,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
-from robot_server.service.notifications import get_notify_robot_server
-
+from service.notifications import get_notify_robot_server
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
