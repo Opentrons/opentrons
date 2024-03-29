@@ -10,20 +10,6 @@ const render = (props: React.ComponentProps<typeof Chip>) => {
   return renderWithProviders(<Chip {...props} />)
 }
 
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation(query => ({
-    matches: false,
-    media: '(height: 600px) and (width: 1024px)',
-    onchange: null,
-    addListener: vi.fn(), // Deprecated
-    removeListener: vi.fn(), // Deprecated
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-})
-
 describe('Chip Touchscreen', () => {
   let props: React.ComponentProps<typeof Chip>
 

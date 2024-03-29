@@ -122,10 +122,10 @@ export function Chip(props: ChipProps): JSX.Element {
 
   const ICON_STYLE = css`
     width: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
-    /* height: ${chipSize === 'medium' ? '1rem' : '0.75rem'}; */
+    height: ${chipSize === 'medium' ? '1rem' : '0.75rem'};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       width: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
-      /* height: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'}; */
+      height: ${chipSize === 'medium' ? '1.5rem' : '1.25rem'};
     }
   `
 
@@ -137,8 +137,6 @@ export function Chip(props: ChipProps): JSX.Element {
         : TYPOGRAPHY.smallBodyTextSemiBold}
     }
   `
-
-  console.log(window.innerHeight, innerWidth)
 
   return (
     <Flex
