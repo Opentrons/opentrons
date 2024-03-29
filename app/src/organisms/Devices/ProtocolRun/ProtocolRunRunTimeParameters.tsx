@@ -6,7 +6,7 @@ import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
-  // Chip,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -257,10 +257,14 @@ export function ProtocolRunRuntimeParameters({
                             <StyledText as="p">
                               {formatRunTimeParameterValue(parameter, t)}
                             </StyledText>
-                            {/* ToDo (kk:03/19/2024) chip will be here with conditional render */}
-                            {/* {index % 2 === 0 ? (
-                              <Chip text={t('updated')} type="success" />
-                            ) : null} */}
+                            {/* ToDo (kk:03/19/2024) need to implement a logic when be is ready */}
+                            {index % 2 === 0 ? (
+                              <Chip
+                                chipSize="small"
+                                text={t('updated')}
+                                type="success"
+                              />
+                            ) : null}
                           </Flex>
                         </StyledTableCell>
                       </StyledTableRow>
