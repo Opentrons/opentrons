@@ -294,6 +294,8 @@ class SyncClient:
 
         return cast(commands.PickUpTipResult, result)
 
+    # FIX BEFORE MERGE?: See if we can cut down on this duplication.
+    # We do not want to have to do this for every method here.
     def pick_up_tip_wait_for_recovery(
         self,
         pipette_id: str,
