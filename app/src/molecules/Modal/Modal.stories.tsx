@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { COLORS, Flex, BORDERS, SPACING } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { COLORS, Flex, BORDERS, SPACING, VIEWPORT } from '@opentrons/components'
 import { Modal } from './Modal'
 import type { Story, Meta } from '@storybook/react'
 
@@ -13,7 +12,7 @@ export default {
     },
     onOutsideClick: { action: 'clicked' },
   },
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof Modal>> = args => (

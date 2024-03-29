@@ -6,6 +6,7 @@ import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -18,7 +19,6 @@ import {
 
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
-// import { Chip } from '../../../atoms/Chip'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
@@ -257,10 +257,14 @@ export function ProtocolRunRuntimeParameters({
                             <StyledText as="p">
                               {formatRunTimeParameterValue(parameter, t)}
                             </StyledText>
-                            {/* ToDo (kk:03/19/2024) chip will be here with conditional render */}
-                            {/* {index % 2 === 0 ? (
-                              <Chip text={t('updated')} type="success" />
-                            ) : null} */}
+                            {/* ToDo (kk:03/19/2024) need to implement a logic when be is ready */}
+                            {index % 2 === 0 ? (
+                              <Chip
+                                chipSize="small"
+                                text={t('updated')}
+                                type="success"
+                              />
+                            ) : null}
                           </Flex>
                         </StyledTableCell>
                       </StyledTableRow>

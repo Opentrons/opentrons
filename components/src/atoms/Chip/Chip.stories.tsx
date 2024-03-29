@@ -1,11 +1,13 @@
 import * as React from 'react'
-import { Flex, COLORS, SPACING } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+
+import { Flex } from '../../primitives'
+import { COLORS } from '../../helix-design-system'
+import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { Chip } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof Chip> = {
-  title: 'ODD/Atoms/Chip',
+  title: 'Library/Atoms/Chip',
   argTypes: {
     type: {
       options: ['basic', 'error', 'info', 'neutral', 'success', 'warning'],
@@ -36,7 +38,7 @@ const meta: Meta<typeof Chip> = {
     },
   },
   component: Chip,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <Flex
