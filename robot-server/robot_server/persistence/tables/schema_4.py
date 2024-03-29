@@ -53,7 +53,7 @@ analysis_table = sqlalchemy.Table(
         "run_time_parameter_values_and_defaults",
         sqlalchemy.String,
         nullable=True,
-    )
+    ),
 )
 
 run_table = sqlalchemy.Table(

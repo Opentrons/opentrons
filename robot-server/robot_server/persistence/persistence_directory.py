@@ -48,7 +48,10 @@ async def prepare_active_subdirectory(prepared_root: Path) -> Path:
     """Return the active persistence subdirectory after preparing it, if necessary."""
     migration_orchestrator = MigrationOrchestrator(
         root=prepared_root,
-        migrations=[up_to_3.MigrationUpTo3(subdirectory="3"), v3_to_v4.Migration3to4(subdirectory="4")],
+        migrations=[
+            up_to_3.MigrationUpTo3(subdirectory="3"),
+            v3_to_v4.Migration3to4(subdirectory="4"),
+        ],
         temp_file_prefix="temp-",
     )
 

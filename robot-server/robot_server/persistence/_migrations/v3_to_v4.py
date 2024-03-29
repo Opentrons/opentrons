@@ -8,6 +8,7 @@ Summary of changes from schema 3:
 from pathlib import Path
 from contextlib import ExitStack
 import shutil
+from typing import Any
 
 import sqlalchemy
 
@@ -17,10 +18,10 @@ from .._folder_migrator import Migration
 
 _DB_FILE = "robot_server.db"
 
-class Migration3to4(Migration):     # noqa: D101
+
+class Migration3to4(Migration):  # noqa: D101
     def migrate(self, source_dir: Path, dest_dir: Path) -> None:
         """Migrate the persistence directory from schema 3 to 4."""
-
         # Copy over all existing directories and files to new version
         for item in source_dir.iterdir():
             if item.is_dir():
@@ -33,11 +34,19 @@ class Migration3to4(Migration):     # noqa: D101
         with ExitStack() as exit_stack:
             dest_engine = exit_stack.enter_context(sql_engine_ctx(dest_db_file))
             schema_4.metadata.create_all(dest_engine)
+
             def add_column(
-                    engine: sqlalchemy.engine.Engine,
-                    table_name: str,
-                    column: sqlalchemy.Column,
+                engine: sqlalchemy.engine.Engine,
+                table_name: str,
+                column: Any,
             ) -> None:
                 column_type = column.type.compile(engine.dialect)
-                engine.execute(f'ALTER TABLE {table_name} ADD COLUMN {column.key} {column_type}')
-            add_column(dest_engine, schema_4.analysis_table.name, schema_4.analysis_table.c.run_time_parameter_values_and_defaults)
+                engine.execute(
+                    f"ALTER TABLE {table_name} ADD COLUMN {column.key} {column_type}"
+                )
+
+            add_column(
+                dest_engine,
+                schema_4.analysis_table.name,
+                schema_4.analysis_table.c.run_time_parameter_values_and_defaults,
+            )

@@ -9,7 +9,8 @@ import sqlalchemy
 from robot_server.persistence.tables import (
     metadata as latest_metadata,
     schema_3,
-    schema_2, schema_4,
+    schema_2,
+    schema_4,
 )
 
 # The statements that we expect to emit when we create a fresh database.
@@ -90,7 +91,8 @@ EXPECTED_STATEMENTS_LATEST = [
 
 EXPECTED_STATEMENTS_V4 = EXPECTED_STATEMENTS_LATEST
 
-EXPECTED_STATEMENTS_V3 = [    """
+EXPECTED_STATEMENTS_V3 = [
+    """
     CREATE TABLE protocol (
         id VARCHAR NOT NULL,
         created_at DATETIME NOT NULL,
