@@ -393,7 +393,7 @@ async def test_load_json_runner(
         protocol_engine.add_command(
             request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
         ),
-        task_queue.set_run_func(func=json_runner_subject._run),
+        task_queue.set_run_func(func=json_runner_subject._add_command_and_execute),
     )
 
 

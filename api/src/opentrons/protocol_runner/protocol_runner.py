@@ -1,6 +1,5 @@
 """Protocol run control and management."""
 import asyncio
-import logging
 from typing import List, NamedTuple, Optional, Union
 
 from abc import ABC, abstractmethod
@@ -42,8 +41,6 @@ from ..protocol_engine.types import (
     DeckConfigurationType,
     RunTimeParamValuesType,
 )
-
-log = logging.getLogger(__name__)
 
 
 class RunResult(NamedTuple):
@@ -314,7 +311,7 @@ class JsonRunner(AbstractRunner):
         for command in commands:
             self._queued_commands.append(command)
 
-        self._task_queue.set_run_func(func=self._run)
+        self._task_queue.set_run_func(func=self._add_command_and_execute)
 
     async def run(  # noqa: D102
         self,
@@ -335,17 +332,14 @@ class JsonRunner(AbstractRunner):
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data)
 
-    async def _run(self) -> None:
+    async def _add_command_and_execute(self) -> None:
         for command in self._queued_commands:
             result = await self._protocol_engine.add_and_execute_command(command)
             if result.error:
-                log.exception("Exception raised by protocol")
                 raise ProtocolCommandFailedError(
                     original_error=result.error,
                     message=f"{result.error.errorType}: {result.error.detail}",
                 )
-
-        # await self._protocol_engine.finish(error)
 
 
 class LiveRunner(AbstractRunner):

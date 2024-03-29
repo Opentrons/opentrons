@@ -120,19 +120,3 @@ stages:
                   z: 1
               flowRate: 3.78
               volume: 100
-#          - id: !anystr
-#            key: !anystr
-#            commandType: pickUpTip
-#            createdAt: !anystr
-#            completedAt: !anystr
-#            status: failed
-#            params:
-#              pipetteId: pipetteId
-#              labwareId: tipRackId
-#              wellName: A1
-#              wellLocation:
-#                origin: top
-#                offset:
-#                  x: 0
-#                  y: 0
-#                  z: 0
