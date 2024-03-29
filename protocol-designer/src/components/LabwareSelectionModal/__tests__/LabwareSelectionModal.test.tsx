@@ -68,7 +68,7 @@ describe('LabwareSelectionModal', () => {
         spec: {} as any,
         name: 'p1000_single',
         id: 'mockId',
-        tiprackDefURI: mockTipUri,
+        tiprackDefURI: [mockTipUri],
       },
     })
     vi.mocked(getCustomLabwareDefsByURI).mockReturnValue({})

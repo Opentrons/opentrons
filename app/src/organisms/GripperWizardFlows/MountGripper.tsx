@@ -1,22 +1,22 @@
 import { useSelector } from 'react-redux'
 import {
-  Flex,
-  Btn,
-  TYPOGRAPHY,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  COLORS,
-  RESPONSIVENESS,
-  PrimaryButton,
-  ALIGN_FLEX_END,
   ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  Btn,
+  COLORS,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'

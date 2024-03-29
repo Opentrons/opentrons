@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { Controller } from 'react-hook-form'
 import {
-  FormGroup,
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
-  TYPOGRAPHY,
   CheckboxField,
+  DIRECTION_COLUMN,
+  Flex,
+  FormGroup,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { InputField } from '../../atoms/InputField'
-import { StyledText } from '../../atoms/text'
 import styles from './styles.module.css'
 
 import type { Control } from 'react-hook-form'

@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_96_tiprack_300ul",
         "location": {
@@ -1153,6 +1155,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap",
         "location": {
@@ -1513,6 +1516,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p300_single_gen2"
@@ -1522,6 +1526,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -1547,6 +1552,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 92.86,
         "volume": 45.4,
@@ -1572,6 +1578,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -1595,6 +1602,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 92.86,
         "volume": 10.0,
@@ -1620,6 +1628,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 92.86,
         "volume": 32.7,
@@ -1645,6 +1654,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -1668,6 +1678,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 92.86,
         "volume": 10.0,
@@ -1693,6 +1704,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 92.86,
         "volume": 32.699999999999996,
@@ -1718,6 +1730,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "fixedTrash",
         "alternateDropLocation": true,
@@ -1740,6 +1753,7 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"

@@ -82,6 +82,7 @@ async def test_runner_with_modules_in_legacy_python(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=commands.HomeParams(axes=None),
+        notes=[],
         result=commands.HomeResult(),
     )
     assert commands_result[1] == commands.LoadLabware.construct(
@@ -92,6 +93,7 @@ async def test_runner_with_modules_in_legacy_python(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=matchers.Anything(),
+        notes=[],
         result=matchers.Anything(),
     )
 
@@ -103,6 +105,7 @@ async def test_runner_with_modules_in_legacy_python(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=matchers.Anything(),
+        notes=[],
         result=temp_module_result_captor,
     )
 
@@ -114,6 +117,7 @@ async def test_runner_with_modules_in_legacy_python(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=matchers.Anything(),
+        notes=[],
         result=mag_module_result_captor,
     )
 
@@ -125,6 +129,7 @@ async def test_runner_with_modules_in_legacy_python(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=matchers.Anything(),
+        notes=[],
         result=thermocycler_result_captor,
     )
 
@@ -136,6 +141,7 @@ async def test_runner_with_modules_in_legacy_python(
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=matchers.Anything(),
+        notes=[],
         result=heater_shaker_result_captor,
     )
 

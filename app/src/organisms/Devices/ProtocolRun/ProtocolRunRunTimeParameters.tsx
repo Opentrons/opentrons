@@ -2,24 +2,24 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
+  NoParameters,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
-// import { Chip } from '../../../atoms/Chip'
-import { NoParameter } from '../../ProtocolDetails/ProtocolParameters/NoParameter'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { formatRunTimeParameterValue } from '../../ProtocolDetails/ProtocolParameters/utils'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -221,7 +221,7 @@ export function ProtocolRunRuntimeParameters({
       </Flex>
       {!hasParameter ? (
         <Flex padding={SPACING.spacing16}>
-          <NoParameter />
+          <NoParameters t={t} />
         </Flex>
       ) : (
         <>
@@ -257,10 +257,14 @@ export function ProtocolRunRuntimeParameters({
                             <StyledText as="p">
                               {formatRunTimeParameterValue(parameter, t)}
                             </StyledText>
-                            {/* ToDo (kk:03/19/2024) chip will be here with conditional render */}
-                            {/* {index % 2 === 0 ? (
-                              <Chip text={t('updated')} type="success" />
-                            ) : null} */}
+                            {/* ToDo (kk:03/19/2024) need to implement a logic when be is ready */}
+                            {index % 2 === 0 ? (
+                              <Chip
+                                chipSize="small"
+                                text={t('updated')}
+                                type="success"
+                              />
+                            ) : null}
                           </Flex>
                         </StyledTableCell>
                       </StyledTableRow>

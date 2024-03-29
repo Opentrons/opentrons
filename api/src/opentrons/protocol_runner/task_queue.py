@@ -1,25 +1,12 @@
 """Asynchronous task queue to accomplish a protocol run."""
 import asyncio
 import logging
-from functools import partial
-from typing import Any, Awaitable, Callable, Optional
-from typing_extensions import Protocol as Callback
+from typing import Any, Awaitable, Callable, Optional, ParamSpec, Concatenate
 
 log = logging.getLogger(__name__)
 
-
-class CleanupFunc(Callback):
-    """Expected cleanup function signature."""
-
-    def __call__(
-        self,
-        error: Optional[Exception],
-    ) -> Any:
-        """Cleanup, optionally taking an error thrown.
-
-        Return value will not be used.
-        """
-        ...
+CleanupFuncInput = ParamSpec("CleanupFuncInput")
+RunFuncInput = ParamSpec("RunFuncInput")
 
 
 class TaskQueue:
@@ -32,15 +19,10 @@ class TaskQueue:
         self,
         # cleanup_func: CleanupFunc,
     ) -> None:
-        """Initialize the TaskQueue.
-
-        Args:
-            cleanup_func: A function to call at run function completion
-                with any error raised by the run function.
-        """
+        """Initialize the TaskQueue."""
         self._cleanup_func: Optional[
-            Callable[[Optional[Exception]], Any]
-        ] = None  # CleanupFunc = cleanup_func
+            Callable[[Optional[Exception]], Awaitable[Any]]
+        ] = None
 
         self._run_func: Optional[Callable[[], Any]] = None
         self._run_task: Optional["asyncio.Task[None]"] = None
@@ -48,25 +30,37 @@ class TaskQueue:
 
     def set_cleanup_func(
         self,
-        func: Callable[..., Awaitable[Any]],
-        **kwargs: Any,
+        func: Callable[
+            Concatenate[Optional[Exception], CleanupFuncInput], Awaitable[Any]
+        ],
+        *args: CleanupFuncInput.args,
+        **kwargs: CleanupFuncInput.kwargs,
     ) -> None:
         """Add the protocol cleanup task to the queue.
 
         The "cleanup" task will be run after the "run" task.
         """
-        self._cleanup_func = partial(func, **kwargs)
+
+        async def _do_cleanup(error: Optional[Exception]) -> None:
+            await func(error, *args, **kwargs)
+
+        self._cleanup_func = _do_cleanup
 
     def set_run_func(
         self,
-        func: Callable[..., Awaitable[Any]],
-        **kwargs: Any,
+        func: Callable[RunFuncInput, Awaitable[Any]],
+        *args: RunFuncInput.args,
+        **kwargs: RunFuncInput.kwargs,
     ) -> None:
         """Add the protocol run task to the queue.
 
         The "run" task will be run first, before the "cleanup" task.
         """
-        self._run_func = partial(func, **kwargs)
+
+        async def _do_run() -> None:
+            await func(*args, **kwargs)
+
+        self._run_func = _do_run
 
     def start(self) -> None:
         """Start running tasks in the queue."""

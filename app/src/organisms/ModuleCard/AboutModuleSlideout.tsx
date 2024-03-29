@@ -3,20 +3,20 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_FINISHING } from '@opentrons/api-client'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
-  Btn,
   ALIGN_START,
-  PrimaryButton,
+  Btn,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { Slideout } from '../../atoms/Slideout'
 import { Banner } from '../../atoms/Banner'
-import { StyledText } from '../../atoms/text'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 
 import type { AttachedModule } from '../../redux/modules/types'

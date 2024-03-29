@@ -12,10 +12,10 @@ import {
   Link,
   SPACING_AUTO,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
 import { getPathToPythonOverride, resetConfigValue } from '../../redux/config'
 import {

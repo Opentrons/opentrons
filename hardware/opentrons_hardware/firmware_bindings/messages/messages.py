@@ -42,6 +42,8 @@ MessageDefinition = Union[
     defs.WriteMotorDriverRegister,
     defs.ReadMotorDriverRequest,
     defs.ReadMotorDriverResponse,
+    defs.ReadMotorDriverErrorStatusRequest,
+    defs.ReadMotorDriverErrorStatusResponse,
     defs.WriteMotorCurrentRequest,
     defs.SetBrushedMotorVrefRequest,
     defs.SetBrushedMotorPwmRequest,
@@ -107,6 +109,8 @@ MessageDefinition = Union[
     defs.SetHepaUVStateRequest,
     defs.GetHepaUVStateRequest,
     defs.GetHepaUVStateResponse,
+    defs.SendAccumulatedPressureDataRequest,
+    defs.AddSensorLinearMoveRequest,
 ]
 
 

@@ -15,11 +15,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING_AUTO,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { useToaster } from '../../organisms/ToasterOven'

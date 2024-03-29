@@ -24,6 +24,7 @@ class MoveType(int, Enum):
     home = 0x1
     calibration = 0x2
     grip = 0x3
+    sensor = 0x4
 
     @classmethod
     def get_move_type(cls, condition: MoveStopCondition) -> "MoveType":
@@ -36,6 +37,7 @@ class MoveType(int, Enum):
             MoveStopCondition.gripper_force: cls.grip,
             MoveStopCondition.stall: cls.linear,
             MoveStopCondition.limit_switch_backoff: cls.linear,
+            MoveStopCondition.sensor_report: cls.sensor,
         }
         return mapping[condition]
 

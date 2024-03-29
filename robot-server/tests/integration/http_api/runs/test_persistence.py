@@ -1,5 +1,6 @@
-from typing import Any, AsyncGenerator, Dict, NamedTuple, cast
+from copy import deepcopy
 from datetime import datetime
+from typing import Any, AsyncGenerator, Dict, NamedTuple, cast
 
 import anyio
 import pytest
@@ -73,7 +74,46 @@ async def _assert_run_persisted(
     assert get_persisted_run_response.json()["data"] == expected_run_data
 
 
-async def test_runs_persist(client_and_server: ClientServerFixture) -> None:
+async def test_untimely_restart_marks_runs_bad(
+    client_and_server: ClientServerFixture,
+) -> None:
+    """Test that a run persists even if the server was restarted before the run was
+    gracefully closed out."""
+    client, server = client_and_server
+
+    # create a run
+    create_run_response = await client.post_run(req_body={"data": {}})
+    run_id = create_run_response.json()["data"]["id"]
+
+    run = (await client.get_run(run_id)).json()["data"]
+    assert run["status"] == "idle"
+    assert run["current"] is True
+    # Some loss of state is expected.
+    expected_run = deepcopy(run)
+    expected_run["status"] = "stopped"
+    expected_run["current"] = False
+    expected_run["ok"] = False
+    expected_run["dataError"] = {
+        "id": "RunDataError",
+        "title": "Run Data Error",
+        "detail": "There was no engine state data for this run.",
+        "meta": {
+            "code": "4008",
+            "detail": {},
+            "message": "There was no engine state data for this run.",
+            "type": "InvalidStoredData",
+            "wrapping": [],
+        },
+        "errorCode": "4008",
+    }
+
+    # reboot the server
+    await client_and_server.restart()
+
+    await _assert_run_persisted(robot_client=client, expected_run_data=expected_run)
+
+
+async def test_runs_persist_via_patch(client_and_server: ClientServerFixture) -> None:
     """Test that runs are persisted through dev server restart."""
     client, server = client_and_server
 
@@ -100,10 +140,7 @@ async def test_runs_persist_via_actions_router(
     """Test that runs commands and state
     are persisted when calling play action through dev server restart."""
     client, server = client_and_server
-    # await client.post_protocol([Path("./tests/integration/protocols/simple.py")])
-    #
-    # protocols = (await client.get_protocols()).json()["data"]
-    # protocol_id = protocols[0]["id"]
+
     # create a run
     create_run_response = await client.post_run(req_body={"data": {}})
     run_id = create_run_response.json()["data"]["id"]

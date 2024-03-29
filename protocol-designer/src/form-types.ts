@@ -176,6 +176,7 @@ export interface HydratedMoveLiquidFormData {
   stepName: string
   description: string | null | undefined
   fields: {
+    tipRack: string
     pipette: PipetteEntity
     volume: number
     path: PathOption
@@ -239,6 +240,7 @@ export interface HydratedMixFormDataLegacy {
   id: string
   stepType: 'mix'
   stepName: string
+  tipRack: string
   stepDetails: string | null | undefined
   pipette: PipetteEntity
   volume: number

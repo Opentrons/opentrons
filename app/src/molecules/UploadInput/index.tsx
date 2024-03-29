@@ -2,19 +2,19 @@ import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  Icon,
-  Flex,
-  SPACING,
+  ALIGN_CENTER,
   BORDERS,
   COLORS,
-  SIZE_3,
   DIRECTION_COLUMN,
-  ALIGN_CENTER,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
-  TYPOGRAPHY,
   PrimaryButton,
+  SIZE_3,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 const StyledLabel = styled.label`
   display: flex;

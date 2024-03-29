@@ -8,10 +8,10 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ToggleButton } from '../../atoms/buttons'
 import { getDevtoolsEnabled, toggleDevtools } from '../../redux/config'
 

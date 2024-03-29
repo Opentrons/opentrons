@@ -5,24 +5,24 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  VIEWPORT,
 } from '@opentrons/components'
 import {
   fixture12Trough,
   fixtureTiprack10ul,
-  LabwareDefinition2,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 
-import { touchScreenViewport } from '../../DesignTokens/constants'
 import { SmallButton } from '../../atoms/buttons'
 import { TerseOffsetTable } from './ResultsSummary'
 
 import type { Story, Meta } from '@storybook/react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 export default {
   title: 'ODD/Organisms/TerseOffsetTable',
   component: TerseOffsetTable,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 // Note: 59rem(944px) is the size of ODD

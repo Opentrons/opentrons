@@ -4,8 +4,8 @@ import {
   Flex,
   POSITION_ABSOLUTE,
   SPACING,
+  VIEWPORT,
 } from '@opentrons/components'
-import { touchScreenViewport } from '../../../DesignTokens/constants'
 import { InputField } from '../../InputField'
 import { AlphanumericKeyboard } from '.'
 import '../index.css'
@@ -16,7 +16,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Atoms/SoftwareKeyboard/AlphanumericKeyboard',
   component: AlphanumericKeyboard,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<

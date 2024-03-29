@@ -134,7 +134,8 @@ export const transfer: CommandCreator<TransferArgs> = (
       prevRobotState,
       invariantContext,
       args.sourceLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     errors.push(
@@ -154,7 +155,8 @@ export const transfer: CommandCreator<TransferArgs> = (
       prevRobotState,
       invariantContext,
       args.destLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     errors.push(
@@ -202,13 +204,18 @@ export const transfer: CommandCreator<TransferArgs> = (
     blowoutOffsetFromTopMm,
     dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
+    tipRack,
   } = args
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
   const effectiveTransferVol =
-    getPipetteWithTipMaxVol(args.pipette, invariantContext) -
+    getPipetteWithTipMaxVol(args.pipette, invariantContext, tipRack) -
     aspirateAirGapVolume
-  const pipetteMinVol = pipetteSpec.minVolume
+  const liquidMinVolumes = Object.values(pipetteSpec.liquids).map(
+    liquid => liquid.minVolume
+  )
+  //  account for minVolume for lowVolume pipettes
+  const pipetteMinVol = Math.min(...liquidMinVolumes)
   const chunksPerSubTransfer = Math.ceil(args.volume / effectiveTransferVol)
   const lastSubTransferVol =
     args.volume - (chunksPerSubTransfer - 1) * effectiveTransferVol
@@ -303,6 +310,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   pipette: args.pipette,
                   nozzles: args.nozzles ?? undefined,
                   dropTipLocation: args.dropTipLocation,
+                  tipRack: args.tipRack,
                 }),
               ]
             : []
@@ -320,6 +328,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   dispenseFlowRateUlSec,
                   aspirateDelaySeconds: aspirateDelay?.seconds,
                   dispenseDelaySeconds: dispenseDelay?.seconds,
+                  tipRack,
                 })
               : []
           const mixBeforeAspirateCommands =
@@ -336,6 +345,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   dispenseFlowRateUlSec,
                   aspirateDelaySeconds: aspirateDelay?.seconds,
                   dispenseDelaySeconds: dispenseDelay?.seconds,
+                  tipRack,
                 })
               : []
           const delayAfterAspirateCommands =
@@ -399,6 +409,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   dispenseFlowRateUlSec,
                   aspirateDelaySeconds: aspirateDelay?.seconds,
                   dispenseDelaySeconds: dispenseDelay?.seconds,
+                  tipRack,
                 })
               : []
 
@@ -413,6 +424,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetSourceWell,
                     isAirGap: true,
+                    tipRack,
                   }),
                   ...(aspirateDelay != null
                     ? [
@@ -473,6 +485,7 @@ export const transfer: CommandCreator<TransferArgs> = (
               well: sourceWell,
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
+              tipRack,
             }),
           ]
           const dispenseCommand = [
@@ -531,6 +544,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     destWell: destinationWell,
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
+                    tipRack,
                   }),
                   ...(aspirateDelay != null
                     ? [
@@ -588,8 +602,8 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...dispenseCommand,
             ...delayAfterDispenseCommands,
             ...mixInDestinationCommands,
-            ...touchTipAfterDispenseCommands,
             ...blowoutCommand,
+            ...touchTipAfterDispenseCommands,
             ...airGapAfterDispenseCommands,
             ...dropTipAfterDispenseAirGap,
           ]

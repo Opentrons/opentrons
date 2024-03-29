@@ -3,13 +3,14 @@ import inspect
 import logging
 import traceback
 import sys
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm
 from opentrons.protocol_api import ProtocolContext, ParameterContext
 from opentrons.protocol_api._parameters import Parameters
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import PythonProtocol, MalformedPythonProtocolError
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 
 
 from opentrons_shared_data.errors.exceptions import ExecutionCancelledError
@@ -65,22 +66,31 @@ def _raise_pretty_protocol_error(exception: Exception, filename: str) -> None:
 
 
 def _parse_and_set_parameters(
-    protocol: PythonProtocol, new_globs: Dict[Any, Any], filename: str
+    parameter_context: ParameterContext,
+    run_time_param_overrides: Optional[RunTimeParamValuesType],
+    new_globs: Dict[Any, Any],
+    filename: str,
 ) -> Parameters:
     try:
         _add_parameters_func_ok(new_globs.get("add_parameters"))
     except SyntaxError as se:
         raise MalformedPythonProtocolError(str(se))
-    parameter_context = ParameterContext(api_version=protocol.api_level)
     new_globs["__param_context"] = parameter_context
     try:
         exec("add_parameters(__param_context)", new_globs)
+        if run_time_param_overrides is not None:
+            parameter_context.set_parameters(run_time_param_overrides)
     except Exception as e:
         _raise_pretty_protocol_error(exception=e, filename=filename)
-    return parameter_context.export_parameters()
+    return parameter_context.export_parameters_for_protocol()
 
 
-def run_python(proto: PythonProtocol, context: ProtocolContext):
+def run_python(
+    proto: PythonProtocol,
+    context: ProtocolContext,
+    parameter_context: ParameterContext,
+    run_time_param_overrides: Optional[RunTimeParamValuesType] = None,
+) -> None:
     new_globs: Dict[Any, Any] = {}
     exec(proto.contents, new_globs)
     # If the protocol is written correctly, it will have defined a function
@@ -100,7 +110,9 @@ def run_python(proto: PythonProtocol, context: ProtocolContext):
         filename = proto.filename or "<protocol>"
 
     if new_globs.get("add_parameters"):
-        context._params = _parse_and_set_parameters(proto, new_globs, filename)
+        context._params = _parse_and_set_parameters(
+            parameter_context, run_time_param_overrides, new_globs, filename
+        )
 
     try:
         _runfunc_ok(new_globs.get("run"))

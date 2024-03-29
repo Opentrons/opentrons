@@ -20,6 +20,7 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   TEXT_ALIGN_RIGHT,
   truncateString,
   TYPOGRAPHY,
@@ -38,7 +39,6 @@ import {
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
 import {
   ProtocolSetupTitleSkeleton,
   ProtocolSetupStepSkeleton,

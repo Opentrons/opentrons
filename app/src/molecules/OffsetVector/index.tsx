@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Flex, SPACING, TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+import { Flex, SPACING, TYPOGRAPHY, StyledText } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
 

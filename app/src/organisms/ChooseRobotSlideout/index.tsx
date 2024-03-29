@@ -22,6 +22,7 @@ import {
   SIZE_1,
   SIZE_4,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -39,7 +40,6 @@ import {
 import { Banner } from '../../atoms/Banner'
 import { Slideout } from '../../atoms/Slideout'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
-import { StyledText } from '../../atoms/text'
 import { ToggleButton } from '../../atoms/buttons'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { InputField } from '../../atoms/InputField'
@@ -378,7 +378,8 @@ export function ChooseRobotSlideout(
             placeholder={value.toString()}
             value={value}
             title={runtimeParam.displayName}
-            caption={runtimeParam.description}
+            tooltipText={runtimeParam.description}
+            caption={`${runtimeParam.min}-${runtimeParam.max}`}
             id={id}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
@@ -523,10 +524,10 @@ const ENABLED_LINK_CSS = css`
 
 const DISABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
-  color: ${COLORS.grey50};
+  color: ${COLORS.grey40};
   cursor: default;
 
   &:hover {
-    color: ${COLORS.grey50};
+    color: ${COLORS.grey40};
   }
 `

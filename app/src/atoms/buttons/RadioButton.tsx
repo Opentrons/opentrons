@@ -1,14 +1,14 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import {
-  TYPOGRAPHY,
-  COLORS,
-  SPACING,
   BORDERS,
+  COLORS,
   Flex,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 
 import type { StyleProps } from '@opentrons/components'
 

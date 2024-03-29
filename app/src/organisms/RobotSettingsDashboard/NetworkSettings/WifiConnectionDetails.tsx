@@ -14,10 +14,10 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { NetworkDetailsModal } from './NetworkDetailsModal'
 import { DisplayWifiList } from '../../NetworkSettings'
 import { getLocalRobot } from '../../../redux/discovery'

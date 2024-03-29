@@ -4,8 +4,12 @@ import {
   volumeInCapacityForMultiDispense,
   volumeInCapacityForMultiAspirate,
 } from '../../../../steplist/formLevel/handleFormChange/utils'
-import { ChangeTipOptions, PipetteEntities } from '@opentrons/step-generation'
-import { PathOption } from '../../../../form-types'
+import type {
+  ChangeTipOptions,
+  LabwareEntities,
+  PipetteEntities,
+} from '@opentrons/step-generation'
+import type { PathOption } from '../../../../form-types'
 export type DisabledPathMap = Partial<Record<PathOption, string>> | null
 export interface ValuesForPath {
   aspirate_airGap_checkbox?: boolean | null
@@ -15,10 +19,12 @@ export interface ValuesForPath {
   dispense_wells?: string[] | null
   pipette?: string | null
   volume?: string | null
+  tipRack?: string | null
 }
 export function getDisabledPathMap(
   values: ValuesForPath,
   pipetteEntities: PipetteEntities,
+  labwareEntities: LabwareEntities,
   t: any
 ): DisabledPathMap {
   const {
@@ -27,6 +33,7 @@ export function getDisabledPathMap(
     changeTip,
     dispense_wells,
     pipette,
+    tipRack,
   } = values
   if (!pipette) return null
   const wellRatio = getWellRatio(aspirate_wells, dispense_wells)
@@ -51,7 +58,8 @@ export function getDisabledPathMap(
 
   // transfer volume overwrites change tip disable reasoning
   const pipetteEntity = pipetteEntities[pipette]
-  const pipetteCapacity = pipetteEntity && getPipetteCapacity(pipetteEntity)
+  const pipetteCapacity =
+    pipetteEntity && getPipetteCapacity(pipetteEntity, labwareEntities, tipRack)
   const volume = Number(values.volume)
   const airGapChecked = aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(values.aspirate_airGap_volume) : 0

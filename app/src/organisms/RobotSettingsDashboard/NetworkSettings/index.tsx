@@ -3,25 +3,24 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  COLORS,
-  Icon,
-  Btn,
-  DIRECTION_ROW,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  TYPOGRAPHY,
   BORDERS,
+  Btn,
+  Chip,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
-import { Chip } from '../../../atoms/Chip'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 
-import type { IconName } from '@opentrons/components'
+import type { IconName, ChipType } from '@opentrons/components'
 import type { NetworkConnection } from '../../../resources/networking/hooks/useNetworkConnection'
-import type { ChipType } from '../../../atoms/Chip'
 import type { SetSettingOption } from '../../../pages/RobotSettingsDashboard'
 
 export type ConnectionType = 'wifi' | 'ethernet' | 'usb'

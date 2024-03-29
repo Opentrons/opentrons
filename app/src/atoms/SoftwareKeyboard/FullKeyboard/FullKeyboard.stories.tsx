@@ -1,11 +1,11 @@
 import * as React from 'react'
 import {
-  Flex,
   DIRECTION_COLUMN,
+  Flex,
   POSITION_ABSOLUTE,
   SPACING,
+  VIEWPORT,
 } from '@opentrons/components'
-import { touchScreenViewport } from '../../../DesignTokens/constants'
 import { InputField } from '../../InputField'
 import { FullKeyboard } from '.'
 
@@ -17,7 +17,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Atoms/SoftwareKeyboard/FullKeyboard',
   component: FullKeyboard,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof FullKeyboard>> = args => {
