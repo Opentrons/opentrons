@@ -36,6 +36,7 @@ from .legacy_wrappers import (
     LegacyExecutor,
     LegacyLoadInfo,
 )
+from ..protocol_engine.errors import ProtocolCommandFailedError
 from ..protocol_engine.types import (
     PostRunHardwareState,
     DeckConfigurationType,
@@ -251,14 +252,14 @@ class JsonRunner(AbstractRunner):
         self._json_translator = json_translator or JsonTranslator()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
         # of runner interface
-        # self._task_queue = (
-        #     task_queue or TaskQueue()
-        # )  # cleanup_func=protocol_engine.finish))
-        # self._task_queue.set_cleanup_func(
-        #     func=protocol_engine.finish,
-        #     drop_tips_after_run=drop_tips_after_run,
-        #     post_run_hardware_state=post_run_hardware_state,
-        # )
+        self._task_queue = (
+            task_queue or TaskQueue()
+        )  # cleanup_func=protocol_engine.finish))
+        self._task_queue.set_cleanup_func(
+            func=protocol_engine.finish,
+            drop_tips_after_run=drop_tips_after_run,
+            post_run_hardware_state=post_run_hardware_state,
+        )
 
         self._hardware_api.should_taskify_movement_execution(taskify=False)
         self._queued_commands: List[pe_commands.CommandCreate] = []
@@ -303,6 +304,7 @@ class JsonRunner(AbstractRunner):
                 color=liquid.displayColor,
             )
             await _yield()
+
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
         )
@@ -312,10 +314,7 @@ class JsonRunner(AbstractRunner):
         for command in commands:
             self._queued_commands.append(command)
 
-        # self._task_queue.add_commands_and_execute(self._queued_commands)
-        # self._task_queue.set_run_func(
-        #     func=self._protocol_engine.add_and_execute_command
-        # )
+        self._task_queue.set_run_func(func=self._run)
 
     async def run(  # noqa: D102
         self,
@@ -328,36 +327,25 @@ class JsonRunner(AbstractRunner):
         if protocol_source:
             await self.load(protocol_source)
 
-        _ok_to_join_event = asyncio.Event()
-
-        _ok_to_join_event.set()
-
-        run_task = asyncio.create_task(self._run())
-
         self.play(deck_configuration=deck_configuration)
-
-        _ok_to_join_event.wait()
-
-        await run_task
-
-        # self._task_queue.start()
-        # await self._task_queue.join()
+        self._task_queue.start()
+        await self._task_queue.join()
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data)
 
     async def _run(self) -> None:
-        error = None
+        for command in self._queued_commands:
+            result = await self._protocol_engine.add_and_execute_command(command)
+            if result.error:
+                log.exception("Exception raised by protocol")
+                raise ProtocolCommandFailedError(
+                    original_error=result.error,
+                    message=f"{result.error.errorType}: {result.error.detail}",
+                )
 
-        try:
-            for command in self._queued_commands:
-                await self._protocol_engine.add_and_execute_command(command)
-        except Exception as e:
-            # log.exception("Exception raised by protocol")
-            error = e
-
-        await self._protocol_engine.finish(error)
+        # await self._protocol_engine.finish(error)
 
 
 class LiveRunner(AbstractRunner):

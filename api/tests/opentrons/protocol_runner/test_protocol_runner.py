@@ -393,24 +393,7 @@ async def test_load_json_runner(
         protocol_engine.add_command(
             request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
         ),
-        protocol_engine.add_command(
-            request=pe_commands.WaitForResumeCreate(
-                params=pe_commands.WaitForResumeParams(message="hello")
-            )
-        ),
-        protocol_engine.add_command(
-            request=pe_commands.WaitForResumeCreate(
-                params=pe_commands.WaitForResumeParams(message="goodbye")
-            )
-        ),
-        protocol_engine.add_command(
-            request=pe_commands.LoadLiquidCreate(
-                params=pe_commands.LoadLiquidParams(
-                    liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
-                )
-            ),
-        ),
-        task_queue.set_run_func(func=protocol_engine.wait_until_complete),
+        task_queue.set_run_func(func=json_runner_subject._run),
     )
 
 
