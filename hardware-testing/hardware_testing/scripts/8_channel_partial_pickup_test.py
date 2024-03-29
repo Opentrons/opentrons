@@ -87,7 +87,7 @@ class Eight_Channel_Partial_Pickup_Test:
             "Current":"None",
             "Speed":"None",
             "Nozzles":"None",
-            "Inital Press":"None",
+            "Initial Press":"None",
             "Final Press":"None",
             "Leak":"None",
             "Feel":"None",
@@ -338,7 +338,7 @@ class Eight_Channel_Partial_Pickup_Test:
         print(f"Initial Press Position: {initial_press[Axis.by_mount(mount)]}")
         final_press = await api.pick_up_tip(mount, tip_length=(self.tip_length[self.tip_size] - self.tip_overlap))
         print(f"Final Press Position: {final_press[Axis.by_mount(mount)]}")
-        self.test_data["Inital Press"] = str(initial_press[Axis.by_mount(mount)])
+        self.test_data["Initial Press"] = str(initial_press[Axis.by_mount(mount)])
         self.test_data["Final Press"] = str(final_press[Axis.by_mount(mount)])
         self.deck_slot['deck_slot'][self.tiprack_slot][Axis.X.name] = tiprack_loc.x
         self.deck_slot['deck_slot'][self.tiprack_slot][Axis.Y.name] = tiprack_loc.y
@@ -454,7 +454,7 @@ class Eight_Channel_Partial_Pickup_Test:
         print(f"Initial Press Position: {initial_press[Axis.by_mount(mount)]}")
         final_press = await api.pick_up_tip(mount, tip_length=(self.tip_length[self.tip_size] - self.tip_overlap))
         print(f"Final Press Position: {final_press[Axis.by_mount(mount)]}")
-        self.test_data["Inital Press"] = str(initial_press[Axis.by_mount(mount)])
+        self.test_data["Initial Press"] = str(initial_press[Axis.by_mount(mount)])
         self.test_data["Final Press"] = str(final_press[Axis.by_mount(mount)])
 
     async def _select_tip(
