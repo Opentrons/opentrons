@@ -294,6 +294,23 @@ class SyncClient:
 
         return cast(commands.PickUpTipResult, result)
 
+    def pick_up_tip_wait_for_recovery(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+    ) -> None:
+        request = commands.PickUpTipCreate(
+            params=commands.PickUpTipParams(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+            )
+        )
+        self._transport.execute_command_wait_for_recovery(request=request)
+
     def drop_tip(
         self,
         pipette_id: str,

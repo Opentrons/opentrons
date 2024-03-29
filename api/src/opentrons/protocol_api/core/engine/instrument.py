@@ -408,13 +408,19 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
         )
-        self._engine_client.pick_up_tip(
+        self._engine_client.pick_up_tip_wait_for_recovery(
             pipette_id=self._pipette_id,
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
         )
+        # FIX BEFORE MERGE?: If the pickUpTip fails, the tip tracker (which is sort of
+        # kind of in Protocol Engine) doesn't think the tip has been consumed. So,
+        # the next PAPI pick_up_tip() after the error recovery will try to pick up
+        # the same tip, diverging from the protocol's analysis.
 
+        # FIX BEFORE MERGE: We should probably only set_last_location() if the
+        # pickUpTip succeeded.
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def drop_tip(

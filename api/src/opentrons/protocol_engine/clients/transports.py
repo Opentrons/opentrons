@@ -79,6 +79,12 @@ class ChildThreadTransport:
 
         return command.result
 
+    def execute_command_wait_for_recovery(self, request: CommandCreate) -> None:
+        run_coroutine_threadsafe(
+            self._engine.add_and_execute_command_wait_for_recovery(request=request),
+            loop=self._loop,
+        ).result()
+
     @overload
     def call_method(
         self,
