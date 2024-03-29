@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import { BORDERS, COLORS } from '../../../helix-design-system'
 import { SPACING } from '../../../ui-style-constants'
