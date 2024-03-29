@@ -36,6 +36,7 @@ class Eight_Channel_Partial_Report:
             "T200":58.35,
             "T50":57.9,
         }
+        self.test_type = ["Leak","Feel"]
 
     def create_folder(self):
         path = self.REPORT_PATH
@@ -52,7 +53,7 @@ class Eight_Channel_Partial_Report:
         df["Pipette Type"] = pipette_type
         df["Tip Size"] = tip_size
         df["Current"] = motor_current
-        df["Overlap"] = abs(df["Final Press"] - df["Inital Press"])
+        df["Overlap"] = abs(df["Final Press"] - df["Initial Press"])
         df["End Effector"] = self.tip_length[tip_size] - df["Overlap"]
         max_cycle = df["Cycle"].max()
         for i in range(max_cycle):
@@ -94,12 +95,18 @@ class Eight_Channel_Partial_Report:
         tip_size = report.pop("Tip Size")
         nozzles = report.pop("Nozzles")
         current = report.pop("Current")
+        cycle = report.pop("Cycle")
         tip = report.pop("Tip")
         report.insert(0, "Pipette Type", pipette_type)
         report.insert(1, "Tip Size", tip_size)
         report.insert(2, "Nozzles", nozzles)
         report.insert(3, "Current", current)
-        report.insert(4, "Tip", tip)
+        report.insert(4, "Cycle", cycle)
+        report.insert(5, "Tip", tip)
+        for test in self.test_type:
+            report[test] = report[test].astype(int)
+            report[test] = report[test].replace(1, "Pass")
+            report[test] = report[test].replace(2, "Fail")
         report.drop_duplicates(inplace=True)
         report.sort_values(by=sort_columns, inplace=True)
         report.reset_index(drop=True, inplace=True)
