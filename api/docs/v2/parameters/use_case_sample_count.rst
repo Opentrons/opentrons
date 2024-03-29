@@ -11,9 +11,9 @@ Choosing how many samples to process is important for efficient automation. This
 At first glance, it might seem like sample count would primarily affect liquid transfers to and from sample wells. But when using the Python API's full range of capabilities, it affects:
 
 - How many tip racks to load.
-- Whether tip racks need to be replaced from the staging area or off-deck.
 - The initial volume and placement of reagents.
-- Actual liquid handling!
+- Pipetting to and from samples.
+- If and when tip racks need to be replaced.
 
 To keep things as simple as possible, this use case only focuses on setting up and using the value of a single sample count parameter, which is just one of several parameters present in the full protocol.
 
@@ -44,7 +44,7 @@ All of the possible values are multiples of 8, because the protocol will use an 
 
     def run(protocol):
 
-        column_count = protocol.params.sample_count / 8
+        column_count = protocol.params.sample_count // 8
 
 Most examples below will use ``column_count``, rather than redoing (and retyping!) this calculation multiple times.
 
@@ -219,14 +219,14 @@ When it comes time to process the samples we'll return to working by column, sin
 For pipetting in the original sample locations, we'll command the 50 µL pipette to move to some or all of A1–A4 on the sample plate. Similar to when we loaded tip racks earlier, we can use ``column_count`` to slice a list containing these well names, and then iterate over that list with a ``for`` loop::
 
     for w in ["A1", "A2", "A3", "A4"][:column_count]:
-        pipette50.pick_up_tip()
-        pipette50.aspirate(volume=13, location=reservoir["A2"].bottom())
-        pipette50.dispense(volume=3, location=reservoir["A2"].bottom())
-        pipette50.dispense(volume=10, location=sample_plate[w].bottom())
-        pipette50.move_to(location=sample_plate[w].bottom())
-        pipette50.mix(repetitions=10, volume=20)
-        pipette50.blow_out(location=sample_plate[w].top(z=-2))
-        pipette50.drop_tip()
+        pipette_50.pick_up_tip()
+        pipette_50.aspirate(volume=13, location=reservoir["A2"].bottom())
+        pipette_50.dispense(volume=3, location=reservoir["A2"].bottom())
+        pipette_50.dispense(volume=10, location=sample_plate[w].bottom())
+        pipette_50.move_to(location=sample_plate[w].bottom())
+        pipette_50.mix(repetitions=10, volume=20)
+        pipette_50.blow_out(location=sample_plate[w].top(z=-2))
+        pipette_50.drop_tip()
 
 Each time through the loop, the pipette will fill from the same well of the reservoir and then dispense (and mix and blow out) in a different column of the sample plate.
 
@@ -236,6 +236,10 @@ Later steps of the protocol will move intermediate samples to the middle of the 
         ["A1", "A2", "A3", "A4"][:column_count],
         ["A5", "A6", "A7", "A8"][:column_count],
     ):
-        pipette50.aspirate(volume=13, location=sample_plate[s])
-        pipette50.dispense(volume=13, location=sample_plate[d])
+        pipette_50.pick_up_tip()
+        pipette_50.aspirate(volume=13, location=sample_plate[s])
+        pipette_50.dispense(volume=13, location=sample_plate[d])
+        pipette_50.drop_tip()
+
+This will transfer from column 1 to 5, 2 to 6, and so on — depending on the number of samples chosen during run setup!
 
