@@ -71,9 +71,14 @@
       "aspirate_delay_mmFromBottom": "Change from where in the well the robot delays after aspirating",
       "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing"
     },
+    "field_titles": {
+      "z_position": "Z position",
+      "x_position": "X position",
+      "y_position": "Y position"
+    },
     "errors": {
       "TOO_MANY_DECIMALS": "a max of 1 decimal place is allowed",
-      "OUT_OF_BOUNDS": "accepted range is {{minMmFromBottom}} to {{maxMmFromBottom}}"
+      "OUT_OF_BOUNDS": "accepted range is {{minMm}} to {{maxMm}}"
     },
     "field_label": "Distance from bottom of well"
   },

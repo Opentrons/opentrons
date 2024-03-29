@@ -418,8 +418,21 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+
         aspirate_labware: {
           value: 'aspirate_labware_id',
+          isIndeterminate: false,
+        },
+        aspirate_x_position: {
+          isIndeterminate: false,
+        },
+        aspirate_y_position: {
+          isIndeterminate: false,
+        },
+        dispense_x_position: {
+          isIndeterminate: false,
+        },
+        dispense_y_position: {
           isIndeterminate: false,
         },
         aspirate_wells: {
@@ -669,6 +682,18 @@ describe('_getSavedMultiSelectFieldValues', () => {
         path: {
           isIndeterminate: true,
         },
+        aspirate_x_position: {
+          isIndeterminate: false,
+        },
+        aspirate_y_position: {
+          isIndeterminate: false,
+        },
+        dispense_x_position: {
+          isIndeterminate: false,
+        },
+        dispense_y_position: {
+          isIndeterminate: false,
+        },
         preWetTip: {
           isIndeterminate: true,
         },
@@ -850,6 +875,12 @@ describe('_getSavedMultiSelectFieldValues', () => {
         mix_touchTip_checkbox: { value: false, isIndeterminate: false },
         mix_touchTip_mmFromBottom: { value: null, isIndeterminate: false },
         nozzles: { value: undefined, isIndeterminate: false },
+        mix_x_position: {
+          isIndeterminate: false,
+        },
+        mix_y_position: {
+          isIndeterminate: false,
+        },
         dropTip_location: {
           value: 'fixedTrash',
           isIndeterminate: false,
@@ -920,6 +951,12 @@ describe('_getSavedMultiSelectFieldValues', () => {
         mix_touchTip_checkbox: { isIndeterminate: true },
         mix_touchTip_mmFromBottom: { isIndeterminate: true },
         nozzles: { isIndeterminate: true },
+        mix_x_position: {
+          isIndeterminate: false,
+        },
+        mix_y_position: {
+          isIndeterminate: false,
+        },
         dropTip_location: {
           value: 'fixedTrash',
           isIndeterminate: false,

@@ -11,20 +11,28 @@ import {
   useHoverTooltip,
   UseHoverTooltipTargetProps,
 } from '@opentrons/components'
-import { getWellsDepth } from '@opentrons/shared-data'
+import {
+  getWellsDepth,
+  getWellXDimension,
+  getWellYDimension,
+} from '@opentrons/shared-data'
 import {
   getIsTouchTipField,
   getIsDelayPositionField,
+} from '../../../../form-types'
+import { selectors as stepFormSelectors } from '../../../../step-forms'
+import { PositionSpecs, TipPositionModal } from './TipPositionModal'
+import { getDefaultMmFromBottom } from './utils'
+import { ZTipPositionModal } from './ZTipPositionModal'
+import type {
   TipXOffsetFields,
   TipYOffsetFields,
   TipZOffsetFields,
 } from '../../../../form-types'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { TipPositionModal } from './TipPositionModal'
-import { getDefaultMmFromBottom } from './utils'
+import type { FieldPropsByName } from '../../types'
+
 import stepFormStyles from '../../StepEditForm.module.css'
 import styles from './TipPositionInput.module.css'
-import type { FieldPropsByName } from '../../types'
 
 interface TipPositionFieldProps {
   propsForFields: FieldPropsByName
@@ -38,7 +46,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
   const { labwareId, propsForFields, zField, xField, yField } = props
   const {
     name: zName,
-    value: zValue,
+    value: rawZValue,
     updateValue: zUpdateValue,
     tooltipContent,
     isIndeterminate,
@@ -55,22 +63,30 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
       : null
 
   let wellDepthMm = 0
+  let wellXWidthMm = 0
+  let wellYWidthMm = 0
   if (labwareDef != null) {
-    // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
+    // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths/widths
     const firstWell = labwareDef.wells.A1
     if (firstWell) {
       wellDepthMm = getWellsDepth(labwareDef, ['A1'])
+      wellXWidthMm = getWellXDimension(labwareDef, ['A1'])
+      wellYWidthMm = getWellYDimension(labwareDef, ['A1'])
     }
   }
 
-  if (wellDepthMm === 0 && labwareId != null && labwareDef != null) {
+  if (
+    (wellDepthMm === 0 || wellXWidthMm === 0 || wellYWidthMm === 0) &&
+    labwareId != null &&
+    labwareDef != null
+  ) {
     console.error(
-      `expected to find the well depth mm with labwareId ${labwareId} but could not`
+      `expected to find all well dimensions mm with labwareId ${labwareId} but could not`
     )
   }
 
   const handleOpen = (): void => {
-    if (wellDepthMm) {
+    if (wellDepthMm && wellXWidthMm && wellYWidthMm) {
       setModalOpen(true)
     }
   }
@@ -79,28 +95,72 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
   }
   const isTouchTipField = getIsTouchTipField(zName)
   const isDelayPositionField = getIsDelayPositionField(zName)
-  let value: string | number = '0'
-  const mmFromBottom = typeof zValue === 'number' ? zValue : null
+  let zValue: string | number = '0'
+  const mmFromBottom = typeof rawZValue === 'number' ? rawZValue : null
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
-    value =
+    zValue =
       mmFromBottom !== null
         ? mmFromBottom
         : getDefaultMmFromBottom({ name: zName, wellDepthMm })
   }
+
+  let modal = (
+    <ZTipPositionModal
+      name={zName}
+      closeModal={handleClose}
+      wellDepthMm={wellDepthMm}
+      mmFromBottom={mmFromBottom}
+      updateValue={zUpdateValue}
+      isIndeterminate={isIndeterminate}
+    />
+  )
+  if (yField != null && xField != null) {
+    const {
+      name: xName,
+      value: rawXValue,
+      updateValue: xUpdateValue,
+    } = propsForFields[xField]
+    const {
+      name: yName,
+      value: rawYValue,
+      updateValue: yUpdateValue,
+    } = propsForFields[yField]
+
+    const specs: PositionSpecs = {
+      z: {
+        name: zName,
+        value: mmFromBottom,
+        updateValue: zUpdateValue,
+      },
+      x: {
+        name: xName,
+        value: rawXValue != null ? Number(rawXValue) : null,
+        updateValue: xUpdateValue,
+      },
+      y: {
+        name: yName,
+        value: rawYValue != null ? Number(rawYValue) : null,
+        updateValue: yUpdateValue,
+      },
+    }
+
+    modal = (
+      <TipPositionModal
+        closeModal={handleClose}
+        wellDepthMm={wellDepthMm}
+        wellXWidthMm={wellXWidthMm}
+        wellYWidthMm={wellYWidthMm}
+        isIndeterminate={isIndeterminate}
+        specs={specs}
+      />
+    )
+  }
+
   return (
     <>
       <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
-      {isModalOpen && (
-        <TipPositionModal
-          name={zName}
-          closeModal={handleClose}
-          wellDepthMm={wellDepthMm}
-          mmFromBottom={mmFromBottom}
-          updateValue={zUpdateValue}
-          isIndeterminate={isIndeterminate}
-        />
-      )}
+      {isModalOpen ? modal : null}
       <Wrapper
         targetProps={targetProps}
         disabled={disabled}
@@ -121,7 +181,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
             className={stepFormStyles.small_field}
             readOnly
             onClick={handleOpen}
-            value={String(value)}
+            value={String(zValue)}
             isIndeterminate={isIndeterminate}
             units={t('units.millimeter')}
             id={`TipPositionField_${zName}`}

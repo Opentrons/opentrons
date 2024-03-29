@@ -36,7 +36,7 @@ export interface InputFieldProps {
   /** appears to the right of the caption. Used for character limits, eg '0/45' */
   secondaryCaption?: string | null | undefined
   /** optional input type (default "text") */
-  type?: typeof INPUT_TYPE_TEXT | typeof INPUT_TYPE_PASSWORD
+  type?: typeof INPUT_TYPE_TEXT | typeof INPUT_TYPE_PASSWORD | 'number'
   /** mouse click handler */
   onClick?: (event: React.MouseEvent<HTMLInputElement>) => unknown
   /** focus handler */

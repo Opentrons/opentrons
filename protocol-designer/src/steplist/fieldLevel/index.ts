@@ -401,24 +401,6 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   tipRack: {
     getErrors: composeErrors(requiredField),
   },
-  mix_x_position: {
-    getErrors: composeErrors(requiredField),
-  },
-  mix_y_position: {
-    getErrors: composeErrors(requiredField),
-  },
-  aspirate_x_position: {
-    getErrors: composeErrors(requiredField),
-  },
-  aspirate_y_position: {
-    getErrors: composeErrors(requiredField),
-  },
-  dispense_x_position: {
-    getErrors: composeErrors(requiredField),
-  },
-  dispense_y_position: {
-    getErrors: composeErrors(requiredField),
-  },
 }
 const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
   // profile step fields

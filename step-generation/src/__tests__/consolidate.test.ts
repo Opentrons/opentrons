@@ -33,6 +33,8 @@ const airGapHelper = makeAirGapHelper({
     origin: 'bottom',
     offset: {
       z: 11.54,
+      x: 0,
+      y: 0,
     },
   },
 })
@@ -98,6 +100,10 @@ beforeEach(() => {
     blowoutLocation: null,
     dropTipLocation: FIXED_TRASH_ID,
     tipRack: 'tiprack1Id',
+    aspirateXOffset: 0,
+    dispenseXOffset: 0,
+    aspirateYOffset: 0,
+    dispenseYOffset: 0,
   }
 })
 
@@ -259,6 +265,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -274,6 +282,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -307,6 +317,8 @@ describe('consolidate single-channel', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -330,6 +342,8 @@ describe('consolidate single-channel', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -363,6 +377,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -373,6 +389,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -383,6 +401,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -399,6 +419,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -409,6 +431,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -419,6 +443,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -454,6 +480,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -467,6 +495,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -501,6 +531,8 @@ describe('consolidate single-channel', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -520,6 +552,8 @@ describe('consolidate single-channel', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -553,6 +587,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -566,6 +602,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -599,6 +637,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -616,6 +656,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -655,6 +697,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -675,6 +719,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -715,6 +761,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -734,6 +782,8 @@ describe('consolidate single-channel', () => {
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -1056,6 +1106,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1080,6 +1132,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1105,6 +1159,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1163,6 +1219,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -1188,6 +1246,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1246,6 +1306,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -1271,6 +1333,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -1313,6 +1377,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -1337,6 +1403,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -1385,6 +1453,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1409,6 +1479,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1434,6 +1506,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1492,6 +1566,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -1517,6 +1593,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -1559,6 +1637,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -1583,6 +1663,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -1627,6 +1709,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -1697,6 +1781,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1721,6 +1807,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1746,6 +1834,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1804,6 +1894,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -1830,6 +1922,8 @@ describe('consolidate single-channel', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                x: 0,
+                y: 0,
               },
             },
             flowRate: 2.1,
@@ -1887,6 +1981,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -1912,6 +2008,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -1954,6 +2052,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -1978,6 +2078,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -2041,6 +2143,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -2065,6 +2169,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -2090,6 +2196,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -2148,6 +2256,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -2173,6 +2283,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -2215,6 +2327,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -2239,6 +2353,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -2298,6 +2414,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -2365,6 +2483,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -2389,6 +2509,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -2414,6 +2536,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -2472,6 +2596,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -2497,6 +2623,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -2555,6 +2683,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -2580,6 +2710,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -2622,6 +2754,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -2646,6 +2780,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -2705,6 +2841,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -2744,6 +2882,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -2769,6 +2909,8 @@ describe('consolidate single-channel', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                x: 0,
+                y: 0,
               },
             },
             flowRate: 2.2,
@@ -2793,6 +2935,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -2851,6 +2995,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -2876,6 +3022,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -2918,6 +3066,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -2942,6 +3092,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -3000,6 +3152,8 @@ describe('consolidate single-channel', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -3058,6 +3212,10 @@ describe('consolidate multi-channel', () => {
       volume: 140,
       tipRack: 'tiprack1Id',
       changeTip: 'once',
+      aspirateXOffset: 0,
+      dispenseXOffset: 0,
+      aspirateYOffset: 0,
+      dispenseYOffset: 0,
     } as ConsolidateArgs
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)

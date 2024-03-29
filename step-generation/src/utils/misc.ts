@@ -479,6 +479,8 @@ interface DispenseLocationHelperArgs {
   pipetteId: string
   volume: number
   flowRate: number
+  xOffset: number
+  yOffset: number
   offsetFromBottomMm?: number
   well?: string
 }
@@ -494,6 +496,8 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     flowRate,
     offsetFromBottomMm,
     well,
+    xOffset,
+    yOffset,
   } = args
 
   const trashOrLabware = getTrashOrLabware(
@@ -516,6 +520,8 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
         well,
         flowRate,
         offsetFromBottomMm,
+        xOffset,
+        yOffset,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -660,6 +666,8 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
           offsetFromBottomMm,
           isAirGap: true,
           tipRack,
+          xOffset: 0,
+          yOffset: 0,
         }),
       ]
       //  when aspirating out of multi wells for consolidate
@@ -674,6 +682,9 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
           offsetFromBottomMm,
           isAirGap: true,
           tipRack,
+          //  NOTE: airgap aspirates happen at default x/y offset
+          xOffset: 0,
+          yOffset: 0,
         }),
       ]
     }

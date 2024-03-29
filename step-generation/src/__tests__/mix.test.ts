@@ -51,6 +51,10 @@ beforeEach(() => {
     aspirateDelaySeconds: null,
     dispenseDelaySeconds: null,
     dropTipLocation: FIXED_TRASH_ID,
+    aspirateXOffset: 0,
+    dispenseXOffset: 0,
+    aspirateYOffset: 0,
+    dispenseYOffset: 0,
   }
 
   invariantContext = makeContext()

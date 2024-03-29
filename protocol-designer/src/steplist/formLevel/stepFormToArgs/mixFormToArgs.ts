@@ -15,7 +15,14 @@ type MixStepArgs = MixArgs
 export const mixFormToArgs = (
   hydratedFormData: HydratedMixFormDataLegacy
 ): MixStepArgs => {
-  const { labware, pipette, dropTip_location, nozzles } = hydratedFormData
+  const {
+    labware,
+    pipette,
+    dropTip_location,
+    nozzles,
+    mix_x_position,
+    mix_y_position,
+  } = hydratedFormData
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     pipette,
     hydratedFormData.volume,
@@ -105,5 +112,9 @@ export const mixFormToArgs = (
     dispenseDelaySeconds,
     dropTipLocation: dropTip_location,
     nozzles,
+    aspirateXOffset: mix_x_position ?? 0,
+    dispenseXOffset: mix_x_position ?? 0,
+    aspirateYOffset: mix_y_position ?? 0,
+    dispenseYOffset: mix_y_position ?? 0,
   }
 }
