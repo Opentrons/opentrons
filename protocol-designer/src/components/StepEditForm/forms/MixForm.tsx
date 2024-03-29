@@ -117,7 +117,10 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                 tiprack={propsForFields.tipRack.value}
               />
               <TipPositionField
-                {...propsForFields.mix_mmFromBottom}
+                propsForFields={propsForFields}
+                zField="mix_mmFromBottom"
+                xField="mix_x_position"
+                yField="mix_y_position"
                 labwareId={
                   formData[
                     getLabwareFieldForPositioningField('mix_mmFromBottom')
@@ -182,7 +185,8 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                 label={t('form:step_edit_form.field.touchTip.label')}
               >
                 <TipPositionField
-                  {...propsForFields.mix_touchTip_mmFromBottom}
+                  propsForFields={propsForFields}
+                  zField="mix_touchTip_mmFromBottom"
                   labwareId={
                     formData[
                       getLabwareFieldForPositioningField(

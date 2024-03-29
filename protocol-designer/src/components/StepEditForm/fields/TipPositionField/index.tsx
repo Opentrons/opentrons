@@ -2,7 +2,10 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
+  COLORS,
+  Flex,
   FormGroup,
+  Icon,
   InputField,
   Tooltip,
   useHoverTooltip,
@@ -12,29 +15,36 @@ import { getWellsDepth } from '@opentrons/shared-data'
 import {
   getIsTouchTipField,
   getIsDelayPositionField,
+  TipXOffsetFields,
+  TipYOffsetFields,
+  TipZOffsetFields,
 } from '../../../../form-types'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { TipPositionModal } from './TipPositionModal'
 import { getDefaultMmFromBottom } from './utils'
 import stepFormStyles from '../../StepEditForm.module.css'
 import styles from './TipPositionInput.module.css'
-import type { FieldProps } from '../../types'
+import type { FieldPropsByName } from '../../types'
 
-interface TipPositionFieldProps extends FieldProps {
+interface TipPositionFieldProps {
+  propsForFields: FieldPropsByName
+  zField: TipZOffsetFields
+  xField?: TipXOffsetFields
+  yField?: TipYOffsetFields
   labwareId?: string | null
-  className?: string
 }
 
 export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
+  const { labwareId, propsForFields, zField, xField, yField } = props
   const {
-    disabled,
-    name,
+    name: zName,
+    value: zValue,
+    updateValue: zUpdateValue,
     tooltipContent,
-    updateValue,
     isIndeterminate,
-    labwareId,
-    value: rawValue,
-  } = props
+    disabled,
+  } = propsForFields[zField]
+
   const { t } = useTranslation('application')
   const [targetProps, tooltipProps] = useHoverTooltip()
   const [isModalOpen, setModalOpen] = React.useState(false)
@@ -67,27 +77,27 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
   const handleClose = (): void => {
     setModalOpen(false)
   }
-  const isTouchTipField = getIsTouchTipField(name)
-  const isDelayPositionField = getIsDelayPositionField(name)
+  const isTouchTipField = getIsTouchTipField(zName)
+  const isDelayPositionField = getIsDelayPositionField(zName)
   let value: string | number = '0'
-  const mmFromBottom = typeof rawValue === 'number' ? rawValue : null
+  const mmFromBottom = typeof zValue === 'number' ? zValue : null
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
     value =
       mmFromBottom !== null
         ? mmFromBottom
-        : getDefaultMmFromBottom({ name, wellDepthMm })
+        : getDefaultMmFromBottom({ name: zName, wellDepthMm })
   }
   return (
     <>
       <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
       {isModalOpen && (
         <TipPositionModal
-          name={name}
+          name={zName}
           closeModal={handleClose}
           wellDepthMm={wellDepthMm}
           mmFromBottom={mmFromBottom}
-          updateValue={updateValue}
+          updateValue={zUpdateValue}
           isIndeterminate={isIndeterminate}
         />
       )}
@@ -97,16 +107,26 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
         isTouchTipField={isTouchTipField}
         isDelayPositionField={isDelayPositionField}
       >
-        <InputField
-          disabled={disabled}
-          className={props.className || stepFormStyles.small_field}
-          readOnly
-          onClick={handleOpen}
-          value={String(value)}
-          isIndeterminate={isIndeterminate}
-          units={t('units.millimeter')}
-          id={`TipPositionField_${name}`}
-        />
+        {yField != null && xField != null ? (
+          <Flex onClick={handleOpen} width="5rem">
+            <Icon
+              name="ot-calibrate"
+              className={styles.tip_position_icon}
+              color={disabled ? COLORS.grey30 : COLORS.grey50}
+            />
+          </Flex>
+        ) : (
+          <InputField
+            disabled={disabled}
+            className={stepFormStyles.small_field}
+            readOnly
+            onClick={handleOpen}
+            value={String(value)}
+            isIndeterminate={isIndeterminate}
+            units={t('units.millimeter')}
+            id={`TipPositionField_${zName}`}
+          />
+        )}
       </Wrapper>
     </>
   )

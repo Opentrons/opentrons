@@ -65,3 +65,15 @@
   position: relative;
   left: 9px;
 }
+
+.tip_position_icon {
+  height: 1.5rem;
+  width: 1.5rem;
+  cursor: pointer;
+  color: #24313F;
+}
+
+
+.tip_position_icon:hover {
+  background-color: #e6e6e6;
+}

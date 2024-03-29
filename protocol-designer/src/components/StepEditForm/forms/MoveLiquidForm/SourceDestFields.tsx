@@ -95,7 +95,10 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           tiprack={propsForFields.tipRack.value}
         />
         <TipPositionField
-          {...propsForFields[addFieldNamePrefix('mmFromBottom')]}
+          propsForFields={propsForFields}
+          zField={`${prefix}_mmFromBottom`}
+          xField={`${prefix}_x_position`}
+          yField={`${prefix}_y_position`}
           labwareId={
             formData[
               getLabwareFieldForPositioningField(
@@ -147,7 +150,8 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           className={styles.small_field}
         >
           <TipPositionField
-            {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}
+            propsForFields={propsForFields}
+            zField={`${prefix}_touchTip_mmFromBottom`}
             labwareId={
               formData[
                 getLabwareFieldForPositioningField(
