@@ -413,7 +413,7 @@ class Eight_Channel_Partial_Pickup_Test:
         await api.home()
         for i, (k, v) in enumerate(self.nozzle_offsets.items()):
             print(f"\n-> Measuring Nozzle {k}")
-            await self._select_nozzle(api, mount, i+1)
+            await self._select_tip(api, mount, i+1)
             if len(self.gauges) > 0:
                 gauge = await self._measure_gauge(api, mount, "Z")
                 self.nozzle_offsets[k] = str(gauge)
@@ -421,19 +421,6 @@ class Eight_Channel_Partial_Pickup_Test:
         print(self.nozzle_offsets)
         nozzle_data = self.dict_values_to_line(self.nozzle_offsets)
         data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=self.nozzle_file, data=nozzle_data)
-
-    async def _select_nozzle(
-        self, api: OT3API, mount: OT3Mount, nozzle: int
-    ) -> None:
-        y_offset = self.tip_distance*(nozzle - 1)
-        gauge_loc = Point(self.deck_slot['deck_slot'][self.gauge_slot]['X'],
-                        self.deck_slot['deck_slot'][self.gauge_slot]['Y'] - y_offset,
-                        self.deck_slot['deck_slot'][self.gauge_slot]['Z'])
-        if nozzle == 1:
-            cp = CriticalPoint.NOZZLE
-            await self._move_to_point(api, mount, gauge_loc, cp)
-        else:
-            await api.move_to(mount, gauge_loc)
 
     async def _update_pick_up_current(
         self, api: OT3API, mount: OT3Mount, tip_count, current
@@ -475,12 +462,12 @@ class Eight_Channel_Partial_Pickup_Test:
     ) -> None:
         self.test_data["Tip"] = str(tip)
         y_offset = self.tip_distance*(tip - 1)
-        tip_loc = self.gauge_position._replace(y=self.gauge_position.y - y_offset)
+        gauge_loc = self.gauge_position._replace(y=self.gauge_position.y - y_offset)
         if tip == 1:
             cp = CriticalPoint.TIP
-            await self._move_to_point(api, mount, tip_loc, cp)
+            await self._move_to_point(api, mount, gauge_loc, cp)
         else:
-            await api.move_to(mount, tip_loc)
+            await api.move_to(mount, gauge_loc)
 
     async def _measure_gauge(
         self, api: OT3API, mount: OT3Mount, axis: str
