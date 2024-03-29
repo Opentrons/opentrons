@@ -496,7 +496,10 @@ async def test_load_legacy_python(
             request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
         ),
         await legacy_executor.execute(
-            protocol=legacy_protocol, context=legacy_context, run_time_param_values=None
+            protocol=legacy_protocol,
+            context=legacy_context,
+            parameter_context=legacy_python_runner_subject._parameter_context,
+            run_time_param_values=None,
         ),
     )
 
@@ -635,7 +638,10 @@ async def test_load_legacy_json(
             request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
         ),
         await legacy_executor.execute(
-            protocol=legacy_protocol, context=legacy_context, run_time_param_values=None
+            protocol=legacy_protocol,
+            context=legacy_context,
+            parameter_context=legacy_python_runner_subject._parameter_context,
+            run_time_param_values=None,
         ),
     )
 

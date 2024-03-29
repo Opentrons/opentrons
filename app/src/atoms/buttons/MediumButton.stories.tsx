@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { ICON_DATA_BY_NAME } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { ICON_DATA_BY_NAME, VIEWPORT } from '@opentrons/components'
 import { MediumButton } from './'
 import type { Story, Meta } from '@storybook/react'
 
@@ -29,7 +28,7 @@ export default {
       defaultValue: undefined,
     },
   },
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const MediumButtonTemplate: Story<

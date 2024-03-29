@@ -81,7 +81,7 @@ class OrderedSet(Generic[_SetElementT]):
     def head(
         self, default_value: Union[_DefaultValueT, _NOT_SPECIFIED] = _NOT_SPECIFIED()
     ) -> Union[_SetElementT, _DefaultValueT]:
-        """Get the head of the set.
+        """Get the head (oldest-added element) of the set.
 
         Args:
             default_value: A value to return if set is empty.
@@ -93,12 +93,12 @@ class OrderedSet(Generic[_SetElementT]):
             IndexError: set is empty and default was not specified.
         """
         try:
-            return next(iter(self))
-        except StopIteration as e:
+            return next(iter(self._elements))
+        except StopIteration:
             if isinstance(default_value, _NOT_SPECIFIED):
-                raise IndexError("Set is empty") from e
-
-        return default_value
+                raise IndexError("Set is empty") from None
+            else:
+                return default_value
 
     def __iter__(self) -> Iterator[_SetElementT]:
         """Enable iteration over all elements in the set.

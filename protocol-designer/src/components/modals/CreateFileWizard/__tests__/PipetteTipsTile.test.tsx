@@ -38,16 +38,11 @@ const values = {
   pipettesByMount: {
     left: {
       pipetteName: 'p1000_single_flex',
-      tiprackDefURI: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
+      tiprackDefURI: ['opentrons/opentrons_flex_96_tiprack_200ul/1'],
     },
     right: { pipetteName: null, tiprackDefURI: null },
   } as FormPipettesByMount,
-  modulesByType: {
-    heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-    magneticBlockType: { onDeck: false, model: null, slot: '2' },
-    temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-    thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-  },
+  modules: {},
   additionalEquipment: ['gripper'],
 } as FormState
 
@@ -55,6 +50,7 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
   goBack: vi.fn(),
   proceed: vi.fn(),
   watch: vi.fn((name: keyof typeof values) => values[name]) as any,
+  getValues: vi.fn(() => values) as any,
 }
 
 const fixtureTipRack10ul = {
@@ -150,16 +146,11 @@ describe('PipetteTipsTile', () => {
       pipettesByMount: {
         left: {
           pipetteName: 'p10_single',
-          tiprackDefURI: 'opentrons/opentrons_96_tiprack_10ul/1',
+          tiprackDefURI: ['opentrons/opentrons_96_tiprack_10ul/1'],
         },
         right: { pipetteName: null, tiprackDefURI: null },
       } as FormPipettesByMount,
-      modulesByType: {
-        heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-        magneticBlockType: { onDeck: false, model: null, slot: '2' },
-        temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-        thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-      },
+      modules: {},
       additionalEquipment: ['gripper'],
     } as FormState
 

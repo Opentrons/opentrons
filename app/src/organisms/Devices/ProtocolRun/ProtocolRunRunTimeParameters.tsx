@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -19,7 +20,6 @@ import {
 
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
-import { Chip } from '../../../atoms/Chip'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 

@@ -9,6 +9,7 @@ import anyio
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
 from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api import ParameterContext
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -38,6 +39,7 @@ from .legacy_wrappers import (
 from ..protocol_engine.types import (
     PostRunHardwareState,
     DeckConfigurationType,
+    RunTimeParameter,
     RunTimeParamValuesType,
 )
 
@@ -47,6 +49,7 @@ class RunResult(NamedTuple):
 
     commands: List[Command]
     state_summary: StateSummary
+    parameters: List[RunTimeParameter]
 
 
 class AbstractRunner(ABC):
@@ -78,6 +81,11 @@ class AbstractRunner(ABC):
         Otherwise, it's a no-op.
         """
         return self._broker
+
+    @property
+    def run_time_parameters(self) -> List[RunTimeParameter]:
+        """Parameter definitions defined by protocol, if any. Currently only for python protocols."""
+        return []
 
     def was_started(self) -> bool:
         """Whether the run has been started.
@@ -150,6 +158,14 @@ class PythonAndLegacyRunner(AbstractRunner):
             drop_tips_after_run=drop_tips_after_run,
             post_run_hardware_state=post_run_hardware_state,
         )
+        self._parameter_context: Optional[ParameterContext] = None
+
+    @property
+    def run_time_parameters(self) -> List[RunTimeParameter]:
+        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        if self._parameter_context is not None:
+            return self._parameter_context.export_parameters_for_analysis()
+        return []
 
     async def load(
         self,
@@ -171,6 +187,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         protocol = self._legacy_file_reader.read(
             protocol_source, labware_definitions, python_parse_mode
         )
+        self._parameter_context = ParameterContext(api_version=protocol.api_level)
         equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
@@ -190,7 +207,7 @@ class PythonAndLegacyRunner(AbstractRunner):
             equipment_broker=equipment_broker,
         )
         initial_home_command = pe_commands.HomeCreate(
-            # this command homes all axes, including pipette plugner and gripper jaw
+            # this command homes all axes, including pipette plunger and gripper jaw
             params=pe_commands.HomeParams(axes=None)
         )
 
@@ -201,6 +218,7 @@ class PythonAndLegacyRunner(AbstractRunner):
             await self._legacy_executor.execute(
                 protocol=protocol,
                 context=context,
+                parameter_context=self._parameter_context,
                 run_time_param_values=run_time_param_values,
             )
 
@@ -228,7 +246,10 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return RunResult(commands=commands, state_summary=run_data)
+        parameters = self.run_time_parameters
+        return RunResult(
+            commands=commands, state_summary=run_data, parameters=parameters
+        )
 
 
 class JsonRunner(AbstractRunner):
@@ -332,7 +353,7 @@ class JsonRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return RunResult(commands=commands, state_summary=run_data)
+        return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
 
 class LiveRunner(AbstractRunner):
@@ -373,7 +394,7 @@ class LiveRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return RunResult(commands=commands, state_summary=run_data)
+        return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
 
 AnyRunner = Union[PythonAndLegacyRunner, JsonRunner, LiveRunner]

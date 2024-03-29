@@ -14,18 +14,11 @@ import {
   ModuleModel,
   PipetteName,
   OT2_ROBOT_TYPE,
-  MAGNETIC_BLOCK_TYPE,
   TEMPERATURE_MODULE_TYPE,
-  MAGNETIC_BLOCK_V1,
   HEATERSHAKER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_V1,
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  SPAN7_8_10_11_SLOT,
   FLEX_ROBOT_TYPE,
-  MAGNETIC_MODULE_V2,
-  THERMOCYCLER_MODULE_V2,
-  TEMPERATURE_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
@@ -139,20 +132,22 @@ export function CreateFileWizard(): JSX.Element | null {
       []
     )
 
-    const modules: ModuleCreationArgs[] = Object.entries(
-      values.modulesByType
-    ).reduce<ModuleCreationArgs[]>((acc, [moduleType, formModule]) => {
-      return formModule?.onDeck
-        ? [
-            ...acc,
-            {
-              type: moduleType as ModuleType,
-              model: formModule.model || ('' as ModuleModel),
-              slot: formModule.slot,
+    const modules: ModuleCreationArgs[] =
+      values.modules != null
+        ? Object.entries(values.modules).reduce<ModuleCreationArgs[]>(
+            (acc, [number, formModule]) => {
+              return [
+                ...acc,
+                {
+                  type: formModule.type,
+                  model: formModule.model || ('' as ModuleModel),
+                  slot: formModule.slot,
+                },
+              ]
             },
-          ]
-        : acc
-    }, [])
+            []
+          )
+        : []
     const heaterShakerIndex = modules.findIndex(
       mod => mod.type === HEATERSHAKER_MODULE_TYPE
     )
@@ -243,7 +238,7 @@ export function CreateFileWizard(): JSX.Element | null {
       }
       // auto-generate tipracks for pipettes
       const newTiprackModels: string[] = uniq(
-        pipettes.map(pipette => pipette.tiprackDefURI)
+        pipettes.flatMap(pipette => pipette.tiprackDefURI)
       )
       newTiprackModels.forEach((tiprackDefURI, index) => {
         const ot2Slots = index === 0 ? '2' : '5'
@@ -319,33 +314,7 @@ const initialFormState: FormState = {
     left: { pipetteName: undefined, tiprackDefURI: undefined },
     right: { pipetteName: undefined, tiprackDefURI: undefined },
   },
-  modulesByType: {
-    [MAGNETIC_BLOCK_TYPE]: {
-      onDeck: false,
-      model: MAGNETIC_BLOCK_V1,
-      slot: '2',
-    },
-    [HEATERSHAKER_MODULE_TYPE]: {
-      onDeck: false,
-      model: HEATERSHAKER_MODULE_V1,
-      slot: '1',
-    },
-    [MAGNETIC_MODULE_TYPE]: {
-      onDeck: false,
-      model: MAGNETIC_MODULE_V2,
-      slot: '1',
-    },
-    [TEMPERATURE_MODULE_TYPE]: {
-      onDeck: false,
-      model: TEMPERATURE_MODULE_V2,
-      slot: '3',
-    },
-    [THERMOCYCLER_MODULE_TYPE]: {
-      onDeck: false,
-      model: THERMOCYCLER_MODULE_V2,
-      slot: SPAN7_8_10_11_SLOT,
-    },
-  },
+  modules: {},
   //  defaulting to selecting trashBin already to avoid user having to
   //  click to add a trash bin/waste chute. Delete once we support returnTip()
   additionalEquipment: ['trashBin'],
@@ -353,7 +322,8 @@ const initialFormState: FormState = {
 
 const pipetteValidationShape = Yup.object().shape({
   pipetteName: Yup.string().nullable(),
-  tiprackDefURI: Yup.string()
+  tiprackDefURI: Yup.array()
+    .of(Yup.string())
     .nullable()
     .when('pipetteName', {
       is: (val: string | null): boolean => Boolean(val),
@@ -363,14 +333,8 @@ const pipetteValidationShape = Yup.object().shape({
 })
 // any typing this because TS says there are too many possibilities of what this could be
 const moduleValidationShape: any = Yup.object().shape({
-  onDeck: Yup.boolean().default(false),
-  model: Yup.string()
-    .nullable()
-    .when('onDeck', {
-      is: true,
-      then: schema => schema.required('Required'),
-      otherwise: schema => schema.nullable(),
-    }),
+  type: Yup.string(),
+  model: Yup.string(),
   slot: Yup.string(),
 })
 

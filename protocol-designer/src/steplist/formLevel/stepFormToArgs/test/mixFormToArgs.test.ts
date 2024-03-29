@@ -36,17 +36,21 @@ beforeEach(() => {
     blowout_checkbox: false,
     blowout_location: null,
     mix_mmFromBottom: 0.5,
+    tipRack: 'mockTiprack',
     pipette: {
       id: 'pipetteId',
       spec: fixtureP10SingleV2Specs,
-      tiprackLabwareDef: {
-        parameters: {
-          tipLength: 10,
+      tiprackLabwareDef: [
+        {
+          parameters: {
+            tipLength: 10,
+            loadName: 'mockTiprack',
+          },
+          metadata: {
+            displayName: 'mock display name',
+          },
         },
-        metadata: {
-          displayName: 'mock display name',
-        },
-      } as any,
+      ] as any,
     } as any,
     // @ts-expect-error(sa, 2021-6-15): volume should be a number
     volume: '12',

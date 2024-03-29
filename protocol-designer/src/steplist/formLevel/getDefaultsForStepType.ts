@@ -36,12 +36,14 @@ export function getDefaultsForStepType(
         mix_touchTip_mmFromBottom: null,
         dropTip_location: null,
         nozzles: null,
+        tipRack: null,
       }
 
     case 'moveLiquid':
       return {
         pipette: null,
         volume: null,
+        tipRack: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         path: 'single',
         aspirate_wells_grouped: false,

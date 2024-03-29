@@ -100,9 +100,7 @@ async def _analyze(
             ),
             metadata=protocol_source.metadata,
             robotType=protocol_source.robot_type,
-            # TODO(spp, 2024-03-12): update this once protocol reader/ runner can parse
-            #  and report the runTimeParameters
-            runTimeParameters=[],
+            runTimeParameters=analysis.parameters,
             commands=analysis.commands,
             errors=analysis.state_summary.errors,
             labware=analysis.state_summary.labware,
