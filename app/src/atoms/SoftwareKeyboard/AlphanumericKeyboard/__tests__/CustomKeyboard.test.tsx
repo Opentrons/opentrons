@@ -3,14 +3,14 @@ import { describe, it, expect, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, renderHook, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { CustomKeyboard } from '..'
+import { AlphanumericKeyboard } from '..'
 
-const render = (props: React.ComponentProps<typeof CustomKeyboard>) => {
-  return renderWithProviders(<CustomKeyboard {...props} />)[0]
+const render = (props: React.ComponentProps<typeof AlphanumericKeyboard>) => {
+  return renderWithProviders(<AlphanumericKeyboard {...props} />)[0]
 }
 
-describe('CustomKeyboard', () => {
-  it('should render the custom keyboards lower case', () => {
+describe('AlphanumericKeyboard', () => {
+  it('should render alphanumeric keyboard - lower case', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
@@ -29,6 +29,7 @@ describe('CustomKeyboard', () => {
       'i',
       'o',
       'p',
+      '123',
       'a',
       's',
       'd',
@@ -38,7 +39,7 @@ describe('CustomKeyboard', () => {
       'j',
       'k',
       'l',
-      'SHIFT',
+      'ABC',
       'z',
       'x',
       'c',
@@ -47,21 +48,20 @@ describe('CustomKeyboard', () => {
       'n',
       'm',
       'del',
-      '123',
     ]
     buttons.forEach((button, index) => {
       const expectedName = expectedButtonNames[index]
       expect(button).toHaveTextContent(expectedName)
     })
   })
-  it('should render the custom keyboards upper case, when clicking shift key', () => {
+  it('should render alphanumeric keyboard - upper case, when clicking ABC key', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
       keyboardRef: result.current,
     }
     render(props)
-    const shiftKey = screen.getByRole('button', { name: 'SHIFT' })
+    const shiftKey = screen.getByRole('button', { name: 'ABC' })
     fireEvent.click(shiftKey)
 
     const buttons = screen.getAllByRole('button')
@@ -76,6 +76,7 @@ describe('CustomKeyboard', () => {
       'I',
       'O',
       'P',
+      '123',
       'A',
       'S',
       'D',
@@ -94,7 +95,6 @@ describe('CustomKeyboard', () => {
       'N',
       'M',
       'del',
-      '123',
     ]
     buttons.forEach((button, index) => {
       const expectedName = expectedButtonNames[index]
@@ -102,7 +102,7 @@ describe('CustomKeyboard', () => {
     })
   })
 
-  it('should render the custom keyboards numbers, when clicking number key', () => {
+  it('should render alphanumeric keyboard - numbers, when clicking number key', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
@@ -132,7 +132,7 @@ describe('CustomKeyboard', () => {
     })
   })
 
-  it('should render the custom keyboards lower case, when clicking number key then abc key', () => {
+  it('should render alphanumeric keyboard - lower case when layout is numbers and clicking abc ', () => {
     const { result } = renderHook(() => React.useRef(null))
     const props = {
       onChange: vi.fn(),
@@ -140,9 +140,63 @@ describe('CustomKeyboard', () => {
     }
     render(props)
     const numberKey = screen.getByRole('button', { name: '123' })
-    screen.getByRole('button', { name: 'a' })
+    fireEvent.click(numberKey)
+    const abcKey = screen.getByRole('button', { name: 'abc' })
+    fireEvent.click(abcKey)
+    const buttons = screen.getAllByRole('button')
+    const expectedButtonNames = [
+      'q',
+      'w',
+      'e',
+      'r',
+      't',
+      'y',
+      'u',
+      'i',
+      'o',
+      'p',
+      '123',
+      'a',
+      's',
+      'd',
+      'f',
+      'g',
+      'h',
+      'j',
+      'k',
+      'l',
+      'ABC',
+      'z',
+      'x',
+      'c',
+      'v',
+      'b',
+      'n',
+      'm',
+      'del',
+    ]
+    buttons.forEach((button, index) => {
+      const expectedName = expectedButtonNames[index]
+      expect(button).toHaveTextContent(expectedName)
+    })
+  })
+
+  it('should switch each alphanumeric keyboard properly', () => {
+    const { result } = renderHook(() => React.useRef(null))
+    const props = {
+      onChange: vi.fn(),
+      keyboardRef: result.current,
+    }
+    render(props)
+    // lower case keyboard -> upper case keyboard
+    const ABCKey = screen.getByRole('button', { name: 'ABC' })
+    fireEvent.click(ABCKey)
+    screen.getByRole('button', { name: 'A' })
+    // upper case keyboard -> number keyboard
+    const numberKey = screen.getByRole('button', { name: '123' })
     fireEvent.click(numberKey)
     screen.getByRole('button', { name: '1' })
+    // number keyboard -> lower case keyboard
     const abcKey = screen.getByRole('button', { name: 'abc' })
     fireEvent.click(abcKey)
     screen.getByRole('button', { name: 'a' })

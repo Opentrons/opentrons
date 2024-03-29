@@ -4,15 +4,20 @@ import Keyboard from 'react-simple-keyboard'
 const customDisplay = {
   '{backspace}': 'del',
 }
-interface NumpadProps {
+interface IndividualKeyProps {
   onChange: (input: string) => void
   keyboardRef: React.MutableRefObject<null>
+  keyText: string
 }
 
-export function Numpad({ onChange, keyboardRef }: NumpadProps): JSX.Element {
-  const keyboardNumpad = {
+export function IndividualKey({
+  onChange,
+  keyboardRef,
+  keyText,
+}: IndividualKeyProps): JSX.Element {
+  const numericalKeyboard = {
     layout: {
-      default: ['7 8 9', '4 5 6', '1 2 3', '0 . {backspace}'],
+      default: [`${keyText}`],
     },
   }
   return (
@@ -22,13 +27,14 @@ export function Numpad({ onChange, keyboardRef }: NumpadProps): JSX.Element {
      */
     <Keyboard
       keyboardRef={r => (keyboardRef.current = r)}
-      theme={'hg-theme-default oddTheme1 numpad'}
+      theme={'hg-theme-default oddTheme1 individual-key'}
       onChange={onChange}
       layoutName="default"
       display={customDisplay}
       autoUseTouchEvents={true}
       useButtonTag={true}
-      {...keyboardNumpad}
+      {...numericalKeyboard}
+      width="100%"
     />
   )
 }
