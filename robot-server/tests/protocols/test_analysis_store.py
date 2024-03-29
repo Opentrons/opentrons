@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import List, NamedTuple
 
 import pytest
+from decoy import Decoy
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 
 from sqlalchemy.engine import Engine as SQLEngine
 
@@ -28,10 +30,16 @@ from robot_server.protocols.analysis_models import (
     AnalysisSummary,
     PendingAnalysis,
     CompletedAnalysis,
+    RunTimeParameterAnalysisData,
 )
 from robot_server.protocols.analysis_store import (
     AnalysisStore,
     AnalysisNotFoundError,
+    _CURRENT_ANALYZER_VERSION,
+)
+from robot_server.protocols.completed_analysis_store import (
+    CompletedAnalysisStore,
+    CompletedAnalysisResource,
 )
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
@@ -171,12 +179,20 @@ async def test_update_adds_details_and_completes_analysis(
         pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
-
+    run_time_param = pe_types.NumberParameter(
+        displayName="My parameter",
+        variableName="cool_param",
+        type="int",
+        min=1,
+        max=5,
+        value=2.0,
+        default=3.0,
+    )
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
     await subject.update(
         analysis_id="analysis-id",
         robot_type="OT-2 Standard",
-        run_time_parameters=[],
+        run_time_parameters=[run_time_param],
         labware=[labware],
         pipettes=[pipette],
         # TODO(mm, 2022-10-21): Give the subject some commands, errors, and liquids here
@@ -195,7 +211,7 @@ async def test_update_adds_details_and_completes_analysis(
         status=AnalysisStatus.COMPLETED,
         result=AnalysisResult.OK,
         robotType="OT-2 Standard",
-        runTimeParameters=[],
+        runTimeParameters=[run_time_param],
         labware=[labware],
         pipettes=[pipette],
         modules=[],
@@ -209,7 +225,17 @@ async def test_update_adds_details_and_completes_analysis(
         "result": "ok",
         "status": "completed",
         "robotType": "OT-2 Standard",
-        "runTimeParameters": [],
+        "runTimeParameters": [
+            {
+                "displayName": "My parameter",
+                "variableName": "cool_param",
+                "type": "int",
+                "min": 1,
+                "max": 5,
+                "value": 2.0,
+                "default": 3.0,
+            }
+        ],
         "labware": [
             {
                 "id": "labware-id",
@@ -226,6 +252,76 @@ async def test_update_adds_details_and_completes_analysis(
         "liquids": [],
         "modules": [],
     }
+
+
+async def test_update_adds_rtp_values_and_defaults_to_completed_store(
+    decoy: Decoy, sql_engine: SQLEngine, protocol_store: ProtocolStore
+) -> None:
+    """It should add RTP values and defaults to completed analysis store."""
+    number_param = pe_types.NumberParameter(
+        displayName="My parameter",
+        variableName="cool_param",
+        type="int",
+        min=1,
+        max=5,
+        value=2.0,
+        default=3.0,
+    )
+    string_param = pe_types.EnumParameter(
+        displayName="A choiced param",
+        variableName="cooler_param",
+        type="str",
+        choices=[
+            pe_types.EnumChoice(displayName="FOOOO", value="foo"),
+            pe_types.EnumChoice(displayName="BARRR", value="bar"),
+        ],
+        value="baz",
+        default="blah",
+    )
+    expected_completed_analysis_resource = CompletedAnalysisResource(
+        id="analysis-id",
+        protocol_id="protocol-id",
+        analyzer_version=_CURRENT_ANALYZER_VERSION,
+        completed_analysis=CompletedAnalysis(
+            id="analysis-id",
+            status=AnalysisStatus.COMPLETED,
+            result=AnalysisResult.OK,
+            robotType="OT-2 Standard",
+            runTimeParameters=[number_param, string_param],
+            labware=[],
+            pipettes=[],
+            modules=[],
+            commands=[],
+            errors=[],
+            liquids=[],
+        ),
+        run_time_parameter_values_and_defaults={
+            "cool_param": RunTimeParameterAnalysisData(value=2.0, default=3.0),
+            "cooler_param": RunTimeParameterAnalysisData(value="baz", default="blah"),
+        },
+    )
+
+    mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)
+    subject = AnalysisStore(sql_engine=sql_engine, completed_store=mock_completed_store)
+    protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
+
+    subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id")
+    await subject.update(
+        analysis_id="analysis-id",
+        robot_type="OT-2 Standard",
+        run_time_parameters=[number_param, string_param],
+        labware=[],
+        pipettes=[],
+        modules=[],
+        commands=[],
+        errors=[],
+        liquids=[],
+    )
+    decoy.verify(
+        await mock_completed_store.add(
+            completed_analysis_resource=expected_completed_analysis_resource
+        )
+    )
 
 
 class AnalysisResultSpec(NamedTuple):
@@ -293,8 +389,55 @@ async def test_update_infers_status_from_errors(
     assert analysis.result == expected_result
 
 
+@pytest.mark.parametrize(
+    argnames=["rtp_values_from_client", "expected_match"],
+    argvalues=[
+        ({"cool_param": 2.0, "cooler_param": "baz", "uncool_param": 5}, True),
+        (
+            {"cool_param": 2, "cooler_param": "baz"},
+            True,
+        ),
+        (
+            {"cool_param": 2, "cooler_param": "buzzzzzzz"},
+            False,
+        ),
+        (
+            {"cool_param": 2.0, "cooler_param": "baz", "weird_param": 5},
+            False,
+        ),
+    ],
+)
 async def test_matching_rtp_values_in_analysis(
-    subject: AnalysisStore,
+    decoy: Decoy,
+    sql_engine: SQLEngine,
     protocol_store: ProtocolStore,
+    rtp_values_from_client: RunTimeParamValuesType,
+    expected_match: bool,
 ) -> None:
-    """It should return whether the provided RTP values match with those in the last analysis of protocol."""
+    """It should return whether the client's RTP values match with those in the last analysis of protocol."""
+    mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)
+    subject = AnalysisStore(sql_engine=sql_engine, completed_store=mock_completed_store)
+    protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
+
+    decoy.when(mock_completed_store.get_ids_by_protocol("protocol-id")).then_return(
+        ["analysis-1", "analysis-2"]
+    )
+    decoy.when(
+        await mock_completed_store.get_rtp_values_and_defaults_by_analysis_id(
+            "analysis-2"
+        )
+    ).then_return(
+        {
+            "cool_param": RunTimeParameterAnalysisData(value=2.0, default=3.0),
+            "cooler_param": RunTimeParameterAnalysisData(
+                value="baz", default="very cool"
+            ),
+            "uncool_param": RunTimeParameterAnalysisData(value=5, default=5),
+        }
+    )
+    assert (
+        await subject.matching_rtp_values_in_last_analysis(
+            "protocol-id", rtp_values_from_client
+        )
+        == expected_match
+    )

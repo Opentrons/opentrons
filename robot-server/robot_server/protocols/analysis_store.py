@@ -95,10 +95,14 @@ class AnalysisStore:
     so they're only kept in-memory, and lost when the store instance is destroyed.
     """
 
-    def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
+    def __init__(
+        self,
+        sql_engine: sqlalchemy.engine.Engine,
+        completed_store: Optional[CompletedAnalysisStore] = None,
+    ) -> None:
         """Initialize the `AnalysisStore`."""
         self._pending_store = _PendingAnalysisStore()
-        self._completed_store = CompletedAnalysisStore(
+        self._completed_store = completed_store or CompletedAnalysisStore(
             sql_engine=sql_engine,
             memory_cache=MemoryCache(_CACHE_MAX_SIZE, str, CompletedAnalysisResource),
             current_analyzer_version=_CURRENT_ANALYZER_VERSION,
@@ -326,6 +330,18 @@ class AnalysisStore:
             rtp_values_and_defaults_in_analysis is not None
         ), "This protocol has no analysis associated with it."
 
+        if not set(rtp_values.keys()).issubset(
+            set(rtp_values_and_defaults_in_analysis.keys())
+        ):
+            # Since the RTP keys in analysis represent all params defined in the protocol,
+            # if the client passes a parameter that's not present in the analysis,
+            # it means that the client is sending incorrect parameters.
+            # We will let this request trigger an analysis using the incorrect params
+            # and have the analysis raise an appropriate error instead of giving an
+            # error response to the protocols request.
+            # This makes the behavior of robot server consistent regardless of whether
+            # the client is sending a protocol for the first time or for the nth time.
+            return False
         for parameter, value_and_default in rtp_values_and_defaults_in_analysis.items():
             if (
                 parameter,
