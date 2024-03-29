@@ -50,6 +50,7 @@ import type {
 import type {
   AddressableArea,
   CoordinateTuple,
+  CutoutFixture,
   DeckDefinition,
   ModuleModel,
 } from './types'
@@ -160,14 +161,27 @@ export function getCutoutFixtureIdsForModuleModel(
   return moduleFixtures ?? []
 }
 
-export function getCutoutIdFromModuleLocation(
-  location: ModuleLocation,
-  deckDef: DeckDefinition
-): CutoutId | null {
+export function getCutoutFixturesForModuleModel(moduleModel: ModuleModel, deckDef: DeckDefinition): CutoutFixture[] {
+  const moduleFixtureIds = getCutoutFixtureIdsForModuleModel(moduleModel)
+  return moduleFixtureIds.reduce<CutoutFixture[]>((acc, id) => {
+    const moduleFixture = deckDef.cutoutFixtures.find(cf => cf.id === id)
+    return moduleFixture != null ? [...acc, moduleFixture] : acc
+  }, [])
+}
+
+export function getCutoutIdsFromModuleSlotName(
+  slotName: string,
+  moduleFixtures: CutoutFixture[],
+): CutoutId[] {
   return (
-    deckDef.locations.cutouts.find(cutout =>
-      cutout.id.includes(location.slotName)
-    )?.id ?? null
+    moduleFixtures.reduce<CutoutId[]>((acc, moduleFixture) => {
+      const anchorCutoutId = moduleFixture.mayMountTo.find(cutoutId => cutoutId.includes(slotName))
+      const newGroupedFixtureIds = moduleFixture.fixtureGroup.filter(fixtureId => fixtureId !== moduleFixture.id)
+      const newGroupedCutoutIds = newGroupedFixtureIds.reduce<CutoutId[]>((innerAcc, fixtureId) => (
+        [...innerAcc, ...(moduleFixtures.find(mf => mf.id === fixtureId)?.mayMountTo ?? [])]
+      ), [])
+      return anchorCutoutId != null ? [...acc, anchorCutoutId, ...newGroupedCutoutIds] : acc
+    }, [])
   )
 }
 
@@ -175,16 +189,15 @@ export function getAddressableAreaNamesFromLoadedModule(
   params: LoadModuleCreateCommand['params'],
   deckDef: DeckDefinition
 ): AddressableAreaName[] {
-  const moduleFixtureIds = getCutoutFixtureIdsForModuleModel(params.model)
-  const cutoutId = getCutoutIdFromModuleLocation(params.location, deckDef)
-  return moduleFixtureIds.reduce<AddressableAreaName[]>(
-    (acc, cutoutFixtureId) => {
-      const cutoutFixture =
-        deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId) ?? null
+  const moduleFixtures = getCutoutFixturesForModuleModel(params.model, deckDef)
+  const cutoutIds = getCutoutIdsFromModuleSlotName(params.location.slotName, moduleFixtures)
+  return moduleFixtures.reduce<AddressableAreaName[]>(
+    (acc, cutoutFixture) => {
       const providedAddressableAreas =
-        cutoutId != null
-          ? cutoutFixture?.providesAddressableAreas[cutoutId] ?? []
-          : []
+        cutoutIds.reduce<AddressableAreaName[]>((innerAcc, cutoutId) => {
+          const newAddressableAreas = cutoutFixture?.providesAddressableAreas[cutoutId] ?? []
+          return [...innerAcc, ...newAddressableAreas]
+        }, [])
       return [...acc, ...providedAddressableAreas]
     },
     []

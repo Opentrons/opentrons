@@ -1,12 +1,9 @@
 import {
   checkModuleCompatibility,
   FLEX_ROBOT_TYPE,
-  getCutoutIdForSlotName,
+  getCutoutFixturesForModuleModel,
+  getCutoutIdsFromModuleSlotName,
   getDeckDefFromRobotType,
-  MAGNETIC_BLOCK_TYPE,
-  SINGLE_SLOT_FIXTURES,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
@@ -66,29 +63,14 @@ export function useModuleRenderInfoForProtocolById(
             ) && !matchedAmod.find(m => m === attachedMod)
         ) ?? null
 
-      const cutoutIdForSlotName = getCutoutIdForSlotName(
-        protocolMod.slotName,
-        deckDef
-      )
-
-      const isMagneticBlockModule =
-        protocolMod.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE
-
-      const isThermocycler =
-        protocolMod.moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
+      const moduleFixtures = getCutoutFixturesForModuleModel(protocolMod.moduleDef.model, deckDef)
+      const moduleCutoutIds = getCutoutIdsFromModuleSlotName(protocolMod.slotName, moduleFixtures)
 
       const conflictedFixture =
         deckConfig?.find(
           fixture =>
-            (fixture.cutoutId === cutoutIdForSlotName ||
-              // special-case A1 for the thermocycler to require a single slot fixture
-              (isThermocycler && fixture.cutoutId === 'cutoutA1')) &&
-            fixture.cutoutFixtureId != null &&
-            // do not generate a conflict for single slot fixtures, because modules are not yet fixtures
-            !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId) &&
-            // special case the magnetic module because unlike other modules it sits in a slot that can also be provided by a staging area fixture
-            (!isMagneticBlockModule ||
-              fixture.cutoutFixtureId !== STAGING_AREA_RIGHT_SLOT_FIXTURE)
+            moduleCutoutIds.includes(fixture.cutoutId) ||
+            fixture.cutoutFixtureId != null
         ) ?? null
 
       if (compatibleAttachedModule !== null) {

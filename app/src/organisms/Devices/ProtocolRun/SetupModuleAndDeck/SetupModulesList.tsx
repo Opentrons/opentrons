@@ -358,6 +358,7 @@ export function ModulesListItem({
           onCloseClick={() => setShowLocationConflictModal(false)}
           cutoutId={cutoutIdForSlotName}
           requiredModule={moduleModel}
+          deckDef={deckDef}
         />
       ) : null}
       {showModuleWizard && attachedModuleMatch != null ? (

@@ -30,6 +30,8 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
+  getCutoutFixtureIdsForModuleModel,
+  getCutoutFixturesForModuleModel,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
@@ -41,11 +43,14 @@ import type {
   CutoutId,
   CutoutFixtureId,
   ModuleModel,
+  DeckDefinition,
 } from '@opentrons/shared-data'
+import { replace } from 'lodash'
 
 interface LocationConflictModalProps {
   onCloseClick: () => void
   cutoutId: CutoutId
+  deckDef: DeckDefinition
   missingLabwareDisplayName?: string | null
   requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
@@ -61,6 +66,7 @@ export const LocationConflictModal = (
     missingLabwareDisplayName,
     requiredFixtureId,
     requiredModule,
+    deckDef,
     isOnDevice = false,
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
@@ -98,28 +104,17 @@ export const LocationConflictModal = (
       )
 
       updateDeckConfiguration(newRequiredFixtureDeckConfig)
-    } else {
-      const isRightCutout = SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
-      const singleSlotFixture = isRightCutout
-        ? SINGLE_RIGHT_SLOT_FIXTURE
-        : SINGLE_LEFT_SLOT_FIXTURE
-
-      const newSingleSlotDeckConfig = deckConfig.map(fixture =>
-        fixture.cutoutId === cutoutId
-          ? { ...fixture, cutoutFixtureId: singleSlotFixture }
+    } else if (requiredModule != null) {
+      const cutoutFixtures = getCutoutFixturesForModuleModel(requiredModule, deckDef)
+      const cutoutIdsToReplace = cutoutFixtures.map(cf => cf.mayMountTo[0])
+      const newDeckConfig = deckConfig.map(fixture => {
+        const replacementFixture = cutoutFixtures.find(cf => cf.mayMountTo[0] === fixture.cutoutId)
+        return cutoutIdsToReplace.includes(fixture.cutoutId) && replacementFixture != null
+          ? { ...fixture, cutoutFixtureId: replacementFixture?.id }
           : fixture
-      )
+      })
 
-      // add A1 and B1 single slot config for thermocycler
-      const newThermocyclerDeckConfig = isThermocycler
-        ? newSingleSlotDeckConfig.map(fixture =>
-            fixture.cutoutId === 'cutoutA1' || fixture.cutoutId === 'cutoutB1'
-              ? { ...fixture, cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE }
-              : fixture
-          )
-        : newSingleSlotDeckConfig
-
-      updateDeckConfiguration(newThermocyclerDeckConfig)
+      updateDeckConfiguration(newDeckConfig)
     }
     onCloseClick()
   }
