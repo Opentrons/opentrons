@@ -105,23 +105,33 @@ class CompletedAnalysisResource:
             cancellable=True,
         )
         rtp_values_and_defaults = await cls.get_run_time_parameter_values_and_defaults(
-            sql_row)
+            sql_row
+        )
         return cls(
             id=id,
             protocol_id=protocol_id,
             analyzer_version=analyzer_version,
             completed_analysis=completed_analysis,
-            run_time_parameter_values_and_defaults=rtp_values_and_defaults
+            run_time_parameter_values_and_defaults=rtp_values_and_defaults,
         )
 
     @classmethod
-    async def get_run_time_parameter_values_and_defaults(cls, sql_row: sqlalchemy.engine.Row) -> Dict[str, RunTimeParameterAnalysisData]:
+    async def get_run_time_parameter_values_and_defaults(
+        cls, sql_row: sqlalchemy.engine.Row
+    ) -> Dict[str, RunTimeParameterAnalysisData]:
+        """Get the run-time parameters used in the analysis with their values & defaults."""
+
         def parse_rtp_dict() -> Dict[str, RunTimeParameterAnalysisData]:
             rtp_contents = sql_row.run_time_parameter_values_and_defaults
-            return parse_raw_as(
-                Dict[str, RunTimeParameterAnalysisData],
-                sql_row.run_time_parameter_values_and_defaults
-            ) if rtp_contents else {}
+            return (
+                parse_raw_as(
+                    Dict[str, RunTimeParameterAnalysisData],
+                    sql_row.run_time_parameter_values_and_defaults,
+                )
+                if rtp_contents
+                else {}
+            )
+
         # In most cases, this parsing should be quite quick but theoretically
         # there could be an unexpectedly large number of run time params.
         # So we delegate the parsing of this to a cancellable thread as well.
@@ -214,9 +224,11 @@ class CompletedAnalysisStore:
         return document
 
     async def get_rtp_values_and_defaults_by_analysis_id(
-            self, analysis_id: str) -> Optional[Dict[str, RunTimeParameterAnalysisData]]:
+        self, analysis_id: str
+    ) -> Optional[Dict[str, RunTimeParameterAnalysisData]]:
         """Return the dictionary of run time parameter values & defaults used in the given analysis.
 
+        If the analysis ID doesn't exist, return None.
         These RTP values are not cached in memory by themselves since we don't anticipate
         that fetching the values from the database to be a time-consuming operation.
         """

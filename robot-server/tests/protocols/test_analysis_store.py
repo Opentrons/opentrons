@@ -291,3 +291,10 @@ async def test_update_infers_status_from_errors(
     analysis = (await subject.get_by_protocol("protocol-id"))[0]
     assert isinstance(analysis, CompletedAnalysis)
     assert analysis.result == expected_result
+
+
+async def test_matching_rtp_values_in_analysis(
+    subject: AnalysisStore,
+    protocol_store: ProtocolStore,
+) -> None:
+    """It should return whether the provided RTP values match with those in the last analysis of protocol."""

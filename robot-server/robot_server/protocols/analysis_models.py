@@ -152,7 +152,9 @@ class CompletedAnalysis(BaseModel):
 
 class RunTimeParameterAnalysisData(NamedTuple):
     """Data from analysis of a run-time parameter."""
+
     value: Union[float, bool, str]
     default: Union[float, bool, str]
+
 
 ProtocolAnalysis = Union[PendingAnalysis, CompletedAnalysis]

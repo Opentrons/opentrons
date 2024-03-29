@@ -19,6 +19,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
     Liquid,
 )
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 
 from .analysis_models import (
     AnalysisSummary,
@@ -27,6 +28,7 @@ from .analysis_models import (
     CompletedAnalysis,
     AnalysisResult,
     AnalysisStatus,
+    RunTimeParameterAnalysisData,
 )
 
 from .completed_analysis_store import CompletedAnalysisStore, CompletedAnalysisResource
@@ -180,6 +182,9 @@ class AnalysisStore:
             protocol_id=protocol_id,
             analyzer_version=_CURRENT_ANALYZER_VERSION,
             completed_analysis=completed_analysis,
+            run_time_parameter_values_and_defaults=self._extract_run_time_param_values_and_defaults(
+                completed_analysis
+            ),
         )
         await self._completed_store.add(
             completed_analysis_resource=completed_analysis_resource
@@ -257,6 +262,77 @@ class AnalysisStore:
             return completed_analyses
         else:
             return completed_analyses + [pending_analysis]
+
+    @staticmethod
+    def _extract_run_time_param_values_and_defaults(
+        completed_analysis: CompletedAnalysis,
+    ) -> Dict[str, RunTimeParameterAnalysisData]:
+        """Extract the Run Time Parameters with current value and default value of each.
+
+        We do this in order to save the RTP data separately, outside the analysis
+        in the database. This saves us from having to de-serialize the entire analysis
+        to read just the RTP values.
+        """
+        rtp_list = completed_analysis.runTimeParameters
+
+        rtp_values_and_defaults = {}
+        for param_spec in rtp_list:
+            rtp_values_and_defaults.update(
+                {
+                    param_spec.variableName: RunTimeParameterAnalysisData(
+                        value=param_spec.value, default=param_spec.default
+                    )
+                }
+            )
+        return rtp_values_and_defaults
+
+    async def matching_rtp_values_in_last_analysis(
+        self, protocol_id: str, rtp_values: RunTimeParamValuesType
+    ) -> bool:
+        """Return whether the last analysis of the given protocol used the mentioned RTP values.
+
+        It is not sufficient to just check the values of provided parameters against the
+        corresponding parameter values in analysis because a previous request could have
+        composed of some extra parameters that are not in the current list.
+
+        Similarly, it is not enough to only compare the current parameter values from
+        the client with the previous values from the client because a previous param
+        might have been assigned a default value by the client while the current request
+        doesn't include that param because it can rely on the API to assign the default
+        value to that param.
+
+        So, we check that the Run Time Parameters in the previous analysis has params
+        with the values provided in the current request, and also verify that rest of the
+        parameters in the analysis use default values.
+        """
+        analyses = self.get_summaries_by_protocol(protocol_id)
+
+        # We only check for matching RTP values if the given protocol ID
+        # (& hence its summary) exists. So this assertion should never be false unless
+        # somehow a protocol resource is created without an analysis record.
+        assert len(analyses) > 0, "This protocol has no analysis associated with it."
+
+        last_analysis = analyses[-1]
+        assert (
+            last_analysis.status != AnalysisStatus.PENDING
+        ), "Protocol must not already have a pending analysis."
+
+        rtp_values_and_defaults_in_analysis = (
+            await self._completed_store.get_rtp_values_and_defaults_by_analysis_id(
+                last_analysis.id
+            )
+        )
+        assert (
+            rtp_values_and_defaults_in_analysis is not None
+        ), "This protocol has no analysis associated with it."
+
+        for parameter, value_and_default in rtp_values_and_defaults_in_analysis.items():
+            if (
+                parameter,
+                value_and_default.value,
+            ) not in rtp_values.items() and value_and_default.value != value_and_default.default:
+                return False
+        return True
 
 
 class _PendingAnalysisStore:

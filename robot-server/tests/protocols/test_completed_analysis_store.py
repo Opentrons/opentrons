@@ -20,7 +20,8 @@ from robot_server.protocols.analysis_memcache import MemoryCache
 from robot_server.protocols.analysis_models import (
     CompletedAnalysis,
     AnalysisResult,
-    AnalysisStatus, RunTimeParameterAnalysisData,
+    AnalysisStatus,
+    RunTimeParameterAnalysisData,
 )
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
@@ -229,7 +230,8 @@ async def test_get_rtp_values_and_defaults_by_analysis_id_prefers_memcache(
         analysis_id="analysis-id",
         protocol_id="protocol-id",
         rtp_values_and_defaults={
-            "abc": RunTimeParameterAnalysisData(value=123, default=234)}
+            "abc": RunTimeParameterAnalysisData(value=123, default=234)
+        },
     )
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
     # When we retrieve a resource via its id we should see it query the cache, and it should
@@ -250,7 +252,8 @@ async def test_get_rtp_values_and_defaults_by_analysis_from_db(
         analysis_id="analysis-id",
         protocol_id="protocol-id",
         rtp_values_and_defaults={
-            "xyz": RunTimeParameterAnalysisData(value=123, default=234)}
+            "xyz": RunTimeParameterAnalysisData(value=123, default=234)
+        },
     )
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
     await subject.add(resource)
