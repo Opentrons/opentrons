@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -13,10 +15,8 @@ import {
 } from '@opentrons/components'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ChildNavigation } from '../ChildNavigation'
-import { Chip } from '../../atoms/Chip'
 import { useToaster } from '../ToasterOven'
 import { mockData } from './index'
-import { formatRunTimeParameterValue } from '../ProtocolDetails/ProtocolParameters/utils'
 
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 

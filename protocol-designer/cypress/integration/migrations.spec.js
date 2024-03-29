@@ -13,7 +13,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
   const testCases = [
     {
-      title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 8.0.x, schema 8',
+      title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 8.1.x, schema 8',
       importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
       expectedExportFixture:
         '../../fixtures/protocol/8/example_1_1_0MigratedToV8.json',
@@ -21,7 +21,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       migrationModal: 'newLabwareDefs',
     },
     {
-      title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 8.0.x, schema 8',
+      title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 8.1.x, schema 8',
       importFixture: '../../fixtures/protocol/4/doItAllV3.json',
       expectedExportFixture:
         '../../fixtures/protocol/8/doItAllV3MigratedToV8.json',
@@ -29,7 +29,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       migrationModal: 'v8',
     },
     {
-      title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 8.0.x, schema 8',
+      title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 8.1.x, schema 8',
       importFixture: '../../fixtures/protocol/4/doItAllV4.json',
       expectedExportFixture:
         '../../fixtures/protocol/8/doItAllV4MigratedToV8.json',
@@ -38,7 +38,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
     },
     {
       title:
-        'doItAll78MigratedToV8 (schema 7, PD version 8.0.0) -> should migrate to 8.0.x, schema 8',
+        'doItAll78MigratedToV8 (schema 7, PD version 8.0.0) -> should migrate to 8.1.x, schema 8',
       importFixture: '../../fixtures/protocol/7/doItAllV7.json',
       expectedExportFixture:
         '../../fixtures/protocol/8/doItAllV7MigratedToV8.json',
@@ -46,7 +46,8 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       migrationModal: 'v8',
     },
     {
-      title: '96-channel full and column schema 8 -> reimported as schema 8',
+      title:
+        '96-channel full and column schema 8 -> should migrate to 8.1.x, schema 8',
       importFixture:
         '../../fixtures/protocol/8/ninetySixChannelFullAndColumn.json',
       expectedExportFixture:
@@ -55,7 +56,8 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       unusedPipettes: false,
     },
     {
-      title: 'doItAllV8 flex robot -> reimported, should not migrate',
+      title:
+        'doItAllV8 flex robot -> reimported, should migrate to 8.1.x, schema 8',
       importFixture: '../../fixtures/protocol/8/doItAllV8.json',
       expectedExportFixture: '../../fixtures/protocol/8/doItAllV8.json',
       migrationModal: null,

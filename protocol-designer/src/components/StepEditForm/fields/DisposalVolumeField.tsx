@@ -44,6 +44,7 @@ interface DisposalVolumeFieldProps {
   volume: string | null
   aspirate_airGap_checkbox?: boolean | null
   aspirate_airGap_volume?: string | null
+  tipRack?: string | null
 }
 
 export const DisposalVolumeField = (
@@ -57,11 +58,13 @@ export const DisposalVolumeField = (
     propsForFields,
     aspirate_airGap_checkbox,
     aspirate_airGap_volume,
+    tipRack,
   } = props
   const { t } = useTranslation(['application', 'form'])
 
   const disposalOptions = useSelector(uiLabwareSelectors.getDisposalOptions)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
+  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const blowoutLocationOptions = getBlowoutLocationOptionsForForm({
     path,
     stepType,
@@ -73,8 +76,10 @@ export const DisposalVolumeField = (
       path,
       pipette,
       volume,
+      tipRack,
     },
-    pipetteEntities
+    pipetteEntities,
+    labwareEntities
   )
   const disposalDestinationOptions = [
     ...disposalOptions,

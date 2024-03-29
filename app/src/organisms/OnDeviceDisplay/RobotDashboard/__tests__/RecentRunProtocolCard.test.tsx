@@ -16,7 +16,7 @@ import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
 import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
-import { useHardwareStatusText } from '../hooks'
+import { useRerunnableStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
 import { useNotifyAllRunsQuery } from '../../../../resources/runs'
 import {
@@ -82,6 +82,14 @@ const mockRunData = {
   status: RUN_STATUS_FAILED,
 } as any
 
+const mockBadRunData = {
+  ...mockRunData,
+  ok: false,
+  dataError: {
+    title: 'Bad run oh no',
+  },
+} as any
+
 const mockCloneRun = vi.fn()
 
 const render = (props: React.ComponentProps<typeof RecentRunProtocolCard>) => {
@@ -109,7 +117,7 @@ describe('RecentRunProtocolCard', () => {
     }
 
     vi.mocked(Skeleton).mockReturnValue(<div>mock Skeleton</div>)
-    vi.mocked(useHardwareStatusText).mockReturnValue('Ready to run')
+    vi.mocked(useRerunnableStatusText).mockReturnValue('Ready to run')
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     vi.mocked(useMissingProtocolHardware).mockReturnValue({
       missingProtocolHardware: [],
@@ -157,7 +165,7 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: [],
     })
-    vi.mocked(useHardwareStatusText).mockReturnValue('Missing 1 pipette')
+    vi.mocked(useRerunnableStatusText).mockReturnValue('Missing 1 pipette')
     render(props)
     screen.getByText('Missing 1 pipette')
   })
@@ -168,7 +176,7 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: ['cutoutD3'],
     })
-    vi.mocked(useHardwareStatusText).mockReturnValue('Location conflicts')
+    vi.mocked(useRerunnableStatusText).mockReturnValue('Location conflicts')
     render(props)
     screen.getByText('Location conflicts')
   })
@@ -179,7 +187,7 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: [],
     })
-    vi.mocked(useHardwareStatusText).mockReturnValue('Missing 1 module')
+    vi.mocked(useRerunnableStatusText).mockReturnValue('Missing 1 module')
     render(props)
     screen.getByText('Missing 1 module')
   })
@@ -190,9 +198,21 @@ describe('RecentRunProtocolCard', () => {
       isLoading: false,
       conflictedSlots: [],
     })
-    vi.mocked(useHardwareStatusText).mockReturnValue('Missing hardware')
+    vi.mocked(useRerunnableStatusText).mockReturnValue('Missing hardware')
     render(props)
     screen.getByText('Missing hardware')
+  })
+
+  it('should render bad protocol chip when the protocol is bad even if hardware matches', () => {
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
+      data: { data: [mockRunData] },
+    } as any)
+    const propsWithBadRun = { runData: mockBadRunData }
+    vi.mocked(useRerunnableStatusText).mockReturnValue(
+      'Run could not be loaded'
+    )
+    render(propsWithBadRun)
+    screen.getByText('Run could not be loaded')
   })
 
   it('when tapping a card, mock functions is called and loading state is activated', () => {

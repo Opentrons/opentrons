@@ -378,7 +378,8 @@ export function ChooseRobotSlideout(
             placeholder={value.toString()}
             value={value}
             title={runtimeParam.displayName}
-            caption={runtimeParam.description}
+            tooltipText={runtimeParam.description}
+            caption={`${runtimeParam.min}-${runtimeParam.max}`}
             id={id}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
@@ -523,10 +524,10 @@ const ENABLED_LINK_CSS = css`
 
 const DISABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
-  color: ${COLORS.grey50};
+  color: ${COLORS.grey40};
   cursor: default;
 
   &:hover {
-    color: ${COLORS.grey50};
+    color: ${COLORS.grey40};
   }
 `

@@ -4,12 +4,9 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { NoParameter } from '../NoParameter'
 import { ProtocolParameters } from '..'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
-
-vi.mock('../NoParameter')
 
 const mockRunTimeParameter: RunTimeParameter[] = [
   {
@@ -87,7 +84,6 @@ describe('ProtocolParameters', () => {
     props = {
       runTimeParameters: mockRunTimeParameter,
     }
-    vi.mocked(NoParameter).mockReturnValue(<div>mock NoParameter</div>)
   })
 
   afterEach(() => {
@@ -131,6 +127,6 @@ describe('ProtocolParameters', () => {
       runTimeParameters: [],
     }
     render(props)
-    screen.getByText('mock NoParameter')
+    screen.getByText('No parameters specified in this protocol')
   })
 })

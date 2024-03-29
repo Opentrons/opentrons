@@ -91,7 +91,8 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           {...propsForFields[addFieldNamePrefix('flowRate')]}
           pipetteId={formData.pipette}
           flowRateType={prefix}
-          volume={propsForFields.volume.value}
+          volume={propsForFields.volume?.value ?? 0}
+          tiprack={propsForFields.tipRack.value}
         />
         <TipPositionField
           {...propsForFields[addFieldNamePrefix('mmFromBottom')]}

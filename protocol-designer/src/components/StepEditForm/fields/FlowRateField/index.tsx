@@ -8,6 +8,7 @@ import { getMatchingTipLiquidSpecs } from '../../../../utils'
 interface OP extends FieldProps {
   flowRateType: FlowRateInputProps['flowRateType']
   volume: unknown
+  tiprack: unknown
   pipetteId?: string | null
   className?: FlowRateInputProps['className']
   label?: FlowRateInputProps['label']
@@ -15,14 +16,21 @@ interface OP extends FieldProps {
 
 // Add a key to force re-constructing component when values change
 export function FlowRateField(props: OP): JSX.Element {
-  const { pipetteId, flowRateType, value, volume, ...passThruProps } = props
+  const {
+    pipetteId,
+    flowRateType,
+    value,
+    volume,
+    tiprack,
+    ...passThruProps
+  } = props
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
   const pipetteDisplayName = pipette ? pipette.spec.displayName : 'pipette'
   const innerKey = `${name}:${String(value || 0)}`
   const matchingTipLiquidSpecs =
     pipette != null
-      ? getMatchingTipLiquidSpecs(pipette, volume as number)
+      ? getMatchingTipLiquidSpecs(pipette, volume as number, tiprack as string)
       : null
 
   let defaultFlowRate

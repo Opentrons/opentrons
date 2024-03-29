@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_96_tiprack_300ul",
         "location": {
@@ -1153,6 +1155,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "usascientific_12_reservoir_22ml",
         "location": {
@@ -1392,6 +1395,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "corning_96_wellplate_360ul_flat",
         "location": {
@@ -2567,6 +2571,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p300_single_gen2"
@@ -2576,6 +2581,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p300_single_gen2"
@@ -2585,6 +2591,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -2610,6 +2617,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 92.86,
         "volume": 20.0,
@@ -2635,6 +2643,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 92.86,
         "volume": 20.0,
@@ -2660,6 +2669,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -2704,7 +2714,7 @@
             "class": "AttributeError",
             "name": "pair_with",
             "obj": "P300 Single-Channel GEN2 on left mount",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 112, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_P300S_Twinning_Error.py\", line 23, in run\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_P300S_Twinning_Error.py\", line 23, in run\n"
           },
           "errorType": "PythonException",
           "wrappedErrors": []

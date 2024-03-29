@@ -256,3 +256,10 @@ export const cannotMoveWithGripper = (): CommandCreatorError => {
     message: 'The gripper cannot move aluminum blocks',
   }
 }
+
+export const noTipSelected = (): CommandCreatorError => {
+  return {
+    type: 'NO_TIP_SELECTED',
+    message: 'No tips were selected for this step',
+  }
+}

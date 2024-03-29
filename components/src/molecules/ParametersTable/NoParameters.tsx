@@ -1,21 +1,16 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  Icon,
-  SPACING,
-  StyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
+import { StyledText } from '../../atoms/StyledText'
+import { Icon } from '../../icons'
+import { Flex } from '../../primitives'
+import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 
-export function NoParameter(): JSX.Element {
-  const { t } = useTranslation('protocol_details')
-
+interface NoParametersProps {
+  t?: any
+}
+export function NoParameters({ t }: NoParametersProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -34,7 +29,9 @@ export function NoParameter(): JSX.Element {
         aria-label="alert"
       />
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {t('no_parameters')}
+        {t != null
+          ? t('no_parameters')
+          : 'No parameters specified in this protocol'}
       </StyledText>
     </Flex>
   )

@@ -72,9 +72,7 @@ class ProtocolAnalyzer:
         await self._analysis_store.update(
             analysis_id=analysis_id,
             robot_type=protocol_resource.source.robot_type,
-            # TODO(spp, 2024-03-12): update this once protocol reader/ runner can parse
-            #  and report the runTimeParameters
-            run_time_parameters=[],
+            run_time_parameters=result.parameters,
             commands=result.commands,
             labware=result.state_summary.labware,
             modules=result.state_summary.modules,

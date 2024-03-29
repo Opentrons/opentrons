@@ -33,15 +33,10 @@ const values = {
     robotType: FLEX_ROBOT_TYPE,
   },
   pipettesByMount: {
-    left: { pipetteName: 'mockPipetteName', tiprackDefURI: 'mocktip' },
+    left: { pipetteName: 'p1000_single_flex', tiprackDefURI: ['mocktip'] },
     right: { pipetteName: null, tiprackDefURI: null },
   } as FormPipettesByMount,
-  modulesByType: {
-    heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-    magneticBlockType: { onDeck: false, model: null, slot: '2' },
-    temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-    thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-  },
+  modules: {},
   additionalEquipment: ['gripper'],
 } as FormState
 
@@ -106,15 +101,10 @@ describe('ModulesAndOtherTile', () => {
         robotType: OT2_ROBOT_TYPE,
       },
       pipettesByMount: {
-        left: { pipetteName: 'p1000_single', tiprackDefURI: 'mocktip' },
+        left: { pipetteName: 'p1000_single', tiprackDefURI: ['mocktip'] },
         right: { pipetteName: null, tiprackDefURI: null },
       } as FormPipettesByMount,
-      modulesByType: {
-        heaterShakerModuleType: { onDeck: false, model: null, slot: '1' },
-        magneticModuleType: { onDeck: false, model: null, slot: '2' },
-        temperatureModuleType: { onDeck: false, model: null, slot: '3' },
-        thermocyclerModuleType: { onDeck: false, model: null, slot: '4' },
-      },
+      modules: {},
     } as FormState
 
     const mockWizardTileProps: Partial<WizardTileProps> = {
