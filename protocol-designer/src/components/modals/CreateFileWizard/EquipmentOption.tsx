@@ -80,13 +80,13 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
   const { t } = useTranslation('tooltip')
   const [targetProps, tooltipProps] = useHoverTooltip()
 
-  let equpimentOptionStyle
+  let equipmentOptionStyle
   if (disabled) {
-    equpimentOptionStyle = EQUIPMENT_OPTION_DISABLED_STYLE
+    equipmentOptionStyle = EQUIPMENT_OPTION_DISABLED_STYLE
   } else if (isSelected) {
-    equpimentOptionStyle = EQUIPMENT_OPTION_SELECTED_STYLE
+    equipmentOptionStyle = EQUIPMENT_OPTION_SELECTED_STYLE
   } else {
-    equpimentOptionStyle = EQUIPMENT_OPTION_STYLE
+    equipmentOptionStyle = EQUIPMENT_OPTION_STYLE
   }
   let iconInfo: JSX.Element | null = null
   if (showCheckbox && !disabled) {
@@ -122,7 +122,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
         onClick={disabled ? undefined : onClick}
         {...styleProps}
         {...targetProps}
-        css={equpimentOptionStyle}
+        css={equipmentOptionStyle}
       >
         {iconInfo}
         <Flex

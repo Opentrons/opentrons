@@ -91,19 +91,19 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
   )
   const hasHeaterShakerSelected =
     modules != null
-      ? Object.values(modules).find(
+      ? Object.values(modules).some(
           module => module.type === HEATERSHAKER_MODULE_TYPE
-        ) != null
+        )
       : false
 
   const leftPipetteSpecs =
     left.pipetteName != null && left.pipetteName !== ''
       ? getPipetteSpecsV2(left.pipetteName as PipetteName)
-      : undefined
+      : null
   const rightPipetteSpecs =
     right.pipetteName != null && right.pipetteName !== ''
       ? getPipetteSpecsV2(right.pipetteName as PipetteName)
-      : undefined
+      : null
 
   const showHeaterShakerPipetteCollisions =
     hasHeaterShakerSelected &&
