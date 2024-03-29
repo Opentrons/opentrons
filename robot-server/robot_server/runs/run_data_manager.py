@@ -142,7 +142,7 @@ class RunDataManager:
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
-        notify_robot_server: Callable,
+        notify_publishers: Callable,
         protocol: Optional[ProtocolResource],
     ) -> Union[Run, BadRun]:
         """Create a new, current run.
@@ -151,7 +151,7 @@ class RunDataManager:
             run_id: Identifier to assign the new run.
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
-            notify_robot_server: Utilized by the engine to notify the robot server of state changes.
+            notify_publishers: Utilized by the engine to notify publishers of state changes.
 
         Returns:
             The run resource.
@@ -173,7 +173,7 @@ class RunDataManager:
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
             protocol=protocol,
-            notify_robot_server=notify_robot_server,
+            notify_publishers=notify_publishers,
         )
         run_resource = self._run_store.insert(
             run_id=run_id,

@@ -1,12 +1,11 @@
-from .initialize import (
-    initialize_notifications,
-)
+from .initialize_notifications import initialize_notifications
+
 from .notification_client import (
     NotificationClient,
     get_notification_client,
     clean_up_notification_client,
 )
-from .publisher_notifier import get_notify_robot_server
+from .publisher_notifier import get_notify_publishers
 from .publishers import (
     MaintenanceRunsPublisher,
     RunsPublisher,
@@ -25,7 +24,7 @@ __all__ = [
     "clean_up_notification_client",
     # for use by FastAPI
     "get_notification_client",
-    "get_notify_robot_server",
+    "get_notify_publishers",
     "get_maintenance_runs_publisher",
     "get_runs_publisher",
 ]

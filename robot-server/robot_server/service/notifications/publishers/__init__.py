@@ -1,3 +1,6 @@
+# TOME: Add a docstring here for publishers. Describe that each router has a publisher, and this manages publishing
+# various flags for the respective topic stem.
+
 from .maintenance_runs_publisher import (
     MaintenanceRunsPublisher,
     get_maintenance_runs_publisher,

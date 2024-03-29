@@ -127,7 +127,7 @@ class MaintenanceEngineStore:
         run_id: str,
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
-        notify_robot_server: Callable,
+        notify_publishers: Callable,
         deck_configuration: Optional[DeckConfigurationType] = [],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
@@ -136,7 +136,7 @@ class MaintenanceEngineStore:
             run_id: The run resource the engine is assigned to.
             created_at: Run creation datetime
             labware_offsets: Labware offsets to create the engine with.
-            notify_robot_server: Utilized by the engine to notify the robot server of state changes.
+            notify_publishers: Utilized by the engine to notify publishers of state changes.
 
         Returns:
             The initial equipment and status summary of the engine.
@@ -156,7 +156,7 @@ class MaintenanceEngineStore:
                 ),
             ),
             deck_configuration=deck_configuration,
-            notify_robot_server=notify_robot_server,
+            notify_publishers=notify_publishers,
         )
 
         # Using LiveRunner as the runner to allow for future refactor of maintenance runs

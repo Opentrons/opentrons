@@ -45,7 +45,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
-from service.notifications import get_notify_robot_server
+from robot_server.service.notifications import get_notify_publishers
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
@@ -144,7 +144,7 @@ async def create_run(
     deck_configuration_store: DeckConfigurationStore = Depends(
         get_deck_configuration_store
     ),
-    notify_robot_server: Callable = Depends(get_notify_robot_server),
+    notify_publishers: Callable = Depends(get_notify_publishers),
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
 
@@ -158,7 +158,7 @@ async def create_run(
             the new run.
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
-        notify_robot_server: Utilized by the engine to notify the robot server of state changes.
+        notify_publishers: Utilized by the engine to notify publishers of state changes.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []
@@ -186,7 +186,7 @@ async def create_run(
             labware_offsets=offsets,
             deck_configuration=deck_configuration,
             protocol=protocol_resource,
-            notify_robot_server=notify_robot_server,
+            notify_publishers=notify_publishers,
         )
     except EngineConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e

@@ -39,7 +39,7 @@ from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
-from service.notifications import get_notify_robot_server
+from robot_server.service.notifications import get_notify_publishers
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
@@ -156,7 +156,7 @@ async def create_run(
     deck_configuration_store: DeckConfigurationStore = Depends(
         get_deck_configuration_store
     ),
-    notify_robot_server: Callable = Depends(get_notify_robot_server),
+    notify_publishers: Callable = Depends(get_notify_publishers),
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
     """Create a new maintenance run.
 
@@ -168,7 +168,7 @@ async def create_run(
         is_ok_to_create_maintenance_run: Verify if a maintenance run may be created if a protocol run exists.
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
-        notify_robot_server: Utilized by the engine to notify the robot server of state changes.
+        notify_publishers: Utilized by the engine to notify publishers of state changes.
     """
     if not is_ok_to_create_maintenance_run:
         raise ProtocolRunIsActive(
@@ -183,7 +183,7 @@ async def create_run(
         created_at=created_at,
         labware_offsets=offsets,
         deck_configuration=deck_configuration,
-        notify_robot_server=notify_robot_server,
+        notify_publishers=notify_publishers,
     )
 
     log.info(f'Created an empty run "{run_id}"".')
