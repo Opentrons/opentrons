@@ -130,6 +130,62 @@ This code will load as few as 3 tip racks and as many as 7, and associate them w
 Loading Liquids
 ===============
 
+Next come the reagents, samples, and the labware that holds them.
+
+The required volume of each reagent is dependent on the sample count. While the full protocol defines more than ten liquids, we'll show three reagents plus the samples here.
+
+First, let's load a reservoir and :ref:`define <defining-liquids>` the three example liquids. Definitions only specify the name, description, and display color, so our sample count parameter doesn't come into play yet::
+
+    # labware to hold reagents
+    reservoir = protocol.load_labware(
+        load_name="nest_96_wellplate_2ml_deep", location="C2"
+    )
+
+    # reagent liquid definitions
+    ampure_liquid = protocol.define_liquid(
+        name="AMPure", description="AMPure Beads", display_color="#704848"
+    )
+    tagstop_liquid = protocol.define_liquid(
+        name="TAGSTOP", description="Tagmentation Stop", display_color="#FF0000"
+    )
+    twb_liquid = protocol.define_liquid(
+        name="TWB", description="Tagmentation Wash Buffer", display_color="#FFA000"
+    )
+
+Now we'll bring sample count into consideration as we :ref:`load the liquids <loading-liquids>`. The application requires the following volumes for each column of samples:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Liquid
+      - Volume
+        (µL per column)
+    * - AMPure Beads
+      - 180
+    * - Tagmentation Stop
+      - 10
+    * - Tagmentation Wash Buffer
+      - 900
+
+To calculate the total volume for each liquid, we'll multiply these numbers by ``column_count`` and by 1.1 (to ensure that the pipette can aspirate the required volume without drawing in air at the bottom of the well). This calculation can be done inline as the ``volume`` value of :py:meth:`.load_liquid`::
+
+    reservoir["A1"].load_liquid(
+        liquid=ampure_liquid, volume=180 * column_count * 1.1
+    )
+    reservoir["A2"].load_liquid(
+        liquid=tagstop_liquid, volume=10 * column_count * 1.1
+    )
+    reservoir["A4"].load_liquid(
+        liquid=twb_liquid, volume=900 * column_count * 1.1
+    )
+
+Now, for example, the volume of AMPure beads to load will vary from 198 µL for a single sample column up to 792 µL for four columns.
+
+.. tip::
+
+    Does telling a technician to load 792 µL of a liquid seem overly precise? Remember that you can perform any calculation you like to set the value of ``volume``! For example, you could round the AMPure volume up to the nearest 10 µL::
+
+        volume=ceil((180 * column_count * 1.1) / 10) * 10
 
 Processing Samples
 ==================
