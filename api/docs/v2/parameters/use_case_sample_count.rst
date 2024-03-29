@@ -196,7 +196,7 @@ Finally, it's good practice to label the wells where the samples reside. The sam
     )
     hs_adapter = hs_mod.load_adapter(name="opentrons_96_pcr_adapter")
     sample_plate = hs_adapter.load_labware(
-        name="armadillo_96_wellplate_200ul_pcr_full_skirt",
+        name="opentrons_96_wellplate_200ul_pcr_full_skirt",
         label="Sample Plate",
     )
 
@@ -213,4 +213,29 @@ Now we can construct a ``for`` loop to label each sample well with ``load_liquid
 
 Processing Samples
 ==================
+
+When it comes time to process the samples we'll return to working by column, since the protocol uses an 8-channel pipette. There are many pipetting steps in the full protocol, but this section will examine just the steps for adding the Tagmentation Stop liquid. The same techniques would apply to similar steps.
+
+For pipetting in the original sample locations, we'll command the 50 µL pipette to move to some or all of A1–A4 on the sample plate. Similar to when we loaded tip racks earlier, we can use ``column_count`` to slice a list containing these well names, and then iterate over that list with a ``for`` loop::
+
+    for w in ["A1", "A2", "A3", "A4"][:column_count]:
+        pipette50.pick_up_tip()
+        pipette50.aspirate(volume=13, location=reservoir["A2"].bottom())
+        pipette50.dispense(volume=3, location=reservoir["A2"].bottom())
+        pipette50.dispense(volume=10, location=sample_plate[w].bottom())
+        pipette50.move_to(location=sample_plate[w].bottom())
+        pipette50.mix(repetitions=10, volume=20)
+        pipette50.blow_out(location=sample_plate[w].top(z=-2))
+        pipette50.drop_tip()
+
+Each time through the loop, the pipette will fill from the same well of the reservoir and then dispense (and mix and blow out) in a different column of the sample plate.
+
+Later steps of the protocol will move intermediate samples to the middle of the plate (columns 5–8) and final samples to the right side of the plate (columns 9–12). When moving directly from one set of columns to another, we have to track *both lists* with the ``for`` loop. The :py:func:`zip` function lets us pair up the lists of well names and step through them in parallel::
+
+    for s, d in zip(
+        ["A1", "A2", "A3", "A4"][:column_count],
+        ["A5", "A6", "A7", "A8"][:column_count],
+    ):
+        pipette50.aspirate(volume=13, location=sample_plate[s])
+        pipette50.dispense(volume=13, location=sample_plate[d])
 
