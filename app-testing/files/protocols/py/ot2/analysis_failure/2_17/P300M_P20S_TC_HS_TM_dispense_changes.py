@@ -68,9 +68,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_right.dispense(volume=0.0, location=res_2.wells_by_name()["A1"])
 
     # everything less than or equal protocol api version 2.15 should dispense everything
-    # in the pipette when you pass 0.0 as the volume. Since this is 2.16, the dispense should not change the volume
+    # in the pipette when you pass 0.0 as the volume. Since this is 2.17, the dispense should not change the volume
     assert pipette_right.current_volume == 20.0
 
     # In protocol api versions 2.16 and lower, if you pass a volume greater than the current volume, the dispense should clamp
     # to the current volume. In versions greater than 2.16, if you pass a volume greater than the current volume, an error should be thrown
+    # Because this is 2.17, an error should be thrown
     pipette_right.dispense(volume=21, location=res_2.wells_by_name()["A1"])
