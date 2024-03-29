@@ -138,7 +138,7 @@ First, let's load a reservoir and :ref:`define <defining-liquids>` the three exa
 
     # labware to hold reagents
     reservoir = protocol.load_labware(
-        load_name="nest_96_wellplate_2ml_deep", location="C2"
+        load_name="nest_12_reservoir_15ml", location="C2"
     )
 
     # reagent liquid definitions
@@ -158,8 +158,8 @@ Now we'll bring sample count into consideration as we :ref:`load the liquids <lo
     :header-rows: 1
 
     * - Liquid
-      - Volume
-        (µL per column)
+      - | Volume
+        | (µL per column)
     * - AMPure Beads
       - 180
     * - Tagmentation Stop
@@ -187,5 +187,30 @@ Now, for example, the volume of AMPure beads to load will vary from 198 µL for 
 
         volume=ceil((180 * column_count * 1.1) / 10) * 10
 
+Finally, it's good practice to label the wells where the samples reside. The sample plate starts out atop the Heater-Shaker Module:
+
+.. code-block::
+
+    hs_mod = protocol.load_module(
+        module_name="heaterShakerModuleV1", location="D1"
+    )
+    hs_adapter = hs_mod.load_adapter(name="opentrons_96_pcr_adapter")
+    sample_plate = hs_adapter.load_labware(
+        name="armadillo_96_wellplate_200ul_pcr_full_skirt",
+        label="Sample Plate",
+    )
+
+Now we can construct a ``for`` loop to label each sample well with ``load_liquid()``. The simplest way to do this is to combine our original *sample count* with the fact that the :py:meth:`.Labware.wells()` accessor returns wells top-to-bottom, left-to-right::
+
+    # define sample liquid
+    sample_liquid = protocol.define_liquid(
+        name="Samples", description=None, display_color="#52AAFF"
+    )
+
+    # load 40 µL in each sample well
+    for w in range(protocol.params.sample_count):
+        sample_plate.wells()[w].load_liquid(liquid=sample_liquid, volume=40)
+
 Processing Samples
 ==================
+
