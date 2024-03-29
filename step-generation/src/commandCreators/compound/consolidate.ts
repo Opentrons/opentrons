@@ -496,8 +496,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ...dispenseCommands,
         ...delayAfterDispenseCommands,
         ...mixAfterCommands,
-        ...touchTipAfterDispenseCommands,
         ...blowoutCommand,
+        ...touchTipAfterDispenseCommands,
         ...airGapAfterDispenseCommands,
         ...dropTipAfterDispenseAirGap,
       ]
