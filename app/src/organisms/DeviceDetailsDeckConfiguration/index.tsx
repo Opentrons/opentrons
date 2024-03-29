@@ -249,12 +249,12 @@ export function DeviceDetailsDeckConfiguration({
                 width="32rem"
               >
                 <Flex
-                  gridGap={SPACING.spacing32}
                   paddingLeft={SPACING.spacing8}
+                  gridGap={SPACING.spacing8}
                   css={TYPOGRAPHY.labelSemiBold}
                 >
-                  <StyledText>{t('location')}</StyledText>
-                  <StyledText>{t('fixture')}</StyledText>
+                  <StyledText flex="1 0 30px">{t('location')}</StyledText>
+                  <StyledText flex="9 1 0">{t('fixture')}</StyledText>
                 </Flex>
                 {fixtureDisplayList.length > 0 ? (
                   fixtureDisplayList.map(({ displayLocation, displayName }) => (
@@ -262,13 +262,13 @@ export function DeviceDetailsDeckConfiguration({
                       key={displayLocation}
                       backgroundColor={COLORS.grey20}
                       borderRadius={BORDERS.borderRadius4}
-                      gridGap={SPACING.spacing60}
+                      gridGap={SPACING.spacing8}
                       padding={SPACING.spacing8}
                       width="100%"
                       css={TYPOGRAPHY.labelRegular}
                     >
-                      <StyledText>{displayLocation}</StyledText>
-                      <StyledText>{displayName}</StyledText>
+                      <StyledText flex="1 0 30px">{displayLocation}</StyledText>
+                      <StyledText flex="9 1 0">{displayName}</StyledText>
                     </Flex>
                   ))
                 ) : (
