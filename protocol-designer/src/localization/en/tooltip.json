@@ -5,6 +5,7 @@
   "disabled_off_deck": "Off-deck labware cannot be modified unless on starting deck state.",
   "disabled_step_creation": "New steps cannot be added in Batch Edit mode.",
   "disabled_no_space_additional_items": "No space for this combination of staging area slots and modules.",
+  "disabled_you_can_add_one_type": "Only one module of each type is allowed on the deck at a time",
   "not_in_beta": "ⓘ Coming Soon",
 
   "step_description": {
