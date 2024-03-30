@@ -223,14 +223,16 @@ async def create_protocol(
         #  so we can validate the data contents and return a better error response.
         parsed_rtp = json.loads(run_time_parameter_values)
     else:
-        parsed_rtp = None
+        parsed_rtp = {}
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
     if cached_protocol_id is not None:
         # Protocol exists in database
         resource = protocol_store.get(protocol_id=cached_protocol_id)
-        if parsed_rtp:
+        if not await analysis_store.matching_rtp_values_in_last_analysis(
+            cached_protocol_id, parsed_rtp
+        ):
             # This protocol exists in database but needs to be re-analyzed with the
             # passed-in RTP overrides
             task_runner.run(
@@ -243,6 +245,8 @@ async def create_protocol(
                 protocol_id=cached_protocol_id,
                 analysis_id=analysis_id,
             )
+
+        # The last analysis in this list of analyses is relevant to this request
         analyses = analysis_store.get_summaries_by_protocol(
             protocol_id=cached_protocol_id
         )
