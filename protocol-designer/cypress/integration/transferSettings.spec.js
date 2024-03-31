@@ -68,8 +68,12 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('input[name="aspirate_mix_checkbox"]').should('be.disabled')
 
     // TipPosition Aspirate and Dispense should be disabled
-    cy.get('[id=TipPositionIcon_aspirate_mmFromBottom]').should('not.be.enabled')
-    cy.get('[id=TipPositionIcon_dispense_mmFromBottom]').should('not.be.enabled')
+    cy.get('[id=TipPositionIcon_aspirate_mmFromBottom]').should(
+      'not.be.enabled'
+    )
+    cy.get('[id=TipPositionIcon_dispense_mmFromBottom]').should(
+      'not.be.enabled'
+    )
 
     // Dispense Flowrate and mix disabled
     cy.get('input[name="dispense_flowRate"]').should('be.disabled')
@@ -108,8 +112,12 @@ describe('Advanced Settings for Transfer Form', () => {
       .should('be.empty')
 
     // TipPosition Aspirate and Dispense should be enabled
-    cy.get('[id=TipPositionIcon_aspirate_mmFromBottom]').should('not.be.disabled')
-    cy.get('[id=TipPositionIcon_dispense_mmFromBottom]').should('not.be.disabled')
+    cy.get('[id=TipPositionIcon_aspirate_mmFromBottom]').should(
+      'not.be.disabled'
+    )
+    cy.get('[id=TipPositionIcon_dispense_mmFromBottom]').should(
+      'not.be.disabled'
+    )
 
     // Delay in aspirate and Dispense settings is enabled
     cy.get('input[name="aspirate_delay_checkbox"]').should('be.enabled')
