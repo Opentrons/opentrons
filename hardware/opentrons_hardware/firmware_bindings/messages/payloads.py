@@ -665,7 +665,7 @@ class GetHepaFanStatePayloadResponse(EmptyPayload):
 
     duty_cycle: utils.UInt32Field
     fan_on: utils.UInt8Field
-    fan_rpm: utils.UInt32Field
+    fan_rpm: utils.UInt16Field
 
 
 @dataclass(eq=False)
