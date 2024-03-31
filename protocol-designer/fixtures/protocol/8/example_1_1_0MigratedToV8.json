@@ -128,6 +128,10 @@
           "dispense_delay_mmFromBottom": "0.5",
           "dropTip_location": "a1a3a3ee-84f5-44f2-b6c5-015be69c0208:trashBin",
           "nozzles": null,
+          "dispense_x_position": 0,
+          "dispense_y_position": 0,
+          "aspirate_x_position": 0,
+          "aspirate_y_position": 0,
           "id": "e7d36200-92a5-11e9-ac62-1b173f839d9e",
           "stepType": "moveLiquid",
           "stepName": "transfer things",
@@ -156,6 +160,8 @@
           "dropTip_location": "a1a3a3ee-84f5-44f2-b6c5-015be69c0208:trashBin",
           "nozzles": null,
           "tipRack": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
+          "mix_x_position": 0,
+          "mix_y_position": 0,
           "id": "18113c80-92a6-11e9-ac62-1b173f839d9e",
           "stepType": "mix",
           "stepName": "mix",
@@ -3430,7 +3436,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3442,7 +3451,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3454,7 +3466,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3466,7 +3481,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3478,7 +3496,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3490,7 +3511,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3502,7 +3526,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3524,7 +3551,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3536,7 +3566,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3548,7 +3581,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3560,7 +3596,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3572,7 +3611,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3635,7 +3677,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3647,7 +3692,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3659,7 +3707,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3671,7 +3722,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3683,7 +3737,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3695,7 +3752,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3707,7 +3767,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3729,7 +3792,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3741,7 +3807,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3753,7 +3822,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3765,7 +3837,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3777,7 +3852,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3840,7 +3918,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3852,7 +3933,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3864,7 +3948,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3876,7 +3963,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3888,7 +3978,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3900,7 +3993,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3912,7 +4008,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3934,7 +4033,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3946,7 +4048,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3958,7 +4063,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -3970,7 +4078,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -3982,7 +4093,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C8",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4045,7 +4159,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4057,7 +4174,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4069,7 +4189,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4081,7 +4204,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4093,7 +4219,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4105,7 +4234,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4117,7 +4249,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4139,7 +4274,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4151,7 +4289,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4163,7 +4304,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4175,7 +4319,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4187,7 +4334,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4250,7 +4400,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4262,7 +4415,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4274,7 +4430,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4286,7 +4445,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4298,7 +4460,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4310,7 +4475,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4322,7 +4490,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4344,7 +4515,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4356,7 +4530,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4368,7 +4545,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4380,7 +4560,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4392,7 +4575,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4455,7 +4641,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4467,7 +4656,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4479,7 +4671,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4491,7 +4686,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4503,7 +4701,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4515,7 +4716,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4527,7 +4731,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4549,7 +4756,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4561,7 +4771,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4573,7 +4786,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4585,7 +4801,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4597,7 +4816,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C7",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4660,7 +4882,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4672,7 +4897,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4684,7 +4912,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4696,7 +4927,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4708,7 +4942,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4720,7 +4957,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4732,7 +4972,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4754,7 +4997,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4766,7 +5012,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4778,7 +5027,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4790,7 +5042,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4802,7 +5057,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "E6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4865,7 +5123,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4877,7 +5138,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4889,7 +5153,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4901,7 +5168,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4913,7 +5183,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4925,7 +5198,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4937,7 +5213,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4959,7 +5238,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4971,7 +5253,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -4983,7 +5268,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -4995,7 +5283,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -5007,7 +5298,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "D6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -5070,7 +5364,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -5082,7 +5379,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -5094,7 +5394,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -5106,7 +5409,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -5118,7 +5424,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -5130,7 +5439,10 @@
         "volume": 2,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -5142,7 +5454,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 1 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 1, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -5164,7 +5479,10 @@
         "volume": 6,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -5176,7 +5494,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -5188,7 +5509,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -5200,7 +5524,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 0.6
       }
     },
@@ -5212,7 +5539,10 @@
         "volume": 3,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "C6",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 2.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 2.5, "x": 0, "y": 0 }
+        },
         "flowRate": 10
       }
     },
@@ -5275,7 +5605,10 @@
         "volume": 5.5,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "F1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
+        },
         "flowRate": 8
       }
     },
@@ -5287,7 +5620,10 @@
         "volume": 5.5,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "F1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
+        },
         "flowRate": 7
       }
     },
@@ -5299,7 +5635,10 @@
         "volume": 5.5,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "F1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
+        },
         "flowRate": 8
       }
     },
@@ -5311,7 +5650,10 @@
         "volume": 5.5,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "F1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
+        },
         "flowRate": 7
       }
     },
@@ -5323,7 +5665,10 @@
         "volume": 5.5,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "F1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
+        },
         "flowRate": 8
       }
     },
@@ -5335,7 +5680,10 @@
         "volume": 5.5,
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "F1",
-        "wellLocation": { "origin": "bottom", "offset": { "z": 0.5 } },
+        "wellLocation": {
+          "origin": "bottom",
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
+        },
         "flowRate": 7
       }
     },

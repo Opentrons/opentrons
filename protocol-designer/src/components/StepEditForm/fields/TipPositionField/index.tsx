@@ -156,6 +156,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
       />
     )
   }
+  console.log('disabled', disabled)
 
   return (
     <>
@@ -168,7 +169,11 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
         isDelayPositionField={isDelayPositionField}
       >
         {yField != null && xField != null ? (
-          <Flex onClick={handleOpen} width="5rem">
+          <Flex
+            onClick={disabled != null ? handleOpen : undefined}
+            id={`TipPositionIcon_${zName}`}
+            width="5rem"
+          >
             <Icon
               name="ot-calibrate"
               className={styles.tip_position_icon}

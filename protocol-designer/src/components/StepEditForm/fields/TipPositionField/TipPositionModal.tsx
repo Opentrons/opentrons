@@ -58,7 +58,6 @@ export const TipPositionModal = (
 
   if (zSpec == null || xSpec == null || ySpec == null) {
     console.error('expected to find specs for the zPosition but could not')
-    return null
   }
 
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
@@ -67,13 +66,13 @@ export const TipPositionModal = (
   })
 
   const [zValue, setZValue] = React.useState<string | null>(
-    zSpec.value === null ? null : String(zSpec?.value)
+    zSpec?.value == null ? null : String(zSpec?.value)
   )
   const [yValue, setYValue] = React.useState<string | null>(
-    ySpec.value === null ? null : String(ySpec?.value)
+    ySpec?.value == null ? null : String(ySpec?.value)
   )
   const [xValue, setXValue] = React.useState<string | null>(
-    xSpec.value === null ? null : String(xSpec?.value)
+    xSpec?.value == null ? null : String(xSpec?.value)
   )
 
   const [isDefault, setIsDefault] = React.useState<boolean>(
@@ -164,13 +163,13 @@ export const TipPositionModal = (
 
     if (!hasErrors) {
       if (isDefault) {
-        zSpec.updateValue(null)
-        xSpec.updateValue(0)
-        ySpec.updateValue(0)
+        zSpec?.updateValue(null)
+        xSpec?.updateValue(0)
+        ySpec?.updateValue(0)
       } else {
-        zSpec.updateValue(zValue === null ? null : Number(zValue))
-        xSpec.updateValue(xValue === null ? null : Number(xValue))
-        ySpec.updateValue(yValue === null ? null : Number(yValue))
+        zSpec?.updateValue(zValue === null ? null : Number(zValue))
+        xSpec?.updateValue(xValue === null ? null : Number(xValue))
+        ySpec?.updateValue(yValue === null ? null : Number(yValue))
       }
       closeModal()
     }
@@ -289,7 +288,7 @@ export const TipPositionModal = (
   ) : null
 
   // Mix Form's asp/disp tip position field has different default value text
-  const isMixAspDispField = zSpec.name === 'mix_mmFromBottom'
+  const isMixAspDispField = zSpec?.name === 'mix_mmFromBottom'
 
   return createPortal(
     <AlertModal
@@ -308,7 +307,7 @@ export const TipPositionModal = (
     >
       <div className={styles.modal_header}>
         <h4>{t('tip_position.title')}</h4>
-        <p>{t(`tip_position.body.${zSpec.name}`)}</p>
+        <p>{t(`tip_position.body.${zSpec?.name}`)}</p>
       </div>
       <div className={styles.main_row}>
         <Flex alignItems="flex-start">

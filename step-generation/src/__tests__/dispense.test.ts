@@ -25,7 +25,6 @@ import {
   dispense,
 } from '../commandCreators/atomic/dispense'
 import type { InvariantContext, RobotState } from '../types'
-import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 
 vi.mock('../utils/thermocyclerPipetteCollision')
 vi.mock('../utils/heaterShakerCollision')
