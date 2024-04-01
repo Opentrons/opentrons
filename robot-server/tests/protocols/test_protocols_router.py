@@ -513,7 +513,7 @@ async def test_create_protocol(
             protocol_analyzer.analyze,
             analysis_id="analysis-id",
             protocol_resource=protocol_resource,
-            run_time_param_values=None,
+            run_time_param_values={},
         ),
     )
 

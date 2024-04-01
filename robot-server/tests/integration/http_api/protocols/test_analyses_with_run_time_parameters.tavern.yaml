@@ -128,7 +128,7 @@ stages:
 
   - name: Check that the new analysis uses run time parameter values from client; retry until analysis is completed
     max_retries: 5
-    delay_after: 2
+    delay_after: 1
     request:
       url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id2}'
     response:
