@@ -414,10 +414,6 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
         )
-        # FIX BEFORE MERGE?: If the pickUpTip fails, the tip tracker (which is sort of
-        # kind of in Protocol Engine) doesn't think the tip has been consumed. So,
-        # the next PAPI pick_up_tip() after the error recovery will try to pick up
-        # the same tip, diverging from the protocol's analysis.
 
         # FIX BEFORE MERGE: We should probably only set_last_location() if the
         # pickUpTip succeeded.

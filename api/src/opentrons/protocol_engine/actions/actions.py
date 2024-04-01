@@ -154,11 +154,28 @@ class FailCommandAction:
     """
 
     command_id: str
+    """The command to fail."""
+
     error_id: str
+    """An ID to assign to the command's error.
+
+    Must be unique to this occurrence of the error.
+    """
+
     failed_at: datetime
+    """When the command failed."""
+
     error: EnumeratedError
+    """The underlying exception that caused this command to fail."""
+
     notes: List[CommandNote]
+    """Overwrite the command's `.notes` with these."""
+
     type: ErrorRecoveryType
+    """How this error should be handled in the context of the overall run."""
+
+    running_command: Command
+    """The command to fail, in its prior `running` state."""
 
 
 @dataclass(frozen=True)

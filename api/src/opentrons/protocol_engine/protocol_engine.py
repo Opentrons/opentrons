@@ -286,6 +286,7 @@ class ProtocolEngine:
             self._state_store.commands.get_running_command_id()
             or self._state_store.commands.state.queued_command_ids.head(None)
         )
+        # FIX BEFORE MERGE
 
         if current_id is not None:
             fail_action = FailCommandAction(

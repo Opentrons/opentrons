@@ -7,11 +7,13 @@ from .abstract_store import HasState, HandlesActions
 from ..actions import (
     Action,
     SucceedCommandAction,
+    FailCommandAction,
     ResetTipsAction,
 )
 from ..commands import (
     Command,
     LoadLabwareResult,
+    PickUpTip,
     PickUpTipResult,
     DropTipResult,
     DropTipInPlaceResult,
@@ -20,6 +22,7 @@ from ..commands.configuring_common import (
     PipetteConfigUpdateResultMixin,
     PipetteNozzleLayoutResultMixin,
 )
+from ..error_recovery_policy import ErrorRecoveryType
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
@@ -71,7 +74,7 @@ class TipStore(HasState[TipState], HandlesActions):
                 self._state.channels_by_pipette_id[pipette_id] = config.channels
                 self._state.active_channels_by_pipette_id[pipette_id] = config.channels
                 self._state.nozzle_map_by_pipette_id[pipette_id] = config.nozzle_map
-            self._handle_command(action.command)
+            self._handle_succeeded_command(action.command)
 
             if isinstance(action.private_result, PipetteNozzleLayoutResultMixin):
                 pipette_id = action.private_result.pipette_id
@@ -86,6 +89,9 @@ class TipStore(HasState[TipState], HandlesActions):
                         pipette_id
                     ] = self._state.channels_by_pipette_id[pipette_id]
 
+        elif isinstance(action, FailCommandAction):
+            self._handle_failed_command(action)
+
         elif isinstance(action, ResetTipsAction):
             labware_id = action.labware_id
 
@@ -94,7 +100,7 @@ class TipStore(HasState[TipState], HandlesActions):
                     well_name
                 ] = TipRackWellState.CLEAN
 
-    def _handle_command(self, command: Command) -> None:
+    def _handle_succeeded_command(self, command: Command) -> None:
         if (
             isinstance(command.result, LoadLabwareResult)
             and command.result.definition.parameters.isTiprack
@@ -123,6 +129,33 @@ class TipStore(HasState[TipState], HandlesActions):
         elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
             pipette_id = command.params.pipetteId
             self._state.length_by_pipette_id.pop(pipette_id, None)
+
+    def _handle_failed_command(
+        self,
+        action: FailCommandAction,
+    ) -> None:
+        # If a pickUpTip command fails recoverably, mark the tips as used. This way,
+        # when the protocol is resumed and the Python Protocol API calls
+        # `get_next_tip()`, we'll move on to other tips as expected.
+        #
+        # We don't attempt this for nonrecoverable errors because maybe the failure
+        # was due to a bad labware ID or well name.
+        if (
+            isinstance(action.running_command, PickUpTip)
+            and action.type != ErrorRecoveryType.FAIL_RUN
+        ):
+            self._set_used_tips(
+                pipette_id=action.running_command.params.pipetteId,
+                labware_id=action.running_command.params.labwareId,
+                well_name=action.running_command.params.wellName,
+            )
+            # TODO(mm, 2024-04-01): We're logically removing the tip from the tip rack,
+            # but we're not logically updating the pipette to have that tip on it,
+            # which is inconsistent and confusing.
+            #
+            # To fix that, we need the tip length. But that traditionally comes to us
+            # through the command result, which we don't have if the command failed. We
+            # may need to expand failed commands to have a private result.
 
     def _set_used_tips(  # noqa: C901
         self, pipette_id: str, well_name: str, labware_id: str
