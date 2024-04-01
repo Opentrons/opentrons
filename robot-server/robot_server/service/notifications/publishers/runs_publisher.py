@@ -10,8 +10,7 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
-from ..notification_client import NotificationClient
-from .. import get_notification_client
+from ..notification_client import NotificationClient, get_notification_client
 from ..topics import Topics
 
 

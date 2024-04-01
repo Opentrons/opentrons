@@ -27,6 +27,11 @@ from robot_server.runs.engine_store import (
 )
 
 
+def mock_notify_publishers() -> None:
+    """A mock notify_publishers."""
+    return None
+
+
 @pytest.fixture
 def subject(decoy: Decoy, hardware_api: HardwareControlAPI) -> EngineStore:
     """Get a EngineStore test subject."""
@@ -55,7 +60,7 @@ async def test_create_engine(subject: EngineStore) -> None:
         labware_offsets=[],
         protocol=None,
         deck_configuration=[],
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert subject.current_run_id == "run-id"
@@ -86,7 +91,7 @@ async def test_create_engine_with_protocol(
         labware_offsets=[],
         deck_configuration=[],
         protocol=protocol,
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
@@ -112,7 +117,7 @@ async def test_create_engine_uses_robot_type(
         labware_offsets=[],
         deck_configuration=[],
         protocol=None,
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert subject.engine.state_view.config.robot_type == robot_type
@@ -131,7 +136,7 @@ async def test_create_engine_with_labware_offsets(subject: EngineStore) -> None:
         labware_offsets=[labware_offset],
         deck_configuration=[],
         protocol=None,
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result.labwareOffsets == [
@@ -152,7 +157,7 @@ async def test_archives_state_if_engine_already_exists(subject: EngineStore) -> 
         labware_offsets=[],
         deck_configuration=[],
         protocol=None,
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
 
     with pytest.raises(EngineConflictError):
@@ -161,7 +166,7 @@ async def test_archives_state_if_engine_already_exists(subject: EngineStore) -> 
             labware_offsets=[],
             deck_configuration=[],
             protocol=None,
-            notify_publishers=lambda: None,
+            notify_publishers=mock_notify_publishers,
         )
 
     assert subject.current_run_id == "run-id-1"
@@ -174,7 +179,7 @@ async def test_clear_engine(subject: EngineStore) -> None:
         labware_offsets=[],
         deck_configuration=[],
         protocol=None,
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
     await subject.runner.run(deck_configuration=[])
     result = await subject.clear()
@@ -198,7 +203,7 @@ async def test_clear_engine_not_stopped_or_idle(
         labware_offsets=[],
         deck_configuration=[],
         protocol=None,
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
     subject.runner.play(deck_configuration=[])
 
@@ -213,7 +218,7 @@ async def test_clear_idle_engine(subject: EngineStore) -> None:
         labware_offsets=[],
         deck_configuration=[],
         protocol=None,
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
     assert subject.engine is not None
     assert subject.runner is not None
@@ -263,7 +268,7 @@ async def test_get_default_engine_current_unstarted(subject: EngineStore) -> Non
         labware_offsets=[],
         deck_configuration=[],
         protocol=None,
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
 
     result = await subject.get_default_engine()
@@ -277,7 +282,7 @@ async def test_get_default_engine_conflict(subject: EngineStore) -> None:
         labware_offsets=[],
         deck_configuration=[],
         protocol=None,
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
     subject.engine.play()
 
@@ -292,7 +297,7 @@ async def test_get_default_engine_run_stopped(subject: EngineStore) -> None:
         labware_offsets=[],
         deck_configuration=[],
         protocol=None,
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
     await subject.engine.finish()
 

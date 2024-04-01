@@ -24,6 +24,11 @@ from robot_server.maintenance_runs.maintenance_engine_store import (
 )
 
 
+def mock_notify_publishers() -> None:
+    """A mock notify_publishers."""
+    return None
+
+
 @pytest.fixture
 def subject(decoy: Decoy) -> MaintenanceEngineStore:
     """Get a MaintenanceEngineStore test subject."""
@@ -45,7 +50,7 @@ async def test_create_engine(subject: MaintenanceEngineStore) -> None:
         run_id="run-id",
         labware_offsets=[],
         created_at=datetime(2023, 1, 1),
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert subject.current_run_id == "run-id"
@@ -73,7 +78,7 @@ async def test_create_engine_uses_robot_and_deck_type(
         run_id="run-id",
         labware_offsets=[],
         created_at=datetime(2023, 4, 1),
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert subject.engine.state_view.config.robot_type == robot_type
@@ -94,7 +99,7 @@ async def test_create_engine_with_labware_offsets(
         run_id="run-id",
         labware_offsets=[labware_offset],
         created_at=datetime(2023, 1, 1),
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result.labwareOffsets == [
@@ -114,7 +119,7 @@ async def test_clear_engine(subject: MaintenanceEngineStore) -> None:
         run_id="run-id",
         labware_offsets=[],
         created_at=datetime(2023, 5, 1),
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
     await subject.runner.run(deck_configuration=[])
     result = await subject.clear()
@@ -137,7 +142,7 @@ async def test_clear_engine_not_stopped_or_idle(
         run_id="run-id",
         labware_offsets=[],
         created_at=datetime(2023, 6, 1),
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
     subject.runner.play()
 
@@ -151,7 +156,7 @@ async def test_clear_idle_engine(subject: MaintenanceEngineStore) -> None:
         run_id="run-id",
         labware_offsets=[],
         created_at=datetime(2023, 7, 1),
-        notify_publishers=lambda: None,
+        notify_publishers=mock_notify_publishers,
     )
     assert subject.engine is not None
     assert subject.runner is not None
