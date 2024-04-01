@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { getisFlexProtocol, getRobotTypeDisplayName } from '../utils'
+import {
+  getAnalysisStatus,
+  getisFlexProtocol,
+  getRobotTypeDisplayName,
+} from '../utils'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { simpleAnalysisFileFixture } from '@opentrons/api-client'
 
 const mockOT3ProtocolAnalysisOutput = {
   robotType: 'OT-3 Standard',
@@ -9,6 +14,36 @@ const mockOT3ProtocolAnalysisOutput = {
 const mockOT2ProtocolAnalysisOutput = {
   robotType: 'OT-2 Standard',
 } as ProtocolAnalysisOutput
+
+describe('getAnalysisStatus', () => {
+  it('should return stale if no liquids in analysis', () => {
+    const result = getAnalysisStatus(false, {
+      ...mockOT3ProtocolAnalysisOutput,
+      liquids: [],
+      errors: [],
+    })
+    expect(result).toBe('stale')
+  })
+
+  it('should return stale if no runTimeParameters in analysis', () => {
+    const result = getAnalysisStatus(false, {
+      ...mockOT3ProtocolAnalysisOutput,
+      runTimeParameters: [],
+      errors: [],
+    })
+    expect(result).toBe('stale')
+  })
+
+  it('should return complete if liquids and runTimeParameters in analysis', () => {
+    const result = getAnalysisStatus(false, {
+      ...mockOT3ProtocolAnalysisOutput,
+      liquids: [],
+      runTimeParameters: [],
+      errors: [],
+    })
+    expect(result).toBe('complete')
+  })
+})
 
 describe('getisFlexProtocol', () => {
   it('should return true for protocols intended for a Flex', () => {
