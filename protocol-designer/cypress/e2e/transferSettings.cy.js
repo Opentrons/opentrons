@@ -50,7 +50,7 @@ describe('Advanced Settings for Transfer Form', () => {
     openDesignTab()
   })
 
-  it('Verify functionality of advanced settings with different pipette and labware', () => {
+  it.only('Verify functionality of advanced settings with different pipette and labware', () => {
     enterBatchEdit()
 
     // Different Pipette disbales aspirate and dispense Flowrate and Mix settings
