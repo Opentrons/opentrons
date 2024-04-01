@@ -5,7 +5,7 @@ from requests.auth import HTTPBasicAuth
 import json
 import webbrowser
 import argparse
-from typing import Dict, List, Tuple, Any
+from typing import List, Tuple
 from abr_testing.data_collection import read_robot_logs, abr_google_drive, get_run_logs
 
 
@@ -84,7 +84,6 @@ class JiraTicket:
 
     def __init__(self, url: str, api_token: str, email: str) -> None:
         """Connect to jira."""
-
         self.url = url
         self.api_token = api_token
         self.email = email
@@ -94,7 +93,7 @@ class JiraTicket:
             "Content-Type": "application/json",
         }
 
-    def issues_on_board(self, board_id) -> List[str]:
+    def issues_on_board(self, board_id: str) -> List[str]:
         """Print Issues on board."""
         response = requests.get(
             f"{self.url}/rest/agile/1.0/board/{board_id}/issue",
@@ -113,7 +112,7 @@ class JiraTicket:
             issue_ids.append(issue_id)
         return issue_ids
 
-    def open_issue(self, issue_key) -> None:
+    def open_issue(self, issue_key: str) -> None:
         """Open issue on web browser."""
         url = f"{self.url}/browse/{issue_key}"
         webbrowser.open(url)
@@ -174,7 +173,7 @@ class JiraTicket:
             print(f"JSON decoding error occurred. Response content: {response_str}")
         return issue_url, issue_key
 
-    def post_attachment_to_ticket(self, issue_id: str, attachment_path: str):
+    def post_attachment_to_ticket(self, issue_id: str, attachment_path: str) -> None:
         """Adds attachments to ticket."""
         # TODO: Ensure that file is actually uploaded.
         file = {"file": open(attachment_path, "rb")}
@@ -209,18 +208,39 @@ if __name__ == "__main__":
         nargs=1,
         help="IP address of robot as string.",
     )
+    parser.add_argument(
+        "jira_api_token",
+        metavar="JIRA_API_TOKEN",
+        type=str,
+        nargs=1,
+        help="JIRA API Token. Get from https://id.atlassian.com/manage-profile/security.",
+    )
+    parser.add_argument(
+        "email",
+        metavar="EMAIL",
+        type=str,
+        nargs=1,
+        help="Email connected to JIRA account.",
+    )
+    # TODO: improve help comment on jira board id.
+    parser.add_argument(
+        "board_id",
+        metavar="BOARD_ID",
+        type=str,
+        nargs=1,
+        help="JIRA Board ID. RABR is 217",
+    )
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
     ip = args.robot_ip[0]
     url = "https://opentrons.atlassian.net"
-    api_token = "ATATT3xFfGF0SZgHzGog6J_bTK3j6HFRnbUC-tE_gB5Sn_56d-NSdlRb5C-ywGxNgV4fHfSGbhgENlGKI1aSPc5dy8ql0EiVYW4dHifJhyKUueu5yq6BrL9Xcsfwz_p1W6xUmSsyecvZ0lGPFLb5sreqRg5kE3FRs6SqcKaQxH6_EGFGS0Obb5c=BA8756FE"
-    email = "rhyann.clarke@opentrons.com"
-    board_id = "217"
+    api_token = args.jira_api_token[0]
+    email = args.email[0]
+    board_id = args.board_id[0]
 
     ticket = JiraTicket(url, api_token, email)
     error_runs = get_error_runs_from_robot(ip)
-    one_run = error_runs[0]
-    print(one_run)
+    one_run = error_runs[-1]  # Most recent run with error.
     (
         summary,
         robot,
@@ -229,6 +249,8 @@ if __name__ == "__main__":
         whole_description_str,
         saved_file_path,
     ) = get_error_info_from_robot(ip, one_run, storage_directory)
+    print(f"Making ticket for run: {one_run} on robot {robot}.")
+    # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
     parent_key = project_key + "-" + robot[-1]
     issue_url, issue_key = ticket.create_ticket(
