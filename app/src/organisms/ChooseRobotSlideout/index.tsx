@@ -381,6 +381,13 @@ export function ChooseRobotSlideout(
             tooltipText={runtimeParam.description}
             caption={`${runtimeParam.min}-${runtimeParam.max}`}
             id={id}
+            error={
+              Number.isNaN(value) ||
+              value < runtimeParam.min ||
+              value > runtimeParam.max
+                ? `Value must be between ${runtimeParam.min}-${runtimeParam.max}`
+                : null
+            }
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {

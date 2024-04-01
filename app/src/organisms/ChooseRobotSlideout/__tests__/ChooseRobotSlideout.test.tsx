@@ -234,6 +234,33 @@ describe('ChooseRobotSlideout', () => {
     })
   })
 
+  it('renders error message for runtime parameter out of range', () => {
+    render({
+      onCloseClick: vi.fn(),
+      isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
+      selectedRobot: null,
+      setSelectedRobot: mockSetSelectedRobot,
+      title: 'choose robot slideout title',
+      robotType: 'OT-2 Standard',
+      multiSlideout: { currentPage: 2 },
+      runTimeParametersOverrides: [
+        {
+          value: 1000,
+          displayName: 'EtoH Volume',
+          variableName: 'ETOH_VOLUME',
+          description: '70% ethanol volume',
+          type: 'float',
+          suffix: 'mL',
+          min: 1.5,
+          max: 10.0,
+          default: 1000,
+        },
+      ],
+    })
+    screen.getByText('Value must be between 1.5-10')
+  })
+
   it('defaults to first available robot and allows an available robot to be selected', () => {
     vi.mocked(getConnectableRobots).mockReturnValue([
       { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
