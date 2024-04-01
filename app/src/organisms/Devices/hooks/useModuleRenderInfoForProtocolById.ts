@@ -68,9 +68,9 @@ export function useModuleRenderInfoForProtocolById(
 
       const conflictedFixture =
         deckConfig?.find(
-          fixture =>
-            moduleCutoutIds.includes(fixture.cutoutId) ||
-            fixture.cutoutFixtureId != null
+          ({cutoutId, cutoutFixtureId}) =>
+            moduleCutoutIds.includes(cutoutId) &&
+            !moduleFixtures.some(({id}) => cutoutFixtureId === id)
         ) ?? null
 
       if (compatibleAttachedModule !== null) {

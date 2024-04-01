@@ -16,6 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_MODULE_ADDRESSABLE_AREAS,
   SINGLE_SLOT_FIXTURES,
   getCutoutDisplayName,
   getFixtureDisplayName,
@@ -75,19 +76,21 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
         marginBottom={SPACING.spacing24}
       >
         {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
-          return (
-            <FixtureListItem
-              key={cutoutConfigAndCompatibility.cutoutId}
-              {...cutoutConfigAndCompatibility}
-            />
-          )
+          return cutoutConfigAndCompatibility.requiredAddressableAreas.some(raa => FLEX_MODULE_ADDRESSABLE_AREAS.includes(raa))
+            ? null // don't list modules here, they're covered by SetupModuleList
+            : (
+              <FixtureListItem
+                key={cutoutConfigAndCompatibility.cutoutId}
+                {...cutoutConfigAndCompatibility}
+              />
+            )
         })}
       </Flex>
     </>
   )
 }
 
-interface FixtureListItemProps extends CutoutConfigAndCompatibility {}
+interface FixtureListItemProps extends CutoutConfigAndCompatibility { }
 
 export function FixtureListItem({
   cutoutId,

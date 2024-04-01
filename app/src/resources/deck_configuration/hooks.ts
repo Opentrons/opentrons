@@ -47,17 +47,6 @@ export function useDeckConfigurationCompatibility(
       ? getInitialAndMovedLabwareInSlots(protocolAnalysis)
       : []
 
-  const protocolModulesInfo =
-    protocolAnalysis != null
-      ? getProtocolModulesInfo(protocolAnalysis, deckDef)
-      : []
-
-  const hasThermocycler =
-    protocolModulesInfo.find(
-      protocolMod =>
-        protocolMod.moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
-    ) != null
-
   return deckConfig.reduce<CutoutConfigAndCompatibility[]>(
     (acc, { cutoutId, cutoutFixtureId }) => {
       const fixturesThatMountToCutoutId = getCutoutFixturesForCutoutId(
@@ -69,7 +58,6 @@ export function useDeckConfigurationCompatibility(
           getCutoutIdForAddressableArea(aa, fixturesThatMountToCutoutId) ===
           cutoutId
       )
-
       const compatibleCutoutFixtureIds = fixturesThatMountToCutoutId
         .filter(cf =>
           requiredAddressableAreasForCutoutId.every(aa =>
@@ -107,10 +95,7 @@ export function useDeckConfigurationCompatibility(
           cutoutFixtureId,
           requiredAddressableAreas: requiredAddressableAreasForCutoutId,
           // Thermocycler requires an "empty" (single slot) fixture in A1 that is not referenced directly in protocol
-          compatibleCutoutFixtureIds:
-            hasThermocycler && cutoutId === 'cutoutA1'
-              ? [SINGLE_LEFT_SLOT_FIXTURE]
-              : compatibleCutoutFixtureIds,
+          compatibleCutoutFixtureIds: compatibleCutoutFixtureIds,
           missingLabwareDisplayName,
         },
       ]

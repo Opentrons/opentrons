@@ -290,40 +290,60 @@ export const NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA: '96ChannelWasteChu
 export const GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA: 'gripperWasteChute' =
   'gripperWasteChute'
 
-export const THERMOCYCLER_ADDRESSABLE_AREA: 'thermocyclerModule' =
-  'thermocyclerModule'
-export const HEATERSHAKER_A1_ADDRESSABLE_AREA: 'heaterShakerA1' =
-  'heaterShakerA1'
-export const HEATERSHAKER_B1_ADDRESSABLE_AREA: 'heaterShakerB1' =
-  'heaterShakerB1'
-export const HEATERSHAKER_C1_ADDRESSABLE_AREA: 'heaterShakerC1' =
-  'heaterShakerC1'
-export const HEATERSHAKER_D1_ADDRESSABLE_AREA: 'heaterShakerD1' =
-  'heaterShakerD1'
-export const HEATERSHAKER_A3_ADDRESSABLE_AREA: 'heaterShakerA3' =
-  'heaterShakerA3'
-export const HEATERSHAKER_B3_ADDRESSABLE_AREA: 'heaterShakerB3' =
-  'heaterShakerB3'
-export const HEATERSHAKER_C3_ADDRESSABLE_AREA: 'heaterShakerC3' =
-  'heaterShakerC3'
-export const HEATERSHAKER_D3_ADDRESSABLE_AREA: 'heaterShakerD3' =
-  'heaterShakerD3'
-export const TEMPERATURE_MODULE_A1_ADDRESSABLE_AREA: 'temperatureModuleA1' =
-  'temperatureModuleA1'
-export const TEMPERATURE_MODULE_B1_ADDRESSABLE_AREA: 'temperatureModuleB1' =
-  'temperatureModuleB1'
-export const TEMPERATURE_MODULE_C1_ADDRESSABLE_AREA: 'temperatureModuleC1' =
-  'temperatureModuleC1'
-export const TEMPERATURE_MODULE_D1_ADDRESSABLE_AREA: 'temperatureModuleD1' =
-  'temperatureModuleD1'
-export const TEMPERATURE_MODULE_A3_ADDRESSABLE_AREA: 'temperatureModuleA3' =
-  'temperatureModuleA3'
-export const TEMPERATURE_MODULE_B3_ADDRESSABLE_AREA: 'temperatureModuleB3' =
-  'temperatureModuleB3'
-export const TEMPERATURE_MODULE_C3_ADDRESSABLE_AREA: 'temperatureModuleC3' =
-  'temperatureModuleC3'
-export const TEMPERATURE_MODULE_D3_ADDRESSABLE_AREA: 'temperatureModuleD3' =
-  'temperatureModuleD3'
+export const THERMOCYCLER_ADDRESSABLE_AREA: 'thermocyclerModuleV2' =
+  'thermocyclerModuleV2'
+export const HEATERSHAKER_A1_ADDRESSABLE_AREA: 'heaterShakerV1A1' =
+  'heaterShakerV1A1'
+export const HEATERSHAKER_B1_ADDRESSABLE_AREA: 'heaterShakerV1B1' =
+  'heaterShakerV1B1'
+export const HEATERSHAKER_C1_ADDRESSABLE_AREA: 'heaterShakerV1C1' =
+  'heaterShakerV1C1'
+export const HEATERSHAKER_D1_ADDRESSABLE_AREA: 'heaterShakerV1D1' =
+  'heaterShakerV1D1'
+export const HEATERSHAKER_A3_ADDRESSABLE_AREA: 'heaterShakerV1A3' =
+  'heaterShakerV1A3'
+export const HEATERSHAKER_B3_ADDRESSABLE_AREA: 'heaterShakerV1B3' =
+  'heaterShakerV1B3'
+export const HEATERSHAKER_C3_ADDRESSABLE_AREA: 'heaterShakerV1C3' =
+  'heaterShakerV1C3'
+export const HEATERSHAKER_D3_ADDRESSABLE_AREA: 'heaterShakerV1D3' =
+  'heaterShakerV1D3'
+export const TEMPERATURE_MODULE_A1_ADDRESSABLE_AREA: 'temperatureModuleV2A1' =
+  'temperatureModuleV2A1'
+export const TEMPERATURE_MODULE_B1_ADDRESSABLE_AREA: 'temperatureModuleV2B1' =
+  'temperatureModuleV2B1'
+export const TEMPERATURE_MODULE_C1_ADDRESSABLE_AREA: 'temperatureModuleV2C1' =
+  'temperatureModuleV2C1'
+export const TEMPERATURE_MODULE_D1_ADDRESSABLE_AREA: 'temperatureModuleV2D1' =
+  'temperatureModuleV2D1'
+export const TEMPERATURE_MODULE_A3_ADDRESSABLE_AREA: 'temperatureModuleV2A3' =
+  'temperatureModuleV2A3'
+export const TEMPERATURE_MODULE_B3_ADDRESSABLE_AREA: 'temperatureModuleV2B3' =
+  'temperatureModuleV2B3'
+export const TEMPERATURE_MODULE_C3_ADDRESSABLE_AREA: 'temperatureModuleV2C3' =
+  'temperatureModuleV2C3'
+export const TEMPERATURE_MODULE_D3_ADDRESSABLE_AREA: 'temperatureModuleV2D3' =
+  'temperatureModuleV2D3'
+
+export const FLEX_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  THERMOCYCLER_ADDRESSABLE_AREA,
+  HEATERSHAKER_A1_ADDRESSABLE_AREA,
+  HEATERSHAKER_B1_ADDRESSABLE_AREA,
+  HEATERSHAKER_C1_ADDRESSABLE_AREA,
+  HEATERSHAKER_D1_ADDRESSABLE_AREA,
+  HEATERSHAKER_A3_ADDRESSABLE_AREA,
+  HEATERSHAKER_B3_ADDRESSABLE_AREA,
+  HEATERSHAKER_C3_ADDRESSABLE_AREA,
+  HEATERSHAKER_D3_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_A1_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_B1_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_C1_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_D1_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_A3_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_B3_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_C3_ADDRESSABLE_AREA,
+  TEMPERATURE_MODULE_D3_ADDRESSABLE_AREA,
+]
 
 export const ADDRESSABLE_AREA_1: '1' = '1'
 export const ADDRESSABLE_AREA_2: '2' = '2'
@@ -420,7 +440,7 @@ export const THERMOCYCLER_V2_FRONT_FIXTURE: 'thermocyclerModuleV2Front' =
   'thermocyclerModuleV2Front'
 
 export const MODULE_FIXTURES_BY_MODEL: {
-  [moduleModel in ModuleModel]?: FlexModuleCutoutFixtureId[]
+  [moduleModel in ModuleModel]?: CutoutFixtureId[]
 } = {
   [HEATERSHAKER_MODULE_V1]: [HEATERSHAKER_MODULE_V1_FIXTURE],
   [TEMPERATURE_MODULE_V2]: [TEMPERATURE_MODULE_V2_FIXTURE],
