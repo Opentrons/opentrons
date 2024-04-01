@@ -8,11 +8,11 @@ black-check:
 
 .PHONY: ruff
 ruff:
-	python -m pipenv run python -m ruff check --fix
+	python -m pipenv run python -m ruff check . --fix
 
 .PHONY: ruff-check
 ruff-check:
-	python -m pipenv run python -m ruff check
+	python -m pipenv run python -m ruff check .
 
 .PHONY: mypy
 mypy:
