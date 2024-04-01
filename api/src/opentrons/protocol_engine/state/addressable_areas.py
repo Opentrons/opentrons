@@ -458,6 +458,27 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         position = addressable_area.position
         return Point(x=position.x, y=position.y, z=position.z)
 
+    def get_addressable_area_offsets_from_cutout(
+        self,
+        addressable_area_name: str,
+    ) -> Point:
+        """Get the offset form cutout fixture of an addressable area."""
+
+        for addressable_area in self.state.deck_definition["locations"][
+            "addressableAreas"
+        ]:
+            if addressable_area["id"] == addressable_area_name:
+                area_offset = addressable_area["offsetFromCutoutFixture"]
+                position = Point(
+                    x=area_offset[0],
+                    y=area_offset[1],
+                    z=area_offset[2],
+                )
+                return Point(x=position.x, y=position.y, z=position.z)
+        raise ValueError(
+            f"No matching addressable area named {addressable_area_name} identified."
+        )
+
     def get_addressable_area_bounding_box(
         self,
         addressable_area_name: str,

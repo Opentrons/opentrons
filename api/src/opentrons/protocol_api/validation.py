@@ -21,6 +21,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocols.models import LabwareDefinition
+from opentrons.protocol_engine.types import DeckType
 from opentrons.types import Mount, DeckSlotName, StagingSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -334,94 +335,6 @@ def ensure_and_convert_trash_bin_location(
         )
 
     return map_trash_bin_addressable_area[slot_name_ot3]
-
-
-def ensure_and_convert_module_fixture_location(
-    deck_slot: DeckSlotName,
-    api_version: APIVersion,
-    robot_type: RobotType,
-    model: ModuleModel,
-) -> Optional[str]:
-    """Ensure module fixture load location is valid.
-
-    Also, convert the deck slot to a valid module fixture addressable area.
-    """
-
-    if robot_type == "OT-2 Standard":
-        # OT-2 Utilizes the existing compatibleModulelTypes list of traditional addressable areas
-        return None
-
-    if isinstance(model, MagneticBlockModel):
-        valid_slots = [
-            slot
-            for slot in [
-                "A1",
-                "B1",
-                "C1",
-                "D1",
-                "A2",
-                "B2",
-                "C2",
-                "D2",
-                "A3",
-                "B3",
-                "C3",
-                "D3",
-            ]
-        ]
-        addressable_areas = [
-            "magneticBlockV1A1",
-            "magneticBlockV1B1",
-            "magneticBlockV1C1",
-            "magneticBlockV1D1",
-            "magneticBlockV1A2",
-            "magneticBlockV1B2",
-            "magneticBlockV1C2",
-            "magneticBlockV1D2",
-            "magneticBlockV1A3",
-            "magneticBlockV1B3",
-            "magneticBlockV1C3",
-            "magneticBlockV1D3",
-        ]
-
-    elif isinstance(model, HeaterShakerModuleModel):
-        valid_slots = [
-            slot for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
-        ]
-        addressable_areas = [
-            "heaterShakerV1A1",
-            "heaterShakerV1B1",
-            "heaterShakerV1C1",
-            "heaterShakerV1D1",
-            "heaterShakerV1A3",
-            "heaterShakerV1B3",
-            "heaterShakerV1C3",
-            "heaterShakerV1D3",
-        ]
-    elif isinstance(model, TemperatureModuleModel):
-        valid_slots = [
-            slot for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
-        ]
-        addressable_areas = [
-            "temperatureModuleV2A1",
-            "temperatureModuleV2B1",
-            "temperatureModuleV2C1",
-            "temperatureModuleV2D1",
-            "temperatureModuleV2A3",
-            "temperatureModuleV2B3",
-            "temperatureModuleV2C3",
-            "temperatureModuleV2D3",
-        ]
-    elif isinstance(model, ThermocyclerModuleModel):
-        return "thermocyclerModuleV2"
-    else:
-        return None
-
-    map_addressable_area = {
-        slot: addressable_area
-        for slot, addressable_area in zip(valid_slots, addressable_areas)
-    }
-    return map_addressable_area[deck_slot.value]
 
 
 def ensure_hold_time_seconds(

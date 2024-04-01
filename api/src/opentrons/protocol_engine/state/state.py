@@ -175,9 +175,6 @@ class StateStore(StateView, ActionHandler):
         )
         self._module_store = ModuleStore(
             config=config,
-            addressable_area_view=AddressableAreaView(
-                self._addressable_area_store.state
-            ),
             module_calibration_offsets=module_calibration_offsets,
         )
         self._liquid_store = LiquidStore()

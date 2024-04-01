@@ -83,17 +83,13 @@ def _standardize_load_labware(
 def _standardize_load_module(
     original: commands.LoadModuleCreate, robot_type: RobotType
 ) -> commands.LoadModuleCreate:
-    if isinstance(original.params.location, DeckSlotLocation):
-        params = original.params.copy(
-            update={
-                "location": _standardize_deck_slot_location(
-                    original.params.location, robot_type
-                )
-            }
-        )
-    else:
-        params = original.params
-
+    params = original.params.copy(
+        update={
+            "location": _standardize_deck_slot_location(
+                original.params.location, robot_type
+            )
+        }
+    )
     return original.copy(update={"params": params})
 
 

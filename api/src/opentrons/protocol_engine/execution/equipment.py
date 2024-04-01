@@ -284,7 +284,7 @@ class EquipmentHandler:
     async def load_module(
         self,
         model: ModuleModel,
-        location: Union[DeckSlotLocation, AddressableAreaLocation],
+        location: DeckSlotLocation,
         module_id: Optional[str],
     ) -> LoadedModuleData:
         """Ensure the required module is attached.

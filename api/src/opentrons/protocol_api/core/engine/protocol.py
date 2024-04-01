@@ -412,20 +412,10 @@ class ProtocolCore(
         normalized_deck_slot = deck_slot.to_equivalent_for_robot_type(robot_type)
         self._ensure_module_location(normalized_deck_slot, module_type)
 
-        addressable_area = validation.ensure_and_convert_module_fixture_location(
-            deck_slot, self._api_version, robot_type, model
+        result = self._engine_client.load_module(
+            model=EngineModuleModel(model),
+            location=DeckSlotLocation(slotName=normalized_deck_slot),
         )
-
-        if robot_type == "OT-3 Standard" and isinstance(addressable_area, str):
-            result = self._engine_client.load_module(
-                model=EngineModuleModel(model),
-                location=AddressableAreaLocation(addressableAreaName=addressable_area),
-            )
-        else:
-            result = self._engine_client.load_module(
-                model=EngineModuleModel(model),
-                location=DeckSlotLocation(slotName=normalized_deck_slot),
-            )
 
         module_core = self._get_module_core(load_module_result=result, model=model)
 
