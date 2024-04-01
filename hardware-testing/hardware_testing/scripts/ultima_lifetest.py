@@ -40,14 +40,14 @@ from opentrons.config.advanced_settings import set_adv_setting
 
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR)
 
 LOG = logging.getLogger(__name__)
 
-logging.getLogger("opentrons.hardware_control.ot3api.OT3API").setLevel(logging.INFO)
-logging.getLogger("opentrons.hardware_control.ot3api").setLevel(logging.INFO)
+logging.getLogger("opentrons.hardware_control.ot3api.OT3API").setLevel(logging.ERROR)
+logging.getLogger("opentrons.hardware_control.ot3api").setLevel(logging.ERROR)
 loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
-print(loggers)
+# print(loggers)
 
 asyncio.run(set_adv_setting('disableOverpressureDetection', True))
 
@@ -55,7 +55,7 @@ FLOW_TO_SPEED = 1.0/15.9 # mm/uL
 DEFAULT_FLOW = 700
 DEFAULT_TRIALS = 10
 
-VOLUME_OFFSET = 300/15.9 #300uL in mm of plunger travel
+VOLUME_OFFSET_DEFAULT = 300/15.9 #300uL in mm of plunger travel
 
 TIP_RACK_LABWARE = f"opentrons_flex_96_tiprack_1000ul"
 TIP_RACK_SLOT = 6
@@ -82,6 +82,8 @@ SECONDS_BETWEEN_READINGS = 0.25
 # DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.P]
 DEFAULT_SPEED = 91
 FLOW_ACCELERATION = 24000.0/15.9
+
+MOTOR_CURRENT = 1.25
 
 def _get_test_tag(flow: float, trial: int) -> str:
     return f"flow-{flow}-trial-{trial}"
@@ -239,17 +241,42 @@ async def test_cycle(
 
     for i in range(cycles):
         if not single:
-            await move_twin_plunger_absolute_ot3(api, positions[0], speed=speed)
+            try:
+                await move_twin_plunger_absolute_ot3(api, positions[0],
+                                                     motor_current=MOTOR_CURRENT,
+                                                     speed=speed)
+            except StallOrCollisionDetectedError as e:
+                print(e)
+                print("DOWN")
+                print(api._current_position)
+                print(api._encoder_position)
+                await api.home([Axis.P_L, Axis.P_R])
+
             if z_move:
                 await twin_z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
-            await move_twin_plunger_absolute_ot3(api, positions[1], speed=speed)
+
+            try:
+                await move_twin_plunger_absolute_ot3(api, positions[1],
+                                                     motor_current=MOTOR_CURRENT,
+                                                     speed=speed)
+            except StallOrCollisionDetectedError as e:
+                print(e)
+                print("UP")
+                print(api._current_position)
+                print(api._encoder_position)
+                await api.home([Axis.P_L, Axis.P_R])
+
             if z_move:
                 await twin_z_move(api, bottom_position)
         else:
-            await move_plunger_absolute_ot3(api, positions[0], speed=speed)
+            await move_plunger_absolute_ot3(api, positions[0],
+                                                 motor_current=MOTOR_CURRENT,
+                                                 speed=speed)
             if z_move:
                 await z_move(api, bottom_position + Point(z=DISPENSE_OFFSET))
-            await move_plunger_absolute_ot3(api, positions[1], speed=speed)
+            await move_plunger_absolute_ot3(api, positions[1],
+                                                 motor_current=MOTOR_CURRENT,
+                                                 speed=speed)
             if z_move:
                 await z_move(api, bottom_position)
         starting_cycle += 1
@@ -282,12 +309,14 @@ async def _read_from_sensor(
 
 async def _main(is_simulating: bool, trials: int, flow: float,
                 liquid_probe: bool, continue_after_stall: bool,
-                single: bool) -> None:
+                single: bool, volume: float) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating,
         pipette_left="p1000_multi_v3.4",
-        pipette_right="p50_single_v3.4",
+        pipette_right="p1000_multi_v3.4",
     )
+
+    VOLUME_OFFSET = volume
 
     # test each attached pipette
     mount = await _get_next_pipette_mount(api)
@@ -485,8 +514,12 @@ async def _main(is_simulating: bool, trials: int, flow: float,
                 print("Blow Out")
                 speed = flow * FLOW_TO_SPEED
                 await twin_z_move(api, temp_reservoir_a1_nominal + Point(z=DISPENSE_OFFSET)) #move Z up
-                await move_twin_plunger_absolute_ot3(api, pip_blow, speed=speed) #blow out
-                await move_twin_plunger_absolute_ot3(api, pip_bot, speed=speed) #return to pipette bottom
+                await move_twin_plunger_absolute_ot3(api, pip_blow,
+                                                     motor_current=MOTOR_CURRENT,
+                                                     speed=70) #blow out
+                await move_twin_plunger_absolute_ot3(api, pip_bot,
+                                                     motor_current=MOTOR_CURRENT,
+                                                     speed=70) #return to pipette bottom
                 await twin_z_move(api, temp_reservoir_a1_nominal) #move Z down
 
             total_cycles += cycles_per_trial
@@ -525,7 +558,9 @@ if __name__ == "__main__":
     parser.add_argument("--probe", action="store_true")
     parser.add_argument("--continue-after-stall", action="store_true")
     parser.add_argument("--single", action="store_true")
+    parser.add_argument("--volume", type=float, default=VOLUME_OFFSET_DEFAULT)
+
     args = parser.parse_args()
     asyncio.run(_main(args.simulate, args.trials, args.flow,
                       args.probe, args.continue_after_stall,
-                      args.single))
+                      args.single, args.volume))
