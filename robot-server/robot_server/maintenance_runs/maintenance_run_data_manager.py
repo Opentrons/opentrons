@@ -83,7 +83,7 @@ class MaintenanceRunDataManager:
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
-        notify_publishers: Callable,
+        notify_publishers: Callable[[], None],
     ) -> MaintenanceRun:
         """Create a new, current maintenance run.
 

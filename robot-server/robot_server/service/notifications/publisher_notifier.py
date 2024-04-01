@@ -1,7 +1,7 @@
 """Provides an interface for alerting notification publishers to events and related lifecycle utilities."""
 import asyncio
 from fastapi import Depends
-from typing import Optional, Callable, List
+from typing import Optional, Callable, List, Awaitable
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -21,19 +21,24 @@ class PublisherNotifier:
     ):
         self._change_notifier = change_notifier or ChangeNotifier()
         self._pe_notifier: Optional[asyncio.Task[None]] = None
-        self._callbacks: Optional[List[Callable]] = None
+        self._callbacks: List[Callable[[], Awaitable[None]]] = []
 
-    async def initialize(self):
+    async def initialize(self) -> None:
+        """Initializes an instance of PublisherNotifier. This method should only be called once."""
         self._pe_notifier = asyncio.create_task(self._wait_for_event())
 
     def notify_publishers(self) -> None:
         """A generic notifier, alerting all `waiters` of a change."""
         self._change_notifier.notify()
 
-    def register_publish_callbacks(self, callbacks: List[Callable]) -> None:
+    def register_publish_callbacks(
+        self, callbacks: List[Callable[[], Awaitable[None]]]
+    ):
+        """Extend the list of callbacks with a given list of callbacks."""
         self._callbacks.extend(callbacks)
 
-    async def _wait_for_event(self):
+    async def _wait_for_event(self) -> None:
+        """Indefinitely wait for an event to occur, then invoke each callback."""
         while True:
             await self._change_notifier.wait()
             for callback in self._callbacks:
@@ -58,9 +63,10 @@ async def initialize_publisher_notifier(app_state: AppState) -> None:
 
 def get_notify_publishers(
     app_state: AppState = Depends(get_app_state),
-) -> Callable:
+) -> Callable[[], None]:
     """Provides access to the callback used to notify publishers of changes."""
     publisher_notifier = _publisher_notifier_accessor.get_from(app_state)
+    assert isinstance(publisher_notifier, PublisherNotifier)
     return publisher_notifier.notify_publishers
 
 

@@ -156,7 +156,7 @@ async def create_run(
     deck_configuration_store: DeckConfigurationStore = Depends(
         get_deck_configuration_store
     ),
-    notify_publishers: Callable = Depends(get_notify_publishers),
+    notify_publishers: Callable[[], None] = Depends(get_notify_publishers),
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
     """Create a new maintenance run.
 

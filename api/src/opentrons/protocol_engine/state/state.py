@@ -146,7 +146,7 @@ class StateStore(StateView, ActionHandler):
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
-        notify_publishers: Optional[Callable] = None,
+        notify_publishers: Optional[Callable[[], None]] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -322,4 +322,5 @@ class StateStore(StateView, ActionHandler):
         self._liquid._state = next_state.liquids
         self._tips._state = next_state.tips
         self._change_notifier.notify()
-        self._notify_robot_server()
+        if self._notify_robot_server is not None:
+            self._notify_robot_server()

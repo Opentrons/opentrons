@@ -20,7 +20,7 @@ async def create_protocol_engine(
     config: Config,
     load_fixed_trash: bool = False,
     deck_configuration: typing.Optional[DeckConfigurationType] = None,
-    notify_publishers: typing.Optional[typing.Callable] = None,
+    notify_publishers: typing.Optional[typing.Callable[[], None]] = None,
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
 

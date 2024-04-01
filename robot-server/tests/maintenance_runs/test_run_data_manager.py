@@ -35,6 +35,11 @@ from robot_server.service.notifications import (
 from opentrons.protocol_engine import Liquid
 
 
+def mock_notify_publishers() -> None:
+    """A mock notify_publishers."""
+    return None
+
+
 @pytest.fixture
 def mock_maintenance_engine_store(decoy: Decoy) -> MaintenanceEngineStore:
     """Get a mock MaintenanceEngineStore."""
@@ -88,6 +93,7 @@ def subject(
     )
 
 
+# TOME: The problem is engine_state_summary isn't working for some reason.
 async def test_create(
     decoy: Decoy,
     mock_maintenance_engine_store: MaintenanceEngineStore,
@@ -104,6 +110,7 @@ async def test_create(
             labware_offsets=[],
             created_at=created_at,
             deck_configuration=[],
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
     decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
@@ -114,6 +121,7 @@ async def test_create(
         created_at=created_at,
         labware_offsets=[],
         deck_configuration=[],
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result == MaintenanceRun(
@@ -153,6 +161,7 @@ async def test_create_with_options(
             labware_offsets=[labware_offset],
             created_at=created_at,
             deck_configuration=[],
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
     decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
@@ -164,6 +173,7 @@ async def test_create_with_options(
         created_at=created_at,
         labware_offsets=[labware_offset],
         deck_configuration=[],
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result == MaintenanceRun(
@@ -196,6 +206,7 @@ async def test_create_engine_error(
             labware_offsets=[],
             created_at=created_at,
             deck_configuration=[],
+            notify_publishers=mock_notify_publishers,
         )
     ).then_raise(EngineConflictError("oh no"))
     decoy.when(mock_maintenance_engine_store.current_run_created_at).then_return(
@@ -208,6 +219,7 @@ async def test_create_engine_error(
             created_at=created_at,
             labware_offsets=[],
             deck_configuration=[],
+            notify_publishers=mock_notify_publishers,
         )
 
 

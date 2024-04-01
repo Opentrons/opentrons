@@ -152,7 +152,7 @@ class EngineStore:
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
-        notify_publishers: Callable,
+        notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
