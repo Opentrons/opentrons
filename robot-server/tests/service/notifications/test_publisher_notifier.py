@@ -11,7 +11,7 @@ async def test_initialize() -> None:
     """It should create a new task."""
     publisher_notifier = PublisherNotifier()
 
-    await publisher_notifier.initialize()
+    await publisher_notifier._initialize()
 
     assert asyncio.get_running_loop()
 
@@ -21,7 +21,7 @@ def test_notify_publishers() -> None:
     change_notifier = MagicMock()
     publisher_notifier = PublisherNotifier(change_notifier)
 
-    publisher_notifier.notify_publishers()
+    publisher_notifier._notify_publishers()
 
     change_notifier.notify.assert_called_once()
 
@@ -64,7 +64,7 @@ async def test_wait_for_event() -> None:
         await asyncio.sleep(0.1)
         change_notifier.notify()
 
-    task = asyncio.create_task(publisher_notifier.initialize())
+    task = asyncio.create_task(publisher_notifier._initialize())
 
     await asyncio.gather(trigger_callbacks(), task)
 
