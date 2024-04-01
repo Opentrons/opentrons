@@ -2,7 +2,10 @@
 from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import Dict, Optional, Union
-from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+from opentrons.protocol_engine.actions.actions import (
+    ResumeFromRecoveryAction,
+    SetTipUsedAction,
+)
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
     ErrorRecoveryType,
@@ -537,10 +540,28 @@ class ProtocolEngine:
         )
 
     def reset_tips(self, labware_id: str) -> None:
-        """Reset the tip state of a given labware."""
+        """Reset the tip state of a given labware.
+
+        Protocol Engine does not directly use this for anything,
+        but it's helpful for calling code that's using Protocol Engine
+        to keep track of tips. See `state_view.tips`.
+        """
         # TODO(mm, 2023-03-10): Safely raise an error if the given labware isn't a
         # tip rack?
         self._action_dispatcher.dispatch(ResetTipsAction(labware_id=labware_id))
+
+    def set_tip_used(self, labware_id: str, well_name: str) -> None:
+        """Set a given tip as used (unavailable to be picked up).
+
+        Protocol Engine does not directly use this for anything,
+        but it's helpful for calling code that's using Protocol Engine
+        to keep track of tips. See `state_view.tips`.
+        """
+        # TODO(mm, 2024-04-01): Safely raise an error if the labware ID or well name
+        # is bad?
+        self._action_dispatcher.dispatch(
+            SetTipUsedAction(labware_id=labware_id, well_name=well_name)
+        )
 
     # TODO(mm, 2022-11-10): This is a method on ProtocolEngine instead of a command
     # as a quick hack to support Python protocols. We should consider making this a

@@ -703,6 +703,26 @@ def test_reset_tips(
     assert result == "A1"
 
 
+def test_set_tip_used(load_labware_command: commands.LoadLabware) -> None:
+    """It should set the given tip as used so it's not picked up."""
+    subject = TipStore()
+    subject.handle_action(
+        actions.SucceedCommandAction(private_result=None, command=load_labware_command)
+    )
+    subject.handle_action(
+        actions.SetTipUsedAction(labware_id="cool-labware", well_name="A1")
+    )
+
+    result = TipView(subject.state).get_next_tip(
+        labware_id="cool-labware",
+        num_tips=1,
+        starting_tip_name=None,
+        nozzle_map=None,
+    )
+
+    assert result == "B1"
+
+
 def test_handle_pipette_config_action(
     subject: TipStore, supported_tip_fixture: pipette_definition.SupportedTipsDefinition
 ) -> None:
