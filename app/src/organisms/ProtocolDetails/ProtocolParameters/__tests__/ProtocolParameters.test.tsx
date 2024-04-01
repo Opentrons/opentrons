@@ -7,6 +7,17 @@ import { i18n } from '../../../../i18n'
 import { ProtocolParameters } from '..'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import type * as Components from '@opentrons/components'
+
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof Components>()
+  return {
+    ...actual,
+    NoParameters: vi.fn(() => (
+      <div>No parameters specified in this protocol</div>
+    )),
+  }
+})
 
 const mockRunTimeParameter: RunTimeParameter[] = [
   {
