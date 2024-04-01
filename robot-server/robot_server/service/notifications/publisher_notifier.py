@@ -1,3 +1,4 @@
+"""Provides an interface for alerting notification publishers to events and related lifecycle utilities."""
 import asyncio
 from fastapi import Depends
 from typing import Optional, Callable, List
@@ -12,6 +13,8 @@ from .change_notifier import ChangeNotifier
 
 
 class PublisherNotifier:
+    """An interface that invokes notification callbacks whenever a generic notify event occurs."""
+
     def __init__(
         self,
         change_notifier: Optional[ChangeNotifier] = None,
@@ -21,16 +24,16 @@ class PublisherNotifier:
         self._callbacks: Optional[List[Callable]] = None
 
     async def initialize(self):
-        self._pe_notifier = asyncio.create_task(self._wait_for_pe_event())
+        self._pe_notifier = asyncio.create_task(self._wait_for_event())
 
-    def protocol_engine_callback_rename_this(self) -> None:
-        """Rename this"""
+    def notify_publishers(self) -> None:
+        """A generic notifier, alerting all `waiters` of a change."""
         self._change_notifier.notify()
 
     def register_publish_callbacks(self, callbacks: List[Callable]) -> None:
         self._callbacks.extend(callbacks)
 
-    async def _wait_for_pe_event(self):
+    async def _wait_for_event(self):
         while True:
             await self._change_notifier.wait()
             for callback in self._callbacks:
@@ -56,8 +59,9 @@ async def initialize_publisher_notifier(app_state: AppState) -> None:
 def get_notify_publishers(
     app_state: AppState = Depends(get_app_state),
 ) -> Callable:
+    """Provides access to the callback used to notify publishers of changes."""
     publisher_notifier = _publisher_notifier_accessor.get_from(app_state)
-    return publisher_notifier.protocol_engine_callback_rename_this
+    return publisher_notifier.notify_publishers
 
 
-# TOME: Left to do. 1) Verify this works conceptually for the runs_publisher route. 2) Add testing.
+# TOME: Left to do. 1) Verify this works conceptually for the runs_publisher route. 2) Add testing. 3) Lint + docstrings.

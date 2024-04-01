@@ -1,3 +1,4 @@
+"""An interface for managing interactions with the notification broker and relevant lifecycle utilities."""
 import random
 import logging
 import paho.mqtt.client as mqtt

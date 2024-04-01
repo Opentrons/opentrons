@@ -1,3 +1,4 @@
+"""Notification service creation and management."""
 from .initialize_notifications import initialize_notifications
 
 from .notification_client import (
