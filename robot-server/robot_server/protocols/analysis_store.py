@@ -343,10 +343,9 @@ class AnalysisStore:
             # the client is sending a protocol for the first time or for the nth time.
             return False
         for parameter, value_and_default in rtp_values_and_defaults_in_analysis.items():
-            if (
-                parameter,
-                value_and_default.value,
-            ) not in rtp_values.items() and value_and_default.value != value_and_default.default:
+            if rtp_values.get(parameter) == value_and_default.value or (rtp_values.get(parameter) is None and value_and_default.value == value_and_default.default):
+                continue
+            else:
                 return False
         return True
 

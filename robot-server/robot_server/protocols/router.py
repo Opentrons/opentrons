@@ -214,7 +214,6 @@ async def create_protocol(
         # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
-
     if isinstance(run_time_parameter_values, str):
         # We have to do this isinstance check because if `runTimeParameterValues` is
         # not specified in the request, then it gets assigned a Form(None) value
