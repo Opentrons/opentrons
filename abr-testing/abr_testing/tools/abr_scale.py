@@ -7,7 +7,7 @@ from typing import Any, List
 import argparse
 import csv
 from abr_testing.data_collection import read_robot_logs
-from abr_testing.google_automation import google_sheets_tool
+from abr_testing.automation import google_sheets_tool
 
 
 def write_to_sheets(file_name_csv: str, google_sheet: Any, row_list: List) -> None:
