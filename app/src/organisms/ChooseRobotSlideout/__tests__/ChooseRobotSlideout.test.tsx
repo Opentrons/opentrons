@@ -229,7 +229,11 @@ describe('ChooseRobotSlideout', () => {
       if (param.type === 'boolean' || 'choices' in param) {
         screen.getByText(param.description)
       } else {
-        screen.getByText(`${param.min}-${param.max}`)
+        if (param.type === 'int') {
+          screen.getByText(`${param.min}-${param.max}`)
+        } else {
+          screen.getByText(`${param.min.toFixed(1)}-${param.max.toFixed(1)}`)
+        }
       }
     })
   })
@@ -258,7 +262,7 @@ describe('ChooseRobotSlideout', () => {
         },
       ],
     })
-    screen.getByText('Value must be between 1.5-10')
+    screen.getByText('Value must be between 1.5-10.0')
   })
 
   it('defaults to first available robot and allows an available robot to be selected', () => {

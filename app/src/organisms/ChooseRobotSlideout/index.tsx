@@ -379,15 +379,27 @@ export function ChooseRobotSlideout(
             value={value}
             title={runtimeParam.displayName}
             tooltipText={runtimeParam.description}
-            caption={`${runtimeParam.min}-${runtimeParam.max}`}
+            caption={
+              runtimeParam.type === 'int'
+                ? `${runtimeParam.min}-${runtimeParam.max}`
+                : `${runtimeParam.min.toFixed(1)}-${runtimeParam.max.toFixed(
+                    1
+                  )}`
+            }
             id={id}
             error={
               Number.isNaN(value) ||
               value < runtimeParam.min ||
               value > runtimeParam.max
                 ? t(`value_out_of_range`, {
-                    min: runtimeParam.min,
-                    max: runtimeParam.max,
+                    min:
+                      runtimeParam.type === 'int'
+                        ? runtimeParam.min
+                        : runtimeParam.min.toFixed(1),
+                    max:
+                      runtimeParam.type === 'int'
+                        ? runtimeParam.max
+                        : runtimeParam.max.toFixed(1),
                   })
                 : null
             }
