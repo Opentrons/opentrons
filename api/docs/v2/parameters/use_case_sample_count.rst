@@ -51,9 +51,9 @@ Most examples below will use ``column_count``, rather than redoing (and retyping
 Loading Tip Racks
 =================
 
-Tip racks come first in most protocols. To ensure that a protocol runs to completion, you need to load enough tip racks to avoid running out of tips.
+Tip racks come first in most protocols. To ensure that a protocol runs to completion, we need to load enough tip racks to avoid running out of tips.
 
-We could load as many tip racks are needed for our maximum number of samples, but that would be suboptimal. Run setup is faster when the technician doesn't have to load extra items onto the deck. So it's best to examine the protocol's steps and determine how many racks are needed for each value of ``sample_count``.
+We could load as many tip racks as are needed for our maximum number of samples, but that would be suboptimal. Run setup is faster when the technician doesn't have to load extra items onto the deck. So it's best to examine the protocol's steps and determine how many racks are needed for each value of ``sample_count``.
 
 In the case of this DNA prep protocol, we can create formulas for the number of 200 µL and 50 µL tip racks needed. The following factors go into these computations:
 
@@ -64,7 +64,7 @@ In the case of this DNA prep protocol, we can create formulas for the number of 
     - 2 fixed actions that pick up once per protocol.
     - 11 variable actions that pick up once per sample column.
 
-Since each tip rack has 12 columns, divide the number of pickup actions by 12 to get the number of racks needed. And since you can't load a partial rack, you always need to round up — performing 13 pickups requires 2 racks. The :py:func:`math.ceil` method rounds up to the nearest integer. Add ``from math import ceil`` at the top of your protocol. Then calculate the number of tip racks as follows::
+Since each tip rack has 12 columns, divide the number of pickup actions by 12 to get the number of racks needed. And we always need to round up — performing 13 pickups requires 2 racks. The :py:func:`math.ceil` method rounds up to the nearest integer. We'll add ``from math import ceil`` at the top of the protocol and then calculate the number of tip racks as follows::
 
     tip_rack_50_count = ceil((1 + 7 * column_count) / 12)
     tip_rack_200_count = ceil((2 + 13 * column_count) / 12)
@@ -214,7 +214,7 @@ Now we can construct a ``for`` loop to label each sample well with ``load_liquid
 Processing Samples
 ==================
 
-When it comes time to process the samples we'll return to working by column, since the protocol uses an 8-channel pipette. There are many pipetting steps in the full protocol, but this section will examine just the steps for adding the Tagmentation Stop liquid. The same techniques would apply to similar steps.
+When it comes time to process the samples we'll return to working by column, since the protocol uses an 8-channel pipette. There are many pipetting stages in the full protocol, but this section will examine just the stage for adding the Tagmentation Stop liquid. The same techniques would apply to similar stages.
 
 For pipetting in the original sample locations, we'll command the 50 µL pipette to move to some or all of A1–A4 on the sample plate. Similar to when we loaded tip racks earlier, we can use ``column_count`` to slice a list containing these well names, and then iterate over that list with a ``for`` loop::
 
@@ -271,4 +271,4 @@ However, in the full protocol, sample count is not the only parameter that affec
     if tip_racks_200[0].wells()[-1].has_tip == False:
         # same move_labware() steps as above
 
-For protocols that use tips at even faster rates than this one — such that you might exhaust a tip rack in a single ``for`` loop of pipetting steps — you may have to perform such checks even more frequently. You can even define a function that counts tips or performs ``has_tip`` checks in combination with picking up a tip, and use that instead of :py:meth:`.pick_up_tip` every time you pipette. The built-in capabilities of Python and the methods of the Python Protocol API give you the flexibility to add this kind of smart behavior to your protocols.
+For a protocol that uses tips at a faster rate than this one — such that it might exhaust a tip rack in a single ``for`` loop of pipetting steps — you may have to perform such checks even more frequently. You can even define a function that counts tips or performs ``has_tip`` checks in combination with picking up a tip, and use that instead of :py:meth:`.pick_up_tip` every time you pipette. The built-in capabilities of Python and the methods of the Python Protocol API give you the flexibility to add this kind of smart behavior to your protocols.
