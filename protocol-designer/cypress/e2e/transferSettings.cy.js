@@ -50,7 +50,9 @@ describe('Advanced Settings for Transfer Form', () => {
     openDesignTab()
   })
 
-  it.only('Verify functionality of advanced settings with different pipette and labware', () => {
+  it('Verify functionality of the transfer form', () => {
+    // Verify functionality of advanced settings with different pipette and labware
+
     enterBatchEdit()
 
     // Different Pipette disbales aspirate and dispense Flowrate and Mix settings
@@ -84,9 +86,9 @@ describe('Advanced Settings for Transfer Form', () => {
 
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
 
-  it('Verify functionality of advanced settings with same pipette and labware', () => {
+    // Verify functionality of advanced settings with same pipette and labware
+
     // click on step 2 in batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // deselecting on step 6 in batch edit mode
@@ -125,9 +127,8 @@ describe('Advanced Settings for Transfer Form', () => {
 
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
 
-  it('verify flowrate indeterminate value', () => {
+    // Verify flowrate indeterminate value
     // click on step 2 in batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
@@ -146,9 +147,9 @@ describe('Advanced Settings for Transfer Form', () => {
 
     // indeterminate state in flowrate is empty
     cy.get('input[name="aspirate_flowRate"]').should('have.value', '')
-  })
 
-  it('verify functionality of flowrate in batch edit transfer', () => {
+    // Verify functionality of flowrate in batch edit transfer
+
     // Batch editing the Flowrate value
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
     cy.contains(
@@ -176,14 +177,13 @@ describe('Advanced Settings for Transfer Form', () => {
 
     // Verify that flowrate value
     cy.get('input[name="aspirate_flowRate"]').should('have.value', 100)
-  })
 
-  it('verify prewet tip indeterminate value', () => {
+    // Verify prewet tip indeterminate value
     // Click on step 2, to enter batch edit and enable prewet tip
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // enable pre-wet tip
     cy.togglePreWetTip()
-    cy.get('input[name="preWetTip"]').should('be.visible')
+    cy.get('input[name="preWetTip"]').should('be.enabled')
     // Click save button to save the changes
     cy.get('button').contains('save').click()
     // Click on step 1, as it does not have prewet-tip selected - indeteminate state
@@ -196,9 +196,9 @@ describe('Advanced Settings for Transfer Form', () => {
     )
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
 
-  it('verify mix settings indeterminate value', () => {
+    // Verify mix settings indeterminate value
+
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_4"]').click(batchEditClickOptions)
     // Select mix settings
@@ -217,9 +217,9 @@ describe('Advanced Settings for Transfer Form', () => {
     )
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
 
-  it('verify mix settings batch editing in transfer form', () => {
+    // Verify mix settings batch editing in transfer form
+
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Click on step 3 to batch edit mix settings
@@ -241,9 +241,9 @@ describe('Advanced Settings for Transfer Form', () => {
     // Verify that volume is set to 10 and repetitions to 2
     cy.get('input[name="aspirate_mix_volume"]').should('have.value', 10)
     cy.get('input[name="aspirate_mix_times"]').should('have.value', 2)
-  })
 
-  it('verify delay settings indeterminate value', () => {
+    // Verify delay settings indeterminate value
+
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Select delay settings
@@ -263,9 +263,9 @@ describe('Advanced Settings for Transfer Form', () => {
     )
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
 
-  it('verify delay settings batch editing in transfer form', () => {
+    // Verify delay settings batch editing in transfer form
+
     // Click on step 4, to enter batch edit mode
     cy.get('[data-test="StepItem_4"]').click(batchEditClickOptions)
     // Click on step 5 to batch edit mix settings
@@ -292,9 +292,9 @@ describe('Advanced Settings for Transfer Form', () => {
 
     // Verify that volume is set to 2 and repitions to 2
     cy.get('input[name="aspirate_delay_seconds"]').should('have.value', 2)
-  })
 
-  it('verify touchTip settings indeterminate value', () => {
+    // Verify touchTip settings indeterminate value
+
     cy.get('[data-test="StepItem_2"]').click()
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
@@ -314,9 +314,9 @@ describe('Advanced Settings for Transfer Form', () => {
     )
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
 
-  it('verify touchTip settings batch editing in transfer form', () => {
+    // verify touchTip settings batch editing in transfer form
+
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Click on step 3 to batch edit mix settings
@@ -347,9 +347,8 @@ describe('Advanced Settings for Transfer Form', () => {
       'have.value',
       13.78
     )
-  })
 
-  it('verify blowout settings indeterminate value', () => {
+    // verify blowout settings indeterminate value
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Select blowout settings
@@ -367,9 +366,9 @@ describe('Advanced Settings for Transfer Form', () => {
     )
     // Exit batch edit mode
     cy.get('button').contains('exit batch edit').click()
-  })
 
-  it('verify blowout settings batch editing in transfer form', () => {
+    // Verify blowout settings batch editing in transfer form
+
     // Click on step 2, to enter batch edit mode
     cy.get('[data-test="StepItem_2"]').click(batchEditClickOptions)
     // Click on step 3 to batch edit mix settings
