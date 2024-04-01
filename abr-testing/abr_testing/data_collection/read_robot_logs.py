@@ -138,6 +138,16 @@ def get_unseen_run_ids(runs: Set[str], runs_from_storage: Set[str]) -> Set[str]:
     return runs_to_save
 
 
+def save_run_log_to_json(
+    ip: str, results: Dict[str, Any], storage_directory: str
+) -> str:
+    """Save run log to local json file."""
+    data_file_name = ip + "_" + results["run_id"] + ".json"
+    saved_file_path = os.path.join(storage_directory, data_file_name)
+    json.dump(results, open(saved_file_path, mode="w"))
+    return saved_file_path
+
+
 def get_run_ids_from_google_drive(google_drive: Any) -> Set[str]:
     """Get run ids in google drive folder."""
     # Run ids in google_drive_folder

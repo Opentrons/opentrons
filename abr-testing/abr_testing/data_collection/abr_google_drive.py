@@ -7,7 +7,7 @@ import gspread  # type: ignore[import]
 from datetime import datetime, timedelta
 from abr_testing.data_collection import read_robot_logs
 from typing import Set, Dict, Any
-from abr_testing.google_automation import google_drive_tool, google_sheets_tool
+from abr_testing.automation import google_drive_tool, google_sheets_tool
 
 
 def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
