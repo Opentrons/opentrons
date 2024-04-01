@@ -17,14 +17,14 @@ import {
   useHoverTooltip,
   Icon,
 } from '@opentrons/components'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import { Tooltip } from '../../../atoms/Tooltip'
 
 interface ProtocolRunRuntimeParametersProps {
   runId: string
@@ -79,17 +79,17 @@ export function ProtocolRunRuntimeParameters({
       </Flex>
       {!hasParameter ? (
         <Flex padding={SPACING.spacing16}>
-          <NoParameters t={t} textKey="no_parameters_specified_in_protocol" />
+          <NoParameters />
         </Flex>
       ) : (
         <>
           <Divider width="100%" />
           <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
             <StyledTable>
-              <thead>
+              <StyledTableHeaderContainer>
                 <StyledTableHeader>{t('name')}</StyledTableHeader>
                 <StyledTableHeader>{t('value')}</StyledTableHeader>
-              </thead>
+              </StyledTableHeaderContainer>
               <tbody>
                 {runTimeParameters.map(
                   (parameter: RunTimeParameter, index: number) => (
@@ -128,10 +128,7 @@ const StyledTableRowComponent = (
       isLast={index === runTimeParametersLength - 1}
       key={`runTimeParameter-${index}`}
     >
-      <StyledTableCell
-        isLast={index === runTimeParametersLength - 1}
-        width="278px"
-      >
+      <StyledTableCell isLast={index === runTimeParametersLength - 1}>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
           <StyledText as="p">{parameter.displayName}</StyledText>
           {parameter.description != null ? (
@@ -151,10 +148,7 @@ const StyledTableRowComponent = (
           ) : null}
         </Flex>
       </StyledTableCell>
-      <StyledTableCell
-        width="278px"
-        isLast={index === runTimeParametersLength - 1}
-      >
+      <StyledTableCell isLast={index === runTimeParametersLength - 1}>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
           <StyledText as="p">
             {formatRunTimeParameterValue(parameter, t)}
@@ -178,11 +172,16 @@ const StyledTable = styled.table`
   border-collapse: collapse;
   text-align: left;
 `
+const StyledTableHeaderContainer = styled.thead`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 48px;
+  border-bottom: ${BORDERS.lineBorder};
+`
 
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}
   padding: ${SPACING.spacing8};
-  border-bottom: ${BORDERS.lineBorder};
 `
 
 interface StyledTableRowProps {
@@ -190,7 +189,11 @@ interface StyledTableRowProps {
 }
 
 const StyledTableRow = styled.tr<StyledTableRowProps>`
-  padding: ${SPACING.spacing8};
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 48px;
+  padding-top: ${SPACING.spacing8};
+  padding-bottom: ${SPACING.spacing8};
   border-bottom: ${props => (props.isLast ? 'none' : BORDERS.lineBorder)};
   align-items: ${ALIGN_CENTER};
 `
@@ -201,5 +204,5 @@ interface StyledTableCellProps {
 
 const StyledTableCell = styled.td<StyledTableCellProps>`
   padding-left: ${SPACING.spacing8};
-  height: 2.25rem;
+  height: 1.25rem;
 `

@@ -7,14 +7,7 @@ import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 
-interface NoParametersProps {
-  t?: any
-  textKey?: string
-}
-export function NoParameters({
-  t,
-  textKey = 'no_parameters_specified',
-}: NoParametersProps): JSX.Element {
+export function NoParameters(): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -33,7 +26,7 @@ export function NoParameters({
         aria-label="alert"
       />
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {t != null ? t(textKey) : 'No parameters specified in this protocol'}
+        No parameters specified in this protocol
       </StyledText>
     </Flex>
   )
