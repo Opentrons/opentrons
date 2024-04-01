@@ -5,8 +5,10 @@ import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { ResetValuesModal } from '../ResetValuesModal'
+import { RunTimeParameter } from '@opentrons/shared-data'
 
 const mockGoBack = vi.fn()
+const mockSetRunTimeParametersOverrides = vi.fn()
 
 const render = (props: React.ComponentProps<typeof ResetValuesModal>) => {
   return renderWithProviders(<ResetValuesModal {...props} />, {
@@ -19,6 +21,8 @@ describe('ResetValuesModal', () => {
 
   beforeEach(() => {
     props = {
+      runTimeParametersOverrides: [] as RunTimeParameter[],
+      setRunTimeParametersOverrides: mockSetRunTimeParametersOverrides,
       handleGoBack: mockGoBack,
     }
   })
@@ -42,5 +46,11 @@ describe('ResetValuesModal', () => {
   })
 
   // ToDo (kk: 03/18/2024) reset value button test will be added
-  it.todo('should call a mock function when tapping reset values button')
+  it('should call a mock function when tapping reset values button', () => {
+    render(props)
+    const resetValuesButton = screen.getByText('Reset values')
+    fireEvent.click(resetValuesButton)
+    expect(mockSetRunTimeParametersOverrides)
+    expect(mockGoBack).toHaveBeenCalled()
+  })
 })
