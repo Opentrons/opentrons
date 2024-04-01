@@ -55,7 +55,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
 
   const { t } = useTranslation('application')
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const [isModalOpen, setModalOpen] = React.useState(false)
+  const [isModalOpen, setModalOpen] = React.useState<boolean>(false)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const labwareDef =
     labwareId != null && labwareEntities[labwareId] != null
@@ -65,6 +65,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
   let wellDepthMm = 0
   let wellXWidthMm = 0
   let wellYWidthMm = 0
+
   if (labwareDef != null) {
     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths/widths
     const firstWell = labwareDef.wells.A1
@@ -85,8 +86,11 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
     )
   }
 
-  const handleOpen = (): void => {
-    if (wellDepthMm && wellXWidthMm && wellYWidthMm) {
+  const handleOpen = (has3Specs: boolean): void => {
+    if (has3Specs && wellDepthMm && wellXWidthMm && wellYWidthMm) {
+      setModalOpen(true)
+    }
+    if (!has3Specs && wellDepthMm) {
       setModalOpen(true)
     }
   }
@@ -156,7 +160,6 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
       />
     )
   }
-  console.log('disabled', disabled)
 
   return (
     <>
@@ -170,8 +173,9 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
       >
         {yField != null && xField != null ? (
           <Flex
-            onClick={disabled != null ? handleOpen : undefined}
+            onClick={disabled != null ? () => handleOpen(true) : undefined}
             id={`TipPositionIcon_${zName}`}
+            data-testid={`TipPositionIcon_${zName}`}
             width="5rem"
           >
             <Icon
@@ -185,7 +189,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
             disabled={disabled}
             className={stepFormStyles.small_field}
             readOnly
-            onClick={handleOpen}
+            onClick={() => handleOpen(false)}
             value={String(zValue)}
             isIndeterminate={isIndeterminate}
             units={t('units.millimeter')}

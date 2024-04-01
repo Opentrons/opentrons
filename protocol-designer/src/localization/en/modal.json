@@ -61,6 +61,12 @@
   },
   "tip_position": {
     "title": "Tip Positioning",
+    "caption": "between {{min}} and {{max}}",
+    "radio_button": {
+      "default": "{{defaultMmFromBottom}} mm from the bottom center (default)",
+      "mix": "Aspirate 1mm, Dispense 0.5mm from the bottom center (default)",
+      "custom": "Custom"
+    },
     "body": {
       "aspirate_mmFromBottom": "Change from where in the well the robot aspirates",
       "dispense_mmFromBottom": "Change from where in the well the robot dispenses",

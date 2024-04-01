@@ -51,7 +51,7 @@ export const roundValue = (value: number | string | null): number => {
 }
 
 const OUT_OF_BOUNDS: 'OUT_OF_BOUNDS' = 'OUT_OF_BOUNDS'
-type Error = typeof TOO_MANY_DECIMALS | typeof OUT_OF_BOUNDS
+export type Error = typeof TOO_MANY_DECIMALS | typeof OUT_OF_BOUNDS
 
 export const getErrorText = (args: {
   errors: Error[]

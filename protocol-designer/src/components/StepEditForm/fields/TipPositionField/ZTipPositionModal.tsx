@@ -135,7 +135,10 @@ export const ZTipPositionModal = (props: Props): JSX.Element => {
 
   const TipPositionInputField = !isDefault && (
     <InputField
-      caption={`between ${minMmFromBottom} and ${maxMmFromBottom}`}
+      caption={t('tip_position.caption', {
+        min: minMmFromBottom,
+        max: maxMmFromBottom,
+      })}
       className={styles.position_from_bottom_input}
       error={errorText}
       id={'TipPositionModal_custom_input'}
@@ -200,11 +203,13 @@ export const ZTipPositionModal = (props: Props): JSX.Element => {
                 }}
                 options={[
                   {
-                    name: `${defaultMmFromBottom} mm from the bottom (default)`,
+                    name: t('tip_position.radio_button.default', {
+                      defaultMmFromBottom,
+                    }),
                     value: 'default',
                   },
                   {
-                    name: 'Custom',
+                    name: t('tip_position.radio_button.custom'),
                     value: 'custom',
                   },
                 ]}

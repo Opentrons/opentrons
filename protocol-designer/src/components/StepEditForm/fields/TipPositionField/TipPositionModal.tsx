@@ -26,7 +26,7 @@ type Offset = 'x' | 'y' | 'z'
 interface PositionSpec {
   name: StepFieldName
   value: number | null
-  updateValue: (val: number | null | undefined) => void
+  updateValue: (val?: number | null) => void
 }
 export type PositionSpecs = Record<Offset, PositionSpec>
 
@@ -108,24 +108,17 @@ export const TipPositionModal = (
     wellXWidthMm
   )
 
-  const zErrors = utils.getErrors({
-    isDefault,
-    minMm: minMmFromBottom,
-    maxMm: maxMmFromBottom,
-    value: zValue,
-  })
-  const xErrors = utils.getErrors({
-    isDefault,
-    minMm: xMinWidth,
-    maxMm: xMaxWidth,
-    value: xValue,
-  })
-  const yErrors = utils.getErrors({
-    isDefault,
-    minMm: yMinWidth,
-    maxMm: yMaxWidth,
-    value: yValue,
-  })
+  const createErrors = (
+    value: string | null,
+    min: number,
+    max: number
+  ): utils.Error[] => {
+    return utils.getErrors({ isDefault, minMm: min, maxMm: max, value })
+  }
+  const zErrors = createErrors(zValue, minMmFromBottom, maxMmFromBottom)
+  const xErrors = createErrors(xValue, xMinWidth, xMaxWidth)
+  const yErrors = createErrors(yValue, yMinWidth, yMaxWidth)
+
   const hasErrors =
     zErrors.length > 0 || xErrors.length > 0 || yErrors.length > 0
   const hasVisibleErrors = isPristine
@@ -134,33 +127,20 @@ export const TipPositionModal = (
       yErrors.includes(TOO_MANY_DECIMALS)
     : hasErrors
 
-  const zErrorText = utils.getErrorText({
-    errors: zErrors,
-    maxMm: maxMmFromBottom,
-    minMm: minMmFromBottom,
-    isPristine,
-    t,
-  })
+  const createErrorText = (
+    errors: utils.Error[],
+    min: number,
+    max: number
+  ): string | null => {
+    return utils.getErrorText({ errors, minMm: min, maxMm: max, isPristine, t })
+  }
 
-  const xErrorText = utils.getErrorText({
-    errors: xErrors,
-    minMm: xMinWidth,
-    maxMm: xMaxWidth,
-    isPristine,
-    t,
-  })
-
-  const yErrorText = utils.getErrorText({
-    errors: yErrors,
-    minMm: yMinWidth,
-    maxMm: yMaxWidth,
-    isPristine,
-    t,
-  })
+  const zErrorText = createErrorText(zErrors, minMmFromBottom, maxMmFromBottom)
+  const xErrorText = createErrorText(xErrors, xMinWidth, xMaxWidth)
+  const yErrorText = createErrorText(yErrors, yMinWidth, yMaxWidth)
 
   const handleDone = (): void => {
     setPristine(false)
-
     if (!hasErrors) {
       if (isDefault) {
         zSpec?.updateValue(null)
@@ -246,7 +226,10 @@ export const TipPositionModal = (
           {t('tip_position.field_titles.x_position')}
         </StyledText>
         <InputField
-          caption={`between ${xMinWidth} and ${xMaxWidth}`}
+          caption={t('tip_position.caption', {
+            min: xMinWidth,
+            max: xMaxWidth,
+          })}
           error={xErrorText}
           className={styles.position_from_bottom_input}
           id="TipPositionModal_x_custom_input"
@@ -260,7 +243,10 @@ export const TipPositionModal = (
           {t('tip_position.field_titles.y_position')}
         </StyledText>
         <InputField
-          caption={`between ${yMinWidth} and ${yMaxWidth}`}
+          caption={t('tip_position.caption', {
+            min: yMinWidth,
+            max: yMaxWidth,
+          })}
           error={yErrorText}
           className={styles.position_from_bottom_input}
           id="TipPositionModal_y_custom_input"
@@ -274,7 +260,10 @@ export const TipPositionModal = (
           {t('tip_position.field_titles.z_position')}
         </StyledText>
         <InputField
-          caption={`between ${minMmFromBottom} and ${maxMmFromBottom}`}
+          caption={t('tip_position.caption', {
+            min: minMmFromBottom,
+            max: maxMmFromBottom,
+          })}
           error={zErrorText}
           className={styles.position_from_bottom_input}
           id="TipPositionModal_z_custom_input"
@@ -320,12 +309,14 @@ export const TipPositionModal = (
               options={[
                 {
                   name: isMixAspDispField
-                    ? `Aspirate 1mm, Dispense 0.5mm from the bottom center (default)`
-                    : `${defaultMmFromBottom} mm from the bottom center (default)`,
+                    ? t('tip_position.radio_button.mix')
+                    : t('tip_position.radio_button.default', {
+                        defaultMmFromBottom,
+                      }),
                   value: 'default',
                 },
                 {
-                  name: 'Custom',
+                  name: t('tip_position.radio_button.custom'),
                   value: 'custom',
                 },
               ]}
