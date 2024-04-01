@@ -122,6 +122,7 @@ class JiraTicket:
         summary: str,
         description: str,
         project_key: str,
+        reporter_id:str,
         issue_type: str,
         priority: str,
         components: list,
@@ -135,7 +136,7 @@ class JiraTicket:
                 "issuetype": {"name": issue_type},
                 "summary": summary,
                 "reporter": {
-                    "accountId": "712020:f32d03f8-f91a-465d-871b-45135b7b955f"
+                    "id": reporter_id
                 },
                 "parent": {"key": robot},
                 "priority": {"name": priority},
@@ -222,6 +223,14 @@ if __name__ == "__main__":
         nargs=1,
         help="Email connected to JIRA account.",
     )
+    # TODO: write function to get reporter_id from email.
+    parser.add_argument(
+        "reporter_id",
+        metavar="REPORTER_ID",
+        type=str,
+        nargs=1, 
+        help="JIRA Reporter ID."
+    )
     # TODO: improve help comment on jira board id.
     parser.add_argument(
         "board_id",
@@ -237,7 +246,7 @@ if __name__ == "__main__":
     api_token = args.jira_api_token[0]
     email = args.email[0]
     board_id = args.board_id[0]
-
+    reporter_id = args.reporter_id[0]
     ticket = JiraTicket(url, api_token, email)
     error_runs = get_error_runs_from_robot(ip)
     one_run = error_runs[-1]  # Most recent run with error.
@@ -257,6 +266,7 @@ if __name__ == "__main__":
         summary,
         whole_description_str,
         project_key,
+        reporter_id,
         "Bug",
         "Medium",
         components,
