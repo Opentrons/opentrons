@@ -74,7 +74,7 @@ Running the numbers shows that the maximum combined number of tip racks is 7. No
     tip_rack_50_slots = ["B3", "C3", "B4"]
     tip_rack_200_slots = ["A2", "B2", "A3", "A4"]
 
-Finally, we can combine this information to call :py:meth:`~.ProtocolContext.load_labware`. Depending on the number of racks needed, we'll slice that number of elements from the slot lists and use a `list comprehension <https://docs.python.org/2/tutorial/datastructures.html#list-comprehensions>`__ to gather up the loaded tip racks. For the 50 µL tips, this would look like::
+Finally, we can combine this information to call :py:meth:`~.ProtocolContext.load_labware`. Depending on the number of racks needed, we'll slice that number of elements from the slot list and use a `list comprehension <https://docs.python.org/2/tutorial/datastructures.html#list-comprehensions>`__ to gather up the loaded tip racks. For the 50 µL tips, this would look like::
 
     tip_racks_50 = [
         protocol.load_labware(
@@ -87,7 +87,7 @@ Finally, we can combine this information to call :py:meth:`~.ProtocolContext.loa
 Then we can associate those lists of tip racks directly with each pipette as we load them. All together, the start of our ``run`` function looks like this::
 
     # calculate column count from sample count
-    column_count = protocol.params.sample_count / 8
+    column_count = protocol.params.sample_count // 8
 
     # calculate number of required tip racks
     tip_rack_50_count = ceil((1 + 7 * column_count) / 12)
@@ -232,14 +232,43 @@ Each time through the loop, the pipette will fill from the same well of the rese
 
 Later steps of the protocol will move intermediate samples to the middle of the plate (columns 5–8) and final samples to the right side of the plate (columns 9–12). When moving directly from one set of columns to another, we have to track *both lists* with the ``for`` loop. The :py:func:`zip` function lets us pair up the lists of well names and step through them in parallel::
 
-    for s, d in zip(
+    for initial, intermediate in zip(
         ["A1", "A2", "A3", "A4"][:column_count],
         ["A5", "A6", "A7", "A8"][:column_count],
     ):
         pipette_50.pick_up_tip()
-        pipette_50.aspirate(volume=13, location=sample_plate[s])
-        pipette_50.dispense(volume=13, location=sample_plate[d])
+        pipette_50.aspirate(volume=13, location=sample_plate[initial])
+        pipette_50.dispense(volume=13, location=sample_plate[intermediate])
         pipette_50.drop_tip()
 
-This will transfer from column 1 to 5, 2 to 6, and so on — depending on the number of samples chosen during run setup!
+This will transfer from column 1 to 5, 2 to 6, and so on — depending on the number of samples chosen during run setup.
 
+Replenishing Tips
+=================
+
+For the higher values of ``protocol.params.sample_count``, the protocol will load tip racks in the staging area slots (column 4). Since pipettes can't reach these slots, we need to move these tip racks into the working area (columns 1–3) before issuing a pipetting command that targets them, or the API will raise an error.
+
+A protocol without parameters will always run out of tips at the same time — just add a :py:meth:`.move_labware` command when that happens. But as we saw in the Processing Samples section above, our parameterized protocol will go through tips at a different rate depending on the sample count.
+
+In our simplified example, we know that when the sample count is 32, the first 200 µL tip rack will be exhausted after three stages of pipetting using the 1000 µL pipette. So, after that step, we could add::
+
+    if protocol.params.sample_count == 32:
+        protocol.move_labware(
+            labware=tip_racks_200[0],
+            new_location=chute,
+            use_gripper=True,
+        )
+        protocol.move_labware(
+            labware=tip_racks_200[-1],
+            new_location="A2",
+            use_gripper=True,
+        )
+
+This will replace the first 200 µL tip rack (in slot A2) with the last 200 µL tip rack (in the staging area).
+
+However, in the full protocol, sample count is not the only parameter that affects the rate of tip use. It would be unwieldy to calculate in advance all the permutations of when tip replenishment is necessary. Instead, before each stage of the protocol, we could use :py:obj:`.Well.has_tip()` to check whether the first tip rack is empty. If the *last well* of the rack is empty, we can assume that the entire rack is empty and needs to be replaced::
+
+    if tip_racks_200[0].wells()[-1].has_tip == False:
+        # same move_labware() steps as above
+
+For protocols that use tips at even faster rates than this one — such that you might exhaust a tip rack in a single ``for`` loop of pipetting steps — you may have to perform such checks even more frequently. You can even define a function that counts tips or performs ``has_tip`` checks in combination with picking up a tip, and use that instead of :py:meth:`.pick_up_tip` every time you pipette. The built-in capabilities of Python and the methods of the Python Protocol API give you the flexibility to add this kind of smart behavior to your protocols.
