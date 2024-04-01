@@ -5,7 +5,6 @@ import {
   getRobotTypeDisplayName,
 } from '../utils'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import { simpleAnalysisFileFixture } from '@opentrons/api-client'
 
 const mockOT3ProtocolAnalysisOutput = {
   robotType: 'OT-3 Standard',
