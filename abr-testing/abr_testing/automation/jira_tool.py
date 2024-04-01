@@ -122,7 +122,7 @@ class JiraTicket:
         summary: str,
         description: str,
         project_key: str,
-        reporter_id:str,
+        reporter_id: str,
         issue_type: str,
         priority: str,
         components: list,
@@ -135,9 +135,7 @@ class JiraTicket:
                 "project": {"id": "10273", "key": project_key},
                 "issuetype": {"name": issue_type},
                 "summary": summary,
-                "reporter": {
-                    "id": reporter_id
-                },
+                "reporter": {"id": reporter_id},
                 "parent": {"key": robot},
                 "priority": {"name": priority},
                 "components": [{"name": component} for component in components],
@@ -228,8 +226,8 @@ if __name__ == "__main__":
         "reporter_id",
         metavar="REPORTER_ID",
         type=str,
-        nargs=1, 
-        help="JIRA Reporter ID."
+        nargs=1,
+        help="JIRA Reporter ID.",
     )
     # TODO: improve help comment on jira board id.
     parser.add_argument(
