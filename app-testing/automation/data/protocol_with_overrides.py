@@ -53,6 +53,7 @@ class ProtocolWithOverrides(Protocol):
                 expected_test_reason=self.expected_test_reason,
                 from_override=True,
                 override_value=override,
+                category=self.category,
             )
             protocols.append(protocol)
         self.protocols = protocols
