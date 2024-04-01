@@ -11,6 +11,7 @@ import {
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { StepFieldName } from '../../steplist/fieldLevel'
 import { selectors as fileDataSelectors } from '../../file-data'
+import { PRESAVED_STEP_ID } from '../../steplist'
 import {
   getVisibleFormWarnings,
   getVisibleFormErrors,
@@ -105,16 +106,6 @@ const AlertsComponent = (props: Props): JSX.Element => {
     })
   }
 
-  const dismissWarning = (dismissId: string): void => {
-    if (stepId) {
-      dispatch(
-        dismissActions.dismissTimelineWarning({
-          type: dismissId,
-          stepId,
-        })
-      )
-    }
-  }
   const makeHandleCloseWarning = (dismissId?: string | null) => () => {
     console.assert(
       dismissId,
@@ -152,6 +143,28 @@ const AlertsComponent = (props: Props): JSX.Element => {
     description: warning.body || null,
     dismissId: warning.type,
   }))
+
+  const dismissWarning = (dismissId: string): void => {
+    const isTimelineWarning = Object.values(timelineWarnings).some(
+      warning => warning.dismissId === dismissId
+    )
+    if (isTimelineWarning && stepId) {
+      dispatch(
+        dismissActions.dismissTimelineWarning({
+          type: dismissId,
+          stepId,
+        })
+      )
+    } else {
+      dispatch(
+        dismissActions.dismissFormWarning({
+          type: dismissId,
+          //  if stepId does not exist, assume it is a presaved step
+          stepId: stepId ?? PRESAVED_STEP_ID,
+        })
+      )
+    }
+  }
 
   return (
     <>

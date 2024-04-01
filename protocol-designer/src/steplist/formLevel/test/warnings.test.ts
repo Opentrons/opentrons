@@ -1,11 +1,16 @@
 import { describe, it, beforeEach, expect } from 'vitest'
-import { fixture_24_tuberack } from '@opentrons/shared-data/labware/fixtures/2'
+import { fixture24Tuberack, fixture96Plate } from '@opentrons/shared-data'
 import {
   _minAirGapVolume,
   belowPipetteMinimumVolume,
   minDisposalVolume,
   maxDispenseWellVolume,
+  aspirateTipPositionInTube,
+  dispenseTipPositionInTube,
+  mixTipPositionInTube,
 } from '../warnings'
+import type { LabwareEntity } from '@opentrons/step-generation'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 type CheckboxFields = 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox'
 type VolumeFields = 'aspirate_airGap_volume' | 'dispense_airGap_volume'
@@ -16,11 +21,15 @@ describe('Min air gap volume', () => {
     const volumeField = `${aspDisp}_airGap_volume` as VolumeFields
 
     describe(`${aspOrDisp} -> air gap`, () => {
-      let pipette: { spec: { minVolume: number } }
+      let pipette: { spec: { liquids: { default: { minVolume: number } } } }
       beforeEach(() => {
         pipette = {
           spec: {
-            minVolume: 100,
+            liquids: {
+              default: {
+                minVolume: 100,
+              },
+            },
           },
         }
       })
@@ -82,12 +91,18 @@ describe('Min air gap volume', () => {
   })
 })
 describe('Below pipette minimum volume', () => {
-  let fieldsWithPipette: { pipette: { spec: { minVolume: number } } }
+  let fieldsWithPipette: {
+    pipette: { spec: { liquids: { default: { minVolume: number } } } }
+  }
   beforeEach(() => {
     fieldsWithPipette = {
       pipette: {
         spec: {
-          minVolume: 100,
+          liquids: {
+            default: {
+              minVolume: 100,
+            },
+          },
         },
       },
     }
@@ -119,7 +134,7 @@ describe('Below pipette minimum volume', () => {
 })
 describe('Below min disposal volume', () => {
   let fieldsWithPipette: {
-    pipette: { spec: { minVolume: number } }
+    pipette: { spec: { liquids: { default: { minVolume: number } } } }
     disposalVolume_checkbox: boolean
     disposalVolume_volume: number
     path: string
@@ -128,7 +143,11 @@ describe('Below min disposal volume', () => {
     fieldsWithPipette = {
       pipette: {
         spec: {
-          minVolume: 100,
+          liquids: {
+            default: {
+              minVolume: 100,
+            },
+          },
         },
       },
       disposalVolume_checkbox: true,
@@ -201,7 +220,7 @@ describe('Max dispense well volume', () => {
   let fieldsWithDispenseLabware: any
   beforeEach(() => {
     fieldsWithDispenseLabware = {
-      dispense_labware: { def: { ...fixture_24_tuberack } },
+      dispense_labware: { def: fixture24Tuberack },
       dispense_wells: ['A1', 'A2'],
     }
   })
@@ -243,5 +262,76 @@ describe('Max dispense well volume', () => {
     }
     // @ts-expect-error(sa, 2021-6-15): maxDispenseWellVolume might return null, need to null check before property access
     expect(maxDispenseWellVolume(fields).type).toBe('OVER_MAX_WELL_VOLUME')
+  })
+  describe('tip position in tube warnings', () => {
+    let fields: {
+      aspirate_labware: LabwareEntity
+      aspirate_mmFromBottom: number | null
+      labware: LabwareEntity
+      mix_mmFromBottom: number
+      dispense_labware: LabwareEntity
+      dispense_mmFromBottom: number | null
+    }
+    beforeEach(() => {
+      fields = {
+        aspirate_labware: {
+          def: fixture24Tuberack as LabwareDefinition2,
+          id: 'mockId',
+          labwareDefURI: 'mockURI',
+        },
+        aspirate_mmFromBottom: null,
+        labware: {
+          def: fixture24Tuberack as LabwareDefinition2,
+          id: 'mockId',
+          labwareDefURI: 'mockURI',
+        },
+        mix_mmFromBottom: 0.5,
+        dispense_labware: {
+          def: fixture24Tuberack as LabwareDefinition2,
+          id: 'mockId',
+          labwareDefURI: 'mockURI',
+        },
+        dispense_mmFromBottom: null,
+      }
+    })
+    it('renders the errors for all 3', () => {
+      expect(aspirateTipPositionInTube(fields)?.type).toBe(
+        'ASPIRATE_TIP_POSITIONED_LOW_IN_TUBE'
+      )
+      expect(dispenseTipPositionInTube(fields)?.type).toBe(
+        'DISPENSE_TIP_POSITIONED_LOW_IN_TUBE'
+      )
+      expect(mixTipPositionInTube(fields)?.type).toBe(
+        'MIX_TIP_POSITIONED_LOW_IN_TUBE'
+      )
+    })
+    it('renders null for all 3 when the number has been adjusted', () => {
+      fields.aspirate_mmFromBottom = 3
+      fields.dispense_mmFromBottom = 3
+      fields.mix_mmFromBottom = 3
+      expect(aspirateTipPositionInTube(fields)).toBe(null)
+      expect(dispenseTipPositionInTube(fields)).toBe(null)
+      expect(mixTipPositionInTube(fields)).toBe(null)
+    })
+    it('renders null for all 3 when the labware is not a tube rack', () => {
+      fields.aspirate_labware = {
+        def: fixture96Plate as LabwareDefinition2,
+        id: 'mockId',
+        labwareDefURI: 'mockURI',
+      }
+      fields.labware = {
+        def: fixture96Plate as LabwareDefinition2,
+        id: 'mockId',
+        labwareDefURI: 'mockURI',
+      }
+      fields.dispense_labware = {
+        def: fixture96Plate as LabwareDefinition2,
+        id: 'mockId',
+        labwareDefURI: 'mockURI',
+      }
+      expect(aspirateTipPositionInTube(fields)).toBe(null)
+      expect(dispenseTipPositionInTube(fields)).toBe(null)
+      expect(mixTipPositionInTube(fields)).toBe(null)
+    })
   })
 })
