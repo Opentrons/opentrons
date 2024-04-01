@@ -6,13 +6,14 @@ from .notification_client import (
     get_notification_client,
     clean_up_notification_client,
 )
-from .publisher_notifier import get_notify_publishers
+from .publisher_notifier import PublisherNotifier, get_notify_publishers
 from .publishers import (
     MaintenanceRunsPublisher,
     RunsPublisher,
     get_maintenance_runs_publisher,
     get_runs_publisher,
 )
+from .change_notifier import ChangeNotifier
 
 __all__ = [
     # main export
@@ -28,4 +29,7 @@ __all__ = [
     "get_notify_publishers",
     "get_maintenance_runs_publisher",
     "get_runs_publisher",
+    # for testing
+    "PublisherNotifier",
+    "ChangeNotifier",
 ]

@@ -68,6 +68,3 @@ def get_notify_publishers(
     publisher_notifier = _publisher_notifier_accessor.get_from(app_state)
     assert isinstance(publisher_notifier, PublisherNotifier)
     return publisher_notifier.notify_publishers
-
-
-# TOME: Left to do. 1) Verify this works conceptually for the runs_publisher route. 2) Add testing. 3) Lint + docstrings.
