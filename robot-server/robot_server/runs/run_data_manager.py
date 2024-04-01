@@ -12,6 +12,7 @@ from opentrons.protocol_engine import (
     CurrentCommand,
     Command,
 )
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
@@ -142,6 +143,7 @@ class RunDataManager:
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
+        run_time_param_values: Optional[RunTimeParamValuesType],
         protocol: Optional[ProtocolResource],
     ) -> Union[Run, BadRun]:
         """Create a new, current run.
@@ -171,6 +173,7 @@ class RunDataManager:
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
             protocol=protocol,
+            run_time_param_values=run_time_param_values,
         )
         run_resource = self._run_store.insert(
             run_id=run_id,

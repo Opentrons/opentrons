@@ -160,6 +160,9 @@ async def create_run(
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []
+    rtp_values = (
+        request_body.data.runTimeParameterValues if request_body is not None else None
+    )
     protocol_resource = None
 
     deck_configuration = await deck_configuration_store.get_deck_configuration()
@@ -183,6 +186,7 @@ async def create_run(
             created_at=created_at,
             labware_offsets=offsets,
             deck_configuration=deck_configuration,
+            run_time_param_values=rtp_values,
             protocol=protocol_resource,
         )
     except EngineConflictError as e:
