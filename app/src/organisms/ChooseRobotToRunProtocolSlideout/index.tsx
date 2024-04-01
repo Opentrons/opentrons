@@ -229,7 +229,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
 
   return (
     <ChooseRobotSlideout
-      multiSlideout={hasRunTimeParameters ? { currentPage } : undefined}
+      multiSlideout={hasRunTimeParameters ? { currentPage } : null}
       isExpanded={showSlideout}
       isSelectedRobotOnDifferentSoftwareVersion={
         isSelectedRobotOnDifferentSoftwareVersion

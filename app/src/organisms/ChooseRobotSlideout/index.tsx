@@ -112,7 +112,7 @@ interface ChooseRobotSlideoutProps
   isAnalysisError?: boolean
   isAnalysisStale?: boolean
   showIdleOnly?: boolean
-  multiSlideout?: { currentPage: number }
+  multiSlideout?: { currentPage: number } | null
 }
 
 export function ChooseRobotSlideout(
@@ -135,7 +135,7 @@ export function ChooseRobotSlideout(
     setSelectedRobot,
     robotType,
     showIdleOnly = false,
-    multiSlideout,
+    multiSlideout = null,
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
   } = props
