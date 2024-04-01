@@ -14,7 +14,6 @@ from opentrons.hardware_control.modules import (
     MagneticStatus,
     module_calibration,
 )
-from opentrons.hardware_control.modules.mod_abc import parse_fw_version
 
 from opentrons.types import Point
 from opentrons.protocol_engine import ModuleModel
