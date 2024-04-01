@@ -8,10 +8,7 @@ from decoy import Decoy
 
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.ordered_set import OrderedSet
-from opentrons.protocol_engine.actions.actions import (
-    ResumeFromRecoveryAction,
-    SetTipUsedAction,
-)
+from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 
 from opentrons.types import DeckSlotName
@@ -1054,19 +1051,5 @@ def test_reset_tips(
 
     decoy.verify(
         action_dispatcher.dispatch(ResetTipsAction(labware_id="cool-labware")),
-        times=1,
-    )
-
-
-def test_set_tip_used(
-    decoy: Decoy, action_dispatcher: ActionDispatcher, subject: ProtocolEngine
-) -> None:
-    """It should dispatch the equivalent action."""
-    subject.set_tip_used(labware_id="cool-labware", well_name="cool-well")
-
-    decoy.verify(
-        action_dispatcher.dispatch(
-            SetTipUsedAction(labware_id="cool-labware", well_name="cool-well")
-        ),
         times=1,
     )

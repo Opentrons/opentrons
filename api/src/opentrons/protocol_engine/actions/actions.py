@@ -208,17 +208,9 @@ class AddModuleAction:
 
 @dataclass(frozen=True)
 class ResetTipsAction:
-    """See `ProtocolEngine.reset_tips()`."""
+    """Reset the tip tracking state of a given tip rack."""
 
     labware_id: str
-
-
-@dataclass(frozen=True)
-class SetTipUsedAction:
-    """See `ProtocolEngine.set_tip_used()`."""
-
-    labware_id: str
-    well_name: str
 
 
 @dataclass(frozen=True)
@@ -250,6 +242,5 @@ Action = Union[
     AddAddressableAreaAction,
     AddLiquidAction,
     ResetTipsAction,
-    SetTipUsedAction,
     SetPipetteMovementSpeedAction,
 ]

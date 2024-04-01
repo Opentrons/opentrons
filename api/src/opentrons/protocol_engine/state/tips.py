@@ -1,11 +1,4 @@
-"""Tip state tracking.
-
-This just a helper for the Python Protocol API. Protocol Engine does not directly use
-this for anything, since all `pickUpTip` commands specify the tip location explicitly.
-Higher-level code in the Python Protocol API chooses the tip. To do that, it needs to
-keep track of tip state, and it's convenient to do that here, inside of
-`opentrons.protocol_engine.state`, because we can hook into every `pickUpTip` command.
-"""
+"""Tip state tracking."""
 from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Optional, List, Union
@@ -15,7 +8,6 @@ from ..actions import (
     Action,
     SucceedCommandAction,
     ResetTipsAction,
-    SetTipUsedAction,
 )
 from ..commands import (
     Command,
@@ -101,10 +93,6 @@ class TipStore(HasState[TipState], HandlesActions):
                 self._state.tips_by_labware_id[labware_id][
                     well_name
                 ] = TipRackWellState.CLEAN
-
-        elif isinstance(action, SetTipUsedAction):
-            tip_state_by_well_name = self._state.tips_by_labware_id[action.labware_id]
-            tip_state_by_well_name[action.well_name] = TipRackWellState.USED
 
     def _handle_command(self, command: Command) -> None:
         if (

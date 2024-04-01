@@ -25,7 +25,6 @@ from .actions import (
     FinishErrorDetails,
     DoorChangeAction,
     ResetTipsAction,
-    SetTipUsedAction,
     SetPipetteMovementSpeedAction,
 )
 
@@ -52,7 +51,6 @@ __all__ = [
     "AddModuleAction",
     "DoorChangeAction",
     "ResetTipsAction",
-    "SetTipUsedAction",
     "SetPipetteMovementSpeedAction",
     # action payload values
     "PauseSource",
