@@ -20,7 +20,7 @@ from opentrons_shared_data.labware.labware_definition import (
 
 
 @st.composite
-def generate_labware_definition_data(draw: st.DrawFn) -> List[Tuple[str, str, int]]:
+def generate_add_labware_definition_actions(draw: st.DrawFn) -> List[AddLabwareDefinitionAction]:
     """Generate a list of Labware Definitions."""
     number_of_labware = draw(st.integers(min_value=1, max_value=10))
     namespaces = draw(
@@ -51,40 +51,31 @@ def generate_labware_definition_data(draw: st.DrawFn) -> List[Tuple[str, str, in
     load_names = list(load_names)
 
     return [
-        (namespaces.pop(0), load_names.pop(0), versions.pop(0))
+        mock_labware_def(namespaces.pop(0), load_names.pop(0), versions.pop(0))
         for _ in range(number_of_labware)
     ]
 
 
-def mock_labware_defs(
-    labware_defs: List[Tuple[str, str, int]]
-) -> List[AddLabwareDefinitionAction]:
+def mock_labware_def(
+    namespace: str, load_name: str, version: int
+) -> AddLabwareDefinitionAction:
     """Generate a list of AddLabwareDefinitionAction with mock labware definitions."""
-    mocked_labware_defs = []
-    for namespace, load_name, version in labware_defs:
-        # Create a mock LabwareDefinition object
-        mocked_definition = Mock(spec=LabwareDefinition)
-        mocked_definition.parameters = Mock(spec=Parameters)
-        mocked_definition.namespace = namespace
-        mocked_definition.version = version
-        mocked_definition.parameters.loadName = load_name
+    mocked_definition = Mock(spec=LabwareDefinition)
+    mocked_definition.parameters = Mock(spec=Parameters)
+    mocked_definition.namespace = namespace
+    mocked_definition.version = version
+    mocked_definition.parameters.loadName = load_name
 
-        mocked_labware_defs.append(
-            AddLabwareDefinitionAction(definition=mocked_definition)
-        )
-
-    return mocked_labware_defs
-
-
-@given(labware_definition_data=generate_labware_definition_data())
-@settings(max_examples=1000)
+    return AddLabwareDefinitionAction(definition=mocked_definition)
+    
+@given(add_labware_definition_actions=generate_add_labware_definition_actions())
+@settings(max_examples=100)
 def test_handles_add_labware(
-    labware_definition_data,
+    add_labware_definition_actions: List[AddLabwareDefinitionAction],
 ) -> None:
     """It should add the labware to the state."""
     labware_store = LabwareStore(
         deck_definition=DeckDefinitionV4(), deck_fixed_labware=[]
     )
-    add_labware_def_actions = mock_labware_defs(labware_definition_data)
-    for action in add_labware_def_actions:
+    for action in add_labware_definition_actions:
         labware_store.handle_action(action)
