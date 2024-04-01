@@ -173,6 +173,7 @@ stages:
             completedAt: !anystr
             status: succeeded
             params: { }
+            notes: [ ]
           - id: '{setup_command_id}'
             key: '{setup_command_key}'
             intent: setup
