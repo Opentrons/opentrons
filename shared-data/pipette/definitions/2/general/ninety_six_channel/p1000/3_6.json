@@ -1,0 +1,87 @@
+{
+  "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
+  "displayName": "Flex 96-Channel 1000 μL",
+  "model": "p1000",
+  "displayCategory": "FLEX",
+  "pickUpTipConfigurations": {
+    "pressFit": {
+      "presses": 1,
+      "increment": 0.0,
+      "speed": 10.0,
+      "distance": 13.0,
+      "currentByTipCount": {
+        "1": 0.2,
+        "2": 0.25,
+        "3": 0.3,
+        "4": 0.35,
+        "5": 0.4,
+        "6": 0.45,
+        "7": 0.5,
+        "8": 0.55,
+        "12": 0.19,
+        "16": 0.25,
+        "24": 0.38,
+        "48": 0.75
+      }
+    },
+    "camAction": {
+      "speed": 5.5,
+      "distance": 10.0,
+      "prep_move_distance": 8.25,
+      "prep_move_speed": 10.0,
+      "connectTiprackDistanceMM": 7.0,
+      "currentByTipCount": {
+        "96": 1.5
+      }
+    }
+  },
+  "dropTipConfigurations": {
+    "camAction": {
+      "current": 1.5,
+      "speed": 5.5,
+      "distance": 10.8,
+      "prep_move_distance": 19.0,
+      "prep_move_speed": 10.0
+    }
+  },
+  "plungerMotorConfigurations": {
+    "idle": 0.3,
+    "run": 0.8
+  },
+  "plungerPositionsConfigurations": {
+    "default": {
+      "top": 0.5,
+      "bottom": 68.5,
+      "blowout": 73.5,
+      "drop": 80
+    }
+  },
+  "availableSensors": {
+    "sensors": ["pressure", "capacitive", "environment"],
+    "pressure": {
+      "count": 2
+    },
+    "capacitive": {
+      "count": 2
+    },
+    "environment": {
+      "count": 1
+    }
+  },
+  "partialTipConfigurations": {
+    "partialTipSupported": true,
+    "availableConfigurations": [1, 8, 12, 16, 24, 48, 96]
+  },
+  "backCompatNames": [],
+  "channels": 96,
+  "shaftDiameter": 4.5,
+  "shaftULperMM": 15.904,
+  "backlashDistance": 0.3,
+  "quirks": [],
+  "plungerHomingConfigurations": {
+    "current": 0.8,
+    "speed": 5
+  },
+  "tipPresenceCheckDistanceMM": 8.0,
+  "endTipActionRetractDistanceMM": 2.0
+}
