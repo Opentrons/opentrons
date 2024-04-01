@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
 import { useQueryClient } from 'react-query'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -179,8 +178,14 @@ export function ProtocolSetupParameters({
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
-  const parameters = runTimeParameters ?? []
-  //    TODO(jr, 3/20/24): modify useCreateRunMutation to take in optional run time parameters
+
+  // todo (nd:04/01/2024): remove mock and look at runTimeParameters prop
+  // const parameters = runTimeParameters ?? []
+  const parameters = runTimeParameters ?? mockData
+  const [
+    runTimeParametersOverrides,
+    setRunTimeParametersOverrides,
+  ] = React.useState<RunTimeParameter[]>(parameters)
   const { createRun, isLoading } = useCreateRunMutation({
     onSuccess: data => {
       queryClient
@@ -197,7 +202,11 @@ export function ProtocolSetupParameters({
   return (
     <>
       {resetValuesModal ? (
-        <ResetValuesModal handleGoBack={() => showResetValuesModal(false)} />
+        <ResetValuesModal
+          runTimeParametersOverrides={runTimeParametersOverrides}
+          setRunTimeParametersOverrides={setRunTimeParametersOverrides}
+          handleGoBack={() => showResetValuesModal(false)}
+        />
       ) : null}
 
       <ChildNavigation
@@ -218,22 +227,69 @@ export function ProtocolSetupParameters({
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
-        paddingX={SPACING.spacing8}
+        paddingX={SPACING.spacing40}
+        paddingBottom={SPACING.spacing40}
       >
-        {parameters.map((parameter, index) => {
-          return (
-            <React.Fragment key={`${parameter.displayName}_${index}`}>
-              <ProtocolSetupStep
-                hasIcon={!(parameter.type === 'boolean')}
-                status="general"
-                title={parameter.displayName}
-                onClickSetupStep={() => console.log('TODO: wire this up')}
-                detail={formatRunTimeParameterValue(parameter, t)}
-                description={parameter.description}
-                fontSize="h4"
-              />
-            </React.Fragment>
-          )
+        {runTimeParametersOverrides.map((parameter, index) => {
+          if ('choices' in parameter) {
+            return (
+              <React.Fragment key={`${parameter.displayName}_${index}`}>
+                <ProtocolSetupStep
+                  hasIcon={true}
+                  status="general"
+                  title={parameter.displayName}
+                  onClickSetupStep={() => {
+                    // todo (nd:04/01/2023) add screens for number and enumeration inputs
+                  }}
+                  detail={parameter.value.toString()}
+                  description={parameter.description}
+                  fontSize="h4"
+                />
+              </React.Fragment>
+            )
+          } else if (parameter.type === 'boolean') {
+            return (
+              <React.Fragment key={`${parameter.displayName}_${index}`}>
+                <ProtocolSetupStep
+                  hasIcon={false}
+                  status="general"
+                  title={parameter.displayName}
+                  onClickSetupStep={() => {
+                    // todo (nd:04/01/2023) add screens for number and enumeration inputs
+                    const clone = runTimeParametersOverrides.map((param, i) => {
+                      if (i === index) {
+                        return {
+                          ...param,
+                          value: !param.value,
+                        }
+                      }
+                      return param
+                    })
+                    setRunTimeParametersOverrides(clone)
+                  }}
+                  detail={parameter.value ? t('on') : t('off')}
+                  description={parameter.description}
+                  fontSize="h4"
+                />
+              </React.Fragment>
+            )
+          } else if (parameter.type === 'int' || parameter.type === 'float') {
+            return (
+              <React.Fragment key={`${parameter.displayName}_${index}`}>
+                <ProtocolSetupStep
+                  hasIcon={true}
+                  status="general"
+                  title={parameter.displayName}
+                  onClickSetupStep={() => {
+                    // todo (nd:04/01/2023) add screens for number and enumeration inputs
+                  }}
+                  detail={parameter.value.toString()}
+                  description={parameter.description}
+                  fontSize="h4"
+                />
+              </React.Fragment>
+            )
+          }
         })}
       </Flex>
     </>
