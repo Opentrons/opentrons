@@ -6,7 +6,7 @@ import datetime
 import time as t
 from typing import List
 import argparse
-from abr_testing.google_automation import google_sheets_tool
+from abr_testing.automation import google_sheets_tool
 
 
 class _ABRAsairSensor:

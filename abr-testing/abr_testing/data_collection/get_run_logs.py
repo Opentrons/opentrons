@@ -23,6 +23,7 @@ def get_run_ids_from_robot(ip: str) -> Set[str]:
             run_ids.add(run_id)
     return run_ids
 
+
 def get_run_data(one_run: Any, ip: str) -> Dict[str, Any]:
     """Use http requests to get command, health, and protocol data from robot."""
     response = requests.get(
@@ -79,9 +80,9 @@ def save_runs(runs_to_save: Set[str], ip: str, storage_directory: str) -> Set[st
     saved_file_paths = set()
     for a_run in runs_to_save:
         data = get_run_data(a_run, ip)
-        data_file_name = ip + "_" + data["run_id"] + ".json"
-        saved_file_path = os.path.join(storage_directory, data_file_name)
-        json.dump(data, open(saved_file_path, mode="w"))
+        saved_file_path = read_robot_logs.save_run_log_to_json(
+            ip, data, storage_directory
+        )
         saved_file_paths.add(saved_file_path)
     print(f"Saved {len(runs_to_save)} run(s) from robot with IP address {ip}.")
     return saved_file_paths
