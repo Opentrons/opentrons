@@ -36,8 +36,7 @@ We want to limit the number of samples to 8, 16, 24, or 32, so we'll use an inte
                 {"display_name": "16", "value": 16},
                 {"display_name": "24", "value": 24},
                 {"display_name": "32", "value": 32},
-            ],
-            unit="samples"
+            ]
         )
 
 All of the possible values are multiples of 8, because the protocol will use an 8-channel pipette to process an entire column of samples at once. Considering how 8-channel pipettes access wells, it may be more useful to operate with a *column count* in code. We can set a ``column_count`` very early in the ``run`` function by accessing the value of ``params.sample_count`` and dividing it by 8::
