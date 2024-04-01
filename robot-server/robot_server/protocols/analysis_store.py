@@ -291,7 +291,7 @@ class AnalysisStore:
         return rtp_values_and_defaults
 
     async def matching_rtp_values_in_last_analysis(
-        self, protocol_id: str, rtp_values: RunTimeParamValuesType
+        self, protocol_id: str, new_rtp_values: RunTimeParamValuesType
     ) -> bool:
         """Return whether the last analysis of the given protocol used the mentioned RTP values.
 
@@ -321,17 +321,17 @@ class AnalysisStore:
             last_analysis.status != AnalysisStatus.PENDING
         ), "Protocol must not already have a pending analysis."
 
-        rtp_values_and_defaults_in_analysis = (
+        rtp_values_and_defaults_in_last_analysis = (
             await self._completed_store.get_rtp_values_and_defaults_by_analysis_id(
                 last_analysis.id
             )
         )
         assert (
-            rtp_values_and_defaults_in_analysis is not None
+            rtp_values_and_defaults_in_last_analysis is not None
         ), "This protocol has no analysis associated with it."
 
-        if not set(rtp_values.keys()).issubset(
-            set(rtp_values_and_defaults_in_analysis.keys())
+        if not set(new_rtp_values.keys()).issubset(
+            set(rtp_values_and_defaults_in_last_analysis.keys())
         ):
             # Since the RTP keys in analysis represent all params defined in the protocol,
             # if the client passes a parameter that's not present in the analysis,
@@ -342,10 +342,13 @@ class AnalysisStore:
             # This makes the behavior of robot server consistent regardless of whether
             # the client is sending a protocol for the first time or for the nth time.
             return False
-        for parameter, value_and_default in rtp_values_and_defaults_in_analysis.items():
-            if rtp_values.get(parameter) == value_and_default.value or (
-                rtp_values.get(parameter) is None
-                and value_and_default.value == value_and_default.default
+        for (
+            parameter,
+            prev_value_and_default,
+        ) in rtp_values_and_defaults_in_last_analysis.items():
+            if new_rtp_values.get(parameter) == prev_value_and_default.value or (
+                new_rtp_values.get(parameter) is None
+                and prev_value_and_default.value == prev_value_and_default.default
             ):
                 continue
             else:
