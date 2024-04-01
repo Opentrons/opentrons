@@ -10,7 +10,10 @@ export function getAnalysisStatus(
 ): AnalysisStatus {
   if (isAnalyzing) {
     return 'loading'
-  } else if (analysis != null && analysis?.liquids == null) {
+  } else if (
+    analysis != null &&
+    (analysis.liquids == null || analysis.runTimeParameters == null)
+  ) {
     return 'stale'
   } else if (analysis != null) {
     return analysis.errors.length > 0 ? 'error' : 'complete'
