@@ -231,7 +231,7 @@ class RunArgs:
             aspirate=args.plunger_direction == "aspirate",
             dial_indicator=dial,
             plunger_speed=args.plunger_speed,
-            trials_before_jog=args.trials_before_jog
+            trials_before_jog=args.trials_before_jog,
         )
 
 

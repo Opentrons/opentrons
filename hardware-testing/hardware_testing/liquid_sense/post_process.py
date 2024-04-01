@@ -41,7 +41,7 @@ def process_csv_directory(  # noqa: C901
         pressure_results[tip] = {}
         results_settings[tip] = {}
         tip_offsets[tip] = []
-        p_offsets[tip] = [i*0 for i in range(trials)]
+        p_offsets[tip] = [i * 0 for i in range(trials)]
         for trial in range(trials):
             pressure_results[tip][trial] = []
             results_settings[tip][trial] = (0.0, 0.0, 0.0)
@@ -108,7 +108,7 @@ def process_csv_directory(  # noqa: C901
             # we want to line up the z height's of each trial at time==0
             # to do this we drop the results at the beginning of each of the trials
             # except for one with the longest tip (lower tip offset are longer tips)
-            min_tip_offset = 0
+            min_tip_offset = 0.0
             if make_graph:
                 for tip in tips:
                     min_tip_offset = min(tip_offsets[tip])
@@ -117,15 +117,20 @@ def process_csv_directory(  # noqa: C901
                             if tip_offsets[tip][trial] > min_tip_offset:
                                 # drop this pressure result
                                 pressure_results[tip][trial].pop(0)
-                                # we don't want to change the length of this array so just stretch out
-                                # the last value
+                                # we don't want to change the length of this array so just
+                                # stretch out the last value
                                 pressure_results[tip][trial].append(
                                     pressure_results[tip][trial][-1]
                                 )
-                                # decrement the offset while this is true so we can account for it later
-                                tip_offsets[tip][trial] -= 0.001 * results_settings[tip][0][0]
+                                # decrement the offset while this is true
+                                # so we can account for it later
+                                tip_offsets[tip][trial] -= (
+                                    0.001 * results_settings[tip][0][0]
+                                )
                                 # keep track of how this effects the plunger start position
-                                p_offsets[tip][trial] = (i+1) * 0.001 * results_settings[tip][0][1] * -1
+                                p_offsets[tip][trial] = (
+                                    (i + 1) * 0.001 * results_settings[tip][0][1] * -1
+                                )
                             else:
                                 # we've lined up this trial so move to the next
                                 break
@@ -133,11 +138,14 @@ def process_csv_directory(  # noqa: C901
             for tip in tips:
                 time = 0.0
                 final_report_writer.writerow(pressure_header_row)
-                meniscus_time = (meniscus_travel + min_tip_offset) / results_settings[tip][0][0]
+                meniscus_time = (meniscus_travel + min_tip_offset) / results_settings[
+                    tip
+                ][0][0]
                 for i in range(max_results_len):
                     pressure_row: List[str] = [f"{time}"]
                     if isclose(
-                        time, meniscus_time,
+                        time,
+                        meniscus_time,
                         rel_tol=0.001,
                     ):
                         pressure_row.append("Meniscus")

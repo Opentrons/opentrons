@@ -1536,7 +1536,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def _retract(
         self,
     ) -> None:
-        self._core.retract()
+        self._core._retract()
 
     @property
     @requires_version(2, 0)

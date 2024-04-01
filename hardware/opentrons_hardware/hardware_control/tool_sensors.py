@@ -26,19 +26,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
     ErrorCode,
 )
-from opentrons_hardware.firmware_bindings.messages.payloads import (
-    SendAccumulatedPressureDataPayload,
-    BindSensorOutputRequestPayload,
-)
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    SensorIdField,
-    SensorOutputBindingField,
-    SensorTypeField,
-)
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    BindSensorOutputRequest,
-    SendAccumulatedPressureDataRequest,
-)
 from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
 from opentrons_hardware.sensors.types import (
     SensorDataType,
@@ -247,7 +234,6 @@ async def liquid_probe(
     )
 
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
-    log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
     if csv_output:
         return await run_stream_output_to_csv(
             messenger,
