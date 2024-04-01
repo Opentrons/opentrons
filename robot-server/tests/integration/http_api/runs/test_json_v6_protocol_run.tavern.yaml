@@ -104,7 +104,7 @@ stages:
             commandType: home
             createdAt: !anystr
             status: queued
-            params: { }
+            params: {}
           - id: '{setup_command_id}'
             key: '{setup_command_key}'
             intent: setup
@@ -183,6 +183,7 @@ stages:
             completedAt: '{setup_command_completed_at}'
             status: succeeded
             params: { }
+            notes: []
           - id: !anystr
             key: !anystr
             commandType: loadPipette
