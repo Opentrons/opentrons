@@ -3,8 +3,8 @@ from automation.data.protocol_with_overrides import ProtocolWithOverrides
 
 
 class ProtocolsWithOverrides:
-    Flex_None_None_2_18_BadTypesInRTP: ProtocolWithOverrides = ProtocolWithOverrides(
-        file_stem="Flex_None_None_2_18_BadTypesInRTP",
+    v2_18_NO_PIPETTES_Overrides_BadTypesInRTP: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="v2_18_NO_PIPETTES_Overrides_BadTypesInRTP",
         file_extension="py",
         protocol_name="Golden RTP Examples 2",
         robot="Flex",
