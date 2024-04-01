@@ -65,7 +65,8 @@ export function getAddressableAreasInProtocol(
         !acc.includes(params.location.slotName as AddressableAreaName)
       ) {
         const addressableAreaNames = getAddressableAreaNamesFromLoadedModule(
-          params,
+          params.model,
+          params.location.slotName,
           deckDef
         )
 

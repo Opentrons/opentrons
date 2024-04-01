@@ -186,11 +186,12 @@ export function getCutoutIdsFromModuleSlotName(
 }
 
 export function getAddressableAreaNamesFromLoadedModule(
-  params: LoadModuleCreateCommand['params'],
+  moduleModel: ModuleModel,
+  slotName: ModuleLocation['slotName'],
   deckDef: DeckDefinition
 ): AddressableAreaName[] {
-  const moduleFixtures = getCutoutFixturesForModuleModel(params.model, deckDef)
-  const cutoutIds = getCutoutIdsFromModuleSlotName(params.location.slotName, moduleFixtures)
+  const moduleFixtures = getCutoutFixturesForModuleModel(moduleModel, deckDef)
+  const cutoutIds = getCutoutIdsFromModuleSlotName(slotName, moduleFixtures)
   return moduleFixtures.reduce<AddressableAreaName[]>(
     (acc, cutoutFixture) => {
       const providedAddressableAreas =

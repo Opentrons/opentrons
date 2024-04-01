@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import {
   useDeckConfigurationQuery,
+  useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
@@ -32,6 +33,8 @@ import {
   THERMOCYCLER_MODULE_V2,
   getCutoutFixtureIdsForModuleModel,
   getCutoutFixturesForModuleModel,
+  getAddressableAreaNamesFromLoadedModule,
+  getCutoutIdForSlotName,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
@@ -46,6 +49,7 @@ import type {
   DeckDefinition,
 } from '@opentrons/shared-data'
 import { replace } from 'lodash'
+import { cs } from 'date-fns/locale'
 
 interface LocationConflictModalProps {
   onCloseClick: () => void
@@ -70,6 +74,7 @@ export const LocationConflictModal = (
     isOnDevice = false,
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const attachedModules = useModulesQuery().data?.data ?? []
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckConfigurationAtLocationFixtureId = deckConfig.find(
@@ -105,15 +110,17 @@ export const LocationConflictModal = (
 
       updateDeckConfiguration(newRequiredFixtureDeckConfig)
     } else if (requiredModule != null) {
+      const addressableAreas = getAddressableAreaNamesFromLoadedModule(requiredModule, cutoutId.replace('cutout', ''), deckDef)
       const cutoutFixtures = getCutoutFixturesForModuleModel(requiredModule, deckDef)
-      const cutoutIdsToReplace = cutoutFixtures.map(cf => cf.mayMountTo[0])
       const newDeckConfig = deckConfig.map(fixture => {
-        const replacementFixture = cutoutFixtures.find(cf => cf.mayMountTo[0] === fixture.cutoutId)
-        return cutoutIdsToReplace.includes(fixture.cutoutId) && replacementFixture != null
-          ? { ...fixture, cutoutFixtureId: replacementFixture?.id }
+        const replacementFixture = cutoutFixtures.find(cf => (
+          cf.mayMountTo.includes(fixture.cutoutId)
+          && addressableAreas.some(aa => cf.providesAddressableAreas[cutoutId].includes(aa))
+        ))
+        return cutoutId === fixture.cutoutId && replacementFixture != null
+          ? { ...fixture, cutoutFixtureId: replacementFixture?.id, opentronsModuleSerialNumber: attachedModules.find(m => m.moduleModel === requiredModule)?.serialNumber }
           : fixture
       })
-
       updateDeckConfiguration(newDeckConfig)
     }
     onCloseClick()

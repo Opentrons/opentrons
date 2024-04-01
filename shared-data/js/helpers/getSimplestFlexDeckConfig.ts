@@ -111,7 +111,6 @@ export function getSimplestDeckConfigForProtocol(
     }
     return acc
   }, FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC)
-
   return simplestDeckConfig
 }
 
