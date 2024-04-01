@@ -3,7 +3,7 @@ import json
 
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, NamedTuple, Dict
+from typing import List, NamedTuple
 
 import pytest
 from decoy import Decoy
@@ -405,9 +405,7 @@ async def test_update_infers_status_from_errors(
             {"cool_param": 2.0, "cooler_param": "baz", "weird_param": 5},
             False,
         ),
-        (
-                {}, False
-        )
+        ({}, False),
     ],
 )
 async def test_matching_rtp_values_in_analysis(
@@ -453,12 +451,12 @@ async def test_matching_default_rtp_values_in_analysis_with_no_client_rtp_values
 ) -> None:
     """It should return a match when client sends no RTP values and last analysis used all default values."""
     params_with_only_default_values = {
-            "cool_param": RunTimeParameterAnalysisData(value=2.0, default=2.0),
-            "cooler_param": RunTimeParameterAnalysisData(
-                value="very cool", default="very cool"
-            ),
-            "uncool_param": RunTimeParameterAnalysisData(value=True, default=True),
-        }
+        "cool_param": RunTimeParameterAnalysisData(value=2.0, default=2.0),
+        "cooler_param": RunTimeParameterAnalysisData(
+            value="very cool", default="very cool"
+        ),
+        "uncool_param": RunTimeParameterAnalysisData(value=True, default=True),
+    }
 
     mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)
     subject = AnalysisStore(sql_engine=sql_engine, completed_store=mock_completed_store)
@@ -472,9 +470,4 @@ async def test_matching_default_rtp_values_in_analysis_with_no_client_rtp_values
             "analysis-2"
         )
     ).then_return(params_with_only_default_values)
-    assert (
-        await subject.matching_rtp_values_in_last_analysis(
-            "protocol-id", {}
-        )
-        == True
-    )
+    assert await subject.matching_rtp_values_in_last_analysis("protocol-id", {}) is True

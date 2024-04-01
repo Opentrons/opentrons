@@ -6,6 +6,7 @@ metadata = {
     "protocolName": "basic_transfer_standalone",
 }
 
+
 def add_parameters(parameters: ParameterContext):
     parameters.add_int(
         display_name="Sample count",
@@ -13,7 +14,7 @@ def add_parameters(parameters: ParameterContext):
         default=6,
         minimum=1,
         maximum=12,
-        description="How many samples to process."
+        description="How many samples to process.",
     )
     parameters.add_float(
         display_name="Pipette volume",
@@ -25,13 +26,13 @@ def add_parameters(parameters: ParameterContext):
             {"display_name": "High Volume", "value": 50.5},
         ],
         description="How many microliters to pipette of each sample.",
-        unit="µL"
+        unit="µL",
     )
     parameters.add_bool(
         display_name="Dry Run",
         variable_name="dry_run",
         default=False,
-        description="Skip aspirate and dispense steps."
+        description="Skip aspirate and dispense steps.",
     )
     parameters.add_str(
         display_name="Pipette Name",

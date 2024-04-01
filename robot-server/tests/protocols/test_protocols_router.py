@@ -686,8 +686,10 @@ async def test_create_existing_protocol_with_different_run_time_params(
     decoy.when(protocol_store.get(protocol_id="the-og-proto-id")).then_return(
         stored_protocol_resource
     )
-    decoy.when(await analysis_store.matching_rtp_values_in_last_analysis(
-        "the-og-proto-id", {"vol": 123, "dry_run": True, "mount": "left"})
+    decoy.when(
+        await analysis_store.matching_rtp_values_in_last_analysis(
+            "the-og-proto-id", {"vol": 123, "dry_run": True, "mount": "left"}
+        )
     ).then_return(False)
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
@@ -799,8 +801,10 @@ async def test_create_existing_protocol_with_same_run_time_params(
     decoy.when(protocol_store.get(protocol_id="the-og-proto-id")).then_return(
         stored_protocol_resource
     )
-    decoy.when(await analysis_store.matching_rtp_values_in_last_analysis(
-        "the-og-proto-id", {"vol": 123, "dry_run": True, "mount": "left"})
+    decoy.when(
+        await analysis_store.matching_rtp_values_in_last_analysis(
+            "the-og-proto-id", {"vol": 123, "dry_run": True, "mount": "left"}
+        )
     ).then_return(True)
     decoy.when(
         analysis_store.get_summaries_by_protocol(protocol_id="the-og-proto-id")
@@ -842,12 +846,15 @@ async def test_create_existing_protocol_with_same_run_time_params(
             analysis_id="analysis-id",
             protocol_resource=stored_protocol_resource,
             run_time_param_values={"vol": 123, "dry_run": True, "mount": "left"},
-        ), times=0),
+        ),
+        times=0,
+    )
     decoy.verify(
         analysis_store.add_pending(
             protocol_id="the-og-proto-id",
             analysis_id="analysis-id",
-        ), times=0,
+        ),
+        times=0,
     )
 
 
