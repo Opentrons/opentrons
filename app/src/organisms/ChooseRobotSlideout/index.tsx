@@ -385,7 +385,10 @@ export function ChooseRobotSlideout(
               Number.isNaN(value) ||
               value < runtimeParam.min ||
               value > runtimeParam.max
-                ? `Value must be between ${runtimeParam.min}-${runtimeParam.max}`
+                ? t(`value_out_of_range`, {
+                    min: runtimeParam.min,
+                    max: runtimeParam.max,
+                  })
                 : null
             }
             onChange={e => {

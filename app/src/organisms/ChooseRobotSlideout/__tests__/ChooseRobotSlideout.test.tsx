@@ -22,7 +22,7 @@ import { useFeatureFlag } from '../../../redux/config'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
 import { useNotifyService } from '../../../resources/useNotifyService'
-import { RunTimeParameter } from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE, RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
@@ -121,7 +121,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     })
     screen.getByText('choose robot slideout title')
   })
@@ -134,7 +134,7 @@ describe('ChooseRobotSlideout', () => {
       setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
       isAnalysisError: true,
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     })
     screen.getByText(
       'This protocol failed in-app analysis. It may be unusable on robots without custom software configurations.'
@@ -148,7 +148,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     })
     screen.getByText('opentrons-robot-name')
     screen.getByText('2 unavailable robots are not listed.')
@@ -162,7 +162,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     })
     screen.getByText('opentrons-robot-name')
     expect(
@@ -177,7 +177,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     })[1]
     const refreshButton = screen.getByRole('button', { name: 'refresh' })
     fireEvent.click(refreshButton)
@@ -192,7 +192,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
       multiSlideout: { currentPage: 1 },
     })
     screen.getByText('Step 1 / 2')
@@ -205,7 +205,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
       multiSlideout: { currentPage: 2 },
     })
     screen.getByText('Step 2 / 2')
@@ -220,7 +220,7 @@ describe('ChooseRobotSlideout', () => {
         selectedRobot: null,
         setSelectedRobot: mockSetSelectedRobot,
         title: 'choose robot slideout title',
-        robotType: 'OT-2 Standard',
+        robotType: OT2_ROBOT_TYPE,
         multiSlideout: { currentPage: 2 },
         runTimeParametersOverrides: [param],
       })
@@ -242,7 +242,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
       multiSlideout: { currentPage: 2 },
       runTimeParametersOverrides: [
         {
@@ -254,7 +254,7 @@ describe('ChooseRobotSlideout', () => {
           suffix: 'mL',
           min: 1.5,
           max: 10.0,
-          default: 1000,
+          default: 6.5,
         },
       ],
     })
@@ -273,7 +273,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     })
     expect(mockSetSelectedRobot).toBeCalledWith({
       ...mockConnectableRobot,
