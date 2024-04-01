@@ -14,6 +14,10 @@ Welcome to the v7.2.2 release of the Opentrons robot software!
 
 - Improved the low-volume performance of recently produced Flex 96-Channel Pipettes.
 
+### Bug Fixes
+
+- Restores the ability to use the speaker and camera on OT-2.
+
 ---
 
 ## Opentrons Robot Software Changes in 7.2.1
