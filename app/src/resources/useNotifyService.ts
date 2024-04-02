@@ -43,6 +43,7 @@ export function useNotifyService<TData, TError = Error>({
   const doTrackEvent = useTrackEvent()
   const isFlex = useIsFlex(host?.robotName ?? '')
   const hasUsedNotifyService = React.useRef(false)
+  const seenHostname = React.useRef<string | null>(null)
   const { enabled, staleTime, forceHttpPolling } = options
 
   const shouldUseNotifications =
@@ -62,6 +63,7 @@ export function useNotifyService<TData, TError = Error>({
       })
       dispatch(notifySubscribeAction(hostname, topic))
       hasUsedNotifyService.current = true
+      seenHostname.current = hostname
     } else {
       setRefetchUsingHTTP('always')
     }
@@ -69,14 +71,14 @@ export function useNotifyService<TData, TError = Error>({
     return () => {
       if (hasUsedNotifyService.current) {
         appShellListener({
-          hostname: hostname as string,
+          hostname: seenHostname.current as string,
           topic,
           callback: onDataEvent,
           isDismounting: true,
         })
       }
     }
-  }, [topic, host, shouldUseNotifications])
+  }, [topic, hostname, shouldUseNotifications])
 
   function onDataEvent(data: NotifyResponseData): void {
     if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
