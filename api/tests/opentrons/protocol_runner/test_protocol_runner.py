@@ -339,21 +339,43 @@ async def test_run_json_runner_stop_requested_breaks_loop(
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     json_runner_subject: JsonRunner,
+    json_file_reader: JsonFileReader,
+    json_translator: JsonTranslator,
 ) -> None:
     """It should run a protocol to completion."""
-    json_runner_subject._queued_commands = [
-        pe_commands.HomeCreate(params=pe_commands.HomeParams())
-    ]
-    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
-        False, True
+    labware_definition = LabwareDefinition.construct()
+    json_protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.json"),
+        files=[],
+        metadata={},
+        robot_type="OT-2 Standard",
+        config=JsonProtocolConfig(schema_version=6),
+        content_hash="abc123",
     )
 
-    assert json_runner_subject.was_started() is False
-    await json_runner_subject.run(deck_configuration=[])
-    assert json_runner_subject.was_started() is True
+    commands: List[pe_commands.CommandCreate] = [
+        pe_commands.HomeCreate(params=pe_commands.HomeParams())
+    ]
+
+    json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
 
     decoy.when(
-        protocol_engine.add_and_execute_command(
+        await protocol_reader.extract_labware_definitions(json_protocol_source)
+    ).then_return([labware_definition])
+    decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
+    decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
+
+    await json_runner_subject.load(json_protocol_source)
+
+    run_func_captor = matchers.Captor()
+
+    # Verify that the run func calls the right things:
+    run_func = run_func_captor.value
+    await run_func()
+
+    decoy.when(
+        await protocol_engine.add_and_execute_command(
             pe_commands.HomeCreate(params=pe_commands.HomeParams())
         )
     ).then_raise(pe_errors.RunStoppedError("run stopped"))
@@ -428,10 +450,6 @@ async def test_load_json_runner(
         ),
         task_queue.set_run_func(func=run_func_captor),
     )
-
-    print(run_func_captor.value)
-
-    # assert run_func_captor.value is json_runner_subject._add_command_and_execute
 
     # Verify that the run func calls the right things:
     run_func = run_func_captor.value
