@@ -272,6 +272,15 @@ class ProtocolEngine:
     ) -> None:
         """Signal to the engine that an estop event occurred.
 
+        If an estop happens while the robot is moving, lower layers physically stop
+        motion and raise the event as an exception, which fails the Protocol Engine
+        command. No action from the `ProtocolEngine` caller is needed to handle that.
+
+        However, if an estop happens in between commands, or in the middle of
+        a command like `comment` or `waitForDuration` that doesn't access the hardware,
+        `ProtocolEngine` needs to be told about it so it can treat it as a fatal run
+        error and stop executing more commands. This method is how to do that.
+
         If there are any queued commands for the engine, they will be marked
         as failed due to the estop event. If there aren't any queued commands
         *and* this is a maintenance run (which has commands queued one-by-one),
