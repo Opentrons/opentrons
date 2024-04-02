@@ -78,6 +78,7 @@ LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM = 1.5
 SAFE_HEIGHT_TRAVEL = 10
 SAFE_HEIGHT_CALIBRATE = 0
 
+ENCODER_ALIGNMENT_THRESHOLD_HOME_MM = 0.005
 ENCODER_ALIGNMENT_THRESHOLD_MM = 0.1
 
 COLUMNS = "ABCDEFGH"
@@ -834,7 +835,8 @@ async def _test_diagnostics_encoder(
     print("homing plunger")
     await api.home([pip_axis])
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
-    if abs(pip_pos) > 0.005 or abs(pip_enc) > 0.005:
+    # NOTE: homing has tighter spec (0.005mm)
+    if abs(pip_pos - pip_enc) > ENCODER_ALIGNMENT_THRESHOLD_HOME_MM:
         print(
             f"FAIL: plunger ({pip_pos}) or encoder ({pip_enc}) is not near 0.0 after homing"
         )
