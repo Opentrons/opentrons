@@ -22,17 +22,24 @@ import type { StepFieldName } from '../../../../form-types'
 import modalStyles from '../../../modals/modal.module.css'
 import styles from './TipPositionInput.module.css'
 
-interface Props {
+interface ZTipPositionModalProps {
   closeModal: () => void
-  isIndeterminate?: boolean
   mmFromBottom: number | null
   name: StepFieldName
-  updateValue: (val: number | null | undefined) => unknown
+  updateValue: (val?: number | null) => unknown
   wellDepthMm: number
+  isIndeterminate?: boolean
 }
 
-export const ZTipPositionModal = (props: Props): JSX.Element => {
-  const { isIndeterminate, name, wellDepthMm } = props
+export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
+  const {
+    isIndeterminate,
+    name,
+    wellDepthMm,
+    mmFromBottom,
+    closeModal,
+    updateValue,
+  } = props
   const { t } = useTranslation(['modal', 'button'])
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
     name,
@@ -40,10 +47,10 @@ export const ZTipPositionModal = (props: Props): JSX.Element => {
   })
 
   const [value, setValue] = React.useState<string | null>(
-    props.mmFromBottom === null ? null : String(props.mmFromBottom)
+    mmFromBottom === null ? null : String(mmFromBottom)
   )
   const [isDefault, setIsDefault] = React.useState<boolean>(
-    !isIndeterminate && props.mmFromBottom === null
+    !isIndeterminate && mmFromBottom === null
   )
   // in this modal, pristinity hides the OUT_OF_BOUNDS error only.
   const [isPristine, setPristine] = React.useState<boolean>(true)
@@ -87,16 +94,16 @@ export const ZTipPositionModal = (props: Props): JSX.Element => {
 
     if (!hasErrors) {
       if (isDefault) {
-        props.updateValue(null)
+        updateValue(null)
       } else {
-        props.updateValue(value === null ? null : Number(value))
+        updateValue(value === null ? null : Number(value))
       }
-      props.closeModal()
+      closeModal()
     }
   }
 
   const handleCancel = (): void => {
-    props.closeModal()
+    closeModal()
   }
 
   const handleChange = (newValueRaw: string | number): void => {
@@ -219,7 +226,7 @@ export const ZTipPositionModal = (props: Props): JSX.Element => {
             </div>
 
             <div className={styles.viz_group}>
-              {!isDefault && (
+              {!isDefault ? (
                 <div className={styles.adjustment_buttons}>
                   <OutlineButton
                     id="Increment_tipPosition"
@@ -236,7 +243,7 @@ export const ZTipPositionModal = (props: Props): JSX.Element => {
                     <Icon name="minus" />
                   </OutlineButton>
                 </div>
-              )}
+              ) : null}
               <TipPositionZAxisViz
                 mmFromBottom={
                   value !== null ? Number(value) : defaultMmFromBottom

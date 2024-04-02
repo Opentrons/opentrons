@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { fixture96Plate } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../localization'
+import { getLabwareEntities } from '../../../../../step-forms/selectors'
+import { ZTipPositionModal } from '../ZTipPositionModal'
 import { TipPositionModal } from '../TipPositionModal'
 import { TipPositionField } from '../index'
-import { getLabwareEntities } from '../../../../../step-forms/selectors'
-import { LabwareDefinition2, fixture96Plate } from '@opentrons/shared-data'
-import { ZTipPositionModal } from '../ZTipPositionModal'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../../../../step-forms/selectors')
 vi.mock('../ZTipPositionModal')

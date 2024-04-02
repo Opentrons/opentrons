@@ -201,9 +201,10 @@ export const getWellsDepth = (
   return offsets[0]
 }
 
-export const getWellXDimension = (
+export const getWellDimension = (
   labwareDef: LabwareDefinition2,
-  wells: string[]
+  wells: string[],
+  position: 'x' | 'y'
 ): number => {
   const offsets = wells.map(well => {
     const labwareWell = labwareDef.wells[well]
@@ -211,23 +212,7 @@ export const getWellXDimension = (
     if (shape === 'circular') {
       return labwareWell.diameter
     } else {
-      return labwareWell.xDimension
-    }
-  })
-  return offsets[0]
-}
-
-export const getWellYDimension = (
-  labwareDef: LabwareDefinition2,
-  wells: string[]
-): number => {
-  const offsets = wells.map(well => {
-    const labwareWell = labwareDef.wells[well]
-    const shape = labwareWell.shape
-    if (shape === 'circular') {
-      return labwareWell.diameter
-    } else {
-      return labwareWell.yDimension
+      return position === 'x' ? labwareWell.xDimension : labwareWell.yDimension
     }
   })
   return offsets[0]

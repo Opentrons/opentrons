@@ -70,7 +70,7 @@
   height: 1.5rem;
   width: 1.5rem;
   cursor: pointer;
-  color: #24313f;
+  color: #24313f; /* black80 */
 }
 
 .tip_position_icon:hover {

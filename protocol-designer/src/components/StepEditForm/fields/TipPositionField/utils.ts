@@ -47,7 +47,7 @@ export function getDefaultMmFromBottom(args: {
 }
 
 export const roundValue = (value: number | string | null): number => {
-  return round(Number(value), DECIMALS_ALLOWED)
+  return value === null ? 0 : round(Number(value), DECIMALS_ALLOWED)
 }
 
 const OUT_OF_BOUNDS: 'OUT_OF_BOUNDS' = 'OUT_OF_BOUNDS'
@@ -80,19 +80,19 @@ export const getErrors = (args: {
   maxMm: number
   minMm: number
 }): Error[] => {
-  const { isDefault, value, maxMm, minMm } = args
+  const { isDefault, value: rawValue, maxMm, minMm } = args
   const errors: Error[] = []
   if (isDefault) return errors
 
-  const v = Number(value)
-  if (value === null || Number.isNaN(v)) {
+  const value = Number(rawValue)
+  if (rawValue === null || Number.isNaN(value)) {
     // blank or otherwise invalid should show this error as a fallback
     return [OUT_OF_BOUNDS]
   }
-  const correctDecimals = round(v, DECIMALS_ALLOWED) === v
-  const outOfBounds = v > maxMm || v < minMm
+  const incorrectDecimals = round(value, DECIMALS_ALLOWED) !== value
+  const outOfBounds = value > maxMm || value < minMm
 
-  if (!correctDecimals) {
+  if (incorrectDecimals) {
     errors.push(TOO_MANY_DECIMALS)
   }
   if (outOfBounds) {
@@ -108,7 +108,7 @@ interface MinMaxValues {
 
 export const getMinMaxWidth = (width: number): MinMaxValues => {
   return {
-    minValue: -width / 2,
-    maxValue: width / 2,
+    minValue: -width * 0.5,
+    maxValue: width * 0.5,
   }
 }

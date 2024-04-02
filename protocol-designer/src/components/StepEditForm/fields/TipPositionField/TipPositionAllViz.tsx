@@ -17,9 +17,7 @@ interface TipPositionAllVizProps {
   xWidthMm: number
 }
 
-export const TipPositionAllViz = (
-  props: TipPositionAllVizProps
-): JSX.Element => {
+export function TipPositionAllViz(props: TipPositionAllVizProps): JSX.Element {
   const { mmFromBottom, xPosition, wellDepthMm, xWidthMm } = props
   const fractionOfWellHeight = mmFromBottom / wellDepthMm
   const pixelsFromBottom =

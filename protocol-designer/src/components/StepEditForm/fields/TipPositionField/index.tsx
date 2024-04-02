@@ -11,17 +11,13 @@ import {
   useHoverTooltip,
   UseHoverTooltipTargetProps,
 } from '@opentrons/components'
-import {
-  getWellsDepth,
-  getWellXDimension,
-  getWellYDimension,
-} from '@opentrons/shared-data'
+import { getWellsDepth, getWellDimension } from '@opentrons/shared-data'
 import {
   getIsTouchTipField,
   getIsDelayPositionField,
 } from '../../../../form-types'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { PositionSpecs, TipPositionModal } from './TipPositionModal'
+import { TipPositionModal } from './TipPositionModal'
 import { getDefaultMmFromBottom } from './utils'
 import { ZTipPositionModal } from './ZTipPositionModal'
 import type {
@@ -30,6 +26,7 @@ import type {
   TipZOffsetFields,
 } from '../../../../form-types'
 import type { FieldPropsByName } from '../../types'
+import type { PositionSpecs } from './TipPositionModal'
 
 import stepFormStyles from '../../StepEditForm.module.css'
 import styles from './TipPositionInput.module.css'
@@ -71,8 +68,8 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
     const firstWell = labwareDef.wells.A1
     if (firstWell) {
       wellDepthMm = getWellsDepth(labwareDef, ['A1'])
-      wellXWidthMm = getWellXDimension(labwareDef, ['A1'])
-      wellYWidthMm = getWellYDimension(labwareDef, ['A1'])
+      wellXWidthMm = getWellDimension(labwareDef, ['A1'], 'x')
+      wellYWidthMm = getWellDimension(labwareDef, ['A1'], 'y')
     }
   }
 
@@ -104,9 +101,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
     zValue =
-      mmFromBottom !== null
-        ? mmFromBottom
-        : getDefaultMmFromBottom({ name: zName, wellDepthMm })
+      mmFromBottom ?? getDefaultMmFromBottom({ name: zName, wellDepthMm })
   }
 
   let modal = (
@@ -173,7 +168,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
       >
         {yField != null && xField != null ? (
           <Flex
-            onClick={disabled != null ? () => handleOpen(true) : undefined}
+            onClick={disabled != null ? () => handleOpen(true) : () => {}}
             id={`TipPositionIcon_${zName}`}
             data-testid={`TipPositionIcon_${zName}`}
             width="5rem"
