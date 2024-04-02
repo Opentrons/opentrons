@@ -2,12 +2,13 @@
 from json import load as json_load
 from pathlib import Path
 import argparse
-from typing import List, Union, Dict, Optional, Any, Tuple
+from typing import List, Union, Dict, Optional, Any, Tuple, OT3Mount
 from dataclasses import dataclass
 from opentrons.protocol_api import ProtocolContext
 from . import report
 import subprocess
 from time import sleep
+from hardware_testing.opentrons_api import helpers_ot3
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.protocols.gravimetric_lpc.gravimetric import (
@@ -535,6 +536,36 @@ def _main(
     else:
         execute.run(cfg_gm, test_resources)
 
+        # heat 96ch after run per type of tiprack
+        Start_Heat_96Ch = True
+        import threading
+        thread = threading.Thread(target=heat_96ch, args=(test_resources.ctx, Start_Heat_96Ch))
+        thread.start()
+        get_stop = input("stop heat 96ch? (y/n)")
+        if get_stop.strip().upper() == "Y":
+            Start_Heat_96Ch = False
+        
+
+def heat_96ch(ctx: ProtocolContext, start_flag: bool):
+    try:
+        m = OT3Mount.LEFT
+        ctx.home()
+        ctx.add_tip(m, 1)
+        ctx.reset()
+        ctx.cache_instruments()
+        ctx.prepare_for_aspirate(m)
+        ctx.set_pipette_speed(m, 0.5, 0.5, 0.5)
+        print("starting heat 96ch...")
+        while True:
+            if not start_flag:
+                print("stopping heat 96ch...")
+                return
+            else:
+                ctx.aspirate(m) is ctx.dispense(m, push_out=0)
+    except Exception as e:
+        print("have issues during heatting 96ch")
+        print(e)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Pipette Testing")
@@ -582,9 +613,12 @@ if __name__ == "__main__":
         run_args.ctx.home()
         for tip, volumes in run_args.volumes:
             if args.channels == 96 and not run_args.ctx.is_simulating():
-                hw = run_args.ctx._core.get_hardware()
+                hw = run_args.ctx._core.get_hardware()    
                 ui.alert_user_ready(f"prepare the {tip}ul tipracks", hw)
+
             _main(args, run_args, tip, volumes)
+
+
     finally:
         if run_args.recorder is not None:
             ui.print_info("ending recording")
