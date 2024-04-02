@@ -214,9 +214,7 @@ export function ChooseProtocolSlideoutComponent(
                 }
                 return parameter
               })
-              if (setRunTimeParametersOverrides != null) {
-                setRunTimeParametersOverrides(clone)
-              }
+              setRunTimeParametersOverrides(clone)
             }}
             title={runtimeParam.displayName}
             caption={runtimeParam.description}
@@ -267,9 +265,7 @@ export function ChooseProtocolSlideoutComponent(
                 }
                 return parameter
               })
-              if (setRunTimeParametersOverrides != null) {
-                setRunTimeParametersOverrides(clone)
-              }
+              setRunTimeParametersOverrides(clone)
             }}
           />
         )
@@ -305,9 +301,7 @@ export function ChooseProtocolSlideoutComponent(
                       return parameter
                     }
                   )
-                  if (setRunTimeParametersOverrides != null) {
-                    setRunTimeParametersOverrides(clone)
-                  }
+                  setRunTimeParametersOverrides(clone)
                 }}
                 height="0.813rem"
                 label={
@@ -344,9 +338,7 @@ export function ChooseProtocolSlideoutComponent(
               ...parameter,
               value: parameter.default,
             }))
-            if (setRunTimeParametersOverrides != null) {
-              setRunTimeParametersOverrides(clone)
-            }
+            setRunTimeParametersOverrides(clone)
           }}
           paddingBottom={SPACING.spacing10}
           {...targetProps}
