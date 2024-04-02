@@ -67,60 +67,6 @@ const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]
 }
 
-const mockRunTimeParameters: RunTimeParameter[] = [
-  {
-    displayName: 'Dry Run',
-    value: false,
-    variableName: 'DRYRUN',
-    description: 'Is this a dry or wet run? Wet is true, dry is false',
-    type: 'boolean',
-    default: false,
-  },
-  {
-    value: 4,
-    displayName: 'Columns of Samples',
-    variableName: 'COLUMNS',
-    description: 'How many columns do you want?',
-    type: 'int',
-    min: 1,
-    max: 14,
-    default: 4,
-  },
-  {
-    value: 6.5,
-    displayName: 'EtoH Volume',
-    variableName: 'ETOH_VOLUME',
-    description: '70% ethanol volume',
-    type: 'float',
-    suffix: 'mL',
-    min: 1.5,
-    max: 10.0,
-    default: 6.5,
-  },
-  {
-    value: 'none',
-    displayName: 'Default Module Offsets',
-    variableName: 'DEFAULT_OFFSETS',
-    description: 'default module offsets for temp, H-S, and none',
-    type: 'str',
-    choices: [
-      {
-        displayName: 'No offsets',
-        value: 'none',
-      },
-      {
-        displayName: 'temp offset',
-        value: '1',
-      },
-      {
-        displayName: 'heater-shaker offset',
-        value: '2',
-      },
-    ],
-    default: 'none',
-  },
-]
-
 interface ChooseProtocolSlideoutProps {
   robot: Robot
   onCloseClick: () => void
@@ -156,6 +102,9 @@ export function ChooseProtocolSlideoutComponent(
 
   const [currentPage, setCurrentPage] = React.useState<number>(1)
   const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
+  const hasRunTimeParameters =
+    enableRunTimeParametersFF && runTimeParametersFromAnalysis.length > 0
+
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   console.log(runTimeParametersOverrides)
@@ -286,6 +235,22 @@ export function ChooseProtocolSlideoutComponent(
             tooltipText={runtimeParam.description}
             caption={`${runtimeParam.min}-${runtimeParam.max}`}
             id={id}
+            error={
+              Number.isNaN(value) ||
+              value < runtimeParam.min ||
+              value > runtimeParam.max
+                ? t(`protocol_details:value_out_of_range`, {
+                    min:
+                      runtimeParam.type === 'int'
+                        ? runtimeParam.min
+                        : runtimeParam.min.toFixed(1),
+                    max:
+                      runtimeParam.type === 'int'
+                        ? runtimeParam.max
+                        : runtimeParam.max.toFixed(1),
+                  })
+                : null
+            }
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
@@ -305,7 +270,7 @@ export function ChooseProtocolSlideoutComponent(
             }}
           />
         )
-      } else if (runtimeParam.type === 'boolean') {
+      } else if (runtimeParam.type === 'bool') {
         return (
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -440,7 +405,7 @@ export function ChooseProtocolSlideoutComponent(
       isExpanded={showSlideout}
       onCloseClick={onCloseClick}
       currentStep={currentPage}
-      maxSteps={2}
+      maxSteps={hasRunTimeParameters ? 2 : 1}
       title={t('choose_protocol_to_run', { name })}
       footer={
         <ApiHostProvider
@@ -469,9 +434,7 @@ export function ChooseProtocolSlideoutComponent(
                 : []) ?? []
             }
           />
-          {enableRunTimeParametersFF && runTimeParametersFromAnalysis.length > 0
-            ? multiPageFooter
-            : singlePageFooter}
+          {hasRunTimeParameters ? multiPageFooter : singlePageFooter}
         </ApiHostProvider>
       }
     >
