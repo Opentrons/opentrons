@@ -5,32 +5,27 @@ describe('The Settings Page', () => {
     cy.visit('/')
   })
 
-  it('displays the announcement modal and clicks "GOT IT!" to close it', () => {
+  it('Verify the settings page', () => {
+    // displays the announcement modal and clicks "GOT IT!" to close it
     cy.closeAnnouncementModal()
-  })
 
-  it('contains a working settings button', () => {
+    // contains a working settings button
     cy.openSettingsPage()
     cy.contains('App Settings')
-  })
 
-  it('contains an information section', () => {
+    // contains an information section
     cy.get('h3').contains('Information').should('exist')
-  })
 
-  it('contains version information', () => {
+    // contains version information
     cy.contains('Protocol Designer Version').should('exist')
-  })
 
-  it('contains a hints section', () => {
+    // contains a hints section
     cy.get('h3').contains('Hints').should('exist')
-  })
 
-  it('contains a privacy section', () => {
+    // contains a privacy section
     cy.get('h3').contains('Privacy').should('exist')
-  })
 
-  it('contains a share settings button in the pivacy section', () => {
+    // contains a share settings button in the pivacy section
     // It's toggled off by default
     cy.contains('Share sessions')
       .next()
@@ -50,13 +45,11 @@ describe('The Settings Page', () => {
       .next()
       .should('have.attr', 'class')
       .and('match', /toggled_off/)
-  })
 
-  it('contains an experimental settings section', () => {
+    // contains an experimental settings section
     cy.get('h3').contains('Experimental Settings').should('exist')
-  })
 
-  it("contains a 'disable module placement restrictions' experimental feature", () => {
+    // contains a 'disable module placement restrictions' experimental feature
     // It's toggled off by default
     cy.contains(exptlSettingText)
       .next()
@@ -93,9 +86,8 @@ describe('The Settings Page', () => {
       .next()
       .should('have.attr', 'class')
       .and('match', /toggled_off/)
-  })
 
-  it("contains a 'disable module placement restrictions' toggle in the experimental settings card", () => {
+    // contains a 'disable module placement restrictions' toggle in the experimental settings card
     // It's toggled off by default
     cy.contains('Disable module')
       .next()
@@ -131,9 +123,8 @@ describe('The Settings Page', () => {
       .next()
       .should('have.attr', 'class')
       .and('match', /toggled_off/)
-  })
 
-  it('remembers when we enable things', () => {
+    // PD remembers when we enable things
     // Enable a button
     // We're not using the privacy button because that
     // interacts with analytics libraries, which might
@@ -149,9 +140,8 @@ describe('The Settings Page', () => {
       .next()
       .should('have.attr', 'class')
       .and('match', /toggled_on/)
-  })
 
-  it('remembers when we disable things', () => {
+    // PD remembers when we disable things
     // Disable a button
     // We're not using the privacy button because that
     // interacts with analytics libraries, which might
