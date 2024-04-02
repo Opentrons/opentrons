@@ -137,6 +137,9 @@ def test_validate_options_raises_name_error() -> None:
         (2.0, float, 2.0),
         (2.2, float, 2.2),
         ("3.0", str, "3.0"),
+        (0.0, bool, False),
+        (1, bool, True),
+        (3.0, bool, 3.0),
         (True, bool, True),
     ],
 )
