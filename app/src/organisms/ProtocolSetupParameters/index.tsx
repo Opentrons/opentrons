@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
 import { useQueryClient } from 'react-query'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
 } from '@opentrons/components'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 
 import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
 import { ChildNavigation } from '../ChildNavigation'
@@ -179,8 +179,14 @@ export function ProtocolSetupParameters({
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
-  const parameters = runTimeParameters ?? []
-  //    TODO(jr, 3/20/24): modify useCreateRunMutation to take in optional run time parameters
+
+  // todo (nd:04/01/2024): remove mock and look at runTimeParameters prop
+  // const parameters = runTimeParameters ?? []
+  const parameters = runTimeParameters ?? mockData
+  const [
+    runTimeParametersOverrides,
+    setRunTimeParametersOverrides,
+  ] = React.useState<RunTimeParameter[]>(parameters)
   const { createRun, isLoading } = useCreateRunMutation({
     onSuccess: data => {
       queryClient
@@ -197,7 +203,11 @@ export function ProtocolSetupParameters({
   return (
     <>
       {resetValuesModal ? (
-        <ResetValuesModal handleGoBack={() => showResetValuesModal(false)} />
+        <ResetValuesModal
+          runTimeParametersOverrides={runTimeParametersOverrides}
+          setRunTimeParametersOverrides={setRunTimeParametersOverrides}
+          handleGoBack={() => showResetValuesModal(false)}
+        />
       ) : null}
 
       <ChildNavigation
@@ -218,7 +228,7 @@ export function ProtocolSetupParameters({
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
-        paddingX={SPACING.spacing8}
+        paddingX={SPACING.spacing40}
       >
         {parameters.map((parameter, index) => {
           return (
