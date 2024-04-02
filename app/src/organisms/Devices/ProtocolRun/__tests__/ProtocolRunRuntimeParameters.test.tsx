@@ -19,7 +19,7 @@ vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof ProtocolRunEmptyState>()
   return {
     ...actual,
-    NoParameters: vi.fn(),
+    ProtocolRunEmptyState: vi.fn(),
   }
 })
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
