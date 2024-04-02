@@ -1,6 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, SPACING, StyledText, TYPOGRAPHY } from '@opentrons/components'
+import {
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { RadioButton } from '../../atoms/buttons'
 import { useToaster } from '../ToasterOven'
 import { ChildNavigation } from '../ChildNavigation'
@@ -51,10 +58,10 @@ export function ChooseEnum({
       />
       <Flex
         marginTop="7.75rem"
-        alignSelf="center"
+        alignSelf={ALIGN_CENTER}
         gridGap={SPACING.spacing8}
         paddingX={SPACING.spacing40}
-        flexDirection="column"
+        flexDirection={DIRECTION_COLUMN}
         paddingBottom={SPACING.spacing40}
       >
         <StyledText
@@ -74,8 +81,8 @@ export function ChooseEnum({
               buttonLabel={
                 isBoolean
                   ? option === true
-                    ? 'True'
-                    : 'False'
+                    ? t('true')
+                    : t('false')
                   : option.displayName
               }
               buttonValue={
