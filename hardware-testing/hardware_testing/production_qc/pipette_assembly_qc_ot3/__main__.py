@@ -468,14 +468,6 @@ async def _aspirate_and_look_for_droplets(
     return leak_test_passed
 
 
-def _connect_to_fixture(test_config: TestConfig) -> PressureFixtureBase:
-    fixture = connect_to_fixture(
-        test_config.simulate or test_config.skip_fixture, side=test_config.fixture_side
-    )
-    fixture.connect()
-    return fixture
-
-
 async def _read_pressure_and_check_results(
     api: OT3API,
     pipette_channels: int,
@@ -1531,7 +1523,9 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
     global PRESSURE_DATA_CACHE
 
     # connect to the pressure fixture (or simulate one)
-    fixture = _connect_to_fixture(test_config)
+    fixture = connect_to_fixture(
+        test_config.simulate or test_config.skip_fixture, side=test_config.fixture_side
+    )
 
     # create API instance, and get Pipette serial number
     api = await helpers_ot3.build_async_ot3_hardware_api(
