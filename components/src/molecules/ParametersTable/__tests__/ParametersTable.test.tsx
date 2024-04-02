@@ -13,7 +13,7 @@ const mockRunTimeParameter: RunTimeParameter[] = [
     variableName: 'TIP_TRASH',
     description:
       'to throw tip into the trash or to not throw tip into the trash',
-    type: 'boolean',
+    type: 'bool',
     default: true,
     value: true,
   },

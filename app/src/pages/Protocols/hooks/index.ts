@@ -206,7 +206,7 @@ export const useRunTimeParameters = (
       displayName: 'Dry Run',
       variableName: 'DRYRUN',
       description: 'Is this a dry or wet run? Wet is true, dry is false',
-      type: 'boolean',
+      type: 'bool',
       default: false,
     },
     {
@@ -214,7 +214,7 @@ export const useRunTimeParameters = (
       displayName: 'Use Gripper',
       variableName: 'USE_GRIPPER',
       description: 'For using the gripper.',
-      type: 'boolean',
+      type: 'bool',
       default: true,
     },
     {
@@ -223,7 +223,7 @@ export const useRunTimeParameters = (
       variableName: 'TIP_TRASH',
       description:
         'to throw tip into the trash or to not throw tip into the trash',
-      type: 'boolean',
+      type: 'bool',
       default: true,
     },
     {
@@ -231,7 +231,7 @@ export const useRunTimeParameters = (
       displayName: 'Deactivate Temperatures',
       variableName: 'DEACTIVATE_TEMP',
       description: 'deactivate temperature on the module',
-      type: 'boolean',
+      type: 'bool',
       default: true,
     },
     {

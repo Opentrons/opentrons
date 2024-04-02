@@ -70,7 +70,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       displayName: 'Deactivate Temperatures',
       variableName: 'DEACTIVATE_TEMP',
       description: 'deactivate temperature on the module',
-      type: 'boolean',
+      type: 'bool',
       default: true,
     } as RunTimeParameter
     const result = formatRunTimeParameterValue(mockData, mockTFunction)
@@ -83,7 +83,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       displayName: 'Dry Run',
       variableName: 'DRYRUN',
       description: 'Is this a dry or wet run? Wet is true, dry is false',
-      type: 'boolean',
+      type: 'bool',
       default: false,
     } as RunTimeParameter
     const result = formatRunTimeParameterValue(mockData, mockTFunction)

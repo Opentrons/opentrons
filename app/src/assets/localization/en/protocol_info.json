@@ -65,6 +65,7 @@
   "protocol_title": "Protocol - {{protocol_name}}",
   "protocol_upload_failed": "Protocol upload failed. Fix the error and try again",
   "protocols": "Protocols",
+  "quick_transfer": "Quick transfer",
   "required_cal_data_title": "Calibration Data",
   "required_quantity_title": "Quantity",
   "required_type_title": "Type",
