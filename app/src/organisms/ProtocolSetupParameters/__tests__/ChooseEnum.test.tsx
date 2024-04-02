@@ -23,7 +23,7 @@ describe('ChooseEnum', () => {
         displayName: 'Dry Run',
         variableName: 'dry_run',
         description: 'a dry run description',
-        type: 'boolean',
+        type: 'bool',
         default: false,
         value: false,
       },

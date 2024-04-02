@@ -270,7 +270,7 @@ export function ProtocolSetupParameters({
   )
   if (
     chooseValueScreen != null &&
-    (chooseValueScreen.type === 'boolean' || chooseValueScreen.type === 'str')
+    (chooseValueScreen.type === 'bool' || chooseValueScreen.type === 'str')
   ) {
     children = (
       <ChooseEnum

@@ -29,7 +29,7 @@ export function ChooseEnum({
   const { makeSnackbar } = useToaster()
 
   const { t } = useTranslation(['protocol_setup', 'shared'])
-  if (parameter.type !== 'boolean' && parameter.type !== 'str') {
+  if (parameter.type !== 'bool' && parameter.type !== 'str') {
     console.error(
       `parameter type is expected to be boolean or string for parameter ${parameter.displayName}`
     )
