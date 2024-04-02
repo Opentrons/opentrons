@@ -364,7 +364,7 @@ export function ChooseProtocolSlideoutComponent(
       width="100%"
     >
       {isCreatingRun ? (
-        <Icon name="ot-spinner" spin size={SIZE_1} />
+        <Icon name="ot-spinner" spin size="1rem" />
       ) : (
         t('shared:proceed_to_setup')
       )}
