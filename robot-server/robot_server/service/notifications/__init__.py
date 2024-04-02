@@ -14,6 +14,7 @@ from .publishers import (
     get_runs_publisher,
 )
 from .change_notifier import ChangeNotifier
+from .topics import Topics
 
 __all__ = [
     # main export
@@ -32,4 +33,5 @@ __all__ = [
     # for testing
     "PublisherNotifier",
     "ChangeNotifier",
+    "Topics",
 ]
