@@ -122,7 +122,7 @@ if __name__ == "__main__":
         metavar="FOLDER_NAME",
         type=str,
         nargs=1,
-        help="Google Drive folder name.",
+        help="Google Drive folder name. Open desired folder and copy string after drive/folders/.",
     )
     parser.add_argument(
         "google_sheet_name",
@@ -131,11 +131,14 @@ if __name__ == "__main__":
         nargs=1,
         help="Google sheet name.",
     )
+    parser.add_argument(
+        "email", metavar="EMAIL", type=str, nargs=1, help="opentrons gmail."
+    )
     args = parser.parse_args()
     folder_name = args.folder_name[0]
     storage_directory = args.storage_directory[0]
     google_sheet_name = args.google_sheet_name[0]
-    parent_folder = False
+    email = args.email[0]
     try:
         credentials_path = os.path.join(storage_directory, "credentials.json")
     except FileNotFoundError:
@@ -143,7 +146,7 @@ if __name__ == "__main__":
         sys.exit()
     try:
         google_drive = google_drive_tool.google_drive(
-            credentials_path, folder_name, parent_folder
+            credentials_path, folder_name, email
         )
         print("Connected to google drive.")
     except json.decoder.JSONDecodeError:
@@ -162,21 +165,9 @@ if __name__ == "__main__":
         sys.exit()
     run_ids_on_gs = google_sheet.get_column(2)
     run_ids_on_gs = set(run_ids_on_gs)
-    # Read Google Drive .json files
-    google_drive_files = google_drive.list_folder()
-    google_drive_files_json = [
-        file for file in google_drive_files if file.endswith(".json")
-    ]
-    # read local directory
-    list_of_files = os.listdir(storage_directory)
-    local_files_json = set(
-        file for file in os.listdir(storage_directory) if file.endswith(".json")
-    )
-    missing_files = local_files_json - set(google_drive_files_json)
-    print(f"Missing files: {len(missing_files)}")
 
     # Uploads files that are not in google drive directory
-    google_drive.upload_missing_files(storage_directory, missing_files)
+    google_drive.upload_missing_files(storage_directory)
 
     # Run ids in google_drive_folder
     run_ids_on_gd = read_robot_logs.get_run_ids_from_google_drive(google_drive)

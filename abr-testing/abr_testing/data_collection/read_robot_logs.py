@@ -1,15 +1,17 @@
 """ABR Read Robot Logs.
 
-This library is downloading logs from robots, extracting wanted information,
+This library has functions to download logs from robots, extracting wanted information,
 and uploading to a google sheet using credentials and google_sheets_tools module
 saved in a local directory.
 """
 import csv
+import datetime
 import os
 from abr_testing.data_collection.error_levels import ERROR_LEVELS_PATH
 from typing import List, Dict, Any, Tuple, Set
 import time as t
 import json
+import requests
 
 
 def create_abr_data_sheet(
@@ -26,7 +28,7 @@ def create_abr_data_sheet(
             writer = csv.DictWriter(csvfile, fieldnames=headers)
             writer.writeheader()
             print(f"Created file. Located: {sheet_location}.")
-    return file_name_csv
+    return sheet_location
 
 
 def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, str]:
@@ -158,3 +160,64 @@ def get_run_ids_from_google_drive(google_drive: Any) -> Set[str]:
             file_id = file.split(".json")[0].split("_")[1]
             run_ids_on_gd.add(file_id)
     return run_ids_on_gd
+
+
+def write_to_sheets(
+    sheet_location: str, google_sheet: Any, row_list: List[Any], headers: List[str]
+) -> None:
+    """Write list to google sheet and csv."""
+    with open(sheet_location, "a", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(row_list)
+        # Read Google Sheet
+        google_sheet.token_check()
+        google_sheet.write_header(headers)
+        google_sheet.update_row_index()
+        google_sheet.write_to_row(row_list)
+        t.sleep(5)  # Sleep added to avoid API error.
+
+
+def get_calibration_offsets(
+    ip: str, storage_directory: str
+) -> Tuple[str, Dict[str, Any]]:
+    """Connect to robot via ip and get calibration data."""
+    calibration = dict()
+    # Robot Information [Name, Software Version]
+    response = requests.get(
+        f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+    )
+    health_data = response.json()
+    robot_name = health_data.get("name", "")
+    api_version = health_data.get("api_version", "")
+    pull_date_timestamp = datetime.datetime.now()
+    date = pull_date_timestamp.date().isoformat()
+    file_date = str(pull_date_timestamp).replace(":", "").split(".")[0]
+    calibration["Robot"] = robot_name
+    calibration["Software Version"] = api_version
+    calibration["Pull Date"] = date
+    calibration["Pull Timestamp"] = pull_date_timestamp.isoformat()
+    calibration["run_id"] = "calibration" + "_" + file_date
+    # Calibration [Instruments, modules, deck]
+    response = requests.get(
+        f"http://{ip}:31950/instruments",
+        headers={"opentrons-version": "3"},
+        params={"cursor": 0, "pageLength": 0},
+    )
+    instruments: Dict[str, Any] = response.json()
+    calibration["Instruments"] = instruments.get("data", "")
+    response = requests.get(
+        f"http://{ip}:31950/modules",
+        headers={"opentrons-version": "3"},
+        params={"cursor": 0, "pageLength": 0},
+    )
+    modules: Dict[str, Any] = response.json()
+    calibration["Modules"] = modules.get("data", "")
+    response = requests.get(
+        f"http://{ip}:31950/calibration/status",
+        headers={"opentrons-version": "3"},
+        params={"cursor": 0, "pageLength": 0},
+    )
+    deck: Dict[str, Any] = response.json()
+    calibration["Deck"] = deck.get("deckCalibration", "")
+    saved_file_path = save_run_log_to_json(ip, calibration, storage_directory)
+    return saved_file_path, calibration
