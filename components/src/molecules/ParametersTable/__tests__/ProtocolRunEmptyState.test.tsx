@@ -18,6 +18,7 @@ describe('NoParameters', () => {
       contentType: 'parameters',
     }
   })
+
   it('should render text and icon with proper color - parameters', () => {
     render(props)
     screen.getByLabelText('alert')

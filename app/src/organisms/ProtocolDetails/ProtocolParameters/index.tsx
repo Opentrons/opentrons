@@ -48,7 +48,7 @@ export function ProtocolParameters({
           <ParametersTable runTimeParameters={runTimeParameters} t={t} />
         </Flex>
       ) : (
-        <ProtocolRunEmptyState />
+        <ProtocolRunEmptyState contentType="parameters" />
       )}
     </Flex>
   )

@@ -78,7 +78,7 @@ export function ProtocolRunRuntimeParameters({
       </Flex>
       {!hasParameter ? (
         <Flex padding={SPACING.spacing16}>
-          <ProtocolRunEmptyState />
+          <ProtocolRunEmptyState contentType="parameters" />
         </Flex>
       ) : (
         <>

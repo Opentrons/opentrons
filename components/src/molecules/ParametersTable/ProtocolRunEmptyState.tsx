@@ -8,11 +8,11 @@ import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 
 interface ProtocolRunEmptyStateProps {
-  contentType?: 'parameters' | 'moduleControls'
+  contentType: 'parameters' | 'moduleControls'
 }
 
 export function ProtocolRunEmptyState({
-  contentType = 'parameters',
+  contentType,
 }: ProtocolRunEmptyStateProps): JSX.Element {
   const bodyText =
     contentType === 'parameters'
