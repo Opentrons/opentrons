@@ -9,6 +9,7 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 
 import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
 import { ChildNavigation } from '../ChildNavigation'
@@ -228,68 +229,21 @@ export function ProtocolSetupParameters({
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
         paddingX={SPACING.spacing40}
-        paddingBottom={SPACING.spacing40}
       >
-        {runTimeParametersOverrides.map((parameter, index) => {
-          if ('choices' in parameter) {
-            return (
-              <React.Fragment key={`${parameter.displayName}_${index}`}>
-                <ProtocolSetupStep
-                  hasIcon={true}
-                  status="general"
-                  title={parameter.displayName}
-                  onClickSetupStep={() => {
-                    // todo (nd:04/01/2023) add screens for number and enumeration inputs
-                  }}
-                  detail={parameter.value.toString()}
-                  description={parameter.description}
-                  fontSize="h4"
-                />
-              </React.Fragment>
-            )
-          } else if (parameter.type === 'boolean') {
-            return (
-              <React.Fragment key={`${parameter.displayName}_${index}`}>
-                <ProtocolSetupStep
-                  hasIcon={false}
-                  status="general"
-                  title={parameter.displayName}
-                  onClickSetupStep={() => {
-                    // todo (nd:04/01/2023) add screens for number and enumeration inputs
-                    const clone = runTimeParametersOverrides.map((param, i) => {
-                      if (i === index) {
-                        return {
-                          ...param,
-                          value: !param.value,
-                        }
-                      }
-                      return param
-                    })
-                    setRunTimeParametersOverrides(clone)
-                  }}
-                  detail={parameter.value ? t('on') : t('off')}
-                  description={parameter.description}
-                  fontSize="h4"
-                />
-              </React.Fragment>
-            )
-          } else if (parameter.type === 'int' || parameter.type === 'float') {
-            return (
-              <React.Fragment key={`${parameter.displayName}_${index}`}>
-                <ProtocolSetupStep
-                  hasIcon={true}
-                  status="general"
-                  title={parameter.displayName}
-                  onClickSetupStep={() => {
-                    // todo (nd:04/01/2023) add screens for number and enumeration inputs
-                  }}
-                  detail={parameter.value.toString()}
-                  description={parameter.description}
-                  fontSize="h4"
-                />
-              </React.Fragment>
-            )
-          }
+        {parameters.map((parameter, index) => {
+          return (
+            <React.Fragment key={`${parameter.displayName}_${index}`}>
+              <ProtocolSetupStep
+                hasIcon={!(parameter.type === 'boolean')}
+                status="general"
+                title={parameter.displayName}
+                onClickSetupStep={() => console.log('TODO: wire this up')}
+                detail={formatRunTimeParameterValue(parameter, t)}
+                description={parameter.description}
+                fontSize="h4"
+              />
+            </React.Fragment>
+          )
         })}
       </Flex>
     </>
