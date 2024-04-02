@@ -42,6 +42,11 @@ from robot_server.runs.router.base_router import (
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
 
+def mock_notify_publishers() -> None:
+    """A mock notify_publishers."""
+    return None
+
+
 @pytest.fixture
 def labware_offset_create() -> LabwareOffsetCreate:
     """Get a labware offset create request value object."""
@@ -87,6 +92,7 @@ async def test_create_run(
             labware_offsets=[labware_offset_create],
             deck_configuration=[],
             protocol=None,
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(expected_response)
 
@@ -99,6 +105,7 @@ async def test_create_run(
         created_at=run_created_at,
         run_auto_deleter=mock_run_auto_deleter,
         deck_configuration_store=mock_deck_configuration_store,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result.content.data == expected_response
@@ -162,6 +169,7 @@ async def test_create_protocol_run(
             labware_offsets=[],
             deck_configuration=[],
             protocol=protocol_resource,
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(expected_response)
 
@@ -173,6 +181,7 @@ async def test_create_protocol_run(
         created_at=run_created_at,
         run_auto_deleter=mock_run_auto_deleter,
         deck_configuration_store=mock_deck_configuration_store,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result.content.data == expected_response
@@ -223,6 +232,7 @@ async def test_create_run_conflict(
             labware_offsets=[],
             deck_configuration=[],
             protocol=None,
+            notify_publishers=mock_notify_publishers,
         )
     ).then_raise(EngineConflictError("oh no"))
 
@@ -234,6 +244,7 @@ async def test_create_run_conflict(
             run_data_manager=mock_run_data_manager,
             run_auto_deleter=mock_run_auto_deleter,
             deck_configuration_store=mock_deck_configuration_store,
+            notify_publishers=mock_notify_publishers,
         )
 
     assert exc_info.value.status_code == 409
