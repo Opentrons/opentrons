@@ -183,7 +183,7 @@ export function FlexPipetteCard({
       subsystemUpdateData == null ? (
         <InstrumentCard
           description={
-            attachedPipette != null
+            attachedPipette != null && pipetteDisplayName != null
               ? pipetteDisplayName
               : i18n.format(t('shared:empty'), 'capitalize')
           }
