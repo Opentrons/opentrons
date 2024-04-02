@@ -21,7 +21,7 @@ describe('ChooseEnum', () => {
       handleGoBack: vi.fn(),
       parameter: {
         displayName: 'Dry Run',
-        variableName: 'DRYRUN',
+        variableName: 'dry_run',
         description: 'a dry run description',
         type: 'boolean',
         default: false,
@@ -36,10 +36,10 @@ describe('ChooseEnum', () => {
     render(props)
     screen.getByText('Choose Dry Run')
     const btn = screen.getByRole('button', { name: 'Restore default values' })
-    screen.getByText('True')
-    screen.getByText('False')
-    const trueOption = screen.getByRole('label', { name: 'True' })
-    const falseOption = screen.getByRole('label', { name: 'False' })
+    screen.getByText('On')
+    screen.getByText('Off')
+    const trueOption = screen.getByRole('label', { name: 'On' })
+    const falseOption = screen.getByRole('label', { name: 'Off' })
     expect(falseOption).toHaveStyle(`background-color: ${COLORS.blue60}`)
     expect(trueOption).toHaveStyle(`background-color: ${COLORS.blue40}`)
     fireEvent.click(btn)
