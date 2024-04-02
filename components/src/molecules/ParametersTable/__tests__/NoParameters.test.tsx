@@ -6,21 +6,19 @@ import { renderWithProviders } from '../../../testing/utils'
 import { BORDERS, COLORS } from '../../../helix-design-system'
 import { NoParameters } from '../NoParameters'
 
-const render = (props: React.ComponentProps<typeof NoParameters>) => {
-  return renderWithProviders(<NoParameters {...props} />)
+const render = () => {
+  return renderWithProviders(<NoParameters />)
 }
-
-const tMock = (key: string) => key
 
 describe('NoParameters', () => {
   it('should render text and icon with proper color', () => {
-    render({})
+    render()
     screen.getByLabelText('alert')
     screen.getByText('No parameters specified in this protocol')
   })
 
   it('should have proper styles', () => {
-    render({})
+    render()
     expect(screen.getByTestId('NoRunTimeParameter')).toHaveStyle(
       `background-color: ${COLORS.grey30}`
     )
@@ -30,12 +28,5 @@ describe('NoParameters', () => {
     expect(screen.getByLabelText('alert')).toHaveStyle(
       `color: ${COLORS.grey60}`
     )
-  })
-
-  it('should render the raw i18n value if a t is provided', () => {
-    render({
-      t: tMock,
-    })
-    screen.getByText('no_parameters')
   })
 })

@@ -27,6 +27,11 @@ from robot_server.runs.engine_store import (
 )
 
 
+def mock_notify_publishers() -> None:
+    """A mock notify_publishers."""
+    return None
+
+
 @pytest.fixture
 def subject(decoy: Decoy, hardware_api: HardwareControlAPI) -> EngineStore:
     """Get a EngineStore test subject."""
@@ -51,7 +56,11 @@ async def json_protocol_source(tmp_path: Path) -> ProtocolSource:
 async def test_create_engine(subject: EngineStore) -> None:
     """It should create an engine for a run."""
     result = await subject.create(
-        run_id="run-id", labware_offsets=[], protocol=None, deck_configuration=[]
+        run_id="run-id",
+        labware_offsets=[],
+        protocol=None,
+        deck_configuration=[],
+        notify_publishers=mock_notify_publishers,
     )
 
     assert subject.current_run_id == "run-id"
@@ -82,6 +91,7 @@ async def test_create_engine_with_protocol(
         labware_offsets=[],
         deck_configuration=[],
         protocol=protocol,
+        notify_publishers=mock_notify_publishers,
     )
     assert subject.current_run_id == "run-id"
     assert isinstance(result, StateSummary)
@@ -103,7 +113,11 @@ async def test_create_engine_uses_robot_type(
     )
 
     await subject.create(
-        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+        run_id="run-id",
+        labware_offsets=[],
+        deck_configuration=[],
+        protocol=None,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert subject.engine.state_view.config.robot_type == robot_type
@@ -122,6 +136,7 @@ async def test_create_engine_with_labware_offsets(subject: EngineStore) -> None:
         labware_offsets=[labware_offset],
         deck_configuration=[],
         protocol=None,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result.labwareOffsets == [
@@ -138,12 +153,20 @@ async def test_create_engine_with_labware_offsets(subject: EngineStore) -> None:
 async def test_archives_state_if_engine_already_exists(subject: EngineStore) -> None:
     """It should not create more than one engine / runner pair."""
     await subject.create(
-        run_id="run-id-1", labware_offsets=[], deck_configuration=[], protocol=None
+        run_id="run-id-1",
+        labware_offsets=[],
+        deck_configuration=[],
+        protocol=None,
+        notify_publishers=mock_notify_publishers,
     )
 
     with pytest.raises(EngineConflictError):
         await subject.create(
-            run_id="run-id-2", labware_offsets=[], deck_configuration=[], protocol=None
+            run_id="run-id-2",
+            labware_offsets=[],
+            deck_configuration=[],
+            protocol=None,
+            notify_publishers=mock_notify_publishers,
         )
 
     assert subject.current_run_id == "run-id-1"
@@ -152,7 +175,11 @@ async def test_archives_state_if_engine_already_exists(subject: EngineStore) -> 
 async def test_clear_engine(subject: EngineStore) -> None:
     """It should clear a stored engine entry."""
     await subject.create(
-        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+        run_id="run-id",
+        labware_offsets=[],
+        deck_configuration=[],
+        protocol=None,
+        notify_publishers=mock_notify_publishers,
     )
     await subject.runner.run(deck_configuration=[])
     result = await subject.clear()
@@ -172,7 +199,11 @@ async def test_clear_engine_not_stopped_or_idle(
 ) -> None:
     """It should raise a conflict if the engine is not stopped."""
     await subject.create(
-        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+        run_id="run-id",
+        labware_offsets=[],
+        deck_configuration=[],
+        protocol=None,
+        notify_publishers=mock_notify_publishers,
     )
     subject.runner.play(deck_configuration=[])
 
@@ -183,7 +214,11 @@ async def test_clear_engine_not_stopped_or_idle(
 async def test_clear_idle_engine(subject: EngineStore) -> None:
     """It should successfully clear engine if idle (not started)."""
     await subject.create(
-        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+        run_id="run-id",
+        labware_offsets=[],
+        deck_configuration=[],
+        protocol=None,
+        notify_publishers=mock_notify_publishers,
     )
     assert subject.engine is not None
     assert subject.runner is not None
@@ -216,7 +251,9 @@ async def test_get_default_engine_robot_type(
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
     hardware_api = decoy.mock(cls=API)
     subject = EngineStore(
-        hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
+        hardware_api=hardware_api,
+        robot_type=robot_type,
+        deck_type=deck_type,
     )
 
     result = await subject.get_default_engine()
@@ -227,7 +264,11 @@ async def test_get_default_engine_robot_type(
 async def test_get_default_engine_current_unstarted(subject: EngineStore) -> None:
     """It should allow a default engine if another engine current but unstarted."""
     await subject.create(
-        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+        run_id="run-id",
+        labware_offsets=[],
+        deck_configuration=[],
+        protocol=None,
+        notify_publishers=mock_notify_publishers,
     )
 
     result = await subject.get_default_engine()
@@ -237,7 +278,11 @@ async def test_get_default_engine_current_unstarted(subject: EngineStore) -> Non
 async def test_get_default_engine_conflict(subject: EngineStore) -> None:
     """It should not allow a default engine if another engine is executing commands."""
     await subject.create(
-        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+        run_id="run-id",
+        labware_offsets=[],
+        deck_configuration=[],
+        protocol=None,
+        notify_publishers=mock_notify_publishers,
     )
     subject.engine.play()
 
@@ -248,7 +293,11 @@ async def test_get_default_engine_conflict(subject: EngineStore) -> None:
 async def test_get_default_engine_run_stopped(subject: EngineStore) -> None:
     """It allow a default engine if another engine is terminal."""
     await subject.create(
-        run_id="run-id", labware_offsets=[], deck_configuration=[], protocol=None
+        run_id="run-id",
+        labware_offsets=[],
+        deck_configuration=[],
+        protocol=None,
+        notify_publishers=mock_notify_publishers,
     )
     await subject.engine.finish()
 

@@ -1,3 +1,4 @@
+"""An interface for managing interactions with the notification broker and relevant lifecycle utilities."""
 import random
 import logging
 import paho.mqtt.client as mqtt
@@ -208,7 +209,5 @@ def get_notification_client(
     app_state: AppState = Depends(get_app_state),
 ) -> Optional[NotificationClient]:
     """Intended to be used by endpoint functions as a FastAPI dependency."""
-    notification_client: Optional[
-        NotificationClient
-    ] = _notification_client_accessor.get_from(app_state)
+    notification_client = _notification_client_accessor.get_from(app_state)
     return notification_client

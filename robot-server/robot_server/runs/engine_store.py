@@ -1,5 +1,5 @@
 """In-memory storage of ProtocolEngine instances."""
-from typing import List, NamedTuple, Optional
+from typing import List, NamedTuple, Optional, Callable
 
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -155,6 +155,7 @@ class EngineStore:
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
+        notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
         run_time_param_values: Optional[RunTimeParamValuesType] = None,
     ) -> StateSummary:
@@ -164,6 +165,7 @@ class EngineStore:
             run_id: The run resource the engine is assigned to.
             labware_offsets: Labware offsets to create the engine with.
             deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
+            notify_publishers: Utilized by the engine to notify publishers of state changes.
             protocol: The protocol to load the runner with, if any.
             run_time_param_values: Any runtime parameter values to set.
 
@@ -190,6 +192,7 @@ class EngineStore:
             ),
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,
+            notify_publishers=notify_publishers,
         )
 
         post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED

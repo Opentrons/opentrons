@@ -1,6 +1,6 @@
 """Manage current and historical run data."""
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional, Callable, Union
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
@@ -144,6 +144,7 @@ class RunDataManager:
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
         run_time_param_values: Optional[RunTimeParamValuesType],
+        notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
     ) -> Union[Run, BadRun]:
         """Create a new, current run.
@@ -152,6 +153,7 @@ class RunDataManager:
             run_id: Identifier to assign the new run.
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
+            notify_publishers: Utilized by the engine to notify publishers of state changes.
 
         Returns:
             The run resource.
@@ -174,6 +176,7 @@ class RunDataManager:
             deck_configuration=deck_configuration,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
+            notify_publishers=notify_publishers,
         )
         run_resource = self._run_store.insert(
             run_id=run_id,

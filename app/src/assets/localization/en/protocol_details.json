@@ -80,6 +80,7 @@
   "unavailable_robot_not_listed_plural": "{{count}} unavailable robots are not listed.",
   "unavailable_robot_not_listed": "{{count}} unavailable robot is not listed.",
   "unsuccessfully_sent": "Unsuccessfully sent",
+  "value_out_of_range": "Value must be between {{min}}-{{max}}",
   "view_run_details": "View run details",
   "view_unavailable_robots": "View unavailable robots on the Devices page"
 }
