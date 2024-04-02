@@ -4,8 +4,8 @@ import {
   Flex,
   POSITION_ABSOLUTE,
   SPACING,
+  VIEWPORT,
 } from '@opentrons/components'
-import { touchScreenViewport } from '../../../DesignTokens/constants'
 import { InputField } from '../../InputField'
 import { NumericalKeyboard } from '.'
 import '../index.css'
@@ -16,7 +16,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Atoms/SoftwareKeyboard/NumericalKeyboard',
   component: NumericalKeyboard,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
   argTypes: {
     isDecimal: {
       control: {
