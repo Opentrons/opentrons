@@ -14,6 +14,7 @@ import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
 import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
+import { ChooseEnum } from './ChooseEnum'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
@@ -176,6 +177,10 @@ export function ProtocolSetupParameters({
   const history = useHistory()
   const host = useHost()
   const queryClient = useQueryClient()
+  const [
+    chooseValueScreen,
+    setChooseValueScreen,
+  ] = React.useState<RunTimeParameter | null>(null)
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
@@ -187,6 +192,30 @@ export function ProtocolSetupParameters({
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
   ] = React.useState<RunTimeParameter[]>(parameters)
+
+  const updateParameters = (
+    value: boolean | string | number,
+    variableName: string
+  ): void => {
+    const updatedParameters = parameters.map(parameter => {
+      if (parameter.variableName === variableName) {
+        return { ...parameter, value }
+      }
+      return parameter
+    })
+    setRunTimeParametersOverrides(updatedParameters)
+    if (chooseValueScreen && chooseValueScreen.variableName === variableName) {
+      const updatedParameter = updatedParameters.find(
+        parameter => parameter.variableName === variableName
+      )
+      if (updatedParameter != null) {
+        setChooseValueScreen(updatedParameter)
+      }
+    }
+  }
+
+  //    TODO(jr, 3/20/24): modify useCreateRunMutation to take in optional run time parameters
+  //    newRunTimeParameters will be the param to plug in!
   const { createRun, isLoading } = useCreateRunMutation({
     onSuccess: data => {
       queryClient
@@ -199,17 +228,8 @@ export function ProtocolSetupParameters({
   const handleConfirmValues = (): void => {
     createRun({ protocolId, labwareOffsets })
   }
-
-  return (
+  let children = (
     <>
-      {resetValuesModal ? (
-        <ResetValuesModal
-          runTimeParametersOverrides={runTimeParametersOverrides}
-          setRunTimeParametersOverrides={setRunTimeParametersOverrides}
-          handleGoBack={() => showResetValuesModal(false)}
-        />
-      ) : null}
-
       <ChildNavigation
         header={t('parameters')}
         onClickBack={() => history.goBack()}
@@ -230,14 +250,14 @@ export function ProtocolSetupParameters({
         gridGap={SPACING.spacing8}
         paddingX={SPACING.spacing40}
       >
-        {parameters.map((parameter, index) => {
+        {runTimeParametersOverrides.map((parameter, index) => {
           return (
             <React.Fragment key={`${parameter.displayName}_${index}`}>
               <ProtocolSetupStep
                 hasIcon={!(parameter.type === 'bool')}
                 status="general"
                 title={parameter.displayName}
-                onClickSetupStep={() => console.log('TODO: wire this up')}
+                onClickSetupStep={() => setChooseValueScreen(parameter)}
                 detail={formatRunTimeParameterValue(parameter, t)}
                 description={parameter.description}
                 fontSize="h4"
@@ -246,6 +266,33 @@ export function ProtocolSetupParameters({
           )
         })}
       </Flex>
+    </>
+  )
+  if (
+    chooseValueScreen != null &&
+    (chooseValueScreen.type === 'boolean' || chooseValueScreen.type === 'str')
+  ) {
+    children = (
+      <ChooseEnum
+        handleGoBack={() => setChooseValueScreen(null)}
+        parameter={chooseValueScreen}
+        setParameter={updateParameters}
+        rawValue={chooseValueScreen.value}
+      />
+    )
+  }
+  // TODO(jr, 4/1/24): add the int/float component
+
+  return (
+    <>
+      {resetValuesModal ? (
+        <ResetValuesModal
+          runTimeParametersOverrides={runTimeParametersOverrides}
+          setRunTimeParametersOverrides={setRunTimeParametersOverrides}
+          handleGoBack={() => showResetValuesModal(false)}
+        />
+      ) : null}
+      {children}
     </>
   )
 }
