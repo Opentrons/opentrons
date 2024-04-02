@@ -29,21 +29,15 @@ export function ChooseEnum({
   const { makeSnackbar } = useToaster()
 
   const { t } = useTranslation(['protocol_setup', 'shared'])
-  if (parameter.type !== 'bool' && parameter.type !== 'str') {
+  if (parameter.type !== 'str') {
     console.error(
-      `parameter type is expected to be boolean or string for parameter ${parameter.displayName}`
+      `parameter type is expected to be a string for parameter ${parameter.displayName}`
     )
   }
-  const options = parameter.type === 'str' ? parameter.choices : [true, false]
+  const options = parameter.type === 'str' ? parameter.choices : undefined
   const handleOnClick = (newValue: string | number | boolean): void => {
     setParameter(newValue, parameter.variableName)
   }
-
-  React.useEffect(() => {
-    if (rawValue === parameter.default) {
-      makeSnackbar(t('no_custom_values'))
-    }
-  }, [rawValue])
 
   return (
     <>
@@ -54,6 +48,7 @@ export function ChooseEnum({
         buttonText={t('restore_default')}
         onClickButton={() => {
           setParameter(parameter.default, parameter.variableName)
+          makeSnackbar(t('no_custom_values'))
         }}
       />
       <Flex
@@ -73,29 +68,14 @@ export function ChooseEnum({
         </StyledText>
 
         {options?.map(option => {
-          const isBoolean = option === true || option === false
           return (
             <RadioButton
-              key={`${isBoolean ? option : option.value}`}
-              data-testid={`${isBoolean ? option : option.value}`}
-              buttonLabel={
-                isBoolean
-                  ? option === true
-                    ? t('on')
-                    : t('off')
-                  : option.displayName
-              }
-              buttonValue={
-                isBoolean
-                  ? option === true
-                    ? 'true'
-                    : 'false'
-                  : `${option.value}`
-              }
-              onChange={() => handleOnClick(isBoolean ? option : option.value)}
-              isSelected={
-                isBoolean ? option === rawValue : option.value === rawValue
-              }
+              key={`${option.value}`}
+              data-testid={`${option.value}`}
+              buttonLabel={option.displayName}
+              buttonValue={`${option.value}`}
+              onChange={() => handleOnClick(option.value)}
+              isSelected={option.value === rawValue}
             />
           )
         })}

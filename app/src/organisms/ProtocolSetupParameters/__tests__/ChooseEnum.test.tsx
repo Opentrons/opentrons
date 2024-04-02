@@ -18,41 +18,8 @@ describe('ChooseEnum', () => {
 
   beforeEach(() => {
     props = {
-      handleGoBack: vi.fn(),
-      parameter: {
-        displayName: 'Dry Run',
-        variableName: 'dry_run',
-        description: 'a dry run description',
-        type: 'bool',
-        default: false,
-        value: false,
-      },
       setParameter: vi.fn(),
-      rawValue: false,
-    }
-  })
-
-  it('should render the text and buttons work for a boolean param', () => {
-    render(props)
-    screen.getByText('Choose Dry Run')
-    const btn = screen.getByRole('button', { name: 'Restore default values' })
-    screen.getByText('On')
-    screen.getByText('Off')
-    const trueOption = screen.getByRole('label', { name: 'On' })
-    const falseOption = screen.getByRole('label', { name: 'Off' })
-    expect(falseOption).toHaveStyle(`background-color: ${COLORS.blue60}`)
-    expect(trueOption).toHaveStyle(`background-color: ${COLORS.blue40}`)
-    fireEvent.click(btn)
-    expect(props.setParameter).toHaveBeenCalled()
-  })
-  it('renders the back icon and calls the prop', () => {
-    render(props)
-    fireEvent.click(screen.getAllByRole('button')[0])
-    expect(props.handleGoBack).toHaveBeenCalled()
-  })
-  it('should render the text and buttons for choice param', () => {
-    props = {
-      ...props,
+      handleGoBack: vi.fn(),
       parameter: {
         displayName: 'Default Module Offsets',
         variableName: 'DEFAULT_OFFSETS',
@@ -77,6 +44,13 @@ describe('ChooseEnum', () => {
       },
       rawValue: '1',
     }
+  })
+  it('renders the back icon and calls the prop', () => {
+    render(props)
+    fireEvent.click(screen.getAllByRole('button')[0])
+    expect(props.handleGoBack).toHaveBeenCalled()
+  })
+  it('should render the text and buttons for choice param', () => {
     render(props)
     screen.getByText('no offsets')
     screen.getByText('temp offset')

@@ -55,10 +55,17 @@ describe('ProtocolSetupParameters', () => {
     screen.getByText('Dry Run')
     screen.getByText('a dry run description')
   })
-  it('renders the ChooseEnum component when a boolean param is selected', () => {
+  it('renders the ChooseEnum component when a str param is selected', () => {
     render(props)
-    fireEvent.click(screen.getByText('Dry Run'))
+    fireEvent.click(screen.getByText('Default Module Offsets'))
     screen.getByText('mock ChooseEnum')
+  })
+  it('renders the other setting when boolean param is selected', () => {
+    render(props)
+    screen.getByText('Off')
+    expect(screen.getAllByText('On')).toHaveLength(3)
+    fireEvent.click(screen.getByText('Dry Run'))
+    expect(screen.getAllByText('On')).toHaveLength(4)
   })
   it('renders the back icon and calls useHistory', () => {
     render(props)

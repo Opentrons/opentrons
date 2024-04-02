@@ -257,7 +257,14 @@ export function ProtocolSetupParameters({
                 hasIcon={!(parameter.type === 'bool')}
                 status="general"
                 title={parameter.displayName}
-                onClickSetupStep={() => setChooseValueScreen(parameter)}
+                onClickSetupStep={() =>
+                  parameter.type === 'bool'
+                    ? updateParameters(
+                        parameter.value === true ? false : true,
+                        parameter.variableName
+                      )
+                    : setChooseValueScreen(parameter)
+                }
                 detail={formatRunTimeParameterValue(parameter, t)}
                 description={parameter.description}
                 fontSize="h4"
@@ -268,10 +275,7 @@ export function ProtocolSetupParameters({
       </Flex>
     </>
   )
-  if (
-    chooseValueScreen != null &&
-    (chooseValueScreen.type === 'bool' || chooseValueScreen.type === 'str')
-  ) {
+  if (chooseValueScreen != null && chooseValueScreen.type === 'str') {
     children = (
       <ChooseEnum
         handleGoBack={() => setChooseValueScreen(null)}
