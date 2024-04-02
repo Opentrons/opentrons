@@ -70,7 +70,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       value: false,
       variableName: 'DRYRUN',
       description: 'Is this a dry or wet run? Wet is true, dry is false',
-      type: 'boolean',
+      type: 'bool',
       default: false,
     },
     {
