@@ -1,10 +1,10 @@
 import type { RunTimeParameter } from '../types'
 
-export const formatRunTimeParameterValue = (
+export const formatRunTimeParameterDefaultValue = (
   runTimeParameter: RunTimeParameter,
-  t: any
+  t?: any
 ): string => {
-  const { type, value } = runTimeParameter
+  const { type, default: defaultValue } = runTimeParameter
   const suffix =
     'suffix' in runTimeParameter && runTimeParameter.suffix != null
       ? runTimeParameter.suffix
@@ -13,15 +13,18 @@ export const formatRunTimeParameterValue = (
     case 'int':
     case 'float':
       return suffix !== null
-        ? `${value.toString()} ${suffix}`
-        : value.toString()
-    case 'bool': {
-      return Boolean(value) ? t('on') : t('off')
-    }
+        ? `${defaultValue.toString()} ${suffix}`
+        : defaultValue.toString()
+    case 'bool':
+      if (t != null) {
+        return Boolean(defaultValue) ? t('on') : t('off')
+      } else {
+        return Boolean(defaultValue) ? 'On' : 'Off'
+      }
     case 'str':
       if ('choices' in runTimeParameter && runTimeParameter.choices != null) {
         const choice = runTimeParameter.choices.find(
-          choice => choice.value === value
+          choice => choice.value === defaultValue
         )
         if (choice != null) {
           return choice.displayName
