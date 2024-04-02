@@ -14,7 +14,7 @@ Protocols
 
 .. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
-   :exclude-members: location_cache, cleanup, clear_commands, params
+   :exclude-members: location_cache, cleanup, clear_commands
 
 Instruments
 ===========
