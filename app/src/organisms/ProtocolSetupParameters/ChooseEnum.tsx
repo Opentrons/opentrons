@@ -38,6 +38,7 @@ export function ChooseEnum({
   const handleOnClick = (newValue: string | number | boolean): void => {
     setParameter(newValue, parameter.variableName)
   }
+  const resetValueDisabled = parameter.default === rawValue
 
   return (
     <>
@@ -46,10 +47,11 @@ export function ChooseEnum({
         onClickBack={handleGoBack}
         buttonType="tertiaryLowLight"
         buttonText={t('restore_default')}
-        onClickButton={() => {
-          setParameter(parameter.default, parameter.variableName)
-          makeSnackbar(t('no_custom_values'))
-        }}
+        onClickButton={() =>
+          resetValueDisabled
+            ? makeSnackbar(t('no_custom_values'))
+            : setParameter(parameter.default, parameter.variableName)
+        }
       />
       <Flex
         marginTop="7.75rem"
