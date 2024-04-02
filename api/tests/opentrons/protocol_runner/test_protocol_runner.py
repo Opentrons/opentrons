@@ -18,7 +18,12 @@ from opentrons.protocols.parse import PythonParseMode
 from opentrons.util.broker import Broker
 
 from opentrons import protocol_reader
-from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    Liquid,
+    commands as pe_commands,
+    errors as pe_errors,
+)
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -328,6 +333,32 @@ async def test_run_json_runner(
     )
 
 
+async def test_run_json_runner_stop_requested_breaks_loop(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    protocol_engine: ProtocolEngine,
+    task_queue: TaskQueue,
+    json_runner_subject: JsonRunner,
+) -> None:
+    """It should run a protocol to completion."""
+    json_runner_subject._queued_commands = [
+        pe_commands.HomeCreate(params=pe_commands.HomeParams())
+    ]
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
+        False, True
+    )
+
+    assert json_runner_subject.was_started() is False
+    await json_runner_subject.run(deck_configuration=[])
+    assert json_runner_subject.was_started() is True
+
+    decoy.when(
+        protocol_engine.add_and_execute_command(
+            pe_commands.HomeCreate(params=pe_commands.HomeParams())
+        )
+    ).then_raise(pe_errors.RunStoppedError("run stopped"))
+
+
 @pytest.mark.parametrize(
     "schema_version, json_protocol",
     [
@@ -385,6 +416,8 @@ async def test_load_json_runner(
 
     await json_runner_subject.load(json_protocol_source)
 
+    run_func_captor = matchers.Captor()
+
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_liquid(
@@ -393,7 +426,20 @@ async def test_load_json_runner(
         protocol_engine.add_command(
             request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
         ),
-        task_queue.set_run_func(func=json_runner_subject._add_command_and_execute),
+        task_queue.set_run_func(func=run_func_captor),
+    )
+
+    print(run_func_captor.value)
+
+    # assert run_func_captor.value is json_runner_subject._add_command_and_execute
+
+    # Verify that the run func calls the right things:
+    run_func = run_func_captor.value
+    await run_func()
+    decoy.verify(
+        await protocol_engine.add_and_execute_command(
+            request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
+        )
     )
 
 

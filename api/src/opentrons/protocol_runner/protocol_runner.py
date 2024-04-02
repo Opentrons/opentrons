@@ -333,8 +333,7 @@ class JsonRunner(AbstractRunner):
         # this command homes all axes, including pipette plugner and gripper jaw
         self._protocol_engine.add_command(request=initial_home_command)
 
-        for command in commands:
-            self._queued_commands.append(command)
+        self._queued_commands = commands
 
         self._task_queue.set_run_func(func=self._add_command_and_execute)
 
@@ -358,9 +357,10 @@ class JsonRunner(AbstractRunner):
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
     async def _add_command_and_execute(self) -> None:
+        print(self._queued_commands)
         for command in self._queued_commands:
             result = await self._protocol_engine.add_and_execute_command(command)
-            if result.error:
+            if result and result.error:
                 raise ProtocolCommandFailedError(
                     original_error=result.error,
                     message=f"{result.error.errorType}: {result.error.detail}",
