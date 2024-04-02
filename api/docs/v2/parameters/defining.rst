@@ -24,7 +24,9 @@ Depending on the :ref:`type of parameter <rtp-types>`, you'll need to specify so
         - A label for the parameter shown in the Opentrons App or on the touchscreen.
         - Maximum 30 characters.
    * - ``description``
-     - An optional longer explanation of what the parameter does, or how its values will affect the execution of the protocol.
+     -
+       - An optional longer explanation of what the parameter does, or how its values will affect the execution of the protocol.
+       - Maximum 100 characters.
    * - ``default``
      - The value the parameter will have if the user makes no changes to it during run setup.
    * - ``minimum`` and ``maximum``
@@ -44,6 +46,7 @@ Depending on the :ref:`type of parameter <rtp-types>`, you'll need to specify so
        - Optional, for numeric parameters only.
        - Displays after the number during run setup.
        - Does not affect the parameter's value or protocol execution.
+       - Maximum [10/TK] characters.
 
 
 
