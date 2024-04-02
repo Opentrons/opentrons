@@ -346,9 +346,10 @@ class AnalysisStore:
             parameter,
             prev_value_and_default,
         ) in rtp_values_and_defaults_in_last_analysis.items():
-            if new_rtp_values.get(
-                parameter, prev_value_and_default.default
-            ) == prev_value_and_default.value:
+            if (
+                new_rtp_values.get(parameter, prev_value_and_default.default)
+                == prev_value_and_default.value
+            ):
                 continue
             else:
                 return False

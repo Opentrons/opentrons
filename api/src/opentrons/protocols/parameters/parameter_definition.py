@@ -143,7 +143,6 @@ class ParameterDefinition(Generic[ParamType]):
                 choices=choices,
                 value=self._value,
                 default=self._default,
-                suffix=self._unit,
             )
         elif self._minimum is not None and self._maximum is not None:
             parameter = NumberParameter(

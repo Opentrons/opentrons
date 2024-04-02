@@ -26,7 +26,7 @@ def add_parameters(parameters: ParameterContext):
             {"display_name": "High Volume", "value": 50.5},
         ],
         description="How many microliters to pipette of each sample.",
-        unit="µL",
+        unit="µL",  # Unit is not wired up, and it doesn't raise errors either.
     )
     parameters.add_bool(
         display_name="Dry Run",

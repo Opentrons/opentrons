@@ -847,6 +847,7 @@ class TipPresenceStatus(str, Enum):
         }[state]
 
 
+# TODO (spp, 2024-04-02): move all RTP types to runner
 class RTPBase(BaseModel):
     """Parameters defined in a protocol."""
 

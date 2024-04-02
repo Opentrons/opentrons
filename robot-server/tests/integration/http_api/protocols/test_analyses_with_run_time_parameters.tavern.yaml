@@ -78,7 +78,6 @@ stages:
                   value: 50.5
               value: 20.1
               description: How many microliters to pipette of each sample.
-              suffix: µL
             - displayName: Dry Run
               variableName: dry_run
               type: bool
@@ -159,7 +158,6 @@ stages:
                   value: 50.5
               value: 10.23
               description: How many microliters to pipette of each sample.
-              suffix: µL
             - displayName: Dry Run
               variableName: dry_run
               type: bool
