@@ -438,8 +438,22 @@ async def test_load_json_runner(
     await run_func()
     decoy.verify(
         await protocol_engine.add_and_execute_command(
-            request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
-        )
+            request=pe_commands.WaitForResumeCreate(
+                params=pe_commands.WaitForResumeParams(message="hello")
+            ),
+        ),
+        await protocol_engine.add_and_execute_command(
+            request=pe_commands.WaitForResumeCreate(
+                params=pe_commands.WaitForResumeParams(message="goodbye")
+            ),
+        ),
+        await protocol_engine.add_and_execute_command(
+            request=pe_commands.LoadLiquidCreate(
+                params=pe_commands.LoadLiquidParams(
+                    liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
+                )
+            ),
+        ),
     )
 
 
