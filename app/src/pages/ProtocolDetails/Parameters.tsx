@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
+import { formatRunTimeParameterDefaultValue } from '@opentrons/shared-data'
 import {
   BORDERS,
   COLORS,
@@ -118,7 +118,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
               </TableDatum>
               <TableDatum>
                 <Flex paddingLeft={SPACING.spacing24} color={COLORS.grey60}>
-                  {formatRunTimeParameterValue(parameter, t)}
+                  {formatRunTimeParameterDefaultValue(parameter, t)}
                 </Flex>
               </TableDatum>
               <TableDatum>

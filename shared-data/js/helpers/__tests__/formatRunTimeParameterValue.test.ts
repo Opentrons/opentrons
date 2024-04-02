@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { formatRunTimeParameterValue } from '../formatRunTimeParameterValue'
+import { formatRunTimeParameterDefaultValue } from '../formatRunTimeParameterDefaultValue'
 
 import type { RunTimeParameter } from '../../types'
 
@@ -9,7 +9,7 @@ const capitalizeFirstLetter = (str: string): string => {
 
 const mockTFunction = vi.fn(str => capitalizeFirstLetter(str))
 
-describe('utils-formatRunTimeParameterValue', () => {
+describe('utils-formatRunTimeParameterDefaultValue', () => {
   it('should return value with suffix when type is int', () => {
     const mockData = {
       value: 6,
@@ -21,7 +21,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       max: 10,
       default: 6,
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('6')
   })
 
@@ -37,7 +37,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       max: 10.0,
       default: 6.5,
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('6.5 mL')
   })
 
@@ -60,7 +60,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       ],
       default: 'left',
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('Left')
   })
 
@@ -73,7 +73,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       type: 'bool',
       default: true,
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('On')
   })
 
@@ -86,7 +86,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       type: 'bool',
       default: false,
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('Off')
   })
 })
