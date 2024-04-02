@@ -48,10 +48,10 @@ import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/us
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
-import type { RunTimeParameter } from '@opentrons/shared-data'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
@@ -78,6 +78,8 @@ export function ChooseProtocolSlideoutComponent(
   const { t } = useTranslation(['device_details', 'shared'])
   const history = useHistory()
   const logger = useLogger(new URL('', import.meta.url).pathname)
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
 
@@ -85,13 +87,13 @@ export function ChooseProtocolSlideoutComponent(
     selectedProtocol,
     setSelectedProtocol,
   ] = React.useState<StoredProtocolData | null>(null)
-  // todo (nd:04/01/2024) look at analysis instead of mock data for RTP
-  // const runTimeParameters =
-  //   selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
   const [
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
   ] = React.useState<RunTimeParameter[]>([])
+  const [currentPage, setCurrentPage] = React.useState<number>(1)
+  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
+
   React.useEffect(() => {
     setRunTimeParametersOverrides(
       selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
@@ -100,14 +102,8 @@ export function ChooseProtocolSlideoutComponent(
   const runTimeParametersFromAnalysis =
     selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
 
-  const [currentPage, setCurrentPage] = React.useState<number>(1)
-  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
   const hasRunTimeParameters =
     enableRunTimeParametersFF && runTimeParametersFromAnalysis.length > 0
-
-  const [targetProps, tooltipProps] = useHoverTooltip()
-
-  console.log(runTimeParametersOverrides)
 
   const analysisStatus = getAnalysisStatus(
     false,
@@ -165,7 +161,14 @@ export function ChooseProtocolSlideoutComponent(
           location,
           definitionUri,
         }))
-      : []
+      : [],
+    runTimeParametersOverrides.reduce(
+      (acc, param) =>
+        param.value !== param.default
+          ? { ...acc, [param.variableName]: param.value }
+          : acc,
+      {}
+    )
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     if (selectedProtocol != null) {
