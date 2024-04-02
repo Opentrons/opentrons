@@ -70,7 +70,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
     }
 
     switch (type) {
-      case 'boolean': {
+      case 'bool': {
         return t('on_off')
       }
       case 'float':

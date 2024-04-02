@@ -15,7 +15,7 @@ export const formatRunTimeParameterValue = (
       return suffix !== null
         ? `${defaultValue.toString()} ${suffix}`
         : defaultValue.toString()
-    case 'boolean':
+    case 'bool':
       if (t != null) {
         return Boolean(defaultValue) ? t('on') : t('off')
       } else {

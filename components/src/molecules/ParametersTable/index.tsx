@@ -32,7 +32,7 @@ export function ParametersTable({
       case 'int':
       case 'float':
         return minMax
-      case 'boolean':
+      case 'bool':
         return t != null ? t('on_off') : 'On, off'
       case 'str':
         if (count > 2) {
