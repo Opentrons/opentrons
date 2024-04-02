@@ -81,8 +81,8 @@ export function ChooseEnum({
               buttonLabel={
                 isBoolean
                   ? option === true
-                    ? t('true')
-                    : t('false')
+                    ? t('on')
+                    : t('off')
                   : option.displayName
               }
               buttonValue={
