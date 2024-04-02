@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
+  ParametersTable,
+  ProtocolRunEmptyState,
   SPACING,
   StyledText,
   TYPOGRAPHY,
-  ParametersTable,
-  NoParameters,
 } from '@opentrons/components'
 import { Banner } from '../../../atoms/Banner'
 
@@ -48,7 +48,7 @@ export function ProtocolParameters({
           <ParametersTable runTimeParameters={runTimeParameters} t={t} />
         </Flex>
       ) : (
-        <NoParameters />
+        <ProtocolRunEmptyState />
       )}
     </Flex>
   )

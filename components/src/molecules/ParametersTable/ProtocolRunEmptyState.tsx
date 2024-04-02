@@ -7,7 +7,17 @@ import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 
-export function NoParameters(): JSX.Element {
+interface ProtocolRunEmptyStateProps {
+  contentType?: 'parameters' | 'moduleControls'
+}
+
+export function ProtocolRunEmptyState({
+  contentType = 'parameters',
+}: ProtocolRunEmptyStateProps): JSX.Element {
+  const bodyText =
+    contentType === 'parameters'
+      ? 'No parameters specified in this protocol'
+      : 'Connect modules to see controls'
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -26,7 +36,7 @@ export function NoParameters(): JSX.Element {
         aria-label="alert"
       />
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        No parameters specified in this protocol
+        {bodyText}
       </StyledText>
     </Flex>
   )

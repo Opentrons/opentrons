@@ -13,7 +13,7 @@ import {
   SPACING,
   StyledText,
   TYPOGRAPHY,
-  NoParameters,
+  ProtocolRunEmptyState,
   useHoverTooltip,
   Icon,
 } from '@opentrons/components'
@@ -78,7 +78,7 @@ export function ProtocolRunRuntimeParameters({
       </Flex>
       {!hasParameter ? (
         <Flex padding={SPACING.spacing16}>
-          <NoParameters />
+          <ProtocolRunEmptyState />
         </Flex>
       ) : (
         <>
