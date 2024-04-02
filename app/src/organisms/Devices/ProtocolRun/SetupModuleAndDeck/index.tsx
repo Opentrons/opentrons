@@ -7,6 +7,10 @@ import {
   SPACING,
   useHoverTooltip,
   PrimaryButton,
+  DIRECTION_ROW,
+  JUSTIFY_SPACE_BETWEEN,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
@@ -46,7 +50,7 @@ export const SetupModuleAndDeck = ({
   hasModules,
   protocolAnalysis,
 }: SetupModuleAndDeckProps): JSX.Element => {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const [selectedValue, toggleGroup] = useToggleGroup(
     t('list_view'),
     t('map_view')
@@ -75,14 +79,51 @@ export const SetupModuleAndDeck = ({
         {toggleGroup}
         {selectedValue === t('list_view') ? (
           <>
-            {hasModules ? (
-              <SetupModulesList robotName={robotName} runId={runId} />
-            ) : null}
-            {requiredDeckConfigCompatibility.length > 0 ? (
-              <SetupFixtureList
-                deckConfigCompatibility={requiredDeckConfigCompatibility}
-              />
-            ) : null}
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              marginTop={SPACING.spacing16}
+              marginLeft={SPACING.spacing20}
+              marginBottom={SPACING.spacing4}
+            >
+              <StyledText
+                css={TYPOGRAPHY.labelSemiBold}
+                marginBottom={SPACING.spacing8}
+                width="45%"
+              >
+                {i18n.format(t('deck_hardware'), 'capitalize')}
+              </StyledText>
+              <StyledText
+                css={TYPOGRAPHY.labelSemiBold}
+                marginRight={SPACING.spacing16}
+                width="15%"
+              >
+                {t('location')}
+              </StyledText>
+              <StyledText
+                css={TYPOGRAPHY.labelSemiBold}
+                marginRight={SPACING.spacing16}
+                width="15%"
+              >
+                {t('status')}
+              </StyledText>
+            </Flex>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              width="100%"
+              overflowY="auto"
+              gridGap={SPACING.spacing4}
+              marginBottom={SPACING.spacing24}
+            >
+              {hasModules ? (
+                <SetupModulesList robotName={robotName} runId={runId} />
+              ) : null}
+              {requiredDeckConfigCompatibility.length > 0 ? (
+                <SetupFixtureList
+                  deckConfigCompatibility={requiredDeckConfigCompatibility}
+                />
+              ) : null}
+            </Flex>
           </>
         ) : (
           <SetupModulesMap runId={runId} />
@@ -105,14 +146,14 @@ export const SetupModuleAndDeck = ({
         </PrimaryButton>
       </Flex>
       {missingModuleIds.length > 0 ||
-      runHasStarted ||
-      !moduleCalibrationStatus.complete ? (
+        runHasStarted ||
+        !moduleCalibrationStatus.complete ? (
         <Tooltip tooltipProps={tooltipProps}>
           {runHasStarted
             ? t('protocol_run_started')
             : missingModuleIds.length > 0
-            ? t('plug_in_required_module', { count: missingModuleIds.length })
-            : t('calibrate_module_failure_reason')}
+              ? t('plug_in_required_module', { count: missingModuleIds.length })
+              : t('calibrate_module_failure_reason')}
         </Tooltip>
       ) : null}
     </>

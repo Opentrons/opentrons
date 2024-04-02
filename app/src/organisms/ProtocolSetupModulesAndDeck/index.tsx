@@ -13,7 +13,7 @@ import { FloatingActionButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
-import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/MultipleModulesModal'
+import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/OT2MultipleModulesHelp'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
@@ -93,11 +93,6 @@ export function ProtocolSetupModulesAndDeck({
     <>
       {createPortal(
         <>
-          {showMultipleModulesModal ? (
-            <MultipleModulesModal
-              onCloseClick={() => setShowMultipleModulesModal(false)}
-            />
-          ) : null}
           {showSetupInstructionsModal ? (
             <SetupInstructionsModal
               setShowSetupInstructionsModal={setShowSetupInstructionsModal}

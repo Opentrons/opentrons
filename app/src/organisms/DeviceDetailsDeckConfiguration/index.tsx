@@ -35,7 +35,6 @@ import {
   SINGLE_LEFT_CUTOUTS,
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
-  SINGLE_CENTER_CUTOUTS,
   getFixtureGroupForCutoutFixture,
 } from '@opentrons/shared-data'
 
@@ -46,7 +45,7 @@ import { AddFixtureModal } from './AddFixtureModal'
 import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
-import type { CutoutConfig, CutoutFixtureId, CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const RUN_REFETCH_INTERVAL = 5000
@@ -62,7 +61,7 @@ function getDisplayLocationForFixtureGroup(cutouts: CutoutId[]): string {
 export function DeviceDetailsDeckConfiguration({
   robotName,
 }: DeviceDetailsDeckConfigurationProps): JSX.Element | null {
-  const { t } = useTranslation('device_details')
+  const { t, i18n } = useTranslation('device_details')
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
@@ -184,11 +183,7 @@ export function DeviceDetailsDeckConfiguration({
           width="100%"
           borderBottom={BORDERS.lineBorder}
         >
-          <StyledText
-            as="h3"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            id="DeckConfiguration_title"
-          >
+          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {`${robotName} ${t('deck_configuration')}`}
           </StyledText>
           <Link
@@ -226,9 +221,7 @@ export function DeviceDetailsDeckConfiguration({
             ) : null}
             <Flex css={DECK_CONFIG_SECTION_STYLE}>
               <Flex
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 marginLeft={`-${SPACING.spacing32}`}
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 marginTop={`-${SPACING.spacing6}`}
                 flexDirection={DIRECTION_COLUMN}
               >
@@ -254,7 +247,7 @@ export function DeviceDetailsDeckConfiguration({
                   css={TYPOGRAPHY.labelSemiBold}
                 >
                   <StyledText flex="1 0 30px">{t('location')}</StyledText>
-                  <StyledText flex="9 1 0">{t('fixture')}</StyledText>
+                  <StyledText flex="9 1 0">{i18n.format(t('deck_hardware'), 'capitalize')}</StyledText>
                 </Flex>
                 {fixtureDisplayList.length > 0 ? (
                   fixtureDisplayList.map(({ displayLocation, displayName }) => (
@@ -296,11 +289,7 @@ export function DeviceDetailsDeckConfiguration({
             paddingBottom={SPACING.spacing24}
             width="100%"
           >
-            <StyledText
-              as="p"
-              color={COLORS.grey40}
-              id="InstrumentsAndModules_offline"
-            >
+            <StyledText as="p" color={COLORS.grey40}>
               {t('offline_deck_configuration')}
             </StyledText>
           </Flex>

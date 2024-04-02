@@ -5,18 +5,18 @@ import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { i18n } from '../../../../../i18n'
 import { getIsOnDevice } from '../../../../../redux/config'
-import { MultipleModulesModal } from '../MultipleModulesModal'
+import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 
 vi.mock('../../../../../redux/config')
 
-const render = (props: React.ComponentProps<typeof MultipleModulesModal>) => {
-  return renderWithProviders(<MultipleModulesModal {...props} />, {
+const render = (props: React.ComponentProps<typeof OT2MultipleModulesHelp>) => {
+  return renderWithProviders(<OT2MultipleModulesHelp {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('MultipleModulesModal', () => {
-  let props: React.ComponentProps<typeof MultipleModulesModal>
+describe('OT2MultipleModulesHelp', () => {
+  let props: React.ComponentProps<typeof OT2MultipleModulesHelp>
   beforeEach(() => {
     props = { onCloseClick: vi.fn() }
     vi.mocked(getIsOnDevice).mockReturnValue(false)
