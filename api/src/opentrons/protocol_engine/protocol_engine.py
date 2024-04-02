@@ -291,15 +291,26 @@ class ProtocolEngine:
         """
         if self._state_store.commands.get_is_stopped():
             return
-        current_id = (
+        running_or_next_queued_id = (
             self._state_store.commands.get_running_command_id()
             or self._state_store.commands.state.queued_command_ids.head(None)
+            # TODO(mm, 2024-04-02): Is it possible for the next queued command to
+            # be a setup command? That wouldn't show up in queued_command_ids.
         )
-        # FIX BEFORE MERGE
+        running_or_next_queued = (
+            self._state_store.commands.get(running_or_next_queued_id)
+            if running_or_next_queued_id is not None
+            else None
+        )
 
-        if current_id is not None:
+        if running_or_next_queued_id is not None:
+            assert running_or_next_queued is not None
+
             fail_action = FailCommandAction(
-                command_id=current_id,
+                command_id=running_or_next_queued_id,
+                # FIXME(mm, 2024-04-02): As of https://github.com/Opentrons/opentrons/pull/14726,
+                # this action is only legal if the command is running, not queued.
+                running_command=running_or_next_queued,
                 error_id=self._model_utils.generate_id(),
                 failed_at=self._model_utils.get_timestamp(),
                 error=EStopActivatedError(message="Estop Activated"),
@@ -308,12 +319,21 @@ class ProtocolEngine:
             )
             self._action_dispatcher.dispatch(fail_action)
 
-            # In the case where the running command was a setup command - check if there
-            # are any pending *run* commands and, if so, clear them all
-            current_id = self._state_store.commands.state.queued_command_ids.head(None)
-            if current_id is not None:
+            # The FailCommandAction above will have cleared all the queued protocol
+            # OR setup commands, depending on whether we gave it a protocol or setup
+            # command. We want both to be cleared in either case. So, do that here.
+            running_or_next_queued_id = (
+                self._state_store.commands.state.queued_command_ids.head(None)
+            )
+            if running_or_next_queued_id is not None:
+                running_or_next_queued = self._state_store.commands.get(
+                    running_or_next_queued_id
+                )
                 fail_action = FailCommandAction(
-                    command_id=current_id,
+                    command_id=running_or_next_queued_id,
+                    # FIXME(mm, 2024-04-02): As of https://github.com/Opentrons/opentrons/pull/14726,
+                    # this action is only legal if the command is running, not queued.
+                    running_command=running_or_next_queued,
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
                     error=EStopActivatedError(message="Estop Activated"),
