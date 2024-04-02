@@ -1,6 +1,6 @@
 """Implementation, request models, and response models for the load module command."""
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Union
+from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
@@ -9,7 +9,6 @@ from ..types import (
     DeckSlotLocation,
     ModuleModel,
     ModuleDefinition,
-    AddressableAreaLocation,
 )
 
 if TYPE_CHECKING:
@@ -42,7 +41,7 @@ class LoadModuleParams(BaseModel):
     # single deck slot precludes loading a Thermocycler in its special "shifted slightly
     # to the left" position. This is okay for now because neither the Python Protocol
     # API nor Protocol Designer attempt to support it, either.
-    location: Union[DeckSlotLocation, AddressableAreaLocation] = Field(
+    location: DeckSlotLocation = Field(
         ...,
         description=(
             "The location into which this module should be loaded."
@@ -109,13 +108,18 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
 
     async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
         """Check that the requested module is attached and assign its identifier."""
-        if isinstance(params.location, DeckSlotLocation):
+        if self._state_view.config.robot_type == "OT-2 Standard":
             self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
                 params.location.slotName.id
             )
-        elif isinstance(params.location, AddressableAreaLocation):
+        else:
+            addressable_area = self._state_view.geometry._modules.ensure_and_convert_module_fixture_location(
+                deck_slot=params.location.slotName,
+                deck_type=self._state_view.config.deck_type,
+                model=params.model,
+            )
             self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
-                params.location.addressableAreaName
+                addressable_area
             )
 
         verified_location = self._state_view.geometry.ensure_location_not_occupied(

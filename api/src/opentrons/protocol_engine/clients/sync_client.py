@@ -265,7 +265,7 @@ class SyncClient:
     def load_module(
         self,
         model: ModuleModel,
-        location: Union[DeckSlotLocation, AddressableAreaLocation],
+        location: DeckSlotLocation,
     ) -> commands.LoadModuleResult:
         """Execute a LoadModule command and return the result."""
         request = commands.LoadModuleCreate(
