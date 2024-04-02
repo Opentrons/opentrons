@@ -24,7 +24,6 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   ProtocolDeck,
-  SIZE_1,
   SPACING,
   SecondaryButton,
   StyledText,
@@ -225,6 +224,21 @@ export function ChooseProtocolSlideoutComponent(
       } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
         const value = runtimeParam.value as number
         const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
+        const error =
+          Number.isNaN(value) ||
+          value < runtimeParam.min ||
+          value > runtimeParam.max
+            ? t(`protocol_details:value_out_of_range`, {
+                min:
+                  runtimeParam.type === 'int'
+                    ? runtimeParam.min
+                    : runtimeParam.min.toFixed(1),
+                max:
+                  runtimeParam.type === 'int'
+                    ? runtimeParam.max
+                    : runtimeParam.max.toFixed(1),
+              })
+            : null
         return (
           <InputField
             key={runtimeParam.variableName}
@@ -236,22 +250,7 @@ export function ChooseProtocolSlideoutComponent(
             tooltipText={runtimeParam.description}
             caption={`${runtimeParam.min}-${runtimeParam.max}`}
             id={id}
-            error={
-              Number.isNaN(value) ||
-              value < runtimeParam.min ||
-              value > runtimeParam.max
-                ? t(`protocol_details:value_out_of_range`, {
-                    min:
-                      runtimeParam.type === 'int'
-                        ? runtimeParam.min
-                        : runtimeParam.min.toFixed(1),
-                    max:
-                      runtimeParam.type === 'int'
-                        ? runtimeParam.max
-                        : runtimeParam.max.toFixed(1),
-                  })
-                : null
-            }
+            error={error}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
