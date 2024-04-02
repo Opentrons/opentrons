@@ -153,7 +153,10 @@ class RunDataManager:
             run_id: Identifier to assign the new run.
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
+            deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
+            run_time_param_values: Any runtime parameter values to set.
+            protocol: The protocol to load the runner with, if any.
 
         Returns:
             The run resource.
