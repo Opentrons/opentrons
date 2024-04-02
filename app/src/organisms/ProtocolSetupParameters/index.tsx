@@ -259,10 +259,7 @@ export function ProtocolSetupParameters({
                 title={parameter.displayName}
                 onClickSetupStep={() =>
                   parameter.type === 'bool'
-                    ? updateParameters(
-                        parameter.value === true ? false : true,
-                        parameter.variableName
-                      )
+                    ? updateParameters(!parameter.value, parameter.variableName)
                     : setChooseValueScreen(parameter)
                 }
                 detail={formatRunTimeParameterValue(parameter, t)}
