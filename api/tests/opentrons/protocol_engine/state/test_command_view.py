@@ -2,7 +2,7 @@
 import pytest
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
-from typing import List, NamedTuple, Optional, Sequence, Type, Union
+from typing import Dict, List, NamedTuple, Optional, Sequence, Type, Union
 
 from opentrons.protocol_engine import EngineStatus, commands as cmd, errors
 from opentrons.protocol_engine.actions import (
@@ -14,6 +14,7 @@ from opentrons.protocol_engine.actions import (
 )
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandView,
@@ -50,6 +51,7 @@ def get_command_view(
     queued_setup_command_ids: Sequence[str] = (),
     run_error: Optional[errors.ErrorOccurrence] = None,
     failed_command: Optional[CommandEntry] = None,
+    command_error_recovery_types: Optional[Dict[str, ErrorRecoveryType]] = None,
     finish_error: Optional[errors.ErrorOccurrence] = None,
     commands: Sequence[cmd.Command] = (),
     latest_command_hash: Optional[str] = None,
@@ -81,6 +83,7 @@ def get_command_view(
         run_error=run_error,
         finish_error=finish_error,
         failed_command=failed_command,
+        command_error_recovery_types=command_error_recovery_types or {},
         run_started_at=run_started_at,
         latest_command_hash=latest_command_hash,
         stopped_by_estop=False,
