@@ -1,4 +1,10 @@
-"""Labware state store tests."""
+"""Tests for CommandView.
+
+DEPRECATED: Testing CommandView independently of CommandStore is no longer helpful.
+Add new tests to test_command_state.py, where they can be tested together.
+"""
+
+
 import pytest
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime

@@ -1,4 +1,10 @@
-"""Tests for the command lifecycle state."""
+"""Tests for CommandStore.
+
+DEPRECATED: Testing CommandStore independently of CommandView is no longer helpful.
+Add new tests to test_command_state.py, where they can be tested together.
+"""
+
+
 import pytest
 from datetime import datetime
 from typing import NamedTuple, Type
