@@ -2,6 +2,7 @@
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional, Dict
 
 import pytest
 from sqlalchemy.engine import Engine
@@ -20,6 +21,7 @@ from robot_server.protocols.analysis_models import (
     CompletedAnalysis,
     AnalysisResult,
     AnalysisStatus,
+    RunTimeParameterAnalysisData,
 )
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
@@ -76,7 +78,9 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
 
 
 def _completed_analysis_resource(
-    analysis_id: str, protocol_id: str
+    analysis_id: str,
+    protocol_id: str,
+    rtp_values_and_defaults: Optional[Dict[str, RunTimeParameterAnalysisData]] = None,
 ) -> CompletedAnalysisResource:
     return CompletedAnalysisResource(
         analysis_id,
@@ -93,6 +97,7 @@ def _completed_analysis_resource(
             errors=[],
             liquids=[],
         ),
+        run_time_parameter_values_and_defaults=rtp_values_and_defaults or {},
     )
 
 
@@ -212,3 +217,47 @@ async def test_get_by_protocol(
     decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)
     resources = await subject.get_by_protocol("protocol-id-1")
     assert resources == [resource_1, resource_2]
+
+
+async def test_get_rtp_values_and_defaults_by_analysis_id_prefers_memcache(
+    subject: CompletedAnalysisStore,
+    memcache: MemoryCache[str, CompletedAnalysisResource],
+    protocol_store: ProtocolStore,
+    decoy: Decoy,
+) -> None:
+    """It should return RTP values and defaults dict from memcache."""
+    resource = _completed_analysis_resource(
+        analysis_id="analysis-id",
+        protocol_id="protocol-id",
+        rtp_values_and_defaults={
+            "abc": RunTimeParameterAnalysisData(value=123, default=234)
+        },
+    )
+    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
+    # When we retrieve a resource via its id we should see it query the cache, and it should
+    # return the identity-same resource
+    decoy.when(memcache.get("analysis-id")).then_return(resource)
+    result = await subject.get_rtp_values_and_defaults_by_analysis_id("analysis-id")
+    assert result == resource.run_time_parameter_values_and_defaults
+
+
+async def test_get_rtp_values_and_defaults_by_analysis_from_db(
+    subject: CompletedAnalysisStore,
+    memcache: MemoryCache[str, CompletedAnalysisResource],
+    protocol_store: ProtocolStore,
+    decoy: Decoy,
+) -> None:
+    """It should fetch the RTP values and defaults dict from database if not present in cache."""
+    resource = _completed_analysis_resource(
+        analysis_id="analysis-id",
+        protocol_id="protocol-id",
+        rtp_values_and_defaults={
+            "xyz": RunTimeParameterAnalysisData(value=123, default=234)
+        },
+    )
+    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
+    await subject.add(resource)
+    # Not in memcache
+    decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
+    result = await subject.get_rtp_values_and_defaults_by_analysis_id("analysis-id")
+    assert result == resource.run_time_parameter_values_and_defaults

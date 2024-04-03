@@ -37,7 +37,7 @@ from robot_server.service.json_api import (
 from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_models import Protocol, ProtocolFile, Metadata
 from .protocol_analyzer import ProtocolAnalyzer
-from .analysis_store import AnalysisStore, AnalysisNotFoundError
+from .analysis_store import AnalysisStore, AnalysisNotFoundError, AnalysisIsPendingError
 from .analysis_models import ProtocolAnalysis
 from .protocol_store import (
     ProtocolStore,
@@ -72,6 +72,13 @@ class AnalysisNotFound(ErrorDetails):
 
     id: Literal["AnalysisNotFound"] = "AnalysisNotFound"
     title: str = "Protocol Analysis Not Found"
+
+
+class LastAnalysisPending(ErrorDetails):
+    """An error returned when the most recent analysis of a protocol is still pending."""
+
+    id: Literal["LastAnalysisPending"] = "LastAnalysisPending"
+    title: str = "Last Analysis Still Pending."
 
 
 class ProtocolFilesInvalid(ErrorDetails):
@@ -140,7 +147,9 @@ protocols_router = APIRouter()
         resource will be returned instead of creating duplicate ones.
 
         When a new protocol resource is created, an analysis is started for it.
-        See the `/protocols/{id}/analyses/` endpoints.
+        A new analysis is also started if the same protocol file is uploaded but with
+        a different set of run-time parameter values than the most recent request.
+        See the `/protocols/{id}/analyses/` endpoints for more details.
         """
     ),
     status_code=status.HTTP_201_CREATED,
@@ -150,9 +159,10 @@ protocols_router = APIRouter()
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": ErrorBody[Union[ProtocolFilesInvalid, ProtocolRobotTypeMismatch]]
         },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
 )
-async def create_protocol(
+async def create_protocol(  # noqa: C901
     files: List[UploadFile] = File(...),
     # use Form because request is multipart/form-data
     # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
@@ -214,7 +224,6 @@ async def create_protocol(
         # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
-
     if isinstance(run_time_parameter_values, str):
         # We have to do this isinstance check because if `runTimeParameterValues` is
         # not specified in the request, then it gets assigned a Form(None) value
@@ -223,29 +232,46 @@ async def create_protocol(
         #  so we can validate the data contents and return a better error response.
         parsed_rtp = json.loads(run_time_parameter_values)
     else:
-        parsed_rtp = None
+        parsed_rtp = {}
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
     if cached_protocol_id is not None:
-        # Protocol exists in database
         resource = protocol_store.get(protocol_id=cached_protocol_id)
-        if parsed_rtp:
-            # This protocol exists in database but needs to be re-analyzed with the
-            # passed-in RTP overrides
-            task_runner.run(
-                protocol_analyzer.analyze,
-                protocol_resource=resource,
-                analysis_id=analysis_id,
-                run_time_param_values=parsed_rtp,
-            )
-            analysis_store.add_pending(
-                protocol_id=cached_protocol_id,
-                analysis_id=analysis_id,
-            )
         analyses = analysis_store.get_summaries_by_protocol(
             protocol_id=cached_protocol_id
         )
+
+        try:
+            if (
+                # Unexpected situations, like powering off the robot after a protocol upload
+                # but before the analysis is complete, can leave the protocol resource
+                # without an associated analysis.
+                len(analyses) == 0
+                or
+                # The most recent analysis was done using different RTP values
+                not await analysis_store.matching_rtp_values_in_analysis(
+                    analysis_summary=analyses[-1], new_rtp_values=parsed_rtp
+                )
+            ):
+                # This protocol exists in database but needs to be (re)analyzed
+                task_runner.run(
+                    protocol_analyzer.analyze,
+                    protocol_resource=resource,
+                    analysis_id=analysis_id,
+                    run_time_param_values=parsed_rtp,
+                )
+                analyses.append(
+                    analysis_store.add_pending(
+                        protocol_id=cached_protocol_id,
+                        analysis_id=analysis_id,
+                    )
+                )
+        except AnalysisIsPendingError as error:
+            raise LastAnalysisPending(detail=str(error)).as_error(
+                status.HTTP_503_SERVICE_UNAVAILABLE
+            ) from error
+
         data = Protocol.construct(
             id=cached_protocol_id,
             createdAt=resource.created_at,
