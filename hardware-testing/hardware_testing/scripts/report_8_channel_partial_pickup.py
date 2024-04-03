@@ -6,12 +6,6 @@ from plotly.subplots import make_subplots
 
 class Eight_Channel_Partial_Report:
     def __init__(self):
-        self.LIMIT = 1000
-        self.PLOT_HEIGHT = 800
-        self.PLOT_WIDTH = 1000
-        self.PLOT_FONT = 16
-        self.PLOT_FORMAT = ".png"
-        self.PLOT_PATH = "plots"
         self.DATA_PATH = "data"
         self.REPORT_PATH = "report"
         self.cycles = None
@@ -53,8 +47,6 @@ class Eight_Channel_Partial_Report:
         df["Pipette Type"] = pipette_type
         df["Tip Size"] = tip_size
         df["Current"] = motor_current
-        df["Overlap"] = abs(df["Final Press"] - df["Initial Press"])
-        df["End Effector"] = self.tip_length[tip_size] - df["Overlap"]
         max_cycle = df["Cycle"].max()
         for i in range(max_cycle):
             cycle = i + 1
@@ -107,6 +99,8 @@ class Eight_Channel_Partial_Report:
             report[test] = report[test].astype(int)
             report[test] = report[test].replace(1, "Pass")
             report[test] = report[test].replace(2, "Fail")
+        report["Leak"] = report.pop("Leak")
+        report["Feel"] = report.pop("Feel")
         report.drop_duplicates(inplace=True)
         report.sort_values(by=sort_columns, inplace=True)
         report.reset_index(drop=True, inplace=True)
@@ -116,7 +110,6 @@ class Eight_Channel_Partial_Report:
     def print_report(self):
         if self.df_report is not None:
             self.df_report.to_csv(f"{self.REPORT_PATH}/{self.report_file}.csv", index=False, float_format="%.3f")
-            # self.df_report.to_excel(f"{self.REPORT_PATH}/{self.report_file}.xlsx", index=False, sheet_name="Raw Data")
 
     def save_report(self):
         print("\nGenerating report...")
