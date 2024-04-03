@@ -325,6 +325,9 @@ class AnalysisStore:
                 analysis_summary.id
             )
         )
+        # We already make sure that the protocol has an analysis associated with before
+        # checking the RTP values so this assert should never raise.
+        # It is only added for type checking.
         assert (
             rtp_values_and_defaults_in_last_analysis is not None
         ), "This protocol has no analysis associated with it."

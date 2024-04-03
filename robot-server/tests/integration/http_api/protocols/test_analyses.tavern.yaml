@@ -26,22 +26,6 @@ stages:
             - id: !anystr
               status: pending
 
-  - name: Upload a protocol
-    request:
-      url: '{ot2_server_base_url}/protocols'
-      method: POST
-      files:
-        files: 'tests/integration/protocols/basic_transfer_standalone.py'
-    response:
-      strict:
-        - json:off
-      status_code: 503
-      json:
-        errors:
-          - id: "LastAnalysisPending"
-            title: "Last Analysis Still Pending."
-            errorCode: '4000'
-
   - name: Check that the analysis summary is present in /protocols/:id; retry until it says it's completed
     max_retries: 5
     delay_after: 1

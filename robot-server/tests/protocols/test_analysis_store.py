@@ -35,6 +35,7 @@ from robot_server.protocols.analysis_models import (
 from robot_server.protocols.analysis_store import (
     AnalysisStore,
     AnalysisNotFoundError,
+    AnalysisIsPendingError,
     _CURRENT_ANALYZER_VERSION,
 )
 from robot_server.protocols.completed_analysis_store import (
@@ -475,3 +476,13 @@ async def test_matching_default_rtp_values_in_analysis_with_no_client_rtp_values
         )
         is True
     )
+
+
+async def test_matching_default_rtp_values_in_analysis_with_pending_analysis(
+    subject: AnalysisStore, protocol_store: ProtocolStore
+) -> None:
+    """It should raise an error if analysis is pending."""
+    with pytest.raises(AnalysisIsPendingError):
+        await subject.matching_rtp_values_in_analysis(
+            AnalysisSummary(id="analysis-id", status=AnalysisStatus.PENDING), {}
+        )
