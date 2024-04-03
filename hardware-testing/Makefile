@@ -286,6 +286,9 @@ push-ot3-gravimetric:
 	$(MAKE) push-ot3
 	ssh $(ssh_helper_ot3) root@$(host) "mkdir -p /data/labware/v2/custom_definitions/custom_beta"
 	scp $(ssh_helper_ot3) -r hardware_testing/labware/* root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	$(MAKE) apply-patches-gravimetric
+	cd ../ && $(MAKE) -C shared-data push-ot3
+	$(MAKE) remove-patches-gravimetric
 
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:
