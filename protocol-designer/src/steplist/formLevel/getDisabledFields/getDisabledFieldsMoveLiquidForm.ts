@@ -18,7 +18,6 @@ export function getDisabledFieldsMoveLiquidForm(
     disabled.add('dispense_mix_checkbox')
     disabled.add('dispense_touchTip_checkbox')
     disabled.add('dispense_mmFromBottom')
-    disabled.add('blowout_z_offset')
   }
   if (hydratedForm.path === 'multiAspirate') {
     disabled.add('aspirate_mix_checkbox')
@@ -43,14 +42,10 @@ export function getDisabledFieldsMoveLiquidForm(
     }
   })
 
-  if (!hydratedForm.blowout_location) {
-    disabled.add('blowout_z_offset')
-  } else if (
+  if (
+    !hydratedForm.blowout_location ||
     hydratedForm.blowout_location.includes('wasteChute') ||
-    hydratedForm.blowout_location.includes('trashBin')
-  ) {
-    disabled.add('blowout_z_offset')
-  } else if (
+    hydratedForm.blowout_location.includes('trashBin') ||
     (hydratedForm.blowout_location === SOURCE_WELL_BLOWOUT_DESTINATION &&
       !hydratedForm.aspirate_labware) ||
     (hydratedForm.blowout_location === DEST_WELL_BLOWOUT_DESTINATION &&
@@ -58,6 +53,5 @@ export function getDisabledFieldsMoveLiquidForm(
   ) {
     disabled.add('blowout_z_offset')
   }
-
   return disabled
 }

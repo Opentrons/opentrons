@@ -28,9 +28,7 @@ export const TipPositionZAxisViz = (
   const pixelsFromBottom =
     Number(fractionOfWellHeight) * WELL_HEIGHT_PIXELS -
     (mmFromBottom != null ? WELL_HEIGHT_PIXELS : 0)
-  const roundedPixelsFromBottom = round(pixelsFromBottom, PIXEL_DECIMALS)
-
-  const bottomPx = roundedPixelsFromBottom
+  const bottomPx = round(pixelsFromBottom, PIXEL_DECIMALS)
 
   return (
     <div className={styles.viz_wrapper}>
