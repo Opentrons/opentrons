@@ -30,7 +30,7 @@ def publisher_notifier() -> AsyncMock:
 
 
 @pytest.fixture
-def runs_publisher(
+async def runs_publisher(
     notification_client: AsyncMock, publisher_notifier: AsyncMock
 ) -> RunsPublisher:
     """Instantiate RunsPublisher."""
@@ -50,11 +50,13 @@ async def test_initialize(
 
     await runs_publisher.initialize(run_id, get_current_command, get_state_summary)
 
-    assert runs_publisher._run_id == run_id
-    assert runs_publisher._get_current_command == get_current_command
-    assert runs_publisher._get_state_summary == get_state_summary
-    assert runs_publisher._previous_current_command is None
-    assert runs_publisher._previous_state_summary_status is None
+    assert runs_publisher._run_hooks
+    assert runs_publisher._run_hooks.run_id == run_id
+    assert runs_publisher._run_hooks.get_current_command == get_current_command
+    assert runs_publisher._run_hooks.get_state_summary == get_state_summary
+    assert runs_publisher._engine_state_slice
+    assert runs_publisher._engine_state_slice.current_command is None
+    assert runs_publisher._engine_state_slice.state_summary_status is None
 
     notification_client.publish_advise_refetch_async.assert_any_await(topic=Topics.RUNS)
     notification_client.publish_advise_refetch_async.assert_any_await(
@@ -67,7 +69,7 @@ async def test_clean_up_current_run(
     runs_publisher: RunsPublisher, notification_client: AsyncMock
 ) -> None:
     """It should publish to appropriate topics at the end of a run."""
-    runs_publisher._run_id = "1234"
+    await runs_publisher.initialize("1234", AsyncMock(), AsyncMock())
 
     await runs_publisher.clean_up_current_run()
 
@@ -85,15 +87,22 @@ async def test_handle_current_command_change(
     runs_publisher: RunsPublisher, notification_client: AsyncMock
 ) -> None:
     """It should handle command changes appropriately."""
-    runs_publisher._run_id = "1234"
-    runs_publisher._get_current_command = lambda _: mock_curent_command("command1")
-    runs_publisher._previous_current_command = mock_curent_command("command1")
+    await runs_publisher.initialize(
+        "1234", lambda _: mock_curent_command("command1"), AsyncMock()
+    )
+
+    assert runs_publisher._run_hooks
+    assert runs_publisher._engine_state_slice
+
+    runs_publisher._engine_state_slice.current_command = mock_curent_command("command1")
 
     await runs_publisher._handle_current_command_change()
 
-    assert not notification_client.publish_advise_refetch_async.called
+    assert notification_client.publish_advise_refetch_async.call_count == 2
 
-    runs_publisher._get_current_command = lambda _: mock_curent_command("command2")
+    runs_publisher._run_hooks.get_current_command = lambda _: mock_curent_command(
+        "command2"
+    )
 
     await runs_publisher._handle_current_command_change()
 
@@ -107,17 +116,24 @@ async def test_handle_engine_status_change(
     runs_publisher: RunsPublisher, notification_client: AsyncMock
 ) -> None:
     """It should handle engine status changes appropriately."""
-    runs_publisher._run_id = "1234"
-    runs_publisher._get_state_summary = MagicMock(
+    await runs_publisher.initialize(
+        "1234", lambda _: mock_curent_command("command1"), AsyncMock()
+    )
+
+    assert runs_publisher._run_hooks
+    assert runs_publisher._engine_state_slice
+
+    runs_publisher._run_hooks.run_id = "1234"
+    runs_publisher._run_hooks.get_state_summary = MagicMock(
         return_value=MagicMock(status=EngineStatus.IDLE)
     )
-    runs_publisher._previous_state_summary_status = EngineStatus.IDLE
+    runs_publisher._engine_state_slice.state_summary_status = EngineStatus.IDLE
 
     await runs_publisher._handle_engine_status_change()
 
-    assert not notification_client.publish_advise_refetch_async.called
+    assert notification_client.publish_advise_refetch_async.call_count == 2
 
-    runs_publisher._get_state_summary.return_value = MagicMock(
+    runs_publisher._run_hooks.get_state_summary.return_value = MagicMock(
         status=EngineStatus.RUNNING
     )
 

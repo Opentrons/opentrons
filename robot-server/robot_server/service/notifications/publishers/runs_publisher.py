@@ -1,5 +1,6 @@
 import asyncio
 from fastapi import Depends
+from dataclasses import dataclass
 from typing import Callable, Optional
 
 from opentrons.protocol_engine import CurrentCommand, StateSummary, EngineStatus
@@ -14,6 +15,23 @@ from ..publisher_notifier import PublisherNotifier, get_publisher_notifier
 from ..topics import Topics
 
 
+@dataclass
+class RunHooks:
+    """Generated during a protocol run. Utilized by RunsPublisher."""
+
+    run_id: str
+    get_current_command: Callable[[str], Optional[CurrentCommand]]
+    get_state_summary: Callable[[str], Optional[StateSummary]]
+
+
+@dataclass
+class EngineStateSlice:
+    """Protocol Engine state relevant to RunsPublisher."""
+
+    current_command: Optional[CurrentCommand] = None
+    state_summary_status: Optional[EngineStatus] = None
+
+
 class RunsPublisher:
     """Publishes protocol runs topics."""
 
@@ -26,15 +44,8 @@ class RunsPublisher:
         self._run_data_manager_polling = asyncio.Event()
         self._poller: Optional[asyncio.Task[None]] = None
         #  Variables and callbacks related to PE state changes.
-        self._run_id: Optional[str] = None
-        self._get_current_command: Optional[
-            Callable[[str], Optional[CurrentCommand]]
-        ] = None
-        self._get_state_summary: Optional[
-            Callable[[str], Optional[StateSummary]]
-        ] = None
-        self._previous_current_command: Optional[CurrentCommand] = None
-        self._previous_state_summary_status: Optional[EngineStatus] = None
+        self._run_hooks: Optional[RunHooks] = None
+        self._engine_state_slice: Optional[EngineStateSlice] = None
 
         self._publisher_notifier.register_publish_callbacks(
             [self._handle_current_command_change, self._handle_engine_status_change]
@@ -53,11 +64,12 @@ class RunsPublisher:
             get_current_command: Callback to get the currently executing command, if any.
             get_state_summary: Callback to get the current run's state summary, if any.
         """
-        self._run_id = run_id
-        self._get_current_command = get_current_command
-        self._get_state_summary = get_state_summary
-        self._previous_current_command = None
-        self._previous_state_summary_status = None
+        self._run_hooks = RunHooks(
+            run_id=run_id,
+            get_current_command=get_current_command,
+            get_state_summary=get_state_summary,
+        )
+        self._engine_state_slice = EngineStateSlice()
 
         await self._publish_runs_advise_refetch_async()
 
@@ -74,40 +86,43 @@ class RunsPublisher:
 
     async def _publish_runs_advise_refetch_async(self) -> None:
         """Publish a refetch flag for relevant runs topics."""
-        await self._client.publish_advise_refetch_async(topic=Topics.RUNS)
-        await self._client.publish_advise_refetch_async(
-            topic=f"{Topics.RUNS}/{self._run_id}"
-        )
+        if self._run_hooks is not None:
+            await self._client.publish_advise_refetch_async(topic=Topics.RUNS)
+            await self._client.publish_advise_refetch_async(
+                topic=f"{Topics.RUNS}/{self._run_hooks.run_id}"
+            )
 
     async def _publish_runs_advise_unsubscribe_async(self) -> None:
         """Publish an unsubscribe flag for relevant runs topics."""
-        await self._client.publish_advise_unsubscribe_async(
-            topic=f"{Topics.RUNS}/{self._run_id}"
-        )
+        if self._run_hooks is not None:
+            await self._client.publish_advise_unsubscribe_async(
+                topic=f"{Topics.RUNS}/{self._run_hooks.run_id}"
+            )
 
     async def _handle_current_command_change(self) -> None:
         """Publish a refetch flag if the current command has changed."""
-        assert self._get_current_command is not None
-        assert self._run_id is not None
-
-        current_command = self._get_current_command(self._run_id)
-        if self._previous_current_command != current_command:
-            await self._publish_current_command()
-            self._previous_current_command = current_command
+        if self._run_hooks is not None and self._engine_state_slice is not None:
+            current_command = self._run_hooks.get_current_command(
+                self._run_hooks.run_id
+            )
+            if self._engine_state_slice.current_command != current_command:
+                await self._publish_current_command()
+                self._previous_current_command = current_command
 
     async def _handle_engine_status_change(self) -> None:
         """Publish a refetch flag if the engine status has changed."""
-        assert self._get_state_summary is not None
-        assert self._run_id is not None
+        if self._run_hooks is not None and self._engine_state_slice is not None:
+            current_state_summary = self._run_hooks.get_state_summary(
+                self._run_hooks.run_id
+            )
 
-        current_state_summary = self._get_state_summary(self._run_id)
-
-        if (
-            current_state_summary is not None
-            and self._previous_state_summary_status != current_state_summary.status
-        ):
-            await self._publish_runs_advise_refetch_async()
-            self._previous_state_summary_status = current_state_summary.status
+            if (
+                current_state_summary is not None
+                and self._engine_state_slice.state_summary_status
+                != current_state_summary.status
+            ):
+                await self._publish_runs_advise_refetch_async()
+                self._previous_state_summary_status = current_state_summary.status
 
 
 _runs_publisher_accessor: AppStateAccessor[RunsPublisher] = AppStateAccessor[
