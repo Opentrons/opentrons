@@ -44,6 +44,7 @@ def get_error_info_from_robot(
     # JIRA Ticket Fields
     failure_level = "Level " + str(error_level) + " Failure"
     components = [failure_level, "Flex-RABR"]
+    components = ["Flex-RABR"]
     affects_version = results["API_Version"]
     parent = results.get("robot_name", "")
     print(parent)
@@ -141,10 +142,16 @@ if __name__ == "__main__":
         whole_description_str,
         saved_file_path,
     ) = get_error_info_from_robot(ip, one_run, storage_directory)
+    # get calibration data
+    saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
+        ip, storage_directory
+    )
     print(f"Making ticket for run: {one_run} on robot {robot}.")
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
     parent_key = project_key + "-" + robot[-1]
+    issues_ids = ticket.issues_on_board(board_id)
+    print(issues_ids)
     issue_url, issue_key = ticket.create_ticket(
         summary,
         whole_description_str,
@@ -156,10 +163,6 @@ if __name__ == "__main__":
         affects_version,
         parent_key,
     )
-    ticket.open_issue(issue_key)
+    ticket.open_issue(issue_url)
     ticket.post_attachment_to_ticket(issue_key, saved_file_path)
-    # get calibration data
-    saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
-        ip, storage_directory
-    )
     ticket.post_attachment_to_ticket(issue_key, saved_file_path_calibration)
