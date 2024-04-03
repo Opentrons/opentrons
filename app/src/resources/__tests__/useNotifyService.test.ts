@@ -184,4 +184,20 @@ describe('useNotifyService', () => {
     unmount()
     expect(appShellListener).toHaveBeenCalled()
   })
+
+  it('should still clean up the listener if the hostname changes to null after subscribing', () => {
+    const { unmount, rerender } = renderHook(() =>
+      useNotifyService({
+        hostOverride: MOCK_HOST_CONFIG,
+        topic: MOCK_TOPIC,
+        setRefetchUsingHTTP: mockHTTPRefetch,
+        options: MOCK_OPTIONS,
+      })
+    )
+    rerender({ hostOverride: null })
+    unmount()
+    expect(appShellListener).toHaveBeenCalledWith(
+      expect.objectContaining({ hostname: MOCK_HOST_CONFIG.hostname })
+    )
+  })
 })

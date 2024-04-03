@@ -48,7 +48,7 @@ const mockRunTimeParameters: RunTimeParameter[] = [
     value: false,
     variableName: 'DRYRUN',
     description: 'Is this a dry or wet run? Wet is true, dry is false',
-    type: 'boolean',
+    type: 'bool',
     default: false,
   },
   {
@@ -226,7 +226,7 @@ describe('ChooseRobotSlideout', () => {
       })
 
       screen.getByText(param.displayName)
-      if (param.type === 'boolean' || 'choices' in param) {
+      if (param.type === 'bool' || 'choices' in param) {
         screen.getByText(param.description)
       } else {
         if (param.type === 'int') {

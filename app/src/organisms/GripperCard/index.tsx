@@ -131,7 +131,7 @@ export function GripperCard({
               ? getGripperDisplayName(
                   attachedGripper.instrumentModel as GripperModel
                 )
-              : t('shared:empty')
+              : i18n.format(t('shared:empty'), 'capitalize')
           }
           banner={
             attachedGripper?.ok && !isCalibrated ? (

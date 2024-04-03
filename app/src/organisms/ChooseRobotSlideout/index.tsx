@@ -422,7 +422,7 @@ export function ChooseRobotSlideout(
             }}
           />
         )
-      } else if (runtimeParam.type === 'boolean') {
+      } else if (runtimeParam.type === 'bool') {
         return (
           <Flex
             flexDirection={DIRECTION_COLUMN}

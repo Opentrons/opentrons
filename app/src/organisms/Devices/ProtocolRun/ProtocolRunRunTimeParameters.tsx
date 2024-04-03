@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-
+import { formatRunTimeParameterDefaultValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -17,7 +17,6 @@ import {
   useHoverTooltip,
   Icon,
 } from '@opentrons/components'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
@@ -151,7 +150,7 @@ const StyledTableRowComponent = (
       <StyledTableCell isLast={index === runTimeParametersLength - 1}>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
           <StyledText as="p">
-            {formatRunTimeParameterValue(parameter, t)}
+            {formatRunTimeParameterDefaultValue(parameter, t)}
           </StyledText>
           {parameter.value !== parameter.default ? (
             <Chip

@@ -28,6 +28,7 @@ export * from './getOccludedSlotCountForModule'
 export * from './labwareInference'
 export * from './getAddressableAreasInProtocol'
 export * from './getSimplestFlexDeckConfig'
+export * from './formatRunTimeParameterDefaultValue'
 export * from './formatRunTimeParameterValue'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
