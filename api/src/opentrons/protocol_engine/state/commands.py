@@ -730,6 +730,13 @@ class CommandView(HasState[CommandState]):
                 message=failed_command.command.error.detail,
             )
 
+    def get_error_recovery_type(self, command_id: str) -> ErrorRecoveryType:
+        """Return the error recovery type with which the given command failed.
+
+        The command ID is assumed to point to a failed command.
+        """
+        return self.state.command_error_recovery_types[command_id]
+
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
         return self._state.run_completed_at is not None
