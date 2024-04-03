@@ -129,6 +129,8 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
 
     if (newValue === '.') {
       setValue('0.')
+    } else if (newValue === '-0') {
+      setValue('0')
     } else {
       isBlowout
         ? setValue(newValue)

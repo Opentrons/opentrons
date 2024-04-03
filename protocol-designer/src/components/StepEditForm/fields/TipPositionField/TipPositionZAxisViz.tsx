@@ -24,27 +24,20 @@ export const TipPositionZAxisViz = (
   } else if (mmFromTop != null) {
     positionInTube = mmFromTop
   }
-  console.log('positionInTube', positionInTube)
   const fractionOfWellHeight = positionInTube / wellDepthMm
-  console.log(' fractionOfWellHeight', fractionOfWellHeight)
   const pixelsFromBottom =
-    Number(fractionOfWellHeight) * WELL_HEIGHT_PIXELS - WELL_HEIGHT_PIXELS
-  console.log('pixelsFromBottom', pixelsFromBottom)
+    Number(fractionOfWellHeight) * WELL_HEIGHT_PIXELS -
+    (mmFromBottom != null ? WELL_HEIGHT_PIXELS : 0)
   const roundedPixelsFromBottom = round(pixelsFromBottom, PIXEL_DECIMALS)
-  console.log('roundedPixelsFromBottom', roundedPixelsFromBottom)
 
   const bottomPx = roundedPixelsFromBottom
 
-  const test =
-    mmFromBottom != null
-      ? { bottom: `${bottomPx}px` }
-      : { top: `${bottomPx}px` }
   return (
     <div className={styles.viz_wrapper}>
       <img
         src={PIPETTE_TIP_IMAGE}
         className={styles.pipette_tip_image}
-        style={test}
+        style={{ bottom: `${bottomPx}px` }}
       />
       {props.wellDepthMm !== null && (
         <span className={styles.well_height_label}>{props.wellDepthMm}mm</span>
