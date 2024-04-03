@@ -215,9 +215,7 @@ class RunCreate(BaseModel):
     )
     runTimeParameterValues: Optional[RunTimeParamValuesType] = Field(
         None,
-        description="Key-value pairs of run-time parameters defined in a protocol."
-        " Also, if this data is included in the request, the server will"
-        " always trigger an analysis (for now).",
+        description="Key-value pairs of run-time parameters defined in a protocol.",
     )
 
 

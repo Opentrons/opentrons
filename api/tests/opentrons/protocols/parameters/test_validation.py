@@ -146,7 +146,7 @@ def test_validate_options_raises_name_error() -> None:
 def test_ensure_value_type(
     value: Union[float, bool, str], param_type: type, result: AllowedTypes
 ) -> None:
-    """It should ensure the correct type is there, converting floats to ints."""
+    """It should ensure that if applicable, the value is coerced into the expected type"""
     assert result == subject.ensure_value_type(value, param_type)
 
 
