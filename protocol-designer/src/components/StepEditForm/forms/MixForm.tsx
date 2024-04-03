@@ -17,6 +17,7 @@ import {
   VolumeField,
   WellOrderField,
   WellSelectionField,
+  BlowoutZOffsetField,
 } from '../fields'
 import { TiprackField } from '../fields/TiprackField'
 import {
@@ -208,6 +209,11 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                   options={getBlowoutLocationOptionsForForm({
                     stepType: formData.stepType,
                   })}
+                />
+                <BlowoutZOffsetField
+                  {...propsForFields.blowout_z_offset}
+                  destLabwareId={propsForFields.labware.value}
+                  blowoutLabwareId={propsForFields.blowout_location.value}
                 />
               </CheckboxRowField>
             </div>

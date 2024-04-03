@@ -11,6 +11,7 @@ import {
   OutlineButton,
   RadioGroup,
 } from '@opentrons/components'
+import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../../constants'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import { getIsTouchTipField } from '../../../../form-types'
 import { TipPositionZAxisViz } from './TipPositionZAxisViz'
@@ -24,7 +25,7 @@ import styles from './TipPositionInput.module.css'
 
 interface ZTipPositionModalProps {
   closeModal: () => void
-  mmFromBottom: number | null
+  zValue: number | null
   name: StepFieldName
   updateValue: (val?: number | null) => unknown
   wellDepthMm: number
@@ -36,21 +37,25 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
     isIndeterminate,
     name,
     wellDepthMm,
-    mmFromBottom,
+    zValue,
     closeModal,
     updateValue,
   } = props
   const { t } = useTranslation(['modal', 'button'])
-  const defaultMmFromBottom = utils.getDefaultMmFromBottom({
-    name,
-    wellDepthMm,
-  })
+
+  const isBlowout = name === 'blowout_z_offset'
+  const defaultMm = isBlowout
+    ? 0
+    : utils.getDefaultMmFromBottom({
+        name,
+        wellDepthMm,
+      })
 
   const [value, setValue] = React.useState<string | null>(
-    mmFromBottom === null ? null : String(mmFromBottom)
+    zValue === null ? null : String(zValue)
   )
   const [isDefault, setIsDefault] = React.useState<boolean>(
-    !isIndeterminate && mmFromBottom === null
+    !isIndeterminate && zValue === null
   )
   // in this modal, pristinity hides the OUT_OF_BOUNDS error only.
   const [isPristine, setPristine] = React.useState<boolean>(true)
@@ -71,20 +76,29 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
     }
   }
   const { maxMmFromBottom, minMmFromBottom } = getMinMaxMmFromBottom()
+
+  //    For blowout from the top of the well
+  const minFromTop = DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+  const maxFromTop = -wellDepthMm
+
+  const minMm = isBlowout ? maxFromTop : minMmFromBottom
+  const maxMm = isBlowout ? minFromTop : maxMmFromBottom
+
   const errors = utils.getErrors({
     isDefault,
-    minMm: minMmFromBottom,
-    maxMm: maxMmFromBottom,
+    minMm,
+    maxMm,
     value,
   })
   const hasErrors = errors.length > 0
   const hasVisibleErrors = isPristine
     ? errors.includes(TOO_MANY_DECIMALS)
     : hasErrors
+
   const errorText = utils.getErrorText({
     errors,
-    minMm: maxMmFromBottom,
-    maxMm: minMmFromBottom,
+    minMm,
+    maxMm,
     isPristine,
     t,
   })
@@ -110,13 +124,15 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
     // if string, strip non-number characters from string and cast to number
     const newValue =
       typeof newValueRaw === 'string'
-        ? newValueRaw.replace(/[^.0-9]/, '')
+        ? newValueRaw.replace(/[^-.0-9]/, '')
         : String(newValueRaw)
 
     if (newValue === '.') {
       setValue('0.')
     } else {
-      setValue(Number(newValue) >= 0 ? newValue : '0')
+      isBlowout
+        ? setValue(newValue)
+        : setValue(Number(newValue) >= 0 ? newValue : '0')
     }
   }
 
@@ -127,7 +143,7 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
   }
 
   const handleIncrementDecrement = (delta: number): void => {
-    const prevValue = value === null ? defaultMmFromBottom : Number(value)
+    const prevValue = value === null ? defaultMm : Number(value)
     setIsDefault(false)
     handleChange(utils.roundValue(prevValue + delta))
   }
@@ -143,8 +159,8 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
   const TipPositionInputField = !isDefault && (
     <InputField
       caption={t('tip_position.caption', {
-        min: minMmFromBottom,
-        max: maxMmFromBottom,
+        min: minMm,
+        max: maxMm,
       })}
       className={styles.position_from_bottom_input}
       error={errorText}
@@ -210,9 +226,11 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
                 }}
                 options={[
                   {
-                    name: t('tip_position.radio_button.default', {
-                      defaultMmFromBottom,
-                    }),
+                    name: isBlowout
+                      ? t('tip_position.radio_button.blowout')
+                      : t('tip_position.radio_button.default', {
+                          defaultMm,
+                        }),
                     value: 'default',
                   },
                   {
@@ -246,7 +264,18 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
               ) : null}
               <TipPositionZAxisViz
                 mmFromBottom={
-                  value !== null ? Number(value) : defaultMmFromBottom
+                  isBlowout
+                    ? undefined
+                    : value !== null
+                    ? Number(value)
+                    : defaultMm
+                }
+                mmFromTop={
+                  isBlowout
+                    ? value !== null
+                      ? Number(value)
+                      : defaultMm
+                    : undefined
                 }
                 wellDepthMm={wellDepthMm}
               />

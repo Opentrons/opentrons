@@ -1,3 +1,7 @@
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '@opentrons/step-generation'
 import type { HydratedFormdata } from '../../../form-types'
 // NOTE: expects that '_checkbox' fields are implemented so that
 // when checkbox is disabled, its dependent fields are hidden
@@ -14,6 +18,7 @@ export function getDisabledFieldsMoveLiquidForm(
     disabled.add('dispense_mix_checkbox')
     disabled.add('dispense_touchTip_checkbox')
     disabled.add('dispense_mmFromBottom')
+    disabled.add('blowout_z_offset')
   }
   if (hydratedForm.path === 'multiAspirate') {
     disabled.add('aspirate_mix_checkbox')
@@ -37,5 +42,22 @@ export function getDisabledFieldsMoveLiquidForm(
       disabled.add(prefix + '_wells')
     }
   })
+
+  if (!hydratedForm.blowout_location) {
+    disabled.add('blowout_z_offset')
+  } else if (
+    hydratedForm.blowout_location.includes('wasteChute') ||
+    hydratedForm.blowout_location.includes('trashBin')
+  ) {
+    disabled.add('blowout_z_offset')
+  } else if (
+    (hydratedForm.blowout_location === SOURCE_WELL_BLOWOUT_DESTINATION &&
+      !hydratedForm.aspirate_labware) ||
+    (hydratedForm.blowout_location === DEST_WELL_BLOWOUT_DESTINATION &&
+      !hydratedForm.dispense_labware)
+  ) {
+    disabled.add('blowout_z_offset')
+  }
+
   return disabled
 }
