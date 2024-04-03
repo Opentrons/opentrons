@@ -290,8 +290,8 @@ class AnalysisStore:
             )
         return rtp_values_and_defaults
 
-    async def matching_rtp_values_in_last_analysis(
-        self, protocol_id: str, new_rtp_values: RunTimeParamValuesType
+    async def matching_rtp_values_in_analysis(
+        self, analysis_summary: AnalysisSummary, new_rtp_values: RunTimeParamValuesType
     ) -> bool:
         """Return whether the last analysis of the given protocol used the mentioned RTP values.
 
@@ -309,21 +309,13 @@ class AnalysisStore:
         with the values provided in the current request, and also verify that rest of the
         parameters in the analysis use default values.
         """
-        analyses = self.get_summaries_by_protocol(protocol_id)
-
-        # We only check for matching RTP values if the given protocol ID
-        # (& hence its summary) exists. So this assertion should never be false unless
-        # somehow a protocol resource is created without an analysis record.
-        assert len(analyses) > 0, "This protocol has no analysis associated with it."
-
-        last_analysis = analyses[-1]
         assert (
-            last_analysis.status != AnalysisStatus.PENDING
+            analysis_summary.status != AnalysisStatus.PENDING
         ), "Protocol must not already have a pending analysis."
 
         rtp_values_and_defaults_in_last_analysis = (
             await self._completed_store.get_rtp_values_and_defaults_by_analysis_id(
-                last_analysis.id
+                analysis_summary.id
             )
         )
         assert (

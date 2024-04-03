@@ -140,7 +140,9 @@ protocols_router = APIRouter()
         resource will be returned instead of creating duplicate ones.
 
         When a new protocol resource is created, an analysis is started for it.
-        See the `/protocols/{id}/analyses/` endpoints.
+        A new analysis is also started if the same protocol file is uploaded but with
+        a different set of run-time parameter values than the most recent request.
+        See the `/protocols/{id}/analyses/` endpoints for more details.
         """
     ),
     status_code=status.HTTP_201_CREATED,
@@ -227,28 +229,36 @@ async def create_protocol(
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
     if cached_protocol_id is not None:
-        # Protocol exists in database
         resource = protocol_store.get(protocol_id=cached_protocol_id)
-        if not await analysis_store.matching_rtp_values_in_last_analysis(
-            cached_protocol_id, parsed_rtp
+        analyses = analysis_store.get_summaries_by_protocol(
+            protocol_id=cached_protocol_id
+        )
+
+        if (
+            # Unexpected situations, like powering off the robot after a protocol upload
+            # but before the analysis is complete, can leave the protocol resource
+            # without an associated analysis.
+            len(analyses) == 0
+            or
+            # The most recent analysis was done using different RTP values
+            not await analysis_store.matching_rtp_values_in_analysis(
+                analysis_summary=analyses[-1], new_rtp_values=parsed_rtp
+            )
         ):
-            # This protocol exists in database but needs to be re-analyzed with the
-            # passed-in RTP overrides
+            # This protocol exists in database but needs to be (re)analyzed
             task_runner.run(
                 protocol_analyzer.analyze,
                 protocol_resource=resource,
                 analysis_id=analysis_id,
                 run_time_param_values=parsed_rtp,
             )
-            analysis_store.add_pending(
-                protocol_id=cached_protocol_id,
-                analysis_id=analysis_id,
+            analyses.append(
+                analysis_store.add_pending(
+                    protocol_id=cached_protocol_id,
+                    analysis_id=analysis_id,
+                )
             )
 
-        # The last analysis in this list of analyses is relevant to this request
-        analyses = analysis_store.get_summaries_by_protocol(
-            protocol_id=cached_protocol_id
-        )
         data = Protocol.construct(
             id=cached_protocol_id,
             createdAt=resource.created_at,
