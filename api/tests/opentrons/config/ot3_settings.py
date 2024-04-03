@@ -138,6 +138,8 @@ ot3_dummy_settings = {
                 "max_overrun_distance_mm": 2,
                 "speed_mm_per_s": 3,
                 "sensor_threshold_pf": 4,
+                "output_option": OutputOptions.stream_to_csv,
+                "data_file": "/var/capacitive_sensor_data.csv",
             },
         },
         "edge_sense": {
@@ -148,6 +150,8 @@ ot3_dummy_settings = {
                 "max_overrun_distance_mm": 5,
                 "speed_mm_per_s": 6,
                 "sensor_threshold_pf": 7,
+                "output_option": OutputOptions.stream_to_csv,
+                "data_file": "/var/capacitive_sensor_data.csv",
             },
             "search_initial_tolerance_mm": 18,
             "search_iteration_limit": 3,

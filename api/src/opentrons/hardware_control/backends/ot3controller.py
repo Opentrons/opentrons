@@ -1400,15 +1400,35 @@ class OT3Controller(FlexBackend):
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
+        output_option: OutputOptions = OutputOptions.can_bus_only,
+        data_file: Optional[str] = None,
         probe: InstrumentProbeType,
     ) -> bool:
+        if output_option == OutputOptions.sync_buffer_to_csv:
+            assert (
+                self._subsystem_manager.device_info[
+                    SubSystem.of_mount(mount)
+                ].revision.tertiary
+                == "1"
+            )
+        csv_output = bool(output_option.value & OutputOptions.stream_to_csv.value)
+        sync_buffer_output = bool(
+            output_option.value & OutputOptions.sync_buffer_to_csv.value
+        )
+        can_bus_only_output = bool(
+            output_option.value & OutputOptions.can_bus_only.value
+        )
         status = await capacitive_probe(
-            self._messenger,
-            sensor_node_for_mount(mount),
-            axis_to_node(moving),
-            distance_mm,
-            speed_mm_per_s,
-            sensor_id_for_instrument(probe),
+            messenger=self._messenger,
+            tool=sensor_node_for_mount(mount),
+            mover=axis_to_node(moving),
+            distance=distance_mm,
+            speed=speed_mm_per_s,
+            csv_output=csv_output,
+            sync_buffer_output=sync_buffer_output,
+            can_bus_only_output=can_bus_only_output,
+            data_file=data_file,
+            sensor_id=sensor_id_for_instrument(probe),
             relative_threshold_pf=sensor_threshold_pf,
         )
 

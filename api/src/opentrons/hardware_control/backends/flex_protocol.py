@@ -365,6 +365,8 @@ class FlexBackend(Protocol):
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
+        output_format: OutputOptions = OutputOptions.can_bus_only,
+        data_file: Optional[str] = None,
         probe: InstrumentProbeType,
     ) -> bool:
         ...

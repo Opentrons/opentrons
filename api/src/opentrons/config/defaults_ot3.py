@@ -44,6 +44,8 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
             max_overrun_distance_mm=5.0,
             speed_mm_per_s=1.0,
             sensor_threshold_pf=3.0,
+            output_option=OutputOptions.stream_to_csv,
+            data_file="/var/capacitive_sensor_data.csv",
         ),
     ),
     edge_sense=EdgeSenseSettings(
@@ -54,6 +56,8 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
             max_overrun_distance_mm=0.5,
             speed_mm_per_s=1,
             sensor_threshold_pf=3.0,
+            output_option=OutputOptions.stream_to_csv,
+            data_file="/var/capacitive_sensor_data.csv",
         ),
         search_initial_tolerance_mm=12.0,
         search_iteration_limit=8,
@@ -272,6 +276,8 @@ def _build_default_cap_pass(
         sensor_threshold_pf=from_conf.get(
             "sensor_threshold_pf", default.sensor_threshold_pf
         ),
+        output_option=from_conf.get("output_option", default.output_option),
+        data_file=from_conf.get("data_file", default.data_file),
     )
 
 

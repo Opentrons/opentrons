@@ -103,19 +103,6 @@ class OT3CurrentSettings:
         )
 
 
-@dataclass(frozen=True)
-class CapacitivePassSettings:
-    prep_distance_mm: float
-    max_overrun_distance_mm: float
-    speed_mm_per_s: float
-    sensor_threshold_pf: float
-
-
-@dataclass(frozen=True)
-class ZSenseSettings:
-    pass_settings: CapacitivePassSettings
-
-
 # str enum so it can be json serializable
 class OutputOptions(int, Enum):
     """Specifies where we should report sensor data to during a sensor pass."""
@@ -124,6 +111,21 @@ class OutputOptions(int, Enum):
     sync_buffer_to_csv = 0x2
     can_bus_only = 0x4
     sync_only = 0x8
+
+
+@dataclass(frozen=True)
+class CapacitivePassSettings:
+    prep_distance_mm: float
+    max_overrun_distance_mm: float
+    speed_mm_per_s: float
+    sensor_threshold_pf: float
+    output_option: OutputOptions
+    data_file: Optional[str]
+
+
+@dataclass(frozen=True)
+class ZSenseSettings:
+    pass_settings: CapacitivePassSettings
 
 
 @dataclass
