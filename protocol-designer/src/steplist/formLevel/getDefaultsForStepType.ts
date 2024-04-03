@@ -37,6 +37,8 @@ export function getDefaultsForStepType(
         dropTip_location: null,
         nozzles: null,
         tipRack: null,
+        mix_x_position: 0,
+        mix_y_position: 0,
       }
 
     case 'moveLiquid':
@@ -86,6 +88,10 @@ export function getDefaultsForStepType(
         dispense_delay_mmFromBottom: null,
         dropTip_location: null,
         nozzles: null,
+        dispense_x_position: 0,
+        dispense_y_position: 0,
+        aspirate_x_position: 0,
+        aspirate_y_position: 0,
       }
 
     case 'moveLabware':

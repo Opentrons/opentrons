@@ -147,6 +147,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
     dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
     blowoutLocation,
+    aspirateXOffset,
+    aspirateYOffset,
+    dispenseXOffset,
+    dispenseYOffset,
   } = args
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
@@ -211,6 +215,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetSourceWell,
               isAirGap: true,
+              xOffset: 0,
+              yOffset: 0,
               tipRack: args.tipRack,
             }),
             ...(aspirateDelay != null
@@ -232,6 +238,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetDestWell,
               isAirGap: true,
+              xOffset: 0,
+              yOffset: 0,
             }),
             ...(dispenseDelay != null
               ? [
@@ -290,6 +298,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               well: destWell,
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
+              xOffset: dispenseXOffset,
+              yOffset: dispenseYOffset,
             }),
             ...delayAfterDispenseCommands,
             ...touchTipAfterDispenseCommand,
@@ -337,6 +347,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 offsetFromBottomMm: airGapOffsetDestWell,
                 isAirGap: true,
                 tipRack: args.tipRack,
+                xOffset: 0,
+                yOffset: 0,
               }),
               ...(aspirateDelay != null
                 ? [
@@ -439,6 +451,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
               aspirateDelaySeconds: aspirateDelay?.seconds,
               dispenseDelaySeconds: dispenseDelay?.seconds,
               tipRack: args.tipRack,
+              aspirateXOffset,
+              aspirateYOffset,
+              dispenseXOffset,
+              dispenseYOffset,
             })
           : []
 
@@ -478,6 +494,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
           flowRate: aspirateFlowRateUlSec,
           offsetFromBottomMm: aspirateOffsetFromBottomMm,
           tipRack: args.tipRack,
+          xOffset: aspirateXOffset,
+          yOffset: aspirateYOffset,
         }),
         ...delayAfterAspirateCommands,
         ...touchTipAfterAspirateCommand,

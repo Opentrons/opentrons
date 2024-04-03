@@ -11,7 +11,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin: 3rem 0 2rem;
+  margin: 1rem 0 2rem;
 }
 
 .position_from_bottom_input {
@@ -64,4 +64,15 @@
 .well_cross_section_image {
   position: relative;
   left: 9px;
+}
+
+.tip_position_icon {
+  height: 1.5rem;
+  width: 1.5rem;
+  cursor: pointer;
+  color: #24313f; /* black80 */
+}
+
+.tip_position_icon:hover {
+  background-color: #e6e6e6;
 }
