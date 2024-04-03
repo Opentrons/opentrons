@@ -27,7 +27,7 @@ import type { ModalHeaderBaseProps } from '../molecules/Modal/types'
 export function OnDeviceDisplayAppFallback({
   error,
 }: FallbackProps): JSX.Element {
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'branded'])
   const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
@@ -59,7 +59,9 @@ export function OnDeviceDisplayAppFallback({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >
-        <StyledText as="p">{t('error_boundary_description')}</StyledText>
+        <StyledText as="p">
+          {t('branded:error_boundary_description')}
+        </StyledText>
         <MediumButton
           width="100%"
           buttonType="alert"

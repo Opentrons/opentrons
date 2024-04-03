@@ -47,7 +47,7 @@ export const DisconnectModal = ({
   onCancel,
   robotName,
 }: DisconnectModalProps): JSX.Element => {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t } = useTranslation(['device_settings', 'shared', 'branded'])
 
   const wifiList = useWifiList(robotName)
   const { wifi } = useSelector((state: State) =>
@@ -144,7 +144,7 @@ export const DisconnectModal = ({
         </StyledText>
         {isError ? (
           <StyledText as="p" marginBottom={SPACING.spacing24}>
-            {t('shared:general_error_message')}
+            {t('branded:general_error_message')}
           </StyledText>
         ) : null}
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>

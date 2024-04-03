@@ -26,14 +26,20 @@ interface ProbeNotAttachedProps {
 export const ProbeNotAttached = (
   props: ProbeNotAttachedProps
 ): JSX.Element | null => {
-  const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
+  const { t, i18n } = useTranslation([
+    'pipette_wizard_flows',
+    'shared',
+    'branded',
+  ])
   const { isOnDevice, handleOnClick, setShowUnableToDetect } = props
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
 
   return (
     <SimpleWizardBody
       header={t('unable_to_detect_probe')}
-      subHeader={numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined}
+      subHeader={
+        numberOfTryAgains > 2 ? t('branded:something_seems_wrong') : undefined
+      }
       iconColor={COLORS.red50}
       isSuccess={false}
     >
