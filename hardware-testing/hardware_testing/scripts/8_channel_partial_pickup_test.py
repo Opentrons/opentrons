@@ -90,6 +90,7 @@ class Eight_Channel_Partial_Pickup_Test:
             "Initial Press":"None",
             "Final Press":"None",
             "Overlap":"None",
+            "End Effector":"None",
             "Leak":"None",
             "Feel":"None",
             "Tip":"None",
@@ -341,9 +342,12 @@ class Eight_Channel_Partial_Pickup_Test:
         print(f"Final Press Position: {final_press[Axis.by_mount(mount)]}")
         tip_overlap = abs(final_press[Axis.by_mount(mount)] - initial_press[Axis.by_mount(mount)])
         print(f"Tip Overlap: {tip_overlap}")
+        end_effector = self.tip_length[self.tip_size] - tip_overlap
+        print(f"End Effector: {end_effector}")
         self.test_data["Initial Press"] = str(initial_press[Axis.by_mount(mount)])
         self.test_data["Final Press"] = str(final_press[Axis.by_mount(mount)])
         self.test_data["Overlap"] = str(tip_overlap)
+        self.test_data["End Effector"] = str(end_effector)
         self.deck_slot['deck_slot'][self.tiprack_slot][Axis.X.name] = tiprack_loc.x
         self.deck_slot['deck_slot'][self.tiprack_slot][Axis.Y.name] = tiprack_loc.y
         self.deck_slot['deck_slot'][self.tiprack_slot]['Z'] = tiprack_loc.z
@@ -460,9 +464,12 @@ class Eight_Channel_Partial_Pickup_Test:
         print(f"Final Press Position: {final_press[Axis.by_mount(mount)]}")
         tip_overlap = abs(final_press[Axis.by_mount(mount)] - initial_press[Axis.by_mount(mount)])
         print(f"Tip Overlap: {tip_overlap}")
+        end_effector = self.tip_length[self.tip_size] - tip_overlap
+        print(f"End Effector: {end_effector}")
         self.test_data["Initial Press"] = str(initial_press[Axis.by_mount(mount)])
         self.test_data["Final Press"] = str(final_press[Axis.by_mount(mount)])
         self.test_data["Overlap"] = str(tip_overlap)
+        self.test_data["End Effector"] = str(end_effector)
 
     async def _select_tip(
         self, api: OT3API, mount: OT3Mount, tip: int
