@@ -30,6 +30,7 @@ describe('useCloneRun hook', () => {
             id: RUN_ID,
             protocolId: 'protocolId',
             labwareOffsets: 'someOffset',
+            runTimeParameterValues: 'someRtp',
           },
         },
       } as any)
@@ -60,6 +61,7 @@ describe('useCloneRun hook', () => {
     expect(mockCreateRun).toHaveBeenCalledWith({
       protocolId: 'protocolId',
       labwareOffsets: 'someOffset',
+      runTimeParameterValues: 'someRtp',
     })
   })
 })
