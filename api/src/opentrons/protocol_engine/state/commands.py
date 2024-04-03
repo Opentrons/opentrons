@@ -4,7 +4,7 @@ from __future__ import annotations
 import enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 from typing_extensions import assert_never
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
@@ -164,6 +164,19 @@ class CommandState:
     # that we're doing error recovery. See if we can implement robot-server pagination
     # atop simpler concepts, like "the last command that ran" or "the next command that
     # would run."
+    #
+    # TODO(mm, 2024-04-03): Can this be replaced by
+    # CommandHistory.get_terminal_command() now?
+
+    command_error_recovery_types: Dict[str, ErrorRecoveryType]
+    """For each command that failed (indexed by ID), what its recovery type was.
+
+    This only includes commands that actually failed, not the ones that we mark as
+    failed but that are effectively "cancelled" because a command before them failed.
+
+    This separate attribute is a stopgap until error recovery concepts are a bit more
+    stable. Eventually, we might want this info to be stored directly on each command.
+    """
 
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
@@ -199,6 +212,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             run_error=None,
             finish_error=None,
             failed_command=None,
+            command_error_recovery_types={},
             run_completed_at=None,
             run_started_at=None,
             latest_command_hash=None,
@@ -253,11 +267,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 error=action.error,
             )
 
-            # TODO(mc, 2022-06-06): add new "cancelled" status or similar
             self._update_to_failed(
                 command_id=action.command_id,
                 failed_at=action.failed_at,
                 error_occurrence=error_occurrence,
+                error_recovery_type=action.type,
                 notes=action.notes,
             )
 
@@ -271,10 +285,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.command_history.get_setup_queue_ids()
                 )
                 for command_id in other_command_ids_to_fail:
+                    # TODO(mc, 2022-06-06): add new "cancelled" status or similar
                     self._update_to_failed(
                         command_id=command_id,
                         failed_at=action.failed_at,
                         error_occurrence=None,
+                        error_recovery_type=None,
                         notes=None,
                     )
                 self._state.command_history.clear_setup_queue()
@@ -289,10 +305,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         self._state.command_history.get_queue_ids()
                     )
                     for command_id in other_command_ids_to_fail:
+                        # TODO(mc, 2022-06-06): add new "cancelled" status or similar
                         self._update_to_failed(
                             command_id=command_id,
                             failed_at=action.failed_at,
                             error_occurrence=None,
+                            error_recovery_type=None,
                             notes=None,
                         )
                     self._state.command_history.clear_queue()
@@ -376,6 +394,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         command_id: str,
         failed_at: datetime,
         error_occurrence: Optional[ErrorOccurrence],
+        error_recovery_type: Optional[ErrorRecoveryType],
         notes: Optional[List[CommandNote]],
     ) -> None:
         prev_entry = self._state.command_history.get(command_id)
@@ -391,6 +410,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
             }
         )
         self._state.command_history.set_command_failed(failed_command)
+        if error_recovery_type is not None:
+            self._state.command_error_recovery_types[command_id] = error_recovery_type
 
     @staticmethod
     def _map_run_exception_to_error_occurrence(
