@@ -22,7 +22,6 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     Liquid,
     commands as pe_commands,
-    errors as pe_errors,
 )
 from opentrons.protocol_reader import (
     ProtocolSource,
@@ -333,7 +332,7 @@ async def test_run_json_runner(
     )
 
 
-async def test_run_json_runner_stop_requested_breaks_loop(
+async def test_run_json_runner_stop_requested_stops_enquqing(
     decoy: Decoy,
     hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
@@ -343,7 +342,7 @@ async def test_run_json_runner_stop_requested_breaks_loop(
     json_translator: JsonTranslator,
 ) -> None:
     """It should run a protocol to completion."""
-    labware_definition = LabwareDefinition.construct()
+    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
     json_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
@@ -355,7 +354,19 @@ async def test_run_json_runner_stop_requested_breaks_loop(
     )
 
     commands: List[pe_commands.CommandCreate] = [
-        pe_commands.HomeCreate(params=pe_commands.HomeParams())
+        pe_commands.HomeCreate(params=pe_commands.HomeParams()),
+        pe_commands.WaitForDurationCreate(
+            params=pe_commands.WaitForDurationParams(seconds=10)
+        ),
+        pe_commands.LoadLiquidCreate(
+            params=pe_commands.LoadLiquidParams(
+                liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
+            )
+        ),
+    ]
+
+    liquids: List[Liquid] = [
+        Liquid(id="water-id", displayName="water", description="water desc")
     ]
 
     json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
@@ -365,20 +376,46 @@ async def test_run_json_runner_stop_requested_breaks_loop(
     ).then_return([labware_definition])
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
     decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
+    decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
+    decoy.when(
+        await protocol_engine.add_and_execute_command(
+            pe_commands.WaitForDurationCreate(
+                params=pe_commands.WaitForDurationParams(seconds=10)
+            ),
+        )
+    ).then_return(
+        pe_commands.WaitForDuration.construct(status=pe_commands.CommandStatus.QUEUED)  # type: ignore[call-arg]
+    )
 
     await json_runner_subject.load(json_protocol_source)
 
     run_func_captor = matchers.Captor()
 
+    decoy.verify(
+        protocol_engine.add_labware_definition(labware_definition),
+        protocol_engine.add_liquid(
+            id="water-id", name="water", description="water desc", color=None
+        ),
+        protocol_engine.add_command(
+            request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
+        ),
+        task_queue.set_run_func(func=run_func_captor),
+    )
+
     # Verify that the run func calls the right things:
     run_func = run_func_captor.value
     await run_func()
 
-    decoy.when(
+    decoy.verify(
         await protocol_engine.add_and_execute_command(
-            pe_commands.HomeCreate(params=pe_commands.HomeParams())
-        )
-    ).then_raise(pe_errors.RunStoppedError("run stopped"))
+            pe_commands.LoadLiquidCreate(
+                params=pe_commands.LoadLiquidParams(
+                    liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
+                )
+            )
+        ),
+        times=0,
+    )
 
 
 @pytest.mark.parametrize(
