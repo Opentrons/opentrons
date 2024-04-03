@@ -47,6 +47,7 @@ import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/us
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
+import type { RunTimeParameterCreateData } from '@opentrons/api-client'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -161,7 +162,7 @@ export function ChooseProtocolSlideoutComponent(
           definitionUri,
         }))
       : [],
-    runTimeParametersOverrides.reduce(
+    runTimeParametersOverrides.reduce<RunTimeParameterCreateData>(
       (acc, param) =>
         param.value !== param.default
           ? { ...acc, [param.variableName]: param.value }

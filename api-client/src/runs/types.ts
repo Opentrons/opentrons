@@ -47,7 +47,7 @@ export interface LegacyGoodRunData {
   modules: LoadedModule[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
-  runTimeParameterValues?: RuntimeParameterCreateData
+  runTimeParameterValues?: RunTimeParameterCreateData
 }
 
 export interface KnownGoodRunData extends LegacyGoodRunData {
@@ -126,7 +126,7 @@ export interface LabwareOffsetCreateData {
   vector: VectorOffset
 }
 
-export interface RuntimeParameterCreateData {
+export interface RunTimeParameterCreateData {
   [key: string]: string | boolean | number
 }
 
