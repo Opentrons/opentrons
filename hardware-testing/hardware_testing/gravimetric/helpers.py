@@ -237,21 +237,6 @@ def _override_add_current_volume(self, volume_incr: float) -> None:  # noqa: ANN
 def _override_ok_to_add_volume(self, volume_incr: float) -> bool:  # noqa: ANN001
     return True
 
-def _override_validate_aspirate_volume(
-    state_view: StateView, pipette_id: str, aspirate_volume: float
-) -> float:
-    return aspirate_volume
-
-
-def _override_check_deck_conflict_for_8_channel(
-    engine_state: StateView,
-    pipette_id: str,
-    labware_id: str,
-    well_name: str,
-    well_location: Union[WellLocation, DropTipWellLocation],
-) -> None:
-    return None
-
 
 def _override_validate_asp_vol(
     state_view: StateView,
@@ -280,12 +265,7 @@ def _override_software_supports_high_volumes() -> None:
     Pipette.set_current_volume = _override_set_current_volume  # type: ignore[assignment]
     Pipette.ok_to_add_volume = _override_ok_to_add_volume  # type: ignore[assignment]
     Pipette.add_current_volume = _override_add_current_volume  # type: ignore[assignment]
-    PE_pipetting._validate_aspirate_volume = (
-        _override_validate_aspirate_volume
-    )  # type: ignore[assignment]
-    PE_deck_conflict._check_deck_conflict_for_8_channel = (
-        _override_check_deck_conflict_for_8_channel
-    )  # type: ignore[assignment]
+    PE_pipetting._validate_aspirate_volume = _override_validate_asp_vol  # type: ignore[assignment]
 
 
 def _get_channel_offset(cfg: config.VolumetricConfig, channel: int) -> Point:
