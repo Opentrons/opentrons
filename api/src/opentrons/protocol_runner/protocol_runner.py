@@ -365,6 +365,8 @@ class JsonRunner(AbstractRunner):
                     original_error=result.error,
                     message=f"{result.error.errorType}: {result.error.detail}",
                 )
+            elif result.status == pe_commands.CommandStatus.QUEUED:
+                break
 
 
 class LiveRunner(AbstractRunner):

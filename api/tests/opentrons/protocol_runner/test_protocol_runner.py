@@ -379,6 +379,13 @@ async def test_run_json_runner_stop_requested_stops_enquqing(
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
     decoy.when(
         await protocol_engine.add_and_execute_command(
+            pe_commands.HomeCreate(params=pe_commands.HomeParams()),
+        )
+    ).then_return(
+        pe_commands.Home.construct(status=pe_commands.CommandStatus.SUCCEEDED)  # type: ignore[call-arg]
+    )
+    decoy.when(
+        await protocol_engine.add_and_execute_command(
             pe_commands.WaitForDurationCreate(
                 params=pe_commands.WaitForDurationParams(seconds=10)
             ),
