@@ -73,6 +73,14 @@ class AnalysisNotFoundError(ValueError):
         super().__init__(f'Analysis "{analysis_id}" not found.')
 
 
+class AnalysisIsPendingError(RuntimeError):
+    """Exception raised if a given analysis is still pending."""
+
+    def __init__(self, analysis_id: str) -> None:
+        """Initialize the error's message."""
+        super().__init__(f'Analysis "{analysis_id}" is still pending.')
+
+
 # TODO(sf, 2023-05-05): Like for protocols and runs, there's an in-memory cache for
 # elements of this store. Unlike for protocols and runs, it isn't just an lru_cache
 # on the top-level store's access methods, because those access methods have to be
@@ -309,9 +317,8 @@ class AnalysisStore:
         with the values provided in the current request, and also verify that rest of the
         parameters in the analysis use default values.
         """
-        assert (
-            analysis_summary.status != AnalysisStatus.PENDING
-        ), "Protocol must not already have a pending analysis."
+        if analysis_summary.status == AnalysisStatus.PENDING:
+            raise AnalysisIsPendingError(analysis_summary.id)
 
         rtp_values_and_defaults_in_last_analysis = (
             await self._completed_store.get_rtp_values_and_defaults_by_analysis_id(

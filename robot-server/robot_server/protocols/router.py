@@ -37,7 +37,7 @@ from robot_server.service.json_api import (
 from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_models import Protocol, ProtocolFile, Metadata
 from .protocol_analyzer import ProtocolAnalyzer
-from .analysis_store import AnalysisStore, AnalysisNotFoundError
+from .analysis_store import AnalysisStore, AnalysisNotFoundError, AnalysisIsPendingError
 from .analysis_models import ProtocolAnalysis
 from .protocol_store import (
     ProtocolStore,
@@ -72,6 +72,13 @@ class AnalysisNotFound(ErrorDetails):
 
     id: Literal["AnalysisNotFound"] = "AnalysisNotFound"
     title: str = "Protocol Analysis Not Found"
+
+
+class LastAnalysisPending(ErrorDetails):
+    """An error returned when the most recent analysis of a protocol is still pending."""
+
+    id: Literal["LastAnalysisPending"] = "LastAnalysisPending"
+    title: str = "Last Analysis Still Pending."
 
 
 class ProtocolFilesInvalid(ErrorDetails):
@@ -152,9 +159,10 @@ protocols_router = APIRouter()
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": ErrorBody[Union[ProtocolFilesInvalid, ProtocolRobotTypeMismatch]]
         },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
 )
-async def create_protocol(
+async def create_protocol(  # noqa: C901
     files: List[UploadFile] = File(...),
     # use Form because request is multipart/form-data
     # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
@@ -234,30 +242,35 @@ async def create_protocol(
             protocol_id=cached_protocol_id
         )
 
-        if (
-            # Unexpected situations, like powering off the robot after a protocol upload
-            # but before the analysis is complete, can leave the protocol resource
-            # without an associated analysis.
-            len(analyses) == 0
-            or
-            # The most recent analysis was done using different RTP values
-            not await analysis_store.matching_rtp_values_in_analysis(
-                analysis_summary=analyses[-1], new_rtp_values=parsed_rtp
-            )
-        ):
-            # This protocol exists in database but needs to be (re)analyzed
-            task_runner.run(
-                protocol_analyzer.analyze,
-                protocol_resource=resource,
-                analysis_id=analysis_id,
-                run_time_param_values=parsed_rtp,
-            )
-            analyses.append(
-                analysis_store.add_pending(
-                    protocol_id=cached_protocol_id,
-                    analysis_id=analysis_id,
+        try:
+            if (
+                # Unexpected situations, like powering off the robot after a protocol upload
+                # but before the analysis is complete, can leave the protocol resource
+                # without an associated analysis.
+                len(analyses) == 0
+                or
+                # The most recent analysis was done using different RTP values
+                not await analysis_store.matching_rtp_values_in_analysis(
+                    analysis_summary=analyses[-1], new_rtp_values=parsed_rtp
                 )
-            )
+            ):
+                # This protocol exists in database but needs to be (re)analyzed
+                task_runner.run(
+                    protocol_analyzer.analyze,
+                    protocol_resource=resource,
+                    analysis_id=analysis_id,
+                    run_time_param_values=parsed_rtp,
+                )
+                analyses.append(
+                    analysis_store.add_pending(
+                        protocol_id=cached_protocol_id,
+                        analysis_id=analysis_id,
+                    )
+                )
+        except AnalysisIsPendingError as error:
+            raise LastAnalysisPending(detail=str(error)).as_error(
+                status.HTTP_503_SERVICE_UNAVAILABLE
+            ) from error
 
         data = Protocol.construct(
             id=cached_protocol_id,
