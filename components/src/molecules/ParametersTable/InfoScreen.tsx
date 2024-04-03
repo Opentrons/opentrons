@@ -7,7 +7,15 @@ import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 
-export function NoParameters(): JSX.Element {
+interface InfoScreenProps {
+  contentType: 'parameters' | 'moduleControls'
+}
+
+export function InfoScreen({ contentType }: InfoScreenProps): JSX.Element {
+  const bodyText =
+    contentType === 'parameters'
+      ? 'No parameters specified in this protocol'
+      : 'Connect modules to see controls'
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -17,7 +25,7 @@ export function NoParameters(): JSX.Element {
       backgroundColor={COLORS.grey30}
       borderRadius={BORDERS.borderRadius8}
       padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
-      data-testid="NoRunTimeParameter"
+      data-testid={`InfoScreen_${contentType}`}
     >
       <Icon
         name="ot-alert"
@@ -26,7 +34,7 @@ export function NoParameters(): JSX.Element {
         aria-label="alert"
       />
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        No parameters specified in this protocol
+        {bodyText}
       </StyledText>
     </Flex>
   )
