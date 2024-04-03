@@ -2,6 +2,7 @@
 import os
 from typing import Set, Any, Optional
 import webbrowser
+import mimetypes
 from oauth2client.service_account import ServiceAccountCredentials  # type: ignore[import]
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -74,10 +75,9 @@ class google_drive:
         """Upload file to Google Drive."""
         file_metadata = {
             "name": os.path.basename(file_path),
-            "mimeType": "application/json",
+            "mimeType": str(mimetypes.guess_type(file_path)[0]),
             "parents": [self.parent_folder],
         }
-
         media = MediaFileUpload(file_path, resumable=True)
 
         uploaded_file = (
