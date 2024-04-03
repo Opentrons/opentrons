@@ -14,7 +14,11 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
-import type { CutoutFixtureId, CutoutId, DeckDefinition } from '@opentrons/shared-data'
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
 // TODO(BC, 2024-03-21): This component is almost identical to HeaterShakerFixture, consider consolidating?
 
@@ -24,13 +28,21 @@ interface TemperatureModuleFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
-  handleClickRemove?: (fixtureLocation: CutoutId, cutoutFixtureId: CutoutFixtureId) => void
+  handleClickRemove?: (
+    fixtureLocation: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ) => void
 }
 
 export function TemperatureModuleFixture(
   props: TemperatureModuleFixtureProps
 ): JSX.Element {
-  const { deckDefinition, handleClickRemove, fixtureLocation, cutoutFixtureId } = props
+  const {
+    deckDefinition,
+    handleClickRemove,
+    fixtureLocation,
+    cutoutFixtureId,
+  } = props
 
   const cutoutDef = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation

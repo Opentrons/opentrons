@@ -64,9 +64,8 @@ export function OT2MultipleModulesHelp(): JSX.Element {
           </Flex>
         </Banner>
       </Box>
-      {
-        showMultipleModulesModal ?
-          createPortal(
+      {showMultipleModulesModal
+        ? createPortal(
             isOnDevice ? (
               <Modal
                 onOutsideClick={onCloseClick}
@@ -82,7 +81,9 @@ export function OT2MultipleModulesHelp(): JSX.Element {
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   gridGap={SPACING.spacing40}
                 >
-                  <StyledText as="p">{t('multiple_of_most_modules')}</StyledText>
+                  <StyledText as="p">
+                    {t('multiple_of_most_modules')}
+                  </StyledText>
                   <img
                     width="428px"
                     height="404px"
@@ -100,7 +101,10 @@ export function OT2MultipleModulesHelp(): JSX.Element {
               >
                 <Flex flexDirection={DIRECTION_COLUMN}>
                   <Flex flexDirection={DIRECTION_ROW}>
-                    <Flex flexDirection={DIRECTION_COLUMN} marginRight="3.625rem">
+                    <Flex
+                      flexDirection={DIRECTION_COLUMN}
+                      marginRight="3.625rem"
+                    >
                       <StyledText as="p" marginBottom={SPACING.spacing16}>
                         {t('multiple_modules_explanation')}
                       </StyledText>
@@ -126,7 +130,9 @@ export function OT2MultipleModulesHelp(): JSX.Element {
                         {t('example')}
                       </StyledText>
 
-                      <StyledText as="p">{t('multiple_modules_example')}</StyledText>
+                      <StyledText as="p">
+                        {t('multiple_modules_example')}
+                      </StyledText>
                     </Flex>
                     <img
                       height="100%"
@@ -147,8 +153,8 @@ export function OT2MultipleModulesHelp(): JSX.Element {
               </LegacyModal>
             ),
             getTopPortalEl()
-          ) : null
-      }
+          )
+        : null}
     </>
   )
 }

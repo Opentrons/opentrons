@@ -55,7 +55,7 @@ interface DeviceDetailsDeckConfigurationProps {
 }
 
 function getDisplayLocationForFixtureGroup(cutouts: CutoutId[]): string {
-  return cutouts.map(cutoutId => getCutoutDisplayName(cutoutId)).join(" + ")
+  return cutouts.map(cutoutId => getCutoutDisplayName(cutoutId)).join(' + ')
 }
 
 export function DeviceDetailsDeckConfiguration({
@@ -92,7 +92,10 @@ export function DeviceDetailsDeckConfiguration({
     setShowAddFixtureModal(true)
   }
 
-  const handleClickRemove = (cutoutId: CutoutId, cutoutFixtureId: CutoutFixtureId): void => {
+  const handleClickRemove = (
+    cutoutId: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ): void => {
     let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
     if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
       replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
@@ -100,58 +103,90 @@ export function DeviceDetailsDeckConfiguration({
       replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
     }
 
-    const fixtureGroup = deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)?.fixtureGroup ?? []
+    const fixtureGroup =
+      deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
+        ?.fixtureGroup ?? []
 
     let newDeckConfig = deckConfig
     if (fixtureGroup.length > 0) {
-      newDeckConfig = deckConfig.map(cutoutConfig => (
+      newDeckConfig = deckConfig.map(cutoutConfig =>
         fixtureGroup.includes(cutoutConfig.cutoutFixtureId)
           ? {
-            ...cutoutConfig,
-            cutoutFixtureId: replacementFixtureId,
-            opentronsModuleSerialNumber: undefined,
-          }
+              ...cutoutConfig,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
           : cutoutConfig
-      ))
+      )
     } else {
-      newDeckConfig = deckConfig.map(cutoutConfig => (
+      newDeckConfig = deckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId === cutoutId
           ? {
-            ...cutoutConfig,
-            cutoutFixtureId: replacementFixtureId,
-            opentronsModuleSerialNumber: undefined,
-          }
+              ...cutoutConfig,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
           : cutoutConfig
-      ))
+      )
     }
     updateDeckConfiguration(newDeckConfig)
   }
 
   // do not show standard slot in fixture display list
-  const { displayList: fixtureDisplayList } = deckConfig.reduce<{ displayList: { displayLocation: string, displayName: string }[], groupedCutoutIds: CutoutId[] }>(
+  const { displayList: fixtureDisplayList } = deckConfig.reduce<{
+    displayList: { displayLocation: string; displayName: string }[]
+    groupedCutoutIds: CutoutId[]
+  }>(
     (acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => {
-      if (cutoutFixtureId == null || SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)) {
+      if (
+        cutoutFixtureId == null ||
+        SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+      ) {
         return acc
       }
-      const displayName = getFixtureDisplayName(cutoutFixtureId, modulesData?.data.find(m => m.serialNumber === opentronsModuleSerialNumber)?.usbPort.port)
-      const fixtureGroup = getFixtureGroupForCutoutFixture(cutoutFixtureId, deckDef.cutoutFixtures)
+      const displayName = getFixtureDisplayName(
+        cutoutFixtureId,
+        modulesData?.data.find(
+          m => m.serialNumber === opentronsModuleSerialNumber
+        )?.usbPort.port
+      )
+      const fixtureGroup = getFixtureGroupForCutoutFixture(
+        cutoutFixtureId,
+        deckDef.cutoutFixtures
+      )
       if (fixtureGroup.length > 1) {
-        const groupedCutoutIds = fixtureGroup.map(groupedFixtureId => deckConfig.find(cc => cc.cutoutFixtureId === groupedFixtureId)?.cutoutId).filter((cc): cc is CutoutId => cc !== null)
-        const displayLocation = getDisplayLocationForFixtureGroup(groupedCutoutIds)
+        const groupedCutoutIds = fixtureGroup
+          .map(
+            groupedFixtureId =>
+              deckConfig.find(cc => cc.cutoutFixtureId === groupedFixtureId)
+                ?.cutoutId
+          )
+          .filter((cc): cc is CutoutId => cc !== null)
+        const displayLocation = getDisplayLocationForFixtureGroup(
+          groupedCutoutIds
+        )
         if (acc.groupedCutoutIds.includes(cutoutId)) {
           return acc // only list grouped fixtures once
         } else {
           return {
             displayList: [...acc.displayList, { displayLocation, displayName }],
-            groupedCutoutIds: [...acc.groupedCutoutIds, ...groupedCutoutIds]
+            groupedCutoutIds: [...acc.groupedCutoutIds, ...groupedCutoutIds],
           }
         }
       }
       return {
         ...acc,
-        displayList: [...acc.displayList, { displayLocation: getDisplayLocationForFixtureGroup([cutoutId]), displayName }]
+        displayList: [
+          ...acc.displayList,
+          {
+            displayLocation: getDisplayLocationForFixtureGroup([cutoutId]),
+            displayName,
+          },
+        ],
       }
-    }, { displayList: [], groupedCutoutIds: [] })
+    },
+    { displayList: [], groupedCutoutIds: [] }
+  )
 
   return (
     <>
@@ -247,7 +282,9 @@ export function DeviceDetailsDeckConfiguration({
                   css={TYPOGRAPHY.labelSemiBold}
                 >
                   <StyledText flex="1 0 30px">{t('location')}</StyledText>
-                  <StyledText flex="9 1 0">{i18n.format(t('deck_hardware'), 'capitalize')}</StyledText>
+                  <StyledText flex="9 1 0">
+                    {i18n.format(t('deck_hardware'), 'capitalize')}
+                  </StyledText>
                 </Flex>
                 {fixtureDisplayList.length > 0 ? (
                   fixtureDisplayList.map(({ displayLocation, displayName }) => (

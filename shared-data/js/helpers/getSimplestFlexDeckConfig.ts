@@ -154,7 +154,9 @@ export function getFixtureGroupForCutoutFixture(
   cutoutFixtureId: CutoutFixtureId,
   cutoutFixtures: CutoutFixture[]
 ): CutoutFixtureId[] {
-  return cutoutFixtures.find(cf => cf.id === cutoutFixtureId)?.fixtureGroup ?? []
+  return (
+    cutoutFixtures.find(cf => cf.id === cutoutFixtureId)?.fixtureGroup ?? []
+  )
 }
 
 export function getCutoutIdForAddressableArea(

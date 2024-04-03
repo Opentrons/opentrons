@@ -301,10 +301,7 @@
               "items": {
                 "type": "object",
                 "additionalProperties": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
+                  "type": "string"
                 }
               }
             }

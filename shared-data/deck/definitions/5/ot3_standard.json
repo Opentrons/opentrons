@@ -894,7 +894,12 @@
         "cutoutA1": []
       },
       "fixtureGroup": {
-        "cutoutA1": [{"cutoutA1": ["thermocyclerModuleV2Rear"]}, {"cutoutB1": ["thermocyclerModuleV2Front"]}]
+        "cutoutA1": [
+          {
+            "cutoutA1": "thermocyclerModuleV2Rear",
+            "cutoutB1": "thermocyclerModuleV2Front"
+          }
+        ]
       },
       "height": 72.35
     },
@@ -907,7 +912,12 @@
         "cutoutB1": ["thermocyclerModuleV2"]
       },
       "fixtureGroup": {
-        "cutoutB1": [{"cutoutA1": ["thermocyclerModuleV2Rear"]}, {"cutoutB1": ["thermocyclerModuleV2Front"]}]
+        "cutoutB1": [
+          {
+            "cutoutA1": "thermocyclerModuleV2Rear",
+            "cutoutB1": "thermocyclerModuleV2Front"
+          }
+        ]
       },
       "height": 72.35
     },

@@ -155,24 +155,23 @@ def get_configuration_errors(  # noqa: C901
                     member_found = False
                     for item in map:
                         for group_member_cutout_id in item:
-                            group_member_fixtures = item[group_member_cutout_id]
-                            for group_member in group_member_fixtures:
-                                for deck_item in placements:
-                                    if (
-                                        group_member == deck_item.cutout_fixture_id
-                                        and group_member_cutout_id
-                                        == deck_item.cutout_id
-                                    ):
-                                        member_found = True
-                                if member_found is False:
-                                    errors.add(
-                                        MissingGroupFixtureError(
-                                            cutout_id=placement.cutout_id,
-                                            cutout_fixture_id=placement.cutout_fixture_id,
-                                            missing_fixture_id=group_member,
-                                        )
+                            group_member_fixture_id = item[group_member_cutout_id]
+                            for deck_item in placements:
+                                if (
+                                    group_member_fixture_id
+                                    == deck_item.cutout_fixture_id
+                                    and group_member_cutout_id == deck_item.cutout_id
+                                ):
+                                    member_found = True
+                            if member_found is False:
+                                errors.add(
+                                    MissingGroupFixtureError(
+                                        cutout_id=placement.cutout_id,
+                                        cutout_fixture_id=placement.cutout_fixture_id,
+                                        missing_fixture_id=group_member_fixture_id,
                                     )
-                                member_found = False
+                                )
+                            member_found = False
     return errors
 
 

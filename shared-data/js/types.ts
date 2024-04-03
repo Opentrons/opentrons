@@ -713,7 +713,7 @@ export type StatusBarAnimations = StatusBarAnimation[]
 
 export interface CutoutConfig {
   cutoutId: CutoutId
-  cutoutFixtureId: CutoutFixtureId 
+  cutoutFixtureId: CutoutFixtureId
   opentronsModuleSerialNumber?: string
 }
 

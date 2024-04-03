@@ -23,7 +23,11 @@ import { StagingAreaConfigFixture } from './StagingAreaConfigFixture'
 import { TrashBinConfigFixture } from './TrashBinConfigFixture'
 import { WasteChuteConfigFixture } from './WasteChuteConfigFixture'
 
-import type { CutoutFixtureId, CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckConfiguration,
+} from '@opentrons/shared-data'
 import { TemperatureModuleFixture } from './TemperatureModuleFixture'
 import { HeaterShakerFixture } from './HeaterShakerFixture'
 import { MagneticBlockFixture } from './MagneticBlockFixture'
@@ -32,7 +36,10 @@ import { ThermocyclerFixture } from './ThermocyclerFixture'
 interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
   handleClickAdd: (cutoutId: CutoutId) => void
-  handleClickRemove: (cutoutId: CutoutId, cutoutFixtureId: CutoutFixtureId) => void
+  handleClickRemove: (
+    cutoutId: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ) => void
   lightFill?: string
   darkFill?: string
   readOnly?: boolean

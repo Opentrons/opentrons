@@ -134,10 +134,10 @@ export function getPositionFromSlotId(
   const slotPosition: CoordinateTuple | null =
     cutoutPosition != null
       ? [
-        cutoutPosition[0] + offsetFromCutoutFixture[0],
-        cutoutPosition[1] + offsetFromCutoutFixture[1],
-        cutoutPosition[2] + offsetFromCutoutFixture[2],
-      ]
+          cutoutPosition[0] + offsetFromCutoutFixture[0],
+          cutoutPosition[1] + offsetFromCutoutFixture[1],
+          cutoutPosition[2] + offsetFromCutoutFixture[2],
+        ]
       : null
 
   return slotPosition
@@ -161,7 +161,10 @@ export function getCutoutFixtureIdsForModuleModel(
   return moduleFixtures ?? []
 }
 
-export function getCutoutFixturesForModuleModel(moduleModel: ModuleModel, deckDef: DeckDefinition): CutoutFixture[] {
+export function getCutoutFixturesForModuleModel(
+  moduleModel: ModuleModel,
+  deckDef: DeckDefinition
+): CutoutFixture[] {
   const moduleFixtureIds = getCutoutFixtureIdsForModuleModel(moduleModel)
   return moduleFixtureIds.reduce<CutoutFixture[]>((acc, id) => {
     const moduleFixture = deckDef.cutoutFixtures.find(cf => cf.id === id)
@@ -171,18 +174,26 @@ export function getCutoutFixturesForModuleModel(moduleModel: ModuleModel, deckDe
 
 export function getCutoutIdsFromModuleSlotName(
   slotName: string,
-  moduleFixtures: CutoutFixture[],
+  moduleFixtures: CutoutFixture[]
 ): CutoutId[] {
-  return (
-    moduleFixtures.reduce<CutoutId[]>((acc, moduleFixture) => {
-      const anchorCutoutId = moduleFixture.mayMountTo.find(cutoutId => cutoutId.includes(slotName))
-      const newGroupedFixtureIds = moduleFixture.fixtureGroup.filter(fixtureId => fixtureId !== moduleFixture.id)
-      const newGroupedCutoutIds = newGroupedFixtureIds.reduce<CutoutId[]>((innerAcc, fixtureId) => (
-        [...innerAcc, ...(moduleFixtures.find(mf => mf.id === fixtureId)?.mayMountTo ?? [])]
-      ), [])
-      return anchorCutoutId != null ? [...acc, anchorCutoutId, ...newGroupedCutoutIds] : acc
-    }, [])
-  )
+  return moduleFixtures.reduce<CutoutId[]>((acc, moduleFixture) => {
+    const anchorCutoutId = moduleFixture.mayMountTo.find(cutoutId =>
+      cutoutId.includes(slotName)
+    )
+    const newGroupedFixtureIds = moduleFixture.fixtureGroup.filter(
+      fixtureId => fixtureId !== moduleFixture.id
+    )
+    const newGroupedCutoutIds = newGroupedFixtureIds.reduce<CutoutId[]>(
+      (innerAcc, fixtureId) => [
+        ...innerAcc,
+        ...(moduleFixtures.find(mf => mf.id === fixtureId)?.mayMountTo ?? []),
+      ],
+      []
+    )
+    return anchorCutoutId != null
+      ? [...acc, anchorCutoutId, ...newGroupedCutoutIds]
+      : acc
+  }, [])
 }
 
 export function getAddressableAreaNamesFromLoadedModule(
@@ -192,17 +203,17 @@ export function getAddressableAreaNamesFromLoadedModule(
 ): AddressableAreaName[] {
   const moduleFixtures = getCutoutFixturesForModuleModel(moduleModel, deckDef)
   const cutoutIds = getCutoutIdsFromModuleSlotName(slotName, moduleFixtures)
-  return moduleFixtures.reduce<AddressableAreaName[]>(
-    (acc, cutoutFixture) => {
-      const providedAddressableAreas =
-        cutoutIds.reduce<AddressableAreaName[]>((innerAcc, cutoutId) => {
-          const newAddressableAreas = cutoutFixture?.providesAddressableAreas[cutoutId] ?? []
-          return [...innerAcc, ...newAddressableAreas]
-        }, [])
-      return [...acc, ...providedAddressableAreas]
-    },
-    []
-  )
+  return moduleFixtures.reduce<AddressableAreaName[]>((acc, cutoutFixture) => {
+    const providedAddressableAreas = cutoutIds.reduce<AddressableAreaName[]>(
+      (innerAcc, cutoutId) => {
+        const newAddressableAreas =
+          cutoutFixture?.providesAddressableAreas[cutoutId] ?? []
+        return [...innerAcc, ...newAddressableAreas]
+      },
+      []
+    )
+    return [...acc, ...providedAddressableAreas]
+  }, [])
 }
 
 export function getFixtureDisplayName(
@@ -224,21 +235,29 @@ export function getFixtureDisplayName(
       return 'Waste chute with staging area slot and cover'
     case HEATERSHAKER_MODULE_V1_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(HEATERSHAKER_MODULE_V1)} in USB-${usbPortNumber}`
+        ? `${getModuleDisplayName(
+            HEATERSHAKER_MODULE_V1
+          )} in USB-${usbPortNumber}`
         : getModuleDisplayName(HEATERSHAKER_MODULE_V1)
     case TEMPERATURE_MODULE_V2_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(TEMPERATURE_MODULE_V2)} in USB-${usbPortNumber}`
+        ? `${getModuleDisplayName(
+            TEMPERATURE_MODULE_V2
+          )} in USB-${usbPortNumber}`
         : getModuleDisplayName(TEMPERATURE_MODULE_V2)
     case MAGNETIC_BLOCK_V1_FIXTURE:
       return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)}`
     case THERMOCYCLER_V2_REAR_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in USB-${usbPortNumber}`
+        ? `${getModuleDisplayName(
+            THERMOCYCLER_MODULE_V2
+          )} in USB-${usbPortNumber}`
         : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
     case THERMOCYCLER_V2_FRONT_FIXTURE:
       return usbPortNumber != null
-        ? `${getModuleDisplayName(THERMOCYCLER_MODULE_V2)} in USB-${usbPortNumber}`
+        ? `${getModuleDisplayName(
+            THERMOCYCLER_MODULE_V2
+          )} in USB-${usbPortNumber}`
         : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
     default:
       return 'Slot'

@@ -110,15 +110,31 @@ export const LocationConflictModal = (
 
       updateDeckConfiguration(newRequiredFixtureDeckConfig)
     } else if (requiredModule != null) {
-      const addressableAreas = getAddressableAreaNamesFromLoadedModule(requiredModule, cutoutId.replace('cutout', ''), deckDef)
-      const cutoutFixtures = getCutoutFixturesForModuleModel(requiredModule, deckDef)
+      const addressableAreas = getAddressableAreaNamesFromLoadedModule(
+        requiredModule,
+        cutoutId.replace('cutout', ''),
+        deckDef
+      )
+      const cutoutFixtures = getCutoutFixturesForModuleModel(
+        requiredModule,
+        deckDef
+      )
       const newDeckConfig = deckConfig.map(fixture => {
-        const replacementFixture = cutoutFixtures.find(cf => (
-          cf.mayMountTo.includes(fixture.cutoutId)
-          && addressableAreas.some(aa => cf.providesAddressableAreas[cutoutId].includes(aa))
-        ))
+        const replacementFixture = cutoutFixtures.find(
+          cf =>
+            cf.mayMountTo.includes(fixture.cutoutId) &&
+            addressableAreas.some(aa =>
+              cf.providesAddressableAreas[cutoutId].includes(aa)
+            )
+        )
         return cutoutId === fixture.cutoutId && replacementFixture != null
-          ? { ...fixture, cutoutFixtureId: replacementFixture?.id, opentronsModuleSerialNumber: attachedModules.find(m => m.moduleModel === requiredModule)?.serialNumber }
+          ? {
+              ...fixture,
+              cutoutFixtureId: replacementFixture?.id,
+              opentronsModuleSerialNumber: attachedModules.find(
+                m => m.moduleModel === requiredModule
+              )?.serialNumber,
+            }
           : fixture
       })
       updateDeckConfiguration(newDeckConfig)
