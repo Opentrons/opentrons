@@ -333,6 +333,99 @@ async def test_add_and_execute_command(
     assert result == completed
 
 
+async def test_add_and_execute_command_wait_for_recovery(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+    subject: ProtocolEngine,
+) -> None:
+    """It should add and execute a command from a request."""
+    created_at = datetime(year=2021, month=1, day=1)
+    original_request = commands.WaitForResumeCreate(
+        params=commands.WaitForResumeParams()
+    )
+    standardized_request = commands.HomeCreate(params=commands.HomeParams())
+    queued = commands.Home(
+        id="command-id",
+        key="command-key",
+        status=commands.CommandStatus.QUEUED,
+        createdAt=created_at,
+        params=commands.HomeParams(),
+    )
+    completed = commands.Home(
+        id="command-id",
+        key="command-key",
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=created_at,
+        params=commands.HomeParams(),
+    )
+
+    robot_type: RobotType = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
+
+    decoy.when(
+        slot_standardization.standardize_command(original_request, robot_type)
+    ).then_return(standardized_request)
+
+    decoy.when(model_utils.generate_id()).then_return("command-id")
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
+
+    def _stub_queued(*_a: object, **_k: object) -> None:
+        decoy.when(state_store.commands.get("command-id")).then_return(queued)
+
+    def _stub_completed(*_a: object, **_k: object) -> bool:
+        decoy.when(state_store.commands.get("command-id")).then_return(completed)
+        return True
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(
+            QueueCommandAction(
+                command_id="command-id",
+                created_at=created_at,
+                request=standardized_request,
+                request_hash=None,
+            )
+        )
+    ).then_return(
+        QueueCommandAction(
+            command_id="command-id-validated",
+            created_at=created_at,
+            request=standardized_request,
+            request_hash=None,
+        )
+    )
+
+    decoy.when(
+        action_dispatcher.dispatch(
+            QueueCommandAction(
+                command_id="command-id-validated",
+                created_at=created_at,
+                request=standardized_request,
+                request_hash=None,
+            )
+        )
+    ).then_do(_stub_queued)
+
+    decoy.when(
+        await state_store.wait_for(
+            condition=state_store.commands.get_command_is_final,
+            command_id="command-id",
+        ),
+    ).then_do(_stub_completed)
+
+    result = await subject.add_and_execute_command_wait_for_recovery(original_request)
+    assert result == completed
+    decoy.verify(
+        await state_store.wait_for_not(
+            state_store.commands.get_recovery_in_progress_for_command,
+            "command-id",
+        )
+    )
+
+
 def test_play(
     decoy: Decoy,
     state_store: StateStore,

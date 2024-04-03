@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from functools import partial
 from typing import Callable, Dict, List, Optional, Sequence, TypeVar
 from typing_extensions import ParamSpec
 
@@ -210,7 +209,7 @@ class StateStore(StateView, ActionHandler):
 
     async def wait_for(
         self,
-        condition: Callable[_ParamsT, Optional[_ReturnT]],
+        condition: Callable[_ParamsT, _ReturnT],
         *args: _ParamsT.args,
         **kwargs: _ParamsT.kwargs,
     ) -> _ReturnT:
@@ -258,14 +257,49 @@ class StateStore(StateView, ActionHandler):
         Raises:
             The exception raised by the `condition` function, if any.
         """
-        predicate = partial(condition, *args, **kwargs)
-        is_done = predicate()
 
-        while not is_done:
-            await self._change_notifier.wait()
-            is_done = predicate()
+        def predicate() -> _ReturnT:
+            return condition(*args, **kwargs)
 
-        return is_done
+        return await self._wait_for(condition=predicate, truthiness_to_wait_for=True)
+
+    async def wait_for_not(
+        self,
+        condition: Callable[_ParamsT, _ReturnT],
+        *args: _ParamsT.args,
+        **kwargs: _ParamsT.kwargs,
+    ) -> _ReturnT:
+        """Like `wait_for()`, except wait for the condition to become false.
+
+        See the documentation in `wait_for()`, especially the warning about condition
+        design.
+
+        The advantage of having this separate method over just passing a wrapper lambda
+        as the condition to `wait_for()` yourself is that wrapper lambdas are hard to
+        test in the mock-heavy Decoy + Protocol Engine style.
+        """
+
+        def predicate() -> _ReturnT:
+            return condition(*args, **kwargs)
+
+        return await self._wait_for(condition=predicate, truthiness_to_wait_for=False)
+
+    async def _wait_for(
+        self, condition: Callable[[], _ReturnT], truthiness_to_wait_for: bool
+    ) -> _ReturnT:
+        current_value = condition()
+
+        if truthiness_to_wait_for:
+            while not current_value:
+                await self._change_notifier.wait()
+                current_value = condition()
+
+        else:
+            while current_value:
+                await self._change_notifier.wait()
+                current_value = condition()
+
+        return current_value
 
     def _get_next_state(self) -> State:
         """Get a new instance of the state value object."""

@@ -234,7 +234,10 @@ class ProtocolEngine:
                 the command in state.
 
         Returns:
-            The command. If the command completed, it will be succeeded or failed.
+            The command.
+
+            If the command completed, it will be succeeded or failed.
+
             If the engine was stopped before it reached the command,
             the command will be queued.
         """
@@ -244,24 +247,31 @@ class ProtocolEngine:
 
     async def add_and_execute_command_wait_for_recovery(
         self, request: commands.CommandCreate
-    ) -> None:
+    ) -> commands.Command:
         """Like `add_and_execute_command()`, except wait for error recovery.
 
         Unlike `add_and_execute_command()`, if the command fails, this will not
         immediately return the failed command. Instead, if the error is recoverable,
         it will wait until error recovery has completed (e.g. when some other task
         calls `self.resume_from_recovery()`).
+
+        Returns:
+            The command.
+
+            If the command completed, it will be succeeded or failed. If it failed
+            and then its failure was recovered from, it will still be failed.
+
+            If the engine was stopped before it reached the command,
+            the command will be queued.
         """
-        command = self.add_command(request)
-        await self.wait_for_command(command_id=command.id)
-        await self._state_store.wait_for(
-            # Per the warnings on `wait_for()`, we want our condition function to
-            # specifically check that *this* command's recovery has completed,
-            # rather than just checking that the overall run state
-            # != "awaiting-recovery."
-            self.state_view.commands.get_command_recovery_complete,
-            command_id=command.id,
+        queued_command = self.add_command(request)
+        await self.wait_for_command(command_id=queued_command.id)
+        completed_command = self._state_store.commands.get(queued_command.id)
+        await self._state_store.wait_for_not(
+            self.state_view.commands.get_recovery_in_progress_for_command,
+            queued_command.id,
         )
+        return completed_command
 
     def estop(
         self,
