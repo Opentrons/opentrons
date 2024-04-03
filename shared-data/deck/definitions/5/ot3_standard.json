@@ -758,7 +758,7 @@
         "cutoutB1": ["B1"],
         "cutoutA1": ["A1"]
       },
-      "fixtureGroup": [],
+      "fixtureGroup": {},
       "height": 0
     },
     {
@@ -772,7 +772,7 @@
         "cutoutB2": ["B2"],
         "cutoutA2": ["A2"]
       },
-      "fixtureGroup": [],
+      "fixtureGroup": {},
       "height": 0
     },
     {
@@ -786,7 +786,7 @@
         "cutoutB3": ["B3"],
         "cutoutA3": ["A3"]
       },
-      "fixtureGroup": [],
+      "fixtureGroup": {},
       "height": 0
     },
     {
@@ -800,7 +800,7 @@
         "cutoutB3": ["B3", "B4"],
         "cutoutA3": ["A3", "A4"]
       },
-      "fixtureGroup": [],
+      "fixtureGroup": {},
       "height": 0
     },
     {
@@ -827,7 +827,7 @@
         "cutoutB3": ["movableTrashB3"],
         "cutoutA3": ["movableTrashA3"]
       },
-      "fixtureGroup": [],
+      "fixtureGroup": {},
       "height": 40
     },
     {
@@ -838,7 +838,7 @@
       "providesAddressableAreas": {
         "cutoutD3": ["1ChannelWasteChute", "8ChannelWasteChute"]
       },
-      "fixtureGroup": [],
+      "fixtureGroup": {},
       "height": 124.5
     },
     {
@@ -854,7 +854,7 @@
           "gripperWasteChute"
         ]
       },
-      "fixtureGroup": [],
+      "fixtureGroup": {},
       "height": 124.5
     },
     {
@@ -865,7 +865,7 @@
       "providesAddressableAreas": {
         "cutoutD3": ["1ChannelWasteChute", "8ChannelWasteChute", "D4"]
       },
-      "fixtureGroup": [],
+      "fixtureGroup": {},
       "height": 124.5
     },
     {
@@ -882,7 +882,7 @@
           "D4"
         ]
       },
-      "fixtureGroup": [],
+      "fixtureGroup": {},
       "height": 124.5
     },
     {
@@ -893,8 +893,10 @@
       "providesAddressableAreas": {
         "cutoutA1": []
       },
-      "fixtureGroup": ["thermocyclerModuleV2Rear", "thermocyclerModuleV2Front"],
-      "height": 211.91
+      "fixtureGroup": {
+        "cutoutA1": [{"cutoutA1": ["thermocyclerModuleV2Rear"]}, {"cutoutB1": ["thermocyclerModuleV2Front"]}]
+      },
+      "height": 72.35
     },
     {
       "id": "thermocyclerModuleV2Front",
@@ -904,8 +906,10 @@
       "providesAddressableAreas": {
         "cutoutB1": ["thermocyclerModuleV2"]
       },
-      "fixtureGroup": ["thermocyclerModuleV2Rear", "thermocyclerModuleV2Front"],
-      "height": 170.66
+      "fixtureGroup": {
+        "cutoutB1": [{"cutoutA1": ["thermocyclerModuleV2Rear"]}, {"cutoutB1": ["thermocyclerModuleV2Front"]}]
+      },
+      "height": 72.35
     },
     {
       "id": "heaterShakerModuleV1",
@@ -931,8 +935,8 @@
         "cutoutB3": ["heaterShakerV1B3"],
         "cutoutA3": ["heaterShakerV1A3"]
       },
-      "fixtureGroup": [],
-      "height": 82
+      "fixtureGroup": {},
+      "height": 18.95
     },
     {
       "id": "temperatureModuleV2",
@@ -958,8 +962,8 @@
         "cutoutB3": ["temperatureModuleV2B3"],
         "cutoutA3": ["temperatureModuleV2A3"]
       },
-      "fixtureGroup": [],
-      "height": 84
+      "fixtureGroup": {},
+      "height": 9.0
     },
     {
       "id": "magneticBlockV1",
@@ -993,8 +997,8 @@
         "cutoutB3": ["magneticBlockV1B3"],
         "cutoutA3": ["magneticBlockV1A3"]
       },
-      "fixtureGroup": [],
-      "height": 45
+      "fixtureGroup": {},
+      "height": 38.0
     }
   ],
   "gripperOffsets": {

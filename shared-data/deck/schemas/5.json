@@ -260,6 +260,7 @@
           "mayMountTo",
           "displayName",
           "providesAddressableAreas",
+          "fixtureGroup",
           "height"
         ],
         "properties": {
@@ -293,10 +294,19 @@
             }
           },
           "fixtureGroup": {
-            "description": "The group of fixtures that must exist in the deck configuration if this fixture exists.",
-            "type": "array",
-            "items": {
-              "type": "string"
+            "description": "The map of fixtures that must exist in the deck configuration if this fixture exists, with the mounting location acting as a key to determine the location of the rest of the group.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           },
           "height": {
