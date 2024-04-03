@@ -3937,5 +3937,16 @@
       "displayColor": "#b925ff"
     }
   ],
-  "runTimeParameters": []
+  "runTimeParameters": [
+    {
+      "type": "int",
+      "displayName": "number of samples",
+      "variableName": "num_samples",
+      "description": "How many samples do you want to run?",
+      "value": 96,
+      "min": 1,
+      "max": 96,
+      "default": 96
+    }
+  ]
 }
