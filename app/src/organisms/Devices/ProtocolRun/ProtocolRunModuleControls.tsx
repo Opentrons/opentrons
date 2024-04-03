@@ -5,7 +5,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  ProtocolRunEmptyState,
+  InfoScreen,
   SPACING,
 } from '@opentrons/components'
 import { ModuleCard } from '../../ModuleCard'
@@ -99,7 +99,7 @@ export const ProtocolRunModuleControls = ({
       padding={SPACING.spacing16}
       backgroundColor={COLORS.white}
     >
-      <ProtocolRunEmptyState contentType="moduleControls" />
+      <InfoScreen contentType="moduleControls" />
     </Flex>
   ) : (
     <Flex gridGap={SPACING.spacing8} padding={SPACING.spacing16}>

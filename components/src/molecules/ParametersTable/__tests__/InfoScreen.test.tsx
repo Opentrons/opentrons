@@ -4,14 +4,14 @@ import { describe, it, expect, beforeEach } from 'vitest'
 
 import { renderWithProviders } from '../../../testing/utils'
 import { BORDERS, COLORS } from '../../../helix-design-system'
-import { ProtocolRunEmptyState } from '../ProtocolRunEmptyState'
+import { InfoScreen } from '../InfoScreen'
 
-const render = (props: React.ComponentProps<typeof ProtocolRunEmptyState>) => {
-  return renderWithProviders(<ProtocolRunEmptyState {...props} />)
+const render = (props: React.ComponentProps<typeof InfoScreen>) => {
+  return renderWithProviders(<InfoScreen {...props} />)
 }
 
-describe('NoParameters', () => {
-  let props: React.ComponentProps<typeof ProtocolRunEmptyState>
+describe('InfoScreen', () => {
+  let props: React.ComponentProps<typeof InfoScreen>
 
   beforeEach(() => {
     props = {
@@ -36,10 +36,10 @@ describe('NoParameters', () => {
 
   it('should have proper styles', () => {
     render(props)
-    expect(screen.getByTestId('NoRunTimeParameter')).toHaveStyle(
+    expect(screen.getByTestId('InfoScreen_parameters')).toHaveStyle(
       `background-color: ${COLORS.grey30}`
     )
-    expect(screen.getByTestId('NoRunTimeParameter')).toHaveStyle(
+    expect(screen.getByTestId('InfoScreen_parameters')).toHaveStyle(
       `border-radius: ${BORDERS.borderRadius8}`
     )
     expect(screen.getByLabelText('alert')).toHaveStyle(

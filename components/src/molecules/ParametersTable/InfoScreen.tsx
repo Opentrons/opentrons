@@ -7,13 +7,11 @@ import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 
-interface ProtocolRunEmptyStateProps {
+interface InfoScreenProps {
   contentType: 'parameters' | 'moduleControls'
 }
 
-export function ProtocolRunEmptyState({
-  contentType,
-}: ProtocolRunEmptyStateProps): JSX.Element {
+export function InfoScreen({ contentType }: InfoScreenProps): JSX.Element {
   const bodyText =
     contentType === 'parameters'
       ? 'No parameters specified in this protocol'
@@ -27,7 +25,7 @@ export function ProtocolRunEmptyState({
       backgroundColor={COLORS.grey30}
       borderRadius={BORDERS.borderRadius8}
       padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
-      data-testid="NoRunTimeParameter"
+      data-testid={`InfoScreen_${contentType}`}
     >
       <Icon
         name="ot-alert"

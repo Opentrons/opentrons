@@ -1,4 +1,4 @@
 export * from './LocationIcon'
 export * from './RoundTab'
 export * from './ParametersTable'
-export * from './ParametersTable/ProtocolRunEmptyState'
+export * from './ParametersTable/InfoScreen'

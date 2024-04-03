@@ -10,12 +10,12 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  Icon,
+  InfoScreen,
   SPACING,
   StyledText,
   TYPOGRAPHY,
-  ProtocolRunEmptyState,
   useHoverTooltip,
-  Icon,
 } from '@opentrons/components'
 
 import { Banner } from '../../../atoms/Banner'
@@ -78,7 +78,7 @@ export function ProtocolRunRuntimeParameters({
       </Flex>
       {!hasParameter ? (
         <Flex padding={SPACING.spacing16}>
-          <ProtocolRunEmptyState contentType="parameters" />
+          <InfoScreen contentType="parameters" />
         </Flex>
       ) : (
         <>

@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
+  InfoScreen,
   ParametersTable,
-  ProtocolRunEmptyState,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -48,7 +48,7 @@ export function ProtocolParameters({
           <ParametersTable runTimeParameters={runTimeParameters} t={t} />
         </Flex>
       ) : (
-        <ProtocolRunEmptyState contentType="parameters" />
+        <InfoScreen contentType="parameters" />
       )}
     </Flex>
   )
