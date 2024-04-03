@@ -1,12 +1,16 @@
-"""Tests for opentrons.commands.publisher."""
+"""Tests for opentrons.legacy_commands.publisher."""
 from __future__ import annotations
 
 import pytest
 from decoy import Decoy, matchers
 from typing import Any, Dict, cast
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.commands.types import Command as CommandDict, CommandMessage
-from opentrons.commands.publisher import CommandPublisher, publish, publish_context
+from opentrons.legacy_commands.types import Command as CommandDict, CommandMessage
+from opentrons.legacy_commands.publisher import (
+    CommandPublisher,
+    publish,
+    publish_context,
+)
 
 
 @pytest.fixture

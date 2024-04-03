@@ -11,9 +11,9 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types
-from opentrons.commands import commands as cmds
+from opentrons.legacy_commands import commands as cmds
 
-from opentrons.commands import publisher
+from opentrons.legacy_commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.advanced_control import transfers
 

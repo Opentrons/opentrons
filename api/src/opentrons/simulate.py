@@ -54,7 +54,7 @@ from opentrons.protocols.execution import execute
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.config import IS_ROBOT
 from opentrons import protocol_api
-from opentrons.commands import types as command_types
+from opentrons.legacy_commands import types as command_types
 
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
@@ -114,7 +114,7 @@ This should match what `opentrons.protocols.parse()` accepts in a protocol's `re
 
 
 # TODO(mm, 2023-10-05): Type _SimulateResultRunLog more precisely by using TypedDicts from
-# opentrons.commands.
+# opentrons.legacy_commands.
 _SimulateResultRunLog = List[Mapping[str, Any]]
 _SimulateResult = Tuple[_SimulateResultRunLog, Optional[BundleContents]]
 
@@ -453,7 +453,7 @@ def simulate(
 
         - ``payload``: The command. The human-readable run log text is available at
           ``payload["text"]``. The other keys of ``payload`` are command-dependent;
-          see ``opentrons.commands``.
+          see ``opentrons.legacy_commands``.
 
           .. note::
             In older software versions, ``payload["text"]`` was a

@@ -1,5 +1,5 @@
 import pytest
-from opentrons.commands import protocol_commands
+from opentrons.legacy_commands import protocol_commands
 
 
 @pytest.mark.parametrize(

@@ -7,7 +7,7 @@ import pytest
 from decoy import matchers, Decoy
 
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.commands.types import CommentMessage, PauseMessage, CommandMessage
+from opentrons.legacy_commands.types import CommentMessage, PauseMessage, CommandMessage
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
