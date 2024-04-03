@@ -3939,91 +3939,24 @@
   ],
   "runTimeParameters": [
     {
-      "displayName": "sample number",
-      "variableName": "number_of_samples",
-      "description": "The number of samples",
       "type": "int",
-      "unit": "samples",
-      "min": 12,
+      "displayName": "number of samples",
+      "variableName": "num_samples",
+      "description": "How many samples do you want to run?",
+      "value": 96,
+      "min": 1,
       "max": 96,
-      "default": 96,
-      "value": 96
+      "default": 96
     },
     {
-      "displayName": "right pipette type",
-      "variableName": "right_pipette",
-      "description": "Which pipette on the right?",
-      "type": "str",
-      "choices": [
-        {
-          "displayName": "GEN2 P300 Multi",
-          "value": "p300_multi_gen2"
-        },
-        {
-          "displayName": "GEN2 P20 Multi",
-          "value": "p20_multi_gen2"
-        },
-        {
-          "displayName": "GEN1 P1000 Multi",
-          "value": "p1000_multi"
-        },
-        {
-          "displayName": "GEN1 P300 Multi",
-          "value": "p300_multi"
-        },
-        {
-          "displayName": "GEN1 P50 Multi",
-          "value": "p50_multi"
-        },
-        {
-          "displayName": "GEN1 P10 Multi",
-          "value": "p10_multi"
-        },
-        {
-          "displayName": "none",
-          "value": "NONE"
-        }
-      ],
-      "default": "p300_multi_gen2",
-      "value": "p300_multi_gen2"
-    },
-    {
-      "displayName": "mastermix volume (in ul)",
-      "variableName": "mastermix_volume",
-      "description": "Mastermix volume",
-      "unit": "µl",
       "type": "float",
-      "min": 10.0,
-      "max": 25.0,
-      "default": 18.0,
-      "value": 18.0
-    },
-    {
-      "displayName": "Aspiration Flow Rate for Mixing",
-      "variableName": "mix_asp_rate",
-      "description": "Options for flow rate",
-      "type": "float",
-      "unit": "µl",
-      "default": 1.0,
-      "value": 1.0,
-      "choices": [
-        {
-          "displayName": "1/2 speed",
-          "value": 0.5
-        },
-        {
-          "displayName": "Default speed",
-          "value": 1.0
-        },
-        {
-          "displayName": "2X speed",
-          "value": 2.0
-        },
-        {
-          "displayName": "Ludicrous Speed",
-          "value": 999.99
-        }
-      ]
+      "displayName": "samples volume",
+      "variableName": "vol_sample",
+      "description": "What sample volume are you using?",
+      "value": 10.0,
+      "min": 1,
+      "max": 20.0,
+      "default": 10.0
     },
     {
       "displayName": "Additional mix for reagent 2?",
@@ -4047,8 +3980,8 @@
           "value": 15
         },
         {
-          "displayName": "100ng (13 cycles)",
-          "value": 13
+          "displayName": "100ng (15 cycles)",
+          "value": 15
         },
         {
           "displayName": "1ug (10 cycles)",
