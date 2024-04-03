@@ -42,7 +42,6 @@ export function useNotifyService<TData, TError = Error>({
   const hostname = host?.hostname ?? null
   const doTrackEvent = useTrackEvent()
   const isFlex = useIsFlex(host?.robotName ?? '')
-  const hasUsedNotifyService = React.useRef(false)
   const seenHostname = React.useRef<string | null>(null)
   const { enabled, staleTime, forceHttpPolling } = options
 
@@ -62,16 +61,15 @@ export function useNotifyService<TData, TError = Error>({
         callback: onDataEvent,
       })
       dispatch(notifySubscribeAction(hostname, topic))
-      hasUsedNotifyService.current = true
       seenHostname.current = hostname
     } else {
       setRefetchUsingHTTP('always')
     }
 
     return () => {
-      if (hasUsedNotifyService.current) {
+      if (seenHostname.current != null) {
         appShellListener({
-          hostname: seenHostname.current as string,
+          hostname: seenHostname.current,
           topic,
           callback: onDataEvent,
           isDismounting: true,
