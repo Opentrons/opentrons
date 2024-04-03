@@ -149,21 +149,30 @@ def get_configuration_errors(  # noqa: C901
                     )
                 )
 
-            for fixture_id in found_cutout_fixture["fixtureGroup"]:
-                result = [
-                    placement.cutout_fixture_id
-                    for placement in placements
-                    if fixture_id in placement.cutout_fixture_id
-                ]
-                if len(result) == 0:
-                    errors.add(
-                        MissingGroupFixtureError(
-                            cutout_id=placement.cutout_id,
-                            cutout_fixture_id=placement.cutout_fixture_id,
-                            missing_fixture_id=fixture_id,
-                        )
-                    )
-
+            for cutout_id in found_cutout_fixture["fixtureGroup"]:
+                if cutout_id == placement.cutout_id:
+                    map = found_cutout_fixture["fixtureGroup"][cutout_id]
+                    member_found = False
+                    for item in map:
+                        for group_member_cutout_id in item:
+                            group_member_fixtures = item[group_member_cutout_id]
+                            for group_member in group_member_fixtures:
+                                for deck_item in placements:
+                                    if (
+                                        group_member == deck_item.cutout_fixture_id
+                                        and group_member_cutout_id
+                                        == deck_item.cutout_id
+                                    ):
+                                        member_found = True
+                                if member_found is False:
+                                    errors.add(
+                                        MissingGroupFixtureError(
+                                            cutout_id=placement.cutout_id,
+                                            cutout_fixture_id=placement.cutout_fixture_id,
+                                            missing_fixture_id=group_member,
+                                        )
+                                    )
+                                member_found = False
     return errors
 
 
