@@ -63,10 +63,11 @@ export const BlowoutZOffsetField = (
       ) : null}
       <div {...targetProps}>
         <InputField
+          data-testid="BlowoutZOffsetField_inputField"
           disabled={disabled}
           className={styles.small_field}
           readOnly
-          onClick={() => setModalOpen(true)}
+          onClick={disabled ? () => {} : () => setModalOpen(true)}
           value={String(value)}
           isIndeterminate={isIndeterminate}
           units={t('units.millimeter')}

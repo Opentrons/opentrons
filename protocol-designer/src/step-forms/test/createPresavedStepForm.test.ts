@@ -191,6 +191,7 @@ describe('createPresavedStepForm', () => {
       aspirate_y_position: 0,
       dispense_x_position: 0,
       dispense_y_position: 0,
+      blowout_z_offset: 0,
     })
   })
   describe('mix step', () => {
@@ -216,6 +217,7 @@ describe('createPresavedStepForm', () => {
         blowout_checkbox: false,
         mix_x_position: 0,
         mix_y_position: 0,
+        blowout_z_offset: 0,
         blowout_location: null,
         changeTip: 'always',
         stepDetails: '',

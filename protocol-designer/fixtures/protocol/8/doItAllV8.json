@@ -158,6 +158,7 @@
           "dispense_y_position": 0,
           "aspirate_x_position": 0,
           "aspirate_y_position": 0,
+          "blowout_z_offset": 0,
           "id": "d2f74144-a7bf-4ba2-aaab-30d70b2b62c7",
           "stepType": "moveLiquid",
           "stepName": "transfer",

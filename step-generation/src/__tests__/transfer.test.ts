@@ -1461,6 +1461,7 @@ describe('advanced options', () => {
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
+
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
@@ -2142,9 +2143,9 @@ describe('advanced options', () => {
             wellName: 'B1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -2443,9 +2444,9 @@ describe('advanced options', () => {
             wellName: 'B1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -2866,9 +2867,9 @@ describe('advanced options', () => {
             wellName: 'B1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -3168,9 +3169,9 @@ describe('advanced options', () => {
             wellName: 'B1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -3589,9 +3590,9 @@ describe('advanced options', () => {
             wellName: 'A1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -3942,9 +3943,9 @@ describe('advanced options', () => {
             wellName: 'A1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },

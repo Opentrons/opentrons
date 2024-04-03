@@ -435,6 +435,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_y_position: {
           isIndeterminate: false,
         },
+        blowout_z_offset: {
+          isIndeterminate: false,
+        },
         aspirate_wells: {
           isIndeterminate: true,
         },
@@ -694,6 +697,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_y_position: {
           isIndeterminate: false,
         },
+        blowout_z_offset: {
+          isIndeterminate: false,
+        },
         preWetTip: {
           isIndeterminate: true,
         },
@@ -881,6 +887,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
         mix_y_position: {
           isIndeterminate: false,
         },
+        blowout_z_offset: {
+          isIndeterminate: false,
+        },
         dropTip_location: {
           value: 'fixedTrash',
           isIndeterminate: false,
@@ -955,6 +964,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
         },
         mix_y_position: {
+          isIndeterminate: false,
+        },
+        blowout_z_offset: {
           isIndeterminate: false,
         },
         dropTip_location: {

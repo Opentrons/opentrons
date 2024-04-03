@@ -2103,9 +2103,9 @@ describe('consolidate single-channel', () => {
             wellName: 'B1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -2378,9 +2378,9 @@ describe('consolidate single-channel', () => {
             wellName: 'B1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -2805,9 +2805,9 @@ describe('consolidate single-channel', () => {
             wellName: 'B1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -3117,9 +3117,9 @@ describe('consolidate single-channel', () => {
             wellName: 'B1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
