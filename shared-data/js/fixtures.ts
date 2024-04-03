@@ -156,7 +156,7 @@ export function getAddressableAreaFromSlotId(
 
 export function getCutoutFixtureIdsForModuleModel(
   moduleModel: ModuleModel
-): FlexModuleCutoutFixtureId[] {
+): CutoutFixtureId[] {
   const moduleFixtures = MODULE_FIXTURES_BY_MODEL[moduleModel]
   return moduleFixtures ?? []
 }

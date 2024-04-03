@@ -24,7 +24,7 @@ import {
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
 } from '../../../hooks'
-import { MultipleModulesModal } from '../OT2MultipleModulesHelp'
+import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import { SetupModulesList } from '../SetupModulesList'
 import { LocationConflictModal } from '../LocationConflictModal'
@@ -37,7 +37,7 @@ vi.mock('../LocationConflictModal')
 vi.mock('../UnMatchedModuleWarning')
 vi.mock('../../../../ModuleCard/ModuleSetupModal')
 vi.mock('../../../../ModuleWizardFlows')
-vi.mock('../MultipleModulesModal')
+vi.mock('../OT2MultipleModulesHelp')
 vi.mock('../../../../../resources/runs')
 vi.mock('../../../../../redux/config')
 
@@ -302,7 +302,7 @@ describe('SetupModulesList', () => {
   })
 
   it('should render the MoaM component when Moam is attached', () => {
-    vi.mocked(MultipleModulesModal).mockReturnValue(<div>mock Moam modal</div>)
+    vi.mocked(OT2MultipleModulesHelp).mockReturnValue(<div>mock Moam modal</div>)
     when(useUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({

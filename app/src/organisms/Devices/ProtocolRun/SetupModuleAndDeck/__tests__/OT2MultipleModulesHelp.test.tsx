@@ -9,11 +9,9 @@ import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 
 vi.mock('../../../../../redux/config')
 
-const render = (props: React.ComponentProps<typeof OT2MultipleModulesHelp>) => {
-  return renderWithProviders(<OT2MultipleModulesHelp {...props} />, {
-    i18nInstance: i18n,
-  })[0]
-}
+const render = () => renderWithProviders(<OT2MultipleModulesHelp />, {
+  i18nInstance: i18n,
+})[0]
 
 describe('OT2MultipleModulesHelp', () => {
   let props: React.ComponentProps<typeof OT2MultipleModulesHelp>
@@ -23,13 +21,15 @@ describe('OT2MultipleModulesHelp', () => {
   })
 
   it('should render the correct header', () => {
-    render(props)
+    render()
+    fireEvent.click(screen.getByText('Learn more'))
     screen.getByRole('heading', {
       name: 'Setting up multiple modules of the same type',
     })
   })
   it('should render the correct body', () => {
-    render(props)
+    render()
+    fireEvent.click(screen.getByText('Learn more'))
     screen.getByText(
       'To use more than one of the same module in a protocol, you first need to plug in the module that’s called first in your protocol to the lowest numbered USB port on the robot. Continue in the same manner with additional modules.'
     )
@@ -40,7 +40,8 @@ describe('OT2MultipleModulesHelp', () => {
     screen.getByAltText('2 temperature modules plugged into the usb ports')
   })
   it('should render a link to the learn more page', () => {
-    render(props)
+    render()
+    fireEvent.click(screen.getByText('Learn more'))
     expect(
       screen
         .getByRole('link', {
@@ -51,23 +52,11 @@ describe('OT2MultipleModulesHelp', () => {
       'https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2'
     )
   })
-  it('should call onCloseClick when the close button is pressed', () => {
-    render(props)
-    expect(props.onCloseClick).not.toHaveBeenCalled()
+  it('should call close info modal when the close button is pressed', () => {
+    render()
+    fireEvent.click(screen.getByText('Learn more'))
     const closeButton = screen.getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)
-    expect(props.onCloseClick).toHaveBeenCalled()
-  })
-  it('should render the correct text and img for on device display', () => {
-    vi.mocked(getIsOnDevice).mockReturnValue(true)
-    render(props)
-    screen.getByText(
-      'You can use multiples of most module types within a single Python protocol by connecting and loading the modules in a specific order. The robot will initialize the matching module attached to the lowest numbered port first, regardless of what deck slot it occupies.'
-    )
-    const img = screen.getByRole('img')
-    expect(img.getAttribute('src')).toBe(
-      '/app/src/assets/images/on-device-display/multiple_modules_modal.png'
-    )
-    screen.getByAltText('2 temperature modules plugged into the usb ports')
+    expect(screen.queryByText('Setting up multiple modules of the same type')).toBeNull()
   })
 })

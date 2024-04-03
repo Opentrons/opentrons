@@ -8,6 +8,7 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
+  ot3StandardDeckV5,
 } from '@opentrons/shared-data'
 import {
   useDeckConfigurationQuery,
@@ -16,7 +17,7 @@ import {
 import { i18n } from '../../../../../i18n'
 import { LocationConflictModal } from '../LocationConflictModal'
 
-import type { DeckConfiguration } from '@opentrons/shared-data'
+import type { DeckConfiguration, DeckDefinition } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 
@@ -39,6 +40,7 @@ describe('LocationConflictModal', () => {
       onCloseClick: vi.fn(),
       cutoutId: 'cutoutB3',
       requiredFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+      deckDef: ot3StandardDeckV5 as any
     }
     vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
@@ -68,6 +70,7 @@ describe('LocationConflictModal', () => {
       onCloseClick: vi.fn(),
       cutoutId: 'cutoutB3',
       requiredModule: 'heaterShakerModuleV1',
+      deckDef: ot3StandardDeckV5 as any
     }
     render(props)
     screen.getByText('Protocol specifies')
@@ -92,6 +95,7 @@ describe('LocationConflictModal', () => {
       cutoutId: 'cutoutB1',
       requiredFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
       missingLabwareDisplayName: 'a tiprack',
+      deckDef: ot3StandardDeckV5 as any
     }
     render(props)
     screen.getByText('Deck location conflict')

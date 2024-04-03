@@ -13,7 +13,6 @@ import { FloatingActionButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
-import { MultipleModulesModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/OT2MultipleModulesHelp'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
@@ -48,10 +47,6 @@ export function ProtocolSetupModulesAndDeck({
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
 
-  const [
-    showMultipleModulesModal,
-    setShowMultipleModulesModal,
-  ] = React.useState<boolean>(false)
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
@@ -142,7 +137,6 @@ export function ProtocolSetupModulesAndDeck({
               deckDef={deckDef}
               protocolModulesInfo={protocolModulesInfo}
               runId={runId}
-              setShowMultipleModulesModal={setShowMultipleModulesModal}
             />
           ) : null}
           <FixtureTable
