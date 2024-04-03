@@ -422,26 +422,28 @@ export function ChooseProtocolSlideoutComponent(
             robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
           }
         >
-          <ApplyHistoricOffsets
-            offsetCandidates={offsetCandidates}
-            shouldApplyOffsets={shouldApplyOffsets}
-            setShouldApplyOffsets={setShouldApplyOffsets}
-            commands={
-              (!missingAnalysisData
-                ? selectedProtocol?.mostRecentAnalysis?.commands
-                : []) ?? []
-            }
-            labware={
-              (!missingAnalysisData
-                ? selectedProtocol?.mostRecentAnalysis?.labware
-                : []) ?? []
-            }
-            modules={
-              (!missingAnalysisData
-                ? selectedProtocol?.mostRecentAnalysis?.modules
-                : []) ?? []
-            }
-          />
+          {currentPage === 1 ? (
+            <ApplyHistoricOffsets
+              offsetCandidates={offsetCandidates}
+              shouldApplyOffsets={shouldApplyOffsets}
+              setShouldApplyOffsets={setShouldApplyOffsets}
+              commands={
+                (!missingAnalysisData
+                  ? selectedProtocol?.mostRecentAnalysis?.commands
+                  : []) ?? []
+              }
+              labware={
+                (!missingAnalysisData
+                  ? selectedProtocol?.mostRecentAnalysis?.labware
+                  : []) ?? []
+              }
+              modules={
+                (!missingAnalysisData
+                  ? selectedProtocol?.mostRecentAnalysis?.modules
+                  : []) ?? []
+              }
+            />
+          ) : null}
           {hasRunTimeParameters ? multiPageFooter : singlePageFooter}
         </ApiHostProvider>
       }
