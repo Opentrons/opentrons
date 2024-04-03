@@ -18,7 +18,7 @@ cd opentrons
 # prerequisite: install dependencies as specified in project setup
 make setup
 # launch the dev server
-make -C opentrons-ai dev
+make -C opentrons-ai-client dev
 ```
 
 ## Stack and structure
