@@ -40,6 +40,11 @@ export function useNotifyService<TData, TError = Error>({
   const host = hostOverride ?? hostFromProvider
   const hostname = host?.hostname ?? null
   const doTrackEvent = useTrackEvent()
+<<<<<<< HEAD
+=======
+  const isFlex = useIsFlex(host?.robotName ?? '')
+  const hasUsedNotifyService = React.useRef(false)
+>>>>>>> 61be566d31 (fix(app): fix excessive /runs network requests (#14783))
   const seenHostname = React.useRef<string | null>(null)
   const { enabled, staleTime, forceHttpPolling } = options
 
@@ -69,6 +74,7 @@ export function useNotifyService<TData, TError = Error>({
       if (seenHostname.current != null) {
 =======
       hasUsedNotifyService.current = true
+      seenHostname.current = hostname
     } else {
       setRefetchUsingHTTP('always')
     }
@@ -77,7 +83,11 @@ export function useNotifyService<TData, TError = Error>({
       if (hasUsedNotifyService.current) {
 >>>>>>> 1ba616651c (refactor(app-shell-odd): Utilize robot-server unsubscribe flags (#14724))
         appShellListener({
+<<<<<<< HEAD
           hostname: seenHostname.current,
+=======
+          hostname: seenHostname.current as string,
+>>>>>>> 61be566d31 (fix(app): fix excessive /runs network requests (#14783))
           topic,
           callback: onDataEvent,
           isDismounting: true,
