@@ -331,7 +331,7 @@ class MoveGroupRunner:
                     int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
                 ),
                 sensor_id=SensorIdField(SensorId.S0),
-                sensor_type=SensorTypeField(SensorType.pressure)
+                sensor_type=SensorTypeField(SensorType.pressure),
             )
             return AddSensorLinearMoveRequest(payload=sensor_move_payload)
         elif step.move_type == MoveType.capacitive_sensor:
@@ -357,7 +357,7 @@ class MoveGroupRunner:
                     int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
                 ),
                 sensor_id=SensorIdField(SensorId.S0),
-                sensor_type=SensorTypeField(SensorType.capacitive)
+                sensor_type=SensorTypeField(SensorType.capacitive),
             )
             return AddSensorLinearMoveRequest(payload=sensor_move_payload)
         else:

@@ -44,7 +44,11 @@ from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
 )
-from opentrons_hardware.sensors.sensor_types import SensorInformation, PressureSensor, CapacitiveSensor
+from opentrons_hardware.sensors.sensor_types import (
+    SensorInformation,
+    PressureSensor,
+    CapacitiveSensor,
+)
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.sensors.utils import SensorThresholdInformation
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
@@ -84,7 +88,7 @@ def _build_pass_step_pressure(
     movers: List[NodeId],
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
-    stop_condition: MoveStopCondition = MoveStopCondition.sync_line, # does this need to be pressure_sync_line? Same for elsewhere
+    stop_condition: MoveStopCondition = MoveStopCondition.sync_line,  # does this need to be pressure_sync_line? Same for elsewhere
 ) -> MoveGroupStep:
     pipette_nodes = [
         i for i in movers if i in [NodeId.pipette_left, NodeId.pipette_right]
@@ -178,7 +182,7 @@ async def run_sync_buffer_to_csv(
     async with sensor_capturer:
         print("starting move group runner")
         positions = await move_group.run(can_messenger=messenger)
-        messenger.add_listener(sensor_capturer, None) # collects data from firmware
+        messenger.add_listener(sensor_capturer, None)  # collects data from firmware
         await messenger.send(
             node_id=tool,
             message=SendAccumulatedSensorDataRequest(
@@ -222,10 +226,17 @@ async def run_stream_output_to_csv(
         file_heading=pressure_output_file_heading,
         sensor_metadata=sensor_metadata,
     )
-    binding = [SensorOutputBinding.sync, SensorOutputBinding.report] # what do sync and report do?
+    binding = [
+        SensorOutputBinding.sync,
+        SensorOutputBinding.report,
+    ]  # what do sync and report do?
 
-    async with sensor_driver.bind_output(messenger, pressure_sensor, binding): # does this do try as __enter__ and finally as __exit__? Yes!
-        messenger.add_listener(sensor_capturer, None) # bind_output seems to trigger continuous responses from firmware
+    async with sensor_driver.bind_output(
+        messenger, pressure_sensor, binding
+    ):  # does this do try as __enter__ and finally as __exit__? Yes!
+        messenger.add_listener(
+            sensor_capturer, None
+        )  # bind_output seems to trigger continuous responses from firmware
 
         async with sensor_capturer:
             positions = await move_group.run(can_messenger=messenger)
@@ -258,7 +269,7 @@ async def run_sync_buffer_to_csv(
     async with sensor_capturer:
         print("starting move group runner")
         positions = await move_group.run(can_messenger=messenger)
-        messenger.add_listener(sensor_capturer, None) # collects data from firmware
+        messenger.add_listener(sensor_capturer, None)  # collects data from firmware
         await messenger.send(
             node_id=tool,
             message=SendAccumulatedSensorDataRequest(
@@ -302,10 +313,17 @@ async def run_stream_output_to_csv(
         file_heading=capacitive_output_file_heading,
         sensor_metadata=sensor_metadata,
     )
-    binding = [SensorOutputBinding.sync, SensorOutputBinding.report] # what do sync and report do?
+    binding = [
+        SensorOutputBinding.sync,
+        SensorOutputBinding.report,
+    ]  # what do sync and report do?
 
-    async with sensor_driver.bind_output(messenger, capacitive_sensor, binding): # does this do try as __enter__ and finally as __exit__? Yes!
-        messenger.add_listener(sensor_capturer, None) # bind_output seems to trigger continuous responses from firmware
+    async with sensor_driver.bind_output(
+        messenger, capacitive_sensor, binding
+    ):  # does this do try as __enter__ and finally as __exit__? Yes!
+        messenger.add_listener(
+            sensor_capturer, None
+        )  # bind_output seems to trigger continuous responses from firmware
 
         async with sensor_capturer:
             positions = await move_group.run(can_messenger=messenger)
@@ -452,7 +470,12 @@ async def capacitive_probe(
     )
     threshold = await sensor_driver.send_stop_threshold(messenger, capacitive_sensor)
     LOG.info(f"starting capacitive probe with threshold {threshold.to_float()}")
-    pass_group = _build_pass_step_capacitive([mover, tool], {mover: distance, tool: distance}, {mover: speed, tool: speed}, MoveStopCondition.sync_line) # does this need to be capacitive_sync_line? Same for elsewhere
+    pass_group = _build_pass_step_capacitive(
+        [mover, tool],
+        {mover: distance, tool: distance},
+        {mover: speed, tool: speed},
+        MoveStopCondition.sync_line,
+    )  # does this need to be capacitive_sync_line? Same for elsewhere
     runner = MoveGroupRunner(move_groups=[[pass_group]])
     log_file: str = "/var/capacitive_sensor_data.csv" if not data_file else data_file
     if csv_output:
