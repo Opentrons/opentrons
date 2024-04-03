@@ -17,6 +17,7 @@ Welcome to the v7.2.2 release of the Opentrons robot software!
 ### Bug Fixes
 
 - Restores the ability to use the speaker and camera on OT-2.
+- Restores the ability to use the camera on Flex.
 
 ---
 
