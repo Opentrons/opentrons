@@ -1,7 +1,7 @@
 """Logic for running a single liquid probe test."""
 from typing import Dict, Any, List, Tuple, Optional
 from .report import store_tip_results, store_trial, store_baseline_trial
-from opentrons.config.types import LiquidProbeSettings
+from opentrons.config.types import LiquidProbeSettings, OutputOptions
 from .__main__ import RunArgs
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 from hardware_testing.gravimetric.helpers import (
@@ -164,7 +164,9 @@ def run(tip: int, run_args: RunArgs) -> None:
     hw_api = get_sync_hw_api(run_args.ctx)
     test_well: Well = test_labware["A1"]
     _load_tipracks(run_args.ctx, run_args.pipette_channels, run_args.protocol_cfg, tip)
-    tips: List[Well] = get_unused_tips(run_args.ctx, tip)
+    tips: List[Well] = get_unused_tips(
+        ctx=run_args.ctx, tip_volume=tip, pipette_mount=""
+    )
     assert len(tips) >= run_args.trials
     results: List[float] = []
     adjusted_results: List[float] = []
@@ -182,7 +184,7 @@ def run(tip: int, run_args: RunArgs) -> None:
         target_height = test_well.bottom(liquid_height).point.z
 
         run_args.pipette._retract()
-        tip_offset = 0.0
+        # tip_offset = 0.0
         if run_args.dial_indicator is not None:
             run_args.pipette.move_to(dial_well.top())
             tip_offset = run_args.dial_indicator.read_stable()
@@ -191,6 +193,7 @@ def run(tip: int, run_args: RunArgs) -> None:
             run_args.pipette.return_tip()
         else:
             run_args.pipette.drop_tip()
+        return target_height
 
         env_data = run_args.environment_sensor.get_reading()
 
@@ -209,7 +212,6 @@ def run(tip: int, run_args: RunArgs) -> None:
     for trial in range(run_args.trials):
         if (trials_before_jog > 0) and (trial % trials_before_jog == 0):
             tip_offset = _get_baseline()
-
 
         print(f"Picking up {tip}ul tip")
         run_args.pipette.pick_up_tip(tips.pop(0))
@@ -291,7 +293,7 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
         plunger_speed=plunger_speed,
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
         expected_liquid_height=110,
-        log_pressure=True,
+        output_option=OutputOptions.sync_buffer_to_csv,
         aspirate_while_sensing=run_args.aspirate,
         auto_zero_sensor=True,
         num_baseline_reads=10,
