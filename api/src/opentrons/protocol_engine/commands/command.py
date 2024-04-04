@@ -55,6 +55,7 @@ class CommandIntent(str, Enum):
 
     PROTOCOL = "protocol"
     SETUP = "setup"
+    FIXIT = "fixit"
 
 
 class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):

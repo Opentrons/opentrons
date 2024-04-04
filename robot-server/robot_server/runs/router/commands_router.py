@@ -128,6 +128,7 @@ async def get_current_run_engine_from_url(
 
         - Setup commands (`data.source == "setup"`)
         - Protocol commands (`data.source == "protocol"`)
+        - Fixit commands (`data.source == "fixit"`)
 
         Setup commands may be enqueued before the run has been started.
         You could use setup commands to prepare a module or
@@ -137,6 +138,11 @@ async def get_current_run_engine_from_url(
         You can create a protocol purely over HTTP using protocol commands.
         If you are running a protocol from a file(s), then you will likely
         not need to enqueue protocol commands using this endpoint.
+        
+        Fixit commands may be enqueued anytime using this endpoint.
+        These commands are intended to fix a failed command. 
+        They will be executed right after the failed command 
+        and only if the run is in a paused state.
 
         Once enqueued, setup commands will execute immediately with priority,
         while protocol commands will wait until a `play` action is issued.
