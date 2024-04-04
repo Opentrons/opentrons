@@ -23,8 +23,9 @@
       "params": {}
     },
     {
-      "commandType": "waitForResume",
+      "commandType": "waitForDuration",
       "params": {
+        "seconds": 30
       }
     },
     {

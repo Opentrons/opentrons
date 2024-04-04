@@ -9,5 +9,5 @@ metadata = {
 
 def run(ctx: ProtocolContext) -> None:
     ctx.home()
-    ctx.pause()
+    ctx.delay(seconds=30)
     ctx.set_rail_lights(on=True)

@@ -39,6 +39,21 @@ stages:
     response:
       status_code: 201
 
+  - name: Wait for the run to complete
+    max_retries: 10
+    delay_after: 0.2
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          - commandType: waitForDuration
+            status: running
+
   - name: Stop the run
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/actions'
@@ -95,12 +110,13 @@ stages:
             notes: [ ]
           - id: !anystr
             key: !anystr
-            commandType: waitForResume
+            commandType: waitForDuration
             createdAt: !anystr
             startedAt: !anystr
             completedAt: !anystr
             status: failed
-            params: { }
+            params:
+              seconds: 30
             notes: [ ]
             error:
               createdAt: !anystr
