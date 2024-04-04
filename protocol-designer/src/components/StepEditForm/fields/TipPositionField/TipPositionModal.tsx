@@ -12,16 +12,16 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
-import modalStyles from '../../../modals/modal.module.css'
 import { getIsTouchTipField } from '../../../../form-types'
+import { PDAlert } from '../../../alerts/PDAlert'
 import { TOO_MANY_DECIMALS } from './constants'
 import { TipPositionAllViz } from './TipPositionAllViz'
-
-import styles from './TipPositionInput.module.css'
 import * as utils from './utils'
 
+import styles from './TipPositionInput.module.css'
+import modalStyles from '../../../modals/modal.module.css'
+
 import type { StepFieldName } from '../../../../form-types'
-import { PDAlert } from '../../../alerts/PDAlert'
 
 type Offset = 'x' | 'y' | 'z'
 interface PositionSpec {
