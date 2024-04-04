@@ -76,7 +76,7 @@ export function useNotifyService<TData, TError = Error>({
       hasUsedNotifyService.current = true
       seenHostname.current = hostname
     } else {
-      setRefetchUsingHTTP('always')
+      setRefetch('always')
     }
 
     return () => {
@@ -99,12 +99,18 @@ export function useNotifyService<TData, TError = Error>({
   function onDataEvent(data: NotifyResponseData): void {
     if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
       setRefetch('always')
+<<<<<<< HEAD
       if (data === 'ECONNREFUSED') {
+=======
+      // TODO(jh 2023-02-23): remove the robot type check once OT-2s support MQTT.
+      if (data === 'ECONNREFUSED' && isFlex) {
+>>>>>>> ef8db92660 (refactor(app, robot-server): Rename refetchUsingHTTP -> refetch (#14800))
         doTrackEvent({
           name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
           properties: {},
         })
       }
+<<<<<<< HEAD
 <<<<<<< HEAD
     } else if ('refetch' in data || 'unsubscribe' in data) {
       setRefetch('once')
@@ -112,6 +118,10 @@ export function useNotifyService<TData, TError = Error>({
     } else if ('refetchUsingHTTP' in data || 'unsubscribe' in data) {
       setRefetchUsingHTTP('once')
 >>>>>>> fbfa607dac (refactor(app-shell, app-shell-odd): Refactor app to use unsubscribe flags (#14640))
+=======
+    } else if ('refetch' in data || 'unsubscribe' in data) {
+      setRefetch('once')
+>>>>>>> ef8db92660 (refactor(app, robot-server): Rename refetchUsingHTTP -> refetch (#14800))
     }
   }
 }

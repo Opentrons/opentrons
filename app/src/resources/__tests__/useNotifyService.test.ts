@@ -234,7 +234,7 @@ describe('useNotifyService', () => {
       useNotifyService({
         hostOverride: MOCK_HOST_CONFIG,
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       })
     )

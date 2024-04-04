@@ -13,10 +13,14 @@ import { FAILURE_STATUSES } from '../constants'
 
 const VALID_NOTIFY_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
 <<<<<<< HEAD
+<<<<<<< HEAD
   { refetch: true },
 =======
   { refetchUsingHTTP: true },
 >>>>>>> 1ba616651c (refactor(app-shell-odd): Utilize robot-server unsubscribe flags (#14724))
+=======
+  { refetch: true },
+>>>>>>> ef8db92660 (refactor(app, robot-server): Rename refetchUsingHTTP -> refetch (#14800))
   { unsubscribe: true },
 ]
 
