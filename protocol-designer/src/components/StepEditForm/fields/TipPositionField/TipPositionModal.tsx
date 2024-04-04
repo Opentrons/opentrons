@@ -14,7 +14,7 @@ import {
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
 import { getIsTouchTipField } from '../../../../form-types'
 import { PDAlert } from '../../../alerts/PDAlert'
-import { TOO_MANY_DECIMALS } from './constants'
+import { TOO_MANY_DECIMALS, PERCENT_RANGE_TO_SHOW_WARNING } from './constants'
 import { TipPositionAllViz } from './TipPositionAllViz'
 import * as utils from './utils'
 
@@ -221,12 +221,14 @@ export const TipPositionModal = (
   ): void => {
     handleYChange(e.currentTarget.value)
   }
-  const xValueNearEdge =
+  const isXValueNearEdge =
     xValue != null &&
-    (parseInt(xValue) > 0.9 * xMaxWidth || parseInt(xValue) < 0.9 * xMinWidth)
-  const yValueNearEdge =
+    (parseInt(xValue) > PERCENT_RANGE_TO_SHOW_WARNING * xMaxWidth ||
+      parseInt(xValue) < PERCENT_RANGE_TO_SHOW_WARNING * xMinWidth)
+  const isYValueNearEdge =
     yValue != null &&
-    (parseInt(yValue) > 0.9 * yMaxWidth || parseInt(yValue) < 0.9 * yMinWidth)
+    (parseInt(yValue) > PERCENT_RANGE_TO_SHOW_WARNING * yMaxWidth ||
+      parseInt(yValue) < PERCENT_RANGE_TO_SHOW_WARNING * yMinWidth)
 
   const TipPositionInputField = !isDefault ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -308,7 +310,7 @@ export const TipPositionModal = (
         <p>{t(`tip_position.body.${zSpec?.name}`)}</p>
       </div>
 
-      {(xValueNearEdge || yValueNearEdge) && !isDefault ? (
+      {(isXValueNearEdge || isYValueNearEdge) && !isDefault ? (
         <Flex marginTop={SPACING.spacing8}>
           <PDAlert
             alertType="warning"
