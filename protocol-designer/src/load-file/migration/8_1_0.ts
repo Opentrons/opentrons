@@ -76,7 +76,12 @@ export const migrateFile = (
               dispense_x_position: 0,
               dispense_y_position: 0,
             }
-      acc[item.id] = { ...item, tipRack: tiprackIds[0], ...xyKeys }
+      acc[item.id] = {
+        ...item,
+        blowout_z_offset: 0,
+        tipRack: tiprackIds[0],
+        ...xyKeys,
+      }
       return acc
     },
     {}

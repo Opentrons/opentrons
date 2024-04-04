@@ -56,7 +56,6 @@
   font-weight: var(--fw-semibold);
   color: var(--c-blue);
   position: absolute;
-  right: 10px;
   bottom: 45px;
   align-self: flex-end;
 }

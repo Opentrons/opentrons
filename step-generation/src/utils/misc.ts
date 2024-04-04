@@ -5,7 +5,6 @@ import reduce from 'lodash/reduce'
 import {
   getIsTiprack,
   getLabwareDefURI,
-  getWellsDepth,
   getWellNamePerMultiTip,
   WASTE_CHUTE_CUTOUT,
   PipetteChannels,
@@ -26,8 +25,8 @@ import { movableTrashCommandsUtil } from './movableTrashCommandsUtil'
 import type {
   AddressableAreaName,
   LabwareDefinition2,
+  BlowoutParams,
 } from '@opentrons/shared-data'
-import type { BlowoutParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
   AdditionalEquipmentEntities,
   AdditionalEquipmentEntity,
@@ -244,15 +243,15 @@ export function getWellsForTips(
 // the SOURCE_WELL_BLOWOUT_DESTINATION / DEST_WELL_BLOWOUT_DESTINATION
 // special strings, or to a labware ID.
 export const blowoutUtil = (args: {
-  pipette: BlowoutParams['pipette']
+  pipette: BlowoutParams['pipetteId']
   sourceLabwareId: string
-  sourceWell: BlowoutParams['well']
+  sourceWell: BlowoutParams['wellName']
   destLabwareId: string
   blowoutLocation: string | null | undefined
   flowRate: number
   offsetFromTopMm: number
   invariantContext: InvariantContext
-  destWell: BlowoutParams['well'] | null
+  destWell: BlowoutParams['wellName'] | null
   prevRobotState: RobotState
 }): CurriedCommandCreator[] => {
   const {
@@ -293,18 +292,18 @@ export const blowoutUtil = (args: {
     well = trashOrLabware === 'labware' ? 'A1' : null
   }
 
-  const wellDepth =
-    labware != null && well != null ? getWellsDepth(labware.def, [well]) : 0
-
-  const offsetFromBottomMm = wellDepth + offsetFromTopMm
   if (well != null && trashOrLabware === 'labware' && labware != null) {
     return [
       curryCommandCreator(blowout, {
-        pipette: pipette,
-        labware: labware.id,
-        well,
+        pipetteId: pipette,
+        labwareId: labware.id,
+        wellName: well,
         flowRate,
-        offsetFromBottomMm,
+        wellLocation: {
+          offset: {
+            z: offsetFromTopMm,
+          },
+        },
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {

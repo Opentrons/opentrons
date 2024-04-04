@@ -63,11 +63,15 @@ describe('blowoutUtil', () => {
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
-      pipette: blowoutArgs.pipette,
-      labware: blowoutArgs.sourceLabwareId,
-      well: blowoutArgs.sourceWell,
+      pipetteId: blowoutArgs.pipette,
+      labwareId: blowoutArgs.sourceLabwareId,
+      wellName: blowoutArgs.sourceWell,
       flowRate: blowoutArgs.flowRate,
-      offsetFromBottomMm: expect.any(Number),
+      wellLocation: {
+        offset: {
+          z: expect.any(Number),
+        },
+      },
     })
   })
   it('blowoutUtil curries waste chute commands when there is no well', () => {
@@ -104,11 +108,15 @@ describe('blowoutUtil', () => {
       blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
-      pipette: blowoutArgs.pipette,
-      labware: blowoutArgs.destLabwareId,
-      well: blowoutArgs.destWell,
+      pipetteId: blowoutArgs.pipette,
+      labwareId: blowoutArgs.destLabwareId,
+      wellName: blowoutArgs.destWell,
       flowRate: blowoutArgs.flowRate,
-      offsetFromBottomMm: expect.any(Number),
+      wellLocation: {
+        offset: {
+          z: expect.any(Number),
+        },
+      },
     })
   })
   it('blowoutUtil curries blowout with an arbitrary labware Id', () => {
@@ -117,11 +125,15 @@ describe('blowoutUtil', () => {
       blowoutLocation: TROUGH_LABWARE,
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
-      pipette: blowoutArgs.pipette,
-      labware: TROUGH_LABWARE,
-      well: 'A1',
+      pipetteId: blowoutArgs.pipette,
+      labwareId: TROUGH_LABWARE,
+      wellName: 'A1',
       flowRate: blowoutArgs.flowRate,
-      offsetFromBottomMm: expect.any(Number),
+      wellLocation: {
+        offset: {
+          z: expect.any(Number),
+        },
+      },
     })
   })
   it('blowoutUtil returns an empty array if not given a blowoutLocation', () => {

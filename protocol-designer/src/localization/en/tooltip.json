@@ -46,7 +46,8 @@
       "mix_touchTip_checkbox": "Touch tip to each side of the well after mixing",
       "mix_touchTip_mmFromBottom": "Distance from the bottom of the well",
       "preWetTip": "Pre-wet pipette tip by aspirating and dispensing 2/3 of the tip's max volume",
-      "volume": "Volume to dispense in each well"
+      "volume": "Volume to dispense in each well",
+      "blowout_z_offset": "The height at which blowout occurs from the top of the well"
     },
     "indeterminate": {
       "aspirate_airGap_checkbox": "Not all selected steps are using this setting",
@@ -61,6 +62,12 @@
       "mix_touchTip_checkbox": "Not all selected steps are using this setting",
       "preWetTip": "Not all selected steps are using this setting"
     },
+    "mix": {
+      "disabled": {
+        "mix_mmFromBottom": "Tip position adjustment is not supported",
+        "blowout_z_offset": "Blowout location and destination labware must first be selected"
+      }
+    },
     "moveLiquid": {
       "disabled": {
         "$generic": "Incompatible with current path",
@@ -69,8 +76,8 @@
         "dispense_mix_checkbox": "Unable to mix in a waste chute or trash bin",
         "aspirate_mmFromBottom": "Tip position adjustment is not supported",
         "dispense_mmFromBottom": "Tip position adjustment is not supported",
-        "mix_mmFromBottom": "Tip position adjustment is not supported",
-        "dispense_touchTip_checkbox": "Touch tip is not supported"
+        "dispense_touchTip_checkbox": "Touch tip is not supported",
+        "blowout_z_offset": "Blowout location, source, and destination labware must first be selected"
       }
     },
     "moveLabware": {

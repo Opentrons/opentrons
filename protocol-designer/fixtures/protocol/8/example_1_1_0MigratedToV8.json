@@ -114,6 +114,7 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "1",
           "blowout_checkbox": true,
+          "blowout_z_offset": 0,
           "blowout_location": "9b1c0d01-9d4f-4016-afe6-9e08b46acf5e:trashBin",
           "preWetTip": false,
           "aspirate_airGap_checkbox": false,
@@ -143,6 +144,7 @@
           "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
           "mix_wellOrder_first": "t2b",
           "mix_wellOrder_second": "l2r",
+          "blowout_z_offset": 0,
           "blowout_checkbox": true,
           "blowout_location": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
           "mix_mmFromBottom": 0.5,
@@ -5695,7 +5697,7 @@
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
         "wellName": "A1",
         "flowRate": 7,
-        "wellLocation": { "origin": "bottom", "offset": { "z": 41.3 } }
+        "wellLocation": { "origin": "top", "offset": { "z": 0 } }
       }
     },
     {
