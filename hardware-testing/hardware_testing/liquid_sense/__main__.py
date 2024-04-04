@@ -40,7 +40,7 @@ from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p1000_96,
 )
 
-API_LEVEL = "2.16"
+API_LEVEL = "2.18"
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
@@ -151,7 +151,11 @@ class RunArgs:
         pipette = _ctx.load_instrument(
             f"flex_{args.channels}channel_{args.pipette}", "left"
         )
-        trash = _ctx.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
+        loaded_labwares = _ctx.loaded_labwares
+        if 12 in loaded_labwares.keys():
+            trash = loaded_labwares[12]
+        else:
+            trash = _ctx.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
         pipette.trash_container = trash
         pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
 
