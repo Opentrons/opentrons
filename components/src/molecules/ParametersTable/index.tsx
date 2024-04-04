@@ -122,7 +122,7 @@ const ParameterName = (props: ParameterNameProps): JSX.Element => {
             <Tooltip
               {...tooltipProps}
               backgroundColor={COLORS.black90}
-              width={'8.75rem'}
+              width="8.75rem"
               css={TYPOGRAPHY.labelRegular}
             >
               {description}
