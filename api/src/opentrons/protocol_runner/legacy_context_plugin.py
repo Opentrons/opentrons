@@ -5,7 +5,7 @@ from asyncio import create_task, Task
 from contextlib import ExitStack
 from typing import List, Optional
 
-from opentrons.commands.types import CommandMessage as LegacyCommand
+from opentrons.legacy_commands.types import CommandMessage as LegacyCommand
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
 from opentrons.util.broker import ReadOnlyBroker
