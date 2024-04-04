@@ -425,3 +425,6 @@ class SubsystemManager:
         if not device_info[node].ok:
             return ToolType.nothing_attached
         return tool
+
+
+# TOME: Do an async generator. Can do a callback here.

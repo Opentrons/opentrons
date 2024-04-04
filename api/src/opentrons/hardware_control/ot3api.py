@@ -162,6 +162,7 @@ def _adjust_high_throughput_z_current(func: Wrapped) -> Wrapped:
     A decorator that temproarily and conditionally changes the active current (based on the axis input)
     before a function is executed and the cleans up afterwards
     """
+
     # only home and retract should be wrappeed by this decorator
     @wraps(func)
     async def wrapper(self: Any, axis: Axis, *args: Any, **kwargs: Any) -> Any:
@@ -377,6 +378,8 @@ class OT3API(
             checked_config = config
         from .backends.ot3controller import OT3Controller
 
+        # I think you'd pass the callback here, but it would be a part of callbacks[]. You'd also have some sort of general_listeners property.
+        # The general listeners are all invoked by whatever classes needs them, so you build out each class interface at a time.
         backend = await OT3Controller.build(
             checked_config,
             use_usb_bus,
@@ -931,7 +934,6 @@ class OT3API(
             current_pos_float > self._config.safe_home_distance
             and current_pos_float < max_distance
         ):
-
             # move toward home until a safe distance
             await self._backend.tip_action(
                 origin={Axis.Q: current_pos_float},

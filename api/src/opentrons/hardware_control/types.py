@@ -379,6 +379,7 @@ class EstopPhysicalStatus(enum.Enum):
     NOT_PRESENT = enum.auto()
 
 
+# TOME:Nothing probably uses this currently, but you'd use this.
 class HardwareEventType(enum.Enum):
     DOOR_SWITCH_CHANGE = enum.auto()
     ERROR_MESSAGE = enum.auto()
@@ -428,6 +429,7 @@ class ErrorMessageNotification:
 
 # new event types get new dataclasses
 # when we add more event types we add them here
+# TOME: Make note of this.
 HardwareEvent = Union[
     DoorStateNotification, ErrorMessageNotification, EstopStateNotification
 ]

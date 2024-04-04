@@ -1474,6 +1474,7 @@ class OT3Controller(FlexBackend):
         door_open = await get_door_state(self._usb_messenger)
         return DoorState.OPEN if door_open else DoorState.CLOSED
 
+    # TOME: capable of being a general purpose eventing interface. Might be one for estop somewhere around here.
     def add_door_state_listener(self, callback: Callable[[DoorState], None]) -> None:
         def _door_listener(msg: BinaryMessageDefinition) -> None:
             door_state = (
