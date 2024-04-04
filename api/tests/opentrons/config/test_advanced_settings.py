@@ -57,12 +57,12 @@ def mock_settings(
 
 @pytest.fixture
 def mock_read_settings_file_ot2(
-    mock_settings_values_ot2: Dict[str, Optional[bool]],
+    mock_settings_values_ot2_all: Dict[str, Optional[bool]],
     mock_settings_version: int,
 ) -> Generator[MagicMock, None, None]:
     with patch("opentrons.config.advanced_settings._read_settings_file") as p:
         p.return_value = advanced_settings.SettingsData(
-            settings_map=mock_settings_values_ot2,
+            settings_map=mock_settings_values_ot2_all,
             version=mock_settings_version,
         )
         yield p
@@ -168,19 +168,19 @@ def test_get_all_adv_settings_empty(
 
 async def test_set_adv_setting(
     mock_read_settings_file_ot2: MagicMock,
-    mock_settings_values_ot2: MagicMock,
+    mock_settings_values_ot2_all: MagicMock,
     mock_write_settings_file: MagicMock,
     mock_settings_version: int,
     restore_restart_required: None,
 ) -> None:
-    for k, v in mock_settings_values_ot2.items():
+    for k, v in mock_settings_values_ot2_all.items():
         # Toggle the advanced setting
         await advanced_settings.set_adv_setting(k, not v)
         mock_write_settings_file.assert_called_with(
             # Only the current key is toggled
             {
                 nk: nv if nk != k else not v
-                for nk, nv in mock_settings_values_ot2.items()
+                for nk, nv in mock_settings_values_ot2_all.items()
             },
             mock_settings_version,
             CONFIG["feature_flags_file"],
