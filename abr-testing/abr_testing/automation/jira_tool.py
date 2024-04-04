@@ -44,6 +44,7 @@ class JiraTicket:
     def open_issue(self, issue_key: str) -> None:
         """Open issue on web browser."""
         url = f"{self.url}/browse/{issue_key}"
+        print(f"Opening at {url}.")
         webbrowser.open(url)
 
     def create_ticket(

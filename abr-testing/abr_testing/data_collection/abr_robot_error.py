@@ -151,7 +151,6 @@ if __name__ == "__main__":
     project_key = "RABR"
     parent_key = project_key + "-" + robot[-1]
     issues_ids = ticket.issues_on_board(board_id)
-    print(issues_ids)
     issue_url, issue_key = ticket.create_ticket(
         summary,
         whole_description_str,
@@ -163,6 +162,6 @@ if __name__ == "__main__":
         affects_version,
         parent_key,
     )
-    ticket.open_issue(issue_url)
+    ticket.open_issue(issue_key)
     ticket.post_attachment_to_ticket(issue_key, saved_file_path)
     ticket.post_attachment_to_ticket(issue_key, saved_file_path_calibration)
