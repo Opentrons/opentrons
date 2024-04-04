@@ -45,37 +45,72 @@ class PublisherNotifier:
                 await callback()
 
 
-_publisher_notifier_accessor: AppStateAccessor[PublisherNotifier] = AppStateAccessor[
+_pe_publisher_notifier_accessor: AppStateAccessor[PublisherNotifier] = AppStateAccessor[
     PublisherNotifier
 ]("publisher_notifier")
 
+_hardware_publisher_notifier_accessor: AppStateAccessor[
+    PublisherNotifier
+] = AppStateAccessor[PublisherNotifier]("publisher_notifier")
 
-def get_publisher_notifier(
+
+def get_pe_publisher_notifier(
     app_state: AppState = Depends(get_app_state),
 ) -> PublisherNotifier:
-    """Intended for use by various publishers only."""
-    publisher_notifier = _publisher_notifier_accessor.get_from(app_state)
+    """Intended for use by various publishers only. Intended for protocol engine."""
+    publisher_notifier = _pe_publisher_notifier_accessor.get_from(app_state)
     assert publisher_notifier is not None
 
     return publisher_notifier
 
 
-def get_notify_publishers(
+def get_hardware_publisher_notifier(
+    app_state: AppState = Depends(get_app_state),
+) -> PublisherNotifier:
+    """Intended for use by various publishers only. Intended for hardware."""
+    publisher_notifier = _hardware_publisher_notifier_accessor.get_from(app_state)
+    assert publisher_notifier is not None
+
+    return publisher_notifier
+
+
+def get_pe_notify_publishers(
     app_state: AppState = Depends(get_app_state),
 ) -> Callable[[], None]:
-    """Provides access to the callback used to notify publishers of changes."""
-    publisher_notifier = _publisher_notifier_accessor.get_from(app_state)
+    """Provides access to the callback used to notify publishers of changes. Intended for protocol engine."""
+    publisher_notifier = _pe_publisher_notifier_accessor.get_from(app_state)
     assert isinstance(publisher_notifier, PublisherNotifier)
 
     return publisher_notifier._notify_publishers
 
 
-async def initialize_publisher_notifier(app_state: AppState) -> None:
-    """Create a new `NotificationClient` and store it on `app_state`.
+def get_hardware_notify_publishers(
+    app_state: AppState = Depends(get_app_state),
+) -> Callable[[], None]:
+    """Provides access to the callback used to notify publishers of changes. Intended for hardware."""
+    publisher_notifier = _hardware_publisher_notifier_accessor.get_from(app_state)
+    assert isinstance(publisher_notifier, PublisherNotifier)
+
+    return publisher_notifier._notify_publishers
+
+
+async def initialize_pe_publisher_notifier(app_state: AppState) -> None:
+    """Create a new `NotificationClient` and store it on `app_state` intended for protocol engine.
 
     Intended to be called just once, when the server starts up.
     """
     publisher_notifier: PublisherNotifier = PublisherNotifier()
-    _publisher_notifier_accessor.set_on(app_state, publisher_notifier)
+    _pe_publisher_notifier_accessor.set_on(app_state, publisher_notifier)
+
+    await publisher_notifier._initialize()
+
+
+async def initialize_hardware_publisher_notifier(app_state: AppState) -> None:
+    """Create a new `NotificationClient` and store it on `app_state` intended for hardware.
+
+    Intended to be called just once, when the server starts up.
+    """
+    publisher_notifier: PublisherNotifier = PublisherNotifier()
+    _hardware_publisher_notifier_accessor.set_on(app_state, publisher_notifier)
 
     await publisher_notifier._initialize()
