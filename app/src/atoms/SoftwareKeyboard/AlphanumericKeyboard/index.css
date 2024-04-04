@@ -32,9 +32,10 @@
   background-color: #dedede; /* grey30 */
 }
 
+/* ToDo (kk:04/04/2024) this important will be removed when I refactor the entire css */
 .hg-layout-default .hg-row .hg-button,
 .hg-layout-shift .hg-row .hg-button {
-  height: 62.3px;
+  height: 62.3px !important;
 }
 
 /* first row and second row */
