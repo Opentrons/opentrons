@@ -105,27 +105,29 @@ export function DeviceDetailsDeckConfiguration({
 
     const fixtureGroup =
       deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
-        ?.fixtureGroup ?? []
+        ?.fixtureGroup ?? {}
 
     let newDeckConfig = deckConfig
-    if (fixtureGroup.length > 0) {
-      newDeckConfig = deckConfig.map(cutoutConfig =>
-        fixtureGroup.includes(cutoutConfig.cutoutFixtureId)
+    if (cutoutId in fixtureGroup) {
+      const groupMap = fixtureGroup[cutoutId]?.find(group => Object.entries(group).every(([cId, cfId]) => (deckConfig.find(config => config.cutoutId === cId && config.cutoutFixtureId === cfId)))) ?? {}
+      console.log('GROUP MAP', groupMap)
+      newDeckConfig = deckConfig.map(cutoutConfig => (
+        cutoutConfig.cutoutId in groupMap
           ? {
-              ...cutoutConfig,
-              cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: undefined,
-            }
+            ...cutoutConfig,
+            cutoutFixtureId: replacementFixtureId,
+            opentronsModuleSerialNumber: undefined,
+          }
           : cutoutConfig
-      )
+      ))
     } else {
       newDeckConfig = deckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId === cutoutId
           ? {
-              ...cutoutConfig,
-              cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: undefined,
-            }
+            ...cutoutConfig,
+            cutoutFixtureId: replacementFixtureId,
+            opentronsModuleSerialNumber: undefined,
+          }
           : cutoutConfig
       )
     }

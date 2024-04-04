@@ -1,16 +1,13 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import {
   ALIGN_FLEX_END,
-  ALIGN_STRETCH,
   Box,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
   Link,
   PrimaryButton,
   SPACING,

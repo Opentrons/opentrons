@@ -270,12 +270,16 @@ export interface DeckCalibrationPoint {
   displayName: string
 }
 
+export type CutoutFixtureGroup = {
+  [cutoutId in CutoutId]?: Array<{ [cutoutId in CutoutId]?: CutoutFixtureId }>
+}
+
 export interface CutoutFixture {
   id: CutoutFixtureId
   mayMountTo: CutoutId[]
   displayName: string
   providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
-  fixtureGroup: CutoutFixtureId[]
+  fixtureGroup: CutoutFixtureGroup
   height: number
 }
 
