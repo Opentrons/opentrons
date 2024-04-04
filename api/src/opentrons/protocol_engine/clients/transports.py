@@ -1,15 +1,23 @@
 """A helper for controlling a `ProtocolEngine` without async/await."""
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
-from typing import Any, overload
+from typing import Any, Final, overload
 from typing_extensions import Literal
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+
 from ..protocol_engine import ProtocolEngine
 from ..errors import ProtocolCommandFailedError
+from ..error_recovery_policy import ErrorRecoveryType
 from ..state import StateView
-from ..commands import CommandCreate, CommandResult
+from ..commands import Command, CommandCreate, CommandResult, CommandStatus
+
+
+# TODO(mm, 2024-04-04): The protocol run infrastructure will currently see this as an
+# error and report a run failure. It should probably see it as a normal stop.
+class _RunStoppedError(RuntimeError):
+    """Raised to signal certain kinds of run stops."""
 
 
 class ChildThreadTransport:
@@ -30,8 +38,10 @@ class ChildThreadTransport:
                 want to synchronously access it.
             loop: The event loop that `engine` is running in (in the other thread).
         """
-        self._engine = engine
-        self._loop = loop
+        # We might access these from different threads,
+        # so let's make them Final for (shallow) immutability.
+        self._engine: Final = engine
+        self._loop: Final = loop
 
     @property
     def state(self) -> StateView:
@@ -64,26 +74,57 @@ class ChildThreadTransport:
                 message=f"{error.errorType}: {error.detail}",
             )
 
-        # FIXME(mm, 2023-04-10): This assert can easily trigger from this sequence:
-        #
-        # 1. The engine is paused.
-        # 2. The user's Python script calls this method to start a new command,
-        #    which remains `queued` because of the pause.
-        # 3. The engine is stopped.
-        #
-        # The returned command will be `queued`, so it won't have a result.
-        #
-        # We need to figure out a proper way to report this condition to callers
-        # so they correctly interpret it as an intentional stop, not an internal error.
+        if command.result is None:
+            # This can happen with a certain pause timing:
+            #
+            # 1. The engine is paused.
+            # 2. The user's Python script calls this method to start a new command,
+            #    which remains `queued` because of the pause.
+            # 3. The engine is stopped. The returned command will be `queued`
+            #    and won't have a result.
+            raise _RunStoppedError()
+
         assert command.result is not None, f"Expected Command {command} to have result"
 
         return command.result
 
-    def execute_command_wait_for_recovery(self, request: CommandCreate) -> None:
-        run_coroutine_threadsafe(
-            self._engine.add_and_execute_command_wait_for_recovery(request=request),
+    def execute_command_wait_for_recovery(self, request: CommandCreate) -> Command:
+        async def run_in_pe_thread() -> Command:
+            command = await self._engine.add_and_execute_command_wait_for_recovery(
+                request=request
+            )
+
+            if command.error is not None:
+                error_was_recovered_from = (
+                    self._engine.state_view.commands.get_error_recovery_type(command.id)
+                    == ErrorRecoveryType.WAIT_FOR_RECOVERY
+                )
+                if not error_was_recovered_from:
+                    error = command.error
+                    # TODO: this needs to have an actual code
+                    raise ProtocolCommandFailedError(
+                        original_error=error,
+                        message=f"{error.errorType}: {error.detail}",
+                    )
+
+            elif command.status == CommandStatus.QUEUED:
+                # This can happen with a certain pause timing:
+                #
+                # 1. The engine is paused.
+                # 2. The user's Python script calls this method to start a new command,
+                #    which remains `queued` because of the pause.
+                # 3. The engine is stopped. The returned command will be `queued`,
+                #    and won't have a result.
+                raise _RunStoppedError()
+
+            return command
+
+        command = run_coroutine_threadsafe(
+            run_in_pe_thread(),
             loop=self._loop,
         ).result()
+
+        return command
 
     @overload
     def call_method(
