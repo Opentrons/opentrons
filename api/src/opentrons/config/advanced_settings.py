@@ -250,7 +250,7 @@ settings = [
         ),
         robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
         internal_only=True,
-    )
+    ),
 ]
 
 if (
@@ -718,6 +718,7 @@ def _migrate31to32(previous: SettingsMap) -> SettingsMap:
     newmap = {k: v for k, v in previous.items()}
     newmap["enableOEMMode"] = None
     return newmap
+
 
 def _migrate32to33(previous: SettingsMap) -> SettingsMap:
     """Migrate to version 33 of the feature flags file.

@@ -79,6 +79,4 @@ def enable_error_recovery_experiments() -> bool:
 
 
 def enable_performance_metrics(robot_type: RobotTypeEnum) -> bool:
-    return advs.get_setting_with_env_overload(
-        "enablePerformanceMetrics", robot_type
-    )
+    return advs.get_setting_with_env_overload("enablePerformanceMetrics", robot_type)

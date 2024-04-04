@@ -33,6 +33,7 @@ def mock_settings_values_flex() -> Dict[str, Optional[bool]]:
         if RobotTypeEnum.FLEX in s.robot_type and not s.internal_only
     }
 
+
 @pytest.fixture
 def mock_settings_values_flex_all() -> Dict[str, Optional[bool]]:
     return {
