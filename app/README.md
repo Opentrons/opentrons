@@ -134,5 +134,5 @@ ANALYZER=1 make -C app
 [redux]: http://redux.js.org/
 [css-modules]: https://github.com/css-modules/css-modules
 [babel]: https://babeljs.io/
-[viete]: https://vitejs.dev/
+[vite]: https://vitejs.dev/
 [bundle-analyzer]: https://github.com/webpack-contrib/webpack-bundle-analyzer
