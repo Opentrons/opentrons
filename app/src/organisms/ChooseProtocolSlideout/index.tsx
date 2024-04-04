@@ -92,6 +92,7 @@ export function ChooseProtocolSlideoutComponent(
     setRunTimeParametersOverrides,
   ] = React.useState<RunTimeParameter[]>([])
   const [currentPage, setCurrentPage] = React.useState<number>(1)
+  const [hasParamError, setHasParamError] = React.useState<boolean>(false)
   const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
 
   React.useEffect(() => {
@@ -99,6 +100,10 @@ export function ChooseProtocolSlideoutComponent(
       selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
     )
   }, [selectedProtocol])
+  React.useEffect(() => {
+    setHasParamError(errors.length > 0)
+  }, [runTimeParametersOverrides])
+
   const runTimeParametersFromAnalysis =
     selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
 
@@ -187,6 +192,7 @@ export function ChooseProtocolSlideoutComponent(
       parameter => parameter.value !== parameter.default
     ) ?? false
 
+  const errors: string[] = []
   const runTimeParametersInputs =
     runTimeParametersOverrides?.map((runtimeParam, index) => {
       if ('choices' in runtimeParam) {
@@ -240,6 +246,9 @@ export function ChooseProtocolSlideoutComponent(
                     : runtimeParam.max.toFixed(1),
               })
             : null
+        if (error != null) {
+          errors.push(error)
+        }
         return (
           <InputField
             key={runtimeParam.variableName}
@@ -385,7 +394,11 @@ export function ChooseProtocolSlideoutComponent(
         <SecondaryButton onClick={() => setCurrentPage(1)} width="51%">
           {t('shared:change_protocol')}
         </SecondaryButton>
-        <PrimaryButton width="49%" onClick={handleProceed}>
+        <PrimaryButton
+          width="49%"
+          onClick={handleProceed}
+          disabled={hasParamError}
+        >
           {isCreatingRun ? (
             <Icon name="ot-spinner" spin size="1rem" />
           ) : (
@@ -409,26 +422,28 @@ export function ChooseProtocolSlideoutComponent(
             robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
           }
         >
-          <ApplyHistoricOffsets
-            offsetCandidates={offsetCandidates}
-            shouldApplyOffsets={shouldApplyOffsets}
-            setShouldApplyOffsets={setShouldApplyOffsets}
-            commands={
-              (!missingAnalysisData
-                ? selectedProtocol?.mostRecentAnalysis?.commands
-                : []) ?? []
-            }
-            labware={
-              (!missingAnalysisData
-                ? selectedProtocol?.mostRecentAnalysis?.labware
-                : []) ?? []
-            }
-            modules={
-              (!missingAnalysisData
-                ? selectedProtocol?.mostRecentAnalysis?.modules
-                : []) ?? []
-            }
-          />
+          {currentPage === 1 ? (
+            <ApplyHistoricOffsets
+              offsetCandidates={offsetCandidates}
+              shouldApplyOffsets={shouldApplyOffsets}
+              setShouldApplyOffsets={setShouldApplyOffsets}
+              commands={
+                (!missingAnalysisData
+                  ? selectedProtocol?.mostRecentAnalysis?.commands
+                  : []) ?? []
+              }
+              labware={
+                (!missingAnalysisData
+                  ? selectedProtocol?.mostRecentAnalysis?.labware
+                  : []) ?? []
+              }
+              modules={
+                (!missingAnalysisData
+                  ? selectedProtocol?.mostRecentAnalysis?.modules
+                  : []) ?? []
+              }
+            />
+          ) : null}
           {hasRunTimeParameters ? multiPageFooter : singlePageFooter}
         </ApiHostProvider>
       }

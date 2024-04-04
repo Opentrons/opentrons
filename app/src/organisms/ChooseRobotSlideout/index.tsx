@@ -113,6 +113,7 @@ interface ChooseRobotSlideoutProps
   isAnalysisStale?: boolean
   showIdleOnly?: boolean
   multiSlideout?: { currentPage: number } | null
+  setHasParamError?: (isError: boolean) => void
 }
 
 export function ChooseRobotSlideout(
@@ -138,6 +139,7 @@ export function ChooseRobotSlideout(
     multiSlideout = null,
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
+    setHasParamError,
   } = props
 
   const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
@@ -330,6 +332,7 @@ export function ChooseRobotSlideout(
     </Flex>
   )
 
+  const errors: string[] = []
   const runTimeParameters =
     runTimeParametersOverrides?.map((runtimeParam, index) => {
       if ('choices' in runtimeParam) {
@@ -370,6 +373,24 @@ export function ChooseRobotSlideout(
       } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
         const value = runtimeParam.value as number
         const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
+        const error =
+          Number.isNaN(value) ||
+          value < runtimeParam.min ||
+          value > runtimeParam.max
+            ? t(`value_out_of_range`, {
+                min:
+                  runtimeParam.type === 'int'
+                    ? runtimeParam.min
+                    : runtimeParam.min.toFixed(1),
+                max:
+                  runtimeParam.type === 'int'
+                    ? runtimeParam.max
+                    : runtimeParam.max.toFixed(1),
+              })
+            : null
+        if (error != null) {
+          errors.push(error)
+        }
         return (
           <InputField
             key={runtimeParam.variableName}
@@ -387,22 +408,7 @@ export function ChooseRobotSlideout(
                   )}`
             }
             id={id}
-            error={
-              Number.isNaN(value) ||
-              value < runtimeParam.min ||
-              value > runtimeParam.max
-                ? t(`value_out_of_range`, {
-                    min:
-                      runtimeParam.type === 'int'
-                        ? runtimeParam.min
-                        : runtimeParam.min.toFixed(1),
-                    max:
-                      runtimeParam.type === 'int'
-                        ? runtimeParam.max
-                        : runtimeParam.max.toFixed(1),
-                  })
-                : null
-            }
+            error={error}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
@@ -473,6 +479,10 @@ export function ChooseRobotSlideout(
         )
       }
     }) ?? null
+
+  if (setHasParamError != null) {
+    setHasParamError(errors.length > 0)
+  }
 
   const isRestoreDefaultsLinkEnabled =
     runTimeParametersOverrides?.some(

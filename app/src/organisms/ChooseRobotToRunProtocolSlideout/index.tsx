@@ -60,14 +60,13 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     storedProtocolData,
     selectedRobot?.name ?? ''
   )
-
-  // TODO: (nd: 3/20/24) remove stubs and pull parameters from analysis
   const runTimeParameters =
     storedProtocolData.mostRecentAnalysis?.runTimeParameters ?? []
   const [
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
   ] = React.useState<RunTimeParameter[]>(runTimeParameters)
+  const [hasParamError, setHasParamError] = React.useState<boolean>(false)
 
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis,
@@ -229,7 +228,11 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
                 <SecondaryButton onClick={() => setCurrentPage(1)} width="50%">
                   {t('shared:change_robot')}
                 </SecondaryButton>
-                <PrimaryButton width="50%" onClick={handleProceed}>
+                <PrimaryButton
+                  width="50%"
+                  onClick={handleProceed}
+                  disabled={hasParamError}
+                >
                   {isCreatingRun ? (
                     <Icon name="ot-spinner" spin size="1rem" />
                   ) : (
@@ -251,6 +254,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       runCreationError={runCreationError}
       runCreationErrorCode={runCreationErrorCode}
       showIdleOnly={true}
+      setHasParamError={setHasParamError}
     />
   )
 }
