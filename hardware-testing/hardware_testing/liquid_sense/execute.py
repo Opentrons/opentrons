@@ -226,9 +226,7 @@ def run(tip: int, run_args: RunArgs) -> None:
 
             run_args.pipette._retract()
             run_args.pipette.move_to(dial_well.top())
-            tip_length_offset = (
-                tip_offset - run_args.dial_indicator.read_stable()
-            )
+            tip_length_offset = tip_offset - run_args.dial_indicator.read_stable()
             run_args.pipette._retract()
             print(f"Tip Offset  {tip_length_offset}")
 
