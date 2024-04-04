@@ -193,7 +193,6 @@ def run(tip: int, run_args: RunArgs) -> None:
             run_args.pipette.return_tip()
         else:
             run_args.pipette.drop_tip()
-        return target_height
 
         env_data = run_args.environment_sensor.get_reading()
 
@@ -206,6 +205,7 @@ def run(tip: int, run_args: RunArgs) -> None:
             test_well.top().point.z - target_height,
             tip_offset - lpc_offset,
         )
+        return target_height
 
     trials_before_jog = run_args.trials_before_jog
     tip_offset = 0.0
