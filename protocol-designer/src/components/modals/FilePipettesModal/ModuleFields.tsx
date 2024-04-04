@@ -1,142 +1,91 @@
 import * as React from 'react'
-import { Control, Controller, UseFormTrigger } from 'react-hook-form'
+import { Flex, SPACING, WRAP, ALIGN_CENTER } from '@opentrons/components'
 import {
-  DeprecatedCheckboxField,
-  DropdownField,
-  FormGroup,
-} from '@opentrons/components'
-import {
-  DEFAULT_MODEL_FOR_MODULE_TYPE,
-  MODELS_FOR_MODULE_TYPE,
-} from '../../../constants'
-import { FormModulesByType } from '../../../step-forms'
+  HEATERSHAKER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+  ModuleModel,
+  ModuleType,
+  OT2_ROBOT_TYPE,
+  SPAN7_8_10_11_SLOT,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
+  getModuleDisplayName,
+  getModuleType,
+} from '@opentrons/shared-data'
+import { uuid } from '../../../utils'
 import { ModuleDiagram } from '../../modules'
-import styles from './FilePipettesModal.module.css'
-import { MAGNETIC_BLOCK_TYPE, ModuleType } from '@opentrons/shared-data'
-import { useTranslation } from 'react-i18next'
-import type { FormState } from '../CreateFileWizard/types'
+import { EquipmentOption } from '../CreateFileWizard/EquipmentOption'
+import type { WizardTileProps } from '../CreateFileWizard/types'
 
-export interface ModuleFieldsProps {
-  errors:
-    | null
-    | string
-    | {
-        magneticModuleType?: {
-          model: string
-        }
-        temperatureModuleType?: {
-          model: string
-        }
-        thermocyclerModuleType?: {
-          model: string
-        }
-        heaterShakerModuleType?: {
-          model: string
-        }
-        magneticBlockType?: {
-          model: string
-        }
-      }
-  touched:
-    | null
-    | boolean
-    | {
-        magneticModuleType?: {
-          model: boolean
-        }
-        temperatureModuleType?: {
-          model: boolean
-        }
-        thermocyclerModuleType?: {
-          model: boolean
-        }
-        heaterShakerModuleType?: {
-          model: boolean
-        }
-        magneticBlockType?: {
-          model: boolean
-        }
-      }
-  values: FormModulesByType
-  control: Control<FormState, any>
-  trigger: UseFormTrigger<FormState>
+export const DEFAULT_SLOT_MAP: { [moduleType in ModuleType]?: string } = {
+  [THERMOCYCLER_MODULE_TYPE]: SPAN7_8_10_11_SLOT,
+  [HEATERSHAKER_MODULE_TYPE]: '1',
+  [MAGNETIC_MODULE_TYPE]: '1',
+  [TEMPERATURE_MODULE_TYPE]: '3',
 }
+export const OT2_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
+]
 
-export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
-  const { t } = useTranslation('modules')
-  const { values, errors, touched, control, trigger } = props
-  // TODO(BC, 2023-05-11): REMOVE THIS MAG BLOCK FILTER BEFORE LAUNCH TO INCLUDE IT AMONG MODULE OPTIONS
-  // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
-  const modules: ModuleType[] = Object.keys(values).filter(
-    k => k !== MAGNETIC_BLOCK_TYPE
-  )
-
+export function ModuleFields(props: WizardTileProps): JSX.Element {
+  const { watch, setValue } = props
+  const modules = watch('modules')
+  const moduleModelsOnDeck =
+    modules != null ? Object.values(modules).map(module => module.model) : []
+  const moduleTypesOnDeck =
+    modules != null ? Object.values(modules).map(module => module.type) : []
   return (
-    <div className={styles.modules_row}>
-      {modules.map((moduleType, i) => {
-        const label = t(`module_display_names.${moduleType}`)
-        const defaultModel = DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType]
-        const selectedModel = values[moduleType].model
+    <Flex flexWrap={WRAP} gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
+      {OT2_SUPPORTED_MODULE_MODELS.map(moduleModel => {
+        const moduleType = getModuleType(moduleModel)
+        const moduleOnDeck = moduleModelsOnDeck.includes(moduleModel)
         return (
-          <div className={styles.module_form_group} key={`${moduleType}`}>
-            <Controller
-              control={control}
-              name={`modulesByType.${moduleType}.onDeck`}
-              render={({ field }) => (
-                <DeprecatedCheckboxField
-                  label={label}
-                  name={`modulesByType.${moduleType}.onDeck`}
-                  value={field.value}
-                  onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
-                    const type: ModuleType = e.target.value as ModuleType
-                    field.onChange(e)
-                    await trigger(`modulesByType.${type}.onDeck`)
-                  }}
-                  tabIndex={i}
-                />
-              )}
-            />
-
-            <ModuleDiagram
-              type={moduleType}
-              model={selectedModel ?? defaultModel}
-            />
-            <Controller
-              control={control}
-              name={`modulesByType.${moduleType}.model`}
-              render={({ field }) => (
-                <div className={styles.module_model}>
-                  {values[moduleType].onDeck && (
-                    <FormGroup label="Model*">
-                      <DropdownField
-                        error={
-                          touched &&
-                          typeof touched !== 'boolean' &&
-                          touched[moduleType] &&
-                          // @ts-expect-error(sa, 2021-6-21): not a valid way to type narrow
-                          touched[moduleType].model &&
-                          errors !== null &&
-                          typeof errors !== 'string' &&
-                          errors[moduleType]
-                            ? // @ts-expect-error(sa, 2021-6-21): not a valid way to type narrow
-                              errors[moduleType].model
-                            : null
-                        }
-                        tabIndex={i}
-                        name={`modulesByType.${moduleType}.model`}
-                        options={MODELS_FOR_MODULE_TYPE[moduleType]}
-                        value={selectedModel ?? defaultModel}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                      />
-                    </FormGroup>
-                  )}
-                </div>
-              )}
-            />
-          </div>
+          <EquipmentOption
+            robotType={OT2_ROBOT_TYPE}
+            key={moduleModel}
+            isSelected={moduleOnDeck}
+            image={<ModuleDiagram type={moduleType} model={moduleModel} />}
+            text={getModuleDisplayName(moduleModel)}
+            disabled={moduleTypesOnDeck.includes(moduleType) && !moduleOnDeck}
+            onClick={() => {
+              if (moduleOnDeck) {
+                const updatedModulesByModel =
+                  modules != null
+                    ? Object.fromEntries(
+                        Object.entries(modules).filter(
+                          ([key, value]) => value.model !== moduleModel
+                        )
+                      )
+                    : {}
+                setValue('modules', updatedModulesByModel)
+              } else {
+                setValue('modules', {
+                  ...modules,
+                  [uuid()]: {
+                    model: moduleModel,
+                    type: moduleType,
+                    slot: DEFAULT_SLOT_MAP[moduleType] ?? '',
+                  },
+                })
+              }
+            }}
+            showCheckbox
+          />
         )
       })}
-    </div>
+    </Flex>
   )
 }

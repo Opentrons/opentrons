@@ -6,7 +6,9 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.commands.protocol_commands import comment as make_legacy_comment_command
+from opentrons.legacy_commands.protocol_commands import (
+    comment as make_legacy_comment_command,
+)
 from opentrons.types import MountType
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 

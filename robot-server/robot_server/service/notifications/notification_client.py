@@ -1,3 +1,4 @@
+"""An interface for managing interactions with the notification broker and relevant lifecycle utilities."""
 import random
 import logging
 import paho.mqtt.client as mqtt
@@ -58,24 +59,26 @@ class NotificationClient:
         # MQTT is somewhat particular about the client_id format and will connect erratically
         # if an unexpected string is supplied. This clientId is derived from the paho-mqtt library.
         self._client_id: str = f"robot-server-{random.randint(0, 1000000)}"
-        self.client: mqtt.Client = mqtt.Client(
+        self._client: mqtt.Client = mqtt.Client(
             client_id=self._client_id, protocol=protocol_version
         )
-        self.client.on_connect = self._on_connect
-        self.client.on_disconnect = self._on_disconnect
+        self._client.on_connect = self._on_connect
+        self._client.on_disconnect = self._on_disconnect
 
     def connect(self) -> None:
         """Connect the client to the MQTT broker."""
-        self.client.on_connect = self._on_connect
-        self.client.on_disconnect = self._on_disconnect
+        self._client.on_connect = self._on_connect
+        self._client.on_disconnect = self._on_disconnect
 
-        self.client.connect(host=self._host, port=self._port, keepalive=self._keepalive)
-        self.client.loop_start()
+        self._client.connect(
+            host=self._host, port=self._port, keepalive=self._keepalive
+        )
+        self._client.loop_start()
 
     async def disconnect(self) -> None:
         """Disconnect the client from the MQTT broker."""
-        self.client.loop_stop()
-        await to_thread.run_sync(self.client.disconnect)
+        self._client.loop_stop()
+        await to_thread.run_sync(self._client.disconnect)
 
     async def publish_advise_refetch_async(self, topic: str) -> None:
         """Asynchronously publish a refetch message on a specific topic to the MQTT broker.
@@ -104,7 +107,7 @@ class NotificationClient:
         """
         message = NotifyRefetchBody.construct()
         payload = message.json()
-        self.client.publish(
+        self._client.publish(
             topic=topic,
             payload=payload,
             qos=self._default_qos,
@@ -122,7 +125,7 @@ class NotificationClient:
         """
         message = NotifyUnsubscribeBody.construct()
         payload = message.json()
-        self.client.publish(
+        self._client.publish(
             topic=topic,
             payload=payload,
             qos=self._default_qos,
@@ -208,7 +211,5 @@ def get_notification_client(
     app_state: AppState = Depends(get_app_state),
 ) -> Optional[NotificationClient]:
     """Intended to be used by endpoint functions as a FastAPI dependency."""
-    notification_client: Optional[
-        NotificationClient
-    ] = _notification_client_accessor.get_from(app_state)
+    notification_client = _notification_client_accessor.get_from(app_state)
     return notification_client

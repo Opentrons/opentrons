@@ -61,14 +61,17 @@ def ensure_value_type(
 
     This does not guarantee that the value will be the correct type for the given parameter, only that any data coming
     in is in the format that we expect. For now, the only transformation it is doing is converting integers represented
-    as floating points to integers. If something is labelled as an int but is not actually an integer, that will be
-    caught when it is attempted to be set as the parameter value and will raise the appropriate error there.
+    as floating points to integers, and bools represented as 1.0/0.0 to True/False.
+
+    If something is labelled as a type but does not get converted here, that will be caught when it is attempted to be
+    set as the parameter value and will raise the appropriate error there.
     """
-    validated_value: AllowedTypes
-    if isinstance(value, float) and parameter_type is int and value.is_integer():
-        validated_value = int(value)
-    else:
-        validated_value = value
+    validated_value: AllowedTypes = value
+    if isinstance(value, float):
+        if parameter_type is bool and (value == 0 or value == 1):
+            validated_value = bool(value)
+        elif parameter_type is int and value.is_integer():
+            validated_value = int(value)
     return validated_value
 
 
@@ -163,7 +166,7 @@ def validate_type(value: ParamType, parameter_type: type) -> None:
     """Validate parameter value is the correct type."""
     if not isinstance(value, parameter_type):
         raise ParameterValueError(
-            f"Parameter value has type {type(value)} must match type {parameter_type}."
+            f"Parameter value {value} has type {type(value)}, must match type {parameter_type}."
         )
 
 

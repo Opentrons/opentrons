@@ -11,7 +11,7 @@ import {
 } from './ModulesAndOtherTile'
 
 import type { ModuleType } from '@opentrons/shared-data'
-import type { FormModulesByType } from '../../../step-forms'
+import type { FormModules } from '../../../step-forms'
 import type { AdditionalEquipment, FormState } from './types'
 
 export const FLEX_TRASH_DEFAULT_SLOT = 'cutoutA3'
@@ -19,39 +19,38 @@ const ALL_STAGING_AREAS = 4
 
 interface LastCheckedProps {
   additionalEquipment: AdditionalEquipment[]
-  modulesByType: FormModulesByType
+  moduleTypesOnDeck: ModuleType[]
 }
 
 export const getLastCheckedEquipment = (
   props: LastCheckedProps
 ): string | null => {
-  const { additionalEquipment, modulesByType } = props
+  const { additionalEquipment, moduleTypesOnDeck } = props
   const hasAllStagingAreas =
     additionalEquipment.filter(equipment => equipment.includes('stagingArea'))
       .length === ALL_STAGING_AREAS
   const hasTrashBin = additionalEquipment.includes('trashBin')
-
   if (!hasTrashBin || !hasAllStagingAreas) {
     return null
   }
 
   if (
-    modulesByType.heaterShakerModuleType.onDeck &&
-    modulesByType.thermocyclerModuleType.onDeck
+    moduleTypesOnDeck.includes(THERMOCYCLER_MODULE_TYPE) &&
+    moduleTypesOnDeck.includes(HEATERSHAKER_MODULE_TYPE)
   ) {
     return TEMPERATURE_MODULE_TYPE
   }
 
   if (
-    modulesByType.heaterShakerModuleType.onDeck &&
-    modulesByType.temperatureModuleType.onDeck
+    moduleTypesOnDeck.includes(HEATERSHAKER_MODULE_TYPE) &&
+    moduleTypesOnDeck.includes(TEMPERATURE_MODULE_TYPE)
   ) {
     return THERMOCYCLER_MODULE_TYPE
   }
 
   if (
-    modulesByType.thermocyclerModuleType.onDeck &&
-    modulesByType.temperatureModuleType.onDeck
+    moduleTypesOnDeck.includes(THERMOCYCLER_MODULE_TYPE) &&
+    moduleTypesOnDeck.includes(TEMPERATURE_MODULE_TYPE)
   ) {
     return HEATERSHAKER_MODULE_TYPE
   }
@@ -60,12 +59,16 @@ export const getLastCheckedEquipment = (
 }
 
 export const getCrashableModuleSelected = (
-  modules: FormModulesByType,
+  modules: FormModules | null,
   moduleType: ModuleType
 ): boolean => {
-  const formModule = modules[moduleType]
+  if (modules == null) return false
+
+  const formModule = Object.values(modules).find(
+    module => module.type === moduleType
+  )
   const crashableModuleOnDeck =
-    formModule?.onDeck && formModule?.model != null
+    formModule?.model != null
       ? isModuleWithCollisionIssue(formModule.model)
       : false
 
@@ -73,15 +76,15 @@ export const getCrashableModuleSelected = (
 }
 
 export const getTrashBinOptionDisabled = (props: LastCheckedProps): boolean => {
-  const { additionalEquipment, modulesByType } = props
+  const { additionalEquipment, moduleTypesOnDeck } = props
   const allStagingAreasInUse =
     additionalEquipment.filter(equipment => equipment.includes('stagingArea'))
       .length === ALL_STAGING_AREAS
 
   const allModulesInSideSlotsOnDeck =
-    modulesByType.heaterShakerModuleType.onDeck &&
-    modulesByType.thermocyclerModuleType.onDeck &&
-    modulesByType.temperatureModuleType.onDeck
+    moduleTypesOnDeck.includes(HEATERSHAKER_MODULE_TYPE) &&
+    moduleTypesOnDeck.includes(TEMPERATURE_MODULE_TYPE) &&
+    moduleTypesOnDeck.includes(THERMOCYCLER_MODULE_TYPE)
 
   return allStagingAreasInUse && allModulesInSideSlotsOnDeck
 }
@@ -122,7 +125,10 @@ export const MOVABLE_TRASH_CUTOUTS = [
 ]
 
 export const getTrashSlot = (values: FormState): string => {
-  const stagingAreas = values.additionalEquipment.filter(equipment =>
+  const { additionalEquipment, modules } = values
+  const moduleTypesOnDeck =
+    modules != null ? Object.values(modules).map(module => module.type) : []
+  const stagingAreas = additionalEquipment.filter(equipment =>
     equipment.includes('stagingArea')
   )
   //  TODO(Jr, 11/16/23): refactor additionalEquipment to store cutouts
@@ -136,7 +142,7 @@ export const getTrashSlot = (values: FormState): string => {
   const moduleSlots: string[] = FLEX_SUPPORTED_MODULE_MODELS.reduce(
     (slots: string[], model) => {
       const moduleType = getModuleType(model)
-      if (values.modulesByType[moduleType].onDeck) {
+      if (moduleTypesOnDeck.includes(moduleType)) {
         const slot = String(DEFAULT_SLOT_MAP[model])
         return moduleType === THERMOCYCLER_MODULE_TYPE
           ? [...slots, 'A1', slot]

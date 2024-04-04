@@ -16,12 +16,13 @@ import {
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
-import { SmallButton } from '../../atoms/buttons'
+import { SmallButton, FloatingActionButton } from '../../atoms/buttons'
 import { Navigation } from '../../organisms/Navigation'
 import {
   getPinnedProtocolIds,
   getProtocolsOnDeviceSortKey,
   updateConfigValue,
+  useFeatureFlag,
 } from '../../redux/config'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { sortProtocols } from './utils'
@@ -56,6 +57,8 @@ export function ProtocolDashboard(): JSX.Element {
   // The pinned protocols are stored as an array of IDs in config
   const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinnedProtocols: ProtocolResource[] = []
+
+  const enableQuickTransferFF = useFeatureFlag('enableQuickTransfer')
 
   // We only need to grab out the pinned protocol data once all the protocols load
   // and if we have pinned ids stored in config.
@@ -272,6 +275,15 @@ export function ProtocolDashboard(): JSX.Element {
           ) : null}
         </Box>
       </Flex>
+      {enableQuickTransferFF && (
+        <FloatingActionButton
+          buttonText={t('quick_transfer')}
+          iconName="plus"
+          onClick={() => {
+            console.log('launch quick transfer flow')
+          }}
+        />
+      )}
     </>
   )
 }

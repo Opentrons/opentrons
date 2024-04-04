@@ -18,6 +18,7 @@ from opentrons.protocol_engine import (
     Liquid,
     CommandNote,
 )
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 from opentrons_shared_data.errors import GeneralError
 from robot_server.service.json_api import ResourceModel
 from robot_server.errors.error_responses import ErrorDetails
@@ -211,6 +212,10 @@ class RunCreate(BaseModel):
     labwareOffsets: List[LabwareOffsetCreate] = Field(
         default_factory=list,
         description="Labware offsets to apply as labware are loaded.",
+    )
+    runTimeParameterValues: Optional[RunTimeParamValuesType] = Field(
+        None,
+        description="Key-value pairs of run-time parameters defined in a protocol.",
     )
 
 

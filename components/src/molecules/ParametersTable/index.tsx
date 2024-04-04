@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
+import { formatRunTimeParameterDefaultValue } from '@opentrons/shared-data'
 import { BORDERS } from '../../helix-design-system'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
 import { StyledText } from '../../atoms/StyledText'
@@ -32,7 +32,7 @@ export function ParametersTable({
       case 'int':
       case 'float':
         return minMax
-      case 'boolean':
+      case 'bool':
         return t != null ? t('on_off') : 'On, off'
       case 'str':
         if (count > 2) {
@@ -69,7 +69,7 @@ export function ParametersTable({
               </StyledTableCell>
               <StyledTableCell isLast={index === runTimeParameters.length - 1}>
                 <StyledText as="p">
-                  {formatRunTimeParameterValue(parameter, t)}
+                  {formatRunTimeParameterDefaultValue(parameter, t)}
                 </StyledText>
               </StyledTableCell>
               <StyledTableCell isLast={index === runTimeParameters.length - 1}>

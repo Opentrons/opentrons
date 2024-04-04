@@ -73,7 +73,6 @@ import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 import { ProtocolParameters } from './ProtocolParameters'
-import { useRunTimeParameters } from '../../pages/Protocols/hooks'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -201,9 +200,12 @@ export function ProtocolDetails(
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const enableProtocolStats = useFeatureFlag('protocolStats')
   const enableRunTimeParameters = useFeatureFlag('enableRunTimeParameters')
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  const hasRunTimeParameters =
+    enableRunTimeParameters && runTimeParameters.length > 0
   const [currentTab, setCurrentTab] = React.useState<
     'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
-  >('robot_config')
+  >(hasRunTimeParameters ? 'parameters' : 'robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
     setShowChooseRobotToRunProtocolSlideout,
@@ -217,8 +219,6 @@ export function ProtocolDetails(
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
-
-  const runTimeParameters = useRunTimeParameters(protocolKey)
 
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
@@ -394,7 +394,6 @@ export function ProtocolDetails(
             onCloseClick={() => setShowChooseRobotToRunProtocolSlideout(false)}
             showSlideout={showChooseRobotToRunProtocolSlideout}
             storedProtocolData={props}
-            runTimeParameters={runTimeParameters}
           />
           <SendProtocolToFlexSlideout
             isExpanded={showSendProtocolToFlexSlideout}

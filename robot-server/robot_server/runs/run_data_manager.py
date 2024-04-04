@@ -1,6 +1,6 @@
 """Manage current and historical run data."""
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional, Callable, Union
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
@@ -12,6 +12,7 @@ from opentrons.protocol_engine import (
     CurrentCommand,
     Command,
 )
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
@@ -142,6 +143,8 @@ class RunDataManager:
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
+        run_time_param_values: Optional[RunTimeParamValuesType],
+        notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
     ) -> Union[Run, BadRun]:
         """Create a new, current run.
@@ -150,6 +153,10 @@ class RunDataManager:
             run_id: Identifier to assign the new run.
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
+            deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
+            notify_publishers: Utilized by the engine to notify publishers of state changes.
+            run_time_param_values: Any runtime parameter values to set.
+            protocol: The protocol to load the runner with, if any.
 
         Returns:
             The run resource.
@@ -171,6 +178,8 @@ class RunDataManager:
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
             protocol=protocol,
+            run_time_param_values=run_time_param_values,
+            notify_publishers=notify_publishers,
         )
         run_resource = self._run_store.insert(
             run_id=run_id,

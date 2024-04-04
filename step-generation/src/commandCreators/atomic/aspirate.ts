@@ -18,6 +18,8 @@ import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schem
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
 export interface ExtendedAspirateParams extends AspirateParams {
+  xOffset: number
+  yOffset: number
   tipRack: string
 }
 /** Aspirate with given args. Requires tip. */
@@ -35,6 +37,8 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     flowRate,
     isAirGap,
     tipRack,
+    xOffset,
+    yOffset,
   } = args
   const actionName = 'aspirate'
   const errors: CommandCreatorError[] = []
@@ -208,6 +212,8 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
           origin: 'bottom',
           offset: {
             z: offsetFromBottomMm,
+            x: xOffset,
+            y: yOffset,
           },
         },
         flowRate,

@@ -614,7 +614,7 @@ interface BooleanParameter {
 }
 
 type NumberParameterType = 'int' | 'float'
-type BooleanParameterType = 'boolean'
+type BooleanParameterType = 'bool'
 type StringParameterType = 'str'
 type RunTimeParameterType =
   | NumberParameter

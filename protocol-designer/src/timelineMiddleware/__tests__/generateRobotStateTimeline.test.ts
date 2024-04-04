@@ -50,6 +50,10 @@ describe('generateRobotStateTimeline', () => {
           description: null,
           nozzles: null,
           tipRack: 'tiprack1Id',
+          aspirateXOffset: 0,
+          aspirateYOffset: 0,
+          dispenseXOffset: 0,
+          dispenseYOffset: 0,
         },
       },
       b: {
@@ -86,6 +90,10 @@ describe('generateRobotStateTimeline', () => {
           description: null,
           nozzles: null,
           tipRack: 'tiprack1Id',
+          aspirateXOffset: 0,
+          aspirateYOffset: 0,
+          dispenseXOffset: 0,
+          dispenseYOffset: 0,
         },
       },
       c: {
@@ -114,6 +122,10 @@ describe('generateRobotStateTimeline', () => {
           dispenseDelaySeconds: null,
           nozzles: null,
           tipRack: 'tiprack1Id',
+          aspirateXOffset: 0,
+          aspirateYOffset: 0,
+          dispenseXOffset: 0,
+          dispenseYOffset: 0,
         },
       },
     }

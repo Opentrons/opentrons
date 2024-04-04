@@ -18,14 +18,11 @@ export function useNotifyAllRunsQuery(
   options: QueryOptionsWithPolling<UseAllRunsQueryOptions, AxiosError> = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<Runs, AxiosError> {
-  const [
-    refetchUsingHTTP,
-    setRefetchUsingHTTP,
-  ] = React.useState<HTTPRefetchFrequency>(null)
+  const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
 
   useNotifyService<UseAllRunsQueryOptions, AxiosError>({
     topic: 'robot-server/runs',
-    setRefetchUsingHTTP,
+    setRefetch,
     options,
     hostOverride,
   })
@@ -34,11 +31,8 @@ export function useNotifyAllRunsQuery(
     params,
     {
       ...(options as UseAllRunsQueryOptions),
-      enabled: options?.enabled !== false && refetchUsingHTTP != null,
-      onSettled:
-        refetchUsingHTTP === 'once'
-          ? () => setRefetchUsingHTTP(null)
-          : () => null,
+      enabled: options?.enabled !== false && refetch != null,
+      onSettled: refetch === 'once' ? () => setRefetch(null) : () => null,
     },
     hostOverride
   )

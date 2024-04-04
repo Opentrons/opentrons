@@ -30,8 +30,12 @@ export function useCloneRun(
   })
   const cloneRun = (): void => {
     if (runRecord != null) {
-      const { protocolId, labwareOffsets } = runRecord.data
-      createRun({ protocolId, labwareOffsets })
+      const {
+        protocolId,
+        labwareOffsets,
+        runTimeParameterValues,
+      } = runRecord.data
+      createRun({ protocolId, labwareOffsets, runTimeParameterValues })
     } else {
       console.info('failed to clone run record, source run record not found')
     }

@@ -303,7 +303,7 @@ class ProtocolEngine:
             return
         running_or_next_queued_id = (
             self._state_store.commands.get_running_command_id()
-            or self._state_store.commands.state.queued_command_ids.head(None)
+            or self._state_store.commands.get_queue_ids().head(None)
             # TODO(mm, 2024-04-02): Is it possible for the next queued command to
             # be a setup command? That wouldn't show up in queued_command_ids.
         )
@@ -333,7 +333,7 @@ class ProtocolEngine:
             # OR setup commands, depending on whether we gave it a protocol or setup
             # command. We want both to be cleared in either case. So, do that here.
             running_or_next_queued_id = (
-                self._state_store.commands.state.queued_command_ids.head(None)
+                self._state_store.commands.state.commands.get_queue_ids().head(None)
             )
             if running_or_next_queued_id is not None:
                 running_or_next_queued = self._state_store.commands.get(
