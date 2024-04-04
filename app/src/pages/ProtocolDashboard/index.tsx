@@ -282,7 +282,6 @@ export function ProtocolDashboard(): JSX.Element {
           buttonText={t('quick_transfer')}
           iconName="plus"
           onClick={() => {
-            console.log('showing wizard')
             history.push('/quick-transfer')
           }}
         />
