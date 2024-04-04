@@ -21,6 +21,7 @@ import styles from './TipPositionInput.module.css'
 import * as utils from './utils'
 
 import type { StepFieldName } from '../../../../form-types'
+import { PDAlert } from '../../../alerts/PDAlert'
 
 type Offset = 'x' | 'y' | 'z'
 interface PositionSpec {
@@ -57,7 +58,9 @@ export const TipPositionModal = (
   const { t } = useTranslation(['modal', 'button'])
 
   if (zSpec == null || xSpec == null || ySpec == null) {
-    console.error('expected to find specs for the zPosition but could not')
+    console.error(
+      'expected to find specs for one of the positions but could not'
+    )
   }
 
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
@@ -218,6 +221,12 @@ export const TipPositionModal = (
   ): void => {
     handleYChange(e.currentTarget.value)
   }
+  const xValueNearEdge =
+    xValue != null &&
+    (parseInt(xValue) > 0.9 * xMaxWidth || parseInt(xValue) < 0.9 * xMinWidth)
+  const yValueNearEdge =
+    yValue != null &&
+    (parseInt(yValue) > 0.9 * yMaxWidth || parseInt(yValue) < 0.9 * yMinWidth)
 
   const TipPositionInputField = !isDefault ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -298,6 +307,17 @@ export const TipPositionModal = (
         <h4>{t('tip_position.title')}</h4>
         <p>{t(`tip_position.body.${zSpec?.name}`)}</p>
       </div>
+
+      {(xValueNearEdge || yValueNearEdge) && !isDefault ? (
+        <Flex marginTop={SPACING.spacing8}>
+          <PDAlert
+            alertType="warning"
+            title=""
+            description={t('tip_position.warning')}
+          />
+        </Flex>
+      ) : null}
+
       <div className={styles.main_row}>
         <Flex alignItems="flex-start">
           <Flex flexDirection={DIRECTION_COLUMN}>
