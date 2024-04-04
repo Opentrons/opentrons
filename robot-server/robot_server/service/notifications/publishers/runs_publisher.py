@@ -107,7 +107,7 @@ class RunsPublisher:
             )
             if self._engine_state_slice.current_command != current_command:
                 await self._publish_current_command()
-                self._previous_current_command = current_command
+                self._engine_state_slice.current_command = current_command
 
     async def _handle_engine_status_change(self) -> None:
         """Publish a refetch flag if the engine status has changed."""
@@ -122,7 +122,9 @@ class RunsPublisher:
                 != current_state_summary.status
             ):
                 await self._publish_runs_advise_refetch_async()
-                self._previous_state_summary_status = current_state_summary.status
+                self._engine_state_slice.state_summary_status = (
+                    current_state_summary.status
+                )
 
 
 _runs_publisher_accessor: AppStateAccessor[RunsPublisher] = AppStateAccessor[
