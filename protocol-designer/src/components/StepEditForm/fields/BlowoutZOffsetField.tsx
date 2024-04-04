@@ -5,12 +5,16 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import { InputField, Tooltip, useHoverTooltip } from '@opentrons/components'
+import {
+  COLORS,
+  Flex,
+  Icon,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 import { getLabwareEntities } from '../../../step-forms/selectors'
 import { ZTipPositionModal } from './TipPositionField/ZTipPositionModal'
 import type { FieldProps } from '../types'
-
-import styles from '../StepEditForm.module.css'
 
 interface BlowoutZOffsetFieldProps extends FieldProps {
   destLabwareId: unknown
@@ -27,7 +31,6 @@ export function BlowoutZOffsetField(
     destLabwareId,
     sourceLabwareId,
     blowoutLabwareId,
-    isIndeterminate,
     tooltipContent,
     name,
     updateValue,
@@ -61,19 +64,19 @@ export function BlowoutZOffsetField(
           wellDepthMm={labwareZDimension}
         />
       ) : null}
-      <div {...targetProps}>
-        <InputField
-          data-testid="BlowoutZOffsetField_inputField"
-          disabled={disabled}
-          className={styles.small_field}
-          readOnly
-          onClick={disabled ? undefined : () => setModalOpen(true)}
-          value={String(value)}
-          isIndeterminate={isIndeterminate}
-          units={t('units.millimeter')}
-          id={`BlowoutZOffsetField_${name}`}
+      <Flex
+        {...targetProps}
+        onClick={disabled ? undefined : () => setModalOpen(true)}
+        id={`BlowoutZOffsetField_${name}`}
+        data-testid={`BlowoutZOffsetField_${name}`}
+      >
+        <Icon
+          name="ot-calibrate"
+          size="1.5rem"
+          cursor="pointer"
+          color={disabled ? COLORS.grey30 : COLORS.grey50}
         />
-      </div>
+      </Flex>
     </>
   )
 }

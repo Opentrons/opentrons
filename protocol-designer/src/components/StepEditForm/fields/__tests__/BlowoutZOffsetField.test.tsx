@@ -44,14 +44,13 @@ describe('BlowoutZOffsetField', () => {
       <div>mock ZTipPositionModal</div>
     )
   })
-  it('renders the text and input field', () => {
+  it('renders the input field', () => {
     render(props)
-    screen.getByText('mm')
-    screen.getByRole('textbox', { name: '' })
+    screen.getByTestId('BlowoutZOffsetField_blowout_z_offset')
   })
   it('renders the modal when input field is clicked on', () => {
     render(props)
-    fireEvent.click(screen.getByRole('textbox', { name: '' }))
+    fireEvent.click(screen.getByTestId('BlowoutZOffsetField_blowout_z_offset'))
     screen.getByText('mock ZTipPositionModal')
   })
 })
