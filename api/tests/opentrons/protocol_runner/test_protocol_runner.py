@@ -1,4 +1,6 @@
 """Tests for the PythonAndLegacyRunner, JsonRunner & LiveRunner classes."""
+from datetime import datetime
+
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy, matchers
@@ -22,6 +24,7 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     Liquid,
     commands as pe_commands,
+    errors as pe_errors,
 )
 from opentrons.protocol_reader import (
     ProtocolSource,
@@ -391,7 +394,13 @@ async def test_run_json_runner_stop_requested_stops_enquqing(
             ),
         )
     ).then_return(
-        pe_commands.WaitForDuration.construct(status=pe_commands.CommandStatus.QUEUED)  # type: ignore[call-arg]
+        pe_commands.WaitForDuration.construct(  # type: ignore[call-arg]
+            error=pe_errors.ErrorOccurrence.from_failed(
+                id="some-id",
+                createdAt=datetime(year=2021, month=1, day=1),
+                error=pe_errors.ProtocolEngineError(),
+            )
+        )
     )
 
     await json_runner_subject.load(json_protocol_source)
@@ -411,18 +420,9 @@ async def test_run_json_runner_stop_requested_stops_enquqing(
 
     # Verify that the run func calls the right things:
     run_func = run_func_captor.value
-    await run_func()
 
-    decoy.verify(
-        await protocol_engine.add_and_execute_command(
-            pe_commands.LoadLiquidCreate(
-                params=pe_commands.LoadLiquidParams(
-                    liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
-                )
-            )
-        ),
-        times=0,
-    )
+    with pytest.raises(pe_errors.ProtocolEngineError):
+        await run_func()
 
 
 @pytest.mark.parametrize(

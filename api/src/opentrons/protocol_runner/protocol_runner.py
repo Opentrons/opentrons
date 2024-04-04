@@ -357,7 +357,6 @@ class JsonRunner(AbstractRunner):
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
     async def _add_command_and_execute(self) -> None:
-        print(self._queued_commands)
         for command in self._queued_commands:
             result = await self._protocol_engine.add_and_execute_command(command)
             if result and result.error:
@@ -365,8 +364,6 @@ class JsonRunner(AbstractRunner):
                     original_error=result.error,
                     message=f"{result.error.errorType}: {result.error.detail}",
                 )
-            elif result.status == pe_commands.CommandStatus.QUEUED:
-                break
 
 
 class LiveRunner(AbstractRunner):
