@@ -18,7 +18,7 @@ interface SendToBrowserParams {
 }
 
 const VALID_NOTIFY_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
-  { refetchUsingHTTP: true },
+  { refetch: true },
   { unsubscribe: true },
 ]
 
