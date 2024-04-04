@@ -1,13 +1,13 @@
 import * as React from 'react'
+import { describe, it, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { fixture96Plate } from '@opentrons/shared-data'
 import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
-import { describe, it, vi, beforeEach } from 'vitest'
-import { BlowoutZOffsetField } from '../BlowoutZOffsetField'
 import { getLabwareEntities } from '../../../../step-forms/selectors'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
 import { ZTipPositionModal } from '../TipPositionField/ZTipPositionModal'
+import { BlowoutZOffsetField } from '../BlowoutZOffsetField'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../../../../step-forms/selectors')

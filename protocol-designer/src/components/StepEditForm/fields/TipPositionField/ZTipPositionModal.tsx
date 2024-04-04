@@ -52,10 +52,11 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
       })
 
   const [value, setValue] = React.useState<string | null>(
-    zValue === null ? null : String(zValue)
+    zValue !== null ? String(zValue) : null
   )
+  const isSetDefault = isBlowout ? zValue === 0 : zValue === null
   const [isDefault, setIsDefault] = React.useState<boolean>(
-    !isIndeterminate && (isBlowout ? zValue === 0 : zValue === null)
+    !isIndeterminate && isSetDefault
   )
   // in this modal, pristinity hides the OUT_OF_BOUNDS error only.
   const [isPristine, setPristine] = React.useState<boolean>(true)

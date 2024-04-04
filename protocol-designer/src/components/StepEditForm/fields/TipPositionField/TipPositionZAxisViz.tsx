@@ -14,19 +14,14 @@ interface TipPositionZAxisVizProps {
   mmFromTop?: number
 }
 
-export const TipPositionZAxisViz = (
+export function TipPositionZAxisViz(
   props: TipPositionZAxisVizProps
-): JSX.Element => {
+): JSX.Element {
   const { mmFromBottom, mmFromTop, wellDepthMm } = props
-  let positionInTube = 0
-  if (mmFromBottom != null) {
-    positionInTube = mmFromBottom
-  } else if (mmFromTop != null) {
-    positionInTube = mmFromTop
-  }
+  const positionInTube = mmFromBottom ?? mmFromTop ?? 0
   const fractionOfWellHeight = positionInTube / wellDepthMm
   const pixelsFromBottom =
-    Number(fractionOfWellHeight) * WELL_HEIGHT_PIXELS -
+    fractionOfWellHeight * WELL_HEIGHT_PIXELS -
     (mmFromBottom != null ? WELL_HEIGHT_PIXELS : 0)
   const bottomPx = round(pixelsFromBottom, PIXEL_DECIMALS)
 

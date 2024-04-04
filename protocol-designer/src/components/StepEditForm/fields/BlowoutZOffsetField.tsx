@@ -12,15 +12,15 @@ import type { FieldProps } from '../types'
 
 import styles from '../StepEditForm.module.css'
 
-type BlowoutZOffsetFieldProps = FieldProps & {
+interface BlowoutZOffsetFieldProps extends FieldProps {
   destLabwareId: unknown
   sourceLabwareId?: unknown
   blowoutLabwareId?: unknown
 }
 
-export const BlowoutZOffsetField = (
+export function BlowoutZOffsetField(
   props: BlowoutZOffsetFieldProps
-): JSX.Element => {
+): JSX.Element {
   const {
     disabled,
     value,
@@ -67,7 +67,7 @@ export const BlowoutZOffsetField = (
           disabled={disabled}
           className={styles.small_field}
           readOnly
-          onClick={disabled ? () => {} : () => setModalOpen(true)}
+          onClick={disabled ? undefined : () => setModalOpen(true)}
           value={String(value)}
           isIndeterminate={isIndeterminate}
           units={t('units.millimeter')}
