@@ -1,0 +1,12 @@
+{
+  "create_new_transfer": "Create new quick transfer",
+  "select_attached_pipette": "Select attached pipette",
+  "select_dest_labware": "Select destination labware",
+  "select_dest_wells": "Select destination wells",
+  "select_source_labware": "Select source labware",
+  "select_source_wells": "Select source wells",
+  "select_tip_rack": "Select tip rack",
+  "set_aspirate_volume": "Set aspirate volume",
+  "set_dispense_volume": "Set dispense volume",
+  "set_transfer_volume": "Set transfer volume"
+}

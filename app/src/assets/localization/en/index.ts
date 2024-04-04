@@ -22,6 +22,7 @@ import protocol_details from './protocol_details.json'
 import protocol_info from './protocol_info.json'
 import protocol_list from './protocol_list.json'
 import protocol_setup from './protocol_setup.json'
+import quick_transfer from './quick_transfer.json'
 import robot_advanced_settings from './robot_advanced_settings.json'
 import robot_calibration from './robot_calibration.json'
 import robot_connection from './robot_connection.json'
@@ -55,6 +56,7 @@ export const en = {
   protocol_info,
   protocol_list,
   protocol_setup,
+  quick_transfer,
   robot_advanced_settings,
   robot_calibration,
   robot_connection,
