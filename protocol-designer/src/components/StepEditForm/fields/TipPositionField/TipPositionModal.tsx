@@ -138,9 +138,14 @@ export const TipPositionModal = (
     return utils.getErrorText({ errors, minMm: min, maxMm: max, isPristine, t })
   }
 
+  const roundedXMin = utils.roundValue(xMinWidth)
+  const roundedYMin = utils.roundValue(yMinWidth)
+  const roundedXMax = utils.roundValue(xMaxWidth)
+  const roundedYMax = utils.roundValue(yMaxWidth)
+
   const zErrorText = createErrorText(zErrors, minMmFromBottom, maxMmFromBottom)
-  const xErrorText = createErrorText(xErrors, xMinWidth, xMaxWidth)
-  const yErrorText = createErrorText(yErrors, yMinWidth, yMaxWidth)
+  const xErrorText = createErrorText(xErrors, roundedXMin, roundedXMax)
+  const yErrorText = createErrorText(yErrors, roundedYMin, roundedYMax)
 
   const handleDone = (): void => {
     setPristine(false)
@@ -238,8 +243,8 @@ export const TipPositionModal = (
         </StyledText>
         <InputField
           caption={t('tip_position.caption', {
-            min: xMinWidth,
-            max: xMaxWidth,
+            min: roundedXMin,
+            max: roundedXMax,
           })}
           error={xErrorText}
           className={styles.position_from_bottom_input}
@@ -255,8 +260,8 @@ export const TipPositionModal = (
         </StyledText>
         <InputField
           caption={t('tip_position.caption', {
-            min: yMinWidth,
-            max: yMaxWidth,
+            min: roundedYMin,
+            max: roundedYMax,
           })}
           error={yErrorText}
           className={styles.position_from_bottom_input}
