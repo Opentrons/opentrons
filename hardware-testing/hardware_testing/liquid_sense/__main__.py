@@ -291,7 +291,7 @@ if __name__ == "__main__":
             execute.run(tip, run_args)
     except Exception as e:
         ui.print_info(f"got error {e}")
-        print(traceback.format_exc())
+        ui.print_info(traceback.format_exc())
     finally:
         if run_args.recorder is not None:
             ui.print_info("ending recording")

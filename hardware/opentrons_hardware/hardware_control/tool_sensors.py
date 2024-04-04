@@ -119,10 +119,8 @@ def _build_pass_step(
         present_nodes=pipette_nodes,
         stop_condition=MoveStopCondition.sensor_report,
     )
-    print(f"Move group for probe {move_group}")
     for node in pipette_nodes:
         move_group[node] = pipette_move[node]
-    print(f"Move group for probe {move_group}")
     return move_group
 
 

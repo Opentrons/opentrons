@@ -213,7 +213,7 @@ def run(tip: int, run_args: RunArgs) -> None:
         if trial % trials_before_jog == 0:
             tip_offset = _get_baseline()
 
-        print(f"Picking up {tip}ul tip")
+        ui.print_info(f"Picking up {tip}ul tip")
         run_args.pipette.pick_up_tip(tips.pop(0))
         run_args.pipette.move_to(test_well.top())
 
@@ -228,7 +228,7 @@ def run(tip: int, run_args: RunArgs) -> None:
             run_args.pipette.move_to(dial_well.top())
             tip_length_offset = tip_offset - run_args.dial_indicator.read_stable()
             run_args.pipette._retract()
-            print(f"Tip Offset  {tip_length_offset}")
+            ui.print_info(f"Tip Offset  {tip_length_offset}")
 
         ui.print_info("Droping tip")
         if run_args.return_tip:
