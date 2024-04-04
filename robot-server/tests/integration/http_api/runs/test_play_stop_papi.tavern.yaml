@@ -39,7 +39,7 @@ stages:
     response:
       status_code: 201
 
-  - name: Wait for the run to complete
+  - name: Wait for the command to run
     max_retries: 10
     delay_after: 0.2
     request:
