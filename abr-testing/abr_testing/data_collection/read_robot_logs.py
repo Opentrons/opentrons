@@ -5,13 +5,217 @@ and uploading to a google sheet using credentials and google_sheets_tools module
 saved in a local directory.
 """
 import csv
-import datetime
+from datetime import datetime
 import os
 from abr_testing.data_collection.error_levels import ERROR_LEVELS_PATH
 from typing import List, Dict, Any, Tuple, Set
 import time as t
 import json
 import requests
+
+
+def command_time(command: Dict[str, str]) -> Tuple[float, float]:
+    """Calculate total create and complete time per command."""
+    try:
+        create_time = datetime.strptime(
+            command.get("createdAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+        )
+        start_time = datetime.strptime(
+            command.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+        )
+        complete_time = datetime.strptime(
+            command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+        )
+        create_to_start = (start_time - create_time).total_seconds()
+        start_to_complete = (complete_time - start_time).total_seconds()
+    except ValueError:
+        create_to_start = 0
+        start_to_complete = 0
+    return create_to_start, start_to_complete
+
+
+def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
+    """Gets total latch engagements, homes, rotations and total on time (sec) for heater shaker."""
+    # TODO: modify for cases that have more than 1 heater shaker.
+    commandData = file_results.get("commands", "")
+    hs_latch_count: float = 0.0
+    hs_temp: float = 0.0
+    hs_home_count: float = 0.0
+    hs_speed: float = 0.0
+    hs_rotations: Dict[str, float] = dict()
+    hs_temps: Dict[str, float] = dict()
+    temp_time = None
+    shake_time = None
+    for command in commandData:
+        commandType = command["commandType"]
+        # Heatershaker
+        # Latch count
+        if (
+            commandType == "heaterShaker/closeLabwareLatch"
+            or commandType == "heaterShaker/openLabwareLatch"
+        ):
+            hs_latch_count += 1
+        # Home count
+        elif commandType == "heaterShaker/deactivateShaker":
+            hs_home_count += 1
+            deactivate_time = datetime.strptime(
+                command.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+            if temp_time is not None and deactivate_time > temp_time:
+                temp_duration = (deactivate_time - temp_time).total_seconds()
+                hs_temps[hs_temp] = hs_temps.get(hs_temp, 0.0) + temp_duration
+            if shake_time is not None and deactivate_time > shake_time:
+                shake_duration = (deactivate_time - shake_time).total_seconds()
+                hs_rotations[hs_speed] = hs_rotations.get(hs_speed, 0.0) + (
+                    (hs_speed * shake_duration) / 60
+                )
+        # of Rotations
+        elif commandType == "heaterShaker/setAndWaitForShakeSpeed":
+            hs_speed = command["params"]["rpm"]
+            shake_time = datetime.strptime(
+                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+        # On Time
+        elif commandType == "heaterShaker/setTargetTemperature":
+            # if heater shaker temp is not deactivated.
+            hs_temp = command["params"]["celsius"]
+            temp_time = datetime.strptime(
+                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+
+    hs_total_rotations = sum(hs_rotations.values())
+    hs_total_temp_time = sum(hs_temps.values())
+    hs_dict = {
+        "Heatershaker # of Latch Engagements": hs_latch_count,
+        "Heatershaker # of Homes": hs_home_count,
+        "Heatershaker # of Rotations": hs_total_rotations,
+        "Heatershaker Temp On Time (sec)": hs_total_temp_time,
+    }
+    return hs_dict
+
+
+def temperature_module_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
+    """Get # of temp changes and total temp on time for temperature module from run log."""
+    # TODO: modify for cases that have more than 1 temperature module.
+    tm_temp_change = 0
+    tm_temps: Dict[str, float] = dict()
+    temp_time = None
+    deactivate_time = None
+    commandData = file_results.get("commands", "")
+    for command in commandData:
+        commandType = command["commandType"]
+        if commandType == "temperatureModule/setTargetTemperature":
+            tm_temp = command["params"]["celsius"]
+            tm_temp_change += 1
+        if commandType == "temperatureModule/waitForTemperature":
+            temp_time = datetime.strptime(
+                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+        if commandType == "temperatureModule/deactivate":
+            deactivate_time = datetime.strptime(
+                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+            if temp_time is not None and deactivate_time > temp_time:
+                temp_duration = (deactivate_time - temp_time).total_seconds()
+                tm_temps[tm_temp] = tm_temps.get(tm_temp, 0.0) + temp_duration
+    if temp_time is not None and deactivate_time is None:
+        # If temperature module is not deactivated, protocol completedAt time stamp used.
+        protocol_end = datetime.strptime(
+            file_results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+        )
+        temp_duration = (protocol_end - temp_time).total_seconds()
+        tm_temps[tm_temp] = tm_temps.get(tm_temp, 0.0) + temp_duration
+    tm_total_temp_time = sum(tm_temps.values())
+    tm_dict = {
+        "Temp Module # of Temp Changes": tm_temp_change,
+        "Temp Module Temp On Time (sec)": tm_total_temp_time,
+    }
+    return tm_dict
+
+
+def thermocycler_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
+    """Counts # of lid engagements, temp changes, and temp sustaining mins."""
+    # TODO: modify for cases that have more than 1 thermocycler.
+    commandData = file_results.get("commands", "")
+    lid_engagements: float = 0.0
+    block_temp_changes: float = 0.0
+    lid_temp_changes: float = 0.0
+    lid_temps: Dict[str, float] = dict()
+    block_temps: Dict[str, float] = dict()
+    lid_on_time = None
+    lid_off_time = None
+    block_on_time = None
+    block_off_time = None
+    for command in commandData:
+        commandType = command["commandType"]
+        if (
+            commandType == "thermocycler/openLid"
+            or commandType == "thermocycler/closeLid"
+        ):
+            lid_engagements += 1
+        if commandType == "thermocycler/setTargetBlockTemperature":
+            block_temp = command["params"]["celsius"]
+            block_temp_changes += 1
+            block_on_time = datetime.strptime(
+                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+        if commandType == "thermocycler/setTargetLidTemperature":
+            lid_temp_changes += 1
+            lid_temp = command["params"]["celsius"]
+            lid_on_time = datetime.strptime(
+                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+        if commandType == "thermocycler/deactivateLid":
+            lid_off_time = datetime.strptime(
+                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+            if lid_on_time is not None and lid_off_time > lid_on_time:
+                lid_duration = (lid_off_time - lid_on_time).total_seconds()
+                lid_temps[lid_temp] = lid_temps.get(lid_temp, 0.0) + lid_duration
+        if commandType == "thermocycler/deactivateBlock":
+            block_off_time = datetime.strptime(
+                command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+            if block_on_time is not None and block_off_time > block_on_time:
+                block_duration = (block_off_time - block_on_time).total_seconds()
+                block_temps[block_temp] = (
+                    block_temps.get(block_temp, 0.0) + block_duration
+                )
+        if commandType == "thermocycler/runProfile":
+            profile = command["params"]["profile"]
+            total_changes = len(profile)
+            block_temp_changes += total_changes
+            for cycle in profile:
+                block_temp = cycle["celsius"]
+                block_time = cycle["holdSeconds"]
+                block_temps[block_temp] = block_temps.get(block_temp, 0.0) + block_time
+    if block_on_time is not None and block_off_time is None:
+        # If thermocycler block not deactivated protocol completedAt time stamp used
+        protocol_end = datetime.strptime(
+            file_results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+        )
+        temp_duration = (protocol_end - block_on_time).total_seconds()
+        block_temps[block_temp] = block_temps.get(block_temp, 0.0) + temp_duration
+    if lid_on_time is not None and lid_off_time is None:
+        # If thermocycler lid not deactivated protocol completedAt time stamp used
+        protocol_end = datetime.strptime(
+            file_results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+        )
+        temp_duration = (protocol_end - lid_on_time).total_seconds()
+        lid_temps[lid_temp] = block_temps.get(lid_temp, 0.0) + temp_duration
+
+    block_total_time = sum(block_temps.values())
+    lid_total_time = sum(lid_temps.values())
+
+    tc_dict = {
+        "Thermocycler # of Lid Engagements": lid_engagements,
+        "Thermocycler Block # of Temp Changes": block_temp_changes,
+        "Thermocycler Block Temp On Time (sec)": block_total_time,
+        "Thermocycler Lid # of Temp Changes": lid_temp_changes,
+        "Thermocycler Lid Temp On Time (sec)": lid_total_time,
+    }
+
+    return tc_dict
 
 
 def create_abr_data_sheet(
@@ -112,7 +316,7 @@ def read_abr_data_sheet(
                 runs_in_sheet.add(run_id)
         print(f"There are {str(len(runs_in_sheet))} runs documented in the ABR sheet.")
     # Read Google Sheet
-    google_sheet.check_token()
+    google_sheet.token_check()
     google_sheet.write_header(headers)
     google_sheet.update_row_index()
     return runs_in_sheet
@@ -189,7 +393,7 @@ def get_calibration_offsets(
     health_data = response.json()
     robot_name = health_data.get("name", "")
     api_version = health_data.get("api_version", "")
-    pull_date_timestamp = datetime.datetime.now()
+    pull_date_timestamp = datetime.now()
     date = pull_date_timestamp.date().isoformat()
     file_date = str(pull_date_timestamp).replace(":", "").split(".")[0]
     calibration["Robot"] = robot_name
@@ -219,5 +423,7 @@ def get_calibration_offsets(
     )
     deck: Dict[str, Any] = response.json()
     calibration["Deck"] = deck.get("deckCalibration", "")
-    saved_file_path = save_run_log_to_json(ip, calibration, storage_directory)
+    save_name = ip + "_calibration.json"
+    saved_file_path = os.path.join(storage_directory, save_name)
+    json.dump(calibration, open(saved_file_path, mode="w"))
     return saved_file_path, calibration
