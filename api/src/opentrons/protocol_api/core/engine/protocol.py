@@ -703,9 +703,7 @@ class ProtocolCore(
             _id=liquid.id,
             name=liquid.displayName,
             description=liquid.description,
-            display_color=(
-                liquid.displayColor.__root__ if liquid.displayColor else None
-            ),
+            display_color=(liquid.displayColor.root if liquid.displayColor else None),
         )
 
     def get_labware_location(

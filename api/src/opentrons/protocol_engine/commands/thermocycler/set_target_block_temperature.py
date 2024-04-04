@@ -106,7 +106,7 @@ class SetTargetBlockTemperature(
         "thermocycler/setTargetBlockTemperature"
     )
     params: SetTargetBlockTemperatureParams
-    result: Optional[SetTargetBlockTemperatureResult]
+    result: Optional[SetTargetBlockTemperatureResult] = None
 
     _ImplementationCls: Type[
         SetTargetBlockTemperatureImpl

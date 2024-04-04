@@ -46,7 +46,7 @@ class WaitForDuration(BaseCommand[WaitForDurationParams, WaitForDurationResult])
 
     commandType: WaitForDurationCommandType = "waitForDuration"
     params: WaitForDurationParams
-    result: Optional[WaitForDurationResult]
+    result: Optional[WaitForDurationResult] = None
 
     _ImplementationCls: Type[
         WaitForDurationImplementation

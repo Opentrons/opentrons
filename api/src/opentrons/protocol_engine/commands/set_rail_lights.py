@@ -46,7 +46,7 @@ class SetRailLights(BaseCommand[SetRailLightsParams, SetRailLightsResult]):
 
     commandType: SetRailLightsCommandType = "setRailLights"
     params: SetRailLightsParams
-    result: Optional[SetRailLightsResult]
+    result: Optional[SetRailLightsResult] = None
 
     _ImplementationCls: Type[SetRailLightsImplementation] = SetRailLightsImplementation
 

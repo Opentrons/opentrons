@@ -68,7 +68,7 @@ class SetStatusBar(BaseCommand[SetStatusBarParams, SetStatusBarResult]):
 
     commandType: SetStatusBarCommandType = "setStatusBar"
     params: SetStatusBarParams
-    result: Optional[SetStatusBarResult]
+    result: Optional[SetStatusBarResult] = None
 
     _ImplementationCls: Type[SetStatusBarImplementation] = SetStatusBarImplementation
 

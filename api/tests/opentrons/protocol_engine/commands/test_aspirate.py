@@ -111,9 +111,7 @@ async def test_aspirate_implementation_with_prep(
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="abc")).then_return(False)
 
     decoy.when(state_view.pipettes.get(pipette_id="abc")).then_return(
-        LoadedPipette.construct(  # type:ignore[call-arg]
-            mount=MountType.LEFT
-        )
+        LoadedPipette.construct(mount=MountType.LEFT)
     )
     decoy.when(
         await movement.move_to_well(

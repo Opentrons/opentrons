@@ -53,7 +53,7 @@ def test_add_labware_definition(
     subject: SyncClient,
 ) -> None:
     """It should add a labware definition."""
-    labware_definition = LabwareDefinition.construct(namespace="hello")  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition.construct(namespace="hello")
     expected_labware_uri = LabwareUri("hello/world/123")
 
     decoy.when(
@@ -91,7 +91,7 @@ def test_add_liquid(
     subject: SyncClient,
 ) -> None:
     """It should add a liquid to engine state."""
-    liquid = Liquid.construct(displayName="water")  # type: ignore[call-arg]
+    liquid = Liquid.construct(displayName="water")
 
     decoy.when(
         transport.call_method(

@@ -27,7 +27,7 @@ from ..pipette_fixtures import (
     get_default_nozzle_map,
 )
 
-_tip_rack_parameters = LabwareParameters.construct(isTiprack=True)  # type: ignore[call-arg]
+_tip_rack_parameters = LabwareParameters.construct(isTiprack=True)
 
 
 @pytest.fixture
@@ -39,7 +39,7 @@ def subject() -> TipStore:
 @pytest.fixture
 def labware_definition() -> LabwareDefinition:
     """Get a labware definition value object."""
-    return LabwareDefinition.construct(  # type: ignore[call-arg]
+    return LabwareDefinition.construct(
         ordering=[
             ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
             ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
@@ -61,7 +61,7 @@ def labware_definition() -> LabwareDefinition:
 @pytest.fixture
 def load_labware_command(labware_definition: LabwareDefinition) -> commands.LoadLabware:
     """Get a load labware command value object."""
-    return commands.LoadLabware.construct(  # type: ignore[call-arg]
+    return commands.LoadLabware.construct(
         result=commands.LoadLabwareResult.construct(
             labwareId="cool-labware",
             definition=labware_definition,
@@ -72,7 +72,7 @@ def load_labware_command(labware_definition: LabwareDefinition) -> commands.Load
 @pytest.fixture
 def pick_up_tip_command() -> commands.PickUpTip:
     """Get a pick-up tip command value object."""
-    return commands.PickUpTip.construct(  # type: ignore[call-arg]
+    return commands.PickUpTip.construct(
         params=commands.PickUpTipParams.construct(
             pipetteId="pipette-id",
             labwareId="cool-labware",
@@ -87,7 +87,7 @@ def pick_up_tip_command() -> commands.PickUpTip:
 @pytest.fixture
 def drop_tip_command() -> commands.DropTip:
     """Get a drop tip command value object."""
-    return commands.DropTip.construct(  # type: ignore[call-arg]
+    return commands.DropTip.construct(
         params=commands.DropTipParams.construct(
             pipetteId="pipette-id",
             labwareId="cool-labware",
@@ -100,7 +100,7 @@ def drop_tip_command() -> commands.DropTip:
 @pytest.fixture
 def drop_tip_in_place_command() -> commands.DropTipInPlace:
     """Get a drop tip in place command object."""
-    return commands.DropTipInPlace.construct(  # type: ignore[call-arg]
+    return commands.DropTipInPlace.construct(
         params=commands.DropTipInPlaceParams.construct(
             pipetteId="pipette-id",
         ),
@@ -110,9 +110,7 @@ def drop_tip_in_place_command() -> commands.DropTipInPlace:
 
 @pytest.mark.parametrize(
     "labware_definition",
-    [
-        LabwareDefinition.construct(ordering=[], parameters=_tip_rack_parameters)  # type: ignore[call-arg]
-    ],
+    [LabwareDefinition.construct(ordering=[], parameters=_tip_rack_parameters)],
 )
 def test_get_next_tip_returns_none(
     load_labware_command: commands.LoadLabware,
@@ -123,7 +121,7 @@ def test_get_next_tip_returns_none(
     subject.handle_action(
         actions.SucceedCommandAction(private_result=None, command=load_labware_command)
     )
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     load_pipette_private_result = commands.LoadPipettePrivateResult(
@@ -176,7 +174,7 @@ def test_get_next_tip_returns_first_tip(
     subject.handle_action(
         actions.SucceedCommandAction(private_result=None, command=load_labware_command)
     )
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     pipette_name_type = PipetteNameType.P1000_96
@@ -237,7 +235,7 @@ def test_get_next_tip_used_starting_tip(
     subject.handle_action(
         actions.SucceedCommandAction(private_result=None, command=load_labware_command)
     )
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     load_pipette_private_result = commands.LoadPipettePrivateResult(
@@ -307,7 +305,7 @@ def test_get_next_tip_skips_picked_up_tip(
     subject.handle_action(
         actions.SucceedCommandAction(private_result=None, command=load_labware_command)
     )
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     channels_num = input_tip_amount
@@ -379,7 +377,7 @@ def test_get_next_tip_with_starting_tip(
     subject.handle_action(
         actions.SucceedCommandAction(private_result=None, command=load_labware_command)
     )
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     load_pipette_private_result = commands.LoadPipettePrivateResult(
@@ -419,7 +417,7 @@ def test_get_next_tip_with_starting_tip(
 
     assert result == "B2"
 
-    pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
+    pick_up_tip = commands.PickUpTip.construct(
         params=commands.PickUpTipParams.construct(
             pipetteId="pipette-id",
             labwareId="cool-labware",
@@ -453,7 +451,7 @@ def test_get_next_tip_with_starting_tip_8_channel(
     subject.handle_action(
         actions.SucceedCommandAction(private_result=None, command=load_labware_command)
     )
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     load_pipette_private_result = commands.LoadPipettePrivateResult(
@@ -494,7 +492,7 @@ def test_get_next_tip_with_starting_tip_8_channel(
 
     assert result == "A2"
 
-    pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
+    pick_up_tip = commands.PickUpTip.construct(
         params=commands.PickUpTipParams.construct(
             pipetteId="pipette-id",
             labwareId="cool-labware",
@@ -528,7 +526,7 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
     subject.handle_action(
         actions.SucceedCommandAction(private_result=None, command=load_labware_command)
     )
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     load_pipette_private_result = commands.LoadPipettePrivateResult(
@@ -569,7 +567,7 @@ def test_get_next_tip_with_starting_tip_out_of_tips(
 
     assert result == "H12"
 
-    pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
+    pick_up_tip = commands.PickUpTip.construct(
         params=commands.PickUpTipParams.construct(
             pipetteId="pipette-id",
             labwareId="cool-labware",
@@ -603,7 +601,7 @@ def test_get_next_tip_with_column_and_starting_tip(
     subject.handle_action(
         actions.SucceedCommandAction(private_result=None, command=load_labware_command)
     )
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     load_pipette_private_result = commands.LoadPipettePrivateResult(
@@ -655,7 +653,7 @@ def test_reset_tips(
     subject.handle_action(
         actions.SucceedCommandAction(private_result=None, command=load_labware_command)
     )
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     load_pipette_private_result = commands.LoadPipettePrivateResult(
@@ -707,7 +705,7 @@ def test_handle_pipette_config_action(
     subject: TipStore, supported_tip_fixture: pipette_definition.SupportedTipsDefinition
 ) -> None:
     """Should add pipette channel to state."""
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     load_pipette_private_result = commands.LoadPipettePrivateResult(
@@ -746,9 +744,9 @@ def test_handle_pipette_config_action(
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
+        LabwareDefinition.construct(
             ordering=[["A1"]],
-            parameters=LabwareParameters.construct(isTiprack=False),  # type: ignore[call-arg]
+            parameters=LabwareParameters.construct(isTiprack=False),
         )
     ],
 )
@@ -790,7 +788,7 @@ def test_drop_tip(
     subject.handle_action(
         actions.SucceedCommandAction(private_result=None, command=load_labware_command)
     )
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     load_pipette_private_result = commands.LoadPipettePrivateResult(
@@ -895,7 +893,7 @@ def test_active_channels(
 ) -> None:
     """Should update active channels after pipette configuration change."""
     # Load pipette to update state
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     load_pipette_private_result = commands.LoadPipettePrivateResult(
@@ -928,7 +926,7 @@ def test_active_channels(
     )
 
     # Configure nozzle for partial configuration
-    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
+    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(
         result=commands.ConfigureNozzleLayoutResult()
     )
     configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
@@ -960,7 +958,7 @@ def test_next_tip_uses_active_channels(
     )
 
     # Load pipette
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     load_pipette_private_result = commands.LoadPipettePrivateResult(
@@ -993,7 +991,7 @@ def test_next_tip_uses_active_channels(
     )
 
     # Configure nozzle for partial configuration
-    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
+    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(
         result=commands.ConfigureNozzleLayoutResult()
     )
     configure_nozzle_private_result = commands.ConfigureNozzleLayoutPrivateResult(
@@ -1040,7 +1038,7 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
     )
 
     # Load pipette
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
+    load_pipette_command = commands.LoadPipette.construct(
         result=commands.LoadPipetteResult(pipetteId="pipette-id")
     )
     load_pipette_private_result = commands.LoadPipettePrivateResult(
@@ -1081,7 +1079,7 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
         )
         assert result == well
 
-        pick_up_tip = commands.PickUpTip.construct(  # type: ignore[call-arg]
+        pick_up_tip = commands.PickUpTip.construct(
             params=commands.PickUpTipParams.construct(
                 pipetteId="pipette-id",
                 labwareId="cool-labware",
@@ -1097,7 +1095,7 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
         )
 
     # Configure nozzle for partial configurations
-    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(  # type: ignore[call-arg]
+    configure_nozzle_layout_cmd = commands.ConfigureNozzleLayout.construct(
         result=commands.ConfigureNozzleLayoutResult()
     )
 

@@ -57,7 +57,7 @@ class DeactivateLid(BaseCommand[DeactivateLidParams, DeactivateLidResult]):
 
     commandType: DeactivateLidCommandType = "thermocycler/deactivateLid"
     params: DeactivateLidParams
-    result: Optional[DeactivateLidResult]
+    result: Optional[DeactivateLidResult] = None
 
     _ImplementationCls: Type[DeactivateLidImpl] = DeactivateLidImpl
 

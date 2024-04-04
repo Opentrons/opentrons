@@ -26,6 +26,7 @@ log = logging.getLogger(__name__)
 def _convert_tip_length_model_to_dict(
     to_dict: typing.Dict[LabwareUri, v1.TipLengthModel]
 ) -> typing.Dict[LabwareUri, typing.Any]:
+    # TODO[pydantic]: supported in Pydantic V2
     # This is a workaround since pydantic doesn't have a nice way to
     # add encoders when converting to a dict.
     dict_of_tip_lengths = {}

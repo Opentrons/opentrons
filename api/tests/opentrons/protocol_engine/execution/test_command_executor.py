@@ -240,7 +240,7 @@ async def test_execute(
     class _TestCommand(BaseCommand[_TestCommandParams, _TestCommandResult]):
         commandType: str = "testCommand"
         params: _TestCommandParams
-        result: Optional[_TestCommandResult]
+        result: Optional[_TestCommandResult] = None
 
         @property
         def _ImplementationCls(self) -> Type[_TestCommandImpl]:
@@ -405,7 +405,7 @@ async def test_execute_raises_protocol_engine_error(
     class _TestCommand(BaseCommand[_TestCommandParams, _TestCommandResult]):
         commandType: str = "testCommand"
         params: _TestCommandParams
-        result: Optional[_TestCommandResult]
+        result: Optional[_TestCommandResult] = None
 
         @property
         def _ImplementationCls(self) -> Type[_TestCommandImpl]:

@@ -59,7 +59,7 @@ class MoveRelative(BaseCommand[MoveRelativeParams, MoveRelativeResult]):
 
     commandType: MoveRelativeCommandType = "moveRelative"
     params: MoveRelativeParams
-    result: Optional[MoveRelativeResult]
+    result: Optional[MoveRelativeResult] = None
 
     _ImplementationCls: Type[MoveRelativeImplementation] = MoveRelativeImplementation
 

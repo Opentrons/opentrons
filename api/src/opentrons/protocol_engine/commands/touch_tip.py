@@ -107,7 +107,7 @@ class TouchTip(BaseCommand[TouchTipParams, TouchTipResult]):
 
     commandType: TouchTipCommandType = "touchTip"
     params: TouchTipParams
-    result: Optional[TouchTipResult]
+    result: Optional[TouchTipResult] = None
 
     _ImplementationCls: Type[TouchTipImplementation] = TouchTipImplementation
 

@@ -63,7 +63,7 @@ class DeactivateShaker(BaseCommand[DeactivateShakerParams, DeactivateShakerResul
 
     commandType: DeactivateShakerCommandType = "heaterShaker/deactivateShaker"
     params: DeactivateShakerParams
-    result: Optional[DeactivateShakerResult]
+    result: Optional[DeactivateShakerResult] = None
 
     _ImplementationCls: Type[DeactivateShakerImpl] = DeactivateShakerImpl
 

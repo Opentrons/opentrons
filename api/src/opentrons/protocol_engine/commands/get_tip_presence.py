@@ -64,7 +64,7 @@ class GetTipPresence(BaseCommand[GetTipPresenceParams, GetTipPresenceResult]):
 
     commandType: GetTipPresenceCommandType = "getTipPresence"
     params: GetTipPresenceParams
-    result: Optional[GetTipPresenceResult]
+    result: Optional[GetTipPresenceResult] = None
 
     _ImplementationCls: Type[
         GetTipPresenceImplementation

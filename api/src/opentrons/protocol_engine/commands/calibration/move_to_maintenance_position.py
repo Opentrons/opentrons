@@ -147,7 +147,7 @@ class MoveToMaintenancePosition(
         "calibration/moveToMaintenancePosition"
     )
     params: MoveToMaintenancePositionParams
-    result: Optional[MoveToMaintenancePositionResult]
+    result: Optional[MoveToMaintenancePositionResult] = None
 
     _ImplementationCls: Type[
         MoveToMaintenancePositionImplementation

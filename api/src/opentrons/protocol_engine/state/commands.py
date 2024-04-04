@@ -238,7 +238,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     else (action.request_hash or action.command_id)
                 ),
                 createdAt=action.created_at,
-                params=action.request.params,  # type: ignore[arg-type]
+                params=action.request.params,
                 intent=action.request.intent,
                 status=CommandStatus.QUEUED,
             )

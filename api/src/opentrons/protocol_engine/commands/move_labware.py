@@ -220,7 +220,7 @@ class MoveLabware(BaseCommand[MoveLabwareParams, MoveLabwareResult]):
 
     commandType: MoveLabwareCommandType = "moveLabware"
     params: MoveLabwareParams
-    result: Optional[MoveLabwareResult]
+    result: Optional[MoveLabwareResult] = None
 
     _ImplementationCls: Type[MoveLabwareImplementation] = MoveLabwareImplementation
 

@@ -27,7 +27,7 @@ class SavePositionParams(BaseModel):
         "Auto-assigned if not defined.",
     )
     failOnNotHomed: Optional[bool] = Field(
-        True, descrption="Require all axes to be homed before saving position."
+        True, description="Require all axes to be homed before saving position."
     )
 
 
@@ -79,7 +79,7 @@ class SavePosition(BaseCommand[SavePositionParams, SavePositionResult]):
 
     commandType: SavePositionCommandType = "savePosition"
     params: SavePositionParams
-    result: Optional[SavePositionResult]
+    result: Optional[SavePositionResult] = None
 
     _ImplementationCls: Type[SavePositionImplementation] = SavePositionImplementation
 

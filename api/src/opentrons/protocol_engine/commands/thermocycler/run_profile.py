@@ -99,7 +99,7 @@ class RunProfile(BaseCommand[RunProfileParams, RunProfileResult]):
 
     commandType: RunProfileCommandType = "thermocycler/runProfile"
     params: RunProfileParams
-    result: Optional[RunProfileResult]
+    result: Optional[RunProfileResult] = None
 
     _ImplementationCls: Type[RunProfileImpl] = RunProfileImpl
 

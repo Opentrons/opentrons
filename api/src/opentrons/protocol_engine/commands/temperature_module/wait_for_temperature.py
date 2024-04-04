@@ -81,7 +81,7 @@ class WaitForTemperature(
 
     commandType: WaitForTemperatureCommandType = "temperatureModule/waitForTemperature"
     params: WaitForTemperatureParams
-    result: Optional[WaitForTemperatureResult]
+    result: Optional[WaitForTemperatureResult] = None
 
     _ImplementationCls: Type[WaitForTemperatureImpl] = WaitForTemperatureImpl
 

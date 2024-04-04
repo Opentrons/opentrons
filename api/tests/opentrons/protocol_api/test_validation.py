@@ -224,23 +224,23 @@ def test_ensure_lowercase_name_invalid() -> None:
     ("definition", "expected_raise"),
     [
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition.construct(
                 allowedRoles=[LabwareRole.labware],
-                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),
             ),
             do_not_raise(),
         ),
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition.construct(
                 allowedRoles=[],
-                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),
             ),
             do_not_raise(),
         ),
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition.construct(
                 allowedRoles=[LabwareRole.adapter],
-                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),
             ),
             pytest.raises(subject.LabwareDefinitionIsNotLabwareError),
         ),
@@ -258,23 +258,23 @@ def test_ensure_definition_is_labware(
     ("definition", "expected_raise"),
     [
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition.construct(
                 allowedRoles=[LabwareRole.adapter],
-                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),
             ),
             do_not_raise(),
         ),
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition.construct(
                 allowedRoles=[],
-                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),
             ),
             pytest.raises(subject.LabwareDefinitionIsNotAdapterError),
         ),
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition.construct(
                 allowedRoles=[LabwareRole.labware],
-                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),  # type: ignore[call-arg]
+                parameters=LabwareDefinitionParameters.construct(loadName="Foo"),
             ),
             pytest.raises(subject.LabwareDefinitionIsNotAdapterError),
         ),

@@ -68,7 +68,7 @@ class CloseLid(BaseCommand[CloseLidParams, CloseLidResult]):
 
     commandType: CloseLidCommandType = "thermocycler/closeLid"
     params: CloseLidParams
-    result: Optional[CloseLidResult]
+    result: Optional[CloseLidResult] = None
 
     _ImplementationCls: Type[CloseLidImpl] = CloseLidImpl
 

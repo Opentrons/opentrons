@@ -428,8 +428,8 @@ async def test_run_json_runner_stop_requested_stops_enquqing(
 @pytest.mark.parametrize(
     "schema_version, json_protocol",
     [
-        (6, ProtocolSchemaV6.construct()),  # type: ignore[call-arg]
-        (7, ProtocolSchemaV7.construct()),  # type: ignore[call-arg]
+        (6, ProtocolSchemaV6.construct()),
+        (7, ProtocolSchemaV7.construct()),
     ],
 )
 async def test_load_json_runner(
@@ -443,7 +443,7 @@ async def test_load_json_runner(
     json_protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7],
 ) -> None:
     """It should load a JSON protocol file."""
-    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition.construct()
 
     json_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -529,7 +529,7 @@ async def test_load_legacy_python(
     legacy_python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
-    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition.construct()
 
     legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -679,7 +679,7 @@ async def test_load_legacy_json(
     legacy_python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based JSON protocol."""
-    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition.construct()
 
     legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),

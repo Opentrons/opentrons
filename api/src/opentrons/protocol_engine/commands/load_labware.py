@@ -156,7 +156,7 @@ class LoadLabware(BaseCommand[LoadLabwareParams, LoadLabwareResult]):
 
     commandType: LoadLabwareCommandType = "loadLabware"
     params: LoadLabwareParams
-    result: Optional[LoadLabwareResult]
+    result: Optional[LoadLabwareResult] = None
 
     _ImplementationCls: Type[LoadLabwareImplementation] = LoadLabwareImplementation
 

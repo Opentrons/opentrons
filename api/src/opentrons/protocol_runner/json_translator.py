@@ -206,7 +206,7 @@ class JsonTranslator:
                 id=liquid_id,
                 displayName=liquid.displayName,
                 description=liquid.description,
-                displayColor=HexColor(__root__=liquid.displayColor)
+                displayColor=HexColor(liquid.displayColor)
                 if liquid.displayColor is not None
                 else None,
             )

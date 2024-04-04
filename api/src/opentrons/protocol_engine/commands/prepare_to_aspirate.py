@@ -57,7 +57,7 @@ class PrepareToAspirate(BaseCommand[PrepareToAspirateParams, PrepareToAspirateRe
 
     commandType: PrepareToAspirateCommandType = "prepareToAspirate"
     params: PrepareToAspirateParams
-    result: Optional[PrepareToAspirateResult]
+    result: Optional[PrepareToAspirateResult] = None
 
     _ImplementationCls: Type[
         PrepareToAspirateImplementation

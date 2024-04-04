@@ -144,7 +144,7 @@ def test_load_module(
     """It should handle a successful LoadModule command."""
     action = actions.SucceedCommandAction(
         private_result=None,
-        command=commands.LoadModule.construct(  # type: ignore[call-arg]
+        command=commands.LoadModule.construct(
             params=commands.LoadModuleParams(
                 model=params_model,
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -204,7 +204,7 @@ def test_load_thermocycler_in_thermocycler_slot(
     """It should update additional slots for thermocycler module."""
     action = actions.SucceedCommandAction(
         private_result=None,
-        command=commands.LoadModule.construct(  # type: ignore[call-arg]
+        command=commands.LoadModule.construct(
             params=commands.LoadModuleParams(
                 model=ModuleModel.THERMOCYCLER_MODULE_V2,
                 location=DeckSlotLocation(slotName=tc_slot),
@@ -323,7 +323,7 @@ def test_add_module_action(
 
 def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) -> None:
     """It should update `plate_target_temperature` correctly."""
-    load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
+    load_module_cmd = commands.LoadModule.construct(
         params=commands.LoadModuleParams(
             model=ModuleModel.HEATER_SHAKER_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -335,11 +335,11 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
             definition=heater_shaker_v1_def,
         ),
     )
-    set_temp_cmd = hs_commands.SetTargetTemperature.construct(  # type: ignore[call-arg]
+    set_temp_cmd = hs_commands.SetTargetTemperature.construct(
         params=hs_commands.SetTargetTemperatureParams(moduleId="module-id", celsius=42),
         result=hs_commands.SetTargetTemperatureResult(),
     )
-    deactivate_cmd = hs_commands.DeactivateHeater.construct(  # type: ignore[call-arg]
+    deactivate_cmd = hs_commands.DeactivateHeater.construct(
         params=hs_commands.DeactivateHeaterParams(moduleId="module-id"),
         result=hs_commands.DeactivateHeaterResult(),
     )
@@ -374,7 +374,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
 
 def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> None:
     """It should update heater-shaker's `is_plate_shaking` correctly."""
-    load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
+    load_module_cmd = commands.LoadModule.construct(
         params=commands.LoadModuleParams(
             model=ModuleModel.HEATER_SHAKER_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -386,11 +386,11 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
             definition=heater_shaker_v1_def,
         ),
     )
-    set_shake_cmd = hs_commands.SetAndWaitForShakeSpeed.construct(  # type: ignore[call-arg]
+    set_shake_cmd = hs_commands.SetAndWaitForShakeSpeed.construct(
         params=hs_commands.SetAndWaitForShakeSpeedParams(moduleId="module-id", rpm=111),
         result=hs_commands.SetAndWaitForShakeSpeedResult(pipetteRetracted=False),
     )
-    deactivate_cmd = hs_commands.DeactivateShaker.construct(  # type: ignore[call-arg]
+    deactivate_cmd = hs_commands.DeactivateShaker.construct(
         params=hs_commands.DeactivateShakerParams(moduleId="module-id"),
         result=hs_commands.DeactivateShakerResult(),
     )
@@ -427,7 +427,7 @@ def test_handle_hs_labware_latch_commands(
     heater_shaker_v1_def: ModuleDefinition,
 ) -> None:
     """It should update heater-shaker's `is_labware_latch_closed` correctly."""
-    load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
+    load_module_cmd = commands.LoadModule.construct(
         params=commands.LoadModuleParams(
             model=ModuleModel.HEATER_SHAKER_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -439,11 +439,11 @@ def test_handle_hs_labware_latch_commands(
             definition=heater_shaker_v1_def,
         ),
     )
-    close_latch_cmd = hs_commands.CloseLabwareLatch.construct(  # type: ignore[call-arg]
+    close_latch_cmd = hs_commands.CloseLabwareLatch.construct(
         params=hs_commands.CloseLabwareLatchParams(moduleId="module-id"),
         result=hs_commands.CloseLabwareLatchResult(),
     )
-    open_latch_cmd = hs_commands.OpenLabwareLatch.construct(  # type: ignore[call-arg]
+    open_latch_cmd = hs_commands.OpenLabwareLatch.construct(
         params=hs_commands.OpenLabwareLatchParams(moduleId="module-id"),
         result=hs_commands.OpenLabwareLatchResult(pipetteRetracted=False),
     )
@@ -489,7 +489,7 @@ def test_handle_tempdeck_temperature_commands(
     tempdeck_v2_def: ModuleDefinition,
 ) -> None:
     """It should update Tempdeck's `plate_target_temperature` correctly."""
-    load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
+    load_module_cmd = commands.LoadModule.construct(
         params=commands.LoadModuleParams(
             model=ModuleModel.TEMPERATURE_MODULE_V2,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -501,13 +501,13 @@ def test_handle_tempdeck_temperature_commands(
             definition=tempdeck_v2_def,
         ),
     )
-    set_temp_cmd = temp_commands.SetTargetTemperature.construct(  # type: ignore[call-arg]
+    set_temp_cmd = temp_commands.SetTargetTemperature.construct(
         params=temp_commands.SetTargetTemperatureParams(
             moduleId="module-id", celsius=42.4
         ),
         result=temp_commands.SetTargetTemperatureResult(targetTemperature=42),
     )
-    deactivate_cmd = temp_commands.DeactivateTemperature.construct(  # type: ignore[call-arg]
+    deactivate_cmd = temp_commands.DeactivateTemperature.construct(
         params=temp_commands.DeactivateTemperatureParams(moduleId="module-id"),
         result=temp_commands.DeactivateTemperatureResult(),
     )
@@ -538,7 +538,7 @@ def test_handle_thermocycler_temperature_commands(
     thermocycler_v1_def: ModuleDefinition,
 ) -> None:
     """It should update thermocycler's temperature statuses correctly."""
-    load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
+    load_module_cmd = commands.LoadModule.construct(
         params=commands.LoadModuleParams(
             model=ModuleModel.THERMOCYCLER_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -550,23 +550,23 @@ def test_handle_thermocycler_temperature_commands(
             definition=thermocycler_v1_def,
         ),
     )
-    set_block_temp_cmd = tc_commands.SetTargetBlockTemperature.construct(  # type: ignore[call-arg]
+    set_block_temp_cmd = tc_commands.SetTargetBlockTemperature.construct(
         params=tc_commands.SetTargetBlockTemperatureParams(
             moduleId="module-id", celsius=42.4
         ),
         result=tc_commands.SetTargetBlockTemperatureResult(targetBlockTemperature=42.4),
     )
-    deactivate_block_cmd = tc_commands.DeactivateBlock.construct(  # type: ignore[call-arg]
+    deactivate_block_cmd = tc_commands.DeactivateBlock.construct(
         params=tc_commands.DeactivateBlockParams(moduleId="module-id"),
         result=tc_commands.DeactivateBlockResult(),
     )
-    set_lid_temp_cmd = tc_commands.SetTargetLidTemperature.construct(  # type: ignore[call-arg]
+    set_lid_temp_cmd = tc_commands.SetTargetLidTemperature.construct(
         params=tc_commands.SetTargetLidTemperatureParams(
             moduleId="module-id", celsius=35.3
         ),
         result=tc_commands.SetTargetLidTemperatureResult(targetLidTemperature=35.3),
     )
-    deactivate_lid_cmd = tc_commands.DeactivateLid.construct(  # type: ignore[call-arg]
+    deactivate_lid_cmd = tc_commands.DeactivateLid.construct(
         params=tc_commands.DeactivateLidParams(moduleId="module-id"),
         result=tc_commands.DeactivateLidResult(),
     )
@@ -625,7 +625,7 @@ def test_handle_thermocycler_lid_commands(
     thermocycler_v1_def: ModuleDefinition,
 ) -> None:
     """It should update thermocycler's lid status after executing lid commands."""
-    load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
+    load_module_cmd = commands.LoadModule.construct(
         params=commands.LoadModuleParams(
             model=ModuleModel.THERMOCYCLER_MODULE_V1,
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
@@ -638,11 +638,11 @@ def test_handle_thermocycler_lid_commands(
         ),
     )
 
-    open_lid_cmd = tc_commands.OpenLid.construct(  # type: ignore[call-arg]
+    open_lid_cmd = tc_commands.OpenLid.construct(
         params=tc_commands.OpenLidParams(moduleId="module-id"),
         result=tc_commands.OpenLidResult(),
     )
-    close_lid_cmd = tc_commands.CloseLid.construct(  # type: ignore[call-arg]
+    close_lid_cmd = tc_commands.CloseLid.construct(
         params=tc_commands.CloseLidParams(moduleId="module-id"),
         result=tc_commands.CloseLidResult(),
     )

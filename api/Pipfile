@@ -5,7 +5,8 @@ name = "pypi"
 
 [packages]
 jsonschema = "==4.17.3"
-pydantic = "==1.10.12"
+pydantic = "==2.6.4"
+pydantic-settings = "==2.2.1"
 anyio = "==3.7.1"
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 opentrons = { editable = true, path = "." }

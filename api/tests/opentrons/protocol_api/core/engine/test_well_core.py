@@ -48,7 +48,7 @@ def api_version() -> APIVersion:
 @pytest.fixture
 def well_definition() -> WellDefinition:
     """Get a partial WellDefinition value object."""
-    return WellDefinition.construct()  # type: ignore[call-arg]
+    return WellDefinition.construct()
 
 
 @pytest.fixture
@@ -92,7 +92,7 @@ def test_display_name(
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.construct(totalLiquidVolume=101)],  # type: ignore[call-arg]
+    [WellDefinition.construct(totalLiquidVolume=101)],
 )
 def test_max_volume(subject: WellCore) -> None:
     """It should have a max volume."""
@@ -189,7 +189,7 @@ def test_load_liquid(
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.construct(diameter=123.4)],  # type: ignore[call-arg]
+    [WellDefinition.construct(diameter=123.4)],
 )
 def test_diameter(subject: WellCore) -> None:
     """It should get the diameter."""
@@ -198,7 +198,7 @@ def test_diameter(subject: WellCore) -> None:
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.construct(xDimension=567.8)],  # type: ignore[call-arg]
+    [WellDefinition.construct(xDimension=567.8)],
 )
 def test_length(subject: WellCore) -> None:
     """It should get the length."""
@@ -207,7 +207,7 @@ def test_length(subject: WellCore) -> None:
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.construct(yDimension=987.6)],  # type: ignore[call-arg]
+    [WellDefinition.construct(yDimension=987.6)],
 )
 def test_width(subject: WellCore) -> None:
     """It should get the width."""
@@ -216,7 +216,7 @@ def test_width(subject: WellCore) -> None:
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.construct(depth=42.0)],  # type: ignore[call-arg]
+    [WellDefinition.construct(depth=42.0)],
 )
 def test_depth(subject: WellCore) -> None:
     """It should get the depth."""

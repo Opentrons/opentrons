@@ -174,7 +174,7 @@ def create_load_module_command(
         moduleId=module_id,
         model=model,
         serialNumber=None,
-        definition=ModuleDefinition.construct(),  # type: ignore[call-arg]
+        definition=ModuleDefinition.construct(),
     )
 
     return cmd.LoadModule(

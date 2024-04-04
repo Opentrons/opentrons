@@ -836,6 +836,6 @@ def test_load_liquid(
             id="liquid-id-555",
             displayName="water",
             description="water description",
-            displayColor=HexColor(__root__="#F00"),
+            displayColor=HexColor("#F00"),
         )
     ]

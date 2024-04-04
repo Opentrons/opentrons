@@ -111,7 +111,7 @@ class DropTip(BaseCommand[DropTipParams, DropTipResult]):
 
     commandType: DropTipCommandType = "dropTip"
     params: DropTipParams
-    result: Optional[DropTipResult]
+    result: Optional[DropTipResult] = None
 
     _ImplementationCls: Type[DropTipImplementation] = DropTipImplementation
 

@@ -27,7 +27,7 @@ from opentrons.protocol_api.core.engine import LabwareCore, WellCore
 @pytest.fixture
 def labware_definition() -> LabwareDefinition:
     """Get a LabwareDefinition value object to use in tests."""
-    return LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
+    return LabwareDefinition.construct(ordering=[])
 
 
 @pytest.fixture
@@ -53,10 +53,10 @@ def subject(mock_engine_client: EngineClient) -> LabwareCore:
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
+        LabwareDefinition.construct(
             namespace="hello",
             version=42,
-            parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
+            parameters=LabwareDefinitionParameters.construct(loadName="world"),
             ordering=[],
         )
     ],
@@ -76,9 +76,9 @@ def test_set_calibration(subject: LabwareCore) -> None:
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
+        LabwareDefinition.construct(
             namespace="hello",
-            parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
+            parameters=LabwareDefinitionParameters.construct(loadName="world"),
             ordering=[],
             allowedRoles=[],
             stackingOffsetWithLabware={},
@@ -120,9 +120,9 @@ def test_get_user_display_name(decoy: Decoy, mock_engine_client: EngineClient) -
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
+        LabwareDefinition.construct(
             ordering=[],
-            metadata=LabwareDefinitionMetadata.construct(  # type: ignore[call-arg]
+            metadata=LabwareDefinitionMetadata.construct(
                 displayName="Cool Display Name"
             ),
         )
@@ -138,8 +138,8 @@ def test_get_display_name(subject: LabwareCore) -> None:
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
-            parameters=LabwareDefinitionParameters.construct(loadName="load-name"),  # type: ignore[call-arg]
+        LabwareDefinition.construct(
+            parameters=LabwareDefinitionParameters.construct(loadName="load-name"),
         ),
     ],
 )
@@ -166,9 +166,9 @@ def test_get_name_display_name(decoy: Decoy, mock_engine_client: EngineClient) -
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
+        LabwareDefinition.construct(
             ordering=[],
-            parameters=LabwareDefinitionParameters.construct(isTiprack=True),  # type: ignore[call-arg]
+            parameters=LabwareDefinitionParameters.construct(isTiprack=True),
         )
     ],
 )
@@ -183,13 +183,13 @@ def test_is_tip_rack(subject: LabwareCore) -> None:
     argnames=["labware_definition", "expected_result"],
     argvalues=[
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition.construct(
                 ordering=[], allowedRoles=[LabwareRole.adapter]
             ),
             True,
         ),
         (
-            LabwareDefinition.construct(  # type: ignore[call-arg]
+            LabwareDefinition.construct(
                 ordering=[], allowedRoles=[LabwareRole.labware]
             ),
             False,
@@ -206,7 +206,7 @@ def test_is_adapter(expected_result: bool, subject: LabwareCore) -> None:
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
+        LabwareDefinition.construct(
             ordering=[["A1", "B1"], ["A2", "B2"]],
         )
     ],
@@ -266,9 +266,9 @@ def test_get_next_tip(
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
+        LabwareDefinition.construct(
             ordering=[],
-            parameters=LabwareDefinitionParameters.construct(isTiprack=True),  # type: ignore[call-arg]
+            parameters=LabwareDefinitionParameters.construct(isTiprack=True),
         )
     ],
 )
@@ -283,10 +283,10 @@ def test_reset_tips(
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
+        LabwareDefinition.construct(
             ordering=[],
-            parameters=LabwareDefinitionParameters.construct(isTiprack=False),  # type: ignore[call-arg]
-            metadata=LabwareDefinitionMetadata.construct(  # type: ignore[call-arg]
+            parameters=LabwareDefinitionParameters.construct(isTiprack=False),
+            metadata=LabwareDefinitionMetadata.construct(
                 displayName="Cool Display Name"
             ),
         )
@@ -342,9 +342,9 @@ def test_get_calibrated_offset(
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
+        LabwareDefinition.construct(
             ordering=[],
-            parameters=LabwareDefinitionParameters.construct(quirks=["quirk"]),  # type: ignore[call-arg]
+            parameters=LabwareDefinitionParameters.construct(quirks=["quirk"]),
         )
     ],
 )

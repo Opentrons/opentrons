@@ -1,10 +1,9 @@
 """Public protocol engine value types and models."""
 from __future__ import annotations
-import re
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, RootModel
 from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
 from typing_extensions import Literal, TypeGuard
 
@@ -371,7 +370,7 @@ class ModuleDimensions(BaseModel):
 
     bareOverallHeight: float
     overLabwareHeight: float
-    lidHeight: Optional[float]
+    lidHeight: Optional[float] = None
 
 
 class Vec3f(BaseModel):
@@ -526,8 +525,8 @@ class LoadedModule(BaseModel):
 
     id: str
     model: ModuleModel
-    location: Optional[DeckSlotLocation]
-    serialNumber: Optional[str]
+    location: Optional[DeckSlotLocation] = None
+    serialNumber: Optional[str] = None
 
 
 class LabwareOffsetLocation(BaseModel):
@@ -636,17 +635,10 @@ class LoadedLabware(BaseModel):
     )
 
 
-class HexColor(BaseModel):
+class HexColor(RootModel[str]):
     """Hex color representation."""
 
-    __root__: str
-
-    @validator("__root__")
-    def _color_is_a_valid_hex(cls, v: str) -> str:
-        match = re.search(r"^#(?:[0-9a-fA-F]{3,4}){1,2}$", v)
-        if not match:
-            raise ValueError("Color is not a valid hex color.")
-        return v
+    root: str = Field(pattern=r"^#(?:[0-9a-fA-F]{3,4}){1,2}$")
 
 
 class Liquid(BaseModel):
@@ -655,7 +647,7 @@ class Liquid(BaseModel):
     id: str
     displayName: str
     description: str
-    displayColor: Optional[HexColor]
+    displayColor: Optional[HexColor] = None
 
 
 class SpeedRange(NamedTuple):
@@ -806,7 +798,7 @@ class QuadrantNozzleLayoutConfiguration(BaseModel):
     )
     frontRightNozzle: str = Field(
         ...,
-        regex=NOZZLE_NAME_REGEX,
+        pattern=NOZZLE_NAME_REGEX,
         description="The front right nozzle in your configuration.",
     )
 

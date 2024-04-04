@@ -96,7 +96,7 @@ class PickUpTip(BaseCommand[PickUpTipParams, PickUpTipResult]):
 
     commandType: PickUpTipCommandType = "pickUpTip"
     params: PickUpTipParams
-    result: Optional[PickUpTipResult]
+    result: Optional[PickUpTipResult] = None
 
     _ImplementationCls: Type[PickUpTipImplementation] = PickUpTipImplementation
 

@@ -140,7 +140,7 @@ class CalibrateGripper(BaseCommand[CalibrateGripperParams, CalibrateGripperResul
 
     commandType: CalibrateGripperCommandType = "calibration/calibrateGripper"
     params: CalibrateGripperParams
-    result: Optional[CalibrateGripperResult]
+    result: Optional[CalibrateGripperResult] = None
 
     _ImplementationCls: Type[
         CalibrateGripperImplementation

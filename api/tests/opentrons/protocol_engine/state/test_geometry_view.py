@@ -606,8 +606,8 @@ def test_get_all_obstacle_highest_z_with_modules(
     subject: GeometryView,
 ) -> None:
     """It should get the highest Z including modules."""
-    module_1 = LoadedModule.construct(id="module-id-1")  # type: ignore[call-arg]
-    module_2 = LoadedModule.construct(id="module-id-2")  # type: ignore[call-arg]
+    module_1 = LoadedModule.construct(id="module-id-1")
+    module_2 = LoadedModule.construct(id="module-id-2")
 
     decoy.when(labware_view.get_all()).then_return([])
     decoy.when(addressable_area_view.get_all()).then_return([])
@@ -1711,8 +1711,8 @@ def test_get_slot_item(
     subject: GeometryView,
 ) -> None:
     """It should get items in certain slots."""
-    labware = LoadedLabware.construct(id="cool-labware")  # type: ignore[call-arg]
-    module = LoadedModule.construct(id="cool-module")  # type: ignore[call-arg]
+    labware = LoadedLabware.construct(id="cool-labware")
+    module = LoadedModule.construct(id="cool-module")
 
     decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
     decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(labware)
@@ -1739,7 +1739,7 @@ def test_get_slot_item_that_is_overflowed_module(
     subject: GeometryView,
 ) -> None:
     """It should return the module that occupies the slot, even if not loaded on it."""
-    module = LoadedModule.construct(id="cool-module")  # type: ignore[call-arg]
+    module = LoadedModule.construct(id="cool-module")
     decoy.when(labware_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
     decoy.when(module_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
     decoy.when(
@@ -2112,7 +2112,7 @@ def test_check_gripper_labware_tip_collision(
         )
     )
 
-    definition = LabwareDefinition.construct(  # type: ignore[call-arg]
+    definition = LabwareDefinition.construct(
         namespace="hello",
         dimensions=LabwareDimensions.construct(
             yDimension=1, zDimension=2, xDimension=3

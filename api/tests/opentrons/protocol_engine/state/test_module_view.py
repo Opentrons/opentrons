@@ -1638,13 +1638,13 @@ def test_get_by_slot() -> None:
         hardware_by_module_id={
             "1": HardwareModule(
                 serial_number="serial-number-1",
-                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                definition=ModuleDefinition.construct(
                     model=ModuleModel.TEMPERATURE_MODULE_V1
                 ),
             ),
             "2": HardwareModule(
                 serial_number="serial-number-2",
-                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                definition=ModuleDefinition.construct(
                     model=ModuleModel.TEMPERATURE_MODULE_V2
                 ),
             ),
@@ -1676,13 +1676,13 @@ def test_get_by_slot_prefers_later() -> None:
         hardware_by_module_id={
             "1": HardwareModule(
                 serial_number="serial-number-1",
-                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                definition=ModuleDefinition.construct(
                     model=ModuleModel.TEMPERATURE_MODULE_V1
                 ),
             ),
             "1-again": HardwareModule(
                 serial_number="serial-number-1-again",
-                definition=ModuleDefinition.construct(  # type: ignore[call-arg]
+                definition=ModuleDefinition.construct(
                     model=ModuleModel.TEMPERATURE_MODULE_V1
                 ),
             ),

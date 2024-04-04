@@ -48,7 +48,7 @@ def mock_labware_data_provider(decoy: Decoy) -> LabwareDataProvider:
 @pytest.fixture
 def tip_rack_definition() -> LabwareDefinition:
     """Get a tip rack defintion value object."""
-    return LabwareDefinition.construct(namespace="test", version=42)  # type: ignore[call-arg]
+    return LabwareDefinition.construct(namespace="test", version=42)
 
 
 async def test_create_tip_handler(

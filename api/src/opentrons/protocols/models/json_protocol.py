@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import ConfigDict, BaseModel, Field
 from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -77,8 +77,7 @@ class Metadata(BaseModel):
     Optional metadata about the protocol
     """
 
-    class Config:
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
     protocolName: Optional[str] = Field(
         None, description="A short, human-readable name for the protocol"
@@ -576,8 +575,7 @@ class Pipettes(BaseModel):
     Fields describing an individual pipette
     """
 
-    class Config:
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
     mount: Literal["left", "right"] = Field(
         ..., description="Where the pipette is mounted"
@@ -594,8 +592,7 @@ class Labware(BaseModel):
     Fields describing a single labware on the deck
     """
 
-    class Config:
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
     slot: str = Field(
         ...,
@@ -618,8 +615,7 @@ class Modules(BaseModel):
     Fields describing a single module on the deck
     """
 
-    class Config:
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
     slot: str = Field(
         ...,

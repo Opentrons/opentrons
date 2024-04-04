@@ -16,7 +16,6 @@ from typing import (
 )
 
 from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -57,7 +56,7 @@ class CommandIntent(str, Enum):
     SETUP = "setup"
 
 
-class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
+class BaseCommandCreate(BaseModel, Generic[CommandParamsT]):
     """Base class for command creation requests.
 
     You shouldn't use this class directly; instead, use or define
@@ -96,7 +95,7 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
     )
 
 
-class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
+class BaseCommand(BaseModel, Generic[CommandParamsT, CommandResultT]):
     """Base command model.
 
     You shouldn't use this class directly; instead, use or define

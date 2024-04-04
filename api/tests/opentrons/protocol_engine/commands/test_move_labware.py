@@ -136,9 +136,7 @@ async def test_move_labware_implementation_on_labware(
     )
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
-    ).then_return(
-        LabwareDefinition.construct(namespace="spacename")  # type: ignore[call-arg]
-    )
+    ).then_return(LabwareDefinition.construct(namespace="spacename"))
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
             location=OnLabwareLocation(labwareId="new-labware-id"),
@@ -158,7 +156,7 @@ async def test_move_labware_implementation_on_labware(
             "my-even-cooler-labware-id"
         ),
         state_view.labware.raise_if_labware_cannot_be_stacked(
-            LabwareDefinition.construct(namespace="spacename"),  # type: ignore[call-arg]
+            LabwareDefinition.construct(namespace="spacename"),
             "my-even-cooler-labware-id",
         ),
     )
@@ -194,9 +192,7 @@ async def test_gripper_move_labware_implementation(
 
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
-    ).then_return(
-        LabwareDefinition.construct(namespace="my-cool-namespace")  # type: ignore[call-arg]
-    )
+    ).then_return(LabwareDefinition.construct(namespace="my-cool-namespace"))
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
         LoadedLabware(
             id="my-cool-labware-id",
@@ -228,7 +224,7 @@ async def test_gripper_move_labware_implementation(
     ).then_return(validated_new_location)
     decoy.when(
         labware_validation.validate_gripper_compatible(
-            LabwareDefinition.construct(namespace="my-cool-namespace")  # type: ignore[call-arg]
+            LabwareDefinition.construct(namespace="my-cool-namespace")
         )
     ).then_return(True)
 
@@ -279,7 +275,7 @@ async def test_gripper_move_to_waste_chute_implementation(
         pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
         dropOffset=None,
     )
-    labware_def = LabwareDefinition.construct(  # type: ignore[call-arg]
+    labware_def = LabwareDefinition.construct(
         namespace="my-cool-namespace",
         dimensions=Dimensions(
             yDimension=labware_width, zDimension=labware_width, xDimension=labware_width
@@ -505,8 +501,8 @@ async def test_move_labware_raises_when_moving_adapter_with_gripper(
         strategy=LabwareMovementStrategy.USING_GRIPPER,
     )
 
-    definition = LabwareDefinition.construct(  # type: ignore[call-arg]
-        parameters=Parameters.construct(loadName="My cool adapter"),  # type: ignore[call-arg]
+    definition = LabwareDefinition.construct(
+        parameters=Parameters.construct(loadName="My cool adapter"),
     )
 
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
@@ -555,8 +551,8 @@ async def test_move_labware_raises_when_moving_labware_with_gripper_incompatible
         strategy=LabwareMovementStrategy.USING_GRIPPER,
     )
 
-    definition = LabwareDefinition.construct(  # type: ignore[call-arg]
-        parameters=Parameters.construct(loadName="My cool labware"),  # type: ignore[call-arg]
+    definition = LabwareDefinition.construct(
+        parameters=Parameters.construct(loadName="My cool labware"),
     )
 
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
@@ -612,9 +608,7 @@ async def test_move_labware_with_gripper_raises_on_ot2(
     )
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
-    ).then_return(
-        LabwareDefinition.construct(namespace="spacename")  # type: ignore[call-arg]
-    )
+    ).then_return(LabwareDefinition.construct(namespace="spacename"))
 
     decoy.when(state_view.config).then_return(
         Config(robot_type="OT-2 Standard", deck_type=DeckType.OT2_STANDARD)
@@ -644,8 +638,10 @@ async def test_move_labware_raises_when_moving_fixed_trash_labware(
         strategy=LabwareMovementStrategy.USING_GRIPPER,
     )
 
-    definition = LabwareDefinition.construct(  # type: ignore[call-arg]
-        parameters=Parameters.construct(loadName="My cool labware", quirks=["fixedTrash"]),  # type: ignore[call-arg]
+    definition = LabwareDefinition.construct(
+        parameters=Parameters.construct(
+            loadName="My cool labware", quirks=["fixedTrash"]
+        ),
     )
 
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
