@@ -5,7 +5,6 @@ import { fixture96Plate } from '@opentrons/shared-data'
 import { SOURCE_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import { getLabwareEntities } from '../../../../step-forms/selectors'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../localization'
 import { ZTipPositionModal } from '../TipPositionField/ZTipPositionModal'
 import { BlowoutZOffsetField } from '../BlowoutZOffsetField'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -13,9 +12,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../TipPositionField/ZTipPositionModal')
 const render = (props: React.ComponentProps<typeof BlowoutZOffsetField>) => {
-  return renderWithProviders(<BlowoutZOffsetField {...props} />, {
-    i18nInstance: i18n,
-  })[0]
+  return renderWithProviders(<BlowoutZOffsetField {...props} />)[0]
 }
 const mockSourceId = 'sourceId'
 describe('BlowoutZOffsetField', () => {

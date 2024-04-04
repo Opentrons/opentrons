@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -37,7 +36,6 @@ export function BlowoutZOffsetField(
   } = props
   const [isModalOpen, setModalOpen] = React.useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { t } = useTranslation('application')
   const labwareEntities = useSelector(getLabwareEntities)
 
   let labwareId = null
