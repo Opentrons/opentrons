@@ -79,8 +79,6 @@ stages:
           status: stopped
 
   - name: Get run commands
-    max_retries: 10
-    delay_after: 0.2
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/commands'
       method: GET
