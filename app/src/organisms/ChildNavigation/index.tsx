@@ -29,14 +29,16 @@ import type {
 
 interface ChildNavigationProps {
   header: string
-  onClickBack: React.MouseEventHandler
+  onClickBack?: React.MouseEventHandler
   buttonText?: React.ReactNode
   inlineNotification?: InlineNotificationProps
   onClickButton?: React.MouseEventHandler
   buttonType?: SmallButtonTypes
+  buttonIsDisabled?: boolean
   iconName?: IconName
   iconPlacement?: IconPlacement
   secondaryButtonProps?: React.ComponentProps<typeof SmallButton>
+  stepMeterPadding?: boolean
 }
 
 export function ChildNavigation({
@@ -49,6 +51,8 @@ export function ChildNavigation({
   iconName,
   iconPlacement,
   secondaryButtonProps,
+  buttonIsDisabled,
+  stepMeterPadding,
 }: ChildNavigationProps): JSX.Element {
   return (
     <Flex
@@ -58,18 +62,20 @@ export function ChildNavigation({
       paddingX={SPACING.spacing40}
       paddingY={SPACING.spacing32}
       position={POSITION_FIXED}
-      top="0"
+      top={stepMeterPadding ? SPACING.spacing8 : '0'}
       left="0"
       width="100%"
       backgroundColor={COLORS.white}
     >
       <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_START}>
-        <IconButton
-          onClick={onClickBack}
-          data-testid="ChildNavigation_Back_Button"
-        >
-          <Icon name="back" size="3rem" color={COLORS.black90} />
-        </IconButton>
+        {onClickBack != null ? (
+          <IconButton
+            onClick={onClickBack}
+            data-testid="ChildNavigation_Back_Button"
+          >
+            <Icon name="back" size="3rem" color={COLORS.black90} />
+          </IconButton>
+        ) : null}
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {header}
         </StyledText>
@@ -87,6 +93,7 @@ export function ChildNavigation({
             onClick={onClickButton}
             iconName={iconName}
             iconPlacement={iconPlacement}
+            disabled={buttonIsDisabled}
           />
         </Flex>
       ) : null}

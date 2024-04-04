@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
@@ -38,6 +39,7 @@ import type { ProtocolResource } from '@opentrons/shared-data'
 export function ProtocolDashboard(): JSX.Element {
   const protocols = useAllProtocolsQuery()
   const runs = useNotifyAllRunsQuery()
+  const history = useHistory()
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
   const [navMenuIsOpened, setNavMenuIsOpened] = React.useState<boolean>(false)
@@ -280,7 +282,8 @@ export function ProtocolDashboard(): JSX.Element {
           buttonText={t('quick_transfer')}
           iconName="plus"
           onClick={() => {
-            console.log('launch quick transfer flow')
+            console.log('showing wizard')
+            history.push('/quick-transfer')
           }}
         />
       )}
