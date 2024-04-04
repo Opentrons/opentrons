@@ -9,6 +9,7 @@ pyserial = "==3.5"
 typing-extensions = ">=4.0.0,<5"
 numpy = "==1.22.3"
 pydantic = "==2.6.4"
+pydantic-settings = "==2.2.1"
 
 [dev-packages]
 pytest = "==7.4.4"
@@ -26,7 +27,6 @@ hypothesis = "~=6.96.1"
 pytest-asyncio = "~=0.23.0"
 matplotlib = "*"
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
-pydantic-settings = "*"
 
 [requires]
 python_version = "3.10"
