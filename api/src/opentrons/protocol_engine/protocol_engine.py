@@ -332,8 +332,8 @@ class ProtocolEngine:
             # The FailCommandAction above will have cleared all the queued protocol
             # OR setup commands, depending on whether we gave it a protocol or setup
             # command. We want both to be cleared in either case. So, do that here.
-            running_or_next_queued_id = (
-                self._state_store.commands.state.commands.get_queue_ids().head(None)
+            running_or_next_queued_id = self._state_store.commands.get_queue_ids().head(
+                None
             )
             if running_or_next_queued_id is not None:
                 running_or_next_queued = self._state_store.commands.get(
