@@ -1,8 +1,8 @@
 """Gripper configurations."""
 
-from typing_extensions import Literal
+from typing_extensions import Annotated, Literal
 from typing import TYPE_CHECKING, List, Dict, Tuple, Any, NewType
-from pydantic import BaseModel, Field, conint, confloat
+from pydantic import ConfigDict, BaseModel, Field
 from enum import Enum
 
 
@@ -44,18 +44,16 @@ if TYPE_CHECKING:
     _StrictNonNegativeInt = int
     _StrictNonNegativeFloat = float
 else:
-    _StrictNonNegativeInt = conint(strict=True, ge=0)
-    _StrictNonNegativeFloat = confloat(strict=True, ge=0.0)
+    _StrictNonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
+    _StrictNonNegativeFloat = Annotated[float, Field(strict=True, ge=0.0)]
 
 
 class GripperBaseModel(BaseModel):
     """Gripper base model."""
 
-    class Config:
-        """Config."""
-
-        alias_generator = _snake_to_camel_case
-        allow_population_by_field_name = True
+    model_config = ConfigDict(
+        alias_generator=_snake_to_camel_case, populate_by_name=True
+    )
 
 
 Offset = Tuple[float, float, float]
@@ -81,7 +79,7 @@ class GripForceProfile(GripperBaseModel):
     polynomial: List[PolynomialTerm] = Field(
         ...,
         description="Polynomial function to convert a grip force in Newton to the jaw motor duty cycle value, which will be read by the gripper firmware.",
-        min_items=1,
+        min_length=1,
     )
     default_grip_force: _StrictNonNegativeFloat
     default_idle_force: _StrictNonNegativeFloat

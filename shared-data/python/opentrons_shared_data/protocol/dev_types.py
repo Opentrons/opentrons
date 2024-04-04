@@ -2,10 +2,10 @@
 opentrons_shared_data.protocol.dev_types: types for json protocols
 """
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Literal
 from enum import Enum
 
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict
 from ..pipette.dev_types import PipetteName
 from ..labware.dev_types import LabwareDefinition
 from ..module.dev_types import ModuleModel

@@ -6,18 +6,16 @@ shared-data. It's been modified by hand to be more friendly.
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Union, Literal
 
 from pydantic import (
+    ConfigDict,
     BaseModel,
-    Extra,
     Field,
-    conint,
-    confloat,
     StrictInt,
     StrictFloat,
 )
-from typing_extensions import Literal
+from typing_extensions import Annotated
 
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
 
@@ -26,8 +24,8 @@ if TYPE_CHECKING:
     _StrictNonNegativeInt = int
     _StrictNonNegativeFloat = float
 else:
-    _StrictNonNegativeInt = conint(strict=True, ge=0)
-    _StrictNonNegativeFloat = confloat(strict=True, ge=0.0)
+    _StrictNonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
+    _StrictNonNegativeFloat = Annotated[float, Field(strict=True, ge=0.0)]
 
 
 _Number = Union[StrictInt, StrictFloat]
@@ -183,8 +181,7 @@ class Dimensions(BaseModel):
 
 
 class WellDefinition(BaseModel):
-    class Config:
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
     depth: _NonNegativeNumber = Field(...)
     x: _NonNegativeNumber = Field(
@@ -319,10 +316,10 @@ class LabwareDefinition(BaseModel):
         "during labware movement.",
     )
     gripHeightFromLabwareBottom: Optional[float] = Field(
-        default_factory=None,
+        default=None,
         description="The Z-height, from labware bottom, where the gripper should grip the labware.",
     )
     gripForce: Optional[float] = Field(
-        default_factory=None,
+        default=None,
         description="Force, in Newtons, with which the gripper should grip the labware.",
     )

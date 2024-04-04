@@ -68,9 +68,9 @@ def _change_to_camel_case(c: str) -> str:
 
 def list_configuration_keys() -> Tuple[List[str], Dict[int, str]]:
     """List out the model keys available to modify at the top level."""
-    lookup = {i: v for (i, v) in enumerate(PipetteConfigurations.__fields__)}
+    lookup = {i: v for (i, v) in enumerate(PipetteConfigurations.model_fields)}
     return [
-        f"{i}: {v}" for (i, v) in enumerate(PipetteConfigurations.__fields__)
+        f"{i}: {v}" for (i, v) in enumerate(PipetteConfigurations.model_fields)
     ], lookup
 
 
@@ -84,7 +84,7 @@ def handle_subclass_model(
 ) -> List[str]:
     """Handle sub-classed basemodels and update the top level model as necessary."""
     if is_basemodel:
-        if base_model.__fields__ == SupportedTipsDefinition.__fields__:
+        if base_model.model_fields == SupportedTipsDefinition.model_fields:
             # pydantic does something weird with the types in ModelFields so
             # we cannot use isinstance checks to confirm if the base model
             # is a supported tips definition
@@ -96,8 +96,8 @@ def handle_subclass_model(
             ]
             top_level_configuration.append(tip_type.name)
 
-        lookup = {i: v for (i, v) in enumerate(base_model.__fields__)}
-        config_list = [f"{i}: {v}" for (i, v) in enumerate(base_model.__fields__)]
+        lookup = {i: v for (i, v) in enumerate(base_model.model_fields)}
+        config_list = [f"{i}: {v}" for (i, v) in enumerate(base_model.model_fields)]
         print(f"you selected the basemodel {base_model.__name__}:")  # type: ignore[attr-defined]
         for row in config_list:
             print(f"\t{row}")
@@ -105,7 +105,9 @@ def handle_subclass_model(
         configuration_to_update = lookup[
             int(input("select a specific configuration from above\n"))
         ]
-        field_type = base_model.__fields__[configuration_to_update].type_
+        field_type = base_model.model_fields[
+            configuration_to_update
+        ].rebuild_annotation()
         is_basemodel = isinstance(field_type, ModelMetaclass)
 
         top_level_configuration.append(configuration_to_update)
@@ -196,7 +198,7 @@ def load_and_update_file_from_config(
     """
     camel_list_to_update = iter([_change_to_camel_case(i) for i in config_to_update])
 
-    if config_to_update[0] in PipetteGeometryDefinition.__fields__:
+    if config_to_update[0] in PipetteGeometryDefinition.model_fields:
         geometry = _geometry(
             model_to_update.pipette_channels,
             model_to_update.pipette_type,
@@ -229,7 +231,7 @@ def load_and_update_file_from_config(
             f"{model_to_update.pipette_version.major}_{model_to_update.pipette_version.minor}",
             geometry,
         )
-    elif config_to_update[0] in PipettePhysicalPropertiesDefinition.__fields__:
+    elif config_to_update[0] in PipettePhysicalPropertiesDefinition.model_fields:
         physical = _physical(
             model_to_update.pipette_channels,
             model_to_update.pipette_type,
@@ -400,9 +402,9 @@ def determine_models_to_update(update_all_models: bool) -> None:
                     f"NOTE: updating the {configuration_to_update[0]} will automatically update the {NOZZLE_LOCATION_CONFIGS[1]}\n"
                 )
 
-            field_type = PipetteConfigurations.__fields__[
+            field_type = PipetteConfigurations.model_fields[
                 configuration_to_update[0]
-            ].type_
+            ].rebuild_annotation()
             is_basemodel = isinstance(field_type, ModelMetaclass)
 
             configuration_to_update = handle_subclass_model(
