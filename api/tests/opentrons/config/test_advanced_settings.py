@@ -33,6 +33,14 @@ def mock_settings_values_flex() -> Dict[str, Optional[bool]]:
         if RobotTypeEnum.FLEX in s.robot_type and not s.internal_only
     }
 
+@pytest.fixture
+def mock_settings_values_flex_all() -> Dict[str, Optional[bool]]:
+    return {
+        s.id: False
+        for s in advanced_settings.settings
+        if RobotTypeEnum.FLEX in s.robot_type
+    }
+
 
 @pytest.fixture
 def mock_settings_values_empty() -> Dict[str, Optional[bool]]:
@@ -70,12 +78,12 @@ def mock_read_settings_file_ot2(
 
 @pytest.fixture
 def mock_read_settings_file_flex(
-    mock_settings_values_flex: Dict[str, Optional[bool]],
+    mock_settings_values_flex_all: Dict[str, Optional[bool]],
     mock_settings_version: int,
 ) -> Generator[MagicMock, None, None]:
     with patch("opentrons.config.advanced_settings._read_settings_file") as p:
         p.return_value = advanced_settings.SettingsData(
-            settings_map=mock_settings_values_flex,
+            settings_map=mock_settings_values_flex_all,
             version=mock_settings_version,
         )
         yield p
