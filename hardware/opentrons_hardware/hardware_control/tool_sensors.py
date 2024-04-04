@@ -44,19 +44,6 @@ from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
 )
-from opentrons_hardware.firmware_bindings.messages.payloads import (
-    BindSensorOutputRequestPayload,
-    SendAccumulatedPressureDataPayload,
-)
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    BindSensorOutputRequest,
-    SendAccumulatedPressureDataRequest,
-)
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    SensorOutputBindingField,
-    SensorTypeField,
-    SensorIdField,
-)
 from opentrons_hardware.sensors.sensor_types import SensorInformation, PressureSensor
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.sensors.utils import SensorThresholdInformation
@@ -220,7 +207,6 @@ async def liquid_probe(
     sensor_id: SensorId = SensorId.S0,
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""
-    log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
     sensor_driver = SensorDriver()
     threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
     pressure_sensor = PressureSensor.build(
@@ -245,7 +231,7 @@ async def liquid_probe(
     )
 
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
-    log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
+    log_file: str = "/data/pressure_sensor_data.csv" if not data_file else data_file
     if csv_output:
         return await run_stream_output_to_csv(
             messenger,
