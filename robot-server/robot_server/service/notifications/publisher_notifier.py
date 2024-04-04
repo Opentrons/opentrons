@@ -19,7 +19,7 @@ class PublisherNotifier:
         self,
         change_notifier: Optional[ChangeNotifier] = None,
     ):
-        self._change_notifier = change_notifier or ChangeNotifier()
+        self._change_notifier = change_notifier or ChangeNotifier(max_queue_size=1)
         self._pe_notifier: Optional[asyncio.Task[None]] = None
         self._callbacks: List[Callable[[], Awaitable[None]]] = []
 
@@ -39,8 +39,7 @@ class PublisherNotifier:
 
     async def _wait_for_event(self) -> None:
         """Indefinitely wait for an event to occur, then invoke each callback."""
-        while True:
-            await self._change_notifier.wait()
+        async for _ in self._change_notifier.wait():
             for callback in self._callbacks:
                 await callback()
 
