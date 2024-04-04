@@ -66,7 +66,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
   ] = React.useState<RunTimeParameter[]>(runTimeParameters)
-  const [isParamError, setIsParamError] = React.useState<boolean>(false)
+  const [hasParamError, setHasParamError] = React.useState<boolean>(false)
 
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis,
@@ -231,7 +231,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
                 <PrimaryButton
                   width="50%"
                   onClick={handleProceed}
-                  disabled={isParamError}
+                  disabled={hasParamError}
                 >
                   {isCreatingRun ? (
                     <Icon name="ot-spinner" spin size="1rem" />
@@ -254,7 +254,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       runCreationError={runCreationError}
       runCreationErrorCode={runCreationErrorCode}
       showIdleOnly={true}
-      setIsParamError={setIsParamError}
+      setHasParamError={setHasParamError}
     />
   )
 }

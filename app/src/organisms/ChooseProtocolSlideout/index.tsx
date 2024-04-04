@@ -92,7 +92,7 @@ export function ChooseProtocolSlideoutComponent(
     setRunTimeParametersOverrides,
   ] = React.useState<RunTimeParameter[]>([])
   const [currentPage, setCurrentPage] = React.useState<number>(1)
-  const [isParamError, setIsParamError] = React.useState<boolean>(false)
+  const [hasParamError, setHasParamError] = React.useState<boolean>(false)
   const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
 
   React.useEffect(() => {
@@ -101,7 +101,7 @@ export function ChooseProtocolSlideoutComponent(
     )
   }, [selectedProtocol])
   React.useEffect(() => {
-    setIsParamError(errors.length > 0)
+    setHasParamError(errors.length > 0)
   }, [runTimeParametersOverrides])
 
   const runTimeParametersFromAnalysis =
@@ -192,7 +192,7 @@ export function ChooseProtocolSlideoutComponent(
       parameter => parameter.value !== parameter.default
     ) ?? false
 
-  const errors = []
+  const errors: string[] = []
   const runTimeParametersInputs =
     runTimeParametersOverrides?.map((runtimeParam, index) => {
       if ('choices' in runtimeParam) {
@@ -397,7 +397,7 @@ export function ChooseProtocolSlideoutComponent(
         <PrimaryButton
           width="49%"
           onClick={handleProceed}
-          disabled={isParamError}
+          disabled={hasParamError}
         >
           {isCreatingRun ? (
             <Icon name="ot-spinner" spin size="1rem" />

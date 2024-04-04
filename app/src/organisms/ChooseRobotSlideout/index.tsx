@@ -113,7 +113,7 @@ interface ChooseRobotSlideoutProps
   isAnalysisStale?: boolean
   showIdleOnly?: boolean
   multiSlideout?: { currentPage: number } | null
-  setIsParamError?: (isError: boolean) => void
+  setHasParamError?: (isError: boolean) => void
 }
 
 export function ChooseRobotSlideout(
@@ -139,7 +139,7 @@ export function ChooseRobotSlideout(
     multiSlideout = null,
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
-    setIsParamError,
+    setHasParamError,
   } = props
 
   const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
@@ -332,7 +332,7 @@ export function ChooseRobotSlideout(
     </Flex>
   )
 
-  const errors = []
+  const errors: string[] = []
   const runTimeParameters =
     runTimeParametersOverrides?.map((runtimeParam, index) => {
       if ('choices' in runtimeParam) {
@@ -480,8 +480,8 @@ export function ChooseRobotSlideout(
       }
     }) ?? null
 
-  if (setIsParamError != null) {
-    setIsParamError(errors.length > 0)
+  if (setHasParamError != null) {
+    setHasParamError(errors.length > 0)
   }
 
   const isRestoreDefaultsLinkEnabled =
