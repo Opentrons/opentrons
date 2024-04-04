@@ -210,7 +210,7 @@ def run(tip: int, run_args: RunArgs) -> None:
     trials_before_jog = run_args.trials_before_jog
     tip_offset = 0.0
     for trial in range(run_args.trials):
-        if (trials_before_jog > 0) and (trial % trials_before_jog == 0):
+        if trial % trials_before_jog == 0:
             tip_offset = _get_baseline()
 
         print(f"Picking up {tip}ul tip")
