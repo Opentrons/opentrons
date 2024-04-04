@@ -62,6 +62,7 @@
   "tip_position": {
     "title": "Tip Positioning",
     "caption": "between {{min}} and {{max}}",
+    "warning": "The X and/or Y position value is close to edge of the well and might collide with it",
     "radio_button": {
       "default": "{{defaultMmFromBottom}} mm from the bottom center (default)",
       "blowout": "0 mm from the top center (default)",

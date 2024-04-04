@@ -12,13 +12,14 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
-import modalStyles from '../../../modals/modal.module.css'
 import { getIsTouchTipField } from '../../../../form-types'
-import { TOO_MANY_DECIMALS } from './constants'
+import { PDAlert } from '../../../alerts/PDAlert'
+import { TOO_MANY_DECIMALS, PERCENT_RANGE_TO_SHOW_WARNING } from './constants'
 import { TipPositionAllViz } from './TipPositionAllViz'
+import * as utils from './utils'
 
 import styles from './TipPositionInput.module.css'
-import * as utils from './utils'
+import modalStyles from '../../../modals/modal.module.css'
 
 import type { StepFieldName } from '../../../../form-types'
 
@@ -57,7 +58,9 @@ export const TipPositionModal = (
   const { t } = useTranslation(['modal', 'button'])
 
   if (zSpec == null || xSpec == null || ySpec == null) {
-    console.error('expected to find specs for the zPosition but could not')
+    console.error(
+      'expected to find specs for one of the positions but could not'
+    )
   }
 
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
@@ -135,9 +138,14 @@ export const TipPositionModal = (
     return utils.getErrorText({ errors, minMm: min, maxMm: max, isPristine, t })
   }
 
+  const roundedXMin = utils.roundValue(xMinWidth)
+  const roundedYMin = utils.roundValue(yMinWidth)
+  const roundedXMax = utils.roundValue(xMaxWidth)
+  const roundedYMax = utils.roundValue(yMaxWidth)
+
   const zErrorText = createErrorText(zErrors, minMmFromBottom, maxMmFromBottom)
-  const xErrorText = createErrorText(xErrors, xMinWidth, xMaxWidth)
-  const yErrorText = createErrorText(yErrors, yMinWidth, yMaxWidth)
+  const xErrorText = createErrorText(xErrors, roundedXMin, roundedXMax)
+  const yErrorText = createErrorText(yErrors, roundedYMin, roundedYMax)
 
   const handleDone = (): void => {
     setPristine(false)
@@ -218,6 +226,14 @@ export const TipPositionModal = (
   ): void => {
     handleYChange(e.currentTarget.value)
   }
+  const isXValueNearEdge =
+    xValue != null &&
+    (parseInt(xValue) > PERCENT_RANGE_TO_SHOW_WARNING * xMaxWidth ||
+      parseInt(xValue) < PERCENT_RANGE_TO_SHOW_WARNING * xMinWidth)
+  const isYValueNearEdge =
+    yValue != null &&
+    (parseInt(yValue) > PERCENT_RANGE_TO_SHOW_WARNING * yMaxWidth ||
+      parseInt(yValue) < PERCENT_RANGE_TO_SHOW_WARNING * yMinWidth)
 
   const TipPositionInputField = !isDefault ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -227,8 +243,8 @@ export const TipPositionModal = (
         </StyledText>
         <InputField
           caption={t('tip_position.caption', {
-            min: xMinWidth,
-            max: xMaxWidth,
+            min: roundedXMin,
+            max: roundedXMax,
           })}
           error={xErrorText}
           className={styles.position_from_bottom_input}
@@ -244,8 +260,8 @@ export const TipPositionModal = (
         </StyledText>
         <InputField
           caption={t('tip_position.caption', {
-            min: yMinWidth,
-            max: yMaxWidth,
+            min: roundedYMin,
+            max: roundedYMax,
           })}
           error={yErrorText}
           className={styles.position_from_bottom_input}
@@ -298,6 +314,17 @@ export const TipPositionModal = (
         <h4>{t('tip_position.title')}</h4>
         <p>{t(`tip_position.body.${zSpec?.name}`)}</p>
       </div>
+
+      {(isXValueNearEdge || isYValueNearEdge) && !isDefault ? (
+        <Flex marginTop={SPACING.spacing8}>
+          <PDAlert
+            alertType="warning"
+            title=""
+            description={t('tip_position.warning')}
+          />
+        </Flex>
+      ) : null}
+
       <div className={styles.main_row}>
         <Flex alignItems="flex-start">
           <Flex flexDirection={DIRECTION_COLUMN}>
