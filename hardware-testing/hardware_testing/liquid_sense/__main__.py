@@ -7,6 +7,7 @@ import subprocess
 from time import sleep
 import os
 from typing import List, Any, Optional
+import traceback
 
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.gravimetric import helpers, workarounds
@@ -290,6 +291,7 @@ if __name__ == "__main__":
             execute.run(tip, run_args)
     except Exception as e:
         ui.print_info(f"got error {e}")
+        print(traceback.format_exc())
     finally:
         if run_args.recorder is not None:
             ui.print_info("ending recording")
