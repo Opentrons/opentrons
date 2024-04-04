@@ -46,8 +46,9 @@ export function ParametersTable({
         return minMax
       case 'bool':
         return t != null ? t('on_off') : 'On, off'
+      default:
+        return ''
     }
-    return ''
   }
 
   return (
