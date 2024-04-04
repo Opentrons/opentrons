@@ -97,10 +97,13 @@ export function AddFixtureModal({
   let initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only mag block (a module) can be configured in column 2
     ? 'moduleOptions'
     : 'modulesOrFixtures'
-  if (providedFixtureOptions != null) { // only show provided options if given as props
+  if (providedFixtureOptions != null) {
+    // only show provided options if given as props
     initialStage = 'providedOptions'
   }
-  const [optionStage, setOptionStage] = React.useState<OptionStage>(initialStage)
+  const [optionStage, setOptionStage] = React.useState<OptionStage>(
+    initialStage
+  )
 
   const modalHeader: ModalHeaderBaseProps = {
     title: t('add_to_slot', {
@@ -120,15 +123,16 @@ export function AddFixtureModal({
     width: '26.75rem',
   }
 
-
   let availableOptions: CutoutConfig[][] = []
 
   if (providedFixtureOptions != null) {
-    availableOptions = providedFixtureOptions?.map(o => ([{
-      cutoutId,
-      cutoutFixtureId: o,
-      opentronsModuleSerialNumber: undefined,
-    }]))
+    availableOptions = providedFixtureOptions?.map(o => [
+      {
+        cutoutId,
+        cutoutFixtureId: o,
+        opentronsModuleSerialNumber: undefined,
+      },
+    ])
   } else if (optionStage === 'fixtureOptions') {
     if (
       SINGLE_RIGHT_CUTOUTS.includes(cutoutId) ||
@@ -136,34 +140,40 @@ export function AddFixtureModal({
     ) {
       availableOptions = [
         ...availableOptions,
-        [{
-          cutoutId,
-          cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE
-        }],
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+          },
+        ],
       ]
     }
     if (STAGING_AREA_CUTOUTS.includes(cutoutId)) {
       availableOptions = [
         ...availableOptions,
-        [{
-          cutoutId,
-          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE
-        }],
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+          },
+        ],
       ]
     }
   } else if (optionStage === 'moduleOptions') {
     availableOptions = [
       ...availableOptions,
-      [{
-        cutoutId,
-        cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE
-      }],
+      [
+        {
+          cutoutId,
+          cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
+        },
+      ],
     ]
     if (unconfiguredMods.length > 0) {
       if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
         const unconfiguredTCs = unconfiguredMods
           .filter(mod => mod.moduleModel === THERMOCYCLER_MODULE_V2)
-          .map(mod => ([
+          .map(mod => [
             {
               cutoutId: THERMOCYCLER_MODULE_CUTOUTS[0],
               cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
@@ -173,8 +183,8 @@ export function AddFixtureModal({
               cutoutId: THERMOCYCLER_MODULE_CUTOUTS[1],
               cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
               opentronsModuleSerialNumber: mod.serialNumber,
-            }
-          ]))
+            },
+          ])
         availableOptions = [...availableOptions, ...unconfiguredTCs]
       }
       if (
@@ -183,11 +193,13 @@ export function AddFixtureModal({
       ) {
         const unconfiguredHeaterShakers = unconfiguredMods
           .filter(mod => mod.moduleModel === HEATERSHAKER_MODULE_V1)
-          .map(mod => ([{
-            cutoutId,
-            cutoutFixtureId: HEATERSHAKER_MODULE_V1_FIXTURE,
-            opentronsModuleSerialNumber: mod.serialNumber,
-          }]))
+          .map(mod => [
+            {
+              cutoutId,
+              cutoutFixtureId: HEATERSHAKER_MODULE_V1_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
         availableOptions = [...availableOptions, ...unconfiguredHeaterShakers]
       }
       if (
@@ -196,11 +208,13 @@ export function AddFixtureModal({
       ) {
         const unconfiguredTemperatureModules = unconfiguredMods
           .filter(mod => mod.moduleModel === TEMPERATURE_MODULE_V2)
-          .map(mod => ([{
-            cutoutId,
-            cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
-            opentronsModuleSerialNumber: mod.serialNumber,
-          }]))
+          .map(mod => [
+            {
+              cutoutId,
+              cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
+              opentronsModuleSerialNumber: mod.serialNumber,
+            },
+          ])
         availableOptions = [
           ...availableOptions,
           ...unconfiguredTemperatureModules,
@@ -208,10 +222,12 @@ export function AddFixtureModal({
       }
     }
   } else if (optionStage === 'wasteChuteOptions') {
-    availableOptions = WASTE_CHUTE_FIXTURES.map(fixture => ([{
-      cutoutId,
-      cutoutFixtureId: fixture,
-    }]))
+    availableOptions = WASTE_CHUTE_FIXTURES.map(fixture => [
+      {
+        cutoutId,
+        cutoutFixtureId: fixture,
+      },
+    ])
   }
 
   const handleAddODD = (cutoutConfigs: CutoutConfig[]): void => {
@@ -254,7 +270,10 @@ export function AddFixtureModal({
         />
       </>
     )
-  } else if (optionStage === 'fixtureOptions' && cutoutId === WASTE_CHUTE_CUTOUT) {
+  } else if (
+    optionStage === 'fixtureOptions' &&
+    cutoutId === WASTE_CHUTE_CUTOUT
+  ) {
     nextStageOptions = (
       <>
         <FixtureOption
@@ -272,7 +291,9 @@ export function AddFixtureModal({
 
   const handleAddDesktop = (addedCutoutConfigs: CutoutConfig[]): void => {
     const newDeckConfig = deckConfig.map(fixture => {
-      const replacementCutoutConfig = addedCutoutConfigs.find(c => c.cutoutId === fixture.cutoutId)
+      const replacementCutoutConfig = addedCutoutConfigs.find(
+        c => c.cutoutId === fixture.cutoutId
+      )
       return replacementCutoutConfig ?? fixture
     })
 
@@ -319,7 +340,11 @@ export function AddFixtureModal({
                   key={cutoutConfigs[0].cutoutFixtureId}
                   optionName={getFixtureDisplayName(
                     cutoutConfigs[0].cutoutFixtureId,
-                    (modulesData?.data ?? []).find(m => m.serialNumber === cutoutConfigs[0].opentronsModuleSerialNumber)?.usbPort.port
+                    (modulesData?.data ?? []).find(
+                      m =>
+                        m.serialNumber ===
+                        cutoutConfigs[0].opentronsModuleSerialNumber
+                    )?.usbPort.port
                   )}
                   buttonText={t('add')}
                   onClickHandler={() => handleAddDesktop(cutoutConfigs)}

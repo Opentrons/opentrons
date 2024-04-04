@@ -16,19 +16,31 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
-import type { CutoutFixtureId, CutoutId, DeckDefinition } from '@opentrons/shared-data'
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
 interface TrashBinConfigFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
-  handleClickRemove?: (fixtureLocation: CutoutId, cutoutFixtureId: CutoutFixtureId) => void
+  handleClickRemove?: (
+    fixtureLocation: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ) => void
 }
 
 export function TrashBinConfigFixture(
   props: TrashBinConfigFixtureProps
 ): JSX.Element {
-  const { deckDefinition, handleClickRemove, fixtureLocation, cutoutFixtureId } = props
+  const {
+    deckDefinition,
+    handleClickRemove,
+    fixtureLocation,
+    cutoutFixtureId,
+  } = props
 
   const trashBinCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation

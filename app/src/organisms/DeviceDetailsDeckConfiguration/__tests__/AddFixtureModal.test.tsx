@@ -164,8 +164,6 @@ describe('Desktop AddFixtureModal', () => {
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
   })
 
-
-
   it('should call update deck config when add button is clicked', () => {
     props = { ...props, cutoutId: 'cutoutA1' }
     render(props)

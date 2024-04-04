@@ -86,14 +86,19 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
 
-  const moduleModels = map(moduleRenderInfoForProtocolById, ({ moduleDef }) => moduleDef.model)
-  const showOT2MoamHelp = robotModel === OT2_ROBOT_TYPE && new Set(moduleModels).size !== moduleModels.length
+  const moduleModels = map(
+    moduleRenderInfoForProtocolById,
+    ({ moduleDef }) => moduleDef.model
+  )
+  const showOT2MoamHelp =
+    robotModel === OT2_ROBOT_TYPE &&
+    new Set(moduleModels).size !== moduleModels.length
 
   return (
     <>
       {showOT2MoamHelp ? <OT2MultipleModulesHelp /> : null}
       {remainingAttachedModules.length !== 0 &&
-        missingModuleIds.length !== 0 ? (
+      missingModuleIds.length !== 0 ? (
         <UnMatchedModuleWarning />
       ) : null}
 
@@ -255,7 +260,7 @@ export function ModulesListItem({
           {t('calibrate_now')}
         </TertiaryButton>
         {(!calibrationStatus?.complete && calibrationStatus?.reason != null) ||
-          isModuleTooHot ? (
+        isModuleTooHot ? (
           <Tooltip tooltipProps={tooltipProps}>
             {calibrateDisabledReason}
           </Tooltip>
@@ -330,7 +335,11 @@ export function ModulesListItem({
               {subText}
             </Flex>
           </Flex>
-          <Flex width="15%" flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
+          <Flex
+            width="15%"
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+          >
             <StyledText as="p">
               {getModuleType(moduleModel) === 'thermocyclerModuleType'
                 ? isFlex
@@ -340,7 +349,9 @@ export function ModulesListItem({
             </StyledText>
             {attachedModuleMatch?.usbPort.port != null ? (
               <StyledText as="p">
-                {t('usb_port_number', { port: attachedModuleMatch.usbPort.port })}
+                {t('usb_port_number', {
+                  port: attachedModuleMatch.usbPort.port,
+                })}
               </StyledText>
             ) : null}
           </Flex>

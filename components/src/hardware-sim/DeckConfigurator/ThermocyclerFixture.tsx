@@ -13,13 +13,20 @@ import {
   THERMOCYCLER_FIXTURE_HEIGHT,
 } from './constants'
 
-import type { CutoutFixtureId, CutoutId, DeckDefinition } from '@opentrons/shared-data'
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
 interface ThermocyclerFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
   cutoutFixtureId: CutoutFixtureId
-  handleClickRemove?: (fixtureLocation: CutoutId, cutoutFixtureId: CutoutFixtureId) => void
+  handleClickRemove?: (
+    fixtureLocation: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ) => void
 }
 
 const THERMOCYCLER_FIXTURE_DISPLAY_NAME = 'Thermocycler'
@@ -27,7 +34,12 @@ const THERMOCYCLER_FIXTURE_DISPLAY_NAME = 'Thermocycler'
 export function ThermocyclerFixture(
   props: ThermocyclerFixtureProps
 ): JSX.Element {
-  const { deckDefinition, handleClickRemove, fixtureLocation, cutoutFixtureId } = props
+  const {
+    deckDefinition,
+    handleClickRemove,
+    fixtureLocation,
+    cutoutFixtureId,
+  } = props
 
   const cutoutDef = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation

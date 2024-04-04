@@ -116,8 +116,8 @@ export function OT2MultipleModulesHelp(): JSX.Element {
               </Flex>
             </LegacyModal>,
             getTopPortalEl()
-          ) : null
-      }
+          )
+        : null}
     </>
   )
 }

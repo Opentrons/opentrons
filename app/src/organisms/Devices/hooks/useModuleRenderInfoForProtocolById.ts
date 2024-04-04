@@ -63,14 +63,20 @@ export function useModuleRenderInfoForProtocolById(
             ) && !matchedAmod.find(m => m === attachedMod)
         ) ?? null
 
-      const moduleFixtures = getCutoutFixturesForModuleModel(protocolMod.moduleDef.model, deckDef)
-      const moduleCutoutIds = getCutoutIdsFromModuleSlotName(protocolMod.slotName, moduleFixtures)
+      const moduleFixtures = getCutoutFixturesForModuleModel(
+        protocolMod.moduleDef.model,
+        deckDef
+      )
+      const moduleCutoutIds = getCutoutIdsFromModuleSlotName(
+        protocolMod.slotName,
+        moduleFixtures
+      )
 
       const conflictedFixture =
         deckConfig?.find(
-          ({cutoutId, cutoutFixtureId}) =>
+          ({ cutoutId, cutoutFixtureId }) =>
             moduleCutoutIds.includes(cutoutId) &&
-            !moduleFixtures.some(({id}) => cutoutFixtureId === id)
+            !moduleFixtures.some(({ id }) => cutoutFixtureId === id)
         ) ?? null
 
       if (compatibleAttachedModule !== null) {

@@ -30,7 +30,7 @@ import { NotConfiguredModal } from './NotConfiguredModal'
 import { getFixtureImage } from './utils'
 import { DeckFixtureSetupInstructionsModal } from '../../../DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 
-import type {DeckDefinition} from '@opentrons/shared-data'
+import type { DeckDefinition } from '@opentrons/shared-data'
 import type { CutoutConfigAndCompatibility } from '../../../../resources/deck_configuration/hooks'
 
 interface SetupFixtureListProps {
@@ -38,7 +38,7 @@ interface SetupFixtureListProps {
 }
 /**
  * List items of all "non-module" fixtures e.g. staging slot, waste chute, trash bin...
- * @param props 
+ * @param props
  * @returns JSX.Element
  */
 export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
@@ -47,15 +47,15 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
   return (
     <>
       {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
-        return cutoutConfigAndCompatibility.requiredAddressableAreas.some(raa => FLEX_MODULE_ADDRESSABLE_AREAS.includes(raa))
-          ? null // don't list modules here, they're covered by SetupModuleList
-          : (
-            <FixtureListItem
-              key={cutoutConfigAndCompatibility.cutoutId}
-              deckDef={deckDef}
-              {...cutoutConfigAndCompatibility}
-            />
-          )
+        return cutoutConfigAndCompatibility.requiredAddressableAreas.some(raa =>
+          FLEX_MODULE_ADDRESSABLE_AREAS.includes(raa)
+        ) ? null : ( // don't list modules here, they're covered by SetupModuleList
+          <FixtureListItem
+            key={cutoutConfigAndCompatibility.cutoutId}
+            deckDef={deckDef}
+            {...cutoutConfigAndCompatibility}
+          />
+        )
       })}
     </>
   )
@@ -70,7 +70,7 @@ export function FixtureListItem({
   cutoutFixtureId,
   compatibleCutoutFixtureIds,
   missingLabwareDisplayName,
-  deckDef
+  deckDef,
 }: FixtureListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
