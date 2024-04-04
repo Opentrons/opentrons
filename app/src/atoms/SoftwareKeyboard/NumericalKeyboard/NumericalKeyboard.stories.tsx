@@ -57,7 +57,7 @@ const Template: Story<
         position={POSITION_ABSOLUTE}
         top="20%"
         width="22.5rem"
-        height="21.25rem"
+        height="max-content"
       >
         {showKeyboard && (
           <NumericalKeyboard
