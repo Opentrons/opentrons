@@ -1,28 +1,33 @@
-include ../scripts/python.mk
+.PHONY: ruff-check
+ruff-check:
+	pipenv run python -m ruff check . 
+
+.PHONY: mypy
+mypy:
+	pipenv run python -m mypy --pretty .
+
+.PHONY: ruff-fix
+ruff-fix:
+	pipenv run python -m ruff check . --fix
+
+.PHONY: format-readme
+format-readme:
+	pipenv run python -m mdformat README.md
 
 .PHONY: lint
 lint:
-	$(python) -m black --check .
-	$(python) -m flake8 .
-	$(python) -m mypy .
+	$(MAKE) ruff-check
+	$(MAKE) mypy
 
 .PHONY: format
 format:
-	$(python) -m black .
+	$(MAKE) ruff-fix
+	$(MAKE) format-readme
 
 .PHONY: setup
 setup:
-	$(pipenv) sync --dev
+	pipenv sync --dev
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
-
-.PHONY: clean
-clean:
-	rm -rf build dist *.egg-info .mypy_cache .pytest_cache src/performance_metrics.egg-info
-
-.PHONY: wheel
-wheel:
-	$(python) setup.py $(wheel_opts) bdist_wheel
-	rm -rf build
+	pipenv --dev --rm
