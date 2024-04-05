@@ -39,6 +39,7 @@ import {
   THERMOCYCLER_MODULE_V2,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
 } from './constants'
 import type {
   AddressableAreaName,
@@ -241,6 +242,8 @@ export function getFixtureDisplayName(
         : getModuleDisplayName(TEMPERATURE_MODULE_V2)
     case MAGNETIC_BLOCK_V1_FIXTURE:
       return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)}`
+    case STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE:
+      return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)} with staging area slot`
     case THERMOCYCLER_V2_REAR_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(

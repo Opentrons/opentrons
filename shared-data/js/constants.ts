@@ -471,6 +471,7 @@ export const HEATERSHAKER_MODULE_V1_FIXTURE: 'heaterShakerModuleV1' =
 export const TEMPERATURE_MODULE_V2_FIXTURE: 'temperatureModuleV2' =
   'temperatureModuleV2'
 export const MAGNETIC_BLOCK_V1_FIXTURE: 'magneticBlockV1' = 'magneticBlockV1'
+export const STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE: 'stagingAreaSlotWithMagneticBlockV1' = 'stagingAreaSlotWithMagneticBlockV1'
 export const THERMOCYCLER_V2_REAR_FIXTURE: 'thermocyclerModuleV2Rear' =
   'thermocyclerModuleV2Rear'
 export const THERMOCYCLER_V2_FRONT_FIXTURE: 'thermocyclerModuleV2Front' =

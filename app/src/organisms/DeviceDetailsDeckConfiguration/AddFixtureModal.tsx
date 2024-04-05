@@ -32,6 +32,7 @@ import {
   SINGLE_RIGHT_CUTOUTS,
   STAGING_AREA_CUTOUTS,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   TEMPERATURE_MODULE_CUTOUTS,
   TEMPERATURE_MODULE_V2,
   TEMPERATURE_MODULE_V2_FIXTURE,
@@ -169,6 +170,17 @@ export function AddFixtureModal({
         },
       ],
     ]
+    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+      availableOptions = [
+        ...availableOptions,
+        [
+          {
+            cutoutId,
+            cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+          },
+        ],
+      ]
+    }
     if (unconfiguredMods.length > 0) {
       if (THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId)) {
         const unconfiguredTCs = unconfiguredMods

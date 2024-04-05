@@ -123,6 +123,7 @@ export type FlexModuleCutoutFixtureId =
   | 'heaterShakerModuleV1'
   | 'temperatureModuleV2'
   | 'magneticBlockV1'
+  | 'stagingAreaSlotWithMagneticBlockV1'
   | 'thermocyclerModuleV2Rear'
   | 'thermocyclerModuleV2Front'
 
