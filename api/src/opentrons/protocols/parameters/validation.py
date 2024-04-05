@@ -75,6 +75,36 @@ def ensure_value_type(
     return validated_value
 
 
+def ensure_float_value(value: Union[float, int]) -> float:
+    """Ensures that if we are expecting a float and receive an int, that will be converted to a float."""
+    if not isinstance(value, bool) and isinstance(value, int):
+        return float(value)
+    return value
+
+
+def ensure_optional_float_value(value: Optional[Union[float, int]]) -> Optional[float]:
+    """Ensures that if we are expecting an optional float and receive an int, that will be converted to a float."""
+    if not isinstance(value, bool) and isinstance(value, int):
+        return float(value)
+    return value
+
+
+def ensure_float_choices(
+    choices: Optional[List[ParameterChoice]],
+) -> Optional[List[ParameterChoice]]:
+    """Ensures that if we are expecting float parameter choices and any are int types, those will be converted."""
+    if choices is not None:
+        return [
+            ParameterChoice(
+                display_name=choice["display_name"],
+                # Type ignore because if for some reason this is a str or bool, that will raise in `validate_options`
+                value=ensure_float_value(choice["value"]),  # type: ignore[arg-type]
+            )
+            for choice in choices
+        ]
+    return choices
+
+
 def convert_type_string_for_enum(
     parameter_type: type,
 ) -> Literal["int", "float", "str"]:

@@ -151,6 +151,67 @@ def test_ensure_value_type(
 
 
 @pytest.mark.parametrize(
+    ["value", "result"],
+    [
+        (1, 1.0),
+        (2.0, 2.0),
+        (3.3, 3.3),
+    ],
+)
+def test_ensure_float_value(value: Union[float, int], result: float) -> None:
+    """It should ensure that if applicable, the value is coerced into a float."""
+    assert result == subject.ensure_float_value(value)
+
+
+@pytest.mark.parametrize(
+    ["value", "result"],
+    [
+        (1, 1.0),
+        (2.0, 2.0),
+        (3.3, 3.3),
+        (None, None),
+    ],
+)
+def test_ensure_optional_float_value(value: Union[float, int], result: float) -> None:
+    """It should ensure that if applicable, the value is coerced into a float."""
+    assert result == subject.ensure_optional_float_value(value)
+
+
+@pytest.mark.parametrize(
+    ["choices", "result"],
+    [
+        ([], []),
+        (None, None),
+        (
+            [{"display_name": "foo", "value": 1}],
+            [{"display_name": "foo", "value": 1.0}],
+        ),
+        (
+            [{"display_name": "foo", "value": 2.0}],
+            [{"display_name": "foo", "value": 2.0}],
+        ),
+        (
+            [{"display_name": "foo", "value": 3.3}],
+            [{"display_name": "foo", "value": 3.3}],
+        ),
+        (
+            [{"display_name": "foo", "value": "4"}],
+            [{"display_name": "foo", "value": "4"}],
+        ),
+        (
+            [{"display_name": "foo", "value": True}],
+            [{"display_name": "foo", "value": True}],
+        ),
+    ],
+)
+def test_ensure_float_choices(
+    choices: Optional[List[ParameterChoice]], result: Optional[List[ParameterChoice]]
+) -> None:
+    """It should ensure that if applicable, the value in a choice is coerced into a float."""
+    assert result == subject.ensure_float_choices(choices)
+
+
+@pytest.mark.parametrize(
     ["param_type", "result"],
     [(int, "int"), (float, "float"), (str, "str")],
 )
