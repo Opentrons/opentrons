@@ -104,7 +104,7 @@ export const LocationConflictModal = (
     if (requiredFixtureId != null) {
       const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
         fixture.cutoutId === cutoutId
-          ? { ...fixture, cutoutFixtureId: requiredFixtureId }
+          ? { ...fixture, cutoutFixtureId: requiredFixtureId, opentronsModuleSerialNumber: undefined }
           : fixture
       )
 

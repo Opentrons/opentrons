@@ -54,7 +54,7 @@ interface DeviceDetailsDeckConfigurationProps {
   robotName: string
 }
 
-function getDisplayLocationForFixtureGroup(cutouts: CutoutId[]): string {
+function getDisplayLocationForCutoutIds(cutouts: CutoutId[]): string {
   return cutouts.map(cutoutId => getCutoutDisplayName(cutoutId)).join(' + ')
 }
 
@@ -109,17 +109,8 @@ export function DeviceDetailsDeckConfiguration({
 
     let newDeckConfig = deckConfig
     if (cutoutId in fixtureGroup) {
-      const groupMap =
-        fixtureGroup[cutoutId]?.find(group =>
-          Object.entries(group).every(([cId, cfId]) =>
-            deckConfig.find(
-              config =>
-                config.cutoutId === cId && config.cutoutFixtureId === cfId
-            )
-          )
-        ) ?? {}
-      console.log('GROUP MAP', groupMap)
-      newDeckConfig = deckConfig.map(cutoutConfig =>
+      const groupMap = fixtureGroup[cutoutId]?.find(group => Object.entries(group).every(([cId, cfId]) => (deckConfig.find(config => config.cutoutId === cId && config.cutoutFixtureId === cfId)))) ?? {}
+      newDeckConfig = deckConfig.map(cutoutConfig => (
         cutoutConfig.cutoutId in groupMap
           ? {
               ...cutoutConfig,
@@ -160,21 +151,13 @@ export function DeviceDetailsDeckConfiguration({
           m => m.serialNumber === opentronsModuleSerialNumber
         )?.usbPort.port
       )
-      const fixtureGroup = getFixtureGroupForCutoutFixture(
-        cutoutFixtureId,
-        deckDef.cutoutFixtures
-      )
-      if (fixtureGroup.length > 1) {
-        const groupedCutoutIds = fixtureGroup
-          .map(
-            groupedFixtureId =>
-              deckConfig.find(cc => cc.cutoutFixtureId === groupedFixtureId)
-                ?.cutoutId
-          )
-          .filter((cc): cc is CutoutId => cc !== null)
-        const displayLocation = getDisplayLocationForFixtureGroup(
-          groupedCutoutIds
-        )
+      const fixtureGroup =
+        deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
+          ?.fixtureGroup ?? {}
+      if (cutoutId in fixtureGroup) {
+        const groupMap = fixtureGroup[cutoutId]?.find(group => Object.entries(group).every(([cId, cfId]) => (deckConfig.find(config => config.cutoutId === cId && config.cutoutFixtureId === cfId)))) ?? {}
+        const groupedCutoutIds = Object.keys(groupMap) as CutoutId[]
+        const displayLocation = getDisplayLocationForCutoutIds(groupedCutoutIds)
         if (acc.groupedCutoutIds.includes(cutoutId)) {
           return acc // only list grouped fixtures once
         } else {
@@ -189,7 +172,7 @@ export function DeviceDetailsDeckConfiguration({
         displayList: [
           ...acc.displayList,
           {
-            displayLocation: getDisplayLocationForFixtureGroup([cutoutId]),
+            displayLocation: getDisplayLocationForCutoutIds([cutoutId]),
             displayName,
           },
         ],

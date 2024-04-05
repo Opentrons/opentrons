@@ -56,6 +56,7 @@ import type {
 } from './types'
 import type { LoadModuleCreateCommand, ModuleLocation } from '../command'
 import { getModuleDisplayName } from './modules'
+import { getCutoutIdForSlotName } from './helpers'
 
 export function getCutoutDisplayName(cutout: CutoutId): string {
   return cutout.replace('cutout', '')
@@ -134,10 +135,10 @@ export function getPositionFromSlotId(
   const slotPosition: CoordinateTuple | null =
     cutoutPosition != null
       ? [
-          cutoutPosition[0] + offsetFromCutoutFixture[0],
-          cutoutPosition[1] + offsetFromCutoutFixture[1],
-          cutoutPosition[2] + offsetFromCutoutFixture[2],
-        ]
+        cutoutPosition[0] + offsetFromCutoutFixture[0],
+        cutoutPosition[1] + offsetFromCutoutFixture[1],
+        cutoutPosition[2] + offsetFromCutoutFixture[2],
+      ]
       : null
 
   return slotPosition
@@ -174,26 +175,19 @@ export function getCutoutFixturesForModuleModel(
 
 export function getCutoutIdsFromModuleSlotName(
   slotName: string,
-  moduleFixtures: CutoutFixture[]
+  moduleFixtures: CutoutFixture[], // cutout fixtures for a specific module model
+  deckDef: DeckDefinition
 ): CutoutId[] {
-  return moduleFixtures.reduce<CutoutId[]>((acc, moduleFixture) => {
-    const anchorCutoutId = moduleFixture.mayMountTo.find(cutoutId =>
-      cutoutId.includes(slotName)
-    )
-    const newGroupedFixtureIds = moduleFixture.fixtureGroup.filter(
-      fixtureId => fixtureId !== moduleFixture.id
-    )
-    const newGroupedCutoutIds = newGroupedFixtureIds.reduce<CutoutId[]>(
-      (innerAcc, fixtureId) => [
-        ...innerAcc,
-        ...(moduleFixtures.find(mf => mf.id === fixtureId)?.mayMountTo ?? []),
-      ],
-      []
-    )
-    return anchorCutoutId != null
-      ? [...acc, anchorCutoutId, ...newGroupedCutoutIds]
-      : acc
-  }, [])
+  const anchorCutoutId = getCutoutIdForSlotName(slotName, deckDef)
+  // find the first fixture for this specific module model that may mount to the cutout implied by the slotName 
+  const anchorFixture = moduleFixtures.find(fixture => fixture.mayMountTo.some(cutoutId => cutoutId === anchorCutoutId))
+  if (anchorCutoutId != null && anchorFixture != null) {
+    const groupedFixtures = anchorFixture.fixtureGroup[anchorCutoutId]
+    return groupedFixtures != null
+      ? Object.keys((groupedFixtures ?? [])[0] ?? {}) as CutoutId[]
+      : [anchorCutoutId]
+  }
+  return []
 }
 
 export function getAddressableAreaNamesFromLoadedModule(
@@ -202,7 +196,7 @@ export function getAddressableAreaNamesFromLoadedModule(
   deckDef: DeckDefinition
 ): AddressableAreaName[] {
   const moduleFixtures = getCutoutFixturesForModuleModel(moduleModel, deckDef)
-  const cutoutIds = getCutoutIdsFromModuleSlotName(slotName, moduleFixtures)
+  const cutoutIds = getCutoutIdsFromModuleSlotName(slotName, moduleFixtures, deckDef)
   return moduleFixtures.reduce<AddressableAreaName[]>((acc, cutoutFixture) => {
     const providedAddressableAreas = cutoutIds.reduce<AddressableAreaName[]>(
       (innerAcc, cutoutId) => {
@@ -236,28 +230,28 @@ export function getFixtureDisplayName(
     case HEATERSHAKER_MODULE_V1_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(
-            HEATERSHAKER_MODULE_V1
-          )} in USB-${usbPortNumber}`
+          HEATERSHAKER_MODULE_V1
+        )} in USB-${usbPortNumber}`
         : getModuleDisplayName(HEATERSHAKER_MODULE_V1)
     case TEMPERATURE_MODULE_V2_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(
-            TEMPERATURE_MODULE_V2
-          )} in USB-${usbPortNumber}`
+          TEMPERATURE_MODULE_V2
+        )} in USB-${usbPortNumber}`
         : getModuleDisplayName(TEMPERATURE_MODULE_V2)
     case MAGNETIC_BLOCK_V1_FIXTURE:
       return `${getModuleDisplayName(MAGNETIC_BLOCK_V1)}`
     case THERMOCYCLER_V2_REAR_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(
-            THERMOCYCLER_MODULE_V2
-          )} in USB-${usbPortNumber}`
+          THERMOCYCLER_MODULE_V2
+        )} in USB-${usbPortNumber}`
         : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
     case THERMOCYCLER_V2_FRONT_FIXTURE:
       return usbPortNumber != null
         ? `${getModuleDisplayName(
-            THERMOCYCLER_MODULE_V2
-          )} in USB-${usbPortNumber}`
+          THERMOCYCLER_MODULE_V2
+        )} in USB-${usbPortNumber}`
         : getModuleDisplayName(THERMOCYCLER_MODULE_V2)
     default:
       return 'Slot'
