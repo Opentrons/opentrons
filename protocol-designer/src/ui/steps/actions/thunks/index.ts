@@ -46,7 +46,7 @@ export const addAndSelectStepWithHints: (arg: {
   const thermocyclerModuleHasLabware = uiModuleSelectors.getThermocyclerModuleHasLabware(
     state
   )
-  const temperatureModuleOnDeck = uiModuleSelectors.getSingleTemperatureModuleId(
+  const temperatureModuleOnDeck = uiModuleSelectors.getTemperatureModuleIds(
     state
   )
   const thermocyclerModuleOnDeck = uiModuleSelectors.getSingleThermocyclerModuleId(
@@ -59,13 +59,15 @@ export const addAndSelectStepWithHints: (arg: {
   const stepModuleMissingLabware =
     (stepMagnetNeedsLabware && !magnetModuleHasLabware) ||
     (stepTemperatureNeedsLabware &&
-      ((temperatureModuleOnDeck && !temperatureModuleHasLabware) ||
-        (thermocyclerModuleOnDeck && !thermocyclerModuleHasLabware)))
+      thermocyclerModuleOnDeck &&
+      !thermocyclerModuleHasLabware)
 
   if (stepNeedsLiquid && !deckHasLiquid) {
     dispatch(tutorialActions.addHint('add_liquids_and_labware'))
   }
-
+  if (temperatureModuleOnDeck && !temperatureModuleHasLabware) {
+    dispatch(tutorialActions.addHint('multiple_modules_without_labware'))
+  }
   if (stepModuleMissingLabware) {
     dispatch(tutorialActions.addHint('module_without_labware'))
   }

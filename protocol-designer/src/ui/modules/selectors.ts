@@ -15,6 +15,7 @@ import {
   getModuleOnDeckByType,
   getModuleHasLabware,
   getMagnetLabwareEngageHeight as getMagnetLabwareEngageHeightUtil,
+  getModulesOnDeckByType,
 } from './utils'
 import { Options } from '@opentrons/components'
 import { Selector } from '../../types'
@@ -84,16 +85,18 @@ export const getSingleMagneticModuleId: Selector<
     getModuleOnDeckByType(initialDeckSetup, MAGNETIC_MODULE_TYPE)?.id || null
 )
 
-/** Get single temperature module (assumes no multiples) */
-export const getSingleTemperatureModuleId: Selector<
-  string | null
+/** Get all temperature modules */
+export const getTemperatureModuleIds: Selector<
+  string[] | null
 > = createSelector(
   getInitialDeckSetup,
   initialDeckSetup =>
-    getModuleOnDeckByType(initialDeckSetup, TEMPERATURE_MODULE_TYPE)?.id || null
+    getModulesOnDeckByType(initialDeckSetup, TEMPERATURE_MODULE_TYPE)?.map(
+      module => module.id
+    ) || null
 )
 
-/** Get single temperature module (assumes no multiples) */
+/** Get single thermocycler module (assumes no multiples) */
 export const getSingleThermocyclerModuleId: Selector<
   string | null
 > = createSelector(
