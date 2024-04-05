@@ -16,6 +16,7 @@ import {
   Y_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
+  STAGING_AREA_FIXTURE_WIDTH,
 } from './constants'
 
 import type {
@@ -32,9 +33,11 @@ interface MagneticBlockFixtureProps {
     fixtureLocation: CutoutId,
     cutoutFixtureId: CutoutFixtureId
   ) => void
+  hasStagingArea?: boolean
 }
 
 const MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME = 'Mag Block'
+const STAGING_AREA_WITH_MAGNETIC_BLOCK_DISPLAY_NAME = 'Mag + staging'
 
 export function MagneticBlockFixture(
   props: MagneticBlockFixtureProps
@@ -44,6 +47,7 @@ export function MagneticBlockFixture(
     fixtureLocation,
     handleClickRemove,
     cutoutFixtureId,
+    hasStagingArea
   } = props
 
   const standardSlotCutout = deckDefinition.locations.cutouts.find(
@@ -59,6 +63,7 @@ export function MagneticBlockFixture(
     standardSlotCutout?.position ?? []
   let x = xSlotPosition
   let width = 0
+  let displayName = hasStagingArea ? STAGING_AREA_WITH_MAGNETIC_BLOCK_DISPLAY_NAME : MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME
   switch (fixtureLocation) {
     case 'cutoutA1':
     case 'cutoutB1':
@@ -74,6 +79,7 @@ export function MagneticBlockFixture(
     case 'cutoutD2': {
       x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
       width = COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
+      displayName = 'Mag' 
       break
     }
     case 'cutoutA3':
@@ -81,7 +87,9 @@ export function MagneticBlockFixture(
     case 'cutoutC3':
     case 'cutoutD3': {
       x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
-      width = COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
+      width = hasStagingArea
+        ? STAGING_AREA_FIXTURE_WIDTH
+        : COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
       break
     }
   }
@@ -107,12 +115,10 @@ export function MagneticBlockFixture(
         onClick={
           handleClickRemove != null
             ? () => handleClickRemove(fixtureLocation, cutoutFixtureId)
-            : () => {}
+            : () => { }
         }
       >
-        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>
-          {MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME}
-        </Text>
+        <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{displayName}</Text>
         {handleClickRemove != null ? (
           <Icon name="remove" color={COLORS.white} size="2rem" />
         ) : null}

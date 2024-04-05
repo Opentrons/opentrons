@@ -12,6 +12,7 @@ import {
   HEATERSHAKER_MODULE_V1_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
@@ -95,10 +96,10 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   const emptyFixtures = readOnly
     ? []
     : configurableDeckConfig.filter(
-        ({ cutoutFixtureId }) =>
-          cutoutFixtureId != null &&
-          SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
-      )
+      ({ cutoutFixtureId }) =>
+        cutoutFixtureId != null &&
+        SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+    )
   const trashBinFixtures = configurableDeckConfig.filter(
     ({ cutoutFixtureId }) => cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
   )
@@ -112,7 +113,8 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     ({ cutoutFixtureId }) => cutoutFixtureId === TEMPERATURE_MODULE_V2_FIXTURE
   )
   const magneticBlockFixtures = configurableDeckConfig.filter(
-    ({ cutoutFixtureId }) => cutoutFixtureId === MAGNETIC_BLOCK_V1_FIXTURE
+    ({ cutoutFixtureId }) =>
+      ([MAGNETIC_BLOCK_V1_FIXTURE, STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE] as CutoutFixtureId[]).includes(cutoutFixtureId)
   )
 
   return (
@@ -203,6 +205,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           handleClickRemove={readOnly ? undefined : handleClickRemove}
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
+          hasStagingArea={cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE}
         />
       ))}
       {thermocyclerFixtures.map(({ cutoutId, cutoutFixtureId }) => (
