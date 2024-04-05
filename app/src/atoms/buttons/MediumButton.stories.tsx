@@ -11,14 +11,12 @@ const meta: Meta<typeof MediumButton> = {
         type: 'select',
       },
       options: Object.keys(ICON_DATA_BY_NAME),
-      defaultValue: undefined,
     },
     buttonCategory: {
       control: {
         type: 'select',
       },
       options: ['default', 'rounded'],
-      defaultValue: 'default',
     },
     onClick: { action: 'clicked' },
   },
