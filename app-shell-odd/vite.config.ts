@@ -16,7 +16,6 @@ export default defineConfig(
     return {
       publicDir: false,
       build: {
-        sourcemap: true,
         // Relative to the root
         ssr: 'src/main.ts',
         outDir: 'lib',
