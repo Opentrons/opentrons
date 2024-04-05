@@ -105,10 +105,6 @@ def make_module_view(
         module_offset_by_serial=module_offset_by_serial or {},
         additional_slots_occupied_by_module_id=additional_slots_occupied_by_module_id
         or {},
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
-        ),
     )
 
     return ModuleView(state=state)
@@ -381,7 +377,10 @@ def test_get_module_offset_for_ot2_standard(
             )
         },
     )
-    assert subject.get_nominal_module_offset("module-id") == expected_offset
+    assert (
+        subject.get_nominal_module_offset("module-id", get_addressable_area_view())
+        == expected_offset
+    )
 
 
 @pytest.mark.parametrize(
@@ -435,7 +434,10 @@ def test_get_module_offset_for_ot3_standard(
             )
         },
     )
-    result_offset = subject.get_nominal_module_offset("module-id")
+
+    result_offset = subject.get_nominal_module_offset(
+        "module-id", get_addressable_area_view()
+    )
     assert (result_offset.x, result_offset.y, result_offset.z) == pytest.approx(
         (expected_offset.x, expected_offset.y, expected_offset.z)
     )
@@ -1843,7 +1845,9 @@ def test_get_module_highest_z(
         },
     )
     assert isclose(
-        subject.get_module_highest_z(module_id="module-id"),
+        subject.get_module_highest_z(
+            module_id="module-id", addressable_areas=get_addressable_area_view()
+        ),
         expected_highest_z,
     )
 

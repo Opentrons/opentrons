@@ -1494,12 +1494,9 @@
         "location": {
           "title": "Location",
           "description": "The location into which this module should be loaded.\n\nFor the Thermocycler Module, which occupies multiple deck slots, this should be the front-most occupied slot (normally slot 7).",
-          "anyOf": [
+          "allOf": [
             {
               "$ref": "#/definitions/DeckSlotLocation"
-            },
-            {
-              "$ref": "#/definitions/AddressableAreaLocation"
             }
           ]
         },

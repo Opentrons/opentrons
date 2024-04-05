@@ -463,7 +463,6 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         addressable_area_name: str,
     ) -> Point:
         """Get the offset form cutout fixture of an addressable area."""
-
         for addressable_area in self.state.deck_definition["locations"][
             "addressableAreas"
         ]:

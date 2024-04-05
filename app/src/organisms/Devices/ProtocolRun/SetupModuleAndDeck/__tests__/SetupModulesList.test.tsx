@@ -302,7 +302,9 @@ describe('SetupModulesList', () => {
   })
 
   it('should render the MoaM component when Moam is attached', () => {
-    vi.mocked(OT2MultipleModulesHelp).mockReturnValue(<div>mock Moam modal</div>)
+    vi.mocked(OT2MultipleModulesHelp).mockReturnValue(
+      <div>mock Moam modal</div>
+    )
     when(useUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({

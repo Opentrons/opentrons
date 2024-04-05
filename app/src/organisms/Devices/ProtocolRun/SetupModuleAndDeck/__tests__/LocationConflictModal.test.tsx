@@ -40,7 +40,7 @@ describe('LocationConflictModal', () => {
       onCloseClick: vi.fn(),
       cutoutId: 'cutoutB3',
       requiredFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
-      deckDef: ot3StandardDeckV5 as any
+      deckDef: ot3StandardDeckV5 as any,
     }
     vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
@@ -70,7 +70,7 @@ describe('LocationConflictModal', () => {
       onCloseClick: vi.fn(),
       cutoutId: 'cutoutB3',
       requiredModule: 'heaterShakerModuleV1',
-      deckDef: ot3StandardDeckV5 as any
+      deckDef: ot3StandardDeckV5 as any,
     }
     render(props)
     screen.getByText('Protocol specifies')
@@ -95,7 +95,7 @@ describe('LocationConflictModal', () => {
       cutoutId: 'cutoutB1',
       requiredFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
       missingLabwareDisplayName: 'a tiprack',
-      deckDef: ot3StandardDeckV5 as any
+      deckDef: ot3StandardDeckV5 as any,
     }
     render(props)
     screen.getByText('Deck location conflict')

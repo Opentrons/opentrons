@@ -124,7 +124,7 @@ function FixtureTableItem({
   setSetupScreen,
   setCutoutId,
   setProvidedFixtureOptions,
-  deckDef
+  deckDef,
 }: FixtureTableItemProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
 

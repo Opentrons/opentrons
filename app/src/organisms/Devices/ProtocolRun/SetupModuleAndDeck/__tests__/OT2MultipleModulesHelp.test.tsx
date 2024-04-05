@@ -9,9 +9,10 @@ import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 
 vi.mock('../../../../../redux/config')
 
-const render = () => renderWithProviders(<OT2MultipleModulesHelp />, {
-  i18nInstance: i18n,
-})[0]
+const render = () =>
+  renderWithProviders(<OT2MultipleModulesHelp />, {
+    i18nInstance: i18n,
+  })[0]
 
 describe('OT2MultipleModulesHelp', () => {
   let props: React.ComponentProps<typeof OT2MultipleModulesHelp>
@@ -57,6 +58,8 @@ describe('OT2MultipleModulesHelp', () => {
     fireEvent.click(screen.getByText('Learn more'))
     const closeButton = screen.getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)
-    expect(screen.queryByText('Setting up multiple modules of the same type')).toBeNull()
+    expect(
+      screen.queryByText('Setting up multiple modules of the same type')
+    ).toBeNull()
   })
 })

@@ -1,6 +1,6 @@
 """Control a `ProtocolEngine` without async/await."""
 
-from typing import cast, List, Optional, Dict, Union
+from typing import cast, List, Optional, Dict
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -25,7 +25,6 @@ from ..types import (
     Liquid,
     NozzleLayoutConfigurationType,
     AddressableOffsetVector,
-    AddressableAreaLocation,
 )
 from .transports import ChildThreadTransport
 

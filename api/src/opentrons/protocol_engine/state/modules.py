@@ -982,7 +982,7 @@ class ModuleView(HasState[ModuleState]):
 
         return neighbor_slot in self._state.slot_by_module_id.values()
 
-    def select_hardware_module_to_load(  # noqa: C901
+    def select_hardware_module_to_load(
         self,
         model: ModuleModel,
         location: DeckSlotLocation,
@@ -1112,7 +1112,6 @@ class ModuleView(HasState[ModuleState]):
 
         Also, convert the deck slot to a valid module fixture addressable area.
         """
-
         if deck_type == DeckType.OT2_STANDARD or deck_type == DeckType.OT2_SHORT_TRASH:
             raise ValueError(
                 f"Invalid Deck Type: {deck_type.name} - Does not support modules as fixtures."

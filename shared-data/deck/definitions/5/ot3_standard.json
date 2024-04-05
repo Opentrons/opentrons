@@ -1009,6 +1009,20 @@
       },
       "fixtureGroup": {},
       "height": 38.0
+    },
+    {
+      "id": "stagingAreaSlotWithMagneticBlockV1",
+      "expectOpentronsModuleSerialNumber": false,
+      "mayMountTo": ["cutoutD3", "cutoutC3", "cutoutB3", "cutoutA3"],
+      "displayName": "Fixture that provides a Magnetic Block and a Staging Area Slot",
+      "providesAddressableAreas": {
+        "cutoutD3": ["magneticBlockV1D3", "D4"],
+        "cutoutC3": ["magneticBlockV1C3", "C4"],
+        "cutoutB3": ["magneticBlockV1B3", "B4"],
+        "cutoutA3": ["magneticBlockV1A3", "A4"]
+      },
+      "fixtureGroup": {},
+      "height": 38.0
     }
   ],
   "gripperOffsets": {

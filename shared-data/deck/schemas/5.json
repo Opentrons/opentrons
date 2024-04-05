@@ -269,7 +269,7 @@
             "type": "string"
           },
           "expectOpentronsModuleSerialNumber": {
-            "description": "Serial number identified for a connected Opentrons Module.",
+            "description": "Determines whether or not a fixture expects a serial number for a connected Opentrons Module.",
             "type": "boolean"
           },
           "mayMountTo": {

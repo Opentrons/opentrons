@@ -229,12 +229,12 @@ function ModuleTableItem({
     module.attachedModuleMatch?.moduleOffset?.last_modified != null
   ) {
     moduleStatus = (
-        <Chip
-          text={t('module_connected')}
-          type="success"
-          background={false}
-          iconName="connection-status"
-        />
+      <Chip
+        text={t('module_connected')}
+        type="success"
+        background={false}
+        iconName="connection-status"
+      />
     )
   } else if (
     isModuleReady &&
@@ -292,7 +292,7 @@ function ModuleTableItem({
             : COLORS.yellow35
         }
         borderRadius={BORDERS.borderRadius8}
-        cursor='inherit'
+        cursor="inherit"
         gridGap={SPACING.spacing24}
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       >

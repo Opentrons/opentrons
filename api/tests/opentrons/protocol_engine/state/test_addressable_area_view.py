@@ -310,7 +310,7 @@ def test_get_fixture_height(decoy: Decoy) -> None:
             # These values don't matter:
             "id": "id",
             "expectOpentronsModuleSerialNumber": False,
-            "fixtureGroup": [],
+            "fixtureGroup": {},
             "mayMountTo": [],
             "displayName": "",
             "providesAddressableAreas": {},
@@ -327,7 +327,7 @@ def test_get_fixture_height(decoy: Decoy) -> None:
             # These values don't matter:
             "id": "id",
             "expectOpentronsModuleSerialNumber": False,
-            "fixtureGroup": [],
+            "fixtureGroup": {},
             "mayMountTo": [],
             "displayName": "",
             "providesAddressableAreas": {},

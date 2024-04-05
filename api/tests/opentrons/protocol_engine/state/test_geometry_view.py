@@ -3,9 +3,10 @@ import inspect
 
 import pytest
 from decoy import Decoy
-from typing import cast, List, Tuple, Optional, NamedTuple
+from typing import cast, List, Tuple, Optional, NamedTuple, Dict, Set
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -26,6 +27,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     OnLabwareLocation,
     AddressableAreaLocation,
+    AddressableArea,
     ModuleOffsetVector,
     ModuleOffsetData,
     LoadedLabware,
@@ -45,6 +47,8 @@ from opentrons.protocol_engine.types import (
     LabwareMovementOffsetData,
     LoadedPipette,
     TipGeometry,
+    PotentialCutoutFixture,
+    DeckConfigurationType,
 )
 from opentrons.protocol_engine.state import move_types
 from opentrons.protocol_engine.state.config import Config
@@ -56,7 +60,10 @@ from opentrons.protocol_engine.state.pipettes import (
     BoundingNozzlesOffsets,
     PipetteBoundingBoxOffsets,
 )
-from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
+from opentrons.protocol_engine.state.addressable_areas import (
+    AddressableAreaView,
+    AddressableAreaState,
+)
 from opentrons.protocol_engine.state.geometry import GeometryView, _GripperMoveType
 from ..pipette_fixtures import get_default_nozzle_map
 
@@ -110,6 +117,30 @@ def subject(
         pipette_view=mock_pipette_view,
         addressable_area_view=addressable_area_view,
     )
+
+
+def get_addressable_area_view(
+    loaded_addressable_areas_by_name: Optional[Dict[str, AddressableArea]] = None,
+    potential_cutout_fixtures_by_cutout_id: Optional[
+        Dict[str, Set[PotentialCutoutFixture]]
+    ] = None,
+    deck_definition: Optional[DeckDefinitionV5] = None,
+    deck_configuration: Optional[DeckConfigurationType] = None,
+    robot_type: RobotType = "OT-3 Standard",
+    use_simulated_deck_config: bool = False,
+) -> AddressableAreaView:
+    """Get a labware view test subject."""
+    state = AddressableAreaState(
+        loaded_addressable_areas_by_name=loaded_addressable_areas_by_name or {},
+        potential_cutout_fixtures_by_cutout_id=potential_cutout_fixtures_by_cutout_id
+        or {},
+        deck_definition=deck_definition or cast(DeckDefinitionV5, {"otId": "fake"}),
+        deck_configuration=deck_configuration or [],
+        robot_type=robot_type,
+        use_simulated_deck_config=use_simulated_deck_config,
+    )
+
+    return AddressableAreaView(state=state)
 
 
 def test_get_labware_parent_position(
@@ -178,9 +209,13 @@ def test_get_labware_parent_position_on_module(
     decoy.when(
         addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(Point(1, 2, 3))
+
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
+
     decoy.when(
-        module_view.get_nominal_module_offset(module_id="module-id")
+        module_view.get_nominal_module_offset(
+            module_id="module-id", addressable_areas=get_addressable_area_view()
+        )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_connected_model("module-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V2
@@ -242,7 +277,9 @@ def test_get_labware_parent_position_on_labware(
 
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
-        module_view.get_nominal_module_offset(module_id="module-id")
+        module_view.get_nominal_module_offset(
+            module_id="module-id", addressable_areas=get_addressable_area_view()
+        )
     ).then_return(LabwareOffsetVector(x=1, y=2, z=3))
 
     decoy.when(module_view.get_connected_model("module-id")).then_return(
@@ -422,7 +459,9 @@ def test_get_module_labware_highest_z(
     )
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
-        module_view.get_nominal_module_offset(module_id="module-id")
+        module_view.get_nominal_module_offset(
+            module_id="module-id", addressable_areas=get_addressable_area_view()
+        )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_height_over_labware("module-id")).then_return(0.5)
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
@@ -707,9 +746,11 @@ def test_get_highest_z_in_slot_with_single_module(
         errors.LabwareNotLoadedOnModuleError("only module")
     )
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
-    decoy.when(module_view.get_module_highest_z(module_id="only-module")).then_return(
-        12345
-    )
+    decoy.when(
+        module_view.get_module_highest_z(
+            module_id="only-module", addressable_areas=get_addressable_area_view()
+        )
+    ).then_return(12345)
 
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
@@ -883,7 +924,9 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
     )
     decoy.when(
-        module_view.get_nominal_module_offset(module_id="module-id")
+        module_view.get_nominal_module_offset(
+            module_id="module-id", addressable_areas=get_addressable_area_view()
+        )
     ).then_return(LabwareOffsetVector(x=40, y=50, z=60))
     decoy.when(module_view.get_connected_model("module-id")).then_return(
         ModuleModel.TEMPERATURE_MODULE_V2
@@ -1087,7 +1130,9 @@ def test_get_module_labware_well_position(
     )
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
-        module_view.get_nominal_module_offset(module_id="module-id")
+        module_view.get_nominal_module_offset(
+            module_id="module-id", addressable_areas=get_addressable_area_view()
+        )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
         ModuleOffsetData(
@@ -1626,7 +1671,9 @@ def test_get_labware_grip_point_for_labware_on_module(
     )
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
-        module_view.get_nominal_module_offset(module_id="module-id")
+        module_view.get_nominal_module_offset(
+            module_id="module-id", addressable_areas=get_addressable_area_view()
+        )
     ).then_return(LabwareOffsetVector(x=1, y=2, z=3))
     decoy.when(module_view.get_connected_model("module-id")).then_return(
         ModuleModel.MAGNETIC_MODULE_V2

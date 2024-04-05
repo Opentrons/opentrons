@@ -83,14 +83,8 @@ def get_addressable_area_view(
 
 def test_initial_state() -> None:
     """It should initialize the module state."""
-    addressable_area_view = get_addressable_area_view(
-        deck_configuration=None,
-        use_simulated_deck_config=True,
-    )
-
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
-        addressable_area_view=addressable_area_view,
     )
 
     assert subject.state == ModuleState(
@@ -101,7 +95,6 @@ def test_initial_state() -> None:
         substate_by_module_id={},
         module_offset_by_serial={},
         additional_slots_occupied_by_module_id={},
-        addressable_area_view=addressable_area_view,
     )
 
 
@@ -200,14 +193,8 @@ def test_load_module(
         ),
     )
 
-    addressable_area_view = get_addressable_area_view(
-        deck_configuration=None,
-        use_simulated_deck_config=True,
-    )
-
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
-        addressable_area_view=addressable_area_view,
     )
     subject.handle_action(action)
 
@@ -224,7 +211,6 @@ def test_load_module(
         substate_by_module_id={"module-id": expected_substate},
         module_offset_by_serial={},
         additional_slots_occupied_by_module_id={},
-        addressable_area_view=addressable_area_view,
     )
 
 
@@ -274,10 +260,6 @@ def test_load_thermocycler_in_thermocycler_slot(
             use_simulated_deck_config=False,
             robot_type=robot_type,
             deck_type=deck_type,
-        ),
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
         ),
     )
     subject.handle_action(action)
@@ -357,14 +339,8 @@ def test_add_module_action(
         module_live_data=live_data,
     )
 
-    addressable_area_view = get_addressable_area_view(
-        deck_configuration=None,
-        use_simulated_deck_config=True,
-    )
-
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
-        addressable_area_view=addressable_area_view,
     )
     subject.handle_action(action)
 
@@ -381,7 +357,6 @@ def test_add_module_action(
         substate_by_module_id={"module-id": expected_substate},
         module_offset_by_serial={},
         additional_slots_occupied_by_module_id={},
-        addressable_area_view=addressable_area_view,
     )
 
 
@@ -409,10 +384,6 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
-        ),
     )
 
     subject.handle_action(
@@ -466,10 +437,6 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
-        ),
     )
 
     subject.handle_action(
@@ -525,10 +492,6 @@ def test_handle_hs_labware_latch_commands(
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
-        ),
     )
 
     subject.handle_action(
@@ -595,10 +558,6 @@ def test_handle_tempdeck_temperature_commands(
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
-        ),
     )
 
     subject.handle_action(
@@ -660,10 +619,6 @@ def test_handle_thermocycler_temperature_commands(
     )
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
-        ),
     )
 
     subject.handle_action(
@@ -746,10 +701,6 @@ def test_handle_thermocycler_lid_commands(
             use_simulated_deck_config=False,
             robot_type="OT-3 Standard",
             deck_type=DeckType.OT3_STANDARD,
-        ),
-        addressable_area_view=get_addressable_area_view(
-            deck_configuration=None,
-            use_simulated_deck_config=True,
         ),
     )
 

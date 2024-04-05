@@ -57,9 +57,8 @@ export function OT2MultipleModulesHelp(): JSX.Element {
           </Flex>
         </Banner>
       </Box>
-      {
-        showMultipleModulesModal ?
-          createPortal(
+      {showMultipleModulesModal
+        ? createPortal(
             <LegacyModal
               title={t('multiple_modules_modal')}
               onClose={onCloseClick}
@@ -93,7 +92,9 @@ export function OT2MultipleModulesHelp(): JSX.Element {
                       {t('example')}
                     </StyledText>
 
-                    <StyledText as="p">{t('multiple_modules_example')}</StyledText>
+                    <StyledText as="p">
+                      {t('multiple_modules_example')}
+                    </StyledText>
                   </Flex>
                   <img
                     height="100%"
