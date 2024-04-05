@@ -8,8 +8,6 @@ import {
 } from '@opentrons/components'
 import { InputField } from '../../InputField'
 import { AlphanumericKeyboard } from '.'
-import '../index.css'
-import './index.css'
 
 import type { Story, Meta } from '@storybook/react'
 

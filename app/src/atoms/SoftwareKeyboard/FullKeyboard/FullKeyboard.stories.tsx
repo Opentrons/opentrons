@@ -9,9 +9,6 @@ import {
 import { InputField } from '../../InputField'
 import { FullKeyboard } from '.'
 
-import '../index.css'
-import './index.css'
-
 import type { Story, Meta } from '@storybook/react'
 
 export default {
