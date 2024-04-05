@@ -1528,9 +1528,7 @@ class OT3API(
             self._gantry_load == GantryLoad.HIGH_THROUGHPUT and axis == Axis.Z_R
         )
         encoder_ok = self._backend.check_encoder_status([axis])
-        if (
-            encoder_ok or enable_right_mount_on_startup
-        ):  # or axis == Axis.Z_R: <- this fixes it
+        if encoder_ok or enable_right_mount_on_startup:
             # enable motor (if needed) and update estimation
             await self._enable_before_update_estimation(axis)
 
