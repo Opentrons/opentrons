@@ -1,9 +1,12 @@
 import * as React from 'react'
-import Keyboard from 'react-simple-keyboard'
+import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 import { alphanumericKeyboardLayout, customDisplay } from '../constants'
 
+import '../index.css'
+import './index.css'
+
 interface AlphanumericKeyboardProps {
-  onChange: (input: string) => void
+  onChange?: (input: string) => void
   keyboardRef: React.MutableRefObject<any>
 }
 
@@ -13,7 +16,6 @@ export function AlphanumericKeyboard({
 }: AlphanumericKeyboardProps): JSX.Element {
   const [layoutName, setLayoutName] = React.useState<string>('default')
   const onKeyPress = (button: string): void => {
-    console.log(button)
     if (button === '{ABC}') handleShift()
     if (button === '{numbers}') handleNumber()
     if (button === '{abc}') handleUnShift()

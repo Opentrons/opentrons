@@ -121,7 +121,7 @@ export function NameRobot(): JSX.Element {
     defaultValues: {
       newRobotName: '',
     },
-    resolver: resolver,
+    resolver,
   })
 
   const newRobotName = watch('newRobotName')
@@ -297,8 +297,9 @@ export function NameRobot(): JSX.Element {
               render={({ field }) => (
                 <AlphanumericKeyboard
                   onChange={(input: string) => {
+                    console.log('input', input)
                     field.onChange(input)
-                    trigger('newRobotName')
+                    void trigger('newRobotName')
                   }}
                   keyboardRef={keyboardRef}
                 />

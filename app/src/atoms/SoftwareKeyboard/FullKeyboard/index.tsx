@@ -1,6 +1,9 @@
 import * as React from 'react'
-import Keyboard from 'react-simple-keyboard'
+import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 import { customDisplay, fullKeyboardLayout } from '../constants'
+
+import '../index.css'
+import './index.css'
 
 interface FullKeyboardProps {
   onChange: (input: string) => void

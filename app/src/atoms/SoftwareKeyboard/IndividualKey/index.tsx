@@ -1,5 +1,8 @@
 import * as React from 'react'
-import Keyboard from 'react-simple-keyboard'
+import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
+
+import '../index.css'
+import './index.css'
 
 const customDisplay = {
   '{backspace}': 'del',
