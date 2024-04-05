@@ -19,7 +19,7 @@ import {
 } from '@opentrons/components'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyLastRunCommandKey } from '../../resources/runs'
+import { useNotifyLastRunCommand } from '../../resources/runs'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
@@ -42,9 +42,9 @@ export const RunPreviewComponent = (
   const { t } = useTranslation('run_details')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
+  const currentRunCommandKey = useNotifyLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
-  })
+  })?.key
   const [
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
