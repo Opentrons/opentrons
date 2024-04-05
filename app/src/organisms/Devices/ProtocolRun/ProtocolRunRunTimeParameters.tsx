@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { formatRunTimeParameterDefaultValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
@@ -9,6 +9,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_INLINE,
   Flex,
   Icon,
   InfoScreen,
@@ -96,7 +97,7 @@ export function ProtocolRunRuntimeParameters({
                       key={`${index}_${parameter.variableName}`}
                       parameter={parameter}
                       index={index}
-                      runTimeParametersLength={runTimeParameters.length}
+                      isLast={index === runTimeParameters.length - 1}
                       t={t}
                     />
                   )
@@ -113,41 +114,48 @@ export function ProtocolRunRuntimeParameters({
 interface StyledTableRowComponentProps {
   parameter: RunTimeParameter
   index: number
-  runTimeParametersLength: number
+  isLast: boolean
   t: any
 }
 
 const StyledTableRowComponent = (
   props: StyledTableRowComponentProps
 ): JSX.Element => {
-  const { parameter, index, runTimeParametersLength, t } = props
+  const { parameter, index, isLast, t } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (
-    <StyledTableRow
-      isLast={index === runTimeParametersLength - 1}
-      key={`runTimeParameter-${index}`}
-    >
-      <StyledTableCell isLast={index === runTimeParametersLength - 1}>
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
-          <StyledText as="p">{parameter.displayName}</StyledText>
-          {parameter.description != null ? (
-            <>
-              <Flex {...targetProps} alignItems={ALIGN_CENTER}>
-                <Icon
-                  name="information"
-                  size={SPACING.spacing12}
-                  color={COLORS.grey60}
-                  data-testid="Icon"
-                />
-              </Flex>
-              <Tooltip tooltipProps={tooltipProps}>
-                {parameter.description}
-              </Tooltip>
-            </>
-          ) : null}
-        </Flex>
+    <StyledTableRow isLast={isLast} key={`runTimeParameter-${index}`}>
+      <StyledTableCell display="span">
+        <StyledText
+          as="p"
+          css={css`
+            display: inline;
+            padding-right: 8px;
+          `}
+        >
+          {parameter.displayName}
+        </StyledText>
+        {parameter.description != null ? (
+          <>
+            <Flex
+              display={DISPLAY_INLINE}
+              {...targetProps}
+              alignItems={ALIGN_CENTER}
+            >
+              <Icon
+                name="information"
+                size={SPACING.spacing12}
+                color={COLORS.grey60}
+                data-testid="Icon"
+              />
+            </Flex>
+            <Tooltip css={TYPOGRAPHY.labelRegular} tooltipProps={tooltipProps}>
+              {parameter.description}
+            </Tooltip>
+          </>
+        ) : null}
       </StyledTableCell>
-      <StyledTableCell isLast={index === runTimeParametersLength - 1}>
+      <StyledTableCell>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
           <StyledText as="p">
             {formatRunTimeParameterDefaultValue(parameter, t)}
@@ -173,14 +181,14 @@ const StyledTable = styled.table`
 `
 const StyledTableHeaderContainer = styled.thead`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 48px;
+  grid-template-columns: 0.35fr 0.35fr;
+  grid-gap: ${SPACING.spacing48};
   border-bottom: ${BORDERS.lineBorder};
 `
 
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}
-  padding: ${SPACING.spacing8};
+  padding-bottom: ${SPACING.spacing8};
 `
 
 interface StyledTableRowProps {
@@ -189,19 +197,20 @@ interface StyledTableRowProps {
 
 const StyledTableRow = styled.tr<StyledTableRowProps>`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 48px;
-  padding-top: ${SPACING.spacing8};
-  padding-bottom: ${SPACING.spacing8};
+  grid-template-columns: 0.35fr 0.35fr;
+  grid-gap: ${SPACING.spacing48};
   border-bottom: ${props => (props.isLast ? 'none' : BORDERS.lineBorder)};
-  align-items: ${ALIGN_CENTER};
 `
 
 interface StyledTableCellProps {
-  isLast: boolean
+  paddingRight?: string
+  display?: string
 }
 
 const StyledTableCell = styled.td<StyledTableCellProps>`
-  padding-left: ${SPACING.spacing8};
-  height: 1.25rem;
+  align-items: ${ALIGN_CENTER};
+  display: ${props => (props.display != null ? props.display : 'table-cell')};
+  padding: ${SPACING.spacing8} 0;
+  padding-right: ${props =>
+    props.paddingRight != null ? props.paddingRight : SPACING.spacing16};
 `

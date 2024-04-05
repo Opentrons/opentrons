@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { formatRunTimeParameterDefaultValue } from '@opentrons/shared-data'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
@@ -7,7 +7,7 @@ import { StyledText } from '../../atoms/StyledText'
 import { Tooltip, useHoverTooltip } from '../../tooltips'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
-import { ALIGN_CENTER } from '../../styles'
+import { DISPLAY_INLINE } from '../../styles'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -82,7 +82,10 @@ export function ParametersTable({
                   {formatRunTimeParameterDefaultValue(parameter, t)}
                 </StyledText>
               </StyledTableCell>
-              <StyledTableCell isLast={index === runTimeParameters.length - 1}>
+              <StyledTableCell
+                isLast={index === runTimeParameters.length - 1}
+                paddingRight="0"
+              >
                 <StyledText as="p">
                   {formatRange(parameter, `${min}-${max}`)}
                 </StyledText>
@@ -107,30 +110,36 @@ const ParameterName = (props: ParameterNameProps): JSX.Element => {
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   return (
-    <StyledTableCell isLast={isLast}>
-      <Flex gridGap={SPACING.spacing8}>
-        <StyledText as="p">{displayName}</StyledText>
-        {description != null ? (
-          <>
-            <Flex {...targetProps} alignItems={ALIGN_CENTER}>
-              <Icon
-                name="information"
-                size={SPACING.spacing12}
-                color={COLORS.grey60}
-                data-testid={`Icon_${index}`}
-              />
-            </Flex>
-            <Tooltip
-              {...tooltipProps}
-              backgroundColor={COLORS.black90}
-              width="8.75rem"
-              css={TYPOGRAPHY.labelRegular}
-            >
-              {description}
-            </Tooltip>
-          </>
-        ) : null}
-      </Flex>
+    <StyledTableCell display="span" isLast={isLast}>
+      <StyledText
+        as="p"
+        css={css`
+          display: ${DISPLAY_INLINE};
+          padding-right: ${SPACING.spacing8};
+        `}
+      >
+        {displayName}
+      </StyledText>
+      {description != null ? (
+        <>
+          <Flex display={DISPLAY_INLINE} {...targetProps}>
+            <Icon
+              name="information"
+              size={SPACING.spacing12}
+              color={COLORS.grey60}
+              data-testid={`Icon_${index}`}
+            />
+          </Flex>
+          <Tooltip
+            {...tooltipProps}
+            backgroundColor={COLORS.black90}
+            css={TYPOGRAPHY.labelRegular}
+            width="8.75rem"
+          >
+            {description}
+          </Tooltip>
+        </>
+      ) : null}
     </StyledTableCell>
   )
 }
@@ -143,7 +152,8 @@ const StyledTable = styled.table`
 
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}
-  padding: ${SPACING.spacing8};
+  grid-gap: ${SPACING.spacing16};
+  padding-bottom: ${SPACING.spacing8};
   border-bottom: ${BORDERS.lineBorder};
 `
 
@@ -152,17 +162,21 @@ interface StyledTableRowProps {
 }
 
 const StyledTableRow = styled.tr<StyledTableRowProps>`
-  padding: ${SPACING.spacing8};
+  grid-gap: ${SPACING.spacing16};
   border-bottom: ${props => (props.isLast ? 'none' : BORDERS.lineBorder)};
 `
 
 interface StyledTableCellProps {
   isLast: boolean
+  paddingRight?: string
+  display?: string
 }
 
 const StyledTableCell = styled.td<StyledTableCellProps>`
   width: 33%;
-  padding-left: ${SPACING.spacing8};
+  display: ${props => (props.display != null ? props.display : 'table-cell')};
   padding-top: ${SPACING.spacing12};
   padding-bottom: ${props => (props.isLast ? 0 : SPACING.spacing12)};
+  padding-right: ${props =>
+    props.paddingRight != null ? props.paddingRight : SPACING.spacing16};
 `
