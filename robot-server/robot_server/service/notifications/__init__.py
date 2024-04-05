@@ -17,7 +17,6 @@ from .publishers import (
     get_maintenance_runs_publisher,
     get_runs_publisher,
 )
-from .change_notifier import ChangeNotifier
 from .topics import Topics
 
 __all__ = [

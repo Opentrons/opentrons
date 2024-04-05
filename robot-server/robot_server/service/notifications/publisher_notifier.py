@@ -1,5 +1,4 @@
 """Provides an interface for alerting notification publishers to events and related lifecycle utilities."""
-import asyncio
 from fastapi import Depends
 from typing import Optional, Callable, List, Awaitable
 
@@ -9,7 +8,7 @@ from server_utils.fastapi_utils.app_state import (
     get_app_state,
 )
 
-from .change_notifier import ChangeNotifier
+from opentrons.util.event_notifier import EventNotifier
 
 
 class PublisherNotifier:
@@ -17,34 +16,30 @@ class PublisherNotifier:
 
     def __init__(
         self,
-        change_notifier: Optional[ChangeNotifier] = None,
+        event_notifier: Optional[EventNotifier] = None,
     ):
         # Because ChangeNotifier is a generic event interface, all callbacks themselves perform a specific
         # conditional check. A max_queue_size=1 ensures that all callbacks perform their conditional check without
         # being "over"-invoked.
-        self._change_notifier = change_notifier or ChangeNotifier(max_queue_size=1)
-        self._pe_notifier: Optional[asyncio.Task[None]] = None
-        self._callbacks: List[Callable[[], Awaitable[None]]] = []
+        self._event_notifier = event_notifier or EventNotifier(max_queue_size=1)
+
+    def register_publish_callback(self, callback: Callable[[], Awaitable[None]]):
+        """Register a single callback."""
+        self._event_notifier.subscribe(callback)
 
     def register_publish_callbacks(
         self, callbacks: List[Callable[[], Awaitable[None]]]
     ):
-        """Extend the list of callbacks with a given list of callbacks."""
-        self._callbacks.extend(callbacks)
+        """Register a list of callbacks."""
+        self._event_notifier.subscribe_many(callbacks)
 
     async def _initialize(self) -> None:
         """Initializes an instance of PublisherNotifier. This method should only be called once."""
-        self._pe_notifier = asyncio.create_task(self._wait_for_event())
+        self._event_notifier.initialize()
 
     def _notify_publishers(self) -> None:
         """A generic notifier, alerting all `waiters` of a change."""
-        self._change_notifier.notify()
-
-    async def _wait_for_event(self) -> None:
-        """Indefinitely wait for an event to occur, then invoke each callback."""
-        async for _ in self._change_notifier.wait():
-            for callback in self._callbacks:
-                await callback()
+        self._event_notifier.notify()
 
 
 _pe_publisher_notifier_accessor: AppStateAccessor[PublisherNotifier] = AppStateAccessor[
