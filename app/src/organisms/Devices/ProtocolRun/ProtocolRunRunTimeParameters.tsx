@@ -182,7 +182,7 @@ const StyledTable = styled.table`
 const StyledTableHeaderContainer = styled.thead`
   display: grid;
   grid-template-columns: 0.35fr 0.35fr;
-  grid-gap: 48px;
+  grid-gap: ${SPACING.spacing48};
   border-bottom: ${BORDERS.lineBorder};
 `
 
@@ -198,7 +198,7 @@ interface StyledTableRowProps {
 const StyledTableRow = styled.tr<StyledTableRowProps>`
   display: grid;
   grid-template-columns: 0.35fr 0.35fr;
-  grid-gap: 48px;
+  grid-gap: ${SPACING.spacing48};
   border-bottom: ${props => (props.isLast ? 'none' : BORDERS.lineBorder)};
 `
 
@@ -212,5 +212,5 @@ const StyledTableCell = styled.td<StyledTableCellProps>`
   display: ${props => (props.display != null ? props.display : 'table-cell')};
   padding: ${SPACING.spacing8} 0;
   padding-right: ${props =>
-    props.paddingRight != null ? props.paddingRight : '1.0625rem'};
+    props.paddingRight != null ? props.paddingRight : SPACING.spacing16};
 `

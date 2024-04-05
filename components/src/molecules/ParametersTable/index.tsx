@@ -152,7 +152,7 @@ const StyledTable = styled.table`
 
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}
-  grid-gap: 1.0625rem;
+  grid-gap: ${SPACING.spacing16};
   padding-bottom: ${SPACING.spacing8};
   border-bottom: ${BORDERS.lineBorder};
 `
@@ -162,7 +162,7 @@ interface StyledTableRowProps {
 }
 
 const StyledTableRow = styled.tr<StyledTableRowProps>`
-  grid-gap: 1.0625rem;
+  grid-gap: ${SPACING.spacing16};
   border-bottom: ${props => (props.isLast ? 'none' : BORDERS.lineBorder)};
 `
 
@@ -178,5 +178,5 @@ const StyledTableCell = styled.td<StyledTableCellProps>`
   padding-top: ${SPACING.spacing12};
   padding-bottom: ${props => (props.isLast ? 0 : SPACING.spacing12)};
   padding-right: ${props =>
-    props.paddingRight != null ? props.paddingRight : '1.0625rem'};
+    props.paddingRight != null ? props.paddingRight : SPACING.spacing16};
 `
