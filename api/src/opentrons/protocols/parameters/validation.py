@@ -73,7 +73,11 @@ def ensure_value_type(
             validated_value = bool(value)
         elif parameter_type is int and value.is_integer():
             validated_value = int(value)
-    elif isinstance(value, int) and not isinstance(value, bool) and parameter_type is float:
+    elif (
+        isinstance(value, int)
+        and not isinstance(value, bool)
+        and parameter_type is float
+    ):
         validated_value = float(value)
     return validated_value
 
