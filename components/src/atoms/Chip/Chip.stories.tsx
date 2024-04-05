@@ -14,27 +14,23 @@ const meta: Meta<typeof Chip> = {
       control: {
         type: 'select',
       },
-      defaultValue: 'basic',
     },
     hasIcon: {
       control: {
         type: 'boolean',
       },
-      defaultValue: true,
     },
     chipSize: {
       options: ['medium', 'small'],
       control: {
         type: 'select',
       },
-      defaultValue: 'medium',
     },
     iconName: {
       options: ['connection-status', 'ot-check', 'ot-alert'],
       control: {
         type: 'select',
       },
-      defaultValue: 'ot-alert',
     },
   },
   component: Chip,
