@@ -13,7 +13,6 @@ export default defineConfig({
   build: {
     // Relative to the root
     outDir: 'dist',
-    sourcemap: true,
   },
   plugins: [
     react({
