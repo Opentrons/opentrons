@@ -7,7 +7,7 @@ import pytest
 from decoy import matchers, Decoy
 
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.commands.types import CommentMessage, PauseMessage, CommandMessage
+from opentrons.legacy_commands.types import CommentMessage, PauseMessage, CommandMessage
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
@@ -70,20 +70,22 @@ def test_map_before_command() -> None:
     result = subject.map_command(legacy_command)
 
     assert result == [
-        pe_actions.UpdateCommandAction(
-            private_result=None,
-            command=pe_commands.Custom.construct(
-                id="command.COMMENT-0",
+        pe_actions.QueueCommandAction(
+            command_id="command.COMMENT-0",
+            created_at=matchers.IsA(datetime),
+            request=pe_commands.CustomCreate(
                 key="command.COMMENT-0",
-                status=pe_commands.CommandStatus.RUNNING,
-                createdAt=matchers.IsA(datetime),
-                startedAt=matchers.IsA(datetime),
                 params=LegacyCommandParams(
                     legacyCommandType="command.COMMENT",
                     legacyCommandText="hello world",
                 ),
             ),
-        )
+            request_hash=None,
+        ),
+        pe_actions.RunCommandAction(
+            command_id="command.COMMENT-0",
+            started_at=matchers.IsA(datetime),
+        ),
     ]
 
 
@@ -110,7 +112,7 @@ def test_map_after_command() -> None:
     result = subject.map_command(legacy_command_end)
 
     assert result == [
-        pe_actions.UpdateCommandAction(
+        pe_actions.SucceedCommandAction(
             private_result=None,
             command=pe_commands.Custom.construct(
                 id="command.COMMENT-0",
@@ -124,6 +126,7 @@ def test_map_after_command() -> None:
                     legacyCommandText="hello world",
                 ),
                 result=pe_commands.CustomResult(),
+                notes=[],
             ),
         )
     ]
@@ -159,6 +162,7 @@ def test_map_after_with_error_command() -> None:
                 LegacyContextCommandError,
                 match="oh no",
             ),
+            notes=[],
             type=ErrorRecoveryType.FAIL_RUN,
         )
     ]
@@ -204,35 +208,37 @@ def test_command_stack() -> None:
     ]
 
     assert result == [
-        pe_actions.UpdateCommandAction(
-            private_result=None,
-            command=pe_commands.Custom.construct(
-                id="command.COMMENT-0",
+        pe_actions.QueueCommandAction(
+            command_id="command.COMMENT-0",
+            created_at=matchers.IsA(datetime),
+            request=pe_commands.CustomCreate(
                 key="command.COMMENT-0",
-                status=pe_commands.CommandStatus.RUNNING,
-                createdAt=matchers.IsA(datetime),
-                startedAt=matchers.IsA(datetime),
                 params=LegacyCommandParams(
                     legacyCommandType="command.COMMENT",
                     legacyCommandText="hello",
                 ),
             ),
+            request_hash=None,
         ),
-        pe_actions.UpdateCommandAction(
-            private_result=None,
-            command=pe_commands.Custom.construct(
-                id="command.COMMENT-1",
+        pe_actions.RunCommandAction(
+            command_id="command.COMMENT-0", started_at=matchers.IsA(datetime)
+        ),
+        pe_actions.QueueCommandAction(
+            command_id="command.COMMENT-1",
+            created_at=matchers.IsA(datetime),
+            request=pe_commands.CustomCreate(
                 key="command.COMMENT-1",
-                status=pe_commands.CommandStatus.RUNNING,
-                createdAt=matchers.IsA(datetime),
-                startedAt=matchers.IsA(datetime),
                 params=LegacyCommandParams(
                     legacyCommandType="command.COMMENT",
                     legacyCommandText="goodbye",
                 ),
             ),
+            request_hash=None,
         ),
-        pe_actions.UpdateCommandAction(
+        pe_actions.RunCommandAction(
+            command_id="command.COMMENT-1", started_at=matchers.IsA(datetime)
+        ),
+        pe_actions.SucceedCommandAction(
             private_result=None,
             command=pe_commands.Custom.construct(
                 id="command.COMMENT-0",
@@ -246,6 +252,7 @@ def test_command_stack() -> None:
                     legacyCommandText="hello",
                 ),
                 result=pe_commands.CustomResult(),
+                notes=[],
             ),
         ),
         pe_actions.FailCommandAction(
@@ -253,6 +260,7 @@ def test_command_stack() -> None:
             error_id=matchers.IsA(str),
             failed_at=matchers.IsA(datetime),
             error=matchers.ErrorMatching(LegacyContextCommandError, "oh no"),
+            notes=[],
             type=ErrorRecoveryType.FAIL_RUN,
         ),
     ]
@@ -270,32 +278,55 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
         offset_id="labware-offset-id-123",
         labware_display_name="My special labware",
     )
-    expected_output = pe_commands.LoadLabware.construct(
-        id=matchers.IsA(str),
-        key=matchers.IsA(str),
-        status=pe_commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=pe_commands.LoadLabwareParams.construct(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            namespace="some_namespace",
-            loadName="some_load_name",
-            version=123,
-            displayName="My special labware",
-            labwareId=None,
-        ),
-        result=pe_commands.LoadLabwareResult.construct(
-            labwareId=matchers.IsA(str),
-            # Trusting that the exact fields within in the labware definition
-            # get passed through correctly.
-            definition=matchers.Anything(),
-            offsetId="labware-offset-id-123",
-        ),
+
+    expected_id_and_key = "commands.LOAD_LABWARE-0"
+    expected_params = pe_commands.LoadLabwareParams(
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        namespace="some_namespace",
+        loadName="some_load_name",
+        version=123,
+        displayName="My special labware",
+        labwareId=None,
     )
-    output = LegacyCommandMapper().map_equipment_load(input)
-    assert output[0] == expected_output
-    assert output[1] is None
+    expected_queue = pe_actions.QueueCommandAction(
+        command_id=expected_id_and_key,
+        created_at=matchers.IsA(datetime),
+        request=pe_commands.LoadLabwareCreate(
+            key=expected_id_and_key,
+            params=expected_params,
+        ),
+        request_hash=None,
+    )
+    expected_run = pe_actions.RunCommandAction(
+        command_id=expected_id_and_key,
+        started_at=matchers.IsA(datetime),
+    )
+    expected_succeed = pe_actions.SucceedCommandAction(
+        command=pe_commands.LoadLabware.construct(
+            id=expected_id_and_key,
+            key=expected_id_and_key,
+            params=expected_params,
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=matchers.IsA(datetime),
+            startedAt=matchers.IsA(datetime),
+            completedAt=matchers.IsA(datetime),
+            result=pe_commands.LoadLabwareResult.construct(
+                labwareId=matchers.IsA(str),
+                # Trusting that the exact fields within in the labware definition
+                # get passed through correctly.
+                definition=matchers.Anything(),
+                offsetId="labware-offset-id-123",
+            ),
+            notes=[],
+        ),
+        private_result=None,
+    )
+    result_queue, result_run, result_succeed = LegacyCommandMapper().map_equipment_load(
+        input
+    )
+    assert result_queue == expected_queue
+    assert result_run == expected_run
+    assert result_succeed == expected_succeed
 
 
 def test_map_instrument_load(decoy: Decoy) -> None:
@@ -312,26 +343,47 @@ def test_map_instrument_load(decoy: Decoy) -> None:
         pipette_data_provider.get_pipette_static_config(pipette_dict)
     ).then_return(pipette_config)
 
-    result = LegacyCommandMapper().map_equipment_load(input)
-    pipette_id_captor = matchers.Captor()
-
-    assert result[0] == pe_commands.LoadPipette.construct(
-        id=matchers.IsA(str),
-        key=matchers.IsA(str),
-        status=pe_commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=pe_commands.LoadPipetteParams.construct(
-            pipetteName=PipetteNameType.P1000_SINGLE_GEN2, mount=MountType.LEFT
+    expected_id_and_key = "commands.LOAD_PIPETTE-0"
+    expected_params = pe_commands.LoadPipetteParams.construct(
+        pipetteName=PipetteNameType.P1000_SINGLE_GEN2, mount=MountType.LEFT
+    )
+    expected_queue = pe_actions.QueueCommandAction(
+        command_id=expected_id_and_key,
+        created_at=matchers.IsA(datetime),
+        request=pe_commands.LoadPipetteCreate(
+            key=expected_id_and_key, params=expected_params
         ),
-        result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id_captor),
+        request_hash=None,
     )
-    assert result[1] == pe_commands.LoadPipettePrivateResult(
-        pipette_id="pipette-0",
-        serial_number="fizzbuzz",
-        config=pipette_config,
+    expected_run = pe_actions.RunCommandAction(
+        command_id=expected_id_and_key, started_at=matchers.IsA(datetime)
     )
+    expected_succeed = pe_actions.SucceedCommandAction(
+        command=pe_commands.LoadPipette.construct(
+            id=expected_id_and_key,
+            key=expected_id_and_key,
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=matchers.IsA(datetime),
+            startedAt=matchers.IsA(datetime),
+            completedAt=matchers.IsA(datetime),
+            params=expected_params,
+            result=pe_commands.LoadPipetteResult(pipetteId="pipette-0"),
+            notes=[],
+        ),
+        private_result=pe_commands.LoadPipettePrivateResult(
+            pipette_id="pipette-0", serial_number="fizzbuzz", config=pipette_config
+        ),
+    )
+
+    [
+        result_queue,
+        result_run,
+        result_succeed,
+    ] = LegacyCommandMapper().map_equipment_load(input)
+
+    assert result_queue == expected_queue
+    assert result_run == expected_run
+    assert result_succeed == expected_succeed
 
 
 def test_map_module_load(
@@ -352,30 +404,50 @@ def test_map_module_load(
         module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V2)
     ).then_return(test_definition)
 
-    expected_output = pe_commands.LoadModule.construct(
-        id=matchers.IsA(str),
-        key=matchers.IsA(str),
-        status=pe_commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=pe_commands.LoadModuleParams.construct(
-            model=ModuleModel.TEMPERATURE_MODULE_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            moduleId=matchers.IsA(str),
-        ),
-        result=pe_commands.LoadModuleResult.construct(
-            moduleId=matchers.IsA(str),
-            serialNumber="module-serial",
-            definition=test_definition,
-            model=ModuleModel.TEMPERATURE_MODULE_V2,
-        ),
+    expected_id_and_key = "commands.LOAD_MODULE-0"
+    expected_params = pe_commands.LoadModuleParams.construct(
+        model=ModuleModel.TEMPERATURE_MODULE_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        moduleId=matchers.IsA(str),
     )
-    output = LegacyCommandMapper(
+    expected_queue = pe_actions.QueueCommandAction(
+        command_id=expected_id_and_key,
+        created_at=matchers.IsA(datetime),
+        request=pe_commands.LoadModuleCreate(
+            key=expected_id_and_key, params=expected_params
+        ),
+        request_hash=None,
+    )
+    expected_run = pe_actions.RunCommandAction(
+        command_id=expected_id_and_key, started_at=matchers.IsA(datetime)
+    )
+    expected_succeed = pe_actions.SucceedCommandAction(
+        command=pe_commands.LoadModule.construct(
+            id=expected_id_and_key,
+            key=expected_id_and_key,
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=matchers.IsA(datetime),
+            startedAt=matchers.IsA(datetime),
+            completedAt=matchers.IsA(datetime),
+            params=expected_params,
+            result=pe_commands.LoadModuleResult.construct(
+                moduleId=matchers.IsA(str),
+                serialNumber="module-serial",
+                definition=test_definition,
+                model=ModuleModel.TEMPERATURE_MODULE_V2,
+            ),
+            notes=[],
+        ),
+        private_result=None,
+    )
+
+    [result_queue, result_run, result_succeed] = LegacyCommandMapper(
         module_data_provider=module_data_provider
     ).map_equipment_load(input)
-    assert output[0] == expected_output
-    assert output[1] is None
+
+    assert result_queue == expected_queue
+    assert result_run == expected_run
+    assert result_succeed == expected_succeed
 
 
 def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None:
@@ -391,33 +463,56 @@ def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None
         offset_id="labware-offset-id-123",
     )
 
-    expected_output = pe_commands.LoadLabware.construct(
-        id=matchers.IsA(str),
-        key=matchers.IsA(str),
-        status=pe_commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=pe_commands.LoadLabwareParams.construct(
-            location=ModuleLocation(moduleId="module-123"),
-            namespace="some_namespace",
-            loadName="some_load_name",
-            version=123,
-            displayName="My very special module labware",
-            labwareId=None,
-        ),
-        result=pe_commands.LoadLabwareResult.construct(
-            labwareId=matchers.IsA(str),
-            definition=matchers.Anything(),
-            offsetId="labware-offset-id-123",
-        ),
+    expected_id_and_key = "commands.LOAD_LABWARE-0"
+    expected_params = pe_commands.LoadLabwareParams.construct(
+        location=ModuleLocation(moduleId="module-123"),
+        namespace="some_namespace",
+        loadName="some_load_name",
+        version=123,
+        displayName="My very special module labware",
+        labwareId=None,
     )
+    expected_queue = pe_actions.QueueCommandAction(
+        command_id=expected_id_and_key,
+        created_at=matchers.IsA(datetime),
+        request=pe_commands.LoadLabwareCreate(
+            key=expected_id_and_key,
+            params=expected_params,
+        ),
+        request_hash=None,
+    )
+    expected_run = pe_actions.RunCommandAction(
+        command_id="commands.LOAD_LABWARE-0",
+        started_at=matchers.IsA(datetime),
+    )
+    expected_succeed = pe_actions.SucceedCommandAction(
+        command=pe_commands.LoadLabware.construct(
+            id=expected_id_and_key,
+            key=expected_id_and_key,
+            params=expected_params,
+            status=pe_commands.CommandStatus.SUCCEEDED,
+            createdAt=matchers.IsA(datetime),
+            startedAt=matchers.IsA(datetime),
+            completedAt=matchers.IsA(datetime),
+            result=pe_commands.LoadLabwareResult.construct(
+                labwareId=matchers.IsA(str),
+                # Trusting that the exact fields within in the labware definition
+                # get passed through correctly.
+                definition=matchers.Anything(),
+                offsetId="labware-offset-id-123",
+            ),
+            notes=[],
+        ),
+        private_result=None,
+    )
+
     subject = LegacyCommandMapper()
     subject._module_id_by_slot = {DeckSlotName.SLOT_1: "module-123"}
-    output = subject.map_equipment_load(load_input)
+    result_queue, result_run, result_succeed = subject.map_equipment_load(load_input)
 
-    assert output[0] == expected_output
-    assert output[1] is None
+    assert result_queue == expected_queue
+    assert result_run == expected_run
+    assert result_succeed == expected_succeed
 
 
 def test_map_pause() -> None:
@@ -444,18 +539,20 @@ def test_map_pause() -> None:
     ]
 
     assert result == [
-        pe_actions.UpdateCommandAction(
-            private_result=None,
-            command=pe_commands.WaitForResume.construct(
-                id="command.PAUSE-0",
+        pe_actions.QueueCommandAction(
+            command_id="command.PAUSE-0",
+            created_at=matchers.IsA(datetime),
+            request=pe_commands.WaitForResumeCreate(
                 key="command.PAUSE-0",
-                status=pe_commands.CommandStatus.RUNNING,
-                createdAt=matchers.IsA(datetime),
-                startedAt=matchers.IsA(datetime),
                 params=pe_commands.WaitForResumeParams(message="hello world"),
             ),
+            request_hash=None,
         ),
-        pe_actions.UpdateCommandAction(
+        pe_actions.RunCommandAction(
+            command_id="command.PAUSE-0",
+            started_at=matchers.IsA(datetime),
+        ),
+        pe_actions.SucceedCommandAction(
             private_result=None,
             command=pe_commands.WaitForResume.construct(
                 id="command.PAUSE-0",
@@ -465,6 +562,7 @@ def test_map_pause() -> None:
                 startedAt=matchers.IsA(datetime),
                 completedAt=matchers.IsA(datetime),
                 params=pe_commands.WaitForResumeParams(message="hello world"),
+                notes=[],
             ),
         ),
         pe_actions.PauseAction(source=pe_actions.PauseSource.PROTOCOL),

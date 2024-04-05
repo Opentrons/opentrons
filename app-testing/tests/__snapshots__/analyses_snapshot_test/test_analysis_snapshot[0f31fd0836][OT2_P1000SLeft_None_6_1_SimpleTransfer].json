@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p1000_single_gen2"
@@ -17,6 +19,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "Opentrons 96 Tip Rack 1000 µL",
         "loadName": "opentrons_96_tiprack_1000ul",
@@ -1163,6 +1166,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "gold",
         "loadName": "axygen_1_reservoir_90ml",
@@ -1249,6 +1253,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "SILVER",
         "loadName": "nest_12_reservoir_15ml",
@@ -1489,6 +1494,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "round",
         "loadName": "corning_6_wellplate_16.8ml_flat",
@@ -1632,6 +1638,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A10": 1000.0,
@@ -1647,6 +1654,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A1": 5000.0
@@ -1657,6 +1665,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -1682,6 +1691,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 137.35,
         "volume": 400.0,
@@ -1707,6 +1717,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 137.35,
         "volume": 400.0,
@@ -1732,6 +1743,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 137.35,
         "volume": 400.0,
@@ -1757,6 +1769,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 137.35,
         "volume": 400.0,
@@ -1782,6 +1795,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {

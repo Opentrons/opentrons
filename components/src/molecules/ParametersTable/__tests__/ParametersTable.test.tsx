@@ -13,7 +13,7 @@ const mockRunTimeParameter: RunTimeParameter[] = [
     variableName: 'TIP_TRASH',
     description:
       'to throw tip into the trash or to not throw tip into the trash',
-    type: 'boolean',
+    type: 'bool',
     default: true,
     value: true,
   },
@@ -74,7 +74,7 @@ const render = (props: React.ComponentProps<typeof ParametersTable>) => {
   return renderWithProviders(<ParametersTable {...props} />)
 }
 
-describe('ParametersTabl', () => {
+describe('ParametersTable', () => {
   let props: React.ComponentProps<typeof ParametersTable>
 
   beforeEach(() => {
@@ -100,10 +100,12 @@ describe('ParametersTabl', () => {
     screen.getByText('6.5 mL')
     screen.getByText('1.5-10')
 
+    // more than 2 options
     screen.getByText('Default Module Offsets')
     screen.getByText('No offsets')
-    screen.getByText('3 choices')
+    screen.getByText('3 options')
 
+    // 2 options
     screen.getByText('pipette mount')
     screen.getByText('Left')
     screen.getByText('Left, Right')
@@ -115,5 +117,10 @@ describe('ParametersTabl', () => {
     screen.getByText('name')
     screen.getByText('default_value')
     screen.getByText('range')
+  })
+
+  it('should render a description icon if description is provided', () => {
+    render(props)
+    screen.getByTestId('Icon_0')
   })
 })

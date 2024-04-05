@@ -147,8 +147,9 @@ interface PipetteTipsFieldProps extends UseFormReturn<FormState> {
 }
 
 function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
-  const { mount, watch, setValue } = props
+  const { mount, watch, setValue, getValues } = props
   const { t } = useTranslation('modal')
+  const { fields } = getValues()
   const pipettesByMount = watch('pipettesByMount')
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
@@ -178,16 +179,15 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
     option.value.includes('custom_beta')
   )
 
-  const currentValue = pipettesByMount[mount].tiprackDefURI
+  const selectedValues = pipettesByMount[mount].tiprackDefURI ?? []
 
   React.useEffect(() => {
-    if (currentValue === undefined) {
-      setValue(
-        `pipettesByMount.${mount}.tiprackDefURI`,
-        tiprackOptions[0]?.value ?? ''
-      )
+    if (selectedValues.length === 0) {
+      setValue(`pipettesByMount.${mount}.tiprackDefURI`, [
+        tiprackOptions[0]?.value ?? '',
+      ])
     }
-  }, [currentValue, setValue, tiprackOptions])
+  }, [selectedValues, setValue, tiprackOptions])
 
   return (
     <Flex
@@ -198,14 +198,22 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
       <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
         {defaultTiprackOptions.map(o => (
           <EquipmentOption
+            robotType={fields.robotType}
             key={o.name}
-            isSelected={currentValue === o.value}
+            isSelected={selectedValues.includes(o.value)}
             text={o.name}
             onClick={() => {
-              setValue(`pipettesByMount.${mount}.tiprackDefURI`, o.value)
+              const updatedValues = selectedValues?.includes(o.value)
+                ? selectedValues.filter(value => value !== o.value)
+                : [...(selectedValues ?? []), o.value]
+              setValue(
+                `pipettesByMount.${mount}.tiprackDefURI`,
+                updatedValues.slice(0, 3)
+              )
             }}
             width="21.75rem"
             minHeight="4rem"
+            showCheckbox
           />
         ))}
       </Flex>
@@ -255,14 +263,22 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
             >
               {customTiprackOptions.map(o => (
                 <EquipmentOption
+                  robotType={fields.robotType}
                   key={o.name}
-                  isSelected={currentValue === o.value}
+                  isSelected={selectedValues.includes(o.value)}
                   text={o.name}
                   onClick={() => {
-                    setValue(`pipettesByMount.${mount}.tiprackDefURI`, o.value)
+                    const updatedValues = selectedValues?.includes(o.value)
+                      ? selectedValues.filter(value => value !== o.value)
+                      : [...(selectedValues ?? []), o.value]
+                    setValue(
+                      `pipettesByMount.${mount}.tiprackDefURI`,
+                      updatedValues.slice(0, 3)
+                    )
                   }}
                   width="21.75rem"
                   minHeight="4rem"
+                  showCheckbox
                 />
               ))}
             </Flex>

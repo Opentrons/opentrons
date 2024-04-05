@@ -13,6 +13,7 @@ import {
   PipetteName,
   MAGNETIC_BLOCK_TYPE,
   getPipetteSpecsV2,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import {
   AdditionalEquipmentEntities,
@@ -339,7 +340,7 @@ export const getPermittedTipracks: Selector<
   reduce(
     initialDeckSetup.pipettes,
     (acc: string[], pipette: PipetteOnDeck) => {
-      return pipette.tiprackDefURI ? [...acc, pipette.tiprackDefURI] : acc
+      return pipette.tiprackDefURI ? [...acc, ...pipette.tiprackDefURI] : acc
     },
     []
   )
@@ -400,13 +401,15 @@ export const getPipettesForInstrumentGroup: Selector<
       pipetteId
     ) => {
       const pipetteSpec = pipetteOnDeck.spec
-      const tiprackDef = pipetteOnDeck.tiprackLabwareDef
+      const tiprackDefs = pipetteOnDeck.tiprackLabwareDef
       const pipetteForInstrumentGroup: InstrumentInfoProps = {
         mount: pipetteOnDeck.mount,
         pipetteSpecs: pipetteSpec,
         description: _getPipetteDisplayName(pipetteOnDeck.name),
         isDisabled: false,
-        tiprackModel: getLabwareDisplayName(tiprackDef),
+        tiprackModels: tiprackDefs?.map((def: LabwareDefinition2) =>
+          getLabwareDisplayName(def)
+        ),
       }
       acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
       return acc
@@ -422,11 +425,13 @@ export const getPipettesForEditPipetteForm: Selector<
     initialDeckSetup.pipettes,
     (acc, pipetteOnDeck: PipetteOnDeck, id) => {
       const pipetteSpec = pipetteOnDeck.spec
-      const tiprackDef = pipetteOnDeck.tiprackLabwareDef
-      if (!pipetteSpec || !tiprackDef) return acc
+      const tiprackDefs = pipetteOnDeck.tiprackLabwareDef
+      if (!pipetteSpec || !tiprackDefs) return acc
       const pipetteForInstrumentGroup = {
         pipetteName: pipetteOnDeck.name,
-        tiprackDefURI: getLabwareDefURI(tiprackDef),
+        tiprackDefURI: tiprackDefs.map((def: LabwareDefinition2) =>
+          getLabwareDefURI(def)
+        ),
       }
       acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
       return acc

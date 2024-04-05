@@ -36,7 +36,6 @@ interface ChooseRobotToRunProtocolSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
   onCloseClick: () => void
   showSlideout: boolean
-  runTimeParameters?: RunTimeParameter[]
 }
 
 export function ChooseRobotToRunProtocolSlideoutComponent(
@@ -61,66 +60,13 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     storedProtocolData,
     selectedRobot?.name ?? ''
   )
-
-  // TODO: (nd: 3/20/24) remove stubs and pull parameters from analysis
-
-  const mockRunTimeParameters: RunTimeParameter[] = [
-    {
-      displayName: 'Dry Run',
-      value: false,
-      variableName: 'DRYRUN',
-      description: 'Is this a dry or wet run? Wet is true, dry is false',
-      type: 'boolean',
-      default: false,
-    },
-    {
-      value: 4,
-      displayName: 'Columns of Samples',
-      variableName: 'COLUMNS',
-      description: 'How many columns do you want?',
-      type: 'int',
-      min: 1,
-      max: 14,
-      default: 4,
-    },
-    {
-      value: 6.5,
-      displayName: 'EtoH Volume',
-      variableName: 'ETOH_VOLUME',
-      description: '70% ethanol volume',
-      type: 'float',
-      suffix: 'mL',
-      min: 1.5,
-      max: 10.0,
-      default: 6.5,
-    },
-    {
-      value: 'none',
-      displayName: 'Default Module Offsets',
-      variableName: 'DEFAULT_OFFSETS',
-      description: 'default module offsets for temp, H-S, and none',
-      type: 'str',
-      choices: [
-        {
-          displayName: 'No offsets',
-          value: 'none',
-        },
-        {
-          displayName: 'temp offset',
-          value: '1',
-        },
-        {
-          displayName: 'heater-shaker offset',
-          value: '2',
-        },
-      ],
-      default: 'none',
-    },
-  ]
+  const runTimeParameters =
+    storedProtocolData.mostRecentAnalysis?.runTimeParameters ?? []
   const [
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
-  ] = React.useState<RunTimeParameter[]>(mockRunTimeParameters)
+  ] = React.useState<RunTimeParameter[]>(runTimeParameters)
+  const [hasParamError, setHasParamError] = React.useState<boolean>(false)
 
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis,
@@ -165,7 +111,14 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           location,
           definitionUri,
         }))
-      : []
+      : [],
+    runTimeParametersOverrides.reduce(
+      (acc, param) =>
+        param.value !== param.default
+          ? { ...acc, [param.variableName]: param.value }
+          : acc,
+      {}
+    )
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
@@ -223,22 +176,31 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     </PrimaryButton>
   )
 
+  const hasRunTimeParameters =
+    enableRunTimeParametersFF && runTimeParameters.length > 0
+
   return (
     <ChooseRobotSlideout
-      multiSlideout={{ currentPage }}
+      multiSlideout={hasRunTimeParameters ? { currentPage } : null}
       isExpanded={showSlideout}
       isSelectedRobotOnDifferentSoftwareVersion={
         isSelectedRobotOnDifferentSoftwareVersion
       }
       onCloseClick={onCloseClick}
-      title={t('choose_robot_to_run', {
-        protocol_name: protocolDisplayName,
-      })}
+      title={
+        hasRunTimeParameters && currentPage === 2
+          ? t('select_parameters_for_robot', {
+              robot_name: selectedRobot?.name,
+            })
+          : t('choose_robot_to_run', {
+              protocol_name: protocolDisplayName,
+            })
+      }
       runTimeParametersOverrides={runTimeParametersOverrides}
       setRunTimeParametersOverrides={setRunTimeParametersOverrides}
       footer={
         <Flex flexDirection={DIRECTION_COLUMN}>
-          {enableRunTimeParametersFF ? (
+          {hasRunTimeParameters ? (
             currentPage === 1 ? (
               <>
                 <ApplyHistoricOffsets
@@ -266,7 +228,11 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
                 <SecondaryButton onClick={() => setCurrentPage(1)} width="50%">
                   {t('shared:change_robot')}
                 </SecondaryButton>
-                <PrimaryButton width="50%" onClick={handleProceed}>
+                <PrimaryButton
+                  width="50%"
+                  onClick={handleProceed}
+                  disabled={hasParamError}
+                >
                   {isCreatingRun ? (
                     <Icon name="ot-spinner" spin size="1rem" />
                   ) : (
@@ -288,6 +254,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       runCreationError={runCreationError}
       runCreationErrorCode={runCreationErrorCode}
       showIdleOnly={true}
+      setHasParamError={setHasParamError}
     />
   )
 }

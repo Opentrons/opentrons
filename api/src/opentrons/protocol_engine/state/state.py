@@ -146,6 +146,7 @@ class StateStore(StateView, ActionHandler):
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
+        notify_publishers: Optional[Callable[[], None]] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -159,6 +160,7 @@ class StateStore(StateView, ActionHandler):
             change_notifier: Internal state change notifier.
             module_calibration_offsets: Module offsets to preload.
             deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
+            notify_publishers: Notifies robot server publishers of internal state change.
         """
         self._command_store = CommandStore(config=config, is_door_open=is_door_open)
         self._pipette_store = PipetteStore()
@@ -191,6 +193,7 @@ class StateStore(StateView, ActionHandler):
         ]
         self._config = config
         self._change_notifier = change_notifier or ChangeNotifier()
+        self._notify_robot_server = notify_publishers
         self._initialize_state()
 
     def handle_action(self, action: Action) -> None:
@@ -319,3 +322,5 @@ class StateStore(StateView, ActionHandler):
         self._liquid._state = next_state.liquids
         self._tips._state = next_state.tips
         self._change_notifier.notify()
+        if self._notify_robot_server is not None:
+            self._notify_robot_server()

@@ -7,6 +7,17 @@ import { i18n } from '../../../../i18n'
 import { ProtocolParameters } from '..'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import type * as Components from '@opentrons/components'
+
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof Components>()
+  return {
+    ...actual,
+    NoParameters: vi.fn(() => (
+      <div>No parameters specified in this protocol</div>
+    )),
+  }
+})
 
 const mockRunTimeParameter: RunTimeParameter[] = [
   {
@@ -14,7 +25,7 @@ const mockRunTimeParameter: RunTimeParameter[] = [
     variableName: 'TIP_TRASH',
     description:
       'to throw tip into the trash or to not throw tip into the trash',
-    type: 'boolean',
+    type: 'bool',
     default: true,
     value: true,
   },
@@ -115,7 +126,7 @@ describe('ProtocolParameters', () => {
 
     screen.getByText('Default Module Offsets')
     screen.getByText('No offsets')
-    screen.getByText('3 choices')
+    screen.getByText('3 options')
 
     screen.getByText('pipette mount')
     screen.getByText('Left')

@@ -12,30 +12,43 @@ import {
   Box,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   DISPLAY_BLOCK,
+  DropdownOption,
   Flex,
   Icon,
+  Link as LinkComponent,
   JUSTIFY_CENTER,
+  JUSTIFY_END,
+  JUSTIFY_FLEX_START,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   ProtocolDeck,
-  SIZE_1,
   SPACING,
+  SecondaryButton,
   StyledText,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
-import { Slideout } from '../../atoms/Slideout'
+import { useFeatureFlag } from '../../redux/config'
+import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
+import { Tooltip } from '../../atoms/Tooltip'
+import { ToggleButton } from '../../atoms/buttons'
+import { InputField } from '../../atoms/InputField'
+import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { MiniCard } from '../../molecules/MiniCard'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
+import type { RunTimeParameterCreateData } from '@opentrons/api-client'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -65,6 +78,8 @@ export function ChooseProtocolSlideoutComponent(
   const { t } = useTranslation(['device_details', 'shared'])
   const history = useHistory()
   const logger = useLogger(new URL('', import.meta.url).pathname)
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
 
@@ -72,6 +87,29 @@ export function ChooseProtocolSlideoutComponent(
     selectedProtocol,
     setSelectedProtocol,
   ] = React.useState<StoredProtocolData | null>(null)
+  const [
+    runTimeParametersOverrides,
+    setRunTimeParametersOverrides,
+  ] = React.useState<RunTimeParameter[]>([])
+  const [currentPage, setCurrentPage] = React.useState<number>(1)
+  const [hasParamError, setHasParamError] = React.useState<boolean>(false)
+  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
+
+  React.useEffect(() => {
+    setRunTimeParametersOverrides(
+      selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
+    )
+  }, [selectedProtocol])
+  React.useEffect(() => {
+    setHasParamError(errors.length > 0)
+  }, [runTimeParametersOverrides])
+
+  const runTimeParametersFromAnalysis =
+    selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
+
+  const hasRunTimeParameters =
+    enableRunTimeParametersFF && runTimeParametersFromAnalysis.length > 0
+
   const analysisStatus = getAnalysisStatus(
     false,
     selectedProtocol?.mostRecentAnalysis
@@ -128,7 +166,14 @@ export function ChooseProtocolSlideoutComponent(
           location,
           definitionUri,
         }))
-      : []
+      : [],
+    runTimeParametersOverrides.reduce<RunTimeParameterCreateData>(
+      (acc, param) =>
+        param.value !== param.default
+          ? { ...acc, [param.variableName]: param.value }
+          : acc,
+      {}
+    )
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     if (selectedProtocol != null) {
@@ -141,10 +186,234 @@ export function ChooseProtocolSlideoutComponent(
       logger.warn('failed to create protocol, no protocol selected')
     }
   }
+
+  const isRestoreDefaultsLinkEnabled =
+    runTimeParametersOverrides?.some(
+      parameter => parameter.value !== parameter.default
+    ) ?? false
+
+  const errors: string[] = []
+  const runTimeParametersInputs =
+    runTimeParametersOverrides?.map((runtimeParam, index) => {
+      if ('choices' in runtimeParam) {
+        const dropdownOptions = runtimeParam.choices.map(choice => {
+          return { name: choice.displayName, value: choice.value }
+        }) as DropdownOption[]
+        return (
+          <DropdownMenu
+            key={runtimeParam.variableName}
+            filterOptions={dropdownOptions}
+            currentOption={
+              dropdownOptions.find(choice => {
+                return choice.value === runtimeParam.value
+              }) ?? dropdownOptions[0]
+            }
+            onClick={choice => {
+              const clone = runTimeParametersOverrides.map((parameter, i) => {
+                if (i === index) {
+                  return {
+                    ...parameter,
+                    value:
+                      dropdownOptions.find(option => option.value === choice)
+                        ?.value ?? parameter.default,
+                  }
+                }
+                return parameter
+              })
+              setRunTimeParametersOverrides(clone)
+            }}
+            title={runtimeParam.displayName}
+            caption={runtimeParam.description}
+            width="100%"
+            dropdownType="neutral"
+          />
+        )
+      } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
+        const value = runtimeParam.value as number
+        const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
+        const error =
+          Number.isNaN(value) ||
+          value < runtimeParam.min ||
+          value > runtimeParam.max
+            ? t(`protocol_details:value_out_of_range`, {
+                min:
+                  runtimeParam.type === 'int'
+                    ? runtimeParam.min
+                    : runtimeParam.min.toFixed(1),
+                max:
+                  runtimeParam.type === 'int'
+                    ? runtimeParam.max
+                    : runtimeParam.max.toFixed(1),
+              })
+            : null
+        if (error != null) {
+          errors.push(error)
+        }
+        return (
+          <InputField
+            key={runtimeParam.variableName}
+            type="number"
+            units={runtimeParam.suffix}
+            placeholder={value.toString()}
+            value={value}
+            title={runtimeParam.displayName}
+            tooltipText={runtimeParam.description}
+            caption={`${runtimeParam.min}-${runtimeParam.max}`}
+            id={id}
+            error={error}
+            onChange={e => {
+              const clone = runTimeParametersOverrides.map((parameter, i) => {
+                if (i === index) {
+                  return {
+                    ...parameter,
+                    value:
+                      runtimeParam.type === 'int'
+                        ? Math.round(e.target.valueAsNumber)
+                        : e.target.valueAsNumber,
+                  }
+                }
+                return parameter
+              })
+              setRunTimeParametersOverrides(clone)
+            }}
+          />
+        )
+      } else if (runtimeParam.type === 'bool') {
+        return (
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            key={runtimeParam.variableName}
+          >
+            <StyledText
+              as="label"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              paddingBottom={SPACING.spacing8}
+            >
+              {runtimeParam.displayName}
+            </StyledText>
+            <Flex
+              gridGap={SPACING.spacing8}
+              justifyContent={JUSTIFY_FLEX_START}
+              width="max-content"
+            >
+              <ToggleButton
+                toggledOn={runtimeParam.value as boolean}
+                onClick={() => {
+                  const clone = runTimeParametersOverrides.map(
+                    (parameter, i) => {
+                      if (i === index) {
+                        return {
+                          ...parameter,
+                          value: !parameter.value,
+                        }
+                      }
+                      return parameter
+                    }
+                  )
+                  setRunTimeParametersOverrides(clone)
+                }}
+                height="0.813rem"
+                label={
+                  runtimeParam.value
+                    ? t('protocol_details:on')
+                    : t('protocol_details:off')
+                }
+                paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
+              />
+              <StyledText as="p">
+                {runtimeParam.value
+                  ? t('protocol_details:on')
+                  : t('protocol_details:off')}
+              </StyledText>
+            </Flex>
+            <StyledText as="label" paddingTop={SPACING.spacing8}>
+              {runtimeParam.description}
+            </StyledText>
+          </Flex>
+        )
+      }
+    }) ?? null
+
+  const pageTwoBody = (
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex justifyContent={JUSTIFY_END}>
+        <LinkComponent
+          textAlign={TYPOGRAPHY.textAlignRight}
+          css={
+            isRestoreDefaultsLinkEnabled ? ENABLED_LINK_CSS : DISABLED_LINK_CSS
+          }
+          onClick={() => {
+            const clone = runTimeParametersOverrides.map(parameter => ({
+              ...parameter,
+              value: parameter.default,
+            }))
+            setRunTimeParametersOverrides(clone)
+          }}
+          paddingBottom={SPACING.spacing10}
+          {...targetProps}
+        >
+          {t('protocol_details:restore_defaults')}
+        </LinkComponent>
+        {!isRestoreDefaultsLinkEnabled && (
+          <Tooltip tooltipProps={tooltipProps}>
+            {t('protocol_details:no_custom_values')}
+          </Tooltip>
+        )}
+      </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        {runTimeParametersInputs}
+      </Flex>
+    </Flex>
+  )
+
+  const singlePageFooter = (
+    <PrimaryButton
+      onClick={handleProceed}
+      disabled={isCreatingRun || selectedProtocol == null}
+      width="100%"
+    >
+      {isCreatingRun ? (
+        <Icon name="ot-spinner" spin size="1rem" />
+      ) : (
+        t('shared:proceed_to_setup')
+      )}
+    </PrimaryButton>
+  )
+
+  const multiPageFooter =
+    currentPage === 1 ? (
+      <PrimaryButton
+        onClick={() => setCurrentPage(2)}
+        width="100%"
+        disabled={isCreatingRun || selectedProtocol == null}
+      >
+        {t('shared:continue_to_param')}
+      </PrimaryButton>
+    ) : (
+      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_ROW}>
+        <SecondaryButton onClick={() => setCurrentPage(1)} width="51%">
+          {t('shared:change_protocol')}
+        </SecondaryButton>
+        <PrimaryButton
+          width="49%"
+          onClick={handleProceed}
+          disabled={hasParamError}
+        >
+          {isCreatingRun ? (
+            <Icon name="ot-spinner" spin size="1rem" />
+          ) : (
+            t('shared:confirm_values')
+          )}
+        </PrimaryButton>
+      </Flex>
+    )
+
   return (
-    <Slideout
+    <MultiSlideout
       isExpanded={showSlideout}
       onCloseClick={onCloseClick}
+      currentStep={currentPage}
+      maxSteps={hasRunTimeParameters ? 2 : 1}
       title={t('choose_protocol_to_run', { name })}
       footer={
         <ApiHostProvider
@@ -153,53 +422,49 @@ export function ChooseProtocolSlideoutComponent(
             robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
           }
         >
-          <ApplyHistoricOffsets
-            offsetCandidates={offsetCandidates}
-            shouldApplyOffsets={shouldApplyOffsets}
-            setShouldApplyOffsets={setShouldApplyOffsets}
-            commands={
-              (!missingAnalysisData
-                ? selectedProtocol?.mostRecentAnalysis?.commands
-                : []) ?? []
-            }
-            labware={
-              (!missingAnalysisData
-                ? selectedProtocol?.mostRecentAnalysis?.labware
-                : []) ?? []
-            }
-            modules={
-              (!missingAnalysisData
-                ? selectedProtocol?.mostRecentAnalysis?.modules
-                : []) ?? []
-            }
-          />
-          <PrimaryButton
-            onClick={handleProceed}
-            disabled={isCreatingRun || selectedProtocol == null}
-            width="100%"
-          >
-            {isCreatingRun ? (
-              <Icon name="ot-spinner" spin size={SIZE_1} />
-            ) : (
-              t('shared:proceed_to_setup')
-            )}
-          </PrimaryButton>
+          {currentPage === 1 ? (
+            <ApplyHistoricOffsets
+              offsetCandidates={offsetCandidates}
+              shouldApplyOffsets={shouldApplyOffsets}
+              setShouldApplyOffsets={setShouldApplyOffsets}
+              commands={
+                (!missingAnalysisData
+                  ? selectedProtocol?.mostRecentAnalysis?.commands
+                  : []) ?? []
+              }
+              labware={
+                (!missingAnalysisData
+                  ? selectedProtocol?.mostRecentAnalysis?.labware
+                  : []) ?? []
+              }
+              modules={
+                (!missingAnalysisData
+                  ? selectedProtocol?.mostRecentAnalysis?.modules
+                  : []) ?? []
+              }
+            />
+          ) : null}
+          {hasRunTimeParameters ? multiPageFooter : singlePageFooter}
         </ApiHostProvider>
       }
     >
       {showSlideout ? (
-        <StoredProtocolList
-          handleSelectProtocol={storedProtocol => {
-            if (!isCreatingRun) {
-              resetCreateRun()
-              setSelectedProtocol(storedProtocol)
-            }
-          }}
-          robotName={robot.name}
-          {...{ selectedProtocol, runCreationError, runCreationErrorCode }}
-        />
+        currentPage === 1 ? (
+          <StoredProtocolList
+            handleSelectProtocol={storedProtocol => {
+              if (!isCreatingRun) {
+                resetCreateRun()
+                setSelectedProtocol(storedProtocol)
+              }
+            }}
+            robotName={robot.name}
+            {...{ selectedProtocol, runCreationError, runCreationErrorCode }}
+          />
+        ) : (
+          pageTwoBody
+        )
       ) : null}
-    </Slideout>
+    </MultiSlideout>
   )
 }
 
@@ -225,7 +490,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
     runCreationErrorCode,
     robotName,
   } = props
-  const { t } = useTranslation(['device_details', 'shared'])
+  const { t } = useTranslation(['device_details', 'protocol_details', 'shared'])
   const storedProtocols = useSelector((state: State) =>
     getStoredProtocols(state)
   )
@@ -401,3 +666,18 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
     </Flex>
   )
 }
+
+const ENABLED_LINK_CSS = css`
+  ${TYPOGRAPHY.linkPSemiBold}
+  cursor: pointer;
+`
+
+const DISABLED_LINK_CSS = css`
+  ${TYPOGRAPHY.linkPSemiBold}
+  color: ${COLORS.grey40};
+  cursor: default;
+
+  &:hover {
+    color: ${COLORS.grey40};
+  }
+`

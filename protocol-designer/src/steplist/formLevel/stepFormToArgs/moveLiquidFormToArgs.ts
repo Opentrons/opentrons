@@ -76,7 +76,13 @@ export const moveLiquidFormToArgs = (
     dispense_wells: destWellsUnordered,
     dropTip_location: dropTipLocation,
     path,
+    tipRack,
     nozzles,
+    aspirate_x_position,
+    dispense_x_position,
+    aspirate_y_position,
+    dispense_y_position,
+    blowout_z_offset,
   } = fields
   let sourceWells = getOrderedWells(
     fields.aspirate_wells,
@@ -160,7 +166,10 @@ export const moveLiquidFormToArgs = (
   )
   const blowoutLocation =
     (fields.blowout_checkbox && fields.blowout_location) || null
-  const blowoutOffsetFromTopMm = DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+  const blowoutOffsetFromTopMm =
+    blowoutLocation != null
+      ? blowout_z_offset ?? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+      : DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
   const aspirateAirGapVolume = getAirGapData(
     fields,
     'aspirate_airGap_checkbox',
@@ -173,13 +182,15 @@ export const moveLiquidFormToArgs = (
   )
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     fields.pipette,
-    fields.volume
+    fields.volume,
+    tipRack
   )
   const commonFields = {
     pipette: pipetteId,
     volume,
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
+    tipRack: tipRack,
     aspirateFlowRateUlSec:
       fields.aspirate_flowRate ||
       matchingTipLiquidSpecs.defaultAspirateFlowRate.default,
@@ -208,6 +219,10 @@ export const moveLiquidFormToArgs = (
     name: hydratedFormData.stepName,
     dropTipLocation,
     nozzles,
+    aspirateXOffset: aspirate_x_position ?? 0,
+    aspirateYOffset: aspirate_y_position ?? 0,
+    dispenseXOffset: dispense_x_position ?? 0,
+    dispenseYOffset: dispense_y_position ?? 0,
   }
   console.assert(
     sourceWellsUnordered.length > 0,

@@ -61,7 +61,16 @@
   },
   "tip_position": {
     "title": "Tip Positioning",
+    "caption": "between {{min}} and {{max}}",
+    "warning": "The X and/or Y position value is close to edge of the well and might collide with it",
+    "radio_button": {
+      "default": "{{defaultMmFromBottom}} mm from the bottom center (default)",
+      "blowout": "0 mm from the top center (default)",
+      "mix": "Aspirate 1mm, Dispense 0.5mm from the bottom center (default)",
+      "custom": "Custom"
+    },
     "body": {
+      "blowout_z_offset": "Change from where in the well the robot emits blowout",
       "aspirate_mmFromBottom": "Change from where in the well the robot aspirates",
       "dispense_mmFromBottom": "Change from where in the well the robot dispenses",
       "mix_mmFromBottom": "Change from where in the well the robot aspirates and dispenses during the mix",
@@ -71,9 +80,14 @@
       "aspirate_delay_mmFromBottom": "Change from where in the well the robot delays after aspirating",
       "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing"
     },
+    "field_titles": {
+      "z_position": "Z position",
+      "x_position": "X position",
+      "y_position": "Y position"
+    },
     "errors": {
       "TOO_MANY_DECIMALS": "a max of 1 decimal place is allowed",
-      "OUT_OF_BOUNDS": "accepted range is {{minMmFromBottom}} to {{maxMmFromBottom}}"
+      "OUT_OF_BOUNDS": "accepted range is {{minMm}} to {{maxMm}}"
     },
     "field_label": "Distance from bottom of well"
   },

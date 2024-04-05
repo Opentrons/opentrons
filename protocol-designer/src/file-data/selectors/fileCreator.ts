@@ -84,7 +84,7 @@ export const getLabwareDefinitionsInUse = (
   )
   const tiprackDefURIsInUse: string[] = Object.keys(pipettes)
     .map(id => pipettes[id])
-    .map((pipetteEntity: PipetteEntity) => pipetteEntity.tiprackDefURI)
+    .flatMap((pipetteEntity: PipetteEntity) => pipetteEntity.tiprackDefURI)
   const labwareDefURIsInUse = uniq([
     ...tiprackDefURIsInUse,
     ...labwareDefURIsOnDeck,
@@ -155,9 +155,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         },
         pipetteTiprackAssignments: mapValues(
           pipetteEntities,
-          (
-            p: typeof pipetteEntities[keyof typeof pipetteEntities]
-          ): string | null | undefined => p.tiprackDefURI
+          (p: typeof pipetteEntities[keyof typeof pipetteEntities]): string[] =>
+            p.tiprackDefURI
         ),
         dismissedWarnings,
         ingredients,

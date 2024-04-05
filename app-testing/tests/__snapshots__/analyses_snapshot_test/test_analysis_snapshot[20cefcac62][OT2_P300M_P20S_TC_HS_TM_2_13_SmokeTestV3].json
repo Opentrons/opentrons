@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Let there be light! True 🌠🌠🌠",
         "legacyCommandType": "command.COMMENT"
@@ -17,6 +19,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Is the door is closed? True 🚪🚪🚪",
         "legacyCommandType": "command.COMMENT"
@@ -26,6 +29,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Is this a simulation? True 🔮🔮🔮",
         "legacyCommandType": "command.COMMENT"
@@ -35,6 +39,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Running against API Version: 2.13",
         "legacyCommandType": "command.COMMENT"
@@ -44,6 +49,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "300ul tips",
         "loadName": "opentrons_96_tiprack_300ul",
@@ -1190,6 +1196,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "20ul tips",
         "loadName": "opentrons_96_tiprack_20ul",
@@ -2336,6 +2343,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p300_multi_gen2"
@@ -2345,6 +2353,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p20_single_gen2"
@@ -2354,6 +2363,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "1"
@@ -2803,6 +2813,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "9"
@@ -3254,6 +3265,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "7"
@@ -3362,6 +3374,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "Temperature-Controlled plate",
         "loadName": "opentrons_96_aluminumblock_nest_wellplate_100ul",
@@ -4520,6 +4533,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt",
         "location": {},
@@ -5675,6 +5689,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "location": {},
@@ -6821,6 +6836,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "4 tubes",
         "loadName": "cpx_4_tuberack_100ul",
@@ -6938,6 +6954,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "logo destination",
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
@@ -8087,6 +8104,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "dye container",
         "loadName": "nest_12_reservoir_15ml",
@@ -8327,6 +8345,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Latching labware on Heater-Shaker",
         "legacyCommandType": "command.HEATER_SHAKER_CLOSE_LABWARE_LATCH"
@@ -8336,6 +8355,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -8361,6 +8381,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8386,6 +8407,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8411,6 +8433,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8434,6 +8457,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8459,6 +8483,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8484,6 +8509,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8507,6 +8533,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8532,6 +8559,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8557,6 +8585,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8580,6 +8609,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8605,6 +8635,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8630,6 +8661,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8653,6 +8685,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 19.0,
@@ -8678,6 +8711,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 18.0,
@@ -8703,6 +8737,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -8726,6 +8761,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -8749,6 +8785,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -8774,6 +8811,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -8799,6 +8837,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -8824,6 +8863,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -8849,6 +8889,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -8874,6 +8915,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -8899,6 +8941,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -8924,6 +8967,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -8949,6 +8993,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -8958,6 +9003,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -8983,6 +9029,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9008,6 +9055,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9033,6 +9081,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -9042,6 +9091,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -9065,6 +9115,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9090,6 +9141,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9115,6 +9167,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9140,6 +9193,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9165,6 +9219,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9190,6 +9245,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9215,6 +9271,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9240,6 +9297,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -9249,6 +9307,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9274,6 +9333,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9299,6 +9359,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9324,6 +9385,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -9333,6 +9395,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -9356,6 +9419,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9381,6 +9445,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9406,6 +9471,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9431,6 +9497,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9456,6 +9523,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9481,6 +9549,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9506,6 +9575,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9531,6 +9601,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -9540,6 +9611,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9565,6 +9637,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9590,6 +9663,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9615,6 +9689,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -9624,6 +9699,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -9647,6 +9723,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9672,6 +9749,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9697,6 +9775,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9722,6 +9801,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9747,6 +9827,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9772,6 +9853,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9797,6 +9879,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9822,6 +9905,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -9831,6 +9915,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9856,6 +9941,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9881,6 +9967,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9906,6 +9993,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -9915,6 +10003,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -9938,6 +10027,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9963,6 +10053,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -9988,6 +10079,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10013,6 +10105,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10038,6 +10131,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10063,6 +10157,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10088,6 +10183,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10113,6 +10209,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -10122,6 +10219,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10147,6 +10245,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10172,6 +10271,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10197,6 +10297,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -10206,6 +10307,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -10229,6 +10331,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10254,6 +10357,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10279,6 +10383,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10304,6 +10409,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10329,6 +10435,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10354,6 +10461,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10379,6 +10487,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10404,6 +10513,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -10413,6 +10523,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10438,6 +10549,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10463,6 +10575,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10488,6 +10601,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -10497,6 +10611,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -10520,6 +10635,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10545,6 +10661,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10570,6 +10687,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10595,6 +10713,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10620,6 +10739,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10645,6 +10765,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10670,6 +10791,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10695,6 +10817,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -10704,6 +10827,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10729,6 +10853,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10754,6 +10879,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10779,6 +10905,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -10788,6 +10915,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -10811,6 +10939,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10836,6 +10965,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10861,6 +10991,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10886,6 +11017,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10911,6 +11043,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10936,6 +11069,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10961,6 +11095,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -10986,6 +11121,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -10995,6 +11131,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11020,6 +11157,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11045,6 +11183,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11070,6 +11209,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -11079,6 +11219,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -11102,6 +11243,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11127,6 +11269,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11152,6 +11295,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11177,6 +11321,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11202,6 +11347,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11227,6 +11373,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11252,6 +11399,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11277,6 +11425,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -11286,6 +11435,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11311,6 +11461,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11336,6 +11487,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11361,6 +11513,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -11370,6 +11523,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -11393,6 +11547,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11418,6 +11573,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11443,6 +11599,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -11466,6 +11623,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11491,6 +11649,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11516,6 +11675,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -11539,6 +11699,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11564,6 +11725,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 20.0,
@@ -11589,6 +11751,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -11612,6 +11775,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -11635,6 +11799,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -11660,6 +11825,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 5.0,
@@ -11689,8 +11855,7 @@
         "legacyCommandText": "Air gap",
         "legacyCommandType": "command.AIR_GAP"
       },
-      "result": {},
-      "status": "succeeded"
+      "status": "running"
     },
     {
       "commandType": "aspirate",
@@ -11707,617 +11872,7 @@
         },
         "wellName": "A11"
       },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 10.0
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Delaying for 0 minutes and 3.0 seconds",
-        "legacyCommandType": "command.DELAY"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "params": {
-        "flowRate": 7.56,
-        "volume": 5.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "H11"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 5.0
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Moving to E12 of logo destination on 2",
-        "legacyCommandType": "command.MOVE_TO"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Moving to E11 of logo destination on 2",
-        "legacyCommandType": "command.MOVE_TO"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "blowout",
-      "params": {
-        "flowRate": 7.56,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "E11"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        }
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Touching tip",
-        "legacyCommandType": "command.TOUCH_TIP"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTip",
-      "params": {
-        "alternateDropLocation": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "default"
-        },
-        "wellName": "C1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        }
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Waiting for Temperature Module to reach temperature 25.0 °C (rounded off to nearest integer)",
-        "legacyCommandType": "command.TEMPDECK_AWAIT_TEMP"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Setting Heater-Shaker to Shake at 466 RPM and waiting until reached",
-        "legacyCommandType": "command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Delaying for 0 minutes and 5.0 seconds",
-        "legacyCommandType": "command.DELAY"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Setting Target Temperature of Heater-Shaker to 38 °C",
-        "legacyCommandType": "command.HEATER_SHAKER_SET_TARGET_TEMPERATURE"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Waiting for Heater-Shaker to reach target temperature",
-        "legacyCommandType": "command.HEATER_SHAKER_WAIT_FOR_TEMPERATURE"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Opening Thermocycler lid",
-        "legacyCommandType": "command.THERMOCYCLER_OPEN"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Closing Thermocycler lid",
-        "legacyCommandType": "command.THERMOCYCLER_CLOSE"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Setting Thermocycler lid temperature to 38.0 °C",
-        "legacyCommandType": "command.THERMOCYCLER_SET_LID_TEMP"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Setting Thermocycler well block temperature to 28.0 °C with a hold time of 5 seconds",
-        "legacyCommandType": "command.THERMOCYCLER_SET_BLOCK_TEMP"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Deactivating Thermocycler well block heating",
-        "legacyCommandType": "command.THERMOCYCLER_DEACTIVATE_BLOCK"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Deactivating Thermocycler lid heating",
-        "legacyCommandType": "command.THERMOCYCLER_DEACTIVATE_LID"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Opening Thermocycler lid",
-        "legacyCommandType": "command.THERMOCYCLER_OPEN"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Deactivating Shaker",
-        "legacyCommandType": "command.HEATER_SHAKER_DEACTIVATE_SHAKER"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "waitForResume",
-      "params": {
-        "message": "This is a pause"
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "pickUpTip",
-      "params": {
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "D1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "tipDiameter": 0,
-        "tipLength": 30.950000000000003,
-        "tipVolume": 20
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "params": {
-        "flowRate": 7.56,
-        "volume": 15.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "A2"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 15.0
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "params": {
-        "flowRate": 7.56,
-        "volume": 15.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 15.0
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTip",
-      "params": {
-        "alternateDropLocation": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "default"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        }
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "pickUpTip",
-      "params": {
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "tipDiameter": 0,
-        "tipLength": 51.099999999999994,
-        "tipVolume": 300
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "params": {
-        "flowRate": 94.0,
-        "volume": 50.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "A2"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 50.0
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "params": {
-        "flowRate": 94.0,
-        "volume": 50.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 50.0
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Setting Heater-Shaker to Shake at 350 RPM and waiting until reached",
-        "legacyCommandType": "command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Delaying for 0 minutes and 5.0 seconds",
-        "legacyCommandType": "command.DELAY"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Deactivating Shaker",
-        "legacyCommandType": "command.HEATER_SHAKER_DEACTIVATE_SHAKER"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
-      "commandType": "pickUpTip",
-      "params": {
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "E1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "tipDiameter": 0,
-        "tipLength": 30.950000000000003,
-        "tipVolume": 20
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "params": {
-        "flowRate": 15.12,
-        "volume": 10.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "A2"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 10.0
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "params": {
-        "flowRate": 11.34,
-        "volume": 10.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "B2"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 10.0
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTip",
-      "params": {
-        "alternateDropLocation": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "default"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        }
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "params": {
-        "flowRate": 94.0,
-        "volume": 75.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "A2"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 75.0
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "params": {
-        "flowRate": 94.0,
-        "volume": 60.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "top"
-        },
-        "wellName": "A6"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 60.0
-      },
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTip",
-      "params": {
-        "alternateDropLocation": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "default"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        }
-      },
-      "status": "succeeded"
+      "status": "running"
     }
   ],
   "config": {
@@ -12327,7 +11882,19 @@
     ],
     "protocolType": "python"
   },
-  "errors": [],
+  "errors": [
+    {
+      "detail": "AssertionError",
+      "errorCode": "4000",
+      "errorInfo": {
+        "args": "()",
+        "class": "AssertionError",
+        "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/protocol_engine.py\", line 442, in finish\n    await exit_stack.aclose()\n\n  File \"/usr/local/lib/python3.10/contextlib.py\", line 656, in aclose\n    await self.__aexit__(None, None, None)\n\n  File \"/usr/local/lib/python3.10/contextlib.py\", line 714, in __aexit__\n    raise exc_details[1]\n\n  File \"/usr/local/lib/python3.10/contextlib.py\", line 697, in __aexit__\n    cb_suppress = await cb(*exc_details)\n\n  File \"/usr/local/lib/python3.10/contextlib.py\", line 608, in _exit_wrapper\n    await callback(*args, **kwds)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/plugins.py\", line 102, in stop\n    await p.teardown()\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/legacy_context_plugin.py\", line 112, in teardown\n    await self._action_dispatching_task\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/legacy_context_plugin.py\", line 160, in _dispatch_all_actions\n    self.dispatch(action)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/plugins.py\", line 37, in dispatch\n    return self._action_dispatcher.dispatch(action)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/actions/action_dispatcher.py\", line 30, in dispatch\n    self._sink.handle_action(action)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/state.py\", line 207, in handle_action\n    substore.handle_action(action)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/commands.py\", line 243, in handle_action\n    self._state.command_history.set_command_running(running_command)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_engine/state/command_history.py\", line 175, in set_command_running\n    assert self.get_running_command() is None\n"
+      },
+      "errorType": "PythonException",
+      "wrappedErrors": []
+    }
+  ],
   "files": [
     {
       "name": "OT2_P300M_P20S_TC_HS_TM_2_13_SmokeTestV3.py",

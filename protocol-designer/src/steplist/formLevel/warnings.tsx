@@ -1,16 +1,19 @@
 import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
 import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'
-import { FormError } from './errors'
+import type { FormError } from './errors'
 /*******************
  ** Warning Messages **
  ********************/
 
 export type FormWarningType =
-  | 'BELOW_PIPETTE_MINIMUM_VOLUME'
-  | 'OVER_MAX_WELL_VOLUME'
-  | 'BELOW_MIN_DISPOSAL_VOLUME'
+  | 'ASPIRATE_TIP_POSITIONED_LOW_IN_TUBE'
   | 'BELOW_MIN_AIR_GAP_VOLUME'
+  | 'BELOW_MIN_DISPOSAL_VOLUME'
+  | 'BELOW_PIPETTE_MINIMUM_VOLUME'
+  | 'DISPENSE_TIP_POSITIONED_LOW_IN_TUBE'
+  | 'OVER_MAX_WELL_VOLUME'
+  | 'MIX_TIP_POSITIONED_LOW_IN_TUBE'
 
 export type FormWarning = FormError & {
   type: FormWarningType
@@ -56,6 +59,27 @@ const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
   dependentFields: ['disposalVolume_volume', 'pipette'],
 })
 
+const aspirateTipPositionedLowInTube = (): FormWarning => ({
+  type: 'ASPIRATE_TIP_POSITIONED_LOW_IN_TUBE',
+  title:
+    'The default aspirate height is 1mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
+  dependentFields: ['aspirate_labware'],
+})
+
+const dispenseTipPositionedLowInTube = (): FormWarning => ({
+  type: 'DISPENSE_TIP_POSITIONED_LOW_IN_TUBE',
+  title:
+    'The default dispense height is 0.5mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
+  dependentFields: ['dispense_labware'],
+})
+
+const mixTipPositionedLowInTube = (): FormWarning => ({
+  type: 'MIX_TIP_POSITIONED_LOW_IN_TUBE',
+  title:
+    'The default mix height is 0.5mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
+  dependentFields: ['labware'],
+})
+
 export type WarningChecker = (val: unknown) => FormWarning | null
 
 /*******************
@@ -64,14 +88,57 @@ export type WarningChecker = (val: unknown) => FormWarning | null
 // TODO: real HydratedFormData type
 export type HydratedFormData = any
 
+export const aspirateTipPositionInTube = (
+  fields: HydratedFormData
+): FormWarning | null => {
+  const { aspirate_labware, aspirate_mmFromBottom } = fields
+  let isTubeRack: boolean = false
+  if (aspirate_labware != null) {
+    isTubeRack = aspirate_labware.def.metadata.displayCategory === 'tubeRack'
+  }
+  return isTubeRack && aspirate_mmFromBottom === null
+    ? aspirateTipPositionedLowInTube()
+    : null
+}
+export const dispenseTipPositionInTube = (
+  fields: HydratedFormData
+): FormWarning | null => {
+  const { dispense_labware, dispense_mmFromBottom } = fields
+  let isTubeRack: boolean = false
+  if (dispense_labware != null) {
+    isTubeRack =
+      // checking that the dispense labware is a labware and not a trash/waste chute
+      'def' in dispense_labware
+        ? dispense_labware.def.metadata.displayCategory === 'tubeRack'
+        : false
+  }
+  return isTubeRack && dispense_mmFromBottom === null
+    ? dispenseTipPositionedLowInTube()
+    : null
+}
+export const mixTipPositionInTube = (
+  fields: HydratedFormData
+): FormWarning | null => {
+  const { labware, mix_mmFromBottom } = fields
+  let isTubeRack: boolean = false
+  if (labware != null) {
+    isTubeRack = labware.def.metadata.displayCategory === 'tubeRack'
+  }
+  return isTubeRack && mix_mmFromBottom === 0.5
+    ? mixTipPositionedLowInTube()
+    : null
+}
 export const belowPipetteMinimumVolume = (
   fields: HydratedFormData
 ): FormWarning | null => {
   const { pipette, volume } = fields
   if (!(pipette && pipette.spec)) return null
-  return volume < pipette.spec.minVolume
-    ? belowPipetteMinVolumeWarning(pipette.spec.minVolume)
-    : null
+  const liquidSpecs = pipette.spec.liquids
+  const minVolume =
+    'lowVolumeDefault' in liquidSpecs
+      ? liquidSpecs.lowVolumeDefault.minVolume
+      : liquidSpecs.default.minVolume
+  return volume < minVolume ? belowPipetteMinVolumeWarning(minVolume) : null
 }
 
 export const maxDispenseWellVolume = (
@@ -102,11 +169,16 @@ export const minDisposalVolume = (
   } = fields
   if (!(pipette && pipette.spec) || path !== 'multiDispense') return null
   const isUnselected = !disposalVolume_checkbox || !disposalVolume_volume
-  if (isUnselected) return belowMinDisposalVolumeWarning(pipette.spec.minVolume)
-  const isBelowMin = disposalVolume_volume < pipette.spec.minVolume
-  return isBelowMin
-    ? belowMinDisposalVolumeWarning(pipette.spec.minVolume)
-    : null
+  const liquidSpecs = pipette.spec.liquids
+  const minVolume =
+    'lowVolumeDefault' in liquidSpecs
+      ? liquidSpecs.lowVolumeDefault.minVolume
+      : liquidSpecs.default.minVolume
+  if (isUnselected) {
+    return belowMinDisposalVolumeWarning(minVolume)
+  }
+  const isBelowMin = disposalVolume_volume < minVolume
+  return isBelowMin ? belowMinDisposalVolumeWarning(minVolume) : null
 }
 
 // both aspirate and dispense air gap volumes have the same minimums
@@ -117,10 +189,16 @@ export const _minAirGapVolume = (
   const checkboxValue = fields[checkboxField]
   const volumeValue = fields[volumeField]
   const { pipette } = fields
-  if (!checkboxValue || !volumeValue || !pipette || !pipette.spec) return null
-
-  const isBelowMin = Number(volumeValue) < pipette.spec.minVolume
-  return isBelowMin ? belowMinAirGapVolumeWarning(pipette.spec.minVolume) : null
+  if (!checkboxValue || !volumeValue || !pipette || !pipette.spec) {
+    return null
+  }
+  const liquidSpecs = pipette.spec.liquids
+  const minVolume =
+    'lowVolumeDefault' in liquidSpecs
+      ? liquidSpecs.lowVolumeDefault.minVolume
+      : liquidSpecs.default.minVolume
+  const isBelowMin = Number(volumeValue) < minVolume
+  return isBelowMin ? belowMinAirGapVolumeWarning(minVolume) : null
 }
 
 export const minAspirateAirGapVolume: (

@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, Location
-from opentrons.commands import types as legacy_command_types
+from opentrons.legacy_commands import types as legacy_command_types
 from opentrons.protocol_engine import (
     ProtocolEngineError,
     actions as pe_actions,
@@ -48,7 +48,6 @@ class LegacyContextCommandError(ProtocolEngineError):
     """An error returned when a PAPIv2 ProtocolContext command fails."""
 
     def __init__(self, wrapping_exc: BaseException) -> None:
-
         if isinstance(wrapping_exc, EnumeratedError):
             super().__init__(
                 wrapping_exc.code,
@@ -145,13 +144,26 @@ class LegacyCommandMapper:
         if stage == "before":
             count = self._command_count[command_type]
             command_id = f"{command_type}-{count}"
-            engine_command = self._build_initial_command(command, command_id, now)
+            command_create, running_command = self._build_initial_command(
+                command, command_id, now
+            )
 
             self._command_count[command_type] = count + 1
-            self._commands_by_broker_id[broker_id] = engine_command
+            self._commands_by_broker_id[broker_id] = running_command
 
             results.append(
-                pe_actions.UpdateCommandAction(engine_command, private_result=None)
+                pe_actions.QueueCommandAction(
+                    command_id=command_id,
+                    created_at=running_command.createdAt,
+                    request=command_create,
+                    request_hash=None,
+                )
+            )
+            assert running_command.startedAt is not None
+            results.append(
+                pe_actions.RunCommandAction(
+                    running_command.id, started_at=running_command.startedAt
+                )
             )
 
         elif stage == "after":
@@ -168,6 +180,7 @@ class LegacyCommandMapper:
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 elif isinstance(running_command, pe_commands.DropTip):
@@ -178,6 +191,7 @@ class LegacyCommandMapper:
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 elif isinstance(running_command, pe_commands.Aspirate):
@@ -191,6 +205,7 @@ class LegacyCommandMapper:
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 elif isinstance(running_command, pe_commands.Dispense):
@@ -204,6 +219,7 @@ class LegacyCommandMapper:
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 elif isinstance(running_command, pe_commands.BlowOut):
@@ -214,6 +230,7 @@ class LegacyCommandMapper:
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 elif isinstance(running_command, pe_commands.Custom):
@@ -222,6 +239,7 @@ class LegacyCommandMapper:
                             "result": pe_commands.CustomResult.construct(),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 else:
@@ -229,10 +247,11 @@ class LegacyCommandMapper:
                         update={
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
+                            "notes": [],
                         }
                     )
                 results.append(
-                    pe_actions.UpdateCommandAction(
+                    pe_actions.SucceedCommandAction(
                         completed_command, private_result=None
                     )
                 )
@@ -249,6 +268,7 @@ class LegacyCommandMapper:
                         error_id=ModelUtils.generate_id(),
                         failed_at=now,
                         error=LegacyContextCommandError(command_error),
+                        notes=[],
                         # For legacy protocols, we don't attempt to support any kind
                         # of error recovery at the Protocol Engine level.
                         # These protocols only run on the OT-2, which doesn't have
@@ -259,46 +279,39 @@ class LegacyCommandMapper:
 
         return results
 
-    def map_equipment_load(
-        self, load_info: LegacyLoadInfo
-    ) -> Tuple[pe_commands.Command, pe_commands.CommandPrivateResult]:
+    def map_equipment_load(self, load_info: LegacyLoadInfo) -> List[pe_actions.Action]:
         """Map a labware, instrument (pipette), or module load to a PE command."""
         if isinstance(load_info, LegacyLabwareLoadInfo):
-            return (self._map_labware_load(load_info), None)
+            return self._map_labware_load(load_info)
         elif isinstance(load_info, LegacyInstrumentLoadInfo):
             return self._map_instrument_load(load_info)
         elif isinstance(load_info, LegacyModuleLoadInfo):
-            return (self._map_module_load(load_info), None)
+            return self._map_module_load(load_info)
 
     def _build_initial_command(
         self,
         command: legacy_command_types.CommandMessage,
         command_id: str,
         now: datetime,
-    ) -> pe_commands.Command:
-        engine_command: pe_commands.Command
+    ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
         if command["name"] == legacy_command_types.PICK_UP_TIP:
-            engine_command = self._build_pick_up_tip_command(
+            return self._build_pick_up_tip(
                 command=command, command_id=command_id, now=now
             )
         elif command["name"] == legacy_command_types.DROP_TIP:
-            engine_command = self._build_drop_tip_command(
-                command=command, command_id=command_id, now=now
-            )
+            return self._build_drop_tip(command=command, command_id=command_id, now=now)
 
         elif (
             command["name"] == legacy_command_types.ASPIRATE
             or command["name"] == legacy_command_types.DISPENSE
         ):
-            engine_command = self._build_liquid_handling_command(
+            return self._build_liquid_handling(
                 command=command, command_id=command_id, now=now
             )
         elif command["name"] == legacy_command_types.BLOW_OUT:
-            engine_command = self._build_blow_out_command(
-                command=command, command_id=command_id, now=now
-            )
+            return self._build_blow_out(command=command, command_id=command_id, now=now)
         elif command["name"] == legacy_command_types.PAUSE:
-            engine_command = pe_commands.WaitForResume.construct(
+            wait_for_resume_running = pe_commands.WaitForResume.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
@@ -308,8 +321,15 @@ class LegacyCommandMapper:
                     message=command["payload"]["userMessage"],
                 ),
             )
+            wait_for_resume_create: pe_commands.CommandCreate = (
+                pe_commands.WaitForResumeCreate.construct(
+                    key=wait_for_resume_running.key,
+                    params=wait_for_resume_running.params,
+                )
+            )
+            return wait_for_resume_create, wait_for_resume_running
         else:
-            engine_command = pe_commands.Custom.construct(
+            custom_running = pe_commands.Custom.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
@@ -320,15 +340,18 @@ class LegacyCommandMapper:
                     legacyCommandText=command["payload"]["text"],
                 ),
             )
+            custom_create = pe_commands.CustomCreate.construct(
+                key=custom_running.key,
+                params=custom_running.params,
+            )
+            return custom_create, custom_running
 
-        return engine_command
-
-    def _build_drop_tip_command(
+    def _build_drop_tip(
         self,
         command: legacy_command_types.DropTipMessage,
         command_id: str,
         now: datetime,
-    ) -> pe_commands.Command:
+    ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         well = command["payload"]["location"]
         mount = MountType(pipette.mount)
@@ -337,7 +360,8 @@ class LegacyCommandMapper:
         well_name = well.well_name
         labware_id = self._labware_id_by_slot[slot]
         pipette_id = self._pipette_id_by_mount[mount]
-        return pe_commands.DropTip.construct(
+
+        running = pe_commands.DropTip.construct(
             id=command_id,
             key=command_id,
             status=pe_commands.CommandStatus.RUNNING,
@@ -349,13 +373,18 @@ class LegacyCommandMapper:
                 wellName=well_name,
             ),
         )
+        create = pe_commands.DropTipCreate.construct(
+            key=running.key,
+            params=running.params,
+        )
+        return create, running
 
-    def _build_pick_up_tip_command(
+    def _build_pick_up_tip(
         self,
         command: legacy_command_types.PickUpTipMessage,
         command_id: str,
         now: datetime,
-    ) -> pe_commands.Command:
+    ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         well = location
@@ -366,7 +395,7 @@ class LegacyCommandMapper:
         labware_id = self._labware_id_by_slot[slot]
         pipette_id = self._pipette_id_by_mount[mount]
 
-        return pe_commands.PickUpTip.construct(
+        running = pe_commands.PickUpTip.construct(
             id=command_id,
             key=command_id,
             status=pe_commands.CommandStatus.RUNNING,
@@ -378,15 +407,19 @@ class LegacyCommandMapper:
                 wellName=well_name,
             ),
         )
+        create = pe_commands.PickUpTipCreate.construct(
+            key=running.key, params=running.params
+        )
+        return create, running
 
-    def _build_liquid_handling_command(
+    def _build_liquid_handling(
         self,
         command: Union[
             legacy_command_types.AspirateMessage, legacy_command_types.DispenseMessage
         ],
         command_id: str,
         now: datetime,
-    ) -> pe_commands.Command:
+    ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         volume = command["payload"]["volume"]
@@ -410,7 +443,11 @@ class LegacyCommandMapper:
                 # or aspirate() with a volume of 0, which behaves roughly like
                 # move_to(). Protocol Engine aspirate and dispense commands must have
                 # volume > 0, so we can't map into those.
-                return pe_commands.MoveToWell.construct(
+                #
+                # TODO(mm, 2024-03-22): I don't think this has been true since
+                # https://github.com/Opentrons/opentrons/pull/14211. Can we just use
+                # aspirate and dispense commands now?
+                move_to_well_running = pe_commands.MoveToWell.construct(
                     id=command_id,
                     key=command_id,
                     status=pe_commands.CommandStatus.RUNNING,
@@ -422,9 +459,13 @@ class LegacyCommandMapper:
                         wellName=well_name,
                     ),
                 )
+                move_to_well_create = pe_commands.MoveToWellCreate.construct(
+                    key=move_to_well_running.key, params=move_to_well_running.params
+                )
+                return move_to_well_create, move_to_well_running
             elif command["name"] == legacy_command_types.ASPIRATE:
                 flow_rate = command["payload"]["rate"] * pipette.flow_rate.aspirate
-                return pe_commands.Aspirate.construct(
+                aspirate_running = pe_commands.Aspirate.construct(
                     id=command_id,
                     key=command_id,
                     status=pe_commands.CommandStatus.RUNNING,
@@ -440,9 +481,13 @@ class LegacyCommandMapper:
                         flowRate=flow_rate,
                     ),
                 )
+                aspirate_create = pe_commands.AspirateCreate.construct(
+                    key=aspirate_running.key, params=aspirate_running.params
+                )
+                return aspirate_create, aspirate_running
             else:
                 flow_rate = command["payload"]["rate"] * pipette.flow_rate.dispense
-                return pe_commands.Dispense.construct(
+                dispense_running = pe_commands.Dispense.construct(
                     id=command_id,
                     key=command_id,
                     status=pe_commands.CommandStatus.RUNNING,
@@ -458,8 +503,13 @@ class LegacyCommandMapper:
                         flowRate=flow_rate,
                     ),
                 )
+                dispense_create = pe_commands.DispenseCreate.construct(
+                    key=dispense_running.key, params=dispense_running.params
+                )
+                return dispense_create, dispense_running
+
         else:
-            return pe_commands.Custom.construct(
+            running = pe_commands.Custom.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
@@ -470,13 +520,17 @@ class LegacyCommandMapper:
                     legacyCommandText=command["payload"]["text"],
                 ),
             )
+            create = pe_commands.CustomCreate.construct(
+                key=running.key, params=running.params
+            )
+            return create, running
 
-    def _build_blow_out_command(
+    def _build_blow_out(
         self,
         command: legacy_command_types.BlowOutMessage,
         command_id: str,
         now: datetime,
-    ) -> pe_commands.Command:
+    ) -> Tuple[pe_commands.CommandCreate, pe_commands.Command]:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         flow_rate = pipette.flow_rate.blow_out
@@ -494,7 +548,8 @@ class LegacyCommandMapper:
             mount = MountType(pipette.mount)
             well_name = well.well_name
             pipette_id = self._pipette_id_by_mount[mount]
-            return pe_commands.BlowOut.construct(
+
+            blow_out_running = pe_commands.BlowOut.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
@@ -508,10 +563,15 @@ class LegacyCommandMapper:
                     flowRate=flow_rate,
                 ),
             )
+            blow_out_create = pe_commands.BlowOutCreate.construct(
+                key=blow_out_running.key, params=blow_out_running.params
+            )
+            return blow_out_create, blow_out_running
+
         #   TODO:(jr, 15.08.2022): blow_out commands with no specified labware get filtered
         #   into custom. Refactor this in followup legacy command mapping
         else:
-            return pe_commands.Custom.construct(
+            custom_running = pe_commands.Custom.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
@@ -522,10 +582,14 @@ class LegacyCommandMapper:
                     legacyCommandText=command["payload"]["text"],
                 ),
             )
+            custom_create = pe_commands.CustomCreate.construct(
+                key=custom_running.key, params=custom_running.params
+            )
+            return custom_create, custom_running
 
     def _map_labware_load(
         self, labware_load_info: LegacyLabwareLoadInfo
-    ) -> pe_commands.Command:
+    ) -> List[pe_actions.Action]:
         """Map a legacy labware load to a ProtocolEngine command."""
         now = ModelUtils.get_timestamp()
         count = self._command_count["LOAD_LABWARE"]
@@ -541,7 +605,7 @@ class LegacyCommandMapper:
         command_id = f"commands.LOAD_LABWARE-{count}"
         labware_id = f"labware-{count}"
 
-        load_labware_command = pe_commands.LoadLabware.construct(
+        succeeded_command = pe_commands.LoadLabware.construct(
             id=command_id,
             key=command_id,
             status=pe_commands.CommandStatus.SUCCEEDED,
@@ -555,6 +619,7 @@ class LegacyCommandMapper:
                 version=labware_load_info.labware_version,
                 displayName=labware_load_info.labware_display_name,
             ),
+            notes=[],
             result=pe_commands.LoadLabwareResult.construct(
                 labwareId=labware_id,
                 definition=LabwareDefinition.parse_obj(
@@ -563,18 +628,36 @@ class LegacyCommandMapper:
                 offsetId=labware_load_info.offset_id,
             ),
         )
+        queue_action = pe_actions.QueueCommandAction(
+            command_id=succeeded_command.id,
+            created_at=succeeded_command.createdAt,
+            request=pe_commands.LoadLabwareCreate.construct(
+                key=succeeded_command.key, params=succeeded_command.params
+            ),
+            request_hash=None,
+        )
+        run_action = pe_actions.RunCommandAction(
+            command_id=succeeded_command.id,
+            # We just set this above, so we know it's not None.
+            started_at=succeeded_command.startedAt,  # type: ignore[arg-type]
+        )
+        succeed_action = pe_actions.SucceedCommandAction(
+            command=succeeded_command,
+            private_result=None,
+        )
 
         self._command_count["LOAD_LABWARE"] = count + 1
         if isinstance(location, pe_types.DeckSlotLocation):
             self._labware_id_by_slot[location.slotName] = labware_id
         elif isinstance(location, pe_types.ModuleLocation):
             self._labware_id_by_module_id[location.moduleId] = labware_id
-        return load_labware_command
+
+        return [queue_action, run_action, succeed_action]
 
     def _map_instrument_load(
         self,
         instrument_load_info: LegacyInstrumentLoadInfo,
-    ) -> Tuple[pe_commands.Command, pe_commands.CommandPrivateResult]:
+    ) -> List[pe_actions.Action]:
         """Map a legacy instrument (pipette) load to a ProtocolEngine command.
 
         Also creates a `AddPipetteConfigAction`, which is not necessary for the run,
@@ -586,7 +669,7 @@ class LegacyCommandMapper:
         pipette_id = f"pipette-{count}"
         mount = MountType(str(instrument_load_info.mount).lower())
 
-        load_pipette_command = pe_commands.LoadPipette.construct(
+        succeeded_command = pe_commands.LoadPipette.construct(
             id=command_id,
             key=command_id,
             status=pe_commands.CommandStatus.SUCCEEDED,
@@ -597,6 +680,7 @@ class LegacyCommandMapper:
                 pipetteName=PipetteNameType(instrument_load_info.instrument_load_name),
                 mount=mount,
             ),
+            notes=[],
             result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id),
         )
         serial = instrument_load_info.pipette_dict.get("pipette_id", None) or ""
@@ -607,15 +691,32 @@ class LegacyCommandMapper:
                 instrument_load_info.pipette_dict
             ),
         )
+        queue_action = pe_actions.QueueCommandAction(
+            command_id=succeeded_command.id,
+            created_at=succeeded_command.createdAt,
+            request=pe_commands.LoadPipetteCreate.construct(
+                key=succeeded_command.key, params=succeeded_command.params
+            ),
+            request_hash=None,
+        )
+        run_action = pe_actions.RunCommandAction(
+            command_id=succeeded_command.id,
+            # We just set this above, so we know it's not None.
+            started_at=succeeded_command.startedAt,  # type: ignore[arg-type]
+        )
+        succeed_action = pe_actions.SucceedCommandAction(
+            command=succeeded_command,
+            private_result=pipette_config_result,
+        )
 
         self._command_count["LOAD_PIPETTE"] = count + 1
         self._pipette_id_by_mount[mount] = pipette_id
 
-        return (load_pipette_command, pipette_config_result)
+        return [queue_action, run_action, succeed_action]
 
     def _map_module_load(
         self, module_load_info: LegacyModuleLoadInfo
-    ) -> pe_commands.Command:
+    ) -> List[pe_actions.Action]:
         """Map a legacy module load to a Protocol Engine command."""
         now = ModelUtils.get_timestamp()
 
@@ -634,7 +735,7 @@ class LegacyCommandMapper:
             loaded_model
         ) or self._module_data_provider.get_definition(loaded_model)
 
-        load_module_command = pe_commands.LoadModule.construct(
+        succeeded_command = pe_commands.LoadModule.construct(
             id=command_id,
             key=command_id,
             status=pe_commands.CommandStatus.SUCCEEDED,
@@ -648,6 +749,7 @@ class LegacyCommandMapper:
                 ),
                 moduleId=module_id,
             ),
+            notes=[],
             result=pe_commands.LoadModuleResult.construct(
                 moduleId=module_id,
                 serialNumber=module_load_info.module_serial,
@@ -655,7 +757,26 @@ class LegacyCommandMapper:
                 model=loaded_model,
             ),
         )
+        queue_action = pe_actions.QueueCommandAction(
+            command_id=succeeded_command.id,
+            created_at=succeeded_command.createdAt,
+            request=pe_commands.LoadModuleCreate.construct(
+                key=succeeded_command.key, params=succeeded_command.params
+            ),
+            request_hash=None,
+        )
+        run_action = pe_actions.RunCommandAction(
+            command_id=succeeded_command.id,
+            # We just set this above, so we know it's not None.
+            started_at=succeeded_command.startedAt,  # type: ignore[arg-type]
+        )
+        succeed_action = pe_actions.SucceedCommandAction(
+            command=succeeded_command,
+            private_result=None,
+        )
+
         self._command_count["LOAD_MODULE"] = count + 1
         self._module_id_by_slot[module_load_info.deck_slot] = module_id
         self._module_definition_by_model[loaded_model] = loaded_definition
-        return load_module_command
+
+        return [queue_action, run_action, succeed_action]

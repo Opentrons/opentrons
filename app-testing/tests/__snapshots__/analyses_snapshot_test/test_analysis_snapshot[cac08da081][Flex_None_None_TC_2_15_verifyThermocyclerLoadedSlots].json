@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "B1"
@@ -135,7 +137,7 @@
           "errorInfo": {
             "args": "()",
             "class": "AssertionError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 112, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_None_None_TC_2_15_verifyThermocyclerLoadedSlots.py\", line 13, in run\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_None_None_TC_2_15_verifyThermocyclerLoadedSlots.py\", line 13, in run\n"
           },
           "errorType": "PythonException",
           "wrappedErrors": []

@@ -53,7 +53,7 @@ describe('useNotifyService', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
@@ -68,7 +68,7 @@ describe('useNotifyService', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: { ...MOCK_OPTIONS, forceHttpPolling: true },
       } as any)
     )
@@ -81,7 +81,7 @@ describe('useNotifyService', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: { ...MOCK_OPTIONS, enabled: false },
       } as any)
     )
@@ -94,7 +94,7 @@ describe('useNotifyService', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: { ...MOCK_OPTIONS, staleTime: Infinity },
       } as any)
     )
@@ -111,7 +111,7 @@ describe('useNotifyService', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
@@ -128,7 +128,7 @@ describe('useNotifyService', () => {
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
@@ -142,12 +142,12 @@ describe('useNotifyService', () => {
       callback,
     }): any {
       // eslint-disable-next-line n/no-callback-literal
-      callback({ refetchUsingHTTP: true })
+      callback({ refetch: true })
     })
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
@@ -165,7 +165,7 @@ describe('useNotifyService', () => {
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
@@ -177,11 +177,27 @@ describe('useNotifyService', () => {
     const { unmount } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       })
     )
     unmount()
     expect(appShellListener).toHaveBeenCalled()
+  })
+
+  it('should still clean up the listener if the hostname changes to null after subscribing', () => {
+    const { unmount, rerender } = renderHook(() =>
+      useNotifyService({
+        hostOverride: MOCK_HOST_CONFIG,
+        topic: MOCK_TOPIC,
+        setRefetch: mockHTTPRefetch,
+        options: MOCK_OPTIONS,
+      })
+    )
+    rerender({ hostOverride: null })
+    unmount()
+    expect(appShellListener).toHaveBeenCalledWith(
+      expect.objectContaining({ hostname: MOCK_HOST_CONFIG.hostname })
+    )
   })
 })

@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import enum
-from collections import OrderedDict
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional, Union
@@ -13,13 +12,17 @@ from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonExce
 from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorState
-from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
+from opentrons.protocol_engine.actions.actions import (
+    ResumeFromRecoveryAction,
+    RunCommandAction,
+)
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from opentrons.protocol_engine.notes.notes import CommandNote
 
 from ..actions import (
     Action,
     QueueCommandAction,
-    UpdateCommandAction,
+    SucceedCommandAction,
     FailCommandAction,
     PlayAction,
     PauseAction,
@@ -31,7 +34,6 @@ from ..actions import (
 
 from ..commands import Command, CommandStatus, CommandIntent
 from ..errors import (
-    CommandDoesNotExistError,
     RunStoppedError,
     ErrorOccurrence,
     RobotDoorOpenError,
@@ -42,6 +44,10 @@ from ..errors import (
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
+from .command_history import (
+    CommandEntry,
+    CommandHistory,
+)
 from .config import Config
 
 
@@ -108,32 +114,11 @@ class CurrentCommand:
     index: int
 
 
-@dataclass(frozen=True)
-class CommandEntry:
-    """An command entry in state, including its index in the list."""
-
-    command: Command
-    index: int
-
-
 @dataclass
 class CommandState:
     """State of all protocol engine command resources."""
 
-    all_command_ids: List[str]
-    """All command IDs, in insertion order."""
-
-    queued_command_ids: OrderedSet[str]
-    """The IDs of queued commands, in FIFO order"""
-
-    queued_setup_command_ids: OrderedSet[str]
-    """The IDs of queued setup commands, in FIFO order"""
-
-    running_command_id: Optional[str]
-    """The ID of the currently running command, if any"""
-
-    commands_by_id: Dict[str, CommandEntry]
-    """All command resources, in insertion order, mapped by their unique IDs."""
+    command_history: CommandHistory
 
     queue_status: QueueStatus
     """Whether the engine is currently pulling new commands off the queue to execute.
@@ -179,6 +164,19 @@ class CommandState:
     # that we're doing error recovery. See if we can implement robot-server pagination
     # atop simpler concepts, like "the last command that ran" or "the next command that
     # would run."
+    #
+    # TODO(mm, 2024-04-03): Can this be replaced by
+    # CommandHistory.get_terminal_command() now?
+
+    command_error_recovery_types: Dict[str, ErrorRecoveryType]
+    """For each command that failed (indexed by ID), what its recovery type was.
+
+    This only includes commands that actually failed, not the ones that we mark as
+    failed but that are effectively "cancelled" because a command before them failed.
+
+    This separate attribute is a stopgap until error recovery concepts are a bit more
+    stable. Eventually, we might want this info to be stored directly on each command.
+    """
 
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
@@ -194,7 +192,7 @@ class CommandState:
 
 
 class CommandStore(HasState[CommandState], HandlesActions):
-    """Command state container."""
+    """Command state container for run-level command concerns."""
 
     _state: CommandState
 
@@ -207,17 +205,14 @@ class CommandStore(HasState[CommandState], HandlesActions):
         """Initialize a CommandStore and its state."""
         self._config = config
         self._state = CommandState(
+            command_history=CommandHistory(),
             queue_status=QueueStatus.SETUP,
             is_door_blocking=is_door_open and config.block_on_door_open,
             run_result=None,
-            running_command_id=None,
-            all_command_ids=[],
-            queued_command_ids=OrderedSet(),
-            queued_setup_command_ids=OrderedSet(),
-            commands_by_id=OrderedDict(),
             run_error=None,
             finish_error=None,
             failed_command=None,
+            command_error_recovery_types={},
             run_completed_at=None,
             run_started_at=None,
             latest_command_hash=None,
@@ -227,8 +222,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def handle_action(self, action: Action) -> None:  # noqa: C901
         """Modify state in reaction to an action."""
         if isinstance(action, QueueCommandAction):
-            assert action.command_id not in self._state.commands_by_id
-
             # TODO(mc, 2021-06-22): mypy has trouble with this automatic
             # request > command mapping, figure out how to type precisely
             # (or wait for a future mypy version that can figure it out).
@@ -246,48 +239,26 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 status=CommandStatus.QUEUED,
             )
 
-            next_index = len(self._state.all_command_ids)
-            self._state.all_command_ids.append(action.command_id)
-            self._state.commands_by_id[queued_command.id] = CommandEntry(
-                index=next_index,
-                command=queued_command,
-            )
-
-            if action.request.intent == CommandIntent.SETUP:
-                self._state.queued_setup_command_ids.add(queued_command.id)
-            else:
-                self._state.queued_command_ids.add(queued_command.id)
+            self._state.command_history.set_command_queued(queued_command)
 
             if action.request_hash is not None:
                 self._state.latest_command_hash = action.request_hash
 
-        # TODO(mc, 2021-12-28): replace "UpdateCommandAction" with explicit
-        # state change actions (e.g. RunCommandAction, SucceedCommandAction)
-        # to make a command's queue transition logic easier to follow
-        elif isinstance(action, UpdateCommandAction):
-            command = action.command
-            prev_entry = self._state.commands_by_id.get(command.id)
+        elif isinstance(action, RunCommandAction):
+            prev_entry = self._state.command_history.get(action.command_id)
 
-            if prev_entry is None:
-                index = len(self._state.all_command_ids)
-                self._state.all_command_ids.append(command.id)
-                self._state.commands_by_id[command.id] = CommandEntry(
-                    index=index,
-                    command=command,
-                )
-            else:
-                self._state.commands_by_id[command.id] = CommandEntry(
-                    index=prev_entry.index,
-                    command=command,
-                )
+            running_command = prev_entry.command.copy(
+                update={
+                    "status": CommandStatus.RUNNING,
+                    "startedAt": action.started_at,
+                }
+            )
 
-            self._state.queued_command_ids.discard(command.id)
-            self._state.queued_setup_command_ids.discard(command.id)
+            self._state.command_history.set_command_running(running_command)
 
-            if command.status == CommandStatus.RUNNING:
-                self._state.running_command_id = command.id
-            elif self._state.running_command_id == command.id:
-                self._state.running_command_id = None
+        elif isinstance(action, SucceedCommandAction):
+            succeeded_command = action.command
+            self._state.command_history.set_command_succeeded(succeeded_command)
 
         elif isinstance(action, FailCommandAction):
             error_occurrence = ErrorOccurrence.from_failed(
@@ -295,23 +266,34 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 createdAt=action.failed_at,
                 error=action.error,
             )
-            prev_entry = self._state.commands_by_id[action.command_id]
-            # TODO(mc, 2022-06-06): add new "cancelled" status or similar
+
             self._update_to_failed(
                 command_id=action.command_id,
                 failed_at=action.failed_at,
                 error_occurrence=error_occurrence,
+                error_recovery_type=action.type,
+                notes=action.notes,
             )
 
-            self._state.failed_command = self._state.commands_by_id[action.command_id]
+            self._state.failed_command = self._state.command_history.get(
+                action.command_id
+            )
 
+            prev_entry = self.state.command_history.get(action.command_id)
             if prev_entry.command.intent == CommandIntent.SETUP:
-                other_command_ids_to_fail = self._state.queued_setup_command_ids
-                for id in other_command_ids_to_fail:
+                other_command_ids_to_fail = (
+                    self._state.command_history.get_setup_queue_ids()
+                )
+                for command_id in other_command_ids_to_fail:
+                    # TODO(mc, 2022-06-06): add new "cancelled" status or similar
                     self._update_to_failed(
-                        command_id=id, failed_at=action.failed_at, error_occurrence=None
+                        command_id=command_id,
+                        failed_at=action.failed_at,
+                        error_occurrence=None,
+                        error_recovery_type=None,
+                        notes=None,
                     )
-                self._state.queued_setup_command_ids.clear()
+                self._state.command_history.clear_setup_queue()
             elif (
                 prev_entry.command.intent == CommandIntent.PROTOCOL
                 or prev_entry.command.intent is None
@@ -319,21 +301,23 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 if action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY:
                     self._state.queue_status = QueueStatus.AWAITING_RECOVERY
                 elif action.type == ErrorRecoveryType.FAIL_RUN:
-                    other_command_ids_to_fail = self._state.queued_command_ids
-                    for id in other_command_ids_to_fail:
+                    other_command_ids_to_fail = (
+                        self._state.command_history.get_queue_ids()
+                    )
+                    for command_id in other_command_ids_to_fail:
+                        # TODO(mc, 2022-06-06): add new "cancelled" status or similar
                         self._update_to_failed(
-                            command_id=id,
+                            command_id=command_id,
                             failed_at=action.failed_at,
                             error_occurrence=None,
+                            error_recovery_type=None,
+                            notes=None,
                         )
-                    self._state.queued_command_ids.clear()
+                    self._state.command_history.clear_queue()
                 else:
                     assert_never(action.type)
             else:
                 assert_never(prev_entry.command.intent)
-
-            if self._state.running_command_id == action.command_id:
-                self._state.running_command_id = None
 
         elif isinstance(action, PlayAction):
             if not self._state.run_result:
@@ -410,18 +394,24 @@ class CommandStore(HasState[CommandState], HandlesActions):
         command_id: str,
         failed_at: datetime,
         error_occurrence: Optional[ErrorOccurrence],
+        error_recovery_type: Optional[ErrorRecoveryType],
+        notes: Optional[List[CommandNote]],
     ) -> None:
-        prev_entry = self._state.commands_by_id[command_id]
-        updated_command = prev_entry.command.copy(
+        prev_entry = self._state.command_history.get(command_id)
+        failed_command = prev_entry.command.copy(
             update={
                 "completedAt": failed_at,
                 "status": CommandStatus.FAILED,
-                **({"error": error_occurrence} if error_occurrence else {}),
+                **({"error": error_occurrence} if error_occurrence is not None else {}),
+                # Assume we're not overwriting any existing notes because they can
+                # only be added when a command completes, and if we're failing this
+                # command, it wouldn't have completed before now.
+                **({"notes": notes} if notes is not None else {}),
             }
         )
-        self._state.commands_by_id[command_id] = CommandEntry(
-            index=prev_entry.index, command=updated_command
-        )
+        self._state.command_history.set_command_failed(failed_command)
+        if error_recovery_type is not None:
+            self._state.command_error_recovery_types[command_id] = error_recovery_type
 
     @staticmethod
     def _map_run_exception_to_error_occurrence(
@@ -473,10 +463,7 @@ class CommandView(HasState[CommandState]):
 
     def get(self, command_id: str) -> Command:
         """Get a command by its unique identifier."""
-        try:
-            return self._state.commands_by_id[command_id].command
-        except KeyError:
-            raise CommandDoesNotExistError(f"Command {command_id} does not exist")
+        return self._state.command_history.get(command_id).command
 
     def get_all(self) -> List[Command]:
         """Get a list of all commands in state.
@@ -485,10 +472,7 @@ class CommandView(HasState[CommandState]):
         Replacing a command (to change its status, for example) keeps its place in the
         ordering.
         """
-        return [
-            self._state.commands_by_id[cid].command
-            for cid in self._state.all_command_ids
-        ]
+        return self._state.command_history.get_all_commands()
 
     def get_slice(
         self,
@@ -498,27 +482,30 @@ class CommandView(HasState[CommandState]):
         """Get a subset of commands around a given cursor.
 
         If the cursor is omitted, a cursor will be selected automatically
-        based on the currently running or most recently executed command."
+        based on the currently running or most recently executed command.
         """
-        # TODO(mc, 2022-01-31): this is not the most performant way to implement
-        # this; if this becomes a problem, change or the underlying data structure
-        # to something that isn't just an OrderedDict
-        all_command_ids = self._state.all_command_ids
-        commands_by_id = self._state.commands_by_id
-        running_command_id = self._state.running_command_id
-        queued_command_ids = self._state.queued_command_ids
-        total_length = len(all_command_ids)
+        running_command = self._state.command_history.get_running_command()
+        queued_command_ids = self._state.command_history.get_queue_ids()
+        total_length = self._state.command_history.length()
 
         if cursor is None:
-            if running_command_id is not None:
-                cursor = commands_by_id[running_command_id].index
+            if running_command is not None:
+                cursor = running_command.index
             elif len(queued_command_ids) > 0:
-                cursor = commands_by_id[queued_command_ids.head()].index - 1
+                # Get the most recently executed command,
+                # which we can find just before the first queued command.
+                cursor = (
+                    self._state.command_history.get(queued_command_ids.head()).index - 1
+                )
             elif (
                 self._state.run_result
                 and self._state.run_result == RunResult.FAILED
                 and self._state.failed_command
             ):
+                # Currently, if the run fails, we mark all the commands we didn't
+                # reach as failed. This makes command status alone insufficient to
+                # find the most recent command that actually executed, so we need to
+                # store that separately.
                 cursor = self._state.failed_command.index
             else:
                 cursor = total_length - length
@@ -526,8 +513,7 @@ class CommandView(HasState[CommandState]):
         # start is inclusive, stop is exclusive
         actual_cursor = max(0, min(cursor, total_length - 1))
         stop = min(total_length, actual_cursor + length)
-        command_ids = all_command_ids[actual_cursor:stop]
-        commands = [commands_by_id[cid].command for cid in command_ids]
+        commands = self._state.command_history.get_slice(start=actual_cursor, stop=stop)
 
         return CommandSlice(
             commands=commands,
@@ -563,7 +549,15 @@ class CommandView(HasState[CommandState]):
 
     def get_running_command_id(self) -> Optional[str]:
         """Return the ID of the command that's currently running, if there is one."""
-        return self._state.running_command_id
+        running_command = self._state.command_history.get_running_command()
+        if running_command is not None:
+            return running_command.command.id
+        else:
+            return None
+
+    def get_queue_ids(self) -> OrderedSet[str]:
+        """Get the IDs of all queued protocol commands, in FIFO order."""
+        return self._state.command_history.get_queue_ids()
 
     def get_current(self) -> Optional[CurrentCommand]:
         """Return the "current" command, if any.
@@ -571,26 +565,23 @@ class CommandView(HasState[CommandState]):
         The "current" command is the command that is currently executing,
         or the most recent command to have completed.
         """
-        if self._state.running_command_id:
-            entry = self._state.commands_by_id[self._state.running_command_id]
+        running_command = self._state.command_history.get_running_command()
+        if running_command:
             return CurrentCommand(
-                command_id=entry.command.id,
-                command_key=entry.command.key,
-                created_at=entry.command.createdAt,
-                index=entry.index,
+                command_id=running_command.command.id,
+                command_key=running_command.command.key,
+                created_at=running_command.command.createdAt,
+                index=running_command.index,
             )
 
-        # TODO(mc, 2022-02-07): this is O(n) in the worst case for no good reason.
-        # Resolve prior to JSONv6 support, where this will matter.
-        for reverse_index, cid in enumerate(reversed(self._state.all_command_ids)):
-            if self.get_command_is_final(cid):
-                entry = self._state.commands_by_id[cid]
-                return CurrentCommand(
-                    command_id=entry.command.id,
-                    command_key=entry.command.key,
-                    created_at=entry.command.createdAt,
-                    index=len(self._state.all_command_ids) - reverse_index - 1,
-                )
+        final_command = self.get_final_command()
+        if final_command:
+            return CurrentCommand(
+                command_id=final_command.command.id,
+                command_key=final_command.command.key,
+                created_at=final_command.command.createdAt,
+                index=final_command.index,
+            )
 
         return None
 
@@ -608,13 +599,13 @@ class CommandView(HasState[CommandState]):
             raise RunStoppedError("Engine was stopped")
 
         # if there is a setup command queued, prioritize it
-        next_setup_cmd = self._state.queued_setup_command_ids.head(None)
+        next_setup_cmd = self._state.command_history.get_setup_queue_ids().head(None)
         if self._state.queue_status != QueueStatus.PAUSED and next_setup_cmd:
             return next_setup_cmd
 
         # if the queue is running, return the next protocol command
         if self._state.queue_status == QueueStatus.RUNNING:
-            return self._state.queued_command_ids.head(None)
+            return self._state.command_history.get_queue_ids().head(None)
 
         # otherwise we've got nothing to do
         return None
@@ -625,8 +616,8 @@ class CommandView(HasState[CommandState]):
             return True
         elif (
             self.get_status() == EngineStatus.IDLE
-            and self._state.running_command_id is None
-            and len(self._state.queued_setup_command_ids) == 0
+            and self._state.command_history.get_running_command() is None
+            and len(self._state.command_history.get_setup_queue_ids()) == 0
         ):
             return True
         else:
@@ -643,6 +634,36 @@ class CommandView(HasState[CommandState]):
     def get_is_running(self) -> bool:
         """Get whether the protocol is running & queued commands should be executed."""
         return self._state.queue_status == QueueStatus.RUNNING
+
+    def get_final_command(self) -> Optional[CommandEntry]:
+        """Get the most recent command that has reached its final `status`. See get_command_is_final."""
+        run_requested_to_stop = self._state.run_result is not None
+
+        if run_requested_to_stop:
+            tail_command = self._state.command_history.get_tail_command()
+            if not tail_command:
+                return None
+            if tail_command.command.status != CommandStatus.RUNNING:
+                return tail_command
+            else:
+                return self._state.command_history.get_prev(tail_command.command.id)
+        else:
+            final_command = self._state.command_history.get_terminal_command()
+            # This iteration is effectively O(1) as we'll only ever have to iterate one or two times at most.
+            while final_command is not None:
+                next_command = self._state.command_history.get_next(
+                    final_command.command.id
+                )
+                if (
+                    next_command is not None
+                    and next_command.command.status != CommandStatus.QUEUED
+                    and next_command.command.status != CommandStatus.RUNNING
+                ):
+                    final_command = next_command
+                else:
+                    break
+
+        return final_command
 
     def get_command_is_final(self, command_id: str) -> bool:
         """Get whether a given command has reached its final `status`.
@@ -676,13 +697,13 @@ class CommandView(HasState[CommandState]):
             CommandExecutionFailedError: if any added command failed, and its `intent` wasn't
             `setup`.
         """
-        no_command_running = self._state.running_command_id is None
+        no_command_running = self._state.command_history.get_running_command() is None
         run_requested_to_stop = self._state.run_result is not None
         no_command_to_execute = (
             run_requested_to_stop
             # TODO(mm, 2024-03-15): This ignores queued setup commands,
             # which seems questionable?
-            or len(self._state.queued_command_ids) == 0
+            or len(self._state.command_history.get_queue_ids()) == 0
         )
 
         return no_command_running and no_command_to_execute
@@ -698,15 +719,23 @@ class CommandView(HasState[CommandState]):
         fatal error of the overall coming from anywhere in the Python script,
         including in between commands.
         """
-        # TODO(mm, 2024-03-14): This is a slow O(n) scan. When a long run ends and
-        # we reach this loop, it can disrupt the robot server.
-        # https://opentrons.atlassian.net/browse/EXEC-55
-        for command_id in self._state.all_command_ids:
-            command = self._state.commands_by_id[command_id].command
-            if command.error and command.intent != CommandIntent.SETUP:
-                raise ProtocolCommandFailedError(
-                    original_error=command.error, message=command.error.detail
-                )
+        failed_command = self.state.failed_command
+        if (
+            failed_command
+            and failed_command.command.error
+            and failed_command.command.intent != CommandIntent.SETUP
+        ):
+            raise ProtocolCommandFailedError(
+                original_error=failed_command.command.error,
+                message=failed_command.command.error.detail,
+            )
+
+    def get_error_recovery_type(self, command_id: str) -> ErrorRecoveryType:
+        """Return the error recovery type with which the given command failed.
+
+        The command ID is assumed to point to a failed command.
+        """
+        return self.state.command_error_recovery_types[command_id]
 
     def get_is_stopped(self) -> bool:
         """Get whether an engine stop has completed."""
