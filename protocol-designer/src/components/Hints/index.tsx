@@ -74,12 +74,15 @@ export const Hints = (): JSX.Element | null => {
             <p>{t(`hint.${hintKey}.body3`)}</p>
           </>
         )
+      case 'multiple_modules_without_labware':
       case 'module_without_labware':
         return (
           <>
             <p>{t(`alert:hint.${hintKey}.body`)}</p>
           </>
         )
+      case 'multiple_modules_without_labware':
+
       case 'thermocycler_lid_passive_cooling':
         return (
           <>

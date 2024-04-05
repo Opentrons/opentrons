@@ -12,13 +12,12 @@ export const TemperatureForm = (props: StepFormProps): JSX.Element => {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )
-  const temperatureModuleId = useSelector(
-    uiModuleSelectors.getSingleTemperatureModuleId
+  const temperatureModuleIds = useSelector(
+    uiModuleSelectors.getTemperatureModuleIds
   )
 
   const { propsForFields } = props
   const { setTemperature, moduleId } = props.formData
-
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -49,43 +48,47 @@ export const TemperatureForm = (props: StepFormProps): JSX.Element => {
             selected to create a temperature step.
           </p>
         )}
-        {moduleId === temperatureModuleId && temperatureModuleId != null && (
-          <>
-            <div className={styles.checkbox_row}>
-              <RadioGroupField
-                {...propsForFields.setTemperature}
-                options={[
-                  {
-                    name: t(
-                      'form:step_edit_form.field.setTemperature.options.true'
-                    ),
-                    value: 'true',
-                  },
-                ]}
-              />
-              {setTemperature === 'true' && (
-                <TextField
-                  {...propsForFields.targetTemperature}
-                  className={styles.small_field}
-                  units={t('units.degrees')}
-                />
-              )}
-            </div>
-            <div className={styles.checkbox_row}>
-              <RadioGroupField
-                {...propsForFields.setTemperature}
-                options={[
-                  {
-                    name: t(
-                      'form:step_edit_form.field.setTemperature.options.false'
-                    ),
-                    value: 'false',
-                  },
-                ]}
-              />
-            </div>
-          </>
-        )}
+        {temperatureModuleIds != null
+          ? temperatureModuleIds.map(id =>
+              id === moduleId ? (
+                <React.Fragment key={id}>
+                  <div className={styles.checkbox_row}>
+                    <RadioGroupField
+                      {...propsForFields.setTemperature}
+                      options={[
+                        {
+                          name: t(
+                            'form:step_edit_form.field.setTemperature.options.true'
+                          ),
+                          value: 'true',
+                        },
+                      ]}
+                    />
+                    {setTemperature === 'true' && (
+                      <TextField
+                        {...propsForFields.targetTemperature}
+                        className={styles.small_field}
+                        units={t('units.degrees')}
+                      />
+                    )}
+                  </div>
+                  <div className={styles.checkbox_row}>
+                    <RadioGroupField
+                      {...propsForFields.setTemperature}
+                      options={[
+                        {
+                          name: t(
+                            'form:step_edit_form.field.setTemperature.options.false'
+                          ),
+                          value: 'false',
+                        },
+                      ]}
+                    />
+                  </div>
+                </React.Fragment>
+              ) : null
+            )
+          : null}
       </div>
     </div>
   )

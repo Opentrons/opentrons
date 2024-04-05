@@ -31,17 +31,17 @@ export const ModuleStepItemRow = (
   </PDListItem>
 )
 
-interface Props {
-  action?: string
+interface ModuleStepItemsProps {
   moduleType: ModuleType
   actionText: string
   labwareNickname?: string | null
   message?: string | null
   children?: React.ReactNode
   hideHeader?: boolean
+  action?: string
 }
 
-export const ModuleStepItems = (props: Props): JSX.Element => {
+export const ModuleStepItems = (props: ModuleStepItemsProps): JSX.Element => {
   const { t } = useTranslation('modules')
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'bottom-start',
