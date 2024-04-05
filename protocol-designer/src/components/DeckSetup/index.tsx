@@ -162,7 +162,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   }, [])
 
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
-
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   const multichannelWarningSlotIds: AddressableAreaName[] = showGen1MultichannelCollisionWarnings
     ? compact([

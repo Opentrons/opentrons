@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { screen, cleanup } from '@testing-library/react'
+import { screen, cleanup, fireEvent } from '@testing-library/react'
 import { BORDERS, COLORS } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { i18n } from '../../../../localization'
@@ -39,7 +39,7 @@ describe('EquipmentOption', () => {
     }
     render(props)
     expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
-      `background-color: ${COLORS.white}`
+      `background-color: ${COLORS.grey10}`
     )
   })
   it('renders the equipment option without check not selected and image', () => {
@@ -72,5 +72,22 @@ describe('EquipmentOption', () => {
     expect(screen.getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `border: ${BORDERS.activeLineBorder}`
     )
+  })
+  it('renders the equipment option with multiples allowed', () => {
+    props = {
+      ...props,
+      multiples: {
+        numItems: 1,
+        maxItems: 4,
+        setValue: vi.fn(),
+        isDisabled: false,
+      },
+    }
+    render(props)
+    screen.getByText('Amount:')
+    screen.getByText('1')
+    fireEvent.click(screen.getByTestId('EquipmentOption_upArrow'))
+    expect(props.multiples?.setValue).toHaveBeenCalled()
+    screen.getByTestId('EquipmentOption_downArrow')
   })
 })
