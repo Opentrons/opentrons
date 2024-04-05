@@ -1,28 +1,12 @@
-.PHONY: ruff-check
-ruff-check:
-	pipenv run python -m ruff check . 
-
-.PHONY: mypy
-mypy:
-	pipenv run python -m mypy --pretty .
-
-.PHONY: ruff-fix
-ruff-fix:
-	pipenv run python -m ruff check . --fix
-
-.PHONY: format-readme
-format-readme:
-	pipenv run python -m mdformat README.md
-
 .PHONY: lint
 lint:
-	$(MAKE) ruff-check
-	$(MAKE) mypy
+	pipenv run python -m black --check .
+	pipenv run python -m flake8 .
+	pipenv run python -m mypy .
 
 .PHONY: format
 format:
-	$(MAKE) ruff-fix
-	$(MAKE) format-readme
+	pipenv run python -m black .
 
 .PHONY: setup
 setup:
@@ -30,4 +14,4 @@ setup:
 
 .PHONY: teardown
 teardown:
-	pipenv --dev --rm
+	pipenv --rm

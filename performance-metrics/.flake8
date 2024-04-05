@@ -20,6 +20,3 @@ extend-ignore =
 docstring-convention = google
 
 noqa-require-code = true
-
-per-file-ignores =
-    setup.py:ANN,D
