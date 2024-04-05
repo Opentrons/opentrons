@@ -57,7 +57,7 @@ type Story = StoryObj<typeof Chip>
 
 export const ChipComponent: Story = {
   args: {
-    type: 'basic',
+    type: 'success',
     text: 'Chip component',
     hasIcon: true,
     chipSize: 'medium',
