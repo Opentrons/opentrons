@@ -6,70 +6,37 @@ shared-data. It's been modified by hand to be more friendly.
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List, Optional, Union, Literal
+from typing import Dict, List, Optional, Literal
 
 from pydantic import (
     ConfigDict,
     BaseModel,
     Field,
-    StrictInt,
-    StrictFloat,
 )
-from typing_extensions import Annotated
+from opentrons_shared_data.types import Vec3f, Number, NonNegativeNumber
+
 
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
 
 
-if TYPE_CHECKING:
-    _StrictNonNegativeInt = int
-    _StrictNonNegativeFloat = float
-else:
-    _StrictNonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
-    _StrictNonNegativeFloat = Annotated[float, Field(strict=True, ge=0.0)]
-
-
-_Number = Union[StrictInt, StrictFloat]
-"""JSON number type, written to preserve lack of decimal point.
-
-For labware definition hashing, which is an older part of the codebase,
-this ensures that Pydantic won't change `"someFloatField: 0` to
-`"someFloatField": 0.0`, which would hash differently.
-"""
-
-_NonNegativeNumber = Union[_StrictNonNegativeInt, _StrictNonNegativeFloat]
-"""Non-negative JSON number type, written to preserve lack of decimal point."""
-
-
-class CornerOffsetFromSlot(BaseModel):
+class CornerOffsetFromSlot(Vec3f[Number]):
     """
     Distance from left-front-bottom corner of slot to left-front-bottom corner
      of labware bounding box. Used for labware that spans multiple slots. For
       labware that does not span multiple slots, x/y/z should all be zero.
     """
 
-    x: _Number
-    y: _Number
-    z: _Number
 
-
-class OverlapOffset(BaseModel):
+class OverlapOffset(Vec3f[Number]):
     """
     Overlap dimensions of labware with another labware/module that it can be stacked on top of.
     """
 
-    x: _Number
-    y: _Number
-    z: _Number
 
-
-class OffsetVector(BaseModel):
+class OffsetVector(Vec3f[Number]):
     """
     A generic 3-D offset vector.
     """
-
-    x: _Number
-    y: _Number
-    z: _Number
 
 
 class GripperOffsets(BaseModel):
@@ -145,12 +112,12 @@ class Parameters(BaseModel):
     isTiprack: bool = Field(
         ..., description="Flag marking whether a labware is a tiprack or not"
     )
-    tipLength: Optional[_NonNegativeNumber] = Field(
+    tipLength: Optional[NonNegativeNumber] = Field(
         None,
         description="Required if labware is tiprack, specifies length of tip"
         " from drawing or as measured with calipers",
     )
-    tipOverlap: Optional[_NonNegativeNumber] = Field(
+    tipOverlap: Optional[NonNegativeNumber] = Field(
         None,
         description="Required if labware is tiprack, specifies the length of "
         "the area of the tip that overlaps the nozzle of the pipette",
@@ -165,7 +132,7 @@ class Parameters(BaseModel):
         description="Flag marking whether a labware is compatible by default "
         "with the Magnetic Module",
     )
-    magneticModuleEngageHeight: Optional[_NonNegativeNumber] = Field(
+    magneticModuleEngageHeight: Optional[NonNegativeNumber] = Field(
         None, description="Distance to move magnetic module magnets to engage"
     )
 
@@ -175,42 +142,42 @@ class Dimensions(BaseModel):
     Outer dimensions of a labware
     """
 
-    yDimension: _NonNegativeNumber = Field(...)
-    zDimension: _NonNegativeNumber = Field(...)
-    xDimension: _NonNegativeNumber = Field(...)
+    yDimension: NonNegativeNumber = Field(...)
+    zDimension: NonNegativeNumber = Field(...)
+    xDimension: NonNegativeNumber = Field(...)
 
 
 class WellDefinition(BaseModel):
     model_config = ConfigDict(extra="allow")
 
-    depth: _NonNegativeNumber = Field(...)
-    x: _NonNegativeNumber = Field(
+    depth: NonNegativeNumber = Field(...)
+    x: NonNegativeNumber = Field(
         ...,
         description="x location of center-bottom of well in reference to "
         "left-front-bottom of labware",
     )
-    y: _NonNegativeNumber = Field(
+    y: NonNegativeNumber = Field(
         ...,
         description="y location of center-bottom of well in reference to "
         "left-front-bottom of labware",
     )
-    z: _NonNegativeNumber = Field(
+    z: NonNegativeNumber = Field(
         ...,
         description="z location of center-bottom of well in reference to "
         "left-front-bottom of labware",
     )
-    totalLiquidVolume: _NonNegativeNumber = Field(
+    totalLiquidVolume: NonNegativeNumber = Field(
         ..., description="Total well, tube, or tip volume in microliters"
     )
-    xDimension: Optional[_NonNegativeNumber] = Field(
+    xDimension: Optional[NonNegativeNumber] = Field(
         None,
         description="x dimension of rectangular wells",
     )
-    yDimension: Optional[_NonNegativeNumber] = Field(
+    yDimension: Optional[NonNegativeNumber] = Field(
         None,
         description="y dimension of rectangular wells",
     )
-    diameter: Optional[_NonNegativeNumber] = Field(
+    diameter: Optional[NonNegativeNumber] = Field(
         None,
         description="diameter of circular wells",
     )
