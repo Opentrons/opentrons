@@ -1,5 +1,5 @@
 """Tests for the top-level StateStore/StateView."""
-from typing import Callable, Optional, Union
+from typing import Callable, Union
 from datetime import datetime
 
 import pytest
