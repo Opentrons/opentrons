@@ -18,8 +18,8 @@ import {
   POSITION_FIXED,
   POSITION_RELATIVE,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
@@ -297,7 +297,6 @@ export function NameRobot(): JSX.Element {
               render={({ field }) => (
                 <AlphanumericKeyboard
                   onChange={(input: string) => {
-                    console.log('input', input)
                     field.onChange(input)
                     void trigger('newRobotName')
                   }}

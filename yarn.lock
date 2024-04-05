@@ -16764,9 +16764,9 @@ react-select@5.4.0:
     react-transition-group "^4.3.0"
 
 react-simple-keyboard@^3.7.0:
-  version "3.7.106"
-  resolved "https://registry.yarnpkg.com/react-simple-keyboard/-/react-simple-keyboard-3.7.106.tgz#42bd98d926f7ebec0f3ae4f793f3e9fa84c4f281"
-  integrity sha512-uF/KwHOKoAFqvFlWxePOiRE1MDBH/lCeah1VVW+xc3IwsRq1C0+OeLClUQVrLwUDuuM4W+EdrdZSJy4pugtq5Q==
+  version "3.7.107"
+  resolved "https://registry.yarnpkg.com/react-simple-keyboard/-/react-simple-keyboard-3.7.107.tgz#6e71f48950a1923486f2ca8edc5194cdbae0f332"
+  integrity sha512-r2emrLGoD6A37fl+GCEODFLxtUET1uXZsmFokb7cB6/3OlE7EV08wSzB+yTju+qwIibsc6EXLC6KoRf0FsVC1A==
 
 react-snap@^1.23.0:
   version "1.23.0"

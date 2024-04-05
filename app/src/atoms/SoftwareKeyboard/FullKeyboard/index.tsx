@@ -5,14 +5,17 @@ import { customDisplay, fullKeyboardLayout } from '../constants'
 import '../index.css'
 import './index.css'
 
+// Note (kk:04/05/2024) add debug to make debugging easy
 interface FullKeyboardProps {
   onChange: (input: string) => void
   keyboardRef: React.MutableRefObject<any>
+  debug?: boolean
 }
 
 export function FullKeyboard({
   onChange,
   keyboardRef,
+  debug = false,
 }: FullKeyboardProps): JSX.Element {
   const [layoutName, setLayoutName] = React.useState<string>('default')
   const handleShift = (button: string): void => {
@@ -54,8 +57,9 @@ export function FullKeyboard({
       layout={fullKeyboardLayout}
       display={customDisplay}
       mergeDisplay={true}
-      autoUseTouchEvents={true}
       useButtonTag={true}
+      debug={debug}
+      baseClass="fullKeyboard"
     />
   )
 }

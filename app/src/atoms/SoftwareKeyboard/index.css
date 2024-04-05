@@ -60,7 +60,6 @@
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
-  height: 40px;
   justify-content: center;
   padding: 5px;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);

@@ -7,16 +7,20 @@ import './index.css'
 const customDisplay = {
   '{backspace}': 'del',
 }
+
+// Note (kk:04/05/2024) add debug to make debugging easy
 interface IndividualKeyProps {
   onChange: (input: string) => void
   keyboardRef: React.MutableRefObject<null>
   keyText: string
+  debug?: boolean
 }
 
 export function IndividualKey({
   onChange,
   keyboardRef,
   keyText,
+  debug = false,
 }: IndividualKeyProps): JSX.Element {
   const numericalKeyboard = {
     layout: {
@@ -34,10 +38,10 @@ export function IndividualKey({
       onChange={onChange}
       layoutName="default"
       display={customDisplay}
-      autoUseTouchEvents={true}
       useButtonTag={true}
       {...numericalKeyboard}
       width="100%"
+      debug={debug}
     />
   )
 }
