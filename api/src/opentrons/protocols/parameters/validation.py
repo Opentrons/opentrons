@@ -61,7 +61,8 @@ def ensure_value_type(
 
     This does not guarantee that the value will be the correct type for the given parameter, only that any data coming
     in is in the format that we expect. For now, the only transformation it is doing is converting integers represented
-    as floating points to integers, and bools represented as 1.0/0.0 to True/False.
+    as floating points to integers, and bools represented as 1.0/0.0 to True/False, and floating points represented as
+    ints to floats.
 
     If something is labelled as a type but does not get converted here, that will be caught when it is attempted to be
     set as the parameter value and will raise the appropriate error there.
@@ -72,6 +73,8 @@ def ensure_value_type(
             validated_value = bool(value)
         elif parameter_type is int and value.is_integer():
             validated_value = int(value)
+    elif isinstance(value, int) and not isinstance(value, bool) and parameter_type is float:
+        validated_value = float(value)
     return validated_value
 
 

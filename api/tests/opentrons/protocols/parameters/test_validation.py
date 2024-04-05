@@ -134,6 +134,7 @@ def test_validate_options_raises_name_error() -> None:
     [
         (1.0, int, 1),
         (1.1, int, 1.1),
+        (2, float, 2.0),
         (2.0, float, 2.0),
         (2.2, float, 2.2),
         ("3.0", str, "3.0"),
