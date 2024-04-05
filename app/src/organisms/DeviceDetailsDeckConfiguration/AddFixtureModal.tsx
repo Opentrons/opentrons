@@ -431,7 +431,7 @@ interface FixtureOptionProps {
   buttonText: string
   isOnDevice?: boolean
 }
-function FixtureOption(props: FixtureOptionProps): JSX.Element {
+export function FixtureOption(props: FixtureOptionProps): JSX.Element {
   const { onClickHandler, optionName, buttonText, isOnDevice } = props
   return isOnDevice ? (
     <Btn

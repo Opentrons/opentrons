@@ -50,6 +50,7 @@ import type {
 } from '@opentrons/shared-data'
 import { replace } from 'lodash'
 import { cs } from 'date-fns/locale'
+import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
 
 interface LocationConflictModalProps {
   onCloseClick: () => void
@@ -74,6 +75,8 @@ export const LocationConflictModal = (
     isOnDevice = false,
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+
+  const [showModuleSelect, setShowModuleSelect] = React.useState(false)
   const attachedModules = useModulesQuery().data?.data ?? []
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
@@ -100,16 +103,8 @@ export const LocationConflictModal = (
       ? getFixtureDisplayName(deckConfigurationAtA1)
       : currentFixtureDisplayName
 
-  const handleUpdateDeck = (): void => {
-    if (requiredFixtureId != null) {
-      const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
-        fixture.cutoutId === cutoutId
-          ? { ...fixture, cutoutFixtureId: requiredFixtureId, opentronsModuleSerialNumber: undefined }
-          : fixture
-      )
-
-      updateDeckConfiguration(newRequiredFixtureDeckConfig)
-    } else if (requiredModule != null) {
+  const handleConfigureModule = (moduleSerialNumber: string) => {
+    if (requiredModule != null) {
       const addressableAreas = getAddressableAreaNamesFromLoadedModule(
         requiredModule,
         cutoutId.replace('cutout', ''),
@@ -129,17 +124,31 @@ export const LocationConflictModal = (
         )
         return cutoutId === fixture.cutoutId && replacementFixture != null
           ? {
-              ...fixture,
-              cutoutFixtureId: replacementFixture?.id,
-              opentronsModuleSerialNumber: attachedModules.find(
-                m => m.moduleModel === requiredModule
-              )?.serialNumber,
-            }
+            ...fixture,
+            cutoutFixtureId: replacementFixture?.id,
+            opentronsModuleSerialNumber: moduleSerialNumber
+          }
           : fixture
       })
       updateDeckConfiguration(newDeckConfig)
     }
     onCloseClick()
+  }
+
+  const handleUpdateDeck = (): void => {
+    if (requiredModule != null) {
+      setShowModuleSelect(true)
+    } else if (requiredFixtureId != null) {
+      const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
+        fixture.cutoutId === cutoutId
+          ? { ...fixture, cutoutFixtureId: requiredFixtureId, opentronsModuleSerialNumber: undefined }
+          : fixture
+      )
+      updateDeckConfiguration(newRequiredFixtureDeckConfig)
+      onCloseClick()
+    } else {
+      onCloseClick()
+    }
   }
 
   let protocolSpecifiesDisplayName = ''
@@ -151,6 +160,18 @@ export const LocationConflictModal = (
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }
 
+  if (showModuleSelect && requiredModule) {
+    return createPortal(
+      <ChooseModuleToConfigureModal
+        handleConfigureModule={handleConfigureModule}
+        requiredModuleModel={requiredModule}
+        onCloseClick={onCloseClick}
+        isOnDevice={isOnDevice}
+        deckDef={deckDef}
+      />,
+      getTopPortalEl()
+    )
+  }
   return createPortal(
     isOnDevice ? (
       <Modal
