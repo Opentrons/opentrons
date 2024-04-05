@@ -50,9 +50,11 @@ def test_error_recovery_type_tracking() -> None:
     subject.handle_action(
         actions.RunCommandAction(command_id="c1", started_at=datetime.now())
     )
+    running_command_1 = CommandView(subject.state).get("c1")
     subject.handle_action(
         actions.FailCommandAction(
             command_id="c1",
+            running_command=running_command_1,
             error_id="c1-error",
             failed_at=datetime.now(),
             error=PythonException(RuntimeError("new sheriff in town")),
@@ -63,9 +65,11 @@ def test_error_recovery_type_tracking() -> None:
     subject.handle_action(
         actions.RunCommandAction(command_id="c2", started_at=datetime.now())
     )
+    running_command_2 = CommandView(subject.state).get("c2")
     subject.handle_action(
         actions.FailCommandAction(
             command_id="c2",
+            running_command=running_command_2,
             error_id="c2-error",
             failed_at=datetime.now(),
             error=PythonException(RuntimeError("new sheriff in town")),

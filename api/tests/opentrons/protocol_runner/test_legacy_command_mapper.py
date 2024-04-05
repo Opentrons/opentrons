@@ -156,6 +156,7 @@ def test_map_after_with_error_command() -> None:
     assert result == [
         pe_actions.FailCommandAction(
             command_id="command.COMMENT-0",
+            running_command=matchers.Anything(),
             error_id=matchers.IsA(str),
             failed_at=matchers.IsA(datetime),
             error=matchers.ErrorMatching(
@@ -257,6 +258,7 @@ def test_command_stack() -> None:
         ),
         pe_actions.FailCommandAction(
             command_id="command.COMMENT-1",
+            running_command=matchers.Anything(),
             error_id=matchers.IsA(str),
             failed_at=matchers.IsA(datetime),
             error=matchers.ErrorMatching(LegacyContextCommandError, "oh no"),

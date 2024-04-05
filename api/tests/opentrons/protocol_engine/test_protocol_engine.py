@@ -2,6 +2,7 @@
 import inspect
 from datetime import datetime
 from typing import Any
+from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy
@@ -857,6 +858,8 @@ async def test_estop_during_command(
     """It should be able to stop the engine."""
     timestamp = datetime(2021, 1, 1, 0, 0)
     command_id = "command_fake_id"
+    running_command = sentinel.running_command
+    queued_command = sentinel.queued_command
     error_id = "fake_error_id"
     fake_command_set = OrderedSet(["fake-id-1", "fake-id-1"])
 
@@ -864,10 +867,15 @@ async def test_estop_during_command(
     decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(state_store.commands.get_is_stopped()).then_return(False)
     decoy.when(state_store.commands.get_running_command_id()).then_return(command_id)
+    decoy.when(state_store.commands.get(command_id)).then_return(running_command)
     decoy.when(state_store.commands.get_queue_ids()).then_return(fake_command_set)
+    decoy.when(state_store.commands.get(fake_command_set.head())).then_return(
+        queued_command
+    )
 
     expected_action = FailCommandAction(
         command_id=command_id,
+        running_command=running_command,
         error_id=error_id,
         failed_at=timestamp,
         error=EStopActivatedError(message="Estop Activated"),
@@ -876,6 +884,7 @@ async def test_estop_during_command(
     )
     expected_action_2 = FailCommandAction(
         command_id=fake_command_set.head(),
+        running_command=queued_command,
         error_id=error_id,
         failed_at=timestamp,
         error=EStopActivatedError(message="Estop Activated"),
