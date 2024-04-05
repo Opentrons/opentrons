@@ -1,3 +1,5 @@
+include ../scripts/python.mk
+
 .PHONY: lint
 lint:
 	pipenv run python -m black --check .
@@ -15,3 +17,12 @@ setup:
 .PHONY: teardown
 teardown:
 	pipenv --rm
+
+.PHONY: clean
+clean:
+	rm -rf build dist *.egg-info .mypy_cache .pytest_cache src/performance_metrics.egg-info
+
+.PHONY: wheel
+wheel:
+	pipenv run python setup.py $(wheel_opts) bdist_wheel
+	rm -rf build

@@ -9,7 +9,6 @@ opentrons-shared-data = {file = "../shared-data/python", editable = true}
 [dev-packages]
 pytest  = "==7.2.2"
 mypy    = "==1.8.0"
-# For Github Flavored Markdown
 flake8 = "==7.0.0"
 flake8-annotations = "~=3.0.1"
 flake8-docstrings = "~=1.7.0"
