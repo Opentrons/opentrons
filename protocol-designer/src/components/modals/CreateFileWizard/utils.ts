@@ -212,7 +212,8 @@ export const getTrashBinOptionDisabled = (
     modules,
     additionalEquipment
   )
-  return nextAvailableSlot === ''
+  const hasTrashBinAlready = additionalEquipment.includes('trashBin')
+  return nextAvailableSlot === '' && !hasTrashBinAlready
 }
 
 export const getTrashSlot = (values: FormState): string => {

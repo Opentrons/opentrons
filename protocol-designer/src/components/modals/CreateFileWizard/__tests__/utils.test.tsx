@@ -12,6 +12,7 @@ import {
   getTrashSlot,
   getNextAvailableModuleSlot,
   getDisabledEquipment,
+  getTrashBinOptionDisabled,
 } from '../utils'
 import { STANDARD_EMPTY_SLOTS } from '../StagingAreaTile'
 import type { FormPipettesByMount } from '../../../../step-forms'
@@ -209,5 +210,60 @@ describe('getTrashSlot', () => {
     }
     const result = getTrashSlot(MOCK_FORM_STATE)
     expect(result).toBe('cutoutA1')
+  })
+  describe('getTrashBinOptionDisabled', () => {
+    it('returns false when there is a trash bin already', () => {
+      const result = getTrashBinOptionDisabled({
+        additionalEquipment: ['trashBin'],
+        modules: {
+          0: {
+            model: 'heaterShakerModuleV1',
+            type: 'heaterShakerModuleType',
+            slot: 'D1',
+          },
+        },
+      })
+      expect(result).toBe(false)
+    })
+    it('returns false when there is an available slot', () => {
+      const result = getTrashBinOptionDisabled({
+        additionalEquipment: ['trashBin'],
+        modules: null,
+      })
+      expect(result).toBe(false)
+    })
+    it('returns true when there is no available slot and trash bin is not selected yet', () => {
+      const result = getTrashBinOptionDisabled({
+        additionalEquipment: [
+          'stagingArea_cutoutA3',
+          'stagingArea_cutoutB3',
+          'stagingArea_cutoutC3',
+          'stagingArea_cutoutD3',
+        ],
+        modules: {
+          0: {
+            model: 'heaterShakerModuleV1',
+            type: 'heaterShakerModuleType',
+            slot: 'D1',
+          },
+          1: {
+            model: 'temperatureModuleV2',
+            type: 'temperatureModuleType',
+            slot: 'C1',
+          },
+          2: {
+            model: 'temperatureModuleV2',
+            type: 'temperatureModuleType',
+            slot: 'B1',
+          },
+          3: {
+            model: 'temperatureModuleV2',
+            type: 'temperatureModuleType',
+            slot: 'A1',
+          },
+        },
+      })
+      expect(result).toBe(true)
+    })
   })
 })
