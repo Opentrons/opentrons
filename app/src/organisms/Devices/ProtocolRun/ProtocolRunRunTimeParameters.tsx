@@ -212,5 +212,5 @@ const StyledTableCell = styled.td<StyledTableCellProps>`
   display: ${props => (props.display != null ? props.display : 'table-cell')};
   padding: ${SPACING.spacing8} 0;
   padding-right: ${props =>
-    props.paddingRight != null ? props.paddingRight : '17px'};
+    props.paddingRight != null ? props.paddingRight : '1.0625rem'};
 `

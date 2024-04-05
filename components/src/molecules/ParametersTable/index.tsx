@@ -84,7 +84,7 @@ export function ParametersTable({
               </StyledTableCell>
               <StyledTableCell
                 isLast={index === runTimeParameters.length - 1}
-                paddingRight="0px"
+                paddingRight="0"
               >
                 <StyledText as="p">
                   {formatRange(parameter, `${min}-${max}`)}
@@ -115,7 +115,7 @@ const ParameterName = (props: ParameterNameProps): JSX.Element => {
         as="p"
         css={css`
           display: ${DISPLAY_INLINE};
-          padding-right: 8px;
+          padding-right: ${SPACING.spacing8};
         `}
       >
         {displayName}
@@ -152,7 +152,7 @@ const StyledTable = styled.table`
 
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}
-  grid-gap: 17px;
+  grid-gap: 1.0625rem;
   padding-bottom: ${SPACING.spacing8};
   border-bottom: ${BORDERS.lineBorder};
 `
@@ -162,7 +162,7 @@ interface StyledTableRowProps {
 }
 
 const StyledTableRow = styled.tr<StyledTableRowProps>`
-  grid-gap: 17px;
+  grid-gap: 1.0625rem;
   border-bottom: ${props => (props.isLast ? 'none' : BORDERS.lineBorder)};
 `
 
@@ -178,5 +178,5 @@ const StyledTableCell = styled.td<StyledTableCellProps>`
   padding-top: ${SPACING.spacing12};
   padding-bottom: ${props => (props.isLast ? 0 : SPACING.spacing12)};
   padding-right: ${props =>
-    props.paddingRight != null ? props.paddingRight : '17px'};
+    props.paddingRight != null ? props.paddingRight : '1.0625rem'};
 `
