@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import { formatRunTimeParameterDefaultValue } from '@opentrons/shared-data'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -158,7 +158,7 @@ const StyledTableRowComponent = (
       <StyledTableCell>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
           <StyledText as="p">
-            {formatRunTimeParameterDefaultValue(parameter, t)}
+            {formatRunTimeParameterValue(parameter, t)}
           </StyledText>
           {parameter.value !== parameter.default ? (
             <Chip
