@@ -38,6 +38,7 @@ from ..errors import (
     ErrorOccurrence,
     RobotDoorOpenError,
     SetupCommandNotAllowedError,
+    FixitCommandNotAllowedError,
     PauseNotAllowedError,
     UnexpectedProtocolError,
     ProtocolCommandFailedError,
@@ -803,6 +804,13 @@ class CommandView(HasState[CommandState]):
             ):
                 raise SetupCommandNotAllowedError(
                     "Setup commands are not allowed after run has started."
+                )
+            elif (
+                action.request.intent == CommandIntent.FIXIT
+                and self._state.queue_status != QueueStatus.AWAITING_RECOVERY
+            ):
+                raise FixitCommandNotAllowedError(
+                    "Fixit commands are not allowed when the run is not in a recoverable state."
                 )
             else:
                 return action

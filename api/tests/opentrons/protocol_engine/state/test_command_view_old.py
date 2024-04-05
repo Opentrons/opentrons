@@ -491,6 +491,20 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         action=ResumeFromRecoveryAction(),
         expected_error=NotImplementedError,
     ),
+    # fixit command is disallowed if not in recovery mode
+    ActionAllowedSpec(
+        subject=get_command_view(queue_status=QueueStatus.RUNNING),
+        action=QueueCommandAction(
+            request=cmd.HomeCreate(
+                params=cmd.HomeParams(),
+                intent=cmd.CommandIntent.FIXIT,
+            ),
+            request_hash=None,
+            command_id="command-id",
+            created_at=datetime(year=2021, month=1, day=1),
+        ),
+        expected_error=errors.FixitCommandNotAllowedError,
+    ),
 ]
 
 
