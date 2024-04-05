@@ -190,7 +190,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
 
 function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const { watch, setValue } = props
-  const moamFf = useSelector(getEnableMoam)
+  const enableMoamFf = useSelector(getEnableMoam)
   const modules = watch('modules')
   const additionalEquipment = watch('additionalEquipment')
   const moduleTypesOnDeck =
@@ -268,7 +268,10 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         }
 
         const handleOnClick = (): void => {
-          if (moduleType !== TEMPERATURE_MODULE_TYPE) {
+          if (
+            (moduleType !== TEMPERATURE_MODULE_TYPE && enableMoamFf) ||
+            !enableMoamFf
+          ) {
             if (moduleOnDeck) {
               const updatedModules =
                 modules != null
@@ -302,7 +305,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
             disabled={isDisabled && !moduleOnDeck}
             onClick={handleOnClick}
             multiples={
-              moduleType === TEMPERATURE_MODULE_TYPE && moamFf
+              moduleType === TEMPERATURE_MODULE_TYPE && enableMoamFf
                 ? {
                     maxItems: 7,
                     setValue: handleMultiplesClick,
@@ -316,7 +319,9 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
                   }
                 : undefined
             }
-            showCheckbox={moduleType !== TEMPERATURE_MODULE_TYPE}
+            showCheckbox={
+              enableMoamFf ? moduleType !== TEMPERATURE_MODULE_TYPE : true
+            }
           />
         )
       })}

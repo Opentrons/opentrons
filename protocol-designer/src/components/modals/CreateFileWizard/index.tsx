@@ -141,10 +141,7 @@ export function CreateFileWizard(): JSX.Element | null {
                 {
                   type: formModule.type,
                   model: formModule.model || ('' as ModuleModel),
-                  slot:
-                    formModule.slot === ''
-                      ? getTrashSlot(values)
-                      : formModule.slot,
+                  slot: formModule.slot,
                 },
               ]
             },
