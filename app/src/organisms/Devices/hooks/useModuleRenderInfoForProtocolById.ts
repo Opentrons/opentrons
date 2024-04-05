@@ -69,7 +69,8 @@ export function useModuleRenderInfoForProtocolById(
       )
       const moduleCutoutIds = getCutoutIdsFromModuleSlotName(
         protocolMod.slotName,
-        moduleFixtures
+        moduleFixtures,
+        deckDef
       )
 
       const conflictedFixture =

@@ -10,6 +10,7 @@ import type {
   DeckDefinition,
   DeckConfiguration,
   CompletedProtocolAnalysis,
+  CutoutFixtureGroup,
 } from '../types'
 
 export interface CutoutConfigProtocolSpec extends CutoutConfig {
@@ -153,9 +154,9 @@ export function getCutoutIdForSlotName(
 export function getFixtureGroupForCutoutFixture(
   cutoutFixtureId: CutoutFixtureId,
   cutoutFixtures: CutoutFixture[]
-): CutoutFixtureId[] {
+): CutoutFixtureGroup {
   return (
-    cutoutFixtures.find(cf => cf.id === cutoutFixtureId)?.fixtureGroup ?? []
+    cutoutFixtures.find(cf => cf.id === cutoutFixtureId)?.fixtureGroup ?? {}
   )
 }
 
