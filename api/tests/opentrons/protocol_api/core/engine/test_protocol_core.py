@@ -13,7 +13,7 @@ from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefDict,
     LabwareUri,
 )
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName, StagingSlotName, Mount, MountType, Point

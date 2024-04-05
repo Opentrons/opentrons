@@ -14,7 +14,7 @@ from typing import (
 
 from typing_extensions import TypeGuard
 
-from opentrons_shared_data.labware.labware_definition import LabwareRole
+from opentrons_shared_data.labware.models import LabwareRole
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 

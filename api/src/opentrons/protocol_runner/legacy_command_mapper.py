@@ -19,7 +19,7 @@ from opentrons.protocol_engine.resources import (
     ModuleDataProvider,
     pipette_data_provider,
 )
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.errors import ErrorCodes, EnumeratedError, PythonException
 from opentrons.protocol_api.core.legacy.deck import FIXED_TRASH_ID
 

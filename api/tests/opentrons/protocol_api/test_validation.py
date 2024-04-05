@@ -5,7 +5,7 @@ from contextlib import nullcontext as do_not_raise
 from decoy import Decoy
 import pytest
 
-from opentrons_shared_data.labware.labware_definition import (
+from opentrons_shared_data.labware.models import (
     LabwareRole,
     Parameters as LabwareDefinitionParameters,
 )

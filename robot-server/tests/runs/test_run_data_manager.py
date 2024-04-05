@@ -36,7 +36,7 @@ from robot_server.service.notifications import RunsPublisher
 
 from opentrons.protocol_engine import Liquid
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 
 

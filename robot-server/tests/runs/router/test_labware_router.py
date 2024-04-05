@@ -19,7 +19,7 @@ from robot_server.runs.router.labware_router import (
     add_labware_definition,
     get_run_loaded_labware_definitions,
 )
-from opentrons_shared_data.labware.labware_definition import (
+from opentrons_shared_data.labware.models import (
     LabwareDefinition as SD_LabwareDefinition,
 )
 

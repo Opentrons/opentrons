@@ -69,7 +69,7 @@ from opentrons.protocols.api_support.deck_type import (
     should_load_fixed_trash_labware_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 from .util import entrypoint_util
 

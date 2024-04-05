@@ -6,7 +6,7 @@ from typing import Iterable
 import anyio
 from pydantic import ValidationError as PydanticValidationError
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.protocol.models import (
     ProtocolSchemaV6 as JsonProtocolV6,
     ProtocolSchemaV7 as JsonProtocolV7,

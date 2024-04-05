@@ -8,7 +8,7 @@
 
 # TODO(mc, 2022-03-11): remove this re-export when it won't break pickling
 # https://opentrons.atlassian.net/browse/RSS-94
-from opentrons_shared_data.labware.labware_definition import (
+from opentrons_shared_data.labware.models import (
     LabwareDefinition,
     WellDefinition,
 )

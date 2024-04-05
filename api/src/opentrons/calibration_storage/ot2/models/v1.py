@@ -1,7 +1,7 @@
 import typing
 
 from typing_extensions import Literal
-from pydantic import field_validator, ConfigDict, BaseModel, Field, PlainSerializer
+from pydantic import field_validator, BaseModel, Field, PlainSerializer
 from datetime import datetime
 
 from opentrons_shared_data.pipette.dev_types import LabwareUri

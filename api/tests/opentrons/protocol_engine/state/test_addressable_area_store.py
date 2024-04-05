@@ -2,7 +2,7 @@
 import pytest
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
-from opentrons_shared_data.labware.labware_definition import Parameters
+from opentrons_shared_data.labware.models import Parameters
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 

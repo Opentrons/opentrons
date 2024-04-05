@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import List, Optional, Callable, Union
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
 from opentrons.protocol_engine import (
     EngineStatus,

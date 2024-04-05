@@ -9,7 +9,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands, DeckPoint
 from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence

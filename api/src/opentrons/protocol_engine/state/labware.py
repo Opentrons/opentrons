@@ -17,7 +17,7 @@ from typing import (
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
-from opentrons_shared_data.labware.labware_definition import LabwareRole
+from opentrons_shared_data.labware.models import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from opentrons.types import DeckSlotName, StagingSlotName, MountType

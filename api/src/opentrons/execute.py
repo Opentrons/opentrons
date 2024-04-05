@@ -23,7 +23,7 @@ from typing import (
     Union,
 )
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons import protocol_api, __version__, should_use_ot3

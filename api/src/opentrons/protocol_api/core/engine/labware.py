@@ -6,7 +6,7 @@ from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LabwareDefinitionDict,
 )
 
-from opentrons_shared_data.labware.labware_definition import LabwareRole
+from opentrons_shared_data.labware.models import LabwareRole
 
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient

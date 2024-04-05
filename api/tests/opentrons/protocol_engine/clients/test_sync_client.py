@@ -15,7 +15,7 @@ from decoy import Decoy
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import DeckSlotLocation, DeckPoint, commands

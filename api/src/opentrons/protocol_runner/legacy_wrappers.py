@@ -7,7 +7,7 @@ from anyio import to_thread
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LegacyLabwareDefinition,
 )
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control import HardwareControlAPI

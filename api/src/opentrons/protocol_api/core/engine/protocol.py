@@ -4,7 +4,7 @@ from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
 from opentrons.protocol_engine.commands import LoadModuleResult
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType

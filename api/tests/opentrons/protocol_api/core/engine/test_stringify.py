@@ -2,7 +2,7 @@
 
 
 from decoy import Decoy
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 from opentrons.protocol_api.core.engine import stringify as subject
 from opentrons.protocol_engine.clients.sync_client import SyncClient

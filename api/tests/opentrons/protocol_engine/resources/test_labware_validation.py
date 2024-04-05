@@ -1,7 +1,7 @@
 """Test labware validation."""
 import pytest
 
-from opentrons_shared_data.labware.labware_definition import (
+from opentrons_shared_data.labware.models import (
     LabwareRole,
     OverlapOffset,
     Parameters,

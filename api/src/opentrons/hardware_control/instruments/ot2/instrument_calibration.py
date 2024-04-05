@@ -9,7 +9,7 @@ from opentrons.calibration_storage import types, helpers
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import OT3Mount
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import LabwareUri

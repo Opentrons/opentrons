@@ -3,7 +3,7 @@ import inspect
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.labware_definition import Parameters, Dimensions
+from opentrons_shared_data.labware.models import Parameters, Dimensions
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 
 from opentrons.types import DeckSlotName, Point

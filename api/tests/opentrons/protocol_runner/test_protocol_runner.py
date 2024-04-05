@@ -7,7 +7,7 @@ from decoy import Decoy, matchers
 from pathlib import Path
 from typing import List, cast, Optional, Union, Type
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSchemaV7
 from opentrons_shared_data.protocol.dev_types import (
     JsonProtocol as LegacyJsonProtocolDict,

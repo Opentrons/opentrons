@@ -5,7 +5,7 @@ import pytest
 
 from typing import Optional
 
-from opentrons_shared_data.labware.labware_definition import (
+from opentrons_shared_data.labware.models import (
     LabwareDefinition,
     Parameters as LabwareParameters,
 )

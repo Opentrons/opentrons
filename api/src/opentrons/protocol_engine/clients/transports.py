@@ -4,7 +4,7 @@ from typing import Any, Final, overload
 from typing_extensions import Literal
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.models import LabwareDefinition
 
 
 from ..protocol_engine import ProtocolEngine

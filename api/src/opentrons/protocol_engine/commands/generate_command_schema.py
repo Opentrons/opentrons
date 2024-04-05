@@ -6,10 +6,10 @@ import sys
 from opentrons.protocol_engine.commands.command_unions import CommandCreate
 
 
-class CreateCommandUnion(pydantic.BaseModel):
+class CreateCommandUnion(pydantic.RootModel[CommandCreate]):
     """Model that validates a union of all CommandCreate models."""
 
-    __root__: CommandCreate
+    root: CommandCreate
 
 
 def generate_command_schema(version: str) -> str:
