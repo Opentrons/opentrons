@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { VIEWPORT } from '@opentrons/components'
 import { SmallButton } from './'
 
