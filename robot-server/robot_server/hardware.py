@@ -54,6 +54,7 @@ from .subsystems.firmware_update_manager import (
 )
 from .subsystems.models import SubSystem
 from .service.task_runner import TaskRunner, get_task_runner
+from .service.notifications import get_hardware_notify_publishers
 
 from .robot.control.estop_handler import EstopHandler
 
@@ -478,7 +479,8 @@ async def _initialize_ot3_robot(
             settings.simulator_configuration_file_path
         )
     else:
-        return await initialize_api()
+        notify_publishers = get_hardware_notify_publishers(app_state)
+        return await initialize_api(notify_publishers=notify_publishers)
 
 
 async def _initialize_ot2_robot(
@@ -514,7 +516,8 @@ async def _initialize_ot2_robot(
             settings.simulator_configuration_file_path
         )
     else:
-        return await initialize_api()
+        notify_publishers = get_hardware_notify_publishers(app_state)
+        return await initialize_api(notify_publishers=notify_publishers)
 
 
 async def _initialize_simulated_hardware(

@@ -32,6 +32,7 @@ __all__ = [
     # for use by FastAPI
     "get_notification_client",
     "get_pe_notify_publishers",
+    "get_hardware_notify_publishers",
     "get_maintenance_runs_publisher",
     "get_runs_publisher",
     # for testing

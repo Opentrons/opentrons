@@ -19,6 +19,9 @@ class PublisherNotifier:
         self,
         change_notifier: Optional[ChangeNotifier] = None,
     ):
+        # Because ChangeNotifier is a generic event interface, all callbacks themselves perform a specific
+        # conditional check. A max_queue_size=1 ensures that all callbacks perform their conditional check without
+        # being "over"-invoked.
         self._change_notifier = change_notifier or ChangeNotifier(max_queue_size=1)
         self._pe_notifier: Optional[asyncio.Task[None]] = None
         self._callbacks: List[Callable[[], Awaitable[None]]] = []
@@ -53,26 +56,6 @@ _hardware_publisher_notifier_accessor: AppStateAccessor[
 ] = AppStateAccessor[PublisherNotifier]("publisher_notifier")
 
 
-def get_pe_publisher_notifier(
-    app_state: AppState = Depends(get_app_state),
-) -> PublisherNotifier:
-    """Intended for use by various publishers only. Intended for protocol engine."""
-    publisher_notifier = _pe_publisher_notifier_accessor.get_from(app_state)
-    assert publisher_notifier is not None
-
-    return publisher_notifier
-
-
-def get_hardware_publisher_notifier(
-    app_state: AppState = Depends(get_app_state),
-) -> PublisherNotifier:
-    """Intended for use by various publishers only. Intended for hardware."""
-    publisher_notifier = _hardware_publisher_notifier_accessor.get_from(app_state)
-    assert publisher_notifier is not None
-
-    return publisher_notifier
-
-
 def get_pe_notify_publishers(
     app_state: AppState = Depends(get_app_state),
 ) -> Callable[[], None]:
@@ -91,6 +74,26 @@ def get_hardware_notify_publishers(
     assert isinstance(publisher_notifier, PublisherNotifier)
 
     return publisher_notifier._notify_publishers
+
+
+def get_pe_publisher_notifier(
+    app_state: AppState = Depends(get_app_state),
+) -> PublisherNotifier:
+    """Intended for use by various publishers only. Intended for protocol engine."""
+    publisher_notifier = _pe_publisher_notifier_accessor.get_from(app_state)
+    assert publisher_notifier is not None
+
+    return publisher_notifier
+
+
+def get_hardware_publisher_notifier(
+    app_state: AppState = Depends(get_app_state),
+) -> PublisherNotifier:
+    """Intended for use by various publishers only. Intended for hardware."""
+    publisher_notifier = _hardware_publisher_notifier_accessor.get_from(app_state)
+    assert publisher_notifier is not None
+
+    return publisher_notifier
 
 
 async def initialize_pe_publisher_notifier(app_state: AppState) -> None:

@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 import logging
 import re
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, Optional, Callable
 
 from opentrons.drivers.serial_communication import get_ports_by_name
 from opentrons.hardware_control import (
@@ -100,7 +100,9 @@ def should_use_ot3() -> bool:
     return False
 
 
-async def _create_thread_manager() -> ThreadManagedHardware:
+async def _create_thread_manager(
+    notify_publishers: Optional[Callable[[], None]]
+) -> ThreadManagedHardware:
     """Build the hardware controller wrapped in a ThreadManager.
 
     .. deprecated:: 4.6
@@ -120,6 +122,7 @@ async def _create_thread_manager() -> ThreadManagedHardware:
             threadmanager_nonblocking=True,
             status_bar_enabled=ff.status_bar_enabled(),
             feature_flags=hw_types.HardwareFeatureFlags.build_from_ff(),
+            notify_publishers=notify_publishers,
         )
     else:
         thread_manager = ThreadManager(
@@ -128,6 +131,7 @@ async def _create_thread_manager() -> ThreadManagedHardware:
             port=_get_motor_control_serial_port(),
             firmware=_find_smoothie_file(),
             feature_flags=hw_types.HardwareFeatureFlags.build_from_ff(),
+            notify_publishers=notify_publishers,
         )
 
     try:
@@ -139,7 +143,9 @@ async def _create_thread_manager() -> ThreadManagedHardware:
     return thread_manager
 
 
-async def initialize() -> ThreadManagedHardware:
+async def initialize(
+    notify_publishers: Optional[Callable[[], None]]
+) -> ThreadManagedHardware:
     """
     Initialize the Opentrons hardware returning a hardware instance.
     """
@@ -149,4 +155,4 @@ async def initialize() -> ThreadManagedHardware:
     log.info(f"API server version: {version}")
     log.info(f"Robot Name: {name()}")
 
-    return await _create_thread_manager()
+    return await _create_thread_manager(notify_publishers=notify_publishers)

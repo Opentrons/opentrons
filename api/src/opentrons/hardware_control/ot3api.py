@@ -366,6 +366,7 @@ class OT3API(
         update_firmware: bool = True,
         status_bar_enabled: bool = True,
         feature_flags: Optional[HardwareFeatureFlags] = None,
+        notify_publishers: Optional[Callable[[], None]] = None,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
