@@ -7280,31 +7280,6 @@
       "notes": [],
       "params": {},
       "status": "failed"
-    },
-    {
-      "commandType": "heaterShaker/deactivateHeater",
-      "params": {},
-      "status": "failed"
-    },
-    {
-      "commandType": "heaterShaker/deactivateShaker",
-      "params": {},
-      "status": "failed"
-    },
-    {
-      "commandType": "thermocycler/openLid",
-      "params": {},
-      "status": "failed"
-    },
-    {
-      "commandType": "thermocycler/deactivateBlock",
-      "params": {},
-      "status": "failed"
-    },
-    {
-      "commandType": "thermocycler/deactivateLid",
-      "params": {},
-      "status": "failed"
     }
   ],
   "config": {
