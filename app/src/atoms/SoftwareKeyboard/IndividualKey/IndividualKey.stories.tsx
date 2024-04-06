@@ -9,15 +9,19 @@ import {
 import { InputField } from '../../InputField'
 import { IndividualKey } from '.'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof IndividualKey> = {
   title: 'ODD/Atoms/SoftwareKeyboard/IndividualKey',
   component: IndividualKey,
   parameters: VIEWPORT.touchScreenViewport,
-} as Meta
+}
 
-const Template: Story<React.ComponentProps<typeof IndividualKey>> = args => {
+export default meta
+
+type Story = StoryObj<typeof IndividualKey>
+
+const Keyboard = ({ ...args }): JSX.Element => {
   const [showKeyboard, setShowKeyboard] = React.useState(false)
   const [value, setValue] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
@@ -47,7 +51,9 @@ const Template: Story<React.ComponentProps<typeof IndividualKey>> = args => {
   )
 }
 
-export const Keyboard = Template.bind({})
-Keyboard.args = {
-  keyText: 'hello!',
+export const IndividualKeySoftwareKeyboard: Story = args => (
+  <Keyboard {...args} />
+)
+IndividualKeySoftwareKeyboard.args = {
+  keyText: 'hello',
 }

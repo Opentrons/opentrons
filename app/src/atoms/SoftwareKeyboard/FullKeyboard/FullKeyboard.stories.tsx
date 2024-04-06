@@ -31,12 +31,14 @@ const Keyboard = (): JSX.Element => {
           value={value}
           type="text"
           placeholder="When focusing, the keyboard shows up"
+          // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
           onFocus={() => setShowKeyboard(true)}
         />
       </form>
       <Flex position={POSITION_ABSOLUTE} top="20%" left="0" width="64rem">
         {showKeyboard && (
           <FullKeyboard
+            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
             onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
           />
