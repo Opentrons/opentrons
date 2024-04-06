@@ -9,15 +9,18 @@ import {
 import { InputField } from '../../InputField'
 import { FullKeyboard } from '.'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof FullKeyboard> = {
   title: 'ODD/Atoms/SoftwareKeyboard/FullKeyboard',
   component: FullKeyboard,
   parameters: VIEWPORT.touchScreenViewport,
-} as Meta
+}
+export default meta
 
-const Template: Story<React.ComponentProps<typeof FullKeyboard>> = args => {
+type Story = StoryObj<typeof FullKeyboard>
+
+const Keyboard = (): JSX.Element => {
   const [showKeyboard, setShowKeyboard] = React.useState(false)
   const [value, setValue] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
@@ -43,4 +46,6 @@ const Template: Story<React.ComponentProps<typeof FullKeyboard>> = args => {
   )
 }
 
-export const FullSoftwareKeyboard = Template.bind({})
+export const FullSoftwareKeyboard: Story = {
+  render: () => <Keyboard />,
+}
