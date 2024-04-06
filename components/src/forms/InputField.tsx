@@ -75,7 +75,7 @@ export function InputField(props: InputFieldProps): JSX.Element {
   return (
     <label className={labelClass}>
       <div className={cx(props.labelTextClassName, styles.label_text)}>
-        {props.label && error && (
+        {error && (
           <div className={styles.error_icon}>
             <Icon name="alert" />
           </div>
