@@ -100,25 +100,23 @@ class uv_Driver:
             except Exception as e:
                 print(f"发生错误: {e}")
                 
-            # 将十六进制字符串转换为字节数组
-            modbus_data_bytes = bytes.fromhex(modbus_data_hex)
-
             # 解析 Modbus 数据
-            device_address = modbus_data_bytes[0]
-            function_code = modbus_data_bytes[1]
-            byte_count = modbus_data_bytes[2]
+            device_address = modbus_data_hex[0:2]
+            function_code = modbus_data_hex[2:4]
+            byte_count = modbus_data_hex[4:6]
             
-            uvdatahex = modbus_data_bytes[3:7]  # 去除设备地址、功能码、字节计数和 CRC 校验
-            Tempvalhex = modbus_data_bytes[7:-2]
-
-            uvdata = int.from_bytes(uvdatahex, byteorder='big', signed=False)  # 将数据转换为十进制
-            Tempval = int.from_bytes(Tempvalhex, byteorder='big', signed=False)  # 将数据转换为十进制
+            uvdatahex = modbus_data_hex[6:10]  # 去除设备地址、功能码、字节计数和 CRC 校验
+            Tempvalhex = modbus_data_hex[14:18]
+            uvdata = int(uvdatahex, 16)
+            Tempval = int(Tempvalhex, 16)
+            
             if uvdata != 0:
-                uvdata = round(int(str(uvdata)[:-4]) / 100,1)
+                uvdata = round(int(str(uvdata)) / 10,1)
             if Tempval != 0:
-                Tempval = round(int(str(Tempval)[:-4]) / 100,1)
-
-            crc = int.from_bytes(modbus_data_bytes[-2:], byteorder='big')  # 获取 CRC 校验值
+                Tempval = round(int(str(Tempval)) / 10,1)
+            # print("UVdata:", uvdata)
+            # print("Tempval:", Tempval)
+            # #crc = int.from_bytes(modbus_data_bytes[-2:], byteorder='big')  # 获取 CRC 校验值
             datalist.append(uvdata)
             # return {
             #     "Device Address": hex(device_address),
