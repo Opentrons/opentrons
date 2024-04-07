@@ -41,6 +41,8 @@ class AnalysisResult(str, Enum):
 
 
 class AnalysisRequest(BaseModel):
+    """Model for analysis request body."""
+
     runTimeParameterValues: RunTimeParamValuesType = Field(
         default={},
         description="Key-value pairs of run-time parameters defined in a protocol.",

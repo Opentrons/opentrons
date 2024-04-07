@@ -7,6 +7,7 @@ from decoy import Decoy, matchers
 from fastapi import UploadFile
 from pathlib import Path
 
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.protocol_reader import (
@@ -1405,7 +1406,7 @@ async def test_create_protocol_analyses_with_same_rtp_values(
     task_runner: TaskRunner,
 ) -> None:
     """It should not start a new analysis for the new rtp values."""
-    rtp_values = {"vol": 123, "dry_run": True, "mount": "left"}
+    rtp_values: RunTimeParamValuesType = {"vol": 123, "dry_run": True, "mount": "left"}
     analysis_summaries = [
         AnalysisSummary(
             id="analysis-id",
@@ -1445,7 +1446,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
     task_runner: TaskRunner,
 ) -> None:
     """It should start a new analysis for the new rtp values."""
-    rtp_values = {"vol": 123, "dry_run": True, "mount": "left"}
+    rtp_values: RunTimeParamValuesType = {"vol": 123, "dry_run": True, "mount": "left"}
     analysis_summaries = [
         AnalysisSummary(
             id="analysis-id",

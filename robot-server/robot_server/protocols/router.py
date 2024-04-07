@@ -164,7 +164,7 @@ protocols_router = APIRouter()
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
 )
-async def create_protocol(  # noqa: C901
+async def create_protocol(
     files: List[UploadFile] = File(...),
     # use Form because request is multipart/form-data
     # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
