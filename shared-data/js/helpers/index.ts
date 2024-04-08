@@ -30,6 +30,7 @@ export * from './getAddressableAreasInProtocol'
 export * from './getSimplestFlexDeckConfig'
 export * from './formatRunTimeParameterDefaultValue'
 export * from './formatRunTimeParameterValue'
+export * from './formatRunTimeParameterMinMax'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
