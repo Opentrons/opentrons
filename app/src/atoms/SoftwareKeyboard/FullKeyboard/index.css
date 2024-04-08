@@ -24,10 +24,6 @@
   grid-gap: 3px;
 }
 
-.simple-keyboard.simple-keyboard.oddTheme1 .hg-button {
-  height: 44.75px;
-}
-
 .simple-keyboard.simple-keyboard.oddTheme1 .hg-button:not(:last-child) {
   margin-bottom: 3px;
 }
@@ -42,7 +38,6 @@
 .hg-layout-symbols .hg-row .hg-button,
 .hg-layout-numbers .hg-row .hg-button {
   color: #16212d;
-  height: 44.75px;
   font-size: 20px;
   font-style: normal;
   font-weight: 600;
