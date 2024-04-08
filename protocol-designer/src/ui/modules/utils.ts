@@ -33,7 +33,12 @@ export function getLabwareOnModule(
   moduleId: string
 ): LabwareOnDeck | null | undefined {
   return values(initialDeckSetup.labware).find(
-    (lab: LabwareOnDeck) => lab.slot === moduleId
+    (labware: LabwareOnDeck) =>
+      labware.slot === moduleId ||
+      //  acccount for adapter!
+      values(initialDeckSetup.labware).find(
+        adapter => adapter.id === labware.slot && adapter.slot === moduleId
+      )
   )
 }
 export function getModuleUnderLabware(

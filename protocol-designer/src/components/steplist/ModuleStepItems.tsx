@@ -9,8 +9,9 @@ import {
 } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
+import type { ModuleType } from '@opentrons/shared-data'
+
 import styles from './StepItem.module.css'
-import { ModuleType } from '@opentrons/shared-data'
 
 export interface ModuleStepItemRowProps {
   label?: string | null
@@ -34,41 +35,61 @@ export const ModuleStepItemRow = (
 interface ModuleStepItemsProps {
   moduleType: ModuleType
   actionText: string
-  labwareNickname?: string | null
-  message?: string | null
+  moduleSlot?: string
+  action?: string
   children?: React.ReactNode
   hideHeader?: boolean
-  action?: string
+  labwareNickname?: string | null
+  message?: string | null
 }
 
 export const ModuleStepItems = (props: ModuleStepItemsProps): JSX.Element => {
-  const { t } = useTranslation('modules')
+  const {
+    moduleType,
+    actionText,
+    moduleSlot,
+    action,
+    hideHeader,
+    labwareNickname,
+    children,
+    message,
+  } = props
+  const { t } = useTranslation(['modules', 'application'])
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'bottom-start',
     strategy: TOOLTIP_FIXED,
   })
+  const moduleLongName = t(`module_long_names.${moduleType}`)
+
   return (
     <>
-      {!props.hideHeader && (
+      {!hideHeader && (
         <li className={styles.substep_header}>
-          <span>{t(`module_long_names.${props.moduleType}`)}</span>
-          <span>{props.action}</span>
+          <span>
+            {moduleSlot != null
+              ? t('application:module_and_slot', {
+                  moduleLongName,
+                  slotName: moduleSlot,
+                })
+              : moduleLongName}
+          </span>
+          <span>{action}</span>
         </li>
       )}
       <Tooltip {...tooltipProps}>
-        <LabwareTooltipContents labwareNickname={props.labwareNickname} />
+        <LabwareTooltipContents labwareNickname={labwareNickname} />
       </Tooltip>
       <ModuleStepItemRow
-        label={props.labwareNickname}
+        label={labwareNickname}
         targetProps={targetProps}
-        value={props.actionText}
+        value={actionText}
       />
-      {props.children}
-      {props.message && (
+      {children}
+      {message != null ? (
         <PDListItem className={cx(styles.substep_content, 'step-item-message')}>
-          &quot;{props.message}&quot;
+          &quot;{message}&quot;
         </PDListItem>
-      )}
+      ) : null}
     </>
   )
 }
