@@ -317,14 +317,6 @@ export function FileSidebar(): JSX.Element {
     'pipette',
     robotType
   )
-  console.log(
-    'pipettesWithoutStep ',
-    pipettesOnDeck,
-    savedStepForms,
-    'pipette',
-    robotType,
-    pipettesWithoutStep
-  )
   const modulesWithoutStep = getUnusedEntities(
     modulesOnDeck,
     savedStepForms,
