@@ -15,7 +15,7 @@ interface AlphanumericKeyboardProps {
 export function AlphanumericKeyboard({
   onChange,
   keyboardRef,
-  debug = false,
+  debug = false, // If true, <ENTER> will input a \n
 }: AlphanumericKeyboardProps): JSX.Element {
   const [layoutName, setLayoutName] = React.useState<string>('default')
   const onKeyPress = (button: string): void => {
