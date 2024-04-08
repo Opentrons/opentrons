@@ -18,7 +18,10 @@ class FunctionTime:
     end_time: datetime
 
 
-class FunctionTimer(AbstractContextManager, AbstractAsyncContextManager):
+class FunctionTimer(
+    AbstractContextManager["FunctionTimer"],
+    AbstractAsyncContextManager["FunctionTimer"],
+):
     """A context manager that tracks the start and end time of a function.
 
     Handles both synchronous and asynchronous functions.

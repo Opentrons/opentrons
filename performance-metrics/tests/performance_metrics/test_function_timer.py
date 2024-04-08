@@ -104,6 +104,7 @@ async def test_synchronous_and_asynchronous_function_with_exception() -> None:
         time = tracker.get_time()
         assert time.start_time < time.end_time
 
+
 async def test_nested_synchronous_functions() -> None:
     """Tests that the FunctionTimer correctly times nested synchronous functions."""
     with FunctionTimer() as outer_tracker:
@@ -118,6 +119,7 @@ async def test_nested_synchronous_functions() -> None:
     assert inner_time.start_time < inner_time.end_time
     assert outer_time.start_time < inner_time.start_time
     assert outer_time.end_time >= inner_time.end_time
+
 
 async def test_timing_sychronous_function_nested_inside_async_function() -> None:
     """Tests that the FunctionTimer correctly times a synchronous function inside an asynchronous context manager."""
@@ -206,17 +208,30 @@ async def test_function_timer_with_async_contexts() -> None:
     assert f1_time.start_time < f2_time.start_time
     assert f1_time.end_time >= f2_time.end_time
 
-def test_direct_use_without_context_manager():
+
+def test_direct_use_without_context_manager() -> None:
+    """Tests the behavior of FunctionTimer when used directly without a context manager block.
+
+    Verifies that the start and end times are not set and that an appropriate assertion is raised when attempting to access them.
+    """
     timer = FunctionTimer()
-    assert timer._start_time is None
-    assert timer._end_time is None
-    
+    assert (
+        timer._start_time is None
+    ), "Start time should be None when not used within a context manager"
+    assert (
+        timer._end_time is None
+    ), "End time should be None when not used within a context manager"
+
     with pytest.raises(AssertionError):
         timer.get_time()
 
-def test_calling_get_time_before_context_manager_finishes():
+
+def test_calling_get_time_before_context_manager_finishes() -> None:
+    """Tests that attempting to call get_time before the context manager has properly finished (exited) results in an assertion error.
+
+    This simulates the scenario where get_time is called prematurely, ensuring the timer enforces correct usage patterns.
+    """
     with pytest.raises(AssertionError):
         with FunctionTimer() as timer:
             synchronous_function()
             timer.get_time()
-
