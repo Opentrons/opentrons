@@ -106,6 +106,7 @@ export interface TemperatureSubstepItem {
   substepType: 'temperature'
   temperature: number | null
   labwareNickname: string | null | undefined
+  moduleId: string | null
   message?: string
 }
 export interface PauseSubstepItem {

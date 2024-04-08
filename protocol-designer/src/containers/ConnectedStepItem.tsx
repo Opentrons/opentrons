@@ -42,7 +42,12 @@ import {
 import { SubstepIdentifier } from '../steplist/types'
 import { StepIdType } from '../form-types'
 import { BaseState, ThunkAction } from '../types'
-import { getAdditionalEquipmentEntities } from '../step-forms/selectors'
+import {
+  getAdditionalEquipmentEntities,
+  getInitialDeckSetup,
+  getLabwareEntities,
+  getModuleEntities,
+} from '../step-forms/selectors'
 import { ThunkDispatch } from 'redux-thunk'
 
 export interface ConnectedStepItemProps {
@@ -86,7 +91,7 @@ export const ConnectedStepItem = (
 
   const hasWarnings =
     hasTimelineWarningsPerStep[stepId] || hasFormLevelWarningsPerStep[stepId]
-
+  const initialDeckSetup = useSelector(getInitialDeckSetup)
   const collapsed = useSelector(getCollapsedSteps)[stepId]
   const hoveredSubstep = useSelector(getHoveredSubstep)
   const hoveredStep = useSelector(getHoveredStepId)
@@ -217,6 +222,7 @@ export const ConnectedStepItem = (
   }
 
   const stepItemContentsProps: StepItemContentsProps = {
+    modules: initialDeckSetup.modules,
     rawForm: step,
     stepType: step.stepType,
     substeps,
