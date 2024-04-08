@@ -292,15 +292,9 @@ class StateStore(StateView, ActionHandler):
     ) -> _ReturnT:
         current_value = condition()
 
-        if truthiness_to_wait_for:
-            while not current_value:
-                await self._change_notifier.wait()
-                current_value = condition()
-
-        else:
-            while current_value:
-                await self._change_notifier.wait()
-                current_value = condition()
+        while bool(current_value) != truthiness_to_wait_for:
+            await self._change_notifier.wait()
+            current_value = condition()
 
         return current_value
 
