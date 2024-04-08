@@ -14,6 +14,17 @@ from ..state import StateView
 from ..commands import Command, CommandCreate, CommandResult, CommandStatus
 
 
+class RunStoppedBeforeCommandError(RuntimeError):
+    """Raised if the ProtocolEngine was stopped before a command could start."""
+
+    def __init__(self, command: Command) -> None:
+        self._command = command
+        super().__init__(
+            f"The run was stopped"
+            f" before {command.commandType} command {command.id} could execute."
+        )
+
+
 class ChildThreadTransport:
     """A helper for controlling a `ProtocolEngine` without async/await.
 
@@ -83,9 +94,7 @@ class ChildThreadTransport:
             #    which remains `queued` because of the pause.
             # 3. The engine is stopped. The returned command will be `queued`
             #    and won't have a result.
-            raise ProtocolCommandFailedError(
-                message=f"The run was stopped before command {command.id} could execute."
-            )
+            raise RunStoppedBeforeCommandError(command)
 
         return command.result
 
@@ -136,9 +145,7 @@ class ChildThreadTransport:
                 #    which remains `queued` because of the pause.
                 # 3. The engine is stopped. The returned command will be `queued`,
                 #    and won't have a result.
-                raise ProtocolCommandFailedError(
-                    message=f"The run was stopped before command {command.id} could execute."
-                )
+                raise RunStoppedBeforeCommandError(command)
 
             return command
 
