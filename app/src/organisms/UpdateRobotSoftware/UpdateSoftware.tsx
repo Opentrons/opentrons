@@ -8,21 +8,18 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   JUSTIFY_CENTER,
   SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ProgressBar } from '../../atoms/ProgressBar'
-
 interface UpdateSoftwareProps {
   updateType: 'downloading' | 'validating' | 'sendingFile' | 'installing' | null
-  processProgress: number
 }
 export function UpdateSoftware({
   updateType,
-  processProgress,
 }: UpdateSoftwareProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const renderText = (): string | null => {
@@ -69,7 +66,13 @@ export function UpdateSoftware({
         </StyledText>
       </Flex>
       <Box width="47.5rem">
-        <ProgressBar percentComplete={processProgress} />
+        <Icon
+          name="ot-spinner"
+          aria-label="spinner"
+          size={'6.25rem'}
+          color={`${COLORS.black90}${COLORS.opacity60HexCode}`}
+          spin={true}
+        />
       </Box>
     </Flex>
   )
