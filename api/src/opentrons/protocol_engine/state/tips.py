@@ -149,13 +149,8 @@ class TipStore(HasState[TipState], HandlesActions):
                 labware_id=action.running_command.params.labwareId,
                 well_name=action.running_command.params.wellName,
             )
-            # TODO(mm, 2024-04-01): We're logically removing the tip from the tip rack,
-            # but we're not logically updating the pipette to have that tip on it,
-            # which is inconsistent and confusing.
-            #
-            # To fix that, we need the tip length. But that traditionally comes to us
-            # through the command result, which we don't have if the command failed. We
-            # may need to expand failed commands to have a private result.
+            # Note: We're logically removing the tip from the tip rack,
+            # but we're not logically updating the pipette to have that tip on it.
 
     def _set_used_tips(  # noqa: C901
         self, pipette_id: str, well_name: str, labware_id: str
