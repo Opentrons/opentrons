@@ -58,6 +58,16 @@ from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleId,
     ModuleSubStateType,
 )
+from opentrons_shared_data.deck import load as load_deck
+from opentrons.protocols.api_support.deck_type import (
+    STANDARD_OT3_DECK,
+)
+
+
+@pytest.fixture(scope="session")
+def ot3_standard_deck_def() -> DeckDefinitionV5:
+    """Get the OT-2 standard deck definition."""
+    return load_deck(STANDARD_OT3_DECK, 5)
 
 
 def get_addressable_area_view(
@@ -384,37 +394,43 @@ def test_get_module_offset_for_ot2_standard(
 
 
 @pytest.mark.parametrize(
-    argnames=["module_def", "slot", "expected_offset"],
+    argnames=["module_def", "slot", "expected_offset", "deck_definition"],
     argvalues=[
         (
             lazy_fixture("tempdeck_v2_def"),
             DeckSlotName.SLOT_1.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=9),
+            lazy_fixture("ot3_standard_deck_def"),
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
             DeckSlotName.SLOT_3.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=9),
+            lazy_fixture("ot3_standard_deck_def"),
         ),
         (
             lazy_fixture("thermocycler_v2_def"),
             DeckSlotName.SLOT_7.to_ot3_equivalent(),
             LabwareOffsetVector(x=-20.005, y=67.96, z=10.96),
+            lazy_fixture("ot3_standard_deck_def"),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_1.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=18.95),
+            lazy_fixture("ot3_standard_deck_def"),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
             DeckSlotName.SLOT_3.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=18.95),
+            lazy_fixture("ot3_standard_deck_def"),
         ),
         (
             lazy_fixture("mag_block_v1_def"),
-            DeckSlotName.SLOT_2,
+            DeckSlotName.SLOT_2.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=38.0),
+            lazy_fixture("ot3_standard_deck_def"),
         ),
     ],
 )
@@ -422,6 +438,7 @@ def test_get_module_offset_for_ot3_standard(
     module_def: ModuleDefinition,
     slot: DeckSlotName,
     expected_offset: LabwareOffsetVector,
+    deck_definition: DeckDefinitionV5,
 ) -> None:
     """It should return the correct labware offset for module in specified slot."""
     subject = make_module_view(
@@ -436,8 +453,14 @@ def test_get_module_offset_for_ot3_standard(
     )
 
     result_offset = subject.get_nominal_module_offset(
-        "module-id", get_addressable_area_view()
+        "module-id",
+        get_addressable_area_view(
+            deck_configuration=None,
+            deck_definition=deck_definition,
+            use_simulated_deck_config=True,
+        ),
     )
+
     assert (result_offset.x, result_offset.y, result_offset.z) == pytest.approx(
         (expected_offset.x, expected_offset.y, expected_offset.z)
     )
@@ -1818,10 +1841,20 @@ def test_get_default_gripper_offsets(
 
 
 @pytest.mark.parametrize(
-    argnames=["deck_type", "slot_name", "expected_highest_z"],
+    argnames=["deck_type", "slot_name", "expected_highest_z", "deck_definition"],
     argvalues=[
-        (DeckType.OT2_STANDARD, DeckSlotName.SLOT_1, 84),
-        (DeckType.OT3_STANDARD, DeckSlotName.SLOT_D1, 12.91),
+        (
+            DeckType.OT2_STANDARD,
+            DeckSlotName.SLOT_1,
+            84,
+            lazy_fixture("ot3_standard_deck_def"),
+        ),
+        (
+            DeckType.OT3_STANDARD,
+            DeckSlotName.SLOT_D1,
+            12.91,
+            lazy_fixture("ot3_standard_deck_def"),
+        ),
     ],
 )
 def test_get_module_highest_z(
@@ -1829,6 +1862,7 @@ def test_get_module_highest_z(
     deck_type: DeckType,
     slot_name: DeckSlotName,
     expected_highest_z: float,
+    deck_definition: DeckDefinitionV5,
 ) -> None:
     """It should get the highest z point of the module."""
     subject = make_module_view(
@@ -1846,7 +1880,12 @@ def test_get_module_highest_z(
     )
     assert isclose(
         subject.get_module_highest_z(
-            module_id="module-id", addressable_areas=get_addressable_area_view()
+            module_id="module-id",
+            addressable_areas=get_addressable_area_view(
+                deck_configuration=None,
+                deck_definition=deck_definition,
+                use_simulated_deck_config=True,
+            ),
         ),
         expected_highest_z,
     )

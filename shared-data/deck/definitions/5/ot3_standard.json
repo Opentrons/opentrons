@@ -356,7 +356,7 @@
       {
         "id": "thermocyclerModuleV2",
         "areaType": "thermocycler",
-        "offsetFromCutoutFixture": [-20.005, 67.9, 10.959999999999994],
+        "offsetFromCutoutFixture": [-20.005, 67.96, 10.96],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,

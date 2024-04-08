@@ -214,9 +214,11 @@ def test_get_labware_parent_position_on_module(
 
     decoy.when(
         module_view.get_nominal_module_offset(
-            module_id="module-id", addressable_areas=get_addressable_area_view()
+            module_id="module-id",
+            addressable_areas=addressable_area_view,
         )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
+
     decoy.when(module_view.get_connected_model("module-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V2
     )
@@ -278,7 +280,8 @@ def test_get_labware_parent_position_on_labware(
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
         module_view.get_nominal_module_offset(
-            module_id="module-id", addressable_areas=get_addressable_area_view()
+            module_id="module-id",
+            addressable_areas=addressable_area_view,
         )
     ).then_return(LabwareOffsetVector(x=1, y=2, z=3))
 
@@ -460,7 +463,8 @@ def test_get_module_labware_highest_z(
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
         module_view.get_nominal_module_offset(
-            module_id="module-id", addressable_areas=get_addressable_area_view()
+            module_id="module-id",
+            addressable_areas=addressable_area_view,
         )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_height_over_labware("module-id")).then_return(0.5)
@@ -748,7 +752,8 @@ def test_get_highest_z_in_slot_with_single_module(
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
         module_view.get_module_highest_z(
-            module_id="only-module", addressable_areas=get_addressable_area_view()
+            module_id="only-module",
+            addressable_areas=addressable_area_view,
         )
     ).then_return(12345)
 
@@ -925,7 +930,8 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
     )
     decoy.when(
         module_view.get_nominal_module_offset(
-            module_id="module-id", addressable_areas=get_addressable_area_view()
+            module_id="module-id",
+            addressable_areas=addressable_area_view,
         )
     ).then_return(LabwareOffsetVector(x=40, y=50, z=60))
     decoy.when(module_view.get_connected_model("module-id")).then_return(
@@ -1131,7 +1137,8 @@ def test_get_module_labware_well_position(
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
         module_view.get_nominal_module_offset(
-            module_id="module-id", addressable_areas=get_addressable_area_view()
+            module_id="module-id",
+            addressable_areas=addressable_area_view,
         )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
@@ -1672,7 +1679,8 @@ def test_get_labware_grip_point_for_labware_on_module(
     decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
         module_view.get_nominal_module_offset(
-            module_id="module-id", addressable_areas=get_addressable_area_view()
+            module_id="module-id",
+            addressable_areas=addressable_area_view,
         )
     ).then_return(LabwareOffsetVector(x=1, y=2, z=3))
     decoy.when(module_view.get_connected_model("module-id")).then_return(
