@@ -46,7 +46,6 @@ class Protocol(BaseModel):
                 os.getenv("FILES_FOLDER", "files"),
                 "protocols",
                 GENERATED_PROTOCOLS_FOLDER,
-                self.category.folder_path,
                 f"{self.file_stem}.{self.file_extension}",
             )
         return Path(

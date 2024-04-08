@@ -28,7 +28,7 @@
           "errorInfo": {
             "args": "('Only parameters of type float or int can have a minimum and maximum',)",
             "class": "ParameterDefinitionError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_minimum.py\", line 95, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 55, in add_int\n    parameter = parameter_definition.create_int_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 178, in create_int_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 73, in __init__\n    validation.validate_options(default, minimum, maximum, choices, parameter_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 188, in validate_options\n    _validate_min_and_max(minimum, maximum, parameter_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 157, in _validate_min_and_max\n    raise ParameterDefinitionError(\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_minimum.py\", line 95, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 55, in add_int\n    parameter = parameter_definition.create_int_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 178, in create_int_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 73, in __init__\n    validation.validate_options(default, minimum, maximum, choices, parameter_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 228, in validate_options\n    _validate_min_and_max(minimum, maximum, parameter_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 197, in _validate_min_and_max\n    raise ParameterDefinitionError(\n"
           },
           "errorType": "PythonException",
           "wrappedErrors": []
@@ -37,10 +37,6 @@
     }
   ],
   "files": [
-    {
-      "name": "Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_minimum.py",
-      "role": "main"
-    },
     {
       "name": "cpx_4_tuberack_100ul.json",
       "role": "labware"
@@ -60,6 +56,10 @@
     {
       "name": "sample_labware.json",
       "role": "labware"
+    },
+    {
+      "name": "v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_minimum.py",
+      "role": "main"
     }
   ],
   "labware": [],

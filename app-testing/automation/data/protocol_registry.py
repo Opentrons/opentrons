@@ -1,6 +1,8 @@
 import os
 from typing import Optional
 
+from rich.console import Console
+
 from automation.data.protocol import Protocol
 from automation.data.protocol_with_overrides import ProtocolWithOverrides
 from automation.data.protocols import Protocols
@@ -31,3 +33,22 @@ class ProtocolRegistry:
         if protocols_to_test == []:
             return None
         return protocols_to_test
+
+
+def main() -> None:
+    console = Console()
+    protocol_registry = ProtocolRegistry()
+    if protocol_registry.protocols_to_test is None:
+        console.print("No protocols to test")
+        return
+    else:
+        console.print(f"There are {len(protocol_registry.protocols_to_test)} protocols to test")
+        for protocol in protocol_registry.protocols_to_test:
+            if protocol.from_override:
+                console.print(f" Override protocol {protocol.file_stem}")
+            else:
+                console.print(f" Protocol {protocol.file_stem}")
+
+
+if __name__ == "__main__":
+    main()

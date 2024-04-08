@@ -67,10 +67,15 @@ snapshot-test-update:
 	python -m pipenv run pytest -k analyses_snapshot_test --snapshot-update
 
 TARGET ?= edge
+CACHEBUST := $(shell date +%s)
 
 .PHONY: build-opentrons-analysis
 build-opentrons-analysis:
 	@echo "Building docker image for $(TARGET)"
-	@echo "If you want to build a different version, run 'make build-docker TARGET=<version>'"
+	@echo "If you want to build a different version, run 'make build-opentrons-analysis TARGET=<version>'"
 	@echo "Cache is always busted to ensure latest version of the code is used"
-	docker build --build-arg OPENTRONS_VERSION=$(TARGET) --build-arg CACHEBUST=$(date +%s) -t opentrons-analysis:$(TARGET) citools/.
+	docker build --build-arg OPENTRONS_VERSION=$(TARGET) --build-arg CACHEBUST=$(CACHEBUST) -t opentrons-analysis:$(TARGET) citools/.
+
+.PHONY: generate-protocols
+generate-protocols:
+	python -m pipenv run python -m automation.data.protocol_registry

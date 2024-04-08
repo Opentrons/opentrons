@@ -17,7 +17,7 @@
   },
   "errors": [
     {
-      "detail": "TypeError [line 30]: object of type 'int' has no len()",
+      "detail": "TypeError [line 113]: object of type 'int' has no len()",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -28,7 +28,7 @@
           "errorInfo": {
             "args": "(\"object of type 'int' has no len()\",)",
             "class": "TypeError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_display_name.py\", line 30, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 55, in add_int\n    parameter = parameter_definition.create_int_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 178, in create_int_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 56, in __init__\n    self._display_name = validation.ensure_display_name(display_name)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 21, in ensure_display_name\n    if len(display_name) > DISPLAY_NAME_MAX_LEN:\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_unit.py\", line 113, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 55, in add_int\n    parameter = parameter_definition.create_int_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 178, in create_int_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 59, in __init__\n    self._unit = validation.ensure_unit_string_length(unit)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 50, in ensure_unit_string_length\n    if unit is not None and len(unit) > UNIT_MAX_LEN:\n"
           },
           "errorType": "PythonException",
           "wrappedErrors": []
@@ -37,10 +37,6 @@
     }
   ],
   "files": [
-    {
-      "name": "Flex_None_None_2_18_BadTypesInRTP_Override_wrong_type_in_display_name.py",
-      "role": "main"
-    },
     {
       "name": "cpx_4_tuberack_100ul.json",
       "role": "labware"
@@ -60,6 +56,10 @@
     {
       "name": "sample_labware.json",
       "role": "labware"
+    },
+    {
+      "name": "v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_unit.py",
+      "role": "main"
     }
   ],
   "labware": [],
