@@ -454,3 +454,13 @@ def get_calibration_offsets(
     saved_file_path = os.path.join(storage_directory, save_name)
     json.dump(calibration, open(saved_file_path, mode="w"))
     return saved_file_path, calibration
+
+def get_logs(storage_directory: str, ip: str):
+    """Get Robot logs."""
+    log_types = ["api.log", "server.log", "serial.log"]
+    for log_type in log_types:
+        response = requests.get(f"http://{ip}:31950/logs", headers={"log_identifier": log_type},params={"cursor": 0, "pageLength": 0})
+        log_name = ip + "-" + log_type.split(".")[0] + ".json"
+        log_data = response.json()
+        file_name = os.path.join(storage_directory, log_name)
+        json.dump(log_data, open(file_name, mode="w"))

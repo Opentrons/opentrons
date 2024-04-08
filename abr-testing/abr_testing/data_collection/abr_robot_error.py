@@ -145,6 +145,7 @@ if __name__ == "__main__":
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
     )
+    read_robot_logs.get_logs(storage_directory, ip)
     print(f"Making ticket for run: {one_run} on robot {robot}.")
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"

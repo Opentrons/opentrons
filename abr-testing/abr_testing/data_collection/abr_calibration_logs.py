@@ -27,7 +27,7 @@ def check_for_duplicates(
                 print(f"Skipped row for instrument {serial}. Already on Google Sheet.")
                 return None
         read_robot_logs.write_to_sheets(sheet_location, google_sheet, row, headers)
-        print(f"Writing calibration for: {ip}")
+        print(f"Writing calibration for: {serial}")
     return row
 
 
