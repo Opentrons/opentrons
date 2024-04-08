@@ -20,7 +20,7 @@ def add_parameters(parameters):
     match type_to_test:
         case str() if type_to_test == default_greater_than_maximum:
             parameters.add_int(
-                display_name=5,
+                display_name="display name",
                 variable_name="dilutions",
                 default=4,
                 minimum=1,
@@ -29,7 +29,7 @@ def add_parameters(parameters):
             )
         case str() if type_to_test == default_less_than_minimum:
             parameters.add_int(
-                display_name=5,
+                display_name="display name",
                 variable_name="dilutions",
                 default=0,
                 minimum=1,
