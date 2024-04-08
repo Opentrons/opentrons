@@ -1,0 +1,54 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      18
+    ],
+    "protocolType": "python"
+  },
+  "errors": [],
+  "files": [
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    },
+    {
+      "name": "v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP_Override_default_less_than_minimum.py",
+      "role": "main"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "protocolName": "Default not in range"
+  },
+  "modules": [],
+  "pipettes": [],
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
+}

@@ -24,3 +24,18 @@ class ProtocolsWithOverrides:
         ],
         category=ProtocolCategory(robot="Flex", outcome="Error"),
     )
+
+    v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP",
+        file_extension="py",
+        protocol_name="Default not in range",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+        override_variable_name="type_to_test",
+        overrides=[
+            "default_greater_than_maximum",
+            "default_less_than_minimum",
+        ],
+        category=ProtocolCategory(robot="Flex", outcome="Error"),
+    )

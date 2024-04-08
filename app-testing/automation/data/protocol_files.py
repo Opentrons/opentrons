@@ -96,4 +96,7 @@ names = Literal[
     "v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_minimum",
     "v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_maximum",
     "v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_unit",
+    "v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP",
+    "v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP_Override_default_less_than_minimum",
+    "v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP_Override_default_greater_than_maximum",
 ]
