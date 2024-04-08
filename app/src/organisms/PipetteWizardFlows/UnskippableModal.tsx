@@ -32,7 +32,7 @@ export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
           <SmallButton
             marginRight={SPACING.spacing8}
             onClick={proceed}
-            buttonText={t('shared:exit')}
+            buttonText={i18n.format(t('shared:exit', 'capitalize'))}
             buttonType="alert"
             disabled={isRobotMoving}
           />
