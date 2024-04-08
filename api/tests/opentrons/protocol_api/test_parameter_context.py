@@ -77,14 +77,21 @@ def test_add_float(decoy: Decoy, subject: ParameterContext) -> None:
     """It should create and add a float parameter definition."""
     param_def = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
     decoy.when(param_def.variable_name).then_return("my cooler variable")
+    decoy.when(mock_validation.ensure_float_value(12.3)).then_return(3.21)
+    decoy.when(mock_validation.ensure_optional_float_value(4.5)).then_return(5.4)
+    decoy.when(mock_validation.ensure_optional_float_value(67.8)).then_return(87.6)
+    decoy.when(
+        mock_validation.ensure_float_choices([{"display_name": "foo", "value": 4.2}])
+    ).then_return([{"display_name": "bar", "value": 2.4}])
+
     decoy.when(
         mock_parameter_definition.create_float_parameter(
             display_name="abc",
             variable_name="xyz",
-            default=12.3,
-            minimum=4.5,
-            maximum=67.8,
-            choices=[{"display_name": "foo", "value": 4.2}],
+            default=3.21,
+            minimum=5.4,
+            maximum=87.6,
+            choices=[{"display_name": "bar", "value": 2.4}],
             description="blah blah blah",
             unit="lux",
         )

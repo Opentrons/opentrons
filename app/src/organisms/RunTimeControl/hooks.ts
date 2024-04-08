@@ -82,7 +82,7 @@ export function useRunStatus(
       !([
         RUN_STATUS_FAILED,
         RUN_STATUS_SUCCEEDED,
-        RUN_STATUS_STOP_REQUESTED,
+        RUN_STATUS_STOPPED,
       ] as RunStatus[]).includes(lastRunStatus.current),
     onSuccess: data => (lastRunStatus.current = data?.data?.status ?? null),
     ...options,

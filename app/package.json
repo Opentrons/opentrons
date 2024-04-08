@@ -52,7 +52,7 @@
     "react-redux": "8.1.2",
     "react-router-dom": "5.3.4",
     "react-select": "5.4.0",
-    "react-simple-keyboard": "^3.4.187",
+    "react-simple-keyboard": "^3.7.0",
     "react-viewport-list": "6.3.0",
     "redux": "4.0.5",
     "redux-observable": "1.1.0",

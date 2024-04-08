@@ -2133,6 +2133,8 @@ class OT3API(
         def add_tip_to_instr() -> None:
             instrument.add_tip(tip_length=tip_length)
             instrument.set_current_volume(0)
+            if isinstance(self._backend, OT3Simulator):
+                self._backend._update_tip_state(realmount, True)
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
         if (
@@ -2233,6 +2235,9 @@ class OT3API(
             await self._home([Axis.by_mount(mount)])
 
         _remove_tips()
+        # call this in case we're simulating
+        if isinstance(self._backend, OT3Simulator):
+            self._backend._update_tip_state(realmount, False)
 
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""

@@ -61,14 +61,30 @@ describe('TipPositionModal', () => {
     expect(mockUpdateYSpec).toHaveBeenCalled()
     expect(mockUpdateZSpec).toHaveBeenCalled()
   })
+  it('renders the alert if the x/y position values are too close to the max/min for x value', () => {
+    props.specs.x.value = 9.7
+    render(props)
+    screen.getByText('warning')
+    screen.getByText(
+      'The X and/or Y position value is close to edge of the well and might collide with it'
+    )
+  })
+  it('renders the alert if the x/y position values are too close to the max/min for y value', () => {
+    props.specs.y.value = -9.7
+    render(props)
+    screen.getByText('warning')
+    screen.getByText(
+      'The X and/or Y position value is close to edge of the well and might collide with it'
+    )
+  })
   it('renders the custom options, captions, and visual', () => {
     render(props)
     fireEvent.click(screen.getByRole('radio', { name: 'Custom' }))
     expect(screen.getAllByRole('textbox', { name: '' })).toHaveLength(3)
     screen.getByText('X position')
-    screen.getByText('between -5.15 and 5.15')
+    screen.getByText('between -5.1 and 5.2')
     screen.getByText('Y position')
-    screen.getByText('between -5.25 and 5.25')
+    screen.getByText('between -5.2 and 5.3')
     screen.getByText('Z position')
     screen.getByText('between 0 and 100')
     screen.getByText('mock TipPositionViz')
@@ -113,8 +129,8 @@ describe('TipPositionModal', () => {
     fireEvent.click(screen.getByText('done'))
     //  display out of bounds error
     screen.getByText('accepted range is 0 to 100')
-    screen.getByText('accepted range is -5.25 to 5.25')
-    screen.getByText('accepted range is -5.15 to 5.15')
+    screen.getByText('accepted range is -5.2 to 5.3')
+    screen.getByText('accepted range is -5.1 to 5.2')
     const xInputField = screen.getAllByRole('textbox', { name: '' })[0]
     fireEvent.change(xInputField, { target: { value: 3.55555 } })
     fireEvent.click(screen.getByText('done'))

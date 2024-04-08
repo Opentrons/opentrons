@@ -186,7 +186,7 @@ class RunDataManager:
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
         )
-        await self._runs_publisher.begin_polling_engine_store(
+        await self._runs_publisher.initialize(
             get_current_command=self.get_current_command,
             get_state_summary=self._get_good_state_summary,
             run_id=run_id,
@@ -277,7 +277,7 @@ class RunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
-            await self._runs_publisher.stop_polling_engine_store()
+            await self._runs_publisher.clean_up_current_run()
 
         self._run_store.remove(run_id=run_id)
 

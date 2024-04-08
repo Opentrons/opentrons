@@ -32,8 +32,7 @@
   background-color: #dedede; /* grey30 */
 }
 
-.hg-layout-default .hg-row .hg-button,
-.hg-layout-shift .hg-row .hg-button {
+.alphanumericKeyboard .hg-button {
   height: 62.3px;
 }
 
