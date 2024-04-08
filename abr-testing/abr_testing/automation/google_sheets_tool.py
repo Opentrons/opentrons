@@ -2,6 +2,7 @@
 import gspread  # type: ignore[import]
 import socket
 import httplib2
+from datetime import datetime
 from oauth2client.service_account import ServiceAccountCredentials  # type: ignore[import]
 from typing import Dict, List, Any, Set, Tuple
 
@@ -55,8 +56,10 @@ class google_sheet:
 
     def write_to_row(self, data: List) -> None:
         """Write data into a row in a List[] format."""
+        
         try:
             self.row_index += 1
+            data = [item.strftime("%Y/%m/%d %H:%M:%S") if isinstance(item, datetime) else item for item in data]
             self.worksheet.insert_row(data, index=self.row_index)
         except socket.gaierror:
             pass

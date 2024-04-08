@@ -44,7 +44,6 @@ def get_error_info_from_robot(
     # JIRA Ticket Fields
     failure_level = "Level " + str(error_level) + " Failure"
     components = [failure_level, "Flex-RABR"]
-    components = ["Flex-RABR"]
     affects_version = results["API_Version"]
     parent = results.get("robot_name", "")
     print(parent)

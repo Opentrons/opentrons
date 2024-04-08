@@ -30,7 +30,7 @@ def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
 
 
 def create_data_dictionary(
-    runs_to_save: Set[str], storage_directory: str
+    runs_to_save: Set[str], storage_directory: str,
 ) -> Tuple[Dict[Any, Dict[str, Any]], List]:
     """Pull data from run files and format into a dictionary."""
     runs_and_robots = {}
@@ -56,6 +56,7 @@ def create_data_dictionary(
                 error_instrument,
                 error_level,
             ) = read_robot_logs.get_error_info(file_results)
+            
             all_modules = get_modules(file_results)
 
             start_time_str, complete_time_str, start_date, run_time_min = (
@@ -103,7 +104,7 @@ def create_data_dictionary(
                 tc_dict = read_robot_logs.thermocycler_commands(file_results)
                 hs_dict = read_robot_logs.hs_commands(file_results)
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
-                notes = {"Note1": "", "Note2": ""}
+                notes = {"Note1": "", "Jira Link": ""}
                 row_2 = {**row, **all_modules, **notes, **hs_dict, **tm_dict, **tc_dict}
                 headers = list(row_2.keys())
                 runs_and_robots[run_id] = row_2
@@ -168,6 +169,12 @@ if __name__ == "__main__":
     except gspread.exceptions.APIError:
         print("ERROR: Check google sheet name. Check credentials file.")
         sys.exit()
+    try: 
+        google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
+        print("Connected to google sheet ABR-LPC")
+    except gspread.exceptions.APIError:
+        print("ERROR: Check google sheet name. Check credentials file.")
+        sys.exit()
     run_ids_on_gs = google_sheet.get_column(2)
     run_ids_on_gs = set(run_ids_on_gs)
 
@@ -186,3 +193,4 @@ if __name__ == "__main__":
     read_robot_logs.write_to_local_and_google_sheet(
         runs_and_robots, storage_directory, google_sheet_name, google_sheet, headers
     )
+    

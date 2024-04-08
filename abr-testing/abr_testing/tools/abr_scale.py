@@ -73,6 +73,9 @@ if __name__ == "__main__":
         print("No google sheets credentials. Add credentials to storage notebook.")
 
     # Scale Loop
+    grams, is_stable = scale.read_mass()
+    grams, is_stable = scale.read_mass()
+    is_stable = False
     break_all = False
     while is_stable is False:
         grams, is_stable = scale.read_mass()
@@ -90,9 +93,12 @@ if __name__ == "__main__":
             y_or_no = input("Do you want to weigh another sample? (Y/N): ")
             if y_or_no == "Y":
                 # Uses same storage directory and file.
+                grams, is_stable = scale.read_mass()
+                is_stable = False
                 robot = input("Robot: ")
                 labware = input("Labware: ")
                 protocol_step = input("Measurement Step (1,2,3): ")
+                grams, is_stable = scale.read_mass()
             elif y_or_no == "N":
                 break_all = True
         if break_all:

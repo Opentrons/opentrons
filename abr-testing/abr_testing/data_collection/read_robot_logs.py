@@ -13,6 +13,34 @@ import time as t
 import json
 import requests
 
+def lpc_data(file_results: Dict[str, Any], protocol_info: Dict)-> List[Dict[str, Any]]:
+    """Get labware offsets from one run log."""
+    offsets = file_results.get("labwareOffsets", "")
+    all_offsets: List[Dict[str, Any]] = []
+    if len(offsets) > 0:
+        for offset in offsets:
+            labware_type = offset.get("definitionUri", "")
+            slot = offset["location"].get("slotName", "")
+            module_location = offset["location"].get("moduleModel", "")
+            adapter = offset["location"].get("definitionUri", "")
+            x_offset = offset["vector"].get("x", 0.0)
+            y_offset = offset["vector"].get("y", 0.0)
+            z_offset = offset["vector"].get("z", 0.0)
+            created_at = offset.get("createdAt", "")
+            row = {
+                "createdAt": created_at,
+                "Labware Type": labware_type,
+                "Slot": slot, 
+                "Module": module_location, 
+                "Adapter": adapter,
+                "X": x_offset,
+                "Y": y_offset, 
+                "Z": z_offset
+            }
+            row2 = {**protocol_info, **row}
+            all_offsets.append(row2)
+    return all_offsets
+        
 
 def command_time(command: Dict[str, str]) -> Tuple[float, float]:
     """Calculate total create and complete time per command."""
@@ -82,11 +110,11 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
             temp_time = datetime.strptime(
                 command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
             )
-
+    hs_latch_sets = hs_latch_count / 2 # one set of open/close
     hs_total_rotations = sum(hs_rotations.values())
     hs_total_temp_time = sum(hs_temps.values())
     hs_dict = {
-        "Heatershaker # of Latch Engagements": hs_latch_count,
+        "Heatershaker # of Latch Open/Close": hs_latch_sets,
         "Heatershaker # of Homes": hs_home_count,
         "Heatershaker # of Rotations": hs_total_rotations,
         "Heatershaker Temp On Time (sec)": hs_total_temp_time,
@@ -206,9 +234,9 @@ def thermocycler_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
 
     block_total_time = sum(block_temps.values())
     lid_total_time = sum(lid_temps.values())
-
+    lid_sets = lid_engagements / 2
     tc_dict = {
-        "Thermocycler # of Lid Engagements": lid_engagements,
+        "Thermocycler # of Lid Open/Close": lid_sets,
         "Thermocycler Block # of Temp Changes": block_temp_changes,
         "Thermocycler Block Temp On Time (sec)": block_total_time,
         "Thermocycler Lid # of Temp Changes": lid_temp_changes,
@@ -223,7 +251,6 @@ def create_abr_data_sheet(
 ) -> str:
     """Creates csv file to log ABR data."""
     file_name_csv = file_name + ".csv"
-    print(file_name_csv)
     sheet_location = os.path.join(storage_directory, file_name_csv)
     if os.path.exists(sheet_location):
         print(f"File {sheet_location} located. Not overwriting.")
