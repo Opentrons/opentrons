@@ -99,4 +99,8 @@ names = Literal[
     "v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP",
     "v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP_Override_default_less_than_minimum",
     "v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP_Override_default_greater_than_maximum",
+    "v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice",
+    "v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice_Override_str_default_no_matching_choices",
+    "v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice_Override_float_default_no_matching_choices",
+    "v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice_Override_int_default_no_matching_choices",
 ]
