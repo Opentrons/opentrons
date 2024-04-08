@@ -17,6 +17,7 @@ import {
   Tooltip,
   DIRECTION_COLUMN,
   Box,
+  StyledText,
 } from '@opentrons/components'
 import type { StyleProps } from '@opentrons/components'
 import type { RobotType } from '@opentrons/shared-data'
@@ -72,7 +73,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
   const { t } = useTranslation(['tooltip', 'shared'])
   const [equipmentTargetProps, equipmentTooltipProps] = useHoverTooltip()
   const [tempTargetProps, tempTooltipProps] = useHoverTooltip()
-  const [numMultiples, setNum] = React.useState<number>(0)
+  const [numMultiples, setNumMultiples] = React.useState<number>(0)
 
   const EQUIPMENT_OPTION_STYLE = css`
     background-color: ${COLORS.white};
@@ -136,17 +137,17 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     iconInfo = <Flex width="1.5rem" />
   } else if (multiples != null) {
     const { numItems, maxItems, isDisabled } = multiples
-    let upArrowCSS = ARROW_STYLE
+    let upArrowStyle = ARROW_STYLE
     if (isDisabled || numItems === maxItems) {
-      upArrowCSS = ARROW_STYLE_DISABLED
+      upArrowStyle = ARROW_STYLE_DISABLED
     } else if (numItems > 0) {
-      upArrowCSS = ARROW_STYLE_ACTIVE
+      upArrowStyle = ARROW_STYLE_ACTIVE
     }
-    let downArrowCSS = ARROW_STYLE
+    let downArrowStyle = ARROW_STYLE
     if (numItems === 0) {
-      downArrowCSS = ARROW_STYLE_DISABLED
+      downArrowStyle = ARROW_STYLE_DISABLED
     } else if (numItems > 0) {
-      downArrowCSS = ARROW_STYLE_ACTIVE
+      downArrowStyle = ARROW_STYLE_ACTIVE
     }
 
     iconInfo = (
@@ -164,11 +165,11 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
               ? undefined
               : () => {
                   multiples.setValue(numMultiples + 1)
-                  setNum(numMultiples + 1)
+                  setNumMultiples(prevNumMultiples => prevNumMultiples + 1)
                 }
           }
         >
-          <Icon css={upArrowCSS} size={SPACING.spacing12} name="ot-arrow-up" />
+          <Icon css={upArrowStyle} size="0.75rem" name="ot-arrow-up" />
         </Flex>
         <Flex
           data-testid="EquipmentOption_downArrow"
@@ -177,12 +178,12 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
               ? undefined
               : () => {
                   multiples.setValue(numMultiples - 1)
-                  setNum(numMultiples - 1)
+                  setNumMultiples(prevNumMultiples => prevNumMultiples - 1)
                 }
           }
         >
           <Icon
-            css={downArrowCSS}
+            css={downArrowStyle}
             size={SPACING.spacing12}
             name="ot-arrow-down"
           />
@@ -228,16 +229,15 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
           {image}
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <Text
+          <StyledText
             css={css`
               user-select: none;
             `}
             as="p"
-            fontSize={TYPOGRAPHY.fontSizeP}
             color={disabled ? COLORS.grey50 : COLORS.black90}
           >
             {text}
-          </Text>
+          </StyledText>
           {multiples != null ? (
             <>
               <Box borderBottom={BORDERS.lineBorder} data-testid="line" />

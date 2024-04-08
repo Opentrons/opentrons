@@ -54,6 +54,8 @@ import { HandleEnter } from './HandleEnter'
 
 import type { AdditionalEquipment, WizardTileProps } from './types'
 
+const MAX_TEMPERATURE_MODULES = 7
+
 export const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
   [THERMOCYCLER_MODULE_V2]: 'B1',
   [HEATERSHAKER_MODULE_V1]: 'D1',
@@ -307,7 +309,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
             multiples={
               moduleType === TEMPERATURE_MODULE_TYPE && enableMoamFf
                 ? {
-                    maxItems: 7,
+                    maxItems: MAX_TEMPERATURE_MODULES,
                     setValue: handleMultiplesClick,
                     numItems:
                       modules != null

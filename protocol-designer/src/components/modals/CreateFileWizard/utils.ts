@@ -139,7 +139,9 @@ export const getNextAvailableModuleSlot = (
   const hasWasteChute = additionalEquipment.find(equipment =>
     equipment.includes('wasteChute')
   )
-  const wasteChuteSlot = hasWasteChute ? [WASTE_CHUTE_CUTOUT as string] : []
+  const wasteChuteSlot = Boolean(hasWasteChute)
+    ? [WASTE_CHUTE_CUTOUT as string]
+    : []
   const trashBin = additionalEquipment.find(equipment =>
     equipment.includes('trashBin')
   )
@@ -235,7 +237,9 @@ export const getTrashSlot = (values: FormState): string => {
   const hasWasteChute = additionalEquipment.find(equipment =>
     equipment.includes('wasteChute')
   )
-  const wasteChuteSlot = hasWasteChute ? [WASTE_CHUTE_CUTOUT as string] : []
+  const wasteChuteSlot = Boolean(hasWasteChute)
+    ? [WASTE_CHUTE_CUTOUT as string]
+    : []
 
   if (
     !cutouts.includes(FLEX_TRASH_DEFAULT_SLOT) &&
