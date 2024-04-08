@@ -1,71 +1,78 @@
-"""A module that contains a context manager to track the start and end time of a function."""
+"""This module offers a mechanism for measuring and storing the execution durations of both synchronous and asynchronous functions.
 
-from contextlib import AbstractContextManager, AbstractAsyncContextManager
-from datetime import datetime, timezone
-from dataclasses import dataclass
-from typing import Type
-from types import TracebackType
+The FunctionTimer class is intended to be used as a decorator to wrap functions and measure their execution times.
+"""
 
+from time import perf_counter_ns
+from typing import Protocol, Callable, TypeVar
+from typing_extensions import ParamSpec
+import inspect
 
-@dataclass
-class FunctionTime:
-    """A dataclass to store the start and end time of a function.
-
-    The dates are in UTC timezone.
-    """
-
-    start_time: datetime
-    end_time: datetime
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
-class FunctionTimer(
-    AbstractContextManager["FunctionTimer"],
-    AbstractAsyncContextManager["FunctionTimer"],
-):
-    """A context manager that tracks the start and end time of a function.
+class StoreDuration(Protocol):
+    """Protocol for a callback function that stores the duration between two timestamps."""
 
-    Handles both synchronous and asynchronous functions.
-    Handles nested usage of the context manager.
-    """
+    def __call__(self, start_time: int, end_time: int) -> None:
+        """Stores the duration of an operation.
 
-    def __init__(self) -> None:
-        self._start_time: datetime | None = None
-        self._end_time: datetime | None = None
+        Args:
+            start_time (int): The start timestamp in nanoseconds.
+            end_time (int): The end timestamp in nanoseconds.
+        """
+        pass
 
-    def __enter__(self) -> "FunctionTimer":
-        """Set the start time of the function."""
-        self._start_time = self._get_datetime()
-        return self
 
-    def __exit__(
-        self,
-        exc_type: Type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
-    ) -> None:
-        """Set the end time of the function."""
-        self._end_time = self._get_datetime()
+class FunctionTimer:
+    """A class designed to measure and store the execution duration of functions, both synchronous and asynchronous."""
 
-    async def __aenter__(self) -> "FunctionTimer":
-        """Set the start time of the function."""
-        self._start_time = self._get_datetime()
-        return self
+    def __init__(self, store_duration: StoreDuration) -> None:
+        """Initializes the FunctionTimer with a specified storage mechanism for the execution duration.
 
-    async def __aexit__(
-        self,
-        exc_type: Type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: TracebackType | None,
-    ) -> None:
-        """Set the end time of the function."""
-        self._end_time = self._get_datetime()
+        Args:
+            store_duration: A callback function that stores the execution duration.
+        """
+        self._store_duration = store_duration
 
-    def _get_datetime(self) -> datetime:
-        """Get the current datetime in UTC timezone."""
-        return datetime.now(timezone.utc)
+    def measure_duration(self, func: Callable[P, R]) -> Callable[P, R]:
+        """Creates a wrapper around a given function to measure its execution duration.
 
-    def get_time(self) -> FunctionTime:
-        """Return a FunctionTime object with the start and end time of the function."""
-        assert self._start_time is not None, "The start time is not set."
-        assert self._end_time is not None, "The end time is not set."
-        return FunctionTime(start_time=self._start_time, end_time=self._end_time)
+        The wrapper calculates the duration of function execution and stores it using the provided
+        storage mechanism. Supports both synchronous and asynchronous functions.
+
+        Args:
+            func: The function whose execution duration is to be measured.
+
+        Returns:
+            A wrapped version of the input function with duration measurement capability.
+        """
+        if inspect.iscoroutinefunction(func):
+
+            async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+                """An asynchronous wrapper function for measuring execution duration."""
+                start_time = perf_counter_ns()
+                try:
+                    result: R = await func(*args, **kwargs)
+                except Exception as e:
+                    raise e
+                finally:
+                    self._store_duration(start_time, perf_counter_ns())
+                return result
+
+            return async_wrapper  # type: ignore
+        else:
+
+            def sync_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+                """A synchronous wrapper function for measuring execution duration."""
+                start_time = perf_counter_ns()
+                try:
+                    result: R = func(*args, **kwargs)
+                except Exception as e:
+                    raise e
+                finally:
+                    self._store_duration(start_time, perf_counter_ns())
+                return result
+
+            return sync_wrapper
