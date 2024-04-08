@@ -876,3 +876,13 @@ class Protocols:
         app_error=False,
         robot_error=False,
     )
+
+    v2_18_NO_PIPETTES_DescriptionTooLongRTP: Protocol = Protocol(
+        file_stem="v2_18_NO_PIPETTES_DescriptionTooLongRTP",
+        file_extension="py",
+        protocol_name="Description too long",
+        category=ProtocolCategory(robot="Flex", outcome="Error"),
+        robot="Flex",
+        app_error=True,
+        robot_error=True,
+    )

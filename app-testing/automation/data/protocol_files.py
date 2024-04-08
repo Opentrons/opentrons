@@ -86,6 +86,7 @@ names = Literal[
     "v2_16_NO_PIPETTES_verifyDoesNotDeadlock",
     "v4_P300S_None_MM_TM_TM_MOAMTemps",
     "v2_16_P300M_P20S_HS_TC_TM_aspirateDispenseMix0Volume",
+    "v2_18_NO_PIPETTES_DescriptionTooLongRTP",
     "v2_18_NO_PIPETTES_Overrides_BadTypesInRTP",  # The one with overrides, children below
     "v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_display_name",
     "v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_variable_name",
