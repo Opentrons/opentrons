@@ -108,7 +108,6 @@ export function ChooseProtocolSlideoutComponent(
   console.log('runTimeParametersFromAnalysis', runTimeParametersFromAnalysis)
 
   const hasRunTimeParameters = runTimeParametersFromAnalysis.length > 0
-  console.log('hasRunTimeParameters', hasRunTimeParameters)
 
   const analysisStatus = getAnalysisStatus(
     false,
