@@ -54,7 +54,7 @@ def add_parameters(parameters):
                     {"display_name": 6.0, "value": "flex_1channel_50"},
                     {"display_name": "Eight Channel 50µL", "value": "flex_8channel_50"},
                 ],
-                default="flex_1channel_50",
+                default="flex_8channel_50",
                 description="This is a description.",
             )
         case str() if type_to_test == wrong_type_in_choice_value:
@@ -65,7 +65,7 @@ def add_parameters(parameters):
                     {"display_name": "50", "value": 5},
                     {"display_name": "Eight Channel 50µL", "value": "flex_8channel_50"},
                 ],
-                default="flex_1channel_50",
+                default="flex_8channel_50",
                 description="This is a description.",
             )
         case str() if type_to_test == wrong_type_in_default:
@@ -87,7 +87,7 @@ def add_parameters(parameters):
                     {"display_name": "50", "value": "flex_8channel_1000"},
                     {"display_name": "Eight Channel 50µL", "value": "flex_8channel_50"},
                 ],
-                default="flex_8channel_1000",
+                default="flex_8channel_50",
                 description=(),
             )
         case str() if type_to_test == wrong_type_in_minimum:
