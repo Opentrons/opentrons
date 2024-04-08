@@ -12,8 +12,8 @@ requirements = {"robotType": "Flex", "apiLevel": "2.18"}
 # change me to test that a bad type is caught
 # for each field of parameter.
 # protocol.overrides is a list of these strings
-default_greater_than_maximum = "default greater then maximum"
-default_less_than_minimum = "default less than minimum"
+default_greater_than_maximum = "default_greater_than_maximum"
+default_less_than_minimum = "default_less_than_minimum"
 
 
 def add_parameters(parameters):
