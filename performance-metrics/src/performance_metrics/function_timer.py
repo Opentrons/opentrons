@@ -22,6 +22,7 @@ class FunctionTimer(ContextDecorator, AsyncContextDecorator):
     """A context manager that tracks the start and end time of a function.
 
     Handles both synchronous and asynchronous functions.
+    Handles nested usage of the context manager.
     """
 
     def __init__(self) -> None:
@@ -62,6 +63,6 @@ class FunctionTimer(ContextDecorator, AsyncContextDecorator):
 
     def get_time(self) -> FunctionTime:
         """Return a FunctionTime object with the start and end time of the function."""
-        assert self._start_time is not None 
-        assert self._end_time is not None
+        assert self._start_time is not None, "The start time is not set."
+        assert self._end_time is not None, "The end time is not set."
         return FunctionTime(start_time=self._start_time, end_time=self._end_time)
