@@ -58,6 +58,7 @@ def get_command_view(
     run_error: Optional[errors.ErrorOccurrence] = None,
     failed_command: Optional[CommandEntry] = None,
     command_error_recovery_types: Optional[Dict[str, ErrorRecoveryType]] = None,
+    recovery_target_command_id: Optional[str] = None,
     finish_error: Optional[errors.ErrorOccurrence] = None,
     commands: Sequence[cmd.Command] = (),
     latest_command_hash: Optional[str] = None,
@@ -90,6 +91,7 @@ def get_command_view(
         finish_error=finish_error,
         failed_command=failed_command,
         command_error_recovery_types=command_error_recovery_types or {},
+        recovery_target_command_id=recovery_target_command_id,
         run_started_at=run_started_at,
         latest_command_hash=latest_command_hash,
         stopped_by_estop=False,
@@ -263,40 +265,6 @@ def test_get_all_commands_final() -> None:
         commands=[running_command],
     )
     assert subject.get_all_commands_final() is False
-
-
-def test_get_recovery_in_progress_for_command() -> None:
-    """It should return whether error recovery is in progress for the given command."""
-    # command-id is not a failed command:
-    subject = get_command_view()
-    assert not subject.get_recovery_in_progress_for_command("command-id")
-
-    # command-id is a failed command and we ARE recovering from it:
-    subject = get_command_view(
-        failed_command=CommandEntry(
-            create_failed_command(command_id="command-id"), index=0
-        ),
-        queue_status=QueueStatus.AWAITING_RECOVERY,
-    )
-    assert subject.get_recovery_in_progress_for_command("command-id")
-
-    # command-id is a failed command but we're not recovering from any command:
-    subject = get_command_view(
-        failed_command=CommandEntry(
-            create_failed_command(command_id="command-id"), index=0
-        ),
-        queue_status=QueueStatus.PAUSED,
-    )
-    assert not subject.get_recovery_in_progress_for_command("command-id")
-
-    # command-id is a failed command, but we're recovering from a different one:
-    subject = get_command_view(
-        failed_command=CommandEntry(
-            create_failed_command(command_id="different-command-id"), index=0
-        ),
-        queue_status=QueueStatus.AWAITING_RECOVERY,
-    )
-    assert not subject.get_recovery_in_progress_for_command("command-id")
 
 
 def test_raise_fatal_command_error() -> None:

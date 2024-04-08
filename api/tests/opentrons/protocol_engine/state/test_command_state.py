@@ -348,3 +348,89 @@ def test_error_recovery_type_tracking() -> None:
     view = CommandView(subject.state)
     assert view.get_error_recovery_type("c1") == ErrorRecoveryType.WAIT_FOR_RECOVERY
     assert view.get_error_recovery_type("c2") == ErrorRecoveryType.FAIL_RUN
+
+
+def test_get_recovery_in_progress_for_command() -> None:
+    """It should return whether error recovery is in progress for the given command."""
+    subject = CommandStore(config=_make_config(), is_door_open=False)
+    subject_view = CommandView(subject.state)
+
+    queue_1 = actions.QueueCommandAction(
+        "c1",
+        created_at=datetime.now(),
+        request=commands.CommentCreate(params=commands.CommentParams(message="")),
+        request_hash=None,
+    )
+    subject.handle_action(queue_1)
+    run_1 = actions.RunCommandAction(command_id="c1", started_at=datetime.now())
+    subject.handle_action(run_1)
+    fail_1 = actions.FailCommandAction(
+        command_id="c1",
+        error_id="c1-error",
+        failed_at=datetime.now(),
+        error=PythonException(RuntimeError()),
+        notes=[],
+        type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+        running_command=subject_view.get("c1"),
+    )
+    subject.handle_action(fail_1)
+
+    # c1 failed recoverably and we're currently recovering from it.
+    assert subject_view.get_recovery_in_progress_for_command("c1")
+
+    resume_from_1_recovery = actions.ResumeFromRecoveryAction()
+    subject.handle_action(resume_from_1_recovery)
+
+    # c1 failed recoverably, but we've already completed its recovery.
+    assert not subject_view.get_recovery_in_progress_for_command("c1")
+
+    queue_2 = actions.QueueCommandAction(
+        "c2",
+        created_at=datetime.now(),
+        request=commands.CommentCreate(params=commands.CommentParams(message="")),
+        request_hash=None,
+    )
+    subject.handle_action(queue_2)
+    run_2 = actions.RunCommandAction(command_id="c2", started_at=datetime.now())
+    subject.handle_action(run_2)
+    fail_2 = actions.FailCommandAction(
+        command_id="c2",
+        error_id="c2-error",
+        failed_at=datetime.now(),
+        error=PythonException(RuntimeError()),
+        notes=[],
+        type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+        running_command=subject_view.get("c2"),
+    )
+    subject.handle_action(fail_2)
+
+    # c2 failed recoverably and we're currently recovering from it.
+    assert subject_view.get_recovery_in_progress_for_command("c2")
+    # ...and that means we're *not* currently recovering from c1,
+    # even though it failed recoverably before.
+    assert not subject_view.get_recovery_in_progress_for_command("c1")
+
+    resume_from_2_recovery = actions.ResumeFromRecoveryAction()
+    subject.handle_action(resume_from_2_recovery)
+    queue_3 = actions.QueueCommandAction(
+        "c3",
+        created_at=datetime.now(),
+        request=commands.CommentCreate(params=commands.CommentParams(message="")),
+        request_hash=None,
+    )
+    subject.handle_action(queue_3)
+    run_3 = actions.RunCommandAction(command_id="c3", started_at=datetime.now())
+    subject.handle_action(run_3)
+    fail_3 = actions.FailCommandAction(
+        command_id="c3",
+        error_id="c3-error",
+        failed_at=datetime.now(),
+        error=PythonException(RuntimeError()),
+        notes=[],
+        type=ErrorRecoveryType.FAIL_RUN,
+        running_command=subject_view.get("c3"),
+    )
+    subject.handle_action(fail_3)
+
+    # c3 failed, but not recoverably.
+    assert not subject_view.get_recovery_in_progress_for_command("c2")
