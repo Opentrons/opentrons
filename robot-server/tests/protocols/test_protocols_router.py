@@ -7,6 +7,7 @@ from decoy import Decoy, matchers
 from fastapi import UploadFile
 from pathlib import Path
 
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.protocol_reader import (
@@ -23,7 +24,7 @@ from opentrons.protocol_reader import (
 )
 
 from robot_server.errors.error_responses import ApiError
-from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta
+from robot_server.service.json_api import SimpleEmptyBody, MultiBodyMeta, RequestModel
 from robot_server.service.task_runner import TaskRunner
 from robot_server.protocols.analysis_store import (
     AnalysisStore,
@@ -38,6 +39,7 @@ from robot_server.protocols.analysis_models import (
     CompletedAnalysis,
     PendingAnalysis,
     AnalysisResult,
+    AnalysisRequest,
 )
 
 from robot_server.protocols.protocol_models import (
@@ -56,6 +58,7 @@ from robot_server.protocols.protocol_store import (
 from robot_server.protocols.router import (
     ProtocolLinks,
     create_protocol,
+    create_protocol_analysis,
     get_protocols,
     get_protocol_ids,
     get_protocol_by_id,
@@ -1393,3 +1396,130 @@ async def test_get_protocol_analysis_as_document_analysis_not_found(
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "AnalysisNotFound"
+
+
+async def test_create_protocol_analyses_with_same_rtp_values(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+    protocol_analyzer: ProtocolAnalyzer,
+    task_runner: TaskRunner,
+) -> None:
+    """It should not start a new analysis for the new rtp values."""
+    rtp_values: RunTimeParamValuesType = {"vol": 123, "dry_run": True, "mount": "left"}
+    analysis_summaries = [
+        AnalysisSummary(
+            id="analysis-id",
+            status=AnalysisStatus.COMPLETED,
+        ),
+    ]
+    decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)
+    decoy.when(
+        analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
+    ).then_return(analysis_summaries)
+    decoy.when(
+        await analysis_store.matching_rtp_values_in_analysis(
+            analysis_summaries[-1], rtp_values
+        )
+    ).then_return(True)
+
+    result = await create_protocol_analysis(
+        protocolId="protocol-id",
+        request_body=RequestModel(
+            data=AnalysisRequest(runTimeParameterValues=rtp_values)
+        ),
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+        protocol_analyzer=protocol_analyzer,
+        task_runner=task_runner,
+        analysis_id="analysis-id-2",
+    )
+    assert result.content.data == analysis_summaries
+    assert result.status_code == 200
+
+
+async def test_update_protocol_analyses_with_new_rtp_values(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+    protocol_analyzer: ProtocolAnalyzer,
+    task_runner: TaskRunner,
+) -> None:
+    """It should start a new analysis for the new rtp values."""
+    rtp_values: RunTimeParamValuesType = {"vol": 123, "dry_run": True, "mount": "left"}
+    analysis_summaries = [
+        AnalysisSummary(
+            id="analysis-id",
+            status=AnalysisStatus.COMPLETED,
+        ),
+    ]
+    decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)
+    decoy.when(
+        analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
+    ).then_return(analysis_summaries)
+    decoy.when(
+        await analysis_store.matching_rtp_values_in_analysis(
+            analysis_summaries[-1], rtp_values
+        )
+    ).then_return(False)
+    decoy.when(analysis_store.add_pending("protocol-id", "analysis-id-2")).then_return(
+        AnalysisSummary(id="analysis-id-2", status=AnalysisStatus.PENDING)
+    )
+    result = await create_protocol_analysis(
+        protocolId="protocol-id",
+        request_body=RequestModel(
+            data=AnalysisRequest(runTimeParameterValues=rtp_values)
+        ),
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+        protocol_analyzer=protocol_analyzer,
+        task_runner=task_runner,
+        analysis_id="analysis-id-2",
+    )
+    assert result.content.data == [
+        AnalysisSummary(id="analysis-id", status=AnalysisStatus.COMPLETED),
+        AnalysisSummary(id="analysis-id-2", status=AnalysisStatus.PENDING),
+    ]
+    assert result.status_code == 201
+
+
+async def test_update_protocol_analyses_with_forced_reanalysis(
+    decoy: Decoy,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+    protocol_analyzer: ProtocolAnalyzer,
+    task_runner: TaskRunner,
+) -> None:
+    """It should start a new analysis for the protocol, regardless of rtp values."""
+    analysis_summaries = [
+        AnalysisSummary(
+            id="analysis-id",
+            status=AnalysisStatus.COMPLETED,
+        ),
+    ]
+    decoy.when(protocol_store.has(protocol_id="protocol-id")).then_return(True)
+    decoy.when(
+        analysis_store.get_summaries_by_protocol(protocol_id="protocol-id")
+    ).then_return(analysis_summaries)
+    decoy.when(
+        await analysis_store.matching_rtp_values_in_analysis(
+            analysis_summary=analysis_summaries[-1], new_rtp_values={}
+        )
+    ).then_return(True)
+    decoy.when(analysis_store.add_pending("protocol-id", "analysis-id-2")).then_return(
+        AnalysisSummary(id="analysis-id-2", status=AnalysisStatus.PENDING)
+    )
+    result = await create_protocol_analysis(
+        protocolId="protocol-id",
+        request_body=RequestModel(data=AnalysisRequest(forceReAnalyze=True)),
+        protocol_store=protocol_store,
+        analysis_store=analysis_store,
+        protocol_analyzer=protocol_analyzer,
+        task_runner=task_runner,
+        analysis_id="analysis-id-2",
+    )
+    assert result.content.data == [
+        AnalysisSummary(id="analysis-id", status=AnalysisStatus.COMPLETED),
+        AnalysisSummary(id="analysis-id-2", status=AnalysisStatus.PENDING),
+    ]
+    assert result.status_code == 201
