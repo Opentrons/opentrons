@@ -26,9 +26,15 @@
           "detail": "TypeError: ParameterContext.add_str() got an unexpected keyword argument 'unit'",
           "errorCode": "4000",
           "errorInfo": {
+<<<<<<< HEAD:app-testing/tests/__snapshots__/analyses_snapshot_test/test_analysis_snapshot[89a255db0b][OT2_X_v2_18_None_None_StrRTPwith_unit].json
             "args": "(\"ParameterContext.add_str() got an unexpected keyword argument 'unit'\",)",
             "class": "TypeError",
             "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_X_v2_18_None_None_StrRTPwith_unit.py\", line 11, in add_parameters\n"
+=======
+            "args": "('Staging areas not permitted for trash bin.',)",
+            "class": "ValueError",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol4.py\", line 15, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 512, in load_trash_bin\n    raise ValueError(\"Staging areas not permitted for trash bin.\")\n"
+>>>>>>> c3ee8d545c (fix(app-testing): snapshot failure capture (#14813)):app-testing/tests/__snapshots__/analyses_snapshot_test/test_analysis_snapshot[ac35bb394d][Flex_None_None_2_16_AnalysisError_TrashBinInStagingAreaCol4].json
           },
           "errorType": "PythonException",
           "wrappedErrors": []
