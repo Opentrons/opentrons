@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { screen } from '@testing-library/react'
-import { describe, it, beforeEach, expect } from 'vitest'
+import { describe, it, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
