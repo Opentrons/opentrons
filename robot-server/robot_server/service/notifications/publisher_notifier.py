@@ -33,10 +33,6 @@ class PublisherNotifier:
         """Register a list of callbacks."""
         self._event_notifier.subscribe_many(callbacks)
 
-    async def _initialize(self) -> None:
-        """Initializes an instance of PublisherNotifier. This method should only be called once."""
-        self._event_notifier.initialize()
-
     def _notify_publishers(self) -> None:
         """A generic notifier, alerting all `waiters` of a change."""
         self._event_notifier.notify()
@@ -91,7 +87,7 @@ def get_hardware_publisher_notifier(
     return publisher_notifier
 
 
-async def initialize_pe_publisher_notifier(app_state: AppState) -> None:
+def initialize_pe_publisher_notifier(app_state: AppState) -> None:
     """Create a new `NotificationClient` and store it on `app_state` intended for protocol engine.
 
     Intended to be called just once, when the server starts up.
@@ -99,15 +95,11 @@ async def initialize_pe_publisher_notifier(app_state: AppState) -> None:
     publisher_notifier: PublisherNotifier = PublisherNotifier()
     _pe_publisher_notifier_accessor.set_on(app_state, publisher_notifier)
 
-    await publisher_notifier._initialize()
 
-
-async def initialize_hardware_publisher_notifier(app_state: AppState) -> None:
+def initialize_hardware_publisher_notifier(app_state: AppState) -> None:
     """Create a new `NotificationClient` and store it on `app_state` intended for hardware.
 
     Intended to be called just once, when the server starts up.
     """
     publisher_notifier: PublisherNotifier = PublisherNotifier()
     _hardware_publisher_notifier_accessor.set_on(app_state, publisher_notifier)
-
-    await publisher_notifier._initialize()

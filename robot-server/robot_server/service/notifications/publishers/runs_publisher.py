@@ -41,8 +41,6 @@ class RunsPublisher:
         """Returns a configured Runs Publisher."""
         self._client = client
         self._publisher_notifier = publisher_notifier
-        self._run_data_manager_polling = asyncio.Event()
-        self._poller: Optional[asyncio.Task[None]] = None
         #  Variables and callbacks related to PE state changes.
         self._run_hooks: Optional[RunHooks] = None
         self._engine_state_slice: Optional[EngineStateSlice] = None
