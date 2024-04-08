@@ -18,7 +18,7 @@ from opentrons.protocol_engine import (
     Liquid,
     CommandNote,
 )
-from opentrons.protocol_engine.types import RunTimeParamValuesType
+from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
 from opentrons_shared_data.errors import GeneralError
 from robot_server.service.json_api import ResourceModel
 from robot_server.errors.error_responses import ErrorDetails
@@ -121,6 +121,16 @@ class Run(ResourceModel):
         ...,
         description="Labware offsets to apply as labware are loaded.",
     )
+    runTimeParameters: List[RunTimeParameter] = Field(
+        default_factory=list,
+        description=(
+            "Run time parameters used during analysis."
+            " These are the parameters that are defined in the protocol, with values"
+            " specified either in the protocol creation request or reanalysis request"
+            " (whichever started this analysis), or default values from the protocol"
+            " if none are specified in the request."
+        ),
+    )
     protocolId: Optional[str] = Field(
         None,
         description=(
@@ -184,6 +194,16 @@ class BadRun(ResourceModel):
     labwareOffsets: List[LabwareOffset] = Field(
         ...,
         description="Labware offsets to apply as labware are loaded.",
+    )
+    runTimeParameters: List[RunTimeParameter] = Field(
+        default_factory=list,
+        description=(
+            "Run time parameters used during analysis."
+            " These are the parameters that are defined in the protocol, with values"
+            " specified either in the protocol creation request or reanalysis request"
+            " (whichever started this analysis), or default values from the protocol"
+            " if none are specified in the request."
+        ),
     )
     protocolId: Optional[str] = Field(
         None,

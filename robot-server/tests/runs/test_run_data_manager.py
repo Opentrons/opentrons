@@ -1,5 +1,5 @@
 """Tests for RunDataManager."""
-from typing import Optional
+from typing import Optional, List
 
 import pytest
 from datetime import datetime
@@ -83,6 +83,19 @@ def engine_state_summary() -> StateSummary:
         modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]
         liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
     )
+
+
+@pytest.fixture()
+def run_time_parameters() -> List[pe_types.RunTimeParameter]:
+    """Get a RunTimeParameter list."""
+    return [
+        pe_types.BooleanParameter(
+            displayName="Display Name",
+            variableName="variable_name",
+            value=False,
+            default=True,
+        )
+    ]
 
 
 @pytest.fixture
@@ -299,6 +312,7 @@ async def test_get_current_run(
     mock_run_store: RunStore,
     subject: RunDataManager,
     engine_state_summary: StateSummary,
+    run_time_parameters: List[pe_types.RunTimeParameter],
     run_resource: RunResource,
 ) -> None:
     """It should get the current run from the engine."""
@@ -308,6 +322,9 @@ async def test_get_current_run(
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
     decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
         engine_state_summary
+    )
+    decoy.when(mock_engine_store.runner.run_time_parameters).then_return(
+        run_time_parameters
     )
 
     result = subject.get(run_id=run_id)
@@ -325,6 +342,7 @@ async def test_get_current_run(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
+        runTimeParameters=run_time_parameters,
     )
     assert subject.current_run_id == run_id
 
@@ -417,6 +435,14 @@ async def test_get_all_runs(
         modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]
         liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
     )
+    current_run_time_parameters: List[pe_types.RunTimeParameter] = [
+        pe_types.BooleanParameter(
+            displayName="Current Bool",
+            variableName="current bool",
+            value=False,
+            default=True,
+        )
+    ]
 
     historical_run_data = StateSummary(
         status=EngineStatus.STOPPED,
@@ -448,6 +474,9 @@ async def test_get_all_runs(
     decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
         current_run_data
     )
+    decoy.when(mock_engine_store.runner.run_time_parameters).then_return(
+        current_run_time_parameters
+    )
     decoy.when(mock_run_store.get_state_summary("historical-run")).then_return(
         historical_run_data
     )
@@ -471,6 +500,7 @@ async def test_get_all_runs(
             pipettes=historical_run_data.pipettes,
             modules=historical_run_data.modules,
             liquids=historical_run_data.liquids,
+            runTimeParameters=[],
         ),
         Run(
             current=True,
@@ -485,6 +515,7 @@ async def test_get_all_runs(
             pipettes=current_run_data.pipettes,
             modules=current_run_data.modules,
             liquids=current_run_data.liquids,
+            runTimeParameters=current_run_time_parameters,
         ),
     ]
 
@@ -571,6 +602,7 @@ async def test_update_current(
 async def test_update_current_noop(
     decoy: Decoy,
     engine_state_summary: StateSummary,
+    run_time_parameters: List[pe_types.RunTimeParameter],
     run_resource: RunResource,
     run_command: commands.Command,
     mock_engine_store: EngineStore,
@@ -583,6 +615,9 @@ async def test_update_current_noop(
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
     decoy.when(mock_engine_store.engine.state_view.get_summary()).then_return(
         engine_state_summary
+    )
+    decoy.when(mock_engine_store.runner.run_time_parameters).then_return(
+        run_time_parameters
     )
     decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
 
@@ -611,6 +646,7 @@ async def test_update_current_noop(
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
+        runTimeParameters=run_time_parameters,
     )
 
 
