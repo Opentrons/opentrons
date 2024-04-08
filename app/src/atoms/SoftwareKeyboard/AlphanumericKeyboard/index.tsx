@@ -5,7 +5,7 @@ import { alphanumericKeyboardLayout, customDisplay } from '../constants'
 import '../index.css'
 import './index.css'
 
-// Note (kk:04/05/2024) add debug to make debugging easy
+// TODO (kk:04/05/2024) add debug to make debugging easy
 interface AlphanumericKeyboardProps {
   onChange: (input: string) => void
   keyboardRef: React.MutableRefObject<any>
@@ -15,7 +15,7 @@ interface AlphanumericKeyboardProps {
 export function AlphanumericKeyboard({
   onChange,
   keyboardRef,
-  debug = false,
+  debug = false, // If true, <ENTER> will input a \n
 }: AlphanumericKeyboardProps): JSX.Element {
   const [layoutName, setLayoutName] = React.useState<string>('default')
   const onKeyPress = (button: string): void => {

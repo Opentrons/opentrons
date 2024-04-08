@@ -5,7 +5,7 @@ import { customDisplay, fullKeyboardLayout } from '../constants'
 import '../index.css'
 import './index.css'
 
-// Note (kk:04/05/2024) add debug to make debugging easy
+// TODO (kk:04/05/2024) add debug to make debugging easy
 interface FullKeyboardProps {
   onChange: (input: string) => void
   keyboardRef: React.MutableRefObject<any>
