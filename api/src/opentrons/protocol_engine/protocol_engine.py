@@ -305,7 +305,7 @@ class ProtocolEngine:
             self._state_store.commands.get_running_command_id()
             or self._state_store.commands.get_queue_ids().head(None)
             # TODO(mm, 2024-04-02): Is it possible for the next queued command to
-            # be a setup command? That wouldn't show up in queued_command_ids.
+            # be a setup command? That wouldn't show up in commands.get_queue_ids().
         )
         running_or_next_queued = (
             self._state_store.commands.get(running_or_next_queued_id)

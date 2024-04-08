@@ -315,9 +315,9 @@ class SyncClient:
                 wellLocation=well_location,
             )
         )
-        result = self._transport.execute_command_wait_for_recovery(request=request)
+        command = self._transport.execute_command_wait_for_recovery(request=request)
 
-        return cast(commands.PickUpTip, result)
+        return cast(commands.PickUpTip, command)
 
     def drop_tip(
         self,
