@@ -5,10 +5,9 @@ import {
   PauseArgs,
   ThermocyclerProfileStepArgs,
 } from '@opentrons/step-generation'
-import { ModuleType } from '@opentrons/shared-data'
-import { StepIdType } from '../form-types'
-import { FormError } from './formLevel/errors'
-import { DeckSlot } from '../types'
+import type { ModuleType } from '@opentrons/shared-data'
+import type { StepIdType } from '../form-types'
+import type { FormError } from './formLevel/errors'
 // timeline start and end
 export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
 export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'

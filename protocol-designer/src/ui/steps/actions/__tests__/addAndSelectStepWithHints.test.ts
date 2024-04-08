@@ -19,15 +19,13 @@ beforeEach(() => {
   vi.mocked(addHint).mockReturnValue('addHintReturnValue' as any)
   vi.mocked(labwareIngredSelectors.getDeckHasLiquid).mockReturnValue(true)
   vi.mocked(uiModuleSelectors.getMagnetModuleHasLabware).mockReturnValue(false)
-  vi.mocked(uiModuleSelectors.getTemperatureModuleHasLabware).mockReturnValue(
-    false
+  vi.mocked(uiModuleSelectors.getTemperatureModulesHaveLabware).mockReturnValue(
+    []
   )
   vi.mocked(uiModuleSelectors.getThermocyclerModuleHasLabware).mockReturnValue(
     false
   )
-  vi.mocked(uiModuleSelectors.getSingleTemperatureModuleId).mockReturnValue(
-    null
-  )
+  vi.mocked(uiModuleSelectors.getTemperatureModuleIds).mockReturnValue(null)
   vi.mocked(uiModuleSelectors.getSingleThermocyclerModuleId).mockReturnValue(
     null
   )
@@ -89,10 +87,11 @@ describe('addAndSelectStepWithHints', () => {
         stepType: 'magnet' as StepType,
         selectorValues: {
           getMagnetModuleHasLabware: false,
-          getTemperatureModuleHasLabware: false,
+          getTemperatureModulesHaveLabware: [],
           getThermocyclerModuleHasLabware: false,
           getSingleTemperatureModuleId: null,
           getSingleThermocyclerModuleId: null,
+          getTemperatureModuleIds: [],
         },
       },
       {
@@ -100,10 +99,13 @@ describe('addAndSelectStepWithHints', () => {
         stepType: 'temperature' as StepType,
         selectorValues: {
           getMagnetModuleHasLabware: false,
-          getTemperatureModuleHasLabware: false,
+          getTemperatureModulesHaveLabware: [
+            { moduleId: 'mockId', hasLabware: false },
+          ],
           getThermocyclerModuleHasLabware: false,
           getSingleTemperatureModuleId: 'something',
           getSingleThermocyclerModuleId: null,
+          getTemperatureModuleIds: ['mockId'],
         },
       },
       {
@@ -111,10 +113,11 @@ describe('addAndSelectStepWithHints', () => {
         stepType: 'temperature' as StepType,
         selectorValues: {
           getMagnetModuleHasLabware: false,
-          getTemperatureModuleHasLabware: false,
+          getTemperatureModulesHaveLabware: [],
           getThermocyclerModuleHasLabware: false,
           getSingleTemperatureModuleId: null,
           getSingleThermocyclerModuleId: 'something',
+          getTemperatureModuleIds: [],
         },
       },
     ].forEach(({ testName, stepType, selectorValues }) => {
@@ -123,14 +126,14 @@ describe('addAndSelectStepWithHints', () => {
           selectorValues.getMagnetModuleHasLabware
         )
         vi.mocked(
-          uiModuleSelectors.getTemperatureModuleHasLabware
-        ).mockReturnValue(selectorValues.getTemperatureModuleHasLabware)
+          uiModuleSelectors.getTemperatureModulesHaveLabware
+        ).mockReturnValue(selectorValues.getTemperatureModulesHaveLabware)
         vi.mocked(
           uiModuleSelectors.getThermocyclerModuleHasLabware
         ).mockReturnValue(selectorValues.getThermocyclerModuleHasLabware)
-        vi.mocked(
-          uiModuleSelectors.getSingleTemperatureModuleId
-        ).mockReturnValue(selectorValues.getSingleTemperatureModuleId)
+        vi.mocked(uiModuleSelectors.getTemperatureModuleIds).mockReturnValue(
+          selectorValues.getTemperatureModuleIds
+        )
         vi.mocked(
           uiModuleSelectors.getSingleThermocyclerModuleId
         ).mockReturnValue(selectorValues.getSingleThermocyclerModuleId)
@@ -140,6 +143,58 @@ describe('addAndSelectStepWithHints', () => {
         addAndSelectStepWithHints(payload)(dispatch, getState)
         expect(vi.mocked(addHint).mock.calls).toEqual([
           ['module_without_labware'],
+        ])
+        expect(dispatch.mock.calls).toEqual([
+          [
+            {
+              type: 'ADD_STEP',
+              payload: {
+                id: PRESAVED_STEP_ID,
+                stepType,
+              },
+              meta: {
+                robotStateTimeline: 'mockGetRobotStateTimelineValue',
+              },
+            },
+          ],
+          ['addHintReturnValue'],
+        ])
+      })
+    })
+  })
+  describe('ADD_HINT "multiple_modules_without_labware"', () => {
+    ;[
+      {
+        testName: 'temperature step, when temperature module has no labware',
+        stepType: 'temperature' as StepType,
+        selectorValues: {
+          getMagnetModuleHasLabware: false,
+          getTemperatureModulesHaveLabware: [
+            { moduleId: 'mockId', hasLabware: false },
+            { moduleId: 'mockId2', hasLabware: true },
+          ],
+          getThermocyclerModuleHasLabware: false,
+          getSingleTemperatureModuleId: 'something',
+          getSingleThermocyclerModuleId: null,
+          getTemperatureModuleIds: ['mockId', 'mockId2'],
+        },
+      },
+    ].forEach(({ testName, stepType, selectorValues }) => {
+      it(`should be dispatched (after addStep thunk is dispatched) for ${testName}`, () => {
+        vi.mocked(
+          uiModuleSelectors.getTemperatureModulesHaveLabware
+        ).mockReturnValue(selectorValues.getTemperatureModulesHaveLabware)
+
+        vi.mocked(uiModuleSelectors.getTemperatureModuleIds).mockReturnValue(
+          selectorValues.getTemperatureModuleIds
+        )
+
+        const payload = {
+          stepType,
+        }
+        addAndSelectStepWithHints(payload)(dispatch, getState)
+        expect(vi.mocked(addHint).mock.calls).toEqual([
+          ['multiple_modules_without_labware'],
         ])
         expect(dispatch.mock.calls).toEqual([
           [

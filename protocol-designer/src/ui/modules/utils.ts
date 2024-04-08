@@ -135,21 +135,34 @@ export function getModuleHasLabware(
   initialDeckSetup: InitialDeckSetup,
   type: ModuleType
 ): boolean {
-  const modulesOnDeck = getModulesOnDeckByType(initialDeckSetup, type)
-  const labwaresOnModules: ModuleOnDeck[] = []
-
-  if (modulesOnDeck != null) {
-    for (const module of modulesOnDeck) {
-      const labware = getLabwareOnModule(initialDeckSetup, module.id)
-      if (labware) {
-        labwaresOnModules.push(module)
-        break
-      }
-    }
-  }
-
-  return labwaresOnModules.length === modulesOnDeck?.length
+  const moduleOnDeck = getModuleOnDeckByType(initialDeckSetup, type)
+  const labware =
+    moduleOnDeck && getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
+  return Boolean(moduleOnDeck) && Boolean(labware)
 }
+
+export interface ModuleAndLabware {
+  moduleId: string
+  hasLabware: boolean
+}
+
+export function getModulesHaveLabware(
+  initialDeckSetup: InitialDeckSetup,
+  type: ModuleType
+): ModuleAndLabware[] {
+  const modulesOnDeck = getModulesOnDeckByType(initialDeckSetup, type)
+  const moduleAndLabware: ModuleAndLabware[] = []
+  modulesOnDeck?.forEach(module => {
+    const labwareHasModule = getLabwareOnModule(initialDeckSetup, module.id)
+
+    moduleAndLabware.push({
+      moduleId: module.id,
+      hasLabware: labwareHasModule != null,
+    })
+  })
+  return moduleAndLabware
+}
+
 export const getMagnetLabwareEngageHeight = (
   initialDeckSetup: InitialDeckSetup,
   magnetModuleId: string | null

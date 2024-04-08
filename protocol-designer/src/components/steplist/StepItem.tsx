@@ -25,6 +25,7 @@ import {
   makeTemperatureText,
   makeTimerText,
 } from '../../utils'
+import { InitialDeckSetup } from '../../step-forms'
 import { PDListItem, TitledStepList } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
@@ -41,11 +42,7 @@ import {
   WellIngredientNames,
 } from '../../steplist/types'
 import { MoveLabwareHeader } from './MoveLabwareHeader'
-import type {
-  AdditionalEquipmentEntities,
-  ModuleEntities,
-} from '@opentrons/step-generation'
-import { InitialDeckSetup } from '../../step-forms'
+import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
 
 export interface StepItemProps {
   description?: string | null

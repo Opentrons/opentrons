@@ -622,6 +622,7 @@ describe('generateSubstepItem', () => {
       temperature: 45,
       labwareNickname: 'temp nickname',
       message: null,
+      moduleId: 'tempId',
     })
   })
 
@@ -652,6 +653,7 @@ describe('generateSubstepItem', () => {
       temperature: 0,
       labwareNickname: 'temp nickname',
       message: null,
+      moduleId: 'tempId',
     })
   })
 
@@ -680,6 +682,7 @@ describe('generateSubstepItem', () => {
       temperature: null,
       labwareNickname: 'temp nickname',
       message: null,
+      moduleId: 'tempId',
     })
   })
 

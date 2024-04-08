@@ -24,7 +24,6 @@ import {
   SelectMultipleStepsAction,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
-
 import {
   StepItem,
   StepItemContents,
@@ -38,17 +37,15 @@ import {
   ConfirmDeleteModal,
   DeleteModalType,
 } from '../components/modals/ConfirmDeleteModal'
-
-import { SubstepIdentifier } from '../steplist/types'
-import { StepIdType } from '../form-types'
-import { BaseState, ThunkAction } from '../types'
 import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
-  getLabwareEntities,
-  getModuleEntities,
 } from '../step-forms/selectors'
-import { ThunkDispatch } from 'redux-thunk'
+
+import type { SubstepIdentifier } from '../steplist/types'
+import type { StepIdType } from '../form-types'
+import type { BaseState, ThunkAction } from '../types'
+import type { ThunkDispatch } from 'redux-thunk'
 
 export interface ConnectedStepItemProps {
   stepId: StepIdType
@@ -242,7 +239,6 @@ export const ConnectedStepItem = (
       return CLOSE_STEP_FORM_WITH_CHANGES
     }
   }
-
   return (
     <>
       {showConfirmation && (

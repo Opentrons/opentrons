@@ -81,7 +81,6 @@ export const Hints = (): JSX.Element | null => {
             <p>{t(`alert:hint.${hintKey}.body`)}</p>
           </>
         )
-      case 'multiple_modules_without_labware':
 
       case 'thermocycler_lid_passive_cooling':
         return (
