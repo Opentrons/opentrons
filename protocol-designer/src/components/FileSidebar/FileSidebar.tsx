@@ -129,6 +129,7 @@ function getWarningContent({
   const pipettesDetails = pipettesWithoutStep
     .map(pipette => `${pipette.mount} ${pipette.spec.displayName}`)
     .join(' and ')
+
   const modulesDetails = modulesWithoutStep
     .map(moduleOnDeck => t(`modules:module_long_names.${moduleOnDeck.type}`))
     .join(' and ')
@@ -169,12 +170,14 @@ function getWarningContent({
   if (modulesWithoutStep.length) {
     const moduleCase =
       modulesWithoutStep.length > 1 ? 'unused_modules' : 'unused_module'
+    const slotName = modulesWithoutStep.map(module => module.slot)
     return {
       content: (
         <>
           <p>
             {t(`export_warnings.${moduleCase}.body1`, {
               modulesDetails,
+              slotName: slotName,
             })}
           </p>
           <p>{t(`export_warnings.${moduleCase}.body2`)}</p>
@@ -313,6 +316,14 @@ export function FileSidebar(): JSX.Element {
     savedStepForms,
     'pipette',
     robotType
+  )
+  console.log(
+    'pipettesWithoutStep ',
+    pipettesOnDeck,
+    savedStepForms,
+    'pipette',
+    robotType,
+    pipettesWithoutStep
   )
   const modulesWithoutStep = getUnusedEntities(
     modulesOnDeck,
