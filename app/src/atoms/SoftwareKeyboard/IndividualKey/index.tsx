@@ -8,7 +8,7 @@ const customDisplay = {
   '{backspace}': 'del',
 }
 
-// Note (kk:04/05/2024) add debug to make debugging easy
+// TODO (kk:04/05/2024) add debug to make debugging easy
 interface IndividualKeyProps {
   onChange: (input: string) => void
   keyboardRef: React.MutableRefObject<null>
