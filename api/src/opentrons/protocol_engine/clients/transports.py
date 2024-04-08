@@ -14,12 +14,6 @@ from ..state import StateView
 from ..commands import Command, CommandCreate, CommandResult, CommandStatus
 
 
-# TODO(mm, 2024-04-04): The protocol run infrastructure will currently see this as an
-# error and report a run failure. It should probably see it as a normal stop.
-class _RunStoppedError(RuntimeError):
-    """Raised to signal certain kinds of run stops."""
-
-
 class ChildThreadTransport:
     """A helper for controlling a `ProtocolEngine` without async/await.
 
@@ -49,7 +43,11 @@ class ChildThreadTransport:
         return self._engine.state_view
 
     def execute_command(self, request: CommandCreate) -> CommandResult:
-        """Execute a ProtocolEngine command, blocking until the command completes.
+        """Execute a ProtocolEngine command.
+
+        This blocks until the command completes. If the command fails, this will always
+        raise the failure as an exception--even if ProtocolEngine deemed the failure
+        recoverable.
 
         Args:
             request: The ProtocolEngine command request
@@ -58,8 +56,11 @@ class ChildThreadTransport:
             The command's result data.
 
         Raises:
-            ProtocolEngineError: if the command execution is not successful,
-                the specific error that cause the command to fail is raised.
+            ProtocolEngineError: If the command execution was not successful,
+                the specific error that caused the command to fail is raised.
+
+                If the run was stopped before the command could complete, that's
+                also signaled as this exception.
         """
         command = run_coroutine_threadsafe(
             self._engine.add_and_execute_command(request=request),
@@ -82,13 +83,33 @@ class ChildThreadTransport:
             #    which remains `queued` because of the pause.
             # 3. The engine is stopped. The returned command will be `queued`
             #    and won't have a result.
-            raise _RunStoppedError()
-
-        assert command.result is not None, f"Expected Command {command} to have result"
+            raise ProtocolCommandFailedError(
+                message=f"The run was stopped before command {command.id} could execute."
+            )
 
         return command.result
 
     def execute_command_wait_for_recovery(self, request: CommandCreate) -> Command:
+        """Execute a ProtocolEngine command, including error recovery.
+
+        This blocks until the command completes. Additionally, if the command fails,
+        this will continue to block until its error recovery has been completed.
+
+        Args:
+            request: The ProtocolEngine command request.
+
+        Returns:
+            The command. If error recovery happened for it, the command will be
+            reported here as failed.
+
+        Raises:
+            ProtocolEngineError: If the command failed, *and* the failure was not
+                recovered from.
+
+                If the run was stopped before the command could complete, that's
+                also signalled as this exception.
+        """
+
         async def run_in_pe_thread() -> Command:
             command = await self._engine.add_and_execute_command_wait_for_recovery(
                 request=request
@@ -115,7 +136,9 @@ class ChildThreadTransport:
                 #    which remains `queued` because of the pause.
                 # 3. The engine is stopped. The returned command will be `queued`,
                 #    and won't have a result.
-                raise _RunStoppedError()
+                raise ProtocolCommandFailedError(
+                    message=f"The run was stopped before command {command.id} could execute."
+                )
 
             return command
 
