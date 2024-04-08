@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { FormGroup } from '@opentrons/components'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { StepFormDropdown, RadioGroupField, TextField } from '../fields'
-import styles from '../StepEditForm.module.css'
 import type { StepFormProps } from '../types'
+
+import styles from '../StepEditForm.module.css'
 
 export const TemperatureForm = (props: StepFormProps): JSX.Element => {
   const { t } = useTranslation(['application', 'form'])
@@ -18,6 +19,7 @@ export const TemperatureForm = (props: StepFormProps): JSX.Element => {
 
   const { propsForFields } = props
   const { setTemperature, moduleId } = props.formData
+
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -35,19 +37,6 @@ export const TemperatureForm = (props: StepFormProps): JSX.Element => {
             options={moduleLabwareOptions}
           />
         </FormGroup>
-        {/* TODO (ka 2020-1-6):
-          moduleID dropdown will autoselect when creating a new step,
-          but this will not be the case when returning to a never saved form.
-          Rather than defaulting to one or the other when null,
-          display a message (copy, design, etc TBD) that you need to select a module to continue
-        */}
-
-        {moduleId === null && (
-          <p className={styles.select_module_message}>
-            Please ensure a compatible module is present on the deck and
-            selected to create a temperature step.
-          </p>
-        )}
         {temperatureModuleIds != null
           ? temperatureModuleIds.map(id =>
               id === moduleId ? (
