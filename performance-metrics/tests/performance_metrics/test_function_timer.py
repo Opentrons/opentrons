@@ -4,7 +4,6 @@ It includes functions and their variants that raise exceptions to simulate error
 to ensure the FunctionTimer accurately measures execution times and handles exceptions correctly for both synchronous and asynchronous
 calls. This serves as a comprehensive suite to validate the functionality of FunctionTimer in various scenarios.
 """
-
 import time
 import asyncio
 import pytest
@@ -40,7 +39,12 @@ async def long_running_task() -> None:
 
 async def short_running_task() -> None:
     """Simulates a shorter running asynchronous task."""
-    await asyncio.sleep(1)
+    await asyncio.sleep(0.5)
+
+
+##################
+# TEST FUNCTIONS #
+##################
 
 
 def test_synchronous_function() -> None:
@@ -100,6 +104,36 @@ async def test_synchronous_and_asynchronous_function_with_exception() -> None:
         time = tracker.get_time()
         assert time.start_time < time.end_time
 
+async def test_nested_synchronous_functions() -> None:
+    """Tests that the FunctionTimer correctly times nested synchronous functions."""
+    with FunctionTimer() as outer_tracker:
+        synchronous_function()
+        with FunctionTimer() as inner_tracker:
+            synchronous_function()
+
+    outer_time = outer_tracker.get_time()
+    inner_time = inner_tracker.get_time()
+
+    assert outer_time.start_time < outer_time.end_time
+    assert inner_time.start_time < inner_time.end_time
+    assert outer_time.start_time < inner_time.start_time
+    assert outer_time.end_time > inner_time.end_time
+
+async def test_timing_sychronous_function_nested_inside_async_function() -> None:
+    """Tests that the FunctionTimer correctly times a synchronous function inside an asynchronous context manager."""
+    async with FunctionTimer() as async_tracker:
+        await asynchronous_function()
+        with FunctionTimer() as sync_tracker:
+            synchronous_function()
+
+    async_time = async_tracker.get_time()
+    sync_time = sync_tracker.get_time()
+
+    assert async_time.start_time < async_time.end_time
+    assert sync_time.start_time < sync_time.end_time
+    assert async_time.start_time < sync_time.start_time
+    assert async_time.end_time > sync_time.end_time
+
 
 def test_instantaneous_function() -> None:
     """Tests that the FunctionTimer can measure the time of an almost instantaneous function."""
@@ -149,17 +183,40 @@ async def test_async_functions_in_parallel() -> None:
 
 async def test_function_timer_with_async_contexts() -> None:
     """Tests that the FunctionTimer context manager correctly times overlapping asynchronous tasks."""
+    # 1. Start long_running_task
+    # 2. __aenter__ will be called on long_running_task
+    # 3. Start short_running_task
+    # 4. __aenter__ will be called on short_running_task
+    # 5. Finish short_running_task
+    # 6. __aexit__ will be called on short_running_task
+    # 7. Finish long_running_task
+    # 8. __aexit__ will be called on long_running_task
 
     async with FunctionTimer() as f1_timer:
         await long_running_task()
 
-        # Within the same block, start a short running task
         async with FunctionTimer() as f2_timer:
             await short_running_task()
 
-        f1_time = f1_timer.get_time()
-        f2_time = f2_timer.get_time()
+    f1_time = f1_timer.get_time()
+    f2_time = f2_timer.get_time()
 
-    # Assertions to ensure correct timing relationships
-    assert f1_time.start_time < f2_time.start_time, "f1 should start before f2"
-    assert f1_time.end_time > f2_time.end_time, "f1 should end after f2 has ended"
+    assert f1_time.start_time < f1_time.end_time
+    assert f2_time.start_time < f2_time.end_time
+    assert f1_time.start_time < f2_time.start_time
+    assert f1_time.end_time > f2_time.end_time
+
+def test_direct_use_without_context_manager():
+    timer = FunctionTimer()
+    assert timer._start_time is None
+    assert timer._end_time is None
+    
+    with pytest.raises(AssertionError):
+        timer.get_time()
+
+def test_calling_get_time_before_context_manager_finishes():
+    with pytest.raises(AssertionError):
+        with FunctionTimer() as timer:
+            synchronous_function()
+            timer.get_time()
+
