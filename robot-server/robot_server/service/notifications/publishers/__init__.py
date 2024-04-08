@@ -8,6 +8,7 @@ from .maintenance_runs_publisher import (
     get_maintenance_runs_publisher,
 )
 from .runs_publisher import RunsPublisher, get_runs_publisher
+from .robot_publisher import initialize_robot_publisher, get_robot_publisher
 
 __all__ = [
     # publish "route" equivalents
@@ -16,4 +17,7 @@ __all__ = [
     # for use by FastAPI
     "get_maintenance_runs_publisher",
     "get_runs_publisher",
+    "get_robot_publisher",
+    # used during app setup
+    "initialize_robot_publisher",
 ]

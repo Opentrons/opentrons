@@ -36,7 +36,8 @@ from .runs.dependencies import (
 )
 
 from .service.notifications import (
-    initialize_notifications,
+    initialize_publisher_notifiers,
+    init_hardware_publishers,
     clean_up_notification_client,
 )
 
@@ -85,7 +86,7 @@ async def on_startup() -> None:
     initialize_logging()
     initialize_task_runner(app_state=app.state)
     fbl_init(app_state=app.state)
-    await initialize_notifications(
+    await initialize_publisher_notifiers(
         app_state=app.state,
     )
     start_initializing_hardware(
@@ -97,6 +98,7 @@ async def on_startup() -> None:
             # OT-2 light control:
             (fbl_start_blinking, True),
             (fbl_mark_hardware_init_complete, False),
+            (init_hardware_publishers, False),
         ],
     )
     start_initializing_persistence(
