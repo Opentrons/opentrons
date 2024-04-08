@@ -58,7 +58,7 @@ export function FullKeyboard({
       display={customDisplay}
       mergeDisplay={true}
       useButtonTag={true}
-      debug={debug}
+      debug={debug} // If true, <ENTER> will input a \n
       baseClass="fullKeyboard"
     />
   )

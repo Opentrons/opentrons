@@ -50,7 +50,7 @@ export function AlphanumericKeyboard({
       mergeDisplay={true}
       useButtonTag={true}
       width="100%"
-      debug={debug}
+      debug={debug} // If true, <ENTER> will input a \n
     />
   )
 }

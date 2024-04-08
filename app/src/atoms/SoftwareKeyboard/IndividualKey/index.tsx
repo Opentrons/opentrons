@@ -41,7 +41,7 @@ export function IndividualKey({
       useButtonTag={true}
       {...numericalKeyboard}
       width="100%"
-      debug={debug}
+      debug={debug} // If true, <ENTER> will input a \n
     />
   )
 }

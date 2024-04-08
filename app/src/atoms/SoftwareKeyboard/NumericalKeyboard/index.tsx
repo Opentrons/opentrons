@@ -38,7 +38,7 @@ export function NumericalKeyboard({
       useButtonTag={true}
       layoutName={layoutName}
       layout={numericalKeyboardLayout}
-      debug={debug}
+      debug={debug} // If true, <ENTER> will input a \n
     />
   )
 }
