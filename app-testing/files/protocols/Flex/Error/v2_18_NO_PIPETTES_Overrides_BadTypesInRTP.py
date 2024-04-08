@@ -73,7 +73,7 @@ def add_parameters(parameters):
                 display_name="Pipette Name",
                 variable_name="pipette",
                 choices=[
-                    {"display_name": "50", "value": 5},
+                    {"display_name": "50", "value": "flex_8channel_1000"},
                     {"display_name": "Eight Channel 50µL", "value": "flex_8channel_50"},
                 ],
                 default=6,
@@ -84,10 +84,10 @@ def add_parameters(parameters):
                 display_name="Pipette Name",
                 variable_name="pipette",
                 choices=[
-                    {"display_name": "50", "value": 5},
+                    {"display_name": "50", "value": "flex_8channel_1000"},
                     {"display_name": "Eight Channel 50µL", "value": "flex_8channel_50"},
                 ],
-                default=6,
+                default="flex_1channel_50",
                 description=(),
             )
         case str() if type_to_test == wrong_type_in_minimum:

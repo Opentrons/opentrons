@@ -17,18 +17,18 @@
   },
   "errors": [
     {
-      "detail": "ParameterValueError [line 84]: Parameter value 6 has type <class 'int'>, must match type <class 'str'>.",
+      "detail": "ParameterValueError [line 84]: Parameter must be set to one of the allowed values of {'flex_8channel_1000', 'flex_8channel_50'}.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
       "wrappedErrors": [
         {
-          "detail": "opentrons.protocols.parameters.types.ParameterValueError: Parameter value 6 has type <class 'int'>, must match type <class 'str'>.",
+          "detail": "opentrons.protocols.parameters.types.ParameterValueError: Parameter must be set to one of the allowed values of {'flex_8channel_1000', 'flex_8channel_50'}.",
           "errorCode": "4000",
           "errorInfo": {
-            "args": "(\"Parameter value 6 has type <class 'int'>, must match type <class 'str'>.\",)",
+            "args": "(\"Parameter must be set to one of the allowed values of {'flex_8channel_1000', 'flex_8channel_50'}.\",)",
             "class": "ParameterValueError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_description.py\", line 84, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 148, in add_str\n    parameter = parameter_definition.create_str_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 241, in create_str_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 73, in __init__\n    validation.validate_options(default, minimum, maximum, choices, parameter_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 218, in validate_options\n    validate_type(default, parameter_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line 205, in validate_type\n    raise ParameterValueError(\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_description.py\", line 84, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line 148, in add_str\n    parameter = parameter_definition.create_str_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 241, in create_str_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 84, in __init__\n    self.value: ParamType = default\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line 95, in value\n    raise ParameterValueError(\n"
           },
           "errorType": "PythonException",
           "wrappedErrors": []
