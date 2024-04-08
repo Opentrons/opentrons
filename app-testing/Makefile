@@ -50,10 +50,6 @@ teardown:
 format-readme:
 	yarn prettier --ignore-path .eslintignore --write app-testing/**/*.md
 
-.PHONY: print-protocols
-print-protocols:
-	python -m pipenv run python print_protocols.py
-
 .PHONY: install-pipenv
 install-pipenv:
 	python -m pip install -U pipenv

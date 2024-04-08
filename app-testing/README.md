@@ -78,7 +78,7 @@ This allows us to run one or many.
 1. add the protocol file named according to the naming convention in the files/protocols appropriate folder
 1. add the protocol stem to `protocol_files.py`
 1. add the protocol data as a property to `protocols.py`
-1. run `make print-protocols`
+1. run `make generate-protocols`
 
 ### Analyses Snapshot Test
 

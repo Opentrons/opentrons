@@ -2,6 +2,7 @@ import os
 from typing import Optional
 
 from rich.console import Console
+from rich.panel import Panel
 
 from automation.data.protocol import Protocol
 from automation.data.protocol_with_overrides import ProtocolWithOverrides
@@ -34,20 +35,27 @@ class ProtocolRegistry:
             return None
         return protocols_to_test
 
+    def all_defined_protocols(self) -> list[Protocol]:
+        return [getattr(self.protocols, prop) for prop in dir(self.protocols) if "__" not in prop]
+
+    def all_defined_protocols_with_overrides(self) -> list[ProtocolWithOverrides]:
+        return [getattr(self.protocols_with_overrides, prop) for prop in dir(self.protocols_with_overrides) if "__" not in prop]
+
 
 def main() -> None:
     console = Console()
     protocol_registry = ProtocolRegistry()
-    if protocol_registry.protocols_to_test is None:
-        console.print("No protocols to test")
-        return
-    else:
-        console.print(f"There are {len(protocol_registry.protocols_to_test)} protocols to test")
-        for protocol in protocol_registry.protocols_to_test:
-            if protocol.from_override:
-                console.print(f" Override protocol {protocol.file_stem}")
-            else:
-                console.print(f" Protocol {protocol.file_stem}")
+    console.print("protocols for APP_ANALYSIS_TEST_PROTOCOLS")
+    console.print(Panel('Formatted for .env APP_ANALYSIS_TEST_PROTOCOLS="'))
+    sorted_stems = sorted([p.file_stem for p in protocol_registry.all_defined_protocols()])
+    console.print('APP_ANALYSIS_TEST_PROTOCOLS="')
+    console.print(",\n".join(sorted_stems))
+    console.print('"')
+    console.print(Panel('Formatted for .env APP_ANALYSIS_TEST_PROTOCOLS_WITH_OVERRIDES="'))
+    console.print('APP_ANALYSIS_TEST_PROTOCOLS_WITH_OVERRIDES="')
+    sorted_stems = sorted([p.file_stem for p in protocol_registry.all_defined_protocols_with_overrides()])
+    console.print(",\n".join(sorted_stems))
+    console.print('"')
 
 
 if __name__ == "__main__":
