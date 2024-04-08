@@ -29,4 +29,4 @@ wheel:
 
 .PHONY: test
 test:
-	$(pytest) tests -vvv
+	$(pytest) tests
