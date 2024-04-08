@@ -1,6 +1,6 @@
 """A module that contains a context manager to track the start and end time of a function."""
 
-from contextlib import ContextDecorator, AsyncContextDecorator
+from contextlib import AbstractContextManager, AbstractAsyncContextManager
 from datetime import datetime, timezone
 from dataclasses import dataclass
 from typing import Type
@@ -18,7 +18,7 @@ class FunctionTime:
     end_time: datetime
 
 
-class FunctionTimer(ContextDecorator, AsyncContextDecorator):
+class FunctionTimer(AbstractContextManager, AbstractAsyncContextManager):
     """A context manager that tracks the start and end time of a function.
 
     Handles both synchronous and asynchronous functions.
