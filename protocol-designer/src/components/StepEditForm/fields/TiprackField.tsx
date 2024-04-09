@@ -10,9 +10,9 @@ import {
 } from '@opentrons/components'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getPipetteEntities } from '../../../step-forms/selectors'
-import styles from '../StepEditForm.module.css'
-
 import type { FieldProps } from '../types'
+
+import styles from '../StepEditForm.module.css'
 
 interface TiprackFieldProps extends FieldProps {
   pipetteId?: unknown
@@ -35,7 +35,7 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
   const pipetteOptions = options.filter(option =>
     defaultTipracks.includes(option.defURI)
   )
-  const missingTiprack = defaultTipracks.length > pipetteOptions.length
+  const hasMissingTiprack = defaultTipracks.length > pipetteOptions.length
 
   return (
     <Box {...targetProps}>
@@ -54,7 +54,7 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
           }}
         />
       </FormGroup>
-      {missingTiprack ? (
+      {hasMissingTiprack ? (
         <Tooltip {...tooltipProps}>{t('tooltip:missing_tiprack')}</Tooltip>
       ) : null}
     </Box>
