@@ -79,6 +79,7 @@ if __name__ == "__main__":
     break_all = False
     while is_stable is False:
         grams, is_stable = scale.read_mass()
+        grams, is_stable = scale.read_mass()
         print(f"Scale reading: grams={grams}, is_stable={is_stable}")
         time_now = datetime.datetime.now()
         date = str(time_now.date())

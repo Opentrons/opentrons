@@ -13,7 +13,8 @@ import time as t
 import json
 import requests
 
-def lpc_data(file_results: Dict[str, Any], protocol_info: Dict)-> List[Dict[str, Any]]:
+
+def lpc_data(file_results: Dict[str, Any], protocol_info: Dict) -> List[Dict[str, Any]]:
     """Get labware offsets from one run log."""
     offsets = file_results.get("labwareOffsets", "")
     all_offsets: List[Dict[str, Any]] = []
@@ -30,17 +31,17 @@ def lpc_data(file_results: Dict[str, Any], protocol_info: Dict)-> List[Dict[str,
             row = {
                 "createdAt": created_at,
                 "Labware Type": labware_type,
-                "Slot": slot, 
-                "Module": module_location, 
+                "Slot": slot,
+                "Module": module_location,
                 "Adapter": adapter,
                 "X": x_offset,
-                "Y": y_offset, 
-                "Z": z_offset
+                "Y": y_offset,
+                "Z": z_offset,
             }
             row2 = {**protocol_info, **row}
             all_offsets.append(row2)
     return all_offsets
-        
+
 
 def command_time(command: Dict[str, str]) -> Tuple[float, float]:
     """Calculate total create and complete time per command."""
@@ -110,7 +111,7 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
             temp_time = datetime.strptime(
                 command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
             )
-    hs_latch_sets = hs_latch_count / 2 # one set of open/close
+    hs_latch_sets = hs_latch_count / 2  # one set of open/close
     hs_total_rotations = sum(hs_rotations.values())
     hs_total_temp_time = sum(hs_temps.values())
     hs_dict = {
@@ -455,12 +456,20 @@ def get_calibration_offsets(
     json.dump(calibration, open(saved_file_path, mode="w"))
     return saved_file_path, calibration
 
-def get_logs(storage_directory: str, ip: str):
+
+def get_logs(storage_directory: str, ip: str) -> List[str]:
     """Get Robot logs."""
-    log_types = ["api.log", "server.log", "serial.log"]
+    log_types = ["api.log", "server.log", "serial.log", "touchscreen.log"]
+    all_paths = []
     for log_type in log_types:
-        response = requests.get(f"http://{ip}:31950/logs", headers={"log_identifier": log_type},params={"cursor": 0, "pageLength": 0})
-        log_name = ip + "-" + log_type.split(".")[0] + ".json"
+        response = requests.get(
+            f"http://{ip}:31950/logs",
+            headers={"log_identifier": log_type},
+            params={"cursor": 0, "pageLength": 0},
+        )
+        log_name = ip + "_" + log_type.split(".")[0] + ".json"
         log_data = response.json()
-        file_name = os.path.join(storage_directory, log_name)
-        json.dump(log_data, open(file_name, mode="w"))
+        file_path = os.path.join(storage_directory, log_name)
+        json.dump(log_data, open(file_path, mode="w"))
+        all_paths.append(file_path)
+    return all_paths

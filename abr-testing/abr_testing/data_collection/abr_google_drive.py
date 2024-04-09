@@ -6,7 +6,7 @@ import json
 import gspread  # type: ignore[import]
 from datetime import datetime, timedelta
 from abr_testing.data_collection import read_robot_logs
-from typing import Set, Dict, Any, Tuple, List
+from typing import Set, Dict, Any, Tuple, List, Union
 from abr_testing.automation import google_drive_tool, google_sheets_tool
 
 
@@ -30,7 +30,9 @@ def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
 
 
 def create_data_dictionary(
-    runs_to_save: Set[str], storage_directory: str,
+    runs_to_save: Union[Set[str], str],
+    storage_directory: str,
+    issue_url: str,
 ) -> Tuple[Dict[Any, Dict[str, Any]], List]:
     """Pull data from run files and format into a dictionary."""
     runs_and_robots = {}
@@ -41,7 +43,7 @@ def create_data_dictionary(
                 file_results = json.load(file)
         else:
             continue
-        run_id = file_results.get("run_id")
+        run_id = file_results.get("run_id", "NaN")
         if run_id in runs_to_save:
             robot = file_results.get("robot_name")
             protocol_name = file_results["protocol"]["metadata"].get("protocolName", "")
@@ -56,7 +58,7 @@ def create_data_dictionary(
                 error_instrument,
                 error_level,
             ) = read_robot_logs.get_error_info(file_results)
-            
+
             all_modules = get_modules(file_results)
 
             start_time_str, complete_time_str, start_date, run_time_min = (
@@ -104,13 +106,14 @@ def create_data_dictionary(
                 tc_dict = read_robot_logs.thermocycler_commands(file_results)
                 hs_dict = read_robot_logs.hs_commands(file_results)
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
-                notes = {"Note1": "", "Jira Link": ""}
+                notes = {"Note1": "", "Jira Link": issue_url}
                 row_2 = {**row, **all_modules, **notes, **hs_dict, **tm_dict, **tc_dict}
                 headers = list(row_2.keys())
                 runs_and_robots[run_id] = row_2
             else:
-                os.remove(file_path)
-                print(f"Run ID: {run_id} has a run time of 0 minutes. Run removed.")
+                continue
+                # os.remove(file_path)
+                # print(f"Run ID: {run_id} has a run time of 0 minutes. Run removed.")
     return runs_and_robots, headers
 
 
@@ -169,8 +172,10 @@ if __name__ == "__main__":
     except gspread.exceptions.APIError:
         print("ERROR: Check google sheet name. Check credentials file.")
         sys.exit()
-    try: 
-        google_sheet_lpc = google_sheets_tool.google_sheet(credentials_path, "ABR-LPC", 0)
+    try:
+        google_sheet_lpc = google_sheets_tool.google_sheet(
+            credentials_path, "ABR-LPC", 0
+        )
         print("Connected to google sheet ABR-LPC")
     except gspread.exceptions.APIError:
         print("ERROR: Check google sheet name. Check credentials file.")
@@ -188,9 +193,8 @@ if __name__ == "__main__":
     )
     # Add missing runs to google sheet
     runs_and_robots, headers = create_data_dictionary(
-        missing_runs_from_gs, storage_directory
+        missing_runs_from_gs, storage_directory, ""
     )
     read_robot_logs.write_to_local_and_google_sheet(
         runs_and_robots, storage_directory, google_sheet_name, google_sheet, headers
     )
-    

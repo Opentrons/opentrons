@@ -1,5 +1,5 @@
 """Get Calibration logs from robots."""
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Union
 import argparse
 import os
 import json
@@ -16,7 +16,7 @@ def check_for_duplicates(
     col_2: int,
     row: List[str],
     headers: List[str],
-) -> List[str]:
+) -> Union[List[str], None]:
     """Check google sheet for duplicates."""
     serials = google_sheet.get_column(col_1)
     modify_dates = google_sheet.get_column(col_2)
@@ -67,7 +67,7 @@ def upload_calibration_offsets(
             instrument_row,
             instrument_headers,
         )
-    
+
     # MODULE SHEET
     if len(calibration.get("Modules", "")) > 0:
         module_headers = (
@@ -202,19 +202,19 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"Add .json file with robot IPs to: {storage_directory}.")
         sys.exit()
-            
+
     if ip_or_all == "ALL":
-            ip_address_list = ip_file["ip_address_list"]
-            for ip in ip_address_list:
-                print(ip)
-                try:
-                    saved_file_path, calibration = read_robot_logs.get_calibration_offsets(
-                        ip, storage_directory
-                    )
-                    upload_calibration_offsets(calibration, storage_directory)
-                except Exception:
-                    print(f"ERROR: Failed to read IP address: {ip}")
-                    continue
+        ip_address_list = ip_file["ip_address_list"]
+        for ip in ip_address_list:
+            print(ip)
+            try:
+                saved_file_path, calibration = read_robot_logs.get_calibration_offsets(
+                    ip, storage_directory
+                )
+                upload_calibration_offsets(calibration, storage_directory)
+            except Exception:
+                print(f"ERROR: Failed to read IP address: {ip}")
+                continue
     else:
         saved_file_path, calibration = read_robot_logs.get_calibration_offsets(
             ip_or_all, storage_directory
