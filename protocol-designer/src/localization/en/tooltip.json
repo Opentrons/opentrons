@@ -8,6 +8,7 @@
   "disabled_you_can_add_one_type": "Only one module of each type is allowed on the deck at a time",
   "not_enough_space_for_temp": "There is not enough space on the deck to add more temperature modules",
   "not_in_beta": "ⓘ Coming Soon",
+  "missing_tiprack": "Missing a tiprack? Make sure it is added to the deck",
 
   "step_description": {
     "heaterShaker": "Set heat, shake, or labware latch commands for the Heater-Shaker module",
