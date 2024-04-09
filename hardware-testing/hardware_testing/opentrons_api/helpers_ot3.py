@@ -1094,7 +1094,12 @@ def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
     model = pipette.model
     volume = model.split("_")[0].replace("p", "")
     volume = "1K" if volume == "1000" else volume
-    channels = "S" if "single" in model else "M"
+    if "single" in model:
+        channels = "S"
+    elif "96" in model:
+        channels = "H"
+    else:
+        channels = "M" 
     version = model.split("v")[-1].strip().replace(".", "")
     assert pipette.pipette_id, f"no pipette_id found for pipette: {pipette}"
     if "P" in pipette.pipette_id:
