@@ -1,7 +1,7 @@
 export interface ButtonProps {
-  label: string;
+  label: string
 }
 
 export const Button = ({ label }: ButtonProps) => {
-  return <button style={{ fontSize: "2rem" }}>{label}</button>;
-};
+  return <button style={{ fontSize: '2rem' }}>{label}</button>
+}
