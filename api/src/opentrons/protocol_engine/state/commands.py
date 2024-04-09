@@ -812,8 +812,8 @@ class CommandView(HasState[CommandState]):
                     )
                 elif not self._state.failed_command or (
                     self._state.failed_command
-                    and self._state.failed_command.command
-                    != action.request.failed_command
+                    and self._state.failed_command.command.id
+                    != action.request.failed_command_id
                 ):
                     raise FixitCommandNotAllowedError(
                         "Fixit command does not match failed command."

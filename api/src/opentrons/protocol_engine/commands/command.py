@@ -21,7 +21,6 @@ from pydantic.generics import GenericModel
 from opentrons.hardware_control import HardwareControlAPI
 
 from ..errors import ErrorOccurrence
-from .command_unions import Command
 from ..notes import CommandNote, CommandNoteAdder
 
 # Work around type-only circular dependencies.
@@ -96,10 +95,10 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
             " If a value is not provided, one will be generated."
         ),
     )
-    failed_command: Optional[Command] = Field(
+    failed_command_id: Optional[str] = Field(
         None,
         description=(
-            "FIXIT command use only. Reference of the failed command we are trying to fix."
+            "FIXIT command use only. Reference of the failed command id we are trying to fix."
         ),
     )
 
