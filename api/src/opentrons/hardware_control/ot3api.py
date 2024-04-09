@@ -2584,6 +2584,7 @@ class OT3API(
             probe=probe if probe else InstrumentProbeType.PRIMARY,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
+        await self.move_to(mount, probe_start_pos)
         return end_pos.z
 
     async def capacitive_probe(
