@@ -241,17 +241,22 @@ export const getDisposalOptions = createSelector(
   }
 )
 
-export const getTiprackOptions: Selector<Options> = createSelector(
+export interface TiprackOption {
+  name: string
+  value: string
+  defURI: string
+}
+export const getTiprackOptions: Selector<TiprackOption[]> = createSelector(
   stepFormSelectors.getLabwareEntities,
   getLabwareNicknamesById,
   (labwareEntities, nicknamesById) => {
     const options = reduce(
       labwareEntities,
       (
-        acc: Options,
+        acc: TiprackOption[],
         labwareEntity: LabwareEntity,
         labwareId: string
-      ): Options => {
+      ): TiprackOption[] => {
         const labwareDefURI = labwareEntity.labwareDefURI
         const optionValues = acc.map(option => option.value)
 
@@ -266,12 +271,13 @@ export const getTiprackOptions: Selector<Options> = createSelector(
             {
               name: nicknamesById[labwareId],
               value: labwareId,
+              defURI: labwareDefURI,
             },
           ]
         }
       },
       []
     )
-    return _sortLabwareDropdownOptions(options)
+    return options
   }
 )
