@@ -11,15 +11,7 @@ i18n.use(initReactI18next).init(
     lng: 'en',
     fallbackLng: 'en',
     debug: process.env.NODE_ENV === 'development',
-    ns: [
-      'shared',
-      'robot_advanced_settings',
-      'robot_calibration',
-      'robot_connection',
-      'robot_controls',
-      'robot_info',
-      'top_navigation',
-    ],
+    ns: ['shared'],
     defaultNS: 'shared',
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
