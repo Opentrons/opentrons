@@ -1,7 +1,7 @@
-from dataclasses import asdict
+import aiohttp
 import logging
+from dataclasses import asdict
 from typing import cast, Any, Dict, List, Optional, Union
-
 from starlette import status
 from fastapi import APIRouter, Depends
 
@@ -64,6 +64,15 @@ log = logging.getLogger(__name__)
 router = APIRouter()
 
 
+async def set_oem_mode_request(enable):
+    """PUT request to set the OEM Mode for the system server."""
+    async with aiohttp.ClientSession() as session:
+        async with session.put(
+            "http://127.0.0.1:31950/system/oem_mode/enable", json={"enable": enable}
+        ) as resp:
+            return resp.status
+
+
 @router.post(
     path="/settings",
     summary="Change a setting",
@@ -82,6 +91,13 @@ async def post_settings(
 ) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
     try:
+        # send request to system server if this is the enableOEMMode setting
+        if update.id == "enableOEMMode":
+            resp = await set_oem_mode_request(update.value)
+            if resp != 200:
+                # TODO: raise correct error here
+                raise Exception(f"Something went wrong setting OEM Mode. err: {resp}")
+
         await advanced_settings.set_adv_setting(update.id, update.value)
         hardware.hardware_feature_flags = HardwareFeatureFlags.build_from_ff()
         await hardware.set_status_bar_enabled(ff.status_bar_enabled())
