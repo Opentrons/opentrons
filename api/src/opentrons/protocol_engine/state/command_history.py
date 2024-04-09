@@ -173,6 +173,8 @@ class CommandHistory:
 
         if command.intent == CommandIntent.SETUP:
             self._add_to_setup_queue(command.id)
+        elif command.intent == CommandIntent.FIXIT:
+            self._add_to_fixit_queue(command.id)
         else:
             self._add_to_queue(command.id)
 

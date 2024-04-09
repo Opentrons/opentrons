@@ -805,13 +805,21 @@ class CommandView(HasState[CommandState]):
                 raise SetupCommandNotAllowedError(
                     "Setup commands are not allowed after run has started."
                 )
-            elif (
-                action.request.intent == CommandIntent.FIXIT
-                and self._state.queue_status != QueueStatus.AWAITING_RECOVERY
-            ):
-                raise FixitCommandNotAllowedError(
-                    "Fixit commands are not allowed when the run is not in a recoverable state."
-                )
+            elif action.request.intent == CommandIntent.FIXIT:
+                if self._state.queue_status != QueueStatus.AWAITING_RECOVERY:
+                    raise FixitCommandNotAllowedError(
+                        "Fixit commands are not allowed when the run is not in a recoverable state."
+                    )
+                elif not self._state.failed_command or (
+                    self._state.failed_command
+                    and self._state.failed_command.command
+                    != action.request.failed_command
+                ):
+                    raise FixitCommandNotAllowedError(
+                        "Fixit command does not match failed command."
+                    )
+                else:
+                    return action
             else:
                 return action
 
