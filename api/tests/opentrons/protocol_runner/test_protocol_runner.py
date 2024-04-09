@@ -345,7 +345,7 @@ async def test_run_json_runner_stop_requested_stops_enquqing(
     json_translator: JsonTranslator,
 ) -> None:
     """It should run a protocol to completion."""
-    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition.construct()
     json_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
@@ -372,7 +372,7 @@ async def test_run_json_runner_stop_requested_stops_enquqing(
         Liquid(id="water-id", displayName="water", description="water desc")
     ]
 
-    json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
+    json_protocol = ProtocolSchemaV6.construct()
 
     decoy.when(
         await protocol_reader.extract_labware_definitions(json_protocol_source)
@@ -385,7 +385,7 @@ async def test_run_json_runner_stop_requested_stops_enquqing(
             pe_commands.HomeCreate(params=pe_commands.HomeParams()),
         )
     ).then_return(
-        pe_commands.Home.construct(status=pe_commands.CommandStatus.SUCCEEDED)  # type: ignore[call-arg]
+        pe_commands.Home.construct(status=pe_commands.CommandStatus.SUCCEEDED)
     )
     decoy.when(
         await protocol_engine.add_and_execute_command(
@@ -394,7 +394,7 @@ async def test_run_json_runner_stop_requested_stops_enquqing(
             ),
         )
     ).then_return(
-        pe_commands.WaitForDuration.construct(  # type: ignore[call-arg]
+        pe_commands.WaitForDuration.construct(
             error=pe_errors.ErrorOccurrence.from_failed(
                 id="some-id",
                 createdAt=datetime(year=2021, month=1, day=1),

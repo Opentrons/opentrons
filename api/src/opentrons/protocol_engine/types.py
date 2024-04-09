@@ -30,7 +30,7 @@ from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
 )
 from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
 from opentrons_shared_data.labware import models as lw_models
-from opentrons_shared_data.protocol.models.shared_models import Location
+from opentrons_shared_data.types import Vec3f as SD_Vec3f
 
 
 class EngineStatus(str, Enum):
@@ -385,12 +385,7 @@ class ModuleDimensions(BaseModel):
     lidHeight: Optional[float] = None
 
 
-class Vec3f(BaseModel):
-    """A 3D vector of floats."""
-
-    x: float
-    y: float
-    z: float
+Vec3f = SD_Vec3f[float]
 
 
 # TODO(mm, 2022-11-07): Deduplicate with Vec3f.

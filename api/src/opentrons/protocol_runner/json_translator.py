@@ -98,7 +98,9 @@ def _translate_module_command(
     translated_obj = pe_commands.LoadModuleCreate(
         params=pe_commands.LoadModuleParams(
             model=ModuleModel(modules[module_id].model),
-            location=DeckSlotLocation.model_validate(location.dict() if isinstance(location, Location) else location),
+            location=DeckSlotLocation.model_validate(
+                location.dict() if isinstance(location, Location) else location
+            ),
             moduleId=command.params.moduleId,
         ),
         key=command.key,
@@ -118,7 +120,9 @@ def _translate_v7_module_command(
     translated_obj = pe_commands.LoadModuleCreate(
         params=pe_commands.LoadModuleParams(
             model=ModuleModel(command.params.model),
-            location=DeckSlotLocation.model_validate(location.dict() if isinstance(location, Location) else location),
+            location=DeckSlotLocation.model_validate(
+                location.dict() if isinstance(location, Location) else location
+            ),
             moduleId=command.params.moduleId,
         ),
         key=command.key,

@@ -14,7 +14,7 @@ class CreateCommandUnion(pydantic.RootModel[CommandCreate]):
 
 def generate_command_schema(version: str) -> str:
     """Generate a JSON Schema that all valid create commands can validate against."""
-    raw_json_schema = CreateCommandUnion.schema_json()
+    raw_json_schema = CreateCommandUnion.model_json_schema()
     schema_as_dict = json.loads(raw_json_schema)
     schema_as_dict["$id"] = f"opentronsCommandSchemaV{version}"
     schema_as_dict["$schema"] = "http://json-schema.org/draft-07/schema#"
