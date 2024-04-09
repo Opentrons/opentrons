@@ -16,7 +16,6 @@ import {
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ChildNavigation } from '../ChildNavigation'
 import { useToaster } from '../ToasterOven'
-import { mockData } from './index'
 
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 
@@ -37,7 +36,7 @@ export function ViewOnlyParameters({
   }
 
   //  TODO(jr, 3/18/24): remove mockData
-  const parameters = mostRecentAnalysis?.runTimeParameters ?? mockData
+  const parameters = mostRecentAnalysis?.runTimeParameters ?? []
 
   return (
     <>
