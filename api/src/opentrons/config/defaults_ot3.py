@@ -2,7 +2,7 @@ from typing import Any, Dict, cast, List, Iterable, Tuple
 from typing_extensions import Final
 from dataclasses import asdict
 
-from opentrons.hardware_control.types import OT3AxisKind
+from opentrons.hardware_control.types import OT3AxisKind, InstrumentProbeType
 from .types import (
     OT3Config,
     ByGantryLoad,
@@ -34,7 +34,7 @@ DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
     aspirate_while_sensing=False,
     auto_zero_sensor=True,
     num_baseline_reads=10,
-    data_file="/var/pressure_sensor_data.csv",
+    data_files={InstrumentProbeType.PRIMARY: "/data/pressure_sensor_data.csv"},
 )
 
 DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSettings(
@@ -302,7 +302,7 @@ def _build_default_liquid_probe(
         num_baseline_reads=from_conf.get(
             "num_baseline_reads", default.num_baseline_reads
         ),
-        data_file=from_conf.get("data_file", default.data_file),
+        data_files=from_conf.get("data_file", default.data_files),
     )
 
 

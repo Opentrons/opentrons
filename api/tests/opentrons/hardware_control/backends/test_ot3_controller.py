@@ -61,6 +61,7 @@ from opentrons.hardware_control.types import (
     UpdateState,
     EstopState,
     CurrentConfig,
+    InstrumentProbeType,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -185,7 +186,7 @@ def fake_liquid_settings() -> LiquidProbeSettings:
         aspirate_while_sensing=False,
         auto_zero_sensor=False,
         num_baseline_reads=8,
-        data_file="fake_data_file",
+        data_files={InstrumentProbeType.PRIMARY: "fake_file_name"},
     )
 
 

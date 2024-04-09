@@ -147,7 +147,7 @@ class FlexBackend(Protocol):
         plunger_speed: float,
         threshold_pascals: float,
         output_format: OutputOptions = OutputOptions.can_bus_only,
-        data_file: Optional[str] = None,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,

@@ -102,6 +102,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
     ErrorCode,
+    SensorId,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     StopRequest,
@@ -1351,7 +1352,7 @@ class OT3Controller(FlexBackend):
         plunger_speed: float,
         threshold_pascals: float,
         output_option: OutputOptions = OutputOptions.can_bus_only,
-        data_file: Optional[Dict[InstrumentProbeType,str]] = None,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -1372,6 +1373,16 @@ class OT3Controller(FlexBackend):
         can_bus_only_output = bool(
             output_option.value & OutputOptions.can_bus_only.value
         )
+        IPT_TO_SID: Dict[InstrumentProbeType, SensorId] = {
+            InstrumentProbeType.PRIMARY: SensorId.S0,
+            InstrumentProbeType.SECONDARY: SensorId.S1,
+            InstrumentProbeType.BOTH: SensorId.BOTH,
+        }
+        data_files_transposed = (
+            None
+            if data_files is None
+            else {IPT_TO_SID[probe]: data_files[probe] for probe in data_files.keys()}
+        )
         positions = await liquid_probe(
             messenger=self._messenger,
             tool=tool,
@@ -1383,7 +1394,7 @@ class OT3Controller(FlexBackend):
             csv_output=csv_output,
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,
-            data_file=data_file,
+            data_files=data_files_transposed,
             auto_zero_sensor=auto_zero_sensor,
             num_baseline_reads=num_baseline_reads,
             sensor_id=sensor_id_for_instrument(probe),
