@@ -35,7 +35,7 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
   const pipetteOptions = options.filter(option =>
     defaultTipracks.includes(option.defURI)
   )
-  const missingTiprack = defaultTipracks.length > options.length
+  const missingTiprack = defaultTipracks.length > pipetteOptions.length
 
   return (
     <Box {...targetProps}>
