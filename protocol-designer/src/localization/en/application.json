@@ -23,6 +23,7 @@
   "next": "Next",
   "no_batch_edit_shared_settings": "Batch editing of settings is only available for Transfer or Mix steps",
   "manually": "Manually",
+  "module_and_slot": "{{moduleLongName}} in Slot {{slotName}}",
   "stepType": {
     "mix": "mix",
     "moveLabware": "move labware",
