@@ -37,6 +37,16 @@ const MODULES = {
   module1: { model: 'module1' },
   module2: { model: 'module2' },
 }
+const RUNTIME_PARAMETERS = [
+  {
+    displayName: 'test param',
+    variableName: 'test_param',
+    description: 'Mock boolean parameter',
+    type: 'bool',
+    default: true,
+    value: true,
+  },
+]
 const FORMATTED_MODULES = 'module1,module2'
 const STORED_PROTOCOL_ANALYSIS = {
   config: { protocolType: 'json', schemaVersion: 1.11 },
@@ -49,11 +59,13 @@ const STORED_PROTOCOL_ANALYSIS = {
   robotType: 'OT-2 Standard',
   pipettes: PIPETTES,
   modules: MODULES,
+  runTimeParameters: RUNTIME_PARAMETERS,
 }
 const ROBOT_PROTOCOL_ANALYSIS = {
   robotType: 'OT-2 Standard',
   pipettes: PIPETTES,
   modules: MODULES,
+  runTimeParameters: RUNTIME_PARAMETERS,
 }
 
 describe('useProtocolAnalysisErrors hook', () => {
@@ -126,6 +138,8 @@ describe('useProtocolAnalysisErrors hook', () => {
         protocolAppName: 'Python API',
         protocolAppVersion: 2.3,
         protocolAuthor: 'hashedString',
+        protocolHasRunTimeParameterCustomValues: false,
+        protocolHasRunTimeParameters: true,
         protocolName: 'robot protocol',
         protocolSource: 'robot protocol source',
         protocolText: 'hashedString',
@@ -156,6 +170,8 @@ describe('useProtocolAnalysisErrors hook', () => {
         protocolAppVersion: '1.1',
         protocolAuthor: 'hashedString',
         protocolName: 'stored protocol',
+        protocolHasRunTimeParameterCustomValues: false,
+        protocolHasRunTimeParameters: true,
         protocolSource: 'stored protocol source',
         protocolText: 'hashedString',
         protocolType: 'json',
