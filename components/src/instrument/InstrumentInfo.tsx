@@ -24,8 +24,10 @@ export interface InstrumentInfoProps {
   /** children to display under the info */
   children?: React.ReactNode
   /** if true, show labels 'LEFT PIPETTE' / 'RIGHT PIPETTE' */
-  showMountLabel?: boolean | null
+  showMountLabel?: boolean
 }
+
+const MAX_WIDTH = '14rem'
 
 export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
   const {
@@ -61,27 +63,27 @@ export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
           >
             {showMountLabel && !has96Channel ? `${mount} pipette` : 'pipette'}
           </StyledText>
-          <StyledText as="p" width="max-content" maxWidth="14rem">
+          <StyledText as="p" width="max-content" maxWidth={MAX_WIDTH}>
             {description}
           </StyledText>
         </Flex>
 
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
           <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            Tip rack
+            {'Tip rack'}
           </StyledText>
           <ul>
-            {tiprackModels != null ? (
+            {tiprackModels != null && tiprackModels.length > 0 ? (
               tiprackModels.map((model, index) => (
                 <li key={`${model}_${index}`}>
-                  <StyledText as="p" width="max-content" maxWidth="14rem">
+                  <StyledText as="p" width="max-content" maxWidth={MAX_WIDTH}>
                     {model}
                   </StyledText>
                 </li>
               ))
             ) : (
-              <StyledText as="p" width="max-content" maxWidth="14rem">
-                None
+              <StyledText as="p" width="max-content" maxWidth={MAX_WIDTH}>
+                {'None'}
               </StyledText>
             )}
           </ul>
