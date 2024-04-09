@@ -42,6 +42,8 @@ const modifiedStoredProtocolData = {
     commands: storedProtocolData?.mostRecentAnalysis?.commands,
     liquids: storedProtocolData?.mostRecentAnalysis?.liquids,
     errors: storedProtocolData?.mostRecentAnalysis?.errors,
+    runTimeParameters:
+      storedProtocolData?.mostRecentAnalysis?.runTimeParameters,
   },
 }
 

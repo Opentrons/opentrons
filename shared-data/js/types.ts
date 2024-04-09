@@ -597,7 +597,7 @@ export interface NumberParameter {
   default: number
 }
 
-interface Choice {
+export interface Choice {
   displayName: string
   value: number | boolean | string
 }
@@ -614,7 +614,7 @@ interface BooleanParameter {
 }
 
 type NumberParameterType = 'int' | 'float'
-type BooleanParameterType = 'boolean'
+type BooleanParameterType = 'bool'
 type StringParameterType = 'str'
 type RunTimeParameterType =
   | NumberParameter

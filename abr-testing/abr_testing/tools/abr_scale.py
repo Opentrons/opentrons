@@ -3,26 +3,9 @@ import os
 import datetime
 from hardware_testing.drivers import find_port, list_ports_and_select  # type: ignore[import]
 from hardware_testing.drivers.radwag import RadwagScale  # type: ignore[import]
-from typing import Any, List
 import argparse
-import csv
 from abr_testing.data_collection import read_robot_logs
-from abr_testing.google_automation import google_sheets_tool
-
-
-def write_to_sheets(file_name_csv: str, google_sheet: Any, row_list: List) -> None:
-    """Write list to google sheet and csv."""
-    sheet_location = os.path.join(storage_directory, file_name_csv)
-    with open(sheet_location, "a", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(row_list)
-        print(f"Written {row_list} point to {file_name_csv}")
-        # Read Google Sheet
-        google_sheet.token_check()
-        google_sheet.write_header(headers)
-        google_sheet.update_row_index()
-        google_sheet.write_to_row(row_list)
-        print(f"Written {row_list} to google sheet.")
+from abr_testing.automation import google_sheets_tool
 
 
 if __name__ == "__main__":
@@ -76,7 +59,7 @@ if __name__ == "__main__":
     is_stable = False
     # Set up csv sheet
     headers = ["Robot", "Date", "Timestamp", "Labware", "Mass (g)", "Measurement Step"]
-    all_data_csv = read_robot_logs.create_abr_data_sheet(
+    sheet_location = read_robot_logs.create_abr_data_sheet(
         storage_directory, file_name, headers
     )
     # Set up google sheet
@@ -90,8 +73,12 @@ if __name__ == "__main__":
         print("No google sheets credentials. Add credentials to storage notebook.")
 
     # Scale Loop
+    grams, is_stable = scale.read_mass()
+    grams, is_stable = scale.read_mass()
+    is_stable = False
     break_all = False
     while is_stable is False:
+        grams, is_stable = scale.read_mass()
         grams, is_stable = scale.read_mass()
         print(f"Scale reading: grams={grams}, is_stable={is_stable}")
         time_now = datetime.datetime.now()
@@ -100,14 +87,19 @@ if __name__ == "__main__":
         row_list = list(row)
         while is_stable is True:
             print("is stable")
-            write_to_sheets(file_name_csv, google_sheet, row_list)
+            read_robot_logs.write_to_sheets(
+                sheet_location, google_sheet, row_list, headers
+            )
             is_stable = False
             y_or_no = input("Do you want to weigh another sample? (Y/N): ")
             if y_or_no == "Y":
                 # Uses same storage directory and file.
+                grams, is_stable = scale.read_mass()
+                is_stable = False
                 robot = input("Robot: ")
                 labware = input("Labware: ")
                 protocol_step = input("Measurement Step (1,2,3): ")
+                grams, is_stable = scale.read_mass()
             elif y_or_no == "N":
                 break_all = True
         if break_all:

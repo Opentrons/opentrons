@@ -183,7 +183,9 @@ export function FlexPipetteCard({
       subsystemUpdateData == null ? (
         <InstrumentCard
           description={
-            attachedPipette != null ? pipetteDisplayName : t('shared:empty')
+            attachedPipette != null && pipetteDisplayName != null
+              ? pipetteDisplayName
+              : i18n.format(t('shared:empty'), 'capitalize')
           }
           instrumentDiagramProps={{
             pipetteSpecs: pipetteModelSpecs,

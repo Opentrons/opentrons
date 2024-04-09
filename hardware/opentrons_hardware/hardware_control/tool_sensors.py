@@ -343,7 +343,6 @@ async def liquid_probe(
     csv_output: bool = False,
     sync_buffer_output: bool = False,
     can_bus_only_output: bool = False,
-    # output_option: OutputOptions,
     data_file: Optional[str] = None,
     auto_zero_sensor: bool = True,
     num_baseline_reads: int = 10,
@@ -374,7 +373,7 @@ async def liquid_probe(
     )
 
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
-    log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
+    log_file: str = "/data/pressure_sensor_data.csv" if not data_file else data_file
     if csv_output:
         return await run_stream_output_to_csv_pressure(
             messenger,

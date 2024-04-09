@@ -7,8 +7,8 @@ import styles from '../StepEditForm.module.css'
 import { FieldProps } from '../types'
 
 type BlowoutLocationDropdownProps = FieldProps & {
-  className?: string
   options: Options
+  className?: string
 }
 
 export const BlowoutLocationField = (
@@ -28,7 +28,7 @@ export const BlowoutLocationField = (
 
   return (
     <DropdownField
-      className={cx(styles.large_field, className)}
+      className={cx(styles.small_field, className)}
       options={options}
       disabled={disabled}
       id={'BlowoutLocationField_dropdown'}

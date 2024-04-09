@@ -6,8 +6,8 @@ import json
 import gspread  # type: ignore[import]
 from datetime import datetime, timedelta
 from abr_testing.data_collection import read_robot_logs
-from typing import Set, Dict, Any
-from abr_testing.google_automation import google_drive_tool, google_sheets_tool
+from typing import Set, Dict, Any, Tuple, List, Union
+from abr_testing.automation import google_drive_tool, google_sheets_tool
 
 
 def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
@@ -30,8 +30,10 @@ def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
 
 
 def create_data_dictionary(
-    runs_to_save: Set[str], storage_directory: str
-) -> Dict[Any, Dict[str, Any]]:
+    runs_to_save: Union[Set[str], str],
+    storage_directory: str,
+    issue_url: str,
+) -> Tuple[Dict[Any, Dict[str, Any]], List]:
     """Pull data from run files and format into a dictionary."""
     runs_and_robots = {}
     for filename in os.listdir(storage_directory):
@@ -41,7 +43,7 @@ def create_data_dictionary(
                 file_results = json.load(file)
         else:
             continue
-        run_id = file_results.get("run_id")
+        run_id = file_results.get("run_id", "NaN")
         if run_id in runs_to_save:
             robot = file_results.get("robot_name")
             protocol_name = file_results["protocol"]["metadata"].get("protocolName", "")
@@ -56,6 +58,7 @@ def create_data_dictionary(
                 error_instrument,
                 error_level,
             ) = read_robot_logs.get_error_info(file_results)
+
             all_modules = get_modules(file_results)
 
             start_time_str, complete_time_str, start_date, run_time_min = (
@@ -100,12 +103,18 @@ def create_data_dictionary(
                     "Right Mount": right_pipette,
                     "Extension": extension,
                 }
-                row_2 = {**row, **all_modules}
+                tc_dict = read_robot_logs.thermocycler_commands(file_results)
+                hs_dict = read_robot_logs.hs_commands(file_results)
+                tm_dict = read_robot_logs.temperature_module_commands(file_results)
+                notes = {"Note1": "", "Jira Link": issue_url}
+                row_2 = {**row, **all_modules, **notes, **hs_dict, **tm_dict, **tc_dict}
+                headers = list(row_2.keys())
                 runs_and_robots[run_id] = row_2
             else:
-                os.remove(file_path)
-                print(f"Run ID: {run_id} has a run time of 0 minutes. Run removed.")
-    return runs_and_robots
+                continue
+                # os.remove(file_path)
+                # print(f"Run ID: {run_id} has a run time of 0 minutes. Run removed.")
+    return runs_and_robots, headers
 
 
 if __name__ == "__main__":
@@ -122,7 +131,7 @@ if __name__ == "__main__":
         metavar="FOLDER_NAME",
         type=str,
         nargs=1,
-        help="Google Drive folder name.",
+        help="Google Drive folder name. Open desired folder and copy string after drive/folders/.",
     )
     parser.add_argument(
         "google_sheet_name",
@@ -131,11 +140,14 @@ if __name__ == "__main__":
         nargs=1,
         help="Google sheet name.",
     )
+    parser.add_argument(
+        "email", metavar="EMAIL", type=str, nargs=1, help="opentrons gmail."
+    )
     args = parser.parse_args()
     folder_name = args.folder_name[0]
     storage_directory = args.storage_directory[0]
     google_sheet_name = args.google_sheet_name[0]
-    parent_folder = False
+    email = args.email[0]
     try:
         credentials_path = os.path.join(storage_directory, "credentials.json")
     except FileNotFoundError:
@@ -143,7 +155,7 @@ if __name__ == "__main__":
         sys.exit()
     try:
         google_drive = google_drive_tool.google_drive(
-            credentials_path, folder_name, parent_folder
+            credentials_path, folder_name, email
         )
         print("Connected to google drive.")
     except json.decoder.JSONDecodeError:
@@ -160,23 +172,19 @@ if __name__ == "__main__":
     except gspread.exceptions.APIError:
         print("ERROR: Check google sheet name. Check credentials file.")
         sys.exit()
+    try:
+        google_sheet_lpc = google_sheets_tool.google_sheet(
+            credentials_path, "ABR-LPC", 0
+        )
+        print("Connected to google sheet ABR-LPC")
+    except gspread.exceptions.APIError:
+        print("ERROR: Check google sheet name. Check credentials file.")
+        sys.exit()
     run_ids_on_gs = google_sheet.get_column(2)
     run_ids_on_gs = set(run_ids_on_gs)
-    # Read Google Drive .json files
-    google_drive_files = google_drive.list_folder()
-    google_drive_files_json = [
-        file for file in google_drive_files if file.endswith(".json")
-    ]
-    # read local directory
-    list_of_files = os.listdir(storage_directory)
-    local_files_json = set(
-        file for file in os.listdir(storage_directory) if file.endswith(".json")
-    )
-    missing_files = local_files_json - set(google_drive_files_json)
-    print(f"Missing files: {len(missing_files)}")
 
     # Uploads files that are not in google drive directory
-    google_drive.upload_missing_files(storage_directory, missing_files)
+    google_drive.upload_missing_files(storage_directory)
 
     # Run ids in google_drive_folder
     run_ids_on_gd = read_robot_logs.get_run_ids_from_google_drive(google_drive)
@@ -184,29 +192,9 @@ if __name__ == "__main__":
         run_ids_on_gd, run_ids_on_gs
     )
     # Add missing runs to google sheet
-    runs_and_robots = create_data_dictionary(missing_runs_from_gs, storage_directory)
-    headers = [
-        "Robot",
-        "Run_ID",
-        "Protocol_Name",
-        "Software Version",
-        "Date",
-        "Start_Time",
-        "End_Time",
-        "Run_Time (min)",
-        "Errors",
-        "Error_Code",
-        "Error_Type",
-        "Error_Instrument",
-        "Error_Level",
-        "Left Mount",
-        "Right Mount",
-        "Extension",
-        "heaterShakerModuleV1",
-        "temperatureModuleV2",
-        "magneticBlockV1",
-        "thermocyclerModuleV2",
-    ]
+    runs_and_robots, headers = create_data_dictionary(
+        missing_runs_from_gs, storage_directory, ""
+    )
     read_robot_logs.write_to_local_and_google_sheet(
         runs_and_robots, storage_directory, google_sheet_name, google_sheet, headers
     )

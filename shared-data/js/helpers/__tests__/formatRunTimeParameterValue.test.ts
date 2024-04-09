@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { formatRunTimeParameterValue } from '../formatRunTimeParameterValue'
+import { formatRunTimeParameterDefaultValue } from '../formatRunTimeParameterDefaultValue'
 
 import type { RunTimeParameter } from '../../types'
 
@@ -9,7 +9,7 @@ const capitalizeFirstLetter = (str: string): string => {
 
 const mockTFunction = vi.fn(str => capitalizeFirstLetter(str))
 
-describe('utils-formatRunTimeParameterValue', () => {
+describe('utils-formatRunTimeParameterDefaultValue', () => {
   it('should return value with suffix when type is int', () => {
     const mockData = {
       value: 6,
@@ -21,7 +21,7 @@ describe('utils-formatRunTimeParameterValue', () => {
       max: 10,
       default: 6,
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('6')
   })
 
@@ -37,15 +37,15 @@ describe('utils-formatRunTimeParameterValue', () => {
       max: 10.0,
       default: 6.5,
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('6.5 mL')
   })
 
-  it('should return value with suffix when type is str', () => {
+  it('should return value when type is str', () => {
     const mockData = {
       value: 'left',
       displayName: 'pipette mount',
-      variableName: 'mont',
+      variableName: 'mount',
       description: 'pipette mount',
       type: 'str',
       choices: [
@@ -60,33 +60,85 @@ describe('utils-formatRunTimeParameterValue', () => {
       ],
       default: 'left',
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('Left')
   })
 
-  it('should return value with suffix when type is boolean true', () => {
+  it('should return value when type is int choice with suffix', () => {
+    const mockData = {
+      value: 5,
+      displayName: 'num',
+      variableName: 'number',
+      description: 'its just number',
+      type: 'int',
+      suffix: 'mL',
+      min: 1,
+      max: 10,
+      choices: [
+        {
+          displayName: 'one',
+          value: 1,
+        },
+        {
+          displayName: 'six',
+          value: 6,
+        },
+      ],
+      default: 5,
+    } as RunTimeParameter
+    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
+    expect(result).toEqual('5 mL')
+  })
+
+  it('should return value when type is float choice with suffix', () => {
+    const mockData = {
+      value: 5.0,
+      displayName: 'num',
+      variableName: 'number',
+      description: 'its just number',
+      type: 'float',
+      suffix: 'mL',
+      min: 1.0,
+      max: 10.0,
+      choices: [
+        {
+          displayName: 'one',
+          value: 1.0,
+        },
+        {
+          displayName: 'six',
+          value: 6.0,
+        },
+      ],
+      default: 5.0,
+    } as RunTimeParameter
+    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
+    expect(result).toEqual('5 mL')
+  })
+
+  it('should return value when type is boolean true', () => {
     const mockData = {
       value: true,
       displayName: 'Deactivate Temperatures',
       variableName: 'DEACTIVATE_TEMP',
       description: 'deactivate temperature on the module',
-      type: 'boolean',
+      type: 'bool',
       default: true,
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('On')
   })
 
-  it('should return value with suffix when type is boolean false', () => {
+  it('should return value when type is boolean false', () => {
     const mockData = {
       value: false,
       displayName: 'Dry Run',
       variableName: 'DRYRUN',
       description: 'Is this a dry or wet run? Wet is true, dry is false',
-      type: 'boolean',
+      type: 'bool',
       default: false,
     } as RunTimeParameter
-    const result = formatRunTimeParameterValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
     expect(result).toEqual('Off')
   })
 })

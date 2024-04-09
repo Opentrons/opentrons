@@ -4,7 +4,9 @@
   "disabled_cannot_delete_trash": "A Trash Bin or Waste Chute is required",
   "disabled_off_deck": "Off-deck labware cannot be modified unless on starting deck state.",
   "disabled_step_creation": "New steps cannot be added in Batch Edit mode.",
-  "disabled_no_space_additional_items": "No space for this combination of staging area slots and modules.",
+  "disabled_no_space_additional_items": "No space for this combination of staging area slots, trash, and modules.",
+  "disabled_you_can_add_one_type": "Only one module of each type is allowed on the deck at a time",
+  "not_enough_space_for_temp": "There is not enough space on the deck to add more temperature modules",
   "not_in_beta": "ⓘ Coming Soon",
 
   "step_description": {
@@ -25,7 +27,7 @@
       "aspirate_delay_mmFromBottom": "Distance from the bottom of the well",
       "aspirate_flowRate": "The speed at which the pipette aspirates",
       "aspirate_mix_checkbox": "Pipette up and down before aspirating",
-      "aspirate_mmFromBottom": "Distance from the bottom of the well",
+      "aspirate_mmFromBottom": "Adjust tip position for aspirate",
       "aspirate_touchTip_checkbox": "Touch tip to each side of well after aspirating",
       "aspirate_touchTip_mmFromBottom": "Distance from the bottom of the well",
       "blowout_checkbox": "Where to dispose of remaining volume in tip",
@@ -36,16 +38,17 @@
       "dispense_delay_mmFromBottom": "Distance from the bottom of the well",
       "dispense_flowRate": "The speed at which the pipette dispenses",
       "dispense_mix_checkbox": "Pipette up and down after dispensing",
-      "dispense_mmFromBottom": "Distance from the bottom of the well",
+      "dispense_mmFromBottom": "Adjust tip position for dispense",
       "dispense_touchTip_checkbox": "Touch tip to each side of well after dispensing",
       "dispense_touchTip_mmFromBottom": "Distance from the bottom of the well",
       "disposalVolume_checkbox": "Aspirate extra volume that is disposed of after a multi-dispense is complete. We recommend a disposal volume of at least the pipette's minimum.",
       "heaterShakerSetTimer": "Once this counter has elapsed, the module will deactivate the heater and shaker",
-      "mix_mmFromBottom": "Distance from the bottom of the well",
+      "mix_mmFromBottom": "Adjust tip position",
       "mix_touchTip_checkbox": "Touch tip to each side of the well after mixing",
       "mix_touchTip_mmFromBottom": "Distance from the bottom of the well",
       "preWetTip": "Pre-wet pipette tip by aspirating and dispensing 2/3 of the tip's max volume",
-      "volume": "Volume to dispense in each well"
+      "volume": "Volume to dispense in each well",
+      "blowout_z_offset": "The height at which blowout occurs from the top of the well"
     },
     "indeterminate": {
       "aspirate_airGap_checkbox": "Not all selected steps are using this setting",
@@ -60,14 +63,22 @@
       "mix_touchTip_checkbox": "Not all selected steps are using this setting",
       "preWetTip": "Not all selected steps are using this setting"
     },
+    "mix": {
+      "disabled": {
+        "mix_mmFromBottom": "Tip position adjustment is not supported",
+        "blowout_z_offset": "Blowout location and destination labware must first be selected"
+      }
+    },
     "moveLiquid": {
       "disabled": {
         "$generic": "Incompatible with current path",
         "aspirate_touchTip_checkbox": "Touch tip is not supported",
         "blowout_checkbox": "Redundant with disposal volume",
         "dispense_mix_checkbox": "Unable to mix in a waste chute or trash bin",
+        "aspirate_mmFromBottom": "Tip position adjustment is not supported",
         "dispense_mmFromBottom": "Tip position adjustment is not supported",
-        "dispense_touchTip_checkbox": "Touch tip is not supported"
+        "dispense_touchTip_checkbox": "Touch tip is not supported",
+        "blowout_z_offset": "Blowout location, source, and destination labware must first be selected"
       }
     },
     "moveLabware": {

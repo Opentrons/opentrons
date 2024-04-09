@@ -36,6 +36,7 @@ from .legacy_wrappers import (
     LegacyExecutor,
     LegacyLoadInfo,
 )
+from ..protocol_engine.errors import ProtocolCommandFailedError
 from ..protocol_engine.types import (
     PostRunHardwareState,
     DeckConfigurationType,
@@ -283,6 +284,7 @@ class JsonRunner(AbstractRunner):
         )
 
         self._hardware_api.should_taskify_movement_execution(taskify=False)
+        self._queued_commands: List[pe_commands.CommandCreate] = []
 
     async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a JSONv6+ ProtocolSource into managed ProtocolEngine."""
@@ -324,17 +326,16 @@ class JsonRunner(AbstractRunner):
                 color=liquid.displayColor,
             )
             await _yield()
+
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
         )
         # this command homes all axes, including pipette plugner and gripper jaw
         self._protocol_engine.add_command(request=initial_home_command)
 
-        for command in commands:
-            self._protocol_engine.add_command(request=command)
-            await _yield()
+        self._queued_commands = commands
 
-        self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
+        self._task_queue.set_run_func(func=self._add_command_and_execute)
 
     async def run(  # noqa: D102
         self,
@@ -354,6 +355,15 @@ class JsonRunner(AbstractRunner):
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
+
+    async def _add_command_and_execute(self) -> None:
+        for command in self._queued_commands:
+            result = await self._protocol_engine.add_and_execute_command(command)
+            if result and result.error:
+                raise ProtocolCommandFailedError(
+                    original_error=result.error,
+                    message=f"{result.error.errorType}: {result.error.detail}",
+                )
 
 
 class LiveRunner(AbstractRunner):

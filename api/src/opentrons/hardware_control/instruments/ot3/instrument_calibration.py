@@ -21,7 +21,7 @@ from opentrons.calibration_storage import (
 )
 from opentrons.hardware_control.types import OT3Mount
 
-PIPETTE_OFFSET_CONSISTENCY_LIMIT: Final = 1.5
+PIPETTE_OFFSET_CONSISTENCY_LIMIT: Final = 4.0
 
 # These type aliases aid typechecking in tests that work the same on this and
 # the hardware_control.instruments.ot2 variant

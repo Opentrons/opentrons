@@ -36,6 +36,8 @@ const airGapHelper = makeAirGapHelper({
   wellLocation: {
     origin: 'bottom',
     offset: {
+      x: 0,
+      y: 0,
       z: 11.54,
     },
   },
@@ -44,6 +46,8 @@ const dispenseAirGapHelper = makeDispenseAirGapHelper({
   wellLocation: {
     origin: 'bottom',
     offset: {
+      x: 0,
+      y: 0,
       z: 11.54,
     },
   },
@@ -84,11 +88,15 @@ beforeEach(() => {
     aspirateAirGapVolume: null,
     touchTipAfterDispense: false,
     dropTipLocation: FIXED_TRASH_ID,
+    aspirateXOffset: 0,
+    dispenseXOffset: 0,
+    aspirateYOffset: 0,
+    dispenseYOffset: 0,
   }
   blowoutSingleToTrash = blowoutInPlaceHelper()
   blowoutSingleToSourceA1 = blowoutHelper(SOURCE_LABWARE, {
     wellLocation: {
-      origin: 'bottom',
+      origin: 'top',
       offset: {
         z: BLOWOUT_OFFSET_ANY,
       },
@@ -96,7 +104,7 @@ beforeEach(() => {
   })
   blowoutSingleToDestA4 = blowoutHelper(DEST_LABWARE, {
     wellLocation: {
-      origin: 'bottom',
+      origin: 'top',
       offset: {
         z: BLOWOUT_OFFSET_ANY,
       },
@@ -105,7 +113,7 @@ beforeEach(() => {
   })
   blowoutSingleToDestA3 = blowoutHelper(DEST_LABWARE, {
     wellLocation: {
-      origin: 'bottom',
+      origin: 'top',
       offset: {
         z: BLOWOUT_OFFSET_ANY,
       },
@@ -274,6 +282,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -309,6 +319,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -320,6 +332,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -553,6 +567,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -565,6 +581,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -690,6 +708,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -701,6 +721,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -781,6 +803,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -793,6 +817,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         wellLocation: {
           origin: 'bottom',
           offset: {
+            x: 0,
+            y: 0,
             z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
           },
         },
@@ -879,6 +905,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },

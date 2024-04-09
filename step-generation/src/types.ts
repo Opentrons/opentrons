@@ -192,6 +192,10 @@ export type SharedTransferLikeArgs = CommonArgs & {
   aspirateFlowRateUlSec: number
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm: number
+  /** x offset mm */
+  aspirateXOffset: number
+  /** y offset mm */
+  aspirateYOffset: number
 
   // ===== DISPENSE SETTINGS =====
   /** Air gap after dispense */
@@ -206,6 +210,10 @@ export type SharedTransferLikeArgs = CommonArgs & {
   dispenseFlowRateUlSec: number
   /** offset from bottom of well in mm */
   dispenseOffsetFromBottomMm: number
+  /** x offset mm */
+  dispenseXOffset: number
+  /** y offset mm */
+  dispenseYOffset: number
 }
 
 export type ConsolidateArgs = SharedTransferLikeArgs & {
@@ -286,6 +294,12 @@ export type MixArgs = CommonArgs & {
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm: number
   dispenseOffsetFromBottomMm: number
+  /** x offset */
+  aspirateXOffset: number
+  dispenseXOffset: number
+  /** y offset */
+  aspirateYOffset: number
+  dispenseYOffset: number
   /** flow rates in uL/sec */
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number

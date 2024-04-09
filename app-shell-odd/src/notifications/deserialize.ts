@@ -12,7 +12,7 @@ import type {
 import { FAILURE_STATUSES } from '../constants'
 
 const VALID_NOTIFY_RESPONSES: [NotifyRefetchData, NotifyUnsubscribeData] = [
-  { refetchUsingHTTP: true },
+  { refetch: true },
   { unsubscribe: true },
 ]
 
