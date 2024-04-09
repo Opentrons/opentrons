@@ -564,12 +564,8 @@ class SyncClient:
         # When Protocol Engine has a proper comment command, we should use it here.
         legacy_comment_command = make_legacy_comment_command(msg=message)
 
-        class LegacyCommentCustomParams(commands.CustomParams):
-            legacyCommandType: str
-            legacyCommandText: str
-
         request = commands.CustomCreate(
-            params=LegacyCommentCustomParams(
+            params=commands.LegacyCommentCustomParams(
                 # This matches how LegacyCommandWrapper handles comments coming from
                 # protocols running under the older non-ProtocolEngine core.
                 legacyCommandType=legacy_comment_command["name"],
@@ -619,7 +615,9 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.thermocycler.SetTargetLidTemperatureResult.model_validate(result)
+        return commands.thermocycler.SetTargetLidTemperatureResult.model_validate(
+            result
+        )
 
     def thermocycler_set_target_block_temperature(
         self,
@@ -638,7 +636,9 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.thermocycler.SetTargetBlockTemperatureResult.model_validate(result)
+        return commands.thermocycler.SetTargetBlockTemperatureResult.model_validate(
+            result
+        )
 
     def thermocycler_wait_for_lid_temperature(
         self, module_id: str
@@ -660,7 +660,9 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.thermocycler.WaitForBlockTemperatureResult.model_validate(result)
+        return commands.thermocycler.WaitForBlockTemperatureResult.model_validate(
+            result
+        )
 
     def thermocycler_run_profile(
         self,
@@ -760,7 +762,9 @@ class SyncClient:
             )
         )
         result = self._transport.execute_command(request=request)
-        return commands.heater_shaker.SetAndWaitForShakeSpeedResult.model_validate(result)
+        return commands.heater_shaker.SetAndWaitForShakeSpeedResult.model_validate(
+            result
+        )
 
     def heater_shaker_open_labware_latch(
         self, module_id: str
@@ -812,7 +816,9 @@ class SyncClient:
             ),
         )
         result = self._transport.execute_command(request=request)
-        return commands.temperature_module.SetTargetTemperatureResult.model_validate(result)
+        return commands.temperature_module.SetTargetTemperatureResult.model_validate(
+            result
+        )
 
     def temperature_module_wait_for_target_temperature(
         self, module_id: str, celsius: Optional[float]
@@ -824,7 +830,9 @@ class SyncClient:
             ),
         )
         result = self._transport.execute_command(request=request)
-        return commands.temperature_module.WaitForTemperatureResult.model_validate(result)
+        return commands.temperature_module.WaitForTemperatureResult.model_validate(
+            result
+        )
 
     def temperature_module_deactivate(
         self, module_id: str
@@ -836,7 +844,9 @@ class SyncClient:
             ),
         )
         result = self._transport.execute_command(request=request)
-        return commands.temperature_module.DeactivateTemperatureResult.model_validate(result)
+        return commands.temperature_module.DeactivateTemperatureResult.model_validate(
+            result
+        )
 
     def home(self, axes: Optional[List[MotorAxis]]) -> commands.HomeResult:
         """Execute a `home` command and return the result."""

@@ -26,6 +26,13 @@ class CustomParams(BaseModel):
     model_config = ConfigDict(extra="allow")
 
 
+# TODO: replace this once we have the proper comment command
+class LegacyCommentCustomParams(CustomParams):
+
+    legacyCommandType: str
+    legacyCommandText: str
+
+
 class CustomResult(BaseModel):
     """Result data from a custom command."""
 

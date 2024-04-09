@@ -145,12 +145,9 @@ async def test_runner_with_modules_in_legacy_python(
         result=heater_shaker_result_captor,
     )
 
-    assert temp_module_result_captor.value["model"] == ModuleModel.TEMPERATURE_MODULE_V1
-    assert mag_module_result_captor.value["model"] == ModuleModel.MAGNETIC_MODULE_V1
+    assert temp_module_result_captor.value.model == ModuleModel.TEMPERATURE_MODULE_V1
+    assert mag_module_result_captor.value.model == ModuleModel.MAGNETIC_MODULE_V1
+    assert thermocycler_result_captor.value.model == ModuleModel.THERMOCYCLER_MODULE_V1
     assert (
-        thermocycler_result_captor.value["model"] == ModuleModel.THERMOCYCLER_MODULE_V1
-    )
-    assert (
-        heater_shaker_result_captor.value["model"]
-        == ModuleModel.HEATER_SHAKER_MODULE_V1
+        heater_shaker_result_captor.value.model == ModuleModel.HEATER_SHAKER_MODULE_V1
     )

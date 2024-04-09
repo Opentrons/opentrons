@@ -136,7 +136,6 @@ def test_analysis_deck_definition(
     )
 
     result = _get_analysis_result([protocol_source_file])
-    breakpoint()
     assert result.exit_code == 0
 
     assert result.json_output is not None

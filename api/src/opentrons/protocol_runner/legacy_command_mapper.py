@@ -37,11 +37,7 @@ from .legacy_wrappers import (
 )
 
 
-class LegacyCommandParams(pe_commands.CustomParams):
-    """Custom command data payload for mapped legacy commands."""
-
-    legacyCommandType: str
-    legacyCommandText: str
+LegacyCommandParams = pe_commands.LegacyCommentCustomParams
 
 
 class LegacyContextCommandError(ProtocolEngineError):

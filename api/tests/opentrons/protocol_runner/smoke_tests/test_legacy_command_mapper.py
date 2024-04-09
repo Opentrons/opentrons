@@ -276,14 +276,12 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         result=pipette_right_result_captor,
     )
 
-    # TODO(mc, 2021-11-11): not sure why I have to dict-access these properties
-    # might be a bug in Decoy, might be something weird that Pydantic does
-    tiprack_1_id = tiprack_1_result_captor.value["labwareId"]
-    tiprack_2_id = tiprack_2_result_captor.value["labwareId"]
-    well_plate_1_id = well_plate_1_result_captor.value["labwareId"]
-    module_plate_1_id = module_plate_1_result_captor.value["labwareId"]
-    pipette_left_id = pipette_left_result_captor.value["pipetteId"]
-    pipette_right_id = pipette_right_result_captor.value["pipetteId"]
+    tiprack_1_id = tiprack_1_result_captor.value.labwareId
+    tiprack_2_id = tiprack_2_result_captor.value.labwareId
+    well_plate_1_id = well_plate_1_result_captor.value.labwareId
+    module_plate_1_id = module_plate_1_result_captor.value.labwareId
+    pipette_left_id = pipette_left_result_captor.value.pipetteId
+    pipette_right_id = pipette_right_result_captor.value.pipetteId
 
     assert commands_result[8] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
