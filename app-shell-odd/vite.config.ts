@@ -1,4 +1,4 @@
-import { versionForProject } from '../scripts/git-version'
+import { versionForProject } from '../scripts/git-version.mjs'
 import pkg from './package.json'
 import path from 'path'
 import { UserConfig, defineConfig } from 'vite'
