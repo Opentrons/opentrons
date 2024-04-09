@@ -276,7 +276,7 @@ def test_pick_up_tip(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
         ),
-        mock_engine_client.pick_up_tip(
+        mock_engine_client.pick_up_tip_wait_for_recovery(
             pipette_id="abc123",
             labware_id="labware-id",
             well_name="well-name",

@@ -265,6 +265,7 @@ class LegacyCommandMapper:
                 results.append(
                     pe_actions.FailCommandAction(
                         command_id=running_command.id,
+                        running_command=running_command,
                         error_id=ModelUtils.generate_id(),
                         failed_at=now,
                         error=LegacyContextCommandError(command_error),
