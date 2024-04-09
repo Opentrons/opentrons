@@ -217,41 +217,59 @@ class ProtocolCore(
             version=version,
             display_name=label,
         )
-        # FIXME(jbl, 2023-08-14) validating after loading the object issue
-        validation.ensure_definition_is_labware(load_result.definition)
 
-        # FIXME(mm, 2023-02-21):
-        #
-        # We're wrongly checking for deck conflicts *after* we've already loaded the
-        # labware into the ProtocolEngine. If it turns out there is a conflict,
-        # and this check raises, it will leave this object and its ProtocolEngine
-        # in a confusing inconsistent state.
-        #
-        # I expect we can get away with this in practice a lot of the time because
-        # exceptions in Python protocols are mostly treated as fatal, anyway.
-        # Users rarely catch them.
-        deck_conflict.check(
-            engine_state=self._engine_client.state,
-            new_labware_id=load_result.labwareId,
-            existing_disposal_locations=self._disposal_locations,
-            # TODO (spp, 2023-11-27): We've been using IDs from _labware_cores_by_id
-            #  and _module_cores_by_id instead of getting the lists directly from engine
-            #  because of the chance of engine carrying labware IDs from LPC too.
-            #  But with https://github.com/Opentrons/opentrons/pull/13943,
-            #  & LPC in maintenance runs, we can now rely on engine state for these IDs too.
-            # Wrapping .keys() in list() is just to make Decoy verification easier.
-            existing_labware_ids=list(self._labware_cores_by_id.keys()),
-            existing_module_ids=list(self._module_cores_by_id.keys()),
-        )
-
-        labware_core = LabwareCore(
-            labware_id=load_result.labwareId,
-            engine_client=self._engine_client,
-        )
-
-        self._labware_cores_by_id[labware_core.labware_id] = labware_core
-
-        return labware_core
+        try:
+            validation.ensure_definition_is_labware(load_result.definition)
+            deck_conflict.check(
+                engine_state=self._engine_client.state,
+                new_labware_id=load_result.labwareId,
+                existing_disposal_locations=self._disposal_locations,
+                # TODO (spp, 2023-11-27): We've been using IDs from _labware_cores_by_id
+                #  and _module_cores_by_id instead of getting the lists directly from engine
+                #  because of the chance of engine carrying labware IDs from LPC too.
+                #  But with https://github.com/Opentrons/opentrons/pull/13943,
+                #  & LPC in maintenance runs, we can now rely on engine state for these IDs too.
+                existing_labware_ids=list(self._labware_cores_by_id.keys()),
+                existing_module_ids=list(self._module_cores_by_id.keys()),
+            )
+        except Exception:
+            # The load worked at the ProtocolEngine layer, but we've just determined
+            # here in the PAPI layer that it's invalid. Unload it from ProtocolEngine
+            # to keep the two layers in sync.
+            #
+            # FIXME(mm, 2024-04-09): This strategy is not sufficient in general.
+            # For example, if we load a labware first and a conflicting module
+            # second, we can't unload the conflicting module.
+            #
+            # We should do some combination of these:
+            #
+            # 1. Make the conflict checks fine-grained and geometry-based (what will
+            #    *actually* collide), instead of coarse-grained and heuristic-based
+            #    (like "no tall labware next to a Heater-Shaker unless it's one of
+            #    these specific definitions"). That way, if the checks start applying
+            #    to JSON and HTTP protocols, they wouldn't be overconservative and take
+            #    meaningful flexibility away from those platforms.
+            #
+            # 2. Make the conflict checks warnings instead of errors, for the same
+            #    reason.
+            #
+            # 3. Move the checks from PAPI down into ProtocolEngine so they can happen
+            #    atomically with the load.
+            self._engine_client.move_labware(
+                labware_id=load_result.labwareId,
+                new_location="offDeck",
+                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+                pick_up_offset=None,
+                drop_offset=None,
+            )
+            raise
+        else:
+            labware_core = LabwareCore(
+                labware_id=load_result.labwareId,
+                engine_client=self._engine_client,
+            )
+            self._labware_cores_by_id[labware_core.labware_id] = labware_core
+            return labware_core
 
     def load_adapter(
         self,
@@ -281,30 +299,36 @@ class ProtocolCore(
             namespace=namespace,
             version=version,
         )
-        # FIXME(jbl, 2023-08-14) validating after loading the object issue
-        validation.ensure_definition_is_adapter(load_result.definition)
 
-        # FIXME(jbl, 2023-06-23) read fixme above:
-        deck_conflict.check(
-            engine_state=self._engine_client.state,
-            new_labware_id=load_result.labwareId,
-            existing_disposal_locations=self._disposal_locations,
-            # TODO: We can now fetch these IDs from engine too.
-            #  See comment in self.load_labware().
-            #
-            # Wrapping .keys() in list() is just to make Decoy verification easier.
-            existing_labware_ids=list(self._labware_cores_by_id.keys()),
-            existing_module_ids=list(self._module_cores_by_id.keys()),
-        )
-
-        labware_core = LabwareCore(
-            labware_id=load_result.labwareId,
-            engine_client=self._engine_client,
-        )
-
-        self._labware_cores_by_id[labware_core.labware_id] = labware_core
-
-        return labware_core
+        try:
+            validation.ensure_definition_is_adapter(load_result.definition)
+            deck_conflict.check(
+                engine_state=self._engine_client.state,
+                new_labware_id=load_result.labwareId,
+                existing_disposal_locations=self._disposal_locations,
+                # TODO: We can now fetch these IDs from engine.
+                # See comment in self.load_labware().
+                existing_labware_ids=list(self._labware_cores_by_id.keys()),
+                existing_module_ids=list(self._module_cores_by_id.keys()),
+            )
+        except Exception:
+            # Try to keep the ProtocolEngine layer in sync with the PAPI layer.
+            # See explanation and FIXME comment in self.load_labware().
+            self._engine_client.move_labware(
+                labware_id=load_result.labwareId,
+                new_location="offDeck",
+                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+                pick_up_offset=None,
+                drop_offset=None,
+            )
+            raise
+        else:
+            labware_core = LabwareCore(
+                labware_id=load_result.labwareId,
+                engine_client=self._engine_client,
+            )
+            self._labware_cores_by_id[labware_core.labware_id] = labware_core
+            return labware_core
 
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
@@ -345,6 +369,10 @@ class ProtocolCore(
             else None
         )
 
+        from_location = self._engine_client.state.labware.get_location(
+            labware_id=labware_core.labware_id
+        )
+
         to_location = self._convert_labware_location(location=new_location)
 
         self._engine_client.move_labware(
@@ -355,25 +383,36 @@ class ProtocolCore(
             drop_offset=_drop_offset,
         )
 
-        if strategy == LabwareMovementStrategy.USING_GRIPPER:
-            # Clear out last location since it is not relevant to pipetting
-            # and we only use last location for in-place pipetting commands
-            self.set_last_location(location=None, mount=Mount.EXTENSION)
-
-        # FIXME(jbl, 2024-01-04) deck conflict after execution logic issue, read notes in load_labware for more info:
-        deck_conflict.check(
-            engine_state=self._engine_client.state,
-            new_labware_id=labware_core.labware_id,
-            existing_disposal_locations=self._disposal_locations,
-            # TODO: We can now fetch these IDs from engine too.
-            #  See comment in self.load_labware().
-            existing_labware_ids=[
-                labware_id
-                for labware_id in self._labware_cores_by_id
-                if labware_id != labware_core.labware_id
-            ],
-            existing_module_ids=list(self._module_cores_by_id.keys()),
-        )
+        try:
+            deck_conflict.check(
+                engine_state=self._engine_client.state,
+                new_labware_id=labware_core.labware_id,
+                existing_disposal_locations=self._disposal_locations,
+                # TODO: We can now fetch these IDs from engine too.
+                #  See comment in self.load_labware().
+                existing_labware_ids=[
+                    labware_id
+                    for labware_id in self._labware_cores_by_id
+                    if labware_id != labware_core.labware_id
+                ],
+                existing_module_ids=list(self._module_cores_by_id.keys()),
+            )
+        except Exception:
+            # Try to keep the ProtocolEngine layer in sync with the PAPI layer.
+            # See explanation and FIXME comment in self.load_labware().
+            self._engine_client.move_labware(
+                labware_id=labware_core.labware_id,
+                new_location=from_location,
+                strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+                pick_up_offset=None,
+                drop_offset=None,
+            )
+            raise
+        else:
+            if strategy == LabwareMovementStrategy.USING_GRIPPER:
+                # Clear out last location since it is not relevant to pipetting
+                # and we only use last location for in-place pipetting commands
+                self.set_last_location(location=None, mount=Mount.EXTENSION)
 
     def _resolve_module_hardware(
         self, serial_number: str, model: ModuleModel
