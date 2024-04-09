@@ -41,7 +41,7 @@ describe('UnskippableModal', () => {
     )
     screen.getByText('Exit')
     screen.getByText('Go back')
-    fireEvent.click(screen.getByRole('button', { name: 'exit' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Exit' }))
     expect(props.proceed).toHaveBeenCalled()
   })
 })
