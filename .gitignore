@@ -160,3 +160,6 @@ opentrons-robot-app.tar.gz
 # asdf versions file
 .tool-versions
 mock_dir
+hardware/.npm-cache/_update-notifier-last-checked
+hardware/.npm-cache/_cacache/content-v2/sha512/e0/f2/0b78b807658be0f5790f7dfcb48708e26a9ed3a9632250264215afa1e5a04fee513f603e12351fcbd1e18e9c6d553cac9858275e1b00cb6d3a049ab6a435
+hardware/.npm-cache/_cacache/index-v5/af/03/5c781820370e585dc2323edbbc80669bf714da5b47d56510c7d0bd7521ee
