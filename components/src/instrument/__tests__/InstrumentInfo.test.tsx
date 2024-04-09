@@ -45,4 +45,10 @@ describe('InstrumentInfo', () => {
     screen.getByText('Tip rack')
     screen.getByText('mock1')
   })
+  it('renders none for pip and tiprack if none are selected', () => {
+    props.pipetteSpecs = undefined
+    props.tiprackModels = undefined
+    render(props)
+    screen.getByText('None')
+  })
 })

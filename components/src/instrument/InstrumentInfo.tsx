@@ -71,15 +71,19 @@ export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
             Tip rack
           </StyledText>
           <ul>
-            {tiprackModels != null
-              ? tiprackModels.map((model, index) => (
-                  <li key={`${model}_${index}`}>
-                    <StyledText as="p" width="max-content" maxWidth="14rem">
-                      {model}
-                    </StyledText>
-                  </li>
-                ))
-              : null}
+            {tiprackModels != null ? (
+              tiprackModels.map((model, index) => (
+                <li key={`${model}_${index}`}>
+                  <StyledText as="p" width="max-content" maxWidth="14rem">
+                    {model}
+                  </StyledText>
+                </li>
+              ))
+            ) : (
+              <StyledText as="p" width="max-content" maxWidth="14rem">
+                None
+              </StyledText>
+            )}
           </ul>
         </Flex>
       </Flex>
