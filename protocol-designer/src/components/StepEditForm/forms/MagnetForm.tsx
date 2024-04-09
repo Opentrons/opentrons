@@ -16,14 +16,14 @@ import type { StepFormProps } from '../types'
 
 import styles from '../StepEditForm.module.css'
 
-export const MagnetForm = (props: StepFormProps): JSX.Element => {
+export function MagnetForm(props: StepFormProps): JSX.Element {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getMagneticLabwareOptions
   )
   const moduleEntities = useSelector(getModuleEntities)
   const { t } = useTranslation(['application', 'form'])
-  const { magnetAction, moduleId } = props.formData
-  const { propsForFields } = props
+  const { propsForFields, formData } = props
+  const { magnetAction, moduleId } = formData
 
   const moduleModel = moduleEntities[moduleId].model
   const moduleOption: string | null | undefined = moduleLabwareOptions[0]
