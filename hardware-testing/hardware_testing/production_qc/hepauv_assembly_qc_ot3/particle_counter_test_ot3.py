@@ -29,13 +29,13 @@ async def _main(arguments: argparse.Namespace) -> None:
         operator = input("Enter Operator Name(输入测试者名称):: ").strip()
         HEPASN = input("Enter HEPA/UV Barcode Number(输入HEPA/UV条码):: ").strip()
 
-        input("CLEAN OT3FLEX,CLOSE DOOR,PRESS ENTER TO CONTINUE(清洁0T3后,关闭OT3门,按回车键开始测试)").strip()
+        input("CLEAN OT3FLEX,PRESS ENTER TO CONTINUE(请清洁0T3内部所有位置,按回车键开始测试)").strip()
 
         api = await helpers_ot3.build_async_ot3_hardware_api(
             is_simulating=arguments.simulate, use_defaults=True
         )
         # home and move to attach position
-        await api.home()
+        
         instrument = BuildAsairGT521S()
         uvinstrument = BuildAsairUV()
         INTSN = instrument.serial_number().strip("SS").replace(' ', '')
@@ -47,8 +47,11 @@ async def _main(arguments: argparse.Namespace) -> None:
         csv_cb.write(["HEPA SN:" , HEPASN])
 
         if not arguments.skip_fan:
-            slotc2 = (229.71,196.32,291.17)
-            await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, Point(slotc2[0], slotc2[1], slotc2[2]))
+            await api.home()
+            # slotc2 = (229.71,196.32,291.17)
+            # await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, Point(slotc2[0], slotc2[1], slotc2[2]))
+            input("Place the particle instrument in C2,PRESS ENTER TO CONTINUE.(把粒子测试仪器放在C2位置,按回车键继续)")
+
             test_data={
                             'Time(Date Time)': None,
                             'Size1(um)': None,
@@ -60,7 +63,9 @@ async def _main(arguments: argparse.Namespace) -> None:
                             'PASS/FAIL': None,
                                 }
                                 
-        
+            input("PLACE CLOSE OTflex DOOR,PRESS ENTER TO CONTINUE.(关闭OT3门,按回车键继续)")
+
+
             input("TURN ON FAN,PRESS ENTER TO CONTINUE.(打开风扇后,按回车键继续)")
             instrument.initialize_connection()
             instrument.clear_data()
@@ -113,12 +118,14 @@ async def _main(arguments: argparse.Namespace) -> None:
                 test_data['Sample Time(sec)']=record_dict['Sample Time']
                 test_data['PASS/FAIL'] = test_result
                 csv_cb.write(list(test_data.values()))
-            input("TURN OFF FAN,PRESS ENTER TO CONTINUE.(关闭风扇后,按回车键继续)")
+            input("TURN OFF FAN,PRESS ENTER TO CONTINUE.(关闭风扇,把粒子仪器移除,按回车键继续)")
+            
         
-        await api.home()
         if not arguments.skip_uv:
+            await api.home()
             input("PLACE THE UV METER ON THE SLOT B3 TO START TEST(将紫外线计放置在插槽B2上开始测试)")
             #UV
+            
             
             test_data2={
                         'SLOT': None,
