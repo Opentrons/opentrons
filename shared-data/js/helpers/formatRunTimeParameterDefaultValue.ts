@@ -9,6 +9,18 @@ export const formatRunTimeParameterDefaultValue = (
     'suffix' in runTimeParameter && runTimeParameter.suffix != null
       ? runTimeParameter.suffix
       : null
+
+  if ('choices' in runTimeParameter && runTimeParameter.choices != null) {
+    const choice = runTimeParameter.choices.find(
+      choice => choice.value === defaultValue
+    )
+    if (choice != null) {
+      return suffix != null
+        ? `${choice.displayName} ${suffix}`
+        : choice.displayName
+    }
+  }
+
   switch (type) {
     case 'int':
     case 'float':
@@ -21,15 +33,7 @@ export const formatRunTimeParameterDefaultValue = (
       } else {
         return Boolean(defaultValue) ? 'On' : 'Off'
       }
-    case 'str':
-      if ('choices' in runTimeParameter && runTimeParameter.choices != null) {
-        const choice = runTimeParameter.choices.find(
-          choice => choice.value === defaultValue
-        )
-        if (choice != null) {
-          return choice.displayName
-        }
-      }
+    default:
       break
   }
   return ''
