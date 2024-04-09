@@ -91,7 +91,7 @@ PRESSURE_ASPIRATED_P50 = PressureEventConfig(
     min=-8000.0,
     max=8000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
-    stability_threshold=200.0,
+    stability_threshold=600.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
