@@ -43,7 +43,7 @@ interface ModuleStepItemsProps {
   message?: string | null
 }
 
-export const ModuleStepItems = (props: ModuleStepItemsProps): JSX.Element => {
+export function ModuleStepItems(props: ModuleStepItemsProps): JSX.Element {
   const {
     moduleType,
     actionText,
@@ -63,7 +63,7 @@ export const ModuleStepItems = (props: ModuleStepItemsProps): JSX.Element => {
 
   return (
     <>
-      {!hideHeader && (
+      {!Boolean(hideHeader) ? (
         <li className={styles.substep_header}>
           <span>
             {moduleSlot != null
@@ -75,7 +75,7 @@ export const ModuleStepItems = (props: ModuleStepItemsProps): JSX.Element => {
           </span>
           <span>{action}</span>
         </li>
-      )}
+      ) : null}
       <Tooltip {...tooltipProps}>
         <LabwareTooltipContents labwareNickname={labwareNickname} />
       </Tooltip>

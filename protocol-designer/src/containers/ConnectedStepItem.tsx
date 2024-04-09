@@ -42,10 +42,10 @@ import {
   getInitialDeckSetup,
 } from '../step-forms/selectors'
 
+import type { ThunkDispatch } from 'redux-thunk'
 import type { SubstepIdentifier } from '../steplist/types'
 import type { StepIdType } from '../form-types'
 import type { BaseState, ThunkAction } from '../types'
-import type { ThunkDispatch } from 'redux-thunk'
 
 export interface ConnectedStepItemProps {
   stepId: StepIdType

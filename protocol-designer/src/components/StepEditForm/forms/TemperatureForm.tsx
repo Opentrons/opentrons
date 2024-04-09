@@ -8,7 +8,7 @@ import type { StepFormProps } from '../types'
 
 import styles from '../StepEditForm.module.css'
 
-export const TemperatureForm = (props: StepFormProps): JSX.Element => {
+export function TemperatureForm(props: StepFormProps): JSX.Element {
   const { t } = useTranslation(['application', 'form'])
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
