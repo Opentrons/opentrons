@@ -160,6 +160,12 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
             " the command's execution or the command's generation."
         ),
     )
+    failed_command: Optional[BaseCommand] = Field(
+        None,
+        description=(
+            "FIXIT command use only. Reference of the failed command we are trying to fix."
+        ),
+    )
 
 
 class AbstractCommandImpl(

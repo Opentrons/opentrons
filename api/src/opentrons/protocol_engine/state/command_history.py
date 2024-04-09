@@ -33,6 +33,12 @@ class CommandHistory:
     _queued_setup_command_ids: OrderedSet[str]
     """The IDs of queued setup commands, in FIFO order"""
 
+    _queued_fixit_command_ids: OrderedSet[str]
+    """The IDs of queued fixit commands, in FIFO order"""
+
+    _executed_command_ids: List[str]
+    """The IDs of all executed commands (setup, fixit, protocol) ordered from oldest to newest."""
+
     _running_command_id: Optional[str]
     """The ID of the currently running command, if any"""
 
@@ -43,6 +49,8 @@ class CommandHistory:
         self._all_command_ids = []
         self._queued_command_ids = OrderedSet()
         self._queued_setup_command_ids = OrderedSet()
+        self._queued_fixit_command_ids = OrderedSet()
+        self._executed_command_ids = []
         self._commands_by_id = OrderedDict()
         self._running_command_id = None
         self._terminal_command_id = None
@@ -135,6 +143,10 @@ class CommandHistory:
         """Get the IDs of all queued setup commands, in FIFO order."""
         return self._queued_setup_command_ids
 
+    def get_fixit_queue_ids(self) -> OrderedSet[str]:
+        """Get the IDs of all queued fixit commands, in FIFO order."""
+        return self._queued_fixit_command_ids
+
     def clear_queue(self) -> None:
         """Clears all commands within the queued command ids structure."""
         self._queued_command_ids.clear()
@@ -142,6 +154,10 @@ class CommandHistory:
     def clear_setup_queue(self) -> None:
         """Clears all commands within the queued setup command ids structure."""
         self._queued_setup_command_ids.clear()
+
+    def clear_fixit_queue(self) -> None:
+        """Clears all commands within the queued setup command ids structure."""
+        self._queued_fixit_command_ids.clear()
 
     def set_command_queued(self, command: Command) -> None:
         """Validate and mark a command as queued in the command history."""
@@ -239,6 +255,10 @@ class CommandHistory:
         """Add a new ID to the queued setup."""
         self._queued_setup_command_ids.add(command_id)
 
+    def _add_to_fixit_queue(self, command_id: str) -> None:
+        """Add a new ID to the queued fixit."""
+        self._queued_fixit_command_ids.add(command_id)
+
     def _remove_queue_id(self, command_id: str) -> None:
         """Remove a specific command from the queued command ids structure."""
         self._queued_command_ids.discard(command_id)
@@ -246,6 +266,10 @@ class CommandHistory:
     def _remove_setup_queue_id(self, command_id: str) -> None:
         """Remove a specific command from the queued setup command ids structure."""
         self._queued_setup_command_ids.discard(command_id)
+
+    def _remove_fixit_queue_id(self, command_id: str) -> None:
+        """Remove a specific command from the queued fixit command ids structure."""
+        self._queued_fixit_command_ids.discard(command_id)
 
     def _set_terminal_command_id(self, command_id: str) -> None:
         """Set the ID of the most recently dequeued command."""
