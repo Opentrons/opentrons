@@ -12,6 +12,7 @@ import {
 import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 
 import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
+import { getRunTimeParameterValuesForRun } from '../Devices/utils'
 import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
@@ -46,14 +47,11 @@ export function ProtocolSetupParameters({
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
-
-  // todo (nd:04/01/2024): remove mock and look at runTimeParameters prop
-  // const parameters = runTimeParameters ?? []
-  const parameters = runTimeParameters
+  const [startSetup, setStartSetup] = React.useState<boolean>(false)
   const [
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
-  ] = React.useState<RunTimeParameter[]>(parameters)
+  ] = React.useState<RunTimeParameter[]>(runTimeParameters)
 
   const updateParameters = (
     value: boolean | string | number,
@@ -74,10 +72,19 @@ export function ProtocolSetupParameters({
         setChooseValueScreen(updatedParameter)
       }
     }
+    if (
+      showNumericalInputScreen &&
+      showNumericalInputScreen.variableName === variableName
+    ) {
+      const updatedParameter = updatedParameters.find(
+        parameter => parameter.variableName === variableName
+      )
+      if (updatedParameter != null) {
+        setShowNumericalInputScreen(updatedParameter)
+      }
+    }
   }
 
-  //    TODO(jr, 3/20/24): modify useCreateRunMutation to take in optional run time parameters
-  //    newRunTimeParameters will be the param to plug in!
   const { createRun, isLoading } = useCreateRunMutation({
     onSuccess: data => {
       queryClient
@@ -88,8 +95,29 @@ export function ProtocolSetupParameters({
     },
   })
   const handleConfirmValues = (): void => {
-    createRun({ protocolId, labwareOffsets })
+    setStartSetup(true)
+    createRun({
+      protocolId,
+      labwareOffsets,
+      runTimeParameterValues: getRunTimeParameterValuesForRun(
+        runTimeParametersOverrides
+      ),
+    })
   }
+
+  const handleSetParameter = (parameter: RunTimeParameter): void => {
+    if ('choices' in parameter) {
+      setChooseValueScreen(parameter)
+    } else if (parameter.type === 'bool') {
+      updateParameters(!parameter.value, parameter.variableName)
+    } else if (parameter.type === 'int' || parameter.type === 'float') {
+      setShowNumericalInputScreen(parameter)
+    } else {
+      // bad param
+      console.log('error')
+    }
+  }
+
   let children = (
     <>
       <ChildNavigation
@@ -97,11 +125,11 @@ export function ProtocolSetupParameters({
         onClickBack={() => history.goBack()}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
-        iconName={isLoading ? 'ot-spinner' : undefined}
+        iconName={isLoading || startSetup ? 'ot-spinner' : undefined}
         iconPlacement="startIcon"
         secondaryButtonProps={{
           buttonType: 'tertiaryLowLight',
-          buttonText: t('restore_default'),
+          buttonText: t('restore_defaults'),
           onClick: () => showResetValuesModal(true),
         }}
       />
@@ -120,11 +148,7 @@ export function ProtocolSetupParameters({
                 hasIcon={!(parameter.type === 'bool')}
                 status="general"
                 title={parameter.displayName}
-                onClickSetupStep={() =>
-                  parameter.type === 'bool'
-                    ? updateParameters(!parameter.value, parameter.variableName)
-                    : setChooseValueScreen(parameter)
-                }
+                onClickSetupStep={() => handleSetParameter(parameter)}
                 detail={formatRunTimeParameterValue(parameter, t)}
                 description={parameter.description}
                 fontSize="h4"
@@ -151,7 +175,6 @@ export function ProtocolSetupParameters({
         handleGoBack={() => setShowNumericalInputScreen(null)}
         parameter={showNumericalInputScreen}
         setParameter={updateParameters}
-        rawValue={showNumericalInputScreen.value}
       />
     )
   }

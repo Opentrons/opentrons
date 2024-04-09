@@ -75,6 +75,7 @@ export interface InputFieldProps {
     | typeof TYPOGRAPHY.textAlignCenter
   /** small or medium input field height, relevant only */
   size?: 'medium' | 'small'
+  ref?: React.MutableRefObject<null>
 }
 
 export function InputField(props: InputFieldProps): JSX.Element {
@@ -108,6 +109,7 @@ function Input(props: InputFieldProps): JSX.Element {
 
   const OUTER_CSS = css`
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      grid-gap: ${SPACING.spacing8};
       &:focus-within {
         filter: ${error
           ? 'none'
@@ -191,8 +193,9 @@ function Input(props: InputFieldProps): JSX.Element {
   `
 
   const FORM_BOTTOM_SPACE_STYLE = css`
-    padding: ${SPACING.spacing4} 0rem;
+    padding-top: ${SPACING.spacing4};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      padding: ${SPACING.spacing8} 0rem;
       padding-bottom: 0;
     }
   `
@@ -200,9 +203,6 @@ function Input(props: InputFieldProps): JSX.Element {
   const TITLE_STYLE = css`
     color: ${error ? COLORS.red50 : COLORS.black90};
     padding-bottom: ${SPACING.spacing8};
-    font-size: ${TYPOGRAPHY.fontSizeLabel};
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    line-height: ${TYPOGRAPHY.lineHeight12};
     align-text: ${textAlign};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       font-size: ${TYPOGRAPHY.fontSize22};
@@ -214,9 +214,11 @@ function Input(props: InputFieldProps): JSX.Element {
 
   const ERROR_TEXT_STYLE = css`
     color: ${COLORS.red50};
+    padding-top: ${SPACING.spacing4};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       font-size: ${TYPOGRAPHY.fontSize22};
       color: ${COLORS.red50};
+      padding-top: ${SPACING.spacing8};
     }
   `
 
@@ -239,9 +241,14 @@ function Input(props: InputFieldProps): JSX.Element {
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       {title != null ? (
         <Flex gridGap={SPACING.spacing8}>
-          <Flex as="label" htmlFor={props.id} css={TITLE_STYLE}>
+          <StyledText
+            as="label"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            htmlFor={props.id}
+            css={TITLE_STYLE}
+          >
             {title}
-          </Flex>
+          </StyledText>
           {tooltipText != null ? (
             <>
               <Flex {...targetProps}>
@@ -277,16 +284,6 @@ function Input(props: InputFieldProps): JSX.Element {
             <Flex css={UNITS_STYLE}>{props.units}</Flex>
           ) : null}
         </Flex>
-        {props.error != null ? (
-          <Flex
-            color={COLORS.grey60}
-            fontSize={TYPOGRAPHY.fontSizeLabel}
-            paddingTop={SPACING.spacing4}
-            flexDirection={DIRECTION_COLUMN}
-          >
-            <Flex css={ERROR_TEXT_STYLE}>{props.error}</Flex>
-          </Flex>
-        ) : null}
       </Flex>
       {props.caption != null ? (
         <StyledText
@@ -304,6 +301,11 @@ function Input(props: InputFieldProps): JSX.Element {
           color={COLORS.grey60}
         >
           {props.secondaryCaption}
+        </StyledText>
+      ) : null}
+      {props.error != null ? (
+        <StyledText as="label" css={ERROR_TEXT_STYLE}>
+          {props.error}
         </StyledText>
       ) : null}
     </Flex>
