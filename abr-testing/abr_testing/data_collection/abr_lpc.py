@@ -1,1 +1,1 @@
-"""Get LPC Values from Run logs and pair with calibration."""
+"""Get Unique LPC Values from Run logs."""

@@ -462,14 +462,21 @@ def get_logs(storage_directory: str, ip: str) -> List[str]:
     log_types = ["api.log", "server.log", "serial.log", "touchscreen.log"]
     all_paths = []
     for log_type in log_types:
-        response = requests.get(
-            f"http://{ip}:31950/logs",
-            headers={"log_identifier": log_type},
-            params={"cursor": 0, "pageLength": 0},
-        )
-        log_name = ip + "_" + log_type.split(".")[0] + ".json"
-        log_data = response.json()
-        file_path = os.path.join(storage_directory, log_name)
-        json.dump(log_data, open(file_path, mode="w"))
+        try:
+            response = requests.get(
+                f"http://{ip}:31950/logs/{log_type}",
+                headers={"log_identifier": log_type},
+                params={"records": 5000},
+            )
+            response.raise_for_status()
+            log_data = response.text
+            log_name = ip + "_" + log_type.split(".")[0] + ".json"
+            file_path = os.path.join(storage_directory, log_name)
+            with open(file_path, mode="w", encoding="utf-8") as file:
+                file.write(response.text)
+            json.dump(log_data, open(file_path, mode="w"))
+        except RuntimeError:
+            print(f"Request exception. Did not save {log_type}")
+            continue
         all_paths.append(file_path)
     return all_paths
