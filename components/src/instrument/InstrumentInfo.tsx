@@ -24,7 +24,7 @@ export interface InstrumentInfoProps {
   /** children to display under the info */
   children?: React.ReactNode
   /** if true, show labels 'LEFT PIPETTE' / 'RIGHT PIPETTE' */
-  showMountLabel?: boolean
+  showMountLabel?: boolean | null
 }
 
 const MAX_WIDTH = '14rem'
