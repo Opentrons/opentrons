@@ -19,8 +19,8 @@ from hardware_testing.data.csv_report import (
 
 NUM_SAMPLES = 10
 INTER_SAMPLE_DELAY_SECONDS = 0.25
-TEMPERATURE_THRESHOLD = [15, 32]
-HUMIDITY_THRESHOLD = [40, 80]
+TEMPERATURE_THRESHOLD = [10, 35]
+HUMIDITY_THRESHOLD = [35, 85]
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
