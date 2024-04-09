@@ -234,7 +234,7 @@ async def test_liquid_probe(
         (NodeId.gripper, NodeId.gantry_y, 10, 10),
     ],
 )
-async def test_capacitive_probes(
+async def test_capacitive_probe(
     mock_messenger: AsyncMock,
     message_send_loopback: CanLoopback,
     mock_sensor_threshold: AsyncMock,
