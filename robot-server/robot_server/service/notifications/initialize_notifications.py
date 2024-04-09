@@ -12,11 +12,11 @@ from .publisher_notifier import (
 from .publishers import initialize_robot_publisher
 
 
-async def initialize_publisher_notifiers(app_state: AppState) -> None:
+def initialize_publisher_notifiers(app_state: AppState) -> None:
     """Initialize the notification system notifiers."""
     initialize_notification_client(app_state)
-    await initialize_pe_publisher_notifier(app_state)
-    await initialize_hardware_publisher_notifier(app_state)
+    initialize_pe_publisher_notifier(app_state)
+    initialize_hardware_publisher_notifier(app_state)
 
 
 async def init_hardware_publishers(
