@@ -50,7 +50,11 @@ interface RobotSettingsListProps {
 
 export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const { setCurrentOption } = props
-  const { t, i18n } = useTranslation(['device_settings', 'app_settings'])
+  const { t, i18n } = useTranslation([
+    'device_settings',
+    'app_settings',
+    'branded',
+  ])
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -144,7 +148,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         <RobotSettingButton
           settingName={t('app_settings:privacy')}
           dataTestId="RobotSettingButton_privacy"
-          settingInfo={t('app_settings:choose_what_data_to_share')}
+          settingInfo={t('branded:choose_what_data_to_share')}
           onClick={() => setCurrentOption('Privacy')}
           iconName="privacy"
         />

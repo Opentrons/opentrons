@@ -43,7 +43,7 @@ export function ConnectRobotSlideout({
   const [mostRecentDiscovered, setMostRecentDiscovered] = React.useState<
     boolean | null
   >(null)
-  const { t } = useTranslation(['app_settings', 'shared'])
+  const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const refreshDiscovery = (): unknown => dispatch(startDiscovery())
   const isScanning = useSelector<State>(getScanning)
@@ -81,7 +81,7 @@ export function ConnectRobotSlideout({
         <StyledText as="p" marginBottom={SPACING.spacing8}>
           {t('ip_description_first')}
         </StyledText>
-        <StyledText as="p">{t('ip_description_second')}</StyledText>
+        <StyledText as="p">{t('branded:ip_description_second')}</StyledText>
         <ExternalLink
           href={SUPPORT_PAGE_LINK}
           css={TYPOGRAPHY.pSemiBold}

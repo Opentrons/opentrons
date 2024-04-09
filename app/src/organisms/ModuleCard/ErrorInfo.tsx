@@ -29,7 +29,7 @@ interface ErrorInfoProps {
 }
 export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
   const { attachedModule } = props
-  const { t } = useTranslation(['device_details', 'shared'])
+  const { t } = useTranslation(['device_details', 'shared', 'branded'])
   const [showErrorDetails, setShowErrorDetails] = React.useState(false)
 
   let isError: boolean = false
@@ -92,7 +92,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
                   <StyledText as="p">{errorDetails}</StyledText>
                 ) : null}
                 <StyledText as="p" marginBottom={SPACING.spacing16}>
-                  {t('module_error_contact_support')}
+                  {t('branded:module_error_contact_support')}
                 </StyledText>
               </Flex>
               <Flex justifyContent={JUSTIFY_FLEX_END}>

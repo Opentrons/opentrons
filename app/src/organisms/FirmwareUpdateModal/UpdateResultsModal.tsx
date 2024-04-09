@@ -29,7 +29,7 @@ export function UpdateResultsModal(
   props: UpdateResultsModalProps
 ): JSX.Element {
   const { isSuccess, shouldExit, onClose, instrument } = props
-  const { i18n, t } = useTranslation(['firmware_update', 'shared'])
+  const { i18n, t } = useTranslation(['firmware_update', 'shared', 'branded'])
 
   const updateFailedHeader: ModalHeaderBaseProps = {
     title: t('update_failed'),
@@ -50,7 +50,7 @@ export function UpdateResultsModal(
         <Modal header={updateFailedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="p" marginBottom={SPACING.spacing32}>
-              {t('download_logs')}
+              {t('branded:firmware_update_download_logs')}
             </StyledText>
             <SmallButton
               onClick={onClose}

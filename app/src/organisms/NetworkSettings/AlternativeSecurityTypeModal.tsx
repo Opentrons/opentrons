@@ -26,7 +26,7 @@ interface AlternativeSecurityTypeModalProps {
 export function AlternativeSecurityTypeModal({
   setShowAlternativeSecurityTypeModal,
 }: AlternativeSecurityTypeModalProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'branded'])
   const history = useHistory()
   const modalHeader: ModalHeaderBaseProps = {
     title: t('alternative_security_types'),
@@ -58,7 +58,7 @@ export function AlternativeSecurityTypeModal({
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
           >
-            {t('alternative_security_types_description')}
+            {t('branded:alternative_security_types_description')}
           </StyledText>
         </Flex>
         <SmallButton
