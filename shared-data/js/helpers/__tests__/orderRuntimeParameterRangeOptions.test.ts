@@ -1,10 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import type { Choice } from '../types'
 
 import {
   isNumeric,
   orderRuntimeParameterRangeOptions,
-} from './orderRuntimeParameterRangeOptions'
+} from '../orderRuntimeParameterRangeOptions'
+
+import type { Choice } from '../../types'
 
 describe('isNumeric', () => {
   it('should return true when input is "2"', () => {
@@ -35,5 +36,15 @@ describe('orderRuntimeParameterRangeOptions', () => {
     ]
     const result = orderRuntimeParameterRangeOptions(mockChoices)
     expect(result).toEqual('Eight Channel 50µL, Single channel 50µL')
+  })
+
+  it('should return empty string choices > 3', () => {
+    const mockChoices: Choice[] = [
+      { displayName: '20', value: 20 },
+      { displayName: '16', value: 16 },
+      { displayName: '18', value: 18 },
+    ]
+    const result = orderRuntimeParameterRangeOptions(mockChoices)
+    expect(result).toEqual('')
   })
 })
