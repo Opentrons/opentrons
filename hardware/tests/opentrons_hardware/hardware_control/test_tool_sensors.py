@@ -1,6 +1,6 @@
 """Test the tool-sensor coordination code."""
 import logging
-from mock import patch, ANY, AsyncMock, call
+from mock import patch, AsyncMock, call
 import pytest
 from contextlib import asynccontextmanager
 from typing import Iterator, List, Tuple, AsyncIterator, Any, Dict
@@ -238,7 +238,7 @@ async def test_capacitive_probe(
     mock_messenger: AsyncMock,
     message_send_loopback: CanLoopback,
     mock_sensor_threshold: AsyncMock,
-    mock_bind_sync: AsyncMock,
+    mock_bind_output: AsyncMock,
     target_node: InstrumentProbeTarget,
     motor_node: NodeId,
     caplog: Any,
@@ -278,6 +278,25 @@ async def test_capacitive_probe(
                     ),
                     motor_node,
                 ),
+                (
+                    NodeId.host,
+                    Acknowledgement(payload=ack_payload),
+                    target_node,
+                ),
+                (
+                    NodeId.host,
+                    MoveCompleted(
+                        payload=MoveCompletedPayload(
+                            group_id=UInt8Field(0),
+                            seq_id=UInt8Field(0),
+                            current_position_um=UInt32Field(10000),
+                            encoder_position_um=Int32Field(10000),
+                            position_flags=MotorPositionFlagsField(0),
+                            ack_id=UInt8Field(1),
+                        )
+                    ),
+                    target_node,
+                ),
             ]
         else:
             return []
@@ -295,13 +314,10 @@ async def test_capacitive_probe(
         data=SensorDataType.build(1.0, sensor_info.sensor_type),
         mode=SensorThresholdMode.auto_baseline,
     )
-    # this mock assert is annoying because, see below
-    mock_bind_sync.assert_called_once_with(
-        ANY,  # this is a mock of a function on a class not a method so this is self
-        sensor_info,
-        ANY,
-        do_log=ANY,
-    )
+    mock_bind_output.assert_called_once()
+    assert mock_bind_output.call_args_list[0][0][3] == [
+        SensorOutputBinding.sync,
+    ]
 
 
 @pytest.mark.parametrize(

@@ -488,6 +488,8 @@ def mock_backend_capacitive_probe(
             speed_mm_per_s: float,
             threshold_pf: float,
             probe: InstrumentProbeType,
+            output_option: OutputOptions = OutputOptions.can_bus_only,
+            data_file: Optional[str] = None,
         ) -> None:
             hardware_backend._position[moving] += distance_mm / 2
 
@@ -872,9 +874,9 @@ async def test_capacitive_probe(
         3,
         4,
         1.0,
+        InstrumentProbeType.PRIMARY,
         fake_settings.output_option,
         fake_settings.data_file,
-        InstrumentProbeType.PRIMARY,
     )
 
     original = moving.set_in_point(here, 0)

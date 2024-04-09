@@ -16,15 +16,13 @@ from numpy import float64
 from math import copysign
 from typing_extensions import Literal
 
-from opentrons_shared_data.errors.exceptions import CanbusCommunicationError
-
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorId,
     SensorType,
-    SensorThresholdMode,
     SensorOutputBinding,
     ErrorCode,
+    SensorThresholdMode,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     SendAccumulatedSensorDataPayload,
@@ -41,7 +39,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
 from opentrons_hardware.sensors.types import (
-    SensorDataType,
     sensor_fixed_point_conversion,
 )
 from opentrons_hardware.sensors.sensor_types import (
@@ -50,7 +47,6 @@ from opentrons_hardware.sensors.sensor_types import (
     CapacitiveSensor,
 )
 from opentrons_hardware.sensors.scheduler import SensorScheduler
-from opentrons_hardware.sensors.utils import SensorThresholdInformation
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -129,9 +125,11 @@ def _build_pass_step_capacitive(
     speed: Dict[NodeId, float],
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
 ) -> MoveGroupStep:
-    pipette_nodes = [
-        i for i in movers if i in [NodeId.pipette_left, NodeId.pipette_right]
-    ]
+    tool_nodes = [
+        i
+        for i in movers
+        if i in [NodeId.pipette_left, NodeId.pipette_right, NodeId.gripper]
+    ] # include gripper firmware in capacitive data collection?!
 
     move_group = create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
@@ -145,20 +143,22 @@ def _build_pass_step_capacitive(
         present_nodes=movers,
         stop_condition=stop_condition,
     )
-    pipette_move = create_step(
+    tool_move = create_step(
         distance={},
         velocity={},
         acceleration={},
-        duration={},
-        present_nodes=pipette_nodes,
+        # use any node present to calculate duration of the move, assuming the durations
+        #   will be the same
+        duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
+        present_nodes=tool_nodes,
         stop_condition=MoveStopCondition.capacitive_sensor_report,
     )
-    for node in pipette_nodes:
-        move_group[node] = pipette_move[node]
+    for node in tool_nodes:
+        move_group[node] = tool_move[node]
     return move_group
 
 
-async def run_sync_buffer_to_csv(
+async def run_sync_buffer_to_csv_pressure(
     messenger: CanMessenger,
     sensor_driver: SensorDriver,
     pressure_sensor: PressureSensor,
@@ -207,7 +207,7 @@ async def run_sync_buffer_to_csv(
     return positions
 
 
-async def run_stream_output_to_csv(
+async def run_stream_output_to_csv_pressure(
     messenger: CanMessenger,
     sensor_driver: SensorDriver,
     pressure_sensor: PressureSensor,
@@ -245,7 +245,7 @@ async def run_stream_output_to_csv(
     return positions
 
 
-async def run_sync_buffer_to_csv(
+async def run_sync_buffer_to_csv_capacitive(
     messenger: CanMessenger,
     sensor_driver: SensorDriver,
     capacitive_sensor: CapacitiveSensor,
@@ -255,7 +255,7 @@ async def run_sync_buffer_to_csv(
     head_node: NodeId,
     move_group: MoveGroupRunner,
     log_file: str,
-    tool: PipetteProbeTarget,
+    tool: InstrumentProbeTarget,
     sensor_id: SensorId,
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Runs the sensor pass move group and creates a csv file with the results."""
@@ -294,7 +294,7 @@ async def run_sync_buffer_to_csv(
     return positions
 
 
-async def run_stream_output_to_csv(
+async def run_stream_output_to_csv_capacitive(
     messenger: CanMessenger,
     sensor_driver: SensorDriver,
     capacitive_sensor: CapacitiveSensor,
@@ -376,7 +376,7 @@ async def liquid_probe(
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
     log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
     if csv_output:
-        return await run_stream_output_to_csv(
+        return await run_stream_output_to_csv_pressure(
             messenger,
             sensor_driver,
             pressure_sensor,
@@ -388,7 +388,7 @@ async def liquid_probe(
             log_file,
         )
     elif sync_buffer_output:
-        return await run_sync_buffer_to_csv(
+        return await run_sync_buffer_to_csv_pressure(
             messenger,
             sensor_driver,
             pressure_sensor,
@@ -468,8 +468,12 @@ async def capacitive_probe(
         node_id=tool,
         stop_threshold=relative_threshold_pf,
     )
-    threshold = await sensor_driver.send_stop_threshold(messenger, capacitive_sensor)
-    LOG.info(f"starting capacitive probe with threshold {threshold.to_float()}")
+    threshold = await sensor_driver.send_stop_threshold(
+        messenger, capacitive_sensor, SensorThresholdMode.auto_baseline
+    )
+    LOG.info(
+        f"starting capacitive probe with threshold {threshold.to_float() if threshold is not None else None}"
+    )
     pass_group = _build_pass_step_capacitive(
         [mover, tool],
         {mover: distance, tool: distance},
@@ -479,12 +483,12 @@ async def capacitive_probe(
     runner = MoveGroupRunner(move_groups=[[pass_group]])
     log_file: str = "/var/capacitive_sensor_data.csv" if not data_file else data_file
     if csv_output:
-        position = await run_stream_output_to_csv(
+        position = await run_stream_output_to_csv_capacitive(
             messenger,
             sensor_driver,
             capacitive_sensor,
             speed,
-            0,
+            0.0,
             relative_threshold_pf,
             mover,
             runner,
@@ -492,12 +496,12 @@ async def capacitive_probe(
         )
         return position[mover]
     elif sync_buffer_output:
-        position = await run_sync_buffer_to_csv(
+        position = await run_sync_buffer_to_csv_capacitive(
             messenger,
             sensor_driver,
             capacitive_sensor,
             speed,
-            0,
+            0.0,
             relative_threshold_pf,
             mover,
             runner,
@@ -544,7 +548,7 @@ async def capacitive_pass(
         sensor_id=sensor_id,
         node_id=tool,
     )
-    pass_group = _build_pass_step([mover], {mover: distance}, {mover: speed})
+    pass_group = _build_pass_step_capacitive([mover], {mover: distance}, {mover: speed})
     runner = MoveGroupRunner(move_groups=[[pass_group]])
     await runner.prep(messenger)
     async with sensor_scheduler.capture_output(sensor_info, messenger) as output_queue:

@@ -2582,7 +2582,7 @@ class OT3API(
         await self.move_to(mount, probe_start_pos)
         return end_pos.z
 
-    async def capacitive_probe(
+    async def capacitive_probe(  # careful with changes, this is what calibration uses
         self,
         mount: OT3Mount,
         moving_axis: Axis,
