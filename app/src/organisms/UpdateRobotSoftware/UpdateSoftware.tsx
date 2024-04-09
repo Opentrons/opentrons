@@ -4,25 +4,21 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
-  Box,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   JUSTIFY_CENTER,
   SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ProgressBar } from '../../atoms/ProgressBar'
-
 interface UpdateSoftwareProps {
   updateType: 'downloading' | 'validating' | 'sendingFile' | 'installing' | null
-  processProgress: number
 }
 export function UpdateSoftware({
   updateType,
-  processProgress,
 }: UpdateSoftwareProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const renderText = (): string | null => {
@@ -52,6 +48,13 @@ export function UpdateSoftware({
       height="33rem"
       borderRadius={BORDERS.borderRadius12}
     >
+      <Icon
+        name="ot-spinner"
+        size="5rem"
+        spin={true}
+        color={COLORS.grey60}
+        data-testid="Icon_update"
+      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
@@ -68,9 +71,6 @@ export function UpdateSoftware({
           {renderText()}
         </StyledText>
       </Flex>
-      <Box width="47.5rem">
-        <ProgressBar percentComplete={processProgress} />
-      </Box>
     </Flex>
   )
 }
