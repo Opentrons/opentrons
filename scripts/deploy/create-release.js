@@ -27,7 +27,7 @@ const {
   tagFromDetails,
   prefixForProject,
   monorepoGit,
-} = require('../git-version')
+} = require('../git-version.mjs')
 
 const USAGE =
   '\nUsage:\n node ./scripts/deploy/create-release <token> <tag> [--deploy] [--allow-old]'

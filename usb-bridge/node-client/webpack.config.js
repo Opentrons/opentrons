@@ -4,7 +4,7 @@ const path = require('path')
 const webpackMerge = require('webpack-merge')
 const { DefinePlugin } = require('webpack')
 const { nodeBaseConfig } = require('@opentrons/webpack-config')
-const { versionForProject } = require('../../scripts/git-version')
+const { versionForProject } = require('../../scripts/git-version.mjs')
 
 const ENTRY_INDEX = path.join(__dirname, 'src/index.ts')
 const ENTRY_CLI = path.join(__dirname, 'src/cli.ts')

@@ -6,7 +6,7 @@ import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
-import { versionForProject } from '../scripts/git-version'
+import { versionForProject } from '../scripts/git-version.mjs'
 
 const testAliases: {} | { 'file-saver': string } =
   process.env.CYPRESS === '1'

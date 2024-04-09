@@ -9,7 +9,7 @@ const { baseConfig } = require('@opentrons/webpack-config')
 // const {baseConfig, DEV_MODE} = require('@opentrons/webpack-config')
 const pkg = require('./package.json')
 
-const { versionForProject } = require('../scripts/git-version')
+const { versionForProject } = require('../scripts/git-version.mjs')
 
 const JS_ENTRY = path.join(__dirname, 'src/index.tsx')
 const HTML_ENTRY = path.join(__dirname, 'src/index.hbs')
