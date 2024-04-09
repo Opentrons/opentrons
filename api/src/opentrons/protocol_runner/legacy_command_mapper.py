@@ -623,7 +623,7 @@ class LegacyCommandMapper:
             notes=[],
             result=pe_commands.LoadLabwareResult.construct(
                 labwareId=labware_id,
-                definition=LabwareDefinition.parse_obj(
+                definition=LabwareDefinition.model_validate(
                     labware_load_info.labware_definition
                 ),
                 offsetId=labware_load_info.offset_id,

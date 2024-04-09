@@ -40,7 +40,7 @@ def mock_tip_handler(decoy: Decoy) -> TipHandler:
 
 def test_drop_tip_params_defaults() -> None:
     """A drop tip should use a `WellOrigin.DROP_TIP` by default."""
-    default_params = DropTipParams.parse_obj(
+    default_params = DropTipParams.model_validate(
         {"pipetteId": "abc", "labwareId": "def", "wellName": "ghj"}
     )
 
@@ -51,7 +51,7 @@ def test_drop_tip_params_defaults() -> None:
 
 def test_drop_tip_params_default_origin() -> None:
     """A drop tip should drop a `WellOrigin.DROP_TIP` by default even if an offset is given."""
-    default_params = DropTipParams.parse_obj(
+    default_params = DropTipParams.model_validate(
         {
             "pipetteId": "abc",
             "labwareId": "def",

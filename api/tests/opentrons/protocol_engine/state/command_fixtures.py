@@ -20,6 +20,10 @@ from opentrons.protocol_engine.types import (
 )
 
 
+class FixtureModel(BaseModel):
+    ...
+
+
 def create_queued_command(
     command_id: str = "command-id",
     command_key: str = "command-key",
@@ -35,7 +39,7 @@ def create_queued_command(
             commandType=command_type,
             createdAt=datetime(year=2021, month=1, day=1),
             status=cmd.CommandStatus.QUEUED,
-            params=params or BaseModel(),
+            params=params or FixtureModel(),
         ),
     )
 
@@ -56,7 +60,7 @@ def create_running_command(
             createdAt=created_at,
             commandType=command_type,
             status=cmd.CommandStatus.RUNNING,
-            params=params or BaseModel(),
+            params=params or FixtureModel(),
         ),
     )
 
@@ -81,7 +85,7 @@ def create_failed_command(
             completedAt=completed_at,
             commandType=command_type,
             status=cmd.CommandStatus.FAILED,
-            params=params or BaseModel(),
+            params=params or FixtureModel(),
             error=error,
             intent=intent,
         ),
@@ -105,8 +109,8 @@ def create_succeeded_command(
             createdAt=created_at,
             commandType=command_type,
             status=cmd.CommandStatus.SUCCEEDED,
-            params=params or BaseModel(),
-            result=result or BaseModel(),
+            params=params or FixtureModel(),
+            result=result or FixtureModel(),
         ),
     )
 

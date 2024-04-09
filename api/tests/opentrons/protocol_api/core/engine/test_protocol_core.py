@@ -1080,7 +1080,7 @@ def test_add_labware_definition(
     """It should add a labware definition to the engine."""
     decoy.when(
         mock_engine_client.add_labware_definition(
-            definition=LabwareDefinition.parse_obj(minimal_labware_def)
+            definition=LabwareDefinition.model_validate(minimal_labware_def)
         )
     ).then_return(LabwareUri("hello/world/123"))
 

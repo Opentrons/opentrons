@@ -394,7 +394,7 @@ def test_map_module_load(
     module_data_provider: ModuleDataProvider,
 ) -> None:
     """It should correctly map a module load."""
-    test_definition = ModuleDefinition.parse_obj(minimal_module_def)
+    test_definition = ModuleDefinition.model_validate(minimal_module_def)
     input = LegacyModuleLoadInfo(
         requested_model=LegacyTemperatureModuleModel.TEMPERATURE_V1,
         loaded_model=LegacyTemperatureModuleModel.TEMPERATURE_V2,

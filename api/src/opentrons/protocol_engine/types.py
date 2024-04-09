@@ -3,8 +3,18 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
-from pydantic import BaseModel, Field, RootModel
-from typing import Optional, Union, List, Dict, Any, NamedTuple, Tuple, FrozenSet
+from pydantic import BaseModel, Field, RootModel, TypeAdapter
+from typing import (
+    Optional,
+    Union,
+    List,
+    Dict,
+    Any,
+    NamedTuple,
+    Tuple,
+    FrozenSet,
+    Annotated,
+)
 from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -19,6 +29,8 @@ from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     LabwareUri as LabwareUri,
 )
 from opentrons_shared_data.module.dev_types import ModuleType as SharedDataModuleType
+from opentrons_shared_data.labware import models as lw_models
+from opentrons_shared_data.protocol.models.shared_models import Location
 
 
 class EngineStatus(str, Enum):
@@ -390,29 +402,7 @@ class ModuleCalibrationPoint(BaseModel):
     z: float
 
 
-# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
-class LabwareOffsetVector(BaseModel):
-    """Offset, in deck coordinates from nominal to actual position."""
-
-    x: float
-    y: float
-    z: float
-
-    def __add__(self, other: Any) -> LabwareOffsetVector:
-        """Adds two vectors together."""
-        if not isinstance(other, LabwareOffsetVector):
-            return NotImplemented
-        return LabwareOffsetVector(
-            x=self.x + other.x, y=self.y + other.y, z=self.z + other.z
-        )
-
-    def __sub__(self, other: Any) -> LabwareOffsetVector:
-        """Subtracts two vectors."""
-        if not isinstance(other, LabwareOffsetVector):
-            return NotImplemented
-        return LabwareOffsetVector(
-            x=self.x - other.x, y=self.y - other.y, z=self.z - other.z
-        )
+LabwareOffsetVector = lw_models.OffsetVector
 
 
 # TODO(mm, 2022-11-07): Deduplicate with Vec3f.

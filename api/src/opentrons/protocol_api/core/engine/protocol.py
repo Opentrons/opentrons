@@ -181,7 +181,7 @@ class ProtocolCore(
     ) -> LabwareLoadParams:
         """Add a labware definition to the set of loadable definitions."""
         uri = self._engine_client.add_labware_definition(
-            LabwareDefinition.parse_obj(definition)
+            LabwareDefinition.model_validate(definition)
         )
         return LabwareLoadParams.from_uri(uri)
 

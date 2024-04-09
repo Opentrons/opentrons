@@ -97,7 +97,7 @@ def _pipette_dict_to_pipette_res(
                 if calibration_data
                 else None,
             ),
-            state=PipetteState.parse_obj(pipette_state) if pipette_state else None,
+            state=PipetteState.model_validate(pipette_state) if pipette_state else None,
         )
 
 

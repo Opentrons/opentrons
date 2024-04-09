@@ -139,7 +139,7 @@ def load_liquid_model(
 ) -> Dict[str, PipetteLiquidPropertiesDefinition]:
     liquid_dict = _liquid(channels, model, version)
     return {
-        k: PipetteLiquidPropertiesDefinition.parse_obj(v)
+        k: PipetteLiquidPropertiesDefinition.model_validate(v)
         for k, v in liquid_dict.items()
     }
 
@@ -229,7 +229,7 @@ def update_pipette_configuration(
         k.name: v
         for k, v in dict_of_base_model["plungerPositionsConfigurations"].items()
     }
-    return PipetteConfigurations.parse_obj(dict_of_base_model)
+    return PipetteConfigurations.model_validate(dict_of_base_model)
 
 
 def load_definition(
@@ -250,7 +250,7 @@ def load_definition(
     generation = PipetteGenerationType(physical_dict["displayCategory"])
     mount_configs = MOUNT_CONFIG_LOOKUP_TABLE[generation][channels]
 
-    return PipetteConfigurations.parse_obj(
+    return PipetteConfigurations.model_validate(
         {
             **geometry_dict,
             **physical_dict,

@@ -6,7 +6,7 @@ shared-data. It's been modified by hand to be more friendly.
 from __future__ import annotations
 
 from enum import Enum
-from typing import Dict, List, Optional, Literal
+from typing import Any, Dict, List, Optional, Literal
 
 from pydantic import (
     ConfigDict,
@@ -37,6 +37,22 @@ class OffsetVector(Vec3f[Number]):
     """
     A generic 3-D offset vector.
     """
+
+    def __add__(self, other: Any) -> OffsetVector:
+        """Adds two vectors together."""
+        if not isinstance(other, OffsetVector):
+            return NotImplemented
+        return OffsetVector(
+            x=self.x + other.x, y=self.y + other.y, z=self.z + other.z
+        )
+
+    def __sub__(self, other: Any) -> OffsetVector:
+        """Subtracts two vectors."""
+        if not isinstance(other, OffsetVector):
+            return NotImplemented
+        return OffsetVector(
+            x=self.x - other.x, y=self.y - other.y, z=self.z - other.z
+        )
 
 
 class GripperOffsets(BaseModel):

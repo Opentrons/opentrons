@@ -809,11 +809,11 @@ class LabwareView(HasState[LabwareState]):
             return None
         else:
             return LabwareMovementOffsetData(
-                pickUpOffset=cast(
-                    LabwareOffsetVector, parsed_offsets[offset_key].pickUpOffset
+                pickUpOffset=LabwareOffsetVector.model_validate(
+                    parsed_offsets[offset_key].pickUpOffset
                 ),
-                dropOffset=cast(
-                    LabwareOffsetVector, parsed_offsets[offset_key].dropOffset
+                dropOffset=LabwareOffsetVector.model_validate(
+                    parsed_offsets[offset_key].dropOffset
                 ),
             )
 

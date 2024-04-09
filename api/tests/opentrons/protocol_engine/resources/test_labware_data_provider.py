@@ -22,7 +22,7 @@ async def test_labware_data_gets_standard_definition() -> None:
         version=1,
     )
 
-    assert result == LabwareDefinition.parse_obj(expected)
+    assert result == LabwareDefinition.model_validate(expected)
 
 
 async def test_labware_hash_match() -> None:
@@ -38,7 +38,7 @@ async def test_labware_hash_match() -> None:
         version=1,
     )
 
-    labware_model = LabwareDefinition.parse_obj(labware_dict)
+    labware_model = LabwareDefinition.model_validate(labware_dict)
     labware_model_dict = cast(
         LabwareDefDict, labware_model.dict(exclude_none=True, exclude_unset=True)
     )

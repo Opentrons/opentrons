@@ -1523,7 +1523,7 @@ def test_calculates_well_bounding_box(
     labware_to_check: str, well_bbox: Dimensions
 ) -> None:
     """It should be able to calculate well bounding boxes."""
-    definition = LabwareDefinition.parse_obj(load_definition(labware_to_check, 1))
+    definition = LabwareDefinition.model_validate(load_definition(labware_to_check, 1))
     labware = LoadedLabware(
         id="test-labware-id",
         loadName=labware_to_check,

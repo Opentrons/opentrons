@@ -215,7 +215,7 @@ def _migrate_data_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
             f"Migrating analysis {index+1}/{len(rows_needing_migration)}, {row.id}..."
         )
 
-        v1_completed_analysis = CompletedAnalysis.parse_obj(
+        v1_completed_analysis = CompletedAnalysis.model_validate(
             _legacy_pickle.loads(row.completed_analysis)
         )
 

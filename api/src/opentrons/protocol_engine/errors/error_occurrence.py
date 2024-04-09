@@ -128,4 +128,4 @@ class ProtocolCommandFailedError(ProtocolEngineError):
         self.original_error = original_error
 
 
-ErrorOccurrence.update_forward_refs()
+ErrorOccurrence.model_rebuild()

@@ -9,14 +9,14 @@ from tests.service.helpers import ItemModel
 def test_attributes_as_dict():
     DictRequest = RequestModel[dict]
     obj_to_validate = {"data": {"some_data": 1}}
-    my_request_obj = DictRequest.parse_obj(obj_to_validate)
+    my_request_obj = DictRequest.model_validate(obj_to_validate)
     assert my_request_obj.dict() == {"data": {"some_data": 1}}
 
 
 def test_attributes_as_item_model():
     ItemRequest = RequestModel[ItemModel]
     obj_to_validate = {"data": {"name": "apple", "quantity": 10, "price": 1.20}}
-    my_request_obj = ItemRequest.parse_obj(obj_to_validate)
+    my_request_obj = ItemRequest.model_validate(obj_to_validate)
     assert my_request_obj.dict() == obj_to_validate
 
 
@@ -24,7 +24,7 @@ def test_attributes_as_item_model_empty_dict():
     ItemRequest = RequestModel[ItemModel]
     obj_to_validate: Dict[str, Any] = {"data": {}}
     with raises(ValidationError) as e:
-        ItemRequest.parse_obj(obj_to_validate)
+        ItemRequest.model_validate(obj_to_validate)
 
     assert e.value.errors() == [
         {
@@ -49,7 +49,7 @@ def test_attributes_required():
     MyRequest = RequestModel[dict]
     obj_to_validate = {"data": None}
     with raises(ValidationError) as e:
-        MyRequest.parse_obj(obj_to_validate)
+        MyRequest.model_validate(obj_to_validate)
 
     assert e.value.errors() == [
         {
@@ -64,7 +64,7 @@ def test_data_required():
     MyRequest = RequestModel[dict]
     obj_to_validate = {"data": None}
     with raises(ValidationError) as e:
-        MyRequest.parse_obj(obj_to_validate)
+        MyRequest.model_validate(obj_to_validate)
 
     assert e.value.errors() == [
         {
@@ -80,7 +80,7 @@ def test_request_with_id():
     obj_to_validate = {
         "data": {"type": "item", "attributes": {}, "id": "abc123"},
     }
-    my_request_obj = MyRequest.parse_obj(obj_to_validate)
+    my_request_obj = MyRequest.model_validate(obj_to_validate)
     assert my_request_obj.dict() == {
         "data": {"type": "item", "attributes": {}, "id": "abc123"},
     }

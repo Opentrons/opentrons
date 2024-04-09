@@ -110,7 +110,7 @@ def _migrate_to_v2_configurations(
         k.name: v
         for k, v in dict_of_base_model["plungerPositionsConfigurations"].items()
     }
-    return PipetteConfigurations.parse_obj(dict_of_base_model)
+    return PipetteConfigurations.model_validate(dict_of_base_model)
 
 
 def _load_available_overrides(
