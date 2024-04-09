@@ -129,7 +129,7 @@ def _build_pass_step_capacitive(
         i
         for i in movers
         if i in [NodeId.pipette_left, NodeId.pipette_right, NodeId.gripper]
-    ] # include gripper firmware in capacitive data collection?!
+    ]  # include gripper firmware in capacitive data collection?!
 
     move_group = create_step(
         distance={ax: float64(abs(distance[ax])) for ax in movers},
