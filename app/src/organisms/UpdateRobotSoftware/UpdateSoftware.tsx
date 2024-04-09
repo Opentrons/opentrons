@@ -49,6 +49,13 @@ export function UpdateSoftware({
       height="33rem"
       borderRadius={BORDERS.borderRadius12}
     >
+      <Icon
+        name="ot-spinner"
+        size="5rem"
+        spin={true}
+        color={COLORS.grey60}
+        data-testid="Icon_update"
+      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
@@ -65,15 +72,6 @@ export function UpdateSoftware({
           {renderText()}
         </StyledText>
       </Flex>
-      <Box width="47.5rem">
-        <Icon
-          name="ot-spinner"
-          aria-label="spinner"
-          size={'6.25rem'}
-          color={`${COLORS.black90}${COLORS.opacity60HexCode}`}
-          spin={true}
-        />
-      </Box>
     </Flex>
   )
 }
