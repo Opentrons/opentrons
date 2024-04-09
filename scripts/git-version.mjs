@@ -20,7 +20,7 @@ import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 const REPO_BASE = dirname(dirname(fileURLToPath(import.meta.url)))
 
-function monorepoGit() {
+export function monorepoGit() {
   return git({ baseDir: REPO_BASE })
 }
 
