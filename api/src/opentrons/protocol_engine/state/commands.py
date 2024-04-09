@@ -599,6 +599,10 @@ class CommandView(HasState[CommandState]):
         if self._state.run_result:
             raise RunStoppedError("Engine was stopped")
 
+        # if queue is in recovery mode, return the next fixit command
+        if self._state.queue_status == QueueStatus.AWAITING_RECOVERY:
+            return self._state.command_history.get_fixit_queue_ids().head(None)
+
         # if there is a setup command queued, prioritize it
         next_setup_cmd = self._state.command_history.get_setup_queue_ids().head(None)
         if self._state.queue_status != QueueStatus.PAUSED and next_setup_cmd:
