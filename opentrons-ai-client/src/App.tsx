@@ -1,11 +1,9 @@
-import * as React from 'react'
+import React from 'react'
 import { Flex, StyledText } from '@opentrons/components'
-function App() {
+export function App(): JSX.Element {
   return (
     <Flex>
       <StyledText as="h1">Opentrons AI</StyledText>
     </Flex>
   )
 }
-
-export default App
