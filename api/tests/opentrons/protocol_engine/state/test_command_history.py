@@ -161,6 +161,14 @@ def test_get_setup_queue_ids(command_history: CommandHistory) -> None:
     assert command_history.get_setup_queue_ids() == OrderedSet(["0", "1"])
 
 
+def test_get_fixit_queue_ids(command_history: CommandHistory) -> None:
+    """It should return the IDs of all commands in the setup queue."""
+    assert command_history.get_fixit_queue_ids() == OrderedSet()
+    command_history._add_to_fixit_queue("0")
+    command_history._add_to_fixit_queue("1")
+    assert command_history.get_fixit_queue_ids() == OrderedSet(["0", "1"])
+
+
 def test_set_command_entry(command_history: CommandHistory) -> None:
     """It should set the command entry for the given ID."""
     command_entry = create_queued_command_entry()
@@ -196,6 +204,12 @@ def test_add_to_setup_queue(command_history: CommandHistory) -> None:
     assert command_history.get_setup_queue_ids() == OrderedSet(["0"])
 
 
+def test_add_to_fixit_queue(command_history: CommandHistory) -> None:
+    """It should add the given ID to the setup queue."""
+    command_history._add_to_fixit_queue("0")
+    assert command_history.get_fixit_queue_ids() == OrderedSet(["0"])
+
+
 def test_clear_queue(command_history: CommandHistory) -> None:
     """It should clear all commands in the queue."""
     command_history._add_to_queue("0")
@@ -210,6 +224,14 @@ def test_clear_setup_queue(command_history: CommandHistory) -> None:
     command_history._add_to_setup_queue("1")
     command_history.clear_setup_queue()
     assert command_history.get_setup_queue_ids() == OrderedSet()
+
+
+def test_clear_fixit_queue(command_history: CommandHistory) -> None:
+    """It should clear all commands in the setup queue."""
+    command_history._add_to_fixit_queue("0")
+    command_history._add_to_fixit_queue("1")
+    command_history.clear_fixit_queue()
+    assert command_history.get_fixit_queue_ids() == OrderedSet()
 
 
 def test_remove_id_from_queue(command_history: CommandHistory) -> None:
