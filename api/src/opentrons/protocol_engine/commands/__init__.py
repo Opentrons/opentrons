@@ -67,7 +67,6 @@ from .comment import (
 from .custom import (
     Custom,
     CustomParams,
-    LegacyCommentCustomParams,
     CustomCreate,
     CustomResult,
     CustomCommandType,
@@ -359,7 +358,6 @@ __all__ = [
     "Custom",
     "CustomCreate",
     "CustomParams",
-    "LegacyCommentCustomParams",
     "CustomResult",
     "CustomCommandType",
     # dispense command models

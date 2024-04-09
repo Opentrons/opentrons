@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
-from pydantic import BaseModel, Field, RootModel, TypeAdapter
+from pydantic import BaseModel, Field, RootModel
 from typing import (
     Optional,
     Union,
@@ -13,7 +13,6 @@ from typing import (
     NamedTuple,
     Tuple,
     FrozenSet,
-    Annotated,
 )
 from typing_extensions import Literal, TypeGuard
 

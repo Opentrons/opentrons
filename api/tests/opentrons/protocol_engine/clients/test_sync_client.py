@@ -651,10 +651,9 @@ def test_comment(
     decoy: Decoy, transport: ChildThreadTransport, subject: SyncClient
 ) -> None:
     """It should execute a comment command."""
-
     request = commands.CustomCreate(
-        params=commands.LegacyCommentCustomParams(
-            legacyCommandType="command.COMMENT",
+        params=commands.CustomParams(
+            legacyCommandType="command.COMMENT",  # type: ignore[call-arg]
             legacyCommandText="Hello, world!",
         )
     )

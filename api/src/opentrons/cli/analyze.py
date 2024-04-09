@@ -81,7 +81,6 @@ async def _analyze(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
     analysis = await runner.run(deck_configuration=[], protocol_source=protocol_source)
-
     if json_output:
         results = AnalyzeResults.construct(
             createdAt=datetime.now(tz=timezone.utc),
@@ -110,7 +109,7 @@ async def _analyze(
         )
 
         await json_output.write_text(
-            results.json(exclude_none=True),
+            results.model_dump_json(exclude_none=True),
             encoding="utf-8",
         )
 

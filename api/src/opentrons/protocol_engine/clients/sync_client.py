@@ -1,6 +1,6 @@
 """Control a `ProtocolEngine` without async/await."""
 
-from typing import cast, List, Optional, Dict
+from typing import List, Optional, Dict
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -565,10 +565,10 @@ class SyncClient:
         legacy_comment_command = make_legacy_comment_command(msg=message)
 
         request = commands.CustomCreate(
-            params=commands.LegacyCommentCustomParams(
+            params=commands.CustomParams(
                 # This matches how LegacyCommandWrapper handles comments coming from
                 # protocols running under the older non-ProtocolEngine core.
-                legacyCommandType=legacy_comment_command["name"],
+                legacyCommandType=legacy_comment_command["name"],  # type: ignore[call-arg]
                 legacyCommandText=legacy_comment_command["payload"]["text"],
             )
         )

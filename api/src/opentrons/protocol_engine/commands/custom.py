@@ -26,13 +26,6 @@ class CustomParams(BaseModel):
     model_config = ConfigDict(extra="allow")
 
 
-# TODO: replace this once we have the proper comment command
-class LegacyCommentCustomParams(CustomParams):
-
-    legacyCommandType: str
-    legacyCommandText: str
-
-
 class CustomResult(BaseModel):
     """Result data from a custom command."""
 
@@ -47,7 +40,7 @@ class CustomImplementation(AbstractCommandImpl[CustomParams, CustomResult]):
     # for legacy RPC (pre-ProtocolEngine) payloads.
     async def execute(self, params: CustomParams) -> CustomResult:
         """A custom command does nothing when executed directly."""
-        return CustomResult.construct()
+        return CustomResult.model_construct()
 
 
 class Custom(BaseCommand[CustomParams, CustomResult]):

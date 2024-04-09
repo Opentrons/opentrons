@@ -21,6 +21,8 @@ from opentrons.protocol_engine.types import (
 
 
 class FixtureModel(BaseModel):
+    """Fixture Model."""
+
     ...
 
 

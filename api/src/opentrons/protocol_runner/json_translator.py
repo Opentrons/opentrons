@@ -1,5 +1,5 @@
 """Translation of JSON protocol commands into ProtocolEngine commands."""
-from typing import cast, List, Union
+from typing import List, Union
 from pydantic import TypeAdapter
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -31,6 +31,13 @@ class CommandTranslatorError(Exception):
     pass
 
 
+# Each time a TypeAdapter is instantiated, it will construct a new validator and
+# serializer. To improve performance, TypeAdapters are instantiated once.
+# See https://docs.pydantic.dev/latest/concepts/performance/#typeadapter-instantiated-once
+LabwareLocationAdapter: TypeAdapter[LabwareLocation] = TypeAdapter(LabwareLocation)  # type: ignore[arg-type]
+CommandCreateAdatper: TypeAdapter[pe_commands.CommandCreate] = TypeAdapter(pe_commands.CommandCreate)  # type: ignore[arg-type]
+
+
 def _translate_labware_command(
     protocol: ProtocolSchemaV6,
     command: protocol_schema_v6.Command,
@@ -50,7 +57,9 @@ def _translate_labware_command(
             version=protocol.labwareDefinitions[definition_id].version,
             namespace=protocol.labwareDefinitions[definition_id].namespace,
             loadName=protocol.labwareDefinitions[definition_id].parameters.loadName,
-            location=TypeAdapter(LabwareLocation).validate_python(location.dict() if isinstance(location, Location) else location),  # type: ignore[arg-type]
+            location=LabwareLocationAdapter.validate_python(
+                location.dict() if isinstance(location, Location) else location
+            ),
         ),
         key=command.key,
     )
@@ -76,7 +85,9 @@ def _translate_v7_labware_command(
             version=command.params.version,
             namespace=command.params.namespace,
             loadName=command.params.loadName,
-            location=TypeAdapter(LabwareLocation).validate_python(location.dict() if isinstance(location, Location) else location),  # type: ignore[arg-type]
+            location=LabwareLocationAdapter.validate_python(
+                location.dict() if isinstance(location, Location) else location
+            ),
         ),
         key=command.key,
     )
@@ -184,7 +195,7 @@ def _translate_simple_command(
         else:
             dict_command["commandType"] = "waitForDuration"
 
-    return TypeAdapter(pe_commands.CommandCreate).validate_python(dict_command)  # type: ignore[return-value]
+    return CommandCreateAdatper.validate_python(dict_command)
 
 
 class JsonTranslator:
