@@ -12,12 +12,12 @@ import {
 import { InputField } from '../../atoms/InputField'
 import { useToaster } from '../ToasterOven'
 import { ChildNavigation } from '../ChildNavigation'
-import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { NumberParameter, RunTimeParameter } from '@opentrons/shared-data'
 import { NumericalKeyboard } from '../../atoms/SoftwareKeyboard'
 
 interface ChooseNumberProps {
   handleGoBack: () => void
-  parameter: RunTimeParameter
+  parameter: NumberParameter
   setParameter: (value: number, variableName: string) => void
 }
 
@@ -28,10 +28,29 @@ export function ChooseNumber({
 }: ChooseNumberProps): JSX.Element | null {
   const { makeSnackbar } = useToaster()
 
-  const inputFieldRef = React.useRef(null)
-
   const { i18n, t } = useTranslation(['protocol_setup', 'shared'])
-  const handleOnClick = (newValue: number): void => {
+  const keyboardRef = React.useRef(null)
+  const [paramValue, setParamValue] = React.useState<string>(
+    String(parameter.value)
+  )
+
+  // We need to arbitrarily set the value of the keyboard to a string the
+  // same length as the initial parameter value (as string) when the component mounts
+  // so that the delete button operates properly on the exisiting input field value.
+  const [prevKeyboardValue, setPrevKeyboardValue] = React.useState<string>('')
+  React.useEffect(() => {
+    const arbitraryInput = new Array(paramValue).join('*')
+    console.log(keyboardRef.current)
+    // @ts-ignore keyboard should expose for `setInput` method
+    keyboardRef.current?.setInput(arbitraryInput)
+    setPrevKeyboardValue(arbitraryInput)
+  }, [])
+
+  if (parameter.type !== 'int' && parameter.type !== 'float') {
+    console.log(`Incorrect parameter type: ${parameter.type}`)
+    return null
+  }
+  const handleClickGoBack = (newValue: number): void => {
     if (error != null) {
       makeSnackbar(t('value_out_of_range_generic'))
     } else {
@@ -39,22 +58,31 @@ export function ChooseNumber({
       handleGoBack()
     }
   }
-  const [paramValue, setParamValue] = React.useState<number>(
-    parameter.value as number
-  )
 
-  const resetValueDisabled = parameter.default === paramValue
-
-  if (parameter.type !== 'int' && parameter.type !== 'float') {
-    console.log(`Incorrect parameter type: ${parameter.type}`)
-    return null
+  const handleKeyboardInput = (e: string) => {
+    if (prevKeyboardValue.length < e.length) {
+      const lastDigit = e.slice(-1)
+      if (paramValue.indexOf('.') > -1 && lastDigit === '.') {
+      } else if (
+        (paramValue.length > 0 || paramValue.indexOf('-') > -1) &&
+        lastDigit === '-'
+      ) {
+      } else {
+        setParamValue(paramValue + lastDigit)
+      }
+    } else {
+      setParamValue(paramValue.slice(0, paramValue.length - 1))
+    }
+    setPrevKeyboardValue(e)
   }
 
-  const min = parameter.min
-  const max = parameter.max
-
+  const paramValueAsNumber = Number(paramValue)
+  const resetValueDisabled = parameter.default === paramValueAsNumber
+  const { min, max } = parameter
   const error =
-    Number.isNaN(paramValue) || paramValue < min || paramValue > max
+    Number.isNaN(paramValueAsNumber) ||
+    paramValueAsNumber < min ||
+    paramValueAsNumber > max
       ? t(`value_out_of_range`, {
           min: parameter.type === 'int' ? min : min.toFixed(1),
           max: parameter.type === 'int' ? max : max.toFixed(1),
@@ -66,14 +94,14 @@ export function ChooseNumber({
       <ChildNavigation
         header={i18n.format(parameter.displayName, 'sentenceCase')}
         onClickBack={() => {
-          handleOnClick(paramValue)
+          handleClickGoBack(paramValueAsNumber)
         }}
         buttonType="tertiaryLowLight"
         buttonText={t('restore_default')}
         onClickButton={() =>
           resetValueDisabled
             ? makeSnackbar(t('no_custom_values'))
-            : setParamValue(parameter.default)
+            : setParamValue(String(parameter.default))
         }
       />
       <Flex
@@ -97,9 +125,7 @@ export function ChooseNumber({
             {parameter.description}
           </StyledText>
           <InputField
-            key={parameter.variableName}
-            ref={inputFieldRef}
-            type="number"
+            type="text"
             units={parameter.suffix}
             placeholder={parameter.default.toString()}
             value={paramValue}
@@ -115,7 +141,9 @@ export function ChooseNumber({
                 parameter.type === 'int'
                   ? Math.round(e.target.valueAsNumber)
                   : e.target.valueAsNumber
-              setParamValue(updatedValue)
+              setParamValue(
+                Number.isNaN(updatedValue) ? '' : String(updatedValue)
+              )
             }}
           />
         </Flex>
@@ -125,11 +153,11 @@ export function ChooseNumber({
           marginTop="7.75rem"
         >
           <NumericalKeyboard
-            keyboardRef={inputFieldRef}
+            keyboardRef={keyboardRef}
             isDecimal={parameter.type === 'float'}
+            hasHyphen={true}
             onChange={e => {
-              console.log(e)
-              e != null && setParamValue(Number(e))
+              handleKeyboardInput(e)
             }}
           />
         </Flex>

@@ -18,7 +18,7 @@ import { ResetValuesModal } from './ResetValuesModal'
 import { ChooseEnum } from './ChooseEnum'
 import { ChooseNumber } from './ChooseNumber'
 
-import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { NumberParameter, RunTimeParameter } from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
 
 interface ProtocolSetupParametersProps {
@@ -43,7 +43,7 @@ export function ProtocolSetupParameters({
   const [
     showNumericalInputScreen,
     setShowNumericalInputScreen,
-  ] = React.useState<RunTimeParameter | null>(null)
+  ] = React.useState<NumberParameter | null>(null)
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
@@ -80,7 +80,7 @@ export function ProtocolSetupParameters({
         parameter => parameter.variableName === variableName
       )
       if (updatedParameter != null) {
-        setShowNumericalInputScreen(updatedParameter)
+        setShowNumericalInputScreen(updatedParameter as NumberParameter)
       }
     }
   }
