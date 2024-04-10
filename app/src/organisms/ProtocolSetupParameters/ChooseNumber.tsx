@@ -107,7 +107,7 @@ export function ChooseNumber({
         alignSelf={ALIGN_CENTER}
         gridGap={SPACING.spacing48}
         paddingX={SPACING.spacing40}
-        paddingBottom={SPACING.spacing40}
+        padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
         marginTop="7.75rem"
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
@@ -153,7 +153,7 @@ export function ChooseNumber({
           <NumericalKeyboard
             keyboardRef={keyboardRef}
             isDecimal={parameter.type === 'float'}
-            hasHyphen={true}
+            hasHyphen
             onChange={e => {
               handleKeyboardInput(e)
             }}
