@@ -325,33 +325,11 @@ export function getUnoccupiedSlotForMoveableTrash(
         'slotName' in location
       ) {
         return [...acc, location.slotName]
-      } else if (
-        location !== 'offDeck' &&
-        location !== null &&
-        'labwareId' in location
-      ) {
-        const adapterId = location.labwareId
-        const adapter = Object.values(file.commands).find(
-          (command): command is LoadLabwareCreateCommand =>
-            command.commandType === 'loadLabware' &&
-            command.params.labwareId === adapterId
-        )
-        if (adapter == null) {
-          console.error('expected to find adapter but could not')
-        }
-        const adapterLocation = adapter?.params.location
-        if (
-          adapterLocation !== 'offDeck' &&
-          adapterLocation != null &&
-          'slotName' in adapterLocation
-        ) {
-          return [...acc, adapterLocation.slotName]
-        }
       }
       return acc
     }, [])
 
-  const allModuleSlotNames = Object.values(file.commands)
+  const allLoadModuleSlotNames = Object.values(file.commands)
     .filter(
       (command): command is LoadModuleCreateCommand =>
         command.commandType === 'loadModule'
@@ -385,7 +363,7 @@ export function getUnoccupiedSlotForMoveableTrash(
   const unoccupiedSlot = MOVABLE_TRASH_CUTOUTS.find(
     cutout =>
       !allLoadLabwareSlotNames.includes(cutout.slot) &&
-      !allModuleSlotNames.includes(cutout.slot) &&
+      !allLoadModuleSlotNames.includes(cutout.slot) &&
       !allMoveLabwareLocations.includes(cutout.slot) &&
       !wasteChuteSlot.includes(cutout.value) &&
       !stagingAreaCutoutIds.includes(cutout.value as CutoutId)

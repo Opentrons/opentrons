@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { getIdsInRange, getUnoccupiedSlotForMoveableTrash } from '../utils'
-import { AddressableAreaName, CreateCommand } from '@opentrons/shared-data'
+import type { AddressableAreaName, CreateCommand } from '@opentrons/shared-data'
+
 describe('getIdsInRange', () => {
   it('gets id in array of length 1', () => {
     expect(getIdsInRange(['X'], 'X', 'X')).toEqual(['X'])
@@ -31,7 +32,7 @@ describe('getIdsInRange', () => {
   })
 })
 describe('getUnoccupiedSlotForMoveableTrash', () => {
-  it('returns slot C3 when all other slots are occupied by modules, labware, moveLabware, and staging areas', () => {
+  it('returns slot D1 when all other slots are occupied by modules, labware, moveLabware, and staging areas', () => {
     const mockPDFile: any = {
       commands: [
         {
@@ -101,6 +102,22 @@ describe('getUnoccupiedSlotForMoveableTrash', () => {
             namespace: 'opentrons',
             version: 2,
             location: { slotName: 'B3' },
+          },
+        },
+        {
+          key: 'fb1807fe-ca16-4f75-b44d-803d704c7d98',
+          commandType: 'loadLabware',
+          params: {
+            displayName: 'Opentrons Flex 96 Tip Rack 50 µL',
+            labwareId:
+              '11fdsa8b1-bf4b-4a6c-80cb-b8e5bdfe309b:opentrons/opentrons_flex_96_tiprack_50ul/1',
+            loadName: 'opentrons_flex_96_tiprack_50ul',
+            namespace: 'opentrons',
+            version: 1,
+            location: {
+              labwareId:
+                '32e97c67-866e-4153-bcb7-2b86b1d3f1fe:opentrons/corning_24_wellplate_3.4ml_flat/2',
+            },
           },
         },
         {
