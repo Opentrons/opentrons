@@ -126,7 +126,6 @@ import type {
   NormalizedLabwareById,
   ModuleEntities,
 } from '../types'
-import { e } from 'vitest/dist/reporters-1evA5lom'
 
 type FormState = FormData | null
 const unsavedFormInitialState = null

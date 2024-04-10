@@ -8,18 +8,19 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
 import { LabwareDefByDefURI } from '../../labware-defs'
-import { MOVABLE_TRASH_CUTOUTS } from '../../components/modals/CreateFileWizard/utils'
 import type {
+  AddressableAreaName,
+  CutoutId,
   DeckSlotId,
-  ModuleType,
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
+  ModuleType,
   MoveLabwareCreateCommand,
-  AddressableAreaName,
 } from '@opentrons/shared-data'
 import type {
   NormalizedPipette,
@@ -29,9 +30,9 @@ import type {
   InvariantContext,
   ModuleEntity,
 } from '@opentrons/step-generation'
-import type { PDProtocolFile } from '../../file-types'
 import type { DeckSlot } from '../../types'
 import type { FormData } from '../../form-types'
+import type { PDProtocolFile } from '../../file-types'
 import type {
   AdditionalEquipmentOnDeck,
   InitialDeckSetup,
@@ -40,7 +41,43 @@ import type {
   FormPipette,
   LabwareOnDeck as LabwareOnDeckType,
 } from '../types'
+import { getCutoutIdByAddressableArea } from '../../utils'
 export { createPresavedStepForm } from './createPresavedStepForm'
+
+const MOVABLE_TRASH_CUTOUTS = [
+  {
+    value: 'cutoutA3',
+    slot: 'A3',
+  },
+  {
+    value: 'cutoutA1',
+    slot: 'A1',
+  },
+  {
+    value: 'cutoutB1',
+    slot: 'B1',
+  },
+  {
+    value: 'cutoutB3',
+    slot: 'B3',
+  },
+  {
+    value: 'cutoutC1',
+    slot: 'C1',
+  },
+  {
+    value: 'cutoutC3',
+    slot: 'C3',
+  },
+  {
+    value: 'cutoutD1',
+    slot: 'D1',
+  },
+  {
+    value: 'cutoutD3',
+    slot: 'D3',
+  },
+]
 
 const slotToCutoutOt2Map: { [key: string]: string } = {
   '1': 'cutout1',
@@ -268,7 +305,13 @@ export function getUnoccupiedSlotForMoveableTrash(
   const wasteChuteSlot = hasWasteChuteCommands
     ? [WASTE_CHUTE_CUTOUT as string]
     : []
-
+  const stagingAreaCutoutIds = stagingAreaSlotNames.map(slotName =>
+    getCutoutIdByAddressableArea(
+      slotName,
+      'stagingAreaRightSlot',
+      FLEX_ROBOT_TYPE
+    )
+  )
   const allLoadLabwareSlotNames = Object.values(file.commands)
     .filter(
       (command): command is LoadLabwareCreateCommand =>
@@ -345,7 +388,7 @@ export function getUnoccupiedSlotForMoveableTrash(
       !allModuleSlotNames.includes(cutout.slot) &&
       !allMoveLabwareLocations.includes(cutout.slot) &&
       !wasteChuteSlot.includes(cutout.value) &&
-      !stagingAreaSlotNames.includes(cutout.value as AddressableAreaName)
+      !stagingAreaCutoutIds.includes(cutout.value as CutoutId)
   )
   if (unoccupiedSlot == null) {
     console.error(
