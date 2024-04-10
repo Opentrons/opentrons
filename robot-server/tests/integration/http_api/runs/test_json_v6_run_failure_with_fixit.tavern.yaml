@@ -1,0 +1,124 @@
+test_name: Upload and run a JSON v6 protocol that should fail.
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+stages:
+  - name: Upload a protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/simple_v6_failure.json'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - name: Create run from protocol
+    request:
+      url: '{ot2_server_base_url}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+    response:
+      status_code: 201
+      save:
+        json:
+          run_id: data.id
+
+  - name: Play the run
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: play
+    response:
+      status_code: 201
+      strict:
+        - json:off
+
+  - name: Wait for the run to fail
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: failed
+
+  - name: Verify the run contains the expected error
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: 'awaiting-recovery'
+          errors:
+            - id: !anystr
+              createdAt: !anystr
+              errorCode: '3005'
+              errorType: TipNotAttachedError
+              detail: Pipette should have a tip attached, but does not.
+              errorInfo: !anydict
+              wrappedErrors: !anylist
+  - name: Verify commands contain the expected results
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links:
+          current:
+            href: !anystr
+            meta:
+              runId: !anystr
+              commandId: !anystr
+              index: 3
+              key: !anystr
+              createdAt: !anystr
+        meta:
+          cursor: 3
+          totalLength: 4
+        data:
+          - id: !anystr
+            key: !anystr
+            commandType: aspirate
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: failed
+            notes: []
+            error:
+              id: !anystr
+              errorType: TipNotAttachedError
+              createdAt: !anystr
+              detail: Pipette should have a tip attached, but does not.
+              errorCode: '3005'
+              errorInfo: !anydict
+              wrappedErrors: !anylist
+            params:
+              pipetteId: pipetteId
+              labwareId: tipRackId
+              wellName: A1
+              wellLocation:
+                origin: bottom
+                offset:
+                  x: 0
+                  y: 0
+                  z: 1
+              flowRate: 3.78
+              volume: 100
