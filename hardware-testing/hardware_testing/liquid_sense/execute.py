@@ -184,7 +184,7 @@ def run(tip: int, run_args: RunArgs) -> None:
         target_height = test_well.bottom(liquid_height).point.z
 
         run_args.pipette._retract()
-        # tip_offset = 0.0
+        tip_offset = 0.0
         if run_args.dial_indicator is not None:
             run_args.pipette.move_to(dial_well.top())
             tip_offset = run_args.dial_indicator.read_stable()
