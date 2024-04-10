@@ -486,6 +486,7 @@ export interface SupportedTip {
   }
   defaultReturnTipHeight?: number
   defaultFlowAcceleration?: number
+  maxFlowRate?: Record<string, number>
 }
 
 export interface SupportedTips {
