@@ -42,17 +42,13 @@ class OffsetVector(Vec3f[Number]):
         """Adds two vectors together."""
         if not isinstance(other, OffsetVector):
             return NotImplemented
-        return OffsetVector(
-            x=self.x + other.x, y=self.y + other.y, z=self.z + other.z
-        )
+        return OffsetVector(x=self.x + other.x, y=self.y + other.y, z=self.z + other.z)
 
     def __sub__(self, other: Any) -> OffsetVector:
         """Subtracts two vectors."""
         if not isinstance(other, OffsetVector):
             return NotImplemented
-        return OffsetVector(
-            x=self.x - other.x, y=self.y - other.y, z=self.z - other.z
-        )
+        return OffsetVector(x=self.x - other.x, y=self.y - other.y, z=self.z - other.z)
 
 
 class GripperOffsets(BaseModel):

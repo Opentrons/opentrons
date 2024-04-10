@@ -1,6 +1,6 @@
 import enum
 from dataclasses import dataclass
-from typing import Union, Dict, Mapping, Tuple, cast
+from typing import Union, Dict, Mapping, Tuple, TypeVar, cast
 from typing_extensions import Literal
 
 """Pipette Definition V2 Types"""

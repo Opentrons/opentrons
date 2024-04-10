@@ -1,7 +1,13 @@
 import re
-from typing import List, Dict, Tuple, Optional, Annotated
-from pydantic import field_validator, ConfigDict, BaseModel, Field, BeforeValidator
-from typing_extensions import Literal
+from typing import List, Dict, Tuple, Optional, Annotated, Literal, TypeVar, Generic
+from pydantic import (
+    field_validator,
+    ConfigDict,
+    BaseModel,
+    Field,
+    BeforeValidator,
+    PlainSerializer,
+)
 from dataclasses import dataclass
 
 from . import types as pip_types, dev_types
@@ -19,6 +25,10 @@ def validate_opentrons_tiprack(v: str) -> str:
     if not OT_TIPRACK_NAMES.match(v):
         raise ValueError("{v} is not a valid tiprack name.")
     return v
+
+
+EnumType = TypeVar("EnumType")
+EnumSerializer = Annotated[EnumType, PlainSerializer(lambda v: v.value)]
 
 
 # TODO (lc 12-5-2022) Ideally we can deprecate this
@@ -286,12 +296,12 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="A list of pipette names that are compatible with this pipette.",
         alias="backCompatNames",
     )
-    pipette_type: pip_types.PipetteModelType = Field(
+    pipette_type: EnumSerializer[pip_types.PipetteModelType] = Field(
         ...,
         description="The pipette model type (related to number of channels).",
         alias="model",
     )
-    display_category: pip_types.PipetteGenerationType = Field(
+    display_category: EnumSerializer[pip_types.PipetteGenerationType] = Field(
         ..., description="The product model of the pipette.", alias="displayCategory"
     )
     pick_up_tip_configurations: PickUpTipConfigurations = Field(
@@ -313,7 +323,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     partial_tip_configurations: PartialTipDefinition = Field(
         ..., alias="partialTipConfigurations"
     )
-    channels: pip_types.PipetteChannelType = Field(
+    channels: EnumSerializer[pip_types.PipetteChannelType] = Field(
         ..., description="The maximum number of channels on the pipette."
     )
     shaft_diameter: float = Field(
@@ -329,7 +339,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The distance of backlash on the plunger motor.",
         alias="backlashDistance",
     )
-    quirks: List[pip_types.Quirks] = Field(
+    quirks: List[EnumSerializer[pip_types.Quirks]] = Field(
         ..., description="The list of quirks available for the loaded configuration"
     )
     tip_presence_check_distance_mm: float = Field(
@@ -372,17 +382,6 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         cls, v: Dict[str, PlungerPositions]
     ) -> Dict[pip_types.LiquidClasses, PlungerPositions]:
         return {pip_types.LiquidClasses[key]: value for key, value in v.items()}
-
-    # TODO[pydantic]: The following keys were removed: `json_encoders`.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    model_config = ConfigDict(
-        json_encoders={
-            pip_types.PipetteChannelType: lambda v: v.value,
-            pip_types.PipetteModelType: lambda v: v.value,
-            pip_types.PipetteGenerationType: lambda v: v.value,
-            pip_types.Quirks: lambda v: v.value,
-        }
-    )
 
 
 class PipetteRowDefinition(BaseModel):

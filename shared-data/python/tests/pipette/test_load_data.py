@@ -90,7 +90,7 @@ def test_update_pipette_configuration(
         base_configurations, v1_configuration_changes, liquid_class
     )
 
-    updated_configurations_dict = updated_configurations.dict()
+    updated_configurations_dict = updated_configurations.model_dump()
     for k, v in v1_configuration_changes.items():
         if k == "tip_length":
             for i in updated_configurations_dict["liquid_properties"][liquid_class][
