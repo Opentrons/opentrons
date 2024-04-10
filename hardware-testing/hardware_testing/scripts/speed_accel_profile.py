@@ -30,6 +30,8 @@ CYCLES = 1
 ENCODER_DELAY = 0.1 #seconds
 ENCODER_REFRESH = True
 ERROR_THRESHOLD = 0.2 #mm
+ENCODER_STABLE_THRESHOLD = 2 #Default 2
+HOME_CYCLES = False
 
 TEST_LIST: Dict[str, list] = {}
 
@@ -252,7 +254,7 @@ async def get_stable_encoder(axis: str, api: OT3API, MOUNT: OT3Mount) -> Dict[Ax
     """Keep reading the encoder until it's value is stable"""
     # Keep reading until we have 3 stable reads
     stable_value_count = 0
-    while stable_value_count < 2:
+    while stable_value_count < ENCODER_STABLE_THRESHOLD:
         read0 = await api.encoder_current_position_ot3(mount=MOUNT,
                                                             refresh=True)
         read1 = await api.encoder_current_position_ot3(mount=MOUNT,
@@ -392,7 +394,7 @@ async def _single_axis_move(
             return output_list
 
         # home every 50 cycles in case we have drifted
-        if (c + 1) % 50 == 0:
+        if ((c + 1) % 50 == 0) and HOME_CYCLES:
             if axis == "G":
                 await api.home([Axis.Z_G])
             if not BENCH:
