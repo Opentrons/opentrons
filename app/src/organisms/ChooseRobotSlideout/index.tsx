@@ -363,7 +363,6 @@ export function ChooseRobotSlideout(
               }
             }}
             title={runtimeParam.displayName}
-            caption={runtimeParam.description}
             width="100%"
             dropdownType="neutral"
           />

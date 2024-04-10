@@ -222,7 +222,6 @@ export function ChooseProtocolSlideoutComponent(
               setRunTimeParametersOverrides(clone)
             }}
             title={runtimeParam.displayName}
-            caption={runtimeParam.description}
             width="100%"
             dropdownType="neutral"
           />
