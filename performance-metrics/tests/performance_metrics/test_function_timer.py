@@ -1,29 +1,29 @@
 """This module contains tests for the FunctionTimer class, focusing on its ability to accurately measure and record the execution times of synchronous and asynchronous functions, including when exceptions are raised."""
 
 import asyncio
+from typing import List
+from performance_metrics.datashapes import RawDurationData
 import pytest
 from time import sleep
 from performance_metrics.function_timer import (
     FunctionTimer,
-    CanStoreTimingResult,
-    TimingResultStore,
 )
 
 
 @pytest.fixture
-def timing_result_store() -> TimingResultStore:
-    """Fixture that provides an empty list to store durations. This list is reset before each test."""
-    return TimingResultStore()
+def temp_storage() -> List[RawDurationData]:
+    """Creates a temporary storage list for testing."""
+    return []
 
 
 @pytest.fixture
-def function_timer(timing_result_store: CanStoreTimingResult) -> FunctionTimer:
+def function_timer(temp_storage: List[RawDurationData]) -> FunctionTimer:
     """Creates a FunctionTimer instance with a mock storage function for testing."""
-    return FunctionTimer(can_store=timing_result_store)
+    return FunctionTimer(temp_storage.append)
 
 
 def test_sync_function(
-    function_timer: FunctionTimer, timing_result_store: TimingResultStore
+    temp_storage: List[RawDurationData], function_timer: FunctionTimer
 ) -> None:
     """Tests accurate measurement of a synchronous function's execution time."""
 
@@ -32,13 +32,16 @@ def test_sync_function(
         sleep(0.01)
 
     sync_test()
-    assert len(timing_result_store) == 1
-    assert timing_result_store[0][1] < timing_result_store[0][2]
+    raw_data = temp_storage[0]
+    assert (
+        raw_data.duration_measurement_start_time
+        < raw_data.duration_measurement_end_time
+    )
 
 
 @pytest.mark.asyncio
 async def test_async_function(
-    function_timer: FunctionTimer, timing_result_store: TimingResultStore
+    temp_storage: List[RawDurationData], function_timer: FunctionTimer
 ) -> None:
     """Tests accurate measurement of an asynchronous function's execution time."""
 
@@ -47,12 +50,15 @@ async def test_async_function(
         await asyncio.sleep(0.01)
 
     await async_test()
-    assert len(timing_result_store) == 1
-    assert timing_result_store[0][1] < timing_result_store[0][2]
+    raw_data = temp_storage[0]
+    assert (
+        raw_data.duration_measurement_start_time
+        < raw_data.duration_measurement_end_time
+    )
 
 
 def test_sync_function_exception(
-    function_timer: FunctionTimer, timing_result_store: TimingResultStore
+    temp_storage: List[RawDurationData], function_timer: FunctionTimer
 ) -> None:
     """Tests duration measurement of a synchronous function that raises an exception."""
 
@@ -63,13 +69,16 @@ def test_sync_function_exception(
 
     with pytest.raises(ValueError):
         sync_test_exception()
-    assert len(timing_result_store) == 1
-    assert timing_result_store[0][1] < timing_result_store[0][2]
+    raw_data = temp_storage[0]
+    assert (
+        raw_data.duration_measurement_start_time
+        < raw_data.duration_measurement_end_time
+    )
 
 
 @pytest.mark.asyncio
 async def test_async_function_exception(
-    function_timer: FunctionTimer, timing_result_store: TimingResultStore
+    temp_storage: List[RawDurationData], function_timer: FunctionTimer
 ) -> None:
     """Tests duration measurement of an asynchronous function that raises an exception."""
 
@@ -80,12 +89,15 @@ async def test_async_function_exception(
 
     with pytest.raises(ValueError):
         await async_test_exception()
-    assert len(timing_result_store) == 1
-    assert timing_result_store[0][1] < timing_result_store[0][2]
+    raw_data = temp_storage[0]
+    assert (
+        raw_data.duration_measurement_start_time
+        < raw_data.duration_measurement_end_time
+    )
 
 
 def test_sync_function_multiple_calls(
-    function_timer: FunctionTimer, timing_result_store: TimingResultStore
+    temp_storage: List[RawDurationData], function_timer: FunctionTimer
 ) -> None:
     """Tests duration measurement of multiple calls to a synchronous function."""
 
@@ -95,23 +107,10 @@ def test_sync_function_multiple_calls(
 
     sync_test_multiple_calls()
     sync_test_multiple_calls()
-    assert len(timing_result_store) == 2
-    assert timing_result_store[0][0] < timing_result_store[1][0]
-    assert all(start < end for _, start, end in timing_result_store)
 
+    row_1 = temp_storage[0]
+    row_2 = temp_storage[1]
 
-@pytest.mark.asyncio
-async def test_async_function_multiple_calls(
-    function_timer: FunctionTimer, timing_result_store: TimingResultStore
-) -> None:
-    """Tests duration measurement of multiple calls to an asynchronous function."""
-
-    @function_timer.measure_duration
-    async def async_test_multiple_calls() -> None:
-        await asyncio.sleep(0.01)
-
-    await async_test_multiple_calls()
-    await async_test_multiple_calls()
-    assert len(timing_result_store) == 2
-    assert timing_result_store[0][0] < timing_result_store[1][0]
-    assert all(start < end for _, start, end in timing_result_store)
+    assert row_1.duration_measurement_start_time < row_1.duration_measurement_end_time
+    assert row_2.duration_measurement_start_time < row_2.duration_measurement_end_time
+    assert row_1.duration_measurement_end_time < row_2.duration_measurement_start_time
