@@ -8,8 +8,8 @@ import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
-import type { UserConfig } from 'vite
-'
+import type { UserConfig } from 'vite'
+
 export default defineConfig(
   async (): Promise<UserConfig> => {
     const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
