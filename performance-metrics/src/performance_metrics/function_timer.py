@@ -5,7 +5,17 @@ The FunctionTimer class is intended to be used as a decorator to wrap functions 
 """
 
 from time import perf_counter_ns, clock_gettime_ns, CLOCK_REALTIME
-from typing import Awaitable, Iterator, Protocol, Callable, TypeVar, List, Tuple
+from typing import (
+    Awaitable,
+    Iterator,
+    Protocol,
+    Callable,
+    Sequence,
+    TypeVar,
+    List,
+    Tuple,
+)
+from performance_metrics.datashapes import RawDurationData
 from typing_extensions import ParamSpec
 import inspect
 
@@ -13,18 +23,13 @@ P = ParamSpec("P")
 R = TypeVar("R")
 
 
-class CanStoreTimingResult(Protocol):
+class FunctionTimerCallback(Protocol):
     """Protocol for a class that can store the result of a timing operation.
 
     Implementing classes must provide a `store` method.
     """
 
-    def store(
-        self,
-        function_start_time: int,
-        duration_measurement_start_time: int,
-        duration_measurement_end_time: int,
-    ) -> None:
+    def __call__(self, data: RawDurationData) -> None:
         """Stores the duration of an operation.
 
         Args:
@@ -35,63 +40,15 @@ class CanStoreTimingResult(Protocol):
         pass
 
 
-class TimingResultStore(CanStoreTimingResult):
-    """A class that stores the result of a timing operation.
-
-    Specifically captures the start, measurement start, and end times of function executions.
-    """
-
-    def __init__(self) -> None:
-        """Initializes the TimingResultStore."""
-        self._storage: List[Tuple[int, int, int]] = []
-
-    def __len__(self) -> int:
-        """Returns the number of stored timing results."""
-        return len(self._storage)
-
-    def __getitem__(self, index: int) -> Tuple[int, int, int]:
-        """Returns the timing result at the specified index."""
-        return self._storage[index]
-
-    def __iter__(self) -> Iterator[Tuple[int, int, int]]:
-        """Returns an iterator over the stored timing results."""
-        return iter(self._storage)
-
-    def store(
-        self,
-        function_start_time: int,
-        duration_measurement_start_time: int,
-        duration_measurement_end_time: int,
-    ) -> None:
-        """Stores timing information of an operation in nanoseconds.
-
-        Args:
-            function_start_time: The time at which the function started executing.
-            duration_measurement_start_time: The time at which the duration measurement started.
-            duration_measurement_end_time: The time at which the duration measurement ended.
-        """
-        self._storage.append(
-            (
-                function_start_time,
-                duration_measurement_start_time,
-                duration_measurement_end_time,
-            )
-        )
-
-
 class FunctionTimer:
     """A decorator class for measuring and storing the execution duration of functions.
 
     It supports both synchronous and asynchronous functions.
     """
 
-    def __init__(self, can_store: CanStoreTimingResult) -> None:
-        """Initializes the FunctionTimer with a specified storage function.
-
-        Args:
-            can_store: A function that stores the execution duration.
-        """
-        self._can_store = can_store
+    def __init__(self, callback: FunctionTimerCallback) -> None:
+        """Initializes the FunctionTimer."""
+        self._callback = callback
 
     def _begin_timing(self) -> Tuple[int, int]:
         """Starts the timing process, capturing both the current real-time and a high-resolution performance counter.
@@ -133,10 +90,12 @@ class FunctionTimer:
             except Exception as e:
                 raise e
             finally:
-                self._can_store.store(
-                    function_start_time,
-                    duration_measurement_start_time,
-                    self._end_timing(),
+                self._callback(
+                    RawDurationData(
+                        function_start_time,
+                        duration_measurement_start_time,
+                        self._end_timing(),
+                    )
                 )
             return result
 
@@ -164,10 +123,12 @@ class FunctionTimer:
             except Exception as e:
                 raise e
             finally:
-                self._can_store.store(
-                    function_start_time,
-                    duration_measurement_start_time,
-                    self._end_timing(),
+                self._callback(
+                    RawDurationData(
+                        function_start_time,
+                        duration_measurement_start_time,
+                        self._end_timing(),
+                    )
                 )
             return result
 
@@ -187,6 +148,7 @@ class FunctionTimer:
         Returns:
             A wrapped version of the input function with duration measurement capability.
         """
+
         if inspect.iscoroutinefunction(func):
             return self._async_wrapper(func)  # type: ignore
         else:
