@@ -6,6 +6,8 @@ calls. This serves as a comprehensive suite to validate the functionality of Fun
 """
 import time
 import asyncio
+from typing import List
+from performance_metrics.datashapes import RawDurationData
 import pytest
 from performance_metrics.function_timer import FunctionTimer
 
