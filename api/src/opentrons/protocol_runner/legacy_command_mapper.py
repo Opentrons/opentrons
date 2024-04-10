@@ -408,9 +408,7 @@ class LegacyCommandMapper:
                 wellName=well_name,
             ),
         )
-        create = pe_commands.PickUpTipCreate(
-            key=running.key, params=running.params
-        )
+        create = pe_commands.PickUpTipCreate(key=running.key, params=running.params)
         return create, running
 
     def _build_liquid_handling(
@@ -521,9 +519,7 @@ class LegacyCommandMapper:
                     legacyCommandText=command["payload"]["text"],
                 ),
             )
-            create = pe_commands.CustomCreate(
-                key=running.key, params=running.params
-            )
+            create = pe_commands.CustomCreate(key=running.key, params=running.params)
             return create, running
 
     def _build_blow_out(
@@ -597,9 +593,7 @@ class LegacyCommandMapper:
         slot = labware_load_info.deck_slot
         location: pe_types.LabwareLocation
         if labware_load_info.on_module:
-            location = pe_types.ModuleLocation(
-                moduleId=self._module_id_by_slot[slot]
-            )
+            location = pe_types.ModuleLocation(moduleId=self._module_id_by_slot[slot])
         else:
             location = pe_types.DeckSlotLocation(slotName=slot)
 

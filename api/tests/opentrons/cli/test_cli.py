@@ -63,7 +63,6 @@ def test_analyze(
 ) -> None:
     """Should return with no errors and a non-empty output."""
     result = _get_analysis_result([fixture_path])
-
     assert result.exit_code == 0
 
     assert result.json_output is not None

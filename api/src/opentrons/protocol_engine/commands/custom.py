@@ -10,7 +10,7 @@ data still adheres to the shapes that ProtocolEngine expects.
 If you are implementing a custom command, you should probably
 put your own disambiguation identifier in the payload.
 """
-from pydantic import ConfigDict, BaseModel
+from pydantic import ConfigDict, BaseModel, SerializeAsAny
 from typing import Optional, Type
 from typing_extensions import Literal
 
@@ -47,7 +47,7 @@ class Custom(BaseCommand[CustomParams, CustomResult]):
     """Custom command model."""
 
     commandType: CustomCommandType = "custom"
-    params: CustomParams
+    params: SerializeAsAny[CustomParams]
     result: Optional[CustomResult] = None
 
     _ImplementationCls: Type[CustomImplementation] = CustomImplementation
