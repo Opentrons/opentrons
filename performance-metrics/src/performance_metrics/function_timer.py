@@ -1,10 +1,11 @@
 """This module offers a mechanism for measuring and storing the execution durations of both synchronous and asynchronous functions.
 
-The FunctionTimer class is intended to be used as a decorator to wrap functions and measure their execution times.
+The FunctionTimer class is intended to be used as a decorator to wrap functions and measure their execution times. It utilizes `perf_counter_ns` for high-resolution performance counter measurements and `clock_gettime_ns(CLOCK_REALTIME)` for real-time clock measurements. The use of `perf_counter_ns` ensures the highest possible resolution timer, which is essential for accurate duration measurement, especially for short-running functions. `clock_gettime_ns(CLOCK_REALTIME)` is used to capture the actual start time in real-world time, which is useful for correlating events or logs with other time-based data.
+
 """
 
 from time import perf_counter_ns, clock_gettime_ns, CLOCK_REALTIME
-from typing import Iterator, Protocol, Callable, TypeVar, List, Tuple
+from typing import Awaitable, Iterator, Protocol, Callable, TypeVar, List, Tuple
 from typing_extensions import ParamSpec
 import inspect
 
@@ -13,7 +14,10 @@ R = TypeVar("R")
 
 
 class CanStoreTimingResult(Protocol):
-    """A protocol for a function that can store the result of a timing operation."""
+    """Protocol for a class that can store the result of a timing operation.
+
+    Implementing classes must provide a `store` method.
+    """
 
     def store(
         self,
@@ -32,14 +36,13 @@ class CanStoreTimingResult(Protocol):
 
 
 class TimingResultStore(CanStoreTimingResult):
-    """A class that stores the result of a timing operation."""
+    """A class that stores the result of a timing operation.
+
+    Specifically captures the start, measurement start, and end times of function executions.
+    """
 
     def __init__(self) -> None:
-        """Initializes the TimingResultStore with a storage method.
-
-        Args:
-            storage_method: A method that stores the result of a timing operation.
-        """
+        """Initializes the TimingResultStore."""
         self._storage: List[Tuple[int, int, int]] = []
 
     def __len__(self) -> int:
@@ -60,7 +63,7 @@ class TimingResultStore(CanStoreTimingResult):
         duration_measurement_start_time: int,
         duration_measurement_end_time: int,
     ) -> None:
-        """Stores the duration of an operation.
+        """Stores timing information of an operation in nanoseconds.
 
         Args:
             function_start_time: The time at which the function started executing.
@@ -77,21 +80,106 @@ class TimingResultStore(CanStoreTimingResult):
 
 
 class FunctionTimer:
-    """A class designed to measure and store the execution duration of functions, both synchronous and asynchronous."""
+    """A decorator class for measuring and storing the execution duration of functions.
+
+    It supports both synchronous and asynchronous functions.
+    """
 
     def __init__(self, can_store: CanStoreTimingResult) -> None:
-        """Initializes the FunctionTimer with a specified storage mechanism for the execution duration.
+        """Initializes the FunctionTimer with a specified storage function.
 
         Args:
-            can_store: A callback function that stores the execution duration.
+            can_store: A function that stores the execution duration.
         """
         self._can_store = can_store
 
+    def _begin_timing(self) -> Tuple[int, int]:
+        """Starts the timing process, capturing both the current real-time and a high-resolution performance counter.
+
+        Returns:
+            A tuple containing the current real-time (`clock_gettime_ns(CLOCK_REALTIME)`) and an initial performance counter (`perf_counter_ns()`). Both values are measured in nanoseconds. The combination of these counters allows us to accurately measure execution durations while also correlating these measurements to real-world time.
+        """
+        return clock_gettime_ns(CLOCK_REALTIME), perf_counter_ns()
+
+    def _end_timing(self) -> int:
+        """Ends the timing process, capturing the final high-resolution performance counter.
+
+        Returns:
+            The final performance counter, measured in nanoseconds. This value is captured using `perf_counter_ns()` to ensure consistency with the initial performance counter, providing an accurate duration measurement.
+        """
+        return perf_counter_ns()
+
+    def _async_wrapper(
+        self, func: Callable[P, Awaitable[R]]
+    ) -> Callable[P, Awaitable[R]]:
+        """Wraps an asynchronous function for duration measurement.
+
+        Args:
+            func: The asynchronous function to be wrapped.
+
+        Returns:
+            A wrapped version of the input function with duration measurement capability.
+        """
+
+        async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            """An asynchronous wrapper function for measuring execution duration.
+
+            If an exception is raised during the execution of the function, it is re-raised after
+            the duration measurement is stored.
+            """
+            function_start_time, duration_measurement_start_time = self._begin_timing()
+            try:
+                result: R = await func(*args, **kwargs)
+            except Exception as e:
+                raise e
+            finally:
+                self._can_store.store(
+                    function_start_time,
+                    duration_measurement_start_time,
+                    self._end_timing(),
+                )
+            return result
+
+        return async_wrapper
+
+    def _sync_wrapper(self, func: Callable[P, R]) -> Callable[P, R]:
+        """Wraps a synchronous function for duration measurement.
+
+        Args:
+            func: The synchronous function to be wrapped.
+
+        Returns:
+            A wrapped version of the input function with duration measurement capability.
+        """
+
+        def sync_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            """A synchronous wrapper function for measuring execution duration.
+
+            If an exception is raised during the execution of the function, it is re-raised after
+            the duration measurement is stored.
+            """
+            function_start_time, duration_measurement_start_time = self._begin_timing()
+            try:
+                result: R = func(*args, **kwargs)
+            except Exception as e:
+                raise e
+            finally:
+                self._can_store.store(
+                    function_start_time,
+                    duration_measurement_start_time,
+                    self._end_timing(),
+                )
+            return result
+
+        return sync_wrapper
+
     def measure_duration(self, func: Callable[P, R]) -> Callable[P, R]:
-        """Creates a wrapper around a given function to measure its execution duration.
+        """Creates a wrapper around a given function to measure the execution duration.
 
         The wrapper calculates the duration of function execution and stores it using the provided
         storage mechanism. Supports both synchronous and asynchronous functions.
+
+        This method is intended to be used as a decorator.
 
         Args:
             func: The function whose execution duration is to be measured.
@@ -100,42 +188,6 @@ class FunctionTimer:
             A wrapped version of the input function with duration measurement capability.
         """
         if inspect.iscoroutinefunction(func):
-
-            async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-                """An asynchronous wrapper function for measuring execution duration."""
-                function_start_time = clock_gettime_ns(CLOCK_REALTIME)
-                duration_measurement_start_time = perf_counter_ns()
-                try:
-                    result: R = await func(*args, **kwargs)
-                except Exception as e:
-                    raise e
-                finally:
-                    duration_measurement_end_time = perf_counter_ns()
-                    self._can_store.store(
-                        function_start_time,
-                        duration_measurement_start_time,
-                        duration_measurement_end_time,
-                    )
-                return result
-
-            return async_wrapper  # type: ignore
+            return self._async_wrapper(func)  # type: ignore
         else:
-
-            def sync_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-                """A synchronous wrapper function for measuring execution duration."""
-                function_start_time = clock_gettime_ns(CLOCK_REALTIME)
-                duration_measurement_start_time = perf_counter_ns()
-                try:
-                    result: R = func(*args, **kwargs)
-                except Exception as e:
-                    raise e
-                finally:
-                    duration_measurement_end_time = perf_counter_ns()
-                    self._can_store.store(
-                        function_start_time,
-                        duration_measurement_start_time,
-                        duration_measurement_end_time,
-                    )
-                return result
-
-            return sync_wrapper
+            return self._sync_wrapper(func)
