@@ -29,7 +29,9 @@ export function OT2MultipleModulesHelp(): JSX.Element {
     setShowMultipleModulesModal,
   ] = React.useState<boolean>(false)
 
-  const onCloseClick = (): void => { setShowMultipleModulesModal(false) }
+  const onCloseClick = (): void => {
+    setShowMultipleModulesModal(false)
+  }
   return (
     <>
       <Box marginTop={SPACING.spacing8}>
@@ -59,62 +61,62 @@ export function OT2MultipleModulesHelp(): JSX.Element {
       </Box>
       {showMultipleModulesModal
         ? createPortal(
-          <LegacyModal
-            title={t('multiple_modules_modal')}
-            onClose={onCloseClick}
-            width="44.75rem"
-          >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Flex flexDirection={DIRECTION_ROW}>
-                <Flex flexDirection={DIRECTION_COLUMN} marginRight="3.625rem">
-                  <StyledText as="p" marginBottom={SPACING.spacing16}>
-                    {t('multiple_modules_explanation')}
-                  </StyledText>
-                  <Link
-                    external
-                    css={TYPOGRAPHY.linkPSemiBold}
-                    href={HOW_TO_MULTIPLE_MODULES_HREF}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    marginBottom={SPACING.spacing16}
-                  >
-                    {t('multiple_modules_learn_more')}
-                    <Icon
-                      name="open-in-new"
-                      marginLeft={SPACING.spacing4}
-                      size="0.625rem"
-                    />
-                  </Link>
-                  <StyledText
-                    css={TYPOGRAPHY.pSemiBold}
-                    marginBottom={SPACING.spacing4}
-                  >
-                    {t('example')}
-                  </StyledText>
+            <LegacyModal
+              title={t('multiple_modules_modal')}
+              onClose={onCloseClick}
+              width="44.75rem"
+            >
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                <Flex flexDirection={DIRECTION_ROW}>
+                  <Flex flexDirection={DIRECTION_COLUMN} marginRight="3.625rem">
+                    <StyledText as="p" marginBottom={SPACING.spacing16}>
+                      {t('multiple_modules_explanation')}
+                    </StyledText>
+                    <Link
+                      external
+                      css={TYPOGRAPHY.linkPSemiBold}
+                      href={HOW_TO_MULTIPLE_MODULES_HREF}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      marginBottom={SPACING.spacing16}
+                    >
+                      {t('multiple_modules_learn_more')}
+                      <Icon
+                        name="open-in-new"
+                        marginLeft={SPACING.spacing4}
+                        size="0.625rem"
+                      />
+                    </Link>
+                    <StyledText
+                      css={TYPOGRAPHY.pSemiBold}
+                      marginBottom={SPACING.spacing4}
+                    >
+                      {t('example')}
+                    </StyledText>
 
-                  <StyledText as="p">
-                    {t('multiple_modules_example')}
-                  </StyledText>
+                    <StyledText as="p">
+                      {t('multiple_modules_example')}
+                    </StyledText>
+                  </Flex>
+                  <img
+                    height="100%"
+                    width="288px"
+                    src={multipleModuleHelp}
+                    style={{ marginBottom: SPACING.spacing16 }}
+                    alt="2 temperature modules plugged into the usb ports"
+                  />
                 </Flex>
-                <img
-                  height="100%"
-                  width="288px"
-                  src={multipleModuleHelp}
-                  style={{ marginBottom: SPACING.spacing16 }}
-                  alt="2 temperature modules plugged into the usb ports"
-                />
+                <PrimaryButton
+                  onClick={onCloseClick}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  alignSelf={ALIGN_FLEX_END}
+                >
+                  {t('shared:close')}
+                </PrimaryButton>
               </Flex>
-              <PrimaryButton
-                onClick={onCloseClick}
-                textTransform={TYPOGRAPHY.textTransformCapitalize}
-                alignSelf={ALIGN_FLEX_END}
-              >
-                {t('shared:close')}
-              </PrimaryButton>
-            </Flex>
-          </LegacyModal>,
-          getTopPortalEl()
-        )
+            </LegacyModal>,
+            getTopPortalEl()
+          )
         : null}
     </>
   )

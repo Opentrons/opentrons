@@ -117,10 +117,10 @@ export const LocationConflictModal = (
         )
         return cutoutId === fixture.cutoutId && replacementFixture != null
           ? {
-            ...fixture,
-            cutoutFixtureId: replacementFixture?.id,
-            opentronsModuleSerialNumber: moduleSerialNumber
-          }
+              ...fixture,
+              cutoutFixtureId: replacementFixture?.id,
+              opentronsModuleSerialNumber: moduleSerialNumber,
+            }
           : fixture
       })
       updateDeckConfiguration(newDeckConfig)
@@ -134,7 +134,11 @@ export const LocationConflictModal = (
     } else if (requiredFixtureId != null) {
       const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
         fixture.cutoutId === cutoutId
-          ? { ...fixture, cutoutFixtureId: requiredFixtureId, opentronsModuleSerialNumber: undefined }
+          ? {
+              ...fixture,
+              cutoutFixtureId: requiredFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
           : fixture
       )
       updateDeckConfiguration(newRequiredFixtureDeckConfig)

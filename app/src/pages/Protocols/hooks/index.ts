@@ -97,26 +97,37 @@ export const useRequiredProtocolHardwareFromAnalysis = (
 
   const requiredGripper: ProtocolGripper[] = getProtocolUsesGripper(analysis)
     ? [
-      {
-        hardwareType: 'gripper',
-        connected:
-          attachedInstruments.some(i => i.instrumentType === 'gripper') ??
-          false,
-      },
-    ]
+        {
+          hardwareType: 'gripper',
+          connected:
+            attachedInstruments.some(i => i.instrumentType === 'gripper') ??
+            false,
+        },
+      ]
     : []
 
   const requiredModules: ProtocolModule[] = analysis.modules.map(
     ({ location, model }) => {
-      const cutoutIdForSlotName = getCutoutIdForSlotName(location.slotName, deckDef)
+      const cutoutIdForSlotName = getCutoutIdForSlotName(
+        location.slotName,
+        deckDef
+      )
       const moduleFixtures = getCutoutFixturesForModuleModel(model, deckDef)
 
-      const configuredModuleSerialNumber = deckConfig.find(({ cutoutId, cutoutFixtureId }) => (
-        cutoutId === cutoutIdForSlotName
-        && moduleFixtures.map(mf => mf.id).includes(cutoutFixtureId)
-      ))?.opentronsModuleSerialNumber ?? null
-      const isConnected = moduleFixtures.every(mf => mf.expectOpentronsModuleSerialNumber)
-        ? attachedModules.some(m => m.moduleModel === model && m.serialNumber === configuredModuleSerialNumber)
+      const configuredModuleSerialNumber =
+        deckConfig.find(
+          ({ cutoutId, cutoutFixtureId }) =>
+            cutoutId === cutoutIdForSlotName &&
+            moduleFixtures.map(mf => mf.id).includes(cutoutFixtureId)
+        )?.opentronsModuleSerialNumber ?? null
+      const isConnected = moduleFixtures.every(
+        mf => mf.expectOpentronsModuleSerialNumber
+      )
+        ? attachedModules.some(
+            m =>
+              m.moduleModel === model &&
+              m.serialNumber === configuredModuleSerialNumber
+          )
         : true
       return {
         hardwareType: 'module',
@@ -162,17 +173,20 @@ export const useRequiredProtocolHardwareFromAnalysis = (
 
   const requiredFixtures = requiredDeckConfigCompatibility
     // filter out all module fixtures as they're handled in the requiredModules section via hardwareType === 'module'
-    .filter(({ requiredAddressableAreas }) => !FLEX_MODULE_ADDRESSABLE_AREAS.some(modAA => requiredAddressableAreas.includes(modAA)))
-    .map(
-      ({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
-        hardwareType: 'fixture' as const,
-        cutoutFixtureId: compatibleCutoutFixtureIds[0],
-        location: { cutout: cutoutId },
-        hasSlotConflict:
-          cutoutFixtureId != null &&
-          !compatibleCutoutFixtureIds.includes(cutoutFixtureId),
-      })
+    .filter(
+      ({ requiredAddressableAreas }) =>
+        !FLEX_MODULE_ADDRESSABLE_AREAS.some(modAA =>
+          requiredAddressableAreas.includes(modAA)
+        )
     )
+    .map(({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
+      hardwareType: 'fixture' as const,
+      cutoutFixtureId: compatibleCutoutFixtureIds[0],
+      location: { cutout: cutoutId },
+      hasSlotConflict:
+        cutoutFixtureId != null &&
+        !compatibleCutoutFixtureIds.includes(cutoutFixtureId),
+    }))
 
   return {
     requiredProtocolHardware: [

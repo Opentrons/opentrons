@@ -53,7 +53,6 @@ interface DeviceDetailsDeckConfigurationProps {
   robotName: string
 }
 
-
 function getDisplayLocationForCutoutIds(cutouts: CutoutId[]): string {
   return cutouts.map(cutoutId => getCutoutDisplayName(cutoutId)).join(' + ')
 }
@@ -109,28 +108,32 @@ export function DeviceDetailsDeckConfiguration({
 
     let newDeckConfig = deckConfig
     if (cutoutId in fixtureGroup) {
-      const groupMap = fixtureGroup[cutoutId]?.find(group => (
-        Object.entries(group).every(([cId, cfId]) => (
-          deckConfig.find(config => config.cutoutId === cId && config.cutoutFixtureId === cfId)
-        ))
-      )) ?? {}
-      newDeckConfig = deckConfig.map(cutoutConfig => (
+      const groupMap =
+        fixtureGroup[cutoutId]?.find(group =>
+          Object.entries(group).every(([cId, cfId]) =>
+            deckConfig.find(
+              config =>
+                config.cutoutId === cId && config.cutoutFixtureId === cfId
+            )
+          )
+        ) ?? {}
+      newDeckConfig = deckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId in groupMap
           ? {
-            ...cutoutConfig,
-            cutoutFixtureId: replacementFixtureId,
-            opentronsModuleSerialNumber: undefined,
-          }
+              ...cutoutConfig,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
           : cutoutConfig
-      ))
+      )
     } else {
       newDeckConfig = deckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId === cutoutId
           ? {
-            ...cutoutConfig,
-            cutoutFixtureId: replacementFixtureId,
-            opentronsModuleSerialNumber: undefined,
-          }
+              ...cutoutConfig,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
           : cutoutConfig
       )
     }
@@ -159,7 +162,15 @@ export function DeviceDetailsDeckConfiguration({
         deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
           ?.fixtureGroup ?? {}
       if (cutoutId in fixtureGroup) {
-        const groupMap = fixtureGroup[cutoutId]?.find(group => Object.entries(group).every(([cId, cfId]) => (deckConfig.find(config => config.cutoutId === cId && config.cutoutFixtureId === cfId)))) ?? {}
+        const groupMap =
+          fixtureGroup[cutoutId]?.find(group =>
+            Object.entries(group).every(([cId, cfId]) =>
+              deckConfig.find(
+                config =>
+                  config.cutoutId === cId && config.cutoutFixtureId === cfId
+              )
+            )
+          ) ?? {}
         const groupedCutoutIds = Object.keys(groupMap) as CutoutId[]
         const displayLocation = getDisplayLocationForCutoutIds(groupedCutoutIds)
         if (acc.groupedCutoutIds.includes(cutoutId)) {

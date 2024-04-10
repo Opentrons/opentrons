@@ -47,7 +47,7 @@ export function MagneticBlockFixture(
     fixtureLocation,
     handleClickRemove,
     cutoutFixtureId,
-    hasStagingArea
+    hasStagingArea,
   } = props
 
   const standardSlotCutout = deckDefinition.locations.cutouts.find(
@@ -63,7 +63,9 @@ export function MagneticBlockFixture(
     standardSlotCutout?.position ?? []
   let x = xSlotPosition
   let width = 0
-  let displayName = hasStagingArea ? STAGING_AREA_WITH_MAGNETIC_BLOCK_DISPLAY_NAME : MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME
+  let displayName = hasStagingArea
+    ? STAGING_AREA_WITH_MAGNETIC_BLOCK_DISPLAY_NAME
+    : MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME
   switch (fixtureLocation) {
     case 'cutoutA1':
     case 'cutoutB1':
@@ -79,7 +81,7 @@ export function MagneticBlockFixture(
     case 'cutoutD2': {
       x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
       width = COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH
-      displayName = 'Mag' 
+      displayName = 'Mag'
       break
     }
     case 'cutoutA3':
@@ -115,7 +117,7 @@ export function MagneticBlockFixture(
         onClick={
           handleClickRemove != null
             ? () => handleClickRemove(fixtureLocation, cutoutFixtureId)
-            : () => { }
+            : () => {}
         }
       >
         <Text css={TYPOGRAPHY.smallBodyTextSemiBold}>{displayName}</Text>

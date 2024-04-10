@@ -64,18 +64,28 @@ export const ChooseModuleToConfigureModal = (
               paddingTop={SPACING.spacing8}
               gridGap={SPACING.spacing8}
             >
-              {attachedModules.filter(m => m.moduleModel === requiredModuleModel).map(attachedModule => {
-                const moduleFixtures = getCutoutFixturesForModuleModel(attachedModule.moduleModel, deckDef)
-                return (
-                  <FixtureOption
-                    key={attachedModule.serialNumber}
-                    onClickHandler={() => handleConfigureModule(attachedModule.serialNumber)}
-                    optionName={getFixtureDisplayName(moduleFixtures[0].id, attachedModule.usbPort.port)}
-                    buttonText={t('shared:add')}
-                    isOnDevice={isOnDevice}
-                  />
-                )
-              })}
+              {attachedModules
+                .filter(m => m.moduleModel === requiredModuleModel)
+                .map(attachedModule => {
+                  const moduleFixtures = getCutoutFixturesForModuleModel(
+                    attachedModule.moduleModel,
+                    deckDef
+                  )
+                  return (
+                    <FixtureOption
+                      key={attachedModule.serialNumber}
+                      onClickHandler={() =>
+                        handleConfigureModule(attachedModule.serialNumber)
+                      }
+                      optionName={getFixtureDisplayName(
+                        moduleFixtures[0].id,
+                        attachedModule.usbPort.port
+                      )}
+                      buttonText={t('shared:add')}
+                      isOnDevice={isOnDevice}
+                    />
+                  )
+                })}
             </Flex>
           </Flex>
         </Flex>
@@ -104,18 +114,28 @@ export const ChooseModuleToConfigureModal = (
               paddingTop={SPACING.spacing8}
               gridGap={SPACING.spacing8}
             >
-              {attachedModules.filter(m => m.moduleModel === requiredModuleModel).map(attachedModule => {
-                const moduleFixtures = getCutoutFixturesForModuleModel(attachedModule.moduleModel, deckDef)
-                return (
-                  <FixtureOption
-                    key={attachedModule.serialNumber}
-                    onClickHandler={() => handleConfigureModule(attachedModule.serialNumber)}
-                    optionName={getFixtureDisplayName(moduleFixtures[0].id, attachedModule.usbPort.port)}
-                    buttonText={t('shared:add')}
-                    isOnDevice={isOnDevice}
-                  />
-                )
-              })}
+              {attachedModules
+                .filter(m => m.moduleModel === requiredModuleModel)
+                .map(attachedModule => {
+                  const moduleFixtures = getCutoutFixturesForModuleModel(
+                    attachedModule.moduleModel,
+                    deckDef
+                  )
+                  return (
+                    <FixtureOption
+                      key={attachedModule.serialNumber}
+                      onClickHandler={() =>
+                        handleConfigureModule(attachedModule.serialNumber)
+                      }
+                      optionName={getFixtureDisplayName(
+                        moduleFixtures[0].id,
+                        attachedModule.usbPort.port
+                      )}
+                      buttonText={t('shared:add')}
+                      isOnDevice={isOnDevice}
+                    />
+                  )
+                })}
             </Flex>
           </Flex>
         </Flex>
