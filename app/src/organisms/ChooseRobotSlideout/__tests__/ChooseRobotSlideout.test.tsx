@@ -226,6 +226,9 @@ describe('ChooseRobotSlideout', () => {
       })
 
       screen.getByText(param.displayName)
+      if (param.type === 'bool') {
+        screen.getByText(param.description)
+      }
       if (param.type === 'int') {
         screen.getByText(`${param.min}-${param.max}`)
       }
