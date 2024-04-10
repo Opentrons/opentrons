@@ -32,7 +32,7 @@ describe('getIdsInRange', () => {
   })
 })
 describe('getUnoccupiedSlotForMoveableTrash', () => {
-  it('returns slot D1 when all other slots are occupied by modules, labware, moveLabware, and staging areas', () => {
+  it('returns slot C1 when all other slots are occupied by modules, labware, moveLabware, and staging areas', () => {
     const mockPDFile: any = {
       commands: [
         {
