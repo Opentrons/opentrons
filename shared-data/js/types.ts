@@ -621,7 +621,6 @@ type RunTimeParameterType =
   | BooleanParameterType
   | StringParameterType
 
-type ParameterType = NumberParameter | ChoiceParameter | BooleanParameter
 interface BaseRunTimeParameter {
   displayName: string
   variableName: string

@@ -62,7 +62,6 @@ import type { Protocol } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { Dispatch } from '../../redux/types'
 import type { OnDeviceRouteParams } from '../../App/types'
-import { Skeleton } from '../../atoms/Skeleton'
 
 interface ProtocolHeaderProps {
   title?: string | null

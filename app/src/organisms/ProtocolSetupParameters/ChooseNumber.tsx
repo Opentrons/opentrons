@@ -12,7 +12,7 @@ import {
 import { InputField } from '../../atoms/InputField'
 import { useToaster } from '../ToasterOven'
 import { ChildNavigation } from '../ChildNavigation'
-import type { NumberParameter, RunTimeParameter } from '@opentrons/shared-data'
+import type { NumberParameter } from '@opentrons/shared-data'
 import { NumericalKeyboard } from '../../atoms/SoftwareKeyboard'
 
 interface ChooseNumberProps {
@@ -41,7 +41,7 @@ export function ChooseNumber({
   React.useEffect(() => {
     const arbitraryInput = new Array(paramValue).join('*')
     console.log(keyboardRef.current)
-    // @ts-ignore keyboard should expose for `setInput` method
+    // @ts-expect-error keyboard should expose for `setInput` method
     keyboardRef.current?.setInput(arbitraryInput)
     setPrevKeyboardValue(arbitraryInput)
   }, [])
@@ -59,15 +59,14 @@ export function ChooseNumber({
     }
   }
 
-  const handleKeyboardInput = (e: string) => {
+  const handleKeyboardInput = (e: string): void => {
     if (prevKeyboardValue.length < e.length) {
       const lastDigit = e.slice(-1)
-      if (paramValue.indexOf('.') > -1 && lastDigit === '.') {
-      } else if (
-        (paramValue.length > 0 || paramValue.indexOf('-') > -1) &&
-        lastDigit === '-'
+      if (
+        !'.-'.includes(lastDigit) ||
+        (lastDigit === '.' && !paramValue.includes('.')) ||
+        (lastDigit === '-' && paramValue.length === 0)
       ) {
-      } else {
         setParamValue(paramValue + lastDigit)
       }
     } else {
@@ -80,6 +79,7 @@ export function ChooseNumber({
   const resetValueDisabled = parameter.default === paramValueAsNumber
   const { min, max } = parameter
   const error =
+    paramValue === '' ||
     Number.isNaN(paramValueAsNumber) ||
     paramValueAsNumber < min ||
     paramValueAsNumber > max
