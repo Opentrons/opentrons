@@ -4,7 +4,6 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_CENTER,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -108,16 +107,16 @@ export function ChooseNumber({
         gridGap={SPACING.spacing48}
         paddingX={SPACING.spacing40}
         padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
-        marginTop="7.75rem"
-        justifyContent={JUSTIFY_CENTER}
+        marginTop="7.75rem" // using margin rather than justify due to content moving with error message
         alignItems={ALIGN_CENTER}
+        height="22rem"
       >
         <Flex
           width="30.5rem"
           height="100%"
           gridGap={SPACING.spacing24}
           flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_CENTER}
+          marginTop="7.75rem"
         >
           <StyledText as="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
             {parameter.description}
@@ -148,7 +147,7 @@ export function ChooseNumber({
         <Flex
           paddingX={SPACING.spacing24}
           height="21.25rem"
-          justifyContent={JUSTIFY_CENTER}
+          marginTop="7.75rem"
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}
