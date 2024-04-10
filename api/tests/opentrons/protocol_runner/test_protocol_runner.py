@@ -261,7 +261,7 @@ async def test_stop(
     subject.play()
     await subject.stop()
 
-    decoy.verify(await protocol_engine.stop(), times=1)
+    decoy.verify(await protocol_engine.stop_soon(), times=1)
 
 
 @pytest.mark.parametrize(
