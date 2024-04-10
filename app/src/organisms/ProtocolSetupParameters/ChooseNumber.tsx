@@ -40,7 +40,6 @@ export function ChooseNumber({
   const [prevKeyboardValue, setPrevKeyboardValue] = React.useState<string>('')
   React.useEffect(() => {
     const arbitraryInput = new Array(paramValue).join('*')
-    console.log(keyboardRef.current)
     // @ts-expect-error keyboard should expose for `setInput` method
     keyboardRef.current?.setInput(arbitraryInput)
     setPrevKeyboardValue(arbitraryInput)
