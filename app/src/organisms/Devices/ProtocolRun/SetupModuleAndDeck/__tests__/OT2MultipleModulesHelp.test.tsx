@@ -15,9 +15,7 @@ const render = () =>
   })[0]
 
 describe('OT2MultipleModulesHelp', () => {
-  let props: React.ComponentProps<typeof OT2MultipleModulesHelp>
   beforeEach(() => {
-    props = { onCloseClick: vi.fn() }
     vi.mocked(getIsOnDevice).mockReturnValue(false)
   })
 

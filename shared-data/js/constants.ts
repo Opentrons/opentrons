@@ -2,7 +2,6 @@ import type {
   CutoutFixtureId,
   CutoutId,
   AddressableAreaName,
-  FlexModuleCutoutFixtureId,
 } from '../deck'
 import type { ModuleModel, ModuleType } from './types'
 

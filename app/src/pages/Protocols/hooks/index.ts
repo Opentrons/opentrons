@@ -9,7 +9,6 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
-  SINGLE_SLOT_FIXTURES,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   RunTimeParameter,
@@ -127,7 +126,7 @@ export const useRequiredProtocolHardwareFromAnalysis = (
         hasSlotConflict: deckConfig.some(
           ({ cutoutId, cutoutFixtureId }) =>
             cutoutId === getCutoutIdForSlotName(location.slotName, deckDef) &&
-            cutoutFixtureId != getCutoutFixtureIdsForModuleModel(model)[0]
+            cutoutFixtureId !== getCutoutFixtureIdsForModuleModel(model)[0]
         ),
       }
     }

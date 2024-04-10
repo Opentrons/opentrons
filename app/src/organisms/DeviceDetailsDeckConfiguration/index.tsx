@@ -35,7 +35,6 @@ import {
   SINGLE_LEFT_CUTOUTS,
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
-  getFixtureGroupForCutoutFixture,
 } from '@opentrons/shared-data'
 
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
@@ -53,6 +52,7 @@ const RUN_REFETCH_INTERVAL = 5000
 interface DeviceDetailsDeckConfigurationProps {
   robotName: string
 }
+
 
 function getDisplayLocationForCutoutIds(cutouts: CutoutId[]): string {
   return cutouts.map(cutoutId => getCutoutDisplayName(cutoutId)).join(' + ')
@@ -139,7 +139,7 @@ export function DeviceDetailsDeckConfiguration({
 
   // do not show standard slot in fixture display list
   const { displayList: fixtureDisplayList } = deckConfig.reduce<{
-    displayList: { displayLocation: string; displayName: string }[]
+    displayList: Array<{ displayLocation: string; displayName: string }>
     groupedCutoutIds: CutoutId[]
   }>(
     (acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => {

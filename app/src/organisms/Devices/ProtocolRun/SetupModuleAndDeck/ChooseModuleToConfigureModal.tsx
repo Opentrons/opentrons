@@ -42,7 +42,7 @@ export const ChooseModuleToConfigureModal = (
     requiredModuleModel,
     isOnDevice,
   } = props
-  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { t } = useTranslation(['protocol_setup', 'shared'])
   const attachedModules = useModulesQuery().data?.data ?? []
 
   return createPortal(

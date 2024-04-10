@@ -26,15 +26,10 @@ import {
   getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleDisplayName,
-  SINGLE_RIGHT_CUTOUTS,
-  SINGLE_LEFT_SLOT_FIXTURE,
-  SINGLE_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
-  getCutoutFixtureIdsForModuleModel,
   getCutoutFixturesForModuleModel,
   getAddressableAreaNamesFromLoadedModule,
-  getCutoutIdForSlotName,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
@@ -48,8 +43,6 @@ import type {
   ModuleModel,
   DeckDefinition,
 } from '@opentrons/shared-data'
-import { replace } from 'lodash'
-import { cs } from 'date-fns/locale'
 import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
 
 interface LocationConflictModalProps {
@@ -103,7 +96,7 @@ export const LocationConflictModal = (
       ? getFixtureDisplayName(deckConfigurationAtA1)
       : currentFixtureDisplayName
 
-  const handleConfigureModule = (moduleSerialNumber: string) => {
+  const handleConfigureModule = (moduleSerialNumber: string): void => {
     if (requiredModule != null) {
       const addressableAreas = getAddressableAreaNamesFromLoadedModule(
         requiredModule,

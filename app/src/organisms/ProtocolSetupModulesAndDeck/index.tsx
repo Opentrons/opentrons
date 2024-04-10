@@ -135,7 +135,6 @@ export function ProtocolSetupModulesAndDeck({
             <ModuleTable
               attachedProtocolModuleMatches={attachedProtocolModuleMatches}
               deckDef={deckDef}
-              protocolModulesInfo={protocolModulesInfo}
               runId={runId}
             />
           ) : null}
