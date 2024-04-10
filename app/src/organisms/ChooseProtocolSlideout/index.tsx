@@ -252,7 +252,6 @@ export function ChooseProtocolSlideoutComponent(
             key={runtimeParam.variableName}
             type="number"
             units={runtimeParam.suffix}
-            placeholder={value.toString()}
             value={value}
             title={runtimeParam.displayName}
             tooltipText={runtimeParam.description}
