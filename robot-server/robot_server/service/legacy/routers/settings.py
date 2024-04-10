@@ -32,7 +32,6 @@ from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import (
     get_hardware,
-    get_robot_type,
     get_robot_type_enum,
     get_ot2_hardware,
 )
@@ -87,12 +86,12 @@ async def set_oem_mode_request(enable):
 async def post_settings(
     update: AdvancedSettingRequest,
     hardware: HardwareControlAPI = Depends(get_hardware),
-    robot_type: str = Depends(get_robot_type),
+    robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
 ) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
     try:
         # send request to system server if this is the enableOEMMode setting
-        if update.id == "enableOEMMode":
+        if update.id == "enableOEMMode" and robot_type == RobotTypeEnum.FLEX:
             resp = await set_oem_mode_request(update.value)
             if resp != 200:
                 # TODO: raise correct error here
@@ -120,21 +119,15 @@ async def post_settings(
     response_model_exclude_unset=True,
 )
 async def get_settings(
-    robot_type: str = Depends(get_robot_type),
+    robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
 ) -> AdvancedSettingsResponse:
     """Get advanced setting (feature flags)"""
     return _create_settings_response(robot_type)
 
 
-def _create_settings_response(robot_type: str) -> AdvancedSettingsResponse:
+def _create_settings_response(robot_type: RobotTypeEnum) -> AdvancedSettingsResponse:
     """Create the feature flag settings response object"""
-    # TODO lc(8-10-2023) We should convert the robot type function to return
-    # the enum value directly.
-    if robot_type == "OT-2 Standard":
-        robot_type_enum = RobotTypeEnum.OT2
-    else:
-        robot_type_enum = RobotTypeEnum.FLEX
-    data = advanced_settings.get_all_adv_settings(robot_type_enum)
+    data = advanced_settings.get_all_adv_settings(robot_type)
 
     if advanced_settings.is_restart_required():
         links = Links(restart="/server/restart")
