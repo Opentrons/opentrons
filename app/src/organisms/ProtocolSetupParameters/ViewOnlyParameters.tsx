@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { formatRunTimeParameterDefaultValue } from '@opentrons/shared-data'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -67,9 +67,6 @@ export function ViewOnlyParameters({
           <StyledText>{t('value')}</StyledText>
         </Flex>
         {parameters.map((parameter, index) => {
-          //  TODO(jr, 3/20/24): plug in the info if the
-          //  parameter changed from the default
-          const hasCustomValue = true
           return (
             <Flex
               onClick={handleOnClick}
@@ -92,11 +89,12 @@ export function ViewOnlyParameters({
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing8}
               >
-                <StyledText as="p" maxWidth="15rem" color={COLORS.grey60}>
-                  {formatRunTimeParameterDefaultValue(parameter, t)}
+                <StyledText as="p" color={COLORS.grey60}>
+                  {formatRunTimeParameterValue(parameter, t)}
                 </StyledText>
-                {hasCustomValue ? (
+                {parameter.value != parameter.default ? (
                   <Chip
+                    data-testid={`Chip_${parameter.variableName}`}
                     type="success"
                     text={t('updated')}
                     hasIcon={false}
