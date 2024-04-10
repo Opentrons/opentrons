@@ -25,7 +25,6 @@ async def enable_oem_mode_endpoint(
     settings: SystemServerSettings = Depends(get_settings),
 ) -> Response:
     """Router for /system/oem_mode/enable endpoint."""
-
     enable = enableRequest.enable
     try:
         settings.oem_mode_enabled = enable
