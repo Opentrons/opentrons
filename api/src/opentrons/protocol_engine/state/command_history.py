@@ -36,9 +36,6 @@ class CommandHistory:
     _queued_fixit_command_ids: OrderedSet[str]
     """The IDs of queued fixit commands, in FIFO order"""
 
-    _executed_command_ids: List[str]
-    """The IDs of all executed commands (setup, fixit, protocol) ordered from oldest to newest."""
-
     _running_command_id: Optional[str]
     """The ID of the currently running command, if any"""
 
@@ -50,7 +47,6 @@ class CommandHistory:
         self._queued_command_ids = OrderedSet()
         self._queued_setup_command_ids = OrderedSet()
         self._queued_fixit_command_ids = OrderedSet()
-        self._executed_command_ids = []
         self._commands_by_id = OrderedDict()
         self._running_command_id = None
         self._terminal_command_id = None
@@ -195,6 +191,7 @@ class CommandHistory:
 
         self._remove_queue_id(command.id)
         self._remove_setup_queue_id(command.id)
+        self._remove_fixit_queue_id(command.id)
 
     def set_command_succeeded(self, command: Command) -> None:
         """Validate and mark a command as succeeded in the command history."""

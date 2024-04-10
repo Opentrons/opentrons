@@ -55,6 +55,7 @@ def get_command_view(
     running_command_id: Optional[str] = None,
     queued_command_ids: Sequence[str] = (),
     queued_setup_command_ids: Sequence[str] = (),
+    queued_fixit_command_ids: Sequence[str] = (),
     run_error: Optional[errors.ErrorOccurrence] = None,
     failed_command: Optional[CommandEntry] = None,
     command_error_recovery_types: Optional[Dict[str, ErrorRecoveryType]] = None,
@@ -73,6 +74,9 @@ def get_command_view(
     if queued_setup_command_ids:
         for command_id in queued_setup_command_ids:
             command_history._add_to_setup_queue(command_id)
+    if queued_fixit_command_ids:
+        for command_id in queued_fixit_command_ids:
+            command_history._add_to_fixit_queue(command_id)
     if commands:
         for index, command in enumerate(commands):
             command_history._add(
@@ -131,6 +135,7 @@ def test_get_next_to_execute_returns_first_queued() -> None:
     subject = get_command_view(
         queue_status=QueueStatus.RUNNING,
         queued_command_ids=["command-id-1", "command-id-2"],
+        queued_fixit_command_ids=["fixit-id-1", "fixit-id-2"],
     )
 
     assert subject.get_next_to_execute() == "command-id-1"
@@ -138,7 +143,7 @@ def test_get_next_to_execute_returns_first_queued() -> None:
 
 @pytest.mark.parametrize(
     "queue_status",
-    [QueueStatus.SETUP, QueueStatus.RUNNING],
+    [QueueStatus.SETUP, QueueStatus.RUNNING, QueueStatus.AWAITING_RECOVERY],
 )
 def test_get_next_to_execute_prioritizes_setup_command_queue(
     queue_status: QueueStatus,
@@ -151,6 +156,24 @@ def test_get_next_to_execute_prioritizes_setup_command_queue(
     )
 
     assert subject.get_next_to_execute() == "setup-command-id"
+
+
+@pytest.mark.parametrize(
+    "queue_status",
+    [QueueStatus.AWAITING_RECOVERY],
+)
+def test_get_next_to_execute_prioritizes_fixit_command_queue(
+    queue_status: QueueStatus,
+) -> None:
+    """It should prioritize fixit command queue over protocol command queue."""
+    subject = get_command_view(
+        queue_status=queue_status,
+        queued_command_ids=["command-id-1", "command-id-2"],
+        queued_setup_command_ids=["setup-command-id"],
+        queued_fixit_command_ids=["fixit-1", "fixit-2"],
+    )
+
+    assert subject.get_next_to_execute() == "fixit-1"
 
 
 def test_get_next_to_execute_returns_none_when_no_queued() -> None:
@@ -184,6 +207,7 @@ def test_get_next_to_execute_returns_no_commands_if_paused() -> None:
         queue_status=QueueStatus.PAUSED,
         queued_setup_command_ids=["setup-id-1", "setup-id-2"],
         queued_command_ids=["command-id-1", "command-id-2"],
+        queued_fixit_command_ids=["fixit-id-1", "fixit-id-2"],
     )
     result = subject.get_next_to_execute()
 
