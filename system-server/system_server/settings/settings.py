@@ -9,15 +9,12 @@ from dotenv import load_dotenv, set_key
 @lru_cache(maxsize=1)
 def get_settings() -> "SystemServerSettings":
     """Get the settings."""
-    update_from_dotenv()
-    return SystemServerSettings()
-
-
-def update_from_dotenv() -> None:
-    """Get the location of the settings file."""
     env = Environment().dot_env_path
     if env:
         load_dotenv(env)
+
+    # Update the systemServer settings from env file
+    return SystemServerSettings(_env_file=env)
 
 
 class Environment(BaseSettings):
