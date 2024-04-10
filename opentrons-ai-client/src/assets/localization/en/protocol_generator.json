@@ -1,5 +1,5 @@
 {
-  "api": "API: An API level between 2.0 and 2.17.",
+  "api": "API: An API level is 2.15",
   "application": "Application: Your protocol's name, describing what it does.",
   "commands": "Commands: List the protocol's steps, specifying quantities in microliters (µL) and giving exact source and destination locations.",
   "make_sure_your_prompt": "Make sure your prompt includes the following:",
