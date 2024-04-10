@@ -3,7 +3,7 @@ import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 
-import { NoParameters } from '@opentrons/components'
+import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -16,10 +16,10 @@ import type {
 } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/components', async importOriginal => {
-  const actual = await importOriginal<typeof NoParameters>()
+  const actual = await importOriginal<typeof InfoScreen>()
   return {
     ...actual,
-    NoParameters: vi.fn(),
+    InfoScreen: vi.fn(),
   }
 })
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
@@ -94,7 +94,7 @@ describe('ProtocolRunRuntimeParameters', () => {
     props = {
       runId: RUN_ID,
     }
-    vi.mocked(NoParameters).mockReturnValue(<div>mock NoParameter</div>)
+    vi.mocked(InfoScreen).mockReturnValue(<div>mock InfoScreen</div>)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({
@@ -151,7 +151,7 @@ describe('ProtocolRunRuntimeParameters', () => {
     screen.getByText('No offsets')
   })
 
-  it('should render mock NoParameter component when RunTimeParameters are empty', () => {
+  it('should render mock InfoScreen component when RunTimeParameters are empty', () => {
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({
@@ -160,7 +160,7 @@ describe('ProtocolRunRuntimeParameters', () => {
     render(props)
     screen.getByText('Parameters')
     expect(screen.queryByText('Default values')).not.toBeInTheDocument()
-    screen.getByText('mock NoParameter')
+    screen.getByText('mock InfoScreen')
   })
 
   // ToDo Additional test will be implemented when chip component is added

@@ -77,7 +77,10 @@ def enable_error_recovery_experiments() -> bool:
         "enableErrorRecoveryExperiments", RobotTypeEnum.FLEX
     )
 
+
+def enable_performance_metrics(robot_type: RobotTypeEnum) -> bool:
+    return advs.get_setting_with_env_overload("enablePerformanceMetrics", robot_type)
+
+
 def oem_mode_enabled() -> bool:
-    return advs.get_setting_with_env_overload(
-        "enableOEMMode", RobotTypeEnum.FLEX
-    )
+    return advs.get_setting_with_env_overload("enableOEMMode", RobotTypeEnum.FLEX)

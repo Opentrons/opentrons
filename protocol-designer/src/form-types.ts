@@ -232,6 +232,7 @@ export interface HydratedMoveLiquidFormData {
     aspirate_y_position?: number | null
     dispense_x_position?: number | null
     dispense_y_position?: number | null
+    blowout_z_offset?: number | null
   }
 }
 
@@ -275,6 +276,7 @@ export interface HydratedMixFormDataLegacy {
   nozzles: NozzleConfigurationStyle | null
   mix_x_position?: number | null
   mix_y_position?: number | null
+  blowout_z_offset?: number | null
 }
 export type MagnetAction = 'engage' | 'disengage'
 export type HydratedMagnetFormData = AnnotationFields & {

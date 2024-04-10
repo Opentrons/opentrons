@@ -82,6 +82,7 @@ export const moveLiquidFormToArgs = (
     dispense_x_position,
     aspirate_y_position,
     dispense_y_position,
+    blowout_z_offset,
   } = fields
   let sourceWells = getOrderedWells(
     fields.aspirate_wells,
@@ -165,7 +166,10 @@ export const moveLiquidFormToArgs = (
   )
   const blowoutLocation =
     (fields.blowout_checkbox && fields.blowout_location) || null
-  const blowoutOffsetFromTopMm = DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+  const blowoutOffsetFromTopMm =
+    blowoutLocation != null
+      ? blowout_z_offset ?? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+      : DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
   const aspirateAirGapVolume = getAirGapData(
     fields,
     'aspirate_airGap_checkbox',

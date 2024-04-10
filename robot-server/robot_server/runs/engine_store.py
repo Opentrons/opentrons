@@ -32,7 +32,10 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.protocols.protocol_store import ProtocolResource
-from opentrons.protocol_engine.types import DeckConfigurationType
+from opentrons.protocol_engine.types import (
+    DeckConfigurationType,
+    RunTimeParamValuesType,
+)
 
 
 class EngineConflictError(RuntimeError):
@@ -154,14 +157,17 @@ class EngineStore:
         deck_configuration: DeckConfigurationType,
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
+        run_time_param_values: Optional[RunTimeParamValuesType] = None,
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
         Args:
             run_id: The run resource the engine is assigned to.
             labware_offsets: Labware offsets to create the engine with.
-            protocol: The protocol to load the runner with, if any.
+            deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
+            protocol: The protocol to load the runner with, if any.
+            run_time_param_values: Any runtime parameter values to set.
 
         Returns:
             The initial equipment and status summary of the engine.
@@ -217,7 +223,7 @@ class EngineStore:
                 # was uploaded before we added stricter validation, and that
                 # doesn't conform to the new rules.
                 python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
-                run_time_param_values=None,
+                run_time_param_values=run_time_param_values,
             )
         elif isinstance(runner, JsonRunner):
             assert (

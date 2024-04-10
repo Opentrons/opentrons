@@ -35,6 +35,7 @@ class HepaFanState:
 
     fan_on: bool
     duty_cycle: int
+    fan_rpm: int
 
 
 @dataclass(frozen=True)
@@ -80,6 +81,7 @@ async def get_hepa_fan_state(can_messenger: CanMessenger) -> Optional[HepaFanSta
             fan_state = HepaFanState(
                 fan_on=bool(message.payload.fan_on.value),
                 duty_cycle=int(message.payload.duty_cycle.value),
+                fan_rpm=int(message.payload.fan_rpm.value),
             )
 
     def _filter(arb_id: ArbitrationId) -> bool:

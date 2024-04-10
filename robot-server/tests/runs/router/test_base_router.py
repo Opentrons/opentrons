@@ -92,6 +92,7 @@ async def test_create_run(
             labware_offsets=[labware_offset_create],
             deck_configuration=[],
             protocol=None,
+            run_time_param_values=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(expected_response)
@@ -169,12 +170,17 @@ async def test_create_protocol_run(
             labware_offsets=[],
             deck_configuration=[],
             protocol=protocol_resource,
+            run_time_param_values={"foo": "bar"},
             notify_publishers=mock_notify_publishers,
         )
     ).then_return(expected_response)
 
     result = await create_run(
-        request_body=RequestModel(data=RunCreate(protocolId="protocol-id")),
+        request_body=RequestModel(
+            data=RunCreate(
+                protocolId="protocol-id", runTimeParameterValues={"foo": "bar"}
+            )
+        ),
         protocol_store=mock_protocol_store,
         run_data_manager=mock_run_data_manager,
         run_id=run_id,
@@ -232,6 +238,7 @@ async def test_create_run_conflict(
             labware_offsets=[],
             deck_configuration=[],
             protocol=None,
+            run_time_param_values=None,
             notify_publishers=mock_notify_publishers,
         )
     ).then_raise(EngineConflictError("oh no"))

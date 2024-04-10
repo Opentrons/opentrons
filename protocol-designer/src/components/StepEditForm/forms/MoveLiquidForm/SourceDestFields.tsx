@@ -11,6 +11,7 @@ import {
   TextField,
   TipPositionField,
   WellOrderField,
+  BlowoutZOffsetField,
 } from '../../fields'
 import { MixFields } from '../../fields/MixFields'
 import {
@@ -175,6 +176,12 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
                 path: formData.path,
                 stepType: formData.stepType,
               })}
+            />
+            <BlowoutZOffsetField
+              {...propsForFields.blowout_z_offset}
+              sourceLabwareId={propsForFields.aspirate_labware.value}
+              destLabwareId={propsForFields.dispense_labware.value}
+              blowoutLabwareId={propsForFields.blowout_location.value}
             />
           </CheckboxRowField>
         )}

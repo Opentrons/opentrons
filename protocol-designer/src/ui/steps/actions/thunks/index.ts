@@ -40,17 +40,20 @@ export const addAndSelectStepWithHints: (arg: {
   const magnetModuleHasLabware = uiModuleSelectors.getMagnetModuleHasLabware(
     state
   )
-  const temperatureModuleHasLabware = uiModuleSelectors.getTemperatureModuleHasLabware(
+  const temperatureModulesHaveLabware = uiModuleSelectors.getTemperatureModulesHaveLabware(
     state
   )
   const thermocyclerModuleHasLabware = uiModuleSelectors.getThermocyclerModuleHasLabware(
     state
   )
-  const temperatureModuleOnDeck = uiModuleSelectors.getSingleTemperatureModuleId(
+  const temperatureModuleOnDeck = uiModuleSelectors.getTemperatureModuleIds(
     state
   )
   const thermocyclerModuleOnDeck = uiModuleSelectors.getSingleThermocyclerModuleId(
     state
+  )
+  const tempHasNoLabware = temperatureModulesHaveLabware.some(
+    module => !module.hasLabware
   )
   // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
   const stepNeedsLiquid = ['mix', 'moveLiquid'].includes(payload.stepType)
@@ -59,15 +62,17 @@ export const addAndSelectStepWithHints: (arg: {
   const stepModuleMissingLabware =
     (stepMagnetNeedsLabware && !magnetModuleHasLabware) ||
     (stepTemperatureNeedsLabware &&
-      ((temperatureModuleOnDeck && !temperatureModuleHasLabware) ||
-        (thermocyclerModuleOnDeck && !thermocyclerModuleHasLabware)))
+      thermocyclerModuleOnDeck &&
+      !thermocyclerModuleHasLabware) ||
+    (temperatureModuleOnDeck?.length === 1 && tempHasNoLabware)
 
   if (stepNeedsLiquid && !deckHasLiquid) {
     dispatch(tutorialActions.addHint('add_liquids_and_labware'))
   }
-
   if (stepModuleMissingLabware) {
     dispatch(tutorialActions.addHint('module_without_labware'))
+  } else if (temperatureModuleOnDeck && tempHasNoLabware) {
+    dispatch(tutorialActions.addHint('multiple_modules_without_labware'))
   }
 }
 export interface ReorderSelectedStepAction {

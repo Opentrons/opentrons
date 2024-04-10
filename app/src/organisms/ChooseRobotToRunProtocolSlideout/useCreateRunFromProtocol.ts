@@ -83,7 +83,8 @@ export function useCreateRunFromProtocol(
         })
       },
     },
-    host
+    host,
+    runTimeParameterValues
   )
 
   let error =
@@ -107,7 +108,11 @@ export function useCreateRunFromProtocol(
     ) => {
       resetRunMutation()
       createProtocolRun(
-        { files: [...srcFiles, ...customLabwareFiles], protocolKey },
+        {
+          files: [...srcFiles, ...customLabwareFiles],
+          protocolKey,
+          runTimeParameterValues,
+        },
         ...args
       )
     },

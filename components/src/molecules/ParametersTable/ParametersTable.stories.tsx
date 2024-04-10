@@ -1,15 +1,10 @@
-import * as React from 'react'
-import { ParametersTable } from '@opentrons/components'
-import type { Story, Meta } from '@storybook/react'
+import * as React from 'react-remove-scroll'
+import { Flex } from '../../primitives'
+import { SPACING } from '../../ui-style-constants'
+import { ParametersTable } from './index'
+
+import type { Meta, StoryObj } from '@storybook/react'
 import type { RunTimeParameter } from '@opentrons/shared-data'
-
-export default {
-  title: 'Library/Molecules/ParametersTable',
-} as Meta
-
-const Template: Story<React.ComponentProps<typeof ParametersTable>> = args => (
-  <ParametersTable {...args} />
-)
 
 const runTimeParameters: RunTimeParameter[] = [
   {
@@ -153,7 +148,24 @@ const runTimeParameters: RunTimeParameter[] = [
     default: 'flex',
   },
 ]
-export const Default = Template.bind({})
-Default.args = {
-  runTimeParameters: runTimeParameters,
+
+const meta: Meta<typeof ParametersTable> = {
+  title: 'Library/Molecules/ParametersTable',
+  component: ParametersTable,
+  decorators: [
+    Story => (
+      <Flex padding={SPACING.spacing16}>
+        <Story />
+      </Flex>
+    ),
+  ],
+}
+export default meta
+
+type Story = StoryObj<typeof ParametersTable>
+
+export const DefaultParameterTable: Story = {
+  args: {
+    runTimeParameters: runTimeParameters,
+  },
 }

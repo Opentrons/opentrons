@@ -109,7 +109,7 @@ export function TipPositionField(props: TipPositionFieldProps): JSX.Element {
       name={zName}
       closeModal={handleClose}
       wellDepthMm={wellDepthMm}
-      mmFromBottom={mmFromBottom}
+      zValue={mmFromBottom}
       updateValue={zUpdateValue}
       isIndeterminate={isIndeterminate}
     />

@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  height: 5rem;
+  height: 4rem;
 }
 
 .main_row {
@@ -56,7 +56,6 @@
   font-weight: var(--fw-semibold);
   color: var(--c-blue);
   position: absolute;
-  right: 10px;
   bottom: 45px;
   align-self: flex-end;
 }

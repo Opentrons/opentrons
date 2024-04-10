@@ -37,12 +37,15 @@ def mock_can_messenger() -> AsyncMock:
     return AsyncMock()
 
 
-def create_hepa_fan_state_response(fan_on: bool, duty_cycle: int) -> MessageDefinition:
+def create_hepa_fan_state_response(
+    fan_on: bool, duty_cycle: int, fan_rpm: int
+) -> MessageDefinition:
     """Create a GetHepaFanStateResponse."""
     return md.GetHepaFanStateResponse(
         payload=GetHepaFanStatePayloadResponse(
             fan_on=UInt8Field(fan_on),
             duty_cycle=UInt32Field(duty_cycle),
+            fan_rpm=UInt16Field(fan_rpm),
         )
     )
 
@@ -111,10 +114,11 @@ async def test_set_hepa_uv_state(
 @pytest.mark.parametrize(
     "response",
     [
-        (NodeId.host, create_hepa_fan_state_response(True, 75), NodeId.hepa_uv),
-        (NodeId.host, create_hepa_fan_state_response(True, 0), NodeId.hepa_uv),
-        (NodeId.host, create_hepa_fan_state_response(False, 75), NodeId.hepa_uv),
-        (NodeId.host, create_hepa_fan_state_response(False, 100), NodeId.hepa_uv),
+        (NodeId.host, create_hepa_fan_state_response(True, 50, 4540), NodeId.hepa_uv),
+        (NodeId.host, create_hepa_fan_state_response(True, 75, 6790), NodeId.hepa_uv),
+        (NodeId.host, create_hepa_fan_state_response(True, 0, 0), NodeId.hepa_uv),
+        (NodeId.host, create_hepa_fan_state_response(False, 75, 0), NodeId.hepa_uv),
+        (NodeId.host, create_hepa_fan_state_response(False, 100, 0), NodeId.hepa_uv),
     ],
 )
 async def test_get_hepa_fan_state(
@@ -147,6 +151,7 @@ async def test_get_hepa_fan_state(
         HepaFanState(
             bool(payload.fan_on.value),
             int(payload.duty_cycle.value),
+            int(payload.fan_rpm.value),
         )
         == res
     )

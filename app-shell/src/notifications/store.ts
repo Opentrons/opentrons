@@ -207,7 +207,8 @@ class ConnectionStore {
 
   public isConnectingToBroker(robotName: string): boolean {
     return (
-      (this.hostsByRobotName[robotName]?.client == null ?? false) &&
+      robotName in this.hostsByRobotName &&
+      this.hostsByRobotName[robotName].client == null &&
       !this.isConnectionTerminated(robotName)
     )
   }
