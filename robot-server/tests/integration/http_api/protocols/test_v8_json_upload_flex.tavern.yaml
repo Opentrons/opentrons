@@ -103,7 +103,7 @@ stages:
                 definitionUri: opentrons/armadillo_96_wellplate_200ul_pcr_full_skirt/1
                 displayName: Sample Collection Plate
                 location:
-                  moduleId: magneticModuleId
+                  moduleId: magneticBlockId
               - id: tipRackId
                 loadName: opentrons_96_tiprack_1000ul
                 definitionUri: opentrons/opentrons_96_tiprack_1000ul/1
@@ -117,9 +117,8 @@ stages:
                 location:
                   slotName: 'A3'
             modules:
-              - id: magneticModuleId
-                serialNumber: !anystr
-                model: magneticModuleV2
+              - id: magneticBlockId
+                model: magneticBlockV1
                 location:
                   slotName: 'D3'
               - id: temperatureModuleId
@@ -157,15 +156,14 @@ stages:
                 key: !anystr
                 status: succeeded
                 params:
-                  model: magneticModuleV2
+                  model: magneticBlockV1
                   location:
                     slotName: 'D3'
-                  moduleId: magneticModuleId
+                  moduleId: magneticBlockId
                 result:
-                  moduleId: magneticModuleId
+                  moduleId: magneticBlockId
                   definition: !anydict
-                  model: magneticModuleV2
-                  serialNumber: !anystr
+                  model: magneticBlockV1
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -210,7 +208,7 @@ stages:
                 status: succeeded
                 params:
                   location:
-                    moduleId: magneticModuleId
+                    moduleId: magneticBlockId
                   loadName: armadillo_96_wellplate_200ul_pcr_full_skirt
                   namespace: opentrons
                   version: 1
@@ -352,7 +350,7 @@ stages:
                   volume: 4.5
                   flowRate: 2.5
                 result:
-                  position: { 'x': 341.205, 'y': 65.115, 'z': 84.3 }
+                  position: { 'x': 342.38, 'y': 65.24, 'z': 40.05 }
                   volume: 4.5
                 startedAt: !anystr
                 completedAt: !anystr
@@ -374,7 +372,7 @@ stages:
                   radius: 1.0
                   speed: 42.0
                 result:
-                  position: { 'x': 341.205, 'y': 65.115, 'z': 94.3 }
+                  position: { 'x': 342.38, 'y': 65.24, 'z': 50.05 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -394,7 +392,7 @@ stages:
                       z: 12.0
                   flowRate: 2.0
                 result:
-                  position: { 'x': 341.205, 'y': 65.115, 'z': 95.3 }
+                  position: { 'x': 342.38, 'y': 65.24, 'z': 51.05 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -432,7 +430,7 @@ stages:
                   speed: 12.3
                 result:
                   position:
-                    { 'x': 350.205, 'y': 65.115, 'z': 98.25 }
+                    { 'x': 351.38, 'y': 65.24, 'z': 54.0 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -454,7 +452,7 @@ stages:
                   forceDirect: true
                 result:
                   position:
-                    { 'x': 352.205, 'y': 68.115, 'z': 93.3 }
+                    { 'x': 353.38, 'y': 68.24, 'z': 49.05 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
