@@ -1,7 +1,8 @@
-"""This module offers a mechanism for measuring and storing the execution durations of both synchronous and asynchronous functions.
+"""Module for measuring and storing execution durations of functions.
 
-The FunctionTimer class is intended to be used as a decorator to wrap functions and measure their execution times. It utilizes `perf_counter_ns` for high-resolution performance counter measurements and `clock_gettime_ns(CLOCK_REALTIME)` for real-time clock measurements. The use of `perf_counter_ns` ensures the highest possible resolution timer, which is essential for accurate duration measurement, especially for short-running functions. `clock_gettime_ns(CLOCK_REALTIME)` is used to capture the actual start time in real-world time, which is useful for correlating events or logs with other time-based data.
-
+Provides a `FunctionTimer` class that can be used as a decorator to measure
+the execution time of both synchronous and asynchronous functions, utilizing high-resolution
+performance counters for accuracy.
 """
 
 from time import perf_counter_ns, clock_gettime_ns, CLOCK_REALTIME
@@ -29,7 +30,7 @@ class FunctionTimer(AbstractAsyncContextManager, AbstractContextManager):  # typ
         """Starts the timing process, capturing both the current real-time and a high-resolution performance counter.
 
         Returns:
-            A tuple containing the current real-time (`clock_gettime_ns(CLOCK_REALTIME)`) and an initial performance counter (`perf_counter_ns()`). Both values are measured in nanoseconds. The combination of these counters allows us to accurately measure execution durations while also correlating these measurements to real-world time.
+            A tuple containing the current real-time (`clock_gettime_ns(CLOCK_REALTIME)`) and an initial performance counter (`perf_counter_ns()`). Both values are measured in nanoseconds.
         """
         return clock_gettime_ns(CLOCK_REALTIME), perf_counter_ns()
 
@@ -37,7 +38,7 @@ class FunctionTimer(AbstractAsyncContextManager, AbstractContextManager):  # typ
         """Ends the timing process, capturing the final high-resolution performance counter.
 
         Returns:
-            The final performance counter, measured in nanoseconds. This value is captured using `perf_counter_ns()` to ensure consistency with the initial performance counter, providing an accurate duration measurement.
+            The final performance counter, measured in nanoseconds.
         """
         return perf_counter_ns()
 
