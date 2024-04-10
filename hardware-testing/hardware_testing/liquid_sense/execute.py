@@ -274,9 +274,17 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
         run_args.pipette_channels
     ][tip]
     data_dir = get_testing_data_directory()
-    data_filename = f"pressure_sensor_data-trial{trial}-tip{tip}.csv"
-    data_file = f"{data_dir}/{run_args.name}/{run_args.run_id}/{data_filename}"
-    ui.print_info(f"logging pressure data to {data_file}")
+    probes: List[InstrumentProbeType] = [InstrumentProbeType.PRIMARY]
+    probe_target: InstrumentProbeType = InstrumentProbeType.PRIMARY
+    if run_args.pipette_channels > 1:
+        probes.append(InstrumentProbeType.SECONDARY)
+        probe_target = InstrumentProbeType.BOTH
+    data_files: Dict[InstrumentProbeType, str] = {}
+    for probe in probes:
+        data_filename = f"pressure_sensor_data-trial{trial}-tip{tip}-{probe.name}.csv"
+        data_file = f"{data_dir}/{run_args.name}/{run_args.run_id}/{data_filename}"
+        ui.print_info(f"logging pressure data to {data_file}")
+        data_files[probe] = data_file
 
     plunger_speed = (
         lqid_cfg["plunger_speed"]
@@ -295,13 +303,13 @@ def _run_trial(run_args: RunArgs, tip: int, well: Well, trial: int) -> float:
         aspirate_while_sensing=run_args.aspirate,
         auto_zero_sensor=True,
         num_baseline_reads=10,
-        data_file=data_file,
+        data_files=data_files,
     )
 
     hw_mount = OT3Mount.LEFT if run_args.pipette.mount == "left" else OT3Mount.RIGHT
     run_args.recorder.set_sample_tag(f"trial-{trial}-{tip}ul")
     # TODO add in stuff for secondary probe
-    height = hw_api.liquid_probe(hw_mount, lps, InstrumentProbeType.PRIMARY)
+    height = hw_api.liquid_probe(hw_mount, lps, probe_target)
     ui.print_info(f"Trial {trial} complete")
     run_args.recorder.clear_sample_tag()
     return height
