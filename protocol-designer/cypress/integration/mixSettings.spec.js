@@ -59,7 +59,7 @@ describe('Advanced Settings for Mix Form', () => {
     cy.get('input[name="aspirate_flowRate"]').should('be.disabled')
 
     // TipPosition Aspirate should be disabled
-    cy.get('[id=TipPositionField_mix_mmFromBottom]').should('be.disabled')
+    cy.get('[id=TipPositionIcon_mix_mmFromBottom]').should('not.be.enabled')
 
     // Dispense Flowrate disbled
     cy.get('input[name="dispense_flowRate"]').should('be.disabled')
@@ -91,7 +91,7 @@ describe('Advanced Settings for Mix Form', () => {
     cy.get('input[name="dispense_flowRate"]').should('be.enabled')
 
     // TipPosition Aspirate should be enabled
-    cy.get('[id=TipPositionField_mix_mmFromBottom]').should('be.enabled')
+    cy.get('[id=TipPositionIcon_mix_mmFromBottom]').should('not.be.disabled')
 
     // Delay in aspirate and Dispense settings is enabled
     cy.get('input[name="aspirate_delay_checkbox"]').should('be.enabled')

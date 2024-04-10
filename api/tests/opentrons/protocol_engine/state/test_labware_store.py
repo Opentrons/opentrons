@@ -21,7 +21,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
-    UpdateCommandAction,
+    SucceedCommandAction,
 )
 from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
@@ -125,7 +125,7 @@ def test_handles_load_labware(
             created_at=datetime(year=2021, month=1, day=2),
         )
     )
-    subject.handle_action(UpdateCommandAction(private_result=None, command=command))
+    subject.handle_action(SucceedCommandAction(private_result=None, command=command))
 
     assert subject.state.labware_by_id["test-labware-id"] == expected_labware_data
 
@@ -173,7 +173,7 @@ def test_handles_move_labware(
         )
     )
     subject.handle_action(
-        UpdateCommandAction(private_result=None, command=load_labware_command)
+        SucceedCommandAction(private_result=None, command=load_labware_command)
     )
 
     move_command = create_move_labware_command(
@@ -183,7 +183,7 @@ def test_handles_move_labware(
         strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
     )
     subject.handle_action(
-        UpdateCommandAction(private_result=None, command=move_command)
+        SucceedCommandAction(private_result=None, command=move_command)
     )
 
     assert subject.state.labware_by_id["my-labware-id"].location == DeckSlotLocation(
@@ -217,7 +217,7 @@ def test_handles_move_labware_off_deck(
         )
     )
     subject.handle_action(
-        UpdateCommandAction(private_result=None, command=load_labware_command)
+        SucceedCommandAction(private_result=None, command=load_labware_command)
     )
 
     move_labware_off_deck_cmd = create_move_labware_command(
@@ -226,7 +226,7 @@ def test_handles_move_labware_off_deck(
         strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
     )
     subject.handle_action(
-        UpdateCommandAction(private_result=None, command=move_labware_off_deck_cmd)
+        SucceedCommandAction(private_result=None, command=move_labware_off_deck_cmd)
     )
     assert subject.state.labware_by_id["my-labware-id"].location == OFF_DECK_LOCATION
     assert subject.state.labware_by_id["my-labware-id"].offsetId is None

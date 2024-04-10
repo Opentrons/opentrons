@@ -233,6 +233,24 @@ settings = [
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
+    SettingDefinition(
+        _id="enableOEMMode",
+        title="Enable OEM Mode",
+        description="This setting anonymizes Opentrons branding in the ODD app.",
+        robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
+    ),
+    SettingDefinition(
+        _id="enablePerformanceMetrics",
+        title="Enable performance metrics",
+        description=(
+            "Do not enable."
+            " This is an Opentrons internal setting to collect performance metrics."
+            " Do not turn this on unless you are playing with the performance metrics system."
+        ),
+        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
+        internal_only=True,
+    ),
 ]
 
 if (
@@ -692,6 +710,26 @@ def _migrate30to31(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate31to32(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 32 of the feature flags file.
+
+    - Adds the enableOEMMode config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableOEMMode"] = None
+    return newmap
+
+
+def _migrate32to33(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 33 of the feature flags file.
+
+    - Adds the enablePerformanceMetrics config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enablePerformanceMetrics"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -724,6 +762,8 @@ _MIGRATIONS = [
     _migrate28to29,
     _migrate29to30,
     _migrate30to31,
+    _migrate31to32,
+    _migrate32to33,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

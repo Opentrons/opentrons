@@ -1,5 +1,5 @@
 """In-memory storage of ProtocolEngine instances."""
-from typing import List, NamedTuple, Optional
+from typing import List, NamedTuple, Optional, Callable
 
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -32,7 +32,10 @@ from opentrons.protocol_engine import (
 )
 
 from robot_server.protocols.protocol_store import ProtocolResource
-from opentrons.protocol_engine.types import DeckConfigurationType
+from opentrons.protocol_engine.types import (
+    DeckConfigurationType,
+    RunTimeParamValuesType,
+)
 
 
 class EngineConflictError(RuntimeError):
@@ -152,14 +155,19 @@ class EngineStore:
         run_id: str,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
+        notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
+        run_time_param_values: Optional[RunTimeParamValuesType] = None,
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
 
         Args:
             run_id: The run resource the engine is assigned to.
             labware_offsets: Labware offsets to create the engine with.
+            deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
+            notify_publishers: Utilized by the engine to notify publishers of state changes.
             protocol: The protocol to load the runner with, if any.
+            run_time_param_values: Any runtime parameter values to set.
 
         Returns:
             The initial equipment and status summary of the engine.
@@ -184,6 +192,7 @@ class EngineStore:
             ),
             load_fixed_trash=load_fixed_trash,
             deck_configuration=deck_configuration,
+            notify_publishers=notify_publishers,
         )
 
         post_run_hardware_state = PostRunHardwareState.HOME_AND_STAY_ENGAGED
@@ -214,7 +223,7 @@ class EngineStore:
                 # was uploaded before we added stricter validation, and that
                 # doesn't conform to the new rules.
                 python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
-                run_time_param_values=None,
+                run_time_param_values=run_time_param_values,
             )
         elif isinstance(runner, JsonRunner):
             assert (
@@ -244,6 +253,7 @@ class EngineStore:
         """
         engine = self.engine
         state_view = engine.state_view
+        runner = self.runner
 
         if state_view.commands.get_is_okay_to_clear():
             await engine.finish(
@@ -256,6 +266,10 @@ class EngineStore:
 
         run_data = state_view.get_summary()
         commands = state_view.commands.get_all()
+        run_time_parameters = runner.run_time_parameters
+
         self._runner_engine_pair = None
 
-        return RunResult(state_summary=run_data, commands=commands)
+        return RunResult(
+            state_summary=run_data, commands=commands, parameters=run_time_parameters
+        )

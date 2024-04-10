@@ -35,6 +35,7 @@ class HepaFanState:
 
     fan_on: bool
     duty_cycle: int
+    fan_rpm: int
 
 
 @dataclass(frozen=True)
@@ -44,6 +45,7 @@ class HepaUVState:
     uv_light_on: bool
     uv_duration_s: int
     remaining_time_s: int
+    uv_current_ma: int
 
 
 async def set_hepa_fan_state(
@@ -79,6 +81,7 @@ async def get_hepa_fan_state(can_messenger: CanMessenger) -> Optional[HepaFanSta
             fan_state = HepaFanState(
                 fan_on=bool(message.payload.fan_on.value),
                 duty_cycle=int(message.payload.duty_cycle.value),
+                fan_rpm=int(message.payload.fan_rpm.value),
             )
 
     def _filter(arb_id: ArbitrationId) -> bool:
@@ -132,6 +135,7 @@ async def get_hepa_uv_state(can_messenger: CanMessenger) -> Optional[HepaUVState
                 uv_light_on=bool(message.payload.uv_light_on.value),
                 uv_duration_s=int(message.payload.uv_duration_s.value),
                 remaining_time_s=int(message.payload.remaining_time_s.value),
+                uv_current_ma=int(message.payload.uv_current_ma.value),
             )
 
     def _filter(arb_id: ArbitrationId) -> bool:

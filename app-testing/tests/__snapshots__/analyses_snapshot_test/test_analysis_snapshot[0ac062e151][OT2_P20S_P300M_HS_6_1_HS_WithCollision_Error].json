@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p300_single_gen2"
@@ -17,6 +19,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p300_multi_gen2"
@@ -26,6 +29,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "1"
@@ -475,6 +479,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "Opentrons 96 Tip Rack 300 µL",
         "loadName": "opentrons_96_tiprack_300ul",
@@ -1621,6 +1626,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "H/S",
         "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
@@ -2872,6 +2878,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "Opentrons 96 Tip Rack 300 µL (1)",
         "loadName": "opentrons_96_tiprack_300ul",
@@ -4018,6 +4025,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "1",
         "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
@@ -5166,6 +5174,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A1": 100.0,
@@ -5199,18 +5208,21 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"

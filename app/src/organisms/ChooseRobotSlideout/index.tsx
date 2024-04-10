@@ -51,7 +51,6 @@ import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
-import { useFeatureFlag } from '../../redux/config'
 import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
@@ -112,7 +111,8 @@ interface ChooseRobotSlideoutProps
   isAnalysisError?: boolean
   isAnalysisStale?: boolean
   showIdleOnly?: boolean
-  multiSlideout?: { currentPage: number }
+  multiSlideout?: { currentPage: number } | null
+  setHasParamError?: (isError: boolean) => void
 }
 
 export function ChooseRobotSlideout(
@@ -135,12 +135,12 @@ export function ChooseRobotSlideout(
     setSelectedRobot,
     robotType,
     showIdleOnly = false,
-    multiSlideout,
+    multiSlideout = null,
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
+    setHasParamError,
   } = props
 
-  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -330,6 +330,7 @@ export function ChooseRobotSlideout(
     </Flex>
   )
 
+  const errors: string[] = []
   const runTimeParameters =
     runTimeParametersOverrides?.map((runtimeParam, index) => {
       if ('choices' in runtimeParam) {
@@ -370,6 +371,24 @@ export function ChooseRobotSlideout(
       } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
         const value = runtimeParam.value as number
         const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
+        const error =
+          Number.isNaN(value) ||
+          value < runtimeParam.min ||
+          value > runtimeParam.max
+            ? t(`value_out_of_range`, {
+                min:
+                  runtimeParam.type === 'int'
+                    ? runtimeParam.min
+                    : runtimeParam.min.toFixed(1),
+                max:
+                  runtimeParam.type === 'int'
+                    ? runtimeParam.max
+                    : runtimeParam.max.toFixed(1),
+              })
+            : null
+        if (error != null) {
+          errors.push(error)
+        }
         return (
           <InputField
             key={runtimeParam.variableName}
@@ -378,8 +397,16 @@ export function ChooseRobotSlideout(
             placeholder={value.toString()}
             value={value}
             title={runtimeParam.displayName}
-            caption={runtimeParam.description}
+            tooltipText={runtimeParam.description}
+            caption={
+              runtimeParam.type === 'int'
+                ? `${runtimeParam.min}-${runtimeParam.max}`
+                : `${runtimeParam.min.toFixed(1)}-${runtimeParam.max.toFixed(
+                    1
+                  )}`
+            }
             id={id}
+            error={error}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
@@ -399,7 +426,7 @@ export function ChooseRobotSlideout(
             }}
           />
         )
-      } else if (runtimeParam.type === 'boolean') {
+      } else if (runtimeParam.type === 'bool') {
         return (
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -451,6 +478,10 @@ export function ChooseRobotSlideout(
       }
     }) ?? null
 
+  if (setHasParamError != null) {
+    setHasParamError(errors.length > 0)
+  }
+
   const isRestoreDefaultsLinkEnabled =
     runTimeParametersOverrides?.some(
       parameter => parameter.value !== parameter.default
@@ -493,7 +524,7 @@ export function ChooseRobotSlideout(
       </Flex>
     ) : null
 
-  return multiSlideout != null && enableRunTimeParametersFF ? (
+  return multiSlideout != null ? (
     <MultiSlideout
       isExpanded={isExpanded}
       onCloseClick={onCloseClick}
@@ -523,10 +554,10 @@ const ENABLED_LINK_CSS = css`
 
 const DISABLED_LINK_CSS = css`
   ${TYPOGRAPHY.linkPSemiBold}
-  color: ${COLORS.grey50};
+  color: ${COLORS.grey40};
   cursor: default;
 
   &:hover {
-    color: ${COLORS.grey50};
+    color: ${COLORS.grey40};
   }
 `

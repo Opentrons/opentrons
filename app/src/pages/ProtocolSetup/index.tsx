@@ -82,7 +82,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_START,
   useTrackEvent,
 } from '../../redux/analytics'
-import { getIsHeaterShakerAttached, useFeatureFlag } from '../../redux/config'
+import { getIsHeaterShakerAttached } from '../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { CloseButton, PlayButton } from './Buttons'
@@ -257,7 +257,6 @@ function PrepareToRun({
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
-  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
   const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
   // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
@@ -730,20 +729,18 @@ function PrepareToRun({
               disabled={lpcDisabledReason != null}
               disabledReason={lpcDisabledReason}
             />
-            {enableRunTimeParametersFF ? (
-              <ProtocolSetupStep
-                onClickSetupStep={() => setSetupScreen('view only parameters')}
-                title={t('parameters')}
-                detail={t(
-                  hasRunTimeParameters
-                    ? parametersDetail
-                    : t('no_parameters_specified')
-                )}
-                subDetail={null}
-                status="general"
-                disabled={!hasRunTimeParameters}
-              />
-            ) : null}
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('view only parameters')}
+              title={t('parameters')}
+              detail={t(
+                hasRunTimeParameters
+                  ? parametersDetail
+                  : t('no_parameters_specified')
+              )}
+              subDetail={null}
+              status="general"
+              disabled={!hasRunTimeParameters}
+            />
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('labware')}
               title={t('labware')}

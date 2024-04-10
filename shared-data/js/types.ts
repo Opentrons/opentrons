@@ -595,35 +595,43 @@ export interface AnalysisError {
   createdAt: string
 }
 
-interface IntParameter {
+export interface NumberParameter {
+  type: NumberParameterType
   min: number
   max: number
   default: number
 }
 
-interface Choice {
+export interface Choice {
   displayName: string
-  value: unknown
+  value: number | boolean | string
 }
 
 interface ChoiceParameter {
+  type: RunTimeParameterType
   choices: Choice[]
-  default: string
+  default: number | boolean | string
 }
 
 interface BooleanParameter {
+  type: BooleanParameterType
   default: boolean
 }
 
-type RunTimeParameterType = 'int' | 'float' | 'str' | 'boolean'
+type NumberParameterType = 'int' | 'float'
+type BooleanParameterType = 'bool'
+type StringParameterType = 'str'
+type RunTimeParameterType =
+  | NumberParameter
+  | BooleanParameterType
+  | StringParameterType
 
-type ParameterType = IntParameter | ChoiceParameter | BooleanParameter
+type ParameterType = NumberParameter | ChoiceParameter | BooleanParameter
 interface BaseRunTimeParameter {
   displayName: string
   variableName: string
   description: string
-  type: RunTimeParameterType
-  value: unknown
+  value: number | boolean | string
   suffix?: string
 }
 

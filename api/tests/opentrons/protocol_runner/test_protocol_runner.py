@@ -1,4 +1,6 @@
 """Tests for the PythonAndLegacyRunner, JsonRunner & LiveRunner classes."""
+from datetime import datetime
+
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 from decoy import Decoy, matchers
@@ -18,7 +20,12 @@ from opentrons.protocols.parse import PythonParseMode
 from opentrons.util.broker import Broker
 
 from opentrons import protocol_reader
-from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    Liquid,
+    commands as pe_commands,
+    errors as pe_errors,
+)
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -328,6 +335,96 @@ async def test_run_json_runner(
     )
 
 
+async def test_run_json_runner_stop_requested_stops_enquqing(
+    decoy: Decoy,
+    hardware_api: HardwareAPI,
+    protocol_engine: ProtocolEngine,
+    task_queue: TaskQueue,
+    json_runner_subject: JsonRunner,
+    json_file_reader: JsonFileReader,
+    json_translator: JsonTranslator,
+) -> None:
+    """It should run a protocol to completion."""
+    labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
+    json_protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.json"),
+        files=[],
+        metadata={},
+        robot_type="OT-2 Standard",
+        config=JsonProtocolConfig(schema_version=6),
+        content_hash="abc123",
+    )
+
+    commands: List[pe_commands.CommandCreate] = [
+        pe_commands.HomeCreate(params=pe_commands.HomeParams()),
+        pe_commands.WaitForDurationCreate(
+            params=pe_commands.WaitForDurationParams(seconds=10)
+        ),
+        pe_commands.LoadLiquidCreate(
+            params=pe_commands.LoadLiquidParams(
+                liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
+            )
+        ),
+    ]
+
+    liquids: List[Liquid] = [
+        Liquid(id="water-id", displayName="water", description="water desc")
+    ]
+
+    json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
+
+    decoy.when(
+        await protocol_reader.extract_labware_definitions(json_protocol_source)
+    ).then_return([labware_definition])
+    decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
+    decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
+    decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
+    decoy.when(
+        await protocol_engine.add_and_execute_command(
+            pe_commands.HomeCreate(params=pe_commands.HomeParams()),
+        )
+    ).then_return(
+        pe_commands.Home.construct(status=pe_commands.CommandStatus.SUCCEEDED)  # type: ignore[call-arg]
+    )
+    decoy.when(
+        await protocol_engine.add_and_execute_command(
+            pe_commands.WaitForDurationCreate(
+                params=pe_commands.WaitForDurationParams(seconds=10)
+            ),
+        )
+    ).then_return(
+        pe_commands.WaitForDuration.construct(  # type: ignore[call-arg]
+            error=pe_errors.ErrorOccurrence.from_failed(
+                id="some-id",
+                createdAt=datetime(year=2021, month=1, day=1),
+                error=pe_errors.ProtocolEngineError(),
+            )
+        )
+    )
+
+    await json_runner_subject.load(json_protocol_source)
+
+    run_func_captor = matchers.Captor()
+
+    decoy.verify(
+        protocol_engine.add_labware_definition(labware_definition),
+        protocol_engine.add_liquid(
+            id="water-id", name="water", description="water desc", color=None
+        ),
+        protocol_engine.add_command(
+            request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
+        ),
+        task_queue.set_run_func(func=run_func_captor),
+    )
+
+    # Verify that the run func calls the right things:
+    run_func = run_func_captor.value
+
+    with pytest.raises(pe_errors.ProtocolEngineError):
+        await run_func()
+
+
 @pytest.mark.parametrize(
     "schema_version, json_protocol",
     [
@@ -385,6 +482,8 @@ async def test_load_json_runner(
 
     await json_runner_subject.load(json_protocol_source)
 
+    run_func_captor = matchers.Captor()
+
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_liquid(
@@ -393,24 +492,30 @@ async def test_load_json_runner(
         protocol_engine.add_command(
             request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
         ),
-        protocol_engine.add_command(
+        task_queue.set_run_func(func=run_func_captor),
+    )
+
+    # Verify that the run func calls the right things:
+    run_func = run_func_captor.value
+    await run_func()
+    decoy.verify(
+        await protocol_engine.add_and_execute_command(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="hello")
-            )
+            ),
         ),
-        protocol_engine.add_command(
+        await protocol_engine.add_and_execute_command(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="goodbye")
-            )
+            ),
         ),
-        protocol_engine.add_command(
+        await protocol_engine.add_and_execute_command(
             request=pe_commands.LoadLiquidCreate(
                 params=pe_commands.LoadLiquidParams(
                     liquidId="water-id", labwareId="labware-id", volumeByWell={"A1": 30}
                 )
             ),
         ),
-        task_queue.set_run_func(func=protocol_engine.wait_until_complete),
     )
 
 
@@ -478,20 +583,30 @@ async def test_load_legacy_python(
         run_time_param_values=None,
     )
 
+    run_func_captor = matchers.Captor()
+
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
-        protocol_engine.add_command(
+        task_queue.set_run_func(run_func_captor),
+    )
+
+    assert broker_captor.value is legacy_python_runner_subject.broker
+
+    # Verify that the run func calls the right things:
+    run_func = run_func_captor.value
+    await run_func()
+    decoy.verify(
+        await protocol_engine.add_and_execute_command(
             request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
         ),
-        task_queue.set_run_func(
-            func=legacy_executor.execute,
+        await legacy_executor.execute(
             protocol=legacy_protocol,
             context=legacy_context,
+            parameter_context=legacy_python_runner_subject._parameter_context,
             run_time_param_values=None,
         ),
     )
-    assert broker_captor.value is legacy_python_runner_subject.broker
 
 
 async def test_load_python_with_pe_papi_core(
@@ -612,16 +727,25 @@ async def test_load_legacy_json(
         run_time_param_values=None,
     )
 
+    run_func_captor = matchers.Captor()
+
     decoy.verify(
         protocol_engine.add_labware_definition(labware_definition),
         protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
-        protocol_engine.add_command(
+        task_queue.set_run_func(run_func_captor),
+    )
+
+    # Verify that the run func calls the right things:
+    run_func = run_func_captor.value
+    await run_func()
+    decoy.verify(
+        await protocol_engine.add_and_execute_command(
             request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
         ),
-        task_queue.set_run_func(
-            func=legacy_executor.execute,
+        await legacy_executor.execute(
             protocol=legacy_protocol,
             context=legacy_context,
+            parameter_context=legacy_python_runner_subject._parameter_context,
             run_time_param_values=None,
         ),
     )

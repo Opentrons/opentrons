@@ -171,11 +171,13 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
-            params: { }
+            notes: []
+            params: {}
           - id: !anystr
             key: !anystr
             commandType: loadLabware
             status: succeeded
+            notes: []
             params:
               location:
                 slotName: '1'
@@ -201,6 +203,7 @@ stages:
           key: !anystr
           commandType: loadLabware
           status: succeeded
+          notes: []
           params:
             location:
               slotName: '1'

@@ -2,8 +2,8 @@ import type { DevInternalFlag } from './types'
 
 export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'protocolStats',
-  'enableRunTimeParameters',
   'enableRunNotes',
+  'enableQuickTransfer',
 ]
 
 // action type constants

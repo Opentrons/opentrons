@@ -1,5 +1,5 @@
 import pytest
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from opentrons.protocols.parameters.types import (
     AllowedTypes,
@@ -127,6 +127,120 @@ def test_validate_options_raises_name_error() -> None:
             [{"display_name": "Lorem ipsum dolor sit amet nam.", "value": "a"}],
             str,
         )
+
+
+@pytest.mark.parametrize(
+    ["value", "param_type", "result"],
+    [
+        (1.0, int, 1),
+        (1.1, int, 1.1),
+        (2, float, 2.0),
+        (2.0, float, 2.0),
+        (2.2, float, 2.2),
+        ("3.0", str, "3.0"),
+        (0.0, bool, False),
+        (1, bool, True),
+        (3.0, bool, 3.0),
+        (True, bool, True),
+    ],
+)
+def test_ensure_value_type(
+    value: Union[float, bool, str], param_type: type, result: AllowedTypes
+) -> None:
+    """It should ensure that if applicable, the value is coerced into the expected type"""
+    assert result == subject.ensure_value_type(value, param_type)
+
+
+@pytest.mark.parametrize(
+    ["value", "result"],
+    [
+        (1, 1.0),
+        (2.0, 2.0),
+        (3.3, 3.3),
+    ],
+)
+def test_ensure_float_value(value: Union[float, int], result: float) -> None:
+    """It should ensure that if applicable, the value is coerced into a float."""
+    assert result == subject.ensure_float_value(value)
+
+
+@pytest.mark.parametrize(
+    ["value", "result"],
+    [
+        (1, 1.0),
+        (2.0, 2.0),
+        (3.3, 3.3),
+        (None, None),
+    ],
+)
+def test_ensure_optional_float_value(value: Union[float, int], result: float) -> None:
+    """It should ensure that if applicable, the value is coerced into a float."""
+    assert result == subject.ensure_optional_float_value(value)
+
+
+@pytest.mark.parametrize(
+    ["choices", "result"],
+    [
+        ([], []),
+        (None, None),
+        (
+            [{"display_name": "foo", "value": 1}],
+            [{"display_name": "foo", "value": 1.0}],
+        ),
+        (
+            [{"display_name": "foo", "value": 2.0}],
+            [{"display_name": "foo", "value": 2.0}],
+        ),
+        (
+            [{"display_name": "foo", "value": 3.3}],
+            [{"display_name": "foo", "value": 3.3}],
+        ),
+        (
+            [{"display_name": "foo", "value": "4"}],
+            [{"display_name": "foo", "value": "4"}],
+        ),
+        (
+            [{"display_name": "foo", "value": True}],
+            [{"display_name": "foo", "value": True}],
+        ),
+    ],
+)
+def test_ensure_float_choices(
+    choices: Optional[List[ParameterChoice]], result: Optional[List[ParameterChoice]]
+) -> None:
+    """It should ensure that if applicable, the value in a choice is coerced into a float."""
+    assert result == subject.ensure_float_choices(choices)
+
+
+@pytest.mark.parametrize(
+    ["param_type", "result"],
+    [(int, "int"), (float, "float"), (str, "str")],
+)
+def test_convert_type_string_for_enum(param_type: type, result: str) -> None:
+    """It should convert the type into a string for the EnumParameter model."""
+    assert result == subject.convert_type_string_for_enum(param_type)
+
+
+def test_convert_type_string_for_enum_raises() -> None:
+    """It should raise if given a bool to convert to an enum type string."""
+    with pytest.raises(ParameterValueError):
+        subject.convert_type_string_for_enum(bool)
+
+
+@pytest.mark.parametrize(["param_type", "result"], [(int, "int"), (float, "float")])
+def test_convert_type_string_for_num_param(param_type: type, result: str) -> None:
+    """It should convert the type into a string for the NumberParameter model."""
+    assert result == subject.convert_type_string_for_num_param(param_type)
+
+
+@pytest.mark.parametrize(
+    "param_type",
+    [str, bool],
+)
+def test_convert_type_string_for_num_param_raises(param_type: type) -> None:
+    """It should raise if given a bool or str to convert to a number type string."""
+    with pytest.raises(ParameterValueError):
+        subject.convert_type_string_for_num_param(param_type)
 
 
 @pytest.mark.parametrize(

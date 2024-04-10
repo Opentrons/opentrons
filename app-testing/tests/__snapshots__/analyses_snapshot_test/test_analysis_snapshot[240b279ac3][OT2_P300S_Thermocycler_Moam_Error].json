@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_12_reservoir_15ml",
         "location": {
@@ -247,6 +249,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_96_tiprack_300ul",
         "location": {
@@ -1392,6 +1395,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p300_single_gen2"
@@ -1401,6 +1405,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "7"
@@ -1509,6 +1514,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "location": {},
@@ -2674,7 +2680,7 @@
           "errorInfo": {
             "args": "('thermocyclerModuleV2 in slot 7 prevents thermocyclerModuleV1 from using slot 7.',)",
             "class": "DeckConflictError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 112, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_P300S_Thermocycler_Moam_Error.py\", line 19, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 810, in load_module\n    module_core = self._core.load_module(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/legacy/legacy_protocol_core.py\", line 333, in load_module\n    self._deck_layout[resolved_location] = geometry\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/legacy/deck.py\", line 186, in __setitem__\n    deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/motion_planning/deck_conflict.py\", line 210, in check\n    raise DeckConflictError(\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_P300S_Thermocycler_Moam_Error.py\", line 19, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 814, in load_module\n    module_core = self._core.load_module(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/legacy/legacy_protocol_core.py\", line 333, in load_module\n    self._deck_layout[resolved_location] = geometry\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/legacy/deck.py\", line 186, in __setitem__\n    deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/motion_planning/deck_conflict.py\", line 210, in check\n    raise DeckConflictError(\n"
           },
           "errorType": "PythonException",
           "wrappedErrors": []

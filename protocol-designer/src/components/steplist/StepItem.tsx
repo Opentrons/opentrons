@@ -25,6 +25,7 @@ import {
   makeTemperatureText,
   makeTimerText,
 } from '../../utils'
+import { InitialDeckSetup } from '../../step-forms'
 import { PDListItem, TitledStepList } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
@@ -121,11 +122,10 @@ export interface StepItemContentsProps {
   rawForm: FormData | null | undefined
   stepType: StepType
   substeps: SubstepItemData | null | undefined
-
   ingredNames: WellIngredientNames
   labwareNicknamesById: { [labwareId: string]: string }
   additionalEquipmentEntities: AdditionalEquipmentEntities
-
+  modules: InitialDeckSetup['modules']
   highlightSubstep: (substepIdentifier: SubstepIdentifier) => unknown
   hoveredSubstep: SubstepIdentifier | null | undefined
 }
@@ -293,6 +293,7 @@ export const StepItemContents = (
   props: StepItemContentsProps
 ): JSX.Element | JSX.Element[] | null => {
   const {
+    modules,
     rawForm,
     stepType,
     substeps,
@@ -326,6 +327,8 @@ export const StepItemContents = (
 
   if (substeps && substeps.substepType === 'temperature') {
     const temperature = makeTemperatureText(substeps.temperature, t)
+    const moduleSlot =
+      substeps.moduleId != null ? modules[substeps.moduleId].slot : ''
 
     return (
       <ModuleStepItems
@@ -334,6 +337,7 @@ export const StepItemContents = (
         actionText={temperature}
         moduleType={TEMPERATURE_MODULE_TYPE}
         labwareNickname={substeps.labwareNickname}
+        moduleSlot={moduleSlot}
       />
     )
   }

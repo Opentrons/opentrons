@@ -35,7 +35,7 @@ from ..types import (
     DeckConfigurationType,
     Dimensions,
 )
-from ..actions import Action, UpdateCommandAction, PlayAction, AddAddressableAreaAction
+from ..actions import Action, SucceedCommandAction, PlayAction, AddAddressableAreaAction
 from .config import Config
 from .abstract_store import HasState, HandlesActions
 
@@ -182,7 +182,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, UpdateCommandAction):
+        if isinstance(action, SucceedCommandAction):
             self._handle_command(action.command)
         elif isinstance(action, AddAddressableAreaAction):
             self._check_location_is_addressable_area(action.addressable_area)

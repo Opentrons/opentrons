@@ -1521,8 +1521,14 @@ class OT3API(
         # G, Q should be handled in the backend through `self._home()`
         assert axis not in [Axis.G, Axis.Q]
 
+        # TODO(CM): This is a temporary fix in response to the right mount causing
+        # errors while trying to home on startup or attachment. We should remove this
+        # when we fix this issue in the firmware.
+        enable_right_mount_on_startup = (
+            self._gantry_load == GantryLoad.HIGH_THROUGHPUT and axis == Axis.Z_R
+        )
         encoder_ok = self._backend.check_encoder_status([axis])
-        if encoder_ok:
+        if encoder_ok or enable_right_mount_on_startup:
             # enable motor (if needed) and update estimation
             await self._enable_before_update_estimation(axis)
 
@@ -2133,6 +2139,8 @@ class OT3API(
         def add_tip_to_instr() -> None:
             instrument.add_tip(tip_length=tip_length)
             instrument.set_current_volume(0)
+            if isinstance(self._backend, OT3Simulator):
+                self._backend._update_tip_state(realmount, True)
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
         if (
@@ -2233,6 +2241,9 @@ class OT3API(
             await self._home([Axis.by_mount(mount)])
 
         _remove_tips()
+        # call this in case we're simulating
+        if isinstance(self._backend, OT3Simulator):
+            self._backend._update_tip_state(realmount, False)
 
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""

@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "B1"
@@ -116,6 +118,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_200ul",
         "location": {
@@ -1267,6 +1270,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p1000_96"
@@ -1276,12 +1280,14 @@
     },
     {
       "commandType": "thermocycler/openLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "configureNozzleLayout",
+      "notes": [],
       "params": {
         "configurationParams": {
           "primaryNozzle": "A12",

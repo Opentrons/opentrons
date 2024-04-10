@@ -9,6 +9,7 @@ import anyio
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
 from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api import ParameterContext
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -35,9 +36,11 @@ from .legacy_wrappers import (
     LegacyExecutor,
     LegacyLoadInfo,
 )
+from ..protocol_engine.errors import ProtocolCommandFailedError
 from ..protocol_engine.types import (
     PostRunHardwareState,
     DeckConfigurationType,
+    RunTimeParameter,
     RunTimeParamValuesType,
 )
 
@@ -47,6 +50,7 @@ class RunResult(NamedTuple):
 
     commands: List[Command]
     state_summary: StateSummary
+    parameters: List[RunTimeParameter]
 
 
 class AbstractRunner(ABC):
@@ -78,6 +82,11 @@ class AbstractRunner(ABC):
         Otherwise, it's a no-op.
         """
         return self._broker
+
+    @property
+    def run_time_parameters(self) -> List[RunTimeParameter]:
+        """Parameter definitions defined by protocol, if any. Currently only for python protocols."""
+        return []
 
     def was_started(self) -> bool:
         """Whether the run has been started.
@@ -150,6 +159,14 @@ class PythonAndLegacyRunner(AbstractRunner):
             drop_tips_after_run=drop_tips_after_run,
             post_run_hardware_state=post_run_hardware_state,
         )
+        self._parameter_context: Optional[ParameterContext] = None
+
+    @property
+    def run_time_parameters(self) -> List[RunTimeParameter]:
+        """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
+        if self._parameter_context is not None:
+            return self._parameter_context.export_parameters_for_analysis()
+        return []
 
     async def load(
         self,
@@ -171,6 +188,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         protocol = self._legacy_file_reader.read(
             protocol_source, labware_definitions, python_parse_mode
         )
+        self._parameter_context = ParameterContext(api_version=protocol.api_level)
         equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
@@ -190,17 +208,22 @@ class PythonAndLegacyRunner(AbstractRunner):
             equipment_broker=equipment_broker,
         )
         initial_home_command = pe_commands.HomeCreate(
+            # this command homes all axes, including pipette plunger and gripper jaw
             params=pe_commands.HomeParams(axes=None)
         )
-        # this command homes all axes, including pipette plunger and gripper jaw
-        self._protocol_engine.add_command(request=initial_home_command)
 
-        self._task_queue.set_run_func(
-            func=self._legacy_executor.execute,
-            protocol=protocol,
-            context=context,
-            run_time_param_values=run_time_param_values,
-        )
+        async def run_func() -> None:
+            await self._protocol_engine.add_and_execute_command(
+                request=initial_home_command
+            )
+            await self._legacy_executor.execute(
+                protocol=protocol,
+                context=context,
+                parameter_context=self._parameter_context,
+                run_time_param_values=run_time_param_values,
+            )
+
+        self._task_queue.set_run_func(run_func)
 
     async def run(  # noqa: D102
         self,
@@ -224,7 +247,10 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return RunResult(commands=commands, state_summary=run_data)
+        parameters = self.run_time_parameters
+        return RunResult(
+            commands=commands, state_summary=run_data, parameters=parameters
+        )
 
 
 class JsonRunner(AbstractRunner):
@@ -258,6 +284,7 @@ class JsonRunner(AbstractRunner):
         )
 
         self._hardware_api.should_taskify_movement_execution(taskify=False)
+        self._queued_commands: List[pe_commands.CommandCreate] = []
 
     async def load(self, protocol_source: ProtocolSource) -> None:
         """Load a JSONv6+ ProtocolSource into managed ProtocolEngine."""
@@ -299,17 +326,16 @@ class JsonRunner(AbstractRunner):
                 color=liquid.displayColor,
             )
             await _yield()
+
         initial_home_command = pe_commands.HomeCreate(
             params=pe_commands.HomeParams(axes=None)
         )
         # this command homes all axes, including pipette plugner and gripper jaw
         self._protocol_engine.add_command(request=initial_home_command)
 
-        for command in commands:
-            self._protocol_engine.add_command(request=command)
-            await _yield()
+        self._queued_commands = commands
 
-        self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
+        self._task_queue.set_run_func(func=self._add_command_and_execute)
 
     async def run(  # noqa: D102
         self,
@@ -328,7 +354,16 @@ class JsonRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return RunResult(commands=commands, state_summary=run_data)
+        return RunResult(commands=commands, state_summary=run_data, parameters=[])
+
+    async def _add_command_and_execute(self) -> None:
+        for command in self._queued_commands:
+            result = await self._protocol_engine.add_and_execute_command(command)
+            if result and result.error:
+                raise ProtocolCommandFailedError(
+                    original_error=result.error,
+                    message=f"{result.error.errorType}: {result.error.detail}",
+                )
 
 
 class LiveRunner(AbstractRunner):
@@ -369,7 +404,7 @@ class LiveRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
-        return RunResult(commands=commands, state_summary=run_data)
+        return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
 
 AnyRunner = Union[PythonAndLegacyRunner, JsonRunner, LiveRunner]

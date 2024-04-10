@@ -95,14 +95,20 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       .calledWith(
         expect.any(Object),
         { hostname: expect.any(String) },
-        expect.any(Array)
+        expect.any(Array),
+        expect.any(Object)
       )
       .thenReturn({
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
       } as any)
     when(vi.mocked(useCreateRunFromProtocol))
-      .calledWith(expect.any(Object), null, expect.any(Array))
+      .calledWith(
+        expect.any(Object),
+        null,
+        expect.any(Array),
+        expect.any(Object)
+      )
       .thenReturn({
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
@@ -315,7 +321,8 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
           location: mockOffsetCandidate.location,
           definitionUri: mockOffsetCandidate.definitionUri,
         },
-      ]
+      ],
+      {}
     )
     expect(screen.getByRole('checkbox')).toBeChecked()
     const proceedButton = screen.getByRole('button', {
@@ -373,13 +380,14 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
           location: mockOffsetCandidate.location,
           definitionUri: mockOffsetCandidate.definitionUri,
         },
-      ]
+      ],
+      {}
     )
-    expect(vi.mocked(useCreateRunFromProtocol)).nthCalledWith(
-      3,
+    expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenLastCalledWith(
       expect.any(Object),
       { hostname: 'otherIp' },
-      []
+      [],
+      {}
     )
   })
 })

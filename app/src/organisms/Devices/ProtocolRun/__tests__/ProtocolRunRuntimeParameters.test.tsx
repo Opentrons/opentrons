@@ -3,9 +3,9 @@ import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 
+import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { NoParameter } from '../../../ProtocolDetails/ProtocolParameters/NoParameter'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
@@ -15,7 +15,13 @@ import type {
   RunTimeParameter,
 } from '@opentrons/shared-data'
 
-vi.mock('../../../ProtocolDetails/ProtocolParameters/NoParameter')
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof InfoScreen>()
+  return {
+    ...actual,
+    InfoScreen: vi.fn(),
+  }
+})
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
 const RUN_ID = 'mockId'
@@ -25,7 +31,7 @@ const mockRunTimeParameterData: RunTimeParameter[] = [
     displayName: 'Dry Run',
     variableName: 'DRYRUN',
     description: 'Is this a dry or wet run? Wet is true, dry is false',
-    type: 'boolean',
+    type: 'bool',
     default: false,
     value: false,
   },
@@ -88,7 +94,7 @@ describe('ProtocolRunRuntimeParameters', () => {
     props = {
       runId: RUN_ID,
     }
-    vi.mocked(NoParameter).mockReturnValue(<div>mock NoParameter</div>)
+    vi.mocked(InfoScreen).mockReturnValue(<div>mock InfoScreen</div>)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({
@@ -100,7 +106,30 @@ describe('ProtocolRunRuntimeParameters', () => {
     vi.resetAllMocks()
   })
 
-  it('should render title, and banner when RunTimeParameters are note empty', () => {
+  it('should render title, and banner when RunTimeParameters are note empty and all values are default', () => {
+    render(props)
+    screen.getByText('Parameters')
+    screen.getByText('Default values')
+    screen.getByText('Values are view-only')
+    screen.getByText('Cancel the run and restart setup to edit')
+    screen.getByText('Name')
+    screen.getByText('Value')
+  })
+
+  it('should render title, and banner when RunTimeParameters are note empty and some value is changed', () => {
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
+      runTimeParameters: [
+        ...mockRunTimeParameterData,
+        {
+          displayName: 'Dry Run',
+          variableName: 'DRYRUN',
+          description: 'Is this a dry or wet run? Wet is true, dry is false',
+          type: 'bool',
+          default: false,
+          value: true,
+        },
+      ],
+    } as CompletedProtocolAnalysis)
     render(props)
     screen.getByText('Parameters')
     screen.getByText('Custom values')
@@ -122,7 +151,7 @@ describe('ProtocolRunRuntimeParameters', () => {
     screen.getByText('No offsets')
   })
 
-  it('should render mock NoParameter component when RunTimeParameters are empty', () => {
+  it('should render mock InfoScreen component when RunTimeParameters are empty', () => {
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn({
@@ -131,7 +160,7 @@ describe('ProtocolRunRuntimeParameters', () => {
     render(props)
     screen.getByText('Parameters')
     expect(screen.queryByText('Default values')).not.toBeInTheDocument()
-    screen.getByText('mock NoParameter')
+    screen.getByText('mock InfoScreen')
   })
 
   // ToDo Additional test will be implemented when chip component is added

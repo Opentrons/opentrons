@@ -136,10 +136,11 @@ export const getHoveredStepLabware = createSelector(
       // only 1 labware
       return [stepArgs.labware]
     }
-    // @ts-expect-error(sa, 2021-6-15): type narrow stepArgs.module
-    if (stepArgs.module) {
-      // @ts-expect-error(sa, 2021-6-15): this expect error should not be necessary after type narrowing above
-      const labware = getLabwareOnModule(initialDeckState, stepArgs.module)
+    if ('module' in stepArgs) {
+      const labware = getLabwareOnModule(
+        initialDeckState,
+        stepArgs.module ?? ''
+      )
       return labware ? [labware.id] : []
     }
 
@@ -150,8 +151,9 @@ export const getHoveredStepLabware = createSelector(
 
     // step types that have no labware that gets highlighted
     if (!(stepArgs.commandCreatorFnName === 'delay')) {
-      // TODO Ian 2018-05-08 use assert here
       console.warn(
+        //  @ts-expect-error: should only reach this warning when new step is added and
+        //  highlighted wells is not yet implemented
         `getHoveredStepLabware does not support step type "${stepArgs.commandCreatorFnName}"`
       )
     }

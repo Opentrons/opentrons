@@ -14,23 +14,19 @@ import * as Yup from 'yup'
 
 import { Modal, OutlineButton } from '@opentrons/components'
 import {
-  HEATERSHAKER_MODULE_V1,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_V1,
   HEATERSHAKER_MODULE_TYPE,
   ModuleType,
   ModuleModel,
   PipetteName,
-  MAGNETIC_BLOCK_V1,
-  MAGNETIC_BLOCK_TYPE,
   OT2_ROBOT_TYPE,
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
 import { PipetteFields } from './PipetteFields'
-import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
+import { CrashInfoBox } from '../../modules'
 import styles from './FilePipettesModal.module.css'
 import modalStyles from '../modal.module.css'
 import {
@@ -39,18 +35,16 @@ import {
   getIsCrashablePipetteSelected,
   PipetteOnDeck,
   FormPipettesByMount,
-  FormModulesByType,
+  FormModules,
   FormPipette,
 } from '../../../step-forms'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  SPAN7_8_10_11_SLOT,
-} from '../../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { NewProtocolFields } from '../../../load-file'
 import { getRobotType } from '../../../file-data/selectors'
 import { uuid } from '../../../utils'
 import { actions as steplistActions } from '../../../steplist'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
+import { getCrashableModuleSelected } from '../CreateFileWizard/utils'
 
 import type { DeckSlot, ThunkDispatch } from '../../../types'
 import type { NormalizedPipette } from '@opentrons/step-generation'
@@ -70,7 +64,7 @@ export interface ModuleCreationArgs {
 export interface FormState {
   fields: NewProtocolFields
   pipettesByMount: FormPipettesByMount
-  modulesByType: FormModulesByType
+  modules: FormModules
 }
 
 export interface Props {
@@ -88,38 +82,13 @@ const initialFormState: FormState = {
     left: { pipetteName: '', tiprackDefURI: null },
     right: { pipetteName: '', tiprackDefURI: null },
   },
-  modulesByType: {
-    [MAGNETIC_BLOCK_TYPE]: {
-      onDeck: false,
-      model: MAGNETIC_BLOCK_V1,
-      slot: '1',
-    },
-    [HEATERSHAKER_MODULE_TYPE]: {
-      onDeck: false,
-      model: HEATERSHAKER_MODULE_V1,
-      slot: '1',
-    },
-    [MAGNETIC_MODULE_TYPE]: {
-      onDeck: false,
-      model: null,
-      slot: '1',
-    },
-    [TEMPERATURE_MODULE_TYPE]: {
-      onDeck: false,
-      model: null,
-      slot: '3',
-    },
-    [THERMOCYCLER_MODULE_TYPE]: {
-      onDeck: false,
-      model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
-      slot: SPAN7_8_10_11_SLOT,
-    },
-  },
+  modules: {},
 }
 
 const pipetteValidationShape = Yup.object().shape({
   pipetteName: Yup.string().nullable(),
-  tiprackDefURI: Yup.string()
+  tiprackDefURI: Yup.array()
+    .of(Yup.string())
     .nullable()
     .when('pipetteName', {
       is: (val: string | null): boolean => Boolean(val),
@@ -129,14 +98,8 @@ const pipetteValidationShape = Yup.object().shape({
 })
 // any typing this because TS says there are too many possibilities of what this could be
 const moduleValidationShape: any = Yup.object().shape({
-  onDeck: Yup.boolean().default(false),
-  model: Yup.string()
-    .nullable()
-    .when('onDeck', {
-      is: true,
-      then: schema => schema.required('Required'),
-      otherwise: schema => schema.nullable(),
-    }),
+  type: Yup.string(),
+  model: Yup.string(),
   slot: Yup.string(),
 })
 
@@ -172,7 +135,7 @@ const makeUpdatePipettes = (
     [pipetteId: string]: {
       mount: string
       name: PipetteName
-      tiprackDefURI: string
+      tiprackDefURI: string[]
       id: string
     }
   } = {}
@@ -253,9 +216,14 @@ const makeUpdatePipettes = (
     nextPipettes,
     (nextPipette: typeof nextPipettes[keyof typeof nextPipettes]) => {
       const newPipetteId = nextPipette.id
+      const nextTips = nextPipette.tiprackDefURI
+      const oldTips =
+        newPipetteId in prevPipettes
+          ? prevPipettes[newPipetteId].tiprackDefURI
+          : null
       const tiprackChanged =
-        newPipetteId in prevPipettes &&
-        nextPipette.tiprackDefURI !== prevPipettes[newPipetteId].tiprackDefURI
+        oldTips != null &&
+        nextTips.every((item, index) => item !== oldTips[index])
       return tiprackChanged
     }
   ).map(pipette => pipette.id)
@@ -333,19 +301,6 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     onCloseModal
   )
 
-  const getCrashableModuleSelected: (
-    modules: FormModulesByType,
-    moduleType: ModuleType
-  ) => boolean = (modules, moduleType) => {
-    const formModule = modules[moduleType]
-    const crashableModuleOnDeck =
-      formModule?.onDeck && formModule?.model
-        ? isModuleWithCollisionIssue(formModule.model)
-        : false
-
-    return crashableModuleOnDeck
-  }
-
   const handleFormSubmit: (values: FormState) => void = values => {
     if (!showEditPipetteConfirmation) {
       setShowEditPipetteConfirmation(true)
@@ -360,8 +315,8 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
         ) // this is mostly for flow
         // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
         return formPipette &&
-          formPipette.pipetteName &&
-          formPipette.tiprackDefURI &&
+          formPipette.pipetteName != null &&
+          formPipette.tiprackDefURI != null &&
           (mount === 'left' || mount === 'right')
           ? [
               ...acc,
@@ -376,25 +331,22 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
       []
     )
 
-    // NOTE: this is extra-explicit for flow. Reduce fns won't cooperate
-    // with enum-typed key like `{[ModuleType]: ___}`
-    // @ts-expect-error(sa, 2021-6-21): TS not smart enough to take real type from Object.keys
-    const moduleTypes: ModuleType[] = Object.keys(values.modulesByType)
-    const modules: ModuleCreationArgs[] = moduleTypes.reduce<
-      ModuleCreationArgs[]
-    >((acc, moduleType) => {
-      const formModule = values.modulesByType[moduleType]
-      return formModule?.onDeck
-        ? [
-            ...acc,
-            {
-              type: moduleType,
-              model: formModule.model || ('' as ModuleModel), // TODO: we need to validate that module models are of type ModuleModel
-              slot: formModule.slot,
+    const modules: ModuleCreationArgs[] =
+      values.modules != null
+        ? Object.entries(values.modules).reduce<ModuleCreationArgs[]>(
+            (acc, [number, formModule]) => {
+              return [
+                ...acc,
+                {
+                  type: formModule.type,
+                  model: formModule.model || ('' as ModuleModel),
+                  slot: formModule.slot,
+                },
+              ]
             },
-          ]
-        : acc
-    }, [])
+            []
+          )
+        : []
     const heaterShakerIndex = modules.findIndex(
       hwModule => hwModule.type === HEATERSHAKER_MODULE_TYPE
     )
@@ -415,8 +367,8 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
         ...initialFormState.pipettesByMount,
         ...initialPipettes,
       },
-      modulesByType: {
-        ...initialFormState.modulesByType,
+      modules: {
+        ...initialFormState.modules,
       },
     }
   }
@@ -434,30 +386,41 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     resolver: yupResolver(validationSchema),
   })
   const pipettesByMount = watch('pipettesByMount')
-  const { modulesByType } = getValues()
+  const { modules } = getValues()
 
   const { left, right } = pipettesByMount
   // at least one must not be none (empty string)
   const pipetteSelectionIsValid = left.pipetteName || right.pipetteName
 
   const hasCrashableMagnetModuleSelected = getCrashableModuleSelected(
-    modulesByType,
+    modules,
     MAGNETIC_MODULE_TYPE
   )
   const hasCrashableTemperatureModuleSelected = getCrashableModuleSelected(
-    modulesByType,
+    modules,
     TEMPERATURE_MODULE_TYPE
   )
-  const hasHeaterShakerSelected = Boolean(
-    modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
-  )
+  const hasHeaterShakerSelected =
+    modules != null
+      ? Object.values(modules).some(
+          module => module.type === HEATERSHAKER_MODULE_TYPE
+        )
+      : false
+
+  const leftPipetteSpecs =
+    left.pipetteName != null && left.pipetteName !== ''
+      ? getPipetteSpecsV2(left.pipetteName as PipetteName)
+      : null
+  const rightPipetteSpecs =
+    right.pipetteName != null && right.pipetteName !== ''
+      ? getPipetteSpecsV2(right.pipetteName as PipetteName)
+      : null
 
   const showHeaterShakerPipetteCollisions =
     hasHeaterShakerSelected &&
-    [
-      getPipetteSpecsV2(left.pipetteName as PipetteName),
-      getPipetteSpecsV2(right.pipetteName as PipetteName),
-    ].some(pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1)
+    [leftPipetteSpecs, rightPipetteSpecs].some(
+      pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1
+    )
 
   const crashablePipetteSelected = getIsCrashablePipetteSelected(
     pipettesByMount
@@ -512,7 +475,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
               </OutlineButton>
               <OutlineButton
                 disabled={!pipetteSelectionIsValid}
-                onClick={handleSubmit(handleFormSubmit)}
+                type="submit"
                 tabIndex={6}
                 className={styles.button}
               >
@@ -524,7 +487,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
           {showEditPipetteConfirmation ? (
             <StepChangesConfirmModal
               onCancel={() => setShowEditPipetteConfirmation(false)}
-              onConfirm={handleSubmit(handleFormSubmit)}
+              onConfirm={() => handleSubmit(handleFormSubmit)()}
             />
           ) : null}
         </div>

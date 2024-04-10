@@ -29,7 +29,8 @@ beforeEach(() => {
     name: 'p10_single',
     id: 'leftPipetteId',
     spec: fixtureP10SingleV2Specs,
-    tiprackLabwareDef: fixture_tiprack_10_ul,
+    tiprackLabwareDef: [fixture_tiprack_10_ul],
+    tiprackDefURI: ['defaultTipRack'],
   }
   const labwareOnMagModule = {
     id: 'labwareOnMagModule',
@@ -38,6 +39,10 @@ beforeEach(() => {
         magneticModuleEngageHeight: EXAMPLE_ENGAGE_HEIGHT,
       },
     },
+  }
+  const tipRack = {
+    id: 'tipRack',
+    def: fixture_tiprack_10_ul,
   }
   defaultArgs = {
     stepId,
@@ -60,6 +65,10 @@ beforeEach(() => {
           ...labwareOnMagModule,
           slot: 'someMagneticModuleId',
         },
+      },
+      tipRack: {
+        ...tipRack,
+        slot: '6',
       },
       modules: {
         someMagneticModuleId: {
@@ -132,6 +141,7 @@ describe('createPresavedStepForm', () => {
       pipette: 'leftPipetteId',
       nozzles: null,
       stepType: 'moveLiquid',
+      tipRack: null,
       // default fields
       dropTip_location: 'mockTrash',
       aspirate_airGap_checkbox: false,
@@ -177,6 +187,11 @@ describe('createPresavedStepForm', () => {
       stepDetails: '',
       stepName: 'transfer',
       volume: null,
+      aspirate_x_position: 0,
+      aspirate_y_position: 0,
+      dispense_x_position: 0,
+      dispense_y_position: 0,
+      blowout_z_offset: 0,
     })
   })
   describe('mix step', () => {
@@ -200,6 +215,9 @@ describe('createPresavedStepForm', () => {
         mix_wellOrder_first: 't2b',
         mix_wellOrder_second: 'l2r',
         blowout_checkbox: false,
+        mix_x_position: 0,
+        mix_y_position: 0,
+        blowout_z_offset: 0,
         blowout_location: null,
         changeTip: 'always',
         stepDetails: '',
@@ -209,6 +227,7 @@ describe('createPresavedStepForm', () => {
         volume: undefined,
         aspirate_flowRate: null,
         dispense_flowRate: null,
+        tipRack: null,
       })
     })
   })

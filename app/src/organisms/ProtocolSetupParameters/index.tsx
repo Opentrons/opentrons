@@ -9,11 +9,12 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 
 import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
 import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
-import { formatRunTimeParameterValue } from '../ProtocolDetails/ProtocolParameters/utils'
+import { ChooseEnum } from './ChooseEnum'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
@@ -24,7 +25,7 @@ export const mockData: RunTimeParameter[] = [
     displayName: 'Dry Run',
     variableName: 'DRYRUN',
     description: 'Is this a dry or wet run? Wet is true, dry is false',
-    type: 'boolean',
+    type: 'bool',
     default: false,
   },
   {
@@ -32,7 +33,7 @@ export const mockData: RunTimeParameter[] = [
     displayName: 'Use Gripper',
     variableName: 'USE_GRIPPER',
     description: 'For using the gripper.',
-    type: 'boolean',
+    type: 'bool',
     default: true,
   },
   {
@@ -41,7 +42,7 @@ export const mockData: RunTimeParameter[] = [
     variableName: 'TIP_TRASH',
     description:
       'to throw tip into the trash or to not throw tip into the trash',
-    type: 'boolean',
+    type: 'bool',
     default: true,
   },
   {
@@ -49,7 +50,7 @@ export const mockData: RunTimeParameter[] = [
     displayName: 'Deactivate Temperatures',
     variableName: 'DEACTIVATE_TEMP',
     description: 'deactivate temperature on the module',
-    type: 'boolean',
+    type: 'bool',
     default: true,
   },
   {
@@ -176,11 +177,45 @@ export function ProtocolSetupParameters({
   const history = useHistory()
   const host = useHost()
   const queryClient = useQueryClient()
+  const [
+    chooseValueScreen,
+    setChooseValueScreen,
+  ] = React.useState<RunTimeParameter | null>(null)
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
-  const parameters = runTimeParameters ?? []
+
+  // todo (nd:04/01/2024): remove mock and look at runTimeParameters prop
+  // const parameters = runTimeParameters ?? []
+  const parameters = runTimeParameters ?? mockData
+  const [
+    runTimeParametersOverrides,
+    setRunTimeParametersOverrides,
+  ] = React.useState<RunTimeParameter[]>(parameters)
+
+  const updateParameters = (
+    value: boolean | string | number,
+    variableName: string
+  ): void => {
+    const updatedParameters = parameters.map(parameter => {
+      if (parameter.variableName === variableName) {
+        return { ...parameter, value }
+      }
+      return parameter
+    })
+    setRunTimeParametersOverrides(updatedParameters)
+    if (chooseValueScreen && chooseValueScreen.variableName === variableName) {
+      const updatedParameter = updatedParameters.find(
+        parameter => parameter.variableName === variableName
+      )
+      if (updatedParameter != null) {
+        setChooseValueScreen(updatedParameter)
+      }
+    }
+  }
+
   //    TODO(jr, 3/20/24): modify useCreateRunMutation to take in optional run time parameters
+  //    newRunTimeParameters will be the param to plug in!
   const { createRun, isLoading } = useCreateRunMutation({
     onSuccess: data => {
       queryClient
@@ -193,13 +228,8 @@ export function ProtocolSetupParameters({
   const handleConfirmValues = (): void => {
     createRun({ protocolId, labwareOffsets })
   }
-
-  return (
+  let children = (
     <>
-      {resetValuesModal ? (
-        <ResetValuesModal handleGoBack={() => showResetValuesModal(false)} />
-      ) : null}
-
       <ChildNavigation
         header={t('parameters')}
         onClickBack={() => history.goBack()}
@@ -218,16 +248,20 @@ export function ProtocolSetupParameters({
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
-        paddingX={SPACING.spacing8}
+        paddingX={SPACING.spacing40}
       >
-        {parameters.map((parameter, index) => {
+        {runTimeParametersOverrides.map((parameter, index) => {
           return (
             <React.Fragment key={`${parameter.displayName}_${index}`}>
               <ProtocolSetupStep
-                hasIcon={!(parameter.type === 'boolean')}
+                hasIcon={!(parameter.type === 'bool')}
                 status="general"
                 title={parameter.displayName}
-                onClickSetupStep={() => console.log('TODO: wire this up')}
+                onClickSetupStep={() =>
+                  parameter.type === 'bool'
+                    ? updateParameters(!parameter.value, parameter.variableName)
+                    : setChooseValueScreen(parameter)
+                }
                 detail={formatRunTimeParameterValue(parameter, t)}
                 description={parameter.description}
                 fontSize="h4"
@@ -236,6 +270,30 @@ export function ProtocolSetupParameters({
           )
         })}
       </Flex>
+    </>
+  )
+  if (chooseValueScreen != null && chooseValueScreen.type === 'str') {
+    children = (
+      <ChooseEnum
+        handleGoBack={() => setChooseValueScreen(null)}
+        parameter={chooseValueScreen}
+        setParameter={updateParameters}
+        rawValue={chooseValueScreen.value}
+      />
+    )
+  }
+  // TODO(jr, 4/1/24): add the int/float component
+
+  return (
+    <>
+      {resetValuesModal ? (
+        <ResetValuesModal
+          runTimeParametersOverrides={runTimeParametersOverrides}
+          setRunTimeParametersOverrides={setRunTimeParametersOverrides}
+          handleGoBack={() => showResetValuesModal(false)}
+        />
+      ) : null}
+      {children}
     </>
   )
 }

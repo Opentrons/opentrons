@@ -1,6 +1,6 @@
 """Manage current and historical run data."""
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional, Callable, Union
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
@@ -12,6 +12,7 @@ from opentrons.protocol_engine import (
     CurrentCommand,
     Command,
 )
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
@@ -142,6 +143,8 @@ class RunDataManager:
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
+        run_time_param_values: Optional[RunTimeParamValuesType],
+        notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
     ) -> Union[Run, BadRun]:
         """Create a new, current run.
@@ -150,6 +153,10 @@ class RunDataManager:
             run_id: Identifier to assign the new run.
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
+            deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
+            notify_publishers: Utilized by the engine to notify publishers of state changes.
+            run_time_param_values: Any runtime parameter values to set.
+            protocol: The protocol to load the runner with, if any.
 
         Returns:
             The run resource.
@@ -171,13 +178,15 @@ class RunDataManager:
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
             protocol=protocol,
+            run_time_param_values=run_time_param_values,
+            notify_publishers=notify_publishers,
         )
         run_resource = self._run_store.insert(
             run_id=run_id,
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
         )
-        await self._runs_publisher.begin_polling_engine_store(
+        await self._runs_publisher.initialize(
             get_current_command=self.get_current_command,
             get_state_summary=self._get_good_state_summary,
             run_id=run_id,
@@ -268,7 +277,7 @@ class RunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
-            await self._runs_publisher.stop_polling_engine_store()
+            await self._runs_publisher.clean_up_current_run()
 
         self._run_store.remove(run_id=run_id)
 
@@ -294,7 +303,7 @@ class RunDataManager:
         next_current = current if current is False else True
 
         if next_current is False:
-            commands, state_summary = await self._engine_store.clear()
+            commands, state_summary, parameters = await self._engine_store.clear()
             run_resource: Union[
                 RunResource, BadRunResource
             ] = self._run_store.update_run_state(

@@ -40,6 +40,11 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 
 
+def mock_notify_publishers() -> None:
+    """A mock notify_publishers."""
+    return None
+
+
 @pytest.fixture
 def mock_engine_store(decoy: Decoy) -> EngineStore:
     """Get a mock EngineStore."""
@@ -138,6 +143,8 @@ async def test_create(
             labware_offsets=[],
             protocol=None,
             deck_configuration=[],
+            run_time_param_values=None,
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
     decoy.when(
@@ -154,6 +161,8 @@ async def test_create(
         labware_offsets=[],
         protocol=None,
         deck_configuration=[],
+        run_time_param_values=None,
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result == Run(
@@ -180,7 +189,7 @@ async def test_create_with_options(
     engine_state_summary: StateSummary,
     run_resource: RunResource,
 ) -> None:
-    """It should handle creation with a protocol and labware offsets."""
+    """It should handle creation with a protocol, labware offsets and parameters."""
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
@@ -203,6 +212,8 @@ async def test_create_with_options(
             labware_offsets=[labware_offset],
             protocol=protocol,
             deck_configuration=[],
+            run_time_param_values={"foo": "bar"},
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
 
@@ -220,6 +231,8 @@ async def test_create_with_options(
         labware_offsets=[labware_offset],
         protocol=protocol,
         deck_configuration=[],
+        run_time_param_values={"foo": "bar"},
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result == Run(
@@ -254,6 +267,8 @@ async def test_create_engine_error(
             labware_offsets=[],
             protocol=None,
             deck_configuration=[],
+            run_time_param_values=None,
+            notify_publishers=mock_notify_publishers,
         )
     ).then_raise(EngineConflictError("oh no"))
 
@@ -264,6 +279,8 @@ async def test_create_engine_error(
             labware_offsets=[],
             protocol=None,
             deck_configuration=[],
+            run_time_param_values=None,
+            notify_publishers=mock_notify_publishers,
         )
 
     decoy.verify(
@@ -519,7 +536,9 @@ async def test_update_current(
     run_id = "hello world"
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
     decoy.when(await mock_engine_store.clear()).then_return(
-        RunResult(commands=[run_command], state_summary=engine_state_summary)
+        RunResult(
+            commands=[run_command], state_summary=engine_state_summary, parameters=[]
+        )
     )
 
     decoy.when(
@@ -627,7 +646,9 @@ async def test_create_archives_existing(
 
     decoy.when(mock_engine_store.current_run_id).then_return(run_id_old)
     decoy.when(await mock_engine_store.clear()).then_return(
-        RunResult(commands=[run_command], state_summary=engine_state_summary)
+        RunResult(
+            commands=[run_command], state_summary=engine_state_summary, parameters=[]
+        )
     )
 
     decoy.when(
@@ -636,6 +657,8 @@ async def test_create_archives_existing(
             labware_offsets=[],
             protocol=None,
             deck_configuration=[],
+            run_time_param_values=None,
+            notify_publishers=mock_notify_publishers,
         )
     ).then_return(engine_state_summary)
 
@@ -653,6 +676,8 @@ async def test_create_archives_existing(
         labware_offsets=[],
         protocol=None,
         deck_configuration=[],
+        run_time_param_values=None,
+        notify_publishers=mock_notify_publishers,
     )
 
     decoy.verify(

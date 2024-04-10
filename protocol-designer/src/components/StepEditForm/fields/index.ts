@@ -7,6 +7,7 @@ export { TextField } from './TextField'
 /* Specialized Fields */
 
 export { BlowoutLocationField } from './BlowoutLocationField'
+export { BlowoutZOffsetField } from './BlowoutZOffsetField'
 export { ChangeTipField } from './ChangeTipField'
 export { DelayFields } from './DelayFields'
 export { DisposalVolumeField } from './DisposalVolumeField'

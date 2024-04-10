@@ -1,68 +1,75 @@
-import * as React from 'react'
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { VIEWPORT } from '@opentrons/components'
 import { SmallButton } from './'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof SmallButton> = {
   title: 'ODD/Atoms/Buttons/SmallButton',
   argTypes: { onClick: { action: 'clicked' } },
   component: SmallButton,
-  parameters: touchScreenViewport,
-} as Meta
-
-const Template: Story<React.ComponentProps<typeof SmallButton>> = args => (
-  <SmallButton {...args} />
-)
-
-export const Primary = Template.bind({})
-Primary.args = {
-  buttonText: 'Button text',
+  parameters: VIEWPORT.touchScreenViewport,
 }
 
-export const Alert = Template.bind({})
-Alert.args = {
-  buttonType: 'alert',
-  buttonText: 'Button text',
+export default meta
+
+type Story = StoryObj<typeof SmallButton>
+
+export const Primary: Story = {
+  args: {
+    buttonText: 'Button text',
+  },
 }
 
-export const Secondary = Template.bind({})
-Secondary.args = {
-  buttonType: 'secondary',
-  buttonText: 'Button text',
+export const Alert: Story = {
+  args: {
+    buttonType: 'alert',
+    buttonText: 'Button text',
+  },
 }
 
-export const TertiaryLowLight = Template.bind({})
-TertiaryLowLight.args = {
-  buttonType: 'tertiaryLowLight',
-  buttonText: 'Button text',
+export const Secondary: Story = {
+  args: {
+    buttonType: 'secondary',
+    buttonText: 'Button text',
+  },
 }
 
-export const TertiaryHighLight = Template.bind({})
-TertiaryHighLight.args = {
-  buttonType: 'tertiaryHighLight',
-  buttonText: 'Button text',
+export const TertiaryLowLight: Story = {
+  args: {
+    buttonType: 'tertiaryLowLight',
+    buttonText: 'Button text',
+  },
 }
 
-export const StartIconPrimary = Template.bind({})
-StartIconPrimary.args = {
-  buttonType: 'primary',
-  buttonText: 'Button text',
-  iconPlacement: 'startIcon',
-  iconName: 'reset',
+export const TertiaryHighLight: Story = {
+  args: {
+    buttonType: 'tertiaryHighLight',
+    buttonText: 'Button text',
+  },
 }
 
-export const EndIconAlert = Template.bind({})
-EndIconAlert.args = {
-  buttonType: 'alert',
-  buttonText: 'Button text',
-  iconPlacement: 'endIcon',
-  iconName: 'play-round-corners',
+export const StartIconPrimary: Story = {
+  args: {
+    buttonType: 'primary',
+    buttonText: 'Button text',
+    iconPlacement: 'startIcon',
+    iconName: 'reset',
+  },
 }
 
-export const SecondaryRounded = Template.bind({})
-SecondaryRounded.args = {
-  buttonType: 'secondary',
-  buttonText: 'Button text',
-  buttonCategory: 'rounded',
+export const EndIconAlert: Story = {
+  args: {
+    buttonType: 'alert',
+    buttonText: 'Button text',
+    iconPlacement: 'endIcon',
+    iconName: 'play-round-corners',
+  },
+}
+
+export const SecondaryRounded: Story = {
+  args: {
+    buttonType: 'secondary',
+    buttonText: 'Button text',
+    buttonCategory: 'rounded',
+  },
 }

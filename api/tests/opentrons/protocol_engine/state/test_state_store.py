@@ -1,5 +1,5 @@
 """Tests for the top-level StateStore/StateView."""
-from typing import Callable, Optional
+from typing import Callable, Union
 from datetime import datetime
 
 import pytest
@@ -80,47 +80,52 @@ def test_notify_on_state_change(
     decoy.verify(change_notifier.notify(), times=1)
 
 
-async def test_wait_for_state(
+async def test_wait_for(
     decoy: Decoy,
     change_notifier: ChangeNotifier,
     subject: StateStore,
 ) -> None:
     """It should return an awaitable that signals state changes."""
-    check_condition: Callable[..., Optional[str]] = decoy.mock(name="check_condition")
+    check_condition: Callable[..., Union[str, int]] = decoy.mock(name="check_condition")
 
     decoy.when(check_condition("foo", bar="baz")).then_return(
-        None,
-        None,
+        0,
+        0,
         "hello world",
     )
-
     result = await subject.wait_for(check_condition, "foo", bar="baz")
     assert result == "hello world"
+    decoy.verify(await change_notifier.wait(), times=2)
 
+    decoy.reset()
+
+    decoy.when(check_condition("foo", bar="baz")).then_return(
+        "hello world",
+        "hello world again",
+        0,
+    )
+    result = await subject.wait_for_not(check_condition, "foo", bar="baz")
+    assert result == 0
     decoy.verify(await change_notifier.wait(), times=2)
 
 
-async def test_wait_for_state_short_circuit(
+async def test_wait_for_already_satisfied(
     decoy: Decoy,
     subject: StateStore,
     change_notifier: ChangeNotifier,
 ) -> None:
-    """It should short-circuit the change notifier if condition is satisfied."""
-    check_condition: Callable[..., Optional[str]] = decoy.mock(name="check_condition")
+    """It should return immediately and skip the change notifier."""
+    check_condition: Callable[..., Union[str, int]] = decoy.mock(name="check_condition")
 
     decoy.when(check_condition("foo", bar="baz")).then_return("hello world")
-
     result = await subject.wait_for(check_condition, "foo", bar="baz")
     assert result == "hello world"
-
     decoy.verify(await change_notifier.wait(), times=0)
 
-
-async def test_wait_for_already_true(decoy: Decoy, subject: StateStore) -> None:
-    """It should signal immediately if condition is already met."""
-    check_condition = decoy.mock(name="check_condition")
-    decoy.when(check_condition()).then_return(True)
-    await subject.wait_for(check_condition)
+    decoy.when(check_condition("foo", bar="baz")).then_return(0)
+    result = await subject.wait_for_not(check_condition, "foo", bar="baz")
+    assert result == 0
+    decoy.verify(await change_notifier.wait(), times=0)
 
 
 async def test_wait_for_raises(decoy: Decoy, subject: StateStore) -> None:
@@ -131,3 +136,6 @@ async def test_wait_for_raises(decoy: Decoy, subject: StateStore) -> None:
 
     with pytest.raises(ValueError, match="oh no"):
         await subject.wait_for(check_condition)
+
+    with pytest.raises(ValueError, match="oh no"):
+        await subject.wait_for_not(check_condition)

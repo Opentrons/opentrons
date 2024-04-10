@@ -240,3 +240,44 @@ export const getDisposalOptions = createSelector(
       : trashBins
   }
 )
+
+export interface TiprackOption {
+  name: string
+  value: string
+  defURI: string
+}
+export const getTiprackOptions: Selector<TiprackOption[]> = createSelector(
+  stepFormSelectors.getLabwareEntities,
+  getLabwareNicknamesById,
+  (labwareEntities, nicknamesById) => {
+    const options = reduce(
+      labwareEntities,
+      (
+        acc: TiprackOption[],
+        labwareEntity: LabwareEntity,
+        labwareId: string
+      ): TiprackOption[] => {
+        const labwareDefURI = labwareEntity.labwareDefURI
+        const optionValues = acc.map(option => option.value)
+
+        if (
+          optionValues.includes(labwareDefURI) ||
+          !getIsTiprack(labwareEntity.def)
+        ) {
+          return acc
+        } else {
+          return [
+            ...acc,
+            {
+              name: nicknamesById[labwareId],
+              value: labwareId,
+              defURI: labwareDefURI,
+            },
+          ]
+        }
+      },
+      []
+    )
+    return options
+  }
+)

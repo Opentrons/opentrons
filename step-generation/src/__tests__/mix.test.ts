@@ -41,7 +41,7 @@ beforeEach(() => {
     commandCreatorFnName: 'mix',
     name: 'mix test',
     description: 'test blah blah',
-
+    tipRack: 'tiprack1Id',
     pipette: DEFAULT_PIPETTE,
     labware: SOURCE_LABWARE,
 
@@ -51,6 +51,10 @@ beforeEach(() => {
     aspirateDelaySeconds: null,
     dispenseDelaySeconds: null,
     dropTipLocation: FIXED_TRASH_ID,
+    aspirateXOffset: 0,
+    dispenseXOffset: 0,
+    aspirateYOffset: 0,
+    dispenseYOffset: 0,
   }
 
   invariantContext = makeContext()
@@ -191,7 +195,7 @@ describe('mix: advanced options', () => {
         dispenseHelper(well, volume),
         blowoutHelper(blowoutLabwareId, {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
               z: BLOWOUT_OFFSET_ANY,
             },
@@ -225,7 +229,7 @@ describe('mix: advanced options', () => {
         dispenseHelper(well, volume),
         blowoutHelper(blowoutLabwareId, {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
               z: BLOWOUT_OFFSET_ANY,
             },
@@ -315,7 +319,7 @@ describe('mix: advanced options', () => {
           delayCommand(12),
           blowoutHelper(blowoutLabwareId, {
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 z: BLOWOUT_OFFSET_ANY,
               },

@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p300_multi_gen2"
@@ -17,6 +19,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p300_single_gen2"
@@ -26,6 +29,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "1"
@@ -475,6 +479,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "9"
@@ -512,6 +517,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "3"
@@ -551,6 +557,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "7"
@@ -591,6 +598,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "Opentrons 96 Tip Rack 300 µL",
         "loadName": "opentrons_96_tiprack_300ul",
@@ -1737,6 +1745,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "H/S",
         "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep",
@@ -2988,6 +2997,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "Temp",
         "loadName": "opentrons_24_aluminumblock_generic_2ml_screwcap",
@@ -3335,6 +3345,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "Mag",
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
@@ -4482,6 +4493,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "Themo",
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
@@ -5629,6 +5641,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "L1",
         "loadName": "agilent_1_reservoir_290ml",
@@ -5715,6 +5728,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A1": 300.0,
@@ -5732,6 +5746,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A1": 20.0,
@@ -5765,6 +5780,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A1": 100.0,
@@ -5822,6 +5838,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A1": 100.0,
@@ -5879,6 +5896,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A1": 29000.0
@@ -5889,30 +5907,35 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/openLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -5938,6 +5961,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 94.0,
         "volume": 20.0,
@@ -5963,6 +5987,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 94.0,
         "volume": 20.0,
@@ -5988,6 +6013,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -6011,6 +6037,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -6036,6 +6063,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 94.0,
         "volume": 20.0,
@@ -6061,6 +6089,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 94.0,
         "volume": 20.0,
@@ -6086,6 +6115,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -6109,6 +6139,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -6134,6 +6165,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 25.0,
@@ -6159,6 +6191,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 25.0,
@@ -6184,6 +6217,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -6207,6 +6241,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -6232,6 +6267,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 25.0,
@@ -6257,6 +6293,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 25.0,
@@ -6282,6 +6319,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -6305,6 +6343,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -6330,6 +6369,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 25.0,
@@ -6355,6 +6395,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 25.0,
@@ -6380,6 +6421,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -6403,6 +6445,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -6428,6 +6471,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 25.0,
@@ -6453,6 +6497,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 25.0,
@@ -6478,6 +6523,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -6501,6 +6547,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -6526,6 +6573,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 22.0,
@@ -6551,6 +6599,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 22.0,
@@ -6576,6 +6625,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -6599,6 +6649,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -6624,6 +6675,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 22.0,
@@ -6649,6 +6701,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 22.0,
@@ -6674,6 +6727,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -6697,6 +6751,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -6722,6 +6777,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 22.0,
@@ -6747,6 +6803,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 22.0,
@@ -6772,6 +6829,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -6795,6 +6853,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -6820,6 +6879,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 22.0,
@@ -6845,6 +6905,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 22.0,
@@ -6870,6 +6931,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -6893,6 +6955,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -6918,6 +6981,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 22.0,
@@ -6943,6 +7007,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 22.0,
@@ -6968,6 +7033,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -6991,6 +7057,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -7016,6 +7083,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 22.0,
@@ -7041,6 +7109,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 46.43,
         "volume": 22.0,
@@ -7066,6 +7135,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -7089,12 +7159,14 @@
     },
     {
       "commandType": "thermocycler/closeLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/setTargetBlockTemperature",
+      "notes": [],
       "params": {
         "celsius": 55.0
       },
@@ -7105,12 +7177,14 @@
     },
     {
       "commandType": "thermocycler/waitForBlockTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/setTargetLidTemperature",
+      "notes": [],
       "params": {
         "celsius": 50.0
       },
@@ -7121,18 +7195,21 @@
     },
     {
       "commandType": "thermocycler/waitForLidTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setTargetTemperature",
+      "notes": [],
       "params": {
         "celsius": 55.0
       },
@@ -7141,12 +7218,14 @@
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "notes": [],
       "params": {
         "rpm": 1000.0
       },
@@ -7157,12 +7236,14 @@
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "magneticModule/engage",
+      "notes": [],
       "params": {
         "height": 12.0
       },
@@ -7171,6 +7252,7 @@
     },
     {
       "commandType": "temperatureModule/setTargetTemperature",
+      "notes": [],
       "params": {
         "celsius": 80.0
       },
@@ -7181,6 +7263,7 @@
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
@@ -7194,31 +7277,7 @@
         "errorType": "CannotPerformModuleAction",
         "wrappedErrors": []
       },
-      "params": {},
-      "status": "failed"
-    },
-    {
-      "commandType": "heaterShaker/deactivateHeater",
-      "params": {},
-      "status": "failed"
-    },
-    {
-      "commandType": "heaterShaker/deactivateShaker",
-      "params": {},
-      "status": "failed"
-    },
-    {
-      "commandType": "thermocycler/openLid",
-      "params": {},
-      "status": "failed"
-    },
-    {
-      "commandType": "thermocycler/deactivateBlock",
-      "params": {},
-      "status": "failed"
-    },
-    {
-      "commandType": "thermocycler/deactivateLid",
+      "notes": [],
       "params": {},
       "status": "failed"
     }

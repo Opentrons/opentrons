@@ -120,6 +120,14 @@ async def test_analyze(
         mount=MountType.LEFT,
     )
 
+    analysis_parameter = pe_types.BooleanParameter(
+        displayName="Display Name",
+        variableName="variable_name",
+        type="bool",
+        value=False,
+        default=True,
+    )
+
     json_runner = decoy.mock(cls=protocol_runner.JsonRunner)
 
     decoy.when(
@@ -148,6 +156,7 @@ async def test_analyze(
                 labwareOffsets=[],
                 liquids=[],
             ),
+            parameters=[analysis_parameter],
         )
     )
 
@@ -161,7 +170,7 @@ async def test_analyze(
         await analysis_store.update(
             analysis_id="analysis-id",
             robot_type=robot_type,
-            run_time_parameters=[],
+            run_time_parameters=[analysis_parameter],
             commands=[analysis_command],
             labware=[analysis_labware],
             modules=[],

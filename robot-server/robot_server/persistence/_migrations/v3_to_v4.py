@@ -2,23 +2,51 @@
 
 Summary of changes from schema 3:
 
-- Deck Configuration now Supports the addition of Modules as Fixtures
-- Fixture items within the configuration have an optional Serial Number field
-- NOTE: Database has not changed, maintains form from v3 of SQLite schema
-- NOTE: Schema 3 is forward compatible with schema 4, so migration is a simple directory copy action
-
+- Adds a new "run_time_parameter_values_and_defaults" column to analysis table
 """
 
 from pathlib import Path
+from contextlib import ExitStack
 import shutil
+from typing import Any
+
+import sqlalchemy
+
+from ..database import sql_engine_ctx
+from ..tables import schema_4
 from .._folder_migrator import Migration
 
+_DB_FILE = "robot_server.db"
 
-class Migration3To4(Migration):  # noqa: D101
+
+class Migration3to4(Migration):  # noqa: D101
     def migrate(self, source_dir: Path, dest_dir: Path) -> None:
         """Migrate the persistence directory from schema 3 to 4."""
+        # Copy over all existing directories and files to new version
         for item in source_dir.iterdir():
             if item.is_dir():
                 shutil.copytree(src=item, dst=dest_dir / item.name)
             else:
                 shutil.copy(src=item, dst=dest_dir / item.name)
+        dest_db_file = dest_dir / _DB_FILE
+
+        # Append the new column to existing analyses in v4 database
+        with ExitStack() as exit_stack:
+            dest_engine = exit_stack.enter_context(sql_engine_ctx(dest_db_file))
+            schema_4.metadata.create_all(dest_engine)
+
+            def add_column(
+                engine: sqlalchemy.engine.Engine,
+                table_name: str,
+                column: Any,
+            ) -> None:
+                column_type = column.type.compile(engine.dialect)
+                engine.execute(
+                    f"ALTER TABLE {table_name} ADD COLUMN {column.key} {column_type}"
+                )
+
+            add_column(
+                dest_engine,
+                schema_4.analysis_table.name,
+                schema_4.analysis_table.c.run_time_parameter_values_and_defaults,
+            )

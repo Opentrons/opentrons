@@ -20,7 +20,7 @@ export type IpcListener = (
 ) => void
 
 export interface NotifyRefetchData {
-  refetchUsingHTTP: boolean
+  refetch: boolean
 }
 
 export interface NotifyUnsubscribeData {

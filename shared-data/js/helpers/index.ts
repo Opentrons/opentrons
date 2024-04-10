@@ -28,6 +28,10 @@ export * from './getOccludedSlotCountForModule'
 export * from './labwareInference'
 export * from './getAddressableAreasInProtocol'
 export * from './getSimplestFlexDeckConfig'
+export * from './formatRunTimeParameterDefaultValue'
+export * from './formatRunTimeParameterValue'
+export * from './formatRunTimeParameterMinMax'
+export * from './orderRuntimeParameterRangeOptions'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
@@ -197,6 +201,23 @@ export const getWellsDepth = (
     )
   }
 
+  return offsets[0]
+}
+
+export const getWellDimension = (
+  labwareDef: LabwareDefinition2,
+  wells: string[],
+  position: 'x' | 'y'
+): number => {
+  const offsets = wells.map(well => {
+    const labwareWell = labwareDef.wells[well]
+    const shape = labwareWell.shape
+    if (shape === 'circular') {
+      return labwareWell.diameter
+    } else {
+      return position === 'x' ? labwareWell.xDimension : labwareWell.yDimension
+    }
+  })
   return offsets[0]
 }
 
