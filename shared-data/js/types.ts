@@ -279,6 +279,7 @@ export interface CutoutFixture {
   mayMountTo: CutoutId[]
   displayName: string
   providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
+  expectOpentronsModuleSerialNumber: boolean
   fixtureGroup: CutoutFixtureGroup
   height: number
 }
