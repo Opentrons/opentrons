@@ -72,7 +72,6 @@ export function useModuleRenderInfoForProtocolById(
         moduleFixtures,
         deckDef
       )
-
       const conflictedFixture =
         deckConfig?.find(
           ({ cutoutId, cutoutFixtureId }) =>

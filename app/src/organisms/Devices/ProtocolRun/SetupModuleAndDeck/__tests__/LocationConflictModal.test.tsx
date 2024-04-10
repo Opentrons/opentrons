@@ -12,12 +12,14 @@ import {
 } from '@opentrons/shared-data'
 import {
   useDeckConfigurationQuery,
+  useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../../i18n'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { DeckConfiguration } from '@opentrons/shared-data'
+import { mockHeaterShaker } from '../../../../../redux/modules/__fixtures__'
 
 vi.mock('@opentrons/react-api-client')
 
@@ -42,6 +44,7 @@ describe('LocationConflictModal', () => {
       requiredFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
       deckDef: ot3StandardDeckV5 as any,
     }
+    vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
     vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<DeckConfiguration>)
@@ -66,6 +69,7 @@ describe('LocationConflictModal', () => {
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render the modal information for a module fixture conflict', () => {
+    vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [mockHeaterShaker] } } as any)
     props = {
       onCloseClick: vi.fn(),
       cutoutId: 'cutoutB3',
@@ -75,10 +79,11 @@ describe('LocationConflictModal', () => {
     render(props)
     screen.getByText('Protocol specifies')
     screen.getByText('Currently configured')
-    screen.getByText('Heater-Shaker Module GEN1')
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
+    screen.getByText('Heater-Shaker Module GEN1 in USB-1')
+    fireEvent.click(screen.getByRole('button', { name: 'add' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render the modal information for a single slot fixture conflict', () => {

@@ -13,7 +13,6 @@ import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModulesInfo'
 
 import {
-  mockMagneticModuleGen2,
   mockTemperatureModuleGen2,
   mockThermocycler,
 } from '../../../../redux/modules/__fixtures__'
@@ -53,23 +52,6 @@ const PROTOCOL_DETAILS = {
   protocolKey: 'fakeProtocolKey',
 }
 
-const mockMagneticModuleDefinition = {
-  moduleId: 'someMagneticModule',
-  model: 'magneticModuleV2' as ModuleModel,
-  type: 'magneticModuleType' as ModuleType,
-  labwareOffset: { x: 5, y: 5, z: 5 },
-  cornerOffsetFromSlot: { x: 1, y: 1, z: 1 },
-  dimensions: {
-    xDimension: 100,
-    yDimension: 100,
-    footprintXDimension: 50,
-    footprintYDimension: 50,
-    labwareInterfaceXDimension: 80,
-    labwareInterfaceYDimension: 120,
-  },
-  twoDimensionalRendering: { children: [] },
-}
-
 const mockTemperatureModuleDefinition = {
   moduleId: 'someMagneticModule',
   model: 'temperatureModuleV2' as ModuleModel,
@@ -87,19 +69,6 @@ const mockTemperatureModuleDefinition = {
   twoDimensionalRendering: { children: [] },
 }
 
-const MAGNETIC_MODULE_INFO = {
-  moduleId: 'magneticModuleId',
-  x: 0,
-  y: 0,
-  z: 0,
-  moduleDef: mockMagneticModuleDefinition as any,
-  nestedLabwareDef: null,
-  nestedLabwareId: null,
-  nestedLabwareDisplayName: null,
-  protocolLoadOrder: 0,
-  slotName: 'D1',
-}
-
 const TEMPERATURE_MODULE_INFO = {
   moduleId: 'temperatureModuleId',
   x: 0,
@@ -111,7 +80,7 @@ const TEMPERATURE_MODULE_INFO = {
   nestedLabwareDisplayName: null,
   protocolLoadOrder: 0,
   slotName: 'D1',
-}
+} as any
 
 const mockCutoutConfig: CutoutConfig = {
   cutoutId: 'cutoutD1',
@@ -124,7 +93,6 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       data: [mockCutoutConfig],
     } as UseQueryResult<DeckConfiguration>)
     vi.mocked(useAttachedModules).mockReturnValue([
-      mockMagneticModuleGen2,
       mockTemperatureModuleGen2,
       mockThermocycler,
     ])
@@ -134,10 +102,7 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith('1')
       .thenReturn(PROTOCOL_DETAILS.protocolData as any)
-    vi.mocked(getProtocolModulesInfo).mockReturnValue([
-      TEMPERATURE_MODULE_INFO,
-      MAGNETIC_MODULE_INFO,
-    ])
+    vi.mocked(getProtocolModulesInfo).mockReturnValue([TEMPERATURE_MODULE_INFO])
   })
 
   it('should return no module render info when protocol details not found', () => {
@@ -155,11 +120,6 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       useModuleRenderInfoForProtocolById('1', true)
     )
     expect(result.current).toStrictEqual({
-      magneticModuleId: {
-        conflictedFixture: mockCutoutConfig,
-        attachedModuleMatch: mockMagneticModuleGen2,
-        ...MAGNETIC_MODULE_INFO,
-      },
       temperatureModuleId: {
         conflictedFixture: mockCutoutConfig,
         attachedModuleMatch: mockTemperatureModuleGen2,
