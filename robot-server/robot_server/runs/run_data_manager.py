@@ -175,6 +175,7 @@ class RunDataManager:
                 run_id=prev_run_id,
                 summary=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
+                run_time_parameters=prev_run_result.parameters,
             )
         state_summary = await self._engine_store.create(
             run_id=run_id,
@@ -316,6 +317,7 @@ class RunDataManager:
                 run_id=run_id,
                 summary=state_summary,
                 commands=commands,
+                run_time_parameters=parameters,
             )
         else:
             state_summary = self._engine_store.engine.state_view.get_summary()
@@ -398,4 +400,4 @@ class RunDataManager:
         if run_id == self._engine_store.current_run_id:
             return self._engine_store.runner.run_time_parameters
         else:
-            return []
+            return self._run_store.get_run_time_parameters(run_id=run_id)

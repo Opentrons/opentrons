@@ -120,6 +120,19 @@ def state_summary() -> StateSummary:
     )
 
 
+@pytest.fixture()
+def run_time_parameters() -> List[pe_types.RunTimeParameter]:
+    """Get a RunTimeParameter list."""
+    return [
+        pe_types.BooleanParameter(
+            displayName="Display Name",
+            variableName="variable_name",
+            value=False,
+            default=True,
+        )
+    ]
+
+
 @pytest.fixture
 def invalid_state_summary() -> StateSummary:
     """Should fail pydantic validation."""
@@ -164,6 +177,7 @@ def test_update_run_state(
     subject: RunStore,
     state_summary: StateSummary,
     protocol_commands: List[pe_commands.Command],
+    run_time_parameters: List[pe_types.RunTimeParameter],
     mock_runs_publisher: mock.Mock,
 ) -> None:
     """It should be able to update a run state to the store."""
@@ -184,8 +198,10 @@ def test_update_run_state(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
+        run_time_parameters=run_time_parameters,
     )
     run_summary_result = subject.get_state_summary(run_id="run-id")
+    parameters_result = subject.get_run_time_parameters(run_id="run-id")
     commands_result = subject.get_commands_slice(
         run_id="run-id",
         length=len(protocol_commands),
@@ -200,6 +216,7 @@ def test_update_run_state(
         actions=[action],
     )
     assert run_summary_result == state_summary
+    assert parameters_result == run_time_parameters
     assert commands_result.commands == protocol_commands
     mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
         run_id="run-id"
@@ -217,6 +234,7 @@ def test_update_state_run_not_found(
             run_id="run-not-found",
             summary=state_summary,
             commands=protocol_commands,
+            run_time_parameters=[],
         )
 
 
@@ -436,7 +454,9 @@ def test_get_state_summary(
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
-    subject.update_run_state(run_id="run-id", summary=state_summary, commands=[])
+    subject.update_run_state(
+        run_id="run-id", summary=state_summary, commands=[], run_time_parameters=[]
+    )
     result = subject.get_state_summary(run_id="run-id")
     assert result == state_summary
     mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
@@ -454,7 +474,10 @@ def test_get_state_summary_failure(
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
     )
     subject.update_run_state(
-        run_id="run-id", summary=invalid_state_summary, commands=[]
+        run_id="run-id",
+        summary=invalid_state_summary,
+        commands=[],
+        run_time_parameters=[],
     )
     result = subject.get_state_summary(run_id="run-id")
     assert isinstance(result, BadStateSummary)
@@ -503,6 +526,7 @@ def test_get_command(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
+        run_time_parameters=[],
     )
     result = subject.get_command(run_id="run-id", command_id="pause-2")
 
@@ -532,6 +556,7 @@ def test_get_command_raise_exception(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
+        run_time_parameters=[],
     )
     with pytest.raises(expected_exception):
         subject.get_command(run_id=input_run_id, command_id=input_command_id)
@@ -552,6 +577,7 @@ def test_get_command_slice(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
+        run_time_parameters=[],
     )
     result = subject.get_commands_slice(
         run_id="run-id", cursor=0, length=len(protocol_commands)
@@ -598,6 +624,7 @@ def test_get_commands_slice_clamping(
         run_id="run-id",
         summary=state_summary,
         commands=protocol_commands,
+        run_time_parameters=[],
     )
     result = subject.get_commands_slice(
         run_id="run-id", cursor=input_cursor, length=input_length
