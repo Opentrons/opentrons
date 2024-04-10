@@ -91,7 +91,7 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const showOT2MoamHelp =
     robotModel === OT2_ROBOT_TYPE &&
     new Set(moduleModels).size !== moduleModels.length
-
+    console.log('MODULES.' , moduleRenderInfoForProtocolById)
   return (
     <>
       {showOT2MoamHelp ? <OT2MultipleModulesHelp /> : null}

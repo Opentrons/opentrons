@@ -308,7 +308,7 @@ describe.only('useMissingProtocolHardware', () => {
           slot: 'D3',
           connected: false,
           hasSlotConflict: false,
-        },
+        }
       ],
       conflictedSlots: [],
     })
@@ -366,6 +366,21 @@ describe.only('useMissingProtocolHardware', () => {
       data: { data: [mockHeaterShaker] },
       isLoading: false,
     } as any)
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+      data: [
+        omitBy(
+          FLEX_SIMPLEST_DECK_CONFIG,
+          ({ cutoutId }) => cutoutId === 'cutoutD3'
+        ),
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: 'heaterShakerModuleV1',
+          opentronsModuleSerialNumber: mockHeaterShaker.serialNumber
+        }
+      ],
+      isLoading: false,
+    } as any)
+
     const { result } = renderHook(
       () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
       { wrapper }
@@ -417,11 +432,10 @@ describe.only('useMissingProtocolHardware', () => {
     expect(result.current).toEqual({
       missingProtocolHardware: [
         {
-          hardwareType: 'fixture',
-          cutoutFixtureId: 'singleRightSlot',
-          location: {
-            cutout: 'cutoutD3',
-          },
+          hardwareType: 'module',
+          moduleModel: 'heaterShakerModuleV1',
+          slot: 'D3',
+          connected: false,
           hasSlotConflict: true,
         },
       ],

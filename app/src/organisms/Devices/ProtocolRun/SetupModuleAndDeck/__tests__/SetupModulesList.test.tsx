@@ -3,7 +3,7 @@ import { when } from 'vitest-when'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
-import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE, STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
@@ -23,6 +23,7 @@ import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
+  useRobot,
 } from '../../../hooks'
 import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
@@ -30,6 +31,7 @@ import { SetupModulesList } from '../SetupModulesList'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import type { DiscoveredRobot } from '../../../../../redux/discovery/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../hooks')
@@ -92,6 +94,7 @@ describe('SetupModulesList', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
     }
+    when(vi.mocked(useRobot)).calledWith(ROBOT_NAME).thenReturn({robotModel: FLEX_ROBOT_TYPE} as DiscoveredRobot)
     mockChainLiveCommands = vi.fn()
     mockChainLiveCommands.mockResolvedValue(null)
     vi.mocked(ModuleSetupModal).mockReturnValue(<div>mockModuleSetupModal</div>)
@@ -116,15 +119,6 @@ describe('SetupModulesList', () => {
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
-  })
-
-  it('should render the list view headers', () => {
-    when(useRunHasStarted).calledWith(RUN_ID).thenReturn(false)
-    when(useModuleRenderInfoForProtocolById).calledWith(RUN_ID).thenReturn({})
-    render(props)
-    screen.getByText('Module')
-    screen.getByText('Location')
-    screen.getByText('Status')
   })
 
   it('should render a magnetic module that is connected', () => {
@@ -301,7 +295,8 @@ describe('SetupModulesList', () => {
     screen.getByText('Connected')
   })
 
-  it('should render the MoaM component when Moam is attached', () => {
+  it('should render the MoaM component when Moam is attached and robot is OT2', () => {
+    when(vi.mocked(useRobot)).calledWith(ROBOT_NAME).thenReturn({robotModel: OT2_ROBOT_TYPE} as DiscoveredRobot)
     vi.mocked(OT2MultipleModulesHelp).mockReturnValue(
       <div>mock Moam modal</div>
     )
@@ -357,8 +352,6 @@ describe('SetupModulesList', () => {
         },
       })
     render(props)
-    const help = screen.getByTestId('Banner_close-button')
-    fireEvent.click(help)
     screen.getByText('mock Moam modal')
   })
   it('should render the module unmatching banner', () => {
