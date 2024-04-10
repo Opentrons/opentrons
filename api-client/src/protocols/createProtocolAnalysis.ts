@@ -7,23 +7,18 @@ import type { RunTimeParameterCreateData } from '../runs'
 
 export function createProtocolAnalysis(
   config: HostConfig,
-  files: File[],
-  protocolKey?: string,
-  runTimeParameterValues?: RunTimeParameterCreateData
+  protocolKey: string,
+  runTimeParameterValues?: RunTimeParameterCreateData,
+  forceReAnalyze?: boolean
 ): ResponsePromise<Protocol> {
-  const formData = new FormData()
-  files.forEach(file => formData.append('files', file, file.name))
-  if (protocolKey != null) formData.append('key', protocolKey)
-  if (runTimeParameterValues != null)
-    formData.append(
-      'runTimeParameterValues',
-      JSON.stringify(runTimeParameterValues)
-    )
-
-  return request<Protocol, FormData>(
+  const data = {
+    runTimeParameterValues: runTimeParameterValues ?? {},
+    forceReAnalyze: forceReAnalyze ?? false,
+  }
+  return request<Protocol, Object>(
     POST,
     `/protocols/${protocolKey}/analyses`,
-    formData,
+    { data },
     config
   )
 }

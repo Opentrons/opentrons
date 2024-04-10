@@ -16,9 +16,9 @@ import type {
 } from '@opentrons/api-client'
 
 export interface CreateProtocolAnalysisVariables {
-  files: File[]
-  protocolKey?: string
+  protocolKey: string
   runTimeParameterValues?: RunTimeParameterCreateData
+  forceReAnalyze?: boolean
 }
 export type UseCreateProtocolMutationResult = UseMutationResult<
   Protocol,
@@ -41,8 +41,7 @@ export type UseCreateProtocolMutationOptions = UseMutationOptions<
 export function useCreateProtocolAnalysisMutation(
   options: UseCreateProtocolMutationOptions = {},
   protocolId: string | null,
-  hostOverride?: HostConfig | null,
-  runTimeParameterValues?: RunTimeParameterCreateData
+  hostOverride?: HostConfig | null
 ): UseCreateProtocolMutationResult {
   const contextHost = useHost()
   const host =
@@ -55,12 +54,12 @@ export function useCreateProtocolAnalysisMutation(
     CreateProtocolAnalysisVariables
   >(
     [host, 'protocols', protocolId, 'analyses'],
-    ({ files: protocolFiles, protocolKey }) =>
+    ({ protocolKey, runTimeParameterValues, forceReAnalyze }) =>
       createProtocolAnalysis(
         host as HostConfig,
-        protocolFiles,
         protocolKey,
-        runTimeParameterValues
+        runTimeParameterValues,
+        forceReAnalyze
       )
         .then(response => {
           const protocolId = response.data.data.id
