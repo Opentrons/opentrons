@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "fa95804888e2d45ce401c98bafc9b543cb6e1afe0a36713660d3f5517ac02b8e"
+            "sha256": "93a35b59bb63ce1a4141b485ea63a81ce03448af4b50ca68b952ed0ee448220c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -36,6 +36,10 @@
             "editable": true,
             "file": "../shared-data/python",
             "markers": "python_version >= '3.8'"
+        },
+        "performance-metrics": {
+            "editable": true,
+            "file": "."
         },
         "pydantic": {
             "hashes": [
@@ -333,12 +337,21 @@
         },
         "pytest": {
             "hashes": [
-                "sha256:130328f552dcfac0b1cec75c12e3f005619dc5f874f0a06e8ff7263f0ee6225e",
-                "sha256:c99ab0c73aceb050f68929bc93af19ab6db0558791c6a0715723abe9d0ade9d4"
+                "sha256:2cf0005922c6ace4a3e2ec8b4080eb0d9753fdc93107415332f50ce9e7994280",
+                "sha256:b090cdf5ed60bf4c45261be03239c2c1c22df034fbffe691abe93cd80cea01d8"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.7'",
-            "version": "==7.2.2"
+            "version": "==7.4.4"
+        },
+        "pytest-asyncio": {
+            "hashes": [
+                "sha256:68516fdd1018ac57b846c9846b954f0393b26f094764a28c955eabb0536a4e8a",
+                "sha256:ffe523a89c1c222598c76856e76852b787504ddb72dd5d9b6617ffa8aa2cde5f"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.8'",
+            "version": "==0.23.6"
         },
         "snowballstemmer": {
             "hashes": [
