@@ -23,9 +23,9 @@ def serialize_deck_configuration(
     cutout_fixture_placements: List[CutoutFixturePlacement], last_modified: datetime
 ) -> bytes:
     """Serialize a deck configuration for storing on the filesystem."""
-    data = _DeckConfigurationModel.construct(
+    data = _DeckConfigurationModel.model_construct(
         cutoutFixtures=[
-            _CutoutFixturePlacementModel.construct(
+            _CutoutFixturePlacementModel.model_construct(
                 cutoutId=e.cutout_id, cutoutFixtureId=e.cutout_fixture_id
             )
             for e in cutout_fixture_placements

@@ -3,7 +3,7 @@
 from typing import Union, TypeVar
 from typing_extensions import Annotated
 
-from pydantic import Field
+from pydantic import Field, TypeAdapter
 
 from . import heater_shaker
 from . import magnetic_module
@@ -541,6 +541,11 @@ CommandCreate = Annotated[
     ],
     Field(discriminator="commandType"),
 ]
+
+# Each time a TypeAdapter is instantiated, it will construct a new validator and
+# serializer. To improve performance, TypeAdapters are instantiated once.
+# See https://docs.pydantic.dev/latest/concepts/performance/#typeadapter-instantiated-once
+CommandCreateAdatper: TypeAdapter[CommandCreate] = TypeAdapter(CommandCreate)  # type: ignore[arg-type]
 
 CommandResult = Union[
     AspirateResult,

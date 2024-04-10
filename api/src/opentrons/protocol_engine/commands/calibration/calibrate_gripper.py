@@ -118,8 +118,8 @@ class CalibrateGripperImplementation(
             )
             calibration_data = result
 
-        return CalibrateGripperResult.construct(
-            jawOffset=Vec3f.construct(
+        return CalibrateGripperResult.model_construct(
+            jawOffset=Vec3f.model_construct(
                 x=probe_offset.x, y=probe_offset.y, z=probe_offset.z
             ),
             savedCalibration=calibration_data,

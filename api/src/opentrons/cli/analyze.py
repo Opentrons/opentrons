@@ -82,18 +82,18 @@ async def _analyze(
     )
     analysis = await runner.run(deck_configuration=[], protocol_source=protocol_source)
     if json_output:
-        results = AnalyzeResults.construct(
+        results = AnalyzeResults.model_construct(
             createdAt=datetime.now(tz=timezone.utc),
             files=[
-                ProtocolFile.construct(name=f.path.name, role=f.role)
+                ProtocolFile.model_construct(name=f.path.name, role=f.role)
                 for f in protocol_source.files
             ],
             config=(
-                JsonConfig.construct(
+                JsonConfig.model_construct(
                     schemaVersion=protocol_source.config.schema_version
                 )
                 if isinstance(protocol_source.config, JsonProtocolConfig)
-                else PythonConfig.construct(
+                else PythonConfig.model_construct(
                     apiVersion=protocol_source.config.api_version
                 )
             ),

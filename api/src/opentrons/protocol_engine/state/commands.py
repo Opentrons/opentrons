@@ -230,7 +230,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             # request > command mapping, figure out how to type precisely
             # (or wait for a future mypy version that can figure it out).
             # For now, unit tests cover mapping every request type
-            queued_command = action.request._CommandCls.construct(
+            queued_command = action.request._CommandCls(
                 id=action.command_id,
                 key=(
                     action.request.key
@@ -238,7 +238,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     else (action.request_hash or action.command_id)
                 ),
                 createdAt=action.created_at,
-                params=action.request.params,
+                params=action.request.params,  # type: ignore[arg-type]
                 intent=action.request.intent,
                 status=CommandStatus.QUEUED,
             )
@@ -533,7 +533,7 @@ class CommandView(HasState[CommandState]):
         finish_error = self._state.finish_error
 
         if run_error and finish_error:
-            combined_error = ErrorOccurrence.construct(
+            combined_error = ErrorOccurrence(
                 id=finish_error.id,
                 createdAt=finish_error.createdAt,
                 errorType="RunAndFinishFailed",

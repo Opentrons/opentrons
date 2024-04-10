@@ -129,7 +129,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             for fixed_labware in deck_fixed_labware
         }
         labware_by_id = {
-            fixed_labware.labware_id: LoadedLabware.construct(
+            fixed_labware.labware_id: LoadedLabware.model_construct(
                 id=fixed_labware.labware_id,
                 location=fixed_labware.location,
                 loadName=fixed_labware.definition.parameters.loadName,
@@ -156,7 +156,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             self._handle_command(action.command)
 
         elif isinstance(action, AddLabwareOffsetAction):
-            labware_offset = LabwareOffset.construct(
+            labware_offset = LabwareOffset.model_construct(
                 id=action.labware_offset_id,
                 createdAt=action.created_at,
                 definitionUri=action.request.definitionUri,
@@ -190,7 +190,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
             self._state.labware_by_id[
                 command.result.labwareId
-            ] = LoadedLabware.construct(
+            ] = LoadedLabware.model_construct(
                 id=command.result.labwareId,
                 location=command.params.location,
                 loadName=command.result.definition.parameters.loadName,
