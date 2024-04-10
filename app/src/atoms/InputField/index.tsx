@@ -75,7 +75,6 @@ export interface InputFieldProps {
     | typeof TYPOGRAPHY.textAlignCenter
   /** small or medium input field height, relevant only */
   size?: 'medium' | 'small'
-  ref?: React.MutableRefObject<null>
 }
 
 export function InputField(props: InputFieldProps): JSX.Element {
@@ -102,7 +101,7 @@ function Input(props: InputFieldProps): JSX.Element {
     tooltipText,
     ...inputProps
   } = props
-  const error = props.error != null
+  const hasError = props.error != null
   const value = props.isIndeterminate ?? false ? '' : props.value ?? ''
   const placeHolder = props.isIndeterminate ?? false ? '-' : props.placeholder
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -111,7 +110,7 @@ function Input(props: InputFieldProps): JSX.Element {
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       grid-gap: ${SPACING.spacing8};
       &:focus-within {
-        filter: ${error
+        filter: ${hasError
           ? 'none'
           : `drop-shadow(0px 0px 10px ${COLORS.blue50})`};
       }
@@ -123,7 +122,7 @@ function Input(props: InputFieldProps): JSX.Element {
     background-color: ${COLORS.white};
     border-radius: ${BORDERS.borderRadius4};
     padding: ${SPACING.spacing8};
-    border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey50};
+    border: 1px ${BORDERS.styleSolid} ${hasError ? COLORS.red50 : COLORS.grey50};
     font-size: ${TYPOGRAPHY.fontSizeP};
     width: 100%;
     height: 2rem;
@@ -146,17 +145,20 @@ function Input(props: InputFieldProps): JSX.Element {
     }
 
     &:hover {
-      border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey60};
+      border: 1px ${BORDERS.styleSolid}
+        ${hasError ? COLORS.red50 : COLORS.grey60};
     }
 
     &:focus-visible {
-      border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey60};
+      border: 1px ${BORDERS.styleSolid}
+        ${hasError ? COLORS.red50 : COLORS.grey60};
       outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
       outline-offset: 3px;
     }
 
     &:focus-within {
-      border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.blue50};
+      border: 1px ${BORDERS.styleSolid}
+        ${hasError ? COLORS.red50 : COLORS.blue50};
     }
 
     &:disabled {
@@ -170,15 +172,16 @@ function Input(props: InputFieldProps): JSX.Element {
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       height: ${size === 'small' ? '4.25rem' : '5rem'};
-      box-shadow: ${error ? BORDERS.shadowBig : 'none'};
+      box-shadow: ${hasError ? BORDERS.shadowBig : 'none'};
       font-size: ${TYPOGRAPHY.fontSize28};
       padding: ${SPACING.spacing16} ${SPACING.spacing24};
-      border: 2px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey50};
+      border: 2px ${BORDERS.styleSolid}
+        ${hasError ? COLORS.red50 : COLORS.grey50};
 
       &:focus-within {
         box-shadow: none;
-        border: ${error ? '2px' : '3px'} ${BORDERS.styleSolid}
-          ${error ? COLORS.red50 : COLORS.blue50};
+        border: ${hasError ? '2px' : '3px'} ${BORDERS.styleSolid}
+          ${hasError ? COLORS.red50 : COLORS.blue50};
       }
 
       & input {
@@ -201,9 +204,9 @@ function Input(props: InputFieldProps): JSX.Element {
   `
 
   const TITLE_STYLE = css`
-    color: ${error ? COLORS.red50 : COLORS.black90};
+    color: ${hasError ? COLORS.red50 : COLORS.black90};
     padding-bottom: ${SPACING.spacing8};
-    align-text: ${textAlign};
+    text-align: ${textAlign};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       font-size: ${TYPOGRAPHY.fontSize22};
       font-weight: ${TYPOGRAPHY.fontWeightRegular};
@@ -303,7 +306,7 @@ function Input(props: InputFieldProps): JSX.Element {
           {props.secondaryCaption}
         </StyledText>
       ) : null}
-      {props.error != null ? (
+      {hasError ? (
         <StyledText as="label" css={ERROR_TEXT_STYLE}>
           {props.error}
         </StyledText>

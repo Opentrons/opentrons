@@ -35,7 +35,6 @@ export function ViewOnlyParameters({
     makeSnackbar(t('reset_setup'))
   }
 
-  //  TODO(jr, 3/18/24): remove mockData
   const parameters = mostRecentAnalysis?.runTimeParameters ?? []
 
   return (
@@ -92,7 +91,7 @@ export function ViewOnlyParameters({
                 <StyledText as="p" color={COLORS.grey60}>
                   {formatRunTimeParameterValue(parameter, t)}
                 </StyledText>
-                {parameter.value != parameter.default ? (
+                {parameter.value !== parameter.default ? (
                   <Chip
                     data-testid={`Chip_${parameter.variableName}`}
                     type="success"

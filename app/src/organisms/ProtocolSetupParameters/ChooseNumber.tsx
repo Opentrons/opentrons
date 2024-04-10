@@ -12,8 +12,8 @@ import {
 import { InputField } from '../../atoms/InputField'
 import { useToaster } from '../ToasterOven'
 import { ChildNavigation } from '../ChildNavigation'
-import type { NumberParameter } from '@opentrons/shared-data'
 import { NumericalKeyboard } from '../../atoms/SoftwareKeyboard'
+import type { NumberParameter } from '@opentrons/shared-data'
 
 interface ChooseNumberProps {
   handleGoBack: () => void
@@ -109,7 +109,6 @@ export function ChooseNumber({
         paddingX={SPACING.spacing40}
         paddingBottom={SPACING.spacing40}
         marginTop="7.75rem"
-        height="22rem"
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
       >
@@ -118,7 +117,7 @@ export function ChooseNumber({
           height="100%"
           gridGap={SPACING.spacing24}
           flexDirection={DIRECTION_COLUMN}
-          marginTop="7.75rem"
+          justifyContent={JUSTIFY_CENTER}
         >
           <StyledText as="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
             {parameter.description}
@@ -149,7 +148,7 @@ export function ChooseNumber({
         <Flex
           paddingX={SPACING.spacing24}
           height="21.25rem"
-          marginTop="7.75rem"
+          justifyContent={JUSTIFY_CENTER}
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}

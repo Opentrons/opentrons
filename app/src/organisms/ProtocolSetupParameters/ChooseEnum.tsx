@@ -29,7 +29,7 @@ export function ChooseEnum({
   const { makeSnackbar } = useToaster()
 
   const { t } = useTranslation(['protocol_setup', 'shared'])
-  const options = 'choices' in parameter ? parameter.choices : undefined
+  const options = 'choices' in parameter ? parameter.choices : null
   const handleOnClick = (newValue: string | number | boolean): void => {
     setParameter(newValue, parameter.variableName)
   }
