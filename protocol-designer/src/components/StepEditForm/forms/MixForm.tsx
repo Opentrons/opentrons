@@ -52,7 +52,10 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
-        <TiprackField {...propsForFields.tipRack} />
+        <TiprackField
+          {...propsForFields.tipRack}
+          pipetteId={propsForFields.pipette.value}
+        />
         {is96Channel ? (
           <Configure96ChannelField {...propsForFields.nozzles} />
         ) : null}

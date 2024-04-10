@@ -1,5 +1,15 @@
 import type { RunTimeParameter } from '../types'
 
+/**
+ * Formats the runtime parameter's default value.
+ *
+ * @param {RunTimeParameter} runTimeParameter - The runtime parameter whose default value is to be formatted.
+ * @param {Function} [t] - An optional function for localization.
+ *
+ * @returns {string} The formatted default value of the runtime parameter.
+ *
+ */
+
 export const formatRunTimeParameterDefaultValue = (
   runTimeParameter: RunTimeParameter,
   t?: any
