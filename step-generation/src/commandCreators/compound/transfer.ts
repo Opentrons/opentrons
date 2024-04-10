@@ -134,7 +134,8 @@ export const transfer: CommandCreator<TransferArgs> = (
       prevRobotState,
       invariantContext,
       args.sourceLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     errors.push(
@@ -154,7 +155,8 @@ export const transfer: CommandCreator<TransferArgs> = (
       prevRobotState,
       invariantContext,
       args.destLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     errors.push(
@@ -202,11 +204,16 @@ export const transfer: CommandCreator<TransferArgs> = (
     blowoutOffsetFromTopMm,
     dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
+    tipRack,
+    aspirateXOffset,
+    aspirateYOffset,
+    dispenseXOffset,
+    dispenseYOffset,
   } = args
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
   const effectiveTransferVol =
-    getPipetteWithTipMaxVol(args.pipette, invariantContext) -
+    getPipetteWithTipMaxVol(args.pipette, invariantContext, tipRack) -
     aspirateAirGapVolume
   const liquidMinVolumes = Object.values(pipetteSpec.liquids).map(
     liquid => liquid.minVolume
@@ -307,6 +314,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   pipette: args.pipette,
                   nozzles: args.nozzles ?? undefined,
                   dropTipLocation: args.dropTipLocation,
+                  tipRack: args.tipRack,
                 }),
               ]
             : []
@@ -324,6 +332,11 @@ export const transfer: CommandCreator<TransferArgs> = (
                   dispenseFlowRateUlSec,
                   aspirateDelaySeconds: aspirateDelay?.seconds,
                   dispenseDelaySeconds: dispenseDelay?.seconds,
+                  tipRack,
+                  aspirateXOffset,
+                  aspirateYOffset,
+                  dispenseXOffset,
+                  dispenseYOffset,
                 })
               : []
           const mixBeforeAspirateCommands =
@@ -340,6 +353,11 @@ export const transfer: CommandCreator<TransferArgs> = (
                   dispenseFlowRateUlSec,
                   aspirateDelaySeconds: aspirateDelay?.seconds,
                   dispenseDelaySeconds: dispenseDelay?.seconds,
+                  tipRack,
+                  aspirateXOffset,
+                  aspirateYOffset,
+                  dispenseXOffset,
+                  dispenseYOffset,
                 })
               : []
           const delayAfterAspirateCommands =
@@ -403,6 +421,11 @@ export const transfer: CommandCreator<TransferArgs> = (
                   dispenseFlowRateUlSec,
                   aspirateDelaySeconds: aspirateDelay?.seconds,
                   dispenseDelaySeconds: dispenseDelay?.seconds,
+                  tipRack,
+                  aspirateXOffset,
+                  aspirateYOffset,
+                  dispenseXOffset,
+                  dispenseYOffset,
                 })
               : []
 
@@ -417,6 +440,9 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetSourceWell,
                     isAirGap: true,
+                    tipRack,
+                    xOffset: 0,
+                    yOffset: 0,
                   }),
                   ...(aspirateDelay != null
                     ? [
@@ -437,6 +463,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: dispenseFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
                     isAirGap: true,
+                    xOffset: 0,
+                    yOffset: 0,
                   }),
                   ...(dispenseDelay != null
                     ? [
@@ -477,6 +505,9 @@ export const transfer: CommandCreator<TransferArgs> = (
               well: sourceWell,
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
+              tipRack,
+              xOffset: aspirateXOffset,
+              yOffset: aspirateYOffset,
             }),
           ]
           const dispenseCommand = [
@@ -487,6 +518,8 @@ export const transfer: CommandCreator<TransferArgs> = (
               well: destinationWell ?? undefined,
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
+              xOffset: dispenseXOffset,
+              yOffset: dispenseYOffset,
             }),
           ]
 
@@ -535,6 +568,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     destWell: destinationWell,
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
+                    tipRack,
                   }),
                   ...(aspirateDelay != null
                     ? [
@@ -592,8 +626,8 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...dispenseCommand,
             ...delayAfterDispenseCommands,
             ...mixInDestinationCommands,
-            ...touchTipAfterDispenseCommands,
             ...blowoutCommand,
+            ...touchTipAfterDispenseCommands,
             ...airGapAfterDispenseCommands,
             ...dropTipAfterDispenseAirGap,
           ]

@@ -37,6 +37,8 @@ const airGapHelper = makeAirGapHelper({
   wellLocation: {
     origin: 'bottom',
     offset: {
+      x: 0,
+      y: 0,
       z: 11.54,
     },
   },
@@ -45,6 +47,8 @@ const dispenseAirGapHelper = makeDispenseAirGapHelper({
   wellLocation: {
     origin: 'bottom',
     offset: {
+      x: 0,
+      y: 0,
       z: 11.54,
     },
   },
@@ -64,7 +68,7 @@ beforeEach(() => {
     name: 'Transfer Test',
     description: 'test blah blah',
     pipette: DEFAULT_PIPETTE,
-
+    tipRack: 'tiprack1Id',
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
 
@@ -78,6 +82,10 @@ beforeEach(() => {
     mixInDestination: null,
     blowoutLocation: null,
     dropTipLocation: FIXED_TRASH_ID,
+    aspirateXOffset: 0,
+    dispenseXOffset: 0,
+    aspirateYOffset: 0,
+    dispenseYOffset: 0,
   }
 
   invariantContext = makeContext()
@@ -136,7 +144,6 @@ describe('pick up tip if no tip on pipette', () => {
     const result = transfer(noTipArgs, invariantContext, robotStateWithTip)
 
     const res = getSuccessResult(result)
-    console.log(res.commands)
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
       aspirateHelper('A1', 30),
@@ -562,6 +569,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -595,6 +604,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -629,6 +640,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -705,6 +718,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -716,6 +731,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -755,6 +772,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -767,6 +786,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -929,6 +950,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -940,6 +963,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -978,6 +1003,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -987,6 +1014,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -998,6 +1027,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -1098,6 +1129,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1123,6 +1156,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1147,6 +1182,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1172,6 +1209,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1196,6 +1235,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1255,6 +1296,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -1282,6 +1325,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1304,8 +1349,11 @@ describe('advanced options', () => {
             wellName: 'B1',
             wellLocation: {
               origin: 'bottom',
+
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1347,6 +1395,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -1372,6 +1422,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1382,22 +1434,6 @@ describe('advanced options', () => {
           key: expect.any(String),
           params: {
             seconds: 12,
-          },
-        },
-        // touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
           },
         },
         // no dispense > air gap, because tip will be reused
@@ -1419,6 +1455,23 @@ describe('advanced options', () => {
             flowRate: 2.3,
           },
         },
+        // touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
+              },
+            },
+          },
+        },
         // next chunk from A1: remaining volume
         // do not pre-wet
         // mix (asp)
@@ -1433,6 +1486,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1458,6 +1513,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1482,6 +1539,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1541,6 +1600,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -1568,6 +1629,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1592,6 +1655,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.2,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1633,6 +1698,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                y: 0,
+                x: 0,
                 z: 3.2,
               },
             },
@@ -1658,6 +1725,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.2,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1668,22 +1737,6 @@ describe('advanced options', () => {
           key: expect.any(String),
           params: {
             seconds: 12,
-          },
-        },
-        // touch tip (disp)
-        {
-          commandType: 'touchTip',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 3.4,
-              },
-            },
           },
         },
         {
@@ -1703,6 +1756,22 @@ describe('advanced options', () => {
             flowRate: 2.3,
           },
         },
+        // touch tip (disp)
+        {
+          commandType: 'touchTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            wellLocation: {
+              origin: 'bottom',
+              offset: {
+                z: 3.4,
+              },
+            },
+          },
+        },
         // use the dispense > air gap here before moving to trash
         {
           commandType: 'aspirate',
@@ -1717,6 +1786,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -1757,6 +1828,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -1781,6 +1854,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1806,6 +1881,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -1830,6 +1907,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1855,6 +1934,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -1914,6 +1995,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -1940,6 +2023,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1964,6 +2049,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2006,6 +2093,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2030,6 +2119,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2040,6 +2131,23 @@ describe('advanced options', () => {
           key: expect.any(String),
           params: {
             seconds: 12,
+          },
+        },
+        // blowout
+        {
+          commandType: 'blowout',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            flowRate: 2.3,
+            wellLocation: {
+              origin: 'top',
+              offset: {
+                z: 3.3,
+              },
+            },
           },
         },
         // touch tip (disp)
@@ -2054,23 +2162,6 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.4,
-              },
-            },
-          },
-        },
-        // blowout
-        {
-          commandType: 'blowout',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            flowRate: 2.3,
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 13.84,
               },
             },
           },
@@ -2092,6 +2183,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2116,6 +2209,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2141,6 +2236,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2198,6 +2295,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             pipetteId: 'p300SingleId',
@@ -2223,6 +2322,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             pipetteId: 'p300SingleId',
@@ -2249,6 +2350,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2291,6 +2394,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2315,6 +2420,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2325,6 +2432,23 @@ describe('advanced options', () => {
           key: expect.any(String),
           params: {
             seconds: 12,
+          },
+        },
+        // blowout to dest well
+        {
+          commandType: 'blowout',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            flowRate: 2.3,
+            wellLocation: {
+              origin: 'top',
+              offset: {
+                z: 3.3,
+              },
+            },
           },
         },
         // touch tip (disp)
@@ -2339,23 +2463,6 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.4,
-              },
-            },
-          },
-        },
-        // blowout to dest well
-        {
-          commandType: 'blowout',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            flowRate: 2.3,
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 13.84,
               },
             },
           },
@@ -2375,6 +2482,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
           },
@@ -2443,6 +2552,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2467,6 +2578,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2492,6 +2605,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2516,6 +2631,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2541,6 +2658,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2600,6 +2719,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2626,6 +2747,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2650,6 +2773,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2692,6 +2817,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2716,6 +2843,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2726,6 +2855,23 @@ describe('advanced options', () => {
           key: expect.any(String),
           params: {
             seconds: 12,
+          },
+        },
+        // blowout
+        {
+          commandType: 'blowout',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            flowRate: 2.3,
+            wellLocation: {
+              origin: 'top',
+              offset: {
+                z: 3.3,
+              },
+            },
           },
         },
         // touch tip (disp)
@@ -2740,23 +2886,6 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.4,
-              },
-            },
-          },
-        },
-        // blowout
-        {
-          commandType: 'blowout',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            flowRate: 2.3,
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 13.84,
               },
             },
           },
@@ -2778,6 +2907,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2802,6 +2933,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2827,6 +2960,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2886,6 +3021,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2912,6 +3049,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2936,6 +3075,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2978,6 +3119,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3002,6 +3145,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3012,6 +3157,23 @@ describe('advanced options', () => {
           key: expect.any(String),
           params: {
             seconds: 12,
+          },
+        },
+        // blowout
+        {
+          commandType: 'blowout',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'destPlateId',
+            wellName: 'B1',
+            flowRate: 2.3,
+            wellLocation: {
+              origin: 'top',
+              offset: {
+                z: 3.3,
+              },
+            },
           },
         },
         // touch tip (disp)
@@ -3026,23 +3188,6 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.4,
-              },
-            },
-          },
-        },
-        // blowout
-        {
-          commandType: 'blowout',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'destPlateId',
-            wellName: 'B1',
-            flowRate: 2.3,
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 13.84,
               },
             },
           },
@@ -3062,6 +3207,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
           },
@@ -3128,6 +3275,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3152,6 +3301,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3177,6 +3328,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3201,6 +3354,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3226,6 +3381,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3285,6 +3442,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3311,6 +3470,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3335,6 +3496,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3377,6 +3540,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3400,6 +3565,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
               },
             },
@@ -3411,6 +3578,23 @@ describe('advanced options', () => {
           key: expect.any(String),
           params: {
             seconds: 12,
+          },
+        },
+        // blowout
+        {
+          commandType: 'blowout',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'sourcePlateId',
+            wellName: 'A1',
+            flowRate: 2.3,
+            wellLocation: {
+              origin: 'top',
+              offset: {
+                z: 3.3,
+              },
+            },
           },
         },
         // touch tip (disp)
@@ -3429,23 +3613,6 @@ describe('advanced options', () => {
             },
           },
         },
-        // blowout
-        {
-          commandType: 'blowout',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            flowRate: 2.3,
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 13.84,
-              },
-            },
-          },
-        },
         // dispense > air gap
         {
           commandType: 'aspirate',
@@ -3460,6 +3627,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             volume: 3,
@@ -3512,6 +3681,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3536,6 +3707,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3561,6 +3734,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3620,6 +3795,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3645,6 +3822,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -3670,6 +3849,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3712,6 +3893,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3736,6 +3919,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3746,6 +3931,23 @@ describe('advanced options', () => {
           key: expect.any(String),
           params: {
             seconds: 12,
+          },
+        },
+        // blowout
+        {
+          commandType: 'blowout',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            labwareId: 'sourcePlateId',
+            wellName: 'A1',
+            flowRate: 2.3,
+            wellLocation: {
+              origin: 'top',
+              offset: {
+                z: 3.3,
+              },
+            },
           },
         },
         // touch tip (disp)
@@ -3760,23 +3962,6 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.4,
-              },
-            },
-          },
-        },
-        // blowout
-        {
-          commandType: 'blowout',
-          key: expect.any(String),
-          params: {
-            pipetteId: 'p300SingleId',
-            labwareId: 'sourcePlateId',
-            wellName: 'A1',
-            flowRate: 2.3,
-            wellLocation: {
-              origin: 'bottom',
-              offset: {
-                z: 13.84,
               },
             },
           },
@@ -3796,6 +3981,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
           },

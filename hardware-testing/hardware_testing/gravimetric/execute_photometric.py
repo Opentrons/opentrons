@@ -5,7 +5,7 @@ from math import ceil
 from opentrons.protocol_api import ProtocolContext, Well, Labware
 
 from hardware_testing.data import ui
-from hardware_testing.opentrons_api.types import Point, OT3Mount
+from hardware_testing.opentrons_api.types import Point
 from .measurement import (
     MeasurementType,
     create_measurement_tag,
@@ -18,7 +18,6 @@ from . import config
 from .helpers import (
     _jog_to_find_liquid_height,
     _sense_liquid_height,
-    _apply_labware_offsets,
     _pick_up_tip,
     _drop_tip,
     get_list_of_wells_affected,
@@ -110,7 +109,6 @@ def _load_labware(
         photoplate = loaded_labwares[cfg.photoplate_slot]
     else:
         photoplate = ctx.load_labware(cfg.photoplate, location=cfg.photoplate_slot)
-        _apply_labware_offsets(cfg, [photoplate])
 
     if (
         cfg.reservoir_slot in loaded_labwares.keys()
@@ -119,7 +117,6 @@ def _load_labware(
         reservoir = loaded_labwares[cfg.reservoir_slot]
     else:
         reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
-        _apply_labware_offsets(cfg, [reservoir])
     return photoplate, reservoir
 
 
@@ -218,11 +215,10 @@ def _run_trial(trial: PhotometricTrial) -> None:
             touch_tip=trial.cfg.touch_tip,
         )
         _record_measurement_and_store(MeasurementType.DISPENSE)
-        trial.ctx._core.get_hardware().retract(OT3Mount.LEFT)
+        trial.pipette._retract()  # retract to top of gantry
         if (i + 1) == num_dispenses:
             if not trial.cfg.same_tip:
                 _drop_tip(trial.pipette, trial.cfg.return_tip)
-                trial.ctx._core.get_hardware().retract(OT3Mount.LEFT)
         if not trial.ctx.is_simulating() and trial.channel_count == 96:
             ui.get_user_ready("add SEAL to plate and remove from DECK")
     return
@@ -350,13 +346,13 @@ def _find_liquid_height(
     setup_tip = _next_tip(resources, cfg, cfg.pipette_channels == 1)
     volume_for_setup = max(resources.test_volumes)
     _pick_up_tip(resources.ctx, resources.pipette, cfg, location=setup_tip.top())
-    mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
-    resources.ctx._core.get_hardware().retract(mnt)
     if (
         not resources.ctx.is_simulating()
         and not cfg.same_tip
         and cfg.pipette_channels == 96
     ):
+
+        resources.pipette._retract()
         ui.get_user_ready("REPLACE first tip with NEW TIP")
     required_ul_per_src = (volume_for_setup * channel_count * cfg.trials) / len(
         cfg.dye_well_column_offset
@@ -411,10 +407,8 @@ def _find_liquid_height(
         raise RuntimeError(
             f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
         )
-    resources.ctx._core.get_hardware().retract(OT3Mount.LEFT)
     if not cfg.same_tip:
         resources.pipette.drop_tip(home_after=False)  # always trash setup tips
-        resources.ctx._core.get_hardware().retract(OT3Mount.LEFT)
         # NOTE: the first tip-rack should have already been replaced
         #       with new tips by the operator
 

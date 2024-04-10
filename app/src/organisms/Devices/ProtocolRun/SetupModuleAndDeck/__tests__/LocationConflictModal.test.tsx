@@ -17,7 +17,7 @@ import {
 import { i18n } from '../../../../../i18n'
 import { LocationConflictModal } from '../LocationConflictModal'
 
-import type { DeckConfiguration, DeckDefinition } from '@opentrons/shared-data'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 

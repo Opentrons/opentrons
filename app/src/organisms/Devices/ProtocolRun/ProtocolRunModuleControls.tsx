@@ -1,13 +1,12 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
+  InfoScreen,
   SPACING,
-  StyledText,
 } from '@opentrons/components'
 import { ModuleCard } from '../../ModuleCard'
 import { useModuleRenderInfoForProtocolById } from '../hooks'
@@ -73,8 +72,6 @@ export const ProtocolRunModuleControls = ({
   robotName,
   runId,
 }: ProtocolRunModuleControlsProps): JSX.Element => {
-  const { t } = useTranslation('protocol_details')
-
   const {
     attachPipetteRequired,
     calibratePipetteRequired,
@@ -97,18 +94,15 @@ export const ProtocolRunModuleControls = ({
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 
   return attachedModules.length === 0 ? (
-    <Flex justifyContent={JUSTIFY_CENTER}>
-      <StyledText as="p" color={COLORS.grey50} marginY={SPACING.spacing16}>
-        {t('connect_modules_to_see_controls')}
-      </StyledText>
+    <Flex
+      justifyContent={JUSTIFY_CENTER}
+      padding={SPACING.spacing16}
+      backgroundColor={COLORS.white}
+    >
+      <InfoScreen contentType="moduleControls" />
     </Flex>
   ) : (
-    <Flex
-      gridGap={SPACING.spacing8}
-      paddingTop={SPACING.spacing16}
-      paddingBottom={SPACING.spacing8}
-      paddingX={SPACING.spacing16}
-    >
+    <Flex gridGap={SPACING.spacing8} padding={SPACING.spacing16}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         flex="50%"

@@ -37,7 +37,6 @@ import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { OPENTRONS_USB } from '../../../redux/discovery'
 import { fetchProtocols } from '../../../redux/protocol-storage'
 import { appShellRequestor } from '../../../redux/shell/remote'
-import { useFeatureFlag } from '../../../redux/config'
 
 import type {
   DesktopRouteParams,
@@ -180,7 +179,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
   const listRef = React.useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = React.useState<number | null>(null)
-  const enableRunTimeParameters = useFeatureFlag('enableRunTimeParameters')
+
   React.useEffect(() => {
     if (jumpedIndex != null) {
       setTimeout(() => setJumpedIndex(null), JUMPED_STEP_HIGHLIGHT_DELAY_MS)
@@ -236,9 +235,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
       />
       <Flex gridGap={SPACING.spacing8} marginBottom={SPACING.spacing12}>
         <SetupTab robotName={robotName} runId={runId} />
-        {enableRunTimeParameters ? (
-          <ParametersTab robotName={robotName} runId={runId} />
-        ) : null}
+        <ParametersTab robotName={robotName} runId={runId} />
         <ModuleControlsTab robotName={robotName} runId={runId} />
         <RunPreviewTab robotName={robotName} runId={runId} />
       </Flex>

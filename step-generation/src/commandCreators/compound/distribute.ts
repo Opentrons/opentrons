@@ -95,7 +95,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
       prevRobotState,
       invariantContext,
       args.sourceLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     errors.push(
@@ -115,7 +116,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
       prevRobotState,
       invariantContext,
       args.destLabware,
-      args.pipette
+      args.pipette,
+      args.tipRack
     )
   ) {
     errors.push(
@@ -145,6 +147,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
     dispenseFlowRateUlSec,
     dispenseOffsetFromBottomMm,
     blowoutLocation,
+    aspirateXOffset,
+    aspirateYOffset,
+    dispenseXOffset,
+    dispenseYOffset,
   } = args
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
@@ -152,7 +158,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const disposalVolume =
     args.disposalVolume && args.disposalVolume > 0 ? args.disposalVolume : 0
   const maxVolume =
-    getPipetteWithTipMaxVol(args.pipette, invariantContext) -
+    getPipetteWithTipMaxVol(args.pipette, invariantContext, args.tipRack) -
     aspirateAirGapVolume
   const maxWellsPerChunk = Math.floor(
     (maxVolume - disposalVolume) / args.volume
@@ -209,6 +215,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetSourceWell,
               isAirGap: true,
+              xOffset: 0,
+              yOffset: 0,
+              tipRack: args.tipRack,
             }),
             ...(aspirateDelay != null
               ? [
@@ -229,6 +238,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetDestWell,
               isAirGap: true,
+              xOffset: 0,
+              yOffset: 0,
             }),
             ...(dispenseDelay != null
               ? [
@@ -287,6 +298,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               well: destWell,
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
+              xOffset: dispenseXOffset,
+              yOffset: dispenseYOffset,
             }),
             ...delayAfterDispenseCommands,
             ...touchTipAfterDispenseCommand,
@@ -304,6 +317,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           curryCommandCreator(replaceTip, {
             pipette: args.pipette,
             dropTipLocation: args.dropTipLocation,
+            tipRack: args.tipRack,
           }),
         ]
       }
@@ -332,6 +346,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
                 isAirGap: true,
+                tipRack: args.tipRack,
+                xOffset: 0,
+                yOffset: 0,
               }),
               ...(aspirateDelay != null
                 ? [
@@ -433,6 +450,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
               dispenseFlowRateUlSec,
               aspirateDelaySeconds: aspirateDelay?.seconds,
               dispenseDelaySeconds: dispenseDelay?.seconds,
+              tipRack: args.tipRack,
+              aspirateXOffset,
+              aspirateYOffset,
+              dispenseXOffset,
+              dispenseYOffset,
             })
           : []
 
@@ -471,6 +493,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
           well: args.sourceWell,
           flowRate: aspirateFlowRateUlSec,
           offsetFromBottomMm: aspirateOffsetFromBottomMm,
+          tipRack: args.tipRack,
+          xOffset: aspirateXOffset,
+          yOffset: aspirateYOffset,
         }),
         ...delayAfterAspirateCommands,
         ...touchTipAfterAspirateCommand,

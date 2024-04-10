@@ -68,7 +68,7 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
-        links: 
+        links:
           referencingRuns: []
   - name: Get protocol analysis by ID
     request:
@@ -132,8 +132,9 @@ stages:
                 commandType: home
                 key: !anystr
                 status: succeeded
-                params: { }
-                result: { }
+                params: {}
+                result: {}
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -147,6 +148,7 @@ stages:
                   pipetteId: pipetteId
                 result:
                   pipetteId: pipetteId
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -164,6 +166,7 @@ stages:
                   definition: !anydict
                   model: magneticModuleV2
                   serialNumber: !anystr
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -181,6 +184,7 @@ stages:
                   definition: !anydict
                   model: temperatureModuleV2
                   serialNumber: !anystr
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -199,6 +203,7 @@ stages:
                 result:
                   labwareId: sourcePlateId
                   definition: !anydict
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -217,6 +222,7 @@ stages:
                 result:
                   labwareId: destPlateId
                   definition: !anydict
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -235,6 +241,7 @@ stages:
                 result:
                   labwareId: tipRackId
                   definition: !anydict
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -249,6 +256,7 @@ stages:
                     A1: 100
                     B1: 100
                 result: {}
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -258,6 +266,7 @@ stages:
                 status: succeeded
                 params: {}
                 result: {}
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -280,6 +289,7 @@ stages:
                   tipVolume: 10.0
                   tipLength: 35.910000000000004
                   tipDiameter: 3.27
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -302,6 +312,7 @@ stages:
                 result:
                   position: { 'x': 16.76, 'y': 75.28, 'z': 157.09 }
                   volume: 5
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -312,6 +323,7 @@ stages:
                 params:
                   seconds: 42
                 result: {}
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -334,6 +346,7 @@ stages:
                 result:
                   position: { 'x': 284.635, 'y': 56.025, 'z': 158.25 }
                   volume: 4.5
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -355,6 +368,7 @@ stages:
                   speed: 42.0
                 result:
                   position: { 'x': 284.635, 'y': 56.025, 'z': 168.25 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -375,6 +389,7 @@ stages:
                   flowRate: 2
                 result:
                   position: { 'x': 284.635, 'y': 56.025, 'z': 169.25 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -396,6 +411,7 @@ stages:
                 result:
                   position:
                     { 'x': 304.52500000000003, 'y': 56.025, 'z': 182.25 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -419,6 +435,7 @@ stages:
                 result:
                   position:
                     { 'x': 306.52500000000003, 'y': 59.025, 'z': 167.25 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -439,6 +456,7 @@ stages:
                   alternateDropLocation: false
                 result:
                   position: { 'x': 347.84000000000003, 'y': 325.06, 'z': 82.0 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -449,6 +467,7 @@ stages:
                 params:
                   message: pause command
                 result: {}
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -467,6 +486,7 @@ stages:
                   speed: 12.3
                 result:
                   position: { 'x': 0.0, 'y': 0.0, 'z': 0.0 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -483,6 +503,7 @@ stages:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -499,6 +520,7 @@ stages:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -515,6 +537,7 @@ stages:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -531,6 +554,7 @@ stages:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -548,6 +572,7 @@ stages:
                     x: !anyfloat
                     y: !anyfloat
                     z: !anyfloat
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
             errors: []

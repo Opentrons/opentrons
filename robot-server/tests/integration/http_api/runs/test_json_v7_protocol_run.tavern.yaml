@@ -93,10 +93,10 @@ stages:
               commandId: '{setup_command_id}'
               key: '{setup_command_key}'
               createdAt: '{setup_command_created_at}'
-              index: 14
+              index: 1
         meta:
           cursor: 0
-          totalLength: 15
+          totalLength: 2
         data:
           # Initial home
           - id: !anystr
@@ -105,184 +105,6 @@ stages:
             createdAt: !anystr
             status: queued
             params: { }
-          - id: !anystr
-            key: !anystr
-            commandType: loadPipette
-            createdAt: !anystr
-            status: queued
-            params:
-              pipetteName: p10_single
-              mount: left
-              pipetteId: pipetteId
-          - id: !anystr
-            key: !anystr
-            commandType: loadModule
-            createdAt: !anystr
-            status: queued
-            params:
-              model: magneticModuleV1
-              location:
-                slotName: '3'
-              moduleId: magneticModuleId
-          - id: !anystr
-            key: !anystr
-            commandType: loadModule
-            createdAt: !anystr
-            status: queued
-            params:
-              model: temperatureModuleV2
-              location:
-                slotName: '1'
-              moduleId: temperatureModuleId
-          - id: !anystr
-            key: !anystr
-            commandType: loadLabware
-            createdAt: !anystr
-            status: queued
-            params:
-              location:
-                moduleId: temperatureModuleId
-              loadName: foo_8_plate_33ul
-              namespace: example
-              version: 1
-              labwareId: sourcePlateId
-              displayName: Source Plate
-          - id: !anystr
-            key: !anystr
-            commandType: loadLabware
-            createdAt: !anystr
-            status: queued
-            params:
-              location:
-                moduleId: magneticModuleId
-              loadName: foo_8_plate_33ul
-              namespace: example
-              version: 1
-              labwareId: destPlateId
-              displayName: Sample Collection Plate
-          - id: !anystr
-            key: !anystr
-            commandType: loadLabware
-            createdAt: !anystr
-            status: queued
-            params:
-              location:
-                slotName: '8'
-              loadName: opentrons_96_tiprack_10ul
-              namespace: opentrons
-              version: 1
-              labwareId: tipRackId
-              displayName: Opentrons 96 Tip Rack 10 µL
-          - id: !anystr
-            createdAt: !anystr
-            commandType: loadLiquid
-            key: !anystr
-            status: queued
-            params:
-              liquidId: 'waterId'
-              labwareId: 'sourcePlateId'
-              volumeByWell:
-                A1: 100
-                B1: 100
-          - id: !anystr
-            key: !anystr
-            commandType: pickUpTip
-            createdAt: !anystr
-            status: queued
-            params:
-              pipetteId: pipetteId
-              labwareId: tipRackId
-              wellName: B1
-              wellLocation:
-                origin: top
-                offset:
-                  x: 0
-                  'y': 0
-                  z: 0
-          - id: !anystr
-            key: !anystr
-            commandType: aspirate
-            createdAt: !anystr
-            status: queued
-            params:
-              pipetteId: pipetteId
-              labwareId: sourcePlateId
-              wellName: A1
-              wellLocation:
-                origin: bottom
-                offset:
-                  x: 0
-                  'y': 0
-                  z: 2
-              volume: 5
-              flowRate: 3
-          - id: !anystr
-            key: !anystr
-            commandType: dispense
-            createdAt: !anystr
-            status: queued
-            params:
-              pipetteId: pipetteId
-              labwareId: destPlateId
-              wellName: B1
-              wellLocation:
-                origin: bottom
-                offset:
-                  x: 0
-                  'y': 0
-                  z: 1
-              volume: 4.5
-              flowRate: 2.5
-          - id: !anystr
-            key: !anystr
-            commandType: moveToWell
-            createdAt: !anystr
-            status: queued
-            params:
-              pipetteId: pipetteId
-              labwareId: destPlateId
-              wellName: B2
-              wellLocation:
-                origin: top
-                offset:
-                  x: 0
-                  'y': 0
-                  z: 0
-              forceDirect: false
-          - id: !anystr
-            key: !anystr
-            commandType: moveToWell
-            createdAt: !anystr
-            status: queued
-            params:
-              pipetteId: pipetteId
-              labwareId: destPlateId
-              wellName: B2
-              wellLocation:
-                origin: bottom
-                offset:
-                  x: 2
-                  y: 3
-                  z: 10
-              minimumZHeight: 35
-              forceDirect: true
-              speed: 12.3
-          - id: !anystr
-            key: !anystr
-            commandType: dropTip
-            createdAt: !anystr
-            status: queued
-            params:
-              pipetteId: pipetteId
-              labwareId: fixedTrash
-              wellName: A1
-              wellLocation:
-                origin: default
-                offset:
-                  x: 0
-                  y: 0
-                  z: 0
-              alternateDropLocation: false
           - id: '{setup_command_id}'
             key: '{setup_command_key}'
             intent: setup
@@ -291,6 +113,7 @@ stages:
             startedAt: '{setup_command_started_at}'
             completedAt: '{setup_command_completed_at}'
             status: succeeded
+            notes: []
             params: {}
 
   - name: Play the run
@@ -350,6 +173,17 @@ stages:
             completedAt: !anystr
             status: succeeded
             params: { }
+            notes: [ ]
+          - id: '{setup_command_id}'
+            key: '{setup_command_key}'
+            intent: setup
+            commandType: home
+            createdAt: '{setup_command_created_at}'
+            startedAt: '{setup_command_started_at}'
+            completedAt: '{setup_command_completed_at}'
+            status: succeeded
+            params: { }
+            notes: []
           - id: !anystr
             key: !anystr
             commandType: loadPipette
@@ -357,6 +191,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteName: p10_single
               mount: left
@@ -368,6 +203,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               model: magneticModuleV1
               location:
@@ -380,6 +216,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               model: temperatureModuleV2
               location:
@@ -392,6 +229,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               location:
                 moduleId: temperatureModuleId
@@ -407,6 +245,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               location:
                 moduleId: magneticModuleId
@@ -422,6 +261,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               location:
                 slotName: '8'
@@ -437,6 +277,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               labwareId: sourcePlateId
               liquidId: waterId
@@ -450,6 +291,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteId: pipetteId
               labwareId: tipRackId
@@ -467,6 +309,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteId: pipetteId
               labwareId: sourcePlateId
@@ -486,6 +329,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteId: pipetteId
               labwareId: destPlateId
@@ -505,6 +349,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteId: pipetteId
               labwareId: destPlateId
@@ -523,6 +368,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteId: pipetteId
               labwareId: destPlateId
@@ -543,6 +389,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: succeeded
+            notes: []
             params:
               pipetteId: pipetteId
               labwareId: fixedTrash
@@ -554,12 +401,3 @@ stages:
                   y: 0
                   z: 0
               alternateDropLocation: false
-          - id: '{setup_command_id}'
-            key: '{setup_command_key}'
-            intent: setup
-            commandType: home
-            createdAt: '{setup_command_created_at}'
-            startedAt: '{setup_command_started_at}'
-            completedAt: '{setup_command_completed_at}'
-            status: succeeded
-            params: { }

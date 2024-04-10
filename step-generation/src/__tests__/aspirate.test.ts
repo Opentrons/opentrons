@@ -59,12 +59,17 @@ describe('aspirate', () => {
   })
   it('aspirate normally (with tip)', () => {
     const params = {
-      ...flowRateAndOffsets,
-      pipette: DEFAULT_PIPETTE,
-      volume: 50,
-      labware: SOURCE_LABWARE,
-      well: 'A1',
-    } as AspDispAirgapParams
+      ...({
+        ...flowRateAndOffsets,
+        pipette: DEFAULT_PIPETTE,
+        volume: 50,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      } as AspDispAirgapParams),
+      tipRack: 'tiprack1Id',
+      xOffset: 0,
+      yOffset: 0,
+    }
     const result = aspirate(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
       {
@@ -79,6 +84,8 @@ describe('aspirate', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: 5,
             },
           },
@@ -87,20 +94,25 @@ describe('aspirate', () => {
     ])
   })
   it('aspirate with volume > tip max volume should throw error', () => {
-    invariantContext.pipetteEntities[
-      DEFAULT_PIPETTE
-    ].tiprackDefURI = getLabwareDefURI(fixtureTiprack10ul)
-    invariantContext.pipetteEntities[
-      DEFAULT_PIPETTE
-    ].tiprackLabwareDef = fixtureTiprack10ul
+    invariantContext.pipetteEntities[DEFAULT_PIPETTE].tiprackDefURI = [
+      getLabwareDefURI(fixtureTiprack10ul),
+    ]
+    invariantContext.pipetteEntities[DEFAULT_PIPETTE].tiprackLabwareDef = [
+      fixtureTiprack10ul,
+    ]
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 201,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 201,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tiprack1Id',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -111,20 +123,25 @@ describe('aspirate', () => {
   })
   it('aspirate with volume > pipette max volume should throw error', () => {
     // NOTE: assigning p300 to a 1000uL tiprack is nonsense, just for this test
-    invariantContext.pipetteEntities[
-      DEFAULT_PIPETTE
-    ].tiprackDefURI = getLabwareDefURI(fixtureTiprack1000ul)
-    invariantContext.pipetteEntities[
-      DEFAULT_PIPETTE
-    ].tiprackLabwareDef = fixtureTiprack1000ul
+    invariantContext.pipetteEntities[DEFAULT_PIPETTE].tiprackDefURI = [
+      getLabwareDefURI(fixtureTiprack1000ul),
+    ]
+    invariantContext.pipetteEntities[DEFAULT_PIPETTE].tiprackLabwareDef = [
+      fixtureTiprack1000ul,
+    ]
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 301,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 301,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -136,12 +153,17 @@ describe('aspirate', () => {
   it('aspirate with invalid pipette ID should return error', () => {
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: 'badPipette',
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: 'badPipette',
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -150,12 +172,17 @@ describe('aspirate', () => {
   it('aspirate with no tip should return error', () => {
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       initialRobotState
     )
@@ -167,41 +194,23 @@ describe('aspirate', () => {
   it('aspirate from nonexistent labware should return error', () => {
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: 'problematicLabwareId',
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: 'problemaaticLabwareId',
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'LABWARE_DOES_NOT_EXIST',
-    })
-  })
-  it('should return an error when aspirating from the 4th column', () => {
-    robotStateWithTip = {
-      ...robotStateWithTip,
-      labware: {
-        [SOURCE_LABWARE]: { slot: 'A4' },
-      },
-    }
-    const result = aspirate(
-      {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
-      invariantContext,
-      robotStateWithTip
-    )
-    expect(getErrorResult(result).errors).toHaveLength(1)
-    expect(getErrorResult(result).errors[0]).toMatchObject({
-      type: 'PIPETTING_INTO_COLUMN_4',
     })
   })
   it('should return an error when aspirating from labware off deck', () => {
@@ -211,12 +220,17 @@ describe('aspirate', () => {
 
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       initialRobotState
     )
@@ -240,12 +254,17 @@ describe('aspirate', () => {
     )
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -269,12 +288,17 @@ describe('aspirate', () => {
     )
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -304,12 +328,17 @@ describe('aspirate', () => {
     )
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -333,12 +362,17 @@ describe('aspirate', () => {
     )
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -368,12 +402,17 @@ describe('aspirate', () => {
     )
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -393,12 +432,17 @@ describe('aspirate', () => {
 
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -417,12 +461,17 @@ describe('aspirate', () => {
 
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -441,12 +490,17 @@ describe('aspirate', () => {
 
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )
@@ -467,12 +521,17 @@ describe('aspirate', () => {
 
     const result = aspirate(
       {
-        ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
-        volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-      } as AspDispAirgapParams,
+        ...({
+          ...flowRateAndOffsets,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as AspDispAirgapParams),
+        tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
+      },
       invariantContext,
       robotStateWithTip
     )

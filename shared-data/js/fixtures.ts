@@ -41,11 +41,12 @@ import {
   MODULE_FIXTURES_BY_MODEL,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
 } from './constants'
+import { getModuleDisplayName } from './modules'
+import { getCutoutIdForSlotName } from './helpers'
 import type {
   AddressableAreaName,
   CutoutFixtureId,
   CutoutId,
-  FlexModuleCutoutFixtureId,
   OT2CutoutId,
 } from '../deck'
 import type {
@@ -55,9 +56,7 @@ import type {
   DeckDefinition,
   ModuleModel,
 } from './types'
-import type { LoadModuleCreateCommand, ModuleLocation } from '../command'
-import { getModuleDisplayName } from './modules'
-import { getCutoutIdForSlotName } from './helpers'
+import type { ModuleLocation } from '../command'
 
 export function getCutoutDisplayName(cutout: CutoutId): string {
   return cutout.replace('cutout', '')

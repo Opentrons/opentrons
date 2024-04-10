@@ -95,6 +95,7 @@ describe('useCreateProtocolMutation hook', () => {
       result.current.createProtocol({
         files: createProtocolData,
         protocolKey: 'fakeProtocolKey',
+        runTimeParameterValues: { fakeParamName: 5.0 },
       })
     )
 

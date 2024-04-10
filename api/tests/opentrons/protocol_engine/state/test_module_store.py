@@ -177,7 +177,7 @@ def test_load_module(
     expected_substate: ModuleSubStateType,
 ) -> None:
     """It should handle a successful LoadModule command."""
-    action = actions.UpdateCommandAction(
+    action = actions.SucceedCommandAction(
         private_result=None,
         command=commands.LoadModule.construct(  # type: ignore[call-arg]
             params=commands.LoadModuleParams(
@@ -239,7 +239,7 @@ def test_load_thermocycler_in_thermocycler_slot(
     thermocycler_v2_def: ModuleDefinition,
 ) -> None:
     """It should update additional slots for thermocycler module."""
-    action = actions.UpdateCommandAction(
+    action = actions.SucceedCommandAction(
         private_result=None,
         command=commands.LoadModule.construct(  # type: ignore[call-arg]
             params=commands.LoadModuleParams(
@@ -387,10 +387,10 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     )
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
+        actions.SucceedCommandAction(private_result=None, command=load_module_cmd)
     )
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=set_temp_cmd)
+        actions.SucceedCommandAction(private_result=None, command=set_temp_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -401,7 +401,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=deactivate_cmd)
+        actions.SucceedCommandAction(private_result=None, command=deactivate_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -440,10 +440,10 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
     )
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
+        actions.SucceedCommandAction(private_result=None, command=load_module_cmd)
     )
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=set_shake_cmd)
+        actions.SucceedCommandAction(private_result=None, command=set_shake_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -454,7 +454,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=deactivate_cmd)
+        actions.SucceedCommandAction(private_result=None, command=deactivate_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -495,7 +495,7 @@ def test_handle_hs_labware_latch_commands(
     )
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
+        actions.SucceedCommandAction(private_result=None, command=load_module_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -507,7 +507,7 @@ def test_handle_hs_labware_latch_commands(
     }
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=close_latch_cmd)
+        actions.SucceedCommandAction(private_result=None, command=close_latch_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -518,7 +518,7 @@ def test_handle_hs_labware_latch_commands(
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=open_latch_cmd)
+        actions.SucceedCommandAction(private_result=None, command=open_latch_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -561,10 +561,10 @@ def test_handle_tempdeck_temperature_commands(
     )
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
+        actions.SucceedCommandAction(private_result=None, command=load_module_cmd)
     )
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=set_temp_cmd)
+        actions.SucceedCommandAction(private_result=None, command=set_temp_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": TemperatureModuleSubState(
@@ -572,7 +572,7 @@ def test_handle_tempdeck_temperature_commands(
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=deactivate_cmd)
+        actions.SucceedCommandAction(private_result=None, command=deactivate_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": TemperatureModuleSubState(
@@ -622,10 +622,10 @@ def test_handle_thermocycler_temperature_commands(
     )
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
+        actions.SucceedCommandAction(private_result=None, command=load_module_cmd)
     )
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=set_block_temp_cmd)
+        actions.SucceedCommandAction(private_result=None, command=set_block_temp_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
@@ -636,7 +636,7 @@ def test_handle_thermocycler_temperature_commands(
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=set_lid_temp_cmd)
+        actions.SucceedCommandAction(private_result=None, command=set_lid_temp_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
@@ -647,7 +647,7 @@ def test_handle_thermocycler_temperature_commands(
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=deactivate_lid_cmd)
+        actions.SucceedCommandAction(private_result=None, command=deactivate_lid_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
@@ -658,7 +658,7 @@ def test_handle_thermocycler_temperature_commands(
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=deactivate_block_cmd)
+        actions.SucceedCommandAction(private_result=None, command=deactivate_block_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
@@ -705,10 +705,10 @@ def test_handle_thermocycler_lid_commands(
     )
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
+        actions.SucceedCommandAction(private_result=None, command=load_module_cmd)
     )
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=open_lid_cmd)
+        actions.SucceedCommandAction(private_result=None, command=open_lid_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
@@ -720,7 +720,7 @@ def test_handle_thermocycler_lid_commands(
     }
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=close_lid_cmd)
+        actions.SucceedCommandAction(private_result=None, command=close_lid_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(

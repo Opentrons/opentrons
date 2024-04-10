@@ -1,170 +1,30 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
-
+import styled, { css } from 'styled-components'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  DISPLAY_INLINE,
   Flex,
+  Icon,
+  InfoScreen,
   SPACING,
   StyledText,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
-// import { Chip } from '../../../atoms/Chip'
-import { NoParameter } from '../../ProtocolDetails/ProtocolParameters/NoParameter'
+import { Tooltip } from '../../../atoms/Tooltip'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { formatRunTimeParameterValue } from '../../ProtocolDetails/ProtocolParameters/utils'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
-
-const mockData: RunTimeParameter[] = [
-  {
-    value: false,
-    displayName: 'Dry Run',
-    variableName: 'DRYRUN',
-    description: 'Is this a dry or wet run? Wet is true, dry is false',
-    type: 'boolean',
-    default: false,
-  },
-  {
-    value: true,
-    displayName: 'Use Gripper',
-    variableName: 'USE_GRIPPER',
-    description: 'For using the gripper.',
-    type: 'boolean',
-    default: true,
-  },
-  {
-    value: true,
-    displayName: 'Trash Tips',
-    variableName: 'TIP_TRASH',
-    description:
-      'to throw tip into the trash or to not throw tip into the trash',
-    type: 'boolean',
-    default: true,
-  },
-  {
-    value: true,
-    displayName: 'Deactivate Temperatures',
-    variableName: 'DEACTIVATE_TEMP',
-    description: 'deactivate temperature on the module',
-    type: 'boolean',
-    default: true,
-  },
-  {
-    value: 4,
-    displayName: 'Columns of Samples',
-    variableName: 'COLUMNS',
-    description: 'How many columns do you want?',
-    type: 'int',
-    min: 1,
-    max: 14,
-    default: 4,
-  },
-  {
-    value: 6,
-    displayName: 'PCR Cycles',
-    variableName: 'PCR_CYCLES',
-    description: 'number of PCR cycles on a thermocycler',
-    type: 'int',
-    min: 1,
-    max: 10,
-    default: 6,
-  },
-  {
-    value: 6.5,
-    displayName: 'EtoH Volume',
-    variableName: 'ETOH_VOLUME',
-    description: '70% ethanol volume',
-    type: 'float',
-    suffix: 'mL',
-    min: 1.5,
-    max: 10.0,
-    default: 6.5,
-  },
-  {
-    value: 'none',
-    displayName: 'Default Module Offsets',
-    variableName: 'DEFAULT_OFFSETS',
-    description: 'default module offsets for temp, H-S, and none',
-    type: 'str',
-    choices: [
-      {
-        displayName: 'No offsets',
-        value: 'none',
-      },
-      {
-        displayName: 'temp offset',
-        value: '1',
-      },
-      {
-        displayName: 'heater-shaker offset',
-        value: '2',
-      },
-    ],
-    default: 'none',
-  },
-  {
-    value: 'left',
-    displayName: 'pipette mount',
-    variableName: 'mont',
-    description: 'pipette mount',
-    type: 'str',
-    choices: [
-      {
-        displayName: 'Left',
-        value: 'left',
-      },
-      {
-        displayName: 'Right',
-        value: 'right',
-      },
-    ],
-    default: 'left',
-  },
-  {
-    value: 'flex',
-    displayName: 'short test case',
-    variableName: 'short 2 options',
-    description: 'this play 2 short options',
-    type: 'str',
-    choices: [
-      {
-        displayName: 'OT-2',
-        value: 'ot2',
-      },
-      {
-        displayName: 'Flex',
-        value: 'flex',
-      },
-    ],
-    default: 'flex',
-  },
-  {
-    value: 'flex',
-    displayName: 'long test case',
-    variableName: 'long 2 options',
-    description: 'this play 2 long options',
-    type: 'str',
-    choices: [
-      {
-        displayName: 'I am kind of long text version',
-        value: 'ot2',
-      },
-      {
-        displayName: 'I am kind of long text version. Today is 3/15',
-        value: 'flex',
-      },
-    ],
-    default: 'flex',
-  },
-]
 
 interface ProtocolRunRuntimeParametersProps {
   runId: string
@@ -174,15 +34,13 @@ export function ProtocolRunRuntimeParameters({
 }: ProtocolRunRuntimeParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  // ToDo (kk:03/18/2024) mockData will be replaced with []
-  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? mockData
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
   const hasParameter = runTimeParameters.length > 0
 
-  // ToDo (kk:03/19/2024) this will be replaced with the boolean from values check result
-  const dummyBoolean = true
+  const hasCustomValues = runTimeParameters.some(
+    parameter => parameter.value !== parameter.default
+  )
 
-  // ToDO (kk:03/18/2024) Need to add Chip to updated runTime parameter value
-  // This part will be implemented in a following PR since need to runTime parameter slideout
   return (
     <>
       <Flex
@@ -200,7 +58,7 @@ export function ProtocolRunRuntimeParameters({
           </StyledText>
           {hasParameter ? (
             <StyledText as="label" color={COLORS.grey60}>
-              {dummyBoolean ? t('custom_values') : t('default_values')}
+              {hasCustomValues ? t('custom_values') : t('default_values')}
             </StyledText>
           ) : null}
         </Flex>
@@ -221,51 +79,28 @@ export function ProtocolRunRuntimeParameters({
       </Flex>
       {!hasParameter ? (
         <Flex padding={SPACING.spacing16}>
-          <NoParameter />
+          <InfoScreen contentType="parameters" />
         </Flex>
       ) : (
         <>
           <Divider width="100%" />
           <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
             <StyledTable>
-              <thead>
+              <StyledTableHeaderContainer>
                 <StyledTableHeader>{t('name')}</StyledTableHeader>
                 <StyledTableHeader>{t('value')}</StyledTableHeader>
-              </thead>
+              </StyledTableHeaderContainer>
               <tbody>
                 {runTimeParameters.map(
-                  (parameter: RunTimeParameter, index: number) => {
-                    return (
-                      <StyledTableRow
-                        isLast={index === runTimeParameters.length - 1}
-                        key={`runTimeParameter-${index}`}
-                      >
-                        <StyledTableCell
-                          isLast={index === runTimeParameters.length - 1}
-                        >
-                          <StyledText as="p">
-                            {parameter.displayName}
-                          </StyledText>
-                        </StyledTableCell>
-                        <StyledTableCell
-                          isLast={index === runTimeParameters.length - 1}
-                        >
-                          <Flex
-                            flexDirection={DIRECTION_ROW}
-                            gridGap={SPACING.spacing16}
-                          >
-                            <StyledText as="p">
-                              {formatRunTimeParameterValue(parameter, t)}
-                            </StyledText>
-                            {/* ToDo (kk:03/19/2024) chip will be here with conditional render */}
-                            {/* {index % 2 === 0 ? (
-                              <Chip text={t('updated')} type="success" />
-                            ) : null} */}
-                          </Flex>
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    )
-                  }
+                  (parameter: RunTimeParameter, index: number) => (
+                    <StyledTableRowComponent
+                      key={`${index}_${parameter.variableName}`}
+                      parameter={parameter}
+                      index={index}
+                      isLast={index === runTimeParameters.length - 1}
+                      t={t}
+                    />
+                  )
                 )}
               </tbody>
             </StyledTable>
@@ -276,16 +111,84 @@ export function ProtocolRunRuntimeParameters({
   )
 }
 
+interface StyledTableRowComponentProps {
+  parameter: RunTimeParameter
+  index: number
+  isLast: boolean
+  t: any
+}
+
+const StyledTableRowComponent = (
+  props: StyledTableRowComponentProps
+): JSX.Element => {
+  const { parameter, index, isLast, t } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
+  return (
+    <StyledTableRow isLast={isLast} key={`runTimeParameter-${index}`}>
+      <StyledTableCell display="span">
+        <StyledText
+          as="p"
+          css={css`
+            display: inline;
+            padding-right: 8px;
+          `}
+        >
+          {parameter.displayName}
+        </StyledText>
+        {parameter.description != null ? (
+          <>
+            <Flex
+              display={DISPLAY_INLINE}
+              {...targetProps}
+              alignItems={ALIGN_CENTER}
+            >
+              <Icon
+                name="information"
+                size={SPACING.spacing12}
+                color={COLORS.grey60}
+                data-testid="Icon"
+              />
+            </Flex>
+            <Tooltip css={TYPOGRAPHY.labelRegular} tooltipProps={tooltipProps}>
+              {parameter.description}
+            </Tooltip>
+          </>
+        ) : null}
+      </StyledTableCell>
+      <StyledTableCell>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+          <StyledText as="p">
+            {formatRunTimeParameterValue(parameter, t)}
+          </StyledText>
+          {parameter.value !== parameter.default ? (
+            <Chip
+              text={t('updated')}
+              type="success"
+              hasIcon={false}
+              chipSize="small"
+            />
+          ) : null}
+        </Flex>
+      </StyledTableCell>
+    </StyledTableRow>
+  )
+}
+
 const StyledTable = styled.table`
   width: 100%;
   border-collapse: collapse;
   text-align: left;
 `
+const StyledTableHeaderContainer = styled.thead`
+  display: grid;
+  grid-template-columns: 0.35fr 0.35fr;
+  grid-gap: ${SPACING.spacing48};
+  border-bottom: ${BORDERS.lineBorder};
+`
 
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}
-  padding: ${SPACING.spacing8};
-  border-bottom: ${BORDERS.lineBorder};
+  padding-bottom: ${SPACING.spacing8};
 `
 
 interface StyledTableRowProps {
@@ -293,16 +196,21 @@ interface StyledTableRowProps {
 }
 
 const StyledTableRow = styled.tr<StyledTableRowProps>`
-  padding: ${SPACING.spacing8};
+  display: grid;
+  grid-template-columns: 0.35fr 0.35fr;
+  grid-gap: ${SPACING.spacing48};
   border-bottom: ${props => (props.isLast ? 'none' : BORDERS.lineBorder)};
 `
 
 interface StyledTableCellProps {
-  isLast: boolean
+  paddingRight?: string
+  display?: string
 }
 
 const StyledTableCell = styled.td<StyledTableCellProps>`
-  padding-left: ${SPACING.spacing8};
-  padding-top: ${SPACING.spacing12};
-  padding-bottom: ${props => (props.isLast ? 0 : SPACING.spacing12)};
+  align-items: ${ALIGN_CENTER};
+  display: ${props => (props.display != null ? props.display : 'table-cell')};
+  padding: ${SPACING.spacing8} 0;
+  padding-right: ${props =>
+    props.paddingRight != null ? props.paddingRight : SPACING.spacing16};
 `

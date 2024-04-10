@@ -16,8 +16,12 @@ import type { CreateCommand } from '@opentrons/shared-data'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
+export interface ExtendedDispenseParams extends DispenseParams {
+  xOffset: number
+  yOffset: number
+}
 /** Dispense with given args. Requires tip. */
-export const dispense: CommandCreator<DispenseParams> = (
+export const dispense: CommandCreator<ExtendedDispenseParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -30,6 +34,8 @@ export const dispense: CommandCreator<DispenseParams> = (
     offsetFromBottomMm,
     flowRate,
     isAirGap,
+    xOffset,
+    yOffset,
   } = args
   const actionName = 'dispense'
   const errors: CommandCreatorError[] = []
@@ -172,6 +178,8 @@ export const dispense: CommandCreator<DispenseParams> = (
           origin: 'bottom',
           offset: {
             z: offsetFromBottomMm,
+            x: xOffset,
+            y: yOffset,
           },
         },
         flowRate,

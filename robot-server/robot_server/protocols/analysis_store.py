@@ -19,6 +19,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
     Liquid,
 )
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 
 from .analysis_models import (
     AnalysisSummary,
@@ -27,6 +28,7 @@ from .analysis_models import (
     CompletedAnalysis,
     AnalysisResult,
     AnalysisStatus,
+    RunTimeParameterAnalysisData,
 )
 
 from .completed_analysis_store import CompletedAnalysisStore, CompletedAnalysisResource
@@ -71,6 +73,14 @@ class AnalysisNotFoundError(ValueError):
         super().__init__(f'Analysis "{analysis_id}" not found.')
 
 
+class AnalysisIsPendingError(RuntimeError):
+    """Exception raised if a given analysis is still pending."""
+
+    def __init__(self, analysis_id: str) -> None:
+        """Initialize the error's message."""
+        super().__init__(f'Analysis "{analysis_id}" is still pending.')
+
+
 # TODO(sf, 2023-05-05): Like for protocols and runs, there's an in-memory cache for
 # elements of this store. Unlike for protocols and runs, it isn't just an lru_cache
 # on the top-level store's access methods, because those access methods have to be
@@ -93,10 +103,14 @@ class AnalysisStore:
     so they're only kept in-memory, and lost when the store instance is destroyed.
     """
 
-    def __init__(self, sql_engine: sqlalchemy.engine.Engine) -> None:
+    def __init__(
+        self,
+        sql_engine: sqlalchemy.engine.Engine,
+        completed_store: Optional[CompletedAnalysisStore] = None,
+    ) -> None:
         """Initialize the `AnalysisStore`."""
         self._pending_store = _PendingAnalysisStore()
-        self._completed_store = CompletedAnalysisStore(
+        self._completed_store = completed_store or CompletedAnalysisStore(
             sql_engine=sql_engine,
             memory_cache=MemoryCache(_CACHE_MAX_SIZE, str, CompletedAnalysisResource),
             current_analyzer_version=_CURRENT_ANALYZER_VERSION,
@@ -180,6 +194,9 @@ class AnalysisStore:
             protocol_id=protocol_id,
             analyzer_version=_CURRENT_ANALYZER_VERSION,
             completed_analysis=completed_analysis,
+            run_time_parameter_values_and_defaults=self._extract_run_time_param_values_and_defaults(
+                completed_analysis
+            ),
         )
         await self._completed_store.add(
             completed_analysis_resource=completed_analysis_resource
@@ -257,6 +274,88 @@ class AnalysisStore:
             return completed_analyses
         else:
             return completed_analyses + [pending_analysis]
+
+    @staticmethod
+    def _extract_run_time_param_values_and_defaults(
+        completed_analysis: CompletedAnalysis,
+    ) -> Dict[str, RunTimeParameterAnalysisData]:
+        """Extract the Run Time Parameters with current value and default value of each.
+
+        We do this in order to save the RTP data separately, outside the analysis
+        in the database. This saves us from having to de-serialize the entire analysis
+        to read just the RTP values.
+        """
+        rtp_list = completed_analysis.runTimeParameters
+
+        rtp_values_and_defaults = {}
+        for param_spec in rtp_list:
+            rtp_values_and_defaults.update(
+                {
+                    param_spec.variableName: RunTimeParameterAnalysisData(
+                        value=param_spec.value, default=param_spec.default
+                    )
+                }
+            )
+        return rtp_values_and_defaults
+
+    async def matching_rtp_values_in_analysis(
+        self, analysis_summary: AnalysisSummary, new_rtp_values: RunTimeParamValuesType
+    ) -> bool:
+        """Return whether the last analysis of the given protocol used the mentioned RTP values.
+
+        It is not sufficient to just check the values of provided parameters against the
+        corresponding parameter values in analysis because a previous request could have
+        composed of some extra parameters that are not in the current list.
+
+        Similarly, it is not enough to only compare the current parameter values from
+        the client with the previous values from the client because a previous param
+        might have been assigned a default value by the client while the current request
+        doesn't include that param because it can rely on the API to assign the default
+        value to that param.
+
+        So, we check that the Run Time Parameters in the previous analysis has params
+        with the values provided in the current request, and also verify that rest of the
+        parameters in the analysis use default values.
+        """
+        if analysis_summary.status == AnalysisStatus.PENDING:
+            raise AnalysisIsPendingError(analysis_summary.id)
+
+        rtp_values_and_defaults_in_last_analysis = (
+            await self._completed_store.get_rtp_values_and_defaults_by_analysis_id(
+                analysis_summary.id
+            )
+        )
+        # We already make sure that the protocol has an analysis associated with before
+        # checking the RTP values so this assert should never raise.
+        # It is only added for type checking.
+        assert (
+            rtp_values_and_defaults_in_last_analysis is not None
+        ), "This protocol has no analysis associated with it."
+
+        if not set(new_rtp_values.keys()).issubset(
+            set(rtp_values_and_defaults_in_last_analysis.keys())
+        ):
+            # Since the RTP keys in analysis represent all params defined in the protocol,
+            # if the client passes a parameter that's not present in the analysis,
+            # it means that the client is sending incorrect parameters.
+            # We will let this request trigger an analysis using the incorrect params
+            # and have the analysis raise an appropriate error instead of giving an
+            # error response to the protocols request.
+            # This makes the behavior of robot server consistent regardless of whether
+            # the client is sending a protocol for the first time or for the nth time.
+            return False
+        for (
+            parameter,
+            prev_value_and_default,
+        ) in rtp_values_and_defaults_in_last_analysis.items():
+            if (
+                new_rtp_values.get(parameter, prev_value_and_default.default)
+                == prev_value_and_default.value
+            ):
+                continue
+            else:
+                return False
+        return True
 
 
 class _PendingAnalysisStore:

@@ -2,6 +2,7 @@ import * as actions from './actions'
 import { rootReducer, RootState } from './reducers'
 import * as selectors from './selectors'
 type HintKey =  // normal hints
+  | 'multiple_modules_without_labware'
   | 'add_liquids_and_labware'
   | 'deck_setup_explanation'
   | 'module_without_labware'

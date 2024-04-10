@@ -50,7 +50,7 @@ async def prepare_active_subdirectory(prepared_root: Path) -> Path:
         root=prepared_root,
         migrations=[
             up_to_3.MigrationUpTo3(subdirectory="3"),
-            v3_to_v4.Migration3To4(subdirectory="4"),
+            v3_to_v4.Migration3to4(subdirectory="4"),
         ],
         temp_file_prefix="temp-",
     )

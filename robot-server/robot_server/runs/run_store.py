@@ -27,7 +27,6 @@ from robot_server.persistence.tables import (
 )
 from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
-from robot_server.service.notifications import RunsPublisher
 
 from .action_models import RunAction, RunActionType
 from .run_models import RunNotFoundError
@@ -94,11 +93,9 @@ class RunStore:
     def __init__(
         self,
         sql_engine: sqlalchemy.engine.Engine,
-        runs_publisher: RunsPublisher,
     ) -> None:
         """Initialize a RunStore with sql engine and notification client."""
         self._sql_engine = sql_engine
-        self._runs_publisher = runs_publisher
 
     def update_run_state(
         self,
@@ -166,7 +163,6 @@ class RunStore:
             action_rows = transaction.execute(select_actions).all()
 
         self._clear_caches()
-        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
         maybe_run_resource = _convert_row_to_run(row=run_row, action_rows=action_rows)
         if not maybe_run_resource.ok:
             raise maybe_run_resource.error
@@ -192,7 +188,6 @@ class RunStore:
             transaction.execute(insert)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
 
     def insert(
         self,
@@ -235,7 +230,6 @@ class RunStore:
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
         return run
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
@@ -467,7 +461,6 @@ class RunStore:
             raise RunNotFoundError(run_id)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs_advise_unsubscribe(run_id=run_id)
 
     def _run_exists(
         self, run_id: str, connection: sqlalchemy.engine.Connection

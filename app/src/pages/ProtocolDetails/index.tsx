@@ -9,6 +9,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Btn,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -31,7 +32,6 @@ import {
 } from '@opentrons/react-api-client'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../atoms/buttons'
-import { Chip } from '../../atoms/Chip'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProcotolDetailsHeaderTitleSkeleton,
@@ -44,7 +44,6 @@ import {
   getApplyHistoricOffsets,
   getPinnedProtocolIds,
   updateConfigValue,
-  useFeatureFlag,
 } from '../../redux/config'
 import { useOffsetCandidatesForAnalysis } from '../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import {
@@ -189,10 +188,8 @@ const ProtocolSectionTabs = ({
   currentOption,
   setCurrentOption,
 }: ProtocolSectionTabsProps): JSX.Element => {
-  const enableRtpFF = useFeatureFlag('enableRunTimeParameters')
-  const options = enableRtpFF
-    ? protocolSectionTabOptions
-    : protocolSectionTabOptionsWithoutParameters
+  const options = protocolSectionTabOptions
+
   return (
     <Flex gridGap={SPACING.spacing8}>
       {options.map(option => {
@@ -308,7 +305,6 @@ export function ProtocolDetails(): JSX.Element | null {
     'protocol_info',
     'shared',
   ])
-  const enableRtpFF = useFeatureFlag('enableRunTimeParameters')
   const { protocolId } = useParams<OnDeviceRouteParams>()
   const {
     missingProtocolHardware,
@@ -326,9 +322,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const [showParameters, setShowParameters] = React.useState<boolean>(false)
   const queryClient = useQueryClient()
   const [currentOption, setCurrentOption] = React.useState<TabOption>(
-    enableRtpFF
-      ? protocolSectionTabOptions[0]
-      : protocolSectionTabOptionsWithoutParameters[0]
+    protocolSectionTabOptions[0]
   )
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = React.useState<boolean>(false)

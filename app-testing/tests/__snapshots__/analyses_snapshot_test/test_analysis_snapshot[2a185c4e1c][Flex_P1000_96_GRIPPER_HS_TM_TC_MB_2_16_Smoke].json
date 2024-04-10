@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "B1"
@@ -116,6 +118,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "C1"
@@ -170,6 +173,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "A3"
@@ -619,6 +623,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "D1"
@@ -1070,12 +1075,14 @@
     },
     {
       "commandType": "thermocycler/openLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -1084,6 +1091,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_96_well_aluminum_block",
         "location": {},
@@ -2240,6 +2248,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_96_pcr_adapter",
         "location": {},
@@ -3396,6 +3405,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_1_reservoir_290ml",
         "location": {
@@ -3482,6 +3492,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "location": {
@@ -4649,6 +4660,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_adapter",
         "location": {
@@ -4711,6 +4723,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_1000ul",
         "location": {},
@@ -5860,6 +5873,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_1000ul",
         "location": {
@@ -7011,6 +7025,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_1000ul",
         "location": {
@@ -8162,6 +8177,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p1000_96"
@@ -8171,6 +8187,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A1": 29000.0
@@ -8181,6 +8198,7 @@
     },
     {
       "commandType": "configureNozzleLayout",
+      "notes": [],
       "params": {
         "configurationParams": {
           "primaryNozzle": "A12",
@@ -8192,6 +8210,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -8217,6 +8236,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8242,6 +8262,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8267,6 +8288,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -8289,12 +8311,14 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -8320,6 +8344,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8345,6 +8370,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8370,6 +8396,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -8392,12 +8419,14 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -8423,6 +8452,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8448,6 +8478,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8473,6 +8504,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -8495,12 +8527,14 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -8526,6 +8560,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8551,6 +8586,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8576,6 +8612,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -8598,12 +8635,14 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -8629,6 +8668,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8654,6 +8694,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8679,6 +8720,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -8701,12 +8743,14 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -8732,6 +8776,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8757,6 +8802,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8782,6 +8828,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -8804,12 +8851,14 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -8835,6 +8884,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8860,6 +8910,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8885,6 +8936,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -8907,12 +8959,14 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -8938,6 +8992,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8963,6 +9018,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -8988,6 +9044,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -9010,12 +9067,14 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -9041,6 +9100,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -9066,6 +9126,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -9091,6 +9152,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -9113,12 +9175,14 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -9144,6 +9208,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -9169,6 +9234,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -9194,6 +9260,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -9216,12 +9283,14 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -9247,6 +9316,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -9272,6 +9342,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -9297,6 +9368,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -9319,12 +9391,14 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -9350,6 +9424,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -9375,6 +9450,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -9400,6 +9476,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -9422,12 +9499,14 @@
     },
     {
       "commandType": "dropTipInPlace",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "gripperWasteChute"
@@ -9439,6 +9518,7 @@
     },
     {
       "commandType": "configureNozzleLayout",
+      "notes": [],
       "params": {
         "configurationParams": {
           "style": "ALL"
@@ -9449,6 +9529,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -9474,6 +9555,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -9499,6 +9581,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9522,6 +9605,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 995.0,
@@ -9547,6 +9631,7 @@
     },
     {
       "commandType": "moveToAddressableArea",
+      "notes": [],
       "params": {
         "addressableAreaName": "96ChannelWasteChute",
         "forceDirect": false,
@@ -9568,6 +9653,7 @@
     },
     {
       "commandType": "blowOutInPlace",
+      "notes": [],
       "params": {
         "flowRate": 80.0
       },
@@ -9576,6 +9662,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -9601,6 +9688,7 @@
     },
     {
       "commandType": "moveToWell",
+      "notes": [],
       "params": {
         "forceDirect": false,
         "wellLocation": {
@@ -9624,6 +9712,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 995.0,
@@ -9649,6 +9738,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -9671,6 +9761,7 @@
     },
     {
       "commandType": "blowOutInPlace",
+      "notes": [],
       "params": {
         "flowRate": 80.0
       },
@@ -9679,6 +9770,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 10.0,
@@ -9704,6 +9796,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 10.0,
@@ -9729,6 +9822,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 15.0,
@@ -9754,6 +9848,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "pushOut": 0.0,
@@ -9780,6 +9875,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 15.0,
@@ -9805,6 +9901,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "pushOut": 0.0,
@@ -9831,6 +9928,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 15.0,
@@ -9856,6 +9954,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "pushOut": 0.0,
@@ -9882,6 +9981,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 15.0,
@@ -9907,6 +10007,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "pushOut": 0.0,
@@ -9933,6 +10034,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 15.0,
@@ -9958,6 +10060,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 15.0,
@@ -9983,6 +10086,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -10006,6 +10110,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": "offDeck",
         "strategy": "manualMoveWithPause"
@@ -10015,6 +10120,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10024,6 +10130,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -10049,6 +10156,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -10074,6 +10182,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "pushOut": 0.0,
@@ -10100,6 +10209,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -10125,6 +10235,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "pushOut": 0.0,
@@ -10151,6 +10262,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -10176,6 +10288,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -10201,6 +10314,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 10.0,
@@ -10226,6 +10340,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 10.0,
@@ -10251,6 +10366,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -10276,6 +10392,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 5.0,
@@ -10301,6 +10418,7 @@
     },
     {
       "commandType": "touchTip",
+      "notes": [],
       "params": {
         "radius": 1.0,
         "speed": 60.0,
@@ -10325,6 +10443,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
+      "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
         "alternateDropLocation": false,
@@ -10347,6 +10466,7 @@
     },
     {
       "commandType": "blowOutInPlace",
+      "notes": [],
       "params": {
         "flowRate": 80.0
       },
@@ -10355,6 +10475,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -10378,6 +10499,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": "offDeck",
         "strategy": "manualMoveWithPause"
@@ -10387,6 +10509,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -10398,6 +10521,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10409,6 +10533,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -10420,6 +10545,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10431,6 +10557,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10442,6 +10569,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10453,6 +10581,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10464,6 +10593,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10475,6 +10605,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -10486,6 +10617,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10497,6 +10629,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -10508,6 +10641,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10519,6 +10653,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -10530,6 +10665,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -10541,6 +10677,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10552,6 +10689,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10561,6 +10699,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10572,6 +10711,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10581,6 +10721,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10592,6 +10733,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10601,6 +10743,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10612,6 +10755,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10621,6 +10765,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10632,6 +10777,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10641,6 +10787,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10650,6 +10797,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10659,6 +10807,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10668,6 +10817,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10679,6 +10829,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10690,6 +10841,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -10701,6 +10853,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10712,6 +10865,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10723,6 +10877,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10734,6 +10889,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -10745,6 +10901,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10756,6 +10913,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10767,6 +10925,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -10778,6 +10937,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10789,6 +10949,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -10800,6 +10961,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10811,6 +10973,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -10822,6 +10985,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -10833,6 +10997,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10844,6 +11009,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10853,6 +11019,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10864,6 +11031,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10873,6 +11041,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10884,6 +11053,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10893,6 +11063,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10904,6 +11075,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10913,6 +11085,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10924,6 +11097,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10933,6 +11107,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10942,6 +11117,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10951,6 +11127,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10960,6 +11137,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -10971,6 +11149,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -10982,6 +11161,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -10993,6 +11173,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11004,6 +11185,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -11015,6 +11197,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11026,6 +11209,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -11037,6 +11221,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -11048,6 +11233,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11059,6 +11245,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -11070,6 +11257,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11081,6 +11269,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -11092,6 +11281,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11103,6 +11293,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -11114,6 +11305,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11125,6 +11317,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -11136,6 +11329,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11147,6 +11341,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11156,6 +11351,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11167,6 +11363,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11176,6 +11373,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11187,6 +11385,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11196,6 +11395,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11207,6 +11407,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11216,6 +11417,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11227,6 +11429,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11236,6 +11439,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11245,6 +11449,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11254,6 +11459,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11263,6 +11469,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11274,6 +11481,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11283,6 +11491,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -11294,6 +11503,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11303,6 +11513,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -11314,6 +11525,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11323,6 +11535,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -11334,6 +11547,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -11345,6 +11559,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11354,6 +11569,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -11365,6 +11581,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11374,6 +11591,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -11385,6 +11603,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11394,6 +11613,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -11405,6 +11625,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11414,6 +11635,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11425,6 +11647,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11434,6 +11657,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -11445,6 +11669,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11456,6 +11681,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11465,6 +11691,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11474,6 +11701,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11483,6 +11711,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11492,6 +11721,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11501,6 +11731,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11510,6 +11741,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11519,6 +11751,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11528,6 +11761,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11537,6 +11771,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11546,6 +11781,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11555,6 +11791,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11564,6 +11801,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -11575,6 +11813,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11584,6 +11823,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -11595,6 +11835,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11604,6 +11845,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -11615,6 +11857,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -11626,6 +11869,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11635,6 +11879,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -11646,6 +11891,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11655,6 +11901,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -11666,6 +11913,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11675,6 +11923,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -11686,6 +11935,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11695,6 +11945,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11706,6 +11957,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11715,6 +11967,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -11726,6 +11979,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11737,6 +11991,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11746,6 +12001,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11755,6 +12011,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11764,6 +12021,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11773,6 +12031,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11782,6 +12041,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11791,6 +12051,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11800,6 +12061,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11809,6 +12071,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11818,6 +12081,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11827,6 +12091,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11836,6 +12101,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11845,6 +12111,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -11856,6 +12123,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11865,6 +12133,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -11876,6 +12145,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11885,6 +12155,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -11896,6 +12167,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -11907,6 +12179,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11916,6 +12189,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -11927,6 +12201,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11936,6 +12211,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -11947,6 +12223,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11956,6 +12233,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -11967,6 +12245,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11976,6 +12255,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -11987,6 +12267,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -11996,6 +12277,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -12007,6 +12289,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -12018,6 +12301,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12027,6 +12311,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12036,6 +12321,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12045,6 +12331,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12054,6 +12341,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12063,6 +12351,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12072,6 +12361,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12081,6 +12371,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12090,6 +12381,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12099,6 +12391,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12108,6 +12401,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12117,6 +12411,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12126,6 +12421,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -12137,6 +12433,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12146,6 +12443,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -12157,6 +12455,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12166,6 +12465,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C2"
@@ -12177,6 +12477,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "B2"
@@ -12188,6 +12489,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12197,6 +12499,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -12208,6 +12511,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12217,6 +12521,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "slotName": "C3"
@@ -12228,6 +12533,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12237,6 +12543,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -12248,6 +12555,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12257,6 +12565,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -12268,6 +12577,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12277,6 +12587,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "C4"
@@ -12288,6 +12599,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"
@@ -12299,6 +12611,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12308,6 +12621,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12317,6 +12631,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12326,6 +12641,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12335,6 +12651,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12344,6 +12661,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12353,6 +12671,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12362,6 +12681,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12371,6 +12691,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12380,6 +12701,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12389,6 +12711,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -12398,12 +12721,14 @@
     },
     {
       "commandType": "thermocycler/closeLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/setTargetBlockTemperature",
+      "notes": [],
       "params": {
         "celsius": 75.0,
         "holdTimeSeconds": 5.0
@@ -12415,12 +12740,14 @@
     },
     {
       "commandType": "thermocycler/waitForBlockTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/setTargetLidTemperature",
+      "notes": [],
       "params": {
         "celsius": 80.0
       },
@@ -12431,24 +12758,28 @@
     },
     {
       "commandType": "thermocycler/waitForLidTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/deactivateBlock",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "thermocycler/deactivateLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/openLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {
         "pipetteRetracted": true
@@ -12457,12 +12788,14 @@
     },
     {
       "commandType": "heaterShaker/closeLabwareLatch",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/setTargetTemperature",
+      "notes": [],
       "params": {
         "celsius": 75.0
       },
@@ -12471,6 +12804,7 @@
     },
     {
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
+      "notes": [],
       "params": {
         "rpm": 1000.0
       },
@@ -12481,24 +12815,28 @@
     },
     {
       "commandType": "heaterShaker/waitForTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateHeater",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "heaterShaker/deactivateShaker",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "temperatureModule/setTargetTemperature",
+      "notes": [],
       "params": {
         "celsius": 80.0
       },
@@ -12509,12 +12847,14 @@
     },
     {
       "commandType": "temperatureModule/waitForTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "temperatureModule/setTargetTemperature",
+      "notes": [],
       "params": {
         "celsius": 10.0
       },
@@ -12525,18 +12865,21 @@
     },
     {
       "commandType": "temperatureModule/waitForTemperature",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "temperatureModule/deactivate",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {
           "addressableAreaName": "D4"

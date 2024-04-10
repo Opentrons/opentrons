@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  Chip,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
@@ -28,7 +29,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Chip } from '../../atoms/Chip'
 import { getModulePrepCommands } from '../../organisms/Devices/getModulePrepCommands'
 import { getModuleTooHot } from '../../organisms/Devices/getModuleTooHot'
 import { useRunCalibrationStatus } from '../../organisms/Devices/hooks'

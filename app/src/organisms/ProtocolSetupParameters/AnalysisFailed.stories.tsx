@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { VIEWPORT } from '../../../../components/src/ui-style-constants'
 import { AnalysisFailedModal } from './AnalysisFailedModal'
 
 import type { Story, Meta } from '@storybook/react'
@@ -8,7 +8,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Organisms/AnalysisFailedModal',
   component: AnalysisFailedModal,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<

@@ -149,40 +149,40 @@ export function makeContext(): InvariantContext {
       name: 'p10_single',
       id: 'p10SingleId',
 
-      tiprackDefURI: getLabwareDefURI(fixtureTiprack10ul),
-      tiprackLabwareDef: fixtureTiprack10ul,
+      tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
+      tiprackLabwareDef: [fixtureTiprack10ul],
       spec: fixtureP10SingleV2Specs,
     },
     p10MultiId: {
       name: 'p10_multi',
       id: 'p10MultiId',
 
-      tiprackDefURI: getLabwareDefURI(fixtureTiprack10ul),
-      tiprackLabwareDef: fixtureTiprack10ul,
+      tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
+      tiprackLabwareDef: [fixtureTiprack10ul],
       spec: fixtureP10MultiV2Specs,
     },
     [DEFAULT_PIPETTE]: {
       name: 'p300_single',
       id: DEFAULT_PIPETTE,
 
-      tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
-      tiprackLabwareDef: fixtureTiprack300ul,
+      tiprackDefURI: [getLabwareDefURI(fixtureTiprack300ul)],
+      tiprackLabwareDef: [fixtureTiprack300ul],
       spec: fixtureP300SingleV2Specs,
     },
     [MULTI_PIPETTE]: {
       name: 'p300_multi',
       id: MULTI_PIPETTE,
 
-      tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
-      tiprackLabwareDef: fixtureTiprack300ul,
+      tiprackDefURI: [getLabwareDefURI(fixtureTiprack300ul)],
+      tiprackLabwareDef: [fixtureTiprack300ul],
       spec: fixtureP300MultiV2Specs,
     },
     [PIPETTE_96]: {
       name: 'p1000_96',
       id: PIPETTE_96,
 
-      tiprackDefURI: getLabwareDefURI(fixtureTiprack1000ul),
-      tiprackLabwareDef: fixtureTiprack1000ul,
+      tiprackDefURI: [getLabwareDefURI(fixtureTiprack1000ul)],
+      tiprackLabwareDef: [fixtureTiprack1000ul],
       spec: fixtureP100096V2Specs,
     },
   }

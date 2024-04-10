@@ -32,7 +32,6 @@ import {
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
 
-import { Banner } from '../../../../atoms/Banner'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { Tooltip } from '../../../../atoms/Tooltip'
@@ -71,7 +70,6 @@ interface SetupModulesListProps {
 
 export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const { robotName, runId } = props
-  const { t } = useTranslation('protocol_setup')
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     runId
   )

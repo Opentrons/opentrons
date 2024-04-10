@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p20_single_gen2"
@@ -17,6 +19,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "gold",
         "loadName": "axygen_1_reservoir_90ml",
@@ -103,6 +106,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "SILVER",
         "loadName": "nest_12_reservoir_15ml",
@@ -343,6 +347,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "round",
         "loadName": "corning_6_wellplate_16.8ml_flat",
@@ -486,6 +491,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "displayName": "Opentrons 96 Tip Rack 20 µL",
         "loadName": "opentrons_96_tiprack_20ul",
@@ -1632,6 +1638,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A10": 1000.0,
@@ -1647,6 +1654,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A1": 5000.0
@@ -1657,6 +1665,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -1694,6 +1703,7 @@
         "errorType": "InvalidAspirateVolumeError",
         "wrappedErrors": []
       },
+      "notes": [],
       "params": {
         "flowRate": 3.78,
         "volume": 21.0,
@@ -1704,39 +1714,6 @@
             "z": 1.0
           },
           "origin": "bottom"
-        },
-        "wellName": "A1"
-      },
-      "status": "failed"
-    },
-    {
-      "commandType": "dispense",
-      "params": {
-        "flowRate": 3.78,
-        "volume": 10.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0.5
-          },
-          "origin": "bottom"
-        },
-        "wellName": "B1"
-      },
-      "status": "failed"
-    },
-    {
-      "commandType": "dropTip",
-      "params": {
-        "alternateDropLocation": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "default"
         },
         "wellName": "A1"
       },

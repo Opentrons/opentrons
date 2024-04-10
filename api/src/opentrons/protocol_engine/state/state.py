@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from functools import partial
-from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
+from typing import Callable, Dict, List, Optional, Sequence, TypeVar
+from typing_extensions import ParamSpec
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 
@@ -30,7 +30,9 @@ from .config import Config
 from .state_summary import StateSummary
 from ..types import DeckConfigurationType
 
-ReturnT = TypeVar("ReturnT")
+
+_ParamsT = ParamSpec("_ParamsT")
+_ReturnT = TypeVar("_ReturnT")
 
 
 @dataclass(frozen=True)
@@ -146,6 +148,7 @@ class StateStore(StateView, ActionHandler):
         change_notifier: Optional[ChangeNotifier] = None,
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
         deck_configuration: Optional[DeckConfigurationType] = None,
+        notify_publishers: Optional[Callable[[], None]] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -159,6 +162,7 @@ class StateStore(StateView, ActionHandler):
             change_notifier: Internal state change notifier.
             module_calibration_offsets: Module offsets to preload.
             deck_configuration: The initial deck configuration the addressable area store will be instantiated with.
+            notify_publishers: Notifies robot server publishers of internal state change.
         """
         self._command_store = CommandStore(config=config, is_door_open=is_door_open)
         self._pipette_store = PipetteStore()
@@ -191,6 +195,7 @@ class StateStore(StateView, ActionHandler):
         ]
         self._config = config
         self._change_notifier = change_notifier or ChangeNotifier()
+        self._notify_robot_server = notify_publishers
         self._initialize_state()
 
     def handle_action(self, action: Action) -> None:
@@ -207,10 +212,10 @@ class StateStore(StateView, ActionHandler):
 
     async def wait_for(
         self,
-        condition: Callable[..., Optional[ReturnT]],
-        *args: Any,
-        **kwargs: Any,
-    ) -> ReturnT:
+        condition: Callable[_ParamsT, _ReturnT],
+        *args: _ParamsT.args,
+        **kwargs: _ParamsT.kwargs,
+    ) -> _ReturnT:
         """Wait for a condition to become true, checking whenever state changes.
 
         If the condition is already true, return immediately.
@@ -255,14 +260,43 @@ class StateStore(StateView, ActionHandler):
         Raises:
             The exception raised by the `condition` function, if any.
         """
-        predicate = partial(condition, *args, **kwargs)
-        is_done = predicate()
 
-        while not is_done:
+        def predicate() -> _ReturnT:
+            return condition(*args, **kwargs)
+
+        return await self._wait_for(condition=predicate, truthiness_to_wait_for=True)
+
+    async def wait_for_not(
+        self,
+        condition: Callable[_ParamsT, _ReturnT],
+        *args: _ParamsT.args,
+        **kwargs: _ParamsT.kwargs,
+    ) -> _ReturnT:
+        """Like `wait_for()`, except wait for the condition to become false.
+
+        See the documentation in `wait_for()`, especially the warning about condition
+        design.
+
+        The advantage of having this separate method over just passing a wrapper lambda
+        as the condition to `wait_for()` yourself is that wrapper lambdas are hard to
+        test in the mock-heavy Decoy + Protocol Engine style.
+        """
+
+        def predicate() -> _ReturnT:
+            return condition(*args, **kwargs)
+
+        return await self._wait_for(condition=predicate, truthiness_to_wait_for=False)
+
+    async def _wait_for(
+        self, condition: Callable[[], _ReturnT], truthiness_to_wait_for: bool
+    ) -> _ReturnT:
+        current_value = condition()
+
+        while bool(current_value) != truthiness_to_wait_for:
             await self._change_notifier.wait()
-            is_done = predicate()
+            current_value = condition()
 
-        return is_done
+        return current_value
 
     def _get_next_state(self) -> State:
         """Get a new instance of the state value object."""
@@ -319,3 +353,5 @@ class StateStore(StateView, ActionHandler):
         self._liquid._state = next_state.liquids
         self._tips._state = next_state.tips
         self._change_notifier.notify()
+        if self._notify_robot_server is not None:
+            self._notify_robot_server()

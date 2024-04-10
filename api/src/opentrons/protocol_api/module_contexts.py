@@ -8,8 +8,8 @@ from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
 
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import ThermocyclerStep
-from opentrons.commands import module_commands as cmds
-from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.legacy_commands import module_commands as cmds
+from opentrons.legacy_commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError, requires_version
 

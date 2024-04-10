@@ -39,6 +39,7 @@
   "not_connected": "not connected",
   "not_in_protocol": "no {{section}} is specified for this protocol",
   "num_choices": "{{num}} choices",
+  "num_options": "{{num}} options",
   "off": "Off",
   "on_off": "On, off",
   "on": "On",
@@ -66,6 +67,7 @@
   "robot_is_busy": "{{robotName}} is busy",
   "robot": "robot",
   "run_protocol": "Run protocol",
+  "select_parameters_for_robot": "Select parameters for {{robot_name}}",
   "send": "Send",
   "sending": "Sending",
   "show_in_folder": "Show in folder",
@@ -79,6 +81,7 @@
   "unavailable_robot_not_listed_plural": "{{count}} unavailable robots are not listed.",
   "unavailable_robot_not_listed": "{{count}} unavailable robot is not listed.",
   "unsuccessfully_sent": "Unsuccessfully sent",
+  "value_out_of_range": "Value must be between {{min}}-{{max}}",
   "view_run_details": "View run details",
   "view_unavailable_robots": "View unavailable robots on the Devices page"
 }

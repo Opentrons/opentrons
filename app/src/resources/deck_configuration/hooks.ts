@@ -7,12 +7,8 @@ import {
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
   getLabwareDisplayName,
-  SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_SLOT_FIXTURES,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
-import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 import type {
   CompletedProtocolAnalysis,

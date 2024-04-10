@@ -1,6 +1,6 @@
 """In-memory storage of ProtocolEngine instances."""
 from datetime import datetime
-from typing import List, NamedTuple, Optional
+from typing import List, NamedTuple, Optional, Callable
 
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -127,6 +127,7 @@ class MaintenanceEngineStore:
         run_id: str,
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
+        notify_publishers: Callable[[], None],
         deck_configuration: Optional[DeckConfigurationType] = [],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
@@ -135,6 +136,7 @@ class MaintenanceEngineStore:
             run_id: The run resource the engine is assigned to.
             created_at: Run creation datetime
             labware_offsets: Labware offsets to create the engine with.
+            notify_publishers: Utilized by the engine to notify publishers of state changes.
 
         Returns:
             The initial equipment and status summary of the engine.
@@ -154,6 +156,7 @@ class MaintenanceEngineStore:
                 ),
             ),
             deck_configuration=deck_configuration,
+            notify_publishers=notify_publishers,
         )
 
         # Using LiveRunner as the runner to allow for future refactor of maintenance runs
@@ -197,4 +200,4 @@ class MaintenanceEngineStore:
         commands = state_view.commands.get_all()
         self._runner_engine_pair = None
 
-        return RunResult(state_summary=run_data, commands=commands)
+        return RunResult(state_summary=run_data, commands=commands, parameters=[])

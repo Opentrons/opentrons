@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "B1"
@@ -116,6 +118,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "A2"
@@ -170,6 +173,7 @@
     },
     {
       "commandType": "loadModule",
+      "notes": [],
       "params": {
         "location": {
           "slotName": "B3"
@@ -621,6 +625,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_96_well_aluminum_block",
         "location": {},
@@ -1777,6 +1782,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "location": {
@@ -2944,6 +2950,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "location": {
@@ -4111,6 +4118,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_adapter",
         "location": {
@@ -4173,6 +4181,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_1000ul",
         "location": {},
@@ -5322,6 +5331,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_adapter",
         "location": {
@@ -5384,6 +5394,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_1000ul",
         "location": {},
@@ -6533,6 +6544,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_1000ul",
         "location": "offDeck",
@@ -7682,6 +7694,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_flex_96_tiprack_1000ul",
         "location": "offDeck",
@@ -8831,6 +8844,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "left",
         "pipetteName": "p1000_96"
@@ -8840,6 +8854,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A1": 100.0
@@ -8850,6 +8865,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "B1": 100.0
@@ -8860,6 +8876,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "C1": 100.0
@@ -8870,6 +8887,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "D1": 100.0
@@ -8880,6 +8898,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "E1": 100.0
@@ -8890,6 +8909,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "F1": 100.0
@@ -8900,6 +8920,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "G1": 100.0
@@ -8910,6 +8931,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "H1": 100.0
@@ -8920,6 +8942,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A2": 100.0
@@ -8930,6 +8953,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "B2": 100.0
@@ -8940,6 +8964,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "C2": 100.0
@@ -8950,6 +8975,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "D2": 100.0
@@ -8960,6 +8986,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "E2": 100.0
@@ -8970,6 +8997,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "F2": 100.0
@@ -8980,6 +9008,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "G2": 100.0
@@ -8990,6 +9019,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "H2": 100.0
@@ -9000,6 +9030,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A3": 100.0
@@ -9010,6 +9041,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "B3": 100.0
@@ -9020,6 +9052,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "C3": 100.0
@@ -9030,6 +9063,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "D3": 100.0
@@ -9040,6 +9074,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "E3": 100.0
@@ -9050,6 +9085,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "F3": 100.0
@@ -9060,6 +9096,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "G3": 100.0
@@ -9070,6 +9107,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "H3": 100.0
@@ -9080,6 +9118,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A4": 100.0
@@ -9090,6 +9129,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "B4": 100.0
@@ -9100,6 +9140,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "C4": 100.0
@@ -9110,6 +9151,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "D4": 100.0
@@ -9120,6 +9162,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "E4": 100.0
@@ -9130,6 +9173,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "F4": 100.0
@@ -9140,6 +9184,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "G4": 100.0
@@ -9150,6 +9195,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "H4": 100.0
@@ -9160,6 +9206,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A5": 100.0
@@ -9170,6 +9217,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "B5": 100.0
@@ -9180,6 +9228,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "C5": 100.0
@@ -9190,6 +9239,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "D5": 100.0
@@ -9200,6 +9250,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "E5": 100.0
@@ -9210,6 +9261,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "F5": 100.0
@@ -9220,6 +9272,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "G5": 100.0
@@ -9230,6 +9283,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "H5": 100.0
@@ -9240,6 +9294,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A6": 100.0
@@ -9250,6 +9305,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "B6": 100.0
@@ -9260,6 +9316,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "C6": 100.0
@@ -9270,6 +9327,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "D6": 100.0
@@ -9280,6 +9338,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "E6": 100.0
@@ -9290,6 +9349,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "F6": 100.0
@@ -9300,6 +9360,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "G6": 100.0
@@ -9310,6 +9371,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "H6": 100.0
@@ -9320,6 +9382,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A7": 100.0
@@ -9330,6 +9393,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "B7": 100.0
@@ -9340,6 +9404,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "C7": 100.0
@@ -9350,6 +9415,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "D7": 100.0
@@ -9360,6 +9426,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "E7": 100.0
@@ -9370,6 +9437,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "F7": 100.0
@@ -9380,6 +9448,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "G7": 100.0
@@ -9390,6 +9459,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "H7": 100.0
@@ -9400,6 +9470,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A8": 100.0
@@ -9410,6 +9481,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "B8": 100.0
@@ -9420,6 +9492,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "C8": 100.0
@@ -9430,6 +9503,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "D8": 100.0
@@ -9440,6 +9514,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "E8": 100.0
@@ -9450,6 +9525,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "F8": 100.0
@@ -9460,6 +9536,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "G8": 100.0
@@ -9470,6 +9547,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "H8": 100.0
@@ -9480,6 +9558,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A9": 100.0
@@ -9490,6 +9569,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "B9": 100.0
@@ -9500,6 +9580,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "C9": 100.0
@@ -9510,6 +9591,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "D9": 100.0
@@ -9520,6 +9602,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "E9": 100.0
@@ -9530,6 +9613,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "F9": 100.0
@@ -9540,6 +9624,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "G9": 100.0
@@ -9550,6 +9635,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "H9": 100.0
@@ -9560,6 +9646,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A10": 100.0
@@ -9570,6 +9657,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "B10": 100.0
@@ -9580,6 +9668,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "C10": 100.0
@@ -9590,6 +9679,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "D10": 100.0
@@ -9600,6 +9690,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "E10": 100.0
@@ -9610,6 +9701,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "F10": 100.0
@@ -9620,6 +9712,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "G10": 100.0
@@ -9630,6 +9723,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "H10": 100.0
@@ -9640,6 +9734,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A11": 100.0
@@ -9650,6 +9745,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "B11": 100.0
@@ -9660,6 +9756,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "C11": 100.0
@@ -9670,6 +9767,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "D11": 100.0
@@ -9680,6 +9778,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "E11": 100.0
@@ -9690,6 +9789,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "F11": 100.0
@@ -9700,6 +9800,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "G11": 100.0
@@ -9710,6 +9811,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "H11": 100.0
@@ -9720,6 +9822,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "A12": 100.0
@@ -9730,6 +9833,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "B12": 100.0
@@ -9740,6 +9844,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "C12": 100.0
@@ -9750,6 +9855,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "D12": 100.0
@@ -9760,6 +9866,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "E12": 100.0
@@ -9770,6 +9877,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "F12": 100.0
@@ -9780,6 +9888,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "G12": 100.0
@@ -9790,6 +9899,7 @@
     },
     {
       "commandType": "loadLiquid",
+      "notes": [],
       "params": {
         "volumeByWell": {
           "H12": 100.0
@@ -9800,6 +9910,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -9825,6 +9936,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 10.0,
@@ -9850,6 +9962,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 10.0,
@@ -9875,6 +9988,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -9898,6 +10012,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -9923,6 +10038,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 10.0,
@@ -9948,6 +10064,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 10.0,
@@ -9973,6 +10090,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -9996,6 +10114,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": "offDeck",
         "strategy": "manualMoveWithPause"
@@ -10005,6 +10124,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": "offDeck",
         "strategy": "manualMoveWithPause"
@@ -10014,6 +10134,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "manualMoveWithPause"
@@ -10023,6 +10144,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "manualMoveWithPause"
@@ -10032,6 +10154,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -10057,6 +10180,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 10.0,
@@ -10082,6 +10206,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 10.0,
@@ -10107,6 +10232,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -10130,6 +10256,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -10155,6 +10282,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 10.0,
@@ -10180,6 +10308,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 160.0,
         "volume": 10.0,
@@ -10205,6 +10334,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -10228,12 +10358,14 @@
     },
     {
       "commandType": "thermocycler/openLid",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10243,6 +10375,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10252,6 +10385,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": {},
         "strategy": "usingGripper"
@@ -10261,6 +10395,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": "offDeck",
         "strategy": "manualMoveWithPause"
@@ -10270,6 +10405,7 @@
     },
     {
       "commandType": "moveLabware",
+      "notes": [],
       "params": {
         "newLocation": "offDeck",
         "strategy": "manualMoveWithPause"

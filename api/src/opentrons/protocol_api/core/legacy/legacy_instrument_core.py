@@ -558,3 +558,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
     def is_tip_tracking_available(self) -> bool:
         # Tip tracking is always available in legacy context
         return True
+
+    def retract(self) -> None:
+        """Retract this instrument to the top of the gantry."""
+        self._protocol_interface.get_hardware.retract(self._mount)  # type: ignore [attr-defined]

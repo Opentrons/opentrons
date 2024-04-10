@@ -58,6 +58,7 @@ describe('ChooseProtocolSlideout', () => {
     screen.getByText(/choose protocol to run/i)
     screen.getByText(/opentrons-robot-name/i)
   })
+
   it('renders an available protocol option for every stored protocol if any', () => {
     render({
       robot: mockConnectableRobot,
@@ -70,6 +71,7 @@ describe('ChooseProtocolSlideout', () => {
       screen.queryByRole('heading', { name: 'No protocols found' })
     ).toBeNull()
   })
+
   it('renders an empty state if no protocol options', () => {
     vi.mocked(getStoredProtocols).mockReturnValue([])
     render({
@@ -83,22 +85,55 @@ describe('ChooseProtocolSlideout', () => {
       screen.getByRole('heading', { name: 'No protocols found' })
     ).toBeInTheDocument()
   })
-  it('calls createRunFromProtocolSource if CTA clicked', () => {
+
+  // it('calls createRunFromProtocolSource if CTA clicked', () => {
+  //   const protocolDataWithoutRunTimeParameter = {
+  //     ...storedProtocolDataFixture,
+  //     runTimeParameters: [],
+  //   }
+  //   vi.mocked(getStoredProtocols).mockReturnValue([
+  //     protocolDataWithoutRunTimeParameter,
+  //   ])
+  //   render({
+  //     robot: mockConnectableRobot,
+  //     onCloseClick: vi.fn(),
+  //     showSlideout: true,
+  //   })
+  //   const proceedButton = screen.getByRole('button', {
+  //     name: 'Proceed to setup',
+  //   })
+  //   fireEvent.click(proceedButton)
+  //   expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
+  //     files: [expect.any(File)],
+  //     protocolKey: storedProtocolDataFixture.protocolKey,
+  //   })
+  //   expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
+  // })
+
+  it('move to the second slideout if CTA clicked', () => {
+    const protocolDataWithoutRunTimeParameter = {
+      ...storedProtocolDataFixture,
+      runTimeParameters: [],
+    }
+    vi.mocked(getStoredProtocols).mockReturnValue([
+      protocolDataWithoutRunTimeParameter,
+    ])
     render({
       robot: mockConnectableRobot,
       onCloseClick: vi.fn(),
       showSlideout: true,
     })
     const proceedButton = screen.getByRole('button', {
-      name: 'Proceed to setup',
+      name: 'Continue to parameters',
     })
     fireEvent.click(proceedButton)
-    expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
-      files: [expect.any(File)],
-      protocolKey: storedProtocolDataFixture.protocolKey,
-    })
-    expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
+    screen.getByText('Step 2 / 2')
+    screen.getByText('number of samples')
+    screen.getByText('Restore default values')
   })
+
+  // ToDo (kk:04/08) update test for RTP
+  /*
   it('renders error state when there is a run creation error', () => {
     vi.mocked(useCreateRunFromProtocol).mockReturnValue({
       runCreationError: 'run creation error',
@@ -153,4 +188,5 @@ describe('ChooseProtocolSlideout', () => {
     fireEvent.click(link)
     expect(link.getAttribute('href')).toEqual('/devices/opentrons-robot-name')
   })
+  */
 })

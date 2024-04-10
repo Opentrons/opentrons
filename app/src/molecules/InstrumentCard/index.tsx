@@ -111,9 +111,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
         >
           {label}
         </StyledText>
-        <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
-          {description}
-        </StyledText>
+        <StyledText as="p">{description}</StyledText>
       </Flex>
       {menuOverlayItems != null && (
         <Box

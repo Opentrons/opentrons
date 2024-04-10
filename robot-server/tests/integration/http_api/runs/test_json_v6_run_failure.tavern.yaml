@@ -69,7 +69,7 @@ stages:
             - id: !anystr
               createdAt: !anystr
               errorCode: '3005'
-              errorType: TipNotAttachedError 
+              errorType: TipNotAttachedError
               detail: Pipette should have a tip attached, but does not.
               errorInfo: !anydict
               wrappedErrors: !anylist
@@ -86,12 +86,12 @@ stages:
             meta:
               runId: !anystr
               commandId: !anystr
-              index: 4
+              index: 3
               key: !anystr
               createdAt: !anystr
         meta:
           cursor: 3
-          totalLength: 5
+          totalLength: 4
         data:
           - id: !anystr
             key: !anystr
@@ -100,6 +100,7 @@ stages:
             startedAt: !anystr
             completedAt: !anystr
             status: failed
+            notes: []
             error:
               id: !anystr
               errorType: TipNotAttachedError
@@ -120,19 +121,3 @@ stages:
                   z: 1
               flowRate: 3.78
               volume: 100
-          - id: !anystr
-            key: !anystr
-            commandType: pickUpTip
-            createdAt: !anystr
-            completedAt: !anystr
-            status: failed
-            params:
-              pipetteId: pipetteId
-              labwareId: tipRackId
-              wellName: A1
-              wellLocation:
-                origin: top
-                offset:
-                  x: 0
-                  y: 0
-                  z: 0
