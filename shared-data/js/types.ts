@@ -597,7 +597,7 @@ export interface NumberParameter extends BaseRunTimeParameter {
   default: number
 }
 
-interface Choice {
+export interface Choice {
   displayName: string
   value: number | boolean | string
 }

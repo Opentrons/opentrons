@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components'
 import {
   formatRunTimeParameterDefaultValue,
   formatRunTimeParameterMinMax,
+  orderRuntimeParameterRangeOptions,
 } from '@opentrons/shared-data'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
@@ -38,7 +39,7 @@ export function ParametersTable({
         ? t != null
           ? t('num_options', { num: count })
           : `${count} options`
-        : choices.map(choice => choice.displayName).join(', ')
+        : orderRuntimeParameterRangeOptions(choices)
     }
 
     switch (type) {
