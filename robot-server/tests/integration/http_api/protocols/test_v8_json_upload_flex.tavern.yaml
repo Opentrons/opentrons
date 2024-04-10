@@ -166,6 +166,7 @@ stages:
                   moduleId: magneticBlockId
                   definition: !anydict
                   model: magneticBlockV1
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -386,6 +387,7 @@ stages:
                   speed: 42.0
                 result:
                   position: { 'x': 342.38, 'y': 65.24, 'z': 50.05 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -406,6 +408,7 @@ stages:
                   flowRate: 2.0
                 result:
                   position: { 'x': 342.38, 'y': 65.24, 'z': 51.05 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -445,6 +448,7 @@ stages:
                 result:
                   position:
                     { 'x': 351.38, 'y': 65.24, 'z': 54.0 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -467,6 +471,7 @@ stages:
                 result:
                   position:
                     { 'x': 353.38, 'y': 68.24, 'z': 49.05 }
+                notes: []
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
