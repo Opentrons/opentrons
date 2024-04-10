@@ -19,7 +19,7 @@ def temp_storage() -> List[RawDurationData]:
 @pytest.fixture
 def function_timer(temp_storage: List[RawDurationData]) -> FunctionTimer:
     """Creates a FunctionTimer instance with a mock storage function for testing."""
-    return FunctionTimer(temp_storage.append)
+    return FunctionTimer(temp_storage.append)  # type: ignore
 
 
 def test_sync_function(

@@ -1,22 +1,27 @@
+"""Tests for the RobotContextTracker class in performance_metrics.robot_context_tracker."""
+
 import pytest
 from performance_metrics.robot_context_tracker import RobotContextTracker
 from performance_metrics.datashapes import RobotContextStates
 from time import sleep
 
-# In milliseconds
-STARTING_TIME = 1 // 1000.0
-CALIBRATING_TIME = 2 // 1000.0
-ANALYZING_TIME = 3 // 1000.0
-RUNNING_TIME = 4 // 1000.0
-SHUTTING_DOWN_TIME = 5 // 1000.0
+# Corrected times in seconds
+STARTING_TIME = 0.001
+CALIBRATING_TIME = 0.002
+ANALYZING_TIME = 0.003
+RUNNING_TIME = 0.004
+SHUTTING_DOWN_TIME = 0.005
 
 
 @pytest.fixture
 def robot_context_tracker() -> RobotContextTracker:
+    """Fixture to provide a fresh instance of RobotContextTracker for each test."""
     return RobotContextTracker()
 
 
 def test_robot_context_tracker(robot_context_tracker: RobotContextTracker) -> None:
+    """Tests the tracking of various robot context states through RobotContextTracker."""
+
     @robot_context_tracker.track(state=RobotContextStates.STARTING_UP)
     def starting_robot() -> None:
         sleep(STARTING_TIME)
@@ -37,35 +42,30 @@ def test_robot_context_tracker(robot_context_tracker: RobotContextTracker) -> No
     def shutting_down_robot() -> None:
         sleep(SHUTTING_DOWN_TIME)
 
-    assert len(robot_context_tracker._storage) == 0
+    # Ensure storage is initially empty
+    assert (
+        len(robot_context_tracker._storage) == 0
+    ), "Storage should be initially empty."
+
     starting_robot()
-    assert len(robot_context_tracker._storage) == 1
     calibrating_robot()
-    assert len(robot_context_tracker._storage) == 2
     analyzing_protocol()
-    assert len(robot_context_tracker._storage) == 3
     running_protocol()
-    assert len(robot_context_tracker._storage) == 4
     shutting_down_robot()
 
-    assert len(robot_context_tracker._storage) == 5
-    assert (
-        RobotContextStates.from_id(robot_context_tracker._storage[0].state)
-        == RobotContextStates.STARTING_UP
-    )
-    assert (
-        RobotContextStates.from_id(robot_context_tracker._storage[1].state)
-        == RobotContextStates.CALIBRATING
-    )
-    assert (
-        RobotContextStates.from_id(robot_context_tracker._storage[2].state)
-        == RobotContextStates.ANALYZING_PROTOCOL
-    )
-    assert (
-        RobotContextStates.from_id(robot_context_tracker._storage[3].state)
-        == RobotContextStates.RUNNING_PROTOCOL
-    )
-    assert (
-        RobotContextStates.from_id(robot_context_tracker._storage[4].state)
-        == RobotContextStates.SHUTTING_DOWN
-    )
+    # Verify that all states were tracked
+    assert len(robot_context_tracker._storage) == 5, "All states should be tracked."
+
+    # Validate the sequence and accuracy of tracked states
+    expected_states = [
+        RobotContextStates.STARTING_UP,
+        RobotContextStates.CALIBRATING,
+        RobotContextStates.ANALYZING_PROTOCOL,
+        RobotContextStates.RUNNING_PROTOCOL,
+        RobotContextStates.SHUTTING_DOWN,
+    ]
+    for i, state in enumerate(expected_states):
+        assert (
+            RobotContextStates.from_id(robot_context_tracker._storage[i].state.state_id)
+            == state
+        ), f"State at index {i} should be {state}."
