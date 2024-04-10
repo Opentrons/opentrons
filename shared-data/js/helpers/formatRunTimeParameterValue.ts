@@ -1,5 +1,15 @@
 import type { RunTimeParameter } from '../types'
 
+/**
+ * Formats the runtime parameter value.
+ *
+ * @param {RunTimeParameter} runTimeParameter - The runtime parameter to be formatted.
+ * @param {Function} t - A function for localization.
+ *
+ * @returns {string} The formatted runtime parameter value.
+ *
+ */
+
 export const formatRunTimeParameterValue = (
   runTimeParameter: RunTimeParameter,
   t: any

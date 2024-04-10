@@ -13,8 +13,7 @@ def get_settings() -> "SystemServerSettings":
     if env:
         load_dotenv(env)
 
-    # Update the systemServer settings from env file
-    return SystemServerSettings(_env_file=env)
+    return SystemServerSettings()
 
 
 class Environment(BaseSettings):
@@ -74,6 +73,7 @@ class SystemServerSettings(BaseSettings):
     class Config:
         """Prefix configuration for environment variables."""
 
+        env_file = Environment().dot_env_path
         env_prefix = "OT_SYSTEM_SERVER_"
 
 
