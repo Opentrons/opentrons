@@ -409,3 +409,8 @@ export const DEPRECATED_WHALE_GREY = '#9395a0'
 // method in PD (not react code) and we do not want non react code loading
 // react code because the web worker context does not play nicely with react
 export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
+
+// these are hardware pipette specs used for flow rates
+export const DEFAULT_MAX_SPEED_HIGH_THROUGHPUT_FLEX_AXIS_KIND_P = 15
+export const DEFAULT_MAX_SPEED_LOW_THROUGHPUT_FLEX_AXIS_KIND_P = 70
+export const B_MAX_SPEED = 40

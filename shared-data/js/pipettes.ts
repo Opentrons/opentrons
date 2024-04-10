@@ -1,6 +1,13 @@
+import round from 'lodash/round'
+
 import pipetteNameSpecs from '../pipette/definitions/1/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/1/pipetteModelSpecs.json'
-import { OT3_PIPETTES } from './constants'
+import {
+  B_MAX_SPEED,
+  DEFAULT_MAX_SPEED_HIGH_THROUGHPUT_FLEX_AXIS_KIND_P,
+  DEFAULT_MAX_SPEED_LOW_THROUGHPUT_FLEX_AXIS_KIND_P,
+  OT3_PIPETTES,
+} from './constants'
 import type {
   PipetteV2Specs,
   PipetteV2GeneralSpecs,
@@ -8,6 +15,7 @@ import type {
   PipetteV2LiquidSpecs,
   PipetteNameSpecs,
   PipetteModelSpecs,
+  SupportedTip,
 } from './types'
 
 type GeneralGeometricModules = PipetteV2GeneralSpecs | PipetteV2GeometrySpecs
@@ -34,6 +42,7 @@ type PipChannelString = 'single' | 'multi' | '96'
 type Channels = 'eight_channel' | 'single_channel' | 'ninety_six_channel'
 type Gen = 'gen1' | 'gen2' | 'gen3' | 'flex'
 type SortableProps = 'maxVolume' | 'channels'
+type GenNumber = 1 | 2 | 3
 
 // TODO(mc, 2021-04-30): use these types, pulled directly from the JSON,
 // to simplify return types in this module and possibly remove some `null`s
@@ -234,4 +243,119 @@ export const getPipetteSpecsV2 = (
   }
 
   return pipetteV2Specs
+}
+
+const getPlungerMaxSpeed = (
+  majorVersion: GenNumber,
+  is96Channel: boolean
+): number => {
+  switch (majorVersion) {
+    case 2: {
+      return B_MAX_SPEED
+    }
+    case 3: {
+      if (is96Channel) {
+        return DEFAULT_MAX_SPEED_HIGH_THROUGHPUT_FLEX_AXIS_KIND_P
+      } else {
+        return DEFAULT_MAX_SPEED_LOW_THROUGHPUT_FLEX_AXIS_KIND_P
+      }
+    }
+    default: {
+      return 0
+    }
+  }
+}
+
+const getUlPerMm = (
+  volume: number,
+  supportedTipSpecs: SupportedTip
+): number | undefined => {
+  const allSequences = supportedTipSpecs.aspirate.default
+  const sequence =
+    Object.keys(allSequences).length === 1
+      ? allSequences['1']
+      : allSequences['2']
+
+  const piecewiseVolumeConversion = (
+    ul: number,
+    seq: number[][]
+  ): number | undefined => {
+    for (let i = 0; i < seq.length; i++) {
+      const x = seq[i]
+      if (ul <= x[0]) {
+        return x[1] * ul + x[2]
+      }
+    }
+    return undefined
+  }
+
+  return piecewiseVolumeConversion(volume, sequence)
+}
+
+/* returns the maximum flow rate from a specific volume,
+   and the support tip specs
+**/
+export const getMaxFlowRateByVolume = (
+  supportedTipSpecs?: SupportedTip,
+  volume?: number,
+  name?: PipetteName | PipetteModel
+): number => {
+  if (
+    name == null ||
+    volume == null ||
+    (volume != null && volume === 0) ||
+    supportedTipSpecs == null
+  ) {
+    return 0
+  }
+  const nameSplit = name.split('_')
+  const channels = getChannelsFromString(nameSplit[1] as PipChannelString)
+  const getGenNumber = (gen: Gen): GenNumber | null => {
+    switch (gen) {
+      case 'gen1': {
+        return 1
+      }
+      case 'gen2': {
+        return 2
+      }
+      case 'gen3':
+      case 'flex': {
+        return 3
+      }
+      default: {
+        return null
+      }
+    }
+  }
+  const gen = getGenNumber(nameSplit[2] as Gen)
+
+  let genNumber: GenNumber = 1
+  //  the first 2 conditions are to accommodate version from the pipetteName
+  if (nameSplit.length === 2) {
+    // special-casing 96-channel
+    if (channels === 'ninety_six_channel') {
+      genNumber = 3
+    } else {
+      genNumber = 1
+    }
+  } else if (gen != null) {
+    genNumber = gen //  ex: gen1 -> 1
+    //  the 'else' is to accommodate the exact version if PipetteModel was added
+  } else {
+    const versionNumber = nameSplit[2].split('v')[1]
+    genNumber = parseInt(versionNumber[0]) as GenNumber //  ex: v3.3 -> 3
+  }
+
+  //  gen1 pipettes don't have max flow rates
+  if (genNumber === 1) {
+    return Infinity
+  }
+
+  const ulPerMm = getUlPerMm(volume, supportedTipSpecs) ?? 0
+  const maxSpeed = getPlungerMaxSpeed(
+    genNumber,
+    channels === 'ninety_six_channel'
+  )
+
+  return round(ulPerMm * maxSpeed, 1)
 }
