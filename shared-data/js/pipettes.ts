@@ -238,17 +238,15 @@ export const getPipetteSpecsV2 = (
 
 /* returns the maximum flow rate from a specific volume,
    and the maxFlowRate key
+   if return value is undefined then pipette is a GEN1
+   or a volume is either out of range or not specified
 **/
 export const getMaxFlowRateByVolume = (
   maxFlowRate?: Record<string, number>,
   volume?: number
-): number => {
-  if (
-    volume == null ||
-    (volume != null && volume === 0) ||
-    maxFlowRate == null
-  ) {
-    return 0
+): number | undefined => {
+  if (volume == null || maxFlowRate == null) {
+    return undefined
   }
   return maxFlowRate[volume]
 }

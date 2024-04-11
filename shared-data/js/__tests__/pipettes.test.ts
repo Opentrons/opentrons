@@ -387,11 +387,14 @@ describe('pipette data accessors', () => {
         )
       })
     }
-    it('returns 0 if max flow rate is undefined', () => {
-      expect(getMaxFlowRateByVolume(undefined, 5)).toEqual(0)
+    it('returns undefined if max flow rate is undefined', () => {
+      expect(getMaxFlowRateByVolume(undefined, 5)).toEqual(undefined)
     })
-    it('returns 0 if volume is 0', () => {
-      expect(getMaxFlowRateByVolume({} as any, 0)).toEqual(0)
+    it('returns undefined if volume is 0', () => {
+      expect(getMaxFlowRateByVolume({} as any, undefined)).toEqual(undefined)
+    })
+    it('returns undefined if volume is out of range', () => {
+      expect(getMaxFlowRateByVolume(mockMaxFlowRate, 55)).toEqual(undefined)
     })
   })
 })
