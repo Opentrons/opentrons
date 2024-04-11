@@ -625,9 +625,11 @@ function PrepareToRun({
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
 
-  const parametersDetail = hasCustomRunTimeParameters
-    ? t('custom_values')
-    : t('default_values')
+  const parametersDetail = hasRunTimeParameters
+    ? hasCustomRunTimeParameters
+      ? t('custom_values')
+      : t('default_values')
+    : t('no_parameters_specified')
 
   return (
     <>
@@ -733,11 +735,7 @@ function PrepareToRun({
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('view only parameters')}
               title={t('parameters')}
-              detail={t(
-                hasRunTimeParameters
-                  ? parametersDetail
-                  : t('no_parameters_specified')
-              )}
+              detail={parametersDetail}
               subDetail={null}
               status="general"
               disabled={!hasRunTimeParameters}

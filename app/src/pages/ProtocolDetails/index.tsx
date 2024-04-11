@@ -348,7 +348,6 @@ export function ProtocolDetails(): JSX.Element | null {
 
   const {
     data: mostRecentAnalysis,
-    isLoading: isAnalysisFetching, // new analysis is triggered from RTP protocol
   } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     last(protocolRecord?.data.analysisSummaries)?.id ?? null,
@@ -429,7 +428,7 @@ export function ProtocolDetails(): JSX.Element | null {
   }
 
   const displayName =
-    !isProtocolFetching && !isAnalysisFetching && protocolRecord != null
+    !isProtocolFetching && protocolRecord != null
       ? protocolRecord?.data.metadata.protocolName ??
         protocolRecord?.data.files[0].name
       : null

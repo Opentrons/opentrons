@@ -66,7 +66,7 @@ export function useCreateProtocolAnalysisMutation(
             .invalidateQueries([host, 'protocols', protocolId, 'analyses'])
             .then(() =>
               queryClient.setQueryData(
-                [host, 'protocols', protocolId],
+                [host, 'protocols', protocolId, 'analyses'],
                 response.data
               )
             )
