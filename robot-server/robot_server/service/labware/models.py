@@ -2,7 +2,7 @@ import typing
 from datetime import datetime
 
 from functools import partial
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 
 from robot_server.service.json_api import (
     DeprecatedResponseDataModel,
@@ -73,44 +73,42 @@ class LabwareCalibration(DeprecatedResponseDataModel):
     definitionHash: str = Field(
         ..., description="The sha256 hash of key labware definition details"
     )
-
-    class Config:
-        schema_extra = {
-            "examples": [
-                {
-                    "calibrationData": {
-                        "tipLength": {
-                            "value": 10,
-                            "lastModified": "2020-07-10T12:50:47.156321",
-                        },
-                        "offset": {
-                            "value": [1, -2, 10],
-                            "lastModified": "2020-07-10T12:40:17.05",
-                        },
+    model_config = ConfigDict(json_schema_extra={
+        "examples": [
+            {
+                "calibrationData": {
+                    "tipLength": {
+                        "value": 10,
+                        "lastModified": "2020-07-10T12:50:47.156321",
                     },
-                    "version": "1",
-                    "parent": "",
-                    "namespace": "opentrons",
-                    "loadName": "opentrons_96_tiprack_300ul",
-                },
-                {
-                    "calibrationData": {
-                        "tipLength": {
-                            "value": 10,
-                            "lastModified": "2020-07-10T12:50:47.156321",
-                        },
-                        "offset": {
-                            "value": [1, -2, 10],
-                            "lastModified": "2020-07-10T12:40:17.05",
-                        },
+                    "offset": {
+                        "value": [1, -2, 10],
+                        "lastModified": "2020-07-10T12:40:17.05",
                     },
-                    "version": "1",
-                    "parent": "temperatureModuleV2",
-                    "namespace": "opentrons",
-                    "loadName": "corning_96_wellPlate_384ul",
                 },
-            ]
-        }
+                "version": "1",
+                "parent": "",
+                "namespace": "opentrons",
+                "loadName": "opentrons_96_tiprack_300ul",
+            },
+            {
+                "calibrationData": {
+                    "tipLength": {
+                        "value": 10,
+                        "lastModified": "2020-07-10T12:50:47.156321",
+                    },
+                    "offset": {
+                        "value": [1, -2, 10],
+                        "lastModified": "2020-07-10T12:40:17.05",
+                    },
+                },
+                "version": "1",
+                "parent": "temperatureModuleV2",
+                "namespace": "opentrons",
+                "loadName": "corning_96_wellPlate_384ul",
+            },
+        ]
+    })
 
 
 MultipleCalibrationsResponse = DeprecatedMultiResponseModel[LabwareCalibration]

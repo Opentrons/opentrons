@@ -1,7 +1,6 @@
 """Request and response models for /modules endpoints."""
 from datetime import datetime
 from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
 from typing import Generic, Optional, TypeVar, Union
 from typing_extensions import Literal
 
@@ -69,7 +68,7 @@ class UsbPort(BaseModel):
     )
 
 
-class _GenericModule(GenericModel, Generic[ModuleT, ModuleModelT, ModuleDataT]):
+class _GenericModule(BaseModel, Generic[ModuleT, ModuleModelT, ModuleDataT]):
     """Base module response."""
 
     id: str = Field(

@@ -22,7 +22,6 @@ import typing
 
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
 
 from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import commands
@@ -70,7 +69,7 @@ ResponseDataT = typing.TypeVar("ResponseDataT")
 
 
 class SessionCommandRequest(
-    GenericModel, typing.Generic[CommandT, RequestDataT, ResponseDataT]
+    BaseModel, typing.Generic[CommandT, RequestDataT, ResponseDataT]
 ):
     """A session command request."""
 
@@ -101,8 +100,7 @@ class SessionCommandRequest(
 
 class SessionCommandResponse(
     DeprecatedResponseDataModel,
-    GenericModel,
-    typing.Generic[CommandT, RequestDataT, ResponseDataT],
+    BaseModel, typing.Generic[CommandT, RequestDataT, ResponseDataT],
 ):
     """A session command response."""
 

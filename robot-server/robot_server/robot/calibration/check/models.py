@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional, List
 from typing_extensions import Literal
 from functools import partial
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 
 from ..helper_classes import RequiredLabware, AttachedPipette
 
@@ -75,9 +75,9 @@ class TipComparisonMap(BaseModel):
 
 
 class ComparisonStatePerCalibration(BaseModel):
-    tipLength: Optional[TipComparisonMap]
-    pipetteOffset: Optional[PipetteOffsetComparisonMap]
-    deck: Optional[DeckComparisonMap]
+    tipLength: Optional[TipComparisonMap] = None
+    pipetteOffset: Optional[PipetteOffsetComparisonMap] = None
+    deck: Optional[DeckComparisonMap] = None
 
 
 class ComparisonStatePerPipette(BaseModel):
@@ -123,35 +123,32 @@ class CalibrationCheckSessionStatus(BaseModel):
     supportedCommands: List[str] = Field(
         ..., description="A list of supported commands for this user flow"
     )
-
-    class Config:
-        arbitrary_types_allowed = True
-        schema_extra = {
-            "examples": [
-                {
-                    "instruments": [
-                        {
-                            "model": "p300_single_v1.5",
-                            "name": "p300_single",
-                            "tip_length": 51.7,
-                            "mount": "left",
-                            "id": "P3HS12123041",
-                        },
-                        {
-                            "model": None,
-                            "name": None,
-                            "tip_length": None,
-                            "mount": "right",
-                            "id": None,
-                        },
-                    ],
-                    "currentStep": "sessionStarted",
-                    "comparisonsByPipette": {
-                        "comparingFirstPipetteHeight": {
-                            "differenceVector": [1, 0, 0],
-                            "exceedsThreshold": False,
-                        }
+    model_config = ConfigDict(arbitrary_types_allowed=True, json_schema_extra={
+        "examples": [
+            {
+                "instruments": [
+                    {
+                        "model": "p300_single_v1.5",
+                        "name": "p300_single",
+                        "tip_length": 51.7,
+                        "mount": "left",
+                        "id": "P3HS12123041",
                     },
-                }
-            ]
-        }
+                    {
+                        "model": None,
+                        "name": None,
+                        "tip_length": None,
+                        "mount": "right",
+                        "id": None,
+                    },
+                ],
+                "currentStep": "sessionStarted",
+                "comparisonsByPipette": {
+                    "comparingFirstPipetteHeight": {
+                        "differenceVector": [1, 0, 0],
+                        "exceedsThreshold": False,
+                    }
+                },
+            }
+        ]
+    })

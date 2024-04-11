@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 from typing import List
 
 from ..helper_classes import AttachedPipette, RequiredLabware
@@ -15,29 +15,27 @@ class DeckCalibrationSessionStatus(BaseModel):
     supportedCommands: List[str] = Field(
         ..., description="A list of supported commands for this user flow"
     )
-
-    class Config:
-        schema_extra = {
-            "example": [
-                {
-                    "instrument": {
-                        "model": "p300_single_v1.5",
-                        "name": "p300_single",
-                        "tip_length": 42,
-                        "mount": "right",
-                        "serial": "P3HS12123041",
-                    },
-                    "currentStep": "sessionStarted",
-                    "labware": [
-                        {
-                            "slot": "8",
-                            "loadName": "opentrons_96_tiprack_300ul",
-                            "namespace": "opentrons",
-                            "version": 1,
-                            "isTiprack": "true",
-                            "definition": {"ordering": "the ordering section..."},
-                        }
-                    ],
-                }
-            ]
-        }
+    model_config = ConfigDict(json_schema_extra={
+        "example": [
+            {
+                "instrument": {
+                    "model": "p300_single_v1.5",
+                    "name": "p300_single",
+                    "tip_length": 42,
+                    "mount": "right",
+                    "serial": "P3HS12123041",
+                },
+                "currentStep": "sessionStarted",
+                "labware": [
+                    {
+                        "slot": "8",
+                        "loadName": "opentrons_96_tiprack_300ul",
+                        "namespace": "opentrons",
+                        "version": 1,
+                        "isTiprack": "true",
+                        "definition": {"ordering": "the ordering section..."},
+                    }
+                ],
+            }
+        ]
+    })

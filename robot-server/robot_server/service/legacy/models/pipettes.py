@@ -1,6 +1,6 @@
 import typing
 
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 
 
 class AttachedPipette(BaseModel):
@@ -36,25 +36,23 @@ class PipettesByMount(BaseModel):
 
     left: AttachedPipette
     right: AttachedPipette
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "left": {
-                    "model": "p300_single_v1.5",
-                    "name": "p300_single",
-                    "tip_length": 51.7,
-                    "mount_axis": "z",
-                    "plunger_axis": "b",
-                    "id": "P3HS12123041",
-                },
-                "right": {
-                    "model": None,
-                    "name": None,
-                    "tip_length": None,
-                    "mount_axis": "a",
-                    "plunger_axis": "c",
-                    "id": None,
-                },
-            }
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "left": {
+                "model": "p300_single_v1.5",
+                "name": "p300_single",
+                "tip_length": 51.7,
+                "mount_axis": "z",
+                "plunger_axis": "b",
+                "id": "P3HS12123041",
+            },
+            "right": {
+                "model": None,
+                "name": None,
+                "tip_length": None,
+                "mount_axis": "a",
+                "plunger_axis": "c",
+                "id": None,
+            },
         }
+    })

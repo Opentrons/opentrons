@@ -12,7 +12,6 @@ from typing import (
     Callable,
 )
 from pydantic import Field, BaseModel
-from pydantic.generics import GenericModel
 from pydantic.typing import get_args
 from fastapi.responses import JSONResponse
 from fastapi.dependencies.utils import get_typed_return_annotation
@@ -57,13 +56,13 @@ class BaseResponseBody(BaseModel):
         return super().json(*args, **kwargs)
 
 
-class SimpleBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
+class SimpleBody(BaseResponseBody, BaseModel, Generic[ResponseDataT]):
     """A response that returns a single resource."""
 
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
 
 
-class Body(BaseResponseBody, GenericModel, Generic[ResponseDataT, ResponseLinksT]):
+class Body(BaseResponseBody, BaseModel, Generic[ResponseDataT, ResponseLinksT]):
     """A response that returns a single resource and stateful links."""
 
     data: ResponseDataT = Field(..., description=DESCRIPTION_DATA)
@@ -74,7 +73,7 @@ class SimpleEmptyBody(BaseResponseBody):
     """A response that returns no data and no links."""
 
 
-class EmptyBody(BaseResponseBody, GenericModel, Generic[ResponseLinksT]):
+class EmptyBody(BaseResponseBody, BaseModel, Generic[ResponseLinksT]):
     """A response that returns no data except stateful links."""
 
     links: ResponseLinksT = Field(..., description=DESCRIPTION_LINKS)
@@ -94,7 +93,7 @@ class MultiBodyMeta(BaseModel):
     )
 
 
-class SimpleMultiBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
+class SimpleMultiBody(BaseResponseBody, BaseModel, Generic[ResponseDataT]):
     """A response that returns multiple resources."""
 
     data: Sequence[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
@@ -116,8 +115,7 @@ class SimpleMultiBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
 
 class MultiBody(
     BaseResponseBody,
-    GenericModel,
-    Generic[ResponseDataT, ResponseLinksT],
+    BaseModel, Generic[ResponseDataT, ResponseLinksT],
 ):
     """A response that returns multiple resources and stateful links."""
 
@@ -240,7 +238,7 @@ class DeprecatedResponseDataModel(BaseModel):
 
 
 # TODO(mc, 2021-12-09): remove this model
-class DeprecatedResponseModel(GenericModel, Generic[ResponseDataT]):
+class DeprecatedResponseModel(BaseModel, Generic[ResponseDataT]):
     """A response that returns a single resource and stateful links.
 
     This deprecated response model may serialize `Optional` fields to `null`,
@@ -259,8 +257,7 @@ class DeprecatedResponseModel(GenericModel, Generic[ResponseDataT]):
 
 # TODO(mc, 2021-12-09): remove this model
 class DeprecatedMultiResponseModel(
-    GenericModel,
-    Generic[ResponseDataT],
+    BaseModel, Generic[ResponseDataT],
 ):
     """A response that returns multiple resources and stateful links.
 

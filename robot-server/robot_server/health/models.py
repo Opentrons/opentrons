@@ -85,16 +85,16 @@ class Health(BaseResponseBody):
         ...,
         description="The system's maximum supported Protocol API version, "
         "in the format `[major_version, minor_version]`",
-        min_items=2,
-        max_items=2,
+        min_length=2,
+        max_length=2,
         examples=[[2, 8]],
     )
     minimum_protocol_api_version: typing.List[int] = Field(
         ...,
         description="The system's minimum supported Protocol API version, "
         "in the format `[major_version, minor_version]`",
-        min_items=2,
-        max_items=2,
+        min_length=2,
+        max_length=2,
         examples=[[2, 0]],
     )
     robot_serial: typing.Optional[str] = Field(

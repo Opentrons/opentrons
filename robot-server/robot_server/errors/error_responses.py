@@ -1,6 +1,5 @@
 """JSON API errors and response models."""
 from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
 from typing import Any, Dict, Generic, Optional, Sequence, TypeVar, Type
 
 from robot_server.service.json_api import BaseResponseBody, ResourceLinks
@@ -175,7 +174,7 @@ class LegacyErrorResponse(BaseErrorBody):
         )
 
 
-class ErrorBody(BaseErrorBody, GenericModel, Generic[ErrorDetailsT]):
+class ErrorBody(BaseErrorBody, BaseModel, Generic[ErrorDetailsT]):
     """A response body for a single error."""
 
     errors: Sequence[ErrorDetailsT] = Field(..., description="Error details.")
@@ -188,7 +187,7 @@ class ErrorBody(BaseErrorBody, GenericModel, Generic[ErrorDetailsT]):
     )
 
 
-class MultiErrorResponse(BaseErrorBody, GenericModel, Generic[ErrorDetailsT]):
+class MultiErrorResponse(BaseErrorBody, BaseModel, Generic[ErrorDetailsT]):
     """An response body for multiple errors."""
 
     errors: Sequence[ErrorDetailsT] = Field(..., description="Error details.")

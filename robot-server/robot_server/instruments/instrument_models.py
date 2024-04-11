@@ -5,7 +5,6 @@ from typing_extensions import Literal
 from typing import Optional, TypeVar, Union, Generic, Dict, List
 from datetime import datetime
 from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
 
 
 from opentrons.calibration_storage.types import SourceType
@@ -41,7 +40,7 @@ class InconsistentCalibrationFailure(BaseModel):
     limit: float
 
 
-class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):
+class _GenericInstrument(BaseModel, Generic[InstrumentModelT, InstrumentDataT]):
     """Base instrument response."""
 
     mount: str = Field(..., description="The mount this instrument is attached to.")
