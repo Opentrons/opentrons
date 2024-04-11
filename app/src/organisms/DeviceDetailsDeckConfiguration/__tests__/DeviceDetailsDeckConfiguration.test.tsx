@@ -6,6 +6,7 @@ import { describe, it, beforeEach, vi, afterEach } from 'vitest'
 import { DeckConfigurator } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
+  useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 
@@ -60,6 +61,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
     props = {
       robotName: ROBOT_NAME,
     }
+    vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
     vi.mocked(useDeckConfigurationQuery).mockReturnValue({ data: [] } as any)
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
@@ -89,7 +91,7 @@ describe('DeviceDetailsDeckConfiguration', () => {
     screen.getByText('otie deck configuration')
     screen.getByRole('button', { name: 'Setup Instructions' })
     screen.getByText('Location')
-    screen.getByText('Fixture')
+    screen.getByText('Deck hardware')
     screen.getByText('mock DeckConfigurator')
   })
 
