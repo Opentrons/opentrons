@@ -11,9 +11,9 @@ import type { AxiosError } from 'axios'
 import type {
   ErrorResponse,
   HostConfig,
-  Protocol,
   RunTimeParameterCreateData,
 } from '@opentrons/api-client'
+import { ProtocolAnalysisSummary } from '@opentrons/shared-data'
 
 export interface CreateProtocolAnalysisVariables {
   protocolKey: string
@@ -21,25 +21,25 @@ export interface CreateProtocolAnalysisVariables {
   forceReAnalyze?: boolean
 }
 export type UseCreateProtocolMutationResult = UseMutationResult<
-  Protocol,
+  ProtocolAnalysisSummary[],
   AxiosError<ErrorResponse>,
   CreateProtocolAnalysisVariables
 > & {
   createProtocolAnalysis: UseMutateFunction<
-    Protocol,
+    ProtocolAnalysisSummary[],
     AxiosError<ErrorResponse>,
     CreateProtocolAnalysisVariables
   >
 }
 
-export type UseCreateProtocolMutationOptions = UseMutationOptions<
-  Protocol,
+export type UseCreateProtocolAnalysisMutationOptions = UseMutationOptions<
+  ProtocolAnalysisSummary[],
   AxiosError<ErrorResponse>,
   CreateProtocolAnalysisVariables
 >
 
 export function useCreateProtocolAnalysisMutation(
-  options: UseCreateProtocolMutationOptions = {},
+  options: UseCreateProtocolAnalysisMutationOptions = {},
   protocolId: string | null,
   hostOverride?: HostConfig | null
 ): UseCreateProtocolMutationResult {
@@ -49,7 +49,7 @@ export function useCreateProtocolAnalysisMutation(
   const queryClient = useQueryClient()
 
   const mutation = useMutation<
-    Protocol,
+    ProtocolAnalysisSummary[],
     AxiosError<ErrorResponse>,
     CreateProtocolAnalysisVariables
   >(
@@ -62,9 +62,8 @@ export function useCreateProtocolAnalysisMutation(
         forceReAnalyze
       )
         .then(response => {
-          const protocolId = response.data.data.id
           queryClient
-            .invalidateQueries([host, 'protocols'])
+            .invalidateQueries([host, 'protocols', protocolId, 'analyses'])
             .then(() =>
               queryClient.setQueryData(
                 [host, 'protocols', protocolId],
