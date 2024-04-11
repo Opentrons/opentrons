@@ -363,7 +363,6 @@ export function ChooseRobotSlideout(
               }
             }}
             title={runtimeParam.displayName}
-            caption={runtimeParam.description}
             width="100%"
             dropdownType="neutral"
           />
@@ -394,7 +393,6 @@ export function ChooseRobotSlideout(
             key={runtimeParam.variableName}
             type="number"
             units={runtimeParam.suffix}
-            placeholder={value.toString()}
             value={value}
             title={runtimeParam.displayName}
             tooltipText={runtimeParam.description}
