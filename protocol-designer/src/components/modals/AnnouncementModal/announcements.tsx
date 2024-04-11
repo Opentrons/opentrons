@@ -265,5 +265,43 @@ export const useAnnouncements = (): Announcement[] => {
         </>
       ),
     },
+    {
+      announcementKey: 'customParamsAndMultiTipAndModule8.1',
+      image: (
+        //  TODO(jr, 4/11/24): add image to announcement modal
+        <Flex/>
+      ),
+      heading: t('announcements.header', { pd: PD }),
+      message: (
+        <>
+          <p>
+            {t('announcements.customParamsAndMultiTipAndModule.body1', {
+              pd: PD,
+            })}
+          </p>
+          <ul>
+            <li>{t('announcements.customParamsAndMultiTipAndModule.body2')}</li>
+            <li>
+              {' '}
+              <Trans
+                t={t}
+                i18nKey={'announcements.customParamsAndMultiTipAndModule.body3'}
+                components={{ i: <em /> }}
+              />
+            </li>
+            <li>{t('announcements.customParamsAndMultiTipAndModule.body4')}</li>
+            <li>{t('announcements.customParamsAndMultiTipAndModule.body5')}</li>
+          </ul>
+          <p>
+            <Trans
+              t={t}
+              i18nKey={'announcements.customParamsAndMultiTipAndModule.body6'}
+              components={{ strong: <strong /> }}
+              values={{ app: APP }}
+            />
+          </p>
+        </>
+      ),
+    },
   ]
 }
