@@ -269,7 +269,7 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'customParamsAndMultiTipAndModule8.1',
       image: (
         //  TODO(jr, 4/11/24): add image to announcement modal
-        <Flex/>
+        <Flex />
       ),
       heading: t('announcements.header', { pd: PD }),
       message: (

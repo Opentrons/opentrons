@@ -74,6 +74,13 @@ describe('FileSidebar', () => {
     vi.resetAllMocks()
     cleanup()
   })
+  it('renders the file sidebar and exports with blocking hint for exporting', () => {
+    vi.mocked(useBlockingHint).mockReturnValue(<div>mock blocking hint</div>)
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    expect(vi.mocked(useBlockingHint)).toHaveBeenCalled()
+    screen.getByText('mock blocking hint')
+  })
   it('renders the file sidebar and buttons work as expected with no warning upon export', () => {
     render()
     screen.getByText('Protocol File')
