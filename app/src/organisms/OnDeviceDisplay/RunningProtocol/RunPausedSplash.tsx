@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
@@ -27,7 +28,13 @@ export function RunPausedSplash({
   errorType,
   protocolName,
 }: RunPausedSplashProps): JSX.Element {
-  const subText = protocolName ?? null
+  const { t } = useTranslation('error_recovery')
+
+  let subText: string | null
+  switch (errorType) {
+    default:
+      subText = protocolName ?? null
+  }
 
   return (
     <Btn
@@ -45,7 +52,7 @@ export function RunPausedSplash({
       <SplashFrame>
         <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
           <Icon name={'ot-alert'} size="4.5rem" color={COLORS.white} />
-          <SplashHeader>{'Run paused'}</SplashHeader>
+          <SplashHeader>{t('run_paused')}</SplashHeader>
         </Flex>
         <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
           <SplashBody>{subText}</SplashBody>
