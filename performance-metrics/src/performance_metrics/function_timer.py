@@ -8,16 +8,13 @@ performance counters for accuracy.
 from time import perf_counter_ns, clock_gettime_ns, CLOCK_REALTIME
 from types import TracebackType
 from typing import (
-    Awaitable,
     Protocol,
-    Callable,
     Type,
     TypeVar,
     Tuple,
 )
 from performance_metrics.datashapes import RawDurationData
 from typing_extensions import ParamSpec
-import inspect
 from contextlib import AbstractAsyncContextManager, AbstractContextManager
 
 P = ParamSpec("P")
@@ -39,7 +36,7 @@ class FunctionTimerCallback(Protocol):
         pass
 
 
-class FunctionTimer(AbstractAsyncContextManager, AbstractContextManager):
+class FunctionTimer(AbstractAsyncContextManager, AbstractContextManager):  # type: ignore
     """A decorator class for measuring and storing the execution duration of functions.
 
     It supports both synchronous and asynchronous functions.
@@ -111,11 +108,9 @@ class FunctionTimer(AbstractAsyncContextManager, AbstractContextManager):
         assert self._func_start_time is not None
         assert self._duration_start_time is not None
         assert self._duration_end_time is not None
-        
+
         return RawDurationData(
             func_start=self._func_start_time,
             duration_start=self._duration_start_time,
             duration_end=self._duration_end_time,
         )
- 
-

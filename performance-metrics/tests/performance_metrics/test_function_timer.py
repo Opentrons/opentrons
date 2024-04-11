@@ -1,4 +1,5 @@
 """This module contains tests for timing the execution of synchronous and asynchronous functions using the FunctionTimer class.
+
 It includes functions and their variants that raise exceptions to simulate errors during execution. Each test function is designed
 to ensure the FunctionTimer accurately measures execution times and handles exceptions correctly for both synchronous and asynchronous
 calls. This serves as a comprehensive suite to validate the functionality of FunctionTimer in various scenarios.
@@ -64,6 +65,7 @@ def test_synchronous_function_with_exception() -> None:
     duration_data = timer.get_data()
     assert duration_data.duration_start < duration_data.duration_end
 
+
 async def test_asynchronous_function() -> None:
     """Tests that the asynchronous function is timed correctly by FunctionTimer."""
     async with FunctionTimer() as timer:
@@ -102,6 +104,7 @@ async def test_synchronous_and_asynchronous_function_with_exception() -> None:
 
     duration_data = timer.get_data()
     assert duration_data.duration_start < duration_data.duration_end
+
 
 async def test_nested_synchronous_functions() -> None:
     """Tests that the FunctionTimer correctly times nested synchronous functions."""
@@ -160,7 +163,9 @@ def test_known_duration_function() -> None:
         known_duration_function()
 
     duration_data = timer.get_data()
-    measured_duration_nanoseconds = abs(duration_data.duration_start - duration_data.duration_end) 
+    measured_duration_nanoseconds = abs(
+        duration_data.duration_start - duration_data.duration_end
+    )
     measure_duration_seconds = measured_duration_nanoseconds / 1_000_000_000
     assert abs(measure_duration_seconds - sleep_duration) < 0.05
 
@@ -210,6 +215,7 @@ async def test_function_timer_with_async_contexts() -> None:
 
 def test_direct_use_without_context_manager() -> None:
     """Tests the behavior of FunctionTimer when used directly without a context manager block.
+
     Verifies that the start and end times are not set and that an appropriate assertion is raised when attempting to access them.
     """
     timer = FunctionTimer()
@@ -229,6 +235,7 @@ def test_direct_use_without_context_manager() -> None:
 
 def test_calling_get_data_before_context_manager_finishes() -> None:
     """Tests that attempting to call get_data before the context manager has properly finished (exited) results in an assertion error.
+
     This simulates the scenario where get_data is called prematurely, ensuring the timer enforces correct usage patterns.
     """
     with pytest.raises(AssertionError):

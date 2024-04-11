@@ -152,10 +152,7 @@ async def test_async_operation_timing_accuracy(
     await async_running_operation()
 
     duration_data = robot_context_tracker._storage[0]
-    measured_duration = (
-        duration_data.duration_end
-        - duration_data.duration_start
-    )
+    measured_duration = duration_data.duration_end - duration_data.duration_start
     assert (
         abs(measured_duration - RUNNING_TIME * 1e9) < 1e7
     ), "Measured duration for async operation should closely match the expected duration."
