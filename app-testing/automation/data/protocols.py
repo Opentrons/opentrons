@@ -19,7 +19,7 @@ class Protocols:
         file_extension="json",
         protocol_name="Need Pipette",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -29,7 +29,7 @@ class Protocols:
         file_extension="json",
         protocol_name="HS Collision",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
         description="""This protocol gives an error in PD.8-Channel pipette cannot access labware8-Channel pipettes cannot access labware or tip racks to the left or right of a Heater-Shaker GEN1 module. Move labware to a different slot to access it with an 8-Channel pipette.If you export it anyway there are NOT analysis errors in the app side analysis.TODO on if there are robot side analysis errors but do not expect them?""",  # noqa: E501
@@ -40,7 +40,7 @@ class Protocols:
         file_extension="json",
         protocol_name="Transfer- Multi liquid (retransfer)",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -49,7 +49,7 @@ class Protocols:
         file_extension="json",
         protocol_name="Have Pipette",
         category=ProtocolCategory(robot="OT2", outcome="Error"),
-        robot="OT-2",
+        robot="OT2",
         app_error=True,
         robot_error=True,
         app_analysis_error="Cannot aspirate more than pipette max volume",
@@ -61,7 +61,7 @@ class Protocols:
         file_extension="json",
         protocol_name="H/S normal use",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -71,7 +71,7 @@ class Protocols:
         file_extension="json",
         protocol_name="All mods",
         category=ProtocolCategory(robot="OT2", outcome="Error"),
-        robot="OT-2",
+        robot="OT2",
         app_error=True,
         robot_error=True,
         app_analysis_error="Heater-Shaker cannot open its labware latch while it is shaking.",
@@ -83,7 +83,7 @@ class Protocols:
         file_extension="json",
         protocol_name="script_pur_sample_1",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -93,7 +93,7 @@ class Protocols:
         file_extension="json",
         protocol_name="script_pur_sample_1",
         category=ProtocolCategory(robot="OT2", outcome="Error"),
-        robot="OT-2",
+        robot="OT2",
         app_error=True,
         robot_error=True,
         app_analysis_error="Cannot aspirate more than pipette max volume",
@@ -105,7 +105,7 @@ class Protocols:
         file_extension="json",
         protocol_name="Mix/transfer- several liquids",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -115,7 +115,7 @@ class Protocols:
         file_extension="json",
         protocol_name="H/S normal use",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -125,7 +125,7 @@ class Protocols:
         file_extension="json",
         protocol_name="gen1 pipette",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -135,7 +135,7 @@ class Protocols:
         file_extension="json",
         protocol_name="MoaM",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -160,7 +160,7 @@ class Protocols:
         file_extension="py",
         protocol_name="🛠 3.10 only Python 🛠",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=True,
         robot_analysis_error="?",
@@ -171,7 +171,7 @@ class Protocols:
         file_extension="py",
         protocol_name="bad import",
         category=ProtocolCategory(robot="OT2", outcome="Error"),
-        robot="OT-2",
+        robot="OT2",
         app_error=True,
         robot_error=True,
         app_analysis_error="No module named 'superspecialmagic'",
@@ -183,7 +183,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_P10S_P300M_TC1_TM_MM_2_11_Swift.py",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -191,9 +191,9 @@ class Protocols:
     v2_7_P20S_None_Walkthrough: Protocol = Protocol(
         file_stem="v2_7_P20S_None_Walkthrough",
         file_extension="py",
-        protocol_name="OT-2 Guided Walk-through",
+        protocol_name="OT2 Guided Walk-through",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -203,7 +203,7 @@ class Protocols:
         file_extension="py",
         protocol_name="QA Protocol - API 2.16 - Aspirate Dispense Mix with 0 Volume",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -213,7 +213,7 @@ class Protocols:
         file_extension="py",
         protocol_name="Will fail on run",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -222,7 +222,7 @@ class Protocols:
         file_extension="py",
         protocol_name="🛠️ 2.13 Smoke Test V3 🪄",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
         custom_labware=["cpx_4_tuberack_100ul"],
@@ -233,7 +233,7 @@ class Protocols:
         file_extension="py",
         protocol_name="🛠️ 2.14 Smoke Test V3 🪄",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
         custom_labware=["cpx_4_tuberack_100ul"],
@@ -244,7 +244,7 @@ class Protocols:
         file_extension="py",
         protocol_name="🛠️ 2.15 Smoke Test V3 🪄",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
         custom_labware=["cpx_4_tuberack_100ul"],
@@ -255,7 +255,7 @@ class Protocols:
         file_extension="py",
         protocol_name="🛠️ 2.16 Smoke Test V3 🪄",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
         custom_labware=["cpx_4_tuberack_100ul"],
@@ -266,7 +266,7 @@ class Protocols:
         file_extension="py",
         protocol_name="🛠️ 2.17 Smoke Test V3 🪄",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -276,7 +276,7 @@ class Protocols:
         file_extension="py",
         protocol_name="🛠 Logo-Modules-CustomLabware 🛠",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
         custom_labware=["cpx_4_tuberack_100ul"],
@@ -287,7 +287,7 @@ class Protocols:
         file_extension="py",
         protocol_name="Zymo Direct-zol96 Magbead RNA",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -297,7 +297,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_P300S_Thermocycler_Moam_Error.py",
         category=ProtocolCategory(robot="OT2", outcome="Error"),
-        robot="OT-2",
+        robot="OT2",
         app_error=True,
         robot_error=True,
         app_analysis_error="DeckConflictError [line 19]: thermocyclerModuleV2 in slot 7 prevents thermocyclerModuleV1 from using slot 7.",  # noqa: E501
@@ -309,7 +309,7 @@ class Protocols:
         file_extension="py",
         protocol_name="My Protocol",
         category=ProtocolCategory(robot="OT2", outcome="Error"),
-        robot="OT-2",
+        robot="OT2",
         app_error=True,
         robot_error=True,
         app_analysis_error="AttributeError [line 24]: 'InstrumentContext' object has no attribute 'pair_with'",
@@ -321,7 +321,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_P300SLeft_MM1_MM_2_2_EngageMagHeightFromBase.py",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -331,7 +331,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_P300SLeft_MM1_MM_TM_2_3_Mix.py",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -341,7 +341,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_P300M_P20S_TC_HS_TM_2_16_aspirateDispenseMix0Volume.py",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -351,7 +351,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_P300M_P20S_TC_HS_TM_2_15_dispense_changes.py",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -361,7 +361,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_P300M_P20S_TC_HS_TM_2_16_dispense_changes.py",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -371,7 +371,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_P300M_P20S_TC_HS_TM_2_17_dispense_changes.py",
         category=ProtocolCategory(robot="OT2", outcome="Error"),
-        robot="OT-2",
+        robot="OT2",
         app_error=True,
         robot_error=False,
         app_analysis_error="ValueError [line 15]: Cannot dispense more than pipette max volume",  # noqa: E501
@@ -382,7 +382,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_None_None_TC_2_14_VerifyThermocyclerLoadedSlots.py",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -392,7 +392,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_None_None_TC_2_15_VerifyThermocyclerLoadedSlots.py",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -402,7 +402,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_None_None_TC_2_16_VerifyThermocyclerLoadedSlots.py",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -412,7 +412,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_None_None_TC_2_17_VerifyThermocyclerLoadedSlots.py",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -422,7 +422,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_None_None_HS_2_16_AnalysisError_HeaterShakerConflictWithTrashBin1.py",
         category=ProtocolCategory(robot="OT2", outcome="Error"),
-        robot="OT-2",
+        robot="OT2",
         app_error=True,
         robot_error=False,
         app_analysis_error="DeckConflictError [line 19]: trash_bin in slot 12 prevents heater_shaker in slot 11 from using slot 11.",  # noqa: E501
@@ -433,7 +433,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_None_None_HS_2_16_AnalysisError_HeaterShakerConflictWithTrashBin2.py",
         category=ProtocolCategory(robot="OT2", outcome="Error"),
-        robot="OT-2",
+        robot="OT2",
         app_error=True,
         robot_error=False,
         app_analysis_error="DeckConflictError [line 19]: trash_bin in slot 12 prevents heater_shaker in slot 11 from using slot 11.",  # noqa: E501
@@ -444,7 +444,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_None_None_2_16_verifyDoesNotDeadlock.py",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -454,7 +454,7 @@ class Protocols:
         file_extension="py",
         protocol_name="OT2_P300S_None_2_16_verifyNoFloatingPointErrorInPipetting.py",
         category=ProtocolCategory(robot="OT2", outcome="Success"),
-        robot="OT-2",
+        robot="OT2",
         app_error=False,
         robot_error=False,
     )
@@ -662,7 +662,7 @@ class Protocols:
     v2_16_P300MGen2_None_OT2PipetteInFlexProtocol: Protocol = Protocol(
         file_stem="v2_16_P300MGen2_None_OT2PipetteInFlexProtocol",
         file_extension="py",
-        protocol_name="QA Protocol - Analysis Error - OT-2 Pipette in Flex Protocol",
+        protocol_name="QA Protocol - Analysis Error - OT2 Pipette in Flex Protocol",
         category=ProtocolCategory(robot="Flex", outcome="Error"),
         robot="Flex",
         app_error=True,
@@ -885,4 +885,24 @@ class Protocols:
         robot="Flex",
         app_error=True,
         robot_error=True,
+    )
+
+    v2_18_None_None_duplicateRTPVariableName: Protocol = Protocol(
+        file_stem="v2_18_None_None_duplicateRTPVariableName",
+        file_extension="py",
+        protocol_name="Multiple RTP Variables with Same Name",
+        category=ProtocolCategory(robot="OT2", outcome="Error"),
+        robot="OT2",
+        app_error=True,
+        robot_error=True,
+    )
+
+    v2_18_None_None_duplicateChoiceValue: Protocol = Protocol(
+        file_stem="v2_18_None_None_duplicateChoiceValue",
+        file_extension="py",
+        protocol_name="Duplicate choice value",
+        category=ProtocolCategory(robot="OT2", outcome="Success"),
+        robot="OT2",
+        app_error=False,
+        robot_error=False,
     )

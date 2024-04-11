@@ -104,4 +104,6 @@ names = Literal[
     "v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice_Override_str_default_no_matching_choices",
     "v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice_Override_float_default_no_matching_choices",
     "v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice_Override_int_default_no_matching_choices",
+    "v2_18_None_None_duplicateRTPVariableName",
+    "v2_18_None_None_duplicateChoiceValue",
 ]

@@ -1,17 +1,10 @@
-# docker build --build-arg OPENTRONS_VERSION=v7.0.2 -t opentrons-analysis:v7.0.2 .
-# docker build --build-arg OPENTRONS_VERSION=v7.1.0-alpha.1 -t opentrons-analysis:v7.1.0-alpha.1 .
-# docker build --build-arg OPENTRONS_VERSION=v7.1.0-alpha.2 -t opentrons-analysis:v7.1.0-alpha.2 .
-# docker build --build-arg OPENTRONS_VERSION=v7.1.0-alpha.3 -t opentrons-analysis:v7.1.0-alpha.3 .
-
-# python -m pipenv run python citools/generate_analyses.py
-
-import datetime
 import json
 import os
 import signal
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from enum import Enum, auto
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional
@@ -71,7 +64,7 @@ class AnalyzedProtocol:
         return self.host_analysis_file.exists()
 
     def create_failed_analysis(self) -> Dict[str, Any]:
-        created_at = datetime.now(datetime.UTC).isoformat()  # type: ignore[attr-defined]
+        created_at = datetime.now(timezone.utc).isoformat()
 
         return {
             "createdAt": created_at,
