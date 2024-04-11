@@ -27,6 +27,6 @@ describe('UpdateInProgressModal', () => {
       subsystem: 'hepa_uv',
     }
     const { getByText } = render(props)
-    getByText('Updating Hepa/UV firmware...')
+    getByText('Updating HEPA/UV Module firmware...')
   })
 })
