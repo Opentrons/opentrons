@@ -53,11 +53,7 @@ interface ModuleTableProps {
 }
 
 export function ModuleTable(props: ModuleTableProps): JSX.Element {
-  const {
-    attachedProtocolModuleMatches,
-    deckDef,
-    runId,
-  } = props
+  const { attachedProtocolModuleMatches, deckDef, runId } = props
 
   const { t } = useTranslation('protocol_setup')
 

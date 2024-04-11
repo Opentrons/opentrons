@@ -294,10 +294,16 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
       ),
       ...deckConfigCompatibility
         .filter(
-          ({ cutoutFixtureId, compatibleCutoutFixtureIds, requiredAddressableAreas }) =>
+          ({
+            cutoutFixtureId,
+            compatibleCutoutFixtureIds,
+            requiredAddressableAreas,
+          }) =>
             cutoutFixtureId != null &&
             !compatibleCutoutFixtureIds.some(id => id === cutoutFixtureId) &&
-            !FLEX_MODULE_ADDRESSABLE_AREAS.some(modAA => requiredAddressableAreas.includes(modAA)) // modules are already included via requiredProtocolHardware
+            !FLEX_MODULE_ADDRESSABLE_AREAS.some(modAA =>
+              requiredAddressableAreas.includes(modAA)
+            ) // modules are already included via requiredProtocolHardware
         )
         .map(({ compatibleCutoutFixtureIds, cutoutId }) => ({
           hardwareType: 'fixture' as const,

@@ -3,7 +3,11 @@ import { when } from 'vitest-when'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE, STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
@@ -93,7 +97,9 @@ describe('SetupModulesList', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
     }
-    when(vi.mocked(useRobot)).calledWith(ROBOT_NAME).thenReturn({robotModel: FLEX_ROBOT_TYPE} as DiscoveredRobot)
+    when(vi.mocked(useRobot))
+      .calledWith(ROBOT_NAME)
+      .thenReturn({ robotModel: FLEX_ROBOT_TYPE } as DiscoveredRobot)
     mockChainLiveCommands = vi.fn()
     mockChainLiveCommands.mockResolvedValue(null)
     vi.mocked(ModuleSetupModal).mockReturnValue(<div>mockModuleSetupModal</div>)
@@ -295,7 +301,9 @@ describe('SetupModulesList', () => {
   })
 
   it('should render the MoaM component when Moam is attached and robot is OT2', () => {
-    when(vi.mocked(useRobot)).calledWith(ROBOT_NAME).thenReturn({robotModel: OT2_ROBOT_TYPE} as DiscoveredRobot)
+    when(vi.mocked(useRobot))
+      .calledWith(ROBOT_NAME)
+      .thenReturn({ robotModel: OT2_ROBOT_TYPE } as DiscoveredRobot)
     vi.mocked(OT2MultipleModulesHelp).mockReturnValue(
       <div>mock Moam modal</div>
     )

@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useDeckConfigurationQuery, useModulesQuery } from '@opentrons/react-api-client'
+import {
+  useDeckConfigurationQuery,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -61,21 +64,36 @@ export const ChooseModuleToConfigureModal = (
         )
     ) ?? []
 
-  const connectedOptions: ModuleFixtureOption[] = unconfiguredModuleMatches.map(attachedMod => ({ moduleModel: attachedMod.moduleModel, usbPort: attachedMod.usbPort.port, serialNumber: attachedMod.serialNumber }))
-  const passiveOptions: ModuleFixtureOption[] = requiredModuleModel === MAGNETIC_BLOCK_V1 ? [{ moduleModel: MAGNETIC_BLOCK_V1 }] : []
-  const fixtureOptions = [...connectedOptions, ...passiveOptions]
-    .map(({ moduleModel, serialNumber, usbPort }) => {
-      const moduleFixtures = getCutoutFixturesForModuleModel(moduleModel, deckDef)
+  const connectedOptions: ModuleFixtureOption[] = unconfiguredModuleMatches.map(
+    attachedMod => ({
+      moduleModel: attachedMod.moduleModel,
+      usbPort: attachedMod.usbPort.port,
+      serialNumber: attachedMod.serialNumber,
+    })
+  )
+  const passiveOptions: ModuleFixtureOption[] =
+    requiredModuleModel === MAGNETIC_BLOCK_V1
+      ? [{ moduleModel: MAGNETIC_BLOCK_V1 }]
+      : []
+  const fixtureOptions = [...connectedOptions, ...passiveOptions].map(
+    ({ moduleModel, serialNumber, usbPort }) => {
+      const moduleFixtures = getCutoutFixturesForModuleModel(
+        moduleModel,
+        deckDef
+      )
       return (
         <FixtureOption
           key={serialNumber}
-          onClickHandler={() => { handleConfigureModule(serialNumber) }}
+          onClickHandler={() => {
+            handleConfigureModule(serialNumber)
+          }}
           optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
           buttonText={t('shared:add')}
           isOnDevice={isOnDevice}
         />
       )
-    })
+    }
+  )
 
   return createPortal(
     isOnDevice ? (

@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
-import { useDeckConfigurationQuery, useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import {
+  useDeckConfigurationQuery,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   BORDERS,

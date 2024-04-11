@@ -33,7 +33,7 @@ export function useModuleRenderInfoForProtocolById(
   pollModules?: boolean
 ): ModuleRenderInfoById {
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { data: deckConfig = []} = useDeckConfigurationQuery({
+  const { data: deckConfig = [] } = useDeckConfigurationQuery({
     refetchInterval: REFETCH_INTERVAL_5000_MS,
   })
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -52,7 +52,7 @@ export function useModuleRenderInfoForProtocolById(
     (modA, modB) => modA.protocolLoadOrder - modB.protocolLoadOrder
   )
 
-  const robotSupportsModuleConfig = assumedRobotType !== OT2_ROBOT_TYPE 
+  const robotSupportsModuleConfig = assumedRobotType !== OT2_ROBOT_TYPE
   let matchedAmod: AttachedModule[] = []
   const allModuleRenderInfo = protocolModulesInfoInLoadOrder.map(
     protocolMod => {
@@ -69,19 +69,24 @@ export function useModuleRenderInfoForProtocolById(
         attachedModules.find(
           attachedMod =>
             // first check module model compatibility
-            checkModuleCompatibility(attachedMod.moduleModel, protocolMod.moduleDef.model) 
-            // then check that the module hasn't already been matched 
-            && !matchedAmod.some(m => m.serialNumber === attachedMod.serialNumber)
+            checkModuleCompatibility(
+              attachedMod.moduleModel,
+              protocolMod.moduleDef.model
+            ) &&
+            // then check that the module hasn't already been matched
+            !matchedAmod.some(
+              m => m.serialNumber === attachedMod.serialNumber
+            ) &&
             // then if robotType supports configurable modules check the deck config has a
-            // a module with the expected serial number in the expected location 
-            && (!robotSupportsModuleConfig || 
-              deckConfig.some(({cutoutId, opentronsModuleSerialNumber}) => 
-              attachedMod.serialNumber === opentronsModuleSerialNumber
-              && moduleCutoutIds.includes(cutoutId)
-            ))
+            // a module with the expected serial number in the expected location
+            (!robotSupportsModuleConfig ||
+              deckConfig.some(
+                ({ cutoutId, opentronsModuleSerialNumber }) =>
+                  attachedMod.serialNumber === opentronsModuleSerialNumber &&
+                  moduleCutoutIds.includes(cutoutId)
+              ))
         ) ?? null
 
-      
       const conflictedFixture =
         deckConfig?.find(
           ({ cutoutId, cutoutFixtureId }) =>

@@ -68,7 +68,7 @@ const mockAttachedTempMod: AttachedModule = {
     targetTemperature: null,
     status: 'idle',
   },
-  usbPort: { 
+  usbPort: {
     path: '/dev/ot_module_heatershaker0',
     port: 1,
     portGroup: 'unknown',
@@ -108,7 +108,7 @@ const TEMPERATURE_MODULE_INFO = {
 const mockCutoutConfig: CutoutConfig = {
   cutoutId: 'cutoutD1',
   cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
-  opentronsModuleSerialNumber: 'abc123'
+  opentronsModuleSerialNumber: 'abc123',
 }
 
 describe('useModuleRenderInfoForProtocolById hook', () => {

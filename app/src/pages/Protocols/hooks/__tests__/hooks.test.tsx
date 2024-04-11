@@ -308,7 +308,7 @@ describe.only('useMissingProtocolHardware', () => {
           slot: 'D3',
           connected: false,
           hasSlotConflict: false,
-        }
+        },
       ],
       conflictedSlots: [],
     })
@@ -375,8 +375,8 @@ describe.only('useMissingProtocolHardware', () => {
         {
           cutoutId: 'cutoutD3',
           cutoutFixtureId: 'heaterShakerModuleV1',
-          opentronsModuleSerialNumber: mockHeaterShaker.serialNumber
-        }
+          opentronsModuleSerialNumber: mockHeaterShaker.serialNumber,
+        },
       ],
       isLoading: false,
     } as any)

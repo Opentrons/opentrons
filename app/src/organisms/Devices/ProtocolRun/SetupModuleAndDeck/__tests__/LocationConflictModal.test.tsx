@@ -69,7 +69,9 @@ describe('LocationConflictModal', () => {
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render the modal information for a module fixture conflict', () => {
-    vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [mockHeaterShaker] } } as any)
+    vi.mocked(useModulesQuery).mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+    } as any)
     props = {
       onCloseClick: vi.fn(),
       cutoutId: 'cutoutB3',
