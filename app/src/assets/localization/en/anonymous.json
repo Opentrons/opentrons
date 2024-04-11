@@ -33,6 +33,7 @@
   "module_calibration_get_started": "<block>To get started, remove labware from the deck and clean up the working area to make the calibration easier. Also gather the needed equipment shown to the right.</block><block>The calibration adapter came with your module. The pipette probe came with your robot's pipette.</block>",
   "module_error_contact_support": "Try powering the module off and on again. If the error persists, contact Opentrons Support.",
   "network_setup_menu_description": "You’ll use this connection to run software updates and load protocols onto your robot.",
+  "oem_mode_description": "Enable OEM Mode to remove all instances of Opentrons from the Flex touchscreen.",
   "opentrons_app_successfully_updated": "The Opentrons App was successfully updated.",
   "opentrons_app_update": "Opentrons App update",
   "opentrons_app_update_available": "Opentrons App Update Available",
