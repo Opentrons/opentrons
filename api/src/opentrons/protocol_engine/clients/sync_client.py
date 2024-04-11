@@ -317,7 +317,7 @@ class SyncClient:
         )
         command = self._transport.execute_command_wait_for_recovery(request=request)
 
-        return cast(commands.PickUpTip, command)
+        return commands.PickUpTip.model_validate(command)
 
     def drop_tip(
         self,
