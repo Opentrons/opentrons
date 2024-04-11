@@ -16,6 +16,7 @@ import {
 import {
   getFixtureDisplayName,
   getCutoutFixturesForModuleModel,
+  MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
@@ -24,8 +25,13 @@ import { Modal } from '../../../../molecules/Modal'
 import type { ModuleModel, DeckDefinition } from '@opentrons/shared-data'
 import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
 
+interface ModuleFixtureOption {
+  moduleModel: ModuleModel
+  usbPort?: number
+  serialNumber?: string
+}
 interface ChooseModuleToConfigureModalProps {
-  handleConfigureModule: (moduleSerialNumber: string) => void
+  handleConfigureModule: (moduleSerialNumber?: string) => void
   onCloseClick: () => void
   deckDef: DeckDefinition
   isOnDevice: boolean
@@ -55,6 +61,22 @@ export const ChooseModuleToConfigureModal = (
         )
     ) ?? []
 
+  const connectedOptions: ModuleFixtureOption[] = unconfiguredModuleMatches.map(attachedMod => ({ moduleModel: attachedMod.moduleModel, usbPort: attachedMod.usbPort.port, serialNumber: attachedMod.serialNumber }))
+  const passiveOptions: ModuleFixtureOption[] = requiredModuleModel === MAGNETIC_BLOCK_V1 ? [{ moduleModel: MAGNETIC_BLOCK_V1 }] : []
+  const fixtureOptions = [...connectedOptions, ...passiveOptions]
+    .map(({ moduleModel, serialNumber, usbPort }) => {
+      const moduleFixtures = getCutoutFixturesForModuleModel(moduleModel, deckDef)
+      return (
+        <FixtureOption
+          key={serialNumber}
+          onClickHandler={() => { handleConfigureModule(serialNumber) }}
+          optionName={getFixtureDisplayName(moduleFixtures[0].id, usbPort)}
+          buttonText={t('shared:add')}
+          isOnDevice={isOnDevice}
+        />
+      )
+    })
+
   return createPortal(
     isOnDevice ? (
       <Modal
@@ -74,27 +96,7 @@ export const ChooseModuleToConfigureModal = (
               paddingTop={SPACING.spacing8}
               gridGap={SPACING.spacing8}
             >
-              {unconfiguredModuleMatches
-                .map(attachedModule => {
-                  const moduleFixtures = getCutoutFixturesForModuleModel(
-                    attachedModule.moduleModel,
-                    deckDef
-                  )
-                  return (
-                    <FixtureOption
-                      key={attachedModule.serialNumber}
-                      onClickHandler={() =>
-                        handleConfigureModule(attachedModule.serialNumber)
-                      }
-                      optionName={getFixtureDisplayName(
-                        moduleFixtures[0].id,
-                        attachedModule.usbPort.port
-                      )}
-                      buttonText={t('shared:add')}
-                      isOnDevice={isOnDevice}
-                    />
-                  )
-                })}
+              {fixtureOptions}
             </Flex>
           </Flex>
         </Flex>
@@ -123,28 +125,7 @@ export const ChooseModuleToConfigureModal = (
               paddingTop={SPACING.spacing8}
               gridGap={SPACING.spacing8}
             >
-              {unconfiguredModuleMatches
-                .filter(m => m.moduleModel === requiredModuleModel)
-                .map(attachedModule => {
-                  const moduleFixtures = getCutoutFixturesForModuleModel(
-                    attachedModule.moduleModel,
-                    deckDef
-                  )
-                  return (
-                    <FixtureOption
-                      key={attachedModule.serialNumber}
-                      onClickHandler={() =>
-                        handleConfigureModule(attachedModule.serialNumber)
-                      }
-                      optionName={getFixtureDisplayName(
-                        moduleFixtures[0].id,
-                        attachedModule.usbPort.port
-                      )}
-                      buttonText={t('shared:add')}
-                      isOnDevice={isOnDevice}
-                    />
-                  )
-                })}
+              {fixtureOptions}
             </Flex>
           </Flex>
         </Flex>

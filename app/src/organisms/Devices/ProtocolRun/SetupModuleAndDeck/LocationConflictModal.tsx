@@ -91,7 +91,7 @@ export const LocationConflictModal = (
       ? getFixtureDisplayName(deckConfigurationAtA1)
       : currentFixtureDisplayName
 
-  const handleConfigureModule = (moduleSerialNumber: string): void => {
+  const handleConfigureModule = (moduleSerialNumber?: string): void => {
     if (requiredModule != null) {
       const addressableAreas = getAddressableAreaNamesFromLoadedModule(
         requiredModule,
