@@ -13,6 +13,7 @@ import {
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
 import { LabwareDefByDefURI } from '../../labware-defs'
+import { getCutoutIdByAddressableArea } from '../../utils'
 import type {
   AddressableAreaName,
   CutoutId,
@@ -41,7 +42,6 @@ import type {
   FormPipette,
   LabwareOnDeck as LabwareOnDeckType,
 } from '../types'
-import { getCutoutIdByAddressableArea } from '../../utils'
 export { createPresavedStepForm } from './createPresavedStepForm'
 
 const MOVABLE_TRASH_CUTOUTS = [
@@ -297,14 +297,12 @@ export function getHydratedForm(
   return hydratedForm
 }
 
-export function getUnoccupiedSlotForMoveableTrash(
+export const getUnoccupiedSlotForMoveableTrash = (
   file: PDProtocolFile,
   hasWasteChuteCommands: boolean,
   stagingAreaSlotNames: AddressableAreaName[]
-): string {
-  const wasteChuteSlot = hasWasteChuteCommands
-    ? [WASTE_CHUTE_CUTOUT as string]
-    : []
+): string => {
+  const wasteChuteSlot = hasWasteChuteCommands ? [WASTE_CHUTE_CUTOUT] : []
   const stagingAreaCutoutIds = stagingAreaSlotNames.map(slotName =>
     getCutoutIdByAddressableArea(
       slotName,
@@ -365,7 +363,7 @@ export function getUnoccupiedSlotForMoveableTrash(
       !allLoadLabwareSlotNames.includes(cutout.slot) &&
       !allLoadModuleSlotNames.includes(cutout.slot) &&
       !allMoveLabwareLocations.includes(cutout.slot) &&
-      !wasteChuteSlot.includes(cutout.value) &&
+      !wasteChuteSlot.includes(cutout.value as typeof WASTE_CHUTE_CUTOUT) &&
       !stagingAreaCutoutIds.includes(cutout.value as CutoutId)
   )
   if (unoccupiedSlot == null) {
@@ -375,5 +373,5 @@ export function getUnoccupiedSlotForMoveableTrash(
     return ''
   }
 
-  return unoccupiedSlot?.slot
+  return unoccupiedSlot.slot
 }
