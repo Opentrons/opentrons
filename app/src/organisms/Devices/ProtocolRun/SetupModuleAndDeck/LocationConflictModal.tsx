@@ -1,11 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  useDeckConfigurationQuery,
-  useModulesQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useDeckConfigurationQuery, useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -70,7 +66,6 @@ export const LocationConflictModal = (
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
 
   const [showModuleSelect, setShowModuleSelect] = React.useState(false)
-  const attachedModules = useModulesQuery().data?.data ?? []
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckConfigurationAtLocationFixtureId = deckConfig.find(

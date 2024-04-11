@@ -66,7 +66,7 @@ describe('Touchscreen AddFixtureModal', () => {
   it('should set deck config when tapping add button', () => {
     render(props)
     fireEvent.click(screen.getAllByText('Select options')[1])
-    fireEvent.click(screen.getByText('Add'))
+    fireEvent.click(screen.getAllByText('Add')[0])
     expect(mockSetCurrentDeckConfig).toHaveBeenCalled()
   })
 
