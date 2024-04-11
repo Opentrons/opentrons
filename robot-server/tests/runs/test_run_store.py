@@ -496,6 +496,62 @@ def test_get_state_summary_none(subject: RunStore) -> None:
     assert result.dataError.code == ErrorCodes.INVALID_STORED_DATA
 
 
+def test_get_run_time_parameters(
+    subject: RunStore,
+    state_summary: StateSummary,
+    run_time_parameters: List[pe_types.RunTimeParameter],
+) -> None:
+    """It should be able to get store run time parameters."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=[],
+        run_time_parameters=run_time_parameters,
+    )
+    result = subject.get_run_time_parameters(run_id="run-id")
+    assert result == run_time_parameters
+
+
+def test_get_run_time_parameters_invalid(
+    subject: RunStore,
+    state_summary: StateSummary,
+) -> None:
+    """It should return an empty list if there invalid parameters."""
+    bad_parameters = [pe_types.BooleanParameter.construct(foo="bar")]  # type: ignore[call-arg]
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=[],
+        run_time_parameters=bad_parameters,  # type: ignore[arg-type]
+    )
+    result = subject.get_run_time_parameters(run_id="run-id")
+    assert result == []
+
+
+def test_get_run_time_parameters_none(
+    subject: RunStore,
+    state_summary: StateSummary,
+) -> None:
+    """It should return an empty list if there are no run time parameters associated."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+    result = subject.get_run_time_parameters(run_id="run-id")
+    assert result == []
+
+
 def test_has_run_id(subject: RunStore) -> None:
     """It should tell us if a given ID is in the store."""
     subject.insert(
