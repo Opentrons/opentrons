@@ -222,7 +222,6 @@ export function ChooseProtocolSlideoutComponent(
               setRunTimeParametersOverrides(clone)
             }}
             title={runtimeParam.displayName}
-            caption={runtimeParam.description}
             width="100%"
             dropdownType="neutral"
           />
@@ -313,14 +312,14 @@ export function ChooseProtocolSlideoutComponent(
                 }}
                 height="0.813rem"
                 label={
-                  runtimeParam.value
+                  Boolean(runtimeParam.value)
                     ? t('protocol_details:on')
                     : t('protocol_details:off')
                 }
                 paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
               />
               <StyledText as="p">
-                {runtimeParam.value
+                {Boolean(runtimeParam.value)
                   ? t('protocol_details:on')
                   : t('protocol_details:off')}
               </StyledText>

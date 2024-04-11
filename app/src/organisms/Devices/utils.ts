@@ -9,9 +9,9 @@ import type {
   Instruments,
   PipetteData,
   PipetteOffsetCalibration,
+  RunTimeParameterCreateData,
 } from '@opentrons/api-client'
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { RunTimeParameterCreateData } from '@opentrons/api-client'
 
 /**
  * formats a string if it is in ISO 8601 date format

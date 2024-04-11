@@ -14,7 +14,7 @@ export const mockRunTimeParameterData: RunTimeParameter[] = [
     variableName: 'USE_GRIPPER',
     description: '',
     type: 'bool',
-    default: true,
+    default: false,
     value: true,
   },
   {

@@ -4,7 +4,6 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_CENTER,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -12,8 +11,8 @@ import {
 import { InputField } from '../../atoms/InputField'
 import { useToaster } from '../ToasterOven'
 import { ChildNavigation } from '../ChildNavigation'
-import type { NumberParameter, RunTimeParameter } from '@opentrons/shared-data'
 import { NumericalKeyboard } from '../../atoms/SoftwareKeyboard'
+import type { NumberParameter } from '@opentrons/shared-data'
 
 interface ChooseNumberProps {
   handleGoBack: () => void
@@ -40,8 +39,7 @@ export function ChooseNumber({
   const [prevKeyboardValue, setPrevKeyboardValue] = React.useState<string>('')
   React.useEffect(() => {
     const arbitraryInput = new Array(paramValue).join('*')
-    console.log(keyboardRef.current)
-    // @ts-ignore keyboard should expose for `setInput` method
+    // @ts-expect-error keyboard should expose for `setInput` method
     keyboardRef.current?.setInput(arbitraryInput)
     setPrevKeyboardValue(arbitraryInput)
   }, [])
@@ -59,15 +57,14 @@ export function ChooseNumber({
     }
   }
 
-  const handleKeyboardInput = (e: string) => {
+  const handleKeyboardInput = (e: string): void => {
     if (prevKeyboardValue.length < e.length) {
       const lastDigit = e.slice(-1)
-      if (paramValue.indexOf('.') > -1 && lastDigit === '.') {
-      } else if (
-        (paramValue.length > 0 || paramValue.indexOf('-') > -1) &&
-        lastDigit === '-'
+      if (
+        !'.-'.includes(lastDigit) ||
+        (lastDigit === '.' && !paramValue.includes('.')) ||
+        (lastDigit === '-' && paramValue.length === 0)
       ) {
-      } else {
         setParamValue(paramValue + lastDigit)
       }
     } else {
@@ -80,6 +77,7 @@ export function ChooseNumber({
   const resetValueDisabled = parameter.default === paramValueAsNumber
   const { min, max } = parameter
   const error =
+    paramValue === '' ||
     Number.isNaN(paramValueAsNumber) ||
     paramValueAsNumber < min ||
     paramValueAsNumber > max
@@ -108,11 +106,10 @@ export function ChooseNumber({
         alignSelf={ALIGN_CENTER}
         gridGap={SPACING.spacing48}
         paddingX={SPACING.spacing40}
-        paddingBottom={SPACING.spacing40}
-        marginTop="7.75rem"
-        height="22rem"
-        justifyContent={JUSTIFY_CENTER}
+        padding={`${SPACING.spacing16} ${SPACING.spacing40} ${SPACING.spacing40}`}
+        marginTop="7.75rem" // using margin rather than justify due to content moving with error message
         alignItems={ALIGN_CENTER}
+        height="22rem"
       >
         <Flex
           width="30.5rem"
@@ -155,7 +152,7 @@ export function ChooseNumber({
           <NumericalKeyboard
             keyboardRef={keyboardRef}
             isDecimal={parameter.type === 'float'}
-            hasHyphen={true}
+            hasHyphen
             onChange={e => {
               handleKeyboardInput(e)
             }}
