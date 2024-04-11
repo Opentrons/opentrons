@@ -67,7 +67,7 @@
   "update_robot_software_link": "Launch Opentrons software update page",
   "use_older_protocol_analysis_method_description": "Use an older, slower method of analyzing uploaded protocols. This changes how the OT-2 validates your protocol during the upload step, but does not affect how your protocol actually runs. Support might ask you to change this setting if you encounter problems with the newer, faster protocol analysis method.",
   "versions_sync": "Learn more about keeping the Opentrons App and robot software in sync",
-  "want_to_help_out": "Want to help out Opentrons?",
+  "want_to_help_out": "Want to help out?",
   "welcome_title": "Welcome!",
   "why_use_lpc": "Labware Position Check is intended to correct for minor variances. Opentrons does not recommend using Labware Position Check to compensate for large positional adjustments. Needing to set large labware offsets could indicate a problem with robot calibration."
 }
