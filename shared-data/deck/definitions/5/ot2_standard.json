@@ -391,7 +391,7 @@
         "cutout11": ["11"],
         "cutout12": ["12"]
       },
-      "fixtureGroup": [],
+      "fixtureGroup": {},
       "height": 0
     },
     {
@@ -402,7 +402,7 @@
       "providesAddressableAreas": {
         "cutout12": ["fixedTrash"]
       },
-      "fixtureGroup": [],
+      "fixtureGroup": {},
       "height": 82
     }
   ]
