@@ -20,7 +20,6 @@ import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
 import {
   useIsFlex,
   useModuleRenderInfoForProtocolById,
-  useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
   useRobot,

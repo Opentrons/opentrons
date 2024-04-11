@@ -42,7 +42,6 @@ import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '../../organisms/Devices/getModulePrepCommands'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
-import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedProtocolModuleMatch } from './utils'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
@@ -50,7 +49,6 @@ const DECK_CONFIG_REFETCH_INTERVAL = 5000
 interface ModuleTableProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]
   deckDef: DeckDefinition
-  protocolModulesInfo: ProtocolModuleInfo[]
   runId: string
 }
 
@@ -58,7 +56,6 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
   const {
     attachedProtocolModuleMatches,
     deckDef,
-    protocolModulesInfo,
     runId,
   } = props
 
