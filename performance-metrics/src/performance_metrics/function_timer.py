@@ -5,93 +5,25 @@ The FunctionTimer class is intended to be used as a decorator to wrap functions 
 """
 
 from time import perf_counter_ns, clock_gettime_ns, CLOCK_REALTIME
-from typing import Awaitable, Iterator, Protocol, Callable, TypeVar, List, Tuple
-from typing_extensions import ParamSpec
-import inspect
-
-P = ParamSpec("P")
-R = TypeVar("R")
-
-
-class CanStoreTimingResult(Protocol):
-    """Protocol for a class that can store the result of a timing operation.
-
-    Implementing classes must provide a `store` method.
-    """
-
-    def store(
-        self,
-        function_start_time: int,
-        duration_measurement_start_time: int,
-        duration_measurement_end_time: int,
-    ) -> None:
-        """Stores the duration of an operation.
-
-        Args:
-            function_start_time: The time at which the function started executing.
-            duration_measurement_start_time: The time at which the duration measurement started.
-            duration_measurement_end_time: The time at which the duration measurement ended.
-        """
-        pass
+from types import TracebackType
+from typing import (
+    Type,
+    Tuple,
+)
+from performance_metrics.datashapes import RawDurationData
+from contextlib import AbstractAsyncContextManager, AbstractContextManager
 
 
-class TimingResultStore(CanStoreTimingResult):
-    """A class that stores the result of a timing operation.
-
-    Specifically captures the start, measurement start, and end times of function executions.
-    """
-
-    def __init__(self) -> None:
-        """Initializes the TimingResultStore."""
-        self._storage: List[Tuple[int, int, int]] = []
-
-    def __len__(self) -> int:
-        """Returns the number of stored timing results."""
-        return len(self._storage)
-
-    def __getitem__(self, index: int) -> Tuple[int, int, int]:
-        """Returns the timing result at the specified index."""
-        return self._storage[index]
-
-    def __iter__(self) -> Iterator[Tuple[int, int, int]]:
-        """Returns an iterator over the stored timing results."""
-        return iter(self._storage)
-
-    def store(
-        self,
-        function_start_time: int,
-        duration_measurement_start_time: int,
-        duration_measurement_end_time: int,
-    ) -> None:
-        """Stores timing information of an operation in nanoseconds.
-
-        Args:
-            function_start_time: The time at which the function started executing.
-            duration_measurement_start_time: The time at which the duration measurement started.
-            duration_measurement_end_time: The time at which the duration measurement ended.
-        """
-        self._storage.append(
-            (
-                function_start_time,
-                duration_measurement_start_time,
-                duration_measurement_end_time,
-            )
-        )
-
-
-class FunctionTimer:
+class FunctionTimer(AbstractAsyncContextManager, AbstractContextManager):  # type: ignore
     """A decorator class for measuring and storing the execution duration of functions.
 
     It supports both synchronous and asynchronous functions.
     """
 
-    def __init__(self, can_store: CanStoreTimingResult) -> None:
-        """Initializes the FunctionTimer with a specified storage function.
-
-        Args:
-            can_store: A function that stores the execution duration.
-        """
-        self._can_store = can_store
+    def __init__(self) -> None:
+        self._func_start_time: int | None = None
+        self._duration_start_time: int | None = None
+        self._duration_end_time: int | None = None
 
     def _begin_timing(self) -> Tuple[int, int]:
         """Starts the timing process, capturing both the current real-time and a high-resolution performance counter.
@@ -109,85 +41,46 @@ class FunctionTimer:
         """
         return perf_counter_ns()
 
-    def _async_wrapper(
-        self, func: Callable[P, Awaitable[R]]
-    ) -> Callable[P, Awaitable[R]]:
-        """Wraps an asynchronous function for duration measurement.
+    def __enter__(self) -> "FunctionTimer":
+        """Set the start time of the function."""
+        self._func_start_time, self._duration_start_time = self._begin_timing()
+        return self
 
-        Args:
-            func: The asynchronous function to be wrapped.
+    def __exit__(
+        self,
+        exc_type: Type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        """Set the end time of the function."""
+        self._duration_end_time = self._end_timing()
 
-        Returns:
-            A wrapped version of the input function with duration measurement capability.
-        """
+    async def __aenter__(self) -> "FunctionTimer":
+        """Set the start time of the function."""
+        self._func_start_time, self._duration_start_time = self._begin_timing()
+        return self
 
-        async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            """An asynchronous wrapper function for measuring execution duration.
+    async def __aexit__(
+        self,
+        exc_type: Type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        """Set the end time of the function."""
+        self._duration_end_time = self._end_timing()
 
-            If an exception is raised during the execution of the function, it is re-raised after
-            the duration measurement is stored.
-            """
-            function_start_time, duration_measurement_start_time = self._begin_timing()
-            try:
-                result: R = await func(*args, **kwargs)
-            except Exception as e:
-                raise e
-            finally:
-                self._can_store.store(
-                    function_start_time,
-                    duration_measurement_start_time,
-                    self._end_timing(),
-                )
-            return result
-
-        return async_wrapper
-
-    def _sync_wrapper(self, func: Callable[P, R]) -> Callable[P, R]:
-        """Wraps a synchronous function for duration measurement.
-
-        Args:
-            func: The synchronous function to be wrapped.
+    def get_data(self) -> RawDurationData:
+        """Returns the duration data for the function.
 
         Returns:
-            A wrapped version of the input function with duration measurement capability.
+            RawDurationData: The duration data for the function.
         """
+        assert self._func_start_time is not None
+        assert self._duration_start_time is not None
+        assert self._duration_end_time is not None
 
-        def sync_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            """A synchronous wrapper function for measuring execution duration.
-
-            If an exception is raised during the execution of the function, it is re-raised after
-            the duration measurement is stored.
-            """
-            function_start_time, duration_measurement_start_time = self._begin_timing()
-            try:
-                result: R = func(*args, **kwargs)
-            except Exception as e:
-                raise e
-            finally:
-                self._can_store.store(
-                    function_start_time,
-                    duration_measurement_start_time,
-                    self._end_timing(),
-                )
-            return result
-
-        return sync_wrapper
-
-    def measure_duration(self, func: Callable[P, R]) -> Callable[P, R]:
-        """Creates a wrapper around a given function to measure the execution duration.
-
-        The wrapper calculates the duration of function execution and stores it using the provided
-        storage mechanism. Supports both synchronous and asynchronous functions.
-
-        This method is intended to be used as a decorator.
-
-        Args:
-            func: The function whose execution duration is to be measured.
-
-        Returns:
-            A wrapped version of the input function with duration measurement capability.
-        """
-        if inspect.iscoroutinefunction(func):
-            return self._async_wrapper(func)  # type: ignore
-        else:
-            return self._sync_wrapper(func)
+        return RawDurationData(
+            func_start=self._func_start_time,
+            duration_start=self._duration_start_time,
+            duration_end=self._duration_end_time,
+        )
