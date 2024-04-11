@@ -237,9 +237,9 @@ export function v8WarningContent(t: any): JSX.Element {
   return (
     <div>
       <p>
-        {t(`hint.export_v8_protocol_7_1.body1`)}{' '}
-        <strong>{t(`hint.export_v8_protocol_7_1.body2`)}</strong>
-        {t(`hint.export_v8_protocol_7_1.body3`)}
+        {t(`hint.export_v8_1_protocol_7_2.body1`)}{' '}
+        <strong>{t(`hint.export_v8_1_protocol_7_2.body2`)}</strong>
+        {t(`hint.export_v8_1_protocol_7_2.body3`)}
       </p>
     </div>
   )
@@ -350,7 +350,7 @@ export function FileSidebar(): JSX.Element {
     content: React.ReactNode
   } => {
     return {
-      hintKey: 'export_v8_protocol_7_1',
+      hintKey: 'export_v8_1_protocol_7_2',
       content: v8WarningContent(t),
     }
   }
