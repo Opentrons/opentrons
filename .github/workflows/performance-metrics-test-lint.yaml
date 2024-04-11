@@ -4,7 +4,9 @@ name: 'performance-metrics test & lint'
 
 on:
   pull_request:
-  push:
+    paths:
+      - 'performance-metrics/**'
+      - '.github/workflows/performance-metrics-test-lint.yaml'
   workflow_dispatch:
 
 concurrency:
