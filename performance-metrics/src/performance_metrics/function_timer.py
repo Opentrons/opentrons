@@ -9,15 +9,10 @@ from time import perf_counter_ns, clock_gettime_ns, CLOCK_REALTIME
 from types import TracebackType
 from typing import (
     Type,
-    TypeVar,
     Tuple,
 )
 from performance_metrics.datashapes import RawDurationData
-from typing_extensions import ParamSpec
 from contextlib import AbstractAsyncContextManager, AbstractContextManager
-
-P = ParamSpec("P")
-R = TypeVar("R")
 
 
 class FunctionTimer(AbstractAsyncContextManager, AbstractContextManager):  # type: ignore
