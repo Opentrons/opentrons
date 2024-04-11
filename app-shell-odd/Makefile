@@ -48,7 +48,7 @@ setup:
 
 .PHONY: clean
 clean:
-	yarn shx rm -rf lib dist opentrons-robot-app.tar.gz
+	shx rm -rf lib dist opentrons-robot-app.tar.gz
 
 # artifacts
 #####################################################################
