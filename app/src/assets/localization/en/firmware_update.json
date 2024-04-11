@@ -5,6 +5,7 @@
   "gantry_y": "Gantry Y",
   "gripper": "Gripper",
   "head": "Head",
+  "hepa_uv": "Hepa/UV",
   "pipette_left": "pipette",
   "pipette_right": "pipette",
   "ready_to_use": "Your <bold>{{instrument}}</bold> is ready to use!",
