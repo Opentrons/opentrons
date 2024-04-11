@@ -98,7 +98,6 @@ export function ProtocolSetupParameters({
     runTimeParametersOverrides
   )
   const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
-    {},
     protocolId,
     host
   )

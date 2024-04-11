@@ -1,9 +1,8 @@
-import {
+import { useMutation, useQueryClient } from 'react-query'
+import type {
   UseMutationResult,
   UseMutationOptions,
-  useMutation,
   UseMutateFunction,
-  useQueryClient,
 } from 'react-query'
 import { createProtocolAnalysis } from '@opentrons/api-client'
 import { useHost } from '../api'
@@ -13,7 +12,7 @@ import type {
   HostConfig,
   RunTimeParameterCreateData,
 } from '@opentrons/api-client'
-import { ProtocolAnalysisSummary } from '@opentrons/shared-data'
+import type { ProtocolAnalysisSummary } from '@opentrons/shared-data'
 
 export interface CreateProtocolAnalysisVariables {
   protocolKey: string
@@ -39,9 +38,9 @@ export type UseCreateProtocolAnalysisMutationOptions = UseMutationOptions<
 >
 
 export function useCreateProtocolAnalysisMutation(
-  options: UseCreateProtocolAnalysisMutationOptions = {},
   protocolId: string | null,
-  hostOverride?: HostConfig | null
+  hostOverride?: HostConfig | null,
+  options: UseCreateProtocolAnalysisMutationOptions | undefined = {}
 ): UseCreateProtocolMutationResult {
   const contextHost = useHost()
   const host =

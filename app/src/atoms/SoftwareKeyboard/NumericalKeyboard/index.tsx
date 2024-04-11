@@ -1,5 +1,5 @@
 import * as React from 'react'
-import Keyboard from 'react-simple-keyboard'
+import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 import { numericalKeyboardLayout, numericalCustom } from '../constants'
 import '../index.css'
 import './index.css'

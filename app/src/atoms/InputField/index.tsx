@@ -75,7 +75,6 @@ export interface InputFieldProps {
     | typeof TYPOGRAPHY.textAlignCenter
   /** small or medium input field height, relevant only */
   size?: 'medium' | 'small'
-  ref?: React.MutableRefObject<null>
 }
 
 export function InputField(props: InputFieldProps): JSX.Element {
