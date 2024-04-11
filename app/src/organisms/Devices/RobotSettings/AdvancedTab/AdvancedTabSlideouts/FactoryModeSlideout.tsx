@@ -18,6 +18,7 @@ import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 import { InputField } from '../../../../../atoms/InputField'
 import { MultiSlideout } from '../../../../../atoms/Slideout/MultiSlideout'
 import { ToggleButton } from '../../../../../atoms/buttons'
+import { restartRobot } from '../../../../../redux/robot-admin'
 import { updateSetting } from '../../../../../redux/robot-settings'
 
 import type { Resolver, FieldError } from 'react-hook-form'
@@ -105,6 +106,7 @@ export function FactoryModeSlideout({
 
   const handleCompleteClick: React.MouseEventHandler<Element> = () => {
     dispatch(updateSetting(robotName, 'enableOEMMode', toggleValue))
+    dispatch(restartRobot(robotName))
     onCloseClick()
   }
 
