@@ -56,7 +56,12 @@ export function ProtocolSetupParameters({
   const [
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
-  ] = React.useState<RunTimeParameter[]>(runTimeParameters)
+  ] = React.useState<RunTimeParameter[]>(
+    // present defaults rather than last-set value
+    runTimeParameters.map(param => {
+      return { ...param, value: param.default }
+    })
+  )
 
   const updateParameters = (
     value: boolean | string | number,

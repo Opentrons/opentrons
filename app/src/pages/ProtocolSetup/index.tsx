@@ -54,6 +54,7 @@ import {
 import {
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
+  useRunTimeParameters,
 } from '../Protocols/hooks'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
@@ -257,9 +258,6 @@ function PrepareToRun({
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
-  const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
-  console.log(hasRunTimeParameters)
-  // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
   const observer = new IntersectionObserver(([entry]) => {
@@ -365,6 +363,12 @@ function PrepareToRun({
       incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
   })
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
+
+  const runTimeParameters = useRunTimeParameters(protocolId)
+  const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
+  const hasCustomRunTimeParameters = runTimeParameters.some(
+    parameter => parameter.value !== parameter.default
+  )
 
   const [
     showConfirmCancelModal,
@@ -623,9 +627,7 @@ function PrepareToRun({
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
 
-  //  TODO(Jr, 3/20/24): wire up custom values
-  const hasCustomValues = false
-  const parametersDetail = hasCustomValues
+  const parametersDetail = hasCustomRunTimeParameters
     ? t('custom_values')
     : t('default_values')
 

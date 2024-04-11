@@ -88,6 +88,5 @@ describe('ProtocolSetupParameters', () => {
     const title = screen.getByText('Reset parameter values?')
     fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
     expect(title).not.toBeInTheDocument()
-    //  TODO(jr, 3/19/24): wire up the confirm button
   })
 })
