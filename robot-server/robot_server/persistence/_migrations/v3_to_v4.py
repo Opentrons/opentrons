@@ -3,6 +3,7 @@
 Summary of changes from schema 3:
 
 - Adds a new "run_time_parameter_values_and_defaults" column to analysis table
+- Adds a new "run_time_parameters" column to run table
 """
 
 from pathlib import Path
