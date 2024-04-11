@@ -258,6 +258,7 @@ function PrepareToRun({
   const history = useHistory()
   const { makeSnackbar } = useToaster()
   const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
+  console.log(hasRunTimeParameters)
   // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
