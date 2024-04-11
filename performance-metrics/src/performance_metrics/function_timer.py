@@ -21,14 +21,6 @@ class FunctionTimer(AbstractAsyncContextManager, AbstractContextManager):  # typ
     It supports both synchronous and asynchronous functions.
     """
 
-    # def __init__(self, callback: FunctionTimerCallback) -> None:
-    #     """Initializes the FunctionTimer.
-
-    #     Args:
-    #         callback: The callback function that will store the duration data.
-    #     """
-    #     self._callback = callback
-
     def __init__(self) -> None:
         self._func_start_time: int | None = None
         self._duration_start_time: int | None = None
