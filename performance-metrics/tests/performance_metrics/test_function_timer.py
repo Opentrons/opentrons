@@ -71,11 +71,6 @@ async def test_asynchronous_function() -> None:
     async with FunctionTimer() as timer:
         await asynchronous_function()
 
-async def test_asynchronous_function() -> None:
-    """Tests that the asynchronous function is timed correctly by FunctionTimer."""
-    async with FunctionTimer() as timer:
-        await asynchronous_function()
-
     duration_data = timer.get_data()
     assert duration_data.duration_start < duration_data.duration_end
 
@@ -89,11 +84,6 @@ async def test_asynchronous_function_with_exception() -> None:
     duration_data = timer.get_data()
     assert duration_data.duration_start < duration_data.duration_end
 
-async def test_asynchronous_and_synchronous_function() -> None:
-    """Tests the timing of a mixed sequence of synchronous and asynchronous functions with FunctionTimer."""
-    async with FunctionTimer() as timer:
-        synchronous_function()
-        await asynchronous_function()
 
 async def test_asynchronous_and_synchronous_function() -> None:
     """Tests the timing of a mixed sequence of synchronous and asynchronous functions with FunctionTimer."""
