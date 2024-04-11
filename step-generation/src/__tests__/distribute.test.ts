@@ -96,7 +96,7 @@ beforeEach(() => {
   blowoutSingleToTrash = blowoutInPlaceHelper()
   blowoutSingleToSourceA1 = blowoutHelper(SOURCE_LABWARE, {
     wellLocation: {
-      origin: 'bottom',
+      origin: 'top',
       offset: {
         z: BLOWOUT_OFFSET_ANY,
       },
@@ -104,7 +104,7 @@ beforeEach(() => {
   })
   blowoutSingleToDestA4 = blowoutHelper(DEST_LABWARE, {
     wellLocation: {
-      origin: 'bottom',
+      origin: 'top',
       offset: {
         z: BLOWOUT_OFFSET_ANY,
       },
@@ -113,7 +113,7 @@ beforeEach(() => {
   })
   blowoutSingleToDestA3 = blowoutHelper(DEST_LABWARE, {
     wellLocation: {
-      origin: 'bottom',
+      origin: 'top',
       offset: {
         z: BLOWOUT_OFFSET_ANY,
       },

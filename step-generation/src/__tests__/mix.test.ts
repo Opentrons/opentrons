@@ -195,7 +195,7 @@ describe('mix: advanced options', () => {
         dispenseHelper(well, volume),
         blowoutHelper(blowoutLabwareId, {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
               z: BLOWOUT_OFFSET_ANY,
             },
@@ -229,7 +229,7 @@ describe('mix: advanced options', () => {
         dispenseHelper(well, volume),
         blowoutHelper(blowoutLabwareId, {
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
               z: BLOWOUT_OFFSET_ANY,
             },
@@ -319,7 +319,7 @@ describe('mix: advanced options', () => {
           delayCommand(12),
           blowoutHelper(blowoutLabwareId, {
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 z: BLOWOUT_OFFSET_ANY,
               },

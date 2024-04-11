@@ -383,8 +383,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       ],
       {}
     )
-    expect(vi.mocked(useCreateRunFromProtocol)).nthCalledWith(
-      3,
+    expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenLastCalledWith(
       expect.any(Object),
       { hostname: 'otherIp' },
       [],

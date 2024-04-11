@@ -406,7 +406,6 @@ export const getPipettesForInstrumentGroup: Selector<
         mount: pipetteOnDeck.mount,
         pipetteSpecs: pipetteSpec,
         description: _getPipetteDisplayName(pipetteOnDeck.name),
-        isDisabled: false,
         tiprackModels: tiprackDefs?.map((def: LabwareDefinition2) =>
           getLabwareDisplayName(def)
         ),

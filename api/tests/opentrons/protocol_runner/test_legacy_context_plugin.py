@@ -5,7 +5,10 @@ from decoy import Decoy, matchers
 from datetime import datetime
 from typing import Callable
 
-from opentrons.commands.types import CommandMessage as LegacyCommand, PauseMessage
+from opentrons.legacy_commands.types import (
+    CommandMessage as LegacyCommand,
+    PauseMessage,
+)
 from opentrons.protocol_engine import (
     StateView,
     actions as pe_actions,

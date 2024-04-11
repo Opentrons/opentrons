@@ -91,10 +91,10 @@ class ParameterContext:
         parameter = parameter_definition.create_float_parameter(
             display_name=display_name,
             variable_name=variable_name,
-            default=default,
-            minimum=minimum,
-            maximum=maximum,
-            choices=choices,
+            default=validation.ensure_float_value(default),
+            minimum=validation.ensure_optional_float_value(minimum),
+            maximum=validation.ensure_optional_float_value(maximum),
+            choices=validation.ensure_float_choices(choices),
             description=description,
             unit=unit,
         )

@@ -17,6 +17,7 @@ import {
   VolumeField,
   WellOrderField,
   WellSelectionField,
+  BlowoutZOffsetField,
 } from '../fields'
 import { TiprackField } from '../fields/TiprackField'
 import {
@@ -51,7 +52,10 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
-        <TiprackField {...propsForFields.tipRack} />
+        <TiprackField
+          {...propsForFields.tipRack}
+          pipetteId={propsForFields.pipette.value}
+        />
         {is96Channel ? (
           <Configure96ChannelField {...propsForFields.nozzles} />
         ) : null}
@@ -208,6 +212,11 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                   options={getBlowoutLocationOptionsForForm({
                     stepType: formData.stepType,
                   })}
+                />
+                <BlowoutZOffsetField
+                  {...propsForFields.blowout_z_offset}
+                  destLabwareId={propsForFields.labware.value}
+                  blowoutLabwareId={propsForFields.blowout_location.value}
                 />
               </CheckboxRowField>
             </div>

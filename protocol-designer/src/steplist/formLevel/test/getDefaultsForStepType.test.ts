@@ -69,6 +69,7 @@ describe('getDefaultsForStepType', () => {
         tipRack: null,
         dispense_x_position: 0,
         dispense_y_position: 0,
+        blowout_z_offset: 0,
       })
     })
   })
@@ -99,6 +100,7 @@ describe('getDefaultsForStepType', () => {
         tipRack: null,
         mix_x_position: 0,
         mix_y_position: 0,
+        blowout_z_offset: 0,
       })
     })
   })

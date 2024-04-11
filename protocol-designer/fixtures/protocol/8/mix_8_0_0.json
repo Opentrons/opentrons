@@ -58,6 +58,7 @@
           "labware": null,
           "mix_wellOrder_first": "t2b",
           "mix_wellOrder_second": "l2r",
+          "blowout_z_offset": 0,
           "blowout_checkbox": false,
           "blowout_location": "5ba7047d-d3e2-4845-9eaa-1974af796ead:trashBin",
           "mix_mmFromBottom": 0.5,

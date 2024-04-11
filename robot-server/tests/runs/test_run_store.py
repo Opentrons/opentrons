@@ -47,7 +47,6 @@ def subject(
     """Get a ProtocolStore test subject."""
     return RunStore(
         sql_engine=sql_engine,
-        runs_publisher=mock_runs_publisher,
     )
 
 

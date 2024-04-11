@@ -1,9 +1,17 @@
 import * as React from 'react'
-import styled from 'styled-components'
-import { formatRunTimeParameterDefaultValue } from '@opentrons/shared-data'
-import { BORDERS } from '../../helix-design-system'
+import styled, { css } from 'styled-components'
+import {
+  formatRunTimeParameterDefaultValue,
+  formatRunTimeParameterMinMax,
+  orderRuntimeParameterRangeOptions,
+} from '@opentrons/shared-data'
+import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
 import { StyledText } from '../../atoms/StyledText'
+import { Tooltip, useHoverTooltip } from '../../tooltips'
+import { Icon } from '../../icons'
+import { Flex } from '../../primitives'
+import { DISPLAY_INLINE } from '../../styles'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
@@ -19,14 +27,20 @@ export function ParametersTable({
   runTimeParameters,
   t,
 }: ProtocolParameterItemsProps): JSX.Element {
-  const formatRange = (
-    runTimeParameter: RunTimeParameter,
-    minMax: string
-  ): string => {
+  const formatRange = (runTimeParameter: RunTimeParameter): string => {
     const { type } = runTimeParameter
+    const minMax = formatRunTimeParameterMinMax(runTimeParameter)
     const choices =
       'choices' in runTimeParameter ? runTimeParameter.choices : []
     const count = choices.length
+
+    if (count > 0) {
+      return count > 2
+        ? t != null
+          ? t('num_options', { num: count })
+          : `${count} options`
+        : orderRuntimeParameterRangeOptions(choices)
+    }
 
     switch (type) {
       case 'int':
@@ -34,14 +48,9 @@ export function ParametersTable({
         return minMax
       case 'bool':
         return t != null ? t('on_off') : 'On, off'
-      case 'str':
-        if (count > 2) {
-          return t != null ? t('choices', { count }) : `${count} choices`
-        } else {
-          return choices.map(choice => choice.displayName).join(', ')
-        }
+      default:
+        return ''
     }
-    return ''
   }
 
   return (
@@ -57,31 +66,79 @@ export function ParametersTable({
       </thead>
       <tbody>
         {runTimeParameters.map((parameter: RunTimeParameter, index: number) => {
-          const min = 'min' in parameter ? parameter.min : 0
-          const max = 'max' in parameter ? parameter.max : 0
           return (
             <StyledTableRow
               isLast={index === runTimeParameters.length - 1}
               key={`runTimeParameter-${index}`}
             >
-              <StyledTableCell isLast={index === runTimeParameters.length - 1}>
-                <StyledText as="p">{parameter.displayName}</StyledText>
-              </StyledTableCell>
+              <ParameterName
+                displayName={parameter.displayName}
+                description={parameter.description}
+                isLast={index === runTimeParameters.length - 1}
+                index={index}
+              />
               <StyledTableCell isLast={index === runTimeParameters.length - 1}>
                 <StyledText as="p">
                   {formatRunTimeParameterDefaultValue(parameter, t)}
                 </StyledText>
               </StyledTableCell>
-              <StyledTableCell isLast={index === runTimeParameters.length - 1}>
-                <StyledText as="p">
-                  {formatRange(parameter, `${min}-${max}`)}
-                </StyledText>
+              <StyledTableCell
+                isLast={index === runTimeParameters.length - 1}
+                paddingRight="0"
+              >
+                <StyledText as="p">{formatRange(parameter)}</StyledText>
               </StyledTableCell>
             </StyledTableRow>
           )
         })}
       </tbody>
     </StyledTable>
+  )
+}
+
+interface ParameterNameProps {
+  displayName: string
+  description: string | null
+  isLast: boolean
+  index: number
+}
+
+const ParameterName = (props: ParameterNameProps): JSX.Element => {
+  const { displayName, description, isLast, index } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
+  return (
+    <StyledTableCell display="span" isLast={isLast}>
+      <StyledText
+        as="p"
+        css={css`
+          display: ${DISPLAY_INLINE};
+          padding-right: ${SPACING.spacing8};
+        `}
+      >
+        {displayName}
+      </StyledText>
+      {description != null ? (
+        <>
+          <Flex display={DISPLAY_INLINE} {...targetProps}>
+            <Icon
+              name="information"
+              size={SPACING.spacing12}
+              color={COLORS.grey60}
+              data-testid={`Icon_${index}`}
+            />
+          </Flex>
+          <Tooltip
+            {...tooltipProps}
+            backgroundColor={COLORS.black90}
+            css={TYPOGRAPHY.labelRegular}
+            width="8.75rem"
+          >
+            {description}
+          </Tooltip>
+        </>
+      ) : null}
+    </StyledTableCell>
   )
 }
 
@@ -93,7 +150,8 @@ const StyledTable = styled.table`
 
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}
-  padding: ${SPACING.spacing8};
+  grid-gap: ${SPACING.spacing16};
+  padding-bottom: ${SPACING.spacing8};
   border-bottom: ${BORDERS.lineBorder};
 `
 
@@ -102,16 +160,21 @@ interface StyledTableRowProps {
 }
 
 const StyledTableRow = styled.tr<StyledTableRowProps>`
-  padding: ${SPACING.spacing8};
+  grid-gap: ${SPACING.spacing16};
   border-bottom: ${props => (props.isLast ? 'none' : BORDERS.lineBorder)};
 `
 
 interface StyledTableCellProps {
   isLast: boolean
+  paddingRight?: string
+  display?: string
 }
 
 const StyledTableCell = styled.td<StyledTableCellProps>`
-  padding-left: ${SPACING.spacing8};
+  width: 33%;
+  display: ${props => (props.display != null ? props.display : 'table-cell')};
   padding-top: ${SPACING.spacing12};
   padding-bottom: ${props => (props.isLast ? 0 : SPACING.spacing12)};
+  padding-right: ${props =>
+    props.paddingRight != null ? props.paddingRight : SPACING.spacing16};
 `

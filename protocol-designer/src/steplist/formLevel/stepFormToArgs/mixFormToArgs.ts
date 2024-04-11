@@ -22,6 +22,7 @@ export const mixFormToArgs = (
     nozzles,
     mix_x_position,
     mix_y_position,
+    blowout_z_offset,
   } = hydratedFormData
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     pipette,
@@ -73,7 +74,7 @@ export const mixFormToArgs = (
     matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default
 
   const blowoutOffsetFromTopMm = blowoutLocation
-    ? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+    ? blowout_z_offset ?? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
     : 0
   // Delay settings
   const aspirateDelaySeconds = getMixDelayData(

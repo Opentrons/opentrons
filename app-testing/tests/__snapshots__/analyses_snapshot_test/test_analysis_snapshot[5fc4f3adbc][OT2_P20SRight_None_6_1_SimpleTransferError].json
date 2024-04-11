@@ -1718,39 +1718,6 @@
         "wellName": "A1"
       },
       "status": "failed"
-    },
-    {
-      "commandType": "dispense",
-      "params": {
-        "flowRate": 3.78,
-        "volume": 10.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0.5
-          },
-          "origin": "bottom"
-        },
-        "wellName": "B1"
-      },
-      "status": "failed"
-    },
-    {
-      "commandType": "dropTip",
-      "params": {
-        "alternateDropLocation": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-          },
-          "origin": "default"
-        },
-        "wellName": "A1"
-      },
-      "status": "failed"
     }
   ],
   "config": {

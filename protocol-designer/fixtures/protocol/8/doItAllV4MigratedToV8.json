@@ -135,6 +135,7 @@
           "dispense_touchTip_mmFromBottom": null,
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "20",
+          "blowout_z_offset": 0,
           "blowout_checkbox": false,
           "blowout_location": "84882326-9cd3-428e-8352-89f133a1fe5d:trashBin",
           "preWetTip": false,

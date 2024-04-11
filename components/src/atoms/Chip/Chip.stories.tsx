@@ -14,27 +14,23 @@ const meta: Meta<typeof Chip> = {
       control: {
         type: 'select',
       },
-      defaultValue: 'basic',
     },
     hasIcon: {
       control: {
         type: 'boolean',
       },
-      defaultValue: true,
     },
     chipSize: {
       options: ['medium', 'small'],
       control: {
         type: 'select',
       },
-      defaultValue: 'medium',
     },
     iconName: {
       options: ['connection-status', 'ot-check', 'ot-alert'],
       control: {
         type: 'select',
       },
-      defaultValue: 'ot-alert',
     },
   },
   component: Chip,
@@ -57,7 +53,7 @@ type Story = StoryObj<typeof Chip>
 
 export const ChipComponent: Story = {
   args: {
-    type: 'basic',
+    type: 'success',
     text: 'Chip component',
     hasIcon: true,
     chipSize: 'medium',

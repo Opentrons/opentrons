@@ -1,7 +1,7 @@
 """SQL database schemas."""
 
 # Re-export the latest schema.
-from .schema_3 import (
+from .schema_4 import (
     metadata,
     protocol_table,
     analysis_table,

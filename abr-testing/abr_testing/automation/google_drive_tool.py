@@ -25,7 +25,6 @@ class google_drive:
         self.drive_service = build("drive", "v3", credentials=self.credentials)
         self.parent_folder = folder_name
         self.email = email
-        self.folder = self.open_folder()
 
     def list_folder(self, delete: Any = False) -> Set[str]:
         """List folders and files in Google Drive."""

@@ -16,26 +16,20 @@ export function useNotifyRunQuery<TError = Error>(
   runId: string | null,
   options: QueryOptionsWithPolling<Run, TError> = {}
 ): UseQueryResult<Run, TError> {
-  const [
-    refetchUsingHTTP,
-    setRefetchUsingHTTP,
-  ] = React.useState<HTTPRefetchFrequency>(null)
+  const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
 
   const isEnabled = options.enabled !== false && runId != null
 
   useNotifyService({
     topic: `robot-server/runs/${runId}` as NotifyTopic,
-    setRefetchUsingHTTP,
+    setRefetch,
     options: { ...options, enabled: options.enabled != null && runId != null },
   })
 
   const httpResponse = useRunQuery(runId, {
     ...options,
-    enabled: isEnabled && refetchUsingHTTP != null,
-    onSettled:
-      refetchUsingHTTP === 'once'
-        ? () => setRefetchUsingHTTP(null)
-        : () => null,
+    enabled: isEnabled && refetch != null,
+    onSettled: refetch === 'once' ? () => setRefetch(null) : () => null,
   })
 
   return httpResponse

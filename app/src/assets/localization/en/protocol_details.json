@@ -39,6 +39,7 @@
   "not_connected": "not connected",
   "not_in_protocol": "no {{section}} is specified for this protocol",
   "num_choices": "{{num}} choices",
+  "num_options": "{{num}} options",
   "off": "Off",
   "on_off": "On, off",
   "on": "On",

@@ -2,7 +2,6 @@ import * as React from 'react'
 import first from 'lodash/first'
 import { Trans, useTranslation } from 'react-i18next'
 import { Link, NavLink, useHistory } from 'react-router-dom'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -14,7 +13,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_BLOCK,
-  DropdownOption,
   Flex,
   Icon,
   Link as LinkComponent,
@@ -30,12 +28,12 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useLogger } from '../../logger'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
-import { useFeatureFlag } from '../../redux/config'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
 import { Tooltip } from '../../atoms/Tooltip'
 import { ToggleButton } from '../../atoms/buttons'
@@ -47,8 +45,10 @@ import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/us
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
+
 import type { RunTimeParameterCreateData } from '@opentrons/api-client'
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { DropdownOption } from '@opentrons/components'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -92,18 +92,22 @@ export function ChooseProtocolSlideoutComponent(
     setRunTimeParametersOverrides,
   ] = React.useState<RunTimeParameter[]>([])
   const [currentPage, setCurrentPage] = React.useState<number>(1)
-  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
+  const [hasParamError, setHasParamError] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     setRunTimeParametersOverrides(
       selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
     )
   }, [selectedProtocol])
+  React.useEffect(() => {
+    setHasParamError(errors.length > 0)
+  }, [runTimeParametersOverrides])
+
   const runTimeParametersFromAnalysis =
     selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
+  console.log('runTimeParametersFromAnalysis', runTimeParametersFromAnalysis)
 
-  const hasRunTimeParameters =
-    enableRunTimeParametersFF && runTimeParametersFromAnalysis.length > 0
+  const hasRunTimeParameters = runTimeParametersFromAnalysis.length > 0
 
   const analysisStatus = getAnalysisStatus(
     false,
@@ -187,6 +191,7 @@ export function ChooseProtocolSlideoutComponent(
       parameter => parameter.value !== parameter.default
     ) ?? false
 
+  const errors: string[] = []
   const runTimeParametersInputs =
     runTimeParametersOverrides?.map((runtimeParam, index) => {
       if ('choices' in runtimeParam) {
@@ -240,6 +245,9 @@ export function ChooseProtocolSlideoutComponent(
                     : runtimeParam.max.toFixed(1),
               })
             : null
+        if (error != null) {
+          errors.push(error)
+        }
         return (
           <InputField
             key={runtimeParam.variableName}
@@ -385,7 +393,11 @@ export function ChooseProtocolSlideoutComponent(
         <SecondaryButton onClick={() => setCurrentPage(1)} width="51%">
           {t('shared:change_protocol')}
         </SecondaryButton>
-        <PrimaryButton width="49%" onClick={handleProceed}>
+        <PrimaryButton
+          width="49%"
+          onClick={handleProceed}
+          disabled={hasParamError}
+        >
           {isCreatingRun ? (
             <Icon name="ot-spinner" spin size="1rem" />
           ) : (
@@ -409,26 +421,28 @@ export function ChooseProtocolSlideoutComponent(
             robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
           }
         >
-          <ApplyHistoricOffsets
-            offsetCandidates={offsetCandidates}
-            shouldApplyOffsets={shouldApplyOffsets}
-            setShouldApplyOffsets={setShouldApplyOffsets}
-            commands={
-              (!missingAnalysisData
-                ? selectedProtocol?.mostRecentAnalysis?.commands
-                : []) ?? []
-            }
-            labware={
-              (!missingAnalysisData
-                ? selectedProtocol?.mostRecentAnalysis?.labware
-                : []) ?? []
-            }
-            modules={
-              (!missingAnalysisData
-                ? selectedProtocol?.mostRecentAnalysis?.modules
-                : []) ?? []
-            }
-          />
+          {currentPage === 1 ? (
+            <ApplyHistoricOffsets
+              offsetCandidates={offsetCandidates}
+              shouldApplyOffsets={shouldApplyOffsets}
+              setShouldApplyOffsets={setShouldApplyOffsets}
+              commands={
+                (!missingAnalysisData
+                  ? selectedProtocol?.mostRecentAnalysis?.commands
+                  : []) ?? []
+              }
+              labware={
+                (!missingAnalysisData
+                  ? selectedProtocol?.mostRecentAnalysis?.labware
+                  : []) ?? []
+              }
+              modules={
+                (!missingAnalysisData
+                  ? selectedProtocol?.mostRecentAnalysis?.modules
+                  : []) ?? []
+              }
+            />
+          ) : null}
           {hasRunTimeParameters ? multiPageFooter : singlePageFooter}
         </ApiHostProvider>
       }
