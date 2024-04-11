@@ -5,7 +5,7 @@ from typing import Callable, TypeVar, List
 from typing_extensions import ParamSpec
 from performance_metrics.datashapes import (
     RawContextData,
-    RobotContextStates,
+    RobotContextState,
     RawDurationData,
 )
 from performance_metrics.function_timer import FunctionTimer
@@ -23,7 +23,7 @@ class RobotContextTracker:
         self._should_track = should_track
 
     def _store(
-        self, state: RobotContextStates, raw_duration_data: RawDurationData
+        self, state: RobotContextState, raw_duration_data: RawDurationData
     ) -> None:
         """Stores the context and duration data for a robot operation.
 
@@ -40,7 +40,7 @@ class RobotContextTracker:
             )
         )
 
-    def track(self, state: RobotContextStates) -> Callable:  # type: ignore
+    def track(self, state: RobotContextState) -> Callable:  # type: ignore
         """Decorator factory for tracking the execution duration and state of robot operations.
 
         Args:

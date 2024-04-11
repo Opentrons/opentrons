@@ -4,7 +4,7 @@ from enum import Enum
 import dataclasses
 
 
-class RobotContextStates(Enum):
+class RobotContextState(Enum):
     """Enum representing different states of a robot's operation context."""
 
     STARTING_UP = 0, "STARTING_UP"
@@ -18,7 +18,7 @@ class RobotContextStates(Enum):
         self.state_name = state_name
 
     @classmethod
-    def from_id(cls, state_id: int) -> "RobotContextStates":
+    def from_id(cls, state_id: int) -> "RobotContextState":
         """Returns the enum member matching the given state ID.
 
         Args:
@@ -30,7 +30,7 @@ class RobotContextStates(Enum):
         Raises:
             ValueError: If no matching state is found.
         """
-        for state in RobotContextStates:
+        for state in RobotContextState:
             if state.state_id == state_id:
                 return state
         raise ValueError(f"Invalid state id: {state_id}")
@@ -59,4 +59,4 @@ class RawContextData(RawDurationData):
     - state (RobotContextStates): The current state of the context.
     """
 
-    state: RobotContextStates
+    state: RobotContextState
