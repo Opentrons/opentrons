@@ -160,6 +160,7 @@ describe('pipette data accessors', () => {
       supportedTips: {
         t50: {
           maxFlowRate: {
+            '5': 48,
             '6': 48.7,
             '7': 49.3,
             '8': 49.7,
