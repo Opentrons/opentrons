@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router-dom'
-// import { I18nextProvider } from 'react-i18next'
 import { css } from 'styled-components'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -16,7 +15,6 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import NiceModal from '@ebay/nice-modal-react'
 
-// import { i18n } from '../i18n'
 import { SleepScreen } from '../atoms/SleepScreen'
 import { OnDeviceLocalizationProvider } from '../LocalizationProvider'
 import { ToasterOven } from '../organisms/ToasterOven'
@@ -41,11 +39,10 @@ import { UpdateRobotDuringOnboarding } from '../pages/UpdateRobot/UpdateRobotDur
 import { InstrumentsDashboard } from '../pages/InstrumentsDashboard'
 import { InstrumentDetail } from '../pages/InstrumentDetail'
 import { Welcome } from '../pages/Welcome'
-import { InitialLoadingScreen } from '../pages/InitialLoadingScreen'
 import { DeckConfigurationEditor } from '../pages/DeckConfiguration'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
-import { updateBrightness } from '../redux/shell'
+import { getIsShellReady, updateBrightness } from '../redux/shell'
 import { SLEEP_NEVER_MS } from './constants'
 import {
   useCurrentRunRoute,
@@ -100,8 +97,6 @@ function getPathComponent(
       return <InstrumentsDashboard />
     case '/instruments/:mount':
       return <InstrumentDetail />
-    case '/loading':
-      return <InitialLoadingScreen />
     case '/network-setup':
       return <NetworkSetupMenu />
     case '/network-setup/ethernet':
@@ -172,7 +167,6 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   return (
     <ApiHostProvider hostname="127.0.0.1">
       <OnDeviceLocalizationProvider>
-        {/* <I18nextProvider i18n={i18n}> */}
         <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
           <Box width="100%" css="user-select: none;">
             {isIdle ? (
@@ -194,10 +188,23 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
           </Box>
         </ErrorBoundary>
         <TopLevelRedirects />
-        {/* </I18nextProvider> */}
       </OnDeviceLocalizationProvider>
     </ApiHostProvider>
   )
+}
+
+const getTargetPath = (
+  isShellReady: boolean,
+  unfinishedUnboxingFlowRoute: string | null
+): string | null => {
+  if (!isShellReady) {
+    return null
+  }
+  if (unfinishedUnboxingFlowRoute != null) {
+    return unfinishedUnboxingFlowRoute
+  }
+
+  return '/dashboard'
 }
 
 // split to a separate function because scrollRef rerenders on every route change
@@ -208,6 +215,12 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
     setCurrentNode(node)
   }, [])
   const isScrolling = useScrolling(currentNode)
+
+  const { unfinishedUnboxingFlowRoute } = useSelector(
+    getOnDeviceDisplaySettings
+  )
+  const isShellReady = useSelector(getIsShellReady)
+  const targetPath = getTargetPath(isShellReady, unfinishedUnboxingFlowRoute)
 
   const TOUCH_SCREEN_STYLE = css`
     position: ${POSITION_RELATIVE};
@@ -238,7 +251,7 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
           </Box>
         </Route>
       ))}
-      <Redirect exact from="/" to={'/loading'} />
+      {targetPath != null && <Redirect exact from="/" to={targetPath} />}
     </Switch>
   )
 }

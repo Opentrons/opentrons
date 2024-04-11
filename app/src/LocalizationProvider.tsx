@@ -6,6 +6,7 @@ import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 
 import { resources } from './assets/localization'
 import { i18n, i18nCb, i18nConfig } from './i18n'
+import { InitialLoadingScreen } from './pages/InitialLoadingScreen'
 
 import type { RobotSettingsField } from '@opentrons/api-client'
 
@@ -61,5 +62,7 @@ export function OnDeviceLocalizationProvider(
   // block render until settings are fetched
   return settings != null ? (
     <I18nextProvider i18n={anonI18n}>{props.children}</I18nextProvider>
-  ) : null
+  ) : (
+    <InitialLoadingScreen />
+  )
 }
