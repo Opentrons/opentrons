@@ -178,7 +178,7 @@ def run(tip: int, run_args: RunArgs) -> None:
 
     def _get_baseline() -> float:
         run_args.pipette.pick_up_tip(tips[0])
-        del tips[:run_args.channels]
+        del tips[: run_args.pipette_channels]
         liquid_height = _jog_to_find_liquid_height(
             run_args.ctx, run_args.pipette, test_well
         )
@@ -216,7 +216,7 @@ def run(tip: int, run_args: RunArgs) -> None:
 
         ui.print_info(f"Picking up {tip}ul tip")
         run_args.pipette.pick_up_tip(tips[0])
-        del tips[:run_args.channels]
+        del tips[: run_args.pipette_channels]
         run_args.pipette.move_to(test_well.top())
 
         start_pos = hw_api.current_position_ot3(OT3Mount.LEFT)
