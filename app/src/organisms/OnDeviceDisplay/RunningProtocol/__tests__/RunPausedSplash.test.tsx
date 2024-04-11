@@ -2,12 +2,12 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
+import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '../../../../i18n'
 
 import { COLORS } from '@opentrons/components'
 
 import { RunPausedSplash } from '../RunPausedSplash'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../i18n'
 
 const render = (props: React.ComponentProps<typeof RunPausedSplash>) => {
   return renderWithProviders(

@@ -28,6 +28,7 @@ import {
   RUN_STATUS_AWAITING_RECOVERY,
 } from '@opentrons/api-client'
 
+import { useFeatureFlag } from '../../redux/config'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
@@ -55,7 +56,6 @@ import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningPr
 import { RunPausedSplash } from '../../organisms/OnDeviceDisplay/RunningProtocol/RunPausedSplash'
 import { getLocalRobot } from '../../redux/discovery'
 import { OpenDoorAlertModal } from '../../organisms/OpenDoorAlertModal'
-import { useFeatureFlag } from '../../redux/config'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -282,7 +282,7 @@ export function RunningProtocol(): JSX.Element {
                 <RunningProtocolSkeleton currentOption={currentOption} />
               )}
               <Flex
-                marginTop="2rem"
+                marginTop={SPACING.spacing32}
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing16}
                 justifyContent={JUSTIFY_CENTER}

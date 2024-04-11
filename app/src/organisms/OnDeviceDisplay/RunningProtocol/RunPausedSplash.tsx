@@ -12,7 +12,6 @@ import {
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   TYPOGRAPHY,
-  BORDERS,
   OVERFLOW_WRAP_BREAK_WORD,
 } from '@opentrons/components'
 import styled from 'styled-components'
@@ -45,13 +44,13 @@ export function RunPausedSplash({
       position={POSITION_ABSOLUTE}
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing40}
-      padding={SPACING.spacing40}
+      padding={SPACING.spacing120}
       backgroundColor={COLORS.grey50}
       onClick={onClose}
     >
       <SplashFrame>
         <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
-          <Icon name={'ot-alert'} size="4.5rem" color={COLORS.white} />
+          <Icon name="ot-alert" size="4.5rem" color={COLORS.white} />
           <SplashHeader>{t('run_paused')}</SplashHeader>
         </Flex>
         <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
@@ -65,8 +64,8 @@ export function RunPausedSplash({
 const SplashHeader = styled.h1`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  font-size: 80px;
-  line-height: 94px;
+  font-size: ${TYPOGRAPHY.fontSize80}
+  line-height: ${TYPOGRAPHY.lineHeight96};
   color: ${COLORS.white};
 `
 const SplashBody = styled.h4`
@@ -90,5 +89,4 @@ const SplashFrame = styled(Flex)`
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing40};
-  border-radius: ${BORDERS.borderRadius8};
 `
