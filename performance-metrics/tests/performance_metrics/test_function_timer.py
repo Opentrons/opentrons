@@ -6,8 +6,6 @@ calls. This serves as a comprehensive suite to validate the functionality of Fun
 """
 import time
 import asyncio
-from typing import List
-from performance_metrics.datashapes import RawDurationData
 import pytest
 from performance_metrics.function_timer import FunctionTimer
 
@@ -67,6 +65,10 @@ def test_synchronous_function_with_exception() -> None:
     duration_data = timer.get_data()
     assert duration_data.duration_start < duration_data.duration_end
 
+async def test_asynchronous_function() -> None:
+    """Tests that the asynchronous function is timed correctly by FunctionTimer."""
+    async with FunctionTimer() as timer:
+        await asynchronous_function()
 
 async def test_asynchronous_function() -> None:
     """Tests that the asynchronous function is timed correctly by FunctionTimer."""
@@ -86,6 +88,11 @@ async def test_asynchronous_function_with_exception() -> None:
     duration_data = timer.get_data()
     assert duration_data.duration_start < duration_data.duration_end
 
+async def test_asynchronous_and_synchronous_function() -> None:
+    """Tests the timing of a mixed sequence of synchronous and asynchronous functions with FunctionTimer."""
+    async with FunctionTimer() as timer:
+        synchronous_function()
+        await asynchronous_function()
 
 async def test_asynchronous_and_synchronous_function() -> None:
     """Tests the timing of a mixed sequence of synchronous and asynchronous functions with FunctionTimer."""
