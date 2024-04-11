@@ -92,6 +92,15 @@
               "dispense": {
                 "type": "array",
                 "items": { "$ref": "#/definitions/liquidHandlingSpecs" }
+              },
+              "maxFlowRate": {
+                "type": "object",
+                "description": "Optional record of each tip volume's max flow rates",
+                "patternProperties": {
+                  "^[0-9]+$": {
+                    "type": "number"
+                  }
+                }
               }
             }
           }
