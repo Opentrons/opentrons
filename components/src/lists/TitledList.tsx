@@ -101,7 +101,7 @@ export function TitledList(props: TitledListProps): JSX.Element {
     iconProps && iconProps.className
   )
 
-  let textColor = 'auto'
+  let textColor = ''
   if (disabled) {
     //  the below hex code is for our legacy --c-font-disabled to match other text colors
     textColor = '#9c9c9c'
