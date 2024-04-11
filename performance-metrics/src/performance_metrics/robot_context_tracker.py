@@ -17,9 +17,10 @@ R = TypeVar("R")
 class RobotContextTracker:
     """Tracks and stores robot context and execution duration for different operations."""
 
-    def __init__(self) -> None:
+    def __init__(self, should_track: bool = False) -> None:
         """Initializes the RobotContextTracker with an empty storage list."""
         self._storage: List[RawContextData] = []
+        self._should_track = should_track
 
     def _store(
         self, state: RobotContextStates, raw_duration_data: RawDurationData
@@ -52,7 +53,8 @@ class RobotContextTracker:
         def inner_decorator(func: Callable[P, R]) -> Callable[P, R]:
             @wraps(func)
             def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-
+                if not self._should_track:
+                    return func(*args, **kwargs)
                 try:
                     with FunctionTimer() as timer:
                         result = func(*args, **kwargs)
