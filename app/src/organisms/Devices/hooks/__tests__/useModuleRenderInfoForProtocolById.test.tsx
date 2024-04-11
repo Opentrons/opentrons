@@ -1,10 +1,11 @@
 import { renderHook } from '@testing-library/react'
 import { vi, it, expect, describe, beforeEach } from 'vitest'
 import { when } from 'vitest-when'
-import { UseQueryResult } from 'react-query'
 
 import {
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V2,
+  TEMPERATURE_MODULE_V2_FIXTURE,
   heater_shaker_commands_with_results_key,
 } from '@opentrons/shared-data'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -29,6 +30,8 @@ import type {
   ModuleType,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import type { UseQueryResult } from 'react-query'
+import type { AttachedModule } from '../../../../redux/modules/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
@@ -52,8 +55,28 @@ const PROTOCOL_DETAILS = {
   protocolKey: 'fakeProtocolKey',
 }
 
+const mockAttachedTempMod: AttachedModule = {
+  id: 'temp_mod_1',
+  moduleModel: TEMPERATURE_MODULE_V2,
+  moduleType: TEMPERATURE_MODULE_TYPE,
+  serialNumber: 'abc123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    currentTemperature: 40,
+    targetTemperature: null,
+    status: 'idle',
+  },
+  usbPort: { 
+    path: '/dev/ot_module_heatershaker0',
+    port: 1,
+    portGroup: 'unknown',
+    hub: false,
+  },
+}
+
 const mockTemperatureModuleDefinition = {
-  moduleId: 'someMagneticModule',
   model: 'temperatureModuleV2' as ModuleModel,
   type: 'temperatureModuleType' as ModuleType,
   labwareOffset: { x: 5, y: 5, z: 5 },
@@ -84,7 +107,8 @@ const TEMPERATURE_MODULE_INFO = {
 
 const mockCutoutConfig: CutoutConfig = {
   cutoutId: 'cutoutD1',
-  cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
+  opentronsModuleSerialNumber: 'abc123'
 }
 
 describe('useModuleRenderInfoForProtocolById hook', () => {
@@ -92,6 +116,7 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockCutoutConfig],
     } as UseQueryResult<DeckConfiguration>)
+    vi.mocked(useAttachedModules).mockReturnValue([mockAttachedTempMod])
     vi.mocked(useAttachedModules).mockReturnValue([
       mockTemperatureModuleGen2,
       mockThermocycler,
@@ -121,7 +146,7 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     )
     expect(result.current).toStrictEqual({
       temperatureModuleId: {
-        conflictedFixture: mockCutoutConfig,
+        conflictedFixture: null,
         attachedModuleMatch: mockTemperatureModuleGen2,
         ...TEMPERATURE_MODULE_INFO,
       },

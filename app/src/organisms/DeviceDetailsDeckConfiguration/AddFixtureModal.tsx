@@ -95,11 +95,6 @@ export function AddFixtureModal({
         )
     ) ?? []
 
-  console.log(
-    'unconfiguredMODS',
-    unconfiguredMods
-  )
-
   let initialStage: OptionStage = SINGLE_CENTER_CUTOUTS.includes(cutoutId) // only mag block (a module) can be configured in column 2
     ? 'moduleOptions'
     : 'modulesOrFixtures'

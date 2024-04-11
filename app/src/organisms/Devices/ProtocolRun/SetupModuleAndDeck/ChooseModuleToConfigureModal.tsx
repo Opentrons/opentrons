@@ -54,7 +54,6 @@ export const ChooseModuleToConfigureModal = (
             attachedMod.serialNumber === opentronsModuleSerialNumber
         )
     ) ?? []
-  console.log('unconfig', unconfiguredModuleMatches)
 
   return createPortal(
     isOnDevice ? (
@@ -124,7 +123,7 @@ export const ChooseModuleToConfigureModal = (
               paddingTop={SPACING.spacing8}
               gridGap={SPACING.spacing8}
             >
-              {attachedModules
+              {unconfiguredModuleMatches
                 .filter(m => m.moduleModel === requiredModuleModel)
                 .map(attachedModule => {
                   const moduleFixtures = getCutoutFixturesForModuleModel(

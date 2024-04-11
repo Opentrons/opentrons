@@ -4,6 +4,7 @@ import {
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
   getDeckDefFromRobotType,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
@@ -32,7 +33,7 @@ export function useModuleRenderInfoForProtocolById(
   pollModules?: boolean
 ): ModuleRenderInfoById {
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { data: deckConfig } = useDeckConfigurationQuery({
+  const { data: deckConfig = []} = useDeckConfigurationQuery({
     refetchInterval: REFETCH_INTERVAL_5000_MS,
   })
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -42,27 +43,19 @@ export function useModuleRenderInfoForProtocolById(
   })
   if (protocolAnalysis == null) return {}
 
-  const deckDef = getDeckDefFromRobotType(
-    protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
-  )
+  const assumedRobotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
+  const deckDef = getDeckDefFromRobotType(assumedRobotType)
 
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 
   const protocolModulesInfoInLoadOrder = protocolModulesInfo.sort(
     (modA, modB) => modA.protocolLoadOrder - modB.protocolLoadOrder
   )
+
+  const robotSupportsModuleConfig = assumedRobotType !== OT2_ROBOT_TYPE 
   let matchedAmod: AttachedModule[] = []
   const allModuleRenderInfo = protocolModulesInfoInLoadOrder.map(
     protocolMod => {
-      const compatibleAttachedModule =
-        attachedModules.find(
-          attachedMod =>
-            checkModuleCompatibility(
-              attachedMod.moduleModel,
-              protocolMod.moduleDef.model
-            ) && !matchedAmod.find(m => m === attachedMod)
-        ) ?? null
-
       const moduleFixtures = getCutoutFixturesForModuleModel(
         protocolMod.moduleDef.model,
         deckDef
@@ -72,11 +65,30 @@ export function useModuleRenderInfoForProtocolById(
         moduleFixtures,
         deckDef
       )
+      const compatibleAttachedModule =
+        attachedModules.find(
+          attachedMod =>
+            // first check module model compatibility
+            checkModuleCompatibility(attachedMod.moduleModel, protocolMod.moduleDef.model) 
+            // then check that the module hasn't already been matched 
+            && !matchedAmod.some(m => m.serialNumber === attachedMod.serialNumber)
+            // then if robotType supports configurable modules check the deck config has a
+            // a module with the expected serial number in the expected location 
+            && (!robotSupportsModuleConfig || 
+              deckConfig.some(({cutoutId, opentronsModuleSerialNumber}) => 
+              attachedMod.serialNumber === opentronsModuleSerialNumber
+              && moduleCutoutIds.includes(cutoutId)
+            ))
+        ) ?? null
+
+      
       const conflictedFixture =
         deckConfig?.find(
           ({ cutoutId, cutoutFixtureId }) =>
             moduleCutoutIds.includes(cutoutId) &&
-            !moduleFixtures.some(({ id }) => cutoutFixtureId === id)
+            !moduleFixtures.some(({ id }) => cutoutFixtureId === id) &&
+            // if robotType supports module config, don't treat module fixture as conflict
+            (!robotSupportsModuleConfig || compatibleAttachedModule == null)
         ) ?? null
 
       if (compatibleAttachedModule !== null) {

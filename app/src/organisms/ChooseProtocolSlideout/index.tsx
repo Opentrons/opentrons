@@ -105,7 +105,6 @@ export function ChooseProtocolSlideoutComponent(
 
   const runTimeParametersFromAnalysis =
     selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
-  console.log('runTimeParametersFromAnalysis', runTimeParametersFromAnalysis)
 
   const hasRunTimeParameters = runTimeParametersFromAnalysis.length > 0
 
