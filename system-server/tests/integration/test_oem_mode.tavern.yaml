@@ -46,15 +46,8 @@ stages:
       url: "{host:s}:{port:d}/system/oem_mode/upload_splash"
       method: POST
       files:
-        files: 'tests/integration/resources/oem_mode_custom.png'
+        file: 'tests/integration/resources/oem_mode_custom.png'
     response:
-      save:
-        json:
-          protocol_id: data.id
-          analysis_id: data.analysisSummaries[0].id
       status_code: 201
-      json:
-        data:
-          id: !anystr
-          protocolType: python
 
+TODO: add other test cases to validate image
