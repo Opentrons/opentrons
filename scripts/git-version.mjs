@@ -15,23 +15,24 @@
 // What that all boils down to is that we need, and this module provides, an interface to get the version of a
 // given project that currently exists in the monorepo.
 
-const git = require('simple-git')
-const { dirname } = require('path')
-const REPO_BASE = dirname(__dirname)
+import git from 'simple-git'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+const REPO_BASE = dirname(dirname(fileURLToPath(import.meta.url)))
 
-function monorepoGit() {
+export function monorepoGit() {
   return git({ baseDir: REPO_BASE })
 }
 
-const detailsFromTag = tag =>
+export const detailsFromTag = tag =>
   tag.includes('@') ? tag.split('@') : ['robot-stack', tag.substring(1)]
 
-function tagFromDetails(project, version) {
+export function tagFromDetails(project, version) {
   const prefix = prefixForProject(project)
   return `${prefix}${version}`
 }
 
-function prefixForProject(project) {
+export function prefixForProject(project) {
   if (project === 'robot-stack') {
     return 'v'
   } else {
@@ -39,7 +40,7 @@ function prefixForProject(project) {
   }
 }
 
-async function latestTagForProject(project) {
+export async function latestTagForProject(project) {
   return (
     await monorepoGit().raw([
       'describe',
@@ -50,7 +51,7 @@ async function latestTagForProject(project) {
   ).trim()
 }
 
-async function versionForProject(project) {
+export async function versionForProject(project) {
   return latestTagForProject(project)
     .then(tag => detailsFromTag(tag)[1])
     .catch(error => {
@@ -59,13 +60,4 @@ async function versionForProject(project) {
       )
       return '0.0.0-dev'
     })
-}
-
-module.exports = {
-  detailsFromTag,
-  tagFromDetails,
-  prefixForProject,
-  latestTagForProject,
-  versionForProject,
-  monorepoGit,
 }

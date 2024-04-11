@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import {
   formatRunTimeParameterDefaultValue,
   formatRunTimeParameterMinMax,
+  orderRuntimeParameterRangeOptions,
 } from '@opentrons/shared-data'
 import {
   BORDERS,
@@ -62,13 +63,13 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
     makeSnackbar(t('start_setup_customize_values'))
   }
 
-  const getRange = (parameter: RunTimeParameter): string => {
+  const formatRange = (parameter: RunTimeParameter): string => {
     const { type } = parameter
     const numChoices = 'choices' in parameter ? parameter.choices.length : 0
     const minMax = formatRunTimeParameterMinMax(parameter)
     let range: string | null = null
     if (numChoices === 2 && 'choices' in parameter) {
-      range = `${parameter.choices[0].displayName}, ${parameter.choices[1].displayName}`
+      range = orderRuntimeParameterRangeOptions(parameter.choices)
     }
 
     switch (type) {
@@ -125,7 +126,7 @@ export const Parameters = (props: { protocolId: string }): JSX.Element => {
               </TableDatum>
               <TableDatum>
                 <Flex paddingLeft={SPACING.spacing24} color={COLORS.grey60}>
-                  {getRange(parameter)}
+                  {formatRange(parameter)}
                 </Flex>
               </TableDatum>
             </TableRow>

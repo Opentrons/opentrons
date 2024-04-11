@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { formatRunTimeParameterDefaultValue } from '../formatRunTimeParameterDefaultValue'
+import { formatRunTimeParameterValue } from '../formatRunTimeParameterValue'
 
 import type { RunTimeParameter } from '../../types'
 
@@ -21,7 +21,7 @@ describe('utils-formatRunTimeParameterDefaultValue', () => {
       max: 10,
       default: 6,
     } as RunTimeParameter
-    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('6')
   })
 
@@ -37,7 +37,7 @@ describe('utils-formatRunTimeParameterDefaultValue', () => {
       max: 10.0,
       default: 6.5,
     } as RunTimeParameter
-    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('6.5 mL')
   })
 
@@ -60,7 +60,7 @@ describe('utils-formatRunTimeParameterDefaultValue', () => {
       ],
       default: 'left',
     } as RunTimeParameter
-    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('Left')
   })
 
@@ -86,7 +86,7 @@ describe('utils-formatRunTimeParameterDefaultValue', () => {
       ],
       default: 5,
     } as RunTimeParameter
-    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('5 mL')
   })
 
@@ -112,7 +112,7 @@ describe('utils-formatRunTimeParameterDefaultValue', () => {
       ],
       default: 5.0,
     } as RunTimeParameter
-    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('5 mL')
   })
 
@@ -125,7 +125,7 @@ describe('utils-formatRunTimeParameterDefaultValue', () => {
       type: 'bool',
       default: true,
     } as RunTimeParameter
-    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('On')
   })
 
@@ -138,7 +138,7 @@ describe('utils-formatRunTimeParameterDefaultValue', () => {
       type: 'bool',
       default: false,
     } as RunTimeParameter
-    const result = formatRunTimeParameterDefaultValue(mockData, mockTFunction)
+    const result = formatRunTimeParameterValue(mockData, mockTFunction)
     expect(result).toEqual('Off')
   })
 })

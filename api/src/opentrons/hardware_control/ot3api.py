@@ -1521,8 +1521,14 @@ class OT3API(
         # G, Q should be handled in the backend through `self._home()`
         assert axis not in [Axis.G, Axis.Q]
 
+        # TODO(CM): This is a temporary fix in response to the right mount causing
+        # errors while trying to home on startup or attachment. We should remove this
+        # when we fix this issue in the firmware.
+        enable_right_mount_on_startup = (
+            self._gantry_load == GantryLoad.HIGH_THROUGHPUT and axis == Axis.Z_R
+        )
         encoder_ok = self._backend.check_encoder_status([axis])
-        if encoder_ok:
+        if encoder_ok or enable_right_mount_on_startup:
             # enable motor (if needed) and update estimation
             await self._enable_before_update_estimation(axis)
 
