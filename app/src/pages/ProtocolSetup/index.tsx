@@ -54,7 +54,6 @@ import {
 import {
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
-  useRunTimeParameters,
 } from '../Protocols/hooks'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
@@ -70,7 +69,6 @@ import {
   getProtocolUsesGripper,
 } from '../../organisms/ProtocolSetupInstruments/utils'
 import {
-  useProtocolHasRunTimeParameters,
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
@@ -364,8 +362,8 @@ function PrepareToRun({
   })
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
 
-  const runTimeParameters = useRunTimeParameters(protocolId)
-  const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  const hasRunTimeParameters = runTimeParameters.length > 0
   const hasCustomRunTimeParameters = runTimeParameters.some(
     parameter => parameter.value !== parameter.default
   )

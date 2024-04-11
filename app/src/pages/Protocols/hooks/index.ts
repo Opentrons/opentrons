@@ -191,7 +191,7 @@ export const useRequiredProtocolHardwareFromAnalysis = (
  */
 
 export const useRunTimeParameters = (
-  protocolId: string | null
+  protocolId: string
 ): RunTimeParameter[] => {
   const { data: protocolData } = useProtocolQuery(protocolId)
   const { data: analysis } = useProtocolAnalysisAsDocumentQuery(

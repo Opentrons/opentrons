@@ -62,7 +62,6 @@ import type { Protocol } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { Dispatch } from '../../redux/types'
 import type { OnDeviceRouteParams } from '../../App/types'
-import { Skeleton } from '../../atoms/Skeleton'
 
 interface ProtocolHeaderProps {
   title?: string | null
@@ -347,13 +346,13 @@ export function ProtocolDetails(): JSX.Element | null {
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinned = pinnedProtocolIds.includes(protocolId)
 
-  const { data: protocolData } = useProtocolQuery(protocolId)
   const {
     data: mostRecentAnalysis,
+    isLoading: isAnalysisFetching, // new analysis is triggered from RTP protocol
   } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    last(protocolData?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
+    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
+    { enabled: protocolRecord != null }
   )
 
   const shouldApplyOffsets = useSelector(getApplyHistoricOffsets)
@@ -430,7 +429,7 @@ export function ProtocolDetails(): JSX.Element | null {
   }
 
   const displayName =
-    !isProtocolFetching && protocolRecord != null
+    !isProtocolFetching && !isAnalysisFetching && protocolRecord != null
       ? protocolRecord?.data.metadata.protocolName ??
         protocolRecord?.data.files[0].name
       : null

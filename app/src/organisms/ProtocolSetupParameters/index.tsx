@@ -36,7 +36,6 @@ export function ProtocolSetupParameters({
   labwareOffsets,
   runTimeParameters,
 }: ProtocolSetupParametersProps): JSX.Element {
-  console.log(protocolId)
   const { t } = useTranslation('protocol_setup')
   const history = useHistory()
   const host = useHost()
