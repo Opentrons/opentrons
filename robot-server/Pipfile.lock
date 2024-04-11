@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9f5428819154087395ae74760e0ee011218e2a65fe3e05415290d6b805df5444"
+            "sha256": "238aafa81f4659bbfb03a9af89b012d9aea4f5a44c4241aad699b7b17b543add"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -320,6 +320,15 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==2.16.3"
+        },
+        "pydantic-settings": {
+            "hashes": [
+                "sha256:00b9f6a5e95553590434c0fa01ead0b216c3e10bc54ae02e37f359948643c5ed",
+                "sha256:0235391d26db4d2190cb9b31051c4b46882d28a51533f97440867f012d4da091"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.8'",
+            "version": "==2.2.1"
         },
         "pyserial": {
             "hashes": [

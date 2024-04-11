@@ -59,3 +59,4 @@ opentrons = { editable = true, path = "../api"}
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 server-utils = {editable = true, path = "./../server-utils"}
 robot-server = { editable = true, path = "."}
+pydantic-settings = "==2.2.1"
