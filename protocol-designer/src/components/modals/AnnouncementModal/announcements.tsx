@@ -267,10 +267,7 @@ export const useAnnouncements = (): Announcement[] => {
     },
     {
       announcementKey: 'customParamsAndMultiTipAndModule8.1',
-      image: (
-        //  TODO(jr, 4/11/24): add image to announcement modal
-        <Flex />
-      ),
+      image: <Flex />,
       heading: t('announcements.header', { pd: PD }),
       message: (
         <>
@@ -282,7 +279,6 @@ export const useAnnouncements = (): Announcement[] => {
           <ul>
             <li>{t('announcements.customParamsAndMultiTipAndModule.body2')}</li>
             <li>
-              {' '}
               <Trans
                 t={t}
                 i18nKey={'announcements.customParamsAndMultiTipAndModule.body3'}

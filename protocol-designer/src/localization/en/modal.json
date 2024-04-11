@@ -44,12 +44,12 @@
       "body2": "All protocols now require {{app}} version <strong> 7.1+ </strong> to run."
     },
     "customParamsAndMultiTipAndModule": {
-      "body1": "Introducing the {{pd}} 8.1. Starting today, you will be able to:",
-      "body2": "Customize blowout flowRate speed and height",
-      "body3": "Customize aspirate, dispense, and mix <i>'x'</i> and <i>'y'</i> well positioning",
-      "body4": "Assign up to 3 types of tipracks to a single pipette",
-      "body5": "For the Flex only; add up to 7 Temperature Modules on the deck at the same time",
-      "body6": "All protocols require {{app}} version <strong> 7.2+ </strong> to run."
+      "body1": "Introducing {{pd}} 8.1. Starting today, you will be able to:",
+      "body2": "Customize blowout speed and height.",
+      "body3": "Adjust horizontal position within a well when aspirating, dispensing, or mixing.",
+      "body4": "Assign up to three types of tip racks to a single pipette.",
+      "body5": "Add multiple Temperature Modules to the deck (Flex only).",
+      "body6": "All protocols require {{app}} version <strong>7.2.0 or later</strong> to run."
     }
   },
   "labware_selection": {
