@@ -1,6 +1,6 @@
 # This workflow runs lint on pull requests that touch anything in the performance-metrics directory
 
-name: 'performance-metrics lint'
+name: 'Performance Metrics Test & Lint'
 
 on:
   pull_request:
