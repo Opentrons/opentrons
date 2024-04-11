@@ -1,5 +1,6 @@
 """Router for /system/register endpoint."""
 
+import os
 import filetype
 from fastapi import (
     APIRouter,
@@ -68,14 +69,12 @@ async def upload_splash_image(
 ) -> Response:
     """Router for /system/oem_mode/upload_splash endpoint."""
 
-    accepted_file_types = [
-        "image/png",
-        "image/jpeg",
-        "image/jpg",
-        "png",
-        "jpeg",
-        "jpg",
-    ]
+    # Make sure oem mode is enabled before this request
+    if not settings.oem_mode_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="OEM Mode needs to be enabled to upload splash image.",
+        )
 
     # Get the file info
     file_info = filetype.guess(file.file)
@@ -85,6 +84,8 @@ async def upload_splash_image(
             detail="Unable to determine file type",
         )
 
+    # Only accept PNG files
+    accepted_file_types = ["image/png", "png"]
     content_type = file_info.extension.lower()
     if (
         file.content_type not in accepted_file_types
@@ -98,7 +99,7 @@ async def upload_splash_image(
     file_size = 0
     for chunk in file.file:
         file_size += len(chunk)
-        if file_size > 5242880:  # 5MB
+        if file_size > 5 * 1024 * 1024:  # 5MB
             raise HTTPException(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 detail="File is larger than 5mb.",
@@ -110,6 +111,10 @@ async def upload_splash_image(
     await file.seek(0)
 
     try:
+        # Remove the old image if exists
+        if settings.oem_mode_splash_custom:
+            os.unlink(settings.oem_mode_splash_custom)
+
         # file is valid, save to final location
         filepath = f"{settings.persistence_directory}/{file.filename}"
         with open(filepath, "wb+") as f:
