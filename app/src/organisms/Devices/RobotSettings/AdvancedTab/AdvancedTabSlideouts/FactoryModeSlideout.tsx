@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useForm, Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
@@ -21,7 +21,7 @@ import { ToggleButton } from '../../../../../atoms/buttons'
 import { updateSetting } from '../../../../../redux/robot-settings'
 
 import type { Resolver, FieldError } from 'react-hook-form'
-import type { State, Dispatch } from '../../../../../redux/types'
+import type { Dispatch } from '../../../../../redux/types'
 
 interface FactoryModeSlideoutProps {
   isExpanded: boolean
@@ -75,17 +75,10 @@ export function FactoryModeSlideout({
     return updatedErrors
   }
 
-  const resolver: Resolver<FormValues> = values => {
-    let errors = {}
-    errors = validate(values, errors)
-    return { values, errors }
-  }
-
   const {
     handleSubmit,
     control,
-    formState: { isDirty, isValid, errors },
-    reset,
+    formState: { errors },
     watch,
     trigger,
   } = useForm({
@@ -94,23 +87,16 @@ export function FactoryModeSlideout({
     },
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
-    // resolver,
   })
   const passwordInput = watch('passwordInput')
 
   const onSubmit = (data: FormValues): void => {
-    const { passwordInput } = data
-
     setCurrentStep(2)
   }
 
   const handleSubmitFactoryPassword = (): void => {
     // TODO: validation and errors: PLAT-281
-    if (passwordInput === 'otie') {
-      void handleSubmit(onSubmit)()
-    } else {
-      console.log('no match')
-    }
+    void handleSubmit(onSubmit)()
   }
 
   const handleToggleClick: React.MouseEventHandler<Element> = () => {
