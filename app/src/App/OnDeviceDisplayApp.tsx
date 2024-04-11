@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router-dom'
+import { I18nextProvider } from 'react-i18next'
 import { css } from 'styled-components'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -15,8 +16,9 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import NiceModal from '@ebay/nice-modal-react'
 
+import { i18n } from '../i18n'
 import { SleepScreen } from '../atoms/SleepScreen'
-import { OnDeviceLocalizationProvider } from '../LocalizationProvider'
+// import { OnDeviceLocalizationProvider } from '../LocalizationProvider'
 import { ToasterOven } from '../organisms/ToasterOven'
 import { MaintenanceRunTakeover } from '../organisms/TakeoverModal'
 import { FirmwareUpdateTakeover } from '../organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
@@ -169,7 +171,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
     <ApiHostProvider hostname="127.0.0.1">
-      <OnDeviceLocalizationProvider>
+      {/* <OnDeviceLocalizationProvider> */}
+      <I18nextProvider i18n={i18n}>
         <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
           <Box width="100%" css="user-select: none;">
             {isIdle ? (
@@ -191,7 +194,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
           </Box>
         </ErrorBoundary>
         <TopLevelRedirects />
-      </OnDeviceLocalizationProvider>
+      </I18nextProvider>
+      {/* </OnDeviceLocalizationProvider> */}
     </ApiHostProvider>
   )
 }
