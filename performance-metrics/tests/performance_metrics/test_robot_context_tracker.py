@@ -17,7 +17,7 @@ SHUTTING_DOWN_TIME = 0.005
 @pytest.fixture
 def robot_context_tracker() -> RobotContextTracker:
     """Fixture to provide a fresh instance of RobotContextTracker for each test."""
-    return RobotContextTracker()
+    return RobotContextTracker(should_track=True)
 
 
 def test_robot_context_tracker(robot_context_tracker: RobotContextTracker) -> None:
@@ -203,3 +203,18 @@ async def test_concurrent_async_operations(
         data.state == RobotContextStates.CALIBRATING
         for data in robot_context_tracker._storage
     ), "All tracked operations should be in CALIBRATING state."
+
+
+def test_no_tracking() -> None:
+    """Tests that operations are not tracked when tracking is disabled."""
+    robot_context_tracker = RobotContextTracker(should_track=False)
+
+    @robot_context_tracker.track(state=RobotContextStates.STARTING_UP)
+    def operation_without_tracking() -> None:
+        sleep(STARTING_TIME)
+
+    operation_without_tracking()
+
+    assert (
+        len(robot_context_tracker._storage) == 0
+    ), "Operation should not be tracked when tracking is disabled."
