@@ -125,11 +125,33 @@ def run_time_parameters() -> List[pe_types.RunTimeParameter]:
     """Get a RunTimeParameter list."""
     return [
         pe_types.BooleanParameter(
-            displayName="Display Name",
-            variableName="variable_name",
+            displayName="Display Name 1",
+            variableName="variable_name_1",
             value=False,
             default=True,
-        )
+        ),
+        pe_types.NumberParameter(
+            displayName="Display Name 2",
+            variableName="variable_name_2",
+            type="int",
+            min=123.0,
+            max=456.0,
+            value=333.0,
+            default=222.0,
+        ),
+        pe_types.EnumParameter(
+            displayName="Display Name 3",
+            variableName="variable_name_3",
+            type="str",
+            choices=[
+                pe_types.EnumChoice(
+                    displayName="Choice Name",
+                    value="cool choice",
+                )
+            ],
+            default="cooler choice",
+            value="coolest choice",
+        ),
     ]
 
 
