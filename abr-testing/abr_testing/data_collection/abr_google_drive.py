@@ -43,77 +43,87 @@ def create_data_dictionary(
                 file_results = json.load(file)
         else:
             continue
-        run_id = file_results.get("run_id", "NaN")
-        if run_id in runs_to_save:
-            robot = file_results.get("robot_name")
-            protocol_name = file_results["protocol"]["metadata"].get("protocolName", "")
-            software_version = file_results.get("API_Version", "")
-            left_pipette = file_results.get("left", "")
-            right_pipette = file_results.get("right", "")
-            extension = file_results.get("extension", "")
-            (
-                num_of_errors,
-                error_type,
-                error_code,
-                error_instrument,
-                error_level,
-            ) = read_robot_logs.get_error_info(file_results)
-
-            all_modules = get_modules(file_results)
-
-            start_time_str, complete_time_str, start_date, run_time_min = (
-                "",
-                "",
-                "",
-                0.0,
-            )
-            try:
-                start_time = datetime.strptime(
-                    file_results.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+        if isinstance(file_results, dict):
+            run_id = file_results.get("run_id", "NaN")
+            if run_id in runs_to_save:
+                robot = file_results.get("robot_name")
+                protocol_name = file_results["protocol"]["metadata"].get(
+                    "protocolName", ""
                 )
-                adjusted_start_time = start_time - timedelta(hours=5)
-                start_date = str(adjusted_start_time.date())
-                start_time_str = str(adjusted_start_time).split("+")[0]
-                complete_time = datetime.strptime(
-                    file_results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
-                )
-                adjusted_complete_time = complete_time - timedelta(hours=5)
-                complete_time_str = str(adjusted_complete_time).split("+")[0]
-                run_time = complete_time - start_time
-                run_time_min = run_time.total_seconds() / 60
-            except ValueError:
-                pass  # Handle datetime parsing errors if necessary
+                software_version = file_results.get("API_Version", "")
+                left_pipette = file_results.get("left", "")
+                right_pipette = file_results.get("right", "")
+                extension = file_results.get("extension", "")
+                (
+                    num_of_errors,
+                    error_type,
+                    error_code,
+                    error_instrument,
+                    error_level,
+                ) = read_robot_logs.get_error_info(file_results)
 
-            if run_time_min > 0:
-                row = {
-                    "Robot": robot,
-                    "Run_ID": run_id,
-                    "Protocol_Name": protocol_name,
-                    "Software Version": software_version,
-                    "Date": start_date,
-                    "Start_Time": start_time_str,
-                    "End_Time": complete_time_str,
-                    "Run_Time (min)": run_time_min,
-                    "Errors": num_of_errors,
-                    "Error_Code": error_code,
-                    "Error_Type": error_type,
-                    "Error_Instrument": error_instrument,
-                    "Error_Level": error_level,
-                    "Left Mount": left_pipette,
-                    "Right Mount": right_pipette,
-                    "Extension": extension,
-                }
-                tc_dict = read_robot_logs.thermocycler_commands(file_results)
-                hs_dict = read_robot_logs.hs_commands(file_results)
-                tm_dict = read_robot_logs.temperature_module_commands(file_results)
-                notes = {"Note1": "", "Jira Link": issue_url}
-                row_2 = {**row, **all_modules, **notes, **hs_dict, **tm_dict, **tc_dict}
-                headers = list(row_2.keys())
-                runs_and_robots[run_id] = row_2
-            else:
-                continue
-                # os.remove(file_path)
-                # print(f"Run ID: {run_id} has a run time of 0 minutes. Run removed.")
+                all_modules = get_modules(file_results)
+
+                start_time_str, complete_time_str, start_date, run_time_min = (
+                    "",
+                    "",
+                    "",
+                    0.0,
+                )
+                try:
+                    start_time = datetime.strptime(
+                        file_results.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+                    )
+                    adjusted_start_time = start_time - timedelta(hours=5)
+                    start_date = str(adjusted_start_time.date())
+                    start_time_str = str(adjusted_start_time).split("+")[0]
+                    complete_time = datetime.strptime(
+                        file_results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+                    )
+                    adjusted_complete_time = complete_time - timedelta(hours=5)
+                    complete_time_str = str(adjusted_complete_time).split("+")[0]
+                    run_time = complete_time - start_time
+                    run_time_min = run_time.total_seconds() / 60
+                except ValueError:
+                    pass  # Handle datetime parsing errors if necessary
+
+                if run_time_min > 0:
+                    row = {
+                        "Robot": robot,
+                        "Run_ID": run_id,
+                        "Protocol_Name": protocol_name,
+                        "Software Version": software_version,
+                        "Date": start_date,
+                        "Start_Time": start_time_str,
+                        "End_Time": complete_time_str,
+                        "Run_Time (min)": run_time_min,
+                        "Errors": num_of_errors,
+                        "Error_Code": error_code,
+                        "Error_Type": error_type,
+                        "Error_Instrument": error_instrument,
+                        "Error_Level": error_level,
+                        "Left Mount": left_pipette,
+                        "Right Mount": right_pipette,
+                        "Extension": extension,
+                    }
+                    tc_dict = read_robot_logs.thermocycler_commands(file_results)
+                    hs_dict = read_robot_logs.hs_commands(file_results)
+                    tm_dict = read_robot_logs.temperature_module_commands(file_results)
+                    notes = {"Note1": "", "Jira Link": issue_url}
+                    row_2 = {
+                        **row,
+                        **all_modules,
+                        **notes,
+                        **hs_dict,
+                        **tm_dict,
+                        **tc_dict,
+                    }
+                    headers = list(row_2.keys())
+                    runs_and_robots[run_id] = row_2
+                else:
+                    continue
+                    # os.remove(file_path)
+                    # print(f"Run ID: {run_id} has a run time of 0 minutes. Run removed.")
     return runs_and_robots, headers
 
 
