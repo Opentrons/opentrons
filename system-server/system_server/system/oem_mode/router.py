@@ -1,7 +1,7 @@
 """Router for /system/register endpoint."""
 
 import os
-import filetype
+import filetype  # type: ignore[import-untyped]
 from fastapi import (
     APIRouter,
     Depends,
@@ -68,7 +68,6 @@ async def upload_splash_image(
     settings: SystemServerSettings = Depends(get_settings),
 ) -> Response:
     """Router for /system/oem_mode/upload_splash endpoint."""
-
     # Make sure oem mode is enabled before this request
     if not settings.oem_mode_enabled:
         raise HTTPException(
