@@ -1,6 +1,6 @@
 """Module for tracking robot context and execution duration for different operations."""
 
-from functools import wraps, partial
+from functools import wraps
 from typing import Callable, TypeVar, List
 from typing_extensions import ParamSpec
 from performance_metrics.datashapes import (
