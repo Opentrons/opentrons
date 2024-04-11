@@ -8,7 +8,6 @@ performance counters for accuracy.
 from time import perf_counter_ns, clock_gettime_ns, CLOCK_REALTIME
 from types import TracebackType
 from typing import (
-    Protocol,
     Type,
     TypeVar,
     Tuple,
@@ -19,21 +18,6 @@ from contextlib import AbstractAsyncContextManager, AbstractContextManager
 
 P = ParamSpec("P")
 R = TypeVar("R")
-
-
-class FunctionTimerCallback(Protocol):
-    """Protocol for a class that can store the result of a timing operation.
-
-    Implementing classes must provide a `store` method.
-    """
-
-    def __call__(self, data: RawDurationData) -> None:
-        """Stores the duration of an operation.
-
-        Args:
-            data: The duration data to store.
-        """
-        pass
 
 
 class FunctionTimer(AbstractAsyncContextManager, AbstractContextManager):  # type: ignore
