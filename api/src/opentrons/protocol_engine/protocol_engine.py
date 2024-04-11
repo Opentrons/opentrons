@@ -159,8 +159,12 @@ class ProtocolEngine:
         else:
             self._hardware_api.resume(HardwarePauseType.PAUSE)
 
-    def pause(self) -> None:
-        """Pause executing commands in the queue."""
+    def request_pause(self) -> None:
+        """Make command execution pause soon.
+
+        This will try to pause in the middle of the ongoing command, if there is one.
+        Otherwise, whenever the next command begins, the pause will happen then.
+        """
         action = self._state_store.commands.validate_action_allowed(
             PauseAction(source=PauseSource.CLIENT)
         )

@@ -101,7 +101,7 @@ class AbstractRunner(ABC):
 
     def pause(self) -> None:
         """Pause the run."""
-        self._protocol_engine.pause()
+        self._protocol_engine.request_pause()
 
     async def stop(self) -> None:
         """Stop (cancel) the run."""

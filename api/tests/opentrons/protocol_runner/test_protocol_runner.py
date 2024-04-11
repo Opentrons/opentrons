@@ -238,7 +238,7 @@ def test_pause(
     """It should pause a protocol run with pause."""
     subject.pause()
 
-    decoy.verify(protocol_engine.pause(), times=1)
+    decoy.verify(protocol_engine.request_pause(), times=1)
 
 
 @pytest.mark.parametrize(

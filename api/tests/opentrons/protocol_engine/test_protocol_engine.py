@@ -515,7 +515,7 @@ def test_pause(
         state_store.commands.validate_action_allowed(expected_action),
     ).then_return(expected_action)
 
-    subject.pause()
+    subject.request_pause()
 
     decoy.verify(
         action_dispatcher.dispatch(expected_action),
