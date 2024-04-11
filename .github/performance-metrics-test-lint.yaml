@@ -32,6 +32,10 @@ jobs:
           cache: 'pipenv'
           cache-dependency-path: performance-metrics/Pipfile.lock
 
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'performance-metrics'
+
       - name: Setup
         id: install
         working-directory: ./performance-metrics
