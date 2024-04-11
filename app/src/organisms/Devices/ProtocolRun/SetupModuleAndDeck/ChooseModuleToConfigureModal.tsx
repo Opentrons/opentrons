@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useModulesQuery } from '@opentrons/react-api-client'
+import { useDeckConfigurationQuery, useModulesQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -44,6 +44,17 @@ export const ChooseModuleToConfigureModal = (
   } = props
   const { t } = useTranslation(['protocol_setup', 'shared'])
   const attachedModules = useModulesQuery().data?.data ?? []
+  const deckConfig = useDeckConfigurationQuery()?.data ?? []
+  const unconfiguredModuleMatches =
+    attachedModules.filter(
+      attachedMod =>
+        attachedMod.moduleModel === requiredModuleModel &&
+        !deckConfig.some(
+          ({ opentronsModuleSerialNumber }) =>
+            attachedMod.serialNumber === opentronsModuleSerialNumber
+        )
+    ) ?? []
+  console.log('unconfig', unconfiguredModuleMatches)
 
   return createPortal(
     isOnDevice ? (
@@ -64,8 +75,7 @@ export const ChooseModuleToConfigureModal = (
               paddingTop={SPACING.spacing8}
               gridGap={SPACING.spacing8}
             >
-              {attachedModules
-                .filter(m => m.moduleModel === requiredModuleModel)
+              {unconfiguredModuleMatches
                 .map(attachedModule => {
                   const moduleFixtures = getCutoutFixturesForModuleModel(
                     attachedModule.moduleModel,
