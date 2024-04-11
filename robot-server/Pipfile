@@ -39,13 +39,11 @@ types-paho-mqtt = "==1.6.0.20240106"
 
 [packages]
 anyio = "==3.7.1"
-# fastapi >=0.100.0 is intended for use with pydantic 2.x, and while it theoretically is
-# backwards compatible, best to be sure
-fastapi = "==0.99.1"
+fastapi = "==0.110.1"
 python-dotenv = "==1.0.1"
 python-multipart = "==0.0.6"
 # pydantic 2.x has many breaking api changes
-pydantic = "==1.10.12"
+pydantic = "==2.6.4"
 typing-extensions = ">=4.0.0,<5"
 uvicorn = "==0.27.0.post1"
 wsproto = "==1.2.0"
