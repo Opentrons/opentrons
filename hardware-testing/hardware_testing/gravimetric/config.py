@@ -7,6 +7,7 @@ from opentrons.config.types import LiquidProbeSettings, OutputOptions
 from opentrons.protocol_api.labware import Well
 from opentrons.hardware_control.types import InstrumentProbeType
 
+
 class ConfigType(Enum):
     """Substitute for Literal which isn't available until 3.8.0."""
 
