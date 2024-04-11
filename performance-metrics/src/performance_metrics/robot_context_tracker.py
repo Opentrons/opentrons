@@ -1,14 +1,13 @@
 """Module for tracking robot context and execution duration for different operations."""
 
 from functools import wraps
+from time import perf_counter_ns, clock_gettime_ns, CLOCK_REALTIME
 from typing import Callable, TypeVar, List
 from typing_extensions import ParamSpec
 from performance_metrics.datashapes import (
     RawContextData,
     RobotContextState,
-    RawDurationData,
 )
-from performance_metrics.function_timer import FunctionTimer
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -22,24 +21,6 @@ class RobotContextTracker:
         self._storage: List[RawContextData] = []
         self._should_track = should_track
 
-    def _store(
-        self, state: RobotContextState, raw_duration_data: RawDurationData
-    ) -> None:
-        """Stores the context and duration data for a robot operation.
-
-        Args:
-            state : The state of the robot during the operation.
-            raw_duration_data : The duration data for the operation.
-        """
-        self._storage.append(
-            RawContextData(
-                func_start=raw_duration_data.func_start,
-                duration_start=raw_duration_data.duration_start,
-                duration_end=raw_duration_data.duration_end,
-                state=state,
-            )
-        )
-
     def track(self, state: RobotContextState) -> Callable:  # type: ignore
         """Decorator factory for tracking the execution duration and state of robot operations.
 
@@ -51,15 +32,25 @@ class RobotContextTracker:
         """
 
         def inner_decorator(func: Callable[P, R]) -> Callable[P, R]:
+            if not self._should_track:
+                return func
+
             @wraps(func)
             def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-                if not self._should_track:
-                    return func(*args, **kwargs)
+                function_start_time = clock_gettime_ns(CLOCK_REALTIME)
+                duration_start_time = perf_counter_ns()
                 try:
-                    with FunctionTimer() as timer:
-                        result = func(*args, **kwargs)
+                    result = func(*args, **kwargs)
                 finally:
-                    self._store(state, timer.get_data())
+                    duration_end_time = perf_counter_ns()
+                    self._storage.append(
+                        RawContextData(
+                            function_start_time,
+                            duration_start_time,
+                            duration_end_time,
+                            state,
+                        )
+                    )
                 return result
 
             return wrapper
