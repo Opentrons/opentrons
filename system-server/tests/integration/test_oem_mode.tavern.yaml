@@ -1,5 +1,6 @@
 ---
-test_name: PUT Enable OEM Mode
+test_name:  Test enable/disable OEM Mode
+
 marks:
   - usefixtures:
     - run_server
@@ -34,4 +35,20 @@ stages:
         content-type: application/json
     response:
       status_code: 422
+---
+test_name: Upload, and validate an image for OEM Mode
 
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload PNG Image
+    request: &upload_splash_first
+      url: "{host:s}:{port:d}/system/oem_mode/upload_splash"
+      method: POST
+      files:
+        file: 'tests/integration/resources/oem_mode_custom.png'
+    response:
+      status_code: 201
+
+TODO: add other test cases to validate image
