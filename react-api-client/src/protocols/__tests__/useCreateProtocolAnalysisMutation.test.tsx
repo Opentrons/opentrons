@@ -35,7 +35,7 @@ describe('useCreateProtocolAnalysisMutation hook', () => {
     vi.mocked(createProtocolAnalysis).mockRejectedValue('oh no')
 
     const { result } = renderHook(
-      () => useCreateProtocolAnalysisMutation({}, 'fake-protocol-key'),
+      () => useCreateProtocolAnalysisMutation('fake-protocol-key'),
       {
         wrapper,
       }
@@ -58,7 +58,7 @@ describe('useCreateProtocolAnalysisMutation hook', () => {
     } as Response<ProtocolAnalysisSummary[]>)
 
     const { result } = renderHook(
-      () => useCreateProtocolAnalysisMutation({}, 'fake-protocol-key'),
+      () => useCreateProtocolAnalysisMutation('fake-protocol-key'),
       {
         wrapper,
       }
