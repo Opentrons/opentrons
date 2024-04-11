@@ -336,7 +336,7 @@ def build_new_pipette_model_v2(
         top_level_pipette_model["liquid"],
         pipette_functions_dict,
     )
-    liquid_model_dict = liquid_model.dict(by_alias=True)
+    liquid_model_dict = liquid_model.model_dump(by_alias=True)
     liquid_model_dict["supportedTips"] = {
         k.name: v for k, v in liquid_model_dict["supportedTips"].items()
     }

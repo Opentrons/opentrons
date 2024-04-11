@@ -1,8 +1,7 @@
 import re
-from typing import List, Dict, Tuple, Optional, Annotated, Literal, TypeVar, Generic
+from typing import List, Dict, Tuple, Optional, Annotated, Literal, TypeVar
 from pydantic import (
     field_validator,
-    ConfigDict,
     BaseModel,
     Field,
     BeforeValidator,

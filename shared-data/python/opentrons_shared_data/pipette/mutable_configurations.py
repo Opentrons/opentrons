@@ -78,7 +78,7 @@ def _migrate_to_v2_configurations(
     Given an input of v1 mutable configs, look up the equivalent keyed
     value of that configuration."""
     quirks_list = []
-    dict_of_base_model = base_configurations.dict(by_alias=True)
+    dict_of_base_model = base_configurations.model_dump(by_alias=True)
     for c, v in v1_mutable_configs.items():
         if isinstance(v, str):
             # ignore the saved model
@@ -233,7 +233,7 @@ def _load_full_mutable_configs(
         pipette_model.pipette_channels,
         pipette_model.pipette_version,
     )
-    base_configs_dict = base_configs.dict(by_alias=True)
+    base_configs_dict = base_configs.model_dump(by_alias=True)
     full_mutable_configs = _list_all_mutable_configs(overrides, base_configs_dict)
 
     if not full_mutable_configs.get("name"):
@@ -426,7 +426,7 @@ def save_overrides(
         pipette_model.pipette_channels,
         pipette_model.pipette_version,
     )
-    base_configs_dict = base_configs.dict(by_alias=True)
+    base_configs_dict = base_configs.model_dump(by_alias=True)
     try:
         existing_overrides = _load_available_overrides(
             pipette_serial_number, pipette_override_path

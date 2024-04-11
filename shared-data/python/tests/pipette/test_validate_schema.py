@@ -1,5 +1,4 @@
 import os
-from typing import List
 from opentrons_shared_data import get_shared_data_root
 
 from opentrons_shared_data.pipette.pipette_definition import PipetteConfigurations

@@ -197,7 +197,7 @@ def update_pipette_configuration(
     Given an input of v1 mutable configs, look up the equivalent keyed
     value of that configuration."""
     quirks_list = []
-    dict_of_base_model = base_configurations.dict(by_alias=True)
+    dict_of_base_model = base_configurations.model_dump(by_alias=True)
 
     for c, v in v1_configuration_changes.items():
         lookup_key = _change_to_camel_case(c)
