@@ -36,7 +36,7 @@ class RobotContextStates(Enum):
         raise ValueError(f"Invalid state id: {state_id}")
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class RawDurationData:
     """Represents raw duration data for a process or function.
 
@@ -46,12 +46,12 @@ class RawDurationData:
     - duration_measurement_end_time (int): The end time for duration measurement.
     """
 
-    function_start_time: int
-    duration_measurement_start_time: int
-    duration_measurement_end_time: int
+    func_start: int
+    duration_start: int
+    duration_end: int
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class RawContextData(RawDurationData):
     """Extends RawDurationData with context state information.
 

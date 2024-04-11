@@ -32,9 +32,9 @@ class RobotContextTracker:
         """
         self._storage.append(
             RawContextData(
-                function_start_time=raw_duration_data.function_start_time,
-                duration_measurement_start_time=raw_duration_data.duration_measurement_start_time,
-                duration_measurement_end_time=raw_duration_data.duration_measurement_end_time,
+                func_start=raw_duration_data.func_start,
+                duration_start=raw_duration_data.duration_start,
+                duration_end=raw_duration_data.duration_end,
                 state=state,
             )
         )
@@ -52,12 +52,12 @@ class RobotContextTracker:
         def inner_decorator(func: Callable[P, R]) -> Callable[P, R]:
             @wraps(func)
             def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-                # Create a partially filled function with the current state pre-filled
-                partial_store_func = partial(self._store, state)
-                # Initialize the FunctionTimer with the partial function as a callback
-                timer = FunctionTimer(callback=partial_store_func)
-                # Measure and store the duration of the function call
-                result = timer.measure_duration(func)(*args, **kwargs)
+
+                try:
+                    with FunctionTimer() as timer:
+                        result = func(*args, **kwargs)
+                finally:
+                    self._store(state, timer.get_data())
                 return result
 
             return wrapper
