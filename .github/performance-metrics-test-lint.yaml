@@ -6,7 +6,11 @@ on:
   pull_request:
     paths:
       - 'performance-metrics/**'
+      - '.github/workflows/performance-metrics-test-lint.yaml'
   push:  # Remove
+    paths:
+      - 'performance-metrics/**'
+      - '.github/workflows/performance-metrics-test-lint.yaml'
   workflow_dispatch:  # Remove
 
 concurrency:
