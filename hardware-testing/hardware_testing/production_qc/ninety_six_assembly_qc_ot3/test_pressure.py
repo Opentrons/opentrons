@@ -1,6 +1,8 @@
 """Test Pressure."""
 from asyncio import sleep
 from typing import List, Union
+from hardware_testing.drivers.sealed_pressure_fixture import SerialDriver as SealedPressureDriver
+from hardware_testing.opentrons_api import helpers_ot3
 
 from opentrons_hardware.firmware_bindings.constants import SensorId
 
@@ -10,7 +12,7 @@ from opentrons.hardware_control.types import InstrumentProbeType
 
 from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount
+from hardware_testing.opentrons_api.types import OT3Mount, Point
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVResult,
@@ -18,6 +20,12 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 
+PRIMARY_SEALED_PRESSURE_FIXTURE_POS = Point(362.68, 148.83, 44.4)  # attached tip
+SECOND_SEALED_PRESSURE_FIXTURE_POS = Point(264.71, 212.81, 44.4)   # attached tip
+SET_PRESSURE_TARGET = 50 # read air pressure when the force pressure value is 300
+REACHED_PRESSURE = 0
+
+USE_SEALED_FIXTURE = False
 SECONDS_BETWEEN_READINGS = 0.25
 NUM_PRESSURE_READINGS = 10
 TIP_VOLUME = 50
@@ -55,7 +63,10 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     for p in InstrumentProbeType:
         for r in PRESSURE_READINGS:
             tag = _get_test_tag(p, r)
-            lines.append(CSVLine(tag, [float, CSVResult]))
+            if r == "sealed-pa":
+                lines.append(CSVLine(tag, [float, CSVResult, float]))
+            else:
+                lines.append(CSVLine(tag, [float, CSVResult]))
     return lines
 
 
@@ -92,6 +103,27 @@ def check_value(test_value: float, test_name: str) -> CSVResult:
         return CSVResult.PASS
     else:
         return CSVResult.FAIL
+    
+async def calibrate_to_pressue_fixture(api: OT3API, sensor:SealedPressureDriver, fixture_pos:Point):
+    """move to suitable height for readding air pressure"""
+    global REACHED_PRESSURE
+    await api.move_to(OT3Mount.LEFT, fixture_pos)
+    debug_target = input("Setting target pressure (default: 20g): ")
+    if debug_target.strip() == "":
+        debug_target = "20"
+    while True:
+        force_pressure = sensor.get_pressure()
+        # step = -0.06 if abs(float(force_pressure)) > 0.1 else -0.1
+        step = -0.06
+        print("Force pressure is: ", force_pressure)
+        if force_pressure < float(debug_target.strip()):
+            await api.move_rel(OT3Mount.LEFT, Point(x=0, y=0, z=step))
+            await sleep(3)
+        else:
+            REACHED_PRESSURE = sensor.get_pressure()
+            ui.print_info(f"Reaching force is {REACHED_PRESSURE}, exit calibration.")
+            break
+        
 
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
@@ -100,7 +132,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     home_pos = await api.gantry_position(OT3Mount.LEFT)
     await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
-
+    # init driver
+    pressure_sensor = SealedPressureDriver()
+    pressure_sensor.init(9600)
+    
     for probe in InstrumentProbeType:
         sensor_id = sensor_id_for_instrument(probe)
         ui.print_header(f"Sensor: {probe}")
@@ -123,7 +158,21 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await api.prepare_for_aspirate(OT3Mount.LEFT)
         if not api.is_simulator:
             ui.get_user_ready(f"attach {TIP_VOLUME} uL TIP to {probe.name} sensor")
-            ui.get_user_ready("SEAL tip using your FINGER")
+            if not USE_SEALED_FIXTURE:
+                 ui.get_user_ready("SEAL tip using your FINGER")
+            else:
+                if probe == InstrumentProbeType.PRIMARY:
+                    fixture_pos = PRIMARY_SEALED_PRESSURE_FIXTURE_POS
+                elif probe == InstrumentProbeType.SECONDARY:
+                    fixture_pos = SECOND_SEALED_PRESSURE_FIXTURE_POS
+                else:
+                    raise KeyError("Couldn't find key for InstrumentProbeTybe")
+
+                await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, fixture_pos._replace(z=fixture_pos.z + 50))
+                ui.get_user_ready("Ready for moving to sensor")
+                
+                await calibrate_to_pressue_fixture(api, pressure_sensor, fixture_pos)
+
             try:
                 sealed_pa = await _read_from_sensor(
                     api, sensor_id, NUM_PRESSURE_READINGS
@@ -133,7 +182,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 break
         print(f"sealed-pa: {sealed_pa}")
         sealed_result = check_value(sealed_pa, "sealed-pa")
-        report(section, _get_test_tag(probe, "sealed-pa"), [sealed_pa, sealed_result])
+        report(section, _get_test_tag(probe, "sealed-pa"), [sealed_pa, sealed_result, REACHED_PRESSURE])
 
         # ASPIRATE-Pa
         aspirate_pa = 0.0
@@ -168,7 +217,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         report(
             section, _get_test_tag(probe, "dispense-pa"), [dispense_pa, dispense_result]
         )
-
+        if USE_SEALED_FIXTURE:
+            await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, fixture_pos._replace(z=fixture_pos.z + 50))
         if not api.is_simulator:
             ui.get_user_ready("REMOVE tip")
+        
         await api.remove_tip(OT3Mount.LEFT)
