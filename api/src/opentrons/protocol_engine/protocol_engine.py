@@ -371,7 +371,7 @@ class ProtocolEngine:
         else:
             _log.info("estop pressed before protocol was started, taking no action.")
 
-    async def stop_soon(self) -> None:
+    async def request_stop(self) -> None:
         """Make command execution stop soon.
 
         This will try to interrupt the ongoing command, if there is one. Future commands

@@ -106,7 +106,7 @@ class AbstractRunner(ABC):
     async def stop(self) -> None:
         """Stop (cancel) the run."""
         if self.was_started():
-            await self._protocol_engine.stop_soon()
+            await self._protocol_engine.request_stop()
         else:
             await self._protocol_engine.finish(
                 drop_tips_after_run=False,
