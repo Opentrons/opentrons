@@ -982,11 +982,12 @@ class ModuleView(HasState[ModuleState]):
 
         return neighbor_slot in self._state.slot_by_module_id.values()
 
-    def select_hardware_module_to_load(
+    def select_hardware_module_to_load(  # noqa: C901
         self,
         model: ModuleModel,
         location: DeckSlotLocation,
         attached_modules: Sequence[HardwareModule],
+        expected_serial_number: Optional[str] = None,
     ) -> HardwareModule:
         """Get the next matching hardware module for the given model and location.
 
@@ -1002,6 +1003,8 @@ class ModuleView(HasState[ModuleState]):
             location: The location the module will be assigned to.
             attached_modules: All attached modules as reported by the HardwareAPI,
                 in the order in which they should be used.
+            expected_serial_number: An optional variable containing the serial number
+                expected of the module identified.
 
         Raises:
             ModuleNotAttachedError: A not-yet-assigned module matching the requested
@@ -1030,7 +1033,11 @@ class ModuleView(HasState[ModuleState]):
         for m in attached_modules:
             if m not in self._state.hardware_by_module_id.values():
                 if model == m.definition.model or model in m.definition.compatibleWith:
-                    return m
+                    if expected_serial_number is not None:
+                        if m.serial_number == expected_serial_number:
+                            return m
+                    else:
+                        return m
 
         raise errors.ModuleNotAttachedError(f"No available {model.value} found.")
 

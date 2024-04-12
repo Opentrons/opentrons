@@ -318,8 +318,14 @@ class EquipmentHandler:
                 for hw_mod in self._hardware_api.attached_modules
             ]
 
+            serial_number_at_locaiton = self._state_store.geometry._addressable_areas.get_fixture_serial_from_deck_configuration_by_deck_slot(
+                location.slotName
+            )
             attached_module = self._state_store.modules.select_hardware_module_to_load(
-                model=model, location=location, attached_modules=attached_modules
+                model=model,
+                location=location,
+                attached_modules=attached_modules,
+                expected_serial_number=serial_number_at_locaiton,
             )
 
         else:
