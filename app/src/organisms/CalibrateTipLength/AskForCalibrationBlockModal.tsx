@@ -40,7 +40,7 @@ interface Props {
 }
 
 export function AskForCalibrationBlockModal(props: Props): JSX.Element {
-  const { t } = useTranslation(['robot_calibration', 'shared'])
+  const { t } = useTranslation(['robot_calibration', 'shared', 'branded'])
   const [rememberPreference, setRememberPreference] = React.useState<boolean>(
     true
   )
@@ -77,7 +77,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
 
             <Trans
               t={t}
-              i18nKey="calibration_block_description"
+              i18nKey="branded:calibration_block_description"
               components={{
                 block: <StyledText as="p" marginBottom={SPACING.spacing8} />,
                 supportLink: (

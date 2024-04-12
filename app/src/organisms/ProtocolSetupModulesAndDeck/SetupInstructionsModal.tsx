@@ -26,7 +26,7 @@ interface SetupInstructionsModalProps {
 export function SetupInstructionsModal({
   setShowSetupInstructionsModal,
 }: SetupInstructionsModalProps): JSX.Element {
-  const { i18n, t } = useTranslation('protocol_setup')
+  const { i18n, t } = useTranslation(['protocol_setup', 'branded'])
   const modalHeader: ModalHeaderBaseProps = {
     title: i18n.format(t('setup_instructions'), 'capitalize'),
     iconName: 'information',
@@ -45,7 +45,9 @@ export function SetupInstructionsModal({
         gridGap={SPACING.spacing40}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-          <StyledText as="p">{t('setup_instructions_description')}</StyledText>
+          <StyledText as="p">
+            {t('branded:setup_instructions_description')}
+          </StyledText>
           <Flex
             backgroundColor={COLORS.grey35}
             borderRadius={BORDERS.borderRadius8}
