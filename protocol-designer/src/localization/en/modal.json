@@ -177,7 +177,7 @@
     "closeUnsavedStepForm": {
       "title": "Unsaved step form",
       "body": "You have not saved this step form. If you navigate away without saving, this step will be deleted.",
-      "confirm_button": "delete step"
+      "confirm_button": "discard step"
     },
     "closeBatchEditForm": {
       "title": "Unsaved changes to multiple steps",
