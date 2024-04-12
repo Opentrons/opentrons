@@ -2,14 +2,14 @@ import React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import {
-  Flex,
-  COLORS,
-  StyledText,
-  SPACING,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   Link,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 const LABWARE_LIBRARY_URL = 'https://labware.opentrons.com/'
