@@ -296,6 +296,29 @@ class SyncClient:
 
         return cast(commands.PickUpTipResult, result)
 
+    def pick_up_tip_wait_for_recovery(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+    ) -> commands.PickUpTip:
+        """Execute a PickUpTip, wait for any error recovery, and return it.
+
+        Note that the returned command will not necessarily have a `result`.
+        """
+        request = commands.PickUpTipCreate(
+            params=commands.PickUpTipParams(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+            )
+        )
+        command = self._transport.execute_command_wait_for_recovery(request=request)
+
+        return cast(commands.PickUpTip, command)
+
     def drop_tip(
         self,
         pipette_id: str,

@@ -1,5 +1,15 @@
 import type { RunTimeParameter } from '../types'
 
+/**
+ * Formats the runtime parameter's default value.
+ *
+ * @param {RunTimeParameter} runTimeParameter - The runtime parameter whose default value is to be formatted.
+ * @param {Function} [t] - An optional function for localization.
+ *
+ * @returns {string} The formatted default value of the runtime parameter.
+ *
+ */
+
 export const formatRunTimeParameterDefaultValue = (
   runTimeParameter: RunTimeParameter,
   t?: any
@@ -9,6 +19,18 @@ export const formatRunTimeParameterDefaultValue = (
     'suffix' in runTimeParameter && runTimeParameter.suffix != null
       ? runTimeParameter.suffix
       : null
+
+  if ('choices' in runTimeParameter && runTimeParameter.choices != null) {
+    const choice = runTimeParameter.choices.find(
+      choice => choice.value === defaultValue
+    )
+    if (choice != null) {
+      return suffix != null
+        ? `${choice.displayName} ${suffix}`
+        : choice.displayName
+    }
+  }
+
   switch (type) {
     case 'int':
     case 'float':
@@ -21,15 +43,7 @@ export const formatRunTimeParameterDefaultValue = (
       } else {
         return Boolean(defaultValue) ? 'On' : 'Off'
       }
-    case 'str':
-      if ('choices' in runTimeParameter && runTimeParameter.choices != null) {
-        const choice = runTimeParameter.choices.find(
-          choice => choice.value === defaultValue
-        )
-        if (choice != null) {
-          return choice.displayName
-        }
-      }
+    default:
       break
   }
   return ''

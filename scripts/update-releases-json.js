@@ -4,7 +4,7 @@ const fs = require('fs/promises')
 
 // Updates a releases historical manifest with a release's version.
 
-const versionFinder = require('./git-version')
+const versionFinder = require('./git-version.mjs')
 
 const parseArgs = require('./deploy/lib/parseArgs')
 const USAGE =

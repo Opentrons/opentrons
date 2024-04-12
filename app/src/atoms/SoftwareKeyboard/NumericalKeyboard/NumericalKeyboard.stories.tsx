@@ -37,7 +37,6 @@ type Story = StoryObj<typeof NumericalKeyboard>
 
 const Keyboard = (args): JSX.Element => {
   const { isDecimal, hasHyphen } = args
-  console.log(isDecimal, hasHyphen)
   const [showKeyboard, setShowKeyboard] = React.useState(false)
   const [value, setValue] = React.useState<string>('')
   const keyboardRef = React.useRef(null)

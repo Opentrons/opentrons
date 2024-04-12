@@ -1,77 +1,103 @@
 import * as React from 'react'
 
 import { LEFT, RIGHT } from '@opentrons/shared-data'
-import { InfoItem } from './InfoItem'
-import { InstrumentDiagram } from './InstrumentDiagram'
-import styles from './instrument.module.css'
 import { Flex } from '../primitives'
-import { SPACING } from '../ui-style-constants'
+import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
+import { StyledText } from '../atoms'
 import { DIRECTION_COLUMN, JUSTIFY_CENTER } from '../styles'
+import { InstrumentDiagram } from './InstrumentDiagram'
 
 import type { Mount } from '../robot-types'
 import type { InstrumentDiagramProps } from './InstrumentDiagram'
 
+import styles from './instrument.module.css'
+
 export interface InstrumentInfoProps {
   /** 'left' or 'right' */
   mount: Mount
-  /** if true, show labels 'LEFT PIPETTE' / 'RIGHT PIPETTE' */
-  showMountLabel?: boolean | null
   /** human-readable description, eg 'p300 Single-channel' */
   description: string
-  /** paired tiprack models */
-  tiprackModels?: string[]
-  /** if disabled, pipette & its info are grayed out */
-  isDisabled: boolean
   /** specs of mounted pipette */
   pipetteSpecs?: InstrumentDiagramProps['pipetteSpecs'] | null
-  /** classes to apply */
-  className?: string
-  /** classes to apply to the info group child */
-  infoClassName?: string
+  /** paired tiprack models */
+  tiprackModels?: string[]
   /** children to display under the info */
   children?: React.ReactNode
+  /** if true, show labels 'LEFT PIPETTE' / 'RIGHT PIPETTE' */
+  showMountLabel?: boolean | null
 }
 
+const MAX_WIDTH = '14rem'
+
 export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
-  const has96Channel = props.pipetteSpecs?.channels === 96
+  const {
+    mount,
+    showMountLabel,
+    description,
+    tiprackModels,
+    pipetteSpecs,
+    children,
+  } = props
+
+  const has96Channel = pipetteSpecs?.channels === 96
   return (
     <Flex justifyContent={JUSTIFY_CENTER} gridGap={SPACING.spacing16}>
-      {props.mount === RIGHT && props.pipetteSpecs && (
+      {mount === RIGHT && pipetteSpecs ? (
         <InstrumentDiagram
-          pipetteSpecs={props.pipetteSpecs}
+          pipetteSpecs={pipetteSpecs}
           className={styles.pipette_icon}
-          mount={props.mount}
+          mount={mount}
         />
-      )}
+      ) : null}
+      {/* NOTE: the color is our legacy c-font-dark, which matches the other colors in this component **/}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        color="#4a4a4a"
+        gridGap={SPACING.spacing8}
+      >
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+          <StyledText
+            as="h3"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+          >
+            {showMountLabel && !has96Channel ? `${mount} pipette` : 'pipette'}
+          </StyledText>
+          <StyledText as="p" width="max-content" maxWidth={MAX_WIDTH}>
+            {description}
+          </StyledText>
+        </Flex>
 
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <InfoItem
-          title={
-            props.showMountLabel && !has96Channel
-              ? `${props.mount} pipette`
-              : 'pipette'
-          }
-          value={props.description}
-        />
-        {props.tiprackModels != null
-          ? props.tiprackModels.map((model, index) => (
-              <InfoItem
-                key={`tiprackModel-${index}`}
-                title={index === 0 ? 'tip racks' : null}
-                value={model}
-              />
-            ))
-          : null}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {'Tip rack'}
+          </StyledText>
+          <ul>
+            {tiprackModels != null && tiprackModels.length > 0 ? (
+              tiprackModels.map((model, index) => (
+                <li key={`${model}_${index}`}>
+                  <StyledText as="p" width="max-content" maxWidth={MAX_WIDTH}>
+                    {model}
+                  </StyledText>
+                </li>
+              ))
+            ) : (
+              <StyledText as="p" width="max-content" maxWidth={MAX_WIDTH}>
+                {'None'}
+              </StyledText>
+            )}
+          </ul>
+        </Flex>
       </Flex>
 
-      {props.children}
-      {props.mount === LEFT && props.pipetteSpecs && (
+      {children}
+      {mount === LEFT && pipetteSpecs ? (
         <InstrumentDiagram
-          pipetteSpecs={props.pipetteSpecs}
+          pipetteSpecs={pipetteSpecs}
           className={styles.pipette_icon}
-          mount={props.mount}
+          mount={mount}
         />
-      )}
+      ) : null}
     </Flex>
   )
 }

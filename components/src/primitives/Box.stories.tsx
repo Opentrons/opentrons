@@ -1,21 +1,25 @@
-import * as React from 'react'
+import { COLORS, BORDERS } from '../helix-design-system'
+import { SPACING } from '../ui-style-constants'
 import { Box as BoxComponent } from './Box'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof BoxComponent> = {
   title: 'Library/Atoms/Box',
-} as Meta
+  component: BoxComponent,
+}
 
-const Template: Story<React.ComponentProps<typeof BoxComponent>> = args => (
-  <BoxComponent {...args} />
-)
-export const Box = Template.bind({})
-Box.args = {
-  children:
-    'This is a simple box atom that accepts all primitive styling props.',
-  backgroundColor: 'grey',
-  border: '1px solid black',
-  padding: '1rem',
-  maxWidth: '20rem',
+export default meta
+
+type Story = StoryObj<typeof BoxComponent>
+
+export const Box: Story = {
+  args: {
+    children:
+      'This is a simple box atom that accepts all primitive styling props.',
+    backgroundColor: COLORS.grey60,
+    border: `1px ${BORDERS.styleSolid} black`,
+    padding: SPACING.spacing16,
+    maxWidth: '20rem',
+  },
 }
