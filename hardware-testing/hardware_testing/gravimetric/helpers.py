@@ -377,11 +377,14 @@ def _get_volumes(
     extra: bool,
     channels: int,
     mode: str = "",
+    cavity: bool = False,
 ) -> List[float]:
     if increment:
         test_volumes = get_volume_increments(
             pipette_channels, pipette_volume, tip_volume, mode=mode
         )
+    elif cavity:
+        test_volumes = [1.0]
     elif user_volumes:
         if ctx.is_simulating():
             rand_vols = [round(random() * tip_volume, 1) for _ in range(randint(1, 3))]
