@@ -94,6 +94,7 @@ export function ChildNavigation({
             iconName={iconName}
             iconPlacement={iconPlacement}
             disabled={buttonIsDisabled}
+            data-testid="ChildNavigation_Primary_Button"
           />
         </Flex>
       ) : null}

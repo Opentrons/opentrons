@@ -7,7 +7,7 @@ import {
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { ChildNavigation } from '../../organisms/ChildNavigation'
+import { ChildNavigation } from '../ChildNavigation'
 
 import type {
   QuickTransferSetupState,
