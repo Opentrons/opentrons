@@ -2,6 +2,7 @@ import React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -90,7 +91,7 @@ const BUTTON_GUIDE_TEXT_STYLE = css`
 `
 
 const PromptButton = styled(PrimaryButton)`
-  border-radius: 2rem;
+  border-radius: ${BORDERS.borderRadiusFull};
   white-space: nowrap;
 `
 
