@@ -126,7 +126,6 @@ async def run_sync_buffer_to_csv(
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Runs the sensor pass move group and creates a csv file with the results."""
     sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold_pascals]
-    print("starting move group runner")
     positions = await move_group.run(can_messenger=messenger)
     for sensor_id in log_files.keys():
         sensor_capturer = LogListener(
