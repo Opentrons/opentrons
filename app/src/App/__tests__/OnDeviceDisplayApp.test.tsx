@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { screen } from '@testing-library/react'
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -20,7 +21,6 @@ import { RunningProtocol } from '../../pages/RunningProtocol'
 import { RunSummary } from '../../pages/RunSummary'
 import { Welcome } from '../../pages/Welcome'
 import { NameRobot } from '../../pages/NameRobot'
-import { InitialLoadingScreen } from '../../pages/InitialLoadingScreen'
 import { EmergencyStop } from '../../pages/EmergencyStop'
 import { DeckConfigurationEditor } from '../../pages/DeckConfiguration'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
@@ -48,7 +48,6 @@ vi.mock('../../pages/InstrumentsDashboard')
 vi.mock('../../pages/RunningProtocol')
 vi.mock('../../pages/RunSummary')
 vi.mock('../../pages/NameRobot')
-vi.mock('../../pages/InitialLoadingScreen')
 vi.mock('../../pages/EmergencyStop')
 vi.mock('../../pages/DeckConfiguration')
 vi.mock('../../redux/config')
@@ -76,7 +75,7 @@ const render = (path = '/') => {
 describe('OnDeviceDisplayApp', () => {
   beforeEach(() => {
     vi.mocked(getOnDeviceDisplaySettings).mockReturnValue(mockSettings as any)
-    vi.mocked(getIsShellReady).mockReturnValue(false)
+    vi.mocked(getIsShellReady).mockReturnValue(true)
     vi.mocked(useCurrentRunRoute).mockReturnValue(null)
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
@@ -149,9 +148,16 @@ describe('OnDeviceDisplayApp', () => {
     render('/runs/my-run-id/summary')
     expect(vi.mocked(RunSummary)).toHaveBeenCalled()
   })
-  it('renders the loading screen on mount', () => {
-    render('/loading')
-    expect(vi.mocked(InitialLoadingScreen)).toHaveBeenCalled()
+  it('renders the localization provider and not the loading screen when app-shell is ready', () => {
+    render('/')
+    expect(vi.mocked(OnDeviceLocalizationProvider)).toHaveBeenCalled()
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+  })
+  it('renders the loading screen when app-shell is not ready', () => {
+    vi.mocked(getIsShellReady).mockReturnValue(false)
+    render('/')
+    screen.getByLabelText('loading indicator')
+    expect(vi.mocked(OnDeviceLocalizationProvider)).not.toHaveBeenCalled()
   })
   it('renders EmergencyStop component from /emergency-stop', () => {
     render('/emergency-stop')

@@ -14,7 +14,7 @@ import { getIsShellReady } from '../../redux/shell'
 export function InitialLoadingScreen({
   children,
 }: {
-  children: React.ReactNode
+  children?: React.ReactNode
 }): JSX.Element {
   const isShellReady = useSelector(getIsShellReady)
 
