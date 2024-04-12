@@ -6,7 +6,7 @@
   "apply_stored_data": "Apply stored data",
   "apply_stored_labware_offset_data": "Apply stored Labware Offset data?",
   "cancel_run_alert_info_flex": "Doing so will terminate this run and home your robot.",
-  "cancel_run_alert_info_ot2": "Doing so will terminate this run, drop any attached tips in the trash container and home your robot.",
+  "cancel_run_alert_info_ot2": "Doing so will terminate this run, drop any attached tips in the trash container, and home your robot.",
   "cancel_run_and_restart": "Cancel the run and restart setup to edit",
   "cancel_run_modal_back": "No, go back",
   "cancel_run_modal_confirm": "Yes, cancel run",

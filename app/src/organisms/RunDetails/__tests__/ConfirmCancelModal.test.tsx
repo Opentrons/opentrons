@@ -83,7 +83,7 @@ describe('ConfirmCancelModal', () => {
     vi.mocked(useIsFlex).mockReturnValue(false)
     render(props)
     screen.getByText(
-      'Doing so will terminate this run, drop any attached tips in the trash container and home your robot.'
+      'Doing so will terminate this run, drop any attached tips in the trash container, and home your robot.'
     )
   })
   it('should render both buttons', () => {
