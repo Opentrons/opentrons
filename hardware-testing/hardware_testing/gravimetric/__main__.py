@@ -20,6 +20,7 @@ from hardware_testing.protocols.gravimetric_lpc.gravimetric import (
     gravimetric_ot3_p50_multi,
     gravimetric_ot3_p1000_multi_1000ul_tip_increment,
     gravimetric_ot3_p50_multi_50ul_tip_increment,
+    gravimetric_cavity_ot3_p50_single,
 )
 from hardware_testing.protocols.gravimetric_lpc.photometric import (
     photometric_ot3_p1000_multi,
@@ -148,6 +149,7 @@ class RunArgs:
     ctx: ProtocolContext
     protocol_cfg: Any
     test_report: report.CSVReport
+    cavity: bool
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -241,6 +243,7 @@ class RunArgs:
                 False,  # set extra to false so we always do the normal tests first
                 args.channels,
                 mode=args.mode,  # NOTE: only needed for increment test
+                cavity=args.cavity,
             )
             if len(vls) > 0:
                 volumes.append(
@@ -322,6 +325,8 @@ class RunArgs:
                 protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][
                     tip_volumes[0]
                 ]
+            elif args.cavity:
+                protocol_cfg = gravimetric_cavity_ot3_p50_single
             else:
                 protocol_cfg = GRAVIMETRIC_CFG[args.pipette][args.channels]
             name = protocol_cfg.metadata["protocolName"]  # type: ignore[attr-defined]
@@ -366,6 +371,7 @@ class RunArgs:
             ctx=_ctx,
             protocol_cfg=protocol_cfg,
             test_report=report,
+            cavity=args.cavity,
         )
 
 
@@ -535,6 +541,7 @@ def _main(
             run_args.pipette,
             tip,
             all_channels=all_channels_same_time,
+            cavity=run_args.cavity,
         ),
         env_sensor=run_args.environment_sensor,
         recorder=run_args.recorder,
@@ -571,6 +578,7 @@ if __name__ == "__main__":
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--same-tip", action="store_true")
     parser.add_argument("--ignore-fail", action="store_true")
+    parser.add_argument("--cavity", action="store_true")
     parser.add_argument("--photoplate-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument("--dye-well-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument(
