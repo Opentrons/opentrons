@@ -1,18 +1,18 @@
-import { useMutation, useQueryClient } from 'react-query'
-import type {
-  UseMutationResult,
-  UseMutationOptions,
-  UseMutateFunction,
-} from 'react-query'
 import { createProtocolAnalysis } from '@opentrons/api-client'
+import { useMutation, useQueryClient } from 'react-query'
 import { useHost } from '../api'
-import type { AxiosError } from 'axios'
 import type {
   ErrorResponse,
   HostConfig,
   RunTimeParameterCreateData,
 } from '@opentrons/api-client'
 import type { ProtocolAnalysisSummary } from '@opentrons/shared-data'
+import type { AxiosError } from 'axios'
+import type {
+  UseMutationResult,
+  UseMutationOptions,
+  UseMutateFunction,
+} from 'react-query'
 
 export interface CreateProtocolAnalysisVariables {
   protocolKey: string
@@ -69,12 +69,12 @@ export function useCreateProtocolAnalysisMutation(
                 response.data
               )
             )
-            .catch(e => {
+            .catch((e: Error) => {
               throw e
             })
           return response.data
         })
-        .catch(e => {
+        .catch((e: Error) => {
           throw e
         }),
     options

@@ -1,8 +1,8 @@
 import { POST, request } from '../request'
 
+import type { ProtocolAnalysisSummary } from '@opentrons/shared-data'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { ProtocolAnalysisSummary } from '@opentrons/shared-data'
 import type { RunTimeParameterCreateData } from '../runs'
 
 interface CreateProtocolAnalysisData {

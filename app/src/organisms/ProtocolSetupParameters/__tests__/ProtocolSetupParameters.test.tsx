@@ -70,7 +70,6 @@ describe('ProtocolSetupParameters', () => {
   })
   it('renders the other setting when boolean param is selected', () => {
     render(props)
-    screen.debug()
     expect(screen.getAllByText('On')).toHaveLength(2)
     fireEvent.click(screen.getByText('Dry Run'))
     expect(screen.getAllByText('On')).toHaveLength(3)
