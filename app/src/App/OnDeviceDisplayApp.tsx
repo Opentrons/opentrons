@@ -67,7 +67,6 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/emergency-stop',
   '/instruments',
   '/instruments/:mount',
-  '/loading',
   '/network-setup',
   '/network-setup/ethernet',
   '/network-setup/usb',
@@ -98,8 +97,6 @@ function getPathComponent(
       return <InstrumentsDashboard />
     case '/instruments/:mount':
       return <InstrumentDetail />
-    case '/loading':
-      return <InitialLoadingScreen />
     case '/network-setup':
       return <NetworkSetupMenu />
     case '/network-setup/ethernet':
@@ -169,31 +166,41 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
     <ApiHostProvider hostname="127.0.0.1">
-      <OnDeviceLocalizationProvider>
-        <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
-          <Box width="100%" css="user-select: none;">
-            {isIdle ? (
-              <SleepScreen />
-            ) : (
-              <>
-                <EstopTakeover />
-                <MaintenanceRunTakeover>
-                  <FirmwareUpdateTakeover />
-                  <NiceModal.Provider>
-                    <ToasterOven>
-                      <ProtocolReceiptToasts />
-                      <OnDeviceDisplayAppRoutes />
-                    </ToasterOven>
-                  </NiceModal.Provider>
-                </MaintenanceRunTakeover>
-              </>
-            )}
-          </Box>
-        </ErrorBoundary>
-        <TopLevelRedirects />
-      </OnDeviceLocalizationProvider>
+      <InitialLoadingScreen>
+        <OnDeviceLocalizationProvider>
+          <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
+            <Box width="100%" css="user-select: none;">
+              {isIdle ? (
+                <SleepScreen />
+              ) : (
+                <>
+                  <EstopTakeover />
+                  <MaintenanceRunTakeover>
+                    <FirmwareUpdateTakeover />
+                    <NiceModal.Provider>
+                      <ToasterOven>
+                        <ProtocolReceiptToasts />
+                        <OnDeviceDisplayAppRoutes />
+                      </ToasterOven>
+                    </NiceModal.Provider>
+                  </MaintenanceRunTakeover>
+                </>
+              )}
+            </Box>
+          </ErrorBoundary>
+          <TopLevelRedirects />
+        </OnDeviceLocalizationProvider>
+      </InitialLoadingScreen>
     </ApiHostProvider>
   )
+}
+
+const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
+  if (unfinishedUnboxingFlowRoute != null) {
+    return unfinishedUnboxingFlowRoute
+  }
+
+  return '/dashboard'
 }
 
 // split to a separate function because scrollRef rerenders on every route change
@@ -204,6 +211,12 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
     setCurrentNode(node)
   }, [])
   const isScrolling = useScrolling(currentNode)
+
+  const { unfinishedUnboxingFlowRoute } = useSelector(
+    getOnDeviceDisplaySettings
+  )
+
+  const targetPath = getTargetPath(unfinishedUnboxingFlowRoute)
 
   const TOUCH_SCREEN_STYLE = css`
     position: ${POSITION_RELATIVE};
@@ -234,7 +247,7 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
           </Box>
         </Route>
       ))}
-      <Redirect exact from="/" to={'/loading'} />
+      {targetPath != null && <Redirect exact from="/" to={targetPath} />}
     </Switch>
   )
 }

@@ -20,7 +20,8 @@ const ANONYMOUS_RESOURCE = 'anonymous'
 export function OnDeviceLocalizationProvider(
   props: OnDeviceLocalizationProviderProps
 ): JSX.Element | null {
-  const { settings } = useRobotSettingsQuery().data ?? {}
+  const { settings } =
+    useRobotSettingsQuery({ retry: true, retryDelay: 1000 }).data ?? {}
   const oemModeSetting = (settings ?? []).find(
     (setting: RobotSettingsField) => setting?.id === 'enableOEMMode'
   )
@@ -56,8 +57,5 @@ export function OnDeviceLocalizationProvider(
     i18nCb
   )
 
-  // block render until settings are fetched
-  return settings != null ? (
-    <I18nextProvider i18n={anonI18n}>{props.children}</I18nextProvider>
-  ) : null
+  return <I18nextProvider i18n={anonI18n}>{props.children}</I18nextProvider>
 }
