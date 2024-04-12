@@ -8,10 +8,8 @@ from opentrons_shared_data.pipette.pipette_load_name_conversions import (
 from opentrons_shared_data.pipette.load_data import load_definition
 from opentrons_shared_data.pipette.ul_per_mm import piecewise_volume_conversion
 
-from opentrons_shared_data.pipette.dev_types import UlPerMmAction, PipetteModel
+from opentrons_shared_data.pipette.dev_types import PipetteModel
 from opentrons_shared_data.pipette.pipette_definition import (
-    PipetteConfigurations,
-    SupportedTipsDefinition,
     ulPerMMDefinition,
 )
 
@@ -55,12 +53,16 @@ def get_all_pipette_models() -> Iterator[PipetteModel]:
     assert os.listdir(paths_to_validate), "You have a path wrong"
     for channel_dir in os.listdir(paths_to_validate):
         for model_dir in os.listdir(paths_to_validate / channel_dir):
-            for version_file in os.listdir(paths_to_validate / channel_dir / model_dir):
-                version_list = version_file.split(".json")[0].split("_")
-                built_model: PipetteModel = PipetteModel(
-                    f"{model_dir}_{_channel_model_str[channel_dir]}_v{version_list[0]}.{version_list[1]}"
-                )
-                yield built_model
+            for liquid_file in os.listdir(paths_to_validate / channel_dir / model_dir):
+                for version_file in os.listdir(
+                    paths_to_validate / channel_dir / model_dir / liquid_file
+                ):
+                    version_list = version_file.split(".json")[0].split("_")
+                    built_model: PipetteModel = PipetteModel(
+                        f"{model_dir}_{_channel_model_str[channel_dir]}_v{version_list[0]}.{version_list[1]}"
+                    )
+                    if version_list[0] != "1" and version_list[1] != "0":
+                        yield built_model
 
 
 @pytest.mark.parametrize("pipette", list(get_all_pipette_models()))
@@ -73,18 +75,14 @@ def test_max_flow_rates_per_volume(pipette: PipetteModel, action: str) -> None:
         pipette_model_version.pipette_channels,
         pipette_model_version.pipette_version,
     )
-    for liquid_name, liquid_property in definition.liquid_properties.items():
+    for liquid_name, liquid_properties in definition.liquid_properties.items():
         for (
             tip_type,
             supported_tip,
-        ) in definition.liquid_properties.supported_tips.items():
-            aspirate_values = supported_tip.aspirate.default.values()
-            volume = aspirate_values[-1][0]
+        ) in liquid_properties.supported_tips.items():
             assert supported_tip.max_flow_rate < _get_max_flow_rate_at_volume(
-                supported_tip.aspirate.default, pipette, volume
+                supported_tip.aspirate, pipette, liquid_properties.min_volume
             )
-            dispense_values = supported_tip.dispense.defualt.values()
-            volume = dispense_values[-1][0]
             assert supported_tip.max_flow_rate < _get_max_flow_rate_at_volume(
-                supported_tip.dispense.default, pipette, volume
+                supported_tip.dispense, pipette, liquid_properties.min_volume
             )
