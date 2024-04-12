@@ -98,7 +98,7 @@ export function ConfirmCancelRunModal({
           paddingBottom={SPACING.spacing32}
           paddingTop={`${isActiveRun ? SPACING.spacing32 : '0'}`}
         >
-          <StyledText as="p">{t('cancel_run_alert_info')}</StyledText>
+          <StyledText as="p">{t('cancel_run_alert_info_flex')}</StyledText>
           <StyledText as="p">{t('cancel_run_module_info')}</StyledText>
         </Flex>
         <Flex
