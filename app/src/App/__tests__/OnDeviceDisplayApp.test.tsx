@@ -30,9 +30,21 @@ import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
 import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 
+import type { UseQueryResult } from 'react-query'
+import type { RobotSettingsResponse } from '@opentrons/api-client'
 import type { OnDeviceLocalizationProviderProps } from '../../LocalizationProvider'
 import type { OnDeviceDisplaySettings } from '../../redux/config/schema-types'
 
+vi.mock('@opentrons/react-api-client', async () => {
+  const actual = await vi.importActual('@opentrons/react-api-client')
+  return {
+    ...actual,
+    useRobotSettingsQuery: () =>
+      (({
+        data: { settings: [] },
+      } as unknown) as UseQueryResult<RobotSettingsResponse>),
+  }
+})
 vi.mock('../../LocalizationProvider')
 vi.mock('../../pages/Welcome')
 vi.mock('../../pages/NetworkSetupMenu')
