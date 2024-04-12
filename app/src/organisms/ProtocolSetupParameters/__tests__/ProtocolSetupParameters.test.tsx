@@ -49,7 +49,7 @@ describe('ProtocolSetupParameters', () => {
     vi.mocked(ChooseEnum).mockReturnValue(<div>mock ChooseEnum</div>)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
     when(vi.mocked(useCreateProtocolAnalysisMutation))
-      .calledWith(expect.anything(), expect.anything(), expect.anything())
+      .calledWith(expect.anything(), expect.anything())
       .thenReturn({ createProtocolAnalysis: mockCreateProtocolAnalysis } as any)
     when(vi.mocked(useCreateRunMutation))
       .calledWith(expect.anything())
