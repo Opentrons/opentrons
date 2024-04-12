@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
+import {
+  useCreateProtocolAnalysisMutation,
+  useCreateRunMutation,
+  useHost,
+} from '@opentrons/react-api-client'
 import { useQueryClient } from 'react-query'
 import {
   ALIGN_CENTER,
@@ -51,7 +55,12 @@ export function ProtocolSetupParameters({
   const [
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
-  ] = React.useState<RunTimeParameter[]>(runTimeParameters)
+  ] = React.useState<RunTimeParameter[]>(
+    // present defaults rather than last-set value
+    runTimeParameters.map(param => {
+      return { ...param, value: param.default }
+    })
+  )
 
   const updateParameters = (
     value: boolean | string | number,
@@ -85,6 +94,14 @@ export function ProtocolSetupParameters({
     }
   }
 
+  const runTimeParameterValues = getRunTimeParameterValuesForRun(
+    runTimeParametersOverrides
+  )
+  const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
+    protocolId,
+    host
+  )
+
   const { createRun, isLoading } = useCreateRunMutation({
     onSuccess: data => {
       queryClient
@@ -96,6 +113,10 @@ export function ProtocolSetupParameters({
   })
   const handleConfirmValues = (): void => {
     setStartSetup(true)
+    createProtocolAnalysis({
+      protocolKey: protocolId,
+      runTimeParameterValues: runTimeParameterValues,
+    })
     createRun({
       protocolId,
       labwareOffsets,
