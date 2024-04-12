@@ -106,4 +106,7 @@ names = Literal[
     "v2_18_NO_PIPETTES_Overrides_DefaultChoiceNoMatchChoice_Override_int_default_no_matching_choices",
     "v2_18_None_None_duplicateRTPVariableName",
     "v2_18_None_None_duplicateChoiceValue",
+    "v2_18_None_None_StrRTPwith_unit",
+    "v2_18_None_None_NoRTPdisplay_name",
+    "v2_18_NO_PIPETTES_GoldenRTP_OT2",
 ]

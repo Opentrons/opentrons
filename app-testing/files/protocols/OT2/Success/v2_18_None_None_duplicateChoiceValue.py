@@ -5,7 +5,7 @@ metadata = {
 requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
 
 # we allow duplicate choice values,even for the default
-# validated this does not cause any issues in the app as well
+# validated this does not cause any issues in the app as well - 4/12/2014 ✅ it does not.
 
 
 def add_parameters(parameters):

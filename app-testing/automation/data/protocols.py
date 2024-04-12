@@ -906,3 +906,33 @@ class Protocols:
         app_error=False,
         robot_error=False,
     )
+
+    v2_18_None_None_StrRTPwith_unit: Protocol = Protocol(
+        file_stem="v2_18_None_None_StrRTPwith_unit",
+        file_extension="py",
+        protocol_name="Str RTP with unit",
+        category=ProtocolCategory(robot="OT2", outcome="Error"),
+        robot="OT2",
+        app_error=True,
+        robot_error=True,
+    )
+
+    v2_18_None_None_NoRTPdisplay_name: Protocol = Protocol(
+        file_stem="v2_18_None_None_NoRTPdisplay_name",
+        file_extension="py",
+        protocol_name="No RTP Display Name",
+        category=ProtocolCategory(robot="OT2", outcome="Error"),
+        robot="OT2",
+        app_error=True,
+        robot_error=True,
+    )
+
+    v2_18_NO_PIPETTES_GoldenRTP_OT2: Protocol = Protocol(
+        file_stem="v2_18_NO_PIPETTES_GoldenRTP_OT2",
+        file_extension="py",
+        protocol_name="Golden RTP Examples OT2",
+        category=ProtocolCategory(robot="OT2", outcome="Success"),
+        robot="OT2",
+        app_error=False,
+        robot_error=False,
+    )

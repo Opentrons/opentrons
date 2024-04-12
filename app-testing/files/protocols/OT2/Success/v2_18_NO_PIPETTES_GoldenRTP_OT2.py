@@ -1,8 +1,8 @@
 metadata = {
-    "protocolName": "Golden RTP Examples",
+    "protocolName": "Golden RTP Examples OT2",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.18"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.18"}
 
 description: str = "Reused description for all parameters."
 unit: str = "unit"
