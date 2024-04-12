@@ -238,6 +238,10 @@ settings = [
         title="Enable OEM Mode",
         description="This setting anonymizes Opentrons branding in the ODD app.",
         robot_type=[RobotTypeEnum.FLEX],
+        show_if=(
+            "enableOEMMode",
+            True,
+        ),
         internal_only=True,
     ),
     SettingDefinition(
