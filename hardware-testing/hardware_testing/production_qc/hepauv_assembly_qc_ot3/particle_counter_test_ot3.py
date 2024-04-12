@@ -66,7 +66,7 @@ async def _main(arguments: argparse.Namespace) -> None:
             input("PLACE CLOSE OTflex DOOR,PRESS ENTER TO CONTINUE.(关闭OT3门,按回车键继续)")
 
 
-            input("TURN ON FAN,PRESS ENTER TO CONTINUE.(打开风扇后,按回车键继续)")
+            input("TURN ON FAN,PRESS ENTER TO CONTINUE.(打开风扇后,按回车键开始测试粒子浓度)")
             instrument.initialize_connection()
             instrument.clear_data()
             instrument.set_number_of_samples(6)
@@ -118,12 +118,12 @@ async def _main(arguments: argparse.Namespace) -> None:
                 test_data['Sample Time(sec)']=record_dict['Sample Time']
                 test_data['PASS/FAIL'] = test_result
                 csv_cb.write(list(test_data.values()))
-            input("TURN OFF FAN,PRESS ENTER TO CONTINUE.(关闭风扇,把粒子仪器移除,按回车键继续)")
+            input("TURN OFF FAN,removal Particle instrument ,PRESS ENTER TO CONTINUE.(关闭风扇,把粒子仪器移除地板区域,按回车键继续)")
             
         
         if not arguments.skip_uv:
             await api.home()
-            input("PLACE THE UV METER ON THE SLOT B3 TO START TEST(将紫外线计放置在插槽B2上开始测试)")
+            input("PLACE THE UV METER ON THE SLOT B2 TO START TEST(将紫外线计放置在底板B2上开始测试)")
             #UV
             
             
