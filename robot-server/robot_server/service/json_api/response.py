@@ -48,7 +48,7 @@ class BaseResponseBody(BaseModel):
         returned in a response, which would violate the spec.
         """
         kwargs["exclude_none"] = True
-        return super().dict(*args, **kwargs)
+        return super().model_dump(*args, **kwargs)
 
     def json(self, *args: Any, **kwargs: Any) -> str:
         """See notes in `.dict()`."""

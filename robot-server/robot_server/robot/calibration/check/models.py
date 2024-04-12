@@ -14,8 +14,8 @@ OffsetVectorField = partial(
     Field,
     ...,
     description="An offset vector in deck coordinates (x, y, z)",
-    min_items=3,
-    max_items=3,
+    min_length=3,
+    max_length=3,
 )
 
 
