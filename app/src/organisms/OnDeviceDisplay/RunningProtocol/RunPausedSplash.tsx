@@ -1,4 +1,5 @@
 import * as React from 'react'
+import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -13,8 +14,8 @@ import {
   POSITION_ABSOLUTE,
   TYPOGRAPHY,
   OVERFLOW_WRAP_BREAK_WORD,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
-import styled from 'styled-components'
 
 interface RunPausedSplashProps {
   onClose: () => void
@@ -37,6 +38,7 @@ export function RunPausedSplash({
 
   return (
     <Btn
+      display={DISPLAY_FLEX}
       height="100vh"
       width="100%"
       justifyContent={JUSTIFY_CENTER}
@@ -64,7 +66,7 @@ export function RunPausedSplash({
 const SplashHeader = styled.h1`
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
-  font-size: ${TYPOGRAPHY.fontSize80}
+  font-size: ${TYPOGRAPHY.fontSize80};
   line-height: ${TYPOGRAPHY.lineHeight96};
   color: ${COLORS.white};
 `
