@@ -2,8 +2,6 @@
 
 [![JavaScript Style Guide][style-guide-badge]][style-guide]
 
-[Download][] | [Support][]
-
 ## Overview
 
 The Opentrons AI application helps you to create a protocol with natural language.
@@ -31,7 +29,7 @@ The UI stack is built using:
 
 Some important directories:
 
-- `opentrons-ai-server` — Opentrons AI application's server
+- [opentrons-ai-server][] — Opentrons AI application's server
 
 ## Copy management
 
@@ -62,3 +60,4 @@ TBD
 [babel]: https://babeljs.io/
 [vite]: https://vitejs.dev/
 [bundle-analyzer]: https://github.com/webpack-contrib/webpack-bundle-analyzer
+[opentrons-ai-server]: https://github.com/Opentrons/opentrons/tree/edge/opentrons-ai-server

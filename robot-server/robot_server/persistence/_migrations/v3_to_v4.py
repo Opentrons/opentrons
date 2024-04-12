@@ -3,6 +3,7 @@
 Summary of changes from schema 3:
 
 - Adds a new "run_time_parameter_values_and_defaults" column to analysis table
+- Adds a new "run_time_parameters" column to run table
 """
 
 from pathlib import Path
@@ -49,4 +50,9 @@ class Migration3to4(Migration):  # noqa: D101
                 dest_engine,
                 schema_4.analysis_table.name,
                 schema_4.analysis_table.c.run_time_parameter_values_and_defaults,
+            )
+            add_column(
+                dest_engine,
+                schema_4.run_table.name,
+                schema_4.run_table.c.run_time_parameters,
             )

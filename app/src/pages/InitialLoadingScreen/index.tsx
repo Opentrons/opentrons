@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Redirect } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
@@ -10,30 +9,23 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
-import { getOnDeviceDisplaySettings } from '../../redux/config'
+import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 import { getIsShellReady } from '../../redux/shell'
 
-const getTargetPath = (
-  isShellReady: boolean,
-  unfinishedUnboxingFlowRoute: string | null
-): string | null => {
-  if (!isShellReady) {
-    return null
-  }
-  if (unfinishedUnboxingFlowRoute != null) {
-    return unfinishedUnboxingFlowRoute
-  }
-
-  return '/dashboard'
-}
-export function InitialLoadingScreen(): JSX.Element {
-  const { unfinishedUnboxingFlowRoute } = useSelector(
-    getOnDeviceDisplaySettings
-  )
+export function InitialLoadingScreen({
+  children,
+}: {
+  children?: React.ReactNode
+}): JSX.Element {
   const isShellReady = useSelector(getIsShellReady)
-  const targetPath = getTargetPath(isShellReady, unfinishedUnboxingFlowRoute)
 
-  return (
+  // ensure robot-server api is up and settings query data available for localization provider
+  const { settings } =
+    useRobotSettingsQuery({ retry: true, retryDelay: 1000 }).data ?? {}
+
+  return isShellReady && settings != null ? (
+    <>{children}</>
+  ) : (
     <Flex
       backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_COLUMN}
@@ -50,7 +42,6 @@ export function InitialLoadingScreen(): JSX.Element {
         color={COLORS.grey60}
         aria-label="loading indicator"
       />
-      {targetPath != null && <Redirect exact from="/" to={targetPath} />}
     </Flex>
   )
 }

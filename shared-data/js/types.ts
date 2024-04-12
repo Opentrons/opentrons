@@ -596,7 +596,7 @@ export interface AnalysisError {
   createdAt: string
 }
 
-export interface NumberParameter {
+export interface NumberParameter extends BaseRunTimeParameter {
   type: NumberParameterType
   min: number
   max: number
@@ -608,13 +608,13 @@ export interface Choice {
   value: number | boolean | string
 }
 
-interface ChoiceParameter {
+interface ChoiceParameter extends BaseRunTimeParameter {
   type: RunTimeParameterType
   choices: Choice[]
   default: number | boolean | string
 }
 
-interface BooleanParameter {
+interface BooleanParameter extends BaseRunTimeParameter {
   type: BooleanParameterType
   default: boolean
 }
@@ -627,7 +627,6 @@ type RunTimeParameterType =
   | BooleanParameterType
   | StringParameterType
 
-type ParameterType = NumberParameter | ChoiceParameter | BooleanParameter
 interface BaseRunTimeParameter {
   displayName: string
   variableName: string
@@ -636,7 +635,10 @@ interface BaseRunTimeParameter {
   suffix?: string
 }
 
-export type RunTimeParameter = BaseRunTimeParameter & ParameterType
+export type RunTimeParameter =
+  | BooleanParameter
+  | ChoiceParameter
+  | NumberParameter
 
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {

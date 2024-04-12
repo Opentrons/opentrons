@@ -11,6 +11,7 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     errors as pe_errors,
 )
+from opentrons.protocol_engine.types import RunTimeParameter, BooleanParameter
 from opentrons.protocol_runner import RunResult, JsonRunner, PythonAndLegacyRunner
 
 from robot_server.service.task_runner import TaskRunner
@@ -58,6 +59,19 @@ def engine_state_summary() -> StateSummary:
         modules=[],
         liquids=[],
     )
+
+
+@pytest.fixture()
+def run_time_parameters() -> List[RunTimeParameter]:
+    """Get a RunTimeParameter list."""
+    return [
+        BooleanParameter(
+            displayName="Display Name",
+            variableName="variable_name",
+            value=False,
+            default=True,
+        )
+    ]
 
 
 @pytest.fixture
@@ -122,6 +136,7 @@ async def test_create_play_action_to_start(
     mock_run_store: RunStore,
     mock_task_runner: TaskRunner,
     engine_state_summary: StateSummary,
+    run_time_parameters: List[RunTimeParameter],
     protocol_commands: List[pe_commands.Command],
     run_id: str,
     subject: RunController,
@@ -153,7 +168,7 @@ async def test_create_play_action_to_start(
         RunResult(
             commands=protocol_commands,
             state_summary=engine_state_summary,
-            parameters=[],
+            parameters=run_time_parameters,
         )
     )
 
@@ -164,6 +179,7 @@ async def test_create_play_action_to_start(
             run_id=run_id,
             summary=engine_state_summary,
             commands=protocol_commands,
+            run_time_parameters=run_time_parameters,
         ),
         times=1,
     )
