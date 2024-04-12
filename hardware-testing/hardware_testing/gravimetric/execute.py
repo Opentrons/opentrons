@@ -424,6 +424,7 @@ def build_gm_report(
     environment_sensor: asair_sensor.AsairSensorBase,
     trials: int,
     fw_version: str,
+    cavity: str,
 ) -> report.CSVReport:
     """Build a CSVReport formated for gravimetric tests."""
     ui.print_header("CREATE TEST-REPORT")
@@ -442,6 +443,7 @@ def build_gm_report(
         scale=recorder.serial_number,
         environment=environment_sensor.get_serial(),
         liquid="None",
+        cavity=cavity,
     )
     return test_report
 
