@@ -56,6 +56,7 @@ EXPECTED_STATEMENTS_LATEST = [
         state_summary VARCHAR,
         engine_status VARCHAR,
         _updated_at DATETIME,
+        run_time_parameters VARCHAR,
         PRIMARY KEY (id),
         FOREIGN KEY(protocol_id) REFERENCES protocol (id)
     )
