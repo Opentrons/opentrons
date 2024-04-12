@@ -18,7 +18,6 @@ import {
   useSwipe,
 } from '@opentrons/components'
 import {
-  useAllCommandsQuery,
   useProtocolQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
