@@ -1,6 +1,6 @@
 # Opentrons Platform
 
-[![Codecov][codecov-badge]][codecov]
+[![Codecov][codecov-badge]][codecov] [![DeepScan grade](https://deepscan.io/api/teams/19471/projects/22868/branches/681363/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=19471&pid=22868&bid=681363)
 
 ## Overview
 
