@@ -43,6 +43,8 @@ def create_data_dictionary(
                 file_results = json.load(file)
         else:
             continue
+        if not isinstance(file_results, dict):
+            continue
         run_id = file_results.get("run_id", "NaN")
         if run_id in runs_to_save:
             robot = file_results.get("robot_name")
@@ -107,7 +109,14 @@ def create_data_dictionary(
                 hs_dict = read_robot_logs.hs_commands(file_results)
                 tm_dict = read_robot_logs.temperature_module_commands(file_results)
                 notes = {"Note1": "", "Jira Link": issue_url}
-                row_2 = {**row, **all_modules, **notes, **hs_dict, **tm_dict, **tc_dict}
+                row_2 = {
+                    **row,
+                    **all_modules,
+                    **notes,
+                    **hs_dict,
+                    **tm_dict,
+                    **tc_dict,
+                }
                 headers = list(row_2.keys())
                 runs_and_robots[run_id] = row_2
             else:

@@ -8,7 +8,7 @@ import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
-import type {UserConfig} from 'vite'
+import type { UserConfig } from 'vite'
 
 export default defineConfig(
   async (): Promise<UserConfig> => {
@@ -80,7 +80,7 @@ export default defineConfig(
             '../discovery-client/src/index.ts'
           ),
           '@opentrons/usb-bridge/node-client': path.resolve(
-            '../usb-bridge/node-client/src/inxex.ts'
+            '../usb-bridge/node-client/src/index.ts'
           ),
         },
       },

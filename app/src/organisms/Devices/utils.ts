@@ -9,7 +9,9 @@ import type {
   Instruments,
   PipetteData,
   PipetteOffsetCalibration,
+  RunTimeParameterCreateData,
 } from '@opentrons/api-client'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 /**
  * formats a string if it is in ISO 8601 date format
@@ -87,5 +89,17 @@ export function getShowPipetteCalibrationWarning(
         return failuresList[0]?.kind === INCONSISTENT_PIPETTE_OFFSET
       } else return false
     }) ?? false
+  )
+}
+
+export function getRunTimeParameterValuesForRun(
+  runTimeParameters: RunTimeParameter[]
+): RunTimeParameterCreateData {
+  return runTimeParameters.reduce(
+    (acc, param) =>
+      param.value !== param.default
+        ? { ...acc, [param.variableName]: param.value }
+        : acc,
+    {}
   )
 }

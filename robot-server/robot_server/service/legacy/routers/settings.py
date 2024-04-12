@@ -63,6 +63,8 @@ log = logging.getLogger(__name__)
 router = APIRouter()
 
 
+# TODO: (ba, 2024-04-11): We should have a proper IPC mechanism to talk between
+# the servers instead of one off endpoint calls like these.
 async def set_oem_mode_request(enable):
     """PUT request to set the OEM Mode for the system server."""
     async with aiohttp.ClientSession() as session:

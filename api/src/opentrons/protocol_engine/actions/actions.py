@@ -55,10 +55,7 @@ class PauseAction:
 
 @dataclass(frozen=True)
 class StopAction:
-    """Stop the current engine execution.
-
-    After a StopAction, the engine status will be marked as stopped.
-    """
+    """Request engine execution to stop soon."""
 
     from_estop: bool = False
 

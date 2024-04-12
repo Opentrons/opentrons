@@ -15,6 +15,7 @@ from fastapi import (
 from .models import EnableOEMMode
 from ...settings import SystemServerSettings, get_settings, save_settings
 
+
 oem_mode_router = APIRouter()
 
 

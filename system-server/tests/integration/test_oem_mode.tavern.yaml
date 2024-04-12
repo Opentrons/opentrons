@@ -122,4 +122,3 @@ stages:
         file: 'tests/integration/resources/oem_mode_custom.png'
     response:
       status_code: 201
-

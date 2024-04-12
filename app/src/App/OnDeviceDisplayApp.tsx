@@ -16,6 +16,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import NiceModal from '@ebay/nice-modal-react'
 
 import { SleepScreen } from '../atoms/SleepScreen'
+import { OnDeviceLocalizationProvider } from '../LocalizationProvider'
 import { ToasterOven } from '../organisms/ToasterOven'
 import { MaintenanceRunTakeover } from '../organisms/TakeoverModal'
 import { FirmwareUpdateTakeover } from '../organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
@@ -66,7 +67,6 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/emergency-stop',
   '/instruments',
   '/instruments/:mount',
-  '/loading',
   '/network-setup',
   '/network-setup/ethernet',
   '/network-setup/usb',
@@ -97,8 +97,6 @@ function getPathComponent(
       return <InstrumentsDashboard />
     case '/instruments/:mount':
       return <InstrumentDetail />
-    case '/loading':
-      return <InitialLoadingScreen />
     case '/network-setup':
       return <NetworkSetupMenu />
     case '/network-setup/ethernet':
@@ -151,11 +149,74 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   }
   const dispatch = useDispatch<Dispatch>()
   const isIdle = useIdle(sleepTime, options)
+
+  React.useEffect(() => {
+    if (isIdle) {
+      dispatch(updateBrightness(TURN_OFF_BACKLIGHT))
+    } else {
+      dispatch(
+        updateConfigValue(
+          'onDeviceDisplaySettings.brightness',
+          userSetBrightness
+        )
+      )
+    }
+  }, [dispatch, isIdle, userSetBrightness])
+
+  // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
+  return (
+    <ApiHostProvider hostname="127.0.0.1">
+      <InitialLoadingScreen>
+        <OnDeviceLocalizationProvider>
+          <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
+            <Box width="100%" css="user-select: none;">
+              {isIdle ? (
+                <SleepScreen />
+              ) : (
+                <>
+                  <EstopTakeover />
+                  <MaintenanceRunTakeover>
+                    <FirmwareUpdateTakeover />
+                    <NiceModal.Provider>
+                      <ToasterOven>
+                        <ProtocolReceiptToasts />
+                        <OnDeviceDisplayAppRoutes />
+                      </ToasterOven>
+                    </NiceModal.Provider>
+                  </MaintenanceRunTakeover>
+                </>
+              )}
+            </Box>
+          </ErrorBoundary>
+          <TopLevelRedirects />
+        </OnDeviceLocalizationProvider>
+      </InitialLoadingScreen>
+    </ApiHostProvider>
+  )
+}
+
+const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
+  if (unfinishedUnboxingFlowRoute != null) {
+    return unfinishedUnboxingFlowRoute
+  }
+
+  return '/dashboard'
+}
+
+// split to a separate function because scrollRef rerenders on every route change
+// this avoids rerendering parent providers as well
+export function OnDeviceDisplayAppRoutes(): JSX.Element {
   const [currentNode, setCurrentNode] = React.useState<null | HTMLElement>(null)
   const scrollRef = React.useCallback((node: HTMLElement | null) => {
     setCurrentNode(node)
   }, [])
   const isScrolling = useScrolling(currentNode)
+
+  const { unfinishedUnboxingFlowRoute } = useSelector(
+    getOnDeviceDisplaySettings
+  )
+
+  const targetPath = getTargetPath(unfinishedUnboxingFlowRoute)
 
   const TOUCH_SCREEN_STYLE = css`
     position: ${POSITION_RELATIVE};
@@ -176,54 +237,18 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     }
   `
 
-  React.useEffect(() => {
-    if (isIdle) {
-      dispatch(updateBrightness(TURN_OFF_BACKLIGHT))
-    } else {
-      dispatch(
-        updateConfigValue(
-          'onDeviceDisplaySettings.brightness',
-          userSetBrightness
-        )
-      )
-    }
-  }, [dispatch, isIdle, userSetBrightness])
-
-  // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider hostname="127.0.0.1">
-      <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
-        <Box width="100%" css="user-select: none;">
-          {isIdle ? (
-            <SleepScreen />
-          ) : (
-            <>
-              <EstopTakeover />
-              <MaintenanceRunTakeover>
-                <FirmwareUpdateTakeover />
-                <NiceModal.Provider>
-                  <ToasterOven>
-                    <ProtocolReceiptToasts />
-                    <Switch>
-                      {ON_DEVICE_DISPLAY_PATHS.map(path => (
-                        <Route key={path} exact path={path}>
-                          <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
-                            <ModalPortalRoot />
-                            {getPathComponent(path)}
-                          </Box>
-                        </Route>
-                      ))}
-                      <Redirect exact from="/" to={'/loading'} />
-                    </Switch>
-                  </ToasterOven>
-                </NiceModal.Provider>
-              </MaintenanceRunTakeover>
-            </>
-          )}
-        </Box>
-      </ErrorBoundary>
-      <TopLevelRedirects />
-    </ApiHostProvider>
+    <Switch>
+      {ON_DEVICE_DISPLAY_PATHS.map(path => (
+        <Route key={path} exact path={path}>
+          <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
+            <ModalPortalRoot />
+            {getPathComponent(path)}
+          </Box>
+        </Route>
+      ))}
+      {targetPath != null && <Redirect exact from="/" to={targetPath} />}
+    </Switch>
   )
 }
 
