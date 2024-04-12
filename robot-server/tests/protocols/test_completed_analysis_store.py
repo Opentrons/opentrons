@@ -2,12 +2,13 @@
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 import pytest
 from sqlalchemy.engine import Engine
 from decoy import Decoy
 
+from robot_server.persistence.tables import analysis_table
 from robot_server.protocols.completed_analysis_store import (
     CompletedAnalysisResource,
     CompletedAnalysisStore,
@@ -261,3 +262,89 @@ async def test_get_rtp_values_and_defaults_by_analysis_from_db(
     decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
     result = await subject.get_rtp_values_and_defaults_by_analysis_id("analysis-id")
     assert result == resource.run_time_parameter_values_and_defaults
+
+
+@pytest.mark.parametrize(
+    argnames=["existing_analysis_ids", "expected_analyses_ids_after_making_room"],
+    argvalues=[
+        (
+            [f"analysis-id-{num}" for num in range(8)],
+            [
+                "analysis-id-4",
+                "analysis-id-5",
+                "analysis-id-6",
+                "analysis-id-7",
+                "new-analysis-id",
+            ],
+        ),
+        (
+            [f"analysis-id-{num}" for num in range(5)],
+            [
+                "analysis-id-1",
+                "analysis-id-2",
+                "analysis-id-3",
+                "analysis-id-4",
+                "new-analysis-id",
+            ],
+        ),
+        (
+            [f"analysis-id-{num}" for num in range(4)],
+            [
+                "analysis-id-0",
+                "analysis-id-1",
+                "analysis-id-2",
+                "analysis-id-3",
+                "new-analysis-id",
+            ],
+        ),
+        (
+            [f"analysis-id-{num}" for num in range(2)],
+            ["analysis-id-0", "analysis-id-1", "new-analysis-id"],
+        ),
+        ([], ["new-analysis-id"]),
+    ],
+)
+async def test_add_makes_room_for_new_analysis(
+    subject: CompletedAnalysisStore,
+    memcache: MemoryCache[str, CompletedAnalysisResource],
+    protocol_store: ProtocolStore,
+    existing_analysis_ids: List[str],
+    expected_analyses_ids_after_making_room: List[str],
+    decoy: Decoy,
+    sql_engine: Engine,
+) -> None:
+    """It should delete old analyses and make room for new analysis."""
+    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
+
+    # Set up the database with extra analyses
+    resources = [
+        _completed_analysis_resource(
+            analysis_id=analysis_id,
+            protocol_id="protocol-id",
+        )
+        for analysis_id in existing_analysis_ids
+    ]
+    for resource in resources:
+        statement = analysis_table.insert().values(await resource.to_sql_values())
+        with sql_engine.begin() as transaction:
+            transaction.execute(statement)
+
+    assert subject.get_ids_by_protocol("protocol-id") == existing_analysis_ids
+    await subject.add(
+        _completed_analysis_resource(
+            analysis_id="new-analysis-id",
+            protocol_id="protocol-id",
+        )
+    )
+    assert (
+        subject.get_ids_by_protocol("protocol-id")
+        == expected_analyses_ids_after_making_room
+    )
+
+    removed_ids = [
+        analysis_id
+        for analysis_id in existing_analysis_ids
+        if analysis_id not in expected_analyses_ids_after_making_room
+    ]
+    for analysis_id in removed_ids:
+        decoy.verify(memcache.remove(analysis_id))
