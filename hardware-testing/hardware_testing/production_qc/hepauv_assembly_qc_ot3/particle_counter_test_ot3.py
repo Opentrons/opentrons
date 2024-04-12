@@ -123,7 +123,7 @@ async def _main(arguments: argparse.Namespace) -> None:
         
         if not arguments.skip_uv:
             await api.home()
-            input("PLACE THE UV METER ON THE SLOT B2 TO START TEST(将紫外线计放置在底板B2上开始测试)")
+            input("PLACE THE UV METER ON THE SLOT B2,CLOSE OTflex DOOR,START TEST(将紫外线计放置在底板B2上,关闭OT3门,开始测试)")
             #UV
             
             
