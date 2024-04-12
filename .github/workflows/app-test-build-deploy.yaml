@@ -10,6 +10,7 @@ on:
       - 'app-shell/**/*'
       - 'app-shell-odd/**/*'
       - 'components/**/*'
+      - 'opentrons-ai-client/**/*'
       - 'shared-data/**/*'
       - 'discovery-client/**/*'
       - '*.js'
@@ -30,6 +31,7 @@ on:
       - 'app-shell/**/*'
       - 'app-shell-odd/**/*'
       - 'components/**/*'
+      - 'opentrons-ai-client/**/*'
       - 'shared-data/**/*'
       - 'discovery-client/**/*'
       - '*.js'
@@ -112,8 +114,6 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: 'downgrade npm version'
-        run: npm install -g npm@6
       - name: check make version
         run: make --version
       - name: 'install libudev and libsystemd'
@@ -245,8 +245,6 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: 'downgrade npm version'
-        run: npm install -g npm@6
       - name: check make version
         run: make --version
       - name: 'install libudev and libsystemd'
