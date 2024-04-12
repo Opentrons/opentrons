@@ -1,13 +1,10 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import {
-  Flex,
-  StepMeter,
-  SPACING,
-  DIRECTION_COLUMN,
-} from '@opentrons/components'
+import { Flex, StepMeter, SPACING } from '@opentrons/components'
+import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
+import { CreateNewTransfer } from './CreateNewTransfer'
 
 import type {
   QuickTransferSetupState,
@@ -86,32 +83,50 @@ export const QuickTransferFlow = (): JSX.Element => {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   // const [state, dispatch] = React.useReducer(reducer, initialQuickTransferState)
   const [currentStep, setCurrentStep] = React.useState(1)
-  const [wizardHeader, setWizardHeader] = React.useState<string>(
-    t('create_new_transfer')
-  )
+  const [wizardHeader, setWizardHeader] = React.useState<string | null>(null)
   const [continueIsDisabled] = React.useState<boolean>(false)
-  const wizardBody = <Flex>Wizard Body</Flex>
+  const [wizardBody, setWizardBody] = React.useState<JSX.Element>(<></>)
   // every child component will take state as a prop, an anonymous
   // dispatch function related to that step (except create new),
   // and a function to disable the continue button
 
+  const exitButtonProps: React.ComponentProps<typeof SmallButton> = {
+    buttonType: 'tertiaryLowLight',
+    buttonText: i18n.format(t('shared:exit'), 'capitalize'),
+    onClick: () => {
+      history.push('protocols')
+    },
+  }
   React.useEffect(() => {
     if (currentStep === 1) {
-      setWizardHeader(t('create_new_transfer'))
+      setWizardHeader(null)
+      setWizardBody(
+        <CreateNewTransfer
+          onNext={() => setCurrentStep(prevStep => prevStep + 1)}
+          exitButtonProps={exitButtonProps}
+        />
+      )
     } else if (currentStep === 2) {
       setWizardHeader(t('select_attached_pipette'))
+      setWizardBody(<></>)
     } else if (currentStep === 3) {
       setWizardHeader(t('select_tip_rack'))
+      setWizardBody(<></>)
     } else if (currentStep === 4) {
       setWizardHeader(t('select_source_labware'))
+      setWizardBody(<></>)
     } else if (currentStep === 5) {
       setWizardHeader(t('select_source_wells'))
+      setWizardBody(<></>)
     } else if (currentStep === 6) {
       setWizardHeader(t('select_dest_labware'))
+      setWizardBody(<></>)
     } else if (currentStep === 7) {
       setWizardHeader(t('select_dest_wells'))
+      setWizardBody(<></>)
     } else if (currentStep === 8) {
       setWizardHeader(t('set_transfer_volume'))
+      setWizardBody(<></>)
     }
   }, [currentStep])
 
@@ -121,40 +136,40 @@ export const QuickTransferFlow = (): JSX.Element => {
         totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
         currentStep={currentStep}
       />
-      <Flex
-        marginTop={SPACING.spacing8}
-        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
-        flexDirection={DIRECTION_COLUMN}
-      >
-        <ChildNavigation
-          header={wizardHeader}
-          onClickBack={
-            currentStep === 1
-              ? undefined
-              : () => {
-                  setCurrentStep(prevStep => prevStep - 1)
-                }
-          }
-          buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-          onClickButton={() => {
-            if (currentStep === 8) {
-              history.push('protocols')
-            } else {
-              setCurrentStep(prevStep => prevStep + 1)
+      {wizardHeader != null ? (
+        <Flex>
+          <ChildNavigation
+            header={wizardHeader}
+            onClickBack={
+              currentStep === 1
+                ? undefined
+                : () => {
+                    setCurrentStep(prevStep => prevStep - 1)
+                  }
             }
-          }}
-          buttonIsDisabled={continueIsDisabled}
-          secondaryButtonProps={{
-            buttonType: 'tertiaryLowLight',
-            buttonText: i18n.format(t('shared:exit'), 'capitalize'),
-            onClick: () => {
-              history.push('protocols')
-            },
-          }}
-          top={SPACING.spacing8}
-        />
-        <Flex marginTop={SPACING.spacing80}>{wizardBody}</Flex>
-      </Flex>
+            buttonText={i18n.format(t('shared:continue'), 'capitalize')}
+            onClickButton={() => {
+              if (currentStep === 8) {
+                history.push('protocols')
+              } else {
+                setCurrentStep(prevStep => prevStep + 1)
+              }
+            }}
+            buttonIsDisabled={continueIsDisabled}
+            secondaryButtonProps={{
+              buttonType: 'tertiaryLowLight',
+              buttonText: i18n.format(t('shared:exit'), 'capitalize'),
+              onClick: () => {
+                history.push('protocols')
+              },
+            }}
+            top={SPACING.spacing8}
+          />
+          <Flex marginTop={SPACING.spacing80}>{wizardBody}</Flex>
+        </Flex>
+      ) : (
+        wizardBody
+      )}
     </>
   )
 }

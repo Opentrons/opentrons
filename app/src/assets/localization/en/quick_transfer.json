@@ -9,7 +9,7 @@
   "set_aspirate_volume": "Set aspirate volume",
   "set_dispense_volume": "Set dispense volume",
   "set_transfer_volume": "Set transfer volume",
-  "use_deck_slots": "Quick transfers use deck slots B2-2. These slots hold a tip rack, a source labware, and a destination labware. <block>Make sure that your deck configuration is up to date to avoid collisions.</block>",
+  "use_deck_slots": "<block>Quick transfers use deck slots B2-D2. These slots hold a tip rack, a source labware, and a destination labware.</block><block>Make sure that your deck configuration is up to date to avoid collisions.</block>",
   "tip_rack": "Tip rack",
   "labware": "Labware",
   "pipette_currently_attached": "Quick transfer options depend on the pipettes currently attached to your robot.",

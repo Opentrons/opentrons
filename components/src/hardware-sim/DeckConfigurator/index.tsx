@@ -18,6 +18,7 @@ import { EmptyConfigFixture } from './EmptyConfigFixture'
 import { StagingAreaConfigFixture } from './StagingAreaConfigFixture'
 import { TrashBinConfigFixture } from './TrashBinConfigFixture'
 import { WasteChuteConfigFixture } from './WasteChuteConfigFixture'
+import { StaticFixture } from './StaticFixture'
 
 import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
 
@@ -30,6 +31,7 @@ interface DeckConfiguratorProps {
   readOnly?: boolean
   showExpansion?: boolean
   children?: React.ReactNode
+  additionalStaticFixtures?: { location: CutoutId; label: string }[]
 }
 
 export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
@@ -41,6 +43,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     darkFill = COLORS.black90,
     readOnly = false,
     showExpansion = true,
+    additionalStaticFixtures,
     children,
   } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
@@ -141,6 +144,13 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           deckDefinition={deckDef}
           handleClickRemove={readOnly ? undefined : handleClickRemove}
           fixtureLocation={cutoutId}
+        />
+      ))}
+      {additionalStaticFixtures?.map(staticFixture => (
+        <StaticFixture
+          deckDefinition={deckDef}
+          label={staticFixture.label}
+          fixtureLocation={staticFixture.location}
         />
       ))}
       <SlotLabels
