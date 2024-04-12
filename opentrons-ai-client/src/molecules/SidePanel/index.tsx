@@ -15,7 +15,7 @@ import {
 import LOGO_PATH from '../../assets/images/opentrons_logo.svg'
 
 const IMAGE_ALT = 'Opentrons logo'
-const FEEDBACK_FORM_LINK = ''
+const FEEDBACK_FORM_LINK = 'https://opentrons-ai-beta.paperform.co/'
 export function SidePanel(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   return (

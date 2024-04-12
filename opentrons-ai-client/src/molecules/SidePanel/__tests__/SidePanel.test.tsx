@@ -10,6 +10,8 @@ import { SidePanel } from '../index'
 const LOGO_FILE_NAME =
   '/opentrons-ai-client/src/assets/images/opentrons_logo.svg'
 
+const FEEDBACK_FORM_LINK = 'https://opentrons-ai-beta.paperform.co/'
+
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(<SidePanel />, {
     i18nInstance: i18n,
@@ -28,6 +30,11 @@ describe('SidePanel', () => {
       'Write a prompt in natural language to generate a Reagent Transfer or a PCR protocol for the OT-2 or Opentrons Flex using the Opentrons Python Protocol API.'
     )
     screen.getByText('Stuck? Try these example prompts to get started.')
+    screen.getByText('Got feedback? We love to hear it.')
+    const link = screen.getByRole('link', {
+      name: 'Share your thoughts here',
+    })
+    expect(link).toHaveAttribute('href', FEEDBACK_FORM_LINK)
   })
 
   it('should render buttons', () => {
