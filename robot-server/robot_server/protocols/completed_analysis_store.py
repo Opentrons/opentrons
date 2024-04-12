@@ -349,13 +349,12 @@ class CompletedAnalysisStore:
         )
 
     def _make_room_for_new_analysis(self, protocol_id: str) -> None:
-        """Remove the oldest analysis in store if the number of analyses exceed the max allowed.
+        """Remove the oldest analyses in store if the number of analyses exceed the max allowed.
 
-        Unlike protocols, a protocol analysis IDs are not stored by any DB entities
+        Unlike protocols, protocol analysis IDs are not stored by any DB entities
         other than the analysis store itself. So we do not have to worry about cleaning up
-        any other tables,
+        any other tables.
         """
-        # Get length of analyses list for this protocol
         analyses_ids = self.get_ids_by_protocol(protocol_id)
 
         # Delete all analyses exceeding max number allowed,

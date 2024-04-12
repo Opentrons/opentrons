@@ -316,7 +316,7 @@ async def test_add_makes_room_for_new_analysis(
     """It should delete old analyses and make room for new analysis."""
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
 
-    # Set up the database with extra analyses
+    # Set up the database with existing analyses
     resources = [
         _completed_analysis_resource(
             analysis_id=analysis_id,
