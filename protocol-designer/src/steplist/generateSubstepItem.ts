@@ -411,6 +411,7 @@ export function generateSubstepItem(
       temperature: temperature,
       labwareNickname: labwareNames?.nickname,
       message: stepArgs.message,
+      moduleId: stepArgs.module,
     }
   }
 

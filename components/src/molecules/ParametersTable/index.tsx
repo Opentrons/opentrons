@@ -1,6 +1,10 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { formatRunTimeParameterDefaultValue } from '@opentrons/shared-data'
+import {
+  formatRunTimeParameterDefaultValue,
+  formatRunTimeParameterMinMax,
+  orderRuntimeParameterRangeOptions,
+} from '@opentrons/shared-data'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
 import { StyledText } from '../../atoms/StyledText'
@@ -23,11 +27,9 @@ export function ParametersTable({
   runTimeParameters,
   t,
 }: ProtocolParameterItemsProps): JSX.Element {
-  const formatRange = (
-    runTimeParameter: RunTimeParameter,
-    minMax: string
-  ): string => {
+  const formatRange = (runTimeParameter: RunTimeParameter): string => {
     const { type } = runTimeParameter
+    const minMax = formatRunTimeParameterMinMax(runTimeParameter)
     const choices =
       'choices' in runTimeParameter ? runTimeParameter.choices : []
     const count = choices.length
@@ -37,7 +39,7 @@ export function ParametersTable({
         ? t != null
           ? t('num_options', { num: count })
           : `${count} options`
-        : choices.map(choice => choice.displayName).join(', ')
+        : orderRuntimeParameterRangeOptions(choices)
     }
 
     switch (type) {
@@ -64,8 +66,6 @@ export function ParametersTable({
       </thead>
       <tbody>
         {runTimeParameters.map((parameter: RunTimeParameter, index: number) => {
-          const min = 'min' in parameter ? parameter.min : 0
-          const max = 'max' in parameter ? parameter.max : 0
           return (
             <StyledTableRow
               isLast={index === runTimeParameters.length - 1}
@@ -86,9 +86,7 @@ export function ParametersTable({
                 isLast={index === runTimeParameters.length - 1}
                 paddingRight="0"
               >
-                <StyledText as="p">
-                  {formatRange(parameter, `${min}-${max}`)}
-                </StyledText>
+                <StyledText as="p">{formatRange(parameter)}</StyledText>
               </StyledTableCell>
             </StyledTableRow>
           )

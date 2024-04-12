@@ -8,7 +8,6 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
   DISPLAY_INLINE_BLOCK,
@@ -59,10 +58,6 @@ function Input(props: InputFieldProps): JSX.Element {
     padding: ${SPACING.spacing8};
     border: 1px ${BORDERS.styleSolid} ${error ? COLORS.red50 : COLORS.grey30};
     font-size: ${TYPOGRAPHY.fontSizeP};
-
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      padding: 0;
-    }
 
     &:active {
       border: 1px ${BORDERS.styleSolid} ${COLORS.grey50};

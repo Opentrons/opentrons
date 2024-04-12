@@ -20,12 +20,25 @@ export function getModuleOnDeckByType(
     (moduleOnDeck: ModuleOnDeck) => moduleOnDeck.type === type
   )
 }
+export function getModulesOnDeckByType(
+  initialDeckSetup: InitialDeckSetup,
+  type: ModuleType
+): ModuleOnDeck[] | null | undefined {
+  return values(initialDeckSetup.modules).filter(
+    (moduleOnDeck: ModuleOnDeck) => moduleOnDeck.type === type
+  )
+}
 export function getLabwareOnModule(
   initialDeckSetup: InitialDeckSetup,
   moduleId: string
 ): LabwareOnDeck | null | undefined {
   return values(initialDeckSetup.labware).find(
-    (lab: LabwareOnDeck) => lab.slot === moduleId
+    (labware: LabwareOnDeck) =>
+      labware.slot === moduleId ||
+      //  acccount for adapter!
+      values(initialDeckSetup.labware).find(
+        adapter => adapter.id === labware.slot && adapter.slot === moduleId
+      )
   )
 }
 export function getModuleUnderLabware(
@@ -81,28 +94,39 @@ export function getModuleLabwareOptions(
   nicknamesById: Record<string, string>,
   type: ModuleType
 ): Options {
-  const moduleOnDeck = getModuleOnDeckByType(initialDeckSetup, type)
-  const labware =
-    moduleOnDeck && getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
+  const labwares = initialDeckSetup.labware
+  const modulesOnDeck = getModulesOnDeckByType(initialDeckSetup, type)
   const module = getModuleShortNames(type)
   let options: Options = []
 
-  if (moduleOnDeck) {
-    if (labware) {
-      options = [
-        {
-          name: `${nicknamesById[labware.id]} in ${module}`,
+  if (modulesOnDeck != null) {
+    options = modulesOnDeck.map(moduleOnDeck => {
+      const labware = getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
+      if (labware) {
+        const labwareOnAdapterId =
+          labwares[labware.id] != null ? labwares[labware.id].id : null
+        if (labwareOnAdapterId != null) {
+          return {
+            name: `${nicknamesById[labwareOnAdapterId]} in ${
+              nicknamesById[labware.id]
+            } in ${module} in slot ${moduleOnDeck.slot}`,
+            value: moduleOnDeck.id,
+          }
+        } else {
+          return {
+            name: `${nicknamesById[labware.id]} in ${module} in slot ${
+              moduleOnDeck.slot
+            }`,
+            value: moduleOnDeck.id,
+          }
+        }
+      } else {
+        return {
+          name: `No labware in ${module} in slot ${moduleOnDeck.slot}`,
           value: moduleOnDeck.id,
-        },
-      ]
-    } else {
-      options = [
-        {
-          name: `${module} No labware on module`,
-          value: moduleOnDeck.id,
-        },
-      ]
-    }
+        }
+      }
+    })
   }
 
   return options
@@ -116,6 +140,29 @@ export function getModuleHasLabware(
     moduleOnDeck && getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
   return Boolean(moduleOnDeck) && Boolean(labware)
 }
+
+export interface ModuleAndLabware {
+  moduleId: string
+  hasLabware: boolean
+}
+
+export function getModulesHaveLabware(
+  initialDeckSetup: InitialDeckSetup,
+  type: ModuleType
+): ModuleAndLabware[] {
+  const modulesOnDeck = getModulesOnDeckByType(initialDeckSetup, type)
+  const moduleAndLabware: ModuleAndLabware[] = []
+  modulesOnDeck?.forEach(module => {
+    const labwareHasModule = getLabwareOnModule(initialDeckSetup, module.id)
+
+    moduleAndLabware.push({
+      moduleId: module.id,
+      hasLabware: labwareHasModule != null,
+    })
+  })
+  return moduleAndLabware
+}
+
 export const getMagnetLabwareEngageHeight = (
   initialDeckSetup: InitialDeckSetup,
   magnetModuleId: string | null

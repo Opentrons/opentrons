@@ -84,9 +84,7 @@ def stop_server_ot3() -> None:
 def restart_server_ot3() -> None:
     """Start opentrons-robot-server on the OT3."""
     print('Starting "opentrons-robot-server"...')
-    Popen(
-        ["systemctl", "restart", "opentrons-robot-server", "&"],
-    )
+    Popen(["systemctl restart opentrons-robot-server &"], shell=True)
 
 
 def start_server_ot3() -> None:

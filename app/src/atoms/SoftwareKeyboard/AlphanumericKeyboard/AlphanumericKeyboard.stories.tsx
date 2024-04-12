@@ -8,20 +8,20 @@ import {
 } from '@opentrons/components'
 import { InputField } from '../../InputField'
 import { AlphanumericKeyboard } from '.'
-import '../index.css'
-import './index.css'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof AlphanumericKeyboard> = {
   title: 'ODD/Atoms/SoftwareKeyboard/AlphanumericKeyboard',
   component: AlphanumericKeyboard,
   parameters: VIEWPORT.touchScreenViewport,
-} as Meta
+}
 
-const Template: Story<
-  React.ComponentProps<typeof AlphanumericKeyboard>
-> = args => {
+export default meta
+
+type Story = StoryObj<typeof AlphanumericKeyboard>
+
+const Keyboard = (): JSX.Element => {
   const [showKeyboard, setShowKeyboard] = React.useState(false)
   const [value, setValue] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
@@ -32,12 +32,14 @@ const Template: Story<
           value={value}
           type="text"
           placeholder="When focusing, the keyboard shows up"
+          // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
           onFocus={() => setShowKeyboard(true)}
         />
       </form>
       <Flex position={POSITION_ABSOLUTE} top="20%" left="0" width="64rem">
         {showKeyboard && (
           <AlphanumericKeyboard
+            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
             onChange={(e: string) => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
           />
@@ -47,4 +49,6 @@ const Template: Story<
   )
 }
 
-export const AlphanumericSoftwareKeyboard = Template.bind({})
+export const AlphanumericSoftwareKeyboard: Story = {
+  render: () => <Keyboard />,
+}

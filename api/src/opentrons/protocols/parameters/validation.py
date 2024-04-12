@@ -61,7 +61,8 @@ def ensure_value_type(
 
     This does not guarantee that the value will be the correct type for the given parameter, only that any data coming
     in is in the format that we expect. For now, the only transformation it is doing is converting integers represented
-    as floating points to integers, and bools represented as 1.0/0.0 to True/False.
+    as floating points to integers, and bools represented as 1.0/0.0 to True/False, and floating points represented as
+    ints to floats.
 
     If something is labelled as a type but does not get converted here, that will be caught when it is attempted to be
     set as the parameter value and will raise the appropriate error there.
@@ -72,7 +73,43 @@ def ensure_value_type(
             validated_value = bool(value)
         elif parameter_type is int and value.is_integer():
             validated_value = int(value)
+    elif (
+        isinstance(value, int)
+        and not isinstance(value, bool)
+        and parameter_type is float
+    ):
+        validated_value = float(value)
     return validated_value
+
+
+def ensure_float_value(value: Union[float, int]) -> float:
+    """Ensures that if we are expecting a float and receive an int, that will be converted to a float."""
+    if not isinstance(value, bool) and isinstance(value, int):
+        return float(value)
+    return value
+
+
+def ensure_optional_float_value(value: Optional[Union[float, int]]) -> Optional[float]:
+    """Ensures that if we are expecting an optional float and receive an int, that will be converted to a float."""
+    if not isinstance(value, bool) and isinstance(value, int):
+        return float(value)
+    return value
+
+
+def ensure_float_choices(
+    choices: Optional[List[ParameterChoice]],
+) -> Optional[List[ParameterChoice]]:
+    """Ensures that if we are expecting float parameter choices and any are int types, those will be converted."""
+    if choices is not None:
+        return [
+            ParameterChoice(
+                display_name=choice["display_name"],
+                # Type ignore because if for some reason this is a str or bool, that will raise in `validate_options`
+                value=ensure_float_value(choice["value"]),  # type: ignore[arg-type]
+            )
+            for choice in choices
+        ]
+    return choices
 
 
 def convert_type_string_for_enum(
