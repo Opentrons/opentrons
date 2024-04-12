@@ -124,10 +124,9 @@ class Run(ResourceModel):
     runTimeParameters: List[RunTimeParameter] = Field(
         default_factory=list,
         description=(
-            "Run time parameters used during analysis."
+            "Run time parameters used during the run."
             " These are the parameters that are defined in the protocol, with values"
-            " specified either in the protocol creation request or reanalysis request"
-            " (whichever started this analysis), or default values from the protocol"
+            " specified either in the run creation request or default values from the protocol"
             " if none are specified in the request."
         ),
     )
@@ -198,10 +197,9 @@ class BadRun(ResourceModel):
     runTimeParameters: List[RunTimeParameter] = Field(
         default_factory=list,
         description=(
-            "Run time parameters used during analysis."
+            "Run time parameters used during the run."
             " These are the parameters that are defined in the protocol, with values"
-            " specified either in the protocol creation request or reanalysis request"
-            " (whichever started this analysis), or default values from the protocol"
+            " specified either in the run creation request or default values from the protocol"
             " if none are specified in the request."
         ),
     )
