@@ -1,6 +1,7 @@
 """Tests for the RobotContextTracker class in performance_metrics.robot_context_tracker."""
 
 import asyncio
+from pathlib import Path
 import pytest
 from performance_metrics.robot_context_tracker import RobotContextTracker
 from performance_metrics.datashapes import RobotContextState
@@ -15,9 +16,9 @@ SHUTTING_DOWN_TIME = 0.005
 
 
 @pytest.fixture
-def robot_context_tracker() -> RobotContextTracker:
+def robot_context_tracker(tmp_path: Path) -> RobotContextTracker:
     """Fixture to provide a fresh instance of RobotContextTracker for each test."""
-    return RobotContextTracker(should_track=True)
+    return RobotContextTracker(storage_file_path=tmp_path, should_track=True)
 
 
 def test_robot_context_tracker(robot_context_tracker: RobotContextTracker) -> None:
@@ -205,9 +206,9 @@ async def test_concurrent_async_operations(
     ), "All tracked operations should be in CALIBRATING state."
 
 
-def test_no_tracking() -> None:
+def test_no_tracking(tmp_path: Path) -> None:
     """Tests that operations are not tracked when tracking is disabled."""
-    robot_context_tracker = RobotContextTracker(should_track=False)
+    robot_context_tracker = RobotContextTracker(tmp_path, should_track=False)
 
     @robot_context_tracker.track(state=RobotContextState.STARTING_UP)
     def operation_without_tracking() -> None:
@@ -218,3 +219,33 @@ def test_no_tracking() -> None:
     assert (
         len(robot_context_tracker._storage) == 0
     ), "Operation should not be tracked when tracking is disabled."
+
+
+async def test_storing_to_file(tmp_path: Path) -> None:
+    """Tests storing the tracked data to a file."""
+    file_path = tmp_path / "test_file.csv"
+    robot_context_tracker = RobotContextTracker(file_path, should_track=True)
+
+    @robot_context_tracker.track(state=RobotContextState.STARTING_UP)
+    def starting_robot() -> None:
+        sleep(STARTING_TIME)
+
+    @robot_context_tracker.track(state=RobotContextState.CALIBRATING)
+    def calibrating_robot() -> None:
+        sleep(CALIBRATING_TIME)
+
+    @robot_context_tracker.track(state=RobotContextState.ANALYZING_PROTOCOL)
+    def analyzing_protocol() -> None:
+        sleep(ANALYZING_TIME)
+
+    starting_robot()
+    calibrating_robot()
+    analyzing_protocol()
+
+    robot_context_tracker.store()
+
+    with open(file_path, "r") as file:
+        lines = file.readlines()
+        assert (
+            len(lines) == 4
+        ), "All stored data + header should be written to the file."

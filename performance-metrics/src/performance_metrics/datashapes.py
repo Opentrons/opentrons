@@ -2,6 +2,7 @@
 
 from enum import Enum
 import dataclasses
+from typing import Tuple
 
 
 class RobotContextState(Enum):
@@ -37,26 +38,30 @@ class RobotContextState(Enum):
 
 
 @dataclasses.dataclass(frozen=True)
-class RawDurationData:
-    """Represents raw duration data for a process or function.
+class RawContextData:
+    """Represents raw duration data with context state information.
 
     Attributes:
     - function_start_time (int): The start time of the function.
     - duration_measurement_start_time (int): The start time for duration measurement.
     - duration_measurement_end_time (int): The end time for duration measurement.
+    - state (RobotContextStates): The current state of the context.
     """
 
     func_start: int
     duration_start: int
     duration_end: int
-
-
-@dataclasses.dataclass(frozen=True)
-class RawContextData(RawDurationData):
-    """Extends RawDurationData with context state information.
-
-    Attributes:
-    - state (RobotContextStates): The current state of the context.
-    """
-
     state: RobotContextState
+
+    @classmethod
+    def headers(self) -> Tuple[str, str, str]:
+        """Returns the headers for the raw context data."""
+        return ("state_id", "function_start_time", "duration")
+
+    def csv_row(self) -> Tuple[int, int, int]:
+        """Returns the raw context data as a string."""
+        return (
+            self.state.state_id,
+            self.func_start,
+            self.duration_end - self.duration_start,
+        )
