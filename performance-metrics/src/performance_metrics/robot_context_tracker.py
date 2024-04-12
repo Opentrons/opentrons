@@ -24,6 +24,7 @@ class RobotContextTracker:
     def __init__(self, storage_file_path: Path, should_track: bool = False) -> None:
         """Initializes the RobotContextTracker with an empty storage list."""
         self._storage: deque[RawContextData] = deque()
+        self._storage_file_path = storage_file_path
         self._should_track = should_track
 
     def track(self, state: RobotContextState) -> Callable:  # type: ignore
