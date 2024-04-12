@@ -90,7 +90,7 @@ class DeckConfigurationStore:  # noqa: D101
             # 5XX errors. We think falling back to an arbitrary default is safe because users
             # of the Opentrons App will always have an opportunity to view and confirm their robot's
             # deck configuration before running a protocol.
-            return models.DeckConfigurationResponse.construct(
+            return models.DeckConfigurationResponse.model_construct(
                 cutoutFixtures=defaults.for_deck_definition(
                     self._deck_type.value
                 ).cutoutFixtures,
@@ -99,13 +99,13 @@ class DeckConfigurationStore:  # noqa: D101
         else:
             cutout_fixtures_from_storage, last_modified_at = from_storage
             cutout_fixtures = [
-                models.CutoutFixture.construct(
+                models.CutoutFixture.model_construct(
                     cutoutFixtureId=e.cutout_fixture_id,
                     cutoutId=e.cutout_id,
                 )
                 for e in cutout_fixtures_from_storage
             ]
-        return models.DeckConfigurationResponse.construct(
+        return models.DeckConfigurationResponse.model_construct(
             cutoutFixtures=cutout_fixtures,
             lastModifiedAt=last_modified_at,
         )

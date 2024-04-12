@@ -176,7 +176,7 @@ class AnalysisStore:
         else:
             result = AnalysisResult.OK
 
-        completed_analysis = CompletedAnalysis.construct(
+        completed_analysis = CompletedAnalysis.model_construct(
             id=analysis_id,
             result=result,
             robotType=robot_type,
@@ -246,7 +246,9 @@ class AnalysisStore:
             protocol_id=protocol_id
         )
         completed_analysis_summaries = [
-            AnalysisSummary.construct(id=analysis_id, status=AnalysisStatus.COMPLETED)
+            AnalysisSummary.model_construct(
+                id=analysis_id, status=AnalysisStatus.COMPLETED
+            )
             for analysis_id in completed_analysis_ids
         ]
 
@@ -379,7 +381,7 @@ class _PendingAnalysisStore:
             protocol_id not in self._analysis_ids_by_protocol_id
         ), "Protocol must not already have a pending analysis."
 
-        new_pending_analysis = PendingAnalysis.construct(id=analysis_id)
+        new_pending_analysis = PendingAnalysis.model_construct(id=analysis_id)
 
         self._analyses_by_id[analysis_id] = new_pending_analysis
         self._analysis_ids_by_protocol_id[protocol_id] = analysis_id

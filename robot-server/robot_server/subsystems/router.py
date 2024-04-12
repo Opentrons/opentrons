@@ -122,7 +122,7 @@ async def get_attached_subsystems(
     """Return all subsystems currently present on the machine."""
     hardware = get_ot3_hardware(thread_manager)
     data = [
-        PresentSubsystem.construct(
+        PresentSubsystem.model_construct(
             name=SubSystem.from_hw(subsystem_id),
             ok=subsystem_details.ok,
             current_fw_version=str(subsystem_details.current_fw_version),
@@ -134,7 +134,7 @@ async def get_attached_subsystems(
     ]
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(data=data, meta=meta)
+        content=SimpleMultiBody.model_construct(data=data, meta=meta)
     )
 
 
@@ -164,8 +164,8 @@ async def get_attached_subsystem(
             status.HTTP_404_NOT_FOUND
         )
     return await PydanticResponse.create(
-        content=SimpleBody.construct(
-            data=PresentSubsystem.construct(
+        content=SimpleBody.model_construct(
+            data=PresentSubsystem.model_construct(
                 name=subsystem,
                 ok=subsystem_status.ok,
                 current_fw_version=str(subsystem_status.current_fw_version),
@@ -195,7 +195,7 @@ async def get_subsystem_updates(
     """Return all currently-running firmware update process summaries."""
     handles = await update_manager.all_ongoing_processes()
     data = [
-        UpdateProgressSummary.construct(
+        UpdateProgressSummary.model_construct(
             id=handle.process_details.update_id,
             subsystem=handle.process_details.subsystem,
             updateStatus=handle.cached_state,
@@ -205,7 +205,7 @@ async def get_subsystem_updates(
     ]
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(data=data, meta=meta)
+        content=SimpleMultiBody.model_construct(data=data, meta=meta)
     )
 
 
@@ -234,8 +234,8 @@ async def get_subsystem_update(
         ) from e
     progress = await handle.get_progress()
     return await PydanticResponse.create(
-        content=SimpleBody.construct(
-            data=UpdateProgressData.construct(
+        content=SimpleBody.model_construct(
+            data=UpdateProgressData.model_construct(
                 id=handle.process_details.update_id,
                 createdAt=handle.process_details.created_at,
                 subsystem=handle.process_details.subsystem,
@@ -276,7 +276,7 @@ async def get_update_processes(
     ]
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(data=data, meta=meta)
+        content=SimpleMultiBody.model_construct(data=data, meta=meta)
     )
 
 
@@ -298,8 +298,8 @@ async def get_update_process(
         raise IDNotFound(detail=id).as_error(status.HTTP_404_NOT_FOUND) from e
     progress = await handle.get_progress()
     return await PydanticResponse.create(
-        content=SimpleBody.construct(
-            data=UpdateProgressData.construct(
+        content=SimpleBody.model_construct(
+            data=UpdateProgressData.model_construct(
                 id=handle.process_details.update_id,
                 subsystem=handle.process_details.subsystem,
                 createdAt=handle.process_details.created_at,
@@ -365,8 +365,8 @@ async def begin_subsystem_update(
     )
     progress = await summary.get_progress()
     return await PydanticResponse.create(
-        content=SimpleBody.construct(
-            data=UpdateProgressData.construct(
+        content=SimpleBody.model_construct(
+            data=UpdateProgressData.model_construct(
                 id=summary.process_details.update_id,
                 createdAt=summary.process_details.created_at,
                 subsystem=subsystem,

@@ -100,7 +100,8 @@ class SessionCommandRequest(
 
 class SessionCommandResponse(
     DeprecatedResponseDataModel,
-    BaseModel, typing.Generic[CommandT, RequestDataT, ResponseDataT],
+    BaseModel,
+    typing.Generic[CommandT, RequestDataT, ResponseDataT],
 ):
     """A session command response."""
 

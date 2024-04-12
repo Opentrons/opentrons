@@ -206,7 +206,7 @@ async def test_analyze_updates_pending_on_error(
 
     raised_exception = Exception("You got me!!")
 
-    error_occurrence = pe_errors.ErrorOccurrence.construct(
+    error_occurrence = pe_errors.ErrorOccurrence.model_construct(
         id="internal-error",
         createdAt=datetime(year=2023, month=3, day=3),
         errorType="EnumeratedError",

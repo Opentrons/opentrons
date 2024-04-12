@@ -159,8 +159,8 @@ async def test_get_run_labware_definition(
         mock_run_data_manager.get_run_loaded_labware_definitions(run_id="run-id")
     ).then_return(
         [
-            SD_LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
-            SD_LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
+            SD_LabwareDefinition.model_construct(namespace="test_1"),  # type: ignore[call-arg]
+            SD_LabwareDefinition.model_construct(namespace="test_2"),  # type: ignore[call-arg]
         ]
     )
 
@@ -168,8 +168,8 @@ async def test_get_run_labware_definition(
         runId="run-id", run_data_manager=mock_run_data_manager
     )
 
-    assert result.content.data.__root__ == [
-        SD_LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
-        SD_LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
+    assert result.content.data.root == [
+        SD_LabwareDefinition.model_construct(namespace="test_1"),  # type: ignore[call-arg]
+        SD_LabwareDefinition.model_construct(namespace="test_2"),  # type: ignore[call-arg]
     ]
     assert result.status_code == 200

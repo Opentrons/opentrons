@@ -123,10 +123,10 @@ def state_summary() -> StateSummary:
 @pytest.fixture
 def invalid_state_summary() -> StateSummary:
     """Should fail pydantic validation."""
-    analysis_error = pe_errors.ErrorOccurrence.construct(
+    analysis_error = pe_errors.ErrorOccurrence.model_construct(
         id="error-id",
         # Invalid value here should fail analysis
-        createdAt=MountType.LEFT,  # type: ignore
+        createdAt=MountType.LEFT,  # type: ignore[arg-type]
         errorType="BadError",
         detail="oh no",
     )

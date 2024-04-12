@@ -214,7 +214,7 @@ async def test_get_all_attached_instruments(
     result = await get_attached_instruments(hardware=ot3_hardware_api)
 
     assert result.content.data == [
-        Pipette.construct(
+        Pipette.model_construct(
             ok=True,
             mount="left",
             instrumentType="pipette",
@@ -236,7 +236,7 @@ async def test_get_all_attached_instruments(
             ),
             state=PipetteState(tip_detected=True),
         ),
-        Pipette.construct(
+        Pipette.model_construct(
             ok=True,
             mount="right",
             firmwareVersion="11",
@@ -258,7 +258,7 @@ async def test_get_all_attached_instruments(
             ),
             state=PipetteState(tip_detected=False),
         ),
-        Gripper.construct(
+        Gripper.model_construct(
             ok=True,
             mount="extension",
             firmwareVersion="11",
@@ -307,7 +307,7 @@ async def test_get_ot2_instruments(
     decoy.verify(await ot2_hardware_api.cache_instruments(), times=0)
     assert result2.status_code == 200
     assert result2.content.data == [
-        Pipette.construct(
+        Pipette.model_construct(  # type: ignore[call-arg]
             ok=True,
             mount="right",
             instrumentType="pipette",
@@ -353,7 +353,7 @@ async def test_get_96_channel_instruments(
     decoy.when(ot3_hardware_api.get_instrument_offset(OT3Mount.RIGHT)).then_return(None)
     assert result2.status_code == 200
     assert result2.content.data == [
-        Pipette.construct(
+        Pipette.model_construct(  # type: ignore[call-arg]
             ok=True,
             mount="left",
             instrumentType="pipette",

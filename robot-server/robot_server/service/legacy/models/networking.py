@@ -1,7 +1,14 @@
 import typing
 from enum import Enum
 
-from pydantic import field_validator, model_validator, ConfigDict, BaseModel, Field, SecretStr
+from pydantic import (
+    field_validator,
+    model_validator,
+    ConfigDict,
+    BaseModel,
+    Field,
+    SecretStr,
+)
 from opentrons.system import wifi
 
 
@@ -53,27 +60,29 @@ class NetworkingStatus(BaseModel):
         description="Per-interface networking status. Properties are "
         "named for network interfaces",
     )
-    model_config = ConfigDict(json_schema_extra={
-        "example": {
-            "status": "full",
-            "interfaces": {
-                "wlan0": {
-                    "ipAddress": "192.168.43.97/24",
-                    "macAddress": "B8:27:EB:6C:95:CF",
-                    "gatewayAddress": "192.168.43.161",
-                    "state": "connected",
-                    "type": "wifi",
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "status": "full",
+                "interfaces": {
+                    "wlan0": {
+                        "ipAddress": "192.168.43.97/24",
+                        "macAddress": "B8:27:EB:6C:95:CF",
+                        "gatewayAddress": "192.168.43.161",
+                        "state": "connected",
+                        "type": "wifi",
+                    },
+                    "eth0": {
+                        "ipAddress": "169.254.229.173/16",
+                        "macAddress": "B8:27:EB:39:C0:9A",
+                        "gatewayAddress": None,
+                        "state": "connected",
+                        "type": "ethernet",
+                    },
                 },
-                "eth0": {
-                    "ipAddress": "169.254.229.173/16",
-                    "macAddress": "B8:27:EB:39:C0:9A",
-                    "gatewayAddress": None,
-                    "state": "connected",
-                    "type": "ethernet",
-                },
-            },
+            }
         }
-    })
+    )
 
 
 class NetworkingSecurityType(str, Enum):
@@ -109,19 +118,21 @@ class WifiNetworks(BaseModel):
     """The list of networks"""
 
     list: typing.List[WifiNetworkFull]
-    model_config = ConfigDict(json_schema_extra={
-        "example": {
-            "list": [
-                {
-                    "ssid": "linksys",
-                    "signal": 50,
-                    "active": False,
-                    "security": "WPA2 802.1X",
-                    "securityType": "wpa-eap",
-                }
-            ]
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "list": [
+                    {
+                        "ssid": "linksys",
+                        "signal": 50,
+                        "active": False,
+                        "security": "WPA2 802.1X",
+                        "securityType": "wpa-eap",
+                    }
+                ]
+            }
         }
-    })
+    )
 
 
 class WifiConfiguration(BaseModel):
@@ -156,7 +167,7 @@ class WifiConfiguration(BaseModel):
         'and it may also have `"anonymousIdentity"` and '
         '`"caCert"` properties, both of which are identified'
         " as present but not required.",
-        required=["eapType"],
+        json_schema_extra={"required": ["eapType"]},
     )
 
     @field_validator("eapConfig")
@@ -196,31 +207,34 @@ class WifiConfiguration(BaseModel):
         elif security_type == NetworkingSecurityType.wpa_eap and not eapconfig:
             raise ValueError("If securityType is wpa-eap, eapConfig must be specified")
         return values
-    model_config = ConfigDict(json_schema_extra={
-        "examples": [
-            {"ssid": "linksys"},
-            {
-                "ssid": "linksys",
-                "securityType": "wpa-psk",
-                "psk": "psksrock",
-            },
-            {
-                "ssid": "cantseeme",
-                "securityType": "wpa-psk",
-                "psk": "letmein",
-                "hidden": True,
-            },
-            {
-                "ssid": "Eduroam",
-                "securityType": "wpa-eap",
-                "eapConfig": {
-                    "eapType": "peap/mschapv2",
-                    "identity": "scientist@biology.org",
-                    "password": "leeuwenhoek",
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {"ssid": "linksys"},
+                {
+                    "ssid": "linksys",
+                    "securityType": "wpa-psk",
+                    "psk": "psksrock",
                 },
-            },
-        ]
-    })
+                {
+                    "ssid": "cantseeme",
+                    "securityType": "wpa-psk",
+                    "psk": "letmein",
+                    "hidden": True,
+                },
+                {
+                    "ssid": "Eduroam",
+                    "securityType": "wpa-eap",
+                    "eapConfig": {
+                        "eapType": "peap/mschapv2",
+                        "identity": "scientist@biology.org",
+                        "password": "leeuwenhoek",
+                    },
+                },
+            ]
+        }
+    )
 
 
 class WifiConfigurationResponse(BaseModel):
@@ -262,17 +276,19 @@ class WifiKeyFiles(BaseModel):
     wifi_keys: typing.List[WifiKeyFile] = Field(
         [], alias="keys", description="A list of keys in the system"
     )
-    model_config = ConfigDict(json_schema_extra={
-        "example": {
-            "keys": [
-                {
-                    "uri": "/wifi/keys/abda234a234",
-                    "id": "abda234a234",
-                    "name": "client.pem",
-                }
-            ]
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "keys": [
+                    {
+                        "uri": "/wifi/keys/abda234a234",
+                        "id": "abda234a234",
+                        "name": "client.pem",
+                    }
+                ]
+            }
         }
-    })
+    )
 
 
 class EapConfigOptionType(str, Enum):
@@ -321,39 +337,41 @@ class EapOptions(BaseModel):
     """An object describing all supported EAP variants and their parameters"""
 
     options: typing.List[EapVariant]
-    model_config = ConfigDict(json_schema_extra={
-        "example": {
-            "options": [
-                {
-                    "name": "peap/mschapv2",
-                    "displayName": "PEAP/MS-CHAP v2",
-                    "options": [
-                        {
-                            "name": "identity",
-                            "displayName": "Username",
-                            "required": True,
-                            "type": "string",
-                        },
-                        {
-                            "name": "anonymousIdentity",
-                            "displayName": "Anonymous Identity",
-                            "required": False,
-                            "type": "string",
-                        },
-                        {
-                            "name": "caCert",
-                            "displayName": "CA Certificate File",
-                            "required": False,
-                            "type": "file",
-                        },
-                        {
-                            "name": "password",
-                            "displayName": "password",
-                            "required": True,
-                            "type": "password",
-                        },
-                    ],
-                }
-            ]
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "options": [
+                    {
+                        "name": "peap/mschapv2",
+                        "displayName": "PEAP/MS-CHAP v2",
+                        "options": [
+                            {
+                                "name": "identity",
+                                "displayName": "Username",
+                                "required": True,
+                                "type": "string",
+                            },
+                            {
+                                "name": "anonymousIdentity",
+                                "displayName": "Anonymous Identity",
+                                "required": False,
+                                "type": "string",
+                            },
+                            {
+                                "name": "caCert",
+                                "displayName": "CA Certificate File",
+                                "required": False,
+                                "type": "file",
+                            },
+                            {
+                                "name": "password",
+                                "displayName": "password",
+                                "required": True,
+                                "type": "password",
+                            },
+                        ],
+                    }
+                ]
+            }
         }
-    })
+    )

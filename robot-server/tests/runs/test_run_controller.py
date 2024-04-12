@@ -64,7 +64,7 @@ def engine_state_summary() -> StateSummary:
 def protocol_commands() -> List[pe_commands.Command]:
     """Get a StateSummary value object."""
     return [
-        pe_commands.WaitForResume.construct(  # type: ignore[call-arg]
+        pe_commands.WaitForResume.model_construct(  # type: ignore[call-arg]
             params=pe_commands.WaitForResumeParams(message="hello world")
         )
     ]

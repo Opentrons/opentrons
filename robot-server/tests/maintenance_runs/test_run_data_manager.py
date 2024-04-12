@@ -60,11 +60,11 @@ def engine_state_summary() -> StateSummary:
     """Get a StateSummary value object."""
     return StateSummary(
         status=EngineStatus.IDLE,
-        errors=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]
-        labware=[LoadedLabware.construct(id="some-labware-id")],  # type: ignore[call-arg]
-        labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
-        pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
-        modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]
+        errors=[ErrorOccurrence.model_construct(id="some-error-id")],  # type: ignore[call-arg]
+        labware=[LoadedLabware.model_construct(id="some-labware-id")],  # type: ignore[call-arg]
+        labwareOffsets=[LabwareOffset.model_construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
+        pipettes=[LoadedPipette.model_construct(id="some-pipette-id")],  # type: ignore[call-arg]
+        modules=[LoadedModule.model_construct(id="some-module-id")],  # type: ignore[call-arg]
         liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
     )
 

@@ -63,7 +63,7 @@ def _pipette_dict_to_pipette_res(
     """Convert PipetteDict to Pipette response model."""
     if pipette_dict:
         calibration_data = pipette_offset
-        return Pipette.construct(
+        return Pipette.model_construct(
             firmwareVersion=str(fw_version) if fw_version else None,
             ok=True,
             mount=MountType.from_hw_mount(mount).value,
@@ -75,7 +75,7 @@ def _pipette_dict_to_pipette_res(
                 channels=pipette_dict["channels"],
                 min_volume=pipette_dict["min_volume"],
                 max_volume=pipette_dict["max_volume"],
-                calibratedOffset=InstrumentCalibrationData.construct(
+                calibratedOffset=InstrumentCalibrationData.model_construct(
                     offset=Vec3f(
                         x=calibration_data.offset.x,
                         y=calibration_data.offset.y,
@@ -84,9 +84,9 @@ def _pipette_dict_to_pipette_res(
                     source=calibration_data.source,
                     last_modified=calibration_data.last_modified,
                     reasonability_check_failures=[
-                        InconsistentCalibrationFailure.construct(
+                        InconsistentCalibrationFailure.model_construct(
                             offsets={
-                                k.name: Vec3f.construct(x=v.x, y=v.y, z=v.z)
+                                k.name: Vec3f.model_construct(x=v.x, y=v.y, z=v.z)
                                 for k, v in failure.offsets.items()
                             },
                             limit=failure.limit,
@@ -106,7 +106,7 @@ def _gripper_dict_to_gripper_res(
 ) -> Gripper:
     """Convert GripperDict to Gripper response model."""
     calibration_data = gripper_dict["calibration_offset"]
-    return Gripper.construct(
+    return Gripper.model_construct(
         firmwareVersion=str(fw_version) if fw_version else None,
         ok=True,
         mount=MountType.EXTENSION.value,
@@ -115,7 +115,7 @@ def _gripper_dict_to_gripper_res(
         subsystem=SubSystem.from_hw(HWSubSystem.of_mount(OT3Mount.GRIPPER)),
         data=GripperData(
             jawState=gripper_dict["state"].name.lower(),
-            calibratedOffset=InstrumentCalibrationData.construct(
+            calibratedOffset=InstrumentCalibrationData.model_construct(
                 offset=Vec3f(
                     x=calibration_data.offset.x,
                     y=calibration_data.offset.y,
@@ -219,7 +219,7 @@ async def _get_attached_instruments_ot3(
     await hardware.cache_instruments(skip_if_would_block=True)
     response_data = await _get_instrument_data(hardware)
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(
+        content=SimpleMultiBody.model_construct(
             data=response_data,
             meta=MultiBodyMeta(cursor=0, totalLength=len(response_data)),
         ),
@@ -243,7 +243,7 @@ async def _get_attached_instruments_ot2(
         if pipette_dict
     ]
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(
+        content=SimpleMultiBody.model_construct(
             data=response_data,
             meta=MultiBodyMeta(cursor=0, totalLength=len(response_data)),
         ),

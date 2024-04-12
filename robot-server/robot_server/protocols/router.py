@@ -257,7 +257,7 @@ async def create_protocol(
                 status.HTTP_503_SERVICE_UNAVAILABLE
             ) from error
 
-        data = Protocol.construct(
+        data = Protocol.model_construct(
             id=cached_protocol_id,
             createdAt=resource.created_at,
             protocolType=resource.source.config.protocol_type,
@@ -277,7 +277,7 @@ async def create_protocol(
         )
 
         return await PydanticResponse.create(
-            content=SimpleBody.construct(data=data),
+            content=SimpleBody.model_construct(data=data),
             # not returning a 201 because we're not actually creating a new resource
             status_code=status.HTTP_200_OK,
         )
@@ -337,7 +337,7 @@ async def create_protocol(
     log.info(f'Created protocol "{protocol_id}" and started analysis "{analysis_id}".')
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=data),
+        content=SimpleBody.model_construct(data=data),
         status_code=status.HTTP_201_CREATED,
     )
 
@@ -408,7 +408,7 @@ async def get_protocols(
     """
     protocol_resources = protocol_store.get_all()
     data = [
-        Protocol.construct(
+        Protocol.model_construct(
             id=r.protocol_id,
             createdAt=r.created_at,
             protocolType=r.source.config.protocol_type,
@@ -423,7 +423,7 @@ async def get_protocols(
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
 
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(data=data, meta=meta),
+        content=SimpleMultiBody.model_construct(data=data, meta=meta),
         status_code=status.HTTP_200_OK,
     )
 
@@ -454,7 +454,7 @@ async def get_protocol_ids(
     meta = MultiBodyMeta(cursor=0, totalLength=len(protocol_ids))
 
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(data=protocol_ids, meta=meta)
+        content=SimpleMultiBody.model_construct(data=protocol_ids, meta=meta)
     )
 
 
@@ -487,7 +487,7 @@ async def get_protocol_by_id(
     analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocolId)
     referencing_run_ids = protocol_store.get_referencing_run_ids(protocolId)
 
-    data = Protocol.construct(
+    data = Protocol.model_construct(
         id=protocolId,
         createdAt=resource.created_at,
         protocolType=resource.source.config.protocol_type,
@@ -500,15 +500,15 @@ async def get_protocol_by_id(
         ],
     )
 
-    links = ProtocolLinks.construct(
+    links = ProtocolLinks.model_construct(
         referencingRuns=[
-            RunLink.construct(id=run_id, href=f"/runs/{run_id}")
+            RunLink.model_construct(id=run_id, href=f"/runs/{run_id}")
             for run_id in referencing_run_ids
         ]
     )
 
     return await PydanticResponse.create(
-        content=Body.construct(
+        content=Body.model_construct(
             data=data,
             links=links,
         ),
@@ -546,7 +546,7 @@ async def delete_protocol_by_id(
         raise ProtocolUsedByRun(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 
     return await PydanticResponse.create(
-        content=SimpleEmptyBody.construct(),
+        content=SimpleEmptyBody.model_construct(),
         status_code=status.HTTP_200_OK,
     )
 
@@ -613,7 +613,7 @@ async def create_protocol_analysis(
             status.HTTP_503_SERVICE_UNAVAILABLE
         ) from error
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(
+        content=SimpleMultiBody.model_construct(
             data=analysis_summaries,
             meta=MultiBodyMeta(cursor=0, totalLength=len(analysis_summaries)),
         ),
@@ -654,7 +654,7 @@ async def get_protocol_analyses(
     analyses = await analysis_store.get_by_protocol(protocolId)
 
     return await PydanticResponse.create(
-        content=SimpleMultiBody.construct(
+        content=SimpleMultiBody.model_construct(
             data=analyses,
             meta=MultiBodyMeta(cursor=0, totalLength=len(analyses)),
         )
@@ -700,7 +700,9 @@ async def get_protocol_analysis_by_id(
             status.HTTP_404_NOT_FOUND
         ) from error
 
-    return await PydanticResponse.create(content=SimpleBody.construct(data=analysis))
+    return await PydanticResponse.create(
+        content=SimpleBody.model_construct(data=analysis)
+    )
 
 
 @protocols_router.get(

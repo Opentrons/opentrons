@@ -51,18 +51,20 @@ class RobotPositions(BaseModel):
 
 class RobotPositionsResponse(BaseModel):
     positions: RobotPositions
-    model_config = ConfigDict(json_schema_extra={
-        "example": {
-            "positions": {
-                "change_pipette": {
-                    "target": "mount",
-                    "left": [325, 40, 30],
-                    "right": [65, 40, 30],
-                },
-                "attach_tip": {"target": "pipette", "point": [200, 90, 150]},
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "positions": {
+                    "change_pipette": {
+                        "target": "mount",
+                        "left": [325, 40, 30],
+                        "right": [65, 40, 30],
+                    },
+                    "attach_tip": {"target": "pipette", "point": [200, 90, 150]},
+                }
             }
         }
-    })
+    )
 
 
 class Mount(str, Enum):
@@ -106,21 +108,24 @@ class RobotMoveTarget(BaseModel):
                 " mount movement must be >= 30"
             )
         return values
-    model_config = ConfigDict(json_schema_extra={
-        "examples": [
-            {
-                "target": "mount",
-                "point": [100, 100, 80],
-                "mount": "left",
-            },
-            {
-                "target": "pipette",
-                "mount": "right",
-                "model": "p300_single",
-                "point": [25, 25, 50],
-            },
-        ]
-    })
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "target": "mount",
+                    "point": [100, 100, 80],
+                    "mount": "left",
+                },
+                {
+                    "target": "pipette",
+                    "mount": "right",
+                    "model": "p300_single",
+                    "point": [25, 25, 50],
+                },
+            ]
+        }
+    )
 
 
 class RobotHomeTarget(BaseModel):
@@ -145,9 +150,12 @@ class RobotHomeTarget(BaseModel):
         if values.get("target") == HomeTarget.pipette.value and not values.get("mount"):
             raise ValueError("mount must be specified if target is pipette")
         return values
-    model_config = ConfigDict(json_schema_extra={
-        "examples": [{"target": "robot"}, {"target": "pipette", "mount": "right"}]
-    })
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [{"target": "robot"}, {"target": "pipette", "mount": "right"}]
+        }
+    )
 
 
 class RobotLightState(BaseModel):

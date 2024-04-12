@@ -3,7 +3,7 @@ import logging
 
 from typing import Optional, List, Dict, Any, Union
 
-from pydantic import field_validator, ConfigDict, BaseModel, Field, create_model
+from pydantic import field_validator, BaseModel, Field, create_model
 
 from opentrons_shared_data.pipette import model_constants
 from opentrons.config.reset import ResetOptionId
@@ -17,7 +17,7 @@ class AdvancedSetting(BaseModel):
         ...,
         description="The ID by which the property used to be known; not"
         " useful now and may contain spaces or hyphens",
-        deprecated=True,
+        json_schema_extra={"deprecated": True},
     )
     title: str = Field(
         ...,
@@ -185,11 +185,9 @@ PipetteSettingsFields.__doc__ = "The fields of the pipette settings"
 
 
 class PipetteSettings(BaseModel):
+
     info: PipetteSettingsInfo
-    setting_fields: PipetteSettingsFields  # type: ignore
-    # TODO[pydantic]: The following keys were removed: `fields`.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    model_config = ConfigDict(fields={"setting_fields": "fields"})
+    setting_fields: PipetteSettingsFields = Field(..., alias="fields")  # type: ignore
 
 
 MultiPipetteSettings = Dict[str, PipetteSettings]

@@ -140,6 +140,6 @@ async def create_run_action(
         raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(
-        content=SimpleBody.construct(data=action),
+        content=SimpleBody.model_construct(data=action),
         status_code=status.HTTP_201_CREATED,
     )

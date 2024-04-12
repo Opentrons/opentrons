@@ -1,7 +1,7 @@
 """Store Pydantic objects in the SQL database."""
 
 from typing import Type, TypeVar
-from pydantic import BaseModel, parse_raw_as
+from pydantic import BaseModel
 
 
 _BaseModelT = TypeVar("_BaseModelT", bound=BaseModel)
@@ -19,4 +19,4 @@ def pydantic_to_json(obj: BaseModel) -> str:
 
 def json_to_pydantic(model: Type[_BaseModelT], json: str) -> _BaseModelT:
     """Parse a Pydantic object stored in the SQL database."""
-    return parse_raw_as(model, json)
+    return model.model_validate_json(json)

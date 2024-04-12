@@ -76,11 +76,11 @@ def engine_state_summary() -> StateSummary:
     """Get a StateSummary value object."""
     return StateSummary(
         status=EngineStatus.IDLE,
-        errors=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]
-        labware=[LoadedLabware.construct(id="some-labware-id")],  # type: ignore[call-arg]
-        labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
-        pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
-        modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]
+        errors=[ErrorOccurrence.model_construct(id="some-error-id")],  # type: ignore[call-arg]
+        labware=[LoadedLabware.model_construct(id="some-labware-id")],  # type: ignore[call-arg]
+        labwareOffsets=[LabwareOffset.model_construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
+        pipettes=[LoadedPipette.model_construct(id="some-pipette-id")],  # type: ignore[call-arg]
+        modules=[LoadedModule.model_construct(id="some-module-id")],  # type: ignore[call-arg]
         liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
     )
 
@@ -410,21 +410,21 @@ async def test_get_all_runs(
     """It should get all runs, including current and historical."""
     current_run_data = StateSummary(
         status=EngineStatus.IDLE,
-        errors=[ErrorOccurrence.construct(id="current-error-id")],  # type: ignore[call-arg]
-        labware=[LoadedLabware.construct(id="current-labware-id")],  # type: ignore[call-arg]
-        labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]
-        pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]
-        modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]
+        errors=[ErrorOccurrence.model_construct(id="current-error-id")],  # type: ignore[call-arg]
+        labware=[LoadedLabware.model_construct(id="current-labware-id")],  # type: ignore[call-arg]
+        labwareOffsets=[LabwareOffset.model_construct(id="current-labware-offset-id")],  # type: ignore[call-arg]
+        pipettes=[LoadedPipette.model_construct(id="current-pipette-id")],  # type: ignore[call-arg]
+        modules=[LoadedModule.model_construct(id="current-module-id")],  # type: ignore[call-arg]
         liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
     )
 
     historical_run_data = StateSummary(
         status=EngineStatus.STOPPED,
-        errors=[ErrorOccurrence.construct(id="old-error-id")],  # type: ignore[call-arg]
-        labware=[LoadedLabware.construct(id="old-labware-id")],  # type: ignore[call-arg]
-        labwareOffsets=[LabwareOffset.construct(id="old-labware-offset-id")],  # type: ignore[call-arg]
-        pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]
-        modules=[LoadedModule.construct(id="old-module-id")],  # type: ignore[call-arg]
+        errors=[ErrorOccurrence.model_construct(id="old-error-id")],  # type: ignore[call-arg]
+        labware=[LoadedLabware.model_construct(id="old-labware-id")],  # type: ignore[call-arg]
+        labwareOffsets=[LabwareOffset.model_construct(id="old-labware-offset-id")],  # type: ignore[call-arg]
+        pipettes=[LoadedPipette.model_construct(id="old-pipette-id")],  # type: ignore[call-arg]
+        modules=[LoadedModule.model_construct(id="old-module-id")],  # type: ignore[call-arg]
         liquids=[],
     )
 
@@ -878,14 +878,14 @@ async def test_get_current_run_labware_definition(
         mock_engine_store.engine.state_view.labware.get_loaded_labware_definitions()
     ).then_return(
         [
-            LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
-            LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
+            LabwareDefinition.model_construct(namespace="test_1"),  # type: ignore[call-arg]
+            LabwareDefinition.model_construct(namespace="test_2"),  # type: ignore[call-arg]
         ]
     )
 
     result = subject.get_run_loaded_labware_definitions(run_id="run-id")
 
     assert result == [
-        LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
-        LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
+        LabwareDefinition.model_construct(namespace="test_1"),  # type: ignore[call-arg]
+        LabwareDefinition.model_construct(namespace="test_2"),  # type: ignore[call-arg]
     ]

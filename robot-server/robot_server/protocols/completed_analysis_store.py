@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 import sqlalchemy
 import anyio
-from pydantic import parse_raw_as
+from pydantic import TypeAdapter
 
 from robot_server.persistence.database import sqlite_rowid
 from robot_server.persistence.tables import analysis_table
@@ -20,6 +20,9 @@ from .analysis_memcache import MemoryCache
 
 
 _log = getLogger(__name__)
+
+
+RtpAdapter = TypeAdapter(Dict[str, RunTimeParameterAnalysisData])
 
 
 @dataclass
@@ -123,14 +126,7 @@ class CompletedAnalysisResource:
 
         def parse_rtp_dict() -> Dict[str, RunTimeParameterAnalysisData]:
             rtp_contents = sql_row.run_time_parameter_values_and_defaults
-            return (
-                parse_raw_as(
-                    Dict[str, RunTimeParameterAnalysisData],
-                    sql_row.run_time_parameter_values_and_defaults,
-                )
-                if rtp_contents
-                else {}
-            )
+            return RtpAdapter.validate_python(rtp_contents) if rtp_contents else {}
 
         # In most cases, this parsing should be quite quick but theoretically
         # there could be an unexpectedly large number of run time params.

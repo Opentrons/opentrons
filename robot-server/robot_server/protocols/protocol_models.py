@@ -39,6 +39,7 @@ class Metadata(BaseModel):
     protocols define their `apiLevel` inside their metadata, but
     this should be considered an exception to the rule.
     """
+
     model_config = ConfigDict(extra="allow")
 
 

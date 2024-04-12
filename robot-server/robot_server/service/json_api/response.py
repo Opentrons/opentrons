@@ -11,8 +11,8 @@ from typing import (
     ParamSpec,
     Callable,
 )
-from pydantic import Field, BaseModel
-from pydantic.typing import get_args
+from typing_extensions import get_args
+from pydantic import Field, BaseModel, RootModel
 from fastapi.responses import JSONResponse
 from fastapi.dependencies.utils import get_typed_return_annotation
 from .resource_links import ResourceLinks as DeprecatedResourceLinks
@@ -115,7 +115,8 @@ class SimpleMultiBody(BaseResponseBody, BaseModel, Generic[ResponseDataT]):
 
 class MultiBody(
     BaseResponseBody,
-    BaseModel, Generic[ResponseDataT, ResponseLinksT],
+    BaseModel,
+    Generic[ResponseDataT, ResponseLinksT],
 ):
     """A response that returns multiple resources and stateful links."""
 
@@ -257,7 +258,8 @@ class DeprecatedResponseModel(BaseModel, Generic[ResponseDataT]):
 
 # TODO(mc, 2021-12-09): remove this model
 class DeprecatedMultiResponseModel(
-    BaseModel, Generic[ResponseDataT],
+    BaseModel,
+    Generic[ResponseDataT],
 ):
     """A response that returns multiple resources and stateful links.
 
@@ -275,10 +277,10 @@ class DeprecatedMultiResponseModel(
     )
 
 
-class ResponseList(BaseModel, Generic[ResponseDataT]):
+class ResponseList(RootModel[List[ResponseDataT]], Generic[ResponseDataT]):
     """A response that returns a list resource."""
 
-    __root__: List[ResponseDataT]
+    root: List[ResponseDataT]
 
 
 class NotifyRefetchBody(BaseResponseBody):

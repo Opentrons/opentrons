@@ -100,7 +100,7 @@ def test_maps_magnetic_module_data(
         has_available_update=True,
         live_data=input_data,
         usb_port=hardware_usb_port,
-        module_offset=ModuleCalibrationData.construct(
+        module_offset=ModuleCalibrationData.model_construct(
             offset=Vec3f(x=0, y=0, z=0),
         ),
     )
@@ -164,7 +164,7 @@ def test_maps_temperature_module_data(input_model: str, input_data: LiveData) ->
         has_available_update=True,
         live_data=input_data,
         usb_port=hardware_usb_port,
-        module_offset=ModuleCalibrationData.construct(
+        module_offset=ModuleCalibrationData.model_construct(
             offset=Vec3f(x=0, y=0, z=0),
         ),
     )
@@ -261,7 +261,7 @@ def test_maps_thermocycler_module_data(input_model: str, input_data: LiveData) -
         has_available_update=True,
         live_data=input_data,
         usb_port=hardware_usb_port,
-        module_offset=ModuleCalibrationData.construct(
+        module_offset=ModuleCalibrationData.model_construct(
             offset=Vec3f(x=0, y=0, z=0),
         ),
     )
@@ -360,7 +360,7 @@ def test_maps_heater_shaker_module_data(input_model: str, input_data: LiveData) 
         has_available_update=True,
         live_data=input_data,
         usb_port=hardware_usb_port,
-        module_offset=ModuleCalibrationData.construct(
+        module_offset=ModuleCalibrationData.model_construct(
             offset=Vec3f(x=0, y=0, z=0),
         ),
     )

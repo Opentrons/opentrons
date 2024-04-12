@@ -29,12 +29,12 @@ async def _get_estop_status_response(
     estop_handler: EstopHandler,
 ) -> PydanticResponse[SimpleBody[EstopStatusModel]]:
     """Helper to generate the current Estop Status as a response model."""
-    data = EstopStatusModel.construct(
+    data = EstopStatusModel.model_construct(
         status=estop_handler.get_state(),
         leftEstopPhysicalStatus=estop_handler.get_left_physical_status(),
         rightEstopPhysicalStatus=estop_handler.get_right_physical_status(),
     )
-    return await PydanticResponse.create(content=SimpleBody.construct(data=data))
+    return await PydanticResponse.create(content=SimpleBody.model_construct(data=data))
 
 
 @PydanticResponse.wrap_route(
@@ -89,8 +89,8 @@ async def get_door_status(
     door_required: bool = Depends(get_door_switch_required),
 ) -> PydanticResponse[SimpleBody[DoorStatusModel]]:
     return await PydanticResponse.create(
-        content=SimpleBody.construct(
-            data=DoorStatusModel.construct(
+        content=SimpleBody.model_construct(
+            data=DoorStatusModel.model_construct(
                 status=DoorState.from_hw_physical_status(hardware.door_state),
                 doorRequiredClosedForProtocol=door_required,
             )

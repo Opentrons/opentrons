@@ -38,7 +38,9 @@ class EngagedMotors(BaseModel):
     z_r: EngagedMotor
     p_l: EngagedMotor
     p_r: EngagedMotor
-    q: typing.Optional[EngagedMotor] = None  # Optional since OT2 doesn't have these axes
+    q: typing.Optional[
+        EngagedMotor
+    ] = None  # Optional since OT2 doesn't have these axes
     g: typing.Optional[EngagedMotor] = None
 
 
