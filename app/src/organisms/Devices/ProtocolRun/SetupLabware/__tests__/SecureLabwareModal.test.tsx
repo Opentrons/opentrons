@@ -27,7 +27,7 @@ describe('SecureLabwareModal', () => {
       'Opentrons recommends ensuring your labware locks to the Magnetic Module by adjusting the black plate bracket on top of the module.'
     )
     screen.getByText(
-      'Please note there are two sizes of plate brackets supplied with your module: standard and deep well. These brackets can be removed and swapped by unscrewing the modules thumb screw (the silver knob on the front).'
+      'There are two sizes of plate brackets supplied with your module: standard and deep well. These brackets can be removed and swapped by unscrewing the module\'s thumb screw (the silver knob on the front).'
     )
   })
   it('should render magnetic module type modal and call onCloseClick when button is pressed', () => {
@@ -43,7 +43,7 @@ describe('SecureLabwareModal', () => {
     render(props)
     screen.getByText('Securing labware to the Thermocycler')
     screen.getByText(
-      'Opentrons recommends securing your labware to the Thermocycler module by closing its latch. Doing so ensures level and accurate plate placement for optimal results.'
+      'Opentrons recommends securing your labware to the Thermocycler Module by closing its latch. Doing so ensures level and accurate plate placement for optimal results.'
     )
   })
 
