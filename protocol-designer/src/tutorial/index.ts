@@ -11,7 +11,7 @@ type HintKey =  // normal hints
   | 'waste_chute_warning'
   // blocking hints
   | 'custom_labware_with_modules'
-  | 'export_v8_1_protocol_7_2'
+  | 'export_v8_1_protocol_7_3'
   | 'change_magnet_module_model'
 // DEPRECATED HINTS (keep a record to avoid name collisions with old persisted dismissal states)
 // 'export_v4_protocol'
