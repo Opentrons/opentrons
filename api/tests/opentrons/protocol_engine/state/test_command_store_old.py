@@ -42,6 +42,7 @@ from opentrons.protocol_engine.actions import (
     StopAction,
     HardwareStoppedAction,
     DoorChangeAction,
+    ResumeFromRecoveryAction
 )
 
 from opentrons.protocol_engine.state.command_history import CommandHistory
@@ -1327,6 +1328,105 @@ def test_command_store_handles_command_failed() -> None:
     assert subject.state.command_history.get_queue_ids() == OrderedSet()
     assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
     assert subject.state.command_history.get("command-id") == failed_command_entry
+
+
+def test_command_store_handles_resume_from_recovery() -> None:
+    """It should resume and clear fixit commands queue."""
+    error_recovery_type = ErrorRecoveryType.WAIT_FOR_RECOVERY
+
+    expected_error_occurrence = errors.ErrorOccurrence(
+        id="error-id",
+        errorType="ProtocolEngineError",
+        createdAt=datetime(year=2023, month=3, day=3),
+        detail="oh no",
+        errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+    )
+
+    expected_failed_command = commands.Comment(
+        id="command-id",
+        commandType="comment",
+        key="command-key",
+        createdAt=datetime(year=2021, month=1, day=1),
+        startedAt=datetime(year=2022, month=2, day=2),
+        completedAt=expected_error_occurrence.createdAt,
+        status=commands.CommandStatus.FAILED,
+        params=commands.CommentParams(message="hello, world"),
+        result=None,
+        error=expected_error_occurrence,
+        notes=[
+            CommandNote(
+                noteKind="noteKind",
+                shortMessage="shortMessage",
+                longMessage="longMessage",
+                source="source",
+            )
+        ],
+    )
+
+    subject = CommandStore(is_door_open=False, config=_make_config())
+
+    subject.handle_action(
+        QueueCommandAction(
+            command_id=expected_failed_command.id,
+            created_at=expected_failed_command.createdAt,
+            request=commands.CommentCreate(
+                params=expected_failed_command.params, key=expected_failed_command.key
+            ),
+            request_hash=None,
+        )
+    )
+    subject.handle_action(
+        RunCommandAction(
+            command_id=expected_failed_command.id,
+            # Ignore arg-type errors because we know this isn't None.
+            started_at=expected_failed_command.startedAt,  # type: ignore[arg-type]
+        )
+    )
+    subject.handle_action(
+        FailCommandAction(
+            command_id=expected_failed_command.id,
+            error_id=expected_error_occurrence.id,
+            failed_at=expected_error_occurrence.createdAt,
+            error=errors.ProtocolEngineError(message="oh no"),
+            notes=[
+                CommandNote(
+                    noteKind="noteKind",
+                    shortMessage="shortMessage",
+                    longMessage="longMessage",
+                    source="source",
+                )
+            ],
+            type=error_recovery_type,
+        )
+    )
+
+    failed_command_entry = CommandEntry(index=0, command=expected_failed_command)
+    command_history = CommandHistory()
+    command_history._add("command-id", failed_command_entry)
+    command_history._set_terminal_command_id("command-id")
+    command_history._add_to_fixit_queue("fixit-id-1")
+    command_history._add_to_fixit_queue("fixit-id-2")
+
+    subject.handle_action(
+        ResumeFromRecoveryAction()
+    )
+
+    assert subject.state == CommandState(
+        command_history=command_history,
+        queue_status=QueueStatus.RUNNING,
+        run_result=None,
+        run_completed_at=None,
+        is_door_blocking=False,
+        run_error=None,
+        finish_error=None,
+        failed_command=failed_command_entry,
+        command_error_recovery_types={expected_failed_command.id: error_recovery_type},
+        run_started_at=None,
+        latest_command_hash=None,
+        stopped_by_estop=False,
+    )
+
+    assert subject.state.command_history.get_fixit_queue_ids() == OrderedSet()
 
 
 def test_handles_hardware_stopped() -> None:

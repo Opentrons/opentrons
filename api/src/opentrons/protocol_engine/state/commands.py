@@ -39,6 +39,7 @@ from ..errors import (
     RobotDoorOpenError,
     SetupCommandNotAllowedError,
     FixitCommandNotAllowedError,
+    ResumeForRecoveryNotAllowedError,
     PauseNotAllowedError,
     UnexpectedProtocolError,
     ProtocolCommandFailedError,
@@ -335,6 +336,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.queue_status = QueueStatus.PAUSED
 
         elif isinstance(action, ResumeFromRecoveryAction):
+            self._state.command_history.clear_fixit_queue()
             self._state.queue_status = QueueStatus.RUNNING
 
         elif isinstance(action, StopAction):
@@ -830,7 +832,16 @@ class CommandView(HasState[CommandState]):
 
         elif isinstance(action, ResumeFromRecoveryAction):
             if self.get_status() != EngineStatus.AWAITING_RECOVERY:
-                raise NotImplementedError()
+                raise ResumeForRecoveryNotAllowedError(
+                    "Cannot resume from recovery if the run is not in recovery mode."
+                )
+            elif (
+                self.get_status() == EngineStatus.AWAITING_RECOVERY
+                and len(self._state.command_history.get_fixit_queue_ids()) > 0
+            ):
+                raise ResumeForRecoveryNotAllowedError(
+                    "Cannot resume from recovery while there are fixit commands in the queue."
+                )
             else:
                 return action
 

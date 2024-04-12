@@ -587,8 +587,28 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         ),
         expected_error=None,
     ),
+    ActionAllowedSpec(
+        subject=get_command_view(
+            queue_status=QueueStatus.AWAITING_RECOVERY,
+            queued_fixit_command_ids=["fixit-id-1", "fixit-id-2"],
+            failed_command=CommandEntry(
+                index=2,
+                command=create_failed_command(
+                    command_id="command-id-3",
+                    error=ErrorOccurrence(
+                        id="error-id",
+                        errorType="ProtocolEngineError",
+                        createdAt=datetime(year=2022, month=2, day=2),
+                        detail="oh no",
+                        errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+                    ),
+                ),
+            ),
+        ),
+        action=ResumeFromRecoveryAction(),
+        expected_error=None,
+    )
 ]
-
 
 @pytest.mark.parametrize(ActionAllowedSpec._fields, action_allowed_specs)
 def test_validate_action_allowed(
