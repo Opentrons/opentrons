@@ -333,7 +333,9 @@ class RunArgs:
             recorder = execute._load_scale(
                 name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
             )
-
+            cavity_str = "unused"
+            if 1.0 in volumes_list:
+                cavity_str = helpers._get_cavity(_ctx.is_simulating())
             report = execute.build_gm_report(
                 test_volumes=volumes_list,
                 run_id=run_id,
@@ -349,6 +351,7 @@ class RunArgs:
                 environment_sensor=environment_sensor,
                 trials=trials,
                 fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
+                cavity=cavity_str,
             )
 
         return RunArgs(

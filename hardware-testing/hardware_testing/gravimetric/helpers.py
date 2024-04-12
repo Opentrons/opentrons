@@ -317,6 +317,13 @@ def _get_tip_batch(is_simulating: bool, tip: int) -> str:
         return "simulation-tip-batch"
 
 
+def _get_cavity(is_simulating: bool) -> str:
+    if not is_simulating:
+        return input("Cavity being tested:").strip()
+    else:
+        return "simulation-cavity"
+
+
 def _pick_up_tip(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
