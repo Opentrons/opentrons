@@ -1,5 +1,5 @@
 import keyword
-from typing import List, Optional, Union, Literal
+from typing import List, Set, Optional, Union, Literal
 
 from .types import (
     AllowedTypes,
@@ -14,6 +14,17 @@ from .types import (
 UNIT_MAX_LEN = 10
 DISPLAY_NAME_MAX_LEN = 30
 DESCRIPTION_MAX_LEN = 100
+
+
+def validate_variable_name_unique(
+    variable_name: str, other_variable_names: Set[str]
+) -> None:
+    """Validate that the given variable name is unique."""
+    if variable_name in other_variable_names:
+        raise ParameterNameError(
+            f'"{variable_name}" is already defined as a variable name for another parameter.'
+            f" All variable names must be unique."
+        )
 
 
 def ensure_display_name(display_name: str) -> str:
