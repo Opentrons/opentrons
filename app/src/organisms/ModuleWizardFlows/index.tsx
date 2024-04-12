@@ -13,6 +13,10 @@ import {
   getModuleDisplayName,
   FLEX_CUTOUT_BY_SLOT_ID,
   SINGLE_SLOT_FIXTURES,
+  getFixtureIdByCutoutIdFromModuleSlotName,
+  getCutoutFixturesForModuleModel,
+  getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
@@ -45,7 +49,6 @@ interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
   closeFlow: () => void
   isPrepCommandLoading: boolean
-  initialSlotName?: string
   onComplete?: () => void
   prepCommandErrorMessage?: string
 }
@@ -57,7 +60,6 @@ export const ModuleWizardFlows = (
 ): JSX.Element | null => {
   const {
     attachedModule,
-    initialSlotName,
     isPrepCommandLoading,
     closeFlow,
     onComplete,
@@ -72,12 +74,21 @@ export const ModuleWizardFlows = (
       : attachedPipettes.right
 
   const moduleCalibrationSteps = getModuleCalibrationSteps()
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const deckConfig = useDeckConfigurationQuery().data ?? []
+  const moduleCutoutConfig = deckConfig.find(cc => (
+    cc.opentronsModuleSerialNumber === attachedModule.serialNumber
+  ))
+  const fixtureIdByCutoutId = moduleCutoutConfig != null ? getFixtureIdByCutoutIdFromModuleSlotName(
+    moduleCutoutConfig.cutoutId.replace('cutout', ''),
+    getCutoutFixturesForModuleModel(attachedModule.moduleModel, deckDef),
+    deckDef
+  ) : {}
   const occupiedCutouts = deckConfig.filter(
-    (fixture: CutoutConfig) =>
+    (cutoutConfig: CutoutConfig) =>
       !SINGLE_SLOT_FIXTURES.includes(
-        fixture.cutoutFixtureId as SingleSlotCutoutFixtureId
-      )
+        cutoutConfig.cutoutFixtureId as SingleSlotCutoutFixtureId
+      ) && !Object.keys(fixtureIdByCutoutId).includes(cutoutConfig.cutoutId)
   )
   const availableSlotNames =
     FLEX_SLOT_NAMES_BY_MOD_TYPE[
@@ -90,9 +101,6 @@ export const ModuleWizardFlows = (
         )
     ) ?? []
 
-  const [slotName, setSlotName] = React.useState(
-    initialSlotName != null ? initialSlotName : availableSlotNames?.[0] ?? null
-  )
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = moduleCalibrationSteps.length - 1
   const currentStep = moduleCalibrationSteps?.[currentStepIndex]
@@ -233,7 +241,7 @@ export const ModuleWizardFlows = (
 
   const maintenanceRunId =
     maintenanceRunData?.data.id != null &&
-    maintenanceRunData?.data.id === createdMaintenanceRunId
+      maintenanceRunData?.data.id === createdMaintenanceRunId
       ? createdMaintenanceRunId
       : undefined
   const calibrateBaseProps = {
@@ -247,7 +255,6 @@ export const ModuleWizardFlows = (
     errorMessage,
     isOnDevice,
     attachedModule,
-    slotName,
     isExiting,
   }
 
@@ -304,8 +311,9 @@ export const ModuleWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         availableSlotNames={availableSlotNames}
-        setSlotName={setSlotName}
+        deckConfig={deckConfig}
         occupiedCutouts={occupiedCutouts}
+        fixtureIdByCutoutId={fixtureIdByCutoutId}
       />
     )
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {
@@ -313,6 +321,7 @@ export const ModuleWizardFlows = (
       <PlaceAdapter
         {...currentStep}
         {...calibrateBaseProps}
+        deckConfig={deckConfig}
         setCreatedAdapterId={setCreatedAdapterId}
       />
     )
@@ -332,7 +341,7 @@ export const ModuleWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         isRobotMoving={isRobotMoving}
-        proceed={isRobotMoving ? () => {} : handleCleanUpAndClose}
+        proceed={isRobotMoving ? () => { } : handleCleanUpAndClose}
       />
     )
   }
