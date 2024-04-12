@@ -2,8 +2,9 @@
 
 from functools import wraps
 from time import perf_counter_ns, clock_gettime_ns, CLOCK_REALTIME
-from typing import Callable, TypeVar, List
+from typing import Callable, TypeVar
 from typing_extensions import ParamSpec
+from collections import deque
 from performance_metrics.datashapes import (
     RawContextData,
     RobotContextState,
@@ -18,7 +19,7 @@ class RobotContextTracker:
 
     def __init__(self, should_track: bool = False) -> None:
         """Initializes the RobotContextTracker with an empty storage list."""
-        self._storage: List[RawContextData] = []
+        self._storage: deque[RawContextData] = deque()
         self._should_track = should_track
 
     def track(self, state: RobotContextState) -> Callable:  # type: ignore
