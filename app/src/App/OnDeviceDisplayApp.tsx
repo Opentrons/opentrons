@@ -32,7 +32,7 @@ import { RobotDashboard } from '../pages/RobotDashboard'
 import { RobotSettingsDashboard } from '../pages/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../pages/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/ProtocolDetails'
-import { NewTransferWizard } from '../organisms/QuickTransfer/NewTransferWizard'
+import { QuickTransferFlow } from '../organisms/QuickTransferFlow'
 import { RunningProtocol } from '../pages/RunningProtocol'
 import { RunSummary } from '../pages/RunSummary'
 import { UpdateRobot } from '../pages/UpdateRobot/UpdateRobot'
@@ -112,7 +112,7 @@ function getPathComponent(
     case '/protocols/:protocolId':
       return <ProtocolDetails />
     case `/quick-transfer`:
-      return <NewTransferWizard />
+      return <QuickTransferFlow />
     case '/robot-settings':
       return <RobotSettingsDashboard />
     case '/robot-settings/rename-robot':

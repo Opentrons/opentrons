@@ -1,6 +1,6 @@
+import { ACTIONS } from './constants'
 import type { PipetteData } from '@opentrons/api-client'
 import type { LabwareDefinition1 } from '@opentrons/shared-data'
-import { ACTIONS } from './constants'
 
 export interface QuickTransferSetupState {
   pipette?: PipetteData

@@ -14,6 +14,8 @@ import type {
   QuickTransferWizardAction,
 } from './types'
 
+const QUICK_TRANSFER_WIZARD_STEPS = 8
+
 // const initialQuickTransferState: QuickTransferSetupState = {}
 export function reducer(
   state: QuickTransferSetupState,
@@ -79,9 +81,9 @@ export function reducer(
   }
 }
 
-export const NewTransferWizard = (): JSX.Element => {
+export const QuickTransferFlow = (): JSX.Element => {
   const history = useHistory()
-  const { t } = useTranslation('quick_transfer')
+  const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   // const [state, dispatch] = React.useReducer(reducer, initialQuickTransferState)
   const [currentStep, setCurrentStep] = React.useState(1)
   const [wizardHeader, setWizardHeader] = React.useState<string>(
@@ -115,7 +117,10 @@ export const NewTransferWizard = (): JSX.Element => {
 
   return (
     <>
-      <StepMeter totalSteps={8} currentStep={currentStep} />
+      <StepMeter
+        totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
+        currentStep={currentStep}
+      />
       <Flex
         marginTop={SPACING.spacing8}
         padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
@@ -130,7 +135,7 @@ export const NewTransferWizard = (): JSX.Element => {
                   setCurrentStep(prevStep => prevStep - 1)
                 }
           }
-          buttonText="Continue"
+          buttonText={i18n.format(t('shared:continue'), 'capitalize')}
           onClickButton={() => {
             if (currentStep === 8) {
               history.push('protocols')
@@ -141,12 +146,12 @@ export const NewTransferWizard = (): JSX.Element => {
           buttonIsDisabled={continueIsDisabled}
           secondaryButtonProps={{
             buttonType: 'tertiaryLowLight',
-            buttonText: 'Exit',
+            buttonText: i18n.format(t('shared:exit'), 'capitalize'),
             onClick: () => {
               history.push('protocols')
             },
           }}
-          stepMeterPadding
+          top={SPACING.spacing8}
         />
         <Flex marginTop={SPACING.spacing80}>{wizardBody}</Flex>
       </Flex>

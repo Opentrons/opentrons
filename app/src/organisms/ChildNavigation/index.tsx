@@ -20,14 +20,14 @@ import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { SmallButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
 
-import type { IconName } from '@opentrons/components'
+import type { IconName, StyleProps } from '@opentrons/components'
 import type { InlineNotificationProps } from '../../atoms/InlineNotification'
 import type {
   IconPlacement,
   SmallButtonTypes,
 } from '../../atoms/buttons/SmallButton'
 
-interface ChildNavigationProps {
+interface ChildNavigationProps extends StyleProps {
   header: string
   onClickBack?: React.MouseEventHandler
   buttonText?: React.ReactNode
@@ -38,7 +38,6 @@ interface ChildNavigationProps {
   iconName?: IconName
   iconPlacement?: IconPlacement
   secondaryButtonProps?: React.ComponentProps<typeof SmallButton>
-  stepMeterPadding?: boolean
 }
 
 export function ChildNavigation({
@@ -52,7 +51,7 @@ export function ChildNavigation({
   iconPlacement,
   secondaryButtonProps,
   buttonIsDisabled,
-  stepMeterPadding,
+  ...styleProps
 }: ChildNavigationProps): JSX.Element {
   return (
     <Flex
@@ -62,10 +61,11 @@ export function ChildNavigation({
       paddingX={SPACING.spacing40}
       paddingY={SPACING.spacing32}
       position={POSITION_FIXED}
-      top={stepMeterPadding ? SPACING.spacing8 : '0'}
+      top="0"
       left="0"
       width="100%"
       backgroundColor={COLORS.white}
+      {...styleProps}
     >
       <Flex gridGap={SPACING.spacing16} justifyContent={JUSTIFY_FLEX_START}>
         {onClickBack != null ? (
