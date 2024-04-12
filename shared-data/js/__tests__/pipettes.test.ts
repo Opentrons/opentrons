@@ -4,7 +4,6 @@ import {
   getPipetteSpecsV2,
   getPipetteNameSpecs,
   getPipetteModelSpecs,
-  getMaxFlowRateByVolume,
 } from '../pipettes'
 import type { PipetteV2LiquidSpecs, PipetteV2Specs } from '../types'
 
@@ -159,54 +158,7 @@ describe('pipette data accessors', () => {
       minVolume: 5,
       supportedTips: {
         t50: {
-          maxFlowRate: {
-            '5': 48,
-            '6': 48.7,
-            '7': 49.3,
-            '8': 49.7,
-            '9': 50,
-            '10': 50.3,
-            '11': 50.5,
-            '12': 50.7,
-            '13': 50.8,
-            '14': 50.9,
-            '15': 51,
-            '16': 51.1,
-            '17': 51.1,
-            '18': 51.2,
-            '19': 51.2,
-            '20': 51.3,
-            '21': 51.3,
-            '22': 51.4,
-            '23': 51.4,
-            '24': 51.5,
-            '25': 51.6,
-            '26': 51.6,
-            '27': 51.7,
-            '28': 51.7,
-            '29': 51.7,
-            '30': 51.7,
-            '31': 51.7,
-            '32': 51.7,
-            '33': 51.8,
-            '34': 51.8,
-            '35': 51.8,
-            '36': 51.8,
-            '37': 51.8,
-            '38': 51.8,
-            '39': 51.8,
-            '40': 51.9,
-            '41': 51.9,
-            '42': 51.9,
-            '43': 51.9,
-            '44': 51.9,
-            '45': 51.9,
-            '46': 51.9,
-            '47': 52,
-            '48': 52,
-            '49': 52,
-            '50': 52,
-          },
+          maxFlowRate: 48,
           aspirate: {
             default: {
               1: expect.anything(),
@@ -254,38 +206,7 @@ describe('pipette data accessors', () => {
       minVolume: 1,
       supportedTips: {
         t50: {
-          maxFlowRate: {
-            '1': 32.8,
-            '2': 41.5,
-            '3': 42.6,
-            '4': 45.5,
-            '5': 48,
-            '6': 48.7,
-            '7': 49.3,
-            '8': 49.7,
-            '9': 50,
-            '10': 50.3,
-            '11': 50.5,
-            '12': 50.7,
-            '13': 50.8,
-            '14': 50.9,
-            '15': 51,
-            '16': 51.1,
-            '17': 51.1,
-            '18': 51.2,
-            '19': 51.2,
-            '20': 51.3,
-            '21': 51.3,
-            '22': 51.4,
-            '23': 51.4,
-            '24': 51.5,
-            '25': 51.6,
-            '26': 51.6,
-            '27': 51.7,
-            '28': 51.7,
-            '29': 51.7,
-            '30': 51.7,
-          },
+          maxFlowRate: 32.8,
           aspirate: {
             default: {
               1: expect.anything(),
@@ -328,73 +249,5 @@ describe('pipette data accessors', () => {
     expect(getPipetteSpecsV2('p50_single_v3.5')?.liquids).toStrictEqual(
       mockLiquids
     )
-  })
-
-  describe('getMaxFlowRateByVolume', () => {
-    const mockMaxFlowRate: Record<string, number> = {
-      '6': 48.4,
-      '7': 48.9,
-      '8': 49.3,
-      '9': 49.6,
-      '10': 49.9,
-      '11': 50.1,
-      '12': 50.2,
-      '13': 50.4,
-      '14': 50.5,
-      '15': 50.7,
-      '16': 50.8,
-      '17': 51,
-      '18': 51,
-      '19': 51.1,
-      '20': 51.2,
-      '21': 51.3,
-      '22': 51.3,
-      '23': 51.4,
-      '24': 51.4,
-      '25': 51.5,
-      '26': 51.5,
-      '27': 51.6,
-      '28': 51.6,
-      '29': 51.7,
-      '30': 51.7,
-      '31': 51.8,
-      '32': 51.8,
-      '33': 51.8,
-      '34': 52,
-      '35': 52,
-      '36': 52,
-      '37': 52.1,
-      '38': 52.1,
-      '39': 52.1,
-      '40': 52.1,
-      '41': 52.2,
-      '42': 52.2,
-      '43': 52.1,
-      '44': 52.1,
-      '45': 52.1,
-      '46': 52.1,
-      '47': 52.2,
-      '48': 52.2,
-      '49': 52.2,
-      '50': 52.2,
-    }
-
-    for (let i = 1; i <= 50; i++) {
-      it(`renders a max flow rate for ${i}uL for p50_single_v3.3 aspirate`, () => {
-        const volume = i.toString()
-        expect(getMaxFlowRateByVolume(mockMaxFlowRate, i)).toEqual(
-          mockMaxFlowRate[volume]
-        )
-      })
-    }
-    it('returns undefined if max flow rate is undefined', () => {
-      expect(getMaxFlowRateByVolume(undefined, 5)).toEqual(undefined)
-    })
-    it('returns undefined if volume is 0', () => {
-      expect(getMaxFlowRateByVolume({} as any, undefined)).toEqual(undefined)
-    })
-    it('returns undefined if volume is out of range', () => {
-      expect(getMaxFlowRateByVolume(mockMaxFlowRate, 55)).toEqual(undefined)
-    })
   })
 })

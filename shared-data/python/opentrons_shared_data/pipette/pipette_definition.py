@@ -111,6 +111,11 @@ class SupportedTipsDefinition(BaseModel):
         description="The default volume for a push-out during dispense.",
         alias="defaultPushOutVolume",
     )
+    max_flow_rate: float = Field(
+        ...,
+        description="The max flow rate for a pipette's given supported tip.",
+        alias="maxFlowRate",
+    )
 
 
 class MotorConfigurations(BaseModel):

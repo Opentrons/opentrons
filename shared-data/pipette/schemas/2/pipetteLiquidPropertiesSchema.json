@@ -94,13 +94,8 @@
                 "items": { "$ref": "#/definitions/liquidHandlingSpecs" }
               },
               "maxFlowRate": {
-                "type": "object",
-                "description": "Optional record of each tip volume's max flow rates",
-                "patternProperties": {
-                  "^[0-9]+$": {
-                    "type": "number"
-                  }
-                }
+                "type": "string",
+                "description": "An average of each tip volume's maximum flowRate for aspirate and dispense minus 10%"
               }
             }
           }
