@@ -1,5 +1,6 @@
 import React from 'react'
 import { Flex, StyledText } from '@opentrons/components'
+
 export function App(): JSX.Element {
   return (
     <Flex>
