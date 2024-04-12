@@ -6,7 +6,7 @@ import { SidePanel as SidePanelComponent } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof SidePanelComponent> = {
-  title: 'AI/molecules/SideBar',
+  title: 'AI/molecules/SidePanel',
   component: SidePanelComponent,
   decorators: [
     Story => (
