@@ -560,6 +560,23 @@ class AddressableAreaView(HasState[AddressableAreaState]):
         )
         return cutout_fixture["height"]
 
+    def get_fixture_serial_from_deck_configuration_by_deck_slot(
+        self, slot_name: DeckSlotName
+    ) -> Optional[str]:
+        """Get the serial number provided by the deck configuration for a Fixture at a given location."""
+        deck_config = self.state.deck_configuration
+        if deck_config:
+            slot_cutout_id = DECK_SLOT_TO_CUTOUT_MAP[slot_name]
+            # This will only ever be one under current assumptions
+            for (
+                cutout_id,
+                cutout_fixture_id,
+                opentrons_module_serial_number,
+            ) in deck_config:
+                if cutout_id == slot_cutout_id:
+                    return opentrons_module_serial_number
+        return None
+
     def get_slot_definition(self, slot_id: str) -> SlotDefV3:
         """Get the definition of a slot in the deck.
 
