@@ -17,16 +17,16 @@
   },
   "errors": [
     {
-      "detail": "TypeError [line 11]: ParameterContext.add_str() got an unexpected keyword argument 'minimum'",
+      "detail": "TypeError [line 11]: ParameterContext.add_str() got an unexpected keyword argument 'unit'",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
       "wrappedErrors": [
         {
-          "detail": "TypeError: ParameterContext.add_str() got an unexpected keyword argument 'minimum'",
+          "detail": "TypeError: ParameterContext.add_str() got an unexpected keyword argument 'unit'",
           "errorCode": "4000",
           "errorInfo": {
-            "args": "(\"ParameterContext.add_str() got an unexpected keyword argument 'minimum'\",)",
+            "args": "(\"ParameterContext.add_str() got an unexpected keyword argument 'unit'\",)",
             "class": "TypeError",
             "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 80, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"v2_18_None_None_StrRTPwith_unit.py\", line 11, in add_parameters\n"
           },
