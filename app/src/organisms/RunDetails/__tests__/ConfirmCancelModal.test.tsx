@@ -11,7 +11,10 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
-import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
+import {
+  useIsFlex,
+  useTrackProtocolRunEvent,
+} from '../../../organisms/Devices/hooks'
 import { useTrackEvent } from '../../../redux/analytics'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
@@ -56,6 +59,7 @@ describe('ConfirmCancelModal', () => {
     when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
+    vi.mocked(useIsFlex).mockReturnValue(true)
 
     props = { onClose: vi.fn(), runId: RUN_ID, robotName: ROBOT_NAME }
   })
@@ -66,15 +70,20 @@ describe('ConfirmCancelModal', () => {
 
   it('should render the correct title', () => {
     render(props)
-    screen.getByText('Are you sure you want to cancel this run?')
+    screen.getByText('Are you sure you want to cancel?')
   })
-  it('should render the correct body', () => {
+  it('should render the correct body text for a Flex', () => {
+    render(props)
+    screen.getByText('Doing so will terminate this run and home your robot.')
+    screen.getByText(
+      'Additionally, any hardware modules used within the protocol will remain active and maintain their current states until deactivated.'
+    )
+  })
+  it('should render correct alternative body text for an OT-2', () => {
+    vi.mocked(useIsFlex).mockReturnValue(false)
     render(props)
     screen.getByText(
       'Doing so will terminate this run, drop any attached tips in the trash container and home your robot.'
-    )
-    screen.getByText(
-      'Additionally, any hardware modules used within the protocol will remain active and maintain their current states until deactivated.'
     )
   })
   it('should render both buttons', () => {
