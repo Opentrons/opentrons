@@ -15,7 +15,7 @@ import LOGO_PATH from '../../assets/images/opentrons_logo.svg'
 
 const IMAGE_ALT = 'Opentrons logo'
 
-export function SideBar(): JSX.Element {
+export function SidePanel(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   return (
     <Flex
@@ -33,8 +33,10 @@ export function SideBar(): JSX.Element {
 
       {/* body text */}
       <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>
-        <StyledText css={HEADER_TEXT_STYLE}>{t('sidebar_header')}</StyledText>
-        <StyledText css={BODY_TEXT_STYLE}>{t('sidebar_body')}</StyledText>
+        <StyledText css={HEADER_TEXT_STYLE}>
+          {t('side_panel_header')}
+        </StyledText>
+        <StyledText css={BODY_TEXT_STYLE}>{t('side_panel_body')}</StyledText>
       </Flex>
 
       {/* buttons */}

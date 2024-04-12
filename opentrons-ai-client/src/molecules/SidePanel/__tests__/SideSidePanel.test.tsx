@@ -5,18 +5,18 @@ import { describe, it, expect } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 
-import { SideBar } from '../index'
+import { SidePanel } from '../index'
 
 const LOGO_FILE_NAME =
   '/opentrons-ai-client/src/assets/images/opentrons_logo.svg'
 
 const render = (): ReturnType<typeof renderWithProviders> => {
-  return renderWithProviders(<SideBar />, {
+  return renderWithProviders(<SidePanel />, {
     i18nInstance: i18n,
   })
 }
 
-describe('SideBar', () => {
+describe('SidePanel', () => {
   it('should render logo and text', () => {
     render()
     const image = screen.getByRole('img')

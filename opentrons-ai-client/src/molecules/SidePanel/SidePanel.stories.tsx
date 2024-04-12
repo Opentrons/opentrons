@@ -1,13 +1,13 @@
 import React from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { i18n } from '../../i18n'
-import { SideBar as SideBarComponent } from './index'
+import { SidePanel as SidePanelComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta<typeof SideBarComponent> = {
+const meta: Meta<typeof SidePanelComponent> = {
   title: 'AI/molecules/SideBar',
-  component: SideBarComponent,
+  component: SidePanelComponent,
   decorators: [
     Story => (
       <I18nextProvider i18n={i18n}>
@@ -17,5 +17,5 @@ const meta: Meta<typeof SideBarComponent> = {
   ],
 }
 export default meta
-type Story = StoryObj<typeof SideBarComponent>
-export const SideBar: Story = {}
+type Story = StoryObj<typeof SidePanelComponent>
+export const SidePanel: Story = {}
