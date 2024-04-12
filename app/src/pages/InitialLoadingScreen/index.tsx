@@ -9,6 +9,7 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
+import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 import { getIsShellReady } from '../../redux/shell'
 
 export function InitialLoadingScreen({
@@ -18,7 +19,11 @@ export function InitialLoadingScreen({
 }): JSX.Element {
   const isShellReady = useSelector(getIsShellReady)
 
-  return isShellReady ? (
+  // ensure robot-server api is up and settings query data available for localization provider
+  const { settings } =
+    useRobotSettingsQuery({ retry: true, retryDelay: 1000 }).data ?? {}
+
+  return isShellReady && settings != null ? (
     <>{children}</>
   ) : (
     <Flex
