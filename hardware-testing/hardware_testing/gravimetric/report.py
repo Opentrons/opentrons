@@ -208,6 +208,7 @@ def create_csv_test_report(
                     CSVLine("tips_50ul", [str]),
                     CSVLine("tips_200ul", [str]),
                     CSVLine("tips_1000ul", [str]),
+                    CSVLine("cavity", [str]),
                     CSVLine("scale", [str]),
                     CSVLine("environment", [str]),
                     CSVLine("liquid", [str]),
@@ -348,6 +349,7 @@ def store_serial_numbers(
     scale: str,
     environment: str,
     liquid: str,
+    cavity: str,
 ) -> None:
     """Report serial numbers."""
     report.set_robot_id(robot)
@@ -359,6 +361,7 @@ def store_serial_numbers(
     report("SERIAL-NUMBERS", "scale", [scale])
     report("SERIAL-NUMBERS", "environment", [environment])
     report("SERIAL-NUMBERS", "liquid", [liquid])
+    report("SERIAL-NUMBERS", "cavity", [cavity])
 
 
 def store_volume_all(
