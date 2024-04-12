@@ -515,7 +515,7 @@ def test_pause(
         state_store.commands.validate_action_allowed(expected_action),
     ).then_return(expected_action)
 
-    subject.pause()
+    subject.request_pause()
 
     decoy.verify(
         action_dispatcher.dispatch(expected_action),
@@ -810,7 +810,7 @@ async def test_stop(
         state_store.commands.validate_action_allowed(expected_action),
     ).then_return(expected_action)
 
-    await subject.stop()
+    await subject.request_stop()
 
     decoy.verify(
         action_dispatcher.dispatch(expected_action),
@@ -836,7 +836,7 @@ async def test_stop_for_legacy_core_protocols(
 
     decoy.when(hardware_api.is_movement_execution_taskified()).then_return(True)
 
-    await subject.stop()
+    await subject.request_stop()
 
     decoy.verify(
         action_dispatcher.dispatch(expected_action),

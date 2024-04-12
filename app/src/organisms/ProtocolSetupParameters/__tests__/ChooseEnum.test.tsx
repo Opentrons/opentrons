@@ -52,7 +52,7 @@ describe('ChooseEnum', () => {
   })
   it('calls the prop if reset default is clicked when the default has changed', () => {
     render(props)
-    fireEvent.click(screen.getByText('Restore default values'))
+    fireEvent.click(screen.getByText('Restore default value'))
     expect(props.setParameter).toHaveBeenCalled()
   })
   it('calls does not call prop if reset default is clicked when the default has not changed', () => {
@@ -61,7 +61,7 @@ describe('ChooseEnum', () => {
       rawValue: 'none',
     }
     render(props)
-    fireEvent.click(screen.getByText('Restore default values'))
+    fireEvent.click(screen.getByText('Restore default value'))
     expect(props.setParameter).not.toHaveBeenCalled()
   })
   it('should render the text and buttons for choice param', () => {

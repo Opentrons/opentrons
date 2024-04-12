@@ -187,5 +187,6 @@ export function useRunErrors(runId: string | null): RunData['errors'] {
 
 export function useProtocolHasRunTimeParameters(runId: string | null): boolean {
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  return mostRecentAnalysis?.runTimeParameters != null
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  return runTimeParameters.length > 0
 }
