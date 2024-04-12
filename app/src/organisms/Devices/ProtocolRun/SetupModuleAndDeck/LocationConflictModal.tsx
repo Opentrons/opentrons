@@ -29,6 +29,8 @@ import {
   THERMOCYCLER_MODULE_V2,
   getCutoutFixturesForModuleModel,
   getAddressableAreaNamesFromLoadedModule,
+  getCutoutIdsFromModuleSlotName,
+  getFixtureIdByCutoutIdFromModuleSlotName,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
@@ -96,30 +98,22 @@ export const LocationConflictModal = (
 
   const handleConfigureModule = (moduleSerialNumber?: string): void => {
     if (requiredModule != null) {
-      const addressableAreas = getAddressableAreaNamesFromLoadedModule(
-        requiredModule,
-        cutoutId.replace('cutout', ''),
-        deckDef
-      )
-      const cutoutFixtures = getCutoutFixturesForModuleModel(
+      const slotName = cutoutId.replace('cutout', '')
+      const moduleFixtures = getCutoutFixturesForModuleModel(
         requiredModule,
         deckDef
       )
-      const newDeckConfig = deckConfig.map(fixture => {
-        const replacementFixture = cutoutFixtures.find(
-          cf =>
-            cf.mayMountTo.includes(fixture.cutoutId) &&
-            addressableAreas.some(aa =>
-              cf.providesAddressableAreas[cutoutId].includes(aa)
-            )
-        )
-        return cutoutId === fixture.cutoutId && replacementFixture != null
+      const moduleFixtureIdByCutoutId = getFixtureIdByCutoutIdFromModuleSlotName(slotName, moduleFixtures, deckDef)
+
+      const newDeckConfig = deckConfig.map(existingCutoutConfig => {
+        const replacementCutoutFixtureId = moduleFixtureIdByCutoutId[existingCutoutConfig.cutoutId]
+        return existingCutoutConfig.cutoutId in moduleFixtureIdByCutoutId && replacementCutoutFixtureId != null
           ? {
-              ...fixture,
-              cutoutFixtureId: replacementFixture?.id,
+              ...existingCutoutConfig,
+              cutoutFixtureId: replacementCutoutFixtureId,
               opentronsModuleSerialNumber: moduleSerialNumber,
             }
-          : fixture
+          : existingCutoutConfig
       })
       updateDeckConfiguration(newDeckConfig)
     }
