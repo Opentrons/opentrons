@@ -1,12 +1,7 @@
 import * as React from 'react'
 
-import {
-  Link,
-  LinkProps,
-  Icon,
-  TYPOGRAPHY,
-  SPACING,
-} from '@opentrons/components'
+import { Link, Icon, TYPOGRAPHY, SPACING } from '@opentrons/components'
+import type { LinkProps } from '@opentrons/components'
 
 export interface ExternalLinkProps extends LinkProps {
   href: string
