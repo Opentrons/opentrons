@@ -93,10 +93,6 @@ export const QuickTransferFlow = (): JSX.Element => {
   const [currentStep, setCurrentStep] = React.useState(1)
   const [continueIsDisabled] = React.useState<boolean>(false)
 
-  React.useEffect(() => {
-    console.log(state)
-  }, [state])
-
   // every child component will take state as a prop, an anonymous
   // dispatch function related to that step (except create new),
   // and a function to disable the continue button
@@ -143,7 +139,6 @@ export const QuickTransferFlow = (): JSX.Element => {
   }
 
   // until each page is wired up, show header title with empty screen
-
   return (
     <>
       <StepMeter
