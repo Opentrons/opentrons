@@ -278,7 +278,7 @@ def test_convert_type_string_for_num_param_raises(param_type: type) -> None:
             None,
             [{"display_name": "abc", "value": "123"}],
             int,
-            "must match type",
+            "must be of type",
         ),
         (123, 1, None, None, int, "maximum must also"),
         (123, None, 100, None, int, "minimum must also"),
@@ -286,7 +286,7 @@ def test_convert_type_string_for_num_param_raises(param_type: type) -> None:
         (123, 1.1, 100, None, int, "Minimum is type"),
         (123, 1, 100.5, None, int, "Maximum is type"),
         (123.0, "1.0", 100.0, None, float, "Minimum is type"),
-        ("blah", 1, 100, None, str, "does not support minimum or maximum"),
+        ("blah", 1, 100, None, str, "Only parameters of type float or int"),
     ],
 )
 def test_validate_options_raise_definition_error(

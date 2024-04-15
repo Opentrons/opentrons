@@ -31,11 +31,11 @@ def ensure_display_name(display_name: str) -> str:
     """Validate display name is within the character limit."""
     if not isinstance(display_name, str):
         raise ParameterNameError(
-            f"Display name must be a string and less than {DISPLAY_NAME_MAX_LEN} characters."
+            f"Display name must be a string and at most {DISPLAY_NAME_MAX_LEN} characters."
         )
     if len(display_name) > DISPLAY_NAME_MAX_LEN:
         raise ParameterNameError(
-            f"Display name {display_name} greater than {DISPLAY_NAME_MAX_LEN} characters."
+            f'Display name "{display_name}" greater than {DISPLAY_NAME_MAX_LEN} characters.'
         )
     return display_name
 
@@ -58,11 +58,11 @@ def ensure_description(description: Optional[str]) -> Optional[str]:
     if description is not None:
         if not isinstance(description, str):
             raise ParameterNameError(
-                f"Description must be a string and less than {DESCRIPTION_MAX_LEN} characters."
+                f"Description must be a string and at most {DESCRIPTION_MAX_LEN} characters."
             )
         if len(description) > DESCRIPTION_MAX_LEN:
             raise ParameterNameError(
-                f"Description {description} greater than {DESCRIPTION_MAX_LEN} characters."
+                f'Description "{description}" greater than {DESCRIPTION_MAX_LEN} characters.'
             )
     return description
 
@@ -72,11 +72,11 @@ def ensure_unit_string_length(unit: Optional[str]) -> Optional[str]:
     if unit is not None:
         if not isinstance(unit, str):
             raise ParameterNameError(
-                f"Unit must be a string and less than {UNIT_MAX_LEN} characters."
+                f"Unit must be a string and at most {UNIT_MAX_LEN} characters."
             )
         if len(unit) > UNIT_MAX_LEN:
             raise ParameterNameError(
-                f"Description {unit} greater than {UNIT_MAX_LEN} characters."
+                f'Unit "{unit}" greater than {UNIT_MAX_LEN} characters.'
             )
     return unit
 
@@ -189,7 +189,7 @@ def _validate_choices(
         ensure_display_name(display_name)
         if not isinstance(value, parameter_type):
             raise ParameterDefinitionError(
-                f"All choices provided must match type {parameter_type}"
+                f"All choices provided must be of type {parameter_type}"
             )
 
 
@@ -211,11 +211,11 @@ def _validate_min_and_max(
         if parameter_type is int or parameter_type is float:
             if not isinstance(minimum, parameter_type):
                 raise ParameterDefinitionError(
-                    f"Minimum is type {type(minimum)}, must match parameter type {parameter_type}"
+                    f"Minimum is type {type(minimum)}, but must be of parameter type {parameter_type}"
                 )
             if not isinstance(maximum, parameter_type):
                 raise ParameterDefinitionError(
-                    f"Maximum is type {type(minimum)}, must match parameter type {parameter_type}"
+                    f"Maximum is type {type(maximum)}, but must be of parameter type {parameter_type}"
                 )
             # These asserts are for the type checker and should never actually be asserted false
             assert isinstance(minimum, (int, float))
@@ -226,7 +226,7 @@ def _validate_min_and_max(
                 )
         else:
             raise ParameterDefinitionError(
-                f"Parameter of type {parameter_type} does not support minimum or maximum arguments."
+                "Only parameters of type float or int can have a minimum and maximum."
             )
 
 
@@ -234,7 +234,7 @@ def validate_type(value: ParamType, parameter_type: type) -> None:
     """Validate parameter value is the correct type."""
     if not isinstance(value, parameter_type):
         raise ParameterValueError(
-            f"Parameter value {value} has type {type(value)}, must match type {parameter_type}."
+            f"Parameter value {value} has type {type(value)}, but must be of type {parameter_type}."
         )
 
 
@@ -248,7 +248,7 @@ def validate_options(
     """Validate default values and all possible constraints for a valid parameter definition."""
     if not isinstance(default, parameter_type):
         raise ParameterValueError(
-            f"Parameter default {default} has type {type(default)}, must match type {parameter_type}."
+            f"Parameter default {default} has type {type(default)}, but must be of type {parameter_type}."
         )
 
     if choices is None and minimum is None and maximum is None:
