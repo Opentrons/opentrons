@@ -30,7 +30,7 @@ class RobotContextTracker:
         )
         self._should_track = should_track
 
-    def track(self, state: RobotContextState) -> Callable:  # type: ignore
+    def _track(self, state: RobotContextState) -> Callable:  # type: ignore
         """Decorator factory for tracking the execution duration and state of robot operations.
 
         Args:
@@ -65,6 +65,14 @@ class RobotContextTracker:
             return wrapper
 
         return inner_decorator
+
+    def track_analysis(self) -> Callable:  # type: ignore
+        """Decorator for tracking the analysis of a protocol."""
+        return self._track(RobotContextState.ANALYZING_PROTOCOL)
+
+    def track_startup(self) -> Callable:  # type: ignore
+        """Decorator for tracking the startup of the robot."""
+        return self._track(RobotContextState.STARTING_UP)
 
     def store(self) -> None:
         """Returns the stored context data and clears the storage list."""
