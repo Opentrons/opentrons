@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { Flex } from '../../primitives'
-import { StyledText } from './'
+import { StyledText } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof StyledText> = {
