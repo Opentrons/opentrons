@@ -111,14 +111,18 @@ export function AddFixtureModal({
       slotName: getCutoutDisplayName(cutoutId),
     }),
     hasExitIcon: providedFixtureOptions == null,
-    onClick: () => setShowAddFixtureModal(false),
+    onClick: () => {
+      setShowAddFixtureModal(false)
+    },
   }
 
   const modalProps: LegacyModalProps = {
     title: t('add_to_slot', {
       slotName: getCutoutDisplayName(cutoutId),
     }),
-    onClose: () => setShowAddFixtureModal(false),
+    onClose: () => {
+      setShowAddFixtureModal(false)
+    },
     closeOnOutsideClick: true,
     childrenPadding: SPACING.spacing24,
     width: '26.75rem',
@@ -314,6 +318,25 @@ export function AddFixtureModal({
     setShowAddFixtureModal(false)
   }
 
+  const fixtureOptions = availableOptions.map(cutoutConfigs => (
+    <FixtureOption
+      key={cutoutConfigs[0].cutoutFixtureId}
+      optionName={getFixtureDisplayName(
+        cutoutConfigs[0].cutoutFixtureId,
+        (modulesData?.data ?? []).find(
+          m => m.serialNumber === cutoutConfigs[0].opentronsModuleSerialNumber
+        )?.usbPort.port
+      )}
+      buttonText={t('add')}
+      onClickHandler={() => {
+        isOnDevice
+          ? handleAddODD(cutoutConfigs)
+          : handleAddDesktop(cutoutConfigs)
+      }}
+      isOnDevice={isOnDevice}
+    />
+  ))
+
   return (
     <>
       {isOnDevice ? (
@@ -328,17 +351,7 @@ export function AddFixtureModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <StyledText as="p">{t('add_to_slot_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {availableOptions.map(cutoutConfigs => (
-                <FixtureOption
-                  key={cutoutConfigs[0].cutoutFixtureId}
-                  optionName={getFixtureDisplayName(
-                    cutoutConfigs[0].cutoutFixtureId
-                  )}
-                  buttonText={t('add')}
-                  onClickHandler={() => handleAddODD(cutoutConfigs)}
-                  isOnDevice={isOnDevice}
-                />
-              ))}
+              {fixtureOptions}
               {nextStageOptions}
             </Flex>
           </Flex>
@@ -348,28 +361,15 @@ export function AddFixtureModal({
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
             <StyledText as="p">{t('add_fixture_description')}</StyledText>
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              {availableOptions.map(cutoutConfigs => (
-                <FixtureOption
-                  key={cutoutConfigs[0].cutoutFixtureId}
-                  optionName={getFixtureDisplayName(
-                    cutoutConfigs[0].cutoutFixtureId,
-                    (modulesData?.data ?? []).find(
-                      m =>
-                        m.serialNumber ===
-                        cutoutConfigs[0].opentronsModuleSerialNumber
-                    )?.usbPort.port
-                  )}
-                  buttonText={t('add')}
-                  onClickHandler={() => handleAddDesktop(cutoutConfigs)}
-                  isOnDevice={isOnDevice}
-                />
-              ))}
+              {fixtureOptions}
               {nextStageOptions}
             </Flex>
           </Flex>
           {optionStage === 'wasteChuteOptions' ? (
             <Btn
-              onClick={() => setOptionStage('fixtureOptions')}
+              onClick={() => {
+                setOptionStage('fixtureOptions')
+              }}
               aria-label="back"
               paddingX={SPACING.spacing16}
               marginTop={'1.44rem'}
@@ -430,7 +430,7 @@ interface FixtureOptionProps {
   onClickHandler: React.MouseEventHandler
   optionName: string
   buttonText: string
-  isOnDevice?: boolean
+  isOnDevice: boolean
 }
 export function FixtureOption(props: FixtureOptionProps): JSX.Element {
   const { onClickHandler, optionName, buttonText, isOnDevice } = props
