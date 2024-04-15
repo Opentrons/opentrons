@@ -184,10 +184,9 @@ export function ChooseRobotSlideout(
     {}
   )
 
-  const reducerAvailable = healthyReachableRobots.filter(
-    robot => !robotBusyStatusByName[robot.name]
+  const reducerAvailable = healthyReachableRobots.filter(robot =>
+    showIdleOnly ? !robotBusyStatusByName[robot.name] : robot
   )
-
   const reducerBusyCount = healthyReachableRobots.filter(
     robot => robotBusyStatusByName[robot.name]
   ).length
