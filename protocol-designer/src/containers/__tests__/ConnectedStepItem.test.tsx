@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { describe, it, beforeEach, vi } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { fixture96Plate, fixtureTiprack1000ul } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../__testing-utils__'
@@ -508,5 +508,4 @@ describe('ConnectedStepItem', () => {
     render(props)
     screen.getByTestId('TitledStepList_icon_alert-circle')
   })
-  //  TODO: try to test the context menu
 })
