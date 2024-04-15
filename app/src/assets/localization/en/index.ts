@@ -25,6 +25,7 @@ import robot_calibration from './robot_calibration.json'
 import robot_controls from './robot_controls.json'
 import run_details from './run_details.json'
 import top_navigation from './top_navigation.json'
+import error_recovery from './error_recovery.json'
 
 export const en = {
   shared,
@@ -54,4 +55,5 @@ export const en = {
   robot_controls,
   run_details,
   top_navigation,
+  error_recovery,
 }

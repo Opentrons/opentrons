@@ -69,7 +69,6 @@ import {
   getProtocolUsesGripper,
 } from '../../organisms/ProtocolSetupInstruments/utils'
 import {
-  useProtocolHasRunTimeParameters,
   useRunControls,
   useRunStatus,
 } from '../../organisms/RunTimeControl/hooks'
@@ -82,7 +81,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_START,
   useTrackEvent,
 } from '../../redux/analytics'
-import { getIsHeaterShakerAttached, useFeatureFlag } from '../../redux/config'
+import { getIsHeaterShakerAttached } from '../../redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { getLatestCurrentOffsets } from '../../organisms/Devices/ProtocolRun/SetupLabwarePositionCheck/utils'
 import { CloseButton, PlayButton } from './Buttons'
@@ -257,9 +256,6 @@ function PrepareToRun({
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
   const { makeSnackbar } = useToaster()
-  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
-  const hasRunTimeParameters = useProtocolHasRunTimeParameters(runId)
-  // Watch for scrolling to toggle dropshadow
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
   const observer = new IntersectionObserver(([entry]) => {
@@ -365,6 +361,12 @@ function PrepareToRun({
       incompleteInstrumentCount != null && incompleteInstrumentCount > 0,
   })
   const moduleCalibrationStatus = useModuleCalibrationStatus(robotName, runId)
+
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  const hasRunTimeParameters = runTimeParameters.length > 0
+  const hasCustomRunTimeParameters = runTimeParameters.some(
+    parameter => parameter.value !== parameter.default
+  )
 
   const [
     showConfirmCancelModal,
@@ -623,11 +625,11 @@ function PrepareToRun({
     doorStatus?.data.status === 'open' &&
     doorStatus?.data.doorRequiredClosedForProtocol
 
-  //  TODO(Jr, 3/20/24): wire up custom values
-  const hasCustomValues = false
-  const parametersDetail = hasCustomValues
-    ? t('custom_values')
-    : t('default_values')
+  const parametersDetail = hasRunTimeParameters
+    ? hasCustomRunTimeParameters
+      ? t('custom_values')
+      : t('default_values')
+    : t('no_parameters_specified')
 
   return (
     <>
@@ -730,20 +732,14 @@ function PrepareToRun({
               disabled={lpcDisabledReason != null}
               disabledReason={lpcDisabledReason}
             />
-            {enableRunTimeParametersFF ? (
-              <ProtocolSetupStep
-                onClickSetupStep={() => setSetupScreen('view only parameters')}
-                title={t('parameters')}
-                detail={t(
-                  hasRunTimeParameters
-                    ? parametersDetail
-                    : t('no_parameters_specified')
-                )}
-                subDetail={null}
-                status="general"
-                disabled={!hasRunTimeParameters}
-              />
-            ) : null}
+            <ProtocolSetupStep
+              onClickSetupStep={() => setSetupScreen('view only parameters')}
+              title={t('parameters')}
+              detail={parametersDetail}
+              subDetail={null}
+              status="general"
+              disabled={!hasRunTimeParameters}
+            />
             <ProtocolSetupStep
               onClickSetupStep={() => setSetupScreen('labware')}
               title={t('labware')}

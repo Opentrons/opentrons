@@ -1,7 +1,7 @@
-from dataclasses import asdict
+import aiohttp
 import logging
+from dataclasses import asdict
 from typing import cast, Any, Dict, List, Optional, Union
-
 from starlette import status
 from fastapi import APIRouter, Depends
 
@@ -32,7 +32,6 @@ from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import (
     get_hardware,
-    get_robot_type,
     get_robot_type_enum,
     get_ot2_hardware,
 )
@@ -64,6 +63,17 @@ log = logging.getLogger(__name__)
 router = APIRouter()
 
 
+# TODO: (ba, 2024-04-11): We should have a proper IPC mechanism to talk between
+# the servers instead of one off endpoint calls like these.
+async def set_oem_mode_request(enable):
+    """PUT request to set the OEM Mode for the system server."""
+    async with aiohttp.ClientSession() as session:
+        async with session.put(
+            "http://127.0.0.1:31950/system/oem_mode/enable", json={"enable": enable}
+        ) as resp:
+            return resp.status
+
+
 @router.post(
     path="/settings",
     summary="Change a setting",
@@ -78,10 +88,17 @@ router = APIRouter()
 async def post_settings(
     update: AdvancedSettingRequest,
     hardware: HardwareControlAPI = Depends(get_hardware),
-    robot_type: str = Depends(get_robot_type),
+    robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
 ) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
     try:
+        # send request to system server if this is the enableOEMMode setting
+        if update.id == "enableOEMMode" and robot_type == RobotTypeEnum.FLEX:
+            resp = await set_oem_mode_request(update.value)
+            if resp != 200:
+                # TODO: raise correct error here
+                raise Exception(f"Something went wrong setting OEM Mode. err: {resp}")
+
         await advanced_settings.set_adv_setting(update.id, update.value)
         hardware.hardware_feature_flags = HardwareFeatureFlags.build_from_ff()
         await hardware.set_status_bar_enabled(ff.status_bar_enabled())
@@ -104,21 +121,15 @@ async def post_settings(
     response_model_exclude_unset=True,
 )
 async def get_settings(
-    robot_type: str = Depends(get_robot_type),
+    robot_type: RobotTypeEnum = Depends(get_robot_type_enum),
 ) -> AdvancedSettingsResponse:
     """Get advanced setting (feature flags)"""
     return _create_settings_response(robot_type)
 
 
-def _create_settings_response(robot_type: str) -> AdvancedSettingsResponse:
+def _create_settings_response(robot_type: RobotTypeEnum) -> AdvancedSettingsResponse:
     """Create the feature flag settings response object"""
-    # TODO lc(8-10-2023) We should convert the robot type function to return
-    # the enum value directly.
-    if robot_type == "OT-2 Standard":
-        robot_type_enum = RobotTypeEnum.OT2
-    else:
-        robot_type_enum = RobotTypeEnum.FLEX
-    data = advanced_settings.get_all_adv_settings(robot_type_enum)
+    data = advanced_settings.get_all_adv_settings(robot_type)
 
     if advanced_settings.is_restart_required():
         links = Links(restart="/server/restart")

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
-
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import '../index.css'
 import './index.css'
 
@@ -11,7 +11,7 @@ const customDisplay = {
 // TODO (kk:04/05/2024) add debug to make debugging easy
 interface IndividualKeyProps {
   onChange: (input: string) => void
-  keyboardRef: React.MutableRefObject<null>
+  keyboardRef: React.MutableRefObject<KeyboardReactInterface | null>
   keyText: string
   debug?: boolean
 }

@@ -52,6 +52,7 @@ class ParameterContext:
             description: A description of the parameter as it will show up on the frontend.
             unit: An optional unit to be appended to the end of the integer as it shown on the frontend.
         """
+        validation.validate_variable_name_unique(variable_name, set(self._parameters))
         parameter = parameter_definition.create_int_parameter(
             display_name=display_name,
             variable_name=variable_name,
@@ -88,6 +89,7 @@ class ParameterContext:
             description: A description of the parameter as it will show up on the frontend.
             unit: An optional unit to be appended to the end of the float as it shown on the frontend.
         """
+        validation.validate_variable_name_unique(variable_name, set(self._parameters))
         parameter = parameter_definition.create_float_parameter(
             display_name=display_name,
             variable_name=variable_name,
@@ -115,6 +117,7 @@ class ParameterContext:
             default: The default value the boolean parameter will be set to. This will be used in initial analysis.
             description: A description of the parameter as it will show up on the frontend.
         """
+        validation.validate_variable_name_unique(variable_name, set(self._parameters))
         parameter = parameter_definition.create_bool_parameter(
             display_name=display_name,
             variable_name=variable_name,
@@ -145,6 +148,7 @@ class ParameterContext:
                 Mutually exclusive with minimum and maximum.
             description: A description of the parameter as it will show up on the frontend.
         """
+        validation.validate_variable_name_unique(variable_name, set(self._parameters))
         parameter = parameter_definition.create_str_parameter(
             display_name=display_name,
             variable_name=variable_name,

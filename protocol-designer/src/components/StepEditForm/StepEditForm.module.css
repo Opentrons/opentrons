@@ -269,33 +269,6 @@ and when that is implemented.
   margin: 1rem 0 2rem 14rem;
 }
 
-.engage_height_diagram {
-  width: 90%;
-  padding-top: calc(40 / 540 * 90%);
-  background-repeat: no-repeat;
-  background-size: cover;
-
-  &:hover {
-    cursor: pointer;
-  }
-}
-
-.engage_height_diagram_gen1 {
-  background-image: url('../../images/modules/engage_height_static_gen1.png');
-
-  &:hover {
-    background-image: url('../../images/modules/engage_height_animation_gen1.gif');
-  }
-}
-
-.engage_height_diagram_gen2 {
-  background-image: url('../../images/modules/engage_height_static_gen2.png');
-
-  &:hover {
-    background-image: url('../../images/modules/engage_height_animation_gen2.gif');
-  }
-}
-
 .tc_step_group {
   margin: 1rem 0;
 }

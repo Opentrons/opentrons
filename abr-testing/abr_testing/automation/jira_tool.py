@@ -5,7 +5,7 @@ from requests.auth import HTTPBasicAuth
 import json
 import webbrowser
 import argparse
-from typing import List, Tuple
+from typing import List
 
 
 class JiraTicket:
@@ -41,11 +41,12 @@ class JiraTicket:
             issue_ids.append(issue_id)
         return issue_ids
 
-    def open_issue(self, issue_key: str) -> None:
+    def open_issue(self, issue_key: str) -> str:
         """Open issue on web browser."""
         url = f"{self.url}/browse/{issue_key}"
         print(f"Opening at {url}.")
         webbrowser.open(url)
+        return url
 
     def create_ticket(
         self,
@@ -58,7 +59,7 @@ class JiraTicket:
         components: list,
         affects_versions: str,
         robot: str,
-    ) -> Tuple[str, str]:
+    ) -> str:
         """Create ticket."""
         data = {
             "fields": {
@@ -94,13 +95,15 @@ class JiraTicket:
             response_str = str(response.content)
             issue_url = response.json().get("self")
             issue_key = response.json().get("key")
+            print(f"issue key {issue_key}")
+            print(f"issue url{issue_url}")
             if issue_key is None:
                 print("Error: Could not create issue. No key returned.")
         except requests.exceptions.HTTPError:
             print(f"HTTP error occurred. Response content: {response_str}")
         except json.JSONDecodeError:
             print(f"JSON decoding error occurred. Response content: {response_str}")
-        return issue_url, issue_key
+        return issue_key
 
     def post_attachment_to_ticket(self, issue_id: str, attachment_path: str) -> None:
         """Adds attachments to ticket."""

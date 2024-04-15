@@ -1,27 +1,31 @@
 import * as React from 'react'
-import cx from 'classnames'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { FormGroup } from '@opentrons/components'
 import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import { maskField } from '../../../steplist/fieldLevel'
+import { getModuleEntities } from '../../../step-forms/selectors'
+import {
+  MAX_ENGAGE_HEIGHT_V1,
+  MAX_ENGAGE_HEIGHT_V2,
+  MIN_ENGAGE_HEIGHT_V1,
+  MIN_ENGAGE_HEIGHT_V2,
+} from '../../../constants'
 import { TextField, RadioGroupField } from '../fields'
+import type { StepFormProps } from '../types'
+
 import styles from '../StepEditForm.module.css'
 
-import { StepFormProps } from '../types'
-
-export const MagnetForm = (props: StepFormProps): JSX.Element => {
+export function MagnetForm(props: StepFormProps): JSX.Element {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getMagneticLabwareOptions
   )
+  const moduleEntities = useSelector(getModuleEntities)
   const { t } = useTranslation(['application', 'form'])
+  const { propsForFields, formData } = props
+  const { magnetAction, moduleId } = formData
 
-  const moduleEntities = useSelector(stepFormSelectors.getModuleEntities)
-  const { magnetAction, moduleId } = props.formData
-  const moduleModel = moduleId ? moduleEntities[moduleId]?.model : null
-
+  const moduleModel = moduleEntities[moduleId].model
   const moduleOption: string | null | undefined = moduleLabwareOptions[0]
     ? moduleLabwareOptions[0].name
     : 'No magnetic module'
@@ -29,12 +33,21 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
   const defaultEngageHeight = useSelector(
     uiModuleSelectors.getMagnetLabwareEngageHeight
   )
-
-  const engageHeightCaption = defaultEngageHeight
-    ? `Recommended: ${String(maskField('engageHeight', defaultEngageHeight))}`
-    : null
-
-  const { propsForFields } = props
+  const engageHeightMinMax =
+    moduleModel === MAGNETIC_MODULE_V1
+      ? t('magnet_height_caption', {
+          low: MIN_ENGAGE_HEIGHT_V1,
+          high: MAX_ENGAGE_HEIGHT_V1,
+        })
+      : t('magnet_height_caption', {
+          low: MIN_ENGAGE_HEIGHT_V2,
+          high: MAX_ENGAGE_HEIGHT_V2,
+        })
+  const engageHeightDefault =
+    defaultEngageHeight != null
+      ? t('magnet_recommended', { default: defaultEngageHeight })
+      : ''
+  const engageHeightCaption = `${engageHeightMinMax} ${engageHeightDefault}`
 
   return (
     <div className={styles.form_wrapper}>
@@ -91,18 +104,6 @@ export const MagnetForm = (props: StepFormProps): JSX.Element => {
           </FormGroup>
         )}
       </div>
-      {magnetAction === 'engage' && (
-        <div className={styles.diagram_row}>
-          <div
-            className={cx(
-              styles.engage_height_diagram,
-              moduleModel === MAGNETIC_MODULE_V1
-                ? styles.engage_height_diagram_gen1
-                : styles.engage_height_diagram_gen2
-            )}
-          />
-        </div>
-      )}
     </div>
   )
 }

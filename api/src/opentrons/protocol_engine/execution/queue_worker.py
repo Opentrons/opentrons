@@ -72,6 +72,9 @@ class QueueWorker:
                 command_id = await self._state_store.wait_for(
                     condition=self._state_store.commands.get_next_to_execute
                 )
+                # Assert for type hinting. This is valid because the wait_for() above
+                # only returns when the value is truthy.
+                assert command_id is not None
             except RunStoppedError:
                 # There are no more commands that we should execute, either because the run has
                 # completed on its own, or because a client requested it to stop.

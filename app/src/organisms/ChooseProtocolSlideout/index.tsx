@@ -2,7 +2,6 @@ import * as React from 'react'
 import first from 'lodash/first'
 import { Trans, useTranslation } from 'react-i18next'
 import { Link, NavLink, useHistory } from 'react-router-dom'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -14,7 +13,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_BLOCK,
-  DropdownOption,
   Flex,
   Icon,
   Link as LinkComponent,
@@ -30,12 +28,12 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useLogger } from '../../logger'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { appShellRequestor } from '../../redux/shell/remote'
-import { useFeatureFlag } from '../../redux/config'
 import { MultiSlideout } from '../../atoms/Slideout/MultiSlideout'
 import { Tooltip } from '../../atoms/Tooltip'
 import { ToggleButton } from '../../atoms/buttons'
@@ -47,8 +45,10 @@ import { useCreateRunFromProtocol } from '../ChooseRobotToRunProtocolSlideout/us
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { getAnalysisStatus } from '../ProtocolsLanding/utils'
+
 import type { RunTimeParameterCreateData } from '@opentrons/api-client'
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { DropdownOption } from '@opentrons/components'
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -93,7 +93,6 @@ export function ChooseProtocolSlideoutComponent(
   ] = React.useState<RunTimeParameter[]>([])
   const [currentPage, setCurrentPage] = React.useState<number>(1)
   const [hasParamError, setHasParamError] = React.useState<boolean>(false)
-  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
 
   React.useEffect(() => {
     setRunTimeParametersOverrides(
@@ -107,8 +106,7 @@ export function ChooseProtocolSlideoutComponent(
   const runTimeParametersFromAnalysis =
     selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
 
-  const hasRunTimeParameters =
-    enableRunTimeParametersFF && runTimeParametersFromAnalysis.length > 0
+  const hasRunTimeParameters = runTimeParametersFromAnalysis.length > 0
 
   const analysisStatus = getAnalysisStatus(
     false,
@@ -223,7 +221,6 @@ export function ChooseProtocolSlideoutComponent(
               setRunTimeParametersOverrides(clone)
             }}
             title={runtimeParam.displayName}
-            caption={runtimeParam.description}
             width="100%"
             dropdownType="neutral"
           />
@@ -254,7 +251,7 @@ export function ChooseProtocolSlideoutComponent(
             key={runtimeParam.variableName}
             type="number"
             units={runtimeParam.suffix}
-            placeholder={value.toString()}
+            placeholder={runtimeParam.default.toString()}
             value={value}
             title={runtimeParam.displayName}
             tooltipText={runtimeParam.description}
@@ -314,14 +311,14 @@ export function ChooseProtocolSlideoutComponent(
                 }}
                 height="0.813rem"
                 label={
-                  runtimeParam.value
+                  Boolean(runtimeParam.value)
                     ? t('protocol_details:on')
                     : t('protocol_details:off')
                 }
                 paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
               />
               <StyledText as="p">
-                {runtimeParam.value
+                {Boolean(runtimeParam.value)
                   ? t('protocol_details:on')
                   : t('protocol_details:off')}
               </StyledText>

@@ -22,7 +22,7 @@ import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { getModalPortalEl } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { useTrackProtocolRunEvent } from '../Devices/hooks'
+import { useTrackProtocolRunEvent, useIsFlex } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../redux/analytics'
 
@@ -39,8 +39,13 @@ export function ConfirmCancelModal(
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
   const runStatus = useRunStatus(runId)
+  const isFlex = useIsFlex(robotName)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const { t } = useTranslation('run_details')
+
+  const cancelRunAlertInfo = isFlex
+    ? t('cancel_run_alert_info_flex')
+    : t('cancel_run_alert_info_ot2')
 
   const cancelRun: React.MouseEventHandler<HTMLButtonElement> = (e): void => {
     e.preventDefault()
@@ -72,7 +77,7 @@ export function ConfirmCancelModal(
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText as="p" marginBottom={SPACING.spacing24}>
-          {t('cancel_run_alert_info')}
+          {cancelRunAlertInfo}
         </StyledText>
         <StyledText as="p" marginBottom={SPACING.spacing24}>
           {t('cancel_run_module_info')}

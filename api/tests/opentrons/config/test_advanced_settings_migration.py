@@ -8,7 +8,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 32
+    return 33
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -31,6 +31,7 @@ def default_file_settings() -> Dict[str, Any]:
         "estopNotRequired": None,
         "enableErrorRecoveryExperiments": None,
         "enableOEMMode": None,
+        "enablePerformanceMetrics": None,
     }
 
 
@@ -392,6 +393,18 @@ def v32_config(v31_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v33_config(v32_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v32_config.copy()
+    r.update(
+        {
+            "_version": 33,
+            "enablePerformanceMetrics": None,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -429,6 +442,7 @@ def v32_config(v31_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v30_config"),
         lazy_fixture("v31_config"),
         lazy_fixture("v32_config"),
+        lazy_fixture("v33_config"),
     ],
 )
 def old_settings(request: SubRequest) -> Dict[str, Any]:
@@ -522,4 +536,5 @@ def test_ensures_config() -> None:
         "disableOverpressureDetection": None,
         "enableErrorRecoveryExperiments": None,
         "enableOEMMode": None,
+        "enablePerformanceMetrics": None,
     }
