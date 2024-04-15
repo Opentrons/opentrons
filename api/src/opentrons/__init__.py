@@ -21,8 +21,12 @@ from opentrons.config import (
     ROBOT_FIRMWARE_DIR,
 )
 from opentrons.util import logging_config
+from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
+from opentrons.config import get_performance_metrics_data_dir
+from opentrons.config.feature_flags import enable_performance_metrics
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
+from performance_metrics import RobotContextTracker
 
 from ._version import version
 
@@ -55,6 +59,8 @@ log = logging.getLogger(__name__)
 
 SMOOTHIE_HEX_RE = re.compile("smoothie-(.*).hex")
 
+_robot_context_tracker: RobotContextTracker | None = None
+
 
 def _find_smoothie_file() -> Tuple[Path, str]:
     resources: List[Path] = []
@@ -83,7 +89,6 @@ def _get_motor_control_serial_port() -> Any:
         # TODO(mc, 2021-08-01): raise a more informative exception than
         # IndexError if a valid serial port is not found
         port = get_ports_by_name(device_name=smoothie_id)[0]
-
     log.info(f"Connecting to motor controller at port {port}")
     return port
 
@@ -137,6 +142,22 @@ async def _create_thread_manager() -> ThreadManagedHardware:
         thread_manager = ThreadManager(HardwareAPI.build_hardware_simulator)
 
     return thread_manager
+
+
+def get_robot_context_tracker() -> RobotContextTracker:
+    global _robot_context_tracker
+
+    if _robot_context_tracker:
+        return _robot_context_tracker
+    else:
+        robot_type = robot_configs.load().model
+        _robot_context_tracker = RobotContextTracker(
+            storage_dir=get_performance_metrics_data_dir(),
+            should_track=enable_performance_metrics(
+                RobotTypeEnum.robot_literal_to_enum(robot_type)
+            ),
+        )
+        return _robot_context_tracker
 
 
 async def initialize() -> ThreadManagedHardware:
