@@ -66,7 +66,7 @@ async def test_deck_slot_standardization(
         {
             "cutoutFixtureId": "temperatureModuleV2",
             "cutoutId": "cutoutD1",
-            "opentronsModuleSerialNumber": "ABC",
+            "opentronsModuleSerialNumber": "temp-1234",
         },
         {"cutoutFixtureId": "singleCenterSlot", "cutoutId": "cutoutA2"},
         {"cutoutFixtureId": "singleCenterSlot", "cutoutId": "cutoutB2"},
