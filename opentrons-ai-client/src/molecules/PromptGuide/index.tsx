@@ -77,7 +77,6 @@ export function PromptGuide(): JSX.Element {
         </ul>
       </Flex>
       <Trans
-        // css={BODY_TEXT_STYLE}
         t={t}
         i18nKey="what_if_you"
         components={{
