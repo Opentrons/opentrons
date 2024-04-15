@@ -12,6 +12,8 @@ import {
   BORDERS,
   StyledText,
   JUSTIFY_FLEX_END,
+  SPACING,
+  AlertPrimaryButton,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
@@ -19,6 +21,7 @@ import {
   useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 
+import { SmallButton } from '../../atoms/buttons'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
@@ -36,6 +39,7 @@ import {
   BLOWOUT_SUCCESS,
   CHOOSE_BLOWOUT_LOCATION,
   CHOOSE_DROP_TIP_LOCATION,
+  DROP_TIP_SPECIAL_ERROR_TYPES,
   DROP_TIP_SUCCESS,
   POSITION_AND_BLOWOUT,
   POSITION_AND_DROP_TIP,
@@ -44,13 +48,9 @@ import { BeforeBeginning } from './BeforeBeginning'
 import { ChooseLocation } from './ChooseLocation'
 import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
-import {
-  useHandleDropTipCommandErrors,
-  useDropTipErrorComponents,
-} from './utils'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 
-import type { PipetteData } from '@opentrons/api-client'
+import type { PipetteData, RunCommandError } from '@opentrons/api-client'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
   PipetteModelSpecs,
@@ -162,7 +162,7 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
     onError: () => closeFlow(),
   })
 
-  const handleCleanUpAndClose = (): void => {
+  const handleCleanUpAndClose = (homeOnExit: boolean = true): void => {
     if (hasCleanedUpAndClosed.current) return
 
     hasCleanedUpAndClosed.current = true
@@ -170,23 +170,27 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
     if (maintenanceRunData?.data.id == null) {
       closeFlow()
     } else {
-      chainRunCommands(
-        maintenanceRunData?.data.id,
-        [
-          {
-            commandType: 'home' as const,
-            params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
-          },
-        ],
-        true
-      )
-        .then(() => {
-          deleteMaintenanceRun(maintenanceRunData?.data.id)
-        })
-        .catch(error => {
-          console.error(error.message)
-          deleteMaintenanceRun(maintenanceRunData?.data.id)
-        })
+      if (homeOnExit) {
+        chainRunCommands(
+          maintenanceRunData?.data.id,
+          [
+            {
+              commandType: 'home' as const,
+              params: { axes: ['leftZ', 'rightZ', 'x', 'y'] },
+            },
+          ],
+          true
+        )
+          .then(() => {
+            deleteMaintenanceRun(maintenanceRunData?.data.id)
+          })
+          .catch(error => {
+            console.error(error.message)
+            deleteMaintenanceRun(maintenanceRunData?.data.id)
+          })
+      } else {
+        deleteMaintenanceRun(maintenanceRunData?.data.id)
+      }
     }
   }
 
@@ -219,7 +223,7 @@ interface DropTipWizardProps {
   isExiting: boolean
   setErrorDetails: (errorDetails: ErrorDetails) => void
   errorDetails: ErrorDetails | null
-  handleCleanUpAndClose: () => void
+  handleCleanUpAndClose: (homeOnError?: boolean) => void
   chainRunCommands: ReturnType<
     typeof useChainMaintenanceCommands
   >['chainRunCommands']
@@ -253,6 +257,7 @@ export const DropTipWizardComponent = (
   const [shouldDispenseLiquid, setShouldDispenseLiquid] = React.useState<
     boolean | null
   >(null)
+  const hasInitiatedExit = React.useRef(false)
 
   const isOnDevice = useSelector(getIsOnDevice)
   const setSpecificErrorDetails = useHandleDropTipCommandErrors(setErrorDetails)
@@ -269,14 +274,6 @@ export const DropTipWizardComponent = (
     showConfirmation: showConfirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(handleCleanUpAndClose, true)
-
-  const hasInitiatedExit = React.useRef(false)
-  let handleExit: () => void = () => null
-  if (!hasInitiatedExit.current) {
-    handleExit = confirmExit
-  } else if (errorDetails != null) {
-    handleExit = handleCleanUpAndClose
-  }
 
   const {
     button: errorExitBtn,
@@ -537,16 +534,20 @@ export const DropTipWizardComponent = (
     )
   }
 
+  const wizardHeaderOnExit = useWizardExitHeader({
+    isFinalStep,
+    hasInitiatedExit: hasInitiatedExit.current,
+    errorDetails,
+    confirmExit,
+    handleCleanUpAndClose,
+  })
+
   const wizardHeader = (
     <WizardHeader
       title={i18n.format(t('drop_tips'), 'capitalize')}
       currentStep={shouldDispenseLiquid != null ? currentStepIndex + 1 : null}
       totalSteps={DropTipWizardSteps.length}
-      onExit={
-        currentStepIndex === DropTipWizardSteps.length - 1
-          ? handleCleanUpAndClose
-          : handleExit
-      }
+      onExit={wizardHeaderOnExit}
     />
   )
 
@@ -574,4 +575,151 @@ export const DropTipWizardComponent = (
     ),
     getTopPortalEl()
   )
+}
+
+interface HandleDropTipCommandErrorsCbProps {
+  runCommandError?: RunCommandError
+  message?: string
+  header?: string
+  type?: RunCommandError['errorType']
+}
+
+/**
+ * @description Wraps the error state setter, updating the setter if the error should be special-cased.
+ */
+export function useHandleDropTipCommandErrors(
+  setErrorDetails: (errorDetails: ErrorDetails) => void
+): (cbProps: HandleDropTipCommandErrorsCbProps) => void {
+  const { t } = useTranslation('drop_tip_wizard')
+
+  return ({
+    runCommandError,
+    message,
+    header,
+    type,
+  }: HandleDropTipCommandErrorsCbProps) => {
+    if (
+      runCommandError?.errorType ===
+      DROP_TIP_SPECIAL_ERROR_TYPES.MUST_HOME_ERROR
+    ) {
+      const headerText = t('cant_safely_drop_tips')
+      const messageText = t('remove_the_tips_manually')
+
+      setErrorDetails({
+        header: headerText,
+        message: messageText,
+        type: DROP_TIP_SPECIAL_ERROR_TYPES.MUST_HOME_ERROR,
+      })
+    } else {
+      const messageText = message ?? ''
+      setErrorDetails({ header, message: messageText, type })
+    }
+  }
+}
+
+interface DropTipErrorComponents {
+  button: JSX.Element | null
+  subHeader: JSX.Element
+}
+
+interface UseDropTipErrorComponentsProps {
+  maintenanceRunId: string | null
+  onClose: () => void
+  errorDetails: ErrorDetails | null
+  isOnDevice: boolean
+}
+
+/**
+ * @description Returns special-cased components given error details.
+ */
+export function useDropTipErrorComponents({
+  maintenanceRunId,
+  onClose,
+  errorDetails,
+  isOnDevice,
+}: UseDropTipErrorComponentsProps): DropTipErrorComponents {
+  const { t } = useTranslation('drop_tip_wizard')
+  const { chainRunCommands } = useChainMaintenanceCommands()
+
+  const genericSubHeader = (
+    <>
+      {t('drop_tip_failed')}
+      <br />
+      {errorDetails?.message}
+    </>
+  )
+
+  const result: DropTipErrorComponents = {
+    button: null,
+    subHeader: genericSubHeader,
+  }
+
+  if (errorDetails?.type === DROP_TIP_SPECIAL_ERROR_TYPES.MUST_HOME_ERROR) {
+    const handleOnClick = (): void => {
+      if (maintenanceRunId !== null) {
+        void chainRunCommands(
+          maintenanceRunId,
+          [
+            {
+              commandType: 'home' as const,
+              params: {},
+            },
+          ],
+          true
+        )
+        onClose()
+      }
+    }
+
+    result.button = isOnDevice ? (
+      <SmallButton
+        buttonType="alert"
+        buttonText={t('confirm_removal_and_home')}
+        onClick={handleOnClick}
+        marginRight={SPACING.spacing4}
+      />
+    ) : (
+      <AlertPrimaryButton onClick={handleOnClick}>
+        {t('confirm_removal_and_home')}
+      </AlertPrimaryButton>
+    )
+
+    result.subHeader = <>{errorDetails.message}</>
+  }
+
+  return result
+}
+
+interface UseWizardExitHeaderProps {
+  isFinalStep: boolean
+  hasInitiatedExit: boolean
+  errorDetails: ErrorDetails | null
+  handleCleanUpAndClose: (homeOnError?: boolean) => void
+  confirmExit: (homeOnError?: boolean) => void
+}
+
+/**
+ * @description Determines the appropriate onClick for the wizard exit button, ensuring the exit logic can occur at
+ * most one time.
+ */
+export function useWizardExitHeader({
+  isFinalStep,
+  hasInitiatedExit,
+  errorDetails,
+  handleCleanUpAndClose,
+  confirmExit,
+}: UseWizardExitHeaderProps): () => void {
+  let handleExit: () => void = () => null
+  if (!hasInitiatedExit) {
+    if (errorDetails != null) {
+      // When an error occurs, do not home when exiting the flow via the wizard header.
+      handleExit = () => handleCleanUpAndClose(false)
+    } else if (isFinalStep) {
+      handleExit = handleCleanUpAndClose
+    } else {
+      handleExit = confirmExit
+    }
+  }
+
+  return handleExit
 }
