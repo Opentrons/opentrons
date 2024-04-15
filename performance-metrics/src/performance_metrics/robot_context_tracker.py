@@ -9,6 +9,7 @@ from time import perf_counter_ns, clock_gettime_ns, CLOCK_REALTIME
 from typing import Callable, TypeVar
 from typing_extensions import ParamSpec
 from collections import deque
+from performance_metrics.constants import PerformanceMetricsFilename
 from performance_metrics.datashapes import (
     RawContextData,
     RobotContextState,
@@ -21,10 +22,10 @@ R = TypeVar("R")
 class RobotContextTracker:
     """Tracks and stores robot context and execution duration for different operations."""
 
-    def __init__(self, storage_file_path: Path, should_track: bool = False) -> None:
+    def __init__(self, storage_dir: Path, should_track: bool = False) -> None:
         """Initializes the RobotContextTracker with an empty storage list."""
         self._storage: deque[RawContextData] = deque()
-        self._storage_file_path = storage_file_path
+        self.storage_file_path = PerformanceMetricsFilename.ROBOT_CONTEXT.get_storage_file_path(storage_dir)
         self._should_track = should_track
 
     def track(self, state: RobotContextState) -> Callable:  # type: ignore
@@ -68,8 +69,8 @@ class RobotContextTracker:
         stored_data = self._storage.copy()
         self._storage.clear()
         rows_to_write = [context_data.csv_row() for context_data in stored_data]
-        os.makedirs(self._storage_file_path.parent, exist_ok=True)
-        with open(self._storage_file_path, "a") as storage_file:
+        os.makedirs(self.storage_file_path.parent, exist_ok=True)
+        with open(self.storage_file_path, "a") as storage_file:
             writer = csv.writer(storage_file)
             writer.writerow(RawContextData.headers())
             writer.writerows(rows_to_write)
