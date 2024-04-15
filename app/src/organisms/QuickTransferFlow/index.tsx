@@ -5,6 +5,7 @@ import { Flex, StepMeter, SPACING } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { CreateNewTransfer } from './CreateNewTransfer'
+import { SelectPipette } from './SelectPipette'
 
 import type {
   QuickTransferSetupState,
@@ -13,7 +14,7 @@ import type {
 
 const QUICK_TRANSFER_WIZARD_STEPS = 8
 
-// const initialQuickTransferState: QuickTransferSetupState = {}
+const initialQuickTransferState: QuickTransferSetupState = {}
 export function reducer(
   state: QuickTransferSetupState,
   action: QuickTransferWizardAction
@@ -22,17 +23,20 @@ export function reducer(
     case 'SELECT_PIPETTE': {
       return {
         pipette: action.pipette,
+        mount: action.mount,
       }
     }
     case 'SELECT_TIP_RACK': {
       return {
         pipette: state.pipette,
+        mount: state.mount,
         tipRack: action.tipRack,
       }
     }
     case 'SET_SOURCE_LABWARE': {
       return {
         pipette: state.pipette,
+        mount: state.mount,
         tipRack: state.tipRack,
         source: action.labware,
       }
@@ -40,6 +44,7 @@ export function reducer(
     case 'SET_SOURCE_WELLS': {
       return {
         pipette: state.pipette,
+        mount: state.mount,
         tipRack: state.tipRack,
         source: state.source,
         sourceWells: action.wells,
@@ -48,6 +53,7 @@ export function reducer(
     case 'SET_DEST_LABWARE': {
       return {
         pipette: state.pipette,
+        mount: state.mount,
         tipRack: state.tipRack,
         source: state.source,
         sourceWells: state.sourceWells,
@@ -57,6 +63,7 @@ export function reducer(
     case 'SET_DEST_WELLS': {
       return {
         pipette: state.pipette,
+        mount: state.mount,
         tipRack: state.tipRack,
         source: state.source,
         sourceWells: state.sourceWells,
@@ -67,6 +74,7 @@ export function reducer(
     case 'SET_VOLUME': {
       return {
         pipette: state.pipette,
+        mount: state.mount,
         tipRack: state.tipRack,
         source: state.source,
         sourceWells: state.sourceWells,
@@ -81,9 +89,13 @@ export function reducer(
 export const QuickTransferFlow = (): JSX.Element => {
   const history = useHistory()
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
-  // const [state, dispatch] = React.useReducer(reducer, initialQuickTransferState)
+  const [state, dispatch] = React.useReducer(reducer, initialQuickTransferState)
   const [currentStep, setCurrentStep] = React.useState(1)
   const [continueIsDisabled] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    console.log(state)
+  }, [state])
 
   // every child component will take state as a prop, an anonymous
   // dispatch function related to that step (except create new),
@@ -112,6 +124,16 @@ export const QuickTransferFlow = (): JSX.Element => {
   if (currentStep === 1) {
     modalContent = (
       <CreateNewTransfer
+        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
+        exitButtonProps={exitButtonProps}
+      />
+    )
+  } else if (currentStep === 2) {
+    modalContent = (
+      <SelectPipette
+        state={state}
+        dispatch={dispatch}
+        onBack={() => setCurrentStep(prevStep => prevStep - 1)}
         onNext={() => setCurrentStep(prevStep => prevStep + 1)}
         exitButtonProps={exitButtonProps}
       />

@@ -1,5 +1,8 @@
 {
   "create_new_transfer": "Create new quick transfer",
+  "left_mount": "Left Mount",
+  "both_mounts": "Left + Right Mount",
+  "right_mount": "Right Mount",
   "select_attached_pipette": "Select attached pipette",
   "select_dest_labware": "Select destination labware",
   "select_dest_wells": "Select destination wells",
