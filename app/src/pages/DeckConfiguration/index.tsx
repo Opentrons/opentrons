@@ -21,6 +21,8 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
   SINGLE_LEFT_CUTOUTS,
   SINGLE_CENTER_SLOT_FIXTURE,
+  getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
@@ -59,6 +61,7 @@ export function DeckConfigurationEditor(): JSX.Element {
     setShowDiscardChangeModal,
   ] = React.useState<boolean>(false)
 
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
 
@@ -72,24 +75,53 @@ export function DeckConfigurationEditor(): JSX.Element {
     setShowConfigurationModal(true)
   }
 
-  const handleClickRemove = (cutoutId: CutoutId): void => {
+  const handleClickRemove = (
+    cutoutId: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ): void => {
     let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
     if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
       replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
     } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
       replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
     }
-    setCurrentDeckConfig(prevDeckConfig =>
-      prevDeckConfig.map(fixture =>
-        fixture.cutoutId === cutoutId
+
+    const fixtureGroup =
+      deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
+        ?.fixtureGroup ?? {}
+
+    let newDeckConfig = deckConfig
+    if (cutoutId in fixtureGroup) {
+      const groupMap =
+        fixtureGroup[cutoutId]?.find(group =>
+          Object.entries(group).every(([cId, cfId]) =>
+            deckConfig.find(
+              config =>
+                config.cutoutId === cId && config.cutoutFixtureId === cfId
+            )
+          )
+        ) ?? {}
+      newDeckConfig = deckConfig.map(cutoutConfig =>
+        cutoutConfig.cutoutId in groupMap
           ? {
-              ...fixture,
+              ...cutoutConfig,
               cutoutFixtureId: replacementFixtureId,
               opentronsModuleSerialNumber: undefined,
             }
-          : fixture
+          : cutoutConfig
       )
-    )
+    } else {
+      newDeckConfig = deckConfig.map(cutoutConfig =>
+        cutoutConfig.cutoutId === cutoutId
+          ? {
+              ...cutoutConfig,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
+          : cutoutConfig
+      )
+    }
+    updateDeckConfiguration(newDeckConfig)
   }
 
   const handleClickConfirm = (): void => {

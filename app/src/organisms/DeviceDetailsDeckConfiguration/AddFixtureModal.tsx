@@ -242,20 +242,6 @@ export function AddFixtureModal({
     ])
   }
 
-  const handleAddODD = (cutoutConfigs: CutoutConfig[]): void => {
-    if (setCurrentDeckConfig != null)
-      setCurrentDeckConfig(
-        (prevDeckConfig: DeckConfiguration): DeckConfiguration =>
-          prevDeckConfig.map((fixture: CutoutConfig) =>
-            fixture.cutoutId === cutoutId
-              ? { ...fixture, ...cutoutConfigs }
-              : fixture
-          )
-      )
-
-    setShowAddFixtureModal(false)
-  }
-
   let nextStageOptions = null
   if (optionStage === 'modulesOrFixtures') {
     nextStageOptions = (
@@ -299,6 +285,21 @@ export function AddFixtureModal({
         />
       </>
     )
+  }
+
+  const handleAddODD = (addedCutoutConfigs: CutoutConfig[]): void => {
+    if (setCurrentDeckConfig != null)
+      setCurrentDeckConfig(
+        (prevDeckConfig: DeckConfiguration): DeckConfiguration =>
+          prevDeckConfig.map((fixture: CutoutConfig) => {
+            const replacementCutoutConfig = addedCutoutConfigs.find(
+              c => c.cutoutId === fixture.cutoutId
+            )
+            return replacementCutoutConfig ?? fixture
+          })
+      )
+
+    setShowAddFixtureModal(false)
   }
 
   const handleAddDesktop = (addedCutoutConfigs: CutoutConfig[]): void => {
