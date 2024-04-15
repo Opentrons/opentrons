@@ -26,7 +26,7 @@ from opentrons.config import get_performance_metrics_data_dir
 from opentrons.config.feature_flags import enable_performance_metrics
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
-from performance_metrics import RobotContextTracker
+from performance_metrics import get_robot_context_tracker_singleton, RobotContextTracker
 
 from ._version import version
 
@@ -58,8 +58,6 @@ log = logging.getLogger(__name__)
 
 
 SMOOTHIE_HEX_RE = re.compile("smoothie-(.*).hex")
-
-_robot_context_tracker: RobotContextTracker | None = None
 
 
 def _find_smoothie_file() -> Tuple[Path, str]:
@@ -144,20 +142,16 @@ async def _create_thread_manager() -> ThreadManagedHardware:
     return thread_manager
 
 
-def get_robot_context_tracker() -> RobotContextTracker:
-    global _robot_context_tracker
+perf_metrics_dir: Path = get_performance_metrics_data_dir()
+should_track: bool = enable_performance_metrics(
+    RobotTypeEnum.robot_literal_to_enum(robot_configs.load().model)
+)
 
-    if _robot_context_tracker:
-        return _robot_context_tracker
-    else:
-        robot_type = robot_configs.load().model
-        _robot_context_tracker = RobotContextTracker(
-            storage_dir=get_performance_metrics_data_dir(),
-            should_track=enable_performance_metrics(
-                RobotTypeEnum.robot_literal_to_enum(robot_type)
-            ),
-        )
-        return _robot_context_tracker
+
+def get_robot_context_tracker() -> RobotContextTracker:
+    return get_robot_context_tracker_singleton(
+        storage_dir=perf_metrics_dir, should_track=should_track
+    )
 
 
 async def initialize() -> ThreadManagedHardware:
