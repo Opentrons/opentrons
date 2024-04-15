@@ -71,6 +71,12 @@ const deckConfig: CutoutConfig[] = [
   },
 ]
 
+const staticFixtures = [
+  { location: 'cutoutB2', label: 'Tip rack' },
+  { location: 'cutoutC2', label: 'Labware' },
+  { location: 'cutoutD2', label: 'Labware' },
+]
+
 export const Default = Template.bind({})
 Default.args = {
   deckConfig,
@@ -84,4 +90,13 @@ ReadOnly.args = {
   handleClickAdd: cutoutId => console.log(`add at ${cutoutId}`),
   handleClickRemove: cutoutId => console.log(`remove at ${cutoutId}`),
   readOnly: true,
+}
+
+export const ReadOnlyWithStaticFixtures = Template.bind({})
+ReadOnlyWithStaticFixtures.args = {
+  deckConfig,
+  handleClickAdd: () => {},
+  handleClickRemove: () => {},
+  readOnly: true,
+  additionalStaticFixtures: staticFixtures,
 }
