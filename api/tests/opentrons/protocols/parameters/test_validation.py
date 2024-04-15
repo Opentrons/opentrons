@@ -12,6 +12,13 @@ from opentrons.protocols.parameters.types import (
 from opentrons.protocols.parameters import validation as subject
 
 
+def test_validate_variable_name_unique() -> None:
+    """It should no-op if the name is unique and raise if it is not."""
+    subject.validate_variable_name_unique("one of a kind", {"fee", "foo", "fum"})
+    with pytest.raises(ParameterNameError):
+        subject.validate_variable_name_unique("copy", {"paste", "copy", "cut"})
+
+
 def test_ensure_display_name() -> None:
     """It should ensure the display name is within the character limit."""
     result = subject.ensure_display_name("abc")

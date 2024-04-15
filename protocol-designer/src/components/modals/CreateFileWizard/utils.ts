@@ -67,12 +67,12 @@ export const getCrashableModuleSelected = (
 
 export const MOVABLE_TRASH_CUTOUTS = [
   {
-    value: 'cutoutA1',
-    slot: 'A1',
-  },
-  {
     value: 'cutoutA3',
     slot: 'A3',
+  },
+  {
+    value: 'cutoutA1',
+    slot: 'A1',
   },
   {
     value: 'cutoutB1',
@@ -240,13 +240,6 @@ export const getTrashSlot = (values: FormState): string => {
   const wasteChuteSlot = Boolean(hasWasteChute)
     ? [WASTE_CHUTE_CUTOUT as string]
     : []
-
-  if (
-    !cutouts.includes(FLEX_TRASH_DEFAULT_SLOT) &&
-    !moduleSlots.includes('A3')
-  ) {
-    return FLEX_TRASH_DEFAULT_SLOT
-  }
 
   const unoccupiedSlot = MOVABLE_TRASH_CUTOUTS.find(
     cutout =>

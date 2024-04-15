@@ -29,12 +29,7 @@ export function ChooseEnum({
   const { makeSnackbar } = useToaster()
 
   const { t } = useTranslation(['protocol_setup', 'shared'])
-  if (parameter.type !== 'str') {
-    console.error(
-      `parameter type is expected to be a string for parameter ${parameter.displayName}`
-    )
-  }
-  const options = parameter.type === 'str' ? parameter.choices : undefined
+  const options = 'choices' in parameter ? parameter.choices : null
   const handleOnClick = (newValue: string | number | boolean): void => {
     setParameter(newValue, parameter.variableName)
   }

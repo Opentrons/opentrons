@@ -129,8 +129,6 @@ class AnalysisStore:
         Returns:
             A summary of the just-added analysis.
         """
-        # TODO (spp, 2024-03-19): cap the number of analyses being stored by
-        #  auto-deleting old ones
         new_pending_analysis = self._pending_store.add(
             protocol_id=protocol_id, analysis_id=analysis_id
         )

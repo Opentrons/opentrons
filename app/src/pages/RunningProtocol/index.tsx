@@ -25,8 +25,10 @@ import {
 import {
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  RUN_STATUS_AWAITING_RECOVERY,
 } from '@opentrons/api-client'
 
+import { useFeatureFlag } from '../../redux/config'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
@@ -51,6 +53,7 @@ import {
 } from '../../organisms/Devices/hooks'
 import { CancelingRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
+import { RunPausedSplash } from '../../organisms/OnDeviceDisplay/RunningProtocol/RunPausedSplash'
 import { getLocalRobot } from '../../redux/discovery'
 import { OpenDoorAlertModal } from '../../organisms/OpenDoorAlertModal'
 
@@ -102,6 +105,7 @@ export function RunningProtocol(): JSX.Element {
   const runStatus = useRunStatus(runId, {
     refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
   })
+  const [enableSplash, setEnableSplash] = React.useState(true)
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data.protocolId ?? null
@@ -117,6 +121,10 @@ export function RunningProtocol(): JSX.Element {
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const robotType = useRobotType(robotName)
+  const errorType = runRecord?.data.errors[0]?.errorType
+
+  const enableRunNotes = useFeatureFlag('enableRunNotes')
+
   React.useEffect(() => {
     if (
       currentOption === 'CurrentRunningProtocolCommand' &&
@@ -160,114 +168,137 @@ export function RunningProtocol(): JSX.Element {
 
   return (
     <>
-      {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
-        <OpenDoorAlertModal />
-      ) : null}
-      {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        position={POSITION_RELATIVE}
-        overflow={OVERFLOW_HIDDEN}
-      >
-        {robotSideAnalysis != null ? (
-          <StepMeter
-            totalSteps={totalIndex != null ? totalIndex : 0}
-            currentStep={
-              currentRunCommandIndex != null
-                ? Number(currentRunCommandIndex) + 1
-                : 1
-            }
-          />
-        ) : null}
-        {showConfirmCancelRunModal ? (
-          <ConfirmCancelRunModal
-            runId={runId}
-            setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
-            isActiveRun={true}
-          />
-        ) : null}
-        {interventionModalCommandKey != null &&
-        runRecord?.data != null &&
-        lastRunCommand != null &&
-        isInterventionCommand(lastRunCommand) ? (
-          <InterventionModal
-            robotName={robotName}
-            command={lastRunCommand}
-            onResume={playRun}
-            run={runRecord.data}
-            analysis={robotSideAnalysis}
-          />
-        ) : null}
-        <Flex
-          ref={swipe.ref}
-          padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
-          flexDirection={DIRECTION_COLUMN}
-        >
-          {robotSideAnalysis != null ? (
-            currentOption === 'CurrentRunningProtocolCommand' ? (
-              <CurrentRunningProtocolCommand
-                playRun={playRun}
-                pauseRun={pauseRun}
-                setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
-                trackProtocolRunEvent={trackProtocolRunEvent}
-                robotType={robotType}
-                robotAnalyticsData={robotAnalyticsData}
-                protocolName={protocolName}
-                runStatus={runStatus}
-                currentRunCommandIndex={currentRunCommandIndex}
-                robotSideAnalysis={robotSideAnalysis}
-                runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
-                lastAnimatedCommand={lastAnimatedCommand.current}
-                updateLastAnimatedCommand={(newCommandKey: string) =>
-                  (lastAnimatedCommand.current = newCommandKey)
+      {enableSplash &&
+      runStatus === RUN_STATUS_AWAITING_RECOVERY &&
+      enableRunNotes ? (
+        <RunPausedSplash
+          onClose={() => setEnableSplash(false)}
+          errorType={errorType}
+          protocolName={protocolName}
+        />
+      ) : (
+        <>
+          {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
+            <OpenDoorAlertModal />
+          ) : null}
+          {runStatus === RUN_STATUS_STOP_REQUESTED ? (
+            <CancelingRunModal />
+          ) : null}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            position={POSITION_RELATIVE}
+            overflow={OVERFLOW_HIDDEN}
+          >
+            {robotSideAnalysis != null ? (
+              <StepMeter
+                totalSteps={totalIndex != null ? totalIndex : 0}
+                currentStep={
+                  currentRunCommandIndex != null
+                    ? Number(currentRunCommandIndex) + 1
+                    : 1
                 }
               />
-            ) : (
-              <>
-                <RunningProtocolCommandList
-                  protocolName={protocolName}
-                  runStatus={runStatus}
-                  robotType={robotType}
-                  playRun={playRun}
-                  pauseRun={pauseRun}
-                  setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
-                  trackProtocolRunEvent={trackProtocolRunEvent}
-                  robotAnalyticsData={robotAnalyticsData}
-                  currentRunCommandIndex={currentRunCommandIndex}
-                  robotSideAnalysis={robotSideAnalysis}
+            ) : null}
+            {showConfirmCancelRunModal ? (
+              <ConfirmCancelRunModal
+                runId={runId}
+                setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
+                isActiveRun={true}
+              />
+            ) : null}
+            {interventionModalCommandKey != null &&
+            runRecord?.data != null &&
+            lastRunCommand != null &&
+            isInterventionCommand(lastRunCommand) ? (
+              <InterventionModal
+                robotName={robotName}
+                command={lastRunCommand}
+                onResume={playRun}
+                run={runRecord.data}
+                analysis={robotSideAnalysis}
+              />
+            ) : null}
+            <Flex
+              ref={swipe.ref}
+              padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
+              flexDirection={DIRECTION_COLUMN}
+            >
+              {robotSideAnalysis != null ? (
+                currentOption === 'CurrentRunningProtocolCommand' ? (
+                  <CurrentRunningProtocolCommand
+                    playRun={playRun}
+                    pauseRun={pauseRun}
+                    setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
+                    trackProtocolRunEvent={trackProtocolRunEvent}
+                    robotType={robotType}
+                    robotAnalyticsData={robotAnalyticsData}
+                    protocolName={protocolName}
+                    runStatus={runStatus}
+                    currentRunCommandIndex={currentRunCommandIndex}
+                    robotSideAnalysis={robotSideAnalysis}
+                    runTimerInfo={{
+                      runStatus,
+                      startedAt,
+                      stoppedAt,
+                      completedAt,
+                    }}
+                    lastAnimatedCommand={lastAnimatedCommand.current}
+                    updateLastAnimatedCommand={(newCommandKey: string) =>
+                      (lastAnimatedCommand.current = newCommandKey)
+                    }
+                  />
+                ) : (
+                  <>
+                    <RunningProtocolCommandList
+                      protocolName={protocolName}
+                      runStatus={runStatus}
+                      robotType={robotType}
+                      playRun={playRun}
+                      pauseRun={pauseRun}
+                      setShowConfirmCancelRunModal={
+                        setShowConfirmCancelRunModal
+                      }
+                      trackProtocolRunEvent={trackProtocolRunEvent}
+                      robotAnalyticsData={robotAnalyticsData}
+                      currentRunCommandIndex={currentRunCommandIndex}
+                      robotSideAnalysis={robotSideAnalysis}
+                    />
+                    <Flex
+                      css={css`
+                        background: linear-gradient(
+                          rgba(255, 0, 0, 0) 85%,
+                          #ffffff
+                        );
+                      `}
+                      position={POSITION_ABSOLUTE}
+                      height="20.25rem"
+                      width="59rem"
+                      marginTop="9.25rem"
+                      alignSelf={ALIGN_FLEX_END}
+                    />
+                  </>
+                )
+              ) : (
+                <RunningProtocolSkeleton currentOption={currentOption} />
+              )}
+              <Flex
+                marginTop={SPACING.spacing32}
+                flexDirection={DIRECTION_ROW}
+                gridGap={SPACING.spacing16}
+                justifyContent={JUSTIFY_CENTER}
+                alignItems={ALIGN_CENTER}
+              >
+                <Bullet
+                  isActive={currentOption === 'CurrentRunningProtocolCommand'}
                 />
-                <Flex
-                  css={css`
-                    background: linear-gradient(
-                      rgba(255, 0, 0, 0) 85%,
-                      #ffffff
-                    );
-                  `}
-                  position={POSITION_ABSOLUTE}
-                  height="20.25rem"
-                  width="59rem"
-                  marginTop="9.25rem"
-                  alignSelf={ALIGN_FLEX_END}
+                <Bullet
+                  isActive={currentOption === 'RunningProtocolCommandList'}
                 />
-              </>
-            )
-          ) : (
-            <RunningProtocolSkeleton currentOption={currentOption} />
-          )}
-          <Flex
-            marginTop="2rem"
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing16}
-            justifyContent={JUSTIFY_CENTER}
-            alignItems={ALIGN_CENTER}
-          >
-            <Bullet
-              isActive={currentOption === 'CurrentRunningProtocolCommand'}
-            />
-            <Bullet isActive={currentOption === 'RunningProtocolCommandList'} />
+              </Flex>
+            </Flex>
           </Flex>
-        </Flex>
-      </Flex>
+        </>
+      )}
     </>
   )
 }

@@ -21,7 +21,7 @@ import {
 import type { Dispatch } from '../../redux/types'
 
 export function ShowLabwareOffsetSnippets(): JSX.Element {
-  const { t } = useTranslation(['app_settings', 'shared'])
+  const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
@@ -47,7 +47,7 @@ export function ShowLabwareOffsetSnippets(): JSX.Element {
           {t('show_labware_offset_snippets')}
         </StyledText>
         <StyledText as="p">
-          {t('show_labware_offset_snippets_description')}
+          {t('branded:show_labware_offset_snippets_description')}
         </StyledText>
       </Box>
       <ToggleButton

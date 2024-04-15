@@ -105,7 +105,6 @@ export function ChooseProtocolSlideoutComponent(
 
   const runTimeParametersFromAnalysis =
     selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
-  console.log('runTimeParametersFromAnalysis', runTimeParametersFromAnalysis)
 
   const hasRunTimeParameters = runTimeParametersFromAnalysis.length > 0
 
@@ -222,7 +221,6 @@ export function ChooseProtocolSlideoutComponent(
               setRunTimeParametersOverrides(clone)
             }}
             title={runtimeParam.displayName}
-            caption={runtimeParam.description}
             width="100%"
             dropdownType="neutral"
           />
@@ -253,7 +251,7 @@ export function ChooseProtocolSlideoutComponent(
             key={runtimeParam.variableName}
             type="number"
             units={runtimeParam.suffix}
-            placeholder={value.toString()}
+            placeholder={runtimeParam.default.toString()}
             value={value}
             title={runtimeParam.displayName}
             tooltipText={runtimeParam.description}
@@ -313,14 +311,14 @@ export function ChooseProtocolSlideoutComponent(
                 }}
                 height="0.813rem"
                 label={
-                  runtimeParam.value
+                  Boolean(runtimeParam.value)
                     ? t('protocol_details:on')
                     : t('protocol_details:off')
                 }
                 paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
               />
               <StyledText as="p">
-                {runtimeParam.value
+                {Boolean(runtimeParam.value)
                   ? t('protocol_details:on')
                   : t('protocol_details:off')}
               </StyledText>

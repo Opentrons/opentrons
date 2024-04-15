@@ -92,13 +92,6 @@ if __name__ == "__main__":
         help="Path to long term storage directory for run logs.",
     )
     parser.add_argument(
-        "robot_ip",
-        metavar="ROBOT_IP",
-        type=str,
-        nargs=1,
-        help="IP address of robot as string.",
-    )
-    parser.add_argument(
         "jira_api_token",
         metavar="JIRA_API_TOKEN",
         type=str,
@@ -130,14 +123,18 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
-    ip = args.robot_ip[0]
+    ip = str(input("Enter Robot IP: "))
     url = "https://opentrons.atlassian.net"
     api_token = args.jira_api_token[0]
     email = args.email[0]
     board_id = args.board_id[0]
     reporter_id = args.reporter_id[0]
     ticket = jira_tool.JiraTicket(url, api_token, email)
-    error_runs = get_error_runs_from_robot(ip)
+    try:
+        error_runs = get_error_runs_from_robot(ip)
+    except requests.exceptions.InvalidURL:
+        print("Invalid IP address.")
+        sys.exit()
     one_run = error_runs[-1]  # Most recent run with error.
     (
         summary,
@@ -147,7 +144,7 @@ if __name__ == "__main__":
         whole_description_str,
         run_log_file_path,
     ) = get_error_info_from_robot(ip, one_run, storage_directory)
-    # get calibration data
+    # Get Calibration Data
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
     )
@@ -156,6 +153,7 @@ if __name__ == "__main__":
     # TODO: make argument or see if I can get rid of with using board_id.
     project_key = "RABR"
     parent_key = project_key + "-" + robot[-1]
+    # TODO: read board to see if ticket for run id already exists.
     # CREATE TICKET
     issue_key = ticket.create_ticket(
         summary,
@@ -172,7 +170,7 @@ if __name__ == "__main__":
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
     error_files = [saved_file_path_calibration, run_log_file_path] + file_paths
-    error_folder_path = os.path.join(storage_directory, str("RABR-238"))
+    error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
     for source_file in error_files:
         destination_file = os.path.join(
