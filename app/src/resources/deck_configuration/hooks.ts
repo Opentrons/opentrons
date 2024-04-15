@@ -90,8 +90,7 @@ export function useDeckConfigurationCompatibility(
           cutoutId,
           cutoutFixtureId,
           requiredAddressableAreas: requiredAddressableAreasForCutoutId,
-          // Thermocycler requires an "empty" (single slot) fixture in A1 that is not referenced directly in protocol
-          compatibleCutoutFixtureIds: compatibleCutoutFixtureIds,
+          compatibleCutoutFixtureIds,
           missingLabwareDisplayName,
         },
       ]

@@ -79,6 +79,7 @@ export const ModuleWizardFlows = (
   const moduleCutoutConfig = deckConfig.find(cc => (
     cc.opentronsModuleSerialNumber === attachedModule.serialNumber
   ))
+  // mapping of cutoutId's occupied by the target module and their cutoutFixtureId's per cutout
   const fixtureIdByCutoutId = moduleCutoutConfig != null ? getFixtureIdByCutoutIdFromModuleSlotName(
     moduleCutoutConfig.cutoutId.replace('cutout', ''),
     getCutoutFixturesForModuleModel(attachedModule.moduleModel, deckDef),
@@ -330,7 +331,9 @@ export const ModuleWizardFlows = (
       <AttachProbe
         {...currentStep}
         {...calibrateBaseProps}
+        deckConfig={deckConfig}
         adapterId={createdAdapterId}
+        fixtureIdByCutoutId={fixtureIdByCutoutId}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {

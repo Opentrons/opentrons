@@ -23,6 +23,7 @@ import {
   HEATERSHAKER_MODULE_MODELS,
   TEMPERATURE_MODULE_MODELS,
   THERMOCYCLER_MODULE_MODELS,
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
 } from '@opentrons/shared-data'
 
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -60,9 +61,10 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
   } = props
   const { t } = useTranslation('module_wizard_flows')
   const mount = attachedPipette.mount
-  const slotName = deckConfig.find(cc => (
+  const cutoutId = deckConfig.find(cc => (
     cc.opentronsModuleSerialNumber === attachedModule.serialNumber
-  ))?.cutoutId?.replace('cutout', '') ?? null
+  ))?.cutoutId
+  const slotName = cutoutId != null ? FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutId] : null
   const handleOnClick = (): void => {
     const calibrationAdapterLoadName = getCalibrationAdapterLoadName(
       attachedModule.moduleModel
