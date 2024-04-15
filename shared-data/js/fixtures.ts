@@ -185,7 +185,7 @@ export function getFixtureIdByCutoutIdFromModuleSlotName(
   )
   if (anchorCutoutId != null && anchorFixture != null) {
     const groupedFixtures = anchorFixture.fixtureGroup[anchorCutoutId]
-    return groupedFixtures?.[0] ?? {[anchorCutoutId]: anchorFixture}
+    return groupedFixtures?.[0] ?? {[anchorCutoutId]: anchorFixture.id}
   }
   return {}
 }
