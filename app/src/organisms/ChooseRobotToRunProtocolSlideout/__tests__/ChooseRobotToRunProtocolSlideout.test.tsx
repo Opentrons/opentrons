@@ -390,4 +390,17 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       {}
     )
   })
+
+  it('disables proceed button if no available robots', () => {
+    vi.mocked(getConnectableRobots).mockReturnValue([])
+    render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: vi.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Continue to parameters',
+    })
+    expect(proceedButton).toBeDisabled()
+  })
 })

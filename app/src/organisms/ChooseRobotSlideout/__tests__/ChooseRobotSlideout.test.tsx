@@ -296,4 +296,18 @@ describe('ChooseRobotSlideout', () => {
       ip: 'otherIp',
     })
   })
+
+  it('sets selected robot to null if no available robots', () => {
+    vi.mocked(getConnectableRobots).mockReturnValue([])
+    render({
+      onCloseClick: vi.fn(),
+      isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
+      selectedRobot: null,
+      setSelectedRobot: mockSetSelectedRobot,
+      title: 'choose robot slideout title',
+      robotType: OT2_ROBOT_TYPE,
+    })
+    expect(mockSetSelectedRobot).toBeCalledWith(null)
+  })
 })
