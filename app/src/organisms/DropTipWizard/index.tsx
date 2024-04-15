@@ -11,6 +11,7 @@ import {
   COLORS,
   BORDERS,
   StyledText,
+  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
@@ -43,6 +44,11 @@ import { BeforeBeginning } from './BeforeBeginning'
 import { ChooseLocation } from './ChooseLocation'
 import { JogToPosition } from './JogToPosition'
 import { Success } from './Success'
+import {
+  useHandleDropTipCommandErrors,
+  useDropTipErrorComponents,
+} from './utils'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
@@ -62,7 +68,7 @@ const MANAGED_PIPETTE_ID = 'managedPipetteId'
 export interface ErrorDetails {
   message: string
   header?: string
-  code?: string
+  type?: string
 }
 
 interface MaintenanceRunManagerProps {
@@ -242,13 +248,15 @@ export const DropTipWizardComponent = (
     instrumentModelSpecs,
     deckConfig,
   } = props
-  const isOnDevice = useSelector(getIsOnDevice)
   const { t, i18n } = useTranslation('drop_tip_wizard')
-
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const [shouldDispenseLiquid, setShouldDispenseLiquid] = React.useState<
     boolean | null
   >(null)
+
+  const isOnDevice = useSelector(getIsOnDevice)
+  const setSpecificErrorDetails = useHandleDropTipCommandErrors(setErrorDetails)
+
   const DropTipWizardSteps = getDropTipWizardSteps(shouldDispenseLiquid)
   const currentStep =
     shouldDispenseLiquid != null
@@ -256,10 +264,34 @@ export const DropTipWizardComponent = (
       : null
   const isFinalStep = currentStepIndex === DropTipWizardSteps.length - 1
 
+  const {
+    confirm: confirmExit,
+    showConfirmation: showConfirmExit,
+    cancel: cancelExit,
+  } = useConditionalConfirm(handleCleanUpAndClose, true)
+
+  const hasInitiatedExit = React.useRef(false)
+  let handleExit: () => void = () => null
+  if (!hasInitiatedExit.current) {
+    handleExit = confirmExit
+  } else if (errorDetails != null) {
+    handleExit = handleCleanUpAndClose
+  }
+
+  const {
+    button: errorExitBtn,
+    subHeader: errorSubHeader,
+  } = useDropTipErrorComponents({
+    maintenanceRunId: createdMaintenanceRunId,
+    onClose: handleCleanUpAndClose,
+    errorDetails,
+    isOnDevice,
+  })
+
   React.useEffect(() => {
     if (createdMaintenanceRunId == null) {
       createMaintenanceRun({}).catch((e: Error) => {
-        setErrorDetails({
+        setSpecificErrorDetails({
           message: `Error creating maintenance run: ${e.message}`,
         })
       })
@@ -291,19 +323,12 @@ export const DropTipWizardComponent = (
         waitUntilComplete: true,
         timeout: JOG_COMMAND_TIMEOUT_MS,
       }).catch((e: Error) => {
-        // TOME: Should probably put the new hook here as well.
-        setErrorDetails({
+        setSpecificErrorDetails({
           message: `Error issuing jog command: ${e.message}`,
         })
       })
     }
   }
-
-  const {
-    confirm: confirmExit,
-    showConfirmation: showConfirmExit,
-    cancel: cancelExit,
-  } = useConditionalConfirm(handleCleanUpAndClose, true)
 
   const moveToAddressableArea = (
     addressableArea: AddressableAreaName
@@ -339,16 +364,15 @@ export const DropTipWizardComponent = (
       ).then(commandData => {
         const error = commandData[0].data.error
         if (error != null) {
-          // TOME: Hook goes here
-          console.log('=>(index.tsx:328) error', error)
-          setErrorDetails({
+          setSpecificErrorDetails({
+            runCommandError: error,
             message: `Error moving to position: ${error.detail}`,
           })
         }
         return null
       })
     } else {
-      setErrorDetails({
+      setSpecificErrorDetails({
         message: `Error moving to position: invalid addressable area.`,
       })
       return Promise.resolve(null)
@@ -356,7 +380,9 @@ export const DropTipWizardComponent = (
   }
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
-  if (showConfirmExit) {
+  if (isRobotMoving) {
+    modalContent = <InProgressModal description={t('stand_back_exiting')} />
+  } else if (showConfirmExit) {
     modalContent = (
       <ExitConfirmation
         handleGoBack={cancelExit}
@@ -364,25 +390,19 @@ export const DropTipWizardComponent = (
           hasInitiatedExit.current = true
           confirmExit()
         }}
-        isRobotMoving={isRobotMoving}
       />
     )
   } else if (errorDetails != null) {
-    // TOME: This is really what changes. Conditionally store/render the header and message.
-    //  I think you add the button as a child and it just works.
     modalContent = (
       <SimpleWizardBody
         isSuccess={false}
         iconColor={COLORS.red50}
         header={errorDetails.header ?? t('error_dropping_tips')}
-        subHeader={
-          <>
-            {t('drop_tip_failed')}
-            <br />
-            {errorDetails.message}
-          </>
-        }
-      />
+        subHeader={errorSubHeader}
+        justifyContentForOddButton={JUSTIFY_FLEX_END}
+      >
+        {errorExitBtn}
+      </SimpleWizardBody>
     )
   } else if (shouldDispenseLiquid == null) {
     modalContent = (
@@ -430,9 +450,8 @@ export const DropTipWizardComponent = (
           />
         }
         moveToAddressableArea={moveToAddressableArea}
-        isRobotMoving={isRobotMoving}
         isOnDevice={isOnDevice}
-        setErrorDetails={setErrorDetails}
+        setErrorDetails={setSpecificErrorDetails}
       />
     )
   } else if (
@@ -466,13 +485,14 @@ export const DropTipWizardComponent = (
               .then(commandData => {
                 const error = commandData[0].data.error
                 if (error != null) {
-                  setErrorDetails({
+                  setSpecificErrorDetails({
+                    runCommandError: error,
                     message: `Error moving to position: ${error.detail}`,
                   })
                 } else proceed()
               })
               .catch(e =>
-                setErrorDetails({
+                setSpecificErrorDetails({
                   message: `Error issuing ${
                     currentStep === POSITION_AND_BLOWOUT
                       ? 'blowout'
@@ -482,7 +502,6 @@ export const DropTipWizardComponent = (
               )
           }
         }}
-        isRobotMoving={isRobotMoving}
         handleGoBack={goBack}
         body={
           currentStep === POSITION_AND_BLOWOUT
@@ -517,11 +536,6 @@ export const DropTipWizardComponent = (
       />
     )
   }
-
-  const hasInitiatedExit = React.useRef(false)
-  let handleExit: () => void = () => null
-  if (!hasInitiatedExit.current) handleExit = confirmExit
-  else if (errorDetails != null) handleExit = handleCleanUpAndClose
 
   const wizardHeader = (
     <WizardHeader

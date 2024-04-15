@@ -22,7 +22,6 @@ import {
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 
 import type { CommandData } from '@opentrons/api-client'
@@ -40,7 +39,6 @@ interface ChooseLocationProps {
   moveToAddressableArea: (
     addressableArea: AddressableAreaName
   ) => Promise<CommandData | null>
-  isRobotMoving: boolean
   isOnDevice: boolean
   setErrorDetails: (errorDetails: ErrorDetails) => void
 }
@@ -55,7 +53,6 @@ export const ChooseLocation = (
     body,
     robotType,
     moveToAddressableArea,
-    isRobotMoving,
     isOnDevice,
     setErrorDetails,
   } = props
@@ -75,10 +72,6 @@ export const ChooseLocation = (
         .then(() => handleProceed())
         .catch(e => setErrorDetails({ message: `${e.message}` }))
     }
-  }
-
-  if (isRobotMoving) {
-    return <InProgressModal description={t('stand_back_exiting')} />
   }
 
   if (isOnDevice) {
