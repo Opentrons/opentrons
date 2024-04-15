@@ -255,7 +255,6 @@ def test_python_error_line_numbers(
 
 def test_tracking_of_analyis_with_robot_context_tracker(tmp_path: Path) -> None:
     """Test that the RobotContextTracker tracks analysis."""
-
     protocol_source = textwrap.dedent(
         """
         requirements = {"apiLevel": "2.15"}
