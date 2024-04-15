@@ -1,19 +1,14 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   getModuleDisplayName,
-  CutoutConfig,
-  DeckConfiguration,
   THERMOCYCLER_MODULE_TYPE,
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
-  CutoutFixtureId,
-  CutoutId,
   getCutoutIdsFromModuleSlotName,
-  getCutoutFixtureIdsForModuleModel,
   getCutoutFixturesForModuleModel,
-  ModuleLocation,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_CENTER_CUTOUTS,
   SINGLE_LEFT_SLOT_FIXTURE,
@@ -31,7 +26,13 @@ import {
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import type { ModuleCalibrationWizardStepProps } from './types'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+import type {
+  CutoutConfig,
+  DeckConfiguration,
+  CutoutFixtureId,
+  CutoutId,
+  ModuleLocation,
+} from '@opentrons/shared-data'
 
 export const BODY_STYLE = css`
   ${TYPOGRAPHY.pRegular};
@@ -65,9 +66,9 @@ export const SelectLocation = (
   }
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const cutoutConfig = deckConfig.find(cc => (
-    cc.opentronsModuleSerialNumber === attachedModule.serialNumber
-  ))
+  const cutoutConfig = deckConfig.find(
+    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
+  )
   const bodyText = (
     <>
       <StyledText css={BODY_STYLE}>
@@ -80,24 +81,42 @@ export const SelectLocation = (
   )
 
   const handleSetLocation = (loc: ModuleLocation): void => {
-    const moduleFixtures = getCutoutFixturesForModuleModel(attachedModule.moduleModel, deckDef)
-    const selectedCutoutIds = getCutoutIdsFromModuleSlotName(loc.slotName, moduleFixtures, deckDef)
-    if (selectedCutoutIds.every(selectedCutoutId => !(selectedCutoutId in fixtureIdByCutoutId))) {
+    const moduleFixtures = getCutoutFixturesForModuleModel(
+      attachedModule.moduleModel,
+      deckDef
+    )
+    const selectedCutoutIds = getCutoutIdsFromModuleSlotName(
+      loc.slotName,
+      moduleFixtures,
+      deckDef
+    )
+    if (
+      selectedCutoutIds.every(
+        selectedCutoutId => !(selectedCutoutId in fixtureIdByCutoutId)
+      )
+    ) {
       updateDeckConfiguration(
         deckConfig.map(cc => {
-          if (cc.cutoutId in fixtureIdByCutoutId) { 
+          if (cc.cutoutId in fixtureIdByCutoutId) {
             let replacementFixtureId: CutoutFixtureId = SINGLE_LEFT_SLOT_FIXTURE
-            if (SINGLE_CENTER_CUTOUTS.includes(cc.cutoutId)){
+            if (SINGLE_CENTER_CUTOUTS.includes(cc.cutoutId)) {
               replacementFixtureId = SINGLE_CENTER_SLOT_FIXTURE
             } else if (SINGLE_RIGHT_CUTOUTS.includes(cc.cutoutId)) {
               replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
             }
-            return {...cc, cutoutFixtureId: replacementFixtureId, opentronsModuleSerialNumber: undefined }
-          } else if (selectedCutoutIds.includes(cc.cutoutId)){
             return {
-              ...cc, 
-              cutoutFixtureId: Object.values(fixtureIdByCutoutId)[0] ?? moduleFixtures[0]?.id ?? cc.cutoutFixtureId,
-              opentronsModuleSerialNumber: attachedModule.serialNumber
+              ...cc,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
+          } else if (selectedCutoutIds.includes(cc.cutoutId)) {
+            return {
+              ...cc,
+              cutoutFixtureId:
+                Object.values(fixtureIdByCutoutId)[0] ??
+                moduleFixtures[0]?.id ??
+                cc.cutoutFixtureId,
+              opentronsModuleSerialNumber: attachedModule.serialNumber,
             }
           } else {
             return cc
@@ -110,10 +129,11 @@ export const SelectLocation = (
     <GenericWizardTile
       header={t('select_location')}
       rightHandBody={
-
         <DeckLocationSelect
           deckDef={deckDef}
-          selectedLocation={{ slotName: cutoutConfig?.cutoutId.replace('cutout', '') ?? '' }}
+          selectedLocation={{
+            slotName: cutoutConfig?.cutoutId.replace('cutout', '') ?? '',
+          }}
           setSelectedLocation={handleSetLocation}
           availableSlotNames={availableSlotNames}
           occupiedCutouts={occupiedCutouts}
@@ -122,11 +142,6 @@ export const SelectLocation = (
           }
           showTooltipOnDisabled={true}
         />
-
-
-
-
-
       }
       bodyText={bodyText}
       proceedButtonText={t('confirm_location')}

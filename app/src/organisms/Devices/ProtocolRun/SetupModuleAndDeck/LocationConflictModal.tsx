@@ -28,8 +28,6 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
   getCutoutFixturesForModuleModel,
-  getAddressableAreaNamesFromLoadedModule,
-  getCutoutIdsFromModuleSlotName,
   getFixtureIdByCutoutIdFromModuleSlotName,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
@@ -103,11 +101,17 @@ export const LocationConflictModal = (
         requiredModule,
         deckDef
       )
-      const moduleFixtureIdByCutoutId = getFixtureIdByCutoutIdFromModuleSlotName(slotName, moduleFixtures, deckDef)
+      const moduleFixtureIdByCutoutId = getFixtureIdByCutoutIdFromModuleSlotName(
+        slotName,
+        moduleFixtures,
+        deckDef
+      )
 
       const newDeckConfig = deckConfig.map(existingCutoutConfig => {
-        const replacementCutoutFixtureId = moduleFixtureIdByCutoutId[existingCutoutConfig.cutoutId]
-        return existingCutoutConfig.cutoutId in moduleFixtureIdByCutoutId && replacementCutoutFixtureId != null
+        const replacementCutoutFixtureId =
+          moduleFixtureIdByCutoutId[existingCutoutConfig.cutoutId]
+        return existingCutoutConfig.cutoutId in moduleFixtureIdByCutoutId &&
+          replacementCutoutFixtureId != null
           ? {
               ...existingCutoutConfig,
               cutoutFixtureId: replacementCutoutFixtureId,

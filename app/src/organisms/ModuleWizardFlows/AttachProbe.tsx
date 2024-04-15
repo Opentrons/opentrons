@@ -14,8 +14,12 @@ import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 
-
-import type { CreateCommand, DeckConfiguration, CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  DeckConfiguration,
+  CutoutId,
+  CutoutFixtureId,
+} from '@opentrons/shared-data'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
@@ -69,8 +73,11 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       probeLocation = t('pipette_wizard_flows:ninety_six_probe_location')
       break
   }
-  const wasteChuteConflictWith96Channel = 'cutoutC3' in fixtureIdByCutoutId && attachedPipette.data.channels === 96
-  const isWasteChuteOnDeck = deckConfig.some(cc => WASTE_CHUTE_FIXTURES.includes(cc.cutoutFixtureId))
+  const wasteChuteConflictWith96Channel =
+    'cutoutC3' in fixtureIdByCutoutId && attachedPipette.data.channels === 96
+  const isWasteChuteOnDeck = deckConfig.some(cc =>
+    WASTE_CHUTE_FIXTURES.includes(cc.cutoutFixtureId)
+  )
 
   const pipetteAttachProbeVid = (
     <Flex height="13.25rem" paddingTop={SPACING.spacing4}>

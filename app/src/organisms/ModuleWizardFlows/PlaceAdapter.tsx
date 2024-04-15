@@ -61,10 +61,11 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
   } = props
   const { t } = useTranslation('module_wizard_flows')
   const mount = attachedPipette.mount
-  const cutoutId = deckConfig.find(cc => (
-    cc.opentronsModuleSerialNumber === attachedModule.serialNumber
-  ))?.cutoutId
-  const slotName = cutoutId != null ? FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutId] : null
+  const cutoutId = deckConfig.find(
+    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
+  )?.cutoutId
+  const slotName =
+    cutoutId != null ? FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutId] : null
   const handleOnClick = (): void => {
     const calibrationAdapterLoadName = getCalibrationAdapterLoadName(
       attachedModule.moduleModel
@@ -112,9 +113,15 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       },
     ]
     chainRunCommands?.(commands, false)
-      .then(() => { setCreatedAdapterId(calibrationAdapterId) })
-      .then(() => { proceed() })
-      .catch((e: Error) => { setErrorMessage(e.message) })
+      .then(() => {
+        setCreatedAdapterId(calibrationAdapterId)
+      })
+      .then(() => {
+        proceed()
+      })
+      .catch((e: Error) => {
+        setErrorMessage(e.message)
+      })
   }
 
   const moduleType = attachedModule.moduleType

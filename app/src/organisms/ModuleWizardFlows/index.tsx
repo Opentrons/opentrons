@@ -76,15 +76,18 @@ export const ModuleWizardFlows = (
   const moduleCalibrationSteps = getModuleCalibrationSteps()
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const deckConfig = useDeckConfigurationQuery().data ?? []
-  const moduleCutoutConfig = deckConfig.find(cc => (
-    cc.opentronsModuleSerialNumber === attachedModule.serialNumber
-  ))
+  const moduleCutoutConfig = deckConfig.find(
+    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
+  )
   // mapping of cutoutId's occupied by the target module and their cutoutFixtureId's per cutout
-  const fixtureIdByCutoutId = moduleCutoutConfig != null ? getFixtureIdByCutoutIdFromModuleSlotName(
-    moduleCutoutConfig.cutoutId.replace('cutout', ''),
-    getCutoutFixturesForModuleModel(attachedModule.moduleModel, deckDef),
-    deckDef
-  ) : {}
+  const fixtureIdByCutoutId =
+    moduleCutoutConfig != null
+      ? getFixtureIdByCutoutIdFromModuleSlotName(
+          moduleCutoutConfig.cutoutId.replace('cutout', ''),
+          getCutoutFixturesForModuleModel(attachedModule.moduleModel, deckDef),
+          deckDef
+        )
+      : {}
   const occupiedCutouts = deckConfig.filter(
     (cutoutConfig: CutoutConfig) =>
       !SINGLE_SLOT_FIXTURES.includes(
@@ -242,7 +245,7 @@ export const ModuleWizardFlows = (
 
   const maintenanceRunId =
     maintenanceRunData?.data.id != null &&
-      maintenanceRunData?.data.id === createdMaintenanceRunId
+    maintenanceRunData?.data.id === createdMaintenanceRunId
       ? createdMaintenanceRunId
       : undefined
   const calibrateBaseProps = {
@@ -344,7 +347,7 @@ export const ModuleWizardFlows = (
         {...currentStep}
         {...calibrateBaseProps}
         isRobotMoving={isRobotMoving}
-        proceed={isRobotMoving ? () => { } : handleCleanUpAndClose}
+        proceed={isRobotMoving ? () => {} : handleCleanUpAndClose}
       />
     )
   }

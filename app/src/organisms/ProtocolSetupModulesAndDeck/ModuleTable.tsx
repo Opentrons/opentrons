@@ -207,7 +207,9 @@ function ModuleTableItem({
         <SmallButton
           buttonCategory="rounded"
           buttonText={t('resolve')}
-          onClick={() => { setShowLocationConflictModal(true) }}
+          onClick={() => {
+            setShowLocationConflictModal(true)
+          }}
         />
       </>
     )
@@ -256,7 +258,9 @@ function ModuleTableItem({
       {showModuleWizard && module.attachedModuleMatch != null ? (
         <ModuleWizardFlows
           attachedModule={module.attachedModuleMatch}
-          closeFlow={() => { setShowModuleWizard(false) }}
+          closeFlow={() => {
+            setShowModuleWizard(false)
+          }}
           isPrepCommandLoading={isLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
@@ -265,7 +269,9 @@ function ModuleTableItem({
       ) : null}
       {showLocationConflictModal && conflictedFixture != null ? (
         <LocationConflictModal
-          onCloseClick={() => { setShowLocationConflictModal(false) }}
+          onCloseClick={() => {
+            setShowLocationConflictModal(false)
+          }}
           cutoutId={conflictedFixture.cutoutId}
           requiredModule={module.moduleDef.model}
           deckDef={deckDef}
@@ -276,12 +282,12 @@ function ModuleTableItem({
         alignItems={ALIGN_CENTER}
         backgroundColor={
           isModuleReady &&
-            module.attachedModuleMatch?.moduleOffset?.last_modified != null &&
-            conflictedFixture == null
+          module.attachedModuleMatch?.moduleOffset?.last_modified != null &&
+          conflictedFixture == null
             ? COLORS.green35
             : isNonConnectingModule && conflictedFixture == null
-              ? COLORS.grey35
-              : COLORS.yellow35
+            ? COLORS.grey35
+            : COLORS.yellow35
         }
         borderRadius={BORDERS.borderRadius8}
         cursor="inherit"
