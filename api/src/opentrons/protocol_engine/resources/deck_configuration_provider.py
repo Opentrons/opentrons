@@ -1,7 +1,7 @@
 """Deck configuration resource provider."""
 from typing import List, Set, Tuple
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, CutoutFixture
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, CutoutFixture
 
 from opentrons.types import DeckSlotName
 
@@ -17,11 +17,10 @@ from ..errors import (
     CutoutDoesNotExistError,
     FixtureDoesNotExistError,
     AddressableAreaDoesNotExistError,
-    FixtureDoesNotProvideAreasError,
 )
 
 
-def get_cutout_position(cutout_id: str, deck_definition: DeckDefinitionV4) -> DeckPoint:
+def get_cutout_position(cutout_id: str, deck_definition: DeckDefinitionV5) -> DeckPoint:
     """Get the base position of a cutout on the deck."""
     for cutout in deck_definition["locations"]["cutouts"]:
         if cutout_id == cutout["id"]:
@@ -32,7 +31,7 @@ def get_cutout_position(cutout_id: str, deck_definition: DeckDefinitionV4) -> De
 
 
 def get_cutout_fixture(
-    cutout_fixture_id: str, deck_definition: DeckDefinitionV4
+    cutout_fixture_id: str, deck_definition: DeckDefinitionV5
 ) -> CutoutFixture:
     """Gets cutout fixture from deck that matches the cutout fixture ID provided."""
     for cutout_fixture in deck_definition["cutoutFixtures"]:
@@ -44,20 +43,18 @@ def get_cutout_fixture(
 
 
 def get_provided_addressable_area_names(
-    cutout_fixture_id: str, cutout_id: str, deck_definition: DeckDefinitionV4
+    cutout_fixture_id: str, cutout_id: str, deck_definition: DeckDefinitionV5
 ) -> List[str]:
     """Gets a list of the addressable areas provided by the cutout fixture on the cutout."""
     cutout_fixture = get_cutout_fixture(cutout_fixture_id, deck_definition)
     try:
         return cutout_fixture["providesAddressableAreas"][cutout_id]
-    except KeyError as exception:
-        raise FixtureDoesNotProvideAreasError(
-            f"Cutout fixture {cutout_fixture['id']} does not provide addressable areas for {cutout_id}"
-        ) from exception
+    except KeyError:
+        return []
 
 
 def get_addressable_area_display_name(
-    addressable_area_name: str, deck_definition: DeckDefinitionV4
+    addressable_area_name: str, deck_definition: DeckDefinitionV5
 ) -> str:
     """Get the display name for an addressable area name."""
     for addressable_area in deck_definition["locations"]["addressableAreas"]:
@@ -69,7 +66,7 @@ def get_addressable_area_display_name(
 
 
 def get_potential_cutout_fixtures(
-    addressable_area_name: str, deck_definition: DeckDefinitionV4
+    addressable_area_name: str, deck_definition: DeckDefinitionV5
 ) -> Tuple[str, Set[PotentialCutoutFixture]]:
     """Given an addressable area name, gets the cutout ID associated with it and a set of potential fixtures."""
     potential_fixtures = []
@@ -102,7 +99,7 @@ def get_addressable_area_from_name(
     addressable_area_name: str,
     cutout_position: DeckPoint,
     base_slot: DeckSlotName,
-    deck_definition: DeckDefinitionV4,
+    deck_definition: DeckDefinitionV5,
 ) -> AddressableArea:
     """Given a name and a cutout position, get an addressable area on the deck."""
     for addressable_area in deck_definition["locations"]["addressableAreas"]:

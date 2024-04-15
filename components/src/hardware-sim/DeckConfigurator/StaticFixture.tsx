@@ -6,7 +6,7 @@ import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
   CONFIG_STYLE_READ_ONLY,
   FIXTURE_HEIGHT,
-  MIDDLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
   COLUMN_2_X_ADJUSTMENT,
 } from './constants'
@@ -41,7 +41,7 @@ export function StaticFixture(props: StaticFixtureProps): JSX.Element {
 
   return (
     <RobotCoordsForeignObject
-      width={MIDDLE_SLOT_FIXTURE_WIDTH}
+      width={COLUMN_2_SINGLE_SLOT_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
