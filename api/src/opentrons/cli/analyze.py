@@ -28,6 +28,11 @@ from opentrons.protocol_engine import (
 )
 
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons import get_robot_context_tracker
+
+from performance_metrics import RobotContextState
+
+_robot_context_tracker = get_robot_context_tracker()
 
 
 @click.command()
@@ -63,6 +68,7 @@ def _get_input_files(files_and_dirs: Sequence[Path]) -> List[Path]:
     return results
 
 
+@_robot_context_tracker.track(state=RobotContextState.ANALYZING_PROTOCOL)
 async def _analyze(
     files_and_dirs: Sequence[Path],
     json_output: Optional[AsyncPath],
