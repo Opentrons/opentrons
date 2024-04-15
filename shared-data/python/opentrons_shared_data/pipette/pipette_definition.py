@@ -112,7 +112,7 @@ class SupportedTipsDefinition(BaseModel):
         alias="defaultPushOutVolume",
     )
     max_flow_rate: float = Field(
-        ...,
+        float("inf"),  # some pipettes (GEN1, unreleased prototype models) don't have a max flow rate
         description="The max flow rate for a pipette's given supported tip.",
         alias="maxFlowRate",
     )

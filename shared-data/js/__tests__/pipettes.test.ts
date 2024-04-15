@@ -158,7 +158,7 @@ describe('pipette data accessors', () => {
       minVolume: 5,
       supportedTips: {
         t50: {
-          maxFlowRate: 48,
+          maxFlowRate: 43.2,
           aspirate: {
             default: {
               1: expect.anything(),
@@ -206,7 +206,7 @@ describe('pipette data accessors', () => {
       minVolume: 1,
       supportedTips: {
         t50: {
-          maxFlowRate: 32.8,
+          maxFlowRate: 27.2,
           aspirate: {
             default: {
               1: expect.anything(),
