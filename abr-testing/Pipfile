@@ -14,6 +14,8 @@ hardware-testing = {editable = true, path = "../hardware-testing"}
 opentrons-shared-data = {editable = true, path = "./../shared-data/python"}
 opentrons-hardware = {editable = true, path = "./../hardware", extras=['FLEX']}
 opentrons = {editable = true, path = "./../api", extras=['flex-hardware']}
+performance-metrics = { editable = true, file = "../performance-metrics" }
+
 
 [dev-packages]
 atomicwrites = "==1.4.1"
