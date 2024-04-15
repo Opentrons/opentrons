@@ -158,7 +158,7 @@ describe('pipette data accessors', () => {
       minVolume: 5,
       supportedTips: {
         t50: {
-          uiMaxFlowRate: 43.2,
+          uiMaxFlowRate: 47,
           aspirate: {
             default: {
               1: expect.anything(),
@@ -206,28 +206,28 @@ describe('pipette data accessors', () => {
       minVolume: 1,
       supportedTips: {
         t50: {
-          uiMaxFlowRate: 24.6,
+          uiMaxFlowRate: 26.7,
           aspirate: {
             default: {
               1: expect.anything(),
             },
           },
           defaultAspirateFlowRate: {
-            default: 35,
+            default: 26.7,
             valuesByApiLevel: {
-              2.14: 35,
+              2.14: 26.7,
             },
           },
           defaultBlowOutFlowRate: {
-            default: 57,
+            default: 26.7,
             valuesByApiLevel: {
-              2.14: 57,
+              2.14: 26.7,
             },
           },
           defaultDispenseFlowRate: {
-            default: 57,
+            default: 26.7,
             valuesByApiLevel: {
-              2.14: 57,
+              2.14: 26.7,
             },
           },
           defaultFlowAcceleration: 1200,
