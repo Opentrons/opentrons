@@ -531,7 +531,7 @@ class SetupCommandNotAllowedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
-class ResumeForRecoveryNotAllowedError(ProtocolEngineError):
+class ResumeFromRecoveryNotAllowedError(ProtocolEngineError):
     """Raised when attempting to resume a run from recovery that has a fixit command in the queue."""
 
     def __init__(
@@ -540,7 +540,7 @@ class ResumeForRecoveryNotAllowedError(ProtocolEngineError):
         details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build a ResumeForRecoveryNotAllowedError."""
+        """Build a ResumeFromRecoveryNotAllowedError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 

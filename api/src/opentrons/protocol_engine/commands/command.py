@@ -95,12 +95,6 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
             " If a value is not provided, one will be generated."
         ),
     )
-    failed_command_id: Optional[str] = Field(
-        None,
-        description=(
-            "FIXIT command use only. Reference of the failed command id we are trying to fix."
-        ),
-    )
 
 
 class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
@@ -164,6 +158,12 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
         description=(
             "Information not critical to the execution of the command derived from either"
             " the command's execution or the command's generation."
+        ),
+    )
+    failed_command_id: Optional[str] = Field(
+        None,
+        description=(
+            "FIXIT command use only. Reference of the failed command id we are trying to fix."
         ),
     )
 

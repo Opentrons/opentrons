@@ -552,7 +552,6 @@ action_allowed_specs: List[ActionAllowedSpec] = [
             request=cmd.HomeCreate(
                 params=cmd.HomeParams(),
                 intent=cmd.CommandIntent.FIXIT,
-                failed_command_id="command-id-2",
             ),
             request_hash=None,
             command_id="command-id",
@@ -581,7 +580,6 @@ action_allowed_specs: List[ActionAllowedSpec] = [
             request=cmd.HomeCreate(
                 params=cmd.HomeParams(),
                 intent=cmd.CommandIntent.FIXIT,
-                failed_command_id="command-id-3",
             ),
             request_hash=None,
             command_id="command-id",
@@ -609,8 +607,9 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         ),
         action=ResumeFromRecoveryAction(),
         expected_error=None,
-    )
+    ),
 ]
+
 
 @pytest.mark.parametrize(ActionAllowedSpec._fields, action_allowed_specs)
 def test_validate_action_allowed(

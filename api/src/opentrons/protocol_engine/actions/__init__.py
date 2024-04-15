@@ -27,7 +27,7 @@ from .actions import (
     DoorChangeAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
-    ResumeFromRecoveryAction
+    ResumeFromRecoveryAction,
 )
 
 __all__ = [

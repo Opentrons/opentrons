@@ -139,10 +139,10 @@ async def get_current_run_engine_from_url(
         If you are running a protocol from a file(s), then you will likely
         not need to enqueue protocol commands using this endpoint.
         
-        Fixit commands may be enqueued anytime using this endpoint.
-        These commands are intended to fix a failed command. 
-        They will be executed right after the failed command 
-        and only if the run is in a paused state.
+        Fixit commands may be enqueued while the run is `awaiting-recovery` state.
+        These commands are intended to fix a failed command.
+        They will be executed right after the failed command
+        and only if the run is in a `awaiting-recovery` state.
 
         Once enqueued, setup commands will execute immediately with priority,
         while protocol commands will wait until a `play` action is issued.
@@ -193,6 +193,12 @@ async def create_run_command(
             " the default was 30 seconds, not infinite."
         ),
     ),
+    failed_command_id: Optional[str] = Query(
+        default=None,
+        description=(
+            "FIXIT command use only. Reference of the failed command id we are trying to fix."
+        ),
+    ),
     protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
     check_estop: bool = Depends(require_estop_in_good_state),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
@@ -205,6 +211,8 @@ async def create_run_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
+        failed_command_id: FIXIT command use only.
+            Reference of the failed command id we are trying to fix.
         protocol_engine: The run's `ProtocolEngine` on which the new
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
