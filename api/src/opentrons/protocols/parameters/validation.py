@@ -216,7 +216,7 @@ def _validate_min_and_max(
                 )
             if not isinstance(maximum, parameter_type):
                 raise ParameterDefinitionError(
-                    f"Maximum is type {type(maximum).__name__},"
+                    f"Maximum is type '{type(maximum).__name__}',"
                     f" but must be of parameter type '{parameter_type.__name__}'"
                 )
             # These asserts are for the type checker and should never actually be asserted false
