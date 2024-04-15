@@ -109,7 +109,7 @@ export const QuickTransferFlow = (): JSX.Element => {
 
   const header = ORDERED_STEP_HEADERS[currentStep - 1]
   let modalContent: JSX.Element | null = null
-  if (currentStep === 0) {
+  if (currentStep === 1) {
     modalContent = (
       <CreateNewTransfer
         onNext={() => setCurrentStep(prevStep => prevStep + 1)}
@@ -159,7 +159,9 @@ export const QuickTransferFlow = (): JSX.Element => {
           />
           <Flex marginTop={SPACING.spacing80}>{modalContent}</Flex>
         </Flex>
-      ) : null}
+      ) : (
+        modalContent
+      )}
     </>
   )
 }
