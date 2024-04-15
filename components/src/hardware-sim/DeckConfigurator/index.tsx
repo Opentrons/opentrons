@@ -31,7 +31,7 @@ interface DeckConfiguratorProps {
   readOnly?: boolean
   showExpansion?: boolean
   children?: React.ReactNode
-  additionalStaticFixtures?: { location: CutoutId; label: string }[]
+  additionalStaticFixtures?: Array<{ location: CutoutId; label: string }>
 }
 
 export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
@@ -148,6 +148,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
       ))}
       {additionalStaticFixtures?.map(staticFixture => (
         <StaticFixture
+          key={staticFixture.location}
           deckDefinition={deckDef}
           label={staticFixture.label}
           fixtureLocation={staticFixture.location}

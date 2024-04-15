@@ -37,7 +37,7 @@ export function StaticFixture(props: StaticFixtureProps): JSX.Element {
    */
   const [xSlotPosition = 0, ySlotPosition = 0] = staticCutout?.position ?? []
   const y = ySlotPosition + Y_ADJUSTMENT
-  let x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
+  const x = xSlotPosition + COLUMN_2_X_ADJUSTMENT
 
   return (
     <RobotCoordsForeignObject

@@ -106,15 +106,19 @@ export const QuickTransferFlow = (): JSX.Element => {
     t('select_dest_wells'),
     t('set_transfer_volume'),
   ]
-  const ORDERED_STEP_BODY: JSX.Element[] = [
-    <CreateNewTransfer
-      onNext={() => setCurrentStep(prevStep => prevStep + 1)}
-      exitButtonProps={exitButtonProps}
-    />,
-  ]
 
   const header = ORDERED_STEP_HEADERS[currentStep - 1]
-  const wizardBody = ORDERED_STEP_BODY[currentStep - 1]
+  let modalContent: JSX.Element | null = null
+  if (currentStep === 0) {
+    modalContent = (
+      <CreateNewTransfer
+        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
+        exitButtonProps={exitButtonProps}
+      />
+    )
+  } else {
+    modalContent = null
+  }
 
   // until each page is wired up, show header title with empty screen
 
@@ -124,7 +128,7 @@ export const QuickTransferFlow = (): JSX.Element => {
         totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
         currentStep={currentStep}
       />
-      {wizardBody == null ? (
+      {modalContent == null ? (
         <Flex>
           <ChildNavigation
             header={header}
@@ -153,11 +157,9 @@ export const QuickTransferFlow = (): JSX.Element => {
             }}
             top={SPACING.spacing8}
           />
-          <Flex marginTop={SPACING.spacing80}>{wizardBody}</Flex>
+          <Flex marginTop={SPACING.spacing80}>{modalContent}</Flex>
         </Flex>
-      ) : (
-        wizardBody
-      )}
+      ) : null}
     </>
   )
 }
