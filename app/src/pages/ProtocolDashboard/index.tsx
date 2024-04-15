@@ -60,8 +60,8 @@ export function ProtocolDashboard(): JSX.Element {
   const pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinnedProtocols: ProtocolResource[] = []
 
-  // The quick transfer button is going to be moved to a new quick transfer tab
-  // before the feature is released. Because of this, we're not adding test cov
+  // TODO(sb, 4/15/24): The quick transfer button is going to be moved to a new quick transfer
+  // tab before the feature is released. Because of this, we're not adding test cov
   // for this button in ProtocolDashboard
   const enableQuickTransferFF = useFeatureFlag('enableQuickTransfer')
 

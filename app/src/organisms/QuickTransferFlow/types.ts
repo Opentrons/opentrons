@@ -15,11 +15,11 @@ export interface QuickTransferSetupState {
 export type QuickTransferWizardAction =
   | SelectPipetteAction
   | SelectTipRackAction
-  | SourceLabwareAction
-  | SourceWellsAction
-  | DestLabwareAction
-  | DestWellsAction
-  | VolumeAction
+  | SetSourceLabwareAction
+  | SetSourceWellsAction
+  | SetDestLabwareAction
+  | SetDestWellsAction
+  | SetVolumeAction
 
 interface SelectPipetteAction {
   type: typeof ACTIONS.SELECT_PIPETTE
@@ -29,23 +29,23 @@ interface SelectTipRackAction {
   type: typeof ACTIONS.SELECT_TIP_RACK
   tipRack: LabwareDefinition1
 }
-interface SourceLabwareAction {
-  type: typeof ACTIONS.SOURCE_LABWARE
+interface SetSourceLabwareAction {
+  type: typeof ACTIONS.SET_SOURCE_LABWARE
   labware: LabwareDefinition1
 }
-interface SourceWellsAction {
-  type: typeof ACTIONS.SOURCE_WELLS
+interface SetSourceWellsAction {
+  type: typeof ACTIONS.SET_SOURCE_WELLS
   wells: string[]
 }
-interface DestLabwareAction {
-  type: typeof ACTIONS.DEST_LABWARE
+interface SetDestLabwareAction {
+  type: typeof ACTIONS.SET_DEST_LABWARE
   labware: LabwareDefinition1
 }
-interface DestWellsAction {
-  type: typeof ACTIONS.DEST_WELLS
+interface SetDestWellsAction {
+  type: typeof ACTIONS.SET_DEST_WELLS
   wells: string[]
 }
-interface VolumeAction {
-  type: typeof ACTIONS.VOLUME
+interface SetVolumeAction {
+  type: typeof ACTIONS.SET_VOLUME
   volume: number
 }

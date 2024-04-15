@@ -30,14 +30,14 @@ export function reducer(
         tipRack: action.tipRack,
       }
     }
-    case 'SOURCE_LABWARE': {
+    case 'SET_SOURCE_LABWARE': {
       return {
         pipette: state.pipette,
         tipRack: state.tipRack,
         source: action.labware,
       }
     }
-    case 'SOURCE_WELLS': {
+    case 'SET_SOURCE_WELLS': {
       return {
         pipette: state.pipette,
         tipRack: state.tipRack,
@@ -45,7 +45,7 @@ export function reducer(
         sourceWells: action.wells,
       }
     }
-    case 'DEST_LABWARE': {
+    case 'SET_DEST_LABWARE': {
       return {
         pipette: state.pipette,
         tipRack: state.tipRack,
@@ -54,7 +54,7 @@ export function reducer(
         destination: action.labware,
       }
     }
-    case 'DEST_WELLS': {
+    case 'SET_DEST_WELLS': {
       return {
         pipette: state.pipette,
         tipRack: state.tipRack,
@@ -64,7 +64,7 @@ export function reducer(
         destinationWells: action.wells,
       }
     }
-    case 'VOLUME': {
+    case 'SET_VOLUME': {
       return {
         pipette: state.pipette,
         tipRack: state.tipRack,
@@ -83,9 +83,8 @@ export const QuickTransferFlow = (): JSX.Element => {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   // const [state, dispatch] = React.useReducer(reducer, initialQuickTransferState)
   const [currentStep, setCurrentStep] = React.useState(1)
-  const [wizardHeader, setWizardHeader] = React.useState<string | null>(null)
   const [continueIsDisabled] = React.useState<boolean>(false)
-  const [wizardBody, setWizardBody] = React.useState<JSX.Element>(<></>)
+
   // every child component will take state as a prop, an anonymous
   // dispatch function related to that step (except create new),
   // and a function to disable the continue button
@@ -97,38 +96,27 @@ export const QuickTransferFlow = (): JSX.Element => {
       history.push('protocols')
     },
   }
-  React.useEffect(() => {
-    if (currentStep === 1) {
-      setWizardHeader(null)
-      setWizardBody(
-        <CreateNewTransfer
-          onNext={() => setCurrentStep(prevStep => prevStep + 1)}
-          exitButtonProps={exitButtonProps}
-        />
-      )
-    } else if (currentStep === 2) {
-      setWizardHeader(t('select_attached_pipette'))
-      setWizardBody(<></>)
-    } else if (currentStep === 3) {
-      setWizardHeader(t('select_tip_rack'))
-      setWizardBody(<></>)
-    } else if (currentStep === 4) {
-      setWizardHeader(t('select_source_labware'))
-      setWizardBody(<></>)
-    } else if (currentStep === 5) {
-      setWizardHeader(t('select_source_wells'))
-      setWizardBody(<></>)
-    } else if (currentStep === 6) {
-      setWizardHeader(t('select_dest_labware'))
-      setWizardBody(<></>)
-    } else if (currentStep === 7) {
-      setWizardHeader(t('select_dest_wells'))
-      setWizardBody(<></>)
-    } else if (currentStep === 8) {
-      setWizardHeader(t('set_transfer_volume'))
-      setWizardBody(<></>)
-    }
-  }, [currentStep])
+  const ORDERED_STEP_HEADERS: string[] = [
+    t('create_new_transfer'),
+    t('select_attached_pipette'),
+    t('select_tip_rack'),
+    t('select_source_labware'),
+    t('select_source_wells'),
+    t('select_dest_labware'),
+    t('select_dest_wells'),
+    t('set_transfer_volume'),
+  ]
+  const ORDERED_STEP_BODY: JSX.Element[] = [
+    <CreateNewTransfer
+      onNext={() => setCurrentStep(prevStep => prevStep + 1)}
+      exitButtonProps={exitButtonProps}
+    />,
+  ]
+
+  const header = ORDERED_STEP_HEADERS[currentStep - 1]
+  const wizardBody = ORDERED_STEP_BODY[currentStep - 1]
+
+  // until each page is wired up, show header title with empty screen
 
   return (
     <>
@@ -136,10 +124,10 @@ export const QuickTransferFlow = (): JSX.Element => {
         totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
         currentStep={currentStep}
       />
-      {wizardHeader != null ? (
+      {wizardBody == null ? (
         <Flex>
           <ChildNavigation
-            header={wizardHeader}
+            header={header}
             onClickBack={
               currentStep === 1
                 ? undefined
