@@ -540,7 +540,7 @@ async def _main() -> None:
         if (args.trough):
             cp = CriticalPoint.TIP
             trough_loc = Point(342.02,
-                                78.0,
+                                78.0+72,
                                 home_w_tip[Axis.by_mount(mount)])
             print("Move to Trough")
             await move_to_point(hw_api, mount, trough_loc, cp)
@@ -559,7 +559,7 @@ async def _main() -> None:
         x_coord_offset = 0
         y_coord_offset = 0
         true_tip_count = 1
-        num_of_columns = args.num_of_columns
+        num_of_columns = args.num_cols
         while True:
             measurements = []
             cp = CriticalPoint.TIP
