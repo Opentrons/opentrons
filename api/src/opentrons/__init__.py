@@ -21,7 +21,7 @@ from opentrons.config import (
     ROBOT_FIRMWARE_DIR,
 )
 from opentrons.util import logging_config
-from opentrons_shared_data.robot.dev_types import RobotType, RobotTypeEnum
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from opentrons.config import get_performance_metrics_data_dir
 from opentrons.config.feature_flags import enable_performance_metrics
 from opentrons.protocols.types import ApiDeprecationError
