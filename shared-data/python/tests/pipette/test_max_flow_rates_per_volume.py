@@ -80,9 +80,9 @@ def test_max_flow_rates_per_volume(pipette: PipetteModel, action: str) -> None:
             tip_type,
             supported_tip,
         ) in liquid_properties.supported_tips.items():
-            assert supported_tip.max_flow_rate < _get_max_flow_rate_at_volume(
+            assert supported_tip.ui_max_flow_rate < _get_max_flow_rate_at_volume(
                 supported_tip.aspirate, pipette, liquid_properties.min_volume
             )
-            assert supported_tip.max_flow_rate < _get_max_flow_rate_at_volume(
+            assert supported_tip.ui_max_flow_rate < _get_max_flow_rate_at_volume(
                 supported_tip.dispense, pipette, liquid_properties.min_volume
             )

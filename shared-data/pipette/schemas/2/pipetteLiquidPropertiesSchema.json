@@ -93,9 +93,10 @@
                 "type": "array",
                 "items": { "$ref": "#/definitions/liquidHandlingSpecs" }
               },
-              "maxFlowRate": {
+              "uiMaxFlowRate": {
                 "type": "string",
-                "description": "An average of each tip volume's maximum flowRate for aspirate and dispense minus 10%"
+                "$comment": "To be used in frontend applications only since it is the limit-to-lowest-max",
+                "description": "An optional string to represent each pipette's supported tip max flow rate for aspirate and dispense. The limit is the lowest max flow rate given all the tip's volumes."
               }
             }
           }

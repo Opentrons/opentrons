@@ -111,12 +111,12 @@ class SupportedTipsDefinition(BaseModel):
         description="The default volume for a push-out during dispense.",
         alias="defaultPushOutVolume",
     )
-    max_flow_rate: float = Field(
+    ui_max_flow_rate: float = Field(
         float(
             "inf"
         ),  # some pipettes (GEN1, unreleased prototype models) don't have a max flow rate
-        description="The max flow rate for a pipette's given supported tip.",
-        alias="maxFlowRate",
+        description="The lowest volume max flow rate for a pipette's given supported tip, minus 2 percent for safety.",
+        alias="uiMaxFlowRate",
     )
 
 

@@ -2,7 +2,7 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t50": {
-      "maxFlowRate": 742.3,
+      "uiMaxFlowRate": 808.3,
       "defaultAspirateFlowRate": {
         "default": 6,
         "valuesByApiLevel": { "2.14": 6 }
@@ -117,7 +117,7 @@
       "defaultPushOutVolume": 7
     },
     "t200": {
-      "maxFlowRate": 831.7,
+      "uiMaxFlowRate": 905.7,
       "defaultAspirateFlowRate": {
         "default": 80,
         "valuesByApiLevel": { "2.14": 80 }
@@ -230,7 +230,7 @@
       "defaultPushOutVolume": 5
     },
     "t1000": {
-      "maxFlowRate": 723.4,
+      "uiMaxFlowRate": 787.7,
       "defaultAspirateFlowRate": {
         "default": 160,
         "valuesByApiLevel": { "2.14": 160 }
