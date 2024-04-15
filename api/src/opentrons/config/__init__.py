@@ -284,6 +284,13 @@ CONFIG_ELEMENTS = (
         ConfigElementType.DIR,
         "The dir where module calibration is stored",
     ),
+    ConfigElement(
+        "performance_metrics_dir",
+        "Performance Metrics Directory",
+        Path("performance_metrics_data"),
+        ConfigElementType.DIR,
+        "The dir where performance metrics are stored",
+    ),
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,
@@ -602,3 +609,7 @@ def get_tip_length_cal_path() -> Path:
 
 def get_custom_tiprack_def_path() -> Path:
     return get_opentrons_path("custom_tiprack_dir")
+
+
+def get_performance_metrics_data_dir() -> Path:
+    return get_opentrons_path("performance_metrics_dir")
