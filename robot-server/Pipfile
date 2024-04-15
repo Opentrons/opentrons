@@ -61,5 +61,4 @@ opentrons-hardware = {editable = true, path='../hardware', extras=['FLEX']}
 opentrons = { editable = true, path = "../api"}
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 server-utils = {editable = true, path = "./../server-utils"}
-performance-metrics = { editable = true, file = "../performance-metrics" }
 robot-server = { editable = true, path = "."}
