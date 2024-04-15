@@ -151,7 +151,7 @@ def convert_type_string_for_enum(
         return "str"
     else:
         raise ParameterValueError(
-            f"Cannot resolve parameter type {parameter_type} for an enumerated parameter."
+            f"Cannot resolve parameter type '{parameter_type.__name__}' for an enumerated parameter."
         )
 
 
@@ -163,7 +163,7 @@ def convert_type_string_for_num_param(parameter_type: type) -> Literal["int", "f
         return "float"
     else:
         raise ParameterValueError(
-            f"Cannot resolve parameter type {parameter_type} for a number parameter."
+            f"Cannot resolve parameter type '{parameter_type.__name__}' for a number parameter."
         )
 
 
@@ -189,7 +189,7 @@ def _validate_choices(
         ensure_display_name(display_name)
         if not isinstance(value, parameter_type):
             raise ParameterDefinitionError(
-                f"All choices provided must be of type {parameter_type}"
+                f"All choices provided must be of type '{parameter_type.__name__}'"
             )
 
 
@@ -211,11 +211,13 @@ def _validate_min_and_max(
         if parameter_type is int or parameter_type is float:
             if not isinstance(minimum, parameter_type):
                 raise ParameterDefinitionError(
-                    f"Minimum is type {type(minimum)}, but must be of parameter type {parameter_type}"
+                    f"Minimum is type '{type(minimum).__name__}',"
+                    f" but must be of parameter type '{parameter_type.__name__}'"
                 )
             if not isinstance(maximum, parameter_type):
                 raise ParameterDefinitionError(
-                    f"Maximum is type {type(maximum)}, but must be of parameter type {parameter_type}"
+                    f"Maximum is type {type(maximum).__name__},"
+                    f" but must be of parameter type '{parameter_type.__name__}'"
                 )
             # These asserts are for the type checker and should never actually be asserted false
             assert isinstance(minimum, (int, float))
@@ -234,7 +236,8 @@ def validate_type(value: ParamType, parameter_type: type) -> None:
     """Validate parameter value is the correct type."""
     if not isinstance(value, parameter_type):
         raise ParameterValueError(
-            f"Parameter value {value} has type {type(value)}, but must be of type {parameter_type}."
+            f"Parameter value {value} has type '{type(value).__name__}',"
+            f" but must be of type '{parameter_type.__name__}'."
         )
 
 
@@ -248,7 +251,8 @@ def validate_options(
     """Validate default values and all possible constraints for a valid parameter definition."""
     if not isinstance(default, parameter_type):
         raise ParameterValueError(
-            f"Parameter default {default} has type {type(default)}, but must be of type {parameter_type}."
+            f"Parameter default {default} has type '{type(default).__name__}',"
+            f" but must be of type '{parameter_type.__name__}'."
         )
 
     if choices is None and minimum is None and maximum is None:
