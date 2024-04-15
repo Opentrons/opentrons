@@ -279,10 +279,12 @@ export const DropTipWizardComponent = (
     button: errorExitBtn,
     subHeader: errorSubHeader,
   } = useDropTipErrorComponents({
-    maintenanceRunId: createdMaintenanceRunId,
-    onClose: handleCleanUpAndClose,
+    t,
     errorDetails,
     isOnDevice,
+    chainRunCommands,
+    maintenanceRunId: createdMaintenanceRunId,
+    onClose: handleCleanUpAndClose,
   })
 
   React.useEffect(() => {
@@ -622,25 +624,28 @@ interface DropTipErrorComponents {
   subHeader: JSX.Element
 }
 
-interface UseDropTipErrorComponentsProps {
+export interface UseDropTipErrorComponentsProps {
+  isOnDevice: boolean
+  t: (translationString: string) => string
   maintenanceRunId: string | null
   onClose: () => void
   errorDetails: ErrorDetails | null
-  isOnDevice: boolean
+  chainRunCommands: ReturnType<
+    typeof useChainMaintenanceCommands
+  >['chainRunCommands']
 }
 
 /**
  * @description Returns special-cased components given error details.
  */
 export function useDropTipErrorComponents({
+  t,
   maintenanceRunId,
   onClose,
   errorDetails,
   isOnDevice,
+  chainRunCommands,
 }: UseDropTipErrorComponentsProps): DropTipErrorComponents {
-  const { t } = useTranslation('drop_tip_wizard')
-  const { chainRunCommands } = useChainMaintenanceCommands()
-
   const genericSubHeader = (
     <>
       {t('drop_tip_failed')}
@@ -690,7 +695,7 @@ export function useDropTipErrorComponents({
   return result
 }
 
-interface UseWizardExitHeaderProps {
+export interface UseWizardExitHeaderProps {
   isFinalStep: boolean
   hasInitiatedExit: boolean
   errorDetails: ErrorDetails | null
