@@ -282,7 +282,7 @@ describe('RecentRunProtocolCard', () => {
     getByText('mock Skeleton')
   })
 
-  it.only('should push to protocol details if protocol contains runtime parameters', () => {
+  it('should push to protocol details if protocol contains runtime parameters', () => {
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: simpleAnalysisFileFixture,
     } as any)

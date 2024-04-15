@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
-import { last } from 'lodash'
+import last from 'lodash/last'
 
 import {
   BORDERS,
