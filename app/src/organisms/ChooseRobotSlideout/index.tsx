@@ -79,7 +79,7 @@ interface RobotBusyStatusByName {
 
 export type RobotBusyStatusAction = RobotIsBusyAction | RobotIsIdleAction
 
-function robotBusyStatusByNameReducer(
+export function robotBusyStatusByNameReducer(
   state: RobotBusyStatusByName,
   action: RobotBusyStatusAction
 ): RobotBusyStatusByName {
@@ -184,15 +184,19 @@ export function ChooseRobotSlideout(
     {}
   )
 
+  const reducerAvailable = healthyReachableRobots.filter(
+    robot => !robotBusyStatusByName[robot.name]
+  )
+
   const reducerBusyCount = healthyReachableRobots.filter(
     robot => robotBusyStatusByName[robot.name]
   ).length
 
   // this useEffect sets the default selection to the first robot in the list. state is managed by the caller
   React.useEffect(() => {
-    if (selectedRobot == null && healthyReachableRobots.length > 0) {
-      setSelectedRobot(healthyReachableRobots[0])
-    } else if (healthyReachableRobots.length === 0) {
+    if (selectedRobot == null && reducerAvailable.length > 0) {
+      setSelectedRobot(reducerAvailable[0])
+    } else if (reducerAvailable.length === 0) {
       setSelectedRobot(null)
     }
   }, [healthyReachableRobots, selectedRobot, setSelectedRobot])

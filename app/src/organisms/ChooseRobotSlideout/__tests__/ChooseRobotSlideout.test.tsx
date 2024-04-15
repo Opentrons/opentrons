@@ -3,6 +3,7 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -22,7 +23,7 @@ import { useFeatureFlag } from '../../../redux/config'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
 import { useNotifyService } from '../../../resources/useNotifyService'
-import { OT2_ROBOT_TYPE, RunTimeParameter } from '@opentrons/shared-data'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
