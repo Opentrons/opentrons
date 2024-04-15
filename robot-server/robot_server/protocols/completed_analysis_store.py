@@ -336,40 +336,34 @@ class CompletedAnalysisStore:
 
         return result_ids
 
-    async def add(self, completed_analysis_resource: CompletedAnalysisResource) -> None:
-        """Add a resource to the store."""
-        self._make_room_for_new_analysis(completed_analysis_resource.protocol_id)
-        statement = analysis_table.insert().values(
-            await completed_analysis_resource.to_sql_values()
-        )
-        with self._sql_engine.begin() as transaction:
-            transaction.execute(statement)
-        self._memcache.insert(
-            completed_analysis_resource.id, completed_analysis_resource
-        )
+    async def make_room_and_add(
+        self, completed_analysis_resource: CompletedAnalysisResource
+    ) -> None:
+        """Make room and add a resource to the store.
 
-    def _make_room_for_new_analysis(self, protocol_id: str) -> None:
-        """Remove the oldest analyses in store if the number of analyses exceed the max allowed.
-
-        Unlike protocols, protocol analysis IDs are not stored by any DB entities
-        other than the analysis store itself. So we do not have to worry about cleaning up
-        any other tables.
+        Removes the oldest analyses in store if the number of analyses exceed
+        the max allowed, and then adds the new analysis.
         """
-        analyses_ids = self.get_ids_by_protocol(protocol_id)
+        analyses_ids = self.get_ids_by_protocol(completed_analysis_resource.protocol_id)
 
         # Delete all analyses exceeding max number allowed,
         # plus an additional one to create room for the new one.
         # Most existing databases will not have multiple extra analyses per protocol
         # but there would be some internally that added multiple analyses before
         # we started capping the number of analyses.
-        analyses_to_delete = analyses_ids[
-            : len(analyses_ids) - MAX_ANALYSES_TO_STORE + 1
-        ]
-
+        analyses_to_delete = analyses_ids[: -MAX_ANALYSES_TO_STORE + 1]
         for analysis_id in analyses_to_delete:
             self._memcache.remove(analysis_id)
-            delete_statement = sqlalchemy.delete(analysis_table).where(
-                analysis_table.c.id == analysis_id
-            )
-            with self._sql_engine.begin() as transaction:
-                transaction.execute(delete_statement)
+        delete_statement = analysis_table.delete().where(
+            analysis_table.c.id.in_(analyses_to_delete)
+        )
+
+        insert_statement = analysis_table.insert().values(
+            await completed_analysis_resource.to_sql_values()
+        )
+        with self._sql_engine.begin() as transaction:
+            transaction.execute(delete_statement)
+            transaction.execute(insert_statement)
+        self._memcache.insert(
+            completed_analysis_resource.id, completed_analysis_resource
+        )
