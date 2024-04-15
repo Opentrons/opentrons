@@ -1,5 +1,8 @@
+"""Performance metrics constants."""
+
 from enum import Enum
 from pathlib import Path
+
 
 class PerformanceMetricsFilename(Enum):
     """Performance metrics filenames."""
