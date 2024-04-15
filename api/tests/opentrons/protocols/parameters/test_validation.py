@@ -12,6 +12,13 @@ from opentrons.protocols.parameters.types import (
 from opentrons.protocols.parameters import validation as subject
 
 
+def test_validate_variable_name_unique() -> None:
+    """It should no-op if the name is unique and raise if it is not."""
+    subject.validate_variable_name_unique("one of a kind", {"fee", "foo", "fum"})
+    with pytest.raises(ParameterNameError):
+        subject.validate_variable_name_unique("copy", {"paste", "copy", "cut"})
+
+
 def test_ensure_display_name() -> None:
     """It should ensure the display name is within the character limit."""
     result = subject.ensure_display_name("abc")
@@ -134,6 +141,7 @@ def test_validate_options_raises_name_error() -> None:
     [
         (1.0, int, 1),
         (1.1, int, 1.1),
+        (2, float, 2.0),
         (2.0, float, 2.0),
         (2.2, float, 2.2),
         ("3.0", str, "3.0"),
@@ -148,6 +156,67 @@ def test_ensure_value_type(
 ) -> None:
     """It should ensure that if applicable, the value is coerced into the expected type"""
     assert result == subject.ensure_value_type(value, param_type)
+
+
+@pytest.mark.parametrize(
+    ["value", "result"],
+    [
+        (1, 1.0),
+        (2.0, 2.0),
+        (3.3, 3.3),
+    ],
+)
+def test_ensure_float_value(value: Union[float, int], result: float) -> None:
+    """It should ensure that if applicable, the value is coerced into a float."""
+    assert result == subject.ensure_float_value(value)
+
+
+@pytest.mark.parametrize(
+    ["value", "result"],
+    [
+        (1, 1.0),
+        (2.0, 2.0),
+        (3.3, 3.3),
+        (None, None),
+    ],
+)
+def test_ensure_optional_float_value(value: Union[float, int], result: float) -> None:
+    """It should ensure that if applicable, the value is coerced into a float."""
+    assert result == subject.ensure_optional_float_value(value)
+
+
+@pytest.mark.parametrize(
+    ["choices", "result"],
+    [
+        ([], []),
+        (None, None),
+        (
+            [{"display_name": "foo", "value": 1}],
+            [{"display_name": "foo", "value": 1.0}],
+        ),
+        (
+            [{"display_name": "foo", "value": 2.0}],
+            [{"display_name": "foo", "value": 2.0}],
+        ),
+        (
+            [{"display_name": "foo", "value": 3.3}],
+            [{"display_name": "foo", "value": 3.3}],
+        ),
+        (
+            [{"display_name": "foo", "value": "4"}],
+            [{"display_name": "foo", "value": "4"}],
+        ),
+        (
+            [{"display_name": "foo", "value": True}],
+            [{"display_name": "foo", "value": True}],
+        ),
+    ],
+)
+def test_ensure_float_choices(
+    choices: Optional[List[ParameterChoice]], result: Optional[List[ParameterChoice]]
+) -> None:
+    """It should ensure that if applicable, the value in a choice is coerced into a float."""
+    assert result == subject.ensure_float_choices(choices)
 
 
 @pytest.mark.parametrize(

@@ -2416,7 +2416,7 @@
     react-redux "8.1.2"
     react-router-dom "5.3.4"
     react-select "5.4.0"
-    react-simple-keyboard "^3.4.187"
+    react-simple-keyboard "^3.7.0"
     react-viewport-list "6.3.0"
     redux "4.0.5"
     redux-observable "1.1.0"
@@ -16763,10 +16763,10 @@ react-select@5.4.0:
     prop-types "^15.6.0"
     react-transition-group "^4.3.0"
 
-react-simple-keyboard@^3.4.187:
-  version "3.7.93"
-  resolved "https://registry.yarnpkg.com/react-simple-keyboard/-/react-simple-keyboard-3.7.93.tgz#2343be2f96d59ab1f00ce8dcd0ed576eb9f59945"
-  integrity sha512-MJSwiBOiU0xMjyHfrHVJ6YJkH/TKga4S4DINfqL+MbNYglJ0qMhCyLxorjjlqs744X71/+InV5Dnc8dYK7YMYg==
+react-simple-keyboard@^3.7.0:
+  version "3.7.107"
+  resolved "https://registry.yarnpkg.com/react-simple-keyboard/-/react-simple-keyboard-3.7.107.tgz#6e71f48950a1923486f2ca8edc5194cdbae0f332"
+  integrity sha512-r2emrLGoD6A37fl+GCEODFLxtUET1uXZsmFokb7cB6/3OlE7EV08wSzB+yTju+qwIibsc6EXLC6KoRf0FsVC1A==
 
 react-snap@^1.23.0:
   version "1.23.0"
@@ -18536,10 +18536,10 @@ store2@^2.14.2:
   resolved "https://registry.yarnpkg.com/store2/-/store2-2.14.3.tgz#24077d7ba110711864e4f691d2af941ec533deb5"
   integrity sha512-4QcZ+yx7nzEFiV4BMLnr/pRa5HYzNITX2ri0Zh6sT9EyQHbBHacC6YigllUPU9X3D0f/22QCgfokpKs52YRrUg==
 
-storybook-addon-pseudo-states@^1.15.5:
-  version "1.15.5"
-  resolved "https://registry.yarnpkg.com/storybook-addon-pseudo-states/-/storybook-addon-pseudo-states-1.15.5.tgz#47d40391440dff235c05938c5b033aa655dda38e"
-  integrity sha512-DVngZ4121lJ6s42vKNfmLCBKhBMhh01D7sCV/LohP0rZoVW6Zws552g906Wan5R14gnArAlPCxQ+zbgm7QqxDA==
+storybook-addon-pseudo-states@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/storybook-addon-pseudo-states/-/storybook-addon-pseudo-states-2.0.0.tgz#4fa251aaea04ebc6d17b7e57e5f09ea240f14583"
+  integrity sha512-tLuuwB1k+xFsX8C1fn4G/vJm5wX33jvSLeqTsJgWwI3/AKJUf6Thbg/kg14I2AwN8nqffjun2PzE05Iea23n0w==
 
 storybook@^7.6.16:
   version "7.6.17"

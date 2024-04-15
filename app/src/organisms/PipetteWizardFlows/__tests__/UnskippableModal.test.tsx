@@ -41,7 +41,9 @@ describe('UnskippableModal', () => {
     screen.getByText(
       'You must detach the mounting plate and reattach the z-axis carraige before using other pipettes. We do not recommend exiting this process before completion.'
     )
-    fireEvent.click(screen.getByRole('button', { name: 'exit' }))
+    screen.getByText('Exit')
+    screen.getByText('Go back')
+    fireEvent.click(screen.getByRole('button', { name: 'Exit' }))
     expect(props.proceed).toHaveBeenCalled()
   })
 })

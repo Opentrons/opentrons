@@ -9,18 +9,18 @@ import {
 import { InputField } from '../../InputField'
 import { FullKeyboard } from '.'
 
-import '../index.css'
-import './index.css'
+import type { Meta, StoryObj } from '@storybook/react'
 
-import type { Story, Meta } from '@storybook/react'
-
-export default {
+const meta: Meta<typeof FullKeyboard> = {
   title: 'ODD/Atoms/SoftwareKeyboard/FullKeyboard',
   component: FullKeyboard,
   parameters: VIEWPORT.touchScreenViewport,
-} as Meta
+}
+export default meta
 
-const Template: Story<React.ComponentProps<typeof FullKeyboard>> = args => {
+type Story = StoryObj<typeof FullKeyboard>
+
+const Keyboard = (): JSX.Element => {
   const [showKeyboard, setShowKeyboard] = React.useState(false)
   const [value, setValue] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
@@ -31,12 +31,14 @@ const Template: Story<React.ComponentProps<typeof FullKeyboard>> = args => {
           value={value}
           type="text"
           placeholder="When focusing, the keyboard shows up"
+          // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
           onFocus={() => setShowKeyboard(true)}
         />
       </form>
       <Flex position={POSITION_ABSOLUTE} top="20%" left="0" width="64rem">
         {showKeyboard && (
           <FullKeyboard
+            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
             onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
           />
@@ -46,4 +48,6 @@ const Template: Story<React.ComponentProps<typeof FullKeyboard>> = args => {
   )
 }
 
-export const FullSoftwareKeyboard = Template.bind({})
+export const FullSoftwareKeyboard: Story = {
+  render: () => <Keyboard />,
+}

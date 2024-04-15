@@ -6,6 +6,21 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
+## Opentrons Robot Software Changes in 7.2.2
+
+Welcome to the v7.2.2 release of the Opentrons robot software!
+
+### Improved Features
+
+- Improved the low-volume performance of recently produced Flex 96-Channel Pipettes.
+
+### Bug Fixes
+
+- Restores the ability to use the speaker and camera on OT-2.
+- Restores the ability to use the camera on Flex.
+
+---
+
 ## Opentrons Robot Software Changes in 7.2.1
 
 Welcome to the v7.2.1 release of the Opentrons robot software!

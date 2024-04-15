@@ -22,13 +22,14 @@ from .engine_store import EngineStore
 from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
 from .run_models import Run, BadRun, RunDataError
 
-from opentrons.protocol_engine.types import DeckConfigurationType
+from opentrons.protocol_engine.types import DeckConfigurationType, RunTimeParameter
 
 
 def _build_run(
     run_resource: Union[RunResource, BadRunResource],
     state_summary: Union[StateSummary, BadStateSummary],
     current: bool,
+    run_time_parameters: List[RunTimeParameter],
 ) -> Union[Run, BadRun]:
     # TODO(mc, 2022-05-16): improve persistence strategy
     # such that this default summary object is not needed
@@ -49,6 +50,7 @@ def _build_run(
             completedAt=state_summary.completedAt,
             startedAt=state_summary.startedAt,
             liquids=state_summary.liquids,
+            runTimeParameters=run_time_parameters,
         )
 
     errors: List[EnumeratedError] = []
@@ -102,6 +104,7 @@ def _build_run(
         completedAt=state.completedAt,
         startedAt=state.startedAt,
         liquids=state.liquids,
+        runTimeParameters=run_time_parameters,
     )
 
 
@@ -172,6 +175,7 @@ class RunDataManager:
                 run_id=prev_run_id,
                 summary=prev_run_result.state_summary,
                 commands=prev_run_result.commands,
+                run_time_parameters=prev_run_result.parameters,
             )
         state_summary = await self._engine_store.create(
             run_id=run_id,
@@ -186,7 +190,7 @@ class RunDataManager:
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
         )
-        await self._runs_publisher.begin_polling_engine_store(
+        await self._runs_publisher.initialize(
             get_current_command=self.get_current_command,
             get_state_summary=self._get_good_state_summary,
             run_id=run_id,
@@ -196,6 +200,7 @@ class RunDataManager:
             run_resource=run_resource,
             state_summary=state_summary,
             current=True,
+            run_time_parameters=[],
         )
 
     def get(self, run_id: str) -> Union[Run, BadRun]:
@@ -215,9 +220,10 @@ class RunDataManager:
         """
         run_resource = self._run_store.get(run_id=run_id)
         state_summary = self._get_state_summary(run_id=run_id)
+        parameters = self._get_run_time_parameters(run_id=run_id)
         current = run_id == self._engine_store.current_run_id
 
-        return _build_run(run_resource, state_summary, current)
+        return _build_run(run_resource, state_summary, current, parameters)
 
     def get_run_loaded_labware_definitions(
         self, run_id: str
@@ -260,6 +266,7 @@ class RunDataManager:
                 run_resource=run_resource,
                 state_summary=self._get_state_summary(run_resource.run_id),
                 current=run_resource.run_id == self._engine_store.current_run_id,
+                run_time_parameters=self._get_run_time_parameters(run_resource.run_id),
             )
             for run_resource in self._run_store.get_all(length)
         ]
@@ -277,7 +284,7 @@ class RunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
-            await self._runs_publisher.stop_polling_engine_store()
+            await self._runs_publisher.clean_up_current_run()
 
         self._run_store.remove(run_id=run_id)
 
@@ -310,15 +317,18 @@ class RunDataManager:
                 run_id=run_id,
                 summary=state_summary,
                 commands=commands,
+                run_time_parameters=parameters,
             )
         else:
             state_summary = self._engine_store.engine.state_view.get_summary()
+            parameters = self._engine_store.runner.run_time_parameters
             run_resource = self._run_store.get(run_id=run_id)
 
         return _build_run(
             run_resource=run_resource,
             state_summary=state_summary,
             current=next_current,
+            run_time_parameters=parameters,
         )
 
     def get_commands_slice(
@@ -385,3 +395,9 @@ class RunDataManager:
     def _get_good_state_summary(self, run_id: str) -> Optional[StateSummary]:
         summary = self._get_state_summary(run_id)
         return summary if isinstance(summary, StateSummary) else None
+
+    def _get_run_time_parameters(self, run_id: str) -> List[RunTimeParameter]:
+        if run_id == self._engine_store.current_run_id:
+            return self._engine_store.runner.run_time_parameters
+        else:
+            return self._run_store.get_run_time_parameters(run_id=run_id)

@@ -18,8 +18,15 @@ describe('UpdateInProgressModal', () => {
       subsystem: 'pipette_right',
     }
   })
-  it('renders text', () => {
+  it('renders pipette text', () => {
     const { getByText } = render(props)
     getByText('Updating pipette firmware...')
+  })
+  it('renders Hepa/UV text', () => {
+    props = {
+      subsystem: 'hepa_uv',
+    }
+    const { getByText } = render(props)
+    getByText('Updating HEPA/UV Module firmware...')
   })
 })

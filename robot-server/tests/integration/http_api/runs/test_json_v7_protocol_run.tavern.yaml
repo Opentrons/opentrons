@@ -45,6 +45,7 @@ stages:
               definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
               location: !anydict
           labwareOffsets: []
+          runTimeParameters: []
           liquids:
             - id: waterId
               displayName: Water

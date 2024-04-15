@@ -8,11 +8,17 @@ import {
 import { createProtocol } from '@opentrons/api-client'
 import { useHost } from '../api'
 import type { AxiosError } from 'axios'
-import type { ErrorResponse, HostConfig, Protocol } from '@opentrons/api-client'
+import type {
+  ErrorResponse,
+  HostConfig,
+  Protocol,
+  RunTimeParameterCreateData,
+} from '@opentrons/api-client'
 
 export interface CreateProtocolVariables {
   files: File[]
   protocolKey?: string
+  runTimeParameterValues?: RunTimeParameterCreateData
 }
 export type UseCreateProtocolMutationResult = UseMutationResult<
   Protocol,
@@ -34,7 +40,8 @@ export type UseCreateProtocolMutationOptions = UseMutationOptions<
 
 export function useCreateProtocolMutation(
   options: UseCreateProtocolMutationOptions = {},
-  hostOverride?: HostConfig | null
+  hostOverride?: HostConfig | null,
+  runTimeParameterValues?: RunTimeParameterCreateData
 ): UseCreateProtocolMutationResult {
   const contextHost = useHost()
   const host =
@@ -48,7 +55,12 @@ export function useCreateProtocolMutation(
   >(
     [host, 'protocols'],
     ({ files: protocolFiles, protocolKey }) =>
-      createProtocol(host as HostConfig, protocolFiles, protocolKey)
+      createProtocol(
+        host as HostConfig,
+        protocolFiles,
+        protocolKey,
+        runTimeParameterValues
+      )
         .then(response => {
           const protocolId = response.data.data.id
           queryClient

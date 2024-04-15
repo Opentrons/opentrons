@@ -19,21 +19,31 @@ import {
 } from '@opentrons/shared-data'
 import { GoBack } from './GoBack'
 import { HandleEnter } from './HandleEnter'
+import { getUnoccupiedStagingAreaSlots } from './utils'
 
 import type { DeckConfiguration, CutoutId } from '@opentrons/shared-data'
 import type { AdditionalEquipment, WizardTileProps } from './types'
+
+export const STANDARD_EMPTY_SLOTS: DeckConfiguration = STAGING_AREA_CUTOUTS.map(
+  cutoutId => ({
+    cutoutId,
+    cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
+  })
+)
 
 export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
   const { getValues, goBack, proceed, setValue, watch } = props
   const { t } = useTranslation(['modal', 'application'])
   const { fields, pipettesByMount } = getValues()
   const additionalEquipment = watch('additionalEquipment')
+  const modules = watch('modules')
   const isOt2 = fields.robotType === OT2_ROBOT_TYPE
   const stagingAreaItems = additionalEquipment.filter(equipment =>
     // TODO(bc, 11/14/2023): refactor the additional items field to include a cutoutId
     // and a cutoutFixtureId so that we don't have to string parse here to generate them
     equipment.includes('stagingArea')
   )
+  const unoccupiedStagingAreaSlots = getUnoccupiedStagingAreaSlots(modules)
 
   const savedStagingAreaSlots: DeckConfiguration = stagingAreaItems.flatMap(
     item => {
@@ -49,14 +59,7 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
     }
   )
 
-  const STANDARD_EMPTY_SLOTS: DeckConfiguration = STAGING_AREA_CUTOUTS.map(
-    cutoutId => ({
-      cutoutId,
-      cutoutFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
-    })
-  )
-
-  STANDARD_EMPTY_SLOTS.forEach(emptySlot => {
+  unoccupiedStagingAreaSlots.forEach(emptySlot => {
     if (
       !savedStagingAreaSlots.some(
         ({ cutoutId }) => cutoutId === emptySlot.cutoutId
@@ -67,7 +70,9 @@ export function StagingAreaTile(props: WizardTileProps): JSX.Element | null {
   })
 
   const initialSlots =
-    stagingAreaItems.length > 0 ? savedStagingAreaSlots : STANDARD_EMPTY_SLOTS
+    stagingAreaItems.length > 0
+      ? savedStagingAreaSlots
+      : unoccupiedStagingAreaSlots
 
   const [updatedSlots, setUpdatedSlots] = React.useState<DeckConfiguration>(
     initialSlots

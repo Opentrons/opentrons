@@ -97,12 +97,10 @@ describe('ConfirmCancelRunModal', () => {
     vi.restoreAllMocks()
   })
 
-  it('should render text and buttons', () => {
+  it('should render correct text and buttons', () => {
     render(props)
-    screen.getByText('Are you sure you want to cancel this run?')
-    screen.getByText(
-      'Doing so will terminate this run, drop any attached tips in the trash container and home your robot.'
-    )
+    screen.getByText('Are you sure you want to cancel?')
+    screen.getByText('Doing so will terminate this run and home your robot.')
     screen.getByText(
       'Additionally, any hardware modules used within the protocol will remain active and maintain their current states until deactivated.'
     )
@@ -111,7 +109,7 @@ describe('ConfirmCancelRunModal', () => {
     screen.getByText('Cancel run')
   })
 
-  it('shoudler render the canceling run modal when run is dismissing', () => {
+  it('should render the canceling run modal when run is dismissing', () => {
     vi.mocked(useDismissCurrentRunMutation).mockReturnValue({
       dismissCurrentRun: mockDismissCurrentRun,
       isLoading: true,

@@ -159,8 +159,12 @@ class ProtocolEngine:
         else:
             self._hardware_api.resume(HardwarePauseType.PAUSE)
 
-    def pause(self) -> None:
-        """Pause executing commands in the queue."""
+    def request_pause(self) -> None:
+        """Make command execution pause soon.
+
+        This will try to pause in the middle of the ongoing command, if there is one.
+        Otherwise, whenever the next command begins, the pause will happen then.
+        """
         action = self._state_store.commands.validate_action_allowed(
             PauseAction(source=PauseSource.CLIENT)
         )
@@ -235,13 +239,44 @@ class ProtocolEngine:
                 the command in state.
 
         Returns:
-            The command. If the command completed, it will be succeeded or failed.
+            The command.
+
+            If the command completed, it will be succeeded or failed.
+
             If the engine was stopped before it reached the command,
             the command will be queued.
         """
         command = self.add_command(request)
         await self.wait_for_command(command.id)
         return self._state_store.commands.get(command.id)
+
+    async def add_and_execute_command_wait_for_recovery(
+        self, request: commands.CommandCreate
+    ) -> commands.Command:
+        """Like `add_and_execute_command()`, except wait for error recovery.
+
+        Unlike `add_and_execute_command()`, if the command fails, this will not
+        immediately return the failed command. Instead, if the error is recoverable,
+        it will wait until error recovery has completed (e.g. when some other task
+        calls `self.resume_from_recovery()`).
+
+        Returns:
+            The command.
+
+            If the command completed, it will be succeeded or failed. If it failed
+            and then its failure was recovered from, it will still be failed.
+
+            If the engine was stopped before it reached the command,
+            the command will be queued.
+        """
+        queued_command = self.add_command(request)
+        await self.wait_for_command(command_id=queued_command.id)
+        completed_command = self._state_store.commands.get(queued_command.id)
+        await self._state_store.wait_for_not(
+            self.state_view.commands.get_recovery_in_progress_for_command,
+            queued_command.id,
+        )
+        return completed_command
 
     def estop(
         self,
@@ -251,6 +286,15 @@ class ProtocolEngine:
         maintenance_run: bool,
     ) -> None:
         """Signal to the engine that an estop event occurred.
+
+        If an estop happens while the robot is moving, lower layers physically stop
+        motion and raise the event as an exception, which fails the Protocol Engine
+        command. No action from the `ProtocolEngine` caller is needed to handle that.
+
+        However, if an estop happens in between commands, or in the middle of
+        a command like `comment` or `waitForDuration` that doesn't access the hardware,
+        `ProtocolEngine` needs to be told about it so it can treat it as a fatal run
+        error and stop executing more commands. This method is how to do that.
 
         If there are any queued commands for the engine, they will be marked
         as failed due to the estop event. If there aren't any queued commands
@@ -262,15 +306,27 @@ class ProtocolEngine:
         """
         if self._state_store.commands.get_is_stopped():
             return
-
-        current_id = (
+        running_or_next_queued_id = (
             self._state_store.commands.get_running_command_id()
             or self._state_store.commands.get_queue_ids().head(None)
+            # TODO(mm, 2024-04-02): This logic looks wrong whenever the next queued
+            # command is a setup command, which is the normal case in maintenance
+            # runs. Setup commands won't show up in commands.get_queue_ids().
+        )
+        running_or_next_queued = (
+            self._state_store.commands.get(running_or_next_queued_id)
+            if running_or_next_queued_id is not None
+            else None
         )
 
-        if current_id is not None:
+        if running_or_next_queued_id is not None:
+            assert running_or_next_queued is not None
+
             fail_action = FailCommandAction(
-                command_id=current_id,
+                command_id=running_or_next_queued_id,
+                # FIXME(mm, 2024-04-02): As of https://github.com/Opentrons/opentrons/pull/14726,
+                # this action is only legal if the command is running, not queued.
+                running_command=running_or_next_queued,
                 error_id=self._model_utils.generate_id(),
                 failed_at=self._model_utils.get_timestamp(),
                 error=EStopActivatedError(message="Estop Activated"),
@@ -279,12 +335,21 @@ class ProtocolEngine:
             )
             self._action_dispatcher.dispatch(fail_action)
 
-            # In the case where the running command was a setup command - check if there
-            # are any pending *run* commands and, if so, clear them all
-            current_id = self._state_store.commands.get_queue_ids().head(None)
-            if current_id is not None:
+            # The FailCommandAction above will have cleared all the queued protocol
+            # OR setup commands, depending on whether we gave it a protocol or setup
+            # command. We want both to be cleared in either case. So, do that here.
+            running_or_next_queued_id = self._state_store.commands.get_queue_ids().head(
+                None
+            )
+            if running_or_next_queued_id is not None:
+                running_or_next_queued = self._state_store.commands.get(
+                    running_or_next_queued_id
+                )
                 fail_action = FailCommandAction(
-                    command_id=current_id,
+                    command_id=running_or_next_queued_id,
+                    # FIXME(mm, 2024-04-02): As of https://github.com/Opentrons/opentrons/pull/14726,
+                    # this action is only legal if the command is running, not queued.
+                    running_command=running_or_next_queued,
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
                     error=EStopActivatedError(message="Estop Activated"),
@@ -311,12 +376,17 @@ class ProtocolEngine:
         else:
             _log.info("estop pressed before protocol was started, taking no action.")
 
-    async def stop(self) -> None:
-        """Stop execution immediately, halting all motion and cancelling future commands.
+    async def request_stop(self) -> None:
+        """Make command execution stop soon.
 
-        After an engine has been `stop`'ed, it cannot be restarted.
+        This will try to interrupt the ongoing command, if there is one. Future commands
+        are canceled. However, by the time this method returns, things may not have
+        settled by the time this method returns; the last command may still be
+        running.
 
-        After a `stop`, you must still call `finish` to give the engine a chance
+        After a stop has been requested, the engine cannot be restarted.
+
+        After a stop request, you must still call `finish` to give the engine a chance
         to clean up resources and propagate errors.
         """
         action = self._state_store.commands.validate_action_allowed(StopAction())

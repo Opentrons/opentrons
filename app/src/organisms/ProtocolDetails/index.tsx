@@ -199,10 +199,8 @@ export function ProtocolDetails(
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const enableProtocolStats = useFeatureFlag('protocolStats')
-  const enableRunTimeParameters = useFeatureFlag('enableRunTimeParameters')
   const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
-  const hasRunTimeParameters =
-    enableRunTimeParameters && runTimeParameters.length > 0
+  const hasRunTimeParameters = runTimeParameters.length > 0
   const [currentTab, setCurrentTab] = React.useState<
     'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
   >(hasRunTimeParameters ? 'parameters' : 'robot_config')
@@ -333,9 +331,7 @@ export function ProtocolDetails(
     stats: enableProtocolStats ? (
       <ProtocolStats analysis={mostRecentAnalysis} />
     ) : null,
-    parameters: enableRunTimeParameters ? (
-      <ProtocolParameters runTimeParameters={runTimeParameters} />
-    ) : null,
+    parameters: <ProtocolParameters runTimeParameters={runTimeParameters} />,
   }
 
   const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
@@ -596,7 +592,7 @@ export function ProtocolDetails(
               gridGap={SPACING.spacing8}
             >
               <Flex gridGap={SPACING.spacing8}>
-                {enableRunTimeParameters && mostRecentAnalysis != null && (
+                {mostRecentAnalysis != null && (
                   <RoundTab
                     data-testid="ProtocolDetails_parameters"
                     isCurrent={currentTab === 'parameters'}

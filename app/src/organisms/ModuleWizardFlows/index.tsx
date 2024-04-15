@@ -276,7 +276,7 @@ export const ModuleWizardFlows = (
           ) : (
             <Trans
               t={t}
-              i18nKey={'module_calibration_failed'}
+              i18nKey={'branded:module_calibration_failed'}
               values={{ error: errorMessage }}
               components={{
                 block: <StyledText as="p" />,

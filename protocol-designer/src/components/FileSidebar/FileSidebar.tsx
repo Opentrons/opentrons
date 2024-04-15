@@ -129,6 +129,7 @@ function getWarningContent({
   const pipettesDetails = pipettesWithoutStep
     .map(pipette => `${pipette.mount} ${pipette.spec.displayName}`)
     .join(' and ')
+
   const modulesDetails = modulesWithoutStep
     .map(moduleOnDeck => t(`modules:module_long_names.${moduleOnDeck.type}`))
     .join(' and ')
@@ -169,12 +170,14 @@ function getWarningContent({
   if (modulesWithoutStep.length) {
     const moduleCase =
       modulesWithoutStep.length > 1 ? 'unused_modules' : 'unused_module'
+    const slotName = modulesWithoutStep.map(module => module.slot)
     return {
       content: (
         <>
           <p>
             {t(`export_warnings.${moduleCase}.body1`, {
               modulesDetails,
+              slotName: slotName,
             })}
           </p>
           <p>{t(`export_warnings.${moduleCase}.body2`)}</p>
@@ -234,9 +237,9 @@ export function v8WarningContent(t: any): JSX.Element {
   return (
     <div>
       <p>
-        {t(`hint.export_v8_protocol_7_1.body1`)}{' '}
-        <strong>{t(`hint.export_v8_protocol_7_1.body2`)}</strong>
-        {t(`hint.export_v8_protocol_7_1.body3`)}
+        {t(`hint.export_v8_1_protocol_7_3.body1`)}{' '}
+        <strong>{t(`hint.export_v8_1_protocol_7_3.body2`)}</strong>
+        {t(`hint.export_v8_1_protocol_7_3.body3`)}
       </p>
     </div>
   )
@@ -347,7 +350,7 @@ export function FileSidebar(): JSX.Element {
     content: React.ReactNode
   } => {
     return {
-      hintKey: 'export_v8_protocol_7_1',
+      hintKey: 'export_v8_1_protocol_7_3',
       content: v8WarningContent(t),
     }
   }

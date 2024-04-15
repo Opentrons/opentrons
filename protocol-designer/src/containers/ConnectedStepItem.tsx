@@ -24,7 +24,6 @@ import {
   SelectMultipleStepsAction,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
-
 import {
   StepItem,
   StepItemContents,
@@ -38,12 +37,15 @@ import {
   ConfirmDeleteModal,
   DeleteModalType,
 } from '../components/modals/ConfirmDeleteModal'
+import {
+  getAdditionalEquipmentEntities,
+  getInitialDeckSetup,
+} from '../step-forms/selectors'
 
-import { SubstepIdentifier } from '../steplist/types'
-import { StepIdType } from '../form-types'
-import { BaseState, ThunkAction } from '../types'
-import { getAdditionalEquipmentEntities } from '../step-forms/selectors'
-import { ThunkDispatch } from 'redux-thunk'
+import type { ThunkDispatch } from 'redux-thunk'
+import type { SubstepIdentifier } from '../steplist/types'
+import type { StepIdType } from '../form-types'
+import type { BaseState, ThunkAction } from '../types'
 
 export interface ConnectedStepItemProps {
   stepId: StepIdType
@@ -86,7 +88,7 @@ export const ConnectedStepItem = (
 
   const hasWarnings =
     hasTimelineWarningsPerStep[stepId] || hasFormLevelWarningsPerStep[stepId]
-
+  const initialDeckSetup = useSelector(getInitialDeckSetup)
   const collapsed = useSelector(getCollapsedSteps)[stepId]
   const hoveredSubstep = useSelector(getHoveredSubstep)
   const hoveredStep = useSelector(getHoveredStepId)
@@ -217,6 +219,7 @@ export const ConnectedStepItem = (
   }
 
   const stepItemContentsProps: StepItemContentsProps = {
+    modules: initialDeckSetup.modules,
     rawForm: step,
     stepType: step.stepType,
     substeps,
@@ -236,7 +239,6 @@ export const ConnectedStepItem = (
       return CLOSE_STEP_FORM_WITH_CHANGES
     }
   }
-
   return (
     <>
       {showConfirmation && (
