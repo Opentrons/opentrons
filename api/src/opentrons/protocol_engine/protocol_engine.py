@@ -418,14 +418,20 @@ class ProtocolEngine:
         set_run_status: bool = True,
         post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
     ) -> None:
-        """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
+        """Finish using the `ProtocolEngine`.
 
-        The engine will finish executing its current command (if any),
-        and then shut down. After an engine has been `finished`'ed, it cannot
-        be restarted.
+        This does a few things:
+
+        1. It may do post-run actions like homing and dropping tips. This depends on the
+           arguments passed as well as heuristics based on the history of the engine.
+        2. It waits for the engine to be done controlling the robot's hardware.
+        3. It releases internal resources, like background tasks.
+
+        It's safe to call `finish()` multiple times. After you call `finish()`,
+        the engine can't be restarted.
 
         This method should not raise. If any exceptions happened during execution that were not
-        properly caught by the CommandExecutor, or if any exceptions happen during this
+        properly caught by `ProtocolEngine` internals, or if any exceptions happen during this
         `finish()` call, they should be saved as `.state_view.get_summary().errors`.
 
         Arguments:
