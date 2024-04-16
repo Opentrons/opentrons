@@ -1,4 +1,6 @@
 """In-memory storage of ProtocolEngine instances."""
+import asyncio
+import logging
 from typing import List, NamedTuple, Optional, Callable
 
 from opentrons.protocol_engine.types import PostRunHardwareState
@@ -38,6 +40,9 @@ from opentrons.protocol_engine.types import (
 )
 
 
+_log = logging.getLogger(__name__)
+
+
 class EngineConflictError(RuntimeError):
     """An error raised if an active engine is already initialized.
 
@@ -60,16 +65,29 @@ class RunnerEnginePair(NamedTuple):
 
 def get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
     """Create a callback for estop events."""
+    engine_loop = asyncio.get_running_loop()
 
-    def _callback(event: HardwareEvent) -> None:
-        if isinstance(event, EstopStateNotification):
-            if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
-                return
-            if engine_store.current_run_id is None:
-                return
-            engine_store.engine.estop(maintenance_run=False)
+    async def _handle_event_in_engine_thread(event: HardwareEvent) -> None:
+        try:
+            if isinstance(event, EstopStateNotification):
+                if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
+                    return
+                if engine_store.current_run_id is None:
+                    return
+                engine_store.engine.estop()
+                # TODO: Unclear if it's correct to call .finish() here.
+                await engine_store.engine.finish()
+        except Exception:
+            # This is a background task kicked off by a hardware event,
+            # so there's no one to propagate this exception to.
+            _log.exception("Exception handling E-stop event.")
 
-    return _callback
+    def _handle_event_in_hardware_thread(event: HardwareEvent) -> None:
+        asyncio.run_coroutine_threadsafe(
+            _handle_event_in_engine_thread(event), engine_loop
+        )
+
+    return _handle_event_in_hardware_thread
 
 
 class EngineStore:
