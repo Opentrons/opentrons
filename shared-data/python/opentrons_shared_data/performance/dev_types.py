@@ -1,17 +1,25 @@
+"""Type definitions for performance tracking."""
+
 from typing import Protocol, TypeVar, Callable, Any
 from pathlib import Path
 from enum import Enum
 
 F = TypeVar("F", bound=Callable[..., Any])
 
+
 class SupportsTracking(Protocol):
+    """Protocol for classes that support tracking of robot context."""
+
     def __init__(self, storage_dir: Path, should_track: bool) -> None:
+        """Initialize the tracker."""
         ...
 
     def track(self, state: "RobotContextState") -> Callable[[F], F]:
+        """Decorator to track the given state for the decorated function."""
         ...
 
     def store(self) -> None:
+        """Store the tracked data."""
         ...
 
 
@@ -25,6 +33,7 @@ class RobotContextState(Enum):
     SHUTTING_DOWN = 4, "SHUTTING_DOWN"
 
     def __init__(self, state_id: int, state_name: str) -> None:
+        """Initialize the enum member."""
         self.state_id = state_id
         self.state_name = state_name
 
