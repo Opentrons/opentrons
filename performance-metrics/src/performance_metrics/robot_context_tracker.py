@@ -34,6 +34,8 @@ def _get_timing_function() -> Callable[[], int]:
 
     return time_function
 
+timing_function = _get_timing_function()
+
 
 class RobotContextTracker:
     """Tracks and stores robot context and execution duration for different operations."""
@@ -60,7 +62,7 @@ class RobotContextTracker:
 
             @wraps(func)
             def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-                function_start_time = _get_timing_function()()
+                function_start_time = timing_function()
                 duration_start_time = perf_counter_ns()
                 try:
                     result = func(*args, **kwargs)
