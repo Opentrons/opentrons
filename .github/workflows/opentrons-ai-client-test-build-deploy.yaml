@@ -41,7 +41,7 @@ jobs:
   js-unit-test:
     # unit tests for the app's view layer (not the node layer)
     runs-on: 'ubuntu-22.04'
-    name: 'opentrons app frontend unit tests'
+    name: 'opentrons ai frontend unit tests'
     timeout-minutes: 60
     steps:
       - uses: 'actions/checkout@v3'
