@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, render, fireEvent } from '@testing-library/react'
 
-import { useDropTipErrorComponents, useWizardExitHeader } from '..'
+import { useDropTipErrorComponents, useWizardExitHeader } from '../utils'
 import { DROP_TIP_SPECIAL_ERROR_TYPES } from '../constants'
 
 import type { Mock } from 'vitest'
 import type {
   UseDropTipErrorComponentsProps,
   UseWizardExitHeaderProps,
-} from '..'
+} from '../utils'
 
 const MOCK_MAINTENANCE_RUN_ID = 'MOCK_MAINTENANCE_RUN_ID'
 const MOCK_ERROR_TYPE = 'MOCK_ERROR_TYPE'

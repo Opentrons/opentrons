@@ -26,7 +26,7 @@ import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
-import type { ErrorDetails } from '.'
+import type { ErrorDetails } from './utils'
 
 // TODO: get help link article URL
 
