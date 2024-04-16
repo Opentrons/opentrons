@@ -19,7 +19,7 @@ SHUTTING_DOWN_TIME = 0.005
 @pytest.fixture
 def robot_context_tracker(tmp_path: Path) -> RobotContextTracker:
     """Fixture to provide a fresh instance of RobotContextTracker for each test."""
-    return RobotContextTracker(storage_file_path=tmp_path, should_track=True)
+    return RobotContextTracker(storage_location=tmp_path, should_track=True)
 
 
 def test_robot_context_tracker(robot_context_tracker: RobotContextTracker) -> None:
@@ -242,8 +242,7 @@ def test_no_tracking(tmp_path: Path) -> None:
 
 async def test_storing_to_file(tmp_path: Path) -> None:
     """Tests storing the tracked data to a file."""
-    file_path = tmp_path / "test_file.csv"
-    robot_context_tracker = RobotContextTracker(file_path, should_track=True)
+    robot_context_tracker = RobotContextTracker(tmp_path, should_track=True)
 
     @robot_context_tracker.track(state=RobotContextState.STARTING_UP)
     def starting_robot() -> None:
@@ -263,7 +262,7 @@ async def test_storing_to_file(tmp_path: Path) -> None:
 
     robot_context_tracker.store()
 
-    with open(file_path, "r") as file:
+    with open(robot_context_tracker._storage_file_path, "r") as file:
         lines = file.readlines()
         assert (
             len(lines) == 4

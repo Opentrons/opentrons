@@ -29,7 +29,7 @@ _robot_context_tracker: SupportsTracking | None = None
 class StubbedTracker(SupportsTracking):
     """A stubbed tracker that does nothing."""
 
-    def __init__(self, storage_dir: Path, should_track: bool) -> None:
+    def __init__(self, storage_location: Path, should_track: bool) -> None:
         """Initialize the stubbed tracker."""
         pass
 
