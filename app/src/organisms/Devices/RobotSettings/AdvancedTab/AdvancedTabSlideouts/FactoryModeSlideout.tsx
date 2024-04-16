@@ -21,7 +21,7 @@ import { MultiSlideout } from '../../../../../atoms/Slideout/MultiSlideout'
 import { restartRobot } from '../../../../../redux/robot-admin'
 import { updateSetting } from '../../../../../redux/robot-settings'
 
-import type { FieldError } from 'react-hook-form'
+import type { RobotSettingsField } from '@opentrons/api-client'
 import type { Dispatch } from '../../../../../redux/types'
 
 interface FactoryModeSlideoutProps {
@@ -52,46 +52,16 @@ export function FactoryModeSlideout({
   const [currentStep, setCurrentStep] = React.useState<number>(1)
   const [toggleValue, setToggleValue] = React.useState<boolean>(false)
 
-  const validate = (
-    data: FormValues,
-    errors: Record<string, FieldError>
-  ): Record<string, FieldError> => {
-    const { passwordInput } = data
-    let message: string | undefined
-
-    if (passwordInput !== 'otie') {
-      message = t('invalid_password')
-    }
-
-    const updatedErrors =
-      message != null
-        ? {
-            ...errors,
-            passwordInput: {
-              type: 'error',
-              message,
-            },
-          }
-        : errors
-    return updatedErrors
-  }
-
   const {
     handleSubmit,
     control,
     formState: { errors },
-    reset,
-    watch,
     trigger,
   } = useForm({
     defaultValues: {
       passwordInput: '',
     },
-    mode: 'onSubmit',
-    reValidateMode: 'onSubmit',
   })
-  const passwordInput = watch('passwordInput')
-
   const onSubmit = (data: FormValues): void => {
     setCurrentStep(2)
   }
@@ -145,7 +115,6 @@ export function FactoryModeSlideout({
           <Controller
             control={control}
             name="passwordInput"
-            rules={{ validate }}
             render={({ field, fieldState }) => (
               <InputField
                 id="passwordInput"
