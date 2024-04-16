@@ -5,7 +5,8 @@ from pathlib import Path
 import pytest
 from performance_metrics.robot_context_tracker import RobotContextTracker
 from performance_metrics.datashapes import RobotContextState
-from time import sleep
+from time import sleep, time_ns
+from unittest.mock import patch
 
 # Corrected times in seconds
 STARTING_TIME = 0.001
@@ -140,6 +141,24 @@ async def test_async_operation_tracking(
     ), "State should be ANALYZING_PROTOCOL."
 
 
+def test_sync_operation_timing_accuracy(
+    robot_context_tracker: RobotContextTracker,
+) -> None:
+    """Tests the timing accuracy of a synchronous operation tracking."""
+
+    @robot_context_tracker.track(state=RobotContextState.RUNNING_PROTOCOL)
+    def running_operation() -> None:
+        sleep(RUNNING_TIME)
+
+    running_operation()
+
+    duration_data = robot_context_tracker._storage[0]
+    measured_duration = duration_data.duration_end - duration_data.duration_start
+    assert (
+        abs(measured_duration - RUNNING_TIME * 1e9) < 1e7
+    ), "Measured duration for sync operation should closely match the expected duration."
+
+
 @pytest.mark.asyncio
 async def test_async_operation_timing_accuracy(
     robot_context_tracker: RobotContextTracker,
@@ -249,3 +268,39 @@ async def test_storing_to_file(tmp_path: Path) -> None:
         assert (
             len(lines) == 4
         ), "All stored data + header should be written to the file."
+
+
+@patch(
+    "performance_metrics.robot_context_tracker._get_timing_function",
+    return_value=time_ns,
+)
+def test_using_non_linux_time_functions(tmp_path: Path) -> None:
+    """Tests tracking operations using non-Linux time functions."""
+    file_path = tmp_path / "test_file.csv"
+    robot_context_tracker = RobotContextTracker(file_path, should_track=True)
+
+    @robot_context_tracker.track(state=RobotContextState.STARTING_UP)
+    def starting_robot() -> None:
+        sleep(STARTING_TIME)
+
+    @robot_context_tracker.track(state=RobotContextState.CALIBRATING)
+    def calibrating_robot() -> None:
+        sleep(CALIBRATING_TIME)
+
+    starting_robot()
+    calibrating_robot()
+
+    storage = robot_context_tracker._storage
+    assert all(
+        data.func_start > 0 for data in storage
+    ), "All function start times should be greater than 0."
+    assert all(
+        data.duration_start > 0 for data in storage
+    ), "All duration start times should be greater than 0."
+    assert all(
+        data.duration_end > 0 for data in storage
+    ), "All duration end times should be greater than 0."
+    assert all(
+        data.duration_end > data.duration_start for data in storage
+    ), "Duration end times should be greater than duration start times."
+    assert len(storage) == 2, "Both operations should be tracked."
