@@ -16,3 +16,7 @@ export const DROP_TIP_STEPS = [
   POSITION_AND_DROP_TIP,
   DROP_TIP_SUCCESS,
 ]
+
+export const DROP_TIP_SPECIAL_ERROR_TYPES = {
+  MUST_HOME_ERROR: 'MustHomeError',
+} as const

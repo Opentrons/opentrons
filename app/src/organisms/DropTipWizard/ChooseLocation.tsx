@@ -22,15 +22,13 @@ import {
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-// import { NeedHelpLink } from '../CalibrationPanels'
 import { TwoUpTileLayout } from '../LabwarePositionCheck/TwoUpTileLayout'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
+import type { ErrorDetails } from './utils'
 
 // TODO: get help link article URL
-// const NEED_HELP_URL = ''
 
 interface ChooseLocationProps {
   handleProceed: () => void
@@ -41,9 +39,8 @@ interface ChooseLocationProps {
   moveToAddressableArea: (
     addressableArea: AddressableAreaName
   ) => Promise<CommandData | null>
-  isRobotMoving: boolean
   isOnDevice: boolean
-  setErrorMessage: (arg0: string) => void
+  setErrorDetails: (errorDetails: ErrorDetails) => void
 }
 
 export const ChooseLocation = (
@@ -56,9 +53,8 @@ export const ChooseLocation = (
     body,
     robotType,
     moveToAddressableArea,
-    isRobotMoving,
     isOnDevice,
-    setErrorMessage,
+    setErrorDetails,
   } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -74,12 +70,8 @@ export const ChooseLocation = (
     if (deckSlot != null) {
       moveToAddressableArea(deckSlot)
         .then(() => handleProceed())
-        .catch(e => setErrorMessage(`${e.message}`))
+        .catch(e => setErrorDetails({ message: `${e.message}` }))
     }
-  }
-
-  if (isRobotMoving) {
-    return <InProgressModal description={t('stand_back_exiting')} />
   }
 
   if (isOnDevice) {
