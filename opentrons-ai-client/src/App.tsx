@@ -1,9 +1,13 @@
 import React from 'react'
-import { Flex, StyledText } from '@opentrons/components'
+import { DIRECTION_ROW, Flex, StyledText } from '@opentrons/components'
+
+import { SidePanel } from './molecules/SidePanel'
+import { PromptGuide } from './molecules/PromptGuide'
+
 export function App(): JSX.Element {
   return (
-    <Flex>
-      <StyledText as="h1">Opentrons AI</StyledText>
+    <Flex flexDirection={DIRECTION_ROW}>
+      <SidePanel />
     </Flex>
   )
 }
