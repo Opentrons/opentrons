@@ -15,12 +15,12 @@ def add_parameters(parameters):
     ###################INT#####################
     ### int min/max with all fields ###
     parameters.add_int(
-        display_name="int min/max all",
+        display_name="int min/max all",  # max 30 chars
         variable_name="min_max_all_fields",
         default=6,
         minimum=1,
         maximum=12,
-        description=description,
+        description=description,  # optional 100 characters max
         unit=unit,
     )
     #### int min/max without unit ###
@@ -145,7 +145,7 @@ def add_parameters(parameters):
         description=description,
         # unit is missing
     )
-    #### float choices with without description and unique choice values ###
+    #### float choices without description and unique choice values ###
     parameters.add_float(
         display_name="float choices no description",
         variable_name="float_choices_no_description",
