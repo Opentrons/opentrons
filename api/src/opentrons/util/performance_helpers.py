@@ -6,7 +6,18 @@ from opentrons_shared_data.performance.dev_types import (
     F,
     RobotContextState,
 )
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from typing import Callable, Type
+from opentrons.config import (
+    feature_flags as ff,
+    get_performance_metrics_data_dir,
+    robot_configs,
+)
+
+
+_should_track = ff.enable_performance_metrics(
+    RobotTypeEnum.robot_literal_to_enum(robot_configs.load().model)
+)
 
 
 def _handle_package_import() -> Type[SupportsTracking]:
@@ -52,5 +63,7 @@ def _get_robot_context_tracker() -> SupportsTracking:
     global _robot_context_tracker
     if _robot_context_tracker is None:
         # TODO: replace with path lookup and should_store lookup
-        _robot_context_tracker = package_to_use(Path("A path"), True)
+        _robot_context_tracker = package_to_use(
+            get_performance_metrics_data_dir(), _should_track
+        )
     return _robot_context_tracker
