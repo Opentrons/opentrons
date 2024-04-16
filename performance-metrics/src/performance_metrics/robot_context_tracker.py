@@ -34,6 +34,7 @@ def _get_timing_function() -> Callable[[], int]:
 
     return time_function
 
+
 timing_function = _get_timing_function()
 
 
