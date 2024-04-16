@@ -26,9 +26,12 @@ from opentrons.config import get_performance_metrics_data_dir
 from opentrons.config.feature_flags import enable_performance_metrics
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
-from performance_metrics import get_robot_context_tracker_singleton, RobotContextTracker
-
 from ._version import version
+
+try: 
+    from performance_metrics import RobotContextTracker as robot_context_tracker
+except ImportError:
+    from opentrons_shared_data.performance.dev_types import StubbedTracker as robot_context_tracker
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 __version__ = version
@@ -147,11 +150,8 @@ should_track: bool = enable_performance_metrics(
     RobotTypeEnum.robot_literal_to_enum(robot_configs.load().model)
 )
 
-
-def get_robot_context_tracker() -> RobotContextTracker:
-    return get_robot_context_tracker_singleton(
-        storage_dir=perf_metrics_dir, should_track=should_track
-    )
+def get_singleton_tracker() -> robot_context_tracker:
+    return robot_context_tracker(perf_metrics_dir, should_track)
 
 
 async def initialize() -> ThreadManagedHardware:
