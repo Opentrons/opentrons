@@ -85,14 +85,6 @@ class MaintenanceEngineStore:
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
         hardware_api.register_callback(get_estop_listener(self))
 
-    def _estop_listener(self, event: HardwareEvent) -> None:
-        if isinstance(event, EstopStateNotification):
-            if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
-                return
-            if self._runner_engine_pair is None:
-                return
-            self._runner_engine_pair.engine.estop(maintenance_run=True)
-
     @property
     def engine(self) -> ProtocolEngine:
         """Get the "current" ProtocolEngine."""
