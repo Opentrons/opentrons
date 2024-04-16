@@ -2,29 +2,18 @@ from typing import Protocol, TypeVar, Callable, Any
 from pathlib import Path
 from enum import Enum
 
-DecoratedFunction = TypeVar("_T", bound=Callable[..., Any])
+F = TypeVar("F", bound=Callable[..., Any])
 
 class SupportsTracking(Protocol):
     def __init__(self, storage_dir: Path, should_track: bool) -> None:
         ...
 
-    def track(self, state: "RobotContextState") -> Callable[[DecoratedFunction], DecoratedFunction]:
+    def track(self, state: "RobotContextState") -> Callable[[F], F]:
         ...
 
     def store(self) -> None:
         ...
 
-class robot_context_tracker(SupportsTracking):
-    def __init__(self, storage_dir: Path, should_track: bool) -> None:
-        pass
-
-    def track(self, state: "RobotContextState") -> Callable[[DecoratedFunction], DecoratedFunction]:
-        def inner_decorator(func: DecoratedFunction) -> DecoratedFunction:
-            return func
-        return inner_decorator
-
-    def store(self) -> None:
-        pass
 
 class RobotContextState(Enum):
     """Enum representing different states of a robot's operation context."""
