@@ -1,6 +1,7 @@
 export * from './DeviceReset'
 export * from './DisplayRobotName'
 export * from './EnableStatusLight'
+export * from './FactoryMode'
 export * from './GantryHoming'
 export * from './LegacySettings'
 export * from './OpenJupyterControl'
