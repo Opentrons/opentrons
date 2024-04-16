@@ -14,12 +14,10 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import RunCommandAction
-from opentrons.protocol_engine.notes.notes import CommandNote
 from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.types import DoorState
 
 from opentrons.protocol_engine import commands, errors
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.types import DeckSlotLocation, DeckType, WellLocation
 from opentrons.protocol_engine.state import Config
 from opentrons.protocol_engine.state.commands import (
@@ -33,7 +31,6 @@ from opentrons.protocol_engine.state.command_history import CommandEntry
 from opentrons.protocol_engine.actions import (
     QueueCommandAction,
     SucceedCommandAction,
-    FailCommandAction,
     PlayAction,
     PauseAction,
     PauseSource,

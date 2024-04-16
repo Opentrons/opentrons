@@ -178,7 +178,9 @@ class ProtocolEngine:
         )
         self._action_dispatcher.dispatch(action)
 
-    def add_command(self, request: commands.CommandCreate) -> commands.Command:
+    def add_command(
+        self, request: commands.CommandCreate, failed_command_id: Optional[str] = None
+    ) -> commands.Command:
         """Add a command to the `ProtocolEngine`'s queue.
 
         Arguments:
@@ -211,6 +213,7 @@ class ProtocolEngine:
                 request_hash=request_hash,
                 command_id=command_id,
                 created_at=self._model_utils.get_timestamp(),
+                failed_command_id=failed_command_id,
             )
         )
         self._action_dispatcher.dispatch(action)

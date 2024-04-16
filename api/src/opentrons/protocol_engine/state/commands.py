@@ -243,6 +243,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 params=action.request.params,  # type: ignore[arg-type]
                 intent=action.request.intent,
                 status=CommandStatus.QUEUED,
+                failed_command_id=action.failed_command_id,
             )
 
             self._state.command_history.set_command_queued(queued_command)
