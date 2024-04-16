@@ -105,7 +105,7 @@ const ModalArea = styled.div<
 >`
   position: ${POSITION_RELATIVE};
   overflow-y: ${OVERFLOW_AUTO};
-  max-height: 100%;
+  max-height: ${({ isFullPage }) => (isFullPage ? '100%' : '31rem')};
   width: 100%;
   border-radius: ${BORDERS.borderRadius8};
   box-shadow: ${BORDERS.smallDropShadow};

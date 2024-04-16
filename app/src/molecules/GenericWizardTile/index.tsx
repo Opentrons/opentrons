@@ -131,7 +131,11 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
 
   return (
     <Flex css={TILE_CONTAINER_STYLE}>
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        gridGap={SPACING.spacing24}
+        paddingBottom={SPACING.spacing24}
+      >
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"
