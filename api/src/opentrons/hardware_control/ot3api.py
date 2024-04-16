@@ -2096,14 +2096,14 @@ class OT3API(
                 target = target_position_from_relative(
                     mount, top_types.Point(z=press.distance), self._current_position
                 )
-            if press.distance < 0:
-                # we expect a stall has happened during a downward movement into the tiprack, so
-                # we want to update the motor estimation
-                await self._move(target, speed=press.speed, expect_stalls=True)
-                await self._update_position_estimation([Axis.by_mount(mount)])
-            else:
-                # we should not ignore stalls that happen during the retract part of the routine
-                await self._move(target, speed=press.speed, expect_stalls=False)
+                if press.distance < 0:
+                    # we expect a stall has happened during a downward movement into the tiprack, so
+                    # we want to update the motor estimation
+                    await self._move(target, speed=press.speed, expect_stalls=True)
+                    await self._update_position_estimation([Axis.by_mount(mount)])
+                else:
+                    # we should not ignore stalls that happen during the retract part of the routine
+                    await self._move(target, speed=press.speed, expect_stalls=False)
 
     async def _tip_motor_action(
         self, mount: OT3Mount, pipette_spec: List[TipActionMoveSpec]
