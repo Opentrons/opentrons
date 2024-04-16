@@ -159,8 +159,12 @@ class ProtocolEngine:
         else:
             self._hardware_api.resume(HardwarePauseType.PAUSE)
 
-    def pause(self) -> None:
-        """Pause executing commands in the queue."""
+    def request_pause(self) -> None:
+        """Make command execution pause soon.
+
+        This will try to pause in the middle of the ongoing command, if there is one.
+        Otherwise, whenever the next command begins, the pause will happen then.
+        """
         action = self._state_store.commands.validate_action_allowed(
             PauseAction(source=PauseSource.CLIENT)
         )
@@ -371,12 +375,17 @@ class ProtocolEngine:
         else:
             _log.info("estop pressed before protocol was started, taking no action.")
 
-    async def stop(self) -> None:
-        """Stop execution immediately, halting all motion and cancelling future commands.
+    async def request_stop(self) -> None:
+        """Make command execution stop soon.
 
-        After an engine has been `stop`'ed, it cannot be restarted.
+        This will try to interrupt the ongoing command, if there is one. Future commands
+        are canceled. However, by the time this method returns, things may not have
+        settled by the time this method returns; the last command may still be
+        running.
 
-        After a `stop`, you must still call `finish` to give the engine a chance
+        After a stop has been requested, the engine cannot be restarted.
+
+        After a stop request, you must still call `finish` to give the engine a chance
         to clean up resources and propagate errors.
         """
         action = self._state_store.commands.validate_action_allowed(StopAction())

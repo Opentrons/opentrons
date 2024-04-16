@@ -12,6 +12,13 @@ from opentrons.protocols.parameters.types import (
 from opentrons.protocols.parameters import validation as subject
 
 
+def test_validate_variable_name_unique() -> None:
+    """It should no-op if the name is unique and raise if it is not."""
+    subject.validate_variable_name_unique("one of a kind", {"fee", "foo", "fum"})
+    with pytest.raises(ParameterNameError):
+        subject.validate_variable_name_unique("copy", {"paste", "copy", "cut"})
+
+
 def test_ensure_display_name() -> None:
     """It should ensure the display name is within the character limit."""
     result = subject.ensure_display_name("abc")
@@ -271,14 +278,15 @@ def test_convert_type_string_for_num_param_raises(param_type: type) -> None:
             None,
             [{"display_name": "abc", "value": "123"}],
             int,
-            "must match type",
+            "must be of type",
         ),
         (123, 1, None, None, int, "maximum must also"),
         (123, None, 100, None, int, "minimum must also"),
         (123, 100, 1, None, int, "Maximum must be greater"),
-        (123, 1.1, 100, None, int, "Minimum and maximum must match type"),
-        (123, 1, 100.5, None, int, "Minimum and maximum must match type"),
-        (123, "1", "100", None, int, "Only parameters of type float or int"),
+        (123, 1.1, 100, None, int, "Minimum is type"),
+        (123, 1, 100.5, None, int, "Maximum is type"),
+        (123.0, "1.0", 100.0, None, float, "Minimum is type"),
+        ("blah", 1, 100, None, str, "Only parameters of type float or int"),
     ],
 )
 def test_validate_options_raise_definition_error(

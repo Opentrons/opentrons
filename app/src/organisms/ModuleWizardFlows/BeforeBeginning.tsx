@@ -103,7 +103,7 @@ export const BeforeBeginning = (
       bodyText={
         <Trans
           t={t}
-          i18nKey={'get_started'}
+          i18nKey={'branded:module_calibration_get_started'}
           values={{ module: moduleDisplayName }}
           components={{ block: <StyledText as="p" /> }}
         />

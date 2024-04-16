@@ -15,6 +15,13 @@ const Template: Story<React.ComponentProps<typeof ChildNavigation>> = args => (
 export const Default = Template.bind({})
 Default.args = {
   header: 'Header',
+  onClickBack: () => {},
+}
+
+export const TitleNoBackButton = Template.bind({})
+TitleNoBackButton.args = {
+  header: 'Header',
+  onClickBack: undefined,
 }
 
 export const TitleWithNormalSmallButton = Template.bind({})
@@ -22,6 +29,16 @@ TitleWithNormalSmallButton.args = {
   header: 'Header',
   buttonText: 'ButtonText',
   onClickButton: () => {},
+  onClickBack: () => {},
+}
+
+export const TitleWithNormalSmallButtonDisabled = Template.bind({})
+TitleWithNormalSmallButtonDisabled.args = {
+  header: 'Header',
+  buttonText: 'ButtonText',
+  onClickButton: () => {},
+  onClickBack: () => {},
+  buttonIsDisabled: true,
 }
 
 export const TitleWithLinkButton = Template.bind({})
@@ -32,6 +49,7 @@ TitleWithLinkButton.args = {
   iconName: 'information',
   iconPlacement: 'startIcon',
   onClickButton: () => {},
+  onClickBack: () => {},
 }
 
 export const TitleWithTwoButtons = Template.bind({})
@@ -47,4 +65,5 @@ TitleWithTwoButtons.args = {
   buttonText: 'ButtonText',
   onClickButton: () => {},
   secondaryButtonProps,
+  onClickBack: () => {},
 }

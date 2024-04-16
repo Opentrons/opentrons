@@ -17,18 +17,18 @@
   },
   "errors": [
     {
-      "detail": "ValueError [line 15]: A magneticModuleType cannot be loaded into slot C1",
+      "detail": "ValueError [line 15]: Module Type magneticModuleType does not have a related fixture ID.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
       "wrappedErrors": [
         {
-          "detail": "ValueError: A magneticModuleType cannot be loaded into slot C1",
+          "detail": "ValueError: Module Type magneticModuleType does not have a related fixture ID.",
           "errorCode": "4000",
           "errorInfo": {
-            "args": "('A magneticModuleType cannot be loaded into slot C1',)",
+            "args": "('Module Type magneticModuleType does not have a related fixture ID.',)",
             "class": "ValueError",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_None_None_MM_2_16_AnalysisError_MagneticModuleInFlexProtocol.py\", line 15, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 814, in load_module\n    module_core = self._core.load_module(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 412, in load_module\n    self._ensure_module_location(normalized_deck_slot, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 631, in _ensure_module_location\n    raise ValueError(f\"A {module_type.value} cannot be loaded into slot {slot}\")\n"
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"Flex_None_None_MM_2_16_AnalysisError_MagneticModuleInFlexProtocol.py\", line 15, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 814, in load_module\n    module_core = self._core.load_module(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 413, in load_module\n    self._ensure_module_location(normalized_deck_slot, module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 637, in _ensure_module_location\n    cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/hardware_control/modules/types.py\", line 79, in to_module_fixture_id\n    raise ValueError(\n"
           },
           "errorType": "PythonException",
           "wrappedErrors": []

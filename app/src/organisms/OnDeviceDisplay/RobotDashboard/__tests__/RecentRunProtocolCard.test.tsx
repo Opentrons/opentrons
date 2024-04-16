@@ -5,8 +5,14 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { useProtocolQuery } from '@opentrons/react-api-client'
-import { RUN_STATUS_FAILED } from '@opentrons/api-client'
+import {
+  useProtocolQuery,
+  useProtocolAnalysisAsDocumentQuery,
+} from '@opentrons/react-api-client'
+import {
+  RUN_STATUS_FAILED,
+  simpleAnalysisFileFixture,
+} from '@opentrons/api-client'
 import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
@@ -24,11 +30,23 @@ import {
   INIT_STATUS,
 } from '../../../../resources/health/hooks'
 
+import type { useHistory } from 'react-router-dom'
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
+
+const mockPush = vi.fn()
+
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<typeof useHistory>()
+  return {
+    ...actual,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../atoms/Skeleton')
 vi.mock('../../../../pages/Protocols/hooks')
+vi.mock('../../../../pages/ProtocolDetails')
 vi.mock('../../../../organisms/Devices/hooks')
 vi.mock('../../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../../organisms/ProtocolUpload/hooks')
@@ -128,7 +146,18 @@ describe('RecentRunProtocolCard', () => {
       data: { data: [mockRunData] },
     } as any)
     vi.mocked(useProtocolQuery).mockReturnValue({
-      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
+      data: {
+        data: {
+          metadata: { protocolName: 'mockProtocol' },
+          id: 'mockProtocolId',
+        },
+      },
+    } as any)
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: {
+        ...simpleAnalysisFileFixture,
+        runTimeParameters: [],
+      },
     } as any)
     vi.mocked(useRobotInitializationStatus).mockReturnValue(
       INIT_STATUS.SUCCEEDED
@@ -251,5 +280,15 @@ describe('RecentRunProtocolCard', () => {
     vi.mocked(useRobotInitializationStatus).mockReturnValue(null)
     const [{ getByText }] = render(props)
     getByText('mock Skeleton')
+  })
+
+  it('should push to protocol details if protocol contains runtime parameters', () => {
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: simpleAnalysisFileFixture,
+    } as any)
+    render(props)
+    const button = screen.getByLabelText('RecentRunProtocolCard')
+    fireEvent.click(button)
+    expect(mockPush).toBeCalledWith('/protocols/mockProtocolId')
   })
 })

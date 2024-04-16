@@ -8,7 +8,7 @@ import {
   useCreateLiveCommandMutation,
   useModulesQuery,
 } from '@opentrons/react-api-client'
-import { ot3StandardDeckV4 as ot3StandardDeckDef } from '@opentrons/shared-data'
+import { ot3StandardDeckV5 as ot3StandardDeckDef } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'

@@ -270,11 +270,17 @@ export interface DeckCalibrationPoint {
   displayName: string
 }
 
+export type CutoutFixtureGroup = {
+  [cutoutId in CutoutId]?: Array<{ [cutoutId in CutoutId]?: CutoutFixtureId }>
+}
+
 export interface CutoutFixture {
   id: CutoutFixtureId
   mayMountTo: CutoutId[]
   displayName: string
   providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
+  expectOpentronsModuleSerialNumber: boolean
+  fixtureGroup: CutoutFixtureGroup
   height: number
 }
 
@@ -722,7 +728,8 @@ export type StatusBarAnimations = StatusBarAnimation[]
 
 export interface CutoutConfig {
   cutoutId: CutoutId
-  cutoutFixtureId: CutoutFixtureId | null
+  cutoutFixtureId: CutoutFixtureId
+  opentronsModuleSerialNumber?: string
 }
 
 export type DeckConfiguration = CutoutConfig[]

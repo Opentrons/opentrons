@@ -261,7 +261,7 @@ describe('useRequiredProtocolLabware', () => {
   })
 })
 
-describe('useMissingProtocolHardware', () => {
+describe.only('useMissingProtocolHardware', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
@@ -343,14 +343,6 @@ describe('useMissingProtocolHardware', () => {
           connected: false,
           hasSlotConflict: true,
         },
-        {
-          hardwareType: 'fixture',
-          cutoutFixtureId: 'singleRightSlot',
-          location: {
-            cutout: 'cutoutD3',
-          },
-          hasSlotConflict: true,
-        },
       ],
       conflictedSlots: ['D3'],
     })
@@ -374,6 +366,21 @@ describe('useMissingProtocolHardware', () => {
       data: { data: [mockHeaterShaker] },
       isLoading: false,
     } as any)
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+      data: [
+        omitBy(
+          FLEX_SIMPLEST_DECK_CONFIG,
+          ({ cutoutId }) => cutoutId === 'cutoutD3'
+        ),
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: 'heaterShakerModuleV1',
+          opentronsModuleSerialNumber: mockHeaterShaker.serialNumber,
+        },
+      ],
+      isLoading: false,
+    } as any)
+
     const { result } = renderHook(
       () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
       { wrapper }
@@ -384,7 +391,7 @@ describe('useMissingProtocolHardware', () => {
       conflictedSlots: [],
     })
   })
-  it('should return conflicting slot when module location is configured with something other than single slot fixture', () => {
+  it('should return conflicting slot when module location is configured with something other than module fixture', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [
@@ -425,11 +432,10 @@ describe('useMissingProtocolHardware', () => {
     expect(result.current).toEqual({
       missingProtocolHardware: [
         {
-          hardwareType: 'fixture',
-          cutoutFixtureId: 'singleRightSlot',
-          location: {
-            cutout: 'cutoutD3',
-          },
+          hardwareType: 'module',
+          moduleModel: 'heaterShakerModuleV1',
+          slot: 'D3',
+          connected: false,
           hasSlotConflict: true,
         },
       ],

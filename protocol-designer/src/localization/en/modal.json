@@ -49,7 +49,7 @@
       "body3": "Adjust horizontal position within a well when aspirating, dispensing, or mixing.",
       "body4": "Assign up to three types of tip racks to a single pipette.",
       "body5": "Add multiple Temperature Modules to the deck (Flex only).",
-      "body6": "All protocols require {{app}} version <strong>7.2.0 or later</strong> to run."
+      "body6": "All protocols require {{app}} version <strong>7.3.0 or later</strong> to run."
     }
   },
   "labware_selection": {
@@ -177,7 +177,7 @@
     "closeUnsavedStepForm": {
       "title": "Unsaved step form",
       "body": "You have not saved this step form. If you navigate away without saving, this step will be deleted.",
-      "confirm_button": "delete step"
+      "confirm_button": "discard step"
     },
     "closeBatchEditForm": {
       "title": "Unsaved changes to multiple steps",

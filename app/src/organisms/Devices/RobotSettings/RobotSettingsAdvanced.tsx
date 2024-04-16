@@ -19,6 +19,7 @@ import {
   DeviceReset,
   DisplayRobotName,
   EnableStatusLight,
+  FactoryMode,
   GantryHoming,
   LegacySettings,
   OpenJupyterControl,
@@ -39,6 +40,7 @@ import {
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
+import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryModeSlideout'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
 import { UNREACHABLE } from '../../../redux/discovery'
 import { getTopPortalEl } from '../../../App/portal'
@@ -71,6 +73,10 @@ export function RobotSettingsAdvanced({
   const [
     showDeviceResetModal,
     setShowDeviceResetModal,
+  ] = React.useState<boolean>(false)
+  const [
+    showFactoryModeSlideout,
+    setShowFactoryModeSlideout,
   ] = React.useState<boolean>(false)
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
@@ -128,6 +134,13 @@ export function RobotSettingsAdvanced({
           <RenameRobotSlideout
             isExpanded={showRenameRobotSlideout}
             onCloseClick={() => setShowRenameRobotSlideout(false)}
+            robotName={robotName}
+          />
+        )}
+        {showFactoryModeSlideout && (
+          <FactoryModeSlideout
+            isExpanded={showFactoryModeSlideout}
+            onCloseClick={() => setShowFactoryModeSlideout(false)}
             robotName={robotName}
           />
         )}
@@ -195,6 +208,15 @@ export function RobotSettingsAdvanced({
           isRobotBusy={isRobotBusy || isEstopNotDisengaged}
           onUpdateStart={() => handleUpdateBuildroot(robot)}
         />
+        {isFlex ? (
+          <>
+            <Divider marginY={SPACING.spacing16} />
+            <FactoryMode
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+              setShowFactoryModeSlideout={setShowFactoryModeSlideout}
+            />
+          </>
+        ) : null}
         <Troubleshooting
           robotName={robotName}
           isEstopNotDisengaged={isEstopNotDisengaged}

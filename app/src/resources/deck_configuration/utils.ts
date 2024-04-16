@@ -25,8 +25,9 @@ export function getIsFixtureMismatch(
   deckConfigProtocolSpec: CutoutConfigAndCompatibility[]
 ): boolean {
   const isFixtureMismatch = !deckConfigProtocolSpec.every(
-    ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
-      isMatchedFixture(cutoutFixtureId, compatibleCutoutFixtureIds)
+    ({ cutoutFixtureId, compatibleCutoutFixtureIds }) => {
+      return isMatchedFixture(cutoutFixtureId, compatibleCutoutFixtureIds)
+    }
   )
   return isFixtureMismatch
 }

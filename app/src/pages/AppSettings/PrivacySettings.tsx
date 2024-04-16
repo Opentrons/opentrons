@@ -21,7 +21,7 @@ import { ToggleButton } from '../../atoms/buttons'
 import type { Dispatch, State } from '../../redux/types'
 
 export function PrivacySettings(): JSX.Element {
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation('branded')
   const dispatch = useDispatch<Dispatch>()
   const analyticsOptedIn = useSelector((s: State) => getAnalyticsOptedIn(s))
 

@@ -51,7 +51,7 @@ export function RunFailedModal({
   setShowRunFailedModal,
   highestPriorityError,
 }: RunFailedModalProps): JSX.Element | null {
-  const { i18n, t } = useTranslation(['run_details', 'shared'])
+  const { i18n, t } = useTranslation(['run_details', 'shared', 'branded'])
   const modalProps: LegacyModalProps = {
     type: 'error',
     title: t('run_failed_modal_title'),
@@ -89,7 +89,7 @@ export function RunFailedModal({
           </StyledText>
         </Flex>
         <StyledText as="p">
-          {t('run_failed_modal_description_desktop')}
+          {t('branded:run_failed_modal_description_desktop')}
         </StyledText>
         <Flex
           marginTop={SPACING.spacing32}

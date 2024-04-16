@@ -60,7 +60,11 @@ export const Results = (props: ResultsProps): JSX.Element => {
     setShowErrorMessage,
     nextMount,
   } = props
-  const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
+  const { t, i18n } = useTranslation([
+    'pipette_wizard_flows',
+    'shared',
+    'branded',
+  ])
   const pipetteName =
     attachedPipettes[mount] != null ? attachedPipettes[mount]?.displayName : ''
 
@@ -263,7 +267,8 @@ export const Results = (props: ResultsProps): JSX.Element => {
         }
       }
     `
-    subHeader = numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined
+    subHeader =
+      numberOfTryAgains > 2 ? t('branded:something_seems_wrong') : undefined
     button = (
       <>
         {isOnDevice ? (

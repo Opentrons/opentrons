@@ -45,7 +45,7 @@ export function DeviceResetModal({
   robotName,
   resetOptions,
 }: DeviceResetModalProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const history = useHistory()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const isFlex = useIsFlex(robotName)
@@ -132,7 +132,7 @@ export function DeviceResetModal({
             marginBottom={SPACING.spacing24}
             paddingBottom={SPACING.spacing24}
           >
-            {t('connection_lost_description')}
+            {t('branded:connection_lost_description')}
           </StyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END}>
             <PrimaryButton

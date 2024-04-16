@@ -9,7 +9,6 @@ import {
   Chip,
   DIRECTION_COLUMN,
   Flex,
-  Icon,
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   SPACING,
@@ -43,7 +42,6 @@ import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '../../organisms/Devices/getModulePrepCommands'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
-import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedProtocolModuleMatch } from './utils'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
@@ -51,19 +49,11 @@ const DECK_CONFIG_REFETCH_INTERVAL = 5000
 interface ModuleTableProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]
   deckDef: DeckDefinition
-  protocolModulesInfo: ProtocolModuleInfo[]
   runId: string
-  setShowMultipleModulesModal: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function ModuleTable(props: ModuleTableProps): JSX.Element {
-  const {
-    attachedProtocolModuleMatches,
-    deckDef,
-    protocolModulesInfo,
-    runId,
-    setShowMultipleModulesModal,
-  } = props
+  const { attachedProtocolModuleMatches, deckDef, runId } = props
 
   const { t } = useTranslation('protocol_setup')
 
@@ -95,16 +85,6 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
         <StyledText flex="4 0 0"> {t('status')}</StyledText>
       </Flex>
       {attachedProtocolModuleMatches.map(module => {
-        // check for duplicate module model in list of modules for protocol
-        const isDuplicateModuleModel = protocolModulesInfo
-          // filter out current module
-          .filter(otherModule => otherModule.moduleId !== module.moduleId)
-          // check for existence of another module of same model
-          .some(
-            otherModule =>
-              otherModule.moduleDef.model === module.moduleDef.model
-          )
-
         const cutoutIdForSlotName = getCutoutIdForSlotName(
           module.slotName,
           deckDef
@@ -134,14 +114,13 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
           <ModuleTableItem
             key={module.moduleId}
             module={module}
-            isDuplicateModuleModel={isDuplicateModuleModel}
-            setShowMultipleModulesModal={setShowMultipleModulesModal}
             calibrationStatus={calibrationStatus}
             chainLiveCommands={chainLiveCommands}
             isLoading={isCommandMutationLoading}
             prepCommandErrorMessage={prepCommandErrorMessage}
             setPrepCommandErrorMessage={setPrepCommandErrorMessage}
             conflictedFixture={conflictedFixture}
+            deckDef={deckDef}
           />
         )
       })}
@@ -156,24 +135,22 @@ interface ModuleTableItemProps {
     continuePastCommandFailure: boolean
   ) => Promise<CommandData[]>
   conflictedFixture: CutoutConfig | null
-  isDuplicateModuleModel: boolean
   isLoading: boolean
   module: AttachedProtocolModuleMatch
   prepCommandErrorMessage: string
   setPrepCommandErrorMessage: React.Dispatch<React.SetStateAction<string>>
-  setShowMultipleModulesModal: React.Dispatch<React.SetStateAction<boolean>>
+  deckDef: DeckDefinition
 }
 
 function ModuleTableItem({
-  isDuplicateModuleModel,
   module,
-  setShowMultipleModulesModal,
   calibrationStatus,
   chainLiveCommands,
   isLoading,
   prepCommandErrorMessage,
   setPrepCommandErrorMessage,
   conflictedFixture,
+  deckDef,
 }: ModuleTableItemProps): JSX.Element {
   const { i18n, t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
 
@@ -216,7 +193,6 @@ function ModuleTableItem({
         background={false}
         iconName="connection-status"
       />
-      {isDuplicateModuleModel ? <Icon name="information" size="2rem" /> : null}
     </>
   )
   if (conflictedFixture != null) {
@@ -231,7 +207,9 @@ function ModuleTableItem({
         <SmallButton
           buttonCategory="rounded"
           buttonText={t('resolve')}
-          onClick={() => setShowLocationConflictModal(true)}
+          onClick={() => {
+            setShowLocationConflictModal(true)
+          }}
         />
       </>
     )
@@ -246,17 +224,12 @@ function ModuleTableItem({
     module.attachedModuleMatch?.moduleOffset?.last_modified != null
   ) {
     moduleStatus = (
-      <>
-        <Chip
-          text={t('module_connected')}
-          type="success"
-          background={false}
-          iconName="connection-status"
-        />
-        {isDuplicateModuleModel ? (
-          <Icon name="information" size="2rem" />
-        ) : null}
-      </>
+      <Chip
+        text={t('module_connected')}
+        type="success"
+        background={false}
+        iconName="connection-status"
+      />
     )
   } else if (
     isModuleReady &&
@@ -285,8 +258,9 @@ function ModuleTableItem({
       {showModuleWizard && module.attachedModuleMatch != null ? (
         <ModuleWizardFlows
           attachedModule={module.attachedModuleMatch}
-          closeFlow={() => setShowModuleWizard(false)}
-          initialSlotName={module.slotName}
+          closeFlow={() => {
+            setShowModuleWizard(false)
+          }}
           isPrepCommandLoading={isLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
@@ -295,9 +269,12 @@ function ModuleTableItem({
       ) : null}
       {showLocationConflictModal && conflictedFixture != null ? (
         <LocationConflictModal
-          onCloseClick={() => setShowLocationConflictModal(false)}
+          onCloseClick={() => {
+            setShowLocationConflictModal(false)
+          }}
           cutoutId={conflictedFixture.cutoutId}
           requiredModule={module.moduleDef.model}
+          deckDef={deckDef}
           isOnDevice={true}
         />
       ) : null}
@@ -313,12 +290,9 @@ function ModuleTableItem({
             : COLORS.yellow35
         }
         borderRadius={BORDERS.borderRadius8}
-        cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
+        cursor="inherit"
         gridGap={SPACING.spacing24}
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-        onClick={() =>
-          isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
-        }
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
