@@ -75,7 +75,10 @@ def get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
                 if engine_store.current_run_id is None:
                     return
                 engine_store.engine.estop()
-                # TODO: Unclear if it's correct to call .finish() here.
+                # todo(mm, 2024-04-16): Is it correct to call .finish() here, in the
+                # non-maintenance engine store? Is this redundant with the .finish()es
+                # in the protocol runners? Is this needed for regular-run setup
+                # commands?
                 await engine_store.engine.finish()
         except Exception:
             # This is a background task kicked off by a hardware event,
