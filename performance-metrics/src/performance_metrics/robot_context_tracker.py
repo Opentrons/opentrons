@@ -9,16 +9,6 @@ from time import perf_counter_ns
 import os
 from typing import Callable, TypeVar, cast
 
-if platform.system() == "Linux":
-    from time import clock_gettime_ns, CLOCK_REALTIME
-
-    time_ns = cast(Callable[[], int], partial(clock_gettime_ns, CLOCK_REALTIME))
-else:
-    # Compatability for Windows and MacOS
-    # This is to allow dev tests to run on Windows and MacOS
-    # The actual production usage is on the robot OS, which is Linux
-    from time import time_ns
-
 
 from typing_extensions import ParamSpec
 from collections import deque
@@ -26,6 +16,19 @@ from performance_metrics.datashapes import RawContextData, RobotContextState
 
 P = ParamSpec("P")
 R = TypeVar("R")
+
+def _get_timing_function() -> Callable[[], int]:
+    """Returns a timing function for the current platform."""
+    time_function: Callable[[], int]
+    if platform.system() == "Linux":
+        from time import clock_gettime_ns, CLOCK_REALTIME
+
+        time_function = cast(Callable[[], int], partial(clock_gettime_ns, CLOCK_REALTIME))
+    else:
+        from time import time_ns
+        time_function = time_ns
+
+    return time_function
 
 
 class RobotContextTracker:
@@ -53,7 +56,7 @@ class RobotContextTracker:
 
             @wraps(func)
             def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-                function_start_time = time_ns()
+                function_start_time = _get_timing_function()()
                 duration_start_time = perf_counter_ns()
                 try:
                     result = func(*args, **kwargs)
