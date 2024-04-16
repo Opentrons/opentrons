@@ -67,3 +67,10 @@ def _get_robot_context_tracker() -> SupportsTracking:
             get_performance_metrics_data_dir(), _should_track
         )
     return _robot_context_tracker
+
+
+def track_analysis(func: F) -> F:
+    """Track the analysis of a protocol."""
+    return _get_robot_context_tracker().track(RobotContextState.ANALYZING_PROTOCOL)(
+        func
+    )
