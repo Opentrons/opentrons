@@ -8,7 +8,15 @@ import { moveDeckItem } from '../labware-ingred/actions/actions'
 import { useBlockingHint } from './Hints/useBlockingHint'
 import { MagneticModuleWarningModalContent } from './modals/EditModulesModal/MagneticModuleWarningModalContent'
 import { EditModulesModal } from './modals/EditModulesModal'
-import { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  ModuleModel,
+  ModuleType,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V2,
+} from '@opentrons/shared-data'
+import { getRobotType } from '../file-data/selectors'
+import { EditMultipleModulesModal } from './modals/EditModulesModal/EditMultipleModulesModal'
 
 export interface EditModulesProps {
   moduleToEdit: {
@@ -27,6 +35,9 @@ export const EditModules = (props: EditModulesProps): JSX.Element => {
   const { onCloseClick, moduleToEdit } = props
   const { moduleId, moduleType } = moduleToEdit
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
+  const robotType = useSelector(getRobotType)
+  const showMultipleModuleModal =
+    robotType === FLEX_ROBOT_TYPE && moduleType === TEMPERATURE_MODULE_TYPE
 
   const moduleOnDeck = moduleId ? _initialDeckSetup.modules[moduleId] : null
   const [
@@ -74,16 +85,24 @@ export const EditModules = (props: EditModulesProps): JSX.Element => {
     enabled: changeModuleWarningInfo !== null,
   })
 
-  return (
-    changeModuleWarning ?? (
-      <EditModulesModal
-        moduleType={moduleType}
-        moduleOnDeck={moduleOnDeck}
+  let modal = (
+    <EditModulesModal
+      moduleType={moduleType}
+      moduleOnDeck={moduleOnDeck}
+      onCloseClick={onCloseClick}
+      editModuleSlot={editModuleSlot}
+      editModuleModel={editModuleModel}
+      displayModuleWarning={displayModuleWarning}
+    />
+  )
+  if (showMultipleModuleModal) {
+    modal = (
+      <EditMultipleModulesModal
         onCloseClick={onCloseClick}
-        editModuleSlot={editModuleSlot}
-        editModuleModel={editModuleModel}
-        displayModuleWarning={displayModuleWarning}
+        modules={Object.values(_initialDeckSetup.modules)}
+        moduleType={TEMPERATURE_MODULE_TYPE}
       />
     )
-  )
+  }
+  return changeModuleWarning ?? modal
 }
