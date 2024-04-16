@@ -46,6 +46,7 @@ class StubbedTracker(SupportsTracking):
         """Do nothing."""
         pass
 
+
 def _get_robot_context_tracker() -> SupportsTracking:
     """Singleton for the robot context tracker."""
     global _robot_context_tracker
