@@ -72,17 +72,17 @@ class SupportedTipsDefinition(BaseModel):
 
     default_aspirate_flowrate: FlowRateDefinition = Field(
         ...,
-        description="The flowrate used in aspirations by default.",
+        description="The flowrate used in aspirations by default. For lowVolumeDefault only, the flowrate matches uiMaxFlowRate for ui purposes, it does not change physical behavior.",
         alias="defaultAspirateFlowRate",
     )
     default_dispense_flowrate: FlowRateDefinition = Field(
         ...,
-        description="The flowrate used in dispenses by default.",
+        description="The flowrate used in dispenses by default. For lowVolumeDefault only, the flowrate matches uiMaxFlowRate for ui purposes, it does not change physical behavior.",
         alias="defaultDispenseFlowRate",
     )
     default_blowout_flowrate: FlowRateDefinition = Field(
         ...,
-        description="The flowrate used in blowouts by default.",
+        description="The flowrate used in blowouts by default. For lowVolumeDefault only, the flowrate matches uiMaxFlowRate for ui purposes, it does not change physical behavior.",
         alias="defaultBlowOutFlowRate",
     )
     default_flow_acceleration: float = Field(
