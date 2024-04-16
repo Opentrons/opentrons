@@ -92,7 +92,7 @@ def BuildAsairSensor(simulate: bool, autosearch: bool = True) -> AsairSensorBase
                     ui.print_info(f"Trying to connect to env sensor on port {port}")
                     sensor = AsairSensor.connect(port)
                     ser_id = sensor.get_serial()
-                    if ser_id == " ":
+                    if len(ser_id) !> 1:
                         ui.print_info(f"Found env sensor {ser_id} on port {port}")
                         return sensor
                 except:  # noqa: E722
@@ -186,7 +186,7 @@ class AsairSensor(AsairSensorBase):
 
     def get_serial(self) -> str:
         """Read the device ID register."""
-        data_packet = "{}0300000002{}".format(
+        data_packet = "{}03000A0002{}".format(
             self._sensor_address, addrs[self._sensor_address]
         )
         log.debug(f"sending {data_packet}")
