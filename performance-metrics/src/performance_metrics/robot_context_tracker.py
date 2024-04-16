@@ -6,7 +6,7 @@ import platform
 
 from functools import wraps, partial
 from time import perf_counter_ns
-import os
+from os import makedirs
 from typing import Callable, TypeVar, cast
 
 
@@ -24,8 +24,6 @@ from opentrons_shared_data.performance.dev_types import (
 P = ParamSpec("P")
 R = TypeVar("R")
 
-
-class RobotContextTracker(SupportsTracking):
 def _get_timing_function() -> Callable[[], int]:
     """Returns a timing function for the current platform."""
     time_function: Callable[[], int]
@@ -43,7 +41,7 @@ def _get_timing_function() -> Callable[[], int]:
     return time_function
 
 
-class RobotContextTracker:
+class RobotContextTracker(SupportsTracking):
     """Tracks and stores robot context and execution duration for different operations."""
 
     def __init__(self, storage_dir: Path, should_track: bool = False) -> None:
