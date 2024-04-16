@@ -277,14 +277,8 @@ class ProtocolEngine:
         )
         return completed_command
 
-    def estop(
-        self,
-        # TODO(mm, 2024-03-26): Maintenance runs are a robot-server concept that
-        # ProtocolEngine should not have to know about. Can this be simplified or
-        # defined in other terms?
-        maintenance_run: bool,
-    ) -> None:
-        """Signal to the engine that an estop event occurred.
+    def estop(self) -> None:
+        """Signal to the engine that an E-stop event occurred.
 
         If an estop happens while the robot is moving, lower layers physically stop
         motion and raise the event as an exception, which fails the Protocol Engine
@@ -303,77 +297,33 @@ class ProtocolEngine:
         case will expect the protocol runner to `finish()` the engine, whereas the
         maintenance run will be put into a state wherein the engine can be discarded.
         """
-        if self._state_store.commands.get_is_stopped():
-            return
-        running_or_next_queued_id = (
-            self._state_store.commands.get_running_command_id()
-            or self._state_store.commands.get_queue_ids().head(None)
-            # TODO(mm, 2024-04-02): This logic looks wrong whenever the next queued
-            # command is a setup command, which is the normal case in maintenance
-            # runs. Setup commands won't show up in commands.get_queue_ids().
-        )
-        running_or_next_queued = (
-            self._state_store.commands.get(running_or_next_queued_id)
-            if running_or_next_queued_id is not None
-            else None
-        )
-
-        if running_or_next_queued_id is not None:
-            assert running_or_next_queued is not None
-
-            fail_action = FailCommandAction(
-                command_id=running_or_next_queued_id,
-                # FIXME(mm, 2024-04-02): As of https://github.com/Opentrons/opentrons/pull/14726,
-                # this action is only legal if the command is running, not queued.
-                running_command=running_or_next_queued,
-                error_id=self._model_utils.generate_id(),
-                failed_at=self._model_utils.get_timestamp(),
-                error=EStopActivatedError(message="Estop Activated"),
-                notes=[],
-                type=ErrorRecoveryType.FAIL_RUN,
-            )
-            self._action_dispatcher.dispatch(fail_action)
-
-            # The FailCommandAction above will have cleared all the queued protocol
-            # OR setup commands, depending on whether we gave it a protocol or setup
-            # command. We want both to be cleared in either case. So, do that here.
-            running_or_next_queued_id = self._state_store.commands.get_queue_ids().head(
-                None
-            )
-            if running_or_next_queued_id is not None:
-                running_or_next_queued = self._state_store.commands.get(
-                    running_or_next_queued_id
-                )
-                fail_action = FailCommandAction(
-                    command_id=running_or_next_queued_id,
-                    # FIXME(mm, 2024-04-02): As of https://github.com/Opentrons/opentrons/pull/14726,
-                    # this action is only legal if the command is running, not queued.
-                    running_command=running_or_next_queued,
-                    error_id=self._model_utils.generate_id(),
-                    failed_at=self._model_utils.get_timestamp(),
-                    error=EStopActivatedError(message="Estop Activated"),
-                    notes=[],
-                    type=ErrorRecoveryType.FAIL_RUN,
-                )
-                self._action_dispatcher.dispatch(fail_action)
-            self._queue_worker.cancel()
-        elif maintenance_run:
-            stop_action = self._state_store.commands.validate_action_allowed(
+        try:
+            # todo(mm, 2024-04-16): This makes the run appeared as "cancelled" instead
+            # of "failed". We either want to make a separate action for E-stops,
+            # or we want to teach CommandView.get_status() about from_estop=True.
+            action = self._state_store.commands.validate_action_allowed(
                 StopAction(from_estop=True)
             )
-            self._action_dispatcher.dispatch(stop_action)
-            hardware_stop_action = HardwareStoppedAction(
-                completed_at=self._model_utils.get_timestamp(),
-                finish_error_details=FinishErrorDetails(
-                    error=EStopActivatedError(message="Estop Activated"),
-                    error_id=self._model_utils.generate_id(),
-                    created_at=self._model_utils.get_timestamp(),
-                ),
+        except Exception:  # todo(mm, 2024-04-16): Catch a more specific type.
+            # This is likely called from some hardware API callback that doesn't care
+            # about ProtocolEngine lifecycle or what methods are valid to call at what
+            # times. So it makes more sense for us to no-op here than to propagate this
+            # as an error.
+            _log.info(
+                "ProtocolEngine cannot handle E-stop event right now. Ignoring it.",
+                exc_info=True,
             )
-            self._action_dispatcher.dispatch(hardware_stop_action)
-            self._queue_worker.cancel()
-        else:
-            _log.info("estop pressed before protocol was started, taking no action.")
+            return
+        self._action_dispatcher.dispatch(action)
+        # self._queue_worker.cancel() will try to interrupt any ongoing command.
+        # Unfortunately, if it's a hardware command, this interruption will race
+        # against the E-stop exception propagating up from lower layers. But we need to
+        # do this because we want to make sure non-hardware commands, like
+        # `waitForDuration`, are also interrupted.
+        self._queue_worker.cancel()
+        # Unlike self.request_stop(), we don't need to do
+        # self._hardware_api.cancel_execution_and_running_tasks(). Since this was an
+        # E-stop event, the hardware API already knows.
 
     async def request_stop(self) -> None:
         """Make command execution stop soon.
