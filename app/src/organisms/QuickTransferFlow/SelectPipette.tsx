@@ -55,13 +55,14 @@ export function SelectPipette(props: SelectPipetteProps): JSX.Element {
       selectedPipette === LEFT ? leftPipetteSpecs : rightPipetteSpecs
 
     // the button will be disabled if these values are null
-    if (selectedPipette != null && selectedPipetteSpecs != null)
+    if (selectedPipette != null && selectedPipetteSpecs != null) {
       dispatch({
         type: 'SELECT_PIPETTE',
         pipette: selectedPipetteSpecs,
         mount: selectedPipette,
       })
-    onNext()
+      onNext()
+    }
   }
   return (
     <Flex>
