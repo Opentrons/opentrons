@@ -486,7 +486,7 @@ export interface SupportedTip {
   }
   defaultReturnTipHeight?: number
   defaultFlowAcceleration?: number
-  uiMaxRate?: number
+  uiMaxFlowRate?: number
 }
 
 export interface SupportedTips {
