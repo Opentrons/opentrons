@@ -11,13 +11,15 @@ from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
-from opentrons import get_robot_context_tracker
+from opentrons.util.performance_helpers import _get_robot_context_tracker
 
 
 # Enable tracking for the RobotContextTracker
 # This must come before the import of the analyze CLI
-context_tracker = get_robot_context_tracker()
-context_tracker._should_track = True
+context_tracker = _get_robot_context_tracker()
+
+# Ignore the type error for the next line, as we're setting a private attribute for testing purposes
+context_tracker._should_track = True  # type: ignore[attr-defined]
 
 from opentrons.cli.analyze import analyze  # noqa: E402
 
@@ -253,7 +255,7 @@ def test_python_error_line_numbers(
     assert error["detail"] == expected_detail
 
 
-def test_tracking_of_analyis_with_robot_context_tracker(tmp_path: Path) -> None:
+def test_track_analysis(tmp_path: Path) -> None:
     """Test that the RobotContextTracker tracks analysis."""
     protocol_source = textwrap.dedent(
         """
@@ -267,8 +269,8 @@ def test_tracking_of_analyis_with_robot_context_tracker(tmp_path: Path) -> None:
     protocol_source_file = tmp_path / "protocol.py"
     protocol_source_file.write_text(protocol_source, encoding="utf-8")
 
-    before_analysis = len(context_tracker._storage)
+    before_analysis = len(context_tracker._storage)  # type: ignore[attr-defined]
 
     _get_analysis_result([protocol_source_file])
 
-    assert len(context_tracker._storage) == before_analysis + 1
+    assert len(context_tracker._storage) == before_analysis + 1  # type: ignore[attr-defined]
