@@ -207,7 +207,11 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
         </Flex>
       </LegacyModalShell>
     ) : (
-      <LegacyModalShell width="47rem" height="31rem" header={wizardHeader}>
+      <LegacyModalShell
+        width="47rem"
+        height="min-content"
+        header={wizardHeader}
+      >
         {showExitConfirmation ? (
           <ExitModal
             goBack={() => setShowExitConfirmation(false)}

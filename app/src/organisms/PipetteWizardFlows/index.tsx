@@ -421,7 +421,7 @@ export const PipetteWizardFlows = (
           currentStep.section === SECTIONS.BEFORE_BEGINNING &&
           selectedPipette === NINETY_SIX_CHANNEL &&
           flowType === FLOWS.ATTACH
-            ? '31rem'
+            ? '30rem'
             : 'auto'
         }
         header={wizardHeader}
