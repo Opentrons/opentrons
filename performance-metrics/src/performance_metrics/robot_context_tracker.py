@@ -26,7 +26,10 @@ from performance_metrics.constants import PerformanceMetricsFilename
 from performance_metrics.datashapes import (
     RawContextData,
 )
-from opentrons_shared_data.performance.dev_types import RobotContextState, SupportsTracking
+from opentrons_shared_data.performance.dev_types import (
+    RobotContextState,
+    SupportsTracking,
+)
 
 P = ParamSpec("P")
 R = TypeVar("R")

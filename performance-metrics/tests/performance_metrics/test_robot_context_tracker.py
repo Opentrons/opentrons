@@ -4,7 +4,7 @@ import asyncio
 from pathlib import Path
 import pytest
 from performance_metrics.robot_context_tracker import RobotContextTracker
-from performance_metrics.datashapes import RobotContextState
+from opentrons_shared_data.performance.dev_types import RobotContextState
 from time import sleep
 
 # Corrected times in seconds

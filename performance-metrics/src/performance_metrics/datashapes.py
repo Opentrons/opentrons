@@ -1,6 +1,5 @@
 """Defines data classes and enums used in the performance metrics module."""
 
-from enum import Enum
 import dataclasses
 from typing import Tuple
 from opentrons_shared_data.performance.dev_types import RobotContextState
