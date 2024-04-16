@@ -186,8 +186,8 @@ class CommandState:
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
 
-    latest_command_hash: Optional[str]
-    """The latest hash value received in a QueueCommandAction.
+    latest_protocol_command_hash: Optional[str]
+    """The latest PROTOCOL command hash value received in a QueueCommandAction.
 
     This value can be used to generate future hashes.
     """
@@ -221,7 +221,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             recovery_target_command_id=None,
             run_completed_at=None,
             run_started_at=None,
-            latest_command_hash=None,
+            latest_protocol_command_hash=None,
             stopped_by_estop=False,
         )
 
@@ -249,7 +249,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.command_history.set_command_queued(queued_command)
 
             if action.request_hash is not None:
-                self._state.latest_command_hash = action.request_hash
+                self._state.latest_protocol_command_hash = action.request_hash
 
         elif isinstance(action, RunCommandAction):
             prev_entry = self._state.command_history.get(action.command_id)
@@ -896,6 +896,6 @@ class CommandView(HasState[CommandState]):
         # SETUP and we're currently a setup command?
         return EngineStatus.IDLE
 
-    def get_latest_command_hash(self) -> Optional[str]:
+    def get_latest_protocol_command_hash(self) -> Optional[str]:
         """Get the command hash of the last queued command, if any."""
-        return self._state.latest_command_hash
+        return self._state.latest_protocol_command_hash
