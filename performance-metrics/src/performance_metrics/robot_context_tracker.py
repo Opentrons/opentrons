@@ -2,17 +2,27 @@
 
 import csv
 from pathlib import Path
-import os
+import platform
 
-from functools import wraps
-from time import perf_counter_ns, clock_gettime_ns, CLOCK_REALTIME
-from typing import Callable, TypeVar
+from functools import wraps, partial
+from time import perf_counter_ns
+import os
+from typing import Callable, TypeVar, cast
+
+if platform.system() == "Linux":
+    from time import clock_gettime_ns, CLOCK_REALTIME
+
+    time_ns = cast(Callable[[], int], partial(clock_gettime_ns, CLOCK_REALTIME))
+else:
+    # Compatability for Windows and MacOS
+    # This is to allow dev tests to run on Windows and MacOS
+    # The actual production usage is on the robot OS, which is Linux
+    from time import time_ns
+
+
 from typing_extensions import ParamSpec
 from collections import deque
-from performance_metrics.datashapes import (
-    RawContextData,
-    RobotContextState,
-)
+from performance_metrics.datashapes import RawContextData, RobotContextState
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -43,7 +53,7 @@ class RobotContextTracker:
 
             @wraps(func)
             def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-                function_start_time = clock_gettime_ns(CLOCK_REALTIME)
+                function_start_time = time_ns()
                 duration_start_time = perf_counter_ns()
                 try:
                     result = func(*args, **kwargs)
