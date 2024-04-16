@@ -17,15 +17,19 @@ from performance_metrics.datashapes import RawContextData, RobotContextState
 P = ParamSpec("P")
 R = TypeVar("R")
 
+
 def _get_timing_function() -> Callable[[], int]:
     """Returns a timing function for the current platform."""
     time_function: Callable[[], int]
     if platform.system() == "Linux":
         from time import clock_gettime_ns, CLOCK_REALTIME
 
-        time_function = cast(Callable[[], int], partial(clock_gettime_ns, CLOCK_REALTIME))
+        time_function = cast(
+            Callable[[], int], partial(clock_gettime_ns, CLOCK_REALTIME)
+        )
     else:
         from time import time_ns
+
         time_function = time_ns
 
     return time_function

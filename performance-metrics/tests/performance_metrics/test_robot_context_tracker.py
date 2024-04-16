@@ -270,7 +270,10 @@ async def test_storing_to_file(tmp_path: Path) -> None:
         ), "All stored data + header should be written to the file."
 
 
-@patch("performance_metrics.robot_context_tracker._get_timing_function", return_value=time_ns)
+@patch(
+    "performance_metrics.robot_context_tracker._get_timing_function",
+    return_value=time_ns,
+)
 def test_using_non_linux_time_functions(tmp_path: Path) -> None:
     """Tests tracking operations using non-Linux time functions."""
     file_path = tmp_path / "test_file.csv"
@@ -301,5 +304,3 @@ def test_using_non_linux_time_functions(tmp_path: Path) -> None:
         data.duration_end > data.duration_start for data in storage
     ), "Duration end times should be greater than duration start times."
     assert len(storage) == 2, "Both operations should be tracked."
-
-
