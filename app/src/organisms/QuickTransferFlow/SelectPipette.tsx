@@ -31,16 +31,14 @@ export function SelectPipette(props: SelectPipetteProps): JSX.Element {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const { data: attachedInstruments } = useInstrumentsQuery()
 
-  // @ts-expect-error mount should be enough of a type narrower here
-  const leftPipette: PipetteData | undefined = attachedInstruments?.data.find(
-    instrument => instrument.ok && instrument.mount === LEFT
+  const leftPipette = attachedInstruments?.data.find(
+    (i): i is PipetteData => i.ok && i.mount === LEFT
   )
   const leftPipetteSpecs =
     leftPipette != null ? getPipetteSpecsV2(leftPipette.instrumentModel) : null
 
-  // @ts-expect-error mount should be enough of a type narrower here
-  const rightPipette: PipetteData | undefined = attachedInstruments?.data.find(
-    instrument => instrument.ok && instrument.mount === RIGHT
+  const rightPipette = attachedInstruments?.data.find(
+    (i): i is PipetteData => i.ok && i.mount === RIGHT
   )
   const rightPipetteSpecs =
     rightPipette != null

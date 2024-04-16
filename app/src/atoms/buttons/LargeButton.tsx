@@ -114,19 +114,11 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       {...buttonProps}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText
-          fontSize="2rem"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight="2.625rem"
-        >
+        <StyledText css={TYPOGRAPHY.level3HeaderSemiBold}>
           {buttonText}
         </StyledText>
         {subtext ? (
-          <StyledText
-            fontSize="2rem"
-            lineHeight="2.625rem"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
+          <StyledText css={TYPOGRAPHY.level3HeaderRegular}>
             {subtext}
           </StyledText>
         ) : null}
