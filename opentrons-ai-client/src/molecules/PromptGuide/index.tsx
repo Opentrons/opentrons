@@ -42,7 +42,7 @@ export function PromptGuide(): JSX.Element {
           <ul>
             <li>
               <StyledText>{t('metadata')}</StyledText>
-              <StyledUL>
+              <StyledUl>
                 <li>
                   <StyledText>{t('application')}</StyledText>
                 </li>
