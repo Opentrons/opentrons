@@ -140,7 +140,7 @@ export function ChooseRobotSlideout(
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
     setHasParamError,
-    resetRunTimeParameters = () => {},
+    resetRunTimeParameters,
   } = props
 
   const dispatch = useDispatch<Dispatch>()
@@ -508,7 +508,9 @@ export function ChooseRobotSlideout(
                 ? ENABLED_LINK_CSS
                 : DISABLED_LINK_CSS
             }
-            onClick={() => resetRunTimeParameters()}
+            onClick={
+              resetRunTimeParameters != undefined && resetRunTimeParameters()
+            }
             paddingBottom={SPACING.spacing10}
             {...targetProps}
           >
