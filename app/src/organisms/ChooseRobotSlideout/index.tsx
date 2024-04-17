@@ -509,7 +509,7 @@ export function ChooseRobotSlideout(
                 : DISABLED_LINK_CSS
             }
             onClick={
-              resetRunTimeParameters != undefined && resetRunTimeParameters()
+              resetRunTimeParameters !== undefined && resetRunTimeParameters()
             }
             paddingBottom={SPACING.spacing10}
             {...targetProps}
