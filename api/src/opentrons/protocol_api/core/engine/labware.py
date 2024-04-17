@@ -10,8 +10,17 @@ from opentrons_shared_data.labware.labware_definition import LabwareRole
 
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError, ModuleNotOnDeckError
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.types import (
+    LabwareOffsetCreate,
+    LabwareOffsetLocation,
+    LabwareOffsetVector,
+    DeckSlotLocation,
+    ModuleLocation,
+    OnLabwareLocation,
+)
 from opentrons.types import DeckSlotName, Point
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from .exceptions import CannotSetOffsetAtThisLocationError
 
 from ..labware import AbstractLabware, LabwareLoadParams
 from .well import WellCore
@@ -91,10 +100,65 @@ class LabwareCore(AbstractLabware[WellCore]):
     def get_quirks(self) -> List[str]:
         return self._definition.parameters.quirks or []
 
-    def set_calibration(self, delta: Point) -> None:
-        raise NotImplementedError(
-            "Setting a labware's calibration after it's been loaded is not supported."
+    def _get_offset_location(self) -> LabwareOffsetLocation:
+        slot = self.get_deck_slot()
+        if None is slot:
+            raise CannotSetOffsetAtThisLocationError(
+                message=f"Cannot set offset for {self.get_name()} as it is not currently in a deck slot.",
+                detail={"kind": "labware-not-in-slot"},
+            )
+        parent_location = self._engine_client.state.labware.get_location(
+            self._labware_id
         )
+
+        if isinstance(parent_location, DeckSlotLocation):
+            return LabwareOffsetLocation(
+                slotName=slot, moduleModel=None, definitionUri=None
+            )
+        elif isinstance(parent_location, ModuleLocation):
+            module_model = self._engine_client.state.modules.get_requested_model(
+                parent_location.moduleId
+            )
+            return LabwareOffsetLocation(
+                slotName=slot, moduleModel=module_model, definitionUri=None
+            )
+        elif isinstance(parent_location, OnLabwareLocation):
+            non_labware_parent_location = (
+                self._engine_client.state.labware.get_parent_location(self._labware_id)
+            )
+            parent_uri = self._engine_client.state.labware.get_definition_uri(
+                parent_location.labwareId
+            )
+            if isinstance(non_labware_parent_location, DeckSlotLocation):
+                return LabwareOffsetLocation(
+                    slotName=slot, moduleModel=None, definitionUri=parent_uri
+                )
+            elif isinstance(non_labware_parent_location, ModuleLocation):
+                module_model = self._engine_client.state.modules.get_requested_model(
+                    non_labware_parent_location.moduleId
+                )
+                return LabwareOffsetLocation(
+                    slotName=slot, moduleModel=module_model, definitionUri=parent_uri
+                )
+
+            else:
+                raise CannotSetOffsetAtThisLocationError(
+                    message=f"Cannot set offset for {self.get_name()} as it is not currently in a deck slot.",
+                    detail={"kind": "labware-not-in-slot"},
+                )
+        else:
+            raise CannotSetOffsetAtThisLocationError(
+                message=f"Cannot set offset for {self.get_name()} as it is not currently in a deck slot.",
+                detail={"kind": "labware-not-in-slot"},
+            )
+
+    def set_calibration(self, delta: Point) -> None:
+        request = LabwareOffsetCreate.construct(
+            definitionUri=self.get_uri(),
+            location=self._get_offset_location(),
+            vector=LabwareOffsetVector(x=delta.x, y=delta.y, z=delta.z),
+        )
+        self._engine_client.add_labware_offset(request)
 
     def get_calibrated_offset(self) -> Point:
         return self._engine_client.state.geometry.get_labware_position(self._labware_id)

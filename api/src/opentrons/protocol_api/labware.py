@@ -35,7 +35,7 @@ from . import validation
 from ._liquid import Liquid
 from ._types import OffDeckType
 from .core import well_grid
-from .core.engine import ENGINE_CORE_API_VERSION
+from .core.engine import ENGINE_CORE_API_VERSION, SET_OFFSET_RESTORED_API_VERSION
 from .core.labware import AbstractLabware
 from .core.module import AbstractModuleCore
 from .core.core_map import LoadedCoreMap
@@ -594,7 +594,10 @@ class Labware:
             Instead, use Labware Position Check in the app or on the touchscreen.
 
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
+        if (
+            self._api_version >= ENGINE_CORE_API_VERSION
+            and self._api_version < SET_OFFSET_RESTORED_API_VERSION
+        ):
             # TODO(mm, 2023-02-13): See Jira RCORE-535.
             #
             # Until that issue is resolved, the only way to simulate or run a
