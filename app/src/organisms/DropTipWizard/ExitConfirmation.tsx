@@ -11,25 +11,19 @@ import {
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SmallButton } from '../../atoms/buttons'
 
 interface ExitConfirmationProps {
   handleExit: () => void
   handleGoBack: () => void
-  isRobotMoving: boolean
 }
 
 export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
-  const { handleGoBack, handleExit, isRobotMoving } = props
+  const { handleGoBack, handleExit } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
 
   const flowTitle = t('drop_tips')
   const isOnDevice = useSelector(getIsOnDevice)
-
-  if (isRobotMoving) {
-    return <InProgressModal description={t('stand_back_exiting')} />
-  }
 
   return (
     <SimpleWizardBody
