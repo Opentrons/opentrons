@@ -374,6 +374,7 @@ export function ChooseRobotSlideout(
             title={runtimeParam.displayName}
             width="100%"
             dropdownType="neutral"
+            tooltipText={runtimeParam.description}
           />
         )
       } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
