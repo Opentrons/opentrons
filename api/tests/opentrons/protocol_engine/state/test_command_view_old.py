@@ -510,13 +510,6 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         ),
         expected_error=errors.SetupCommandNotAllowedError,
     ),
-    # Resuming from error recovery is not implemented yet.
-    # https://opentrons.atlassian.net/browse/EXEC-301
-    ActionAllowedSpec(
-        subject=get_command_view(),
-        action=ResumeFromRecoveryAction(),
-        expected_error=NotImplementedError,
-    ),
     # fixit command is disallowed if not in recovery mode
     ActionAllowedSpec(
         subject=get_command_view(queue_status=QueueStatus.RUNNING),
@@ -557,36 +550,9 @@ action_allowed_specs: List[ActionAllowedSpec] = [
             command_id="command-id",
             created_at=datetime(year=2021, month=1, day=1),
         ),
-        expected_error=errors.FixitCommandNotAllowedError,
-    ),
-    ActionAllowedSpec(
-        subject=get_command_view(
-            queue_status=QueueStatus.AWAITING_RECOVERY,
-            failed_command=CommandEntry(
-                index=2,
-                command=create_failed_command(
-                    command_id="command-id-3",
-                    error=ErrorOccurrence(
-                        id="error-id",
-                        errorType="ProtocolEngineError",
-                        createdAt=datetime(year=2022, month=2, day=2),
-                        detail="oh no",
-                        errorCode=ErrorCodes.GENERAL_ERROR.value.code,
-                    ),
-                ),
-            ),
-        ),
-        action=QueueCommandAction(
-            request=cmd.HomeCreate(
-                params=cmd.HomeParams(),
-                intent=cmd.CommandIntent.FIXIT,
-            ),
-            request_hash=None,
-            command_id="command-id",
-            created_at=datetime(year=2021, month=1, day=1),
-        ),
         expected_error=None,
     ),
+    # resume from recovery not allowed if fixit commands in queue
     ActionAllowedSpec(
         subject=get_command_view(
             queue_status=QueueStatus.AWAITING_RECOVERY,
@@ -606,7 +572,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
             ),
         ),
         action=ResumeFromRecoveryAction(),
-        expected_error=None,
+        expected_error=errors.ResumeFromRecoveryNotAllowedError,
     ),
 ]
 

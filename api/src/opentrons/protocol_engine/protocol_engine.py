@@ -201,10 +201,16 @@ class ProtocolEngine:
         )
 
         command_id = self._model_utils.generate_id()
-        request_hash = commands.hash_command_params(
-            create=request,
-            last_hash=self._state_store.commands.get_latest_protocol_command_hash(),
-        )
+        if request.intent in (
+            commands.CommandIntent.SETUP,
+            commands.CommandIntent.FIXIT,
+        ):
+            request_hash = None
+        else:
+            request_hash = commands.hash_protocol_command_params(
+                create=request,
+                last_hash=self._state_store.commands.get_latest_protocol_command_hash(),
+            )
 
         action = self.state_view.commands.validate_action_allowed(
             QueueCommandAction(

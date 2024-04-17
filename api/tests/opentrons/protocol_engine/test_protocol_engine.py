@@ -130,7 +130,7 @@ def _mock_slot_standardization_module(
 def _mock_hash_command_params_module(
     decoy: Decoy, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    hash_command_params = commands.hash_command_params
+    hash_command_params = commands.hash_protocol_command_params
     monkeypatch.setattr(
         commands, "hash_command_params", decoy.mock(func=hash_command_params)
     )
@@ -208,7 +208,9 @@ def test_add_command(
         "abc"
     )
     decoy.when(
-        commands.hash_command_params(create=standardized_request, last_hash="abc")
+        commands.hash_protocol_command_params(
+            create=standardized_request, last_hash="abc"
+        )
     ).then_return("123")
 
     def _stub_queued(*_a: object, **_k: object) -> None:
