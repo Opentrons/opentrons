@@ -6,7 +6,18 @@ from opentrons_shared_data.performance.dev_types import (
     F,
     RobotContextState,
 )
+from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from typing import Callable, Type
+from opentrons.config import (
+    feature_flags as ff,
+    get_performance_metrics_data_dir,
+    robot_configs,
+)
+
+
+_should_track = ff.enable_performance_metrics(
+    RobotTypeEnum.robot_literal_to_enum(robot_configs.load().model)
+)
 
 
 def _handle_package_import() -> Type[SupportsTracking]:
@@ -29,7 +40,7 @@ _robot_context_tracker: SupportsTracking | None = None
 class StubbedTracker(SupportsTracking):
     """A stubbed tracker that does nothing."""
 
-    def __init__(self, storage_dir: Path, should_track: bool) -> None:
+    def __init__(self, storage_location: Path, should_track: bool) -> None:
         """Initialize the stubbed tracker."""
         pass
 
@@ -52,5 +63,14 @@ def _get_robot_context_tracker() -> SupportsTracking:
     global _robot_context_tracker
     if _robot_context_tracker is None:
         # TODO: replace with path lookup and should_store lookup
-        _robot_context_tracker = package_to_use(Path("A path"), True)
+        _robot_context_tracker = package_to_use(
+            get_performance_metrics_data_dir(), _should_track
+        )
     return _robot_context_tracker
+
+
+def track_analysis(func: F) -> F:
+    """Track the analysis of a protocol."""
+    return _get_robot_context_tracker().track(RobotContextState.ANALYZING_PROTOCOL)(
+        func
+    )
