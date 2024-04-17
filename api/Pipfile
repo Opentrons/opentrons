@@ -48,3 +48,4 @@ pytest-profiling = "~=1.7.0"
 # TODO(mc, 2022-03-31): upgrade sphinx, remove this subdep pin
 jinja2 = ">=2.3,<3.1"
 hypothesis = "==6.96.1"
+performance-metrics = {file = "../performance-metrics", editable = true}
