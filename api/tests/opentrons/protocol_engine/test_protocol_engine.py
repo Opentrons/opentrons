@@ -204,7 +204,9 @@ def test_add_command(
 
     decoy.when(model_utils.generate_id()).then_return("command-id")
     decoy.when(model_utils.get_timestamp()).then_return(created_at)
-    decoy.when(state_store.commands.get_latest_command_hash()).then_return("abc")
+    decoy.when(state_store.commands.get_latest_protocol_command_hash()).then_return(
+        "abc"
+    )
     decoy.when(
         commands.hash_command_params(create=standardized_request, last_hash="abc")
     ).then_return("123")

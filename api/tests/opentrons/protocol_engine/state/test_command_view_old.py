@@ -97,7 +97,7 @@ def get_command_view(
         command_error_recovery_types=command_error_recovery_types or {},
         recovery_target_command_id=recovery_target_command_id,
         run_started_at=run_started_at,
-        latest_command_hash=latest_command_hash,
+        latest_protocol_command_hash=latest_command_hash,
         stopped_by_estop=False,
     )
 
@@ -1046,4 +1046,4 @@ def test_get_slice_default_cursor_queued() -> None:
 def test_get_latest_command_hash() -> None:
     """It should get the latest command hash from state, if set."""
     subject = get_command_view(latest_command_hash="abc123")
-    assert subject.get_latest_command_hash() == "abc123"
+    assert subject.get_latest_protocol_command_hash() == "abc123"
