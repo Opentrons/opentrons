@@ -61,15 +61,16 @@ const EditMultipleModulesModalComponent = (
     defaultValue: moduleLocations ?? [],
   })
 
-  const areSlotsEmpty = selectedSlots.map(slot => {
-    return (
-      getSlotIsEmpty(initialDeckSetup, slot) &&
-      modules.find(module => module.type === moduleType && module.slot !== slot)
-    )
+  const areSlotsEmpty = selectedSlots.map(s => {
+    const hasModSlot =
+      modules.find(
+        module => module.type === moduleType && s === `cutout${module.slot}`
+      ) != null
+    return getSlotIsEmpty(initialDeckSetup, s) || hasModSlot
   })
 
   const hasConflictedSlot = areSlotsEmpty.includes(false)
-  const mappedStagingAreas: DeckConfiguration =
+  const mappedModules: DeckConfiguration =
     modules.length > 0
       ? modules.flatMap(module => {
           return [
@@ -89,16 +90,14 @@ const EditMultipleModulesModalComponent = (
 
   STANDARD_EMPTY_SLOTS.forEach(emptySlot => {
     if (
-      !mappedStagingAreas.some(
-        ({ cutoutId }) => cutoutId === emptySlot.cutoutId
-      )
+      !mappedModules.some(({ cutoutId }) => cutoutId === emptySlot.cutoutId)
     ) {
-      mappedStagingAreas.push(emptySlot)
+      mappedModules.push(emptySlot)
     }
   })
 
   const selectableSlots =
-    mappedStagingAreas.length > 0 ? mappedStagingAreas : STANDARD_EMPTY_SLOTS
+    mappedModules.length > 0 ? mappedModules : STANDARD_EMPTY_SLOTS
   const [updatedSlots, setUpdatedSlots] = React.useState<DeckConfiguration>(
     selectableSlots
   )
@@ -155,7 +154,7 @@ const EditMultipleModulesModalComponent = (
             {hasConflictedSlot ? (
               <PDAlert
                 alertType="warning"
-                title={'Slot occupied'}
+                title={t('alert:module_placement.SLOT_OCCUPIED.title')}
                 description={''}
               />
             ) : null}
@@ -206,9 +205,9 @@ export const EditMultipleModulesModal = (
   const moduleLocations = Object.values(modules)
     .filter(module => module.type === moduleType)
     .map(temp => `cutout${temp.slot}`)
+
   const onSaveClick = (data: EditMultipleModulesModalValues): void => {
     onCloseClick()
-
     data.selectedAddressableAreas.forEach(aa => {
       if (!moduleLocations?.includes(aa)) {
         dispatch(
@@ -218,7 +217,6 @@ export const EditMultipleModulesModal = (
             model: TEMPERATURE_MODULE_V2,
           })
         )
-      } else {
       }
     })
     Object.values(modules).forEach(module => {
@@ -232,7 +230,9 @@ export const EditMultipleModulesModal = (
     <form onSubmit={handleSubmit(onSaveClick)}>
       <ModalShell width="48rem">
         <Box marginTop={SPACING.spacing32} paddingX={SPACING.spacing32}>
-          <Text as="h2">{'Temperature modules'}</Text>
+          <Text as="h2">
+            {t('module_display_names.multipleTemperatureModuleTypes')}
+          </Text>
         </Box>
         <EditMultipleModulesModalComponent
           onCloseClick={onCloseClick}
