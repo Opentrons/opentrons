@@ -285,16 +285,11 @@ class ProtocolEngine:
 
         However, if an estop happens in between commands, or in the middle of
         a command like `comment` or `waitForDuration` that doesn't access the hardware,
-        `ProtocolEngine` needs to be told about it so it can treat it as a fatal run
-        error and stop executing more commands. This method is how to do that.
+        `ProtocolEngine` needs to be told about it so it can interrupt the command
+        and stop executing any more. This method is how to do that.
 
-        If there are any queued commands for the engine, they will be marked
-        as failed due to the estop event. If there aren't any queued commands
-        *and* this is a maintenance run (which has commands queued one-by-one),
-        a series of actions will mark the engine as Stopped. In either case the
-        queue worker will be deactivated; the primary difference is that the former
-        case will expect the protocol runner to `finish()` the engine, whereas the
-        maintenance run will be put into a state wherein the engine can be discarded.
+        This acts roughly like `request_stop()`. After calling this, you should call
+        `finish()` with an EStopActivatedError.
         """
         try:
             # todo(mm, 2024-04-16): This makes the run appeared as "cancelled" instead
