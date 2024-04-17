@@ -20,22 +20,25 @@ import {
 
 export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
   const { t } = useTranslation('protocol_generator')
+  // ToDo use react-hook-form
   return (
-    <Flex
-      padding={SPACING.spacing40}
-      gridGap={SPACING.spacing40}
-      flexDirection={DIRECTION_ROW}
-      backgroundColor={COLORS.white}
-      borderRadisu={BORDERS.borderRadius4}
-      width="930px"
-      justifyContent={JUSTIFY_CENTER}
-      alignItems={ALIGN_CENTER}
-    >
-      {/* textarea */}
-      <StyledTextarea rows={1} placeholder={t('type_your_prompt')} />
-      {/* button: play button/stop button */}
-      <PlayButton />
-    </Flex>
+    <form id="User_Prompt" onSubmit={() => {}}>
+      <Flex
+        padding={SPACING.spacing40}
+        gridGap={SPACING.spacing40}
+        flexDirection={DIRECTION_ROW}
+        backgroundColor={COLORS.white}
+        borderRadisu={BORDERS.borderRadius4}
+        width="930px"
+        justifyContent={JUSTIFY_CENTER}
+        alignItems={ALIGN_CENTER}
+      >
+        {/* textarea */}
+        <StyledTextarea rows={1} placeholder={t('type_your_prompt')} />
+        {/* button: play button/stop button */}
+        <PlayButton />
+      </Flex>
+    </form>
   )
 }
 
@@ -81,7 +84,6 @@ function PlayButton({
     }
 
     &:focus-visible {
-      /* box-shadow: ${ODD_FOCUS_VISIBLE}; */
       background-color: ${COLORS.blue50};
     }
 

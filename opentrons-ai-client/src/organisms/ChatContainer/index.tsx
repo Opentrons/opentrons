@@ -6,6 +6,7 @@ import {
   FLEX_MAX_CONTENT,
   Flex,
   POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -23,7 +24,7 @@ export function ChatContainer(): JSX.Element {
     >
       {/* This will be updated when input textbox and function are implemented */}
       {isDummyInitial ? (
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing12}
