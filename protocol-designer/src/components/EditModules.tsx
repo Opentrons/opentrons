@@ -1,22 +1,21 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
+  FLEX_ROBOT_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import {
   selectors as stepFormSelectors,
   actions as stepFormActions,
 } from '../step-forms'
 import { moveDeckItem } from '../labware-ingred/actions/actions'
+import { getRobotType } from '../file-data/selectors'
+import { getEnableMoam } from '../feature-flags/selectors'
+import { EditMultipleModulesModal } from './modals/EditModulesModal/EditMultipleModulesModal'
 import { useBlockingHint } from './Hints/useBlockingHint'
 import { MagneticModuleWarningModalContent } from './modals/EditModulesModal/MagneticModuleWarningModalContent'
 import { EditModulesModal } from './modals/EditModulesModal'
-import {
-  FLEX_ROBOT_TYPE,
-  ModuleModel,
-  ModuleType,
-  TEMPERATURE_MODULE_TYPE,
-  TEMPERATURE_MODULE_V2,
-} from '@opentrons/shared-data'
-import { getRobotType } from '../file-data/selectors'
-import { EditMultipleModulesModal } from './modals/EditModulesModal/EditMultipleModulesModal'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 export interface EditModulesProps {
   moduleToEdit: {
@@ -36,8 +35,11 @@ export const EditModules = (props: EditModulesProps): JSX.Element => {
   const { moduleId, moduleType } = moduleToEdit
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const robotType = useSelector(getRobotType)
+  const moamFf = useSelector(getEnableMoam)
   const showMultipleModuleModal =
-    robotType === FLEX_ROBOT_TYPE && moduleType === TEMPERATURE_MODULE_TYPE
+    robotType === FLEX_ROBOT_TYPE &&
+    moduleType === TEMPERATURE_MODULE_TYPE &&
+    moamFf
 
   const moduleOnDeck = moduleId ? _initialDeckSetup.modules[moduleId] : null
   const [
@@ -99,8 +101,8 @@ export const EditModules = (props: EditModulesProps): JSX.Element => {
     modal = (
       <EditMultipleModulesModal
         onCloseClick={onCloseClick}
-        modules={Object.values(_initialDeckSetup.modules)}
-        moduleType={TEMPERATURE_MODULE_TYPE}
+        allModulesOnDeck={Object.values(_initialDeckSetup.modules)}
+        moduleType={moduleType}
       />
     )
   }

@@ -32,8 +32,9 @@ import {
   TEMPERATURE_MODULE_V2_FIXTURE,
 } from '@opentrons/shared-data'
 import { createModule, deleteModule } from '../../../step-forms/actions'
-import { getSlotIsEmpty } from '../../../step-forms'
+import { getLabwareOnSlot, getSlotIsEmpty } from '../../../step-forms'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
+import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
 import { PDAlert } from '../../alerts/PDAlert'
 import type { CutoutId, ModuleType } from '@opentrons/shared-data'
 import type { ModuleOnDeck } from '../../../step-forms'
@@ -52,7 +53,13 @@ const EditMultipleModulesModalComponent = (
   props: EditMultipleModulesModalComponentProps
 ): JSX.Element => {
   const { t } = useTranslation(['button', 'alert'])
-  const { onCloseClick, modules, control, moduleLocations, moduleType } = props
+  const {
+    onCloseClick,
+    allModulesOnDeck,
+    control,
+    moduleLocations,
+    moduleType,
+  } = props
   const initialDeckSetup = useSelector(getInitialDeckSetup)
 
   const selectedSlots = useWatch({
@@ -60,22 +67,30 @@ const EditMultipleModulesModalComponent = (
     name: 'selectedAddressableAreas',
     defaultValue: moduleLocations ?? [],
   })
+  const occupiedCutoutIds = selectedSlots
+    .map(slot => {
+      const hasModSlot =
+        allModulesOnDeck.find(
+          module =>
+            module.type === moduleType && slot === `cutout${module.slot}`
+        ) != null
+      const labwareOnSlot = getLabwareOnSlot(initialDeckSetup, slot)
+      const isEmpty = getSlotIsEmpty(initialDeckSetup, slot, true)
+      const isLabwareCompatible =
+        (labwareOnSlot &&
+          getLabwareIsCompatible(labwareOnSlot.def, moduleType)) ??
+        true
 
-  const areSlotsEmpty = selectedSlots.map(s => {
-    const hasModSlot =
-      modules.find(
-        module => module.type === moduleType && s === `cutout${module.slot}`
-      ) != null
-    return getSlotIsEmpty(initialDeckSetup, s) || hasModSlot
-  })
-
-  const hasConflictedSlot = areSlotsEmpty.includes(false)
+      return { slot, isEmpty: (isEmpty || hasModSlot) && isLabwareCompatible }
+    })
+    .filter(slot => !slot.isEmpty)
+  const hasConflictedSlot = occupiedCutoutIds.length > 0
   const mappedModules: DeckConfiguration =
-    modules.length > 0
-      ? modules.flatMap(module => {
+    moduleLocations != null
+      ? moduleLocations.flatMap(location => {
           return [
             {
-              cutoutId: `cutout${module.slot}` as CutoutId,
+              cutoutId: location as CutoutId,
               cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
             },
           ]
@@ -101,7 +116,6 @@ const EditMultipleModulesModalComponent = (
   const [updatedSlots, setUpdatedSlots] = React.useState<DeckConfiguration>(
     selectableSlots
   )
-
   const handleClickAdd = (
     cutoutId: string,
     field: ControllerRenderProps<
@@ -140,6 +154,17 @@ const EditMultipleModulesModalComponent = (
 
     field.onChange(selectedSlots.filter(item => item !== cutoutId))
   }
+  const occupiedSlots = occupiedCutoutIds.map(
+    occupiedCutout => occupiedCutout.slot.split('cutout')[1]
+  )
+  const alertDescription = t(
+    `alert:module_placement.SLOTS_OCCUPIED.${
+      occupiedSlots.length === 1 ? 'single' : 'multi'
+    }`,
+    {
+      slotName: occupiedSlots,
+    }
+  )
 
   return (
     <>
@@ -147,7 +172,7 @@ const EditMultipleModulesModalComponent = (
         <Flex
           justifyContent={JUSTIFY_END}
           alignItems={ALIGN_CENTER}
-          height="4rem"
+          height="1.5rem"
           paddingX={SPACING.spacing32}
         >
           <Box>
@@ -155,7 +180,7 @@ const EditMultipleModulesModalComponent = (
               <PDAlert
                 alertType="warning"
                 title={t('alert:module_placement.SLOT_OCCUPIED.title')}
-                description={''}
+                description={alertDescription}
               />
             ) : null}
           </Box>
@@ -192,24 +217,28 @@ const EditMultipleModulesModalComponent = (
 
 export interface EditMultipleModulesModalProps {
   onCloseClick: () => void
-  modules: ModuleOnDeck[]
+  allModulesOnDeck: ModuleOnDeck[]
   moduleType: ModuleType
 }
 export const EditMultipleModulesModal = (
   props: EditMultipleModulesModalProps
 ): JSX.Element => {
-  const { onCloseClick, modules, moduleType } = props
+  const { onCloseClick, allModulesOnDeck, moduleType } = props
   const { t } = useTranslation('modules')
   const dispatch = useDispatch()
   const { control, handleSubmit } = useForm<EditMultipleModulesModalValues>()
-  const moduleLocations = Object.values(modules)
+  const moduleLocations = Object.values(allModulesOnDeck)
     .filter(module => module.type === moduleType)
     .map(temp => `cutout${temp.slot}`)
 
   const onSaveClick = (data: EditMultipleModulesModalValues): void => {
     onCloseClick()
+
     data.selectedAddressableAreas.forEach(aa => {
-      if (!moduleLocations?.includes(aa)) {
+      const moduleInSlot = Object.values(allModulesOnDeck).find(module =>
+        aa.includes(module.slot)
+      )
+      if (!moduleInSlot) {
         dispatch(
           createModule({
             slot: aa.split('cutout')[1],
@@ -219,8 +248,9 @@ export const EditMultipleModulesModal = (
         )
       }
     })
-    Object.values(modules).forEach(module => {
-      if (!data.selectedAddressableAreas.includes(module.slot)) {
+    Object.values(allModulesOnDeck).forEach(module => {
+      const moduleCutout = `cutout${module.slot}`
+      if (!data.selectedAddressableAreas.includes(moduleCutout)) {
         dispatch(deleteModule(module.id))
       }
     })
@@ -236,7 +266,7 @@ export const EditMultipleModulesModal = (
         </Box>
         <EditMultipleModulesModalComponent
           onCloseClick={onCloseClick}
-          modules={modules}
+          allModulesOnDeck={allModulesOnDeck}
           control={control}
           moduleLocations={moduleLocations}
           moduleType={moduleType}
