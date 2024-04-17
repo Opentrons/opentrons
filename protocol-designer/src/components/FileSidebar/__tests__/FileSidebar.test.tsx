@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { fireEvent, screen, cleanup } from '@testing-library/react'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  LabwareDefinition2,
+  fixtureTiprack300ul,
+} from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { createFile, getRobotType } from '../../../file-data/selectors'
 import {
@@ -17,11 +21,8 @@ import {
 import { toggleNewProtocolModal } from '../../../navigation/actions'
 import { getHasUnsavedChanges } from '../../../load-file/selectors'
 import { useBlockingHint } from '../../Hints/useBlockingHint'
-import {
-  getUnusedEntities,
-  getUnusedStagingAreas,
-  getUnusedTrash,
-} from '../utils'
+import { getUnusedStagingAreas } from '../utils/getUnusedStagingAreas'
+import { getUnusedTrash } from '../utils/getUnusedTrash'
 import { FileSidebar } from '../FileSidebar'
 
 vi.mock('../../../step-forms/selectors')
@@ -30,15 +31,14 @@ vi.mock('../../../navigation/actions')
 vi.mock('../../../navigation/selectors')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../Hints/useBlockingHint')
-vi.mock('../utils')
-
+vi.mock('../utils/getUnusedStagingAreas')
+vi.mock('../utils/getUnusedTrash')
 const render = () => {
   return renderWithProviders(<FileSidebar />, { i18nInstance: i18n })[0]
 }
 
 describe('FileSidebar', () => {
   beforeEach(() => {
-    vi.mocked(getUnusedEntities).mockReturnValue([])
     vi.mocked(getUnusedStagingAreas).mockReturnValue([])
     vi.mocked(getUnusedTrash).mockReturnValue({
       trashBinUnused: false,
@@ -74,6 +74,13 @@ describe('FileSidebar', () => {
     vi.resetAllMocks()
     cleanup()
   })
+  it('renders the file sidebar and exports with blocking hint for exporting', () => {
+    vi.mocked(useBlockingHint).mockReturnValue(<div>mock blocking hint</div>)
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    expect(vi.mocked(useBlockingHint)).toHaveBeenCalled()
+    screen.getByText('mock blocking hint')
+  })
   it('renders the file sidebar and buttons work as expected with no warning upon export', () => {
     render()
     screen.getByText('Protocol File')
@@ -91,19 +98,54 @@ describe('FileSidebar', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Export' }))
     screen.getByText('Your protocol has no steps')
   })
-  it('renders the unused pipette and module warning', () => {
-    vi.mocked(getUnusedEntities).mockReturnValue([
-      {
-        mount: 'left',
-        name: 'p1000_96',
-        id: 'pipetteId',
-        tiprackDefURI: 'mockURI',
-        spec: {
-          name: 'mock pip name',
-          displayName: 'mock display name',
+  it('renders the unused pipette warning', () => {
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      modules: {},
+      pipettes: {
+        pipetteId: {
+          mount: 'left',
+          name: 'p1000_96',
+          id: 'pipetteId',
+          tiprackLabwareDef: [fixtureTiprack300ul as LabwareDefinition2],
+          tiprackDefURI: ['mockDefUri'],
+          spec: {
+            displayName: 'mock display name',
+          } as any,
         },
       },
-    ])
+      additionalEquipmentOnDeck: {},
+      labware: {},
+    })
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    screen.getByText('Unused pipette')
+  })
+  it('renders the unused pieptte and module warning', () => {
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      modules: {
+        moduleId: {
+          slot: 'A1',
+          moduleState: {} as any,
+          id: 'moduleId',
+          type: 'temperatureModuleType',
+          model: 'temperatureModuleV2',
+        },
+      },
+      pipettes: {
+        pipetteId: {
+          mount: 'left',
+          name: 'p1000_96',
+          id: 'pipetteId',
+          tiprackLabwareDef: [fixtureTiprack300ul as LabwareDefinition2],
+          tiprackDefURI: ['mockDefUri'],
+          spec: {
+            displayName: 'mock display name',
+          } as any,
+        },
+      },
+      additionalEquipmentOnDeck: {},
+      labware: {},
+    })
     render()
     fireEvent.click(screen.getByRole('button', { name: 'Export' }))
     screen.getByText('Unused pipette and module')
@@ -139,5 +181,56 @@ describe('FileSidebar', () => {
     render()
     fireEvent.click(screen.getByRole('button', { name: 'Export' }))
     screen.getByText('Unused gripper')
+  })
+  it('renders the unused module warning', () => {
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      modules: {
+        moduleId: {
+          slot: 'A1',
+          moduleState: {} as any,
+          id: 'moduleId',
+          type: 'temperatureModuleType',
+          model: 'temperatureModuleV2',
+        },
+      },
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+      labware: {},
+    })
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    screen.getByText('Unused module')
+    screen.getByText(
+      'The Temperature module specified in your protocol in Slot A1 is not currently used in any step. In order to run this protocol you will need to power up and connect the module to your robot.'
+    )
+  })
+  it('renders the unused modules warning', () => {
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      modules: {
+        moduleId: {
+          slot: 'A1',
+          moduleState: {} as any,
+          id: 'moduleId',
+          type: 'temperatureModuleType',
+          model: 'temperatureModuleV2',
+        },
+        moduleId2: {
+          slot: 'B1',
+          moduleState: {} as any,
+          id: 'moduleId2',
+          type: 'temperatureModuleType',
+          model: 'temperatureModuleV2',
+        },
+      },
+      pipettes: {},
+      additionalEquipmentOnDeck: {},
+      labware: {},
+    })
+    render()
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    screen.getByText('Unused modules')
+    screen.getByText(
+      'One or more modules specified in your protocol in Slot(s) A1,B1 are not currently used in any step. In order to run this protocol you will need to power up and connect the modules to your robot.'
+    )
   })
 })

@@ -178,3 +178,24 @@ stages:
           commands:
             # Check for this command's presence as a smoke test that the analysis isn't empty.
             - commandType: loadPipette
+
+  - name: Check that a new analysis is started for the protocol because of new RTP values
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      method: POST
+      json:
+        data:
+          runTimeParameterValues:
+            sample_count: 2
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+          - id: '{analysis_id2}'
+            status: completed
+          - id: !anystr
+            status: pending

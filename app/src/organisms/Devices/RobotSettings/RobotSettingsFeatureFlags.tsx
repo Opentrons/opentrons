@@ -29,6 +29,7 @@ interface RobotSettingsFeatureFlagsProps {
 
 const NON_FEATURE_FLAG_SETTINGS = [
   'enableDoorSafetySwitch',
+  'enableOEMMode',
   'disableHomeOnBoot',
   'deckCalibrationDots',
   'shortFixedTrash',

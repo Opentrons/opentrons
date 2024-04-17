@@ -113,7 +113,7 @@ describe('UpdateRobotSoftware', () => {
     render()
     expect(mockBeforeCommitting).toBeCalled()
     expect(UpdateSoftware).toBeCalledWith(
-      { updateType: 'installing', processProgress: 0 },
+      { updateType: 'installing' },
       expect.anything()
     )
     screen.getByText('mock UpdateSoftware')

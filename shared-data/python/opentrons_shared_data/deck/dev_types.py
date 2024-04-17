@@ -10,6 +10,7 @@ from typing_extensions import Literal, TypedDict
 from ..module.dev_types import ModuleType
 
 
+DeckSchemaVersion5 = Literal[5]
 DeckSchemaVersion4 = Literal[4]
 DeckSchemaVersion3 = Literal[3]
 DeckSchemaVersion2 = Literal[2]
@@ -111,9 +112,11 @@ class Cutout(TypedDict):
 
 class CutoutFixture(TypedDict):
     id: str
+    expectOpentronsModuleSerialNumber: bool
     mayMountTo: List[str]
     displayName: str
     providesAddressableAreas: Dict[str, List[str]]
+    fixtureGroup: Dict[str, List[Dict[str, str]]]
     height: float
 
 
@@ -176,4 +179,19 @@ class DeckDefinitionV4(_RequiredDeckDefinitionV4, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
 
 
-DeckDefinition = Union[DeckDefinitionV3, DeckDefinitionV4]
+class _RequiredDeckDefinitionV5(TypedDict):
+    otId: str
+    schemaVersion: Literal[5]
+    cornerOffsetFromOrigin: List[float]
+    dimensions: List[float]
+    metadata: Metadata
+    robot: Robot
+    locations: LocationsV4
+    cutoutFixtures: List[CutoutFixture]
+
+
+class DeckDefinitionV5(_RequiredDeckDefinitionV5, total=False):
+    gripperOffsets: Dict[str, GripperOffsets]
+
+
+DeckDefinition = Union[DeckDefinitionV3, DeckDefinitionV4, DeckDefinitionV5]

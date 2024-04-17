@@ -408,13 +408,18 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
         )
-        self._engine_client.pick_up_tip(
+
+        self._engine_client.pick_up_tip_wait_for_recovery(
             pipette_id=self._pipette_id,
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
         )
 
+        # Set the "last location" unconditionally, even if the command failed
+        # and was recovered from and we don't know if the pipette is physically here.
+        # This isn't used for path planning, but rather for implicit destination
+        # selection like in `pipette.aspirate(location=None)`.
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
     def drop_tip(

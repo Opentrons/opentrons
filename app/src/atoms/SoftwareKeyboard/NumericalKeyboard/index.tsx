@@ -1,12 +1,18 @@
 import * as React from 'react'
-import Keyboard from 'react-simple-keyboard'
+import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 import { numericalKeyboardLayout, numericalCustom } from '../constants'
 
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import '../index.css'
+import './index.css'
+
+// Note (kk:04/05/2024) add debug to make debugging easy
 interface NumericalKeyboardProps {
   onChange: (input: string) => void
-  keyboardRef: React.MutableRefObject<null>
+  keyboardRef: React.MutableRefObject<KeyboardReactInterface | null>
   isDecimal?: boolean
   hasHyphen?: boolean
+  debug?: boolean
 }
 
 // the default keyboard layout intKeyboard that doesn't have decimal point and hyphen.
@@ -15,6 +21,7 @@ export function NumericalKeyboard({
   keyboardRef,
   isDecimal = false,
   hasHyphen = false,
+  debug = false,
 }: NumericalKeyboardProps): JSX.Element {
   const layoutName = `${isDecimal ? 'float' : 'int'}${
     hasHyphen ? 'NegKeyboard' : 'Keyboard'
@@ -30,10 +37,10 @@ export function NumericalKeyboard({
       theme={'hg-theme-default oddTheme1 numerical-keyboard'}
       onChange={onChange}
       display={numericalCustom}
-      autoUseTouchEvents={true}
       useButtonTag={true}
       layoutName={layoutName}
       layout={numericalKeyboardLayout}
+      debug={debug} // If true, <ENTER> will input a \n
     />
   )
 }

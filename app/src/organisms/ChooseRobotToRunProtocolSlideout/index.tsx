@@ -17,7 +17,6 @@ import {
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { OPENTRONS_USB } from '../../redux/discovery'
 import { appShellRequestor } from '../../redux/shell/remote'
-import { useFeatureFlag } from '../../redux/config'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
@@ -53,7 +52,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     srcFiles,
     mostRecentAnalysis,
   } = storedProtocolData
-  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
   const [currentPage, setCurrentPage] = React.useState<number>(1)
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
@@ -176,8 +174,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     </PrimaryButton>
   )
 
-  const hasRunTimeParameters =
-    enableRunTimeParametersFF && runTimeParameters.length > 0
+  const hasRunTimeParameters = runTimeParameters.length > 0
 
   return (
     <ChooseRobotSlideout

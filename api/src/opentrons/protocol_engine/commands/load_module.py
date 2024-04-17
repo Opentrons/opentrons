@@ -5,7 +5,11 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..types import DeckSlotLocation, ModuleModel, ModuleDefinition
+from ..types import (
+    DeckSlotLocation,
+    ModuleModel,
+    ModuleDefinition,
+)
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -104,9 +108,19 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
 
     async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
         """Check that the requested module is attached and assign its identifier."""
-        self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
-            params.location.slotName.id
-        )
+        if self._state_view.config.robot_type == "OT-2 Standard":
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                params.location.slotName.id
+            )
+        else:
+            addressable_area = self._state_view.geometry._modules.ensure_and_convert_module_fixture_location(
+                deck_slot=params.location.slotName,
+                deck_type=self._state_view.config.deck_type,
+                model=params.model,
+            )
+            self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
+                addressable_area
+            )
 
         verified_location = self._state_view.geometry.ensure_location_not_occupied(
             params.location

@@ -106,4 +106,5 @@ class RunController:
             run_id=self._run_id,
             summary=result.state_summary,
             commands=result.commands,
+            run_time_parameters=result.parameters,
         )

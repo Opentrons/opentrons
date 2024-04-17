@@ -51,7 +51,6 @@ import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
-import { useFeatureFlag } from '../../redux/config'
 import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
@@ -142,7 +141,6 @@ export function ChooseRobotSlideout(
     setHasParamError,
   } = props
 
-  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -186,18 +184,27 @@ export function ChooseRobotSlideout(
     {}
   )
 
+  const reducerAvailableRobots = healthyReachableRobots.filter(robot =>
+    showIdleOnly ? !robotBusyStatusByName[robot.name] : robot
+  )
   const reducerBusyCount = healthyReachableRobots.filter(
     robot => robotBusyStatusByName[robot.name]
   ).length
 
   // this useEffect sets the default selection to the first robot in the list. state is managed by the caller
   React.useEffect(() => {
-    if (selectedRobot == null && healthyReachableRobots.length > 0) {
-      setSelectedRobot(healthyReachableRobots[0])
-    } else if (healthyReachableRobots.length === 0) {
+    if (
+      (selectedRobot == null ||
+        !reducerAvailableRobots.some(
+          robot => robot.name === selectedRobot.name
+        )) &&
+      reducerAvailableRobots.length > 0
+    ) {
+      setSelectedRobot(reducerAvailableRobots[0])
+    } else if (reducerAvailableRobots.length === 0) {
       setSelectedRobot(null)
     }
-  }, [healthyReachableRobots, selectedRobot, setSelectedRobot])
+  }, [reducerAvailableRobots, selectedRobot, setSelectedRobot])
 
   const unavailableCount =
     unhealthyReachableRobots.length + unreachableRobots.length
@@ -365,7 +372,6 @@ export function ChooseRobotSlideout(
               }
             }}
             title={runtimeParam.displayName}
-            caption={runtimeParam.description}
             width="100%"
             dropdownType="neutral"
           />
@@ -396,7 +402,7 @@ export function ChooseRobotSlideout(
             key={runtimeParam.variableName}
             type="number"
             units={runtimeParam.suffix}
-            placeholder={value.toString()}
+            placeholder={runtimeParam.default.toString()}
             value={value}
             title={runtimeParam.displayName}
             tooltipText={runtimeParam.description}
@@ -526,7 +532,7 @@ export function ChooseRobotSlideout(
       </Flex>
     ) : null
 
-  return multiSlideout != null && enableRunTimeParametersFF ? (
+  return multiSlideout != null ? (
     <MultiSlideout
       isExpanded={isExpanded}
       onCloseClick={onCloseClick}

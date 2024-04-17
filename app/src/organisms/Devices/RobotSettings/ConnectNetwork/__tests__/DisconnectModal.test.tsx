@@ -160,7 +160,7 @@ describe('DisconnectModal', () => {
       'Your robot was unable to disconnect from Wi-Fi network foo.'
     )
     screen.getByText(
-      'If you keep getting this message, try restarting your app and/or robot. If this does not resolve the issue please contact Opentrons Support.'
+      'If you keep getting this message, try restarting your app and robot. If this does not resolve the issue, contact Opentrons Support.'
     )
     screen.getByRole('button', { name: 'cancel' })
     screen.getByRole('button', { name: 'Disconnect' })

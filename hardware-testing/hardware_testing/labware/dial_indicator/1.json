@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "custom_beta",
+  "ordering": [["A1"]],
+  "metadata": {
+    "displayName": "Mitutoyo Digimatic Indicator",
+    "displayCategory": "tubeRack",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 128,
+    "yDimension": 86,
+    "zDimension": 136
+  },
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "dial_indicator"
+  },
+  "wells": {
+    "A1": {
+      "depth": 14,
+      "totalLiquidVolume": 10,
+      "shape": "circular",
+      "diameter": 4,
+      "x": 60.8,
+      "y": 41.5,
+      "z": 135
+    }
+  },
+  "brand": {
+    "brand": "Mitutoyo",
+    "brandId": ["ID-S"]
+  },
+  "groups": [
+    {
+      "brand": {
+        "brand": "Mitutoyo",
+        "brandId": ["ID-S"]
+      },
+      "metadata": {
+        "wellBottomShape": "flat",
+        "displayCategory": "tubeRack"
+      },
+      "wells": ["A1"]
+    }
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
+}

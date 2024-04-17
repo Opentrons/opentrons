@@ -122,7 +122,7 @@ describe('ProtocolParameters', () => {
 
     screen.getByText('EtoH Volume')
     screen.getByText('6.5 mL')
-    screen.getByText('1.5-10')
+    screen.getByText('1.5-10.0')
 
     screen.getByText('Default Module Offsets')
     screen.getByText('No offsets')

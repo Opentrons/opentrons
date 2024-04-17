@@ -1219,6 +1219,24 @@
         }
       },
       "status": "succeeded"
+    },
+    {
+      "commandType": "loadModule",
+      "error": {
+        "detail": "Cannot use Temperature Module in D3, not compatible with one or more of the following fixtures: Waste Chute",
+        "errorCode": "4000",
+        "errorInfo": {},
+        "errorType": "IncompatibleAddressableAreaError",
+        "wrappedErrors": []
+      },
+      "notes": [],
+      "params": {
+        "location": {
+          "slotName": "D3"
+        },
+        "model": "temperatureModuleV2"
+      },
+      "status": "failed"
     }
   ],
   "config": {
@@ -1230,17 +1248,25 @@
   },
   "errors": [
     {
-      "detail": "IncompatibleAddressableAreaError [line 19]: Error 4000 GENERAL_ERROR (IncompatibleAddressableAreaError): Cannot use Slot D3, not compatible with one or more of the following fixtures: Waste Chute",
+      "detail": "ProtocolCommandFailedError [line 19]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): IncompatibleAddressableAreaError: Cannot use Temperature Module in D3, not compatible with one or more of the following fixtures: Waste Chute",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
       "wrappedErrors": [
         {
-          "detail": "Cannot use Slot D3, not compatible with one or more of the following fixtures: Waste Chute",
+          "detail": "IncompatibleAddressableAreaError: Cannot use Temperature Module in D3, not compatible with one or more of the following fixtures: Waste Chute",
           "errorCode": "4000",
           "errorInfo": {},
-          "errorType": "IncompatibleAddressableAreaError",
-          "wrappedErrors": []
+          "errorType": "ProtocolCommandFailedError",
+          "wrappedErrors": [
+            {
+              "detail": "Cannot use Temperature Module in D3, not compatible with one or more of the following fixtures: Waste Chute",
+              "errorCode": "4000",
+              "errorInfo": {},
+              "errorType": "IncompatibleAddressableAreaError",
+              "wrappedErrors": []
+            }
+          ]
         }
       ]
     }

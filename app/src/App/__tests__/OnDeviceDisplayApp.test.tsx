@@ -1,9 +1,11 @@
 import * as React from 'react'
+import { screen } from '@testing-library/react'
 import { vi, describe, beforeEach, afterEach, expect, it } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '../../__testing-utils__'
 import { i18n } from '../../i18n'
+import { OnDeviceLocalizationProvider } from '../../LocalizationProvider'
 import { ConnectViaEthernet } from '../../pages/ConnectViaEthernet'
 import { ConnectViaUSB } from '../../pages/ConnectViaUSB'
 import { ConnectViaWifi } from '../../pages/ConnectViaWifi'
@@ -19,7 +21,6 @@ import { RunningProtocol } from '../../pages/RunningProtocol'
 import { RunSummary } from '../../pages/RunSummary'
 import { Welcome } from '../../pages/Welcome'
 import { NameRobot } from '../../pages/NameRobot'
-import { InitialLoadingScreen } from '../../pages/InitialLoadingScreen'
 import { EmergencyStop } from '../../pages/EmergencyStop'
 import { DeckConfigurationEditor } from '../../pages/DeckConfiguration'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
@@ -29,8 +30,22 @@ import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
 import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 
+import type { UseQueryResult } from 'react-query'
+import type { RobotSettingsResponse } from '@opentrons/api-client'
+import type { OnDeviceLocalizationProviderProps } from '../../LocalizationProvider'
 import type { OnDeviceDisplaySettings } from '../../redux/config/schema-types'
 
+vi.mock('@opentrons/react-api-client', async () => {
+  const actual = await vi.importActual('@opentrons/react-api-client')
+  return {
+    ...actual,
+    useRobotSettingsQuery: () =>
+      (({
+        data: { settings: [] },
+      } as unknown) as UseQueryResult<RobotSettingsResponse>),
+  }
+})
+vi.mock('../../LocalizationProvider')
 vi.mock('../../pages/Welcome')
 vi.mock('../../pages/NetworkSetupMenu')
 vi.mock('../../pages/ConnectViaEthernet')
@@ -45,7 +60,6 @@ vi.mock('../../pages/InstrumentsDashboard')
 vi.mock('../../pages/RunningProtocol')
 vi.mock('../../pages/RunSummary')
 vi.mock('../../pages/NameRobot')
-vi.mock('../../pages/InitialLoadingScreen')
 vi.mock('../../pages/EmergencyStop')
 vi.mock('../../pages/DeckConfiguration')
 vi.mock('../../redux/config')
@@ -73,7 +87,7 @@ const render = (path = '/') => {
 describe('OnDeviceDisplayApp', () => {
   beforeEach(() => {
     vi.mocked(getOnDeviceDisplaySettings).mockReturnValue(mockSettings as any)
-    vi.mocked(getIsShellReady).mockReturnValue(false)
+    vi.mocked(getIsShellReady).mockReturnValue(true)
     vi.mocked(useCurrentRunRoute).mockReturnValue(null)
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
@@ -83,6 +97,12 @@ describe('OnDeviceDisplayApp', () => {
         },
       },
     } as any)
+    // TODO(bh, 2024-03-27): implement testing of branded and anonymous i18n, but for now pass through
+    vi.mocked(
+      OnDeviceLocalizationProvider
+    ).mockImplementation((props: OnDeviceLocalizationProviderProps) => (
+      <>{props.children}</>
+    ))
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -140,9 +160,16 @@ describe('OnDeviceDisplayApp', () => {
     render('/runs/my-run-id/summary')
     expect(vi.mocked(RunSummary)).toHaveBeenCalled()
   })
-  it('renders the loading screen on mount', () => {
-    render('/loading')
-    expect(vi.mocked(InitialLoadingScreen)).toHaveBeenCalled()
+  it('renders the localization provider and not the loading screen when app-shell is ready', () => {
+    render('/')
+    expect(vi.mocked(OnDeviceLocalizationProvider)).toHaveBeenCalled()
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+  })
+  it('renders the loading screen when app-shell is not ready', () => {
+    vi.mocked(getIsShellReady).mockReturnValue(false)
+    render('/')
+    screen.getByLabelText('loading indicator')
+    expect(vi.mocked(OnDeviceLocalizationProvider)).not.toHaveBeenCalled()
   })
   it('renders EmergencyStop component from /emergency-stop', () => {
     render('/emergency-stop')

@@ -53,7 +53,7 @@ export function AvailableRobotOption(
     registerRobotBusyStatus,
   } = props
   const { ip, local, name: robotName } = robot ?? {}
-  const { t } = useTranslation('protocol_list')
+  const { t } = useTranslation(['protocol_list', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
@@ -160,7 +160,7 @@ export function AvailableRobotOption(
         >
           <Trans
             t={t}
-            i18nKey="a_robot_software_update_is_available"
+            i18nKey="branded:a_robot_software_update_is_available"
             components={{
               robotLink: <NavLink to={`/devices/${robotName}`} />,
             }}

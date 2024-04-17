@@ -837,6 +837,7 @@ async def test_load_module(
                 HardwareModule(serial_number="serial-1", definition=tempdeck_v1_def),
                 HardwareModule(serial_number="serial-2", definition=tempdeck_v2_def),
             ],
+            expected_serial_number=None,
         )
     ).then_return(HardwareModule(serial_number="serial-1", definition=tempdeck_v1_def))
 

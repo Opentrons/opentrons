@@ -11,23 +11,36 @@ import {
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   FIXTURE_HEIGHT,
-  SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
   TRASH_BIN_DISPLAY_NAME,
   Y_ADJUSTMENT,
 } from './constants'
 
-import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
 interface TrashBinConfigFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  handleClickRemove?: (fixtureLocation: CutoutId) => void
+  cutoutFixtureId: CutoutFixtureId
+  handleClickRemove?: (
+    fixtureLocation: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ) => void
 }
 
 export function TrashBinConfigFixture(
   props: TrashBinConfigFixtureProps
 ): JSX.Element {
-  const { deckDefinition, handleClickRemove, fixtureLocation } = props
+  const {
+    deckDefinition,
+    handleClickRemove,
+    fixtureLocation,
+    cutoutFixtureId,
+  } = props
 
   const trashBinCutout = deckDefinition.locations.cutouts.find(
     cutout => cutout.id === fixtureLocation
@@ -54,7 +67,7 @@ export function TrashBinConfigFixture(
 
   return (
     <RobotCoordsForeignObject
-      width={SINGLE_SLOT_FIXTURE_WIDTH}
+      width={COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
@@ -70,7 +83,7 @@ export function TrashBinConfigFixture(
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null
-            ? () => handleClickRemove(fixtureLocation)
+            ? () => handleClickRemove(fixtureLocation, cutoutFixtureId)
             : () => {}
         }
       >

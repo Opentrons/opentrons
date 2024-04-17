@@ -1,8 +1,8 @@
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
-import standardOt2DeckDef from '../../deck/definitions/4/ot2_standard.json'
-import standardFlexDeckDef from '../../deck/definitions/4/ot3_standard.json'
+import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
+import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import type {
   DeckDefinition,
   LabwareDefinition2,
@@ -30,6 +30,8 @@ export * from './getAddressableAreasInProtocol'
 export * from './getSimplestFlexDeckConfig'
 export * from './formatRunTimeParameterDefaultValue'
 export * from './formatRunTimeParameterValue'
+export * from './formatRunTimeParameterMinMax'
+export * from './orderRuntimeParameterRangeOptions'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

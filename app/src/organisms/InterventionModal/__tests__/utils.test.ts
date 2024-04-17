@@ -2,7 +2,7 @@ import deepClone from 'lodash/cloneDeep'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   getSlotHasMatingSurfaceUnitVector,
-  ot2DeckDefV4,
+  ot2DeckDefV5,
 } from '@opentrons/shared-data'
 
 import {
@@ -137,7 +137,7 @@ describe('getRunLabwareRenderInfo', () => {
     const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
-      ot2DeckDefV4 as any
+      ot2DeckDefV5 as any
     )
     const labwareInfo = res[0]
     expect(labwareInfo).toBeTruthy()
@@ -154,7 +154,7 @@ describe('getRunLabwareRenderInfo', () => {
     const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
-      ot2DeckDefV4 as any
+      ot2DeckDefV5 as any
     )
     expect(res).toHaveLength(1) // the offdeck labware still gets added because the mating surface doesn't exist for offdeck labware
   })
@@ -163,7 +163,7 @@ describe('getRunLabwareRenderInfo', () => {
     const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
-      ot2DeckDefV4 as any
+      ot2DeckDefV5 as any
     )
     expect(res).toHaveLength(2)
     const labwareInfo = res.find(
@@ -172,7 +172,7 @@ describe('getRunLabwareRenderInfo', () => {
     expect(labwareInfo).toBeTruthy()
     expect(labwareInfo?.x).toEqual(0)
     expect(labwareInfo?.y).toEqual(
-      ot2DeckDefV4.cornerOffsetFromOrigin[1] -
+      ot2DeckDefV5.cornerOffsetFromOrigin[1] -
         mockLabwareDefinition.dimensions.yDimension
     )
   })
@@ -189,7 +189,7 @@ describe('getRunLabwareRenderInfo', () => {
     const res = getRunLabwareRenderInfo(
       { labware: [mockBadSlotLabware] } as any,
       mockLabwareDefinitionsByUri,
-      ot2DeckDefV4 as any
+      ot2DeckDefV5 as any
     )
 
     expect(res[0].x).toEqual(0)
@@ -207,7 +207,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
   it('returns run module render info with nested labware', () => {
     const res = getRunModuleRenderInfo(
       mockRunData,
-      ot2DeckDefV4 as any,
+      ot2DeckDefV5 as any,
       mockLabwareDefinitionsByUri
     )
     const moduleInfo = res[0]
@@ -228,7 +228,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     const res = getRunModuleRenderInfo(
       mockRunDataNoNesting,
-      ot2DeckDefV4 as any,
+      ot2DeckDefV5 as any,
       mockLabwareDefinitionsByUri
     )
 
@@ -245,7 +245,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     const res = getRunModuleRenderInfo(
       mockRunDataWithTC,
-      ot2DeckDefV4 as any,
+      ot2DeckDefV5 as any,
       mockLabwareDefinitionsByUri
     )
 
@@ -270,7 +270,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     const res = getRunModuleRenderInfo(
       mockRunDataWithBadModuleSlot,
-      ot2DeckDefV4 as any,
+      ot2DeckDefV5 as any,
       mockLabwareDefinitionsByUri
     )
 

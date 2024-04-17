@@ -178,6 +178,9 @@ class CommandState:
     stable. Eventually, we might want this info to be stored directly on each command.
     """
 
+    recovery_target_command_id: Optional[str]
+    """If we're currently recovering from a command failure, which command it was."""
+
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
 
@@ -213,6 +216,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             finish_error=None,
             failed_command=None,
             command_error_recovery_types={},
+            recovery_target_command_id=None,
             run_completed_at=None,
             run_started_at=None,
             latest_command_hash=None,
@@ -300,6 +304,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             ):
                 if action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY:
                     self._state.queue_status = QueueStatus.AWAITING_RECOVERY
+                    self._state.recovery_target_command_id = action.command_id
                 elif action.type == ErrorRecoveryType.FAIL_RUN:
                     other_command_ids_to_fail = (
                         self._state.command_history.get_queue_ids()
@@ -335,6 +340,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
         elif isinstance(action, ResumeFromRecoveryAction):
             self._state.queue_status = QueueStatus.RUNNING
+            self._state.recovery_target_command_id = None
 
         elif isinstance(action, StopAction):
             if not self._state.run_result:
@@ -707,6 +713,10 @@ class CommandView(HasState[CommandState]):
         )
 
         return no_command_running and no_command_to_execute
+
+    def get_recovery_in_progress_for_command(self, command_id: str) -> bool:
+        """Return whether the given command failed and its error recovery is in progress."""
+        return self._state.recovery_target_command_id == command_id
 
     def raise_fatal_command_error(self) -> None:
         """Raise the run's fatal command error, if there was one, as an exception.

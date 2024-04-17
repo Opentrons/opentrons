@@ -29,8 +29,6 @@ export const TemperatureModuleData = (
   let pulse
   switch (moduleStatus) {
     case 'idle': {
-      backgroundColor = COLORS.grey30
-      iconColor = COLORS.grey60
       textColor = COLORS.grey60
       break
     }

@@ -58,7 +58,7 @@ export const MountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
   const { proceed, isRobotMoving } = props
-  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
   const isOnDevice = useSelector(getIsOnDevice)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
   const [isPending, setIsPending] = React.useState(false)
@@ -119,7 +119,7 @@ export const MountGripper = (
     </SimpleWizardBody>
   ) : (
     <GenericWizardTile
-      header={t('connect_and_screw_in_gripper')}
+      header={t('branded:connect_and_screw_in_gripper')}
       rightHandBody={
         <video
           css={css`
