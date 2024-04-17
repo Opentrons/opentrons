@@ -23,7 +23,7 @@ describe('ChatDisplay', () => {
     render(props)
     screen.getByText('OpentronsAI')
     screen.getByText('mock text from the backend')
-    // Note (kk:04/16/2024) activate the following when jsdom's issue is solved
+    // ToDO (kk:04/16/2024) activate the following when jsdom's issue is solved
     // const display = screen.getByTextId('ChatDisplay_from_backend')
     // expect(display).toHaveStyle(`background-color: ${COLORS.grey30}`)
   })
@@ -35,7 +35,7 @@ describe('ChatDisplay', () => {
     render(props)
     screen.getByText('You')
     screen.getByText('mock text from user input')
-    // Note (kk:04/16/2024) activate the following when jsdom's issue is solved
+    // ToDO (kk:04/16/2024) activate the following when jsdom's issue is solved
     // const display = screen.getByTextId('ChatDisplay_from_user')
     // expect(display).toHaveStyle(`background-color: ${COLORS.blue}`)
   })
