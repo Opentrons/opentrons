@@ -289,7 +289,10 @@ class RunArgs:
             volumes_list.extend(vls)
 
         if args.trials == 0:
-            trials = helpers.get_default_trials(args.increment, kind, args.channels)
+            if args.cavity:
+                trials = 240
+            else:
+                trials = helpers.get_default_trials(args.increment, kind, args.channels)
         else:
             trials = args.trials
 
