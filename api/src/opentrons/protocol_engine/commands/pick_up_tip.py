@@ -84,8 +84,6 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
             well_name=well_name,
         )
 
-        raise TipNotAttachedError()
-
         return PickUpTipResult(
             tipVolume=tip_geometry.volume,
             tipLength=tip_geometry.length,

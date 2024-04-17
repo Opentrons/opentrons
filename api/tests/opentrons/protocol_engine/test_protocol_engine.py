@@ -184,7 +184,7 @@ def test_add_command(
     original_request = commands.WaitForResumeCreate(
         params=commands.WaitForResumeParams()
     )
-    standardized_request = commands.HomeCreate(params=commands.HomeParams())
+    standardized_request = commands.HomeCreate(params=commands.HomeParams(), intent=commands.CommandIntent.PROTOCOL)
     queued = commands.Home(
         id="command-id",
         key="command-key",
@@ -207,11 +207,11 @@ def test_add_command(
     decoy.when(state_store.commands.get_latest_protocol_command_hash()).then_return(
         "abc"
     )
-    decoy.when(
-        commands.hash_protocol_command_params(
-            create=standardized_request, last_hash="abc"
-        )
-    ).then_return("123")
+    # decoy.when(
+    #     commands.hash_protocol_command_params(
+    #         create=standardized_request, last_hash="abc"
+    #     )
+    # ).then_return("123")
 
     def _stub_queued(*_a: object, **_k: object) -> None:
         decoy.when(state_store.commands.get("command-id")).then_return(queued)
