@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "steps": [
+        {
+          "description": "Check Help Center.",   
+          "action": "checkLink",
+          "url": "https://support.opentrons.com/s/",
+          "statusCodes": [200, 201, 202, 301]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "tests": [
+    {
+      "steps": [
+        {
+          "action": "setVariables",
+          "path": "simulator.env"
+        },
+        {
+          "action": "runShell",
+          "description": "Run a simple command.",
+          "command": "pipenv run opentrons_simulate ../example_protocols/dilution_tutorial_flex.py -o nothing"
+        }
+      ]
+    },
+    {
+      "steps": [
+        {
+          "action": "setVariables",
+          "path": "simulator.env"
+        },
+        {
+          "action": "runShell",
+          "description": "Run a simple command.",
+          "command": "pipenv run opentrons_simulate ../example_protocols/dilution_tutorial_multi_flex.py -o nothing"
+        }
+      ]
+    },
+    {
+      "steps": [
+        {
+          "action": "setVariables",
+          "path": "simulator.env"
+        },
+        {
+          "action": "runShell",
+          "description": "Run a simple command.",
+          "command": "pipenv run opentrons_simulate ../example_protocols/dilution_tutorial.py -o nothing"
+        }
+      ]
+    },
+    {
+      "steps": [
+        {
+          "action": "setVariables",
+          "path": "simulator.env"
+        },
+        {
+          "action": "runShell",
+          "description": "Run a simple command.",
+          "command": "pipenv run opentrons_simulate ../example_protocols/dilution_tutorial_multi.py -o nothing"
+        }
+      ]
+    }
+  ]
+}

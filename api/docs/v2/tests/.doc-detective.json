@@ -1,0 +1,85 @@
+{
+  "envVariables": "./samples/variables.env",
+  "input": ".",
+  "output": ".",
+  "recursive": true,
+  "logLevel": "info",
+  "runTests": {
+    "detectSteps": true,
+    "input": "../index.rst",
+    "output": "./",
+    "recursive": true,
+    "mediaDirectory": "./samples",
+    "downloadDirectory": "./samples"
+  },
+  "fileTypes": [
+    {
+      "name": "Markdown",
+      "extensions": [".md"],
+      "testStartStatementOpen": "[comment]: # (test start",
+      "testStartStatementClose": ")",
+      "testIgnoreStatement": "[comment]: # (test ignore)",
+      "testEndStatement": "[comment]: # (test end)",
+      "stepStatementOpen": "[comment]: # (step",
+      "stepStatementClose": ")",
+      "markup": [
+        {
+          "name": "Hyperlink",
+          "regex": ["(?<=(?<!!)\\[[\\w\\s]+\\]\\().*?(?=\\))"],
+          "actions": ["checkLink"]
+        },
+        {
+          "name": "Navigation link",
+          "regex": ["(?<=([Oo]pen|[Cc]lick) (?<!!)\\[[\\w\\s]+\\]\\().*?(?=\\))"],
+          "actions": ["goTo"]
+        },
+        {
+          "name": "Onscreen text",
+          "regex": ["(?<=\\*\\*)[\\w\\s]+?(?=\\*\\*)"],
+          "actions": ["find"]
+        },
+        {
+          "name": "Image",
+          "regex": ["(?<=\\!\\[.*?\\]\\().*?(?=\\))"],
+          "actions": [
+            {
+              "name": "saveScreenshot",
+              "params": {
+                "directory": "samples",
+                "maxVariation": 5,
+                "overwrite": "byVariation"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reStructuredText",
+      "extensions": [".rst"],
+      "testStartStatementOpen": ".. (test start",
+      "testStartStatementClose": ")",
+      "testIgnoreStatement": ".. (test ignore)",
+      "testEndStatement": ".. (test end)",
+      "stepStatementOpen": ".. (step",
+      "stepStatementClose": ")",
+      "markup": [
+        {
+          "name": "Hyperlink",
+          "regex": ["(?<= <)https?[^>]+(?=>`_)"],
+          "actions": ["goTo"]
+        },
+        {
+          "name": "Anonymous hyperlink",
+          "regex": ["(?<=__ )https?[\\S]+"],
+          "actions": ["checkLink"]
+        }
+      ]
+    }
+  ],
+  "telemetry": {
+    "send": true,
+    "userId": "Doc Detective Repo"
+  },
+  "defaultCommand": "runTests"
+}
