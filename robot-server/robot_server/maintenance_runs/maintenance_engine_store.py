@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 from typing import List, NamedTuple, Optional, Callable
 
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
@@ -64,8 +65,10 @@ def get_estop_listener(engine_store: "MaintenanceEngineStore") -> HardwareEventH
                     return
                 if engine_store.current_run_id is None:
                     return
+                # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
+                # runner layer.
                 engine_store.engine.estop()
-                await engine_store.engine.finish()
+                await engine_store.engine.finish(error=EStopActivatedError())
         except Exception:
             # This is a background task kicked off by a hardware event,
             # so there's no one to propagate this exception to.

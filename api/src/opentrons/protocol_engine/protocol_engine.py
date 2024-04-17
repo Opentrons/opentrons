@@ -19,7 +19,6 @@ from opentrons_shared_data.errors import (
 )
 
 from .errors import ProtocolCommandFailedError, ErrorOccurrence
-from .errors.exceptions import EStopActivatedError
 from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
 from .types import (
@@ -301,9 +300,7 @@ class ProtocolEngine:
             # todo(mm, 2024-04-16): This makes the run appeared as "cancelled" instead
             # of "failed". We either want to make a separate action for E-stops,
             # or we want to teach CommandView.get_status() about from_estop=True.
-            action = self._state_store.commands.validate_action_allowed(
-                StopAction(from_estop=True)
-            )
+            action = self._state_store.commands.validate_action_allowed(StopAction())
         except Exception:  # todo(mm, 2024-04-16): Catch a more specific type.
             # This is likely called from some hardware API callback that doesn't care
             # about ProtocolEngine lifecycle or what methods are valid to call at what
@@ -392,16 +389,6 @@ class ProtocolEngine:
             post_run_hardware_state: The state in which to leave the gantry and motors in
                 after the run is over.
         """
-        if self._state_store.commands.state.stopped_by_estop:
-            # This handles the case where the E-stop was pressed while we were *not* in the middle
-            # of some hardware interaction that would raise it as an exception. For example, imagine
-            # we were paused between two commands, or imagine we were executing a very long run of
-            # comment commands.
-            drop_tips_after_run = False
-            post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
-            if error is None:
-                error = EStopActivatedError(message="Estop was activated during a run")
-
         if error:
             # If the run had an error, check if that error indicates an E-stop.
             # This handles the case where the run was in the middle of some hardware control

@@ -3,6 +3,7 @@ import asyncio
 import logging
 from typing import List, NamedTuple, Optional, Callable
 
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
@@ -74,12 +75,10 @@ def get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
                     return
                 if engine_store.current_run_id is None:
                     return
+                # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
+                # runner layer.
                 engine_store.engine.estop()
-                # todo(mm, 2024-04-16): Is it correct to call .finish() here, in the
-                # non-maintenance engine store? Is this redundant with the .finish()es
-                # in the protocol runners? Is this needed for regular-run setup
-                # commands?
-                await engine_store.engine.finish()
+                await engine_store.engine.finish(error=EStopActivatedError())
         except Exception:
             # This is a background task kicked off by a hardware event,
             # so there's no one to propagate this exception to.

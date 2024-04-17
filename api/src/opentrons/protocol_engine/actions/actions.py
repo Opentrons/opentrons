@@ -57,8 +57,6 @@ class PauseAction:
 class StopAction:
     """Request engine execution to stop soon."""
 
-    from_estop: bool = False
-
 
 @dataclass(frozen=True)
 class ResumeFromRecoveryAction:

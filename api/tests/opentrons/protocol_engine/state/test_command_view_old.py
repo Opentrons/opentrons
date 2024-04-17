@@ -94,7 +94,6 @@ def get_command_view(
         recovery_target_command_id=recovery_target_command_id,
         run_started_at=run_started_at,
         latest_command_hash=latest_command_hash,
-        stopped_by_estop=False,
     )
 
     return CommandView(state=state)
