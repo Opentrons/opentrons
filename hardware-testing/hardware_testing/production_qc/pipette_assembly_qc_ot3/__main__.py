@@ -33,6 +33,7 @@ from opentrons.hardware_control.ot3_calibration import (
     CalibrationStructureNotFoundError,
 )
 
+from hardware_testing.drivers.sealed_pressure_fixture import SerialDriver as SealedPressureDriver
 from hardware_testing import data
 from hardware_testing.drivers.pressure_fixture import (
     PressureFixtureBase,
