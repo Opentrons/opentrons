@@ -15,6 +15,8 @@ import {
   WASTE_CHUTE_ONLY_FIXTURES,
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
   HEATERSHAKER_MODULE_V1,
+  FLEX_MODULE_ADDRESSABLE_AREAS,
+  MODULE_FIXTURES_BY_MODEL,
 } from '@opentrons/shared-data'
 
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
@@ -32,6 +34,7 @@ import { WasteChuteFixture } from './WasteChuteFixture'
 import { WasteChuteStagingAreaFixture } from './WasteChuteStagingAreaFixture'
 
 import type {
+  CutoutFixtureId,
   DeckConfiguration,
   LabwareDefinition2,
   LabwareLocation,
@@ -101,7 +104,12 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
   const singleSlotFixtures = deckConfig.filter(
     fixture =>
       fixture.cutoutFixtureId != null &&
-      SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
+      (SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId) ||
+        // If module fixture is loaded, still visualize singleSlotFixture underneath for consistency
+        Object.entries(MODULE_FIXTURES_BY_MODEL).reduce<CutoutFixtureId[]>(
+          (acc, [_model, fixtures]) => [...acc, ...fixtures],
+          []
+        ))
   )
   const stagingAreaFixtures = deckConfig.filter(
     fixture =>
