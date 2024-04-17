@@ -1,23 +1,28 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useForm, Controller } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Link,
   PrimaryButton,
   SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useRobotSettingsQuery } from '@opentrons/react-api-client'
+import {
+  useCreateSplashMutation,
+  useRobotSettingsQuery,
+} from '@opentrons/react-api-client'
 
 import { ToggleButton } from '../../../../../atoms/buttons'
 import { InputField } from '../../../../../atoms/InputField'
 import { MultiSlideout } from '../../../../../atoms/Slideout/MultiSlideout'
+import { UploadInput } from '../../../../../molecules/UploadInput'
 import { restartRobot } from '../../../../../redux/robot-admin'
 import { updateSetting } from '../../../../../redux/robot-settings'
 
@@ -43,6 +48,7 @@ export function FactoryModeSlideout({
 
   const dispatch = useDispatch<Dispatch>()
 
+  const { createSplash } = useCreateSplashMutation()
   const { settings } = useRobotSettingsQuery().data ?? {}
   const oemModeSetting = (settings ?? []).find(
     (setting: RobotSettingsField) => setting?.id === 'enableOEMMode'
@@ -51,6 +57,7 @@ export function FactoryModeSlideout({
 
   const [currentStep, setCurrentStep] = React.useState<number>(1)
   const [toggleValue, setToggleValue] = React.useState<boolean>(false)
+  const [file, setFile] = React.useState<File | null>(null)
 
   const {
     handleSubmit,
@@ -76,9 +83,34 @@ export function FactoryModeSlideout({
   }
 
   const handleCompleteClick: React.MouseEventHandler<Element> = () => {
+    // TODO: loading spinner, wait for update setting response before sending image
     dispatch(updateSetting(robotName, 'enableOEMMode', toggleValue))
+
+    if (toggleValue && file != null) {
+      createSplash({ file })
+    }
+
+    // TODO: wait for createSplash response before restarting robot and closing slideout
     dispatch(restartRobot(robotName))
     onCloseClick()
+  }
+
+  const handleChooseFile = (file: File): void => {
+    const imgUrl = URL.createObjectURL(file)
+    const logoImage = new Image()
+    logoImage.src = imgUrl
+    logoImage.onload = () => {
+      // validation for ODD screen size and allowed file type
+      if (
+        logoImage.naturalWidth === 1024 &&
+        logoImage.naturalHeight === 600 &&
+        file.type === 'image/png'
+      ) {
+        setFile(file)
+      } else {
+        // TODO: error handling in file upload component
+      }
+    }
   }
 
   React.useEffect(() => {
@@ -103,7 +135,11 @@ export function FactoryModeSlideout({
             </PrimaryButton>
           ) : null}
           {currentStep === 2 ? (
-            <PrimaryButton onClick={handleCompleteClick} width="100%">
+            <PrimaryButton
+              disabled={toggleValue && file == null}
+              onClick={handleCompleteClick}
+              width="100%"
+            >
               {t('complete_and_restart_robot')}
             </PrimaryButton>
           ) : null}
@@ -143,24 +179,54 @@ export function FactoryModeSlideout({
         </Flex>
       ) : null}
       {currentStep === 2 ? (
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText
-            css={TYPOGRAPHY.pSemiBold}
-            paddingBottom={SPACING.spacing4}
-          >
-            {t('oem_mode')}
-          </StyledText>
-          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing6}>
-            <ToggleButton
-              label="oem_mode_toggle"
-              toggledOn={toggleValue}
-              onClick={handleToggleClick}
-            />
-            <StyledText as="p" marginBottom={SPACING.spacing4}>
-              {toggleValue ? t('on') : t('off')}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText
+              css={TYPOGRAPHY.pSemiBold}
+              paddingBottom={SPACING.spacing4}
+            >
+              {t('oem_mode')}
             </StyledText>
+            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing6}>
+              <ToggleButton
+                label="oem_mode_toggle"
+                toggledOn={toggleValue}
+                onClick={handleToggleClick}
+              />
+              <StyledText as="p" marginBottom={SPACING.spacing4}>
+                {toggleValue ? t('on') : t('off')}
+              </StyledText>
+            </Flex>
+            <StyledText as="p">{t('branded:oem_mode_description')}</StyledText>
           </Flex>
-          <StyledText as="p">{t('branded:oem_mode_description')}</StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
+              <StyledText css={TYPOGRAPHY.pSemiBold}>
+                {t('upload_custom_logo')}
+              </StyledText>
+              <StyledText as="p">
+                {t('upload_custom_logo_description')}
+              </StyledText>
+              <StyledText as="p">
+                {t('upload_custom_logo_dimensions')}
+              </StyledText>
+            </Flex>
+            <UploadInput
+              uploadButtonText={t('choose_file')}
+              onUpload={(file: File) => handleChooseFile(file)}
+              dragAndDropText={
+                <StyledText as="p">
+                  <Trans
+                    t={t}
+                    i18nKey="shared:drag_and_drop"
+                    components={{
+                      a: <Link color={COLORS.blue55} role="button" />,
+                    }}
+                  />
+                </StyledText>
+              }
+            />
+          </Flex>
         </Flex>
       ) : null}
     </MultiSlideout>
