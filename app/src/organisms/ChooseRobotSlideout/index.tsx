@@ -193,12 +193,18 @@ export function ChooseRobotSlideout(
 
   // this useEffect sets the default selection to the first robot in the list. state is managed by the caller
   React.useEffect(() => {
-    if (selectedRobot == null && reducerAvailableRobots.length > 0) {
+    if (
+      (selectedRobot == null ||
+        !reducerAvailableRobots.some(
+          robot => robot.name === selectedRobot.name
+        )) &&
+      reducerAvailableRobots.length > 0
+    ) {
       setSelectedRobot(reducerAvailableRobots[0])
     } else if (reducerAvailableRobots.length === 0) {
       setSelectedRobot(null)
     }
-  }, [healthyReachableRobots, selectedRobot, setSelectedRobot])
+  }, [reducerAvailableRobots, selectedRobot, setSelectedRobot])
 
   const unavailableCount =
     unhealthyReachableRobots.length + unreachableRobots.length
@@ -368,6 +374,7 @@ export function ChooseRobotSlideout(
             title={runtimeParam.displayName}
             width="100%"
             dropdownType="neutral"
+            tooltipText={runtimeParam.description}
           />
         )
       } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {

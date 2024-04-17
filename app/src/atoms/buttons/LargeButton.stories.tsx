@@ -45,3 +45,16 @@ export const Alert: Story = {
     iconName: 'reset',
   },
 }
+export const PrimaryNoIcon: Story = {
+  args: {
+    buttonText: 'Button text',
+    disabled: false,
+  },
+}
+export const PrimaryWithSubtext: Story = {
+  args: {
+    buttonText: 'Button text',
+    disabled: false,
+    subtext: 'Button subtext',
+  },
+}

@@ -1,9 +1,10 @@
 import { ACTIONS } from './constants'
-import type { PipetteData } from '@opentrons/api-client'
-import type { LabwareDefinition1 } from '@opentrons/shared-data'
+import type { Mount } from '@opentrons/api-client'
+import type { LabwareDefinition1, PipetteV2Specs } from '@opentrons/shared-data'
 
 export interface QuickTransferSetupState {
-  pipette?: PipetteData
+  pipette?: PipetteV2Specs
+  mount?: Mount
   tipRack?: LabwareDefinition1
   source?: LabwareDefinition1
   sourceWells?: string[]
@@ -23,7 +24,8 @@ export type QuickTransferWizardAction =
 
 interface SelectPipetteAction {
   type: typeof ACTIONS.SELECT_PIPETTE
-  pipette: PipetteData
+  mount: Mount
+  pipette: PipetteV2Specs
 }
 interface SelectTipRackAction {
   type: typeof ACTIONS.SELECT_TIP_RACK

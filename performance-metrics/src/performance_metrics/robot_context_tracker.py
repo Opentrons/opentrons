@@ -2,29 +2,57 @@
 
 import csv
 from pathlib import Path
-import os
+import platform
 
-from functools import wraps
-from time import perf_counter_ns, clock_gettime_ns, CLOCK_REALTIME
-from typing import Callable, TypeVar
+from functools import wraps, partial
+from time import perf_counter_ns
+import os
+from typing import Callable, TypeVar, cast
+
+
 from typing_extensions import ParamSpec
 from collections import deque
 from performance_metrics.datashapes import (
     RawContextData,
+)
+from opentrons_shared_data.performance.dev_types import (
     RobotContextState,
+    SupportsTracking,
 )
 
 P = ParamSpec("P")
 R = TypeVar("R")
 
 
-class RobotContextTracker:
+def _get_timing_function() -> Callable[[], int]:
+    """Returns a timing function for the current platform."""
+    time_function: Callable[[], int]
+    if platform.system() == "Linux":
+        from time import clock_gettime_ns, CLOCK_REALTIME
+
+        time_function = cast(
+            Callable[[], int], partial(clock_gettime_ns, CLOCK_REALTIME)
+        )
+    else:
+        from time import time_ns
+
+        time_function = time_ns
+
+    return time_function
+
+
+timing_function = _get_timing_function()
+
+
+class RobotContextTracker(SupportsTracking):
     """Tracks and stores robot context and execution duration for different operations."""
 
-    def __init__(self, storage_file_path: Path, should_track: bool = False) -> None:
+    FILE_NAME = "context_data.csv"
+
+    def __init__(self, storage_location: Path, should_track: bool = False) -> None:
         """Initializes the RobotContextTracker with an empty storage list."""
         self._storage: deque[RawContextData] = deque()
-        self._storage_file_path = storage_file_path
+        self._storage_file_path = storage_location / self.FILE_NAME
         self._should_track = should_track
 
     def track(self, state: RobotContextState) -> Callable:  # type: ignore
@@ -43,7 +71,7 @@ class RobotContextTracker:
 
             @wraps(func)
             def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-                function_start_time = clock_gettime_ns(CLOCK_REALTIME)
+                function_start_time = timing_function()
                 duration_start_time = perf_counter_ns()
                 try:
                     result = func(*args, **kwargs)
