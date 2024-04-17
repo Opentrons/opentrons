@@ -317,7 +317,7 @@ export const ModuleWizardFlows = (
         availableSlotNames={availableSlotNames}
         deckConfig={deckConfig}
         occupiedCutouts={occupiedCutouts}
-        fixtureIdByCutoutId={fixtureIdByCutoutId}
+        configuredFixtureIdByCutoutId={fixtureIdByCutoutId}
       />
     )
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {

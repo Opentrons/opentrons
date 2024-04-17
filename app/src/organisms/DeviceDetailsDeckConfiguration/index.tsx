@@ -120,20 +120,20 @@ export function DeviceDetailsDeckConfiguration({
       newDeckConfig = deckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId in groupMap
           ? {
-              ...cutoutConfig,
-              cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: undefined,
-            }
+            ...cutoutConfig,
+            cutoutFixtureId: replacementFixtureId,
+            opentronsModuleSerialNumber: undefined,
+          }
           : cutoutConfig
       )
     } else {
       newDeckConfig = deckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId === cutoutId
           ? {
-              ...cutoutConfig,
-              cutoutFixtureId: replacementFixtureId,
-              opentronsModuleSerialNumber: undefined,
-            }
+            ...cutoutConfig,
+            cutoutFixtureId: replacementFixtureId,
+            opentronsModuleSerialNumber: undefined,
+          }
           : cutoutConfig
       )
     }
@@ -269,10 +269,10 @@ export function DeviceDetailsDeckConfiguration({
                 flexDirection={DIRECTION_COLUMN}
               >
                 <DeckConfigurator
-                  readOnly={
-                    isRunRunning ||
-                    isMaintenanceRunExisting ||
-                    isEstopNotDisengaged
+                  editableCutoutIds={
+                    (isRunRunning ||
+                      isMaintenanceRunExisting ||
+                      isEstopNotDisengaged) ? [] : deckConfig.map(({ cutoutId }) => cutoutId)
                   }
                   deckConfig={deckConfig}
                   handleClickAdd={handleClickAdd}
