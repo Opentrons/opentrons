@@ -52,7 +52,7 @@ export function PromptGuide(): JSX.Element {
                 <li>
                   <StyledText>{t('api')}</StyledText>
                 </li>
-              </StyledUL>
+              </StyledUl>
             </li>
             <li>
               <StyledText>{t('ot2_pipettes')}</StyledText>
@@ -100,7 +100,7 @@ const BODY_TEXT_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSize20};
   line-height: ${TYPOGRAPHY.lineHeight24};
 `
-const StyledUL = styled.ul`
+const StyledUl = styled.ul`
   padding-left: ${SPACING.spacing16};
   list-style-type: disc;
 `
