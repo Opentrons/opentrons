@@ -174,6 +174,8 @@ jobs:
         with:
           node-version: '18.19.0'
           registry-url: 'https://registry.npmjs.org'
+      - name: 'install udev for usb-detection'
+        run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'setup-js'
         run: |
           npm config set cache ./.npm-cache
