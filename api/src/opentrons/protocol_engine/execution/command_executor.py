@@ -159,7 +159,7 @@ class CommandExecutor:
             if isinstance(error, asyncio.CancelledError):
                 error = RunStoppedError("Run was cancelled")
             elif isinstance(error, EStopActivatedError):
-                error = PE_EStopActivatedError(message=str(error), wrapping=[error])
+                error = PE_EStopActivatedError(wrapping=[error])
             elif not isinstance(error, EnumeratedError):
                 error = PythonException(error)
 
