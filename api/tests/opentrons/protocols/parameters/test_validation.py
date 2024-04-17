@@ -104,10 +104,12 @@ def test_ensure_variable_name_raises_keyword(variable_name: str) -> None:
 def test_validate_options() -> None:
     """It should not raise when given valid constraints"""
     subject.validate_options(123, 1, 100, None, int)
+    subject.validate_options(123, 100, 100, None, int)
     subject.validate_options(
         123, None, None, [{"display_name": "abc", "value": 456}], int
     )
     subject.validate_options(12.3, 1.1, 100.9, None, float)
+    subject.validate_options(12.3, 1.1, 1.1, None, float)
     subject.validate_options(
         12.3, None, None, [{"display_name": "abc", "value": 45.6}], float
     )

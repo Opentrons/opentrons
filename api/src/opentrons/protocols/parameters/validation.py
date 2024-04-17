@@ -222,7 +222,7 @@ def _validate_min_and_max(
             # These asserts are for the type checker and should never actually be asserted false
             assert isinstance(minimum, (int, float))
             assert isinstance(maximum, (int, float))
-            if maximum <= minimum:
+            if maximum < minimum:
                 raise ParameterDefinitionError(
                     "Maximum must be greater than the minimum"
                 )
