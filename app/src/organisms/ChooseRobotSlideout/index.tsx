@@ -113,6 +113,7 @@ interface ChooseRobotSlideoutProps
   showIdleOnly?: boolean
   multiSlideout?: { currentPage: number } | null
   setHasParamError?: (isError: boolean) => void
+  resetRunTimeParameters?: () => void
 }
 
 export function ChooseRobotSlideout(
@@ -139,6 +140,7 @@ export function ChooseRobotSlideout(
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
     setHasParamError,
+    resetRunTimeParameters,
   } = props
 
   const dispatch = useDispatch<Dispatch>()
@@ -507,15 +509,7 @@ export function ChooseRobotSlideout(
                 ? ENABLED_LINK_CSS
                 : DISABLED_LINK_CSS
             }
-            onClick={() => {
-              const clone = runTimeParametersOverrides.map(parameter => ({
-                ...parameter,
-                value: parameter.default,
-              }))
-              if (setRunTimeParametersOverrides != null) {
-                setRunTimeParametersOverrides(clone)
-              }
-            }}
+            onClick={() => resetRunTimeParameters?.()}
             paddingBottom={SPACING.spacing10}
             {...targetProps}
           >

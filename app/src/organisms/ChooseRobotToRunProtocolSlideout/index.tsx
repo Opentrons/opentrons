@@ -132,6 +132,8 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     'downgrade',
   ].includes(autoUpdateAction)
 
+  const hasRunTimeParameters = runTimeParameters.length > 0
+
   if (
     protocolKey == null ||
     srcFileNames == null ||
@@ -174,7 +176,14 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     </PrimaryButton>
   )
 
-  const hasRunTimeParameters = runTimeParameters.length > 0
+  const resetRunTimeParameters = (): void => {
+    setRunTimeParametersOverrides(
+      runTimeParametersOverrides?.map(parameter => ({
+        ...parameter,
+        value: parameter.default,
+      }))
+    )
+  }
 
   return (
     <ChooseRobotSlideout
@@ -183,7 +192,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       isSelectedRobotOnDifferentSoftwareVersion={
         isSelectedRobotOnDifferentSoftwareVersion
       }
-      onCloseClick={onCloseClick}
+      onCloseClick={() => {
+        onCloseClick()
+        resetRunTimeParameters()
+        setCurrentPage(1)
+        setSelectedRobot(null)
+      }}
       title={
         hasRunTimeParameters && currentPage === 2
           ? t('select_parameters_for_robot', {
@@ -250,8 +264,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       reset={resetCreateRun}
       runCreationError={runCreationError}
       runCreationErrorCode={runCreationErrorCode}
-      showIdleOnly={true}
+      showIdleOnly
       setHasParamError={setHasParamError}
+      resetRunTimeParameters={resetRunTimeParameters}
     />
   )
 }
