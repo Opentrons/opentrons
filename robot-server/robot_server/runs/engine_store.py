@@ -64,32 +64,45 @@ class RunnerEnginePair(NamedTuple):
     engine: ProtocolEngine
 
 
-def get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
-    """Create a callback for estop events."""
+async def handle_estop_event(engine_store: "EngineStore", event: HardwareEvent) -> None:
+    """Handle an E-stop event from the hardware API.
+
+    This is meant to run in the engine's thread and asyncio event loop.
+
+    This is a public function for unit-testing purposes, but it's an implementation
+    detail of the store.
+    """
+    try:
+        if isinstance(event, EstopStateNotification):
+            if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
+                return
+            if engine_store.current_run_id is None:
+                return
+            # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
+            # runner layer.
+            engine_store.engine.estop()
+            await engine_store.engine.finish(error=EStopActivatedError())
+    except Exception:
+        # This is a background task kicked off by a hardware event,
+        # so there's no one to propagate this exception to.
+        _log.exception("Exception handling E-stop event.")
+
+
+def _get_estop_listener(engine_store: "EngineStore") -> HardwareEventHandler:
+    """Create a callback for estop events.
+
+    The returned callback is meant to run in the hardware API's thread.
+    """
     engine_loop = asyncio.get_running_loop()
 
-    async def _handle_event_in_engine_thread(event: HardwareEvent) -> None:
-        try:
-            if isinstance(event, EstopStateNotification):
-                if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
-                    return
-                if engine_store.current_run_id is None:
-                    return
-                # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
-                # runner layer.
-                engine_store.engine.estop()
-                await engine_store.engine.finish(error=EStopActivatedError())
-        except Exception:
-            # This is a background task kicked off by a hardware event,
-            # so there's no one to propagate this exception to.
-            _log.exception("Exception handling E-stop event.")
-
-    def _handle_event_in_hardware_thread(event: HardwareEvent) -> None:
+    def run_handler_in_engine_thread_from_hardware_thread(
+        event: HardwareEvent,
+    ) -> None:
         asyncio.run_coroutine_threadsafe(
-            _handle_event_in_engine_thread(event), engine_loop
+            handle_estop_event(engine_store, event), engine_loop
         )
 
-    return _handle_event_in_hardware_thread
+    return run_handler_in_engine_thread_from_hardware_thread
 
 
 class EngineStore:
@@ -114,7 +127,7 @@ class EngineStore:
         self._deck_type = deck_type
         self._default_engine: Optional[ProtocolEngine] = None
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
-        hardware_api.register_callback(get_estop_listener(self))
+        hardware_api.register_callback(_get_estop_listener(self))
 
     @property
     def engine(self) -> ProtocolEngine:
