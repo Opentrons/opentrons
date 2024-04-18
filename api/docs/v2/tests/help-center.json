@@ -3,6 +3,10 @@
     {
       "steps": [
         {
+          "action": "setVariables",
+          "path": "ignore-certificate-problems.env"
+        },
+        {
           "description": "Check Help Center.",   
           "action": "checkLink",
           "url": "https://support.opentrons.com/s/",

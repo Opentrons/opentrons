@@ -1,12 +1,12 @@
 {
-  "envVariables": "./samples/variables.env",
+  "envVariables": "ignore-certificate-problems.env",
   "input": ".",
   "output": ".",
   "recursive": true,
   "logLevel": "info",
   "runTests": {
     "detectSteps": true,
-    "input": "../index.rst",
+    "input": "../",
     "output": "./",
     "recursive": true,
     "mediaDirectory": "./samples",
@@ -67,7 +67,7 @@
         {
           "name": "Hyperlink",
           "regex": ["(?<= <)https?[^>]+(?=>`_)"],
-          "actions": ["goTo"]
+          "actions": ["checkLink"]
         },
         {
           "name": "Anonymous hyperlink",
