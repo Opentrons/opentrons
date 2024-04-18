@@ -20,7 +20,7 @@ def validate_variable_name_unique(
     variable_name: str, other_variable_names: Set[str]
 ) -> None:
     """Validate that the given variable name is unique."""
-    if variable_name in other_variable_names:
+    if isinstance(variable_name, str) and variable_name in other_variable_names:
         raise ParameterNameError(
             f'"{variable_name}" is already defined as a variable name for another parameter.'
             f" All variable names must be unique."
@@ -222,7 +222,7 @@ def _validate_min_and_max(
             # These asserts are for the type checker and should never actually be asserted false
             assert isinstance(minimum, (int, float))
             assert isinstance(maximum, (int, float))
-            if maximum <= minimum:
+            if maximum < minimum:
                 raise ParameterDefinitionError(
                     "Maximum must be greater than the minimum"
                 )

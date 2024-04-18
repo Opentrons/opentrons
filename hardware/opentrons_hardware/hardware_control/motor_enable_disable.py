@@ -122,7 +122,9 @@ async def get_motor_enabled(
             )
         else:
             log.debug("Read motor status terminated, no missing nodes.")
-    return reported
+    finally:
+        can_messenger.remove_listener(_listener)
+        return reported
 
 
 async def get_tip_motor_enabled(

@@ -13,8 +13,9 @@ from opentrons.protocols.parameters import validation as subject
 
 
 def test_validate_variable_name_unique() -> None:
-    """It should no-op if the name is unique and raise if it is not."""
+    """It should no-op if the name is unique or if it's not a string, and raise if it is not."""
     subject.validate_variable_name_unique("one of a kind", {"fee", "foo", "fum"})
+    subject.validate_variable_name_unique({}, {"fee", "foo", "fum"})  # type: ignore[arg-type]
     with pytest.raises(ParameterNameError):
         subject.validate_variable_name_unique("copy", {"paste", "copy", "cut"})
 
@@ -103,10 +104,12 @@ def test_ensure_variable_name_raises_keyword(variable_name: str) -> None:
 def test_validate_options() -> None:
     """It should not raise when given valid constraints"""
     subject.validate_options(123, 1, 100, None, int)
+    subject.validate_options(123, 100, 100, None, int)
     subject.validate_options(
         123, None, None, [{"display_name": "abc", "value": 456}], int
     )
     subject.validate_options(12.3, 1.1, 100.9, None, float)
+    subject.validate_options(12.3, 1.1, 1.1, None, float)
     subject.validate_options(
         12.3, None, None, [{"display_name": "abc", "value": 45.6}], float
     )
