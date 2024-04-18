@@ -147,7 +147,7 @@ export function EditModulesCard(props: Props): JSX.Element {
           } else if (moduleData != null && moduleData.length > 1) {
             return (
               <MultipleModuleRow
-                type={moduleType}
+                moduleType={moduleType}
                 moduleOnDeck={moduleData}
                 key={i}
                 moduleOnDeckType={moduleData[0].type}

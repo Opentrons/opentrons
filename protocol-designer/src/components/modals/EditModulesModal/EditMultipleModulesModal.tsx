@@ -75,13 +75,15 @@ const EditMultipleModulesModalComponent = (
             module.type === moduleType && slot === `cutout${module.slot}`
         ) != null
       const labwareOnSlot = getLabwareOnSlot(initialDeckSetup, slot)
-      const isEmpty = getSlotIsEmpty(initialDeckSetup, slot, true)
       const isLabwareCompatible =
         (labwareOnSlot &&
           getLabwareIsCompatible(labwareOnSlot.def, moduleType)) ??
         true
+      const isEmpty =
+        (getSlotIsEmpty(initialDeckSetup, slot, true) || hasModSlot) &&
+        isLabwareCompatible
 
-      return { slot, isEmpty: (isEmpty || hasModSlot) && isLabwareCompatible }
+      return { slot, isEmpty }
     })
     .filter(slot => !slot.isEmpty)
   const hasConflictedSlot = occupiedCutoutIds.length > 0
@@ -220,9 +222,9 @@ export interface EditMultipleModulesModalProps {
   allModulesOnDeck: ModuleOnDeck[]
   moduleType: ModuleType
 }
-export const EditMultipleModulesModal = (
+export function EditMultipleModulesModal(
   props: EditMultipleModulesModalProps
-): JSX.Element => {
+): JSX.Element {
   const { onCloseClick, allModulesOnDeck, moduleType } = props
   const { t } = useTranslation('modules')
   const dispatch = useDispatch()

@@ -6,36 +6,37 @@ import {
   OutlineButton,
   ModuleIcon,
   C_DARK_GRAY,
-  SIZE_1,
   SPACING,
 } from '@opentrons/components'
-import { actions as stepFormActions, ModuleOnDeck } from '../../step-forms'
+import { actions as stepFormActions } from '../../step-forms'
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../constants'
 import { ModuleDiagram } from './ModuleDiagram'
 import { FlexSlotMap } from './FlexSlotMap'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import type { ModuleOnDeck } from '../../step-forms'
 
 import styles from './styles.module.css'
 
-interface MultipleModuleRowProps {
-  type: ModuleType
+interface MultipleModulesRowProps {
+  moduleType: ModuleType
   openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => void
   moduleOnDeckType?: ModuleType
   moduleOnDeckModel?: ModuleModel
   moduleOnDeck?: ModuleOnDeck[]
 }
 
-export function MultipleModuleRow(props: MultipleModuleRowProps): JSX.Element {
+export function MultipleModuleRow(props: MultipleModulesRowProps): JSX.Element {
   const {
     moduleOnDeck,
     openEditModuleModal,
     moduleOnDeckModel,
     moduleOnDeckType,
-    type: propsType,
+    moduleType,
   } = props
   const { t } = useTranslation(['modules', 'shared'])
+  const dispatch = useDispatch()
 
-  const type: ModuleType = moduleOnDeckType || propsType
+  const type: ModuleType = moduleOnDeckType ?? moduleType
   const occupiedSlots = moduleOnDeck?.map(module => module.slot) ?? []
   const occupiedSlotsDisplayName = (
     moduleOnDeck?.map(module => module.slot) ?? []
@@ -45,8 +46,6 @@ export function MultipleModuleRow(props: MultipleModuleRowProps): JSX.Element {
     openEditModuleModal(moduleType, moduleId)
 
   const addRemoveText = moduleOnDeck ? t('shared:remove') : t('shared:add')
-
-  const dispatch = useDispatch()
 
   const handleAddOrRemove = (): void => {
     if (moduleOnDeck != null) {
@@ -65,7 +64,7 @@ export function MultipleModuleRow(props: MultipleModuleRowProps): JSX.Element {
       <h4 className={styles.row_title}>
         <ModuleIcon
           moduleType={type}
-          size={SIZE_1}
+          size="1rem"
           color={C_DARK_GRAY}
           marginRight={SPACING.spacing4}
         />

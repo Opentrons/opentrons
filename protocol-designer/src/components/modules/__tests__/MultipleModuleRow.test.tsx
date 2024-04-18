@@ -9,9 +9,9 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
-import { ModuleOnDeck } from '../../../step-forms'
 import { FlexSlotMap } from '../FlexSlotMap'
 import { deleteModule } from '../../../step-forms/actions'
+import type { ModuleOnDeck } from '../../../step-forms'
 
 vi.mock('../../../step-forms/actions')
 vi.mock('../FlexSlotMap')
@@ -40,7 +40,7 @@ describe('MultipleModuleRow', () => {
   let props: React.ComponentProps<typeof MultipleModuleRow>
   beforeEach(() => {
     props = {
-      type: TEMPERATURE_MODULE_TYPE,
+      moduleType: TEMPERATURE_MODULE_TYPE,
       openEditModuleModal: vi.fn(),
       moduleOnDeckType: TEMPERATURE_MODULE_TYPE,
       moduleOnDeckModel: TEMPERATURE_MODULE_V2,
