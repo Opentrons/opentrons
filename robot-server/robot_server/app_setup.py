@@ -106,9 +106,7 @@ async def on_startup() -> None:
             fbl_mark_persistence_init_complete
         ],
     )
-    await initialize_notifications(
-        app_state=app.state,
-    )
+    initialize_notifications(app_state=app.state)
 
 
 @app.on_event("shutdown")

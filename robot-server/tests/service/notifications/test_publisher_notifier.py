@@ -1,74 +1,48 @@
-import asyncio
+import pytest
 from unittest.mock import Mock, MagicMock
 
-from robot_server.service.notifications import (
-    PublisherNotifier,
-    ChangeNotifier,
-)
+from opentrons.util.event_notifier import EventNotifier
+
+from robot_server.service.notifications import PublisherNotifier
 
 
-async def test_initialize() -> None:
-    """It should create a new task."""
-    publisher_notifier = PublisherNotifier()
-
-    await publisher_notifier._initialize()
-
-    assert asyncio.get_running_loop()
+@pytest.fixture
+async def event_notifier() -> EventNotifier:
+    """Mock event notifier."""
+    return EventNotifier(max_queue_size=10)
 
 
 def test_notify_publishers() -> None:
     """Invoke the change notifier's notify method."""
-    change_notifier = MagicMock()
-    publisher_notifier = PublisherNotifier(change_notifier)
+    event_notifier = MagicMock()
+    publisher_notifier = PublisherNotifier(event_notifier=event_notifier)
 
     publisher_notifier._notify_publishers()
 
-    change_notifier.notify.assert_called_once()
+    event_notifier.notify.assert_called_once()
 
 
-def test_register_publish_callbacks() -> None:
+@pytest.mark.asyncio
+async def test_register_publish_callback(event_notifier: EventNotifier) -> None:
+    """It should append the list of callbacks within a given callback."""
+    publisher_notifier = PublisherNotifier(event_notifier=event_notifier)
+    callback = Mock()
+
+    publisher_notifier.register_publish_callback(callback)
+
+    assert len(publisher_notifier._event_notifier._callbacks) == 1
+    assert publisher_notifier._event_notifier._callbacks[0] == callback
+
+
+@pytest.mark.asyncio
+def test_register_publish_callbacks(event_notifier: EventNotifier) -> None:
     """It should extend the list of callbacks within a given list of callbacks."""
-    publisher_notifier = PublisherNotifier()
+    publisher_notifier = PublisherNotifier(event_notifier=event_notifier)
     callback1 = Mock()
     callback2 = Mock()
 
     publisher_notifier.register_publish_callbacks([callback1, callback2])
 
-    assert len(publisher_notifier._callbacks) == 2
-    assert publisher_notifier._callbacks[0] == callback1
-    assert publisher_notifier._callbacks[1] == callback2
-
-
-async def test_wait_for_event() -> None:
-    """It should wait for an event to occur, then invoke each callback."""
-    change_notifier = ChangeNotifier()
-    publisher_notifier = PublisherNotifier(change_notifier)
-
-    callback_called = False
-    callback_2_called = False
-
-    async def callback() -> None:
-        """Mock callback."""
-        nonlocal callback_called
-        callback_called = True
-
-    async def callback_2() -> None:
-        """Mock callback."""
-        nonlocal callback_2_called
-        callback_2_called = True
-
-    publisher_notifier.register_publish_callbacks([callback, callback_2])
-
-    async def trigger_callbacks() -> None:
-        """Mock trigger for callbacks."""
-        await asyncio.sleep(0.1)
-        change_notifier.notify()
-
-    task = asyncio.create_task(publisher_notifier._initialize())
-
-    await asyncio.gather(trigger_callbacks(), task)
-
-    assert callback_called
-    assert callback_2_called
-
-    task.cancel()
+    assert len(publisher_notifier._event_notifier._callbacks) == 2
+    assert publisher_notifier._event_notifier._callbacks[0] == callback1
+    assert publisher_notifier._event_notifier._callbacks[1] == callback2
