@@ -8,9 +8,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
@@ -59,7 +57,6 @@ from opentrons.protocol_engine.actions import (
     QueueCommandAction,
     HardwareStoppedAction,
     ResetTipsAction,
-    FailCommandAction,
 )
 
 
@@ -571,7 +568,6 @@ async def test_finish(
     completed_at = datetime(2021, 1, 1, 0, 0)
 
     decoy.when(model_utils.get_timestamp()).then_return(completed_at)
-    decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
 
     await subject.finish(
         drop_tips_after_run=drop_tips_after_run,
@@ -605,7 +601,6 @@ async def test_finish_with_defaults(
     state_store: StateStore,
 ) -> None:
     """It should be able to gracefully tell the engine it's done."""
-    decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
     await subject.finish()
 
     decoy.verify(
@@ -640,16 +635,13 @@ async def test_finish_with_error(
     expected_end_state: PostRunHardwareState,
 ) -> None:
     """It should be able to tell the engine it's finished because of an error."""
-    error = RuntimeError("oh no")
+    error = EStopActivatedError() if stopped_by_estop else RuntimeError("oh no")
     expected_error_details = FinishErrorDetails(
         error_id="error-id",
         created_at=datetime(year=2021, month=1, day=1),
         error=error,
     )
 
-    decoy.when(state_store.commands.state.stopped_by_estop).then_return(
-        stopped_by_estop
-    )
     decoy.when(model_utils.generate_id()).then_return("error-id")
     decoy.when(model_utils.get_timestamp()).then_return(
         datetime(year=2021, month=1, day=1), datetime(year=2022, month=2, day=2)
@@ -747,8 +739,6 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         await queue_worker.join(),
     ).then_raise(exception)
 
-    decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
-
     error_id = "error-id"
     completed_at = datetime(2021, 1, 1, 0, 0)
 
@@ -845,106 +835,53 @@ async def test_stop_for_legacy_core_protocols(
     )
 
 
-@pytest.mark.parametrize("maintenance_run", [True, False])
-async def test_estop_during_command(
+async def test_estop(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
     state_store: StateStore,
     subject: ProtocolEngine,
-    model_utils: ModelUtils,
-    maintenance_run: bool,
 ) -> None:
     """It should be able to stop the engine."""
-    timestamp = datetime(2021, 1, 1, 0, 0)
-    command_id = "command_fake_id"
-    running_command = sentinel.running_command
-    queued_command = sentinel.queued_command
-    error_id = "fake_error_id"
-    fake_command_set = OrderedSet(["fake-id-1", "fake-id-1"])
+    expected_action = StopAction()
+    validated_action = sentinel.validated_action
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_action),
+    ).then_return(validated_action)
 
-    decoy.when(model_utils.get_timestamp()).then_return(timestamp)
-    decoy.when(model_utils.generate_id()).then_return(error_id)
-    decoy.when(state_store.commands.get_is_stopped()).then_return(False)
-    decoy.when(state_store.commands.get_running_command_id()).then_return(command_id)
-    decoy.when(state_store.commands.get(command_id)).then_return(running_command)
-    decoy.when(state_store.commands.get_queue_ids()).then_return(fake_command_set)
-    decoy.when(state_store.commands.get(fake_command_set.head())).then_return(
-        queued_command
-    )
-
-    expected_action = FailCommandAction(
-        command_id=command_id,
-        running_command=running_command,
-        error_id=error_id,
-        failed_at=timestamp,
-        error=EStopActivatedError(message="Estop Activated"),
-        notes=[],
-        type=ErrorRecoveryType.FAIL_RUN,
-    )
-    expected_action_2 = FailCommandAction(
-        command_id=fake_command_set.head(),
-        running_command=queued_command,
-        error_id=error_id,
-        failed_at=timestamp,
-        error=EStopActivatedError(message="Estop Activated"),
-        notes=[],
-        type=ErrorRecoveryType.FAIL_RUN,
-    )
-
-    subject.estop(maintenance_run=maintenance_run)
+    subject.estop()
 
     decoy.verify(
-        action_dispatcher.dispatch(action=expected_action),
-        action_dispatcher.dispatch(action=expected_action_2),
+        action_dispatcher.dispatch(action=validated_action),
         queue_worker.cancel(),
     )
 
 
-@pytest.mark.parametrize("maintenance_run", [True, False])
-async def test_estop_without_command(
+async def test_estop_noops_if_invalid(
     decoy: Decoy,
     action_dispatcher: ActionDispatcher,
     queue_worker: QueueWorker,
     state_store: StateStore,
     subject: ProtocolEngine,
-    model_utils: ModelUtils,
-    maintenance_run: bool,
 ) -> None:
-    """It should be able to stop the engine."""
-    timestamp = datetime(2021, 1, 1, 0, 0)
-    error_id = "fake_error_id"
-
-    decoy.when(model_utils.get_timestamp()).then_return(timestamp)
-    decoy.when(model_utils.generate_id()).then_return(error_id)
-    decoy.when(state_store.commands.get_is_stopped()).then_return(False)
-    decoy.when(state_store.commands.get_running_command_id()).then_return(None)
-    decoy.when(state_store.commands.get_queue_ids()).then_return(OrderedSet())
-
-    expected_stop = StopAction(from_estop=True)
-    expected_hardware_stop = HardwareStoppedAction(
-        completed_at=timestamp,
-        finish_error_details=FinishErrorDetails(
-            error=EStopActivatedError(message="Estop Activated"),
-            error_id=error_id,
-            created_at=timestamp,
-        ),
-    )
-
+    """It should no-op if a stop is invalid right now.."""
+    expected_action = StopAction()
     decoy.when(
-        state_store.commands.validate_action_allowed(expected_stop),
-    ).then_return(expected_stop)
+        state_store.commands.validate_action_allowed(expected_action),
+    ).then_raise(RuntimeError("unable to stop; this machine craves flesh"))
 
-    subject.estop(maintenance_run=maintenance_run)
+    subject.estop()  # Should not raise.
 
     decoy.verify(
-        action_dispatcher.dispatch(expected_stop), times=1 if maintenance_run else 0
+        action_dispatcher.dispatch(),  # type: ignore
+        ignore_extra_args=True,
+        times=0,
     )
     decoy.verify(
-        action_dispatcher.dispatch(expected_hardware_stop),
-        times=1 if maintenance_run else 0,
+        queue_worker.cancel(),
+        ignore_extra_args=True,
+        times=0,
     )
-    decoy.verify(queue_worker.cancel(), times=1 if maintenance_run else 0)
 
 
 def test_add_plugin(

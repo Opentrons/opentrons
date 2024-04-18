@@ -5,7 +5,6 @@ from typing import Dict, Optional, Union
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
-    ErrorRecoveryType,
     error_recovery_by_ff,
 )
 
@@ -57,7 +56,6 @@ from .actions import (
     HardwareStoppedAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
-    FailCommandAction,
 )
 
 
