@@ -3,6 +3,8 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 
+import { simpleAnalysisFileFixture } from '@opentrons/api-client'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
@@ -15,6 +17,7 @@ import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks
 import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
 import { useNotifyService } from '../../../resources/useNotifyService'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 vi.mock('../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol')
 vi.mock('../../../redux/protocol-storage')
@@ -33,6 +36,20 @@ const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
   )
 }
 
+const modifiedSimpleAnalysisFileFixture = {
+  ...simpleAnalysisFileFixture,
+  robotType: OT2_ROBOT_TYPE,
+}
+const mockStoredProtocolDataFixture = [
+  {
+    ...storedProtocolDataFixture,
+    mostRecentAnalysis: ({
+      ...modifiedSimpleAnalysisFileFixture,
+      runTimeParameters: [],
+    } as any) as ProtocolAnalysisOutput,
+  },
+]
+
 describe('ChooseProtocolSlideout', () => {
   let mockCreateRunFromProtocol = vi.fn()
   let mockTrackCreateProtocolRunEvent = vi.fn()
@@ -41,7 +58,7 @@ describe('ChooseProtocolSlideout', () => {
     mockTrackCreateProtocolRunEvent = vi.fn(
       () => new Promise(resolve => resolve({}))
     )
-    vi.mocked(getStoredProtocols).mockReturnValue([storedProtocolDataFixture])
+    vi.mocked(getStoredProtocols).mockReturnValue(mockStoredProtocolDataFixture)
     vi.mocked(useCreateRunFromProtocol).mockReturnValue({
       createRunFromProtocolSource: mockCreateRunFromProtocol,
       reset: vi.fn(),
@@ -115,7 +132,6 @@ describe('ChooseProtocolSlideout', () => {
   it('move to the second slideout if CTA clicked', () => {
     const protocolDataWithoutRunTimeParameter = {
       ...storedProtocolDataFixture,
-      robotType: 'OT-2 Standard',
     }
     vi.mocked(getStoredProtocols).mockReturnValue([
       protocolDataWithoutRunTimeParameter,
