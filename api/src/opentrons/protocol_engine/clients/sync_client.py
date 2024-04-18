@@ -27,7 +27,6 @@ from ..types import (
     Liquid,
     NozzleLayoutConfigurationType,
     AddressableOffsetVector,
-    LabwareOffset,
     LabwareOffsetCreate,
 )
 from .transports import ChildThreadTransport
@@ -95,6 +94,7 @@ class SyncClient:
         )
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> None:
+        """Add a labware offset."""
         self._transport.call_method("add_labware_offset", request=request)
 
     def set_pipette_movement_speed(

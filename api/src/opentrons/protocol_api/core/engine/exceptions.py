@@ -1,5 +1,4 @@
-from typing import Optional, Dict
-from opentrons_shared_data.errors.exceptions import InvalidProtocolData
+from typing import Optional
 
 
 # TODO(mc, 2022-10-20): move to public ProtocolContext
@@ -18,11 +17,3 @@ class InvalidModuleLocationError(ValueError):
 
 class InvalidMagnetEngageHeightError(ValueError):
     """Error raised if a Magnetic Module engage height is invalid."""
-
-
-class CannotSetOffsetAtThisLocationError(InvalidProtocolData):
-    """Error raised when a user tries to add an offset in a location that cannot be offset."""
-
-    def __init__(self, message: str, detail: Dict[str, str]) -> None:
-        """Build a CannotSetOffsetAtThisLocation error"""
-        super().__init__(message, detail, None)
