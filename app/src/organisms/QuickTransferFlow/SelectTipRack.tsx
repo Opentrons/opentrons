@@ -61,7 +61,8 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
       >
         {selectedPipetteDefaultTipracks.map(tipRack => {
           const tipRackDef = allLabwareDefinitionsByUri[tipRack]
-          return (
+
+          return tipRackDef != null ? (
             <LargeButton
               buttonType={
                 selectedTipRack === tipRackDef ? 'primary' : 'secondary'
@@ -71,7 +72,7 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
               }}
               buttonText={tipRackDef.metadata.displayName}
             />
-          )
+          ) : null
         })}
       </Flex>
     </Flex>
