@@ -17,6 +17,7 @@ from opentrons.protocol_engine.actions.actions import (
     RunCommandAction,
 )
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.notes.notes import CommandNote
 
 from ..actions import (
@@ -782,7 +783,13 @@ class CommandView(HasState[CommandState]):
                 may not be added.
         """
         if self._state.run_result is not None:
-            raise RunStoppedError("The run has already stopped.")
+            # TODO: Explain this.
+            raise RunStoppedError(
+                "The run has already stopped.",
+                wrapping=[EStopActivatedError()]
+                if self._state.stopped_by_estop
+                else [],
+            )
 
         elif isinstance(action, PlayAction):
             if self.get_status() == EngineStatus.BLOCKED_BY_OPEN_DOOR:
