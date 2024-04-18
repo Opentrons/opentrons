@@ -1655,16 +1655,17 @@ class OT3API(
         motor_ok = self._backend.check_motor_status([axis])
         encoder_ok = self._backend.check_encoder_status([axis])
 
-        if motor_ok and encoder_ok:
-            # we can move to the home position without checking the limit switch
-            origin = await self._backend.update_position()
-            target_pos = {axis: self._backend.home_position()[axis]}
-            await self._backend.move(origin, target_pos, 400, HWStopCondition.none)
-        else:
-            # home the axis
-            await self._home_axis(axis)
-        await self._cache_current_position()
-        await self._cache_encoder_position()
+        async with self._motion_lock:
+            if motor_ok and encoder_ok:
+                # we can move to the home position without checking the limit switch
+                origin = await self._backend.update_position()
+                target_pos = {axis: self._backend.home_position()[axis]}
+                await self._backend.move(origin, target_pos, 400, HWStopCondition.none)
+            else:
+                # home the axis
+                await self._home_axis(axis)
+            await self._cache_current_position()
+            await self._cache_encoder_position()
 
     # Gantry/frame (i.e. not pipette) config API
     @property

@@ -379,7 +379,6 @@ class CanMessenger:
                     handled = False
                     for listener, filter in self._listeners.values():
                         if filter and not filter(message.arbitration_id):
-                            log.debug("message ignored by filter")
                             continue
                         listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]
                         handled = True
