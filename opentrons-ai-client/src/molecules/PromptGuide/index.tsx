@@ -29,52 +29,55 @@ export function PromptGuide(): JSX.Element {
       <StyledText css={HEADER_TEXT_STYLE}>
         {t('what_typeof_protocol')}
       </StyledText>
-      <StyledText css={BODY_TEXT_STYLE}>
-        {t('make_sure_your_prompt')}
-      </StyledText>
-      <Flex
-        css={BODY_TEXT_STYLE}
-        flexDirection={DIRECTION_COLUMN}
-        paddingLeft={SPACING.spacing32}
-      >
-        <ul>
-          <li>
-            <StyledText>{t('metadata')}</StyledText>
-            <ul css={NESTED_ITEM_STYLE}>
-              <li>
-                <StyledText>{t('application')}</StyledText>
-              </li>
-              <li>
-                <StyledText>{t('robot')}</StyledText>
-              </li>
-              <li>
-                <StyledText>{t('api')}</StyledText>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <StyledText>{t('ot2_pipettes')}</StyledText>
-          </li>
-          <li>
-            <StyledText>{t('modules')}</StyledText>
-          </li>
-          <li>
-            <StyledText>{t('well_allocations')}</StyledText>
-          </li>
-          <li>
-            <Trans
-              t={t}
-              i18nKey="tipracks_and_labware"
-              components={{
-                a: <ExternalLink external href={LABWARE_LIBRARY_URL} />,
-                span: <StyledText css={BODY_TEXT_STYLE} />,
-              }}
-            />
-          </li>
-          <li>
-            <StyledText>{t('commands')}</StyledText>
-          </li>
-        </ul>
+
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        <StyledText css={BODY_TEXT_STYLE}>
+          {t('make_sure_your_prompt')}
+        </StyledText>
+        <Flex
+          css={BODY_TEXT_STYLE}
+          flexDirection={DIRECTION_COLUMN}
+          paddingLeft={SPACING.spacing32}
+        >
+          <ul>
+            <li>
+              <StyledText>{t('metadata')}</StyledText>
+              <StyledUl>
+                <li>
+                  <StyledText>{t('application')}</StyledText>
+                </li>
+                <li>
+                  <StyledText>{t('robot')}</StyledText>
+                </li>
+                <li>
+                  <StyledText>{t('api')}</StyledText>
+                </li>
+              </StyledUl>
+            </li>
+            <li>
+              <StyledText>{t('ot2_pipettes')}</StyledText>
+            </li>
+            <li>
+              <StyledText>{t('modules')}</StyledText>
+            </li>
+            <li>
+              <StyledText>{t('well_allocations')}</StyledText>
+            </li>
+            <li>
+              <Trans
+                t={t}
+                i18nKey="tipracks_and_labware"
+                components={{
+                  a: <ExternalLink external href={LABWARE_LIBRARY_URL} />,
+                  span: <StyledText css={BODY_TEXT_STYLE} />,
+                }}
+              />
+            </li>
+            <li>
+              <StyledText>{t('commands')}</StyledText>
+            </li>
+          </ul>
+        </Flex>
       </Flex>
       <Trans
         t={t}
@@ -97,10 +100,11 @@ const BODY_TEXT_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSize20};
   line-height: ${TYPOGRAPHY.lineHeight24};
 `
-const NESTED_ITEM_STYLE = css`
+const StyledUl = styled.ul`
   padding-left: ${SPACING.spacing16};
   list-style-type: disc;
 `
+
 const ExternalLink = styled(Link)`
   font-size: ${TYPOGRAPHY.fontSize20};
   line-height: ${TYPOGRAPHY.lineHeight24};
