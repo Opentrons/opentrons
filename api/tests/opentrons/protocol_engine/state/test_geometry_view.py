@@ -49,12 +49,16 @@ from opentrons.protocol_engine.types import (
     LabwareMovementOffsetData,
     LoadedPipette,
     TipGeometry,
+    ModuleDefinition,
 )
 from opentrons.protocol_engine.commands import (
     CommandStatus,
     LoadLabwareResult,
     LoadLabware,
     LoadLabwareParams,
+    LoadModuleResult,
+    LoadModule,
+    LoadModuleParams,
 )
 from opentrons.protocol_engine.actions import SucceedCommandAction
 from opentrons.protocol_engine.state import move_types
@@ -190,6 +194,18 @@ def nice_labware_definition() -> LabwareDefinition:
             load_shared_data("labware/fixtures/2/fixture_12_trough_v2.json").decode(
                 "utf-8"
             )
+        )
+    )
+
+
+@pytest.fixture
+def nice_adapter_definition() -> LabwareDefinition:
+    """Load a friendly adapter definition."""
+    return LabwareDefinition.parse_obj(
+        json.loads(
+            load_shared_data(
+                "labware/definitions/2/opentrons_aluminum_flat_bottom_plate/1.json"
+            ).decode("utf-8")
         )
     )
 
@@ -2399,9 +2415,9 @@ def test_get_offset_location_deck_slot(
             ),
             params=LoadLabwareParams(
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
-                loadName="fixture_12_trough_v2",
-                namespace="fixture",
-                version=2,
+                loadName=nice_labware_definition.parameters.loadName,
+                namespace=nice_labware_definition.namespace,
+                version=nice_labware_definition.version,
             ),
         ),
         private_result=None,
@@ -2412,3 +2428,142 @@ def test_get_offset_location_deck_slot(
     assert offset_location.slotName == DeckSlotName.SLOT_C2
     assert offset_location.definitionUri is None
     assert offset_location.moduleModel is None
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_get_offset_location_module(
+    decoy: Decoy,
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    nice_labware_definition: LabwareDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+    subject: GeometryView,
+) -> None:
+    """Test if you can get the offset of a labware directly on a module."""
+    load_module = SucceedCommandAction(
+        command=LoadModule(
+            params=LoadModuleParams(
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+                model=ModuleModel.TEMPERATURE_MODULE_V1,
+            ),
+            id="load-module-1",
+            createdAt=datetime.now(),
+            key="load-module-1",
+            status=CommandStatus.SUCCEEDED,
+            result=LoadModuleResult(
+                moduleId="module-id-1",
+                definition=tempdeck_v2_def,
+                model=tempdeck_v2_def.model,
+            ),
+        ),
+        private_result=None,
+    )
+    load_labware = SucceedCommandAction(
+        command=LoadLabware(
+            id="load-labware-1",
+            createdAt=datetime.now(),
+            key="load-labware-1",
+            status=CommandStatus.SUCCEEDED,
+            result=LoadLabwareResult(
+                labwareId="labware-id-1",
+                definition=nice_labware_definition,
+                offsetId=None,
+            ),
+            params=LoadLabwareParams(
+                location=ModuleLocation(moduleId="module-id-1"),
+                loadName=nice_labware_definition.parameters.loadName,
+                namespace=nice_labware_definition.namespace,
+                version=nice_labware_definition.version,
+            ),
+        ),
+        private_result=None,
+    )
+    module_store.handle_action(load_module)
+    labware_store.handle_action(load_labware)
+    offset_location = subject.get_offset_location("labware-id-1")
+    assert offset_location is not None
+    assert offset_location.slotName == DeckSlotName.SLOT_A3
+    assert offset_location.definitionUri is None
+    assert offset_location.moduleModel == ModuleModel.TEMPERATURE_MODULE_V2
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_get_offset_location_module_with_adapter(
+    decoy: Decoy,
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    nice_labware_definition: LabwareDefinition,
+    nice_adapter_definition: LabwareDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+    labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """Test if you can get the offset of a labware directly on a module."""
+    load_module = SucceedCommandAction(
+        command=LoadModule(
+            params=LoadModuleParams(
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A2),
+                model=ModuleModel.TEMPERATURE_MODULE_V1,
+            ),
+            id="load-module-1",
+            createdAt=datetime.now(),
+            key="load-module-1",
+            status=CommandStatus.SUCCEEDED,
+            result=LoadModuleResult(
+                moduleId="module-id-1",
+                definition=tempdeck_v2_def,
+                model=tempdeck_v2_def.model,
+            ),
+        ),
+        private_result=None,
+    )
+    load_adapter = SucceedCommandAction(
+        command=LoadLabware(
+            id="load-adapter-1",
+            createdAt=datetime.now(),
+            key="load-adapter-1",
+            status=CommandStatus.SUCCEEDED,
+            result=LoadLabwareResult(
+                labwareId="adapter-id-1",
+                definition=nice_adapter_definition,
+                offsetId=None,
+            ),
+            params=LoadLabwareParams(
+                location=ModuleLocation(moduleId="module-id-1"),
+                loadName=nice_adapter_definition.parameters.loadName,
+                namespace=nice_adapter_definition.namespace,
+                version=nice_adapter_definition.version,
+            ),
+        ),
+        private_result=None,
+    )
+    load_labware = SucceedCommandAction(
+        command=LoadLabware(
+            id="load-labware-1",
+            createdAt=datetime.now(),
+            key="load-labware-1",
+            status=CommandStatus.SUCCEEDED,
+            result=LoadLabwareResult(
+                labwareId="labware-id-1",
+                definition=nice_labware_definition,
+                offsetId=None,
+            ),
+            params=LoadLabwareParams(
+                location=OnLabwareLocation(labwareId="adapter-id-1"),
+                loadName=nice_labware_definition.parameters.loadName,
+                namespace=nice_labware_definition.namespace,
+                version=nice_labware_definition.version,
+            ),
+        ),
+        private_result=None,
+    )
+    module_store.handle_action(load_module)
+    labware_store.handle_action(load_adapter)
+    labware_store.handle_action(load_labware)
+    offset_location = subject.get_offset_location("labware-id-1")
+    assert offset_location is not None
+    assert offset_location.slotName == DeckSlotName.SLOT_A2
+    assert offset_location.definitionUri == labware_view.get_uri_from_definition(
+        nice_adapter_definition
+    )
+    assert offset_location.moduleModel == ModuleModel.TEMPERATURE_MODULE_V2
