@@ -193,6 +193,32 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
     },
 )
 
+def _build_log_files_with_default(
+    from_conf: Any,
+    default: Dict[InstrumentProbeType, str],
+) -> Dict[InstrumentProbeType, str]:
+    if not isinstance(from_conf, dict):
+        return {k: v for k, v in default.items()}
+    else:
+        validated: Dict[InstrumentProbeType, str] = {}
+        for k, v in from_conf.items():
+            if isinstance(k, InstrumentProbeType):
+                validated[k] = v
+            else:
+                try:
+                    enumval = InstrumentProbeType[k]
+                except KeyError:  # not an enum entry
+                    pass
+                else:
+                    validated[enumval] = v
+        for k, default_v in default.items():
+            if k in from_conf:
+                validated[k] = from_conf[k]
+            elif k.name in from_conf:
+                validated[k] = from_conf[k.name]
+            else:
+                validated[k] = default_v
+        return validated
 
 def _build_dict_with_default(
     from_conf: Any,
@@ -302,7 +328,7 @@ def _build_default_liquid_probe(
         num_baseline_reads=from_conf.get(
             "num_baseline_reads", default.num_baseline_reads
         ),
-        data_files=from_conf.get("data_file", default.data_files),
+        data_files=_build_log_files_with_default(from_conf.get("data_files", {}), default.data_files),
     )
 
 
@@ -412,7 +438,7 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
 def serialize(config: OT3Config) -> Dict[str, Any]:
     def _build_dict(pairs: Iterable[Tuple[Any, Any]]) -> Dict[str, Any]:
         def _normalize_key(key: Any) -> Any:
-            if isinstance(key, OT3AxisKind):
+            if isinstance(key, OT3AxisKind) or isinstance(key, InstrumentProbeType):
                 return key.name
             return key
 
