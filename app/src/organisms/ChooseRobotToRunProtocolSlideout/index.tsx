@@ -158,7 +158,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       ? mostRecentAnalysis?.robotType ?? null
       : null
 
-  const SinglePageButtonWithoutFF = (
+  const singlePageButton = (
     <PrimaryButton
       disabled={
         isCreatingRun ||
@@ -259,7 +259,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           ) : (
             <>
               {offsetsComponent}
-              {SinglePageButtonWithoutFF}
+              {singlePageButton}
             </>
           )}
         </Flex>
