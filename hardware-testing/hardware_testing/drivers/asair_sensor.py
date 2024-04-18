@@ -38,13 +38,7 @@ crc_reading = {
     "0A": "48d9",
 }
 
-crc_device_id = {
-    "01": "45C9",
-    "02": "45FA",
-    "03": "442B",
-    "04": "459C",
-    "05": "444D"
-}
+crc_device_id = {"01": "45C9", "02": "45FA", "03": "442B", "04": "459C", "05": "444D"}
 
 
 class AsairSensorError(Exception):
