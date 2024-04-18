@@ -24,6 +24,7 @@ import {
   TEMPERATURE_MODULE_MODELS,
   THERMOCYCLER_MODULE_MODELS,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -62,7 +63,8 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
   const { t } = useTranslation('module_wizard_flows')
   const mount = attachedPipette.mount
   const cutoutId = deckConfig.find(
-    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
+    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber &&
+    (attachedModule.moduleType !== THERMOCYCLER_MODULE_TYPE || cc.cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE)
   )?.cutoutId
   const slotName =
     cutoutId != null ? FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutId] : null

@@ -84,7 +84,6 @@ export const SelectLocation = (
   )
   const mayMountToCutoutIds = moduleFixtures.reduce<CutoutId[]>((acc, { mayMountTo }) => [...acc, ...mayMountTo], [])
   const editableCutoutIds = deckConfig.reduce<CutoutId[]>((acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => {
-
     const isCurrentConfiguration = Object.values(configuredFixtureIdByCutoutId).includes(cutoutFixtureId) && attachedModule.serialNumber === opentronsModuleSerialNumber
     if (mayMountToCutoutIds.includes(cutoutId) &&
       (isCurrentConfiguration || SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId))) {
@@ -123,6 +122,30 @@ export const SelectLocation = (
       )
     }
   }
+
+  const handleRemoveFixture = (anchorCutoutId: CutoutId): void => {
+    const removedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(anchorCutoutId, moduleFixtures)
+    updateDeckConfiguration(
+      deckConfig.map(cc => {
+        if (cc.cutoutId in removedFixtureIdByCutoutIds) {
+          let replacementFixtureId: CutoutFixtureId = SINGLE_LEFT_SLOT_FIXTURE
+          if (SINGLE_CENTER_CUTOUTS.includes(cc.cutoutId)) {
+            replacementFixtureId = SINGLE_CENTER_SLOT_FIXTURE
+          } else if (SINGLE_RIGHT_CUTOUTS.includes(cc.cutoutId)) {
+            replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
+          }
+          return {
+            ...cc,
+            cutoutFixtureId: replacementFixtureId,
+            opentronsModuleSerialNumber: undefined,
+          }
+        } else {
+          return cc
+        }
+      })
+    )
+  }
+
   return (
     <GenericWizardTile
       header={t('select_location')}
@@ -130,8 +153,8 @@ export const SelectLocation = (
         <DeckConfigurator
           deckConfig={deckConfig}
           handleClickAdd={handleAddFixture}
-          handleClickRemove={() => console.log('remove')}
-          editableCutoutIds={editableCutoutIds}
+          handleClickRemove={handleRemoveFixture}
+          editableCutoutIds={editableCutoutIds} 
           height="250px"
         />
       }
