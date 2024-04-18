@@ -7,7 +7,10 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
-import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
+import {
+  storedProtocolData as storedProtocolDataFixture,
+  storedProtocolDataWithoutRunTimeParameters,
+} from '../../../redux/protocol-storage/__fixtures__'
 import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useCreateRunFromProtocol } from '../../ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
@@ -86,34 +89,37 @@ describe('ChooseProtocolSlideout', () => {
     ).toBeInTheDocument()
   })
 
-  // it('calls createRunFromProtocolSource if CTA clicked', () => {
-  //   const protocolDataWithoutRunTimeParameter = {
-  //     ...storedProtocolDataFixture,
-  //     runTimeParameters: [],
-  //   }
-  //   vi.mocked(getStoredProtocols).mockReturnValue([
-  //     protocolDataWithoutRunTimeParameter,
-  //   ])
-  //   render({
-  //     robot: mockConnectableRobot,
-  //     onCloseClick: vi.fn(),
-  //     showSlideout: true,
-  //   })
-  //   const proceedButton = screen.getByRole('button', {
-  //     name: 'Proceed to setup',
-  //   })
-  //   fireEvent.click(proceedButton)
-  //   expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
-  //     files: [expect.any(File)],
-  //     protocolKey: storedProtocolDataFixture.protocolKey,
-  //   })
-  //   expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
-  // })
+  it('calls createRunFromProtocolSource if CTA clicked', () => {
+    const protocolDataWithoutRunTimeParameter = {
+      ...storedProtocolDataWithoutRunTimeParameters,
+    }
+    console.log(
+      'protocolDataWithoutRunTimeParameter',
+      protocolDataWithoutRunTimeParameter
+    )
+    vi.mocked(getStoredProtocols).mockReturnValue([
+      protocolDataWithoutRunTimeParameter,
+    ])
+    render({
+      robot: mockConnectableRobot,
+      onCloseClick: vi.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Proceed to setup',
+    })
+    fireEvent.click(proceedButton)
+    expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
+      files: [expect.any(File)],
+      protocolKey: storedProtocolDataFixture.protocolKey,
+    })
+    expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
+  })
 
   it('move to the second slideout if CTA clicked', () => {
     const protocolDataWithoutRunTimeParameter = {
       ...storedProtocolDataFixture,
-      runTimeParameters: [],
+      robotType: 'OT-2 Standard',
     }
     vi.mocked(getStoredProtocols).mockReturnValue([
       protocolDataWithoutRunTimeParameter,
@@ -132,7 +138,7 @@ describe('ChooseProtocolSlideout', () => {
     screen.getByText('Restore default values')
   })
 
-  // ToDo (kk:04/08) update test for RTP
+  // ToDo (kk:04/18/2024) I will update test for RTP
   /*
   it('renders error state when there is a run creation error', () => {
     vi.mocked(useCreateRunFromProtocol).mockReturnValue({
