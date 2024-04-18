@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
 from opentrons.protocol_engine.commands import LoadModuleResult
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4, SlotDefV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5, SlotDefV3
+from opentrons.protocol_engine.resources import deck_configuration_provider
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -602,7 +603,7 @@ class ProtocolCore(
         self._last_location = location
         self._last_mount = mount
 
-    def get_deck_definition(self) -> DeckDefinitionV4:
+    def get_deck_definition(self) -> DeckDefinitionV5:
         """Get the geometry definition of the robot's deck."""
         return self._engine_client.state.labware.get_deck_definition()
 
@@ -625,10 +626,26 @@ class ProtocolCore(
     def _ensure_module_location(
         self, slot: DeckSlotName, module_type: ModuleType
     ) -> None:
-        slot_def = self.get_slot_definition(slot)
-        compatible_modules = slot_def["compatibleModuleTypes"]
-        if module_type.value not in compatible_modules:
-            raise ValueError(f"A {module_type.value} cannot be loaded into slot {slot}")
+        if self._engine_client.state.config.robot_type == "OT-2 Standard":
+            slot_def = self.get_slot_definition(slot)
+            compatible_modules = slot_def["compatibleModuleTypes"]
+            if module_type.value not in compatible_modules:
+                raise ValueError(
+                    f"A {module_type.value} cannot be loaded into slot {slot}"
+                )
+        else:
+            cutout_fixture_id = ModuleType.to_module_fixture_id(module_type)
+            module_fixture = deck_configuration_provider.get_cutout_fixture(
+                cutout_fixture_id,
+                self._engine_client.state.addressable_areas.state.deck_definition,
+            )
+            cutout_id = self._engine_client.state.addressable_areas.get_cutout_id_by_deck_slot_name(
+                slot
+            )
+            if cutout_id not in module_fixture["mayMountTo"]:
+                raise ValueError(
+                    f"A {module_type.value} cannot be loaded into slot {slot}"
+                )
 
     def get_slot_item(
         self, slot_name: Union[DeckSlotName, StagingSlotName]

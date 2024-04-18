@@ -103,7 +103,7 @@ describe('RobotSettings DeviceResetModal', () => {
     })
     screen.getByText('Connection to robot lost')
     screen.getByText(
-      'The Opentrons App is unable to communicate with this robot right now. Double check the USB or Wifi connection to the robot, then try to reconnect.'
+      'The Opentrons App is unable to communicate with this robot right now. Double check the USB or Wi-Fi connection to the robot, then try to reconnect.'
     )
     screen.getByRole('button', { name: 'close' })
   })

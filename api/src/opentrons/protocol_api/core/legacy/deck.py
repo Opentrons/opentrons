@@ -280,6 +280,11 @@ class Deck(UserDict):  # type: ignore[type-arg]
             compatible_modules = slot_def["compatibleModuleTypes"]
             if module_type.value in compatible_modules:
                 return location
+            elif (
+                self._definition["robot"]["model"] == "OT-3 Standard"
+                and ModuleType.to_module_fixture_id(module_type) == slot_def["id"]
+            ):
+                return location
             else:
                 raise ValueError(
                     f"A {dn_from_type[module_type]} cannot be loaded"

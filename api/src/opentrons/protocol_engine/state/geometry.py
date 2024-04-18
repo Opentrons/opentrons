@@ -166,6 +166,7 @@ class GeometryView:
             except LabwareNotLoadedOnModuleError:
                 return self._modules.get_module_highest_z(
                     module_id=module_id,
+                    addressable_areas=self._addressable_areas,
                 )
             else:
                 return self.get_highest_z_of_labware_stack(labware_id)
@@ -246,7 +247,9 @@ class GeometryView:
             return LabwareOffsetVector(x=0, y=0, z=0)
         elif isinstance(labware_location, ModuleLocation):
             module_id = labware_location.moduleId
-            module_offset = self._modules.get_nominal_module_offset(module_id=module_id)
+            module_offset = self._modules.get_nominal_module_offset(
+                module_id=module_id, addressable_areas=self._addressable_areas
+            )
             module_model = self._modules.get_connected_model(module_id)
             stacking_overlap = self._labware.get_module_overlap_offsets(
                 labware_id, module_model

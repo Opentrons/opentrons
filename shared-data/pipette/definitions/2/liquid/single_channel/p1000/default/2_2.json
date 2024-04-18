@@ -2,6 +2,7 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t1000": {
+      "uiMaxFlowRate": 1020.7,
       "defaultAspirateFlowRate": {
         "default": 274.7,
         "valuesByApiLevel": { "2.0": 137.35, "2.6": 274.7 }

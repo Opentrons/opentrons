@@ -72,4 +72,26 @@ describe('ChildNavigation', () => {
     fireEvent.click(secondaryButton)
     expect(mockOnClickSecondaryButton).toHaveBeenCalled()
   })
+  it.fails(
+    'should not render back button if onClickBack does not exist',
+    () => {
+      props = {
+        ...props,
+        onClickBack: undefined,
+      }
+      render(props)
+      screen.getByTestId('ChildNavigation_Back_Button')
+    }
+  )
+  it('should render button as disabled', () => {
+    props = {
+      ...props,
+      buttonText: 'mock button',
+      onClickButton: mockOnClickButton,
+      buttonIsDisabled: true,
+    }
+    render(props)
+    const button = screen.getByTestId('ChildNavigation_Primary_Button')
+    expect(button).toBeDisabled()
+  })
 })

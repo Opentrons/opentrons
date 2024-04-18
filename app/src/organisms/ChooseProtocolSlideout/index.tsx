@@ -105,7 +105,6 @@ export function ChooseProtocolSlideoutComponent(
 
   const runTimeParametersFromAnalysis =
     selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
-  console.log('runTimeParametersFromAnalysis', runTimeParametersFromAnalysis)
 
   const hasRunTimeParameters = runTimeParametersFromAnalysis.length > 0
 
@@ -222,7 +221,6 @@ export function ChooseProtocolSlideoutComponent(
               setRunTimeParametersOverrides(clone)
             }}
             title={runtimeParam.displayName}
-            caption={runtimeParam.description}
             width="100%"
             dropdownType="neutral"
           />
@@ -253,7 +251,7 @@ export function ChooseProtocolSlideoutComponent(
             key={runtimeParam.variableName}
             type="number"
             units={runtimeParam.suffix}
-            placeholder={value.toString()}
+            placeholder={runtimeParam.default.toString()}
             value={value}
             title={runtimeParam.displayName}
             tooltipText={runtimeParam.description}
@@ -313,14 +311,14 @@ export function ChooseProtocolSlideoutComponent(
                 }}
                 height="0.813rem"
                 label={
-                  runtimeParam.value
+                  Boolean(runtimeParam.value)
                     ? t('protocol_details:on')
                     : t('protocol_details:off')
                 }
                 paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
               />
               <StyledText as="p">
-                {runtimeParam.value
+                {Boolean(runtimeParam.value)
                   ? t('protocol_details:on')
                   : t('protocol_details:off')}
               </StyledText>
@@ -333,6 +331,15 @@ export function ChooseProtocolSlideoutComponent(
       }
     }) ?? null
 
+  const resetRunTimeParameters = (): void => {
+    setRunTimeParametersOverrides(
+      runTimeParametersOverrides?.map(parameter => ({
+        ...parameter,
+        value: parameter.default,
+      }))
+    )
+  }
+
   const pageTwoBody = (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Flex justifyContent={JUSTIFY_END}>
@@ -341,13 +348,7 @@ export function ChooseProtocolSlideoutComponent(
           css={
             isRestoreDefaultsLinkEnabled ? ENABLED_LINK_CSS : DISABLED_LINK_CSS
           }
-          onClick={() => {
-            const clone = runTimeParametersOverrides.map(parameter => ({
-              ...parameter,
-              value: parameter.default,
-            }))
-            setRunTimeParametersOverrides(clone)
-          }}
+          onClick={resetRunTimeParameters}
           paddingBottom={SPACING.spacing10}
           {...targetProps}
         >
@@ -410,7 +411,11 @@ export function ChooseProtocolSlideoutComponent(
   return (
     <MultiSlideout
       isExpanded={showSlideout}
-      onCloseClick={onCloseClick}
+      onCloseClick={() => {
+        onCloseClick()
+        setCurrentPage(1)
+        resetRunTimeParameters()
+      }}
       currentStep={currentPage}
       maxSteps={hasRunTimeParameters ? 2 : 1}
       title={t('choose_protocol_to_run', { name })}

@@ -13,7 +13,6 @@ import { FloatingActionButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
-import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/MultipleModulesModal'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
@@ -48,10 +47,6 @@ export function ProtocolSetupModulesAndDeck({
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
 
-  const [
-    showMultipleModulesModal,
-    setShowMultipleModulesModal,
-  ] = React.useState<boolean>(false)
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
@@ -93,11 +88,6 @@ export function ProtocolSetupModulesAndDeck({
     <>
       {createPortal(
         <>
-          {showMultipleModulesModal ? (
-            <MultipleModulesModal
-              onCloseClick={() => setShowMultipleModulesModal(false)}
-            />
-          ) : null}
           {showSetupInstructionsModal ? (
             <SetupInstructionsModal
               setShowSetupInstructionsModal={setShowSetupInstructionsModal}
@@ -145,9 +135,7 @@ export function ProtocolSetupModulesAndDeck({
             <ModuleTable
               attachedProtocolModuleMatches={attachedProtocolModuleMatches}
               deckDef={deckDef}
-              protocolModulesInfo={protocolModulesInfo}
               runId={runId}
-              setShowMultipleModulesModal={setShowMultipleModulesModal}
             />
           ) : null}
           <FixtureTable

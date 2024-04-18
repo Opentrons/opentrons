@@ -6,6 +6,7 @@ import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
 import { BaseDeck } from '@opentrons/components'
 import {
   useDeckConfigurationQuery,
+  useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 
@@ -19,6 +20,7 @@ import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
 } from '@opentrons/shared-data'
+import { Modules } from '@opentrons/api-client'
 
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
 vi.mock('@opentrons/react-api-client')
@@ -72,6 +74,9 @@ describe('ProtocolSetupDeckConfiguration', () => {
     vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
+    vi.mocked(useModulesQuery).mockReturnValue(({
+      data: { data: [] },
+    } as unknown) as UseQueryResult<Modules>)
   })
 
   afterEach(() => {

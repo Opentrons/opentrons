@@ -6,20 +6,23 @@ import {
   getPipetteSpecsV2,
   GEN_ONE_MULTI_PIPETTES,
   THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V2,
+  WASTE_CHUTE_CUTOUT,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
 import { LabwareDefByDefURI } from '../../labware-defs'
-import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
+import { getCutoutIdByAddressableArea } from '../../utils'
 import type {
-  AdditionalEquipmentOnDeck,
-  InitialDeckSetup,
-  ModuleOnDeck,
-  FormPipettesByMount,
-  FormPipette,
-  LabwareOnDeck as LabwareOnDeckType,
-} from '../types'
-import type { DeckSlot } from '../../types'
+  AddressableAreaName,
+  CutoutId,
+  DeckSlotId,
+  LoadLabwareCreateCommand,
+  LoadModuleCreateCommand,
+  ModuleType,
+  MoveLabwareCreateCommand,
+} from '@opentrons/shared-data'
 import type {
   NormalizedPipette,
   NormalizedPipetteById,
@@ -28,8 +31,53 @@ import type {
   InvariantContext,
   ModuleEntity,
 } from '@opentrons/step-generation'
+import type { DeckSlot } from '../../types'
 import type { FormData } from '../../form-types'
+import type { PDProtocolFile } from '../../file-types'
+import type {
+  AdditionalEquipmentOnDeck,
+  InitialDeckSetup,
+  ModuleOnDeck,
+  FormPipettesByMount,
+  FormPipette,
+  LabwareOnDeck as LabwareOnDeckType,
+} from '../types'
 export { createPresavedStepForm } from './createPresavedStepForm'
+
+const MOVABLE_TRASH_CUTOUTS = [
+  {
+    value: 'cutoutA3',
+    slot: 'A3',
+  },
+  {
+    value: 'cutoutA1',
+    slot: 'A1',
+  },
+  {
+    value: 'cutoutB1',
+    slot: 'B1',
+  },
+  {
+    value: 'cutoutB3',
+    slot: 'B3',
+  },
+  {
+    value: 'cutoutC1',
+    slot: 'C1',
+  },
+  {
+    value: 'cutoutC3',
+    slot: 'C3',
+  },
+  {
+    value: 'cutoutD1',
+    slot: 'D1',
+  },
+  {
+    value: 'cutoutD3',
+    slot: 'D3',
+  },
+]
 
 const slotToCutoutOt2Map: { [key: string]: string } = {
   '1': 'cutout1',
@@ -247,4 +295,83 @@ export function getHydratedForm(
   }
   // @ts-expect-error(sa, 2021-6-14):type this properly in #3161
   return hydratedForm
+}
+
+export const getUnoccupiedSlotForMoveableTrash = (
+  file: PDProtocolFile,
+  hasWasteChuteCommands: boolean,
+  stagingAreaSlotNames: AddressableAreaName[]
+): string => {
+  const wasteChuteSlot = hasWasteChuteCommands ? [WASTE_CHUTE_CUTOUT] : []
+  const stagingAreaCutoutIds = stagingAreaSlotNames.map(slotName =>
+    getCutoutIdByAddressableArea(
+      slotName,
+      'stagingAreaRightSlot',
+      FLEX_ROBOT_TYPE
+    )
+  )
+  const allLoadLabwareSlotNames = Object.values(file.commands)
+    .filter(
+      (command): command is LoadLabwareCreateCommand =>
+        command.commandType === 'loadLabware'
+    )
+    .reduce((acc: string[], command) => {
+      const location = command.params.location
+      if (
+        location !== 'offDeck' &&
+        location !== null &&
+        'slotName' in location
+      ) {
+        return [...acc, location.slotName]
+      }
+      return acc
+    }, [])
+
+  const allLoadModuleSlotNames = Object.values(file.commands)
+    .filter(
+      (command): command is LoadModuleCreateCommand =>
+        command.commandType === 'loadModule'
+    )
+    .flatMap(command => {
+      //  special-casing Thermocycler
+      if (command.params.model === THERMOCYCLER_MODULE_V2) {
+        return ['A1', command.params.location.slotName]
+      } else {
+        return command.params.location.slotName
+      }
+    })
+
+  const allMoveLabwareLocations = Object.values(file.commands)
+    .filter(
+      (command): command is MoveLabwareCreateCommand =>
+        command.commandType === 'moveLabware'
+    )
+    .reduce((acc: string[], command) => {
+      const newLocation = command.params.newLocation
+      if (
+        newLocation !== 'offDeck' &&
+        newLocation !== null &&
+        'slotName' in newLocation
+      ) {
+        return [...acc, newLocation.slotName]
+      }
+      return acc
+    }, [])
+
+  const unoccupiedSlot = MOVABLE_TRASH_CUTOUTS.find(
+    cutout =>
+      !allLoadLabwareSlotNames.includes(cutout.slot) &&
+      !allLoadModuleSlotNames.includes(cutout.slot) &&
+      !allMoveLabwareLocations.includes(cutout.slot) &&
+      !wasteChuteSlot.includes(cutout.value as typeof WASTE_CHUTE_CUTOUT) &&
+      !stagingAreaCutoutIds.includes(cutout.value as CutoutId)
+  )
+  if (unoccupiedSlot == null) {
+    console.error(
+      'Expected to find an unoccupied slot for auto-generating a trash bin but could not'
+    )
+    return ''
+  }
+
+  return unoccupiedSlot.slot
 }

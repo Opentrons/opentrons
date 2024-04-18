@@ -10,7 +10,11 @@ from . import validation
 def map_in(request: models.DeckConfigurationRequest) -> List[validation.Placement]:
     """Map a request from HTTP to internal types that can be validated."""
     return [
-        validation.Placement(cutout_id=p.cutoutId, cutout_fixture_id=p.cutoutFixtureId)
+        validation.Placement(
+            cutout_id=p.cutoutId,
+            cutout_fixture_id=p.cutoutFixtureId,
+            opentrons_module_serial_number=p.opentronsModuleSerialNumber,
+        )
         for p in request.cutoutFixtures
     ]
 

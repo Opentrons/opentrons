@@ -20,7 +20,7 @@ export const parameters = {
   options: {
     storySort: {
       method: 'alphabetical',
-      order: ['Design Tokens', 'Library', 'App', 'ODD'],
+      order: ['Design Tokens', 'Library', 'App', 'ODD', 'AI'],
     },
   },
 }

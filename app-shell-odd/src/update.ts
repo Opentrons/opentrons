@@ -14,15 +14,15 @@ import type { ReleaseSetUrls } from './system-update/types'
 
 const log = createLogger('update')
 
+const OPENTRONS_PROJECT: string = _OPENTRONS_PROJECT_
+
 export const FLEX_MANIFEST_URL =
-  // @ts-expect-error can't get TS to recognize global.d.ts
-  global._OPENTRONS_PROJECT_ &&
-  // @ts-expect-error can't get TS to recognize global.d.ts
-  global._OPENTRONS_PROJECT_.includes('robot-stack')
+  OPENTRONS_PROJECT && OPENTRONS_PROJECT.includes('robot-stack')
     ? 'https://builds.opentrons.com/ot3-oe/releases.json'
     : 'https://ot3-development.builds.opentrons.com/ot3-oe/releases.json'
 
-let LATEST_OT_SYSTEM_VERSION = _PKG_VERSION_
+const PKG_VERSION = _PKG_VERSION_
+let LATEST_OT_SYSTEM_VERSION = PKG_VERSION
 
 const channelFinder = (version: string, channel: string): boolean => {
   // return the latest alpha/beta if a user subscribes to alpha/beta updates
@@ -60,7 +60,7 @@ export const updateLatestVersion = (): Promise<string> => {
         })
         .find(verson => channelFinder(verson, channel))
       const changed = LATEST_OT_SYSTEM_VERSION !== latestAvailableVersion
-      LATEST_OT_SYSTEM_VERSION = latestAvailableVersion ?? _PKG_VERSION_
+      LATEST_OT_SYSTEM_VERSION = latestAvailableVersion ?? PKG_VERSION
       if (changed) {
         log.info(
           `Update: latest version available from ${FLEX_MANIFEST_URL} is ${latestAvailableVersion}`
@@ -80,7 +80,7 @@ export const getLatestVersion = (): string => {
   return LATEST_OT_SYSTEM_VERSION
 }
 
-export const getCurrentVersion = (): string => _PKG_VERSION_
+export const getCurrentVersion = (): string => PKG_VERSION
 
 export const isUpdateAvailable = (): boolean =>
   getLatestVersion() !== getCurrentVersion()

@@ -28,7 +28,7 @@ interface AnalyticsOptInModalProps {
 export function AnalyticsOptInModal({
   setShowAnalyticsOptInModal,
 }: AnalyticsOptInModalProps): JSX.Element {
-  const { t } = useTranslation(['app_settings', 'shared'])
+  const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
 
   const localRobot = useSelector(getLocalRobot)
@@ -57,7 +57,7 @@ export function AnalyticsOptInModal({
   }
 
   return (
-    <Modal modalSize="medium" header={{ title: t('want_to_help_out') }}>
+    <Modal modalSize="medium" header={{ title: t('branded:want_to_help_out') }}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
