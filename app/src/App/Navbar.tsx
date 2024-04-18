@@ -28,6 +28,7 @@ import { NAV_BAR_WIDTH } from './constants'
 import type { RouteProps } from './types'
 
 const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
+const PROJECT: string = _OPENTRONS_PROJECT_
 
 const NavbarLink = styled(NavLink)`
   color: ${COLORS.white};
@@ -128,7 +129,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         alignSelf={ALIGN_STRETCH}
       >
         <LogoImg
-          src={global._OPENTRONS_PROJECT_ === 'ot3' ? logoSvgThree : logoSvg}
+          src={PROJECT === 'ot3' ? logoSvgThree : logoSvg}
           alt="opentrons logo"
         />
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (

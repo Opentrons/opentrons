@@ -32,6 +32,7 @@ import { RobotDashboard } from '../pages/RobotDashboard'
 import { RobotSettingsDashboard } from '../pages/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../pages/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/ProtocolDetails'
+import { QuickTransferFlow } from '../organisms/QuickTransferFlow'
 import { RunningProtocol } from '../pages/RunningProtocol'
 import { RunSummary } from '../pages/RunSummary'
 import { UpdateRobot } from '../pages/UpdateRobot/UpdateRobot'
@@ -73,6 +74,7 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/network-setup/wifi',
   '/protocols',
   '/protocols/:protocolId',
+  '/quick-transfer',
   '/robot-settings',
   '/robot-settings/rename-robot',
   '/robot-settings/update-robot',
@@ -109,6 +111,8 @@ function getPathComponent(
       return <ProtocolDashboard />
     case '/protocols/:protocolId':
       return <ProtocolDetails />
+    case `/quick-transfer`:
+      return <QuickTransferFlow />
     case '/robot-settings':
       return <RobotSettingsDashboard />
     case '/robot-settings/rename-robot':

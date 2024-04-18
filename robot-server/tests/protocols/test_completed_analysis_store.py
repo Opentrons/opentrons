@@ -126,7 +126,7 @@ async def test_get_by_analysis_id_falls_back_to_sql(
     """It should return analyses from sql if they are not cached."""
     resource = _completed_analysis_resource("analysis-id", "protocol-id")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-    await subject.add(resource)
+    await subject.make_room_and_add(resource)
     # the analysis is not cached
     decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
     analysis_from_sql = await subject.get_by_id("analysis-id")
@@ -143,7 +143,7 @@ async def test_get_by_analysis_id_stores_results_in_cache(
     """It should cache successful fetches from sql."""
     resource = _completed_analysis_resource("analysis-id", "protocol-id")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-    await subject.add(resource)
+    await subject.make_room_and_add(resource)
     # the analysis is not cached
     decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
     from_sql = await subject.get_by_id("analysis-id")
@@ -158,7 +158,7 @@ async def test_get_by_analysis_id_as_document(
     """It should return the analysis serialized as a JSON string."""
     resource = _completed_analysis_resource("analysis-id", "protocol-id")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-    await subject.add(resource)
+    await subject.make_room_and_add(resource)
     result = await subject.get_by_id_as_document("analysis-id")
     assert result is not None
     assert json.loads(result) == {
@@ -184,9 +184,9 @@ async def test_get_ids_by_protocol(
     resource_3 = _completed_analysis_resource("analysis-id-3", "protocol-id-2")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id-1"))
     protocol_store.insert(make_dummy_protocol_resource("protocol-id-2"))
-    await subject.add(resource_1)
-    await subject.add(resource_2)
-    await subject.add(resource_3)
+    await subject.make_room_and_add(resource_1)
+    await subject.make_room_and_add(resource_2)
+    await subject.make_room_and_add(resource_3)
     assert subject.get_ids_by_protocol("protocol-id-1") == [
         "analysis-id-1",
         "analysis-id-2",
@@ -208,9 +208,9 @@ async def test_get_by_protocol(
     decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)
     decoy.when(memcache.insert("analysis-id-2", resource_2)).then_return(None)
     decoy.when(memcache.insert("analysis-id-3", resource_3)).then_return(None)
-    await subject.add(resource_1)
-    await subject.add(resource_2)
-    await subject.add(resource_3)
+    await subject.make_room_and_add(resource_1)
+    await subject.make_room_and_add(resource_2)
+    await subject.make_room_and_add(resource_3)
     decoy.when(memcache.get("analysis-id-1")).then_raise(KeyError())
     decoy.when(memcache.get("analysis-id-2")).then_return(resource_2)
     decoy.when(memcache.contains("analysis-id-1")).then_return(False)
@@ -257,7 +257,7 @@ async def test_get_rtp_values_and_defaults_by_analysis_from_db(
         },
     )
     protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
-    await subject.add(resource)
+    await subject.make_room_and_add(resource)
     # Not in memcache
     decoy.when(memcache.get("analysis-id")).then_raise(KeyError())
     result = await subject.get_rtp_values_and_defaults_by_analysis_id("analysis-id")
@@ -298,9 +298,19 @@ async def test_get_rtp_values_and_defaults_by_analysis_from_db(
             ],
         ),
         (
+            [f"analysis-id-{num}" for num in range(3)],
+            [
+                "analysis-id-0",
+                "analysis-id-1",
+                "analysis-id-2",
+                "new-analysis-id",
+            ],
+        ),
+        (
             [f"analysis-id-{num}" for num in range(2)],
             ["analysis-id-0", "analysis-id-1", "new-analysis-id"],
         ),
+        (["analysis-id-0"], ["analysis-id-0", "new-analysis-id"]),
         ([], ["new-analysis-id"]),
     ],
 )
@@ -330,7 +340,7 @@ async def test_add_makes_room_for_new_analysis(
             transaction.execute(statement)
 
     assert subject.get_ids_by_protocol("protocol-id") == existing_analysis_ids
-    await subject.add(
+    await subject.make_room_and_add(
         _completed_analysis_resource(
             analysis_id="new-analysis-id",
             protocol_id="protocol-id",

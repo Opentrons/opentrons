@@ -28,6 +28,7 @@ from opentrons.protocol_engine import (
 )
 
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons.util.performance_helpers import track_analysis
 
 
 @click.command()
@@ -63,6 +64,7 @@ def _get_input_files(files_and_dirs: Sequence[Path]) -> List[Path]:
     return results
 
 
+@track_analysis
 async def _analyze(
     files_and_dirs: Sequence[Path],
     json_output: Optional[AsyncPath],

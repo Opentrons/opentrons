@@ -196,7 +196,7 @@ class AnalysisStore:
                 completed_analysis
             ),
         )
-        await self._completed_store.add(
+        await self._completed_store.make_room_and_add(
             completed_analysis_resource=completed_analysis_resource
         )
 

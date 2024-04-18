@@ -84,23 +84,25 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   if (robot.status === CONNECTABLE && runId == null) {
     menuItems = (
       <>
-        {!isRobotBusy ? (
-          <MenuItem
-            {...targetProps}
-            onClick={handleClickRun}
-            disabled={isRobotOnWrongVersionOfSoftware}
-            data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
-            css={css`
-              border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8} 0
-                0;
-            `}
-          >
-            {t('run_a_protocol')}
-          </MenuItem>
-        ) : null}
+        <MenuItem
+          {...targetProps}
+          onClick={handleClickRun}
+          disabled={isRobotOnWrongVersionOfSoftware || isRobotBusy}
+          data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
+          css={css`
+            border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8} 0 0;
+          `}
+        >
+          {t('run_a_protocol')}
+        </MenuItem>
         {isRobotOnWrongVersionOfSoftware && (
           <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
             {t('shared:a_software_update_is_available')}
+          </Tooltip>
+        )}
+        {!isRobotOnWrongVersionOfSoftware && isRobotBusy && (
+          <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+            {t('shared:robot_is_busy')}
           </Tooltip>
         )}
         <Divider marginY="0" />

@@ -25,11 +25,10 @@ import {
   getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleDisplayName,
-  SINGLE_RIGHT_CUTOUTS,
-  SINGLE_LEFT_SLOT_FIXTURE,
-  SINGLE_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
+  getCutoutFixturesForModuleModel,
+  getFixtureIdByCutoutIdFromModuleSlotName,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
@@ -41,11 +40,14 @@ import type {
   CutoutId,
   CutoutFixtureId,
   ModuleModel,
+  DeckDefinition,
 } from '@opentrons/shared-data'
+import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
 
 interface LocationConflictModalProps {
   onCloseClick: () => void
   cutoutId: CutoutId
+  deckDef: DeckDefinition
   missingLabwareDisplayName?: string | null
   requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
@@ -61,9 +63,12 @@ export const LocationConflictModal = (
     missingLabwareDisplayName,
     requiredFixtureId,
     requiredModule,
+    deckDef,
     isOnDevice = false,
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+
+  const [showModuleSelect, setShowModuleSelect] = React.useState(false)
   const deckConfig = useDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckConfigurationAtLocationFixtureId = deckConfig.find(
@@ -89,39 +94,54 @@ export const LocationConflictModal = (
       ? getFixtureDisplayName(deckConfigurationAtA1)
       : currentFixtureDisplayName
 
-  const handleUpdateDeck = (): void => {
-    if (requiredFixtureId != null) {
-      const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
-        fixture.cutoutId === cutoutId
-          ? { ...fixture, cutoutFixtureId: requiredFixtureId }
-          : fixture
+  const handleConfigureModule = (moduleSerialNumber?: string): void => {
+    if (requiredModule != null) {
+      const slotName = cutoutId.replace('cutout', '')
+      const moduleFixtures = getCutoutFixturesForModuleModel(
+        requiredModule,
+        deckDef
+      )
+      const moduleFixtureIdByCutoutId = getFixtureIdByCutoutIdFromModuleSlotName(
+        slotName,
+        moduleFixtures,
+        deckDef
       )
 
-      updateDeckConfiguration(newRequiredFixtureDeckConfig)
-    } else {
-      const isRightCutout = SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
-      const singleSlotFixture = isRightCutout
-        ? SINGLE_RIGHT_SLOT_FIXTURE
-        : SINGLE_LEFT_SLOT_FIXTURE
-
-      const newSingleSlotDeckConfig = deckConfig.map(fixture =>
-        fixture.cutoutId === cutoutId
-          ? { ...fixture, cutoutFixtureId: singleSlotFixture }
-          : fixture
-      )
-
-      // add A1 and B1 single slot config for thermocycler
-      const newThermocyclerDeckConfig = isThermocycler
-        ? newSingleSlotDeckConfig.map(fixture =>
-            fixture.cutoutId === 'cutoutA1' || fixture.cutoutId === 'cutoutB1'
-              ? { ...fixture, cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE }
-              : fixture
-          )
-        : newSingleSlotDeckConfig
-
-      updateDeckConfiguration(newThermocyclerDeckConfig)
+      const newDeckConfig = deckConfig.map(existingCutoutConfig => {
+        const replacementCutoutFixtureId =
+          moduleFixtureIdByCutoutId[existingCutoutConfig.cutoutId]
+        return existingCutoutConfig.cutoutId in moduleFixtureIdByCutoutId &&
+          replacementCutoutFixtureId != null
+          ? {
+              ...existingCutoutConfig,
+              cutoutFixtureId: replacementCutoutFixtureId,
+              opentronsModuleSerialNumber: moduleSerialNumber,
+            }
+          : existingCutoutConfig
+      })
+      updateDeckConfiguration(newDeckConfig)
     }
     onCloseClick()
+  }
+
+  const handleUpdateDeck = (): void => {
+    if (requiredModule != null) {
+      setShowModuleSelect(true)
+    } else if (requiredFixtureId != null) {
+      const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
+        fixture.cutoutId === cutoutId
+          ? {
+              ...fixture,
+              cutoutFixtureId: requiredFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
+          : fixture
+      )
+      updateDeckConfiguration(newRequiredFixtureDeckConfig)
+      onCloseClick()
+    } else {
+      onCloseClick()
+    }
   }
 
   let protocolSpecifiesDisplayName = ''
@@ -133,6 +153,18 @@ export const LocationConflictModal = (
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }
 
+  if (showModuleSelect && requiredModule) {
+    return createPortal(
+      <ChooseModuleToConfigureModal
+        handleConfigureModule={handleConfigureModule}
+        requiredModuleModel={requiredModule}
+        onCloseClick={onCloseClick}
+        isOnDevice={isOnDevice}
+        deckDef={deckDef}
+      />,
+      getTopPortalEl()
+    )
+  }
   return createPortal(
     isOnDevice ? (
       <Modal
