@@ -12,19 +12,48 @@ metadata = {
 
 requirements = {"robotType": "OT-2", "apiLevel": "2.17"}
 
+#############
+# CHANGELOG #
+#############
 
-#########################
-#### LOOK AT THIS #######
-#########################
+# ----
+# 2.17
+# ----
 
+# NOTHING NEW
 # This protocol is exactly the same as 2.16 Smoke Test V3
 # The only difference is the API version in the metadata
 # There were no new positive test cases for 2.17
 # The negative test cases are captured in the 2.17 dispense changes protcol
 
-#########################
-#### LOOK AT THIS #######
-#########################
+# ----
+# 2.16
+# ----
+
+# - prepare_to_aspirate added
+# - fixed_trash property changed
+# - instrument_context.trash_container property changed
+
+# ----
+# 2.15
+# ----
+
+# - move_labware added - Manual Deck State Modification
+# - ProtocolContext.load_adapter added 
+# - OFF_DECK location added
+
+# ----
+# 2.14
+# ----
+
+# - ProtocolContext.defined_liquid and Well.load_liquid added
+# - load_labware without parameters should still find the labware
+
+# ----
+# 2.13
+# ----
+
+# - Heater-Shaker Module support added
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
@@ -72,7 +101,14 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     pipette_right = ctx.load_instrument(instrument_name="p20_single_gen2", mount="right", tip_racks=tips_20ul)
 
-    # modules https://docs.opentrons.com/v2/new_modules.html#available-modules
+    #########################
+    # Heater-Shaker Support #
+    #########################
+
+    # -------------------------- #
+    # Added in API version: 2.13 #
+    # -------------------------- #
+
     hs_module = ctx.load_module("heaterShakerModuleV1", hs_position)
     temperature_module = ctx.load_module("temperature module gen2", temperature_position)
     thermocycler_module = ctx.load_module("thermocycler module gen2")
@@ -86,7 +122,14 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     hs_plate = hs_module.load_labware(name="nest_96_wellplate_100ul_pcr_full_skirt", adapter="opentrons_96_pcr_adapter")
     tc_plate = thermocycler_module.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
 
-    # A 2.14 difference, no params specified, still should find it.
+    ###################################
+    # Load Labware with no parameters #
+    ###################################
+
+    # -------------------------- #
+    # Fixed in API version: 2.14 #
+    # -------------------------- #
+
     custom_labware = ctx.load_labware(
         "cpx_4_tuberack_100ul",
         custom_lw_position,
@@ -117,7 +160,14 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         logo_destination_plate.wells_by_name()["E5"],
     ]
 
-    # >= 2.14 define_liquid and load_liquid
+    #######################################
+    # define_liquid & load_liquid Support #
+    #######################################
+
+    # -------------------------- #
+    # Added in API version: 2.14 #
+    # -------------------------- #
+
     water = ctx.define_liquid(
         name="water", description="H₂O", display_color="#42AB2D"
     )  # subscript 2 https://www.compart.com/en/unicode/U+2082
@@ -147,7 +197,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # Added in API version: 2.15 #
     # -------------------------- #
 
-    # Putting steps for this at beginning of protocol so you can do the manual stuff
+    # Putting steps for this at beginning of protocol so y    # >= 2.14 define_liquid and load_liquidou can do the manual stuff
     # then walk away to let the rest of the protocol execute
 
     # The test flow is as follows:
