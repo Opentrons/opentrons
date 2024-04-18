@@ -287,12 +287,15 @@ class RunArgs:
         volumes_list: List[float] = []
         for _, vls in volumes:
             volumes_list.extend(vls)
-
-        if args.trials == 0:
-            if args.cavity:
+        if args.cavity:
+            if args.trials == 0:
                 trials = 240
             else:
-                trials = helpers.get_default_trials(args.increment, kind, args.channels)
+                trials = (
+                    args.trials * 8
+                )  # we want to specify trials in X per rack so multiply by 8
+        elif args.trials == 0:
+            trials = helpers.get_default_trials(args.increment, kind, args.channels)
         else:
             trials = args.trials
 
@@ -548,6 +551,7 @@ def _main(
             tip,
             all_channels=all_channels_same_time,
             cavity=run_args.cavity,
+            trials_per_rack=int(run_args.trials / 8),
         ),
         env_sensor=run_args.environment_sensor,
         recorder=run_args.recorder,
