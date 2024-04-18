@@ -139,7 +139,7 @@ export function EditModulesCard(props: Props): JSX.Element {
                 type={moduleType}
                 moduleOnDeck={moduleData[0]}
                 showCollisionWarnings={warningsEnabled}
-                key={i}
+                key={`${moduleType}_${i}`}
                 openEditModuleModal={openEditModuleModal}
                 robotType={robotType}
               />
@@ -149,7 +149,7 @@ export function EditModulesCard(props: Props): JSX.Element {
               <MultipleModuleRow
                 moduleType={moduleType}
                 moduleOnDeck={moduleData}
-                key={i}
+                key={`${moduleType}_${i}`}
                 moduleOnDeckType={moduleData[0].type}
                 moduleOnDeckModel={moduleData[0].model}
                 openEditModuleModal={openEditModuleModal}
@@ -159,7 +159,7 @@ export function EditModulesCard(props: Props): JSX.Element {
             return (
               <ModuleRow
                 type={moduleType}
-                key={i}
+                key={`noModule_${i}`}
                 openEditModuleModal={openEditModuleModal}
               />
             )

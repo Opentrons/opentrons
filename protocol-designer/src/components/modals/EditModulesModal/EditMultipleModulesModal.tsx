@@ -1,13 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  Control,
-  Controller,
-  ControllerRenderProps,
-  useForm,
-  useWatch,
-} from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import {
   BUTTON_TYPE_SUBMIT,
   OutlineButton,
@@ -36,6 +30,7 @@ import { getLabwareOnSlot, getSlotIsEmpty } from '../../../step-forms'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
 import { PDAlert } from '../../alerts/PDAlert'
+import type { Control, ControllerRenderProps } from 'react-hook-form'
 import type { CutoutId, ModuleType } from '@opentrons/shared-data'
 import type { ModuleOnDeck } from '../../../step-forms'
 
