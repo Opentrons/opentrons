@@ -17,7 +17,6 @@ from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands, slot_standardization
-from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import (
     DeckType,
     LabwareOffset,
@@ -567,6 +566,7 @@ async def test_finish(
     """It should be able to gracefully tell the engine it's done."""
     completed_at = datetime(2021, 1, 1, 0, 0)
 
+    decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
     decoy.when(model_utils.get_timestamp()).then_return(completed_at)
 
     await subject.finish(
@@ -601,6 +601,7 @@ async def test_finish_with_defaults(
     state_store: StateStore,
 ) -> None:
     """It should be able to gracefully tell the engine it's done."""
+    decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
     await subject.finish()
 
     decoy.verify(
@@ -635,13 +636,16 @@ async def test_finish_with_error(
     expected_end_state: PostRunHardwareState,
 ) -> None:
     """It should be able to tell the engine it's finished because of an error."""
-    error = EStopActivatedError() if stopped_by_estop else RuntimeError("oh no")
+    error = RuntimeError("oh no")
     expected_error_details = FinishErrorDetails(
         error_id="error-id",
         created_at=datetime(year=2021, month=1, day=1),
         error=error,
     )
 
+    decoy.when(state_store.commands.state.stopped_by_estop).then_return(
+        stopped_by_estop
+    )
     decoy.when(model_utils.generate_id()).then_return("error-id")
     decoy.when(model_utils.get_timestamp()).then_return(
         datetime(year=2021, month=1, day=1), datetime(year=2022, month=2, day=2)
@@ -738,6 +742,8 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     decoy.when(
         await queue_worker.join(),
     ).then_raise(exception)
+
+    decoy.when(state_store.commands.state.stopped_by_estop).then_return(False)
 
     error_id = "error-id"
     completed_at = datetime(2021, 1, 1, 0, 0)
@@ -843,7 +849,7 @@ async def test_estop(
     subject: ProtocolEngine,
 ) -> None:
     """It should be able to stop the engine."""
-    expected_action = StopAction()
+    expected_action = StopAction(from_estop=True)
     validated_action = sentinel.validated_action
     decoy.when(
         state_store.commands.validate_action_allowed(expected_action),
@@ -865,7 +871,7 @@ async def test_estop_noops_if_invalid(
     subject: ProtocolEngine,
 ) -> None:
     """It should no-op if a stop is invalid right now.."""
-    expected_action = StopAction()
+    expected_action = StopAction(from_estop=True)
     decoy.when(
         state_store.commands.validate_action_allowed(expected_action),
     ).then_raise(RuntimeError("unable to stop; this machine craves flesh"))
