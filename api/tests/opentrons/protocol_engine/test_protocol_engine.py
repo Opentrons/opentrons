@@ -184,7 +184,9 @@ def test_add_command(
     original_request = commands.WaitForResumeCreate(
         params=commands.WaitForResumeParams()
     )
-    standardized_request = commands.HomeCreate(params=commands.HomeParams(), intent=commands.CommandIntent.PROTOCOL)
+    standardized_request = commands.HomeCreate(
+        params=commands.HomeParams(), intent=commands.CommandIntent.PROTOCOL
+    )
     queued = commands.Home(
         id="command-id",
         key="command-key",
@@ -248,6 +250,106 @@ def test_add_command(
     result = subject.add_command(original_request)
 
     assert result == queued
+
+
+def test_add_fixit_command(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+    subject: ProtocolEngine,
+) -> None:
+    """It should add a fixit command to the state from a request."""
+    created_at = datetime(year=2021, month=1, day=1)
+    original_request = commands.WaitForResumeCreate(
+        params=commands.WaitForResumeParams()
+    )
+    standardized_request = commands.HomeCreate(
+        params=commands.HomeParams(), intent=commands.CommandIntent.FIXIT
+    )
+    queued = commands.Home(
+        id="command-id",
+        key="command-key",
+        status=commands.CommandStatus.QUEUED,
+        createdAt=created_at,
+        params=commands.HomeParams(),
+    )
+
+    robot_type: RobotType = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
+
+    decoy.when(
+        slot_standardization.standardize_command(original_request, robot_type)
+    ).then_return(standardized_request)
+
+    decoy.when(model_utils.generate_id()).then_return("command-id")
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
+
+    def _stub_queued(*_a: object, **_k: object) -> None:
+        decoy.when(state_store.commands.get("command-id")).then_return(queued)
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(
+            QueueCommandAction(
+                command_id="command-id",
+                created_at=created_at,
+                request=standardized_request,
+                request_hash=None,
+            )
+        )
+    ).then_return(
+        QueueCommandAction(
+            command_id="command-id-validated",
+            created_at=created_at,
+            request=standardized_request,
+            request_hash=None,
+        )
+    )
+
+    decoy.when(
+        action_dispatcher.dispatch(
+            QueueCommandAction(
+                command_id="command-id-validated",
+                created_at=created_at,
+                request=standardized_request,
+                request_hash=None,
+            )
+        ),
+    ).then_do(_stub_queued)
+
+    result = subject.add_command(original_request)
+    print(result)
+    assert result == queued
+
+
+def test_add_fixit_command_raises(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+    subject: ProtocolEngine,
+) -> None:
+    """It should raise if a failed_command_id is supplied without a  fixit command."""
+    original_request = commands.WaitForResumeCreate(
+        params=commands.WaitForResumeParams()
+    )
+    standardized_request = commands.HomeCreate(
+        params=commands.HomeParams(), intent=commands.CommandIntent.PROTOCOL
+    )
+
+    robot_type: RobotType = "OT-3 Standard"
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
+
+    decoy.when(
+        slot_standardization.standardize_command(original_request, robot_type)
+    ).then_return(standardized_request)
+
+    with pytest.raises(AssertionError):
+        subject.add_command(original_request, "id-123")
 
 
 async def test_add_and_execute_command(

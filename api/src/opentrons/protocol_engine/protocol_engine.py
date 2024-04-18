@@ -200,6 +200,11 @@ class ProtocolEngine:
             request, self.state_view.config.robot_type
         )
 
+        if failed_command_id:
+            assert (
+                request.intent == commands.CommandIntent.FIXIT
+            ), "failed command id should be supplied with a FIXIT command."
+
         command_id = self._model_utils.generate_id()
         if request.intent in (
             commands.CommandIntent.SETUP,
