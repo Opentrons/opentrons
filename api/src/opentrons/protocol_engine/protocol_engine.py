@@ -290,9 +290,6 @@ class ProtocolEngine:
         `finish()` with an EStopActivatedError.
         """
         try:
-            # todo(mm, 2024-04-16): This makes the run appeared as "cancelled" instead
-            # of "failed". We either want to make a separate action for E-stops,
-            # or we want to teach CommandView.get_status() about from_estop=True.
             action = self._state_store.commands.validate_action_allowed(StopAction())
         except Exception:  # todo(mm, 2024-04-16): Catch a more specific type.
             # This is likely called from some hardware API callback that doesn't care
