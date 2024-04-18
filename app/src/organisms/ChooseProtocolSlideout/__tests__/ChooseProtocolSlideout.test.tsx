@@ -93,10 +93,6 @@ describe('ChooseProtocolSlideout', () => {
     const protocolDataWithoutRunTimeParameter = {
       ...storedProtocolDataWithoutRunTimeParameters,
     }
-    console.log(
-      'protocolDataWithoutRunTimeParameter',
-      protocolDataWithoutRunTimeParameter
-    )
     vi.mocked(getStoredProtocols).mockReturnValue([
       protocolDataWithoutRunTimeParameter,
     ])
