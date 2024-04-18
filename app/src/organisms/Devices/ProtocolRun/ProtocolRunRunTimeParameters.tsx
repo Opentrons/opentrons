@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+import {
+  RUN_STATUS_STOPPED,
+  RUN_STATUSES_TERMINAL,
+} from '@opentrons/api-client'
 import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
@@ -25,6 +29,8 @@ import { Tooltip } from '../../../atoms/Tooltip'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { RunTimeParameter } from '@opentrons/shared-data'
+import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useNotifyRunQuery } from '../../../resources/runs'
 
 interface ProtocolRunRuntimeParametersProps {
   runId: string
@@ -34,7 +40,15 @@ export function ProtocolRunRuntimeParameters({
 }: ProtocolRunRuntimeParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  const runStatus = useRunStatus(runId)
+  const isRunTerminal =
+    // @ts-expect-error: expected that runStatus may not be a terminal status
+    runStatus == null ? false : RUN_STATUSES_TERMINAL.includes(runStatus)
+  const run = useNotifyRunQuery(runId).data
+  const runTimeParameters =
+    (isRunTerminal
+      ? run?.data?.runTimeParameters
+      : mostRecentAnalysis?.runTimeParameters) ?? []
   const hasParameter = runTimeParameters.length > 0
 
   const hasCustomValues = runTimeParameters.some(
@@ -79,7 +93,11 @@ export function ProtocolRunRuntimeParameters({
       </Flex>
       {!hasParameter ? (
         <Flex padding={SPACING.spacing16}>
-          <InfoScreen contentType="parameters" />
+          <InfoScreen
+            contentType={
+              runStatus === RUN_STATUS_STOPPED ? 'runNotStarted' : 'parameters'
+            }
+          />
         </Flex>
       ) : (
         <>

@@ -52,7 +52,8 @@ export function useRunControls(
 
   const { cloneRun, isLoading: isResetRunLoading } = useCloneRun(
     runId ?? null,
-    onCloneRunSuccess
+    onCloneRunSuccess,
+    true
   )
 
   return {

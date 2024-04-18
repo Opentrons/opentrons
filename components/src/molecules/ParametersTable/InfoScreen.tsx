@@ -8,14 +8,25 @@ import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 
 interface InfoScreenProps {
-  contentType: 'parameters' | 'moduleControls'
+  contentType: 'parameters' | 'moduleControls' | 'runNotStarted'
 }
 
 export function InfoScreen({ contentType }: InfoScreenProps): JSX.Element {
-  const bodyText =
-    contentType === 'parameters'
-      ? 'No parameters specified in this protocol'
-      : 'Connect modules to see controls'
+  let bodyText: string = ''
+  switch (contentType) {
+    case 'parameters':
+      bodyText = 'No parameters specified in this protocol'
+      break
+    case 'moduleControls':
+      bodyText = 'Connect modules to see controls'
+      break
+    case 'runNotStarted':
+      bodyText = 'Run was never started'
+      break
+    default:
+      bodyText = contentType
+  }
+
   return (
     <Flex
       alignItems={ALIGN_CENTER}
