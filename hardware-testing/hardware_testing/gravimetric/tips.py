@@ -106,13 +106,17 @@ def _get_racks(ctx: ProtocolContext) -> Dict[int, Labware]:
 
 
 def _unused_tips_for_racks(
-    ctx: ProtocolContext, pipette_mount: str, racks: List[Labware], cavity: bool = False
+    ctx: ProtocolContext,
+    pipette_mount: str,
+    racks: List[Labware],
+    cavity: bool = False,
+    trials_per_rack: int = 0,
 ) -> List[Well]:
     wells: List[Well] = []
     rows = "ABCDEFGH"
-    rack_max = 96
+    rack_max: int = 96
     if cavity:
-        rack_max = 31
+        rack_max = trials_per_rack + 1
         # 31 for the first rack so we can grab a tip for the blanks
     for rack in racks:
         rack_wells: List[Well] = []
@@ -125,26 +129,35 @@ def _unused_tips_for_racks(
                 )
                 if next_well is not None and wellname == next_well.well_name:
                     rack_wells.append(rack[wellname])
+        print(f" rack max {rack_max}")
         wells.extend(rack_wells[0:rack_max])
-        rack_max = 30
+        rack_max = trials_per_rack
     return wells
 
 
 def get_unused_tips(
-    ctx: ProtocolContext, tip_volume: int, pipette_mount: str, cavity: bool = False
+    ctx: ProtocolContext,
+    tip_volume: int,
+    pipette_mount: str,
+    cavity: bool = False,
+    trials_per_rack: int = 0,
 ) -> List[Well]:
     """Use the labware's tip tracker to get a list of all unused tips for a given tip volume."""
     racks = [
         r for r in _get_racks(ctx).values() if r.wells()[0].max_volume == tip_volume
     ]
-    return _unused_tips_for_racks(ctx, pipette_mount, racks, cavity)
+    return _unused_tips_for_racks(ctx, pipette_mount, racks, cavity, trials_per_rack)
 
 
 def get_tips_for_single(
-    ctx: ProtocolContext, tip_volume: int, pipette_mount: str, cavity: bool
+    ctx: ProtocolContext,
+    tip_volume: int,
+    pipette_mount: str,
+    cavity: bool,
+    trials_per_rack: int = 0,
 ) -> List[Well]:
     """Get tips for single channel."""
-    return get_unused_tips(ctx, tip_volume, pipette_mount, cavity)
+    return get_unused_tips(ctx, tip_volume, pipette_mount, cavity, trials_per_rack)
 
 
 def get_tips_for_individual_channel_on_multi(
@@ -194,10 +207,15 @@ def get_tips(
     tip_volume: int,
     all_channels: bool = True,
     cavity: bool = False,
+    trials_per_rack: int = 0,
 ) -> Dict[int, List[Well]]:
     """Get tips."""
     if pipette.channels == 1:
-        return {0: get_tips_for_single(ctx, tip_volume, pipette.mount, cavity)}
+        return {
+            0: get_tips_for_single(
+                ctx, tip_volume, pipette.mount, cavity, trials_per_rack
+            )
+        }
     elif pipette.channels == 8:
         if all_channels:
             return {0: get_tips_for_all_channels_on_multi(ctx, tip_volume)}
