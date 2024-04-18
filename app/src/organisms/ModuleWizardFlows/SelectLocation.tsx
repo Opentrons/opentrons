@@ -82,18 +82,33 @@ export const SelectLocation = (
     attachedModule.moduleModel,
     deckDef
   )
-  const mayMountToCutoutIds = moduleFixtures.reduce<CutoutId[]>((acc, { mayMountTo }) => [...acc, ...mayMountTo], [])
-  const editableCutoutIds = deckConfig.reduce<CutoutId[]>((acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => {
-    const isCurrentConfiguration = Object.values(configuredFixtureIdByCutoutId).includes(cutoutFixtureId) && attachedModule.serialNumber === opentronsModuleSerialNumber
-    if (mayMountToCutoutIds.includes(cutoutId) &&
-      (isCurrentConfiguration || SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId))) {
-      return [...acc, cutoutId]
-    }
-    return acc
-  }, [])
+  const mayMountToCutoutIds = moduleFixtures.reduce<CutoutId[]>(
+    (acc, { mayMountTo }) => [...acc, ...mayMountTo],
+    []
+  )
+  const editableCutoutIds = deckConfig.reduce<CutoutId[]>(
+    (acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => {
+      const isCurrentConfiguration =
+        Object.values(configuredFixtureIdByCutoutId).includes(
+          cutoutFixtureId
+        ) && attachedModule.serialNumber === opentronsModuleSerialNumber
+      if (
+        mayMountToCutoutIds.includes(cutoutId) &&
+        (isCurrentConfiguration ||
+          SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId))
+      ) {
+        return [...acc, cutoutId]
+      }
+      return acc
+    },
+    []
+  )
 
   const handleAddFixture = (anchorCutoutId: CutoutId): void => {
-    const selectedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(anchorCutoutId, moduleFixtures)
+    const selectedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
+      anchorCutoutId,
+      moduleFixtures
+    )
     if (!isEqual(selectedFixtureIdByCutoutIds, configuredFixtureIdByCutoutId)) {
       updateDeckConfiguration(
         deckConfig.map(cc => {
@@ -112,7 +127,8 @@ export const SelectLocation = (
           } else if (cc.cutoutId in selectedFixtureIdByCutoutIds) {
             return {
               ...cc,
-              cutoutFixtureId: selectedFixtureIdByCutoutIds[cc.cutoutId] ?? cc.cutoutFixtureId,
+              cutoutFixtureId:
+                selectedFixtureIdByCutoutIds[cc.cutoutId] ?? cc.cutoutFixtureId,
               opentronsModuleSerialNumber: attachedModule.serialNumber,
             }
           } else {
@@ -124,7 +140,10 @@ export const SelectLocation = (
   }
 
   const handleRemoveFixture = (anchorCutoutId: CutoutId): void => {
-    const removedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(anchorCutoutId, moduleFixtures)
+    const removedFixtureIdByCutoutIds = getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
+      anchorCutoutId,
+      moduleFixtures
+    )
     updateDeckConfiguration(
       deckConfig.map(cc => {
         if (cc.cutoutId in removedFixtureIdByCutoutIds) {
@@ -154,7 +173,7 @@ export const SelectLocation = (
           deckConfig={deckConfig}
           handleClickAdd={handleAddFixture}
           handleClickRemove={handleRemoveFixture}
-          editableCutoutIds={editableCutoutIds} 
+          editableCutoutIds={editableCutoutIds}
           height="250px"
         />
       }

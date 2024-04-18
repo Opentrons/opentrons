@@ -62,7 +62,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     darkFill = COLORS.black90,
     editableCutoutIds = deckConfig.map(({ cutoutId }) => cutoutId),
     showExpansion = true,
-    height = "455px"
+    height = '455px',
   } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
@@ -85,8 +85,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   )
   const emptyCutouts = configurableDeckConfig.filter(
     ({ cutoutFixtureId }) =>
-      cutoutFixtureId != null &&
-      SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+      cutoutFixtureId != null && SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
   )
   const trashBinFixtures = configurableDeckConfig.filter(
     ({ cutoutFixtureId }) => cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
@@ -130,7 +129,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         <StagingAreaConfigFixture
           key={cutoutId}
           deckDefinition={deckDef}
-          handleClickRemove={editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
         />
@@ -147,7 +148,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         <WasteChuteConfigFixture
           key={cutoutId}
           deckDefinition={deckDef}
-          handleClickRemove={editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
         />
@@ -156,7 +159,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         <WasteChuteConfigFixture
           key={cutoutId}
           deckDefinition={deckDef}
-          handleClickRemove={editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
           hasStagingAreas
@@ -166,7 +171,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         <TrashBinConfigFixture
           key={cutoutId}
           deckDefinition={deckDef}
-          handleClickRemove={editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
         />
@@ -175,7 +182,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         <TemperatureModuleFixture
           key={cutoutId}
           deckDefinition={deckDef}
-          handleClickRemove={editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
         />
@@ -184,7 +193,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         <HeaterShakerFixture
           key={cutoutId}
           deckDefinition={deckDef}
-          handleClickRemove={editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
         />
@@ -193,7 +204,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         <MagneticBlockFixture
           key={cutoutId}
           deckDefinition={deckDef}
-          handleClickRemove={editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
           hasStagingArea={
@@ -205,7 +218,9 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
         <ThermocyclerFixture
           key={cutoutId}
           deckDefinition={deckDef}
-          handleClickRemove={editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
         />

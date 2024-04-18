@@ -63,8 +63,10 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
   const { t } = useTranslation('module_wizard_flows')
   const mount = attachedPipette.mount
   const cutoutId = deckConfig.find(
-    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber &&
-    (attachedModule.moduleType !== THERMOCYCLER_MODULE_TYPE || cc.cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE)
+    cc =>
+      cc.opentronsModuleSerialNumber === attachedModule.serialNumber &&
+      (attachedModule.moduleType !== THERMOCYCLER_MODULE_TYPE ||
+        cc.cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE)
   )?.cutoutId
   const slotName =
     cutoutId != null ? FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutId] : null

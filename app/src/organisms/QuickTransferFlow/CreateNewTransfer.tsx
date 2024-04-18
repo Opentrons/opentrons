@@ -57,7 +57,7 @@ export function CreateNewTransfer(props: CreateNewTransferProps): JSX.Element {
           <Flex width="50%">
             <DeckConfigurator
               deckConfig={deckConfig}
-              editableCutoutIds={[]} 
+              editableCutoutIds={[]}
               handleClickAdd={() => {}}
               handleClickRemove={() => {}}
               additionalStaticFixtures={[
