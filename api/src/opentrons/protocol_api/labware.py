@@ -598,15 +598,9 @@ class Labware:
             self._api_version >= ENGINE_CORE_API_VERSION
             and self._api_version < SET_OFFSET_RESTORED_API_VERSION
         ):
-            # TODO(mm, 2023-02-13): See Jira RCORE-535.
-            #
-            # Until that issue is resolved, the only way to simulate or run a
-            # >=ENGINE_CORE_API_VERSION protocol is through the Opentrons App.
-            # Therefore, in >=ENGINE_CORE_API_VERSION protocols,
-            # there's no legitimate way to use this method.
             raise APIVersionError(
-                "Labware.set_offset() is not supported when apiLevel is 2.14 or higher."
-                " Use a lower apiLevel"
+                "Labware.set_offset() is not supported when apiLevel is 2.14, 2.15, 2.16, or 2.17."
+                " Use apiLevel 2.13 or below, or 2.18 or above to set offset,"
                 " or use the Opentrons App's Labware Position Check."
             )
         else:
