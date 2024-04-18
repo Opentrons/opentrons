@@ -1,6 +1,4 @@
 import {
-  HEATERSHAKER_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
@@ -12,41 +10,6 @@ import type { FormModules } from '../../../step-forms'
 import type { AdditionalEquipment, FormState } from './types'
 
 export const FLEX_TRASH_DEFAULT_SLOT = 'cutoutA3'
-
-const MODULES_SLOTS_FLEX = [
-  {
-    value: 'cutoutD1',
-    slot: 'D1',
-  },
-  {
-    value: 'cutoutC3',
-    slot: 'C3',
-  },
-  {
-    value: 'cutoutB1',
-    slot: 'B1',
-  },
-  {
-    value: 'cutoutB3',
-    slot: 'B3',
-  },
-  {
-    value: 'cutoutA3',
-    slot: 'A3',
-  },
-  {
-    value: 'cutoutD3',
-    slot: 'D3',
-  },
-  {
-    value: 'cutoutC1',
-    slot: 'C1',
-  },
-  {
-    value: 'cutoutA1',
-    slot: 'A1',
-  },
-]
 
 export const getCrashableModuleSelected = (
   modules: FormModules | null,
@@ -120,31 +83,14 @@ export const getUnoccupiedStagingAreaSlots = (
   return unoccupiedSlots
 }
 
-export const getNextAvailableModuleSlot = (
+const TOTAL_MODULE_SLOTS = 8
+
+export const getIsSlotAvailable = (
   modules: FormState['modules'],
   additionalEquipment: FormState['additionalEquipment']
-): string => {
-  const moduleSlots =
-    modules != null
-      ? Object.values(modules).flatMap(module =>
-          module.type === THERMOCYCLER_MODULE_TYPE
-            ? [module.slot, 'A1']
-            : module.slot
-        )
-      : []
-  const stagingAreas = additionalEquipment.filter(equipment =>
-    equipment.includes('stagingArea')
-  )
-  const stagingAreaCutouts = stagingAreas.map(cutout => cutout.split('_')[1])
-  const hasWasteChute = additionalEquipment.find(equipment =>
-    equipment.includes('wasteChute')
-  )
-  const wasteChuteSlot = Boolean(hasWasteChute)
-    ? [WASTE_CHUTE_CUTOUT as string]
-    : []
-  const trashBin = additionalEquipment.find(equipment =>
-    equipment.includes('trashBin')
-  )
+): boolean => {
+  const moduleLength = modules != null ? Object.keys(modules).length : 0
+  const additionalEquipmentLength = additionalEquipment.length
   const hasTC =
     modules != null
       ? Object.values(modules).some(
@@ -152,70 +98,44 @@ export const getNextAvailableModuleSlot = (
         )
       : false
 
-  //  removing slot(s) for the trash if spaces are limited
-  let removeSlotForTrash = MODULES_SLOTS_FLEX
-  if (trashBin != null && hasTC) {
-    removeSlotForTrash = MODULES_SLOTS_FLEX.slice(0, -2)
-  } else if (trashBin != null && !hasTC) {
-    removeSlotForTrash = MODULES_SLOTS_FLEX.slice(0, -1)
-  }
-  const unoccupiedSlot = removeSlotForTrash.find(
-    cutout =>
-      !stagingAreaCutouts.includes(cutout.value) &&
-      !moduleSlots.includes(cutout.slot) &&
-      !wasteChuteSlot.includes(cutout.value)
+  const filteredModuleLength = hasTC ? moduleLength + 1 : moduleLength
+  const hasWasteChute = additionalEquipment.find(equipment =>
+    equipment.includes('wasteChute')
   )
-  if (unoccupiedSlot == null) {
-    return ''
+  const isStagingAreaInD3 = additionalEquipment
+    .filter(equipment => equipment.includes('stagingArea'))
+    .find(stagingArea => stagingArea.split('_')[1] === 'cutoutD3')
+  const hasGripper = additionalEquipment.find(equipment =>
+    equipment.includes('gripper')
+  )
+
+  let filteredAdditionalEquipmentLength = additionalEquipmentLength
+  if (hasWasteChute && isStagingAreaInD3) {
+    filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
+  }
+  if (hasGripper) {
+    filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
   }
 
-  return unoccupiedSlot?.slot ?? ''
+  return (
+    filteredModuleLength + filteredAdditionalEquipmentLength <
+    TOTAL_MODULE_SLOTS
+  )
 }
 
-interface DisabledEquipmentProps {
+interface TrashOptionDisabledProps {
+  trashType: 'trashBin' | 'wasteChute'
   additionalEquipment: AdditionalEquipment[]
   modules: FormModules | null
 }
 
-export const getDisabledEquipment = (
-  props: DisabledEquipmentProps
-): string[] => {
-  const { additionalEquipment, modules } = props
-  const nextAvailableSlot = getNextAvailableModuleSlot(
-    modules,
-    additionalEquipment
-  )
-  const disabledEquipment: string[] = []
-
-  const moduleSlots =
-    modules != null
-      ? Object.values(modules).flatMap(module =>
-          module.type === THERMOCYCLER_MODULE_TYPE
-            ? [module.slot, 'A1']
-            : module.slot
-        )
-      : []
-
-  if (moduleSlots.includes('A1') || moduleSlots.includes('B1')) {
-    disabledEquipment.push(THERMOCYCLER_MODULE_TYPE)
-  }
-  if (nextAvailableSlot === '') {
-    disabledEquipment.push(TEMPERATURE_MODULE_TYPE, HEATERSHAKER_MODULE_TYPE)
-  }
-
-  return disabledEquipment
-}
-
-export const getTrashBinOptionDisabled = (
-  props: DisabledEquipmentProps
+export const getTrashOptionDisabled = (
+  props: TrashOptionDisabledProps
 ): boolean => {
-  const { additionalEquipment, modules } = props
-  const nextAvailableSlot = getNextAvailableModuleSlot(
-    modules,
-    additionalEquipment
-  )
-  const hasTrashBinAlready = additionalEquipment.includes('trashBin')
-  return nextAvailableSlot === '' && !hasTrashBinAlready
+  const { additionalEquipment, modules, trashType } = props
+  const isSlotAvailable = getIsSlotAvailable(modules, additionalEquipment)
+  const hasTrashBinAlready = additionalEquipment.includes(trashType)
+  return !isSlotAvailable && !hasTrashBinAlready
 }
 
 export const getTrashSlot = (values: FormState): string => {
