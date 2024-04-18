@@ -83,7 +83,13 @@
         "label": "delay"
       },
       "tip_position": { "label": "tip position" },
-      "flow_rate": { "label": "Flow Rate" },
+      "flow_rate": {
+        "label": "Flow Rate",
+        "range": "between {{min}} and {{max}}",
+        "error_decimals": "A max of {{decimals}} decimal places is allowed",
+        "error_out_of_bounds": "accepted range is {{min}} to {{max}}",
+        "default_text": "Our default aspirate speed is optimal for a {{displayName}} aspirating liquids with a viscosity similar to water"
+      },
       "volume": { "label": "volume per well" },
       "well_order": {
         "label": "Well order",
