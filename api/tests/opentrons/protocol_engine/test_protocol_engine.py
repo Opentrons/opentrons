@@ -132,7 +132,7 @@ def _mock_hash_command_params_module(
 ) -> None:
     hash_command_params = commands.hash_protocol_command_params
     monkeypatch.setattr(
-        commands, "hash_command_params", decoy.mock(func=hash_command_params)
+        commands, "hash_protocol_command_params", decoy.mock(func=hash_command_params)
     )
 
 
@@ -207,11 +207,11 @@ def test_add_command(
     decoy.when(state_store.commands.get_latest_protocol_command_hash()).then_return(
         "abc"
     )
-    # decoy.when(
-    #     commands.hash_protocol_command_params(
-    #         create=standardized_request, last_hash="abc"
-    #     )
-    # ).then_return("123")
+    decoy.when(
+        commands.hash_protocol_command_params(
+            create=standardized_request, last_hash="abc"
+        )
+    ).then_return("123")
 
     def _stub_queued(*_a: object, **_k: object) -> None:
         decoy.when(state_store.commands.get("command-id")).then_return(queued)
