@@ -1,7 +1,12 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Flex, StepMeter, SPACING } from '@opentrons/components'
+import {
+  Flex,
+  StepMeter,
+  SPACING,
+  POSITION_STICKY,
+} from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { CreateNewTransfer } from './CreateNewTransfer'
@@ -87,6 +92,8 @@ export const QuickTransferFlow = (): JSX.Element => {
       <StepMeter
         totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
         currentStep={currentStep}
+        position={POSITION_STICKY}
+        top="0"
       />
       {modalContent == null ? (
         <Flex>

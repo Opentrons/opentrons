@@ -5,13 +5,15 @@ import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
 
-interface StepMeterProps {
+import type { StyleProps } from '@opentrons/components'
+
+interface StepMeterProps extends StyleProps {
   totalSteps: number
   currentStep: number | null
 }
 
 export const StepMeter = (props: StepMeterProps): JSX.Element => {
-  const { totalSteps, currentStep } = props
+  const { totalSteps, currentStep, ...styleProps } = props
   const progress = currentStep != null ? currentStep : 0
   const percentComplete = `${
     //    this logic puts a cap at 100% percentComplete which we should never run into
@@ -21,7 +23,7 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
   }%`
 
   const StepMeterContainer = css`
-    position: ${POSITION_RELATIVE};
+    position: ${styleProps.position ? styleProps.position : POSITION_RELATIVE};
     height: ${SPACING.spacing4};
     background-color: ${COLORS.grey30};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -41,7 +43,11 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
   `
 
   return (
-    <Box data-testid="StepMeter_StepMeterContainer" css={StepMeterContainer}>
+    <Box
+      data-testid="StepMeter_StepMeterContainer"
+      css={StepMeterContainer}
+      {...styleProps}
+    >
       <Box data-testid="StepMeter_StepMeterBar" css={StepMeterBar} />
     </Box>
   )
