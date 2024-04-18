@@ -27,6 +27,7 @@ from typing import (
 )
 from opentrons.config.types import OT3Config, GantryLoad, OutputOptions
 from opentrons.config import gripper_config
+from opentrons.util.broker import Broker
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -269,6 +270,7 @@ class OT3Controller(FlexBackend):
         use_usb_bus: bool = False,
         check_updates: bool = True,
         feature_flags: Optional[HardwareFeatureFlags] = None,
+        notify_api: Callable[[None], None] = None,
     ) -> OT3Controller:
         """Create the OT3Controller instance.
 
@@ -294,6 +296,7 @@ class OT3Controller(FlexBackend):
             usb_driver=usb_driver,
             check_updates=check_updates,
             feature_flags=feature_flags,
+            notify_api=notify_api,
         )
         await inst._subsystem_manager.start()
         return inst
@@ -306,6 +309,7 @@ class OT3Controller(FlexBackend):
         eeprom_driver: Optional[EEPROMDriver] = None,
         check_updates: bool = True,
         feature_flags: Optional[HardwareFeatureFlags] = None,
+        notify_api: Callable[[Any], None] = None,
     ) -> None:
         """Construct.
 
@@ -341,6 +345,7 @@ class OT3Controller(FlexBackend):
         self._initialized = False
         self._status_bar = status_bar.StatusBar(messenger=self._usb_messenger)
         self._status_bar_controller = StatusBarStateController(self._status_bar)
+        self._notification_broker = Broker()
 
         try:
             self._event_watcher = self._build_event_watcher()
@@ -356,6 +361,7 @@ class OT3Controller(FlexBackend):
                 self._configuration.motion_settings, GantryLoad.LOW_THROUGHPUT
             )
         )
+        self._notification_broker.subscribe(notify_api)
 
     @asynccontextmanager
     async def restore_system_constraints(self) -> AsyncIterator[None]:
@@ -1218,6 +1224,7 @@ class OT3Controller(FlexBackend):
         """Set the light states."""
         if rails is not None:
             await set_deck_light(1 if rails else 0, self._usb_messenger)
+            self._notification_broker.publish()
 
     @requires_update
     async def get_lights(self) -> Dict[str, bool]:

@@ -14,6 +14,10 @@ from ..publisher_notifier import PublisherNotifier, get_hardware_publisher_notif
 from ..notification_client import NotificationClient, get_notification_client
 from ..topics import Topics
 
+import logging
+
+log = logging.getLogger(__name__)
+
 
 @dataclass
 class RobotHooks:
@@ -64,11 +68,16 @@ class RobotPublisher:
         await self._client.publish_advise_refetch_async(topic=Topics.LIGHTS)
 
     async def _handle_lights_change(self) -> None:
+        log.info("4HITTING LIGHTS CALLBACK")
         if self._robot_hooks is not None and self._robot_state is not None:
+            log.info("5HITTING INSIDE LIGHTS CALLBACK")
             light_state = await self._robot_hooks.get_light_state()
+            log.info(f"6HITTING LIGHT STATE {light_state}")
             is_light_on = light_state.get("rails", False)
+            log.info(f"7HITTING LIGHT ON? {is_light_on}")
 
             if self._robot_state.light_state != is_light_on:
+                log.info(f"8HITTING INSIDE BLOCK")
                 self._robot_state.light_state = is_light_on
                 await self._publish_lights()
 

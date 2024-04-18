@@ -3,11 +3,10 @@
 
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
-from typing import Callable, ContextManager, Generator, Generic, Set, TypeVar
-
+from typing import Callable, ContextManager, Generator, Generic, Set, TypeVar, Optional
 
 _MessageT = TypeVar("_MessageT")
-_CallbackT = Callable[[_MessageT], None]
+_CallbackT = Callable[[Optional[_MessageT], ...], None]
 
 
 class ReadOnlyBroker(ABC, Generic[_MessageT]):
@@ -70,7 +69,7 @@ class Broker(Generic[_MessageT], ReadOnlyBroker[_MessageT]):
         self._callbacks.add(callback)
         return unsubscribe
 
-    def publish(self, message: _MessageT) -> None:
+    def publish(self, *message: Optional[_MessageT]) -> None:
         """Call every subscribed callback, with ``message`` as the argument.
 
         The order in which the callbacks are called is undefined.
@@ -81,4 +80,4 @@ class Broker(Generic[_MessageT], ReadOnlyBroker[_MessageT]):
         # Callback order is undefined because
         # Python sets don't preserve insertion order.
         for callback in self._callbacks:
-            callback(message)
+            callback(*message)

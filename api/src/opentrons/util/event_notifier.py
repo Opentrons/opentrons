@@ -12,10 +12,15 @@ from typing import (
     Generic,
     Generator,
     ContextManager,
+    Any,
 )
 
 _MessageT = TypeVar("_MessageT")
 _CallbackT = Callable[[_MessageT], Awaitable[None]]
+
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class ReadOnlyEventNotifier(ABC, Generic[_MessageT]):
@@ -62,6 +67,8 @@ class EventNotifier(Generic[_MessageT], ReadOnlyEventNotifier[_MessageT]):
 
         try:
             self._queue.put_nowait(message)
+            log.info(f"=>(event_notifier.py:69) message {message}")
+            log.info("1HITTING NEW NOTIFY")
         except asyncio.QueueFull:
             pass
 
@@ -127,14 +134,25 @@ class EventNotifier(Generic[_MessageT], ReadOnlyEventNotifier[_MessageT]):
         while True:
             try:
                 yield await self._queue.get()
+                log.info("2HITTING NEW WAIT")
             except asyncio.CancelledError:
                 raise StopAsyncIteration
 
     async def _wait_for_event(self) -> None:
         """Indefinitely wait for an event to occur, then invoke each callback."""
         async for message in self._wait():
+            log.info("3HITTING NEW MESSAGE")
             for callback in self._callbacks:
-                await callback(message)
+                try:
+                    await callback(message)
+                except TypeError:
+                    try:
+                        log.info("8HITTING HERE.")
+                        # TOME: This stupid type error...
+                        await callback()
+                        log.info(f"{callback.__name__} was called.")
+                    except Exception as e:
+                        log.info("9HITTING THE GENERIC.")
 
 
 class NotInitializedError(Exception):

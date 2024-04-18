@@ -53,6 +53,7 @@ from opentrons_shared_data.errors.exceptions import (
     InvalidActuator,
     FirmwareUpdateFailedError,
 )
+from opentrons.util.broker import Broker
 
 from .util import use_or_initialize_loop, check_motion_bounds
 
@@ -209,6 +210,7 @@ class OT3API(
         loop: asyncio.AbstractEventLoop,
         config: OT3Config,
         feature_flags: HardwareFeatureFlags,
+        notification_broker: Broker,
     ) -> None:
         """Initialize an API instance.
 
@@ -220,6 +222,7 @@ class OT3API(
         self._config = config
         self._backend = backend
         self._loop = loop
+        self._notification_broker = notification_broker
 
         def estop_cb(event: HardwareEvent) -> None:
             self._update_estop_state(event)
@@ -366,7 +369,7 @@ class OT3API(
         update_firmware: bool = True,
         status_bar_enabled: bool = True,
         feature_flags: Optional[HardwareFeatureFlags] = None,
-        notify_publishers: Optional[Callable[[], None]] = None,
+        notify_publishers: Optional[Callable[[None], None]] = None,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
@@ -379,6 +382,10 @@ class OT3API(
             checked_config = config
         from .backends.ot3controller import OT3Controller
 
+        notification_broker = Broker()
+        if notify_publishers is not None:
+            notification_broker.subscribe(notify_publishers)
+
         # I think you'd pass the callback here, but it would be a part of callbacks[]. You'd also have some sort of general_listeners property.
         # The general listeners are all invoked by whatever classes needs them, so you build out each class interface at a time.
         backend = await OT3Controller.build(
@@ -386,6 +393,7 @@ class OT3API(
             use_usb_bus,
             check_updates=update_firmware,
             feature_flags=feature_flags,
+            notify_api=notification_broker.publish,
         )
 
         api_instance = cls(
@@ -393,6 +401,7 @@ class OT3API(
             loop=checked_loop,
             config=checked_config,
             feature_flags=feature_flags,
+            notification_broker=notification_broker,
         )
 
         await api_instance.set_status_bar_enabled(status_bar_enabled)
