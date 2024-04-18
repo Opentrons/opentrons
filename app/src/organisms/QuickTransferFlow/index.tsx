@@ -6,6 +6,7 @@ import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { CreateNewTransfer } from './CreateNewTransfer'
 import { SelectPipette } from './SelectPipette'
+import { SelectTipRack } from './SelectTipRack'
 import { quickTransferReducer } from './utils'
 
 import type { QuickTransferSetupState } from './types'
@@ -59,6 +60,16 @@ export const QuickTransferFlow = (): JSX.Element => {
   } else if (currentStep === 2) {
     modalContent = (
       <SelectPipette
+        state={state}
+        dispatch={dispatch}
+        onBack={() => setCurrentStep(prevStep => prevStep - 1)}
+        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
+        exitButtonProps={exitButtonProps}
+      />
+    )
+  } else if (currentStep === 3) {
+    modalContent = (
+      <SelectTipRack
         state={state}
         dispatch={dispatch}
         onBack={() => setCurrentStep(prevStep => prevStep - 1)}
