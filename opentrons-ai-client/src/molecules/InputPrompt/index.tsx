@@ -22,14 +22,13 @@ export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   // ToDo use react-hook-form
   return (
-    <form id="User_Prompt" onSubmit={() => {}}>
+    <form id="User_Prompt" onSubmit={() => {}} style={{ width: '100%' }}>
       <Flex
         padding={SPACING.spacing40}
         gridGap={SPACING.spacing40}
         flexDirection={DIRECTION_ROW}
         backgroundColor={COLORS.white}
-        borderRadisu={BORDERS.borderRadius4}
-        width="930px"
+        borderRadius={BORDERS.borderRadius4}
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
       >

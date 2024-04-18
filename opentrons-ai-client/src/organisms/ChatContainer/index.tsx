@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   DIRECTION_COLUMN,
-  FLEX_MAX_CONTENT,
   Flex,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
@@ -20,11 +19,15 @@ export function ChatContainer(): JSX.Element {
     <Flex
       padding={SPACING.spacing40}
       backgroundColor={COLORS.grey10}
-      width={FLEX_MAX_CONTENT}
+      width="100%"
     >
       {/* This will be updated when input textbox and function are implemented */}
       {isDummyInitial ? (
-        <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          position={POSITION_RELATIVE}
+          width="100%"
+        >
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing12}
@@ -33,7 +36,7 @@ export function ChatContainer(): JSX.Element {
             <StyledText>{t('opentronsai')}</StyledText>
             <PromptGuide />
           </Flex>
-          <Flex width="100%" position={POSITION_ABSOLUTE} bottom="0">
+          <Flex position={POSITION_ABSOLUTE} bottom="0" width="100%">
             <InputPrompt />
           </Flex>
         </Flex>
