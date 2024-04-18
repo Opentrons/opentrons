@@ -158,7 +158,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       ? mostRecentAnalysis?.robotType ?? null
       : null
 
-  const SinglePageButtonWithoutFF = (
+  const singlePageButton = (
     <PrimaryButton
       disabled={
         isCreatingRun ||
@@ -174,6 +174,17 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
         t('shared:proceed_to_setup')
       )}
     </PrimaryButton>
+  )
+
+  const offsetsComponent = (
+    <ApplyHistoricOffsets
+      offsetCandidates={offsetCandidates}
+      shouldApplyOffsets={shouldApplyOffsets}
+      setShouldApplyOffsets={setShouldApplyOffsets}
+      commands={mostRecentAnalysis?.commands ?? []}
+      labware={mostRecentAnalysis?.labware ?? []}
+      modules={mostRecentAnalysis?.modules ?? []}
+    />
   )
 
   const resetRunTimeParameters = (): void => {
@@ -214,14 +225,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           {hasRunTimeParameters ? (
             currentPage === 1 ? (
               <>
-                <ApplyHistoricOffsets
-                  offsetCandidates={offsetCandidates}
-                  shouldApplyOffsets={shouldApplyOffsets}
-                  setShouldApplyOffsets={setShouldApplyOffsets}
-                  commands={mostRecentAnalysis?.commands ?? []}
-                  labware={mostRecentAnalysis?.labware ?? []}
-                  modules={mostRecentAnalysis?.modules ?? []}
-                />
+                {offsetsComponent}
                 <PrimaryButton
                   onClick={() => setCurrentPage(2)}
                   width="100%"
@@ -253,7 +257,10 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
               </Flex>
             )
           ) : (
-            SinglePageButtonWithoutFF
+            <>
+              {offsetsComponent}
+              {singlePageButton}
+            </>
           )}
         </Flex>
       }
