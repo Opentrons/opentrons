@@ -5,7 +5,7 @@ import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
 
-import type { StyleProps } from '@opentrons/components'
+import type { StyleProps } from '../../primitives'
 
 interface StepMeterProps extends StyleProps {
   totalSteps: number
