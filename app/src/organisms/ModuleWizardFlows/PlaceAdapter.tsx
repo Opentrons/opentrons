@@ -16,7 +16,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  CreateCommand,
   getCalibrationAdapterLoadName,
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
@@ -24,16 +23,18 @@ import {
   HEATERSHAKER_MODULE_MODELS,
   TEMPERATURE_MODULE_MODELS,
   THERMOCYCLER_MODULE_MODELS,
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
 } from '@opentrons/shared-data'
 
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { LEFT_SLOTS } from './constants'
 
+import type { DeckConfiguration, CreateCommand } from '@opentrons/shared-data'
 import type { ModuleCalibrationWizardStepProps } from './types'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 
 interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
-  slotName: string
+  deckConfig: DeckConfiguration
   setCreatedAdapterId: (adapterId: string) => void
 }
 
@@ -50,8 +51,8 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
   const {
     proceed,
     goBack,
+    deckConfig,
     attachedModule,
-    slotName,
     chainRunCommands,
     setErrorMessage,
     setCreatedAdapterId,
@@ -60,6 +61,11 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
   } = props
   const { t } = useTranslation('module_wizard_flows')
   const mount = attachedPipette.mount
+  const cutoutId = deckConfig.find(
+    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
+  )?.cutoutId
+  const slotName =
+    cutoutId != null ? FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutId] : null
   const handleOnClick = (): void => {
     const calibrationAdapterLoadName = getCalibrationAdapterLoadName(
       attachedModule.moduleModel
@@ -70,15 +76,19 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       )
       return
     }
+    if (slotName == null) {
+      console.error(
+        `could not load module ${attachedModule.moduleModel} into location ${slotName}`
+      )
+      return
+    }
 
     const calibrationAdapterId = uuidv4()
     const commands: CreateCommand[] = [
       {
         commandType: 'loadModule',
         params: {
-          location: {
-            slotName: slotName,
-          },
+          location: { slotName },
           model: attachedModule.moduleModel,
           moduleId: attachedModule.id,
         },
@@ -97,15 +107,21 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       {
         commandType: 'calibration/moveToMaintenancePosition',
         params: {
-          mount: mount,
+          mount,
           maintenancePosition: 'attachInstrument',
         },
       },
     ]
     chainRunCommands?.(commands, false)
-      .then(() => setCreatedAdapterId(calibrationAdapterId))
-      .then(() => proceed())
-      .catch((e: Error) => setErrorMessage(e.message))
+      .then(() => {
+        setCreatedAdapterId(calibrationAdapterId)
+      })
+      .then(() => {
+        proceed()
+      })
+      .catch((e: Error) => {
+        setErrorMessage(e.message)
+      })
   }
 
   const moduleType = attachedModule.moduleType

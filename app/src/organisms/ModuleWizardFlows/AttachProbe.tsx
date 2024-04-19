@@ -1,12 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
-import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
-import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { Trans, useTranslation } from 'react-i18next'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { WASTE_CHUTE_CUTOUT, CreateCommand, LEFT } from '@opentrons/shared-data'
-import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import {
   Flex,
   RESPONSIVENESS,
@@ -14,13 +8,26 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { LEFT, WASTE_CHUTE_FIXTURES } from '@opentrons/shared-data'
+import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
+import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
+import attachProbe96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 
+import type {
+  CreateCommand,
+  DeckConfiguration,
+  CutoutId,
+  CutoutFixtureId,
+} from '@opentrons/shared-data'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 
 import type { ModuleCalibrationWizardStepProps } from './types'
 interface AttachProbeProps extends ModuleCalibrationWizardStepProps {
   adapterId: string | null
+  deckConfig: DeckConfiguration
+  fixtureIdByCutoutId: { [cutoutId in CutoutId]?: CutoutFixtureId }
 }
 
 const BODY_STYLE = css`
@@ -42,7 +49,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     attachedModule,
     attachedPipette,
     isOnDevice,
-    slotName,
+    deckConfig,
+    fixtureIdByCutoutId,
   } = props
   const { t, i18n } = useTranslation([
     'module_wizard_flows',
@@ -65,12 +73,11 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       probeLocation = t('pipette_wizard_flows:ninety_six_probe_location')
       break
   }
-  const wasteChuteConflict =
-    slotName === 'C3' && attachedPipette.data.channels === 96
-  const deckConfig = useDeckConfigurationQuery().data
-  const isWasteChuteOnDeck =
-    deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
-    false
+  const wasteChuteConflictWith96Channel =
+    'cutoutC3' in fixtureIdByCutoutId && attachedPipette.data.channels === 96
+  const isWasteChuteOnDeck = deckConfig.some(cc =>
+    WASTE_CHUTE_FIXTURES.includes(cc.cutoutFixtureId)
+  )
 
   const pipetteAttachProbeVid = (
     <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
@@ -101,7 +108,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         />
       </StyledText>
 
-      {wasteChuteConflict && (
+      {wasteChuteConflictWith96Channel && (
         <Banner
           type={isWasteChuteOnDeck ? 'error' : 'warning'}
           size={isOnDevice ? '1.5rem' : '1rem'}

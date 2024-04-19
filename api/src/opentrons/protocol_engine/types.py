@@ -714,6 +714,10 @@ class AreaType(Enum):
     MOVABLE_TRASH = "movableTrash"
     FIXED_TRASH = "fixedTrash"
     WASTE_CHUTE = "wasteChute"
+    THERMOCYCLER = "thermocycler"
+    HEATER_SHAKER = "heaterShaker"
+    TEMPERATURE = "temperatureModule"
+    MAGNETICBLOCK = "magneticBlock"
 
 
 @dataclass(frozen=True)
@@ -820,7 +824,10 @@ NozzleLayoutConfigurationType = Union[
 ]
 
 # TODO make the below some sort of better type
-DeckConfigurationType = List[Tuple[str, str]]  # cutout_id, cutout_fixture_id
+# TODO This should instead contain a proper cutout fixture type
+DeckConfigurationType = List[
+    Tuple[str, str, Optional[str]]
+]  # cutout_id, cutout_fixture_id, opentrons_module_serial_number
 
 
 class TipPresenceStatus(str, Enum):

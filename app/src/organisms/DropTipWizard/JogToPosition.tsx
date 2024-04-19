@@ -148,7 +148,6 @@ interface JogToPositionProps {
   handleJog: Jog
   handleProceed: () => void
   body: string
-  isRobotMoving: boolean
   currentStep: string
   isOnDevice: boolean
 }
@@ -161,7 +160,6 @@ export const JogToPosition = (
     handleJog,
     handleProceed,
     body,
-    isRobotMoving,
     currentStep,
     isOnDevice,
   } = props
@@ -171,10 +169,10 @@ export const JogToPosition = (
     setShowPositionConfirmation,
   ] = React.useState(false)
   // Includes special case homing only present in this step.
-  const [isRobotInMotion, setIsRobotInMotion] = React.useState(isRobotMoving)
+  const [isRobotInMotion, setIsRobotInMotion] = React.useState(false)
 
   const onGoBack = (): void => {
-    setIsRobotInMotion(() => true)
+    setIsRobotInMotion(true)
     handleGoBack()
   }
 
@@ -199,11 +197,6 @@ export const JogToPosition = (
         currentStep={currentStep}
       />
     )
-  }
-
-  // Moving due to "Exit" or "Go back" click.
-  if (isRobotInMotion) {
-    return <InProgressModal description={t('stand_back_exiting')} />
   }
 
   if (isOnDevice) {

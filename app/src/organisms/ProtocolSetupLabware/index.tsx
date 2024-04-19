@@ -108,6 +108,7 @@ export function ProtocolSetupLabware({
     mostRecentAnalysis != null
       ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
       : []
+
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
     attachedModules,
     protocolModulesInfo

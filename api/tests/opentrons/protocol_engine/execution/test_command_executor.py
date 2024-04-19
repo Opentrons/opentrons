@@ -360,8 +360,8 @@ async def test_execute(
             False,
         ),
         (
-            EStopActivatedError("oh no"),
-            matchers.ErrorMatching(PE_EStopActivatedError, match="oh no"),
+            EStopActivatedError(),
+            matchers.ErrorMatching(PE_EStopActivatedError),
             True,
         ),
         (

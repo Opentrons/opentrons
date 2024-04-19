@@ -11,17 +11,25 @@ import {
   CONFIG_STYLE_READ_ONLY,
   FIXTURE_HEIGHT,
   STAGING_AREA_FIXTURE_WIDTH,
-  SINGLE_SLOT_FIXTURE_WIDTH,
+  COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
   WASTE_CHUTE_DISPLAY_NAME,
   Y_ADJUSTMENT,
 } from './constants'
 
-import type { CutoutId, DeckDefinition } from '@opentrons/shared-data'
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckDefinition,
+} from '@opentrons/shared-data'
 
 interface WasteChuteConfigFixtureProps {
   deckDefinition: DeckDefinition
   fixtureLocation: CutoutId
-  handleClickRemove?: (fixtureLocation: CutoutId) => void
+  cutoutFixtureId: CutoutFixtureId
+  handleClickRemove?: (
+    fixtureLocation: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ) => void
   hasStagingAreas?: boolean
 }
 
@@ -32,6 +40,7 @@ export function WasteChuteConfigFixture(
     deckDefinition,
     handleClickRemove,
     fixtureLocation,
+    cutoutFixtureId,
     hasStagingAreas = false,
   } = props
 
@@ -52,7 +61,9 @@ export function WasteChuteConfigFixture(
   return (
     <RobotCoordsForeignObject
       width={
-        hasStagingAreas ? STAGING_AREA_FIXTURE_WIDTH : SINGLE_SLOT_FIXTURE_WIDTH
+        hasStagingAreas
+          ? STAGING_AREA_FIXTURE_WIDTH
+          : COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH
       }
       height={FIXTURE_HEIGHT}
       x={x}
@@ -69,7 +80,7 @@ export function WasteChuteConfigFixture(
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null
-            ? () => handleClickRemove(fixtureLocation)
+            ? () => handleClickRemove(fixtureLocation, cutoutFixtureId)
             : () => {}
         }
       >

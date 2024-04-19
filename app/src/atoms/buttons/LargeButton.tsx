@@ -7,6 +7,7 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   Icon,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyledText,
@@ -20,7 +21,8 @@ interface LargeButtonProps extends StyleProps {
   onClick: () => void
   buttonType?: LargeButtonTypes
   buttonText: React.ReactNode
-  iconName: IconName
+  iconName?: IconName
+  subtext?: string
   disabled?: boolean
 }
 
@@ -29,6 +31,7 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
     buttonType = 'primary',
     buttonText,
     iconName,
+    subtext,
     disabled = false,
     ...buttonProps
   } = props
@@ -110,23 +113,28 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       disabled={disabled}
       {...buttonProps}
     >
-      <StyledText
-        fontSize="2rem"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        lineHeight="2.625rem"
-      >
-        {buttonText}
-      </StyledText>
-      <Icon
-        name={iconName}
-        aria-label={`${iconName} icon`}
-        color={
-          disabled
-            ? COLORS.grey50
-            : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
-        }
-        size="5rem"
-      />
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <StyledText css={TYPOGRAPHY.level3HeaderSemiBold}>
+          {buttonText}
+        </StyledText>
+        {subtext ? (
+          <StyledText css={TYPOGRAPHY.level3HeaderRegular}>
+            {subtext}
+          </StyledText>
+        ) : null}
+      </Flex>
+      {iconName ? (
+        <Icon
+          name={iconName}
+          aria-label={`${iconName} icon`}
+          color={
+            disabled
+              ? COLORS.grey50
+              : LARGE_BUTTON_PROPS_BY_TYPE[buttonType].iconColor
+          }
+          size="5rem"
+        />
+      ) : null}
     </Btn>
   )
 }

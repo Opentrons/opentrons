@@ -363,9 +363,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
         elif isinstance(action, StopAction):
             if not self._state.run_result:
                 self._state.queue_status = QueueStatus.PAUSED
-                self._state.run_result = RunResult.STOPPED
                 if action.from_estop:
                     self._state.stopped_by_estop = True
+                    self._state.run_result = RunResult.FAILED
+                else:
+                    self._state.run_result = RunResult.STOPPED
 
         elif isinstance(action, FinishAction):
             if not self._state.run_result:
@@ -379,12 +381,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 else:
                     self._state.run_result = RunResult.STOPPED
 
-                if action.error_details:
-                    self._state.run_error = self._map_run_exception_to_error_occurrence(
-                        action.error_details.error_id,
-                        action.error_details.created_at,
-                        action.error_details.error,
-                    )
+            if not self._state.run_error and action.error_details:
+                self._state.run_error = self._map_run_exception_to_error_occurrence(
+                    action.error_details.error_id,
+                    action.error_details.created_at,
+                    action.error_details.error,
+                )
 
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.PAUSED
