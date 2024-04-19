@@ -5,7 +5,7 @@ from opentrons.ordered_set import OrderedSet
 
 from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
 from opentrons.protocol_engine.state.command_history import CommandHistory, CommandEntry
-from opentrons.protocol_engine.commands import CommandIntent
+from opentrons.protocol_engine.commands import CommandIntent, CommandStatus
 
 from .command_fixtures import (
     create_queued_command,
@@ -206,14 +206,32 @@ def test_set_fixit_running_command_id(command_history: CommandHistory) -> None:
     """It should set the ID of the currently running fixit command."""
     command_entry = create_queued_command()
     command_history.set_command_queued(command_entry)
-    command_history.set_command_running(command_entry)
-    fixit_command_entry = create_queued_command(intent=CommandIntent.FIXIT)
+    running_command = command_entry.copy(
+        update={
+            "status": CommandStatus.RUNNING,
+        }
+    )
+    command_history.set_command_running(running_command)
+    finished_command = command_entry.copy(
+        update={
+            "status": CommandStatus.SUCCEEDED,
+        }
+    )
+    command_history.set_command_succeeded(finished_command)
+    fixit_command_entry = create_queued_command(
+        command_id="fixit-id", intent=CommandIntent.FIXIT
+    )
     command_history.set_command_queued(fixit_command_entry)
-    command_history.set_command_running(fixit_command_entry)
-    assert command_history.get_running_command() == fixit_command_entry
+    fixit_running_command = fixit_command_entry.copy(
+        update={
+            "status": CommandStatus.RUNNING,
+        }
+    )
+    command_history.set_command_running(fixit_running_command)
+    assert command_history.get_running_command().command == fixit_running_command
     assert command_history.get_all_commands() == [
-        command_entry.command,
-        fixit_command_entry.command,
+        finished_command,
+        fixit_running_command,
     ]
 
 
