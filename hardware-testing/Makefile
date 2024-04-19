@@ -109,7 +109,7 @@ test-gravimetric-single:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 50
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 200
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 1 --trials 1 --increment --no-blank --tip 1000
-	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1 --trials 240 --cavity --no-blank
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 50 --channels 1  --cavity --no-blank
 
 .PHONY: test-gravimetric-multi
 test-gravimetric-multi:
