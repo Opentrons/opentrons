@@ -1,4 +1,5 @@
 import {
+  RUN_STATUSES_TERMINAL,
   RUN_STATUS_AWAITING_RECOVERY,
   RUN_STATUS_FAILED,
   RUN_STATUS_IDLE,
@@ -29,9 +30,8 @@ export function useRunStatuses(): RunStatusesInfo {
     runStatus === RUN_STATUS_RUNNING ||
     runStatus === RUN_STATUS_AWAITING_RECOVERY
   const isRunTerminal =
-    runStatus === RUN_STATUS_SUCCEEDED ||
-    runStatus === RUN_STATUS_STOPPED ||
-    runStatus === RUN_STATUS_FAILED
+    // @ts-expect-error: runStatus expected to not necessarily be in RUN_STATUSES_TERMINAL
+    runStatus != null ? RUN_STATUSES_TERMINAL.includes(runStatus) : false
   const isRunStill = isRunTerminal || isRunIdle
 
   return { isRunStill, isRunTerminal, isRunIdle, isRunRunning }

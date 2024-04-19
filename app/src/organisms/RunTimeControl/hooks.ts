@@ -12,6 +12,7 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_ACTION_TYPE_STOP,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
@@ -79,11 +80,7 @@ export function useRunStatus(
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
     enabled:
       lastRunStatus.current == null ||
-      !([
-        RUN_STATUS_FAILED,
-        RUN_STATUS_SUCCEEDED,
-        RUN_STATUS_STOPPED,
-      ] as RunStatus[]).includes(lastRunStatus.current),
+      !(RUN_STATUSES_TERMINAL as RunStatus[]).includes(lastRunStatus.current),
     onSuccess: data => (lastRunStatus.current = data?.data?.status ?? null),
     ...options,
   })
