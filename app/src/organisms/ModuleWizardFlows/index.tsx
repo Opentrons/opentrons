@@ -300,15 +300,7 @@ export const ModuleWizardFlows = (
   } else if (isExiting) {
     modalContent = <InProgressModal description={t('stand_back_exiting')} />
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
-    modalContent = (
-      <BeforeBeginning
-        {...currentStep}
-        {...calibrateBaseProps}
-        createMaintenanceRun={createTargetedMaintenanceRun}
-        isCreateLoading={isCreateLoading}
-        createdMaintenanceRunId={createdMaintenanceRunId}
-      />
-    )
+    modalContent = <BeforeBeginning {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
     modalContent = (
       <SelectLocation
@@ -327,6 +319,9 @@ export const ModuleWizardFlows = (
         {...calibrateBaseProps}
         deckConfig={deckConfig}
         setCreatedAdapterId={setCreatedAdapterId}
+        createMaintenanceRun={createTargetedMaintenanceRun}
+        isCreateLoading={isCreateLoading}
+        createdMaintenanceRunId={createdMaintenanceRunId}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {

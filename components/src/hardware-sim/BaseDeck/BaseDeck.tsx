@@ -105,10 +105,12 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       fixture.cutoutFixtureId != null &&
       (SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId) ||
         // If module fixture is loaded, still visualize singleSlotFixture underneath for consistency
-        Object.entries(MODULE_FIXTURES_BY_MODEL).reduce<CutoutFixtureId[]>(
-          (acc, [_model, fixtures]) => [...acc, ...fixtures],
-          []
-        ))
+        Object.entries(MODULE_FIXTURES_BY_MODEL)
+          .reduce<CutoutFixtureId[]>(
+            (acc, [_model, fixtures]) => [...acc, ...fixtures],
+            []
+          )
+          .includes(fixture.cutoutFixtureId))
   )
   const stagingAreaFixtures = deckConfig.filter(
     fixture =>
