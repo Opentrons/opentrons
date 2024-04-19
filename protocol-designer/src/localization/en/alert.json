@@ -218,6 +218,11 @@
   "export": "Export",
   "import": "Import",
   "module_placement": {
+    "SLOTS_OCCUPIED": {
+      "title": "Cannot place module",
+      "single": "Slot {{slotName}} is occupied",
+      "multi": "Multiple slots are occupied"
+    },
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",
       "body": "Slot {{selectedSlot}} is occupied. Navigate to the design tab and remove the labware or remove the additional item to continue."
