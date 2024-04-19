@@ -48,6 +48,7 @@ interface LocationConflictModalProps {
   onCloseClick: () => void
   cutoutId: CutoutId
   deckDef: DeckDefinition
+  robotName: string
   missingLabwareDisplayName?: string | null
   requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
@@ -60,6 +61,7 @@ export const LocationConflictModal = (
   const {
     onCloseClick,
     cutoutId,
+    robotName,
     missingLabwareDisplayName,
     requiredFixtureId,
     requiredModule,
@@ -113,10 +115,10 @@ export const LocationConflictModal = (
         return existingCutoutConfig.cutoutId in moduleFixtureIdByCutoutId &&
           replacementCutoutFixtureId != null
           ? {
-              ...existingCutoutConfig,
-              cutoutFixtureId: replacementCutoutFixtureId,
-              opentronsModuleSerialNumber: moduleSerialNumber,
-            }
+            ...existingCutoutConfig,
+            cutoutFixtureId: replacementCutoutFixtureId,
+            opentronsModuleSerialNumber: moduleSerialNumber,
+          }
           : existingCutoutConfig
       })
       updateDeckConfiguration(newDeckConfig)
@@ -131,10 +133,10 @@ export const LocationConflictModal = (
       const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
         fixture.cutoutId === cutoutId
           ? {
-              ...fixture,
-              cutoutFixtureId: requiredFixtureId,
-              opentronsModuleSerialNumber: undefined,
-            }
+            ...fixture,
+            cutoutFixtureId: requiredFixtureId,
+            opentronsModuleSerialNumber: undefined,
+          }
           : fixture
       )
       updateDeckConfiguration(newRequiredFixtureDeckConfig)
@@ -153,7 +155,7 @@ export const LocationConflictModal = (
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }
 
-  if (showModuleSelect && requiredModule) {
+  if (showModuleSelect && requiredModule != null) {
     return createPortal(
       <ChooseModuleToConfigureModal
         handleConfigureModule={handleConfigureModule}
@@ -161,10 +163,15 @@ export const LocationConflictModal = (
         onCloseClick={onCloseClick}
         isOnDevice={isOnDevice}
         deckDef={deckDef}
+        robotName={robotName}
+        displaySlotName={displaySlotName}
       />,
       getTopPortalEl()
     )
   }
+  const displaySlotName = isThermocycler
+    ? 'A1 + B1'
+    : getCutoutDisplayName(cutoutId)
   return createPortal(
     isOnDevice ? (
       <Modal
@@ -200,11 +207,7 @@ export const LocationConflictModal = (
               fontWeight={TYPOGRAPHY.fontWeightBold}
               paddingBottom={SPACING.spacing8}
             >
-              {t('slot_location', {
-                slotName: isThermocycler
-                  ? 'A1 + B1'
-                  : getCutoutDisplayName(cutoutId),
-              })}
+              {t('slot_location', { slotName: displaySlotName })}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -303,11 +306,7 @@ export const LocationConflictModal = (
               fontSize={TYPOGRAPHY.fontSizeH4}
               fontWeight={TYPOGRAPHY.fontWeightBold}
             >
-              {t('slot_location', {
-                slotName: isThermocycler
-                  ? 'A1 + B1'
-                  : getCutoutDisplayName(cutoutId),
-              })}
+              {t('slot_location', { slotName: displaySlotName })}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_COLUMN}
