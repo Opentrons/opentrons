@@ -6,10 +6,12 @@ export function createSplash(
   config: HostConfig,
   file: File
 ): ResponsePromise<void> {
-  const formData = new FormData()
+  // sanitize file name to ensure no spaces
   const renamedFile = new File([file], file.name.replace(' ', '_'), {
     type: 'image/png',
   })
+
+  const formData = new FormData()
   formData.append('file', renamedFile)
 
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type

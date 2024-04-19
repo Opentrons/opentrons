@@ -8,6 +8,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   Link,
   PrimaryButton,
   SPACING,
@@ -17,6 +18,7 @@ import {
 import {
   useCreateSplashMutation,
   useRobotSettingsQuery,
+  useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '../../../../../atoms/buttons'
@@ -24,7 +26,6 @@ import { InputField } from '../../../../../atoms/InputField'
 import { MultiSlideout } from '../../../../../atoms/Slideout/MultiSlideout'
 import { UploadInput } from '../../../../../molecules/UploadInput'
 import { restartRobot } from '../../../../../redux/robot-admin'
-import { updateSetting } from '../../../../../redux/robot-settings'
 
 import type { RobotSettingsField } from '@opentrons/api-client'
 import type { Dispatch } from '../../../../../redux/types'
@@ -48,7 +49,6 @@ export function FactoryModeSlideout({
 
   const dispatch = useDispatch<Dispatch>()
 
-  const { createSplash } = useCreateSplashMutation()
   const { settings } = useRobotSettingsQuery().data ?? {}
   const oemModeSetting = (settings ?? []).find(
     (setting: RobotSettingsField) => setting?.id === 'enableOEMMode'
@@ -58,6 +58,30 @@ export function FactoryModeSlideout({
   const [currentStep, setCurrentStep] = React.useState<number>(1)
   const [toggleValue, setToggleValue] = React.useState<boolean>(false)
   const [file, setFile] = React.useState<File | null>(null)
+  const [isUploading, setIsUploading] = React.useState<boolean>(false)
+
+  const onFinishCompleteClick = (): void => {
+    dispatch(restartRobot(robotName))
+    onCloseClick()
+    setIsUploading(false)
+  }
+
+  const { createSplash } = useCreateSplashMutation({
+    onSuccess: () => {
+      onFinishCompleteClick()
+    },
+  })
+
+  const { updateRobotSetting } = useUpdateRobotSettingMutation({
+    onSuccess: () => {
+      // TODO: issue UPDATE_SETTING_SUCCESS action also because we haven't migrated away from redux
+      if (toggleValue && file != null) {
+        createSplash({ file })
+      } else {
+        onFinishCompleteClick()
+      }
+    },
+  })
 
   const {
     handleSubmit,
@@ -83,16 +107,8 @@ export function FactoryModeSlideout({
   }
 
   const handleCompleteClick: React.MouseEventHandler<Element> = () => {
-    // TODO: loading spinner, wait for update setting response before sending image
-    dispatch(updateSetting(robotName, 'enableOEMMode', toggleValue))
-
-    if (toggleValue && file != null) {
-      createSplash({ file })
-    }
-
-    // TODO: wait for createSplash response before restarting robot and closing slideout
-    dispatch(restartRobot(robotName))
-    onCloseClick()
+    setIsUploading(true)
+    updateRobotSetting({ id: 'enableOEMMode', value: toggleValue })
   }
 
   const handleChooseFile = (file: File): void => {
@@ -136,11 +152,15 @@ export function FactoryModeSlideout({
           ) : null}
           {currentStep === 2 ? (
             <PrimaryButton
-              disabled={toggleValue && file == null}
+              disabled={(toggleValue && file == null) || isUploading}
               onClick={handleCompleteClick}
               width="100%"
             >
-              {t('complete_and_restart_robot')}
+              {isUploading ? (
+                <Icon name="ot-spinner" spin size="1rem" />
+              ) : (
+                t('complete_and_restart_robot')
+              )}
             </PrimaryButton>
           ) : null}
         </>
