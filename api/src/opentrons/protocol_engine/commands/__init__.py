@@ -120,6 +120,14 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
+from .reload_labware import (
+    ReloadLabware,
+    ReloadLabwareParams,
+    ReloadLabwareCreate,
+    ReloadLabwareResult,
+    ReloadLabwareCommandType,
+)
+
 from .load_liquid import (
     LoadLiquid,
     LoadLiquidParams,
@@ -402,6 +410,12 @@ __all__ = [
     "LoadLabwareParams",
     "LoadLabwareResult",
     "LoadLabwareCommandType",
+    # reload labware command models
+    "ReloadLabware",
+    "ReloadLabwareCreate",
+    "ReloadLabwareParams",
+    "ReloadLabwareResult",
+    "ReloadLabwareCommandType",
     # load module command models
     "LoadModule",
     "LoadModuleCreate",
