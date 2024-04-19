@@ -324,6 +324,20 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.command_history.clear_queue()
                 else:
                     assert_never(action.type)
+            elif prev_entry.command.intent == CommandIntent.FIXIT:
+                other_command_ids_to_fail = (
+                    self._state.command_history.get_fixit_queue_ids()
+                )
+                for command_id in other_command_ids_to_fail:
+                    # TODO(mc, 2022-06-06): add new "cancelled" status or similar
+                    self._update_to_failed(
+                        command_id=command_id,
+                        failed_at=action.failed_at,
+                        error_occurrence=None,
+                        error_recovery_type=None,
+                        notes=None,
+                    )
+                self._state.command_history.clear_fixit_queue()
             else:
                 assert_never(prev_entry.command.intent)
 

@@ -46,7 +46,7 @@ from .command_fixtures import (
 )
 
 
-def get_command_view(
+def get_command_view(  # noqa: C901
     queue_status: QueueStatus = QueueStatus.SETUP,
     run_completed_at: Optional[datetime] = None,
     run_started_at: Optional[datetime] = None,
