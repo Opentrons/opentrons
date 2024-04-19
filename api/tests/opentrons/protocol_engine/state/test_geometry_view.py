@@ -2567,3 +2567,36 @@ def test_get_offset_location_module_with_adapter(
         nice_adapter_definition
     )
     assert offset_location.moduleModel == ModuleModel.TEMPERATURE_MODULE_V2
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_get_offset_fails_with_off_deck_labware(
+    decoy: Decoy,
+    labware_store: LabwareStore,
+    nice_labware_definition: LabwareDefinition,
+    subject: GeometryView,
+) -> None:
+    """You cannot get the offset location for a labware loaded OFF_DECK."""
+    action = SucceedCommandAction(
+        command=LoadLabware(
+            id="load-labware-1",
+            createdAt=datetime.now(),
+            key="load-labware-1",
+            status=CommandStatus.SUCCEEDED,
+            result=LoadLabwareResult(
+                labwareId="labware-id-1",
+                definition=nice_labware_definition,
+                offsetId=None,
+            ),
+            params=LoadLabwareParams(
+                location=OFF_DECK_LOCATION,
+                loadName=nice_labware_definition.parameters.loadName,
+                namespace=nice_labware_definition.namespace,
+                version=nice_labware_definition.version,
+            ),
+        ),
+        private_result=None,
+    )
+    labware_store.handle_action(action)
+    offset_location = subject.get_offset_location("labware-id-1")
+    assert offset_location is None
