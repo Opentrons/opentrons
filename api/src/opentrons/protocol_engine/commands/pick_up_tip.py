@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from ..types import DeckPoint
-from ..errors import TipNotAttachedError
 from .pipetting_common import (
     PipetteIdMixin,
     WellLocationMixin,
