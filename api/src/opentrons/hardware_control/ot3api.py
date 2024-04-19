@@ -1677,8 +1677,8 @@ class OT3API(
                 # home the axis
                 await self._home_axis(axis)
 
-        await self._cache_current_position()
-        await self._cache_encoder_position()
+            await self._cache_current_position()
+            await self._cache_encoder_position()
 
     # Gantry/frame (i.e. not pipette) config API
     @property

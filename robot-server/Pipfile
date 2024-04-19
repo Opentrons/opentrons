@@ -36,6 +36,7 @@ sqlalchemy2-stubs = "==0.0.2a21"
 # limited by tavern
 python-box = "==6.1.0"
 types-paho-mqtt = "==1.6.0.20240106"
+performance-metrics = {file = "../performance-metrics", editable = true}
 
 [packages]
 anyio = "==3.7.1"

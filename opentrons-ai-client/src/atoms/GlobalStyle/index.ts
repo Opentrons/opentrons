@@ -4,15 +4,12 @@ import '@fontsource/public-sans'
 import '@fontsource/public-sans/600.css'
 import '@fontsource/public-sans/700.css'
 
-export const GlobalStyle = createGlobalStyle<{ isOnDevice?: boolean }>`
+export const GlobalStyle = createGlobalStyle`
   * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: ${props =>
-      props.isOnDevice ?? false
-        ? 'Public Sans, DejaVu Sans'
-        : 'Open Sans'}, sans-serif;
+    font-family: 'Public Sans', 'sans-serif';
   }
 
   html,

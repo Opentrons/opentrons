@@ -2,8 +2,12 @@
   "machine": "OT-3 Standard",
   "strict_attached_instruments": false,
   "attached_instruments": {
+    "right": {
+      "model": "p1000_single_3.4",
+      "id": "321"
+    },
     "left": {
-      "model": "p1000_96_v1",
+      "model": "p50_single_3.4",
       "id": "123"
     }
   },
