@@ -16,12 +16,11 @@ export type AttachedProtocolModuleMatch = ProtocolModuleInfo & {
   attachedModuleMatch: AttachedModule | null
 }
 
-
 // some logic copied from useModuleRenderInfoForProtocolById
 export function getAttachedProtocolModuleMatches(
   attachedModules: AttachedModule[],
   protocolModulesInfo: ProtocolModuleInfo[],
-  deckConfig: DeckConfiguration,
+  deckConfig: DeckConfiguration
 ): AttachedProtocolModuleMatch[] {
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE) // this is only used for Flex ODD
   const matchedAttachedModules: AttachedModule[] = []
@@ -46,7 +45,8 @@ export function getAttachedProtocolModuleMatches(
             // check id instead of object reference in useModuleRenderInfoForProtocolById
             !matchedAttachedModules.some(
               matchedAttachedModule =>
-                matchedAttachedModule.serialNumber === attachedModule.serialNumber
+                matchedAttachedModule.serialNumber ===
+                attachedModule.serialNumber
             ) &&
             // check deck config has module with expected serial number in expected location
             deckConfig.some(
@@ -101,18 +101,18 @@ export function getUnmatchedModulesForProtocol(
       )
       return moduleTypeMatchIndex !== -1
         ? {
-          ...acc,
-          // remove matched module from remaining modules list
-          remainingAttachedModules: acc.remainingAttachedModules.filter(
-            (_remainingAttachedModule, index) =>
-              index !== moduleTypeMatchIndex
-          ),
-        }
+            ...acc,
+            // remove matched module from remaining modules list
+            remainingAttachedModules: acc.remainingAttachedModules.filter(
+              (_remainingAttachedModule, index) =>
+                index !== moduleTypeMatchIndex
+            ),
+          }
         : {
-          ...acc,
-          // append unmatchable module to list of requested modules that are missing a physical match
-          missingModuleIds: [...acc.missingModuleIds, module.moduleId],
-        }
+            ...acc,
+            // append unmatchable module to list of requested modules that are missing a physical match
+            missingModuleIds: [...acc.missingModuleIds, module.moduleId],
+          }
     },
     { missingModuleIds: [], remainingAttachedModules: attachedModules }
   )

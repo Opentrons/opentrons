@@ -78,7 +78,7 @@ export function FixtureTable({
   const sortedDeckConfigCompatibility = requiredDeckConfigCompatibility.sort(
     a =>
       a.cutoutFixtureId != null &&
-        a.compatibleCutoutFixtureIds.includes(a.cutoutFixtureId)
+      a.compatibleCutoutFixtureIds.includes(a.cutoutFixtureId)
         ? 1
         : -1
   )
@@ -88,19 +88,18 @@ export function FixtureTable({
       {sortedDeckConfigCompatibility.map((fixtureCompatibility, index) => {
         return fixtureCompatibility.requiredAddressableAreas.some(raa =>
           FLEX_MODULE_ADDRESSABLE_AREAS.includes(raa)
-        ) ? null
-          : (
-            <FixtureTableItem
-              key={`FixtureTableItem_${index}`}
-              {...fixtureCompatibility}
-              lastItem={index === requiredFixtureDetails.length - 1}
-              setSetupScreen={setSetupScreen}
-              setCutoutId={setCutoutId}
-              setProvidedFixtureOptions={setProvidedFixtureOptions}
-              deckDef={deckDef}
-              robotName={robotName}
-            />
-          )
+        ) ? null : (
+          <FixtureTableItem
+            key={`FixtureTableItem_${index}`}
+            {...fixtureCompatibility}
+            lastItem={index === requiredFixtureDetails.length - 1}
+            setSetupScreen={setSetupScreen}
+            setCutoutId={setCutoutId}
+            setProvidedFixtureOptions={setProvidedFixtureOptions}
+            deckDef={deckDef}
+            robotName={robotName}
+          />
+        )
       })}
     </>
   ) : null
@@ -163,10 +162,10 @@ function FixtureTableItem({
             isConflictingFixtureConfigured
               ? () => setShowLocationConflictModal(true)
               : () => {
-                setCutoutId(cutoutId)
-                setProvidedFixtureOptions(compatibleCutoutFixtureIds)
-                setSetupScreen('deck configuration')
-              }
+                  setCutoutId(cutoutId)
+                  setProvidedFixtureOptions(compatibleCutoutFixtureIds)
+                  setSetupScreen('deck configuration')
+                }
           }
         />
       </>
@@ -208,7 +207,7 @@ function FixtureTableItem({
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {cutoutFixtureId != null &&
-              (isCurrentFixtureCompatible || isRequiredSingleSlotMissing)
+            (isCurrentFixtureCompatible || isRequiredSingleSlotMissing)
               ? getFixtureDisplayName(cutoutFixtureId)
               : getFixtureDisplayName(compatibleCutoutFixtureIds?.[0])}
           </StyledText>

@@ -27,8 +27,8 @@ const enumerateMassStorage = (path: string): Promise<string[]> =>
     .then(entries =>
       entries.length === 0
         ? new Promise<void>(resolve =>
-          setTimeout(resolve, MOUNT_ENUMERATION_DELAY_MS)
-        )
+            setTimeout(resolve, MOUNT_ENUMERATION_DELAY_MS)
+          )
         : new Promise<void>(resolve => resolve())
     )
     .then(() => fsPromises.readdir(path, { withFileTypes: true }))
@@ -38,8 +38,8 @@ const enumerateMassStorage = (path: string): Promise<string[]> =>
           entry.isDirectory() && !isWeirdDirectoryAndShouldSkip(entry.name)
             ? enumerateMassStorage(join(path, entry.name))
             : new Promise<string[]>(resolve =>
-              resolve([join(path, entry.name)])
-            )
+                resolve([join(path, entry.name)])
+              )
         )
       )
     )
@@ -150,7 +150,7 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
           )
           // we don't care if this fails because it's racing the system removing
           // the mount dir in the common case
-          fsPromises.unlink(mountPath).catch(() => { })
+          fsPromises.unlink(mountPath).catch(() => {})
         }
       })
     }

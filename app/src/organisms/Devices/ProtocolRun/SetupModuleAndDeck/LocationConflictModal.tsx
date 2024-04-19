@@ -115,10 +115,10 @@ export const LocationConflictModal = (
         return existingCutoutConfig.cutoutId in moduleFixtureIdByCutoutId &&
           replacementCutoutFixtureId != null
           ? {
-            ...existingCutoutConfig,
-            cutoutFixtureId: replacementCutoutFixtureId,
-            opentronsModuleSerialNumber: moduleSerialNumber,
-          }
+              ...existingCutoutConfig,
+              cutoutFixtureId: replacementCutoutFixtureId,
+              opentronsModuleSerialNumber: moduleSerialNumber,
+            }
           : existingCutoutConfig
       })
       updateDeckConfiguration(newDeckConfig)
@@ -133,10 +133,10 @@ export const LocationConflictModal = (
       const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
         fixture.cutoutId === cutoutId
           ? {
-            ...fixture,
-            cutoutFixtureId: requiredFixtureId,
-            opentronsModuleSerialNumber: undefined,
-          }
+              ...fixture,
+              cutoutFixtureId: requiredFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
           : fixture
       )
       updateDeckConfiguration(newRequiredFixtureDeckConfig)

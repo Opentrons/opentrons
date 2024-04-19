@@ -131,7 +131,7 @@ function ModuleTableItem({
   setPrepCommandErrorMessage,
   conflictedFixture,
   deckDef,
-  robotName
+  robotName,
 }: ModuleTableItemProps): JSX.Element {
   const { i18n, t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
 
@@ -264,12 +264,12 @@ function ModuleTableItem({
         alignItems={ALIGN_CENTER}
         backgroundColor={
           isModuleReady &&
-            module.attachedModuleMatch?.moduleOffset?.last_modified != null &&
-            conflictedFixture == null
+          module.attachedModuleMatch?.moduleOffset?.last_modified != null &&
+          conflictedFixture == null
             ? COLORS.green35
             : isNonConnectingModule && conflictedFixture == null
-              ? COLORS.grey35
-              : COLORS.yellow35
+            ? COLORS.grey35
+            : COLORS.yellow35
         }
         borderRadius={BORDERS.borderRadius8}
         cursor="inherit"

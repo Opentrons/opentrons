@@ -43,7 +43,7 @@ describe('LocationConflictModal', () => {
       cutoutId: 'cutoutB3',
       requiredFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
       deckDef: ot3StandardDeckV5 as any,
-      robotName: 'otie'
+      robotName: 'otie',
     }
     vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
     vi.mocked(useDeckConfigurationQuery).mockReturnValue({
@@ -78,7 +78,7 @@ describe('LocationConflictModal', () => {
       cutoutId: 'cutoutB3',
       requiredModule: 'heaterShakerModuleV1',
       deckDef: ot3StandardDeckV5 as any,
-      robotName: 'otie'
+      robotName: 'otie',
     }
     render(props)
     screen.getByText('Protocol specifies')
@@ -105,7 +105,7 @@ describe('LocationConflictModal', () => {
       requiredFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
       missingLabwareDisplayName: 'a tiprack',
       deckDef: ot3StandardDeckV5 as any,
-      robotName: 'otie'
+      robotName: 'otie',
     }
     render(props)
     screen.getByText('Deck location conflict')

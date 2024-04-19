@@ -58,7 +58,7 @@ export const ChooseModuleToConfigureModal = (
     requiredModuleModel,
     isOnDevice,
     robotName,
-    displaySlotName
+    displaySlotName,
   } = props
   const { t } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
@@ -110,32 +110,38 @@ export const ChooseModuleToConfigureModal = (
   const handleCancelRun = (): void => {
     if (currentRunId != null) stopRun(currentRunId)
   }
-  const handleNavigateToDeviceDetails = (): void => { history.push(`/devices/${robotName}`) }
+  const handleNavigateToDeviceDetails = (): void => {
+    history.push(`/devices/${robotName}`)
+  }
   const emptyState = (
     <Flex>
-      <StyledText as="p">{t('there_are_no_unconfigured_modules', { module: getModuleDisplayName(requiredModuleModel) })}</StyledText>
-      {isOnDevice
-        ? (
-          <SmallButton
-            onClick={handleCancelRun}
-            buttonText={t('cancel_protocol_and_edit_deck_config')} />
-        ) : (
-          <PrimaryButton onClick={handleNavigateToDeviceDetails}>
-            {t('update_deck_config')}
-          </PrimaryButton>
-        )}
+      <StyledText as="p">
+        {t('there_are_no_unconfigured_modules', {
+          module: getModuleDisplayName(requiredModuleModel),
+        })}
+      </StyledText>
+      {isOnDevice ? (
+        <SmallButton
+          onClick={handleCancelRun}
+          buttonText={t('cancel_protocol_and_edit_deck_config')}
+        />
+      ) : (
+        <PrimaryButton onClick={handleNavigateToDeviceDetails}>
+          {t('update_deck_config')}
+        </PrimaryButton>
+      )}
     </Flex>
   )
 
-  const contents = fixtureOptions.length > 0
-    ? (
+  const contents =
+    fixtureOptions.length > 0 ? (
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p">
-          {t('add_this_deck_hardware')}
-        </StyledText>
+        <StyledText as="p">{t('add_this_deck_hardware')}</StyledText>
         {fixtureOptions}
       </Flex>
-    ) : emptyState
+    ) : (
+      emptyState
+    )
 
   return createPortal(
     isOnDevice ? (

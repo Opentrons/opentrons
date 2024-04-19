@@ -2,7 +2,14 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
-import { COLORS, DIRECTION_COLUMN, Flex, SPACING, StyledText, TYPOGRAPHY } from '@opentrons/components'
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -144,7 +151,9 @@ export function ProtocolSetupModulesAndDeck({
             lineHeight={TYPOGRAPHY.lineHeight28}
             paddingX={SPACING.spacing24}
           >
-            <StyledText flex="3.5 0 0">{i18n.format(t('deck_hardware'), 'titleCase')}</StyledText>
+            <StyledText flex="3.5 0 0">
+              {i18n.format(t('deck_hardware'), 'titleCase')}
+            </StyledText>
             <StyledText flex="2 0 0">{t('location')}</StyledText>
             <StyledText flex="4 0 0"> {t('status')}</StyledText>
           </Flex>

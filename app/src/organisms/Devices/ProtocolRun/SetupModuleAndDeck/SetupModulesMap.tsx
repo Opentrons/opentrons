@@ -48,7 +48,7 @@ export const SetupModulesMap = ({
 
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
-  
+
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
@@ -70,7 +70,9 @@ export const SetupModulesMap = ({
     ),
   }))
 
-  const simplestProtocolDeckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
+  const simplestProtocolDeckConfig = getSimplestDeckConfigForProtocol(
+    protocolAnalysis
+  )
 
   return (
     <Flex
@@ -81,10 +83,12 @@ export const SetupModulesMap = ({
     >
       <Box margin="0 auto" maxWidth="46.25rem" width="100%">
         <BaseDeck
-          deckConfig={simplestProtocolDeckConfig.map(({ cutoutId, cutoutFixtureId }) => ({
-            cutoutId,
-            cutoutFixtureId,
-          }))}
+          deckConfig={simplestProtocolDeckConfig.map(
+            ({ cutoutId, cutoutFixtureId }) => ({
+              cutoutId,
+              cutoutFixtureId,
+            })
+          )}
           deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
           robotType={robotType}
           labwareOnDeck={[]}
