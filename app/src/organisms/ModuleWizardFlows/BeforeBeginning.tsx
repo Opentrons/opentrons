@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
@@ -12,12 +11,7 @@ import { StyledText } from '@opentrons/components'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 
-import type {
-  CreateMaintenanceRunData,
-  MaintenanceRun,
-  AttachedModule,
-} from '@opentrons/api-client'
-import type { AxiosError } from 'axios'
+import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleCalibrationWizardStepProps } from './types'
 
 interface EqipmentItem {
@@ -26,34 +20,14 @@ interface EqipmentItem {
   subtitle?: string
 }
 
-interface BeforeBeginningProps extends ModuleCalibrationWizardStepProps {
-  createMaintenanceRun: UseMutateFunction<
-    MaintenanceRun,
-    AxiosError<any>,
-    CreateMaintenanceRunData,
-    unknown
-  >
-  isCreateLoading: boolean
-  createdMaintenanceRunId: string | null
-}
+type BeforeBeginningProps = ModuleCalibrationWizardStepProps
 
 export const BeforeBeginning = (
   props: BeforeBeginningProps
 ): JSX.Element | null => {
-  const {
-    proceed,
-    createMaintenanceRun,
-    isCreateLoading,
-    attachedModule,
-    maintenanceRunId,
-    createdMaintenanceRunId,
-  } = props
+  const { proceed, attachedModule } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
-  React.useEffect(() => {
-    if (createdMaintenanceRunId == null) {
-      createMaintenanceRun({})
-    }
-  }, [])
+
   const moduleDisplayName = getModuleDisplayName(attachedModule.moduleModel)
 
   let adapterLoadname: string
@@ -109,7 +83,6 @@ export const BeforeBeginning = (
         />
       }
       proceedButtonText={t('start_setup')}
-      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       proceed={proceed}
     />
   )
