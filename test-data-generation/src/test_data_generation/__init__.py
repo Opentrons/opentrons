@@ -1,1 +1,1 @@
-"""Test data generation for deck configuration tests."""
+"""Test data generation."""
