@@ -951,16 +951,18 @@ class InvalidAxisForRobotType(ProtocolEngineError):
 
 
 class EStopActivatedError(ProtocolEngineError):
-    """Raised when an operation's required pipette tip is not attached."""
+    """Represents an E-stop event."""
 
     def __init__(
         self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an EStopActivatedError."""
-        super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, details, wrapping)
+        super().__init__(
+            code=ErrorCodes.E_STOP_ACTIVATED,
+            message="E-stop activated.",
+            wrapping=wrapping,
+        )
 
 
 class NotSupportedOnRobotType(ProtocolEngineError):

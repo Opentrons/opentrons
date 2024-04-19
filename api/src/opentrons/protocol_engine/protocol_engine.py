@@ -5,7 +5,6 @@ from typing import Dict, Optional, Union
 from opentrons.protocol_engine.actions.actions import ResumeFromRecoveryAction
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
-    ErrorRecoveryType,
     error_recovery_by_ff,
 )
 
@@ -58,7 +57,6 @@ from .actions import (
     HardwareStoppedAction,
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
-    FailCommandAction,
 )
 
 
@@ -277,14 +275,8 @@ class ProtocolEngine:
         )
         return completed_command
 
-    def estop(
-        self,
-        # TODO(mm, 2024-03-26): Maintenance runs are a robot-server concept that
-        # ProtocolEngine should not have to know about. Can this be simplified or
-        # defined in other terms?
-        maintenance_run: bool,
-    ) -> None:
-        """Signal to the engine that an estop event occurred.
+    def estop(self) -> None:
+        """Signal to the engine that an E-stop event occurred.
 
         If an estop happens while the robot is moving, lower layers physically stop
         motion and raise the event as an exception, which fails the Protocol Engine
@@ -292,88 +284,36 @@ class ProtocolEngine:
 
         However, if an estop happens in between commands, or in the middle of
         a command like `comment` or `waitForDuration` that doesn't access the hardware,
-        `ProtocolEngine` needs to be told about it so it can treat it as a fatal run
-        error and stop executing more commands. This method is how to do that.
+        `ProtocolEngine` needs to be told about it so it can interrupt the command
+        and stop executing any more. This method is how to do that.
 
-        If there are any queued commands for the engine, they will be marked
-        as failed due to the estop event. If there aren't any queued commands
-        *and* this is a maintenance run (which has commands queued one-by-one),
-        a series of actions will mark the engine as Stopped. In either case the
-        queue worker will be deactivated; the primary difference is that the former
-        case will expect the protocol runner to `finish()` the engine, whereas the
-        maintenance run will be put into a state wherein the engine can be discarded.
+        This acts roughly like `request_stop()`. After calling this, you should call
+        `finish()` with an EStopActivatedError.
         """
-        if self._state_store.commands.get_is_stopped():
-            return
-        running_or_next_queued_id = (
-            self._state_store.commands.get_running_command_id()
-            or self._state_store.commands.get_queue_ids().head(None)
-            # TODO(mm, 2024-04-02): This logic looks wrong whenever the next queued
-            # command is a setup command, which is the normal case in maintenance
-            # runs. Setup commands won't show up in commands.get_queue_ids().
-        )
-        running_or_next_queued = (
-            self._state_store.commands.get(running_or_next_queued_id)
-            if running_or_next_queued_id is not None
-            else None
-        )
-
-        if running_or_next_queued_id is not None:
-            assert running_or_next_queued is not None
-
-            fail_action = FailCommandAction(
-                command_id=running_or_next_queued_id,
-                # FIXME(mm, 2024-04-02): As of https://github.com/Opentrons/opentrons/pull/14726,
-                # this action is only legal if the command is running, not queued.
-                running_command=running_or_next_queued,
-                error_id=self._model_utils.generate_id(),
-                failed_at=self._model_utils.get_timestamp(),
-                error=EStopActivatedError(message="Estop Activated"),
-                notes=[],
-                type=ErrorRecoveryType.FAIL_RUN,
-            )
-            self._action_dispatcher.dispatch(fail_action)
-
-            # The FailCommandAction above will have cleared all the queued protocol
-            # OR setup commands, depending on whether we gave it a protocol or setup
-            # command. We want both to be cleared in either case. So, do that here.
-            running_or_next_queued_id = self._state_store.commands.get_queue_ids().head(
-                None
-            )
-            if running_or_next_queued_id is not None:
-                running_or_next_queued = self._state_store.commands.get(
-                    running_or_next_queued_id
-                )
-                fail_action = FailCommandAction(
-                    command_id=running_or_next_queued_id,
-                    # FIXME(mm, 2024-04-02): As of https://github.com/Opentrons/opentrons/pull/14726,
-                    # this action is only legal if the command is running, not queued.
-                    running_command=running_or_next_queued,
-                    error_id=self._model_utils.generate_id(),
-                    failed_at=self._model_utils.get_timestamp(),
-                    error=EStopActivatedError(message="Estop Activated"),
-                    notes=[],
-                    type=ErrorRecoveryType.FAIL_RUN,
-                )
-                self._action_dispatcher.dispatch(fail_action)
-            self._queue_worker.cancel()
-        elif maintenance_run:
-            stop_action = self._state_store.commands.validate_action_allowed(
+        try:
+            action = self._state_store.commands.validate_action_allowed(
                 StopAction(from_estop=True)
             )
-            self._action_dispatcher.dispatch(stop_action)
-            hardware_stop_action = HardwareStoppedAction(
-                completed_at=self._model_utils.get_timestamp(),
-                finish_error_details=FinishErrorDetails(
-                    error=EStopActivatedError(message="Estop Activated"),
-                    error_id=self._model_utils.generate_id(),
-                    created_at=self._model_utils.get_timestamp(),
-                ),
+        except Exception:  # todo(mm, 2024-04-16): Catch a more specific type.
+            # This is likely called from some hardware API callback that doesn't care
+            # about ProtocolEngine lifecycle or what methods are valid to call at what
+            # times. So it makes more sense for us to no-op here than to propagate this
+            # as an error.
+            _log.info(
+                "ProtocolEngine cannot handle E-stop event right now. Ignoring it.",
+                exc_info=True,
             )
-            self._action_dispatcher.dispatch(hardware_stop_action)
-            self._queue_worker.cancel()
-        else:
-            _log.info("estop pressed before protocol was started, taking no action.")
+            return
+        self._action_dispatcher.dispatch(action)
+        # self._queue_worker.cancel() will try to interrupt any ongoing command.
+        # Unfortunately, if it's a hardware command, this interruption will race
+        # against the E-stop exception propagating up from lower layers. But we need to
+        # do this because we want to make sure non-hardware commands, like
+        # `waitForDuration`, are also interrupted.
+        self._queue_worker.cancel()
+        # Unlike self.request_stop(), we don't need to do
+        # self._hardware_api.cancel_execution_and_running_tasks(). Since this was an
+        # E-stop event, the hardware API already knows.
 
     async def request_stop(self) -> None:
         """Make command execution stop soon.
@@ -418,14 +358,20 @@ class ProtocolEngine:
         set_run_status: bool = True,
         post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
     ) -> None:
-        """Gracefully finish using the ProtocolEngine, waiting for it to become idle.
+        """Finish using the `ProtocolEngine`.
 
-        The engine will finish executing its current command (if any),
-        and then shut down. After an engine has been `finished`'ed, it cannot
-        be restarted.
+        This does a few things:
+
+        1. It may do post-run actions like homing and dropping tips. This depends on the
+           arguments passed as well as heuristics based on the history of the engine.
+        2. It waits for the engine to be done controlling the robot's hardware.
+        3. It releases internal resources, like background tasks.
+
+        It's safe to call `finish()` multiple times. After you call `finish()`,
+        the engine can't be restarted.
 
         This method should not raise. If any exceptions happened during execution that were not
-        properly caught by the CommandExecutor, or if any exceptions happen during this
+        properly caught by `ProtocolEngine` internals, or if any exceptions happen during this
         `finish()` call, they should be saved as `.state_view.get_summary().errors`.
 
         Arguments:
@@ -439,12 +385,11 @@ class ProtocolEngine:
         if self._state_store.commands.state.stopped_by_estop:
             # This handles the case where the E-stop was pressed while we were *not* in the middle
             # of some hardware interaction that would raise it as an exception. For example, imagine
-            # we were paused between two commands, or imagine we were executing a very long run of
-            # comment commands.
+            # we were paused between two commands, or imagine we were executing a waitForDuration.
             drop_tips_after_run = False
             post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
             if error is None:
-                error = EStopActivatedError(message="Estop was activated during a run")
+                error = EStopActivatedError()
 
         if error:
             # If the run had an error, check if that error indicates an E-stop.
