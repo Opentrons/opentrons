@@ -505,6 +505,19 @@ class MustHomeError(ProtocolEngineError):
         super().__init__(ErrorCodes.POSITION_UNKNOWN, message, details, wrapping)
 
 
+class CommandNotAllowedError(ProtocolEngineError):
+    """Raised when adding a command with bad data."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CommandNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class FixitCommandNotAllowedError(ProtocolEngineError):
     """Raised when adding a fixit command to a non-recoverable engine."""
 

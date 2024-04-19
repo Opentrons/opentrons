@@ -19,7 +19,10 @@ from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands, slot_standardization
-from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
+from opentrons.protocol_engine.errors.exceptions import (
+    EStopActivatedError,
+    CommandNotAllowedError,
+)
 from opentrons.protocol_engine.types import (
     DeckType,
     LabwareOffset,
@@ -348,7 +351,7 @@ def test_add_fixit_command_raises(
         slot_standardization.standardize_command(original_request, robot_type)
     ).then_return(standardized_request)
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(CommandNotAllowedError):
         subject.add_command(original_request, "id-123")
 
 

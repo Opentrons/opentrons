@@ -132,6 +132,31 @@ async def test_create_run_command(
     decoy.verify(await mock_protocol_engine.wait_for_command("command-id"), times=0)
 
 
+async def test_create_command_with_failed_command_raises(
+    decoy: Decoy,
+    protocol_engine: ProtocolEngine,
+) -> None:
+    """It should return 400 bad request."""
+    command_create = pe_commands.HomeCreate(params=pe_commands.HomeParams())
+
+    decoy.when(
+        protocol_engine.add_command(
+            pe_commands.HomeCreate(
+                params=pe_commands.HomeParams(),
+                intent=pe_commands.CommandIntent.SETUP,
+            )
+        )
+    ).then_raise(pe_errors.CommandNotAllowedError)
+
+    with pytest.raises(ApiError):
+        await create_run_command(
+            RequestModelWithCommandCreate(data=command_create),
+            waitUntilComplete=False,
+            timeout=42,
+            engine=protocol_engine,
+            failed_command_id="123"
+        )
+
 async def test_create_run_command_blocking_completion(
     decoy: Decoy,
     mock_protocol_engine: ProtocolEngine,

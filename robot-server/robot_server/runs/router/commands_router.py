@@ -222,12 +222,6 @@ async def create_run_command(
     command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
     command_create = request_body.data.copy(update={"intent": command_intent})
 
-    if failed_command_id and command_intent != pe_commands.CommandIntent.FIXIT:
-        raise CommandNotAllowed(
-            title="failed command with a non fixit command",
-            detail="Cannot supply failed command id with a non fixit command.",
-        ).as_error(status.HTTP_400_BAD_REQUEST)
-
     try:
         command = protocol_engine.add_command(command_create, failed_command_id)
 
@@ -235,6 +229,8 @@ async def create_run_command(
         raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT)
     except pe_errors.RunStoppedError as e:
         raise RunStopped.from_exc(e).as_error(status.HTTP_409_CONFLICT)
+    except pe_errors.CommandNotAllowedError as e:
+        raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
 
     if waitUntilComplete:
         timeout_sec = None if timeout is None else timeout / 1000.0
