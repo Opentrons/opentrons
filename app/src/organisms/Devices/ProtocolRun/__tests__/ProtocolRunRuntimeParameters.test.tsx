@@ -7,6 +7,9 @@ import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useRunStatus } from '../../../RunTimeControl/hooks'
+import { useNotifyRunQuery } from '../../../../resources/runs'
+import { mockSucceededRun } from '../../../RunTimeControl/__fixtures__'
 
 import { ProtocolRunRuntimeParameters } from '../ProtocolRunRunTimeParameters'
 
@@ -14,6 +17,8 @@ import type {
   CompletedProtocolAnalysis,
   RunTimeParameter,
 } from '@opentrons/shared-data'
+import { Run } from '@opentrons/api-client'
+import { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()
@@ -23,6 +28,8 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 vi.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('../../../RunTimeControl/hooks')
+vi.mock('../../../../resources/runs')
 
 const RUN_ID = 'mockId'
 
@@ -100,13 +107,17 @@ describe('ProtocolRunRuntimeParameters', () => {
       .thenReturn({
         runTimeParameters: mockRunTimeParameterData,
       } as CompletedProtocolAnalysis)
+    vi.mocked(useRunStatus).mockReturnValue('running')
+    vi.mocked(useNotifyRunQuery).mockReturnValue(({
+      data: { data: mockSucceededRun },
+    } as unknown) as UseQueryResult<Run>)
   })
 
   afterEach(() => {
     vi.resetAllMocks()
   })
 
-  it('should render title, and banner when RunTimeParameters are note empty and all values are default', () => {
+  it('should render title, and banner when RunTimeParameters are not empty and all values are default', () => {
     render(props)
     screen.getByText('Parameters')
     screen.getByText('Default values')
@@ -116,7 +127,7 @@ describe('ProtocolRunRuntimeParameters', () => {
     screen.getByText('Value')
   })
 
-  it('should render title, and banner when RunTimeParameters are note empty and some value is changed', () => {
+  it('should render title, and banner when RunTimeParameters are not empty and some value is changed', () => {
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       runTimeParameters: [
         ...mockRunTimeParameterData,
@@ -139,7 +150,7 @@ describe('ProtocolRunRuntimeParameters', () => {
     screen.getByText('Value')
   })
 
-  it('should render RunTimeParameters when RunTimeParameters are note empty', () => {
+  it('should render RunTimeParameters when RunTimeParameters are not empty', () => {
     render(props)
     screen.getByText('Dry Run')
     screen.getByText('Off')
