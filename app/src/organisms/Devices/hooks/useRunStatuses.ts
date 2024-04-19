@@ -1,12 +1,9 @@
 import {
   RUN_STATUSES_TERMINAL,
   RUN_STATUS_AWAITING_RECOVERY,
-  RUN_STATUS_FAILED,
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSED,
   RUN_STATUS_RUNNING,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
