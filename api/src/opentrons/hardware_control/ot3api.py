@@ -1539,6 +1539,12 @@ class OT3API(
             await self._set_plunger_current_and_home(axis, motor_ok, encoder_ok)
             return
 
+        # TODO: (ba, 2024-04-19): We need to explictly engage the axis and enable
+        # the motor when we are attempting to move. This should be already
+        # happening but something on the firmware is either not enabling the motor or
+        # disabling the motor.
+        await self.engage_axes([axis])
+
         # we can move to safe home distance!
         if encoder_ok and motor_ok:
             origin, target_pos = await self._retrieve_home_position(axis)
@@ -1655,14 +1661,22 @@ class OT3API(
         motor_ok = self._backend.check_motor_status([axis])
         encoder_ok = self._backend.check_encoder_status([axis])
 
-        if motor_ok and encoder_ok:
-            # we can move to the home position without checking the limit switch
-            origin = await self._backend.update_position()
-            target_pos = {axis: self._backend.home_position()[axis]}
-            await self._backend.move(origin, target_pos, 400, HWStopCondition.none)
-        else:
-            # home the axis
-            await self._home_axis(axis)
+        async with self._motion_lock:
+            if motor_ok and encoder_ok:
+                # TODO: (ba, 2024-04-19): We need to explictly engage the axis and enable
+                # the motor when we are attempting to move. This should be already
+                # happening but something on the firmware is either not enabling the motor or
+                # disabling the motor.
+                await self.engage_axes([axis])
+
+                # we can move to the home position without checking the limit switch
+                origin = await self._backend.update_position()
+                target_pos = {axis: self._backend.home_position()[axis]}
+                await self._backend.move(origin, target_pos, 400, HWStopCondition.none)
+            else:
+                # home the axis
+                await self._home_axis(axis)
+
         await self._cache_current_position()
         await self._cache_encoder_position()
 
