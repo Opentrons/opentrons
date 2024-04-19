@@ -7,7 +7,6 @@ import {
   BORDERS,
   COLORS,
   Chip,
-  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
@@ -17,7 +16,9 @@ import {
 } from '@opentrons/components'
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
+  getCutoutFixturesForModuleModel,
   getCutoutIdForSlotName,
+  getCutoutIdsFromModuleSlotName,
   getModuleDisplayName,
   getModuleType,
   MAGNETIC_BLOCK_TYPE,
@@ -55,8 +56,6 @@ interface ModuleTableProps {
 export function ModuleTable(props: ModuleTableProps): JSX.Element {
   const { attachedProtocolModuleMatches, deckDef, runId } = props
 
-  const { t } = useTranslation('protocol_setup')
-
   const [
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
@@ -71,45 +70,24 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-      <Flex
-        color={COLORS.grey60}
-        fontSize={TYPOGRAPHY.fontSize22}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        gridGap={SPACING.spacing24}
-        lineHeight={TYPOGRAPHY.lineHeight28}
-        paddingX={SPACING.spacing24}
-      >
-        <StyledText flex="3.5 0 0">{t('module')}</StyledText>
-        <StyledText flex="2 0 0">{t('location')}</StyledText>
-        <StyledText flex="4 0 0"> {t('status')}</StyledText>
-      </Flex>
+    <>
       {attachedProtocolModuleMatches.map(module => {
-        const cutoutIdForSlotName = getCutoutIdForSlotName(
-          module.slotName,
+        const moduleFixtures = getCutoutFixturesForModuleModel(
+          module.moduleDef.model,
           deckDef
         )
-
-        const isMagneticBlockModule =
-          module.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE
-
-        const isThermocycler =
-          module.moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
-
+        const moduleCutoutIds = getCutoutIdsFromModuleSlotName(
+          module.slotName,
+          moduleFixtures,
+          deckDef
+        )
         const conflictedFixture =
           deckConfig?.find(
-            fixture =>
-              (fixture.cutoutId === cutoutIdForSlotName ||
-                // special-case A1 for the thermocycler to require a single slot fixture
-                (fixture.cutoutId === 'cutoutA1' && isThermocycler)) &&
-              fixture.cutoutFixtureId != null &&
-              // do not generate a conflict for single slot fixtures, because modules are not yet fixtures
-              !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId) &&
-              // special case the magnetic module because unlike other modules it sits in a slot that can also be provided by a staging area fixture
-              (!isMagneticBlockModule ||
-                fixture.cutoutFixtureId !== STAGING_AREA_RIGHT_SLOT_FIXTURE)
+            ({ cutoutId, cutoutFixtureId }) =>
+              moduleCutoutIds.includes(cutoutId) &&
+              !moduleFixtures.some(({ id }) => cutoutFixtureId === id) &&
+              module.attachedModuleMatch == null
           ) ?? null
-
         return (
           <ModuleTableItem
             key={module.moduleId}
@@ -121,10 +99,11 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
             setPrepCommandErrorMessage={setPrepCommandErrorMessage}
             conflictedFixture={conflictedFixture}
             deckDef={deckDef}
+            robotName={robotName}
           />
         )
       })}
-    </Flex>
+    </>
   )
 }
 
@@ -140,6 +119,7 @@ interface ModuleTableItemProps {
   prepCommandErrorMessage: string
   setPrepCommandErrorMessage: React.Dispatch<React.SetStateAction<string>>
   deckDef: DeckDefinition
+  robotName: string
 }
 
 function ModuleTableItem({
@@ -151,6 +131,7 @@ function ModuleTableItem({
   setPrepCommandErrorMessage,
   conflictedFixture,
   deckDef,
+  robotName
 }: ModuleTableItemProps): JSX.Element {
   const { i18n, t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
 
@@ -276,18 +257,19 @@ function ModuleTableItem({
           requiredModule={module.moduleDef.model}
           deckDef={deckDef}
           isOnDevice={true}
+          robotName={robotName}
         />
       ) : null}
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={
           isModuleReady &&
-          module.attachedModuleMatch?.moduleOffset?.last_modified != null &&
-          conflictedFixture == null
+            module.attachedModuleMatch?.moduleOffset?.last_modified != null &&
+            conflictedFixture == null
             ? COLORS.green35
             : isNonConnectingModule && conflictedFixture == null
-            ? COLORS.grey35
-            : COLORS.yellow35
+              ? COLORS.grey35
+              : COLORS.yellow35
         }
         borderRadius={BORDERS.borderRadius8}
         cursor="inherit"

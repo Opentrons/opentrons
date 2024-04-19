@@ -143,7 +143,6 @@
   "module_setup_step_title": "Modules",
   "module_slot_location": "Slot {{slotName}}, {{moduleName}}",
   "module": "Module",
-  "modules_and_deck": "Modules & deck",
   "modules_connected_plural": "{{count}} modules attached",
   "modules_connected": "{{count}} module attached",
   "modules_setup_step_title": "Module Setup",

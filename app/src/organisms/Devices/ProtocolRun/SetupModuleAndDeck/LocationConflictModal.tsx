@@ -155,6 +155,10 @@ export const LocationConflictModal = (
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }
 
+  const displaySlotName = isThermocycler
+    ? 'A1 + B1'
+    : getCutoutDisplayName(cutoutId)
+
   if (showModuleSelect && requiredModule != null) {
     return createPortal(
       <ChooseModuleToConfigureModal
@@ -169,9 +173,7 @@ export const LocationConflictModal = (
       getTopPortalEl()
     )
   }
-  const displaySlotName = isThermocycler
-    ? 'A1 + B1'
-    : getCutoutDisplayName(cutoutId)
+
   return createPortal(
     isOnDevice ? (
       <Modal

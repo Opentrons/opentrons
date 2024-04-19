@@ -19,8 +19,10 @@ import { ModuleInfo } from '../../ModuleInfo'
 import { useAttachedModules, useStoredProtocolAnalysis } from '../../hooks'
 import { getProtocolModulesInfo } from '../utils/getProtocolModulesInfo'
 import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
+import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 const ATTACHED_MODULE_POLL_MS = 5000
+const DECK_CONFIG_POLL_MS = 5000
 
 interface SetupModulesMapProps {
   runId: string
@@ -33,7 +35,9 @@ export const SetupModulesMap = ({
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
-
+  const { data: actualDeckConfig = [] } = useDeckConfigurationQuery({
+    refetchInterval: DECK_CONFIG_POLL_MS,
+  })
   const attachedModules =
     useAttachedModules({
       refetchInterval: ATTACHED_MODULE_POLL_MS,
@@ -44,11 +48,13 @@ export const SetupModulesMap = ({
 
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
+  
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
     attachedModules,
-    protocolModulesInfo
+    protocolModulesInfo,
+    actualDeckConfig
   )
 
   const modulesOnDeck = attachedProtocolModuleMatches.map(module => ({
@@ -64,7 +70,7 @@ export const SetupModulesMap = ({
     ),
   }))
 
-  const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
+  const simplestProtocolDeckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
   return (
     <Flex
@@ -75,7 +81,7 @@ export const SetupModulesMap = ({
     >
       <Box margin="0 auto" maxWidth="46.25rem" width="100%">
         <BaseDeck
-          deckConfig={deckConfig.map(({ cutoutId, cutoutFixtureId }) => ({
+          deckConfig={simplestProtocolDeckConfig.map(({ cutoutId, cutoutFixtureId }) => ({
             cutoutId,
             cutoutFixtureId,
           }))}

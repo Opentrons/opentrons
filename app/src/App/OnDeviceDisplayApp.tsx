@@ -169,9 +169,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider hostname="127.0.0.1">
+    <ApiHostProvider hostname="10.14.16.63">
       <InitialLoadingScreen>
-        <OnDeviceLocalizationProvider>
+        {/* <OnDeviceLocalizationProvider> */}
           <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
             <Box width="100%" css="user-select: none;">
               {isIdle ? (
@@ -193,7 +193,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
             </Box>
           </ErrorBoundary>
           <TopLevelRedirects />
-        </OnDeviceLocalizationProvider>
+        {/* </OnDeviceLocalizationProvider> */}
       </InitialLoadingScreen>
     </ApiHostProvider>
   )
