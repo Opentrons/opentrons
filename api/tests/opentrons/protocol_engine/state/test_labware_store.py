@@ -28,6 +28,7 @@ from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 from .command_fixtures import (
     create_load_labware_command,
     create_move_labware_command,
+    create_reload_labware_command,
 )
 
 
@@ -130,6 +131,73 @@ def test_handles_load_labware(
     assert subject.state.labware_by_id["test-labware-id"] == expected_labware_data
 
     assert subject.state.definitions_by_uri[expected_definition_uri] == well_plate_def
+
+
+def test_handles_reload_labware(
+    subject: LabwareStore,
+    well_plate_def: LabwareDefinition,
+    flex_50uL_tiprack: LabwareDefinition,
+) -> None:
+    """It should override labware data in the state."""
+    load_labware = create_load_labware_command(
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A1),
+        labware_id="test-labware-id",
+        definition=well_plate_def,
+        display_name="display-name",
+        offset_id=None,
+    )
+
+    subject.handle_action(
+        SucceedCommandAction(private_result=None, command=load_labware)
+    )
+    assert subject.state.labware_by_id[
+        "test-labware-id"
+    ].definitionUri == uri_from_details(
+        load_name=well_plate_def.parameters.loadName,
+        namespace=well_plate_def.namespace,
+        version=well_plate_def.version,
+    )
+
+    offset_request = LabwareOffsetCreate(
+        definitionUri="offset-definition-uri",
+        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        vector=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+    subject.handle_action(
+        AddLabwareOffsetAction(
+            request=offset_request,
+            labware_offset_id="offset-id",
+            created_at=datetime(year=2021, month=1, day=2),
+        )
+    )
+    reload_labware = create_reload_labware_command(
+        labware_id="test-labware-id",
+        definition=flex_50uL_tiprack,
+        offset_id="offset-id",
+        display_name="display-name-2",
+    )
+    subject.handle_action(
+        SucceedCommandAction(private_result=None, command=reload_labware)
+    )
+
+    expected_definition_uri = uri_from_details(
+        load_name=flex_50uL_tiprack.parameters.loadName,
+        namespace=flex_50uL_tiprack.namespace,
+        version=flex_50uL_tiprack.version,
+    )
+
+    expected_labware_data = LoadedLabware(
+        id="test-labware-id",
+        loadName=flex_50uL_tiprack.parameters.loadName,
+        definitionUri=expected_definition_uri,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A1),
+        offsetId="offset-id",
+        displayName="display-name-2",
+    )
+    assert subject.state.labware_by_id["test-labware-id"] == expected_labware_data
+    assert (
+        subject.state.definitions_by_uri[expected_definition_uri] == flex_50uL_tiprack
+    )
 
 
 def test_handles_add_labware_definition(

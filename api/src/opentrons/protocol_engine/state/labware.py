@@ -31,6 +31,7 @@ from ..commands import (
     Command,
     LoadLabwareResult,
     MoveLabwareResult,
+    ReloadLabwareResult,
 )
 from ..types import (
     DeckSlotLocation,
@@ -175,7 +176,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
-        if isinstance(command.result, LoadLabwareResult):
+        if isinstance(command.result, (LoadLabwareResult, ReloadLabwareResult)):
             # If the labware load refers to an offset, that offset must actually exist.
             if command.result.offsetId is not None:
                 assert command.result.offsetId in self._state.labware_offsets_by_id
@@ -187,12 +188,16 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             )
 
             self._state.definitions_by_uri[definition_uri] = command.result.definition
+            if isinstance(command.result, LoadLabwareResult):
+                location = command.params.location
+            else:
+                location = self._state.labware_by_id[command.result.labwareId].location
 
             self._state.labware_by_id[
                 command.result.labwareId
             ] = LoadedLabware.construct(
                 id=command.result.labwareId,
-                location=command.params.location,
+                location=location,
                 loadName=command.result.definition.parameters.loadName,
                 definitionUri=definition_uri,
                 offsetId=command.result.offsetId,
