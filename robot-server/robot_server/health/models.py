@@ -1,11 +1,11 @@
 """HTTP request and response models for /health endpoints."""
 import typing
-from pydantic import BaseModel, Field
+from pydantic import Field
 from opentrons_shared_data.deck.dev_types import RobotModel
 from robot_server.service.json_api import BaseResponseBody
 
 
-class HealthLinks(BaseModel):
+class HealthLinks(BaseResponseBody):
     """Useful server links."""
 
     apiLog: str = Field(
@@ -24,7 +24,7 @@ class HealthLinks(BaseModel):
         examples=["/logs/server.log"],
     )
     oddLog: typing.Optional[str] = Field(
-        None,
+        default=None,
         description=(
             "The path to the on-device display app logs endpoint"
             " (only present on the Opentrons Flex)"

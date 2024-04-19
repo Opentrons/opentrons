@@ -27,25 +27,25 @@ class BaseErrorBody(BaseResponseBody):
         """Serialize the response as an API error to raise in a handler."""
         return ApiError(
             status_code=status_code,
-            content=self.dict(),
+            content=self.model_dump(),
         )
 
 
-class ErrorSource(BaseModel):
+class ErrorSource(BaseResponseBody):
     """An object containing references to the source of the error."""
 
     pointer: Optional[str] = Field(
-        None,
+        default=None,
         description=(
             "A JSON Pointer [RFC6901] to the associated entity in the request document."
         ),
     )
     parameter: Optional[str] = Field(
-        None,
+        default=None,
         description="a string indicating which URI query parameter caused the error.",
     )
     header: Optional[str] = Field(
-        None,
+        default=None,
         description="A string indicating which header caused the error.",
     )
 
@@ -95,18 +95,18 @@ class ErrorDetails(BaseErrorBody):
         ),
     )
     source: Optional[ErrorSource] = Field(
-        None,
+        default=None,
         description="An object containing references to the source of the error.",
     )
     meta: Optional[Dict[str, Any]] = Field(
-        None,
+        default=None,
         description=(
             "An object containing non-standard information about this "
             "occurrence of the error"
         ),
     )
     errorCode: str = Field(
-        ErrorCodes.GENERAL_ERROR.value.code,
+        default=ErrorCodes.GENERAL_ERROR.value.code,
         description=("The Opentrons error code associated with the error"),
     )
 
@@ -179,7 +179,7 @@ class ErrorBody(BaseErrorBody, BaseModel, Generic[ErrorDetailsT]):
 
     errors: Sequence[ErrorDetailsT] = Field(..., description="Error details.")
     links: Optional[ResourceLinks] = Field(
-        None,
+        default=None,
         description=(
             "Links that leads to further details about "
             "this particular occurrence of the problem."
@@ -192,7 +192,7 @@ class MultiErrorResponse(BaseErrorBody, BaseModel, Generic[ErrorDetailsT]):
 
     errors: Sequence[ErrorDetailsT] = Field(..., description="Error details.")
     links: Optional[ResourceLinks] = Field(
-        None,
+        default=None,
         description=(
             "Links that leads to further details about "
             "this particular occurrence of the problem."

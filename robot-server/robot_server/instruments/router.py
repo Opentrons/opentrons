@@ -154,7 +154,7 @@ async def _get_gripper_instrument_data(
     attached_gripper: Optional[GripperDict],
 ) -> Optional[AttachedItem]:
     subsys = HWSubSystem.of_mount(OT3Mount.GRIPPER)
-    status = hardware.attached_subsystems.get(subsys)
+    status = hardware.attached_subsystems.get(key=subsys)
     if status and (status.fw_update_needed or not status.ok):
         return _bad_gripper_response()
     if attached_gripper:
