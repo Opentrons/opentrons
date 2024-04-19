@@ -1,6 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+import { useForm, SubmitHandler } from 'react-hook-form'
 
 import {
   ALIGN_CENTER,
@@ -16,13 +17,34 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+// ToDo (kk:04/19/2024) Note this interface will be used by prompt buttons in SidePanel
 // interface InputPromptProps {}
+
+interface InputType {
+  userPrompt: string
+}
 
 export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  // ToDo use react-hook-form
+  const { register, handleSubmit, watch } = useForm<InputType>({
+    defaultValues: {
+      userPrompt: '',
+    },
+  })
+  const userPrompt = watch('userPrompt') ?? ''
+
+  const onSubmit: SubmitHandler<InputType> = data => {
+    // ToDo (kk: 04/19/2024) call api
+    const { userPrompt } = data
+    console.log('user prompt', userPrompt)
+  }
+
   return (
-    <form id="User_Prompt" onSubmit={() => {}} style={{ width: '100%' }}>
+    <form
+      id="User_Prompt"
+      onSubmit={handleSubmit(onSubmit)}
+      style={{ width: '100%' }}
+    >
       <Flex
         padding={SPACING.spacing40}
         gridGap={SPACING.spacing40}
@@ -32,10 +54,12 @@ export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
       >
-        {/* textarea */}
-        <StyledTextarea rows={1} placeholder={t('type_your_prompt')} />
-        {/* button: play button/stop button */}
-        <PlayButton />
+        <StyledTextarea
+          rows={1}
+          placeholder={t('type_your_prompt')}
+          {...register('userPrompt')}
+        />
+        <PlayButton disabled={userPrompt.length === 0} />
       </Flex>
     </form>
   )
@@ -105,14 +129,16 @@ function PlayButton({
       justifyContent={JUSTIFY_CENTER}
       width="4.25rem"
       height="3.75rem"
-      disabled={disabled}
+      disabled={disabled || isLoading}
       onClick={onPlay}
       aria-label="play"
       css={playButtonStyle}
+      type="submit"
     >
       <Icon
         color={disabled ? COLORS.grey50 : COLORS.white}
-        name="send"
+        name={isLoading ? 'ot-spinner' : 'send'}
+        spin={isLoading}
         size="2rem"
       />
     </Btn>
