@@ -114,10 +114,11 @@ async def test_create_run_command(
 
     decoy.when(
         mock_protocol_engine.add_command(
-            pe_commands.WaitForResumeCreate(
+            request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="Hello"),
                 intent=pe_commands.CommandIntent.SETUP,
-            )
+            ),
+            failed_command_id=None,
         )
     ).then_do(_stub_queued_command_state)
 
@@ -125,6 +126,7 @@ async def test_create_run_command(
         request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=False,
         protocol_engine=mock_protocol_engine,
+        failed_command_id=None,
     )
 
     assert result.content.data == command_once_added
@@ -134,28 +136,30 @@ async def test_create_run_command(
 
 async def test_create_command_with_failed_command_raises(
     decoy: Decoy,
-    protocol_engine: ProtocolEngine,
+    mock_protocol_engine: ProtocolEngine,
 ) -> None:
     """It should return 400 bad request."""
     command_create = pe_commands.HomeCreate(params=pe_commands.HomeParams())
 
     decoy.when(
-        protocol_engine.add_command(
+        mock_protocol_engine.add_command(
             pe_commands.HomeCreate(
                 params=pe_commands.HomeParams(),
                 intent=pe_commands.CommandIntent.SETUP,
-            )
+            ),
+            failed_command_id="123",
         )
-    ).then_raise(pe_errors.CommandNotAllowedError)
+    ).then_raise(pe_errors.CommandNotAllowedError())
 
     with pytest.raises(ApiError):
         await create_run_command(
             RequestModelWithCommandCreate(data=command_create),
             waitUntilComplete=False,
             timeout=42,
-            engine=protocol_engine,
-            failed_command_id="123"
+            protocol_engine=mock_protocol_engine,
+            failed_command_id="123",
         )
+
 
 async def test_create_run_command_blocking_completion(
     decoy: Decoy,
@@ -196,7 +200,7 @@ async def test_create_run_command_blocking_completion(
             mock_protocol_engine.state_view.commands.get("command-id")
         ).then_return(command_once_completed)
 
-    decoy.when(mock_protocol_engine.add_command(command_request)).then_do(
+    decoy.when(mock_protocol_engine.add_command(command_request, None)).then_do(
         _stub_queued_command_state
     )
 
@@ -209,6 +213,7 @@ async def test_create_run_command_blocking_completion(
         waitUntilComplete=True,
         timeout=999,
         protocol_engine=mock_protocol_engine,
+        failed_command_id=None,
     )
 
     assert result.content.data == command_once_completed
@@ -225,7 +230,7 @@ async def test_add_conflicting_setup_command(
         intent=pe_commands.CommandIntent.SETUP,
     )
 
-    decoy.when(mock_protocol_engine.add_command(command_request)).then_raise(
+    decoy.when(mock_protocol_engine.add_command(command_request, None)).then_raise(
         pe_errors.SetupCommandNotAllowedError("oh no")
     )
 
@@ -234,6 +239,7 @@ async def test_add_conflicting_setup_command(
             request_body=RequestModelWithCommandCreate(data=command_request),
             waitUntilComplete=False,
             protocol_engine=mock_protocol_engine,
+            failed_command_id=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -253,7 +259,7 @@ async def test_add_command_to_stopped_engine(
         intent=pe_commands.CommandIntent.SETUP,
     )
 
-    decoy.when(mock_protocol_engine.add_command(command_request)).then_raise(
+    decoy.when(mock_protocol_engine.add_command(command_request, None)).then_raise(
         pe_errors.RunStoppedError("oh no")
     )
 
@@ -262,6 +268,7 @@ async def test_add_command_to_stopped_engine(
             request_body=RequestModelWithCommandCreate(data=command_request),
             waitUntilComplete=False,
             protocol_engine=mock_protocol_engine,
+            failed_command_id=None,
         )
 
     assert exc_info.value.status_code == 409

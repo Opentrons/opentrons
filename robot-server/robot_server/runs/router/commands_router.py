@@ -221,9 +221,11 @@ async def create_run_command(
     # behavior is to pass through `command_intent` without overriding it
     command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
     command_create = request_body.data.copy(update={"intent": command_intent})
-
+    print(failed_command_id)
     try:
-        command = protocol_engine.add_command(command_create, failed_command_id)
+        command = protocol_engine.add_command(
+            request=command_create, failed_command_id=failed_command_id
+        )
 
     except pe_errors.SetupCommandNotAllowedError as e:
         raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT)
