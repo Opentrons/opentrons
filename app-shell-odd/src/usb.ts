@@ -90,48 +90,40 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
         prevDirs = present.filter((entry): entry is string => entry !== null)
       })
 
-  const mediaWatcherCreator = (): fs.FSWatcher | null => {
-    try {
-      return fs.watch(
-        FLEX_USB_MOUNT_DIR,
-        { persistent: true },
-        (event, fileName) => {
-          if (!!!fileName) {
-            rescan(dispatch)
+  const mediaWatcher = fs.watch(
+    FLEX_USB_MOUNT_DIR,
+    { persistent: true },
+    (event, fileName) => {
+      if (!!!fileName) {
+        rescan(dispatch)
+        return
+      }
+      if (!fileName.match(FLEX_USB_MOUNT_FILTER)) {
+        return
+      }
+      const fullPath = join(FLEX_USB_MOUNT_DIR, fileName)
+      fsPromises
+        .stat(fullPath)
+        .then(info => {
+          if (!info.isDirectory) {
             return
           }
-          if (!fileName.match(FLEX_USB_MOUNT_FILTER)) {
+          if (prevDirs.includes(fullPath)) {
             return
           }
-          const fullPath = join(FLEX_USB_MOUNT_DIR, fileName)
-          fsPromises
-            .stat(fullPath)
-            .then(info => {
-              if (!info.isDirectory) {
-                return
-              }
-              if (prevDirs.includes(fullPath)) {
-                return
-              }
-              console.log(`New mass storage device ${fileName} detected`)
-              prevDirs.push(fullPath)
-              return handleNewlyPresent(fullPath)
-            })
-            .catch(() => {
-              if (prevDirs.includes(fullPath)) {
-                console.log(`Mass storage device at ${fileName} removed`)
-                prevDirs = prevDirs.filter(entry => entry !== fullPath)
-                dispatch(robotMassStorageDeviceRemoved(fullPath))
-              }
-            })
-        }
-      )
-    } catch {
-      return null
+          console.log(`New mass storage device ${fileName} detected`)
+          prevDirs.push(fullPath)
+          return handleNewlyPresent(fullPath)
+        })
+        .catch(() => {
+          if (prevDirs.includes(fullPath)) {
+            console.log(`Mass storage device at ${fileName} removed`)
+            prevDirs = prevDirs.filter(entry => entry !== fullPath)
+            dispatch(robotMassStorageDeviceRemoved(fullPath))
+          }
+        })
     }
-  }
-
-  const mediaWatcher = mediaWatcherCreator()
+  )
 
   const devWatcher = fs.watch(
     FLEX_USB_DEVICE_DIR,
@@ -158,7 +150,7 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
 
   rescan(dispatch)
   return () => {
-    mediaWatcher != null && mediaWatcher.close()
+    mediaWatcher.close()
     devWatcher.close()
   }
 }
