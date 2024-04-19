@@ -580,6 +580,9 @@ class Labware:
         (see :ref:`protocol-api-deck-coords`) that the motion system
         will add to any movement targeting this labware instance.
 
+        The offset *will not apply* to any other labware instances,
+        even if those labware are of the same type.
+
         This method is *only* for use with mechanisms like
         :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
         to adjust labware offsets. (See :ref:`advanced-control`.)
@@ -590,71 +593,6 @@ class Labware:
             because it will produce undefined behavior.
             Instead, use Labware Position Check in the app or on the touchscreen.
 
-        The offset added by this function is applied differently in different Python Protocol
-        API versions.
-
-        Python Protocol API Version 2.13 and Below
-        ------------------------------------------
-
-        The offset *will not apply* to any other labware instances,
-        even if those labware are of the same type. The offset *will* apply to this labware
-        wherever it is moved (by moving it around in the deck).
-
-        Python Protocol API Versions Above 2.13 and Below 2.18
-        ------------------------------------------------------
-
-        This function is not available in Python Protocol API Versions 2.14, 2.15, 2.16, and 2.17.
-
-        Python Protocol API Version 2.18 And Above
-        ------------------------------------------
-
-        The offset is applied to any labware of this type (same ``loadName``, ``namespace``, and
-        ``version``) in the location of this labware at the time ``set_offset`` is called. Calling
-        this function adds a labware offset for the definition and location pair. That means
-
-        - You should call this function again with an offset after you move this labware to set the
-          offset in the new location
-        - You cannot call this function if the labware is currently loaded ``OFF_DECK``
-        - If you call this function when the labware is in a specific place, and later replace it with
-          a different instance of the same labware in the same place, the offset will also apply to
-          this new labware.
-
-        This sample protocol shows the behavior:
-
-        .. code-block:: python
-
-            from opentrons import protocol_api
-
-            requirements = {
-                "apiLevel": "2.18",
-                "robotType": "Flex"
-            }
-
-            metadata = {
-                "protocolName": "set_offset example"
-            }
-
-            def run(context: protocol_api.ProtocolContext):
-                first_reservoir = protocol.load_labware("nest_12_reservoir_15ml", "C2")
-                second_reservoir = protocol.load_labware("nest_12_reservoir_15ml", "C3")
-                plate = protocol.load_labware("nest_96_wellplate_200ul_flat", "D1")
-                # this offset will apply to any nest_12_reservoir_15ml in C2
-                first_reservoir.set_offset(1, 2, 3)
-                # this offset will apply to any nest_12_reservoir_15ml in C3
-                second_reservoir.set_offset(2, 4, 6)
-                # this offset will apply to any nest_96_wellplate_200ul_flat in D1
-                plate.set_offset(4, 8, 12)
-                # once first_reservoir is in A1, it has no offset, since the above offset
-                # is only applied when it is in C2
-                protocol.move_labware(first_reservoir, new_location="A1")
-                # to add an offset to the labware in its new location, set its offset after
-                # you move it
-                first_reservoir.set_offset(1, 2, 3)
-                # since second_reservoir is also a nest_12_reservoir_15ml, when it is moved
-                # to C2 (where first_reservoir started and where the (1, 2, 3) offset is loaded)
-                # it will now have an offset of (1, 2, 3)
-                protocol.move_labware(second_reservoir, new_location="C2")
-
         """
         if (
             self._api_version >= ENGINE_CORE_API_VERSION
@@ -662,7 +600,7 @@ class Labware:
         ):
             raise APIVersionError(
                 "Labware.set_offset() is not supported when apiLevel is 2.14, 2.15, 2.16, or 2.17."
-                " Use apiLevel 2.13 or below, or 2.18 or above to set offset,"
+                " Use apilevel 2.13 or below, or 2.18 or above to set offset,"
                 " or use the Opentrons App's Labware Position Check."
             )
         else:
