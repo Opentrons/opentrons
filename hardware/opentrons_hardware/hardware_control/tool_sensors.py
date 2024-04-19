@@ -77,7 +77,7 @@ def _build_pass_step(
     distance: Dict[NodeId, float],
     speed: Dict[NodeId, float],
     stop_condition: MoveStopCondition = MoveStopCondition.sync_line,
-    sensor_to_use:Optional[SensorId] = None
+    sensor_to_use: Optional[SensorId] = None,
 ) -> MoveGroupStep:
     pipette_nodes = [
         i for i in movers if i in [NodeId.pipette_left, NodeId.pipette_right]
@@ -106,7 +106,7 @@ def _build_pass_step(
         duration=float64(abs(distance[movers[0]] / speed[movers[0]])),
         present_nodes=pipette_nodes,
         stop_condition=MoveStopCondition.sensor_report,
-        sensor_to_use=sensor_to_use
+        sensor_to_use=sensor_to_use,
     )
     for node in pipette_nodes:
         move_group[node] = pipette_move[node]
