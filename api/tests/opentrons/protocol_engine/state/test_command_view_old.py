@@ -157,7 +157,7 @@ def test_get_next_to_execute_prioritizes_setup_command_queue(
         queued_setup_command_ids=["setup-command-id"],
     )
 
-    assert subject.get_next_to_execute() == "setup-command-id"
+    assert subject.get_next_to_execute() is None
 
 
 @pytest.mark.parametrize(
@@ -210,6 +210,19 @@ def test_get_next_to_execute_returns_no_commands_if_paused() -> None:
         queued_setup_command_ids=["setup-id-1", "setup-id-2"],
         queued_command_ids=["command-id-1", "command-id-2"],
         queued_fixit_command_ids=["fixit-id-1", "fixit-id-2"],
+    )
+    result = subject.get_next_to_execute()
+
+    assert result is None
+
+
+def test_get_next_to_execute_returns_no_commands_if_awaiting_recovery_no_fixit() -> None:
+    """It should not return any type of command if the engine is awaiting-recovery."""
+    subject = get_command_view(
+        queue_status=QueueStatus.AWAITING_RECOVERY,
+        queued_setup_command_ids=["setup-id-1", "setup-id-2"],
+        queued_command_ids=["command-id-1", "command-id-2"],
+        queued_fixit_command_ids=[],
     )
     result = subject.get_next_to_execute()
 

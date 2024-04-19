@@ -204,12 +204,12 @@ def test_set_running_command_id(command_history: CommandHistory) -> None:
 
 def test_set_fixit_running_command_id(command_history: CommandHistory) -> None:
     """It should set the ID of the currently running fixit command."""
-    command_entry = create_queued_command_entry()
-    command_history._add("0", command_entry)
-    command_history._set_running_command_id("0")
-    fixit_command_entry = create_fixit_command_entry()
-    command_history._add("1", fixit_command_entry)
-    command_history._set_running_command_id("1")
+    command_entry = create_queued_command()
+    command_history.set_command_queued(command_entry)
+    command_history.set_command_running(command_entry)
+    fixit_command_entry = create_queued_command(intent=CommandIntent.FIXIT)
+    command_history.set_command_queued(fixit_command_entry)
+    command_history.set_command_running(fixit_command_entry)
     assert command_history.get_running_command() == fixit_command_entry
     assert command_history.get_all_commands() == [
         command_entry.command,

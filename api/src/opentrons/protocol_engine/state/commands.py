@@ -615,7 +615,11 @@ class CommandView(HasState[CommandState]):
 
         # if there is a setup command queued, prioritize it
         next_setup_cmd = self._state.command_history.get_setup_queue_ids().head(None)
-        if self._state.queue_status != QueueStatus.PAUSED and next_setup_cmd:
+        if (
+            self._state.queue_status
+            not in [QueueStatus.PAUSED, QueueStatus.AWAITING_RECOVERY]
+            and next_setup_cmd
+        ):
             return next_setup_cmd
 
         # if the queue is running, return the next protocol command
