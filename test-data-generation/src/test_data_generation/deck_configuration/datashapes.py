@@ -15,7 +15,7 @@ class SlotContents(enum.Enum):
     HEATER_SHAKER_MODULE = enum.auto()
     TRASH_BIN = enum.auto()
     WASTE_CHUTE = enum.auto()
-    LABWARE = enum.auto()
+    LABWARE = enum.auto()  # This will need to be here for generating protocols
 
     def is_a_module(self) -> bool:
         """Return True if the slot contains a module."""

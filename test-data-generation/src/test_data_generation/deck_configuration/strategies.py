@@ -47,17 +47,20 @@ def a_deck_configuration(draw: st.DrawFn) -> DeckConfiguration:
 @st.composite
 def a_valid_deck(draw: st.DrawFn) -> DeckConfiguration:
     """Generate a valid deck."""
-    deck = draw(
-        st.builds(
-            DeckConfiguration,
-            A=a_row(),
-            B=a_row(),
-            C=a_row(),
-            D=a_row(),
-        )
-    )
+    deck = draw(a_deck_configuration())
 
     for evaluation_function in VALID_DECK_CONFIGURATION_EVALUATION_FUNCTIONS:
         assume(evaluation_function(deck))
+
+    return deck
+
+
+@st.composite
+def an_invalid_deck(draw: st.DrawFn) -> DeckConfiguration:
+    """Generate an invalid deck."""
+    deck = draw(a_deck_configuration())
+
+    for evaluation_function in VALID_DECK_CONFIGURATION_EVALUATION_FUNCTIONS:
+        assume(not evaluation_function(deck))
 
     return deck
