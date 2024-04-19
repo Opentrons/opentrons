@@ -9,36 +9,45 @@ from typing import (
     Awaitable,
     Optional,
     Generator,
-    ContextManager,
-    Any,
+    TypeVar,
+    Union,
+    Generic,
 )
 
-_CallbackT = Callable[..., Awaitable[None]]
+_MessageT = TypeVar("_MessageT")
+_CallbackT = Union[
+    Callable[[_MessageT], Awaitable[None]], Callable[[], Awaitable[None]]
+]
 
 
-class ReadOnlyEventNotifier(ABC):
+class ReadOnlyEventNotifier(ABC, Generic[_MessageT]):
     """The read-only subset of `EventNotifier`.
 
     Only allow registering callbacks for an instantiated `EventNotifier`.
     """
 
     @abstractmethod
-    def subscribed(self, callback: _CallbackT) -> ContextManager[None]:
-        """See `Broker.subscribed()`."""  # noqa: D402
+    @contextmanager
+    def subscribed(
+        self, callback: _CallbackT[_MessageT]
+    ) -> Generator[None, None, None]:
+        """See `Broker.subscribed()`."""
         pass
 
     @abstractmethod
-    def subscribe(self, callback: _CallbackT) -> Callable[[], None]:
-        """See `Broker.subscribe()`."""  # noqa: D402
+    def subscribe(self, callback: _CallbackT[_MessageT]) -> Callable[[], None]:
+        """See `Broker.subscribe()`."""
         pass
 
     @abstractmethod
-    def subscribe_many(self, callbacks: List[_CallbackT]) -> Callable[[], None]:
-        """See `Broker.subscribe_many()`."""  # noqa: D402
+    def subscribe_many(
+        self, callbacks: List[_CallbackT[_MessageT]]
+    ) -> Callable[[], None]:
+        """See `Broker.subscribe_many()`."""
         pass
 
 
-class EventNotifier(ReadOnlyEventNotifier):
+class EventNotifier(Generic[_MessageT], ReadOnlyEventNotifier[_MessageT]):
     """Asynchronously manages a queue of events and notifying subscribed callbacks when a change occurs.
 
     It is safe to use an `EventNotifier` for communication between two threads if:
@@ -48,15 +57,18 @@ class EventNotifier(ReadOnlyEventNotifier):
 
     def __init__(self, max_queue_size: int) -> None:
         self._task: Optional[asyncio.Task[None]] = None
-        self._queue: asyncio.Queue[Optional[_CallbackT]] = asyncio.Queue(
+        self._queue: asyncio.Queue[Optional[_MessageT]] = asyncio.Queue(
             maxsize=max_queue_size
         )
-        self._callbacks: List[_CallbackT] = []
+        self._callbacks: List[_CallbackT[_MessageT]] = []
 
         self._initialize()
 
-    def notify(self, message: Any = None) -> None:
-        """Notify all `subscribers` of a change."""
+    def notify_lossy(self, message: Optional[_MessageT] = None) -> None:
+        """Notify all `subscribers` of a change.
+
+        Silently drop the message if the notify queue is full.
+        """
         if self._task is None:
             raise NotInitializedError()
 
@@ -65,8 +77,20 @@ class EventNotifier(ReadOnlyEventNotifier):
         except asyncio.QueueFull:
             pass
 
+    async def notify_reliable(self, message: Optional[_MessageT] = None) -> None:
+        """Notify all `subscribers` of a change.
+
+        Wait to put the message in the notify queue if the queue is full.
+        """
+        if self._task is None:
+            raise NotInitializedError()
+
+        await self._queue.put(message)
+
     @contextmanager
-    def subscribed(self, callback: _CallbackT) -> Generator[None, None, None]:
+    def subscribed(
+        self, callback: _CallbackT[_MessageT]
+    ) -> Generator[None, None, None]:
         """Register a callback to be called on each message.
 
         The callback is subscribed when this context manager is entered,
@@ -80,7 +104,7 @@ class EventNotifier(ReadOnlyEventNotifier):
         finally:
             unsubscribe()
 
-    def subscribe(self, callback: _CallbackT) -> Callable[[], None]:
+    def subscribe(self, callback: _CallbackT[_MessageT]) -> Callable[[], None]:
         """Register a callback to be called on each notify().
 
         Returns:
@@ -97,11 +121,14 @@ class EventNotifier(ReadOnlyEventNotifier):
 
         return unsubscribe
 
-    def subscribe_many(self, callbacks: List[_CallbackT]) -> Callable[[], None]:
+    def subscribe_many(
+        self,
+        callbacks: List[_CallbackT[_MessageT]],
+    ) -> Callable[[], None]:
         """Register a list of callbacks to be called on each notify().
 
         Returns:
-            A function that you can call to unsubscribe ``callback``.
+            A function that you can call to unsubscribe all ``callbacks``.
             Raises a ValueError if any of the callbacks are not present.
         """
         if self._task is None:
@@ -122,7 +149,7 @@ class EventNotifier(ReadOnlyEventNotifier):
         """
         self._task = asyncio.create_task(self._wait_for_event())
 
-    async def _wait(self) -> AsyncIterable[Optional[Any]]:
+    async def _wait(self) -> AsyncIterable[Optional[_MessageT]]:
         """Wait until the next change notification."""
         while True:
             try:
@@ -134,10 +161,10 @@ class EventNotifier(ReadOnlyEventNotifier):
         """Indefinitely wait for an event to occur, then invoke each callback."""
         async for message in self._wait():
             for callback in self._callbacks:
-                if message is None:
-                    await callback()
-                else:
-                    await callback(message)
+                try:
+                    await callback(message)  # type: ignore
+                except TypeError:
+                    await callback()  # type: ignore
 
 
 class NotInitializedError(Exception):

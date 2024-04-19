@@ -7,7 +7,7 @@ from robot_server.service.notifications import PublisherNotifier
 
 
 @pytest.fixture
-async def event_notifier() -> EventNotifier:
+async def event_notifier() -> EventNotifier[None]:
     """Mock event notifier."""
     return EventNotifier(max_queue_size=10)
 
@@ -19,11 +19,11 @@ def test_notify_publishers() -> None:
 
     publisher_notifier._notify_publishers()
 
-    event_notifier.notify.assert_called_once()
+    event_notifier.notify_lossy.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_register_publish_callback(event_notifier: EventNotifier) -> None:
+async def test_register_publish_callback(event_notifier: EventNotifier[None]) -> None:
     """It should append the list of callbacks within a given callback."""
     publisher_notifier = PublisherNotifier(event_notifier=event_notifier)
     callback = Mock()
@@ -35,7 +35,7 @@ async def test_register_publish_callback(event_notifier: EventNotifier) -> None:
 
 
 @pytest.mark.asyncio
-def test_register_publish_callbacks(event_notifier: EventNotifier) -> None:
+def test_register_publish_callbacks(event_notifier: EventNotifier[None]) -> None:
     """It should extend the list of callbacks within a given list of callbacks."""
     publisher_notifier = PublisherNotifier(event_notifier=event_notifier)
     callback1 = Mock()

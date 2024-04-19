@@ -16,7 +16,7 @@ class PublisherNotifier:
 
     def __init__(
         self,
-        event_notifier: Optional[EventNotifier] = None,
+        event_notifier: Optional[EventNotifier[None]] = None,
     ):
         # Because EventNotifier is a generic event interface, all callbacks themselves perform a specific
         # conditional check. A max_queue_size=1 ensures that all callbacks are invoked, even if a new event occurs
@@ -31,11 +31,11 @@ class PublisherNotifier:
         self, callbacks: List[Callable[[], Awaitable[None]]]
     ):
         """Register a list of callbacks."""
-        self._event_notifier.subscribe_many(callbacks)
+        self._event_notifier.subscribe_many(callbacks)  # type: ignore[arg-type]
 
     def _notify_publishers(self) -> None:
         """A generic notifier, alerting all `waiters` of a change."""
-        self._event_notifier.notify()
+        self._event_notifier.notify_lossy()
 
 
 _pe_publisher_notifier_accessor: AppStateAccessor[PublisherNotifier] = AppStateAccessor[

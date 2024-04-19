@@ -8,13 +8,13 @@ from opentrons.util.event_notifier import EventNotifier
 
 
 @pytest.fixture
-async def event_notifier() -> EventNotifier:
+async def event_notifier() -> EventNotifier[str]:
     """Mock event notifier."""
     return EventNotifier(max_queue_size=10)
 
 
 @pytest.mark.asyncio
-async def test_subscribe(event_notifier: EventNotifier) -> None:
+async def test_subscribe(event_notifier: EventNotifier[str]) -> None:
     """It should add the callback to a list of callbacks."""
 
     async def mock_callback() -> None:
@@ -27,7 +27,7 @@ async def test_subscribe(event_notifier: EventNotifier) -> None:
 
 
 @pytest.mark.asyncio
-async def test_subscribe_many(event_notifier: EventNotifier) -> None:
+async def test_subscribe_many(event_notifier: EventNotifier[str]) -> None:
     """It should subscribe a list of callbacks."""
 
     async def mock_callback1() -> None:
@@ -42,20 +42,20 @@ async def test_subscribe_many(event_notifier: EventNotifier) -> None:
 
 
 @pytest.mark.asyncio
-async def test_subscribed(event_notifier: EventNotifier) -> None:
+async def test_subscribed(event_notifier: EventNotifier[str]) -> None:
     """It should unsubscribe a callback when subscribed() as soon as the context is exited."""
 
     async def mock_callback() -> None:
         await asyncio.sleep(0)
 
     with event_notifier.subscribed(mock_callback):
-        event_notifier.notify()
+        event_notifier.notify_lossy()
 
     assert mock_callback not in event_notifier._callbacks
 
 
 @pytest.mark.asyncio
-async def test_notify_with_message(event_notifier: EventNotifier) -> None:
+async def test_notify_with_message(event_notifier: EventNotifier[str]) -> None:
     """It should allow callbacks to subscribe to notify(), passing a message if the callback supports one."""
     result = []
 
@@ -63,7 +63,7 @@ async def test_notify_with_message(event_notifier: EventNotifier) -> None:
         result.append(message)
 
     unsubscribe = event_notifier.subscribe(mock_callback)
-    event_notifier.notify("TEST_MESSAGE")
+    event_notifier.notify_lossy("TEST_MESSAGE")
     await asyncio.sleep(0)
 
     assert len(result) == 1
@@ -73,10 +73,10 @@ async def test_notify_with_message(event_notifier: EventNotifier) -> None:
 
 
 @pytest.mark.asyncio
-async def test_notify_without_message(event_notifier: EventNotifier) -> None:
+async def test_notify_without_message(event_notifier: EventNotifier[str]) -> None:
     """It should allow callbacks to subscribe to notify(), passing no messages if the callback does not support them."""
 
-    async def mock_callback() -> None:
+    async def mock_callback(message: str) -> None:
         await asyncio.sleep(0)
 
     mock_callback = MagicMock(wraps=mock_callback)
@@ -84,7 +84,7 @@ async def test_notify_without_message(event_notifier: EventNotifier) -> None:
 
     assert mock_callback.call_count == 0
 
-    event_notifier.notify("TEST_MESSAGE")
+    event_notifier.notify_lossy("TEST_MESSAGE")
     await asyncio.sleep(0)
 
     assert mock_callback.call_count == 1
@@ -93,8 +93,8 @@ async def test_notify_without_message(event_notifier: EventNotifier) -> None:
 
 
 @pytest.mark.asyncio
-async def test_notify_full_queue(event_notifier: EventNotifier) -> None:
-    """It should not add more messages to the notify queue if the queue is full."""
+async def test_notify_lossy_full_queue(event_notifier: EventNotifier[str]) -> None:
+    """It should not add messages to the notify queue if the queue is full, silently passing QueueFull exceptions."""
 
     async def mock_callback() -> None:
         await asyncio.sleep(0)
@@ -102,7 +102,7 @@ async def test_notify_full_queue(event_notifier: EventNotifier) -> None:
     unsubscribe = event_notifier.subscribe(mock_callback)
 
     for _ in range(15):
-        event_notifier.notify(message="TEST_MESSAGE")
+        event_notifier.notify_lossy(message="TEST_MESSAGE")
 
     assert event_notifier._queue.qsize() == 10
 
@@ -110,7 +110,31 @@ async def test_notify_full_queue(event_notifier: EventNotifier) -> None:
 
 
 @pytest.mark.asyncio
-async def test_notify_unsubscribe(event_notifier: EventNotifier) -> None:
+async def test_notify_reliable_full_queue() -> None:
+    """It should wait to add messages to the notify queue if the queue is full."""
+    notifier = EventNotifier[str](max_queue_size=1)
+
+    received_messages = []
+
+    async def callback(message: str) -> None:
+        await asyncio.sleep(0.01)
+        received_messages.append(message)
+
+    unsubscribe = notifier.subscribe(callback)
+
+    await notifier.notify_reliable("TEST_MESSAGE_1")
+    await asyncio.sleep(0.01)
+    await notifier.notify_reliable("TEST_MESSAGE_2")
+
+    await asyncio.sleep(0.3)
+
+    assert received_messages == ["TEST_MESSAGE_1", "TEST_MESSAGE_2"]
+
+    unsubscribe()
+
+
+@pytest.mark.asyncio
+async def test_notify_unsubscribe(event_notifier: EventNotifier[str]) -> None:
     """It should unsubscribe a callback from the notifier."""
 
     async def mock_callback() -> None:
