@@ -18,7 +18,6 @@ from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands, slot_standardization
 from opentrons.protocol_engine.errors.exceptions import (
-    EStopActivatedError,
     CommandNotAllowedError,
 )
 from opentrons.protocol_engine.types import (
