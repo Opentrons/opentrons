@@ -1,4 +1,4 @@
-from typing import Any, Dict, cast, List, Iterable, Tuple
+from typing import Any, Dict, cast, List, Iterable, Tuple, Optional
 from typing_extensions import Final
 from dataclasses import asdict
 
@@ -193,12 +193,34 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
     },
 )
 
+
+def _build_output_option_with_default(
+    from_conf: Any, default: OutputOptions
+) -> OutputOptions:
+    if from_conf is None:
+        return default
+    else:
+        if isinstance(from_conf, OutputOptions):
+            return from_conf
+        else:
+            try:
+                enumval = OutputOptions[from_conf]
+            except KeyError:  # not an enum entry
+                return default
+            else:
+                return enumval
+
+
 def _build_log_files_with_default(
     from_conf: Any,
-    default: Dict[InstrumentProbeType, str],
-) -> Dict[InstrumentProbeType, str]:
+    default: Optional[Dict[InstrumentProbeType, str]],
+) -> Optional[Dict[InstrumentProbeType, str]]:
+    print(f"from_conf {from_conf} default {default}")
     if not isinstance(from_conf, dict):
-        return {k: v for k, v in default.items()}
+        if default is None:
+            return None
+        else:
+            return {k: v for k, v in default.items()}
     else:
         validated: Dict[InstrumentProbeType, str] = {}
         for k, v in from_conf.items():
@@ -211,14 +233,9 @@ def _build_log_files_with_default(
                     pass
                 else:
                     validated[enumval] = v
-        for k, default_v in default.items():
-            if k in from_conf:
-                validated[k] = from_conf[k]
-            elif k.name in from_conf:
-                validated[k] = from_conf[k.name]
-            else:
-                validated[k] = default_v
+        print(f"result {validated}")
         return validated
+
 
 def _build_dict_with_default(
     from_conf: Any,
@@ -304,6 +321,18 @@ def _build_default_cap_pass(
 def _build_default_liquid_probe(
     from_conf: Any, default: LiquidProbeSettings
 ) -> LiquidProbeSettings:
+    output_option = _build_output_option_with_default(
+        from_conf.get("output_option", None), default.output_option
+    )
+    print(f"output_option {output_option}")
+    data_files: Optional[Dict[InstrumentProbeType, str]] = None
+    if (
+        output_option is OutputOptions.sync_buffer_to_csv
+        or output_option is OutputOptions.stream_to_csv
+    ):
+        data_files = _build_log_files_with_default(
+            from_conf.get("data_files", {}), default.data_files
+        )
     return LiquidProbeSettings(
         starting_mount_height=from_conf.get(
             "starting_mount_height", default.starting_mount_height
@@ -328,7 +357,7 @@ def _build_default_liquid_probe(
         num_baseline_reads=from_conf.get(
             "num_baseline_reads", default.num_baseline_reads
         ),
-        data_files=_build_log_files_with_default(from_conf.get("data_files", {}), default.data_files),
+        data_files=data_files,
     )
 
 
