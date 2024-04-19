@@ -79,6 +79,7 @@ def test_get_load_params(subject: LabwareCore) -> None:
             version=42,
             parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
             ordering=[],
+            metadata=LabwareDefinitionMetadata.construct(displayName="what a cool labware"),  # type: ignore[call-arg]
         )
     ],
 )
@@ -98,6 +99,9 @@ def test_set_calibration_succeeds_in_ok_location(
             version=labware_definition.version,
         )
     )
+    decoy.when(
+        mock_engine_client.state.labware.get_display_name("cool-labware")
+    ).then_return("what a cool labware")
     location = LabwareOffsetLocation(slotName=DeckSlotName.SLOT_C2)
     decoy.when(
         mock_engine_client.state.geometry.get_offset_location("cool-labware")
@@ -110,7 +114,10 @@ def test_set_calibration_succeeds_in_ok_location(
                 location=location,
                 vector=LabwareOffsetVector(x=1, y=2, z=3),
             )
-        )
+        ),
+        mock_engine_client.reload_labware(
+            labware_id="cool-labware",
+        ),
     )
 
 

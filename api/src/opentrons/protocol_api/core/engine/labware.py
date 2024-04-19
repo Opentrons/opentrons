@@ -117,6 +117,9 @@ class LabwareCore(AbstractLabware[WellCore]):
             vector=LabwareOffsetVector(x=delta.x, y=delta.y, z=delta.z),
         )
         self._engine_client.add_labware_offset(request)
+        self._engine_client.reload_labware(
+            labware_id=self._labware_id,
+        )
 
     def get_calibrated_offset(self) -> Point:
         return self._engine_client.state.geometry.get_labware_position(self._labware_id)
