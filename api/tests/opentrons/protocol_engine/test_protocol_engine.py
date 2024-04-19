@@ -323,7 +323,6 @@ def test_add_fixit_command(
     ).then_do(_stub_queued)
 
     result = subject.add_command(original_request)
-    print(result)
     assert result == queued
 
 
