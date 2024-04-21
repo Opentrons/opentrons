@@ -2,17 +2,16 @@ import React from 'react'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Link,
-  PrimaryButton,
   SPACING,
   StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
+import { PromptButton } from '../../organisms/PromptButton'
 import LOGO_PATH from '../../assets/images/opentrons_logo.svg'
 
 const IMAGE_ALT = 'Opentrons logo'
@@ -48,11 +47,10 @@ export function SidePanel(): JSX.Element {
         </StyledText>
 
         <Flex gridGap={SPACING.spacing16} flexWrap={WRAP}>
-          {/* ToDo(kk:04/11/2024) add a button component */}
-          <PromptButton>{t('reagent_transfer')}</PromptButton>
-          <PromptButton>{t('reagent_transfer_flex')}</PromptButton>
-          <PromptButton>{t('prc')}</PromptButton>
-          <PromptButton>{t('prc_flex')}</PromptButton>
+          <PromptButton buttonText={t('reagent_transfer')} />
+          <PromptButton buttonText={t('reagent_transfer_flex')} />
+          <PromptButton buttonText={t('pcr')} />
+          <PromptButton buttonText={t('pcr_flex')} />
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -88,11 +86,6 @@ const BUTTON_GUIDE_TEXT_STYLE = css`
   line-height: ${TYPOGRAPHY.lineHeight24};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   color: ${COLORS.white};
-`
-
-const PromptButton = styled(PrimaryButton)`
-  border-radius: ${BORDERS.borderRadiusFull};
-  white-space: nowrap;
 `
 
 const FeedbackLink = styled(Link)`

@@ -9,10 +9,15 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { PromptGuide } from '../../molecules/PromptGuide'
+import { promptContext } from '../PromptButton/PromptProvider'
+
+const usePromptValue = () => React.useContext(promptContext)
 
 export function ChatContainer(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const isDummyInitial = true
+  const promptFromButton = usePromptValue()
+  console.log('promptFromButton', promptFromButton)
   return (
     <Flex
       padding={SPACING.spacing40}
@@ -30,6 +35,7 @@ export function ChatContainer(): JSX.Element {
           <PromptGuide />
         </Flex>
       ) : null}
+      {promptFromButton}
     </Flex>
   )
 }
