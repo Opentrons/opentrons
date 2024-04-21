@@ -9,8 +9,6 @@ import {
   flexPcr,
 } from '../../assets/prompts'
 
-const usePromptSetValue = () => React.useContext(setPromptContext)
-
 interface PromptButtonProps {
   buttonText: string
 }
@@ -32,6 +30,7 @@ const PROMPT_BY_NAME: Record<string, { prompt: string }> = {
 }
 
 export function PromptButton({ buttonText }: PromptButtonProps): JSX.Element {
+  const usePromptSetValue = () => React.useContext(setPromptContext)
   const setPrompt = usePromptSetValue()
 
   const handleClick = useCallback(() => {
