@@ -2,13 +2,17 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useForm, Controller } from 'react-hook-form'
 import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
+  BORDERS,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  JUSTIFY_SPACE_BETWEEN,
   Link,
   PrimaryButton,
   SPACING,
@@ -40,6 +44,17 @@ interface FormValues {
   passwordInput: string
 }
 
+const CLOSE_ICON_STYLE = css`
+  border-radius: 50%;
+
+  &:hover {
+    background: ${COLORS.black90}${COLORS.opacity20HexCode};
+  }
+  &:active {
+    background: ${COLORS.black90}${COLORS.opacity20HexCode}};
+  }
+`
+
 export function FactoryModeSlideout({
   isExpanded,
   onCloseClick,
@@ -58,6 +73,7 @@ export function FactoryModeSlideout({
   const [currentStep, setCurrentStep] = React.useState<number>(1)
   const [toggleValue, setToggleValue] = React.useState<boolean>(false)
   const [file, setFile] = React.useState<File | null>(null)
+  const [fileError, setFileError] = React.useState<string | null>(null)
   const [isUploading, setIsUploading] = React.useState<boolean>(false)
 
   const onFinishCompleteClick = (): void => {
@@ -113,19 +129,25 @@ export function FactoryModeSlideout({
 
   const handleChooseFile = (file: File): void => {
     const imgUrl = URL.createObjectURL(file)
-    const logoImage = new Image()
-    logoImage.src = imgUrl
-    logoImage.onload = () => {
-      // validation for ODD screen size and allowed file type
-      if (
-        logoImage.naturalWidth === 1024 &&
-        logoImage.naturalHeight === 600 &&
-        file.type === 'image/png'
-      ) {
+    try {
+      const logoImage = new Image()
+      logoImage.src = imgUrl
+      logoImage.onload = () => {
+        // validation for ODD screen size and allowed file type
+        // TODO: pull this check out of the onload
+        if (file.type !== 'image/png') {
+          setFileError('Incorrect file type')
+        } else if (
+          logoImage.naturalWidth !== 1024 ||
+          logoImage.naturalHeight !== 600
+        ) {
+          setFileError('Incorrect image dimensions')
+        }
         setFile(file)
-      } else {
-        // TODO: error handling in file upload component
       }
+    } catch {
+      // TODO: not catching for non-image files
+      setFileError('Cannot load file')
     }
   }
 
@@ -152,7 +174,11 @@ export function FactoryModeSlideout({
           ) : null}
           {currentStep === 2 ? (
             <PrimaryButton
-              disabled={(toggleValue && file == null) || isUploading}
+              disabled={
+                (toggleValue && file == null) ||
+                isUploading ||
+                fileError != null
+              }
               onClick={handleCompleteClick}
               width="100%"
             >
@@ -219,34 +245,72 @@ export function FactoryModeSlideout({
             </Flex>
             <StyledText as="p">{t('branded:oem_mode_description')}</StyledText>
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
-              <StyledText css={TYPOGRAPHY.pSemiBold}>
-                {t('upload_custom_logo')}
-              </StyledText>
-              <StyledText as="p">
-                {t('upload_custom_logo_description')}
-              </StyledText>
-              <StyledText as="p">
-                {t('upload_custom_logo_dimensions')}
-              </StyledText>
-            </Flex>
-            <UploadInput
-              uploadButtonText={t('choose_file')}
-              onUpload={(file: File) => handleChooseFile(file)}
-              dragAndDropText={
-                <StyledText as="p">
-                  <Trans
-                    t={t}
-                    i18nKey="shared:drag_and_drop"
-                    components={{
-                      a: <Link color={COLORS.blue55} role="button" />,
-                    }}
-                  />
+          {toggleValue ? (
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
+                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('upload_custom_logo')}
                 </StyledText>
-              }
-            />
-          </Flex>
+                <StyledText as="p">
+                  {t('upload_custom_logo_description')}
+                </StyledText>
+                <StyledText as="p">
+                  {t('upload_custom_logo_dimensions')}
+                </StyledText>
+              </Flex>
+              {file == null ? (
+                <UploadInput
+                  uploadButtonText={t('choose_file')}
+                  onUpload={(file: File) => handleChooseFile(file)}
+                  dragAndDropText={
+                    <StyledText as="p">
+                      <Trans
+                        t={t}
+                        i18nKey="shared:drag_and_drop"
+                        components={{
+                          a: <Link color={COLORS.blue55} role="button" />,
+                        }}
+                      />
+                    </StyledText>
+                  }
+                />
+              ) : (
+                // TODO: extract to FileUpload component
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing4}
+                >
+                  <Flex
+                    alignItems={ALIGN_CENTER}
+                    backgroundColor={
+                      fileError == null ? COLORS.grey20 : COLORS.red30
+                    }
+                    borderRadius={BORDERS.borderRadius4}
+                    height={SPACING.spacing44}
+                    justifyContent={JUSTIFY_SPACE_BETWEEN}
+                    padding={SPACING.spacing8}
+                  >
+                    <StyledText as="p">{file.name}</StyledText>
+                    <Btn
+                      size="1.5rem"
+                      onClick={() => {
+                        setFile(null)
+                        setFileError(null)
+                      }}
+                      aria-label="remove_file"
+                    >
+                      <Icon name="close" css={CLOSE_ICON_STYLE} />
+                    </Btn>
+                  </Flex>
+                  {fileError != null ? (
+                    <StyledText as="label" color={COLORS.red50}>
+                      {fileError}
+                    </StyledText>
+                  ) : null}
+                </Flex>
+              )}
+            </Flex>
+          ) : null}
         </Flex>
       ) : null}
     </MultiSlideout>
