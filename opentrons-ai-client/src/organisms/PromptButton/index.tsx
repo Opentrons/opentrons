@@ -30,13 +30,14 @@ const PROMPT_BY_NAME: Record<string, { prompt: string }> = {
 }
 
 export function PromptButton({ buttonText }: PromptButtonProps): JSX.Element {
-  const usePromptSetValue = () => React.useContext(setPromptContext)
+  const usePromptSetValue = (): React.Dispatch<React.SetStateAction<string>> =>
+    React.useContext(setPromptContext)
   const setPrompt = usePromptSetValue()
 
   const handleClick = useCallback(() => {
     const { prompt } = PROMPT_BY_NAME[buttonText]
     setPrompt(prompt)
-  }, [setPrompt])
+  }, [setPrompt, buttonText])
 
   return <PromptBtn onClick={handleClick}>{buttonText}</PromptBtn>
 }

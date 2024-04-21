@@ -11,13 +11,12 @@ import {
 import { PromptGuide } from '../../molecules/PromptGuide'
 import { promptContext } from '../PromptButton/PromptProvider'
 
-const usePromptValue = () => React.useContext(promptContext)
+const usePromptValue = (): string => React.useContext(promptContext)
 
 export function ChatContainer(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
   const isDummyInitial = true
   const promptFromButton = usePromptValue()
-  console.log('promptFromButton', promptFromButton)
   return (
     <Flex
       padding={SPACING.spacing40}
