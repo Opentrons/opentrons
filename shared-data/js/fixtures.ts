@@ -173,12 +173,10 @@ export function getCutoutFixturesForModuleModel(
   }, [])
 }
 
-export function getFixtureIdByCutoutIdFromModuleSlotName(
-  slotName: string,
-  moduleFixtures: CutoutFixture[], // cutout fixtures for a specific module model
-  deckDef: DeckDefinition
+export function getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
+  anchorCutoutId: CutoutId | null,
+  moduleFixtures: CutoutFixture[] // cutout fixtures for a specific module model
 ): { [cutoutId in CutoutId]?: CutoutFixtureId } {
-  const anchorCutoutId = getCutoutIdForSlotName(slotName, deckDef)
   // find the first fixture for this specific module model that may mount to the cutout implied by the slotName
   const anchorFixture = moduleFixtures.find(fixture =>
     fixture.mayMountTo.some(cutoutId => cutoutId === anchorCutoutId)
@@ -188,6 +186,18 @@ export function getFixtureIdByCutoutIdFromModuleSlotName(
     return groupedFixtures?.[0] ?? { [anchorCutoutId]: anchorFixture.id }
   }
   return {}
+}
+
+export function getFixtureIdByCutoutIdFromModuleSlotName(
+  slotName: string,
+  moduleFixtures: CutoutFixture[], // cutout fixtures for a specific module model
+  deckDef: DeckDefinition
+): { [cutoutId in CutoutId]?: CutoutFixtureId } {
+  const anchorCutoutId = getCutoutIdForSlotName(slotName, deckDef)
+  return getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
+    anchorCutoutId,
+    moduleFixtures
+  )
 }
 
 export function getCutoutIdsFromModuleSlotName(
