@@ -1,7 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 
 import {
   ALIGN_CENTER,
@@ -16,6 +16,8 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import type { SubmitHandler } from 'react-hook-form'
 
 // ToDo (kk:04/19/2024) Note this interface will be used by prompt buttons in SidePanel
 // interface InputPromptProps {}
@@ -33,18 +35,14 @@ export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
   })
   const userPrompt = watch('userPrompt') ?? ''
 
-  const onSubmit: SubmitHandler<InputType> = data => {
+  const onSubmit: SubmitHandler<InputType> = async data => {
     // ToDo (kk: 04/19/2024) call api
     const { userPrompt } = data
     console.log('user prompt', userPrompt)
   }
 
   return (
-    <form
-      id="User_Prompt"
-      onSubmit={handleSubmit(onSubmit)}
-      style={{ width: '100%' }}
-    >
+    <StyledForm id="User_Prompt" onSubmit={() => handleSubmit(onSubmit)}>
       <Flex
         padding={SPACING.spacing40}
         gridGap={SPACING.spacing40}
@@ -61,11 +59,16 @@ export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
         />
         <PlayButton disabled={userPrompt.length === 0} />
       </Flex>
-    </form>
+    </StyledForm>
   )
 }
 
+const StyledForm = styled.form`
+  width: 100%;
+`
+
 const StyledTextarea = styled.textarea`
+  resize: none;
   min-height: 3.75rem;
   background-color: ${COLORS.white};
   border: none;
