@@ -76,7 +76,6 @@ export function FactoryModeSlideout({
 
   const { updateRobotSetting } = useUpdateRobotSettingMutation({
     onSuccess: () => {
-      // TODO: issue UPDATE_SETTING_SUCCESS action also because we haven't migrated away from redux
       if (toggleValue && file != null) {
         createSplash({ file })
       } else {
@@ -114,16 +113,17 @@ export function FactoryModeSlideout({
   }
 
   const handleChooseFile = (file: File): void => {
-    const imgUrl = URL.createObjectURL(file)
-    try {
+    // validation for file type
+    if (file.type !== 'image/png') {
+      setFileError('Incorrect file type')
+      setFile(file)
+    } else {
+      const imgUrl = URL.createObjectURL(file)
       const logoImage = new Image()
       logoImage.src = imgUrl
       logoImage.onload = () => {
-        // validation for ODD screen size and allowed file type
-        // TODO: pull this check out of the onload
-        if (file.type !== 'image/png') {
-          setFileError('Incorrect file type')
-        } else if (
+        // validation for ODD screen size
+        if (
           logoImage.naturalWidth !== 1024 ||
           logoImage.naturalHeight !== 600
         ) {
@@ -131,9 +131,6 @@ export function FactoryModeSlideout({
         }
         setFile(file)
       }
-    } catch {
-      // TODO: not catching for non-image files
-      setFileError('Cannot load file')
     }
   }
 
