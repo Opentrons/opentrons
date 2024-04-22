@@ -17,14 +17,10 @@ import {
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   getCutoutFixturesForModuleModel,
-  getCutoutIdForSlotName,
   getCutoutIdsFromModuleSlotName,
   getModuleDisplayName,
   getModuleType,
-  MAGNETIC_BLOCK_TYPE,
   NON_CONNECTING_MODULE_TYPES,
-  SINGLE_SLOT_FIXTURES,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'

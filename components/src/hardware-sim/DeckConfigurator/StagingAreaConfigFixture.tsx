@@ -9,6 +9,7 @@ import {
   COLUMN_3_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
+  CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
   STAGING_AREA_DISPLAY_NAME,
   STAGING_AREA_FIXTURE_WIDTH,
@@ -29,6 +30,7 @@ interface StagingAreaConfigFixtureProps {
     fixtureLocation: CutoutId,
     cutoutFixtureId: CutoutFixtureId
   ) => void
+  selected?: boolean
 }
 
 export function StagingAreaConfigFixture(
@@ -39,6 +41,7 @@ export function StagingAreaConfigFixture(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    selected = false,
   } = props
 
   const stagingAreaCutout = deckDefinition.locations.cutouts.find(
@@ -55,6 +58,7 @@ export function StagingAreaConfigFixture(
   const x = xSlotPosition + COLUMN_3_X_ADJUSTMENT
   const y = ySlotPosition + Y_ADJUSTMENT
 
+  const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
       width={STAGING_AREA_FIXTURE_WIDTH}
@@ -65,11 +69,7 @@ export function StagingAreaConfigFixture(
       foreignObjectProps={{ flex: '1' }}
     >
       <Btn
-        css={
-          handleClickRemove != null
-            ? CONFIG_STYLE_EDITABLE
-            : CONFIG_STYLE_READ_ONLY
-        }
+        css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null

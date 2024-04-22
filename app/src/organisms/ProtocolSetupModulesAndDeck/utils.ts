@@ -16,6 +16,7 @@ export type AttachedProtocolModuleMatch = ProtocolModuleInfo & {
   attachedModuleMatch: AttachedModule | null
 }
 
+// NOTE: this is a FLEX only function
 // some logic copied from useModuleRenderInfoForProtocolById
 export function getAttachedProtocolModuleMatches(
   attachedModules: AttachedModule[],

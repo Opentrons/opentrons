@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
+import { MemoryRouter } from 'react-router-dom'
 import { screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
@@ -13,15 +14,18 @@ import {
 import {
   useDeckConfigurationQuery,
   useModulesQuery,
+  useStopRunMutation,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../../i18n'
+import { mockHeaterShaker } from '../../../../../redux/modules/__fixtures__'
+import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { DeckConfiguration } from '@opentrons/shared-data'
-import { mockHeaterShaker } from '../../../../../redux/modules/__fixtures__'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../ProtocolUpload/hooks')
 
 const mockFixture = {
   cutoutId: 'cutoutB3',
@@ -29,9 +33,14 @@ const mockFixture = {
 }
 
 const render = (props: React.ComponentProps<typeof LocationConflictModal>) => {
-  return renderWithProviders(<LocationConflictModal {...props} />, {
-    i18nInstance: i18n,
-  })[0]
+  return renderWithProviders(
+    <MemoryRouter>
+      <LocationConflictModal {...props} />
+    </MemoryRouter>,
+    {
+      i18nInstance: i18n,
+    }
+  )[0]
 }
 
 describe('LocationConflictModal', () => {
@@ -45,6 +54,8 @@ describe('LocationConflictModal', () => {
       deckDef: ot3StandardDeckV5 as any,
       robotName: 'otie',
     }
+    vi.mocked(useStopRunMutation).mockReturnValue({ stopRun: vi.fn() } as any)
+    vi.mocked(useCurrentRunId).mockReturnValue('RUNID')
     vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
     vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],

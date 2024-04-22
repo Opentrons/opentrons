@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 import {
   useDeckConfigurationQuery,
   useModulesQuery,
@@ -27,10 +28,10 @@ import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Modal } from '../../../../molecules/Modal'
 import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
 
-import type { ModuleModel, DeckDefinition } from '@opentrons/shared-data'
 import { SmallButton } from '../../../../atoms/buttons'
-import { useHistory } from 'react-router-dom'
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
+
+import type { ModuleModel, DeckDefinition } from '@opentrons/shared-data'
 
 const EQUIPMENT_POLL_MS = 5000
 interface ModuleFixtureOption {
