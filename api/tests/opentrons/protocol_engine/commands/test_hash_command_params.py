@@ -38,7 +38,7 @@ def test_nonequivalent_commands() -> None:
         params=commands.BlowOutInPlaceParams(
             pipetteId="abc123",
             flowRate=123,
-        )
+        ), intent=CommandIntent.PROTOCOL
     )
     b = commands.WaitForDurationCreate(
         params=commands.WaitForDurationParams(seconds=123)
@@ -52,10 +52,10 @@ def test_nonequivalent_commands() -> None:
 def test_repeated_commands() -> None:
     """Repeated commands should hash differently, even though they're equivalent in isolation."""
     a = commands.WaitForDurationCreate(
-        params=commands.WaitForDurationParams(seconds=123)
+        params=commands.WaitForDurationParams(seconds=123), intent=CommandIntent.PROTOCOL
     )
     b = commands.WaitForDurationCreate(
-        params=commands.WaitForDurationParams(seconds=123)
+        params=commands.WaitForDurationParams(seconds=123), intent=CommandIntent.PROTOCOL
     )
 
     a_hash = hash_protocol_command_params(a, None)

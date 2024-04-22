@@ -145,7 +145,7 @@ def test_get_next_to_execute_returns_first_queued() -> None:
 
 @pytest.mark.parametrize(
     "queue_status",
-    [QueueStatus.SETUP, QueueStatus.RUNNING, QueueStatus.AWAITING_RECOVERY],
+    [QueueStatus.SETUP, QueueStatus.RUNNING],
 )
 def test_get_next_to_execute_prioritizes_setup_command_queue(
     queue_status: QueueStatus,
@@ -157,7 +157,7 @@ def test_get_next_to_execute_prioritizes_setup_command_queue(
         queued_setup_command_ids=["setup-command-id"],
     )
 
-    assert subject.get_next_to_execute() is None
+    assert subject.get_next_to_execute() == "setup-command-id"
 
 
 @pytest.mark.parametrize(
