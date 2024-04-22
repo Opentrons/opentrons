@@ -1386,7 +1386,7 @@ async def _test_liquid_probe(
                 aspirate_while_sensing=False,  # FIXME: I heard this doesn't work
                 auto_zero_sensor=True,  # TODO: when would we want to adjust this?
                 num_baseline_reads=10,  # TODO: when would we want to adjust this?
-                data_file="",  # FIXME: remove
+                data_files=None,
             )
             end_z = await api.liquid_probe(mount, probe_settings, probe=probe)
             if probe == InstrumentProbeType.PRIMARY:

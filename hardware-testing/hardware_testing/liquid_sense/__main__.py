@@ -270,6 +270,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
+    exit_error = os.EX_OK
     try:
         if not run_args.ctx.is_simulating():
             data_dir = get_testing_data_directory()
@@ -292,6 +293,7 @@ if __name__ == "__main__":
     except Exception as e:
         ui.print_info(f"got error {e}")
         ui.print_info(traceback.format_exc())
+        exit_error = 1
     finally:
         if run_args.recorder is not None:
             ui.print_info("ending recording")
@@ -314,4 +316,4 @@ if __name__ == "__main__":
         run_args.ctx.cleanup()
         if not args.simulate:
             helpers_ot3.restart_server_ot3()
-        os._exit(os.EX_OK)
+        os._exit(exit_error)
