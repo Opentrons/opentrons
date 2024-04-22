@@ -581,23 +581,15 @@ class Labware:
 
         How the motion system applies the offset depends on the API level of the protocol.
 
-            - In API level 2.13 and earlier, it applies only to the labware instance it
-              is called on.
-            - In API levels 2.14–2.17, ``set_offset()`` is not available, and the API will
-              raise an error.
-            - In API level 2.18 and newer, the offset will apply to any labware of the
+            - In API level 2.13 and earlier, the offset applies only to the labware
+              instance that ``set_offset()`` is called on.
+            - In API levels 2.14–2.17, ``set_offset()`` is not available, and the API
+              raises an error.
+            - In API level 2.18 and newer, the offset applies to any labware of the
               same type, in the same on-deck location. Labware type is defined as the
               combination of the ``loadName``, ``namespace``, and ``version`` parameters
               of :py:meth:`~.ProtocolContext.load_labware`.
-
-        For example, in API level 2.18, if you use ``set_offset()`` on a tip rack, use
-        all the tips, and replace the rack with a fresh one of the same type in the same
-        location, the offsets will apply to the fresh tip rack.
-
-        Furthermore, if you use ``set_offset()`` on a well plate and then use
-        :py:meth:`.move_labware` to change its location, the API will apply different
-        offsets for the new type–location combination. If you want to use the same
-        offsets in the new location, call ``set_offset()`` again, after the movement.
+              See :ref:`labware-offset-behavior` for examples.
 
         .. note::
 

@@ -65,7 +65,12 @@ Since a typical protocol only `defines` the ``run`` function but doesn't `call` 
 Setting Labware Offsets
 -----------------------
 
-All positions relative to labware are adjusted automatically based on labware offset data. When you're running your code in Jupyter Notebook or with ``opentrons_execute``, you need to set your own offsets because you can't perform run setup and Labware Position Check in the Opentrons App or on the Flex touchscreen. For these applications, do the following to calculate and apply labware offsets:
+All positions relative to labware are adjusted automatically based on labware offset data. When you're running your code in Jupyter Notebook or with ``opentrons_execute``, you need to set your own offsets because you can't perform run setup and Labware Position Check in the Opentrons App or on the Flex touchscreen. 
+
+Creating a Dummy Protocol
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For advanced control applications, do the following to calculate and apply labware offsets:
 	
 	1. Create a "dummy" protocol that loads your labware and has each used pipette pick up a tip from a tip rack.
 	2. Import the dummy protocol to the Opentrons App.
@@ -118,11 +123,65 @@ This automatically generated code uses generic names for the loaded labware. If 
 
 Once you've executed this code in Jupyter Notebook, all subsequent positional calculations for this reservoir in slot 2 will be adjusted 0.1 mm to the right, 0.2 mm to the back, and 0.3 mm up.
 
-Remember, you should only add ``set_offset()`` commands to protocols run outside of the Opentrons App. And you should follow the behavior of Labware Position Check, i.e., *do not* reuse offset measurements unless they apply to the *same labware* in the *same deck slot* on the *same robot*.
+Keep in mind that ``set_offset()`` commands will override any labware offsets set by running Labware Position Check in the Opentrons App. And you should follow the behavior of Labware Position Check, i.e., *do not* reuse offset measurements unless they apply to the *same labware type* in the *same deck slot* on the *same robot*.
 
 .. warning::
 
-	Improperly reusing offset data may cause your robot to move to an unexpected position or crash against labware, which can lead to incorrect protocol execution or damage your equipment. The same applies when running protocols with ``set_offset()`` commands in the Opentrons App. When in doubt: run Labware Position Check again and update your code!
+	Improperly reusing offset data may cause your robot to move to an unexpected position or crash against labware, which can lead to incorrect protocol execution or damage your equipment. When in doubt: run Labware Position Check again and update your code!
+
+.. _labware-offset-behavior:
+
+Labware Offset Behavior
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The effects of ``set_offset()`` vary depending on the API level of your protocol.
+
+.. list-table::
+    :header-rows: 1
+    
+    * - API version 
+      - Offset behavior
+    * - 2.12–2.13
+      - Offsets only apply to the exact :py:class:`.Labware` instance.
+    * - 2.14–2.17
+      - ``set_offset()`` is not available, and the API raises an error.
+    * - 2.18 and newer
+      - 
+        - Offsets apply to any labware of the same type, in the same on-deck location. 
+        - Offsets can't be set on labware that is currently off-deck.
+        - Offsets do not follow a labware instance when using :py:meth:`.move_labware`.
+
+For example, in the latest API version, if you use ``set_offset()`` on a tip rack, use all the tips, and replace the rack with a fresh one of the same type in the same location, the offsets will apply to the fresh tip rack::
+
+    tiprack = protocol.load_labware(
+        load_name="opentrons_flex_96_tiprack_1000ul", location="D3"
+    )
+    tiprack2 = protocol.load_labware(
+        load_name="opentrons_flex_96_tiprack_1000ul",
+        location=protocol_api.OFF_DECK,
+    )
+    tiprack.set_offset(x=0.1, y=0.1, z=0.1)
+    protocol.move_labware(
+        labware=tiprack, new_location=protocol_api.OFF_DECK
+    )  # tiprack has no offset while off-deck
+    protocol.move_labware(
+        labware=tiprack2, new_location="D3"
+    )  # tiprack2 now has offset 0.1, 0.1, 0.1
+    
+Because offsets apply to combinations of labware type and location, if you want an offset to apply to a piece of labware as it moves around the deck, call ``set_offset()`` again after each movement::
+
+    plate = protocol.load_labware(
+        load_name="corning_96_wellplate_360ul_flat", location="D2"
+    )
+    plate.set_offset(
+        x=-0.1, y=-0.2, z=-0.3
+    )  # plate now has offset -0.1, -0.2, -0.3
+    protocol.move_labware(
+        labware=plate, new_location="D3"
+    )  # plate now has offset 0, 0, 0
+    plate.set_offset(
+        x=-0.1, y=-0.2, z=-0.3
+    )  # plate again has offset -0.1, -0.2, -0.3
 
 Using Custom Labware
 --------------------
