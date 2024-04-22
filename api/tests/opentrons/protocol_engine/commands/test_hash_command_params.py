@@ -2,7 +2,9 @@
 
 from opentrons.protocol_engine import CommandIntent
 from opentrons.protocol_engine import commands
-from opentrons.protocol_engine.commands.hash_command_params import hash_command_params
+from opentrons.protocol_engine.commands.hash_command_params import (
+    hash_protocol_command_params,
+)
 
 
 def test_equivalent_commands() -> None:
@@ -20,10 +22,14 @@ def test_equivalent_commands() -> None:
         params=commands.WaitForDurationParams(seconds=123)
     )
 
-    assert hash_command_params(b, None) == hash_command_params(c, None)
+    assert hash_protocol_command_params(b, None) == hash_protocol_command_params(
+        c, None
+    )
 
-    a_hash = hash_command_params(a, None)
-    assert hash_command_params(b, a_hash) == hash_command_params(c, a_hash)
+    a_hash = hash_protocol_command_params(a, None)
+    assert hash_protocol_command_params(b, a_hash) == hash_protocol_command_params(
+        c, a_hash
+    )
 
 
 def test_nonequivalent_commands() -> None:
@@ -32,26 +38,31 @@ def test_nonequivalent_commands() -> None:
         params=commands.BlowOutInPlaceParams(
             pipetteId="abc123",
             flowRate=123,
-        )
+        ),
+        intent=CommandIntent.PROTOCOL,
     )
     b = commands.WaitForDurationCreate(
         params=commands.WaitForDurationParams(seconds=123)
     )
 
-    assert hash_command_params(a, None) != hash_command_params(b, None)
+    assert hash_protocol_command_params(a, None) != hash_protocol_command_params(
+        b, None
+    )
 
 
 def test_repeated_commands() -> None:
     """Repeated commands should hash differently, even though they're equivalent in isolation."""
     a = commands.WaitForDurationCreate(
-        params=commands.WaitForDurationParams(seconds=123)
+        params=commands.WaitForDurationParams(seconds=123),
+        intent=CommandIntent.PROTOCOL,
     )
     b = commands.WaitForDurationCreate(
-        params=commands.WaitForDurationParams(seconds=123)
+        params=commands.WaitForDurationParams(seconds=123),
+        intent=CommandIntent.PROTOCOL,
     )
 
-    a_hash = hash_command_params(a, None)
-    b_hash = hash_command_params(b, a_hash)
+    a_hash = hash_protocol_command_params(a, None)
+    b_hash = hash_protocol_command_params(b, a_hash)
     assert a_hash != b_hash
 
 
@@ -61,4 +72,4 @@ def test_setup_command() -> None:
         params=commands.WaitForDurationParams(seconds=123),
         intent=CommandIntent.SETUP,
     )
-    assert hash_command_params(setup_command, None) is None
+    assert hash_protocol_command_params(setup_command, None) is None
