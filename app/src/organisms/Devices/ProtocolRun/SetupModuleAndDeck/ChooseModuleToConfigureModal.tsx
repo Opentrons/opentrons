@@ -138,7 +138,9 @@ export const ChooseModuleToConfigureModal = (
     fixtureOptions.length > 0 ? (
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText as="p">{t('add_this_deck_hardware')}</StyledText>
-        {fixtureOptions}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          {fixtureOptions}
+        </Flex>
       </Flex>
     ) : (
       emptyState
