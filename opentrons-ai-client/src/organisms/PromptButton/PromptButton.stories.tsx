@@ -29,12 +29,12 @@ const meta: Meta<typeof PromptButtonComponent> = {
   decorators: [
     Story => {
       const usePromptValue = (): string => React.useContext(promptContext)
-      const prompt = usePromptValue()
+      const promptFromButton = usePromptValue()
       return (
         <I18nextProvider i18n={i18n}>
           <PromptProvider>
             <Story />
-            <Flex padding={SPACING.spacing16}>{prompt}</Flex>
+            <Flex padding={SPACING.spacing16}>{promptFromButton}</Flex>
           </PromptProvider>
         </I18nextProvider>
       )

@@ -11,12 +11,11 @@ import {
 import { PromptGuide } from '../../molecules/PromptGuide'
 import { promptContext } from '../PromptButton/PromptProvider'
 
-const usePromptValue = (): string => React.useContext(promptContext)
-
 export function ChatContainer(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const isDummyInitial = true
+  const usePromptValue = (): string => React.useContext(promptContext)
   const promptFromButton = usePromptValue()
+  const isDummyInitial = true
   return (
     <Flex
       padding={SPACING.spacing40}
@@ -34,6 +33,7 @@ export function ChatContainer(): JSX.Element {
           <PromptGuide />
         </Flex>
       ) : null}
+      {/* ToDo (kk:04/22/2024) this will be removed when the pr is approved */}
       {promptFromButton}
     </Flex>
   )
