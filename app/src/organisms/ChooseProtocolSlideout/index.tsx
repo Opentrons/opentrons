@@ -461,7 +461,7 @@ export function ChooseProtocolSlideoutComponent(
                 setSelectedProtocol(storedProtocol)
               }
             }}
-            robotName={robot.name}
+            robot={robot}
             {...{ selectedProtocol, runCreationError, runCreationErrorCode }}
           />
         ) : (
@@ -483,7 +483,7 @@ interface StoredProtocolListProps {
   handleSelectProtocol: (storedProtocol: StoredProtocolData | null) => void
   runCreationError: string | null
   runCreationErrorCode: number | null
-  robotName: string
+  robot: Robot
 }
 
 function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
@@ -492,11 +492,13 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
     handleSelectProtocol,
     runCreationError,
     runCreationErrorCode,
-    robotName,
+    robot,
   } = props
   const { t } = useTranslation(['device_details', 'protocol_details', 'shared'])
   const storedProtocols = useSelector((state: State) =>
     getStoredProtocols(state)
+  ).filter(
+    protocol => protocol.mostRecentAnalysis?.robotType === robot.robotModel
   )
   React.useEffect(() => {
     handleSelectProtocol(first(storedProtocols) ?? null)
@@ -585,7 +587,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                             color: ${COLORS.red60};
                             text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
                           `}
-                          to={`/devices/${robotName}`}
+                          to={`/devices/${robot.name}`}
                         />
                       ),
                     }}
