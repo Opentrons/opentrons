@@ -43,6 +43,7 @@ import {
   createDeckFixture,
   toggleIsGripperRequired,
 } from '../../../step-forms/actions/additionalItems'
+import { createModuleWithNoSlot } from '../../../modules'
 import { RobotTypeTile } from './RobotTypeTile'
 import { MetadataTile } from './MetadataTile'
 import { FirstPipetteTypeTile, SecondPipetteTypeTile } from './PipetteTypeTile'
@@ -229,9 +230,29 @@ export function CreateFileWizard(): JSX.Element | null {
       }
 
       // create modules
-      modules.forEach(moduleArgs =>
-        dispatch(stepFormActions.createModule(moduleArgs))
-      )
+      // sort so modules with slot are created first
+      // then modules without a slot are generated in remaining available slots
+      modules.sort((a, b) => {
+        if (a.slot == null && b.slot != null) {
+          return 1
+        }
+        if (b.slot == null && a.slot != null) {
+          return -1
+        }
+        return 0
+      })
+
+      modules.forEach(moduleArgs => {
+        return moduleArgs.slot != null
+          ? dispatch(stepFormActions.createModule(moduleArgs))
+          : dispatch(
+              createModuleWithNoSlot({
+                model: moduleArgs.model,
+                type: moduleArgs.type,
+              })
+            )
+      })
+
       // add gripper
       if (values.additionalEquipment.includes('gripper')) {
         dispatch(toggleIsGripperRequired())

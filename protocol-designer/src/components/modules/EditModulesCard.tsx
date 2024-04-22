@@ -28,7 +28,7 @@ import { ModuleRow } from './ModuleRow'
 import { AdditionalItemsRow } from './AdditionalItemsRow'
 import { isModuleWithCollisionIssue } from './utils'
 import { StagingAreasRow } from './StagingAreasRow'
-import { MultipleModuleRow } from './MultipleModuleRow'
+import { MultipleModulesRow } from './MultipleModulesRow'
 
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
@@ -146,7 +146,7 @@ export function EditModulesCard(props: Props): JSX.Element {
             )
           } else if (moduleData != null && moduleData.length > 1) {
             return (
-              <MultipleModuleRow
+              <MultipleModulesRow
                 moduleType={moduleType}
                 moduleOnDeck={moduleData}
                 key={`${moduleType}_${i}`}
