@@ -5,6 +5,12 @@ from .action_handler import ActionHandler
 from .actions import Action
 
 
+import logging
+
+
+_log = logging.getLogger(__name__)
+
+
 class ActionDispatcher:
     """A pipeline, with an endpoint, that actions can be dispatched into."""
 
@@ -24,6 +30,9 @@ class ActionDispatcher:
 
     def dispatch(self, action: Action) -> None:
         """Dispatch an action into the pipeline."""
+
+        _log.warning(f"Dispatching action {action}")
+
         for handler in self._handlers:
             handler.handle_action(action)
 
