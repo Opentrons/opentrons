@@ -1,11 +1,17 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Flex, StepMeter, SPACING } from '@opentrons/components'
+import {
+  Flex,
+  StepMeter,
+  SPACING,
+  POSITION_STICKY,
+} from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../ChildNavigation'
 import { CreateNewTransfer } from './CreateNewTransfer'
 import { SelectPipette } from './SelectPipette'
+import { SelectTipRack } from './SelectTipRack'
 import { quickTransferReducer } from './utils'
 
 import type { QuickTransferSetupState } from './types'
@@ -66,6 +72,16 @@ export const QuickTransferFlow = (): JSX.Element => {
         exitButtonProps={exitButtonProps}
       />
     )
+  } else if (currentStep === 3) {
+    modalContent = (
+      <SelectTipRack
+        state={state}
+        dispatch={dispatch}
+        onBack={() => setCurrentStep(prevStep => prevStep - 1)}
+        onNext={() => setCurrentStep(prevStep => prevStep + 1)}
+        exitButtonProps={exitButtonProps}
+      />
+    )
   } else {
     modalContent = null
   }
@@ -76,6 +92,8 @@ export const QuickTransferFlow = (): JSX.Element => {
       <StepMeter
         totalSteps={QUICK_TRANSFER_WIZARD_STEPS}
         currentStep={currentStep}
+        position={POSITION_STICKY}
+        top="0"
       />
       {modalContent == null ? (
         <Flex>

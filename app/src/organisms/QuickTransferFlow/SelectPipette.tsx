@@ -79,9 +79,12 @@ export function SelectPipette(props: SelectPipetteProps): JSX.Element {
         marginTop={SPACING.spacing120}
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing16} ${SPACING.spacing60} ${SPACING.spacing40} ${SPACING.spacing60}`}
-        gridGap={SPACING.spacing16}
+        gridGap={SPACING.spacing4}
       >
-        <StyledText css={TYPOGRAPHY.level4HeaderRegular}>
+        <StyledText
+          css={TYPOGRAPHY.level4HeaderRegular}
+          paddingBottom={SPACING.spacing8}
+        >
           {t('pipette_currently_attached')}
         </StyledText>
         {leftPipetteSpecs != null ? (
