@@ -102,7 +102,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
     ErrorCode,
-    SensorId,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     StopRequest,
@@ -1373,15 +1372,13 @@ class OT3Controller(FlexBackend):
         can_bus_only_output = bool(
             output_option.value & OutputOptions.can_bus_only.value
         )
-        IPT_TO_SID: Dict[InstrumentProbeType, SensorId] = {
-            InstrumentProbeType.PRIMARY: SensorId.S0,
-            InstrumentProbeType.SECONDARY: SensorId.S1,
-            InstrumentProbeType.BOTH: SensorId.BOTH,
-        }
         data_files_transposed = (
             None
             if data_files is None
-            else {IPT_TO_SID[probe]: data_files[probe] for probe in data_files.keys()}
+            else {
+                sensor_id_for_instrument(probe): data_files[probe]
+                for probe in data_files.keys()
+            }
         )
         positions = await liquid_probe(
             messenger=self._messenger,

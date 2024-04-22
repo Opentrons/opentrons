@@ -324,7 +324,6 @@ def _build_default_liquid_probe(
     output_option = _build_output_option_with_default(
         from_conf.get("output_option", None), default.output_option
     )
-    print(f"output_option {output_option}")
     data_files: Optional[Dict[InstrumentProbeType, str]] = None
     if (
         output_option is OutputOptions.sync_buffer_to_csv
