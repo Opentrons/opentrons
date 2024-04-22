@@ -329,7 +329,7 @@ def test_add_fixit_command_raises(
     model_utils: ModelUtils,
     subject: ProtocolEngine,
 ) -> None:
-    """It should raise if a failed_command_id is supplied without a  fixit command."""
+    """It should raise if a failedCommandId is supplied without a  fixit command."""
     original_request = commands.WaitForResumeCreate(
         params=commands.WaitForResumeParams()
     )
