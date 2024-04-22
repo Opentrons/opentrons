@@ -326,7 +326,7 @@ def pickup_direction(nozzle):
     if nozzle == 'front_right':
         x_direction = 1
         y_direction = -1
-    elif nozzle == 'front left':
+    elif nozzle == 'front_left':
         x_direction = -1
         y_direction = -1
     elif nozzle == 'rear_right':
@@ -429,6 +429,8 @@ async def _main() -> None:
                                             nozzle_loc[Axis.by_mount(mount)])
                     await move_to_point(hw_api, mount, nozzle_position, cp)
                     await asyncio.sleep(1)
+                    nozzle_dist = await hw_api.encoder_current_position_ot3(mount, cp)
+                    print(f'nozzle_position: {nozzle_dist[Axis.by_mount(mount)]}')
                     nozzle_measurement = gauge.read()
                     measurement_map.update({nozzle_count: nozzle_measurement})
                     print("nozzle-",nozzle_count, "(mm): " , nozzle_measurement, end="")
@@ -559,9 +561,12 @@ async def _main() -> None:
         x_coord_offset = 0
         y_coord_offset = 0
         true_tip_count = 1
+        trial = 1
         num_of_columns = args.num_cols
+        print(f'Trial: {trial}')
         while True:
             measurements = []
+            encoder_pos = []
             cp = CriticalPoint.TIP
             if args.dial_indicator:
                 tip_count = 0
@@ -575,6 +580,9 @@ async def _main() -> None:
                                             dial_loc[2])
                     await move_to_point(hw_api, mount, tip_position, cp)
                     await asyncio.sleep(1)
+                    tip_dist = await hw_api.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
+                    encoder_pos.append(tip_dist[Axis.by_mount(mount)])
+                    print(f'tip_position: {tip_dist[Axis.by_mount(mount)]}')
                     tip_measurement = gauge.read()
                     print("tip-",tip_count, "(mm): " ,tip_measurement,"\r", end="")
                     measurements.append(tip_measurement)
@@ -593,6 +601,8 @@ async def _main() -> None:
                         y_offset += 9
                     if tip_count % num_of_columns == 0:
                         x_offset = 0
+                print(measurements)
+                print(encoder_pos)
 
             if args.trough:
                 await hw_api.prepare_for_aspirate(mount)
@@ -609,10 +619,8 @@ async def _main() -> None:
             drop_tip_location =  Point(30 , 60 , 104.5)
              # 299.66 , 389.04 , 104.5
             await move_to_point(hw_api, mount, drop_tip_location, cp)
-            input("Feel the Tip!")
             await hw_api.drop_tip(mount)
-            await hw_api.home_z(mount)
-
+            # await hw_api.home_z(mount)
             # m_current = float(input("motor_current in amps: "))
             # pick_up_speed = float(input("prep pick up tip speed in mm/s: "))
             # Pick up distance i originally used was 16.5
@@ -652,13 +660,15 @@ async def _main() -> None:
                                     pickup_loc[2])
             await move_to_point(hw_api, mount, pu_location, cp)
             initial_press_dist = await hw_api.encoder_current_position_ot3(mount, cp)
+            trial += 1
+            print(f'Trial: {trial}')
             print(f'inital press position: {initial_press_dist[Axis.by_mount(mount)]}')
             press_dist = await hw_api.pick_up_tip(mount,
                                     tip_length=(tip_length[args.tip_size]-tip_overlap),
                                     presses = 1,
                                     increment = 0)
             print(f'Press Position: {press_dist[Axis.by_mount(mount)]}')
-            await hw_api.home_z(mount.LEFT)
+            # await hw_api.home_z(mount.LEFT)
             cp = CriticalPoint.TIP
             current_position = await hw_api.current_position_ot3(mount, cp)
             # this_position = await jog(hw_api, current_position, cp)
@@ -734,7 +744,7 @@ if __name__ == "__main__":
     else:
         with open(path + cal_fn, 'r') as openfile:
             deck_slot = json.load(openfile)
-    tip_length = {"T1K": 95.7, "T200": 58.35, "T50": 57.9}
+    tip_length = {"T1K": 95.6, "T200": 58.35, "T50": 57.9}
     tip_overlap = 10.5
     if args.mount == "left":
         mount = OT3Mount.LEFT
