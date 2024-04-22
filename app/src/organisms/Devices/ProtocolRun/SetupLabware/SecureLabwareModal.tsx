@@ -29,7 +29,7 @@ interface SecureLabwareModalProps {
 export const SecureLabwareModal = (
   props: SecureLabwareModalProps
 ): JSX.Element => {
-  const { t } = useTranslation(['protocol_setup', 'shared'])
+  const { t } = useTranslation(['protocol_setup', 'shared', 'branded'])
   const moduleName = getModuleName(props.type)
   return createPortal(
     <LegacyModal
@@ -48,7 +48,9 @@ export const SecureLabwareModal = (
             <Flex flexDirection={DIRECTION_COLUMN}>
               <Trans
                 t={t}
-                i18nKey={`secure_labware_explanation_${snakeCase(moduleName)}`}
+                i18nKey={`branded:secure_labware_explanation_${snakeCase(
+                  moduleName
+                )}`}
                 components={{
                   block: (
                     <StyledText
@@ -74,7 +76,7 @@ export const SecureLabwareModal = (
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <StyledText as="p" marginRight="3.625rem">
-              {t(`secure_labware_explanation_${snakeCase(moduleName)}`)}
+              {t(`branded:secure_labware_explanation_${snakeCase(moduleName)}`)}
             </StyledText>
             <img
               src={secureTCLatchImage}

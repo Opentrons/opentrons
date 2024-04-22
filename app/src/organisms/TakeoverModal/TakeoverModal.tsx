@@ -32,7 +32,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
     confirmTerminate,
     terminateInProgress,
   } = props
-  const { i18n, t } = useTranslation('shared')
+  const { i18n, t } = useTranslation(['shared', 'branded'])
 
   const terminateHeader: ModalHeaderBaseProps = {
     title: t('terminate') + '?',
@@ -46,7 +46,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
       <Modal header={terminateHeader}>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText as="p" marginBottom={SPACING.spacing32}>
-            {t('confirm_terminate')}
+            {t('branded:confirm_terminate')}
           </StyledText>
           <Flex flex="1" gridGap={SPACING.spacing8}>
             <SmallButton
@@ -96,7 +96,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
               {i18n.format(t('robot_is_busy'), 'capitalize')}
             </StyledText>
             <StyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
-              {t('computer_in_app_is_controlling_robot')}
+              {t('branded:computer_in_app_is_controlling_robot')}
             </StyledText>
           </Flex>
           <StyledText

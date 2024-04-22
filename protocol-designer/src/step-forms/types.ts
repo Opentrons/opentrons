@@ -72,7 +72,7 @@ export interface ModuleTemporalProperties {
 }
 export type ModuleOnDeck = ModuleEntity & ModuleTemporalProperties
 export type ModulesForEditModulesCard = Partial<
-  Record<ModuleType, ModuleOnDeck | null | undefined>
+  Record<ModuleType, ModuleOnDeck[] | null | undefined>
 >
 // =========== LABWARE ========
 export type NormalizedLabwareById = Record<

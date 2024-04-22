@@ -150,7 +150,7 @@ describe('ChoosePipette', () => {
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
     render(props)
     screen.getByText(
-      'Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette'
+      'Detach Flex 1-Channel 1000 μL and Attach 96-Channel pipette'
     )
   })
 
@@ -163,7 +163,7 @@ describe('ChoosePipette', () => {
     props = { ...props, selectedPipette: NINETY_SIX_CHANNEL }
     render(props)
     screen.getByText(
-      'Detach Flex 1-Channel 1000 μL and attach 96-Channel pipette'
+      'Detach Flex 1-Channel 1000 μL and Attach 96-Channel pipette'
     )
   })
 })

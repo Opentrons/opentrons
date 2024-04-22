@@ -50,7 +50,7 @@ def mock_runs_publisher(decoy: Decoy) -> RunsPublisher:
 @pytest.fixture
 def run_store(sql_engine: SQLEngine, mock_runs_publisher: RunsPublisher) -> RunStore:
     """Get a RunStore linked to the same database as the subject ProtocolStore."""
-    return RunStore(sql_engine=sql_engine, runs_publisher=mock_runs_publisher)
+    return RunStore(sql_engine=sql_engine)
 
 
 async def test_insert_and_get_protocol(

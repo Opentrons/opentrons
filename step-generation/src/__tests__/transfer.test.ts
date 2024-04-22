@@ -37,6 +37,8 @@ const airGapHelper = makeAirGapHelper({
   wellLocation: {
     origin: 'bottom',
     offset: {
+      x: 0,
+      y: 0,
       z: 11.54,
     },
   },
@@ -45,6 +47,8 @@ const dispenseAirGapHelper = makeDispenseAirGapHelper({
   wellLocation: {
     origin: 'bottom',
     offset: {
+      x: 0,
+      y: 0,
       z: 11.54,
     },
   },
@@ -78,6 +82,10 @@ beforeEach(() => {
     mixInDestination: null,
     blowoutLocation: null,
     dropTipLocation: FIXED_TRASH_ID,
+    aspirateXOffset: 0,
+    dispenseXOffset: 0,
+    aspirateYOffset: 0,
+    dispenseYOffset: 0,
   }
 
   invariantContext = makeContext()
@@ -561,6 +569,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -594,6 +604,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -628,6 +640,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -704,6 +718,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -715,6 +731,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -754,6 +772,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -766,6 +786,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -928,6 +950,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -939,6 +963,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -977,6 +1003,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -986,6 +1014,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -997,6 +1027,8 @@ describe('advanced options', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
             },
           },
@@ -1097,6 +1129,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1122,6 +1156,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1146,6 +1182,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1171,6 +1209,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1195,6 +1235,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1254,6 +1296,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -1281,6 +1325,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1303,8 +1349,11 @@ describe('advanced options', () => {
             wellName: 'B1',
             wellLocation: {
               origin: 'bottom',
+
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1346,6 +1395,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.2,
               },
             },
@@ -1371,6 +1422,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1408,6 +1461,7 @@ describe('advanced options', () => {
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
+
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
@@ -1432,6 +1486,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1457,6 +1513,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1481,6 +1539,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 3.1,
               },
             },
@@ -1540,6 +1600,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -1567,6 +1629,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1591,6 +1655,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.2,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1632,6 +1698,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                y: 0,
+                x: 0,
                 z: 3.2,
               },
             },
@@ -1657,6 +1725,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.2,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1716,6 +1786,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -1756,6 +1828,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -1780,6 +1854,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1805,6 +1881,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -1829,6 +1907,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1854,6 +1934,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -1913,6 +1995,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -1939,6 +2023,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -1963,6 +2049,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2005,6 +2093,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2029,6 +2119,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2051,9 +2143,9 @@ describe('advanced options', () => {
             wellName: 'B1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -2091,6 +2183,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2115,6 +2209,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2140,6 +2236,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2197,6 +2295,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             pipetteId: 'p300SingleId',
@@ -2222,6 +2322,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             pipetteId: 'p300SingleId',
@@ -2248,6 +2350,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2290,6 +2394,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2314,6 +2420,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2336,9 +2444,9 @@ describe('advanced options', () => {
             wellName: 'B1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -2374,6 +2482,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
           },
@@ -2442,6 +2552,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2466,6 +2578,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2491,6 +2605,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2515,6 +2631,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2540,6 +2658,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2599,6 +2719,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2625,6 +2747,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2649,6 +2773,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2691,6 +2817,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2715,6 +2843,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2737,9 +2867,9 @@ describe('advanced options', () => {
             wellName: 'B1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -2777,6 +2907,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2801,6 +2933,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2826,6 +2960,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2885,6 +3021,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -2911,6 +3049,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2935,6 +3075,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -2977,6 +3119,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3001,6 +3145,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3023,9 +3169,9 @@ describe('advanced options', () => {
             wellName: 'B1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -3061,6 +3207,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
           },
@@ -3127,6 +3275,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3151,6 +3301,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3176,6 +3328,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3200,6 +3354,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3225,6 +3381,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3284,6 +3442,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3310,6 +3470,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3334,6 +3496,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3376,6 +3540,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3399,6 +3565,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
               },
             },
@@ -3422,9 +3590,9 @@ describe('advanced options', () => {
             wellName: 'A1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -3459,6 +3627,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             volume: 3,
@@ -3511,6 +3681,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3535,6 +3707,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3560,6 +3734,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 3.1,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3619,6 +3795,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3644,6 +3822,8 @@ describe('advanced options', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 11.54,
               },
             },
@@ -3669,6 +3849,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3711,6 +3893,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.1,
@@ -3735,6 +3919,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+                y: 0,
+                x: 0,
               },
             },
             flowRate: 2.2,
@@ -3757,9 +3943,9 @@ describe('advanced options', () => {
             wellName: 'A1',
             flowRate: 2.3,
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 13.84,
+                z: 3.3,
               },
             },
           },
@@ -3795,6 +3981,8 @@ describe('advanced options', () => {
               origin: 'bottom',
               offset: {
                 z: 11.54,
+                y: 0,
+                x: 0,
               },
             },
           },

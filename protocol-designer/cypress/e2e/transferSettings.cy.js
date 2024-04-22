@@ -55,7 +55,7 @@ describe('Advanced Settings for Transfer Form', () => {
 
     enterBatchEdit()
 
-    // Different Pipette disbales aspirate and dispense Flowrate and Mix settings
+    // Different Pipette disables aspirate and dispense Flowrate and Mix settings
     // step 6 has different pipette than step 1
     cy.get('[data-test="StepItem_6"]').click(batchEditClickOptions)
 
@@ -70,10 +70,14 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('input[name="aspirate_mix_checkbox"]').should('be.disabled')
 
     // TipPosition Aspirate and Dispense should be disabled
-    cy.get('[id=TipPositionField_aspirate_mmFromBottom]').should('be.disabled')
-    cy.get('[id=TipPositionField_dispense_mmFromBottom]').should('be.disabled')
+    cy.get('[id=TipPositionIcon_aspirate_mmFromBottom]').should(
+      'not.be.enabled'
+    )
+    cy.get('[id=TipPositionIcon_dispense_mmFromBottom]').should(
+      'not.be.enabled'
+    )
 
-    // Dispense Flowrate and mix diabled
+    // Dispense Flowrate and mix disabled
     cy.get('input[name="dispense_flowRate"]').should('be.disabled')
     cy.get('input[name="dispense_mix_checkbox"]').should('be.disabled')
 
@@ -110,8 +114,12 @@ describe('Advanced Settings for Transfer Form', () => {
       .should('be.empty')
 
     // TipPosition Aspirate and Dispense should be enabled
-    cy.get('[id=TipPositionField_aspirate_mmFromBottom]').should('be.enabled')
-    cy.get('[id=TipPositionField_dispense_mmFromBottom]').should('be.enabled')
+    cy.get('[id=TipPositionIcon_aspirate_mmFromBottom]').should(
+      'not.be.disabled'
+    )
+    cy.get('[id=TipPositionIcon_dispense_mmFromBottom]').should(
+      'not.be.disabled'
+    )
 
     // Delay in aspirate and Dispense settings is enabled
     cy.get('input[name="aspirate_delay_checkbox"]').should('be.enabled')

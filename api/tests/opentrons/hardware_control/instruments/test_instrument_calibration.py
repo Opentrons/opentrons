@@ -134,9 +134,9 @@ def test_load_tip_length(
         (top_types.Point(0, 1.0, 1.5), top_types.Point(-1, 0, 0.2), True),
         # If both points are non-zero but at least one element is more than
         # the range different the test should fail
-        (top_types.Point(0.1, -1, 1.5), top_types.Point(1.7, 0, 0.2), False),
-        (top_types.Point(0.1, -1, 1.5), top_types.Point(0.6, 0.6, 1.3), False),
-        (top_types.Point(0.1, -1, 1.5), top_types.Point(-0.2, -0.1, 5), False),
+        (top_types.Point(0.1, -1, 4.3), top_types.Point(1.7, 0, 0.2), False),
+        (top_types.Point(0.1, -3.2, 1.5), top_types.Point(0.6, 0.9, 1.3), False),
+        (top_types.Point(0.1, -1, 1.5), top_types.Point(-0.2, -0.1, 6), False),
     ],
 )
 def test_instrument_consistency_check_ot3(
@@ -151,4 +151,4 @@ def test_instrument_consistency_check_ot3(
             top_types.Mount.LEFT: left,
             top_types.Mount.RIGHT: right,
         }
-        assert result[0].limit == 1.5
+        assert result[0].limit == 4.0

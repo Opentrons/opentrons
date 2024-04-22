@@ -1,33 +1,38 @@
 import * as React from 'react'
-
-import { Box, SIZE_3 } from '@opentrons/components'
+import { Flex } from '../primitives'
+import { SPACING } from '../ui-style-constants'
 import { ICON_DATA_BY_NAME } from './icon-data'
 import { Icon as IconComponent } from './Icon'
+import type { Meta, StoryObj } from '@storybook/react'
 
-import type { Story, Meta } from '@storybook/react'
-
-export default {
+const meta: Meta<typeof IconComponent> = {
   title: 'Library/Atoms/Icon',
+  component: IconComponent,
   argTypes: {
     name: {
+      options: Object.keys(ICON_DATA_BY_NAME),
       control: {
         type: 'select',
-        options: Object.keys(ICON_DATA_BY_NAME),
       },
-      defaultValue: 'alert',
     },
   },
   decorators: [
     Story => (
-      <Box size={SIZE_3}>
+      <Flex padding={SPACING.spacing16}>
         <Story />
-      </Box>
+      </Flex>
     ),
   ],
-} as Meta
-
-const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
-  return <IconComponent {...args} />
 }
-export const Icon = Template.bind({})
-Icon.args = { spin: false }
+
+export default meta
+
+type Story = StoryObj<typeof IconComponent>
+
+export const Icon: Story = {
+  args: {
+    name: 'alert',
+    spin: false,
+    size: '4rem',
+  },
+}

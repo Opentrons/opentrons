@@ -1,62 +1,15 @@
 import {
-  getModuleType,
-  HEATERSHAKER_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { isModuleWithCollisionIssue } from '../../modules'
-import {
-  FLEX_SUPPORTED_MODULE_MODELS,
-  DEFAULT_SLOT_MAP,
-} from './ModulesAndOtherTile'
+import { STANDARD_EMPTY_SLOTS } from './StagingAreaTile'
 
-import type { ModuleType } from '@opentrons/shared-data'
+import type { DeckConfiguration, ModuleType } from '@opentrons/shared-data'
 import type { FormModules } from '../../../step-forms'
 import type { AdditionalEquipment, FormState } from './types'
 
 export const FLEX_TRASH_DEFAULT_SLOT = 'cutoutA3'
-const ALL_STAGING_AREAS = 4
-
-interface LastCheckedProps {
-  additionalEquipment: AdditionalEquipment[]
-  moduleTypesOnDeck: ModuleType[]
-}
-
-export const getLastCheckedEquipment = (
-  props: LastCheckedProps
-): string | null => {
-  const { additionalEquipment, moduleTypesOnDeck } = props
-  const hasAllStagingAreas =
-    additionalEquipment.filter(equipment => equipment.includes('stagingArea'))
-      .length === ALL_STAGING_AREAS
-  const hasTrashBin = additionalEquipment.includes('trashBin')
-  if (!hasTrashBin || !hasAllStagingAreas) {
-    return null
-  }
-
-  if (
-    moduleTypesOnDeck.includes(THERMOCYCLER_MODULE_TYPE) &&
-    moduleTypesOnDeck.includes(HEATERSHAKER_MODULE_TYPE)
-  ) {
-    return TEMPERATURE_MODULE_TYPE
-  }
-
-  if (
-    moduleTypesOnDeck.includes(HEATERSHAKER_MODULE_TYPE) &&
-    moduleTypesOnDeck.includes(TEMPERATURE_MODULE_TYPE)
-  ) {
-    return THERMOCYCLER_MODULE_TYPE
-  }
-
-  if (
-    moduleTypesOnDeck.includes(THERMOCYCLER_MODULE_TYPE) &&
-    moduleTypesOnDeck.includes(TEMPERATURE_MODULE_TYPE)
-  ) {
-    return HEATERSHAKER_MODULE_TYPE
-  }
-
-  return null
-}
 
 export const getCrashableModuleSelected = (
   modules: FormModules | null,
@@ -75,28 +28,14 @@ export const getCrashableModuleSelected = (
   return crashableModuleOnDeck
 }
 
-export const getTrashBinOptionDisabled = (props: LastCheckedProps): boolean => {
-  const { additionalEquipment, moduleTypesOnDeck } = props
-  const allStagingAreasInUse =
-    additionalEquipment.filter(equipment => equipment.includes('stagingArea'))
-      .length === ALL_STAGING_AREAS
-
-  const allModulesInSideSlotsOnDeck =
-    moduleTypesOnDeck.includes(HEATERSHAKER_MODULE_TYPE) &&
-    moduleTypesOnDeck.includes(TEMPERATURE_MODULE_TYPE) &&
-    moduleTypesOnDeck.includes(THERMOCYCLER_MODULE_TYPE)
-
-  return allStagingAreasInUse && allModulesInSideSlotsOnDeck
-}
-
 export const MOVABLE_TRASH_CUTOUTS = [
-  {
-    value: 'cutoutA1',
-    slot: 'A1',
-  },
   {
     value: 'cutoutA3',
     slot: 'A3',
+  },
+  {
+    value: 'cutoutA1',
+    slot: 'A1',
   },
   {
     value: 'cutoutB1',
@@ -124,37 +63,107 @@ export const MOVABLE_TRASH_CUTOUTS = [
   },
 ]
 
+export const getUnoccupiedStagingAreaSlots = (
+  modules: FormState['modules']
+): DeckConfiguration => {
+  let unoccupiedSlots = STANDARD_EMPTY_SLOTS
+  const moduleCutoutIds =
+    modules != null
+      ? Object.values(modules).flatMap(module =>
+          module.type === THERMOCYCLER_MODULE_TYPE
+            ? [`cutout${module.slot}`, 'cutoutA1']
+            : `cutout${module.slot}`
+        )
+      : []
+
+  unoccupiedSlots = unoccupiedSlots.filter(emptySlot => {
+    return !moduleCutoutIds.includes(emptySlot.cutoutId)
+  })
+
+  return unoccupiedSlots
+}
+
+const TOTAL_MODULE_SLOTS = 8
+
+export const getIsSlotAvailable = (
+  modules: FormState['modules'],
+  additionalEquipment: FormState['additionalEquipment']
+): boolean => {
+  const moduleLength = modules != null ? Object.keys(modules).length : 0
+  const additionalEquipmentLength = additionalEquipment.length
+  const hasTC = Object.values(modules || {}).some(
+    module => module.type === THERMOCYCLER_MODULE_TYPE
+  )
+
+  const filteredModuleLength = hasTC ? moduleLength + 1 : moduleLength
+  const hasWasteChute = additionalEquipment.some(equipment =>
+    equipment.includes('wasteChute')
+  )
+  const isStagingAreaInD3 = additionalEquipment
+    .filter(equipment => equipment.includes('stagingArea'))
+    .find(stagingArea => stagingArea.split('_')[1] === 'cutoutD3')
+  const hasGripper = additionalEquipment.some(equipment =>
+    equipment.includes('gripper')
+  )
+
+  let filteredAdditionalEquipmentLength = additionalEquipmentLength
+  if (hasWasteChute && isStagingAreaInD3) {
+    filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
+  }
+  if (hasGripper) {
+    filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
+  }
+
+  return (
+    filteredModuleLength + filteredAdditionalEquipmentLength <
+    TOTAL_MODULE_SLOTS
+  )
+}
+
+interface TrashOptionDisabledProps {
+  trashType: 'trashBin' | 'wasteChute'
+  additionalEquipment: AdditionalEquipment[]
+  modules: FormModules | null
+}
+
+export const getTrashOptionDisabled = (
+  props: TrashOptionDisabledProps
+): boolean => {
+  const { additionalEquipment, modules, trashType } = props
+  return (
+    !getIsSlotAvailable(modules, additionalEquipment) &&
+    !additionalEquipment.includes(trashType)
+  )
+}
+
 export const getTrashSlot = (values: FormState): string => {
   const { additionalEquipment, modules } = values
-  const moduleTypesOnDeck =
-    modules != null ? Object.values(modules).map(module => module.type) : []
+  const moduleSlots =
+    modules != null
+      ? Object.values(modules).flatMap(module =>
+          module.type === THERMOCYCLER_MODULE_TYPE
+            ? [module.slot, 'A1']
+            : module.slot
+        )
+      : []
   const stagingAreas = additionalEquipment.filter(equipment =>
     equipment.includes('stagingArea')
   )
   //  TODO(Jr, 11/16/23): refactor additionalEquipment to store cutouts
   //  so the split isn't needed
   const cutouts = stagingAreas.map(cutout => cutout.split('_')[1])
-
-  if (!cutouts.includes(FLEX_TRASH_DEFAULT_SLOT)) {
-    return FLEX_TRASH_DEFAULT_SLOT
-  }
-
-  const moduleSlots: string[] = FLEX_SUPPORTED_MODULE_MODELS.reduce(
-    (slots: string[], model) => {
-      const moduleType = getModuleType(model)
-      if (moduleTypesOnDeck.includes(moduleType)) {
-        const slot = String(DEFAULT_SLOT_MAP[model])
-        return moduleType === THERMOCYCLER_MODULE_TYPE
-          ? [...slots, 'A1', slot]
-          : [...slots, slot]
-      }
-      return slots
-    },
-    []
+  const hasWasteChute = additionalEquipment.find(equipment =>
+    equipment.includes('wasteChute')
   )
+  const wasteChuteSlot = Boolean(hasWasteChute)
+    ? [WASTE_CHUTE_CUTOUT as string]
+    : []
+
   const unoccupiedSlot = MOVABLE_TRASH_CUTOUTS.find(
     cutout =>
-      !cutouts.includes(cutout.value) && !moduleSlots.includes(cutout.slot)
+      !cutouts.includes(cutout.value) &&
+      !moduleSlots.includes(cutout.slot) &&
+      !wasteChuteSlot.includes(cutout.value)
   )
   if (unoccupiedSlot == null) {
     console.error(

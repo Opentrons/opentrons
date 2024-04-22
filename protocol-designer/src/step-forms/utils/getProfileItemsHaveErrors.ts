@@ -1,5 +1,6 @@
 import { getProfileFieldErrors } from '../../steplist/fieldLevel'
-import { ProfileItem, PROFILE_CYCLE } from '../../form-types'
+import { PROFILE_CYCLE } from '../../form-types'
+import type { ProfileItem } from '../../form-types'
 
 const _someFieldsHaveErrors = (item: ProfileItem): boolean => {
   for (const fieldName in item) {

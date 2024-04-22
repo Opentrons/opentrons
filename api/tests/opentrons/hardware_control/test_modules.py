@@ -3,6 +3,7 @@ import pytest
 
 from pathlib import Path
 from unittest import mock
+from packaging.version import Version
 
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import ModuleAtPort
@@ -22,6 +23,7 @@ from opentrons.hardware_control.modules import (
     HeaterShaker,
     AbstractModule,
 )
+from opentrons.hardware_control.modules.mod_abc import parse_fw_version
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 
@@ -422,3 +424,20 @@ def test_magnetic_module_revision_parsing(revision, model):
 )
 def test_temperature_module_revision_parsing(revision, model):
     assert TempDeck._model_from_revision(revision) == model
+
+
+@pytest.mark.parametrize(
+    argnames=["device_version", "expected_result"],
+    argvalues=[
+        ["v1.0.4", Version("v1.0.4")],
+        ["v0.5.6", Version("v0.5.6")],
+        ["v1.0.4-dhfs", Version("v0.0.0")],
+        ["v3.0.dshjfd", Version("v0.0.0")],
+    ],
+)
+async def test_catch_invalid_fw_version(
+    device_version: str,
+    expected_result: bool,
+) -> None:
+    """Assert that invalid firmware versions prompt a valid Version object of v0.0.0."""
+    assert parse_fw_version(device_version) == expected_result

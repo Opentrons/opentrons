@@ -3,6 +3,7 @@ import { vi, it, describe, expect, beforeEach } from 'vitest'
 
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -22,7 +23,7 @@ import { useFeatureFlag } from '../../../redux/config'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { ChooseRobotSlideout } from '..'
 import { useNotifyService } from '../../../resources/useNotifyService'
-import { RunTimeParameter } from '@opentrons/shared-data'
+import type { RunTimeParameter } from '@opentrons/shared-data'
 
 vi.mock('../../../redux/discovery')
 vi.mock('../../../redux/robot-update')
@@ -48,7 +49,7 @@ const mockRunTimeParameters: RunTimeParameter[] = [
     value: false,
     variableName: 'DRYRUN',
     description: 'Is this a dry or wet run? Wet is true, dry is false',
-    type: 'boolean',
+    type: 'bool',
     default: false,
   },
   {
@@ -121,7 +122,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     })
     screen.getByText('choose robot slideout title')
   })
@@ -134,7 +135,7 @@ describe('ChooseRobotSlideout', () => {
       setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
       isAnalysisError: true,
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     })
     screen.getByText(
       'This protocol failed in-app analysis. It may be unusable on robots without custom software configurations.'
@@ -148,7 +149,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     })
     screen.getByText('opentrons-robot-name')
     screen.getByText('2 unavailable robots are not listed.')
@@ -162,7 +163,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: vi.fn(),
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     })
     screen.getByText('opentrons-robot-name')
     expect(
@@ -177,7 +178,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     })[1]
     const refreshButton = screen.getByRole('button', { name: 'refresh' })
     fireEvent.click(refreshButton)
@@ -192,7 +193,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
       multiSlideout: { currentPage: 1 },
     })
     screen.getByText('Step 1 / 2')
@@ -205,7 +206,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
       multiSlideout: { currentPage: 2 },
     })
     screen.getByText('Step 2 / 2')
@@ -220,18 +221,49 @@ describe('ChooseRobotSlideout', () => {
         selectedRobot: null,
         setSelectedRobot: mockSetSelectedRobot,
         title: 'choose robot slideout title',
-        robotType: 'OT-2 Standard',
+        robotType: OT2_ROBOT_TYPE,
         multiSlideout: { currentPage: 2 },
         runTimeParametersOverrides: [param],
       })
 
       screen.getByText(param.displayName)
-      if (param.type === 'boolean' || 'choices' in param) {
+      if (param.type === 'bool') {
         screen.getByText(param.description)
-      } else {
+      }
+      if (param.type === 'int') {
         screen.getByText(`${param.min}-${param.max}`)
       }
+      if (param.type === 'float') {
+        screen.getByText(`${param.min.toFixed(1)}-${param.max.toFixed(1)}`)
+      }
     })
+  })
+
+  it('renders error message for runtime parameter out of range', () => {
+    render({
+      onCloseClick: vi.fn(),
+      isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
+      selectedRobot: null,
+      setSelectedRobot: mockSetSelectedRobot,
+      title: 'choose robot slideout title',
+      robotType: OT2_ROBOT_TYPE,
+      multiSlideout: { currentPage: 2 },
+      runTimeParametersOverrides: [
+        {
+          value: 1000,
+          displayName: 'EtoH Volume',
+          variableName: 'ETOH_VOLUME',
+          description: '70% ethanol volume',
+          type: 'float',
+          suffix: 'mL',
+          min: 1.5,
+          max: 10.0,
+          default: 6.5,
+        },
+      ],
+    })
+    screen.getByText('Value must be between 1.5-10.0')
   })
 
   it('defaults to first available robot and allows an available robot to be selected', () => {
@@ -246,7 +278,7 @@ describe('ChooseRobotSlideout', () => {
       selectedRobot: null,
       setSelectedRobot: mockSetSelectedRobot,
       title: 'choose robot slideout title',
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     })
     expect(mockSetSelectedRobot).toBeCalledWith({
       ...mockConnectableRobot,
@@ -263,5 +295,19 @@ describe('ChooseRobotSlideout', () => {
       name: 'otherRobot',
       ip: 'otherIp',
     })
+  })
+
+  it('sets selected robot to null if no available robots', () => {
+    vi.mocked(getConnectableRobots).mockReturnValue([])
+    render({
+      onCloseClick: vi.fn(),
+      isExpanded: true,
+      isSelectedRobotOnDifferentSoftwareVersion: false,
+      selectedRobot: null,
+      setSelectedRobot: mockSetSelectedRobot,
+      title: 'choose robot slideout title',
+      robotType: OT2_ROBOT_TYPE,
+    })
+    expect(mockSetSelectedRobot).toBeCalledWith(null)
   })
 })

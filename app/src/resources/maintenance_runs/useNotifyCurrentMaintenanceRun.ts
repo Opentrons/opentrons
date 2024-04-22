@@ -14,24 +14,18 @@ import type {
 export function useNotifyCurrentMaintenanceRun(
   options: QueryOptionsWithPolling<MaintenanceRun, Error> = {}
 ): UseQueryResult<MaintenanceRun> | UseQueryResult<MaintenanceRun, Error> {
-  const [
-    refetchUsingHTTP,
-    setRefetchUsingHTTP,
-  ] = React.useState<HTTPRefetchFrequency>(null)
+  const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
 
   useNotifyService<MaintenanceRun, Error>({
     topic: 'robot-server/maintenance_runs/current_run',
-    setRefetchUsingHTTP,
+    setRefetch,
     options,
   })
 
   const httpQueryResult = useCurrentMaintenanceRun({
     ...options,
-    enabled: options?.enabled !== false && refetchUsingHTTP != null,
-    onSettled:
-      refetchUsingHTTP === 'once'
-        ? () => setRefetchUsingHTTP(null)
-        : () => null,
+    enabled: options?.enabled !== false && refetch != null,
+    onSettled: refetch === 'once' ? () => setRefetch(null) : () => null,
   })
 
   return httpQueryResult

@@ -270,11 +270,17 @@ export interface DeckCalibrationPoint {
   displayName: string
 }
 
+export type CutoutFixtureGroup = {
+  [cutoutId in CutoutId]?: Array<{ [cutoutId in CutoutId]?: CutoutFixtureId }>
+}
+
 export interface CutoutFixture {
   id: CutoutFixtureId
   mayMountTo: CutoutId[]
   displayName: string
   providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
+  expectOpentronsModuleSerialNumber: boolean
+  fixtureGroup: CutoutFixtureGroup
   height: number
 }
 
@@ -486,6 +492,7 @@ export interface SupportedTip {
   }
   defaultReturnTipHeight?: number
   defaultFlowAcceleration?: number
+  uiMaxFlowRate?: number
 }
 
 export interface SupportedTips {
@@ -590,38 +597,37 @@ export interface AnalysisError {
   createdAt: string
 }
 
-export interface NumberParameter {
+export interface NumberParameter extends BaseRunTimeParameter {
   type: NumberParameterType
   min: number
   max: number
   default: number
 }
 
-interface Choice {
+export interface Choice {
   displayName: string
   value: number | boolean | string
 }
 
-interface ChoiceParameter {
+interface ChoiceParameter extends BaseRunTimeParameter {
   type: RunTimeParameterType
   choices: Choice[]
   default: number | boolean | string
 }
 
-interface BooleanParameter {
+interface BooleanParameter extends BaseRunTimeParameter {
   type: BooleanParameterType
   default: boolean
 }
 
 type NumberParameterType = 'int' | 'float'
-type BooleanParameterType = 'boolean'
+type BooleanParameterType = 'bool'
 type StringParameterType = 'str'
 type RunTimeParameterType =
   | NumberParameter
   | BooleanParameterType
   | StringParameterType
 
-type ParameterType = NumberParameter | ChoiceParameter | BooleanParameter
 interface BaseRunTimeParameter {
   displayName: string
   variableName: string
@@ -630,7 +636,10 @@ interface BaseRunTimeParameter {
   suffix?: string
 }
 
-export type RunTimeParameter = BaseRunTimeParameter & ParameterType
+export type RunTimeParameter =
+  | BooleanParameter
+  | ChoiceParameter
+  | NumberParameter
 
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
@@ -720,7 +729,8 @@ export type StatusBarAnimations = StatusBarAnimation[]
 
 export interface CutoutConfig {
   cutoutId: CutoutId
-  cutoutFixtureId: CutoutFixtureId | null
+  cutoutFixtureId: CutoutFixtureId
+  opentronsModuleSerialNumber?: string
 }
 
 export type DeckConfiguration = CutoutConfig[]

@@ -4,40 +4,39 @@ import {
   Flex,
   POSITION_ABSOLUTE,
   SPACING,
+  VIEWPORT,
 } from '@opentrons/components'
-import { touchScreenViewport } from '../../../DesignTokens/constants'
 import { InputField } from '../../InputField'
 import { NumericalKeyboard } from '.'
-import '../index.css'
-import './index.css'
 
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof NumericalKeyboard> = {
   title: 'ODD/Atoms/SoftwareKeyboard/NumericalKeyboard',
   component: NumericalKeyboard,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
   argTypes: {
     isDecimal: {
       control: {
         type: 'boolean',
         options: [true, false],
       },
-      defaultValue: false,
     },
     hasHyphen: {
       control: {
         type: 'boolean',
         options: [true, false],
       },
-      defaultValue: false,
     },
   },
-} as Meta
+}
 
-const Template: Story<
-  React.ComponentProps<typeof NumericalKeyboard>
-> = args => {
+export default meta
+
+type Story = StoryObj<typeof NumericalKeyboard>
+
+const Keyboard = (args): JSX.Element => {
+  const { isDecimal, hasHyphen } = args
   const [showKeyboard, setShowKeyboard] = React.useState(false)
   const [value, setValue] = React.useState<string>('')
   const keyboardRef = React.useRef(null)
@@ -57,15 +56,15 @@ const Template: Story<
         position={POSITION_ABSOLUTE}
         top="20%"
         width="22.5rem"
-        height="21.25rem"
+        height="max-content"
       >
         {showKeyboard && (
           <NumericalKeyboard
             // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
             onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
-            isDecimal={args.isDecimal}
-            hasHyphen={args.hasHyphen}
+            isDecimal={isDecimal}
+            hasHyphen={hasHyphen}
           />
         )}
       </Flex>
@@ -73,8 +72,8 @@ const Template: Story<
   )
 }
 
-export const Keyboard = Template.bind({})
-Keyboard.args = {
+export const NumericalSoftwareKeyboard: Story = args => <Keyboard {...args} />
+NumericalSoftwareKeyboard.args = {
   isDecimal: false,
   hasHyphen: false,
 }

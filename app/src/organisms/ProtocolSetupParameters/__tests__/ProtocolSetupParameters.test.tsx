@@ -2,16 +2,22 @@ import * as React from 'react'
 import { when } from 'vitest-when'
 import { it, describe, beforeEach, vi, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
+import {
+  useCreateProtocolAnalysisMutation,
+  useCreateRunMutation,
+  useHost,
+} from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { ProtocolSetupParameters } from '..'
+import { ChooseEnum } from '../ChooseEnum'
 import { mockRunTimeParameterData } from '../../../pages/ProtocolDetails/fixtures'
 import type * as ReactRouterDom from 'react-router-dom'
 import type { HostConfig } from '@opentrons/api-client'
 
 const mockGoBack = vi.fn()
 
+vi.mock('../ChooseEnum')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 vi.mock('react-router-dom', async importOriginal => {
@@ -22,6 +28,7 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 const MOCK_HOST_CONFIG: HostConfig = { hostname: 'MOCK_HOST' }
+const mockCreateProtocolAnalysis = vi.fn()
 const mockCreateRun = vi.fn()
 const render = (
   props: React.ComponentProps<typeof ProtocolSetupParameters>
@@ -39,7 +46,11 @@ describe('ProtocolSetupParameters', () => {
       labwareOffsets: [],
       runTimeParameters: mockRunTimeParameterData,
     }
+    vi.mocked(ChooseEnum).mockReturnValue(<div>mock ChooseEnum</div>)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
+    when(vi.mocked(useCreateProtocolAnalysisMutation))
+      .calledWith(expect.anything(), expect.anything())
+      .thenReturn({ createProtocolAnalysis: mockCreateProtocolAnalysis } as any)
     when(vi.mocked(useCreateRunMutation))
       .calledWith(expect.anything())
       .thenReturn({ createRun: mockCreateRun } as any)
@@ -51,6 +62,17 @@ describe('ProtocolSetupParameters', () => {
     screen.getByRole('button', { name: 'Confirm values' })
     screen.getByText('Dry Run')
     screen.getByText('a dry run description')
+  })
+  it('renders the ChooseEnum component when a str param is selected', () => {
+    render(props)
+    fireEvent.click(screen.getByText('Default Module Offsets'))
+    screen.getByText('mock ChooseEnum')
+  })
+  it('renders the other setting when boolean param is selected', () => {
+    render(props)
+    expect(screen.getAllByText('On')).toHaveLength(2)
+    fireEvent.click(screen.getByText('Dry Run'))
+    expect(screen.getAllByText('On')).toHaveLength(3)
   })
   it('renders the back icon and calls useHistory', () => {
     render(props)
@@ -73,6 +95,5 @@ describe('ProtocolSetupParameters', () => {
     const title = screen.getByText('Reset parameter values?')
     fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
     expect(title).not.toBeInTheDocument()
-    //  TODO(jr, 3/19/24): wire up the confirm button
   })
 })

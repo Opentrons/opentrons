@@ -5,6 +5,9 @@ import type { MenuItemConstructorOptions } from 'electron'
 
 import { LOG_DIR } from './log'
 
+const PRODUCT_NAME: string = _PKG_PRODUCT_NAME_
+const BUGS_URL: string = _PKG_BUGS_URL_
+
 // file or application menu
 const firstMenu: MenuItemConstructorOptions = {
   role: process.platform === 'darwin' ? 'appMenu' : 'fileMenu',
@@ -27,8 +30,7 @@ const helpMenu: MenuItemConstructorOptions = {
       },
     },
     {
-      // @ts-expect-error can't get TS to recognize global.d.ts
-      label: `View ${global._PKG_PRODUCT_NAME_} App Logs`,
+      label: `View ${PRODUCT_NAME} App Logs`,
       click: () => {
         shell.openPath(LOG_DIR)
       },
@@ -37,8 +39,7 @@ const helpMenu: MenuItemConstructorOptions = {
       label: 'Report an Issue',
       click: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        // @ts-expect-error can't get TS to recognize global.d.ts
-        shell.openExternal(global._PKG_BUGS_URL_)
+        shell.openExternal(BUGS_URL)
       },
     },
   ],

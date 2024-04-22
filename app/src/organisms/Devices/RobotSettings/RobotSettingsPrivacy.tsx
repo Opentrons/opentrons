@@ -25,8 +25,8 @@ const INFO_BY_SETTING_ID: {
   }
 } = {
   disableLogAggregation: {
-    titleKey: 'share_logs_with_opentrons',
-    descriptionKey: 'share_logs_with_opentrons_description',
+    titleKey: 'branded:share_logs_with_opentrons',
+    descriptionKey: 'branded:share_logs_with_opentrons_description',
     invert: true,
   },
 }
@@ -34,7 +34,7 @@ const INFO_BY_SETTING_ID: {
 export function RobotSettingsPrivacy({
   robotName,
 }: RobotSettingsPrivacyProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'branded'])
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
   )

@@ -8,8 +8,8 @@ from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
 
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules import ThermocyclerStep
-from opentrons.commands import module_commands as cmds
-from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.legacy_commands import module_commands as cmds
+from opentrons.legacy_commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError, requires_version
 
@@ -151,7 +151,7 @@ class ModuleContext(CommandPublisher):
             load_location = loaded_adapter._core
         else:
             load_location = self._core
-
+        name = validation.ensure_lowercase_name(name)
         labware_core = self._protocol_core.load_labware(
             load_name=name,
             label=label,
@@ -467,9 +467,9 @@ class MagneticModuleContext(ModuleContext):
         if height is not None:
             if self._api_version >= _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN:
                 raise APIVersionError(
-                    "The height parameter of MagneticModuleContext.engage() was removed"
-                    " in {_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN}."
-                    " Use offset or height_from_base instead."
+                    f"The height parameter of MagneticModuleContext.engage() was removed"
+                    f" in {_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN}."
+                    f" Use offset or height_from_base instead."
                 )
             self._core.engage(height_from_home=height)
 

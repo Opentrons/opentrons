@@ -1,13 +1,14 @@
-import { versionForProject } from '../scripts/git-version'
+import { versionForProject } from '../scripts/git-version.mjs'
 import pkg from './package.json'
 import path from 'path'
-import { UserConfig, defineConfig } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import postCssImport from 'postcss-import'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
+import type { UserConfig } from 'vite'
 
 export default defineConfig(
   async (): Promise<UserConfig> => {
@@ -79,7 +80,7 @@ export default defineConfig(
             '../discovery-client/src/index.ts'
           ),
           '@opentrons/usb-bridge/node-client': path.resolve(
-            '../usb-bridge/node-client/src/inxex.ts'
+            '../usb-bridge/node-client/src/index.ts'
           ),
         },
       },

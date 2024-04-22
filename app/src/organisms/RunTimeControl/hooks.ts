@@ -21,7 +21,6 @@ import {
   useRunCommands,
 } from '../ProtocolUpload/hooks'
 import { useNotifyRunQuery } from '../../resources/runs'
-import { useFeatureFlag } from '../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { UseQueryOptions } from 'react-query'
@@ -82,7 +81,7 @@ export function useRunStatus(
       !([
         RUN_STATUS_FAILED,
         RUN_STATUS_SUCCEEDED,
-        RUN_STATUS_STOP_REQUESTED,
+        RUN_STATUS_STOPPED,
       ] as RunStatus[]).includes(lastRunStatus.current),
     onSuccess: data => (lastRunStatus.current = data?.data?.status ?? null),
     ...options,
@@ -188,11 +187,6 @@ export function useRunErrors(runId: string | null): RunData['errors'] {
 
 export function useProtocolHasRunTimeParameters(runId: string | null): boolean {
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const runTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
-
-  console.log(
-    'TODO: delete the feature flag logic',
-    mostRecentAnalysis?.runTimeParameters
-  )
-  return runTimeParametersFF
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  return runTimeParameters.length > 0
 }

@@ -383,12 +383,38 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       ],
       {}
     )
-    expect(vi.mocked(useCreateRunFromProtocol)).nthCalledWith(
-      3,
+    expect(vi.mocked(useCreateRunFromProtocol)).toHaveBeenLastCalledWith(
       expect.any(Object),
       { hostname: 'otherIp' },
       [],
       {}
+    )
+  })
+
+  it('disables proceed button if no available robots', () => {
+    vi.mocked(getConnectableRobots).mockReturnValue([])
+    render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: vi.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = screen.getByRole('button', {
+      name: 'Continue to parameters',
+    })
+    expect(proceedButton).toBeDisabled()
+  })
+
+  it('renders labware offset data selection and learn more button launches help modal', () => {
+    render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: vi.fn(),
+      showSlideout: true,
+    })
+    screen.getByText('No offset data available')
+    const learnMoreLink = screen.getByText('Learn more')
+    fireEvent.click(learnMoreLink)
+    screen.getByText(
+      'Labware offset data references previous protocol run labware locations to save you time. If all the labware in this protocol have been checked in previous runs, that data will be applied to this run.'
     )
   })
 })

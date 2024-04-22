@@ -129,6 +129,8 @@ export const makeAspirateHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedP
     wellLocation: {
       origin: 'bottom',
       offset: {
+        y: 0,
+        x: 0,
         z: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
       },
     },
@@ -199,6 +201,8 @@ const _defaultDispenseParams = {
   wellLocation: {
     origin: 'bottom' as const,
     offset: {
+      y: 0,
+      x: 0,
       z: DISPENSE_OFFSET_FROM_BOTTOM_MM,
     },
   },

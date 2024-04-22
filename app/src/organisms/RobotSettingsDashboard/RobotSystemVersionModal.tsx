@@ -51,7 +51,7 @@ export function RobotSystemVersionModal({
         >
           <InlineNotification
             type="neutral"
-            heading={t('update_requires_restarting')}
+            heading={t('update_requires_restarting_robot')}
             hug
           />
           <ReleaseNotes source={releaseNotes} />

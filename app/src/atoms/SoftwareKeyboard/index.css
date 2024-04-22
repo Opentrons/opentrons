@@ -4,7 +4,8 @@
   background-color: #ececec;
   border-radius: 5px;
   box-sizing: border-box;
-  font-family: HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
+  font-family: HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue,
+    Helvetica, Arial, Lucida Grande, sans-serif;
   overflow: hidden;
   padding: 5px;
   touch-action: manipulation;
@@ -59,7 +60,6 @@
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
-  height: 40px;
   justify-content: center;
   padding: 5px;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -81,15 +81,6 @@
   width: 33.3%;
 }
 
-.hg-theme-default .hg-button.hg-button-numpadadd,
-.hg-theme-default .hg-button.hg-button-numpadenter {
-  height: 85px;
-}
-
-.hg-theme-default .hg-button.hg-button-numpad0 {
-  width: 105px;
-}
-
 .hg-theme-default .hg-button.hg-button-com {
   max-width: 85px;
 }
@@ -103,11 +94,11 @@
   color: #fff;
 }
 
-.hg-theme-default .hg-button.hg-standardBtn[data-skbtn=".com"] {
+.hg-theme-default .hg-button.hg-standardBtn[data-skbtn='.com'] {
   max-width: 82px;
 }
 
-.hg-theme-default .hg-button.hg-standardBtn[data-skbtn="@"] {
+.hg-theme-default .hg-button.hg-standardBtn[data-skbtn='@'] {
   max-width: 60px;
 }
 
@@ -151,11 +142,11 @@ li.hg-candidate-box-list-item:active {
 }
 
 .hg-candidate-box-prev:before {
-  content: "◄";
+  content: '◄';
 }
 
 .hg-candidate-box-next:before {
-  content: "►";
+  content: '►';
 }
 
 .hg-candidate-box-next,

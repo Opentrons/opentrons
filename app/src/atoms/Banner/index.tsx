@@ -8,13 +8,12 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  IconProps,
   JUSTIFY_SPACE_BETWEEN,
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import type { StyleProps } from '@opentrons/components'
+import type { IconProps, StyleProps } from '@opentrons/components'
 
 export type BannerType =
   | 'success'

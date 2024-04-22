@@ -6,7 +6,7 @@ import json
 import requests
 import sys
 from abr_testing.data_collection import read_robot_logs
-from abr_testing.google_automation import google_drive_tool
+from abr_testing.automation import google_drive_tool
 
 
 def get_run_ids_from_robot(ip: str) -> Set[str]:
@@ -80,9 +80,9 @@ def save_runs(runs_to_save: Set[str], ip: str, storage_directory: str) -> Set[st
     saved_file_paths = set()
     for a_run in runs_to_save:
         data = get_run_data(a_run, ip)
-        data_file_name = ip + "_" + data["run_id"] + ".json"
-        saved_file_path = os.path.join(storage_directory, data_file_name)
-        json.dump(data, open(saved_file_path, mode="w"))
+        saved_file_path = read_robot_logs.save_run_log_to_json(
+            ip, data, storage_directory
+        )
         saved_file_paths.add(saved_file_path)
     print(f"Saved {len(runs_to_save)} run(s) from robot with IP address {ip}.")
     return saved_file_paths
@@ -107,8 +107,8 @@ def get_all_run_logs(storage_directory: str) -> None:
         try:
             runs = get_run_ids_from_robot(ip)
             runs_to_save = read_robot_logs.get_unseen_run_ids(runs, runs_from_storage)
-            saved_file_paths = save_runs(runs_to_save, ip, storage_directory)
-            google_drive.upload_missing_files(storage_directory, saved_file_paths)
+            save_runs(runs_to_save, ip, storage_directory)
+            google_drive.upload_missing_files(storage_directory)
         except Exception:
             print(f"ERROR: Failed to read IP address: {ip}.")
 
@@ -128,12 +128,15 @@ if __name__ == "__main__":
         metavar="FOLDER_NAME",
         type=str,
         nargs=1,
-        help="Google Drive folder name.",
+        help="Google Drive folder name. Open desired folder and copy string after drive/folders/.",
+    )
+    parser.add_argument(
+        "email", metavar="EMAIL", type=str, nargs=1, help="opentrons gmail."
     )
     args = parser.parse_args()
     storage_directory = args.storage_directory[0]
     folder_name = args.folder_name[0]
-    parent_folder = False
+    email = args.email[0]
     try:
         credentials_path = os.path.join(storage_directory, "credentials.json")
     except FileNotFoundError:
@@ -141,7 +144,7 @@ if __name__ == "__main__":
         sys.exit()
     try:
         google_drive = google_drive_tool.google_drive(
-            credentials_path, folder_name, parent_folder
+            credentials_path, folder_name, email
         )
         print("Connected to google drive.")
     except json.decoder.JSONDecodeError:

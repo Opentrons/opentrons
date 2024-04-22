@@ -21,12 +21,14 @@
 .hg-layout-floatNegKeyboard .hg-row {
   grid-gap: 3px;
 }
+
+/* ToDo (kk:04/04/2024) this important will be removed when I refactor the entire css */
 .numerical-keyboard .hg-row .hg-button {
   text-align: center;
   font-size: 20px;
   font-weight: 600;
   line-height: 24px;
-  height: 75px;
+  height: 75px !important;
   padding: 10px 22px;
 }
 

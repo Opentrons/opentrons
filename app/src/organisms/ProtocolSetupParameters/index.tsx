@@ -1,169 +1,33 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
+import {
+  useCreateProtocolAnalysisMutation,
+  useCreateRunMutation,
+  useHost,
+} from '@opentrons/react-api-client'
 import { useQueryClient } from 'react-query'
-import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
 } from '@opentrons/components'
+import { formatRunTimeParameterValue } from '@opentrons/shared-data'
 
 import { ProtocolSetupStep } from '../../pages/ProtocolSetup'
+import { getRunTimeParameterValuesForRun } from '../Devices/utils'
 import { ChildNavigation } from '../ChildNavigation'
 import { ResetValuesModal } from './ResetValuesModal'
+import { ChooseEnum } from './ChooseEnum'
+import { ChooseNumber } from './ChooseNumber'
 
-import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { NumberParameter, RunTimeParameter } from '@opentrons/shared-data'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
-
-export const mockData: RunTimeParameter[] = [
-  {
-    value: false,
-    displayName: 'Dry Run',
-    variableName: 'DRYRUN',
-    description: 'Is this a dry or wet run? Wet is true, dry is false',
-    type: 'boolean',
-    default: false,
-  },
-  {
-    value: true,
-    displayName: 'Use Gripper',
-    variableName: 'USE_GRIPPER',
-    description: 'For using the gripper.',
-    type: 'boolean',
-    default: true,
-  },
-  {
-    value: true,
-    displayName: 'Trash Tips',
-    variableName: 'TIP_TRASH',
-    description:
-      'to throw tip into the trash or to not throw tip into the trash',
-    type: 'boolean',
-    default: true,
-  },
-  {
-    value: true,
-    displayName: 'Deactivate Temperatures',
-    variableName: 'DEACTIVATE_TEMP',
-    description: 'deactivate temperature on the module',
-    type: 'boolean',
-    default: true,
-  },
-  {
-    value: 4,
-    displayName: 'Columns of Samples',
-    variableName: 'COLUMNS',
-    description: 'How many columns do you want?',
-    type: 'int',
-    min: 1,
-    max: 14,
-    default: 4,
-  },
-  {
-    value: 6,
-    displayName: 'PCR Cycles',
-    variableName: 'PCR_CYCLES',
-    description: 'number of PCR cycles on a thermocycler',
-    type: 'int',
-    min: 1,
-    max: 10,
-    default: 6,
-  },
-  {
-    value: 6.5,
-    displayName: 'EtoH Volume',
-    variableName: 'ETOH_VOLUME',
-    description: '70% ethanol volume',
-    type: 'float',
-    suffix: 'mL',
-    min: 1.5,
-    max: 10.0,
-    default: 6.5,
-  },
-  {
-    value: 'none',
-    displayName: 'Default Module Offsets',
-    variableName: 'DEFAULT_OFFSETS',
-    description: 'default module offsets for temp, H-S, and none',
-    type: 'str',
-    choices: [
-      {
-        displayName: 'No offsets',
-        value: 'none',
-      },
-      {
-        displayName: 'temp offset',
-        value: '1',
-      },
-      {
-        displayName: 'heater-shaker offset',
-        value: '2',
-      },
-    ],
-    default: 'none',
-  },
-  {
-    value: 'left',
-    displayName: 'pipette mount',
-    variableName: 'mont',
-    description: 'pipette mount',
-    type: 'str',
-    choices: [
-      {
-        displayName: 'Left',
-        value: 'left',
-      },
-      {
-        displayName: 'Right',
-        value: 'right',
-      },
-    ],
-    default: 'left',
-  },
-  {
-    value: 'flex',
-    displayName: 'short test case',
-    variableName: 'short 2 options',
-    description: 'this play 2 short options',
-    type: 'str',
-    choices: [
-      {
-        displayName: 'OT-2',
-        value: 'ot2',
-      },
-      {
-        displayName: 'Flex',
-        value: 'flex',
-      },
-    ],
-    default: 'flex',
-  },
-  {
-    value: 'flex',
-    displayName: 'long test case',
-    variableName: 'long 2 options',
-    description: 'this play 2 long options',
-    type: 'str',
-    choices: [
-      {
-        displayName: 'I am kind of long text version',
-        value: 'ot2',
-      },
-      {
-        displayName: 'I am kind of long text version. Today is 3/15',
-        value: 'flex',
-      },
-    ],
-    default: 'flex',
-  },
-]
 
 interface ProtocolSetupParametersProps {
   protocolId: string
-  runTimeParameters?: RunTimeParameter[]
+  runTimeParameters: RunTimeParameter[]
   labwareOffsets?: LabwareOffsetCreateData[]
 }
 
@@ -176,11 +40,68 @@ export function ProtocolSetupParameters({
   const history = useHistory()
   const host = useHost()
   const queryClient = useQueryClient()
+  const [
+    chooseValueScreen,
+    setChooseValueScreen,
+  ] = React.useState<RunTimeParameter | null>(null)
+  const [
+    showNumericalInputScreen,
+    setShowNumericalInputScreen,
+  ] = React.useState<NumberParameter | null>(null)
   const [resetValuesModal, showResetValuesModal] = React.useState<boolean>(
     false
   )
-  const parameters = runTimeParameters ?? []
-  //    TODO(jr, 3/20/24): modify useCreateRunMutation to take in optional run time parameters
+  const [startSetup, setStartSetup] = React.useState<boolean>(false)
+  const [
+    runTimeParametersOverrides,
+    setRunTimeParametersOverrides,
+  ] = React.useState<RunTimeParameter[]>(
+    // present defaults rather than last-set value
+    runTimeParameters.map(param => {
+      return { ...param, value: param.default }
+    })
+  )
+
+  const updateParameters = (
+    value: boolean | string | number,
+    variableName: string
+  ): void => {
+    const updatedParameters = runTimeParametersOverrides.map(parameter => {
+      if (parameter.variableName === variableName) {
+        return { ...parameter, value }
+      }
+      return parameter
+    })
+    setRunTimeParametersOverrides(updatedParameters)
+    if (chooseValueScreen && chooseValueScreen.variableName === variableName) {
+      const updatedParameter = updatedParameters.find(
+        parameter => parameter.variableName === variableName
+      )
+      if (updatedParameter != null) {
+        setChooseValueScreen(updatedParameter)
+      }
+    }
+    if (
+      showNumericalInputScreen &&
+      showNumericalInputScreen.variableName === variableName
+    ) {
+      const updatedParameter = updatedParameters.find(
+        parameter => parameter.variableName === variableName
+      )
+      if (updatedParameter != null) {
+        setShowNumericalInputScreen(updatedParameter as NumberParameter)
+      }
+    }
+  }
+
+  const runTimeParameterValues = getRunTimeParameterValuesForRun(
+    runTimeParametersOverrides
+  )
+  const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
+    protocolId,
+    host
+  )
+
   const { createRun, isLoading } = useCreateRunMutation({
     onSuccess: data => {
       queryClient
@@ -191,25 +112,45 @@ export function ProtocolSetupParameters({
     },
   })
   const handleConfirmValues = (): void => {
-    createRun({ protocolId, labwareOffsets })
+    setStartSetup(true)
+    createProtocolAnalysis({
+      protocolKey: protocolId,
+      runTimeParameterValues: runTimeParameterValues,
+    })
+    createRun({
+      protocolId,
+      labwareOffsets,
+      runTimeParameterValues: getRunTimeParameterValuesForRun(
+        runTimeParametersOverrides
+      ),
+    })
   }
 
-  return (
-    <>
-      {resetValuesModal ? (
-        <ResetValuesModal handleGoBack={() => showResetValuesModal(false)} />
-      ) : null}
+  const handleSetParameter = (parameter: RunTimeParameter): void => {
+    if ('choices' in parameter) {
+      setChooseValueScreen(parameter)
+    } else if (parameter.type === 'bool') {
+      updateParameters(!parameter.value, parameter.variableName)
+    } else if (parameter.type === 'int' || parameter.type === 'float') {
+      setShowNumericalInputScreen(parameter)
+    } else {
+      // bad param
+      console.log('error')
+    }
+  }
 
+  let children = (
+    <>
       <ChildNavigation
         header={t('parameters')}
         onClickBack={() => history.goBack()}
         onClickButton={handleConfirmValues}
         buttonText={t('confirm_values')}
-        iconName={isLoading ? 'ot-spinner' : undefined}
+        iconName={isLoading || startSetup ? 'ot-spinner' : undefined}
         iconPlacement="startIcon"
         secondaryButtonProps={{
           buttonType: 'tertiaryLowLight',
-          buttonText: t('restore_default'),
+          buttonText: t('restore_defaults'),
           onClick: () => showResetValuesModal(true),
         }}
       />
@@ -218,16 +159,17 @@ export function ProtocolSetupParameters({
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
-        paddingX={SPACING.spacing8}
+        paddingX={SPACING.spacing40}
+        paddingBottom={SPACING.spacing40}
       >
-        {parameters.map((parameter, index) => {
+        {runTimeParametersOverrides.map((parameter, index) => {
           return (
             <React.Fragment key={`${parameter.displayName}_${index}`}>
               <ProtocolSetupStep
-                hasIcon={!(parameter.type === 'boolean')}
+                hasIcon={!(parameter.type === 'bool')}
                 status="general"
                 title={parameter.displayName}
-                onClickSetupStep={() => console.log('TODO: wire this up')}
+                onClickSetupStep={() => handleSetParameter(parameter)}
                 detail={formatRunTimeParameterValue(parameter, t)}
                 description={parameter.description}
                 fontSize="h4"
@@ -236,6 +178,38 @@ export function ProtocolSetupParameters({
           )
         })}
       </Flex>
+    </>
+  )
+  if (chooseValueScreen != null) {
+    children = (
+      <ChooseEnum
+        handleGoBack={() => setChooseValueScreen(null)}
+        parameter={chooseValueScreen}
+        setParameter={updateParameters}
+        rawValue={chooseValueScreen.value}
+      />
+    )
+  }
+  if (showNumericalInputScreen != null) {
+    children = (
+      <ChooseNumber
+        handleGoBack={() => setShowNumericalInputScreen(null)}
+        parameter={showNumericalInputScreen}
+        setParameter={updateParameters}
+      />
+    )
+  }
+
+  return (
+    <>
+      {resetValuesModal ? (
+        <ResetValuesModal
+          runTimeParametersOverrides={runTimeParametersOverrides}
+          setRunTimeParametersOverrides={setRunTimeParametersOverrides}
+          handleGoBack={() => showResetValuesModal(false)}
+        />
+      ) : null}
+      {children}
     </>
   )
 }

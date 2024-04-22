@@ -16,6 +16,7 @@ import {
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
+  getDeckDefFromRobotType,
   getFixtureDisplayName,
   getSimplestDeckConfigForProtocol,
   SINGLE_SLOT_FIXTURES,
@@ -30,6 +31,7 @@ import type {
   CompletedProtocolAnalysis,
   CutoutFixtureId,
   CutoutId,
+  DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
@@ -59,6 +61,7 @@ export function FixtureTable({
     robotType,
     mostRecentAnalysis
   )
+  const deckDef = getDeckDefFromRobotType(robotType)
 
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
     deckConfigCompatibility
@@ -96,6 +99,7 @@ export function FixtureTable({
             setSetupScreen={setSetupScreen}
             setCutoutId={setCutoutId}
             setProvidedFixtureOptions={setProvidedFixtureOptions}
+            deckDef={deckDef}
           />
         )
       })}
@@ -108,6 +112,7 @@ interface FixtureTableItemProps extends CutoutConfigAndCompatibility {
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   setCutoutId: (cutoutId: CutoutId) => void
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
+  deckDef: DeckDefinition
 }
 
 function FixtureTableItem({
@@ -119,6 +124,7 @@ function FixtureTableItem({
   setSetupScreen,
   setCutoutId,
   setProvidedFixtureOptions,
+  deckDef,
 }: FixtureTableItemProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
 
@@ -183,6 +189,7 @@ function FixtureTableItem({
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
           isOnDevice={true}
           missingLabwareDisplayName={missingLabwareDisplayName}
+          deckDef={deckDef}
         />
       ) : null}
       <Flex

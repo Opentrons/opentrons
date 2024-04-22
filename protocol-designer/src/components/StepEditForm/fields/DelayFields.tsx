@@ -37,7 +37,8 @@ export const DelayFields = (props: DelayFieldProps): JSX.Element => {
       />
       {tipPositionFieldName && (
         <TipPositionField
-          {...propsForFields[tipPositionFieldName]}
+          propsForFields={propsForFields}
+          zField={tipPositionFieldName as any}
           labwareId={labwareId}
         />
       )}

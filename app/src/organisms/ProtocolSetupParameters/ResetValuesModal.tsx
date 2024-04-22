@@ -14,13 +14,18 @@ import {
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 
+import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface ResetValuesModalProps {
+  runTimeParametersOverrides: RunTimeParameter[]
+  setRunTimeParametersOverrides: (parameters: RunTimeParameter[]) => void
   handleGoBack: () => void
 }
 
 export function ResetValuesModal({
+  runTimeParametersOverrides,
+  setRunTimeParametersOverrides,
   handleGoBack,
 }: ResetValuesModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'shared'])
@@ -33,7 +38,12 @@ export function ResetValuesModal({
 
   // ToDo (kk:03/18/2024) reset values function will be implemented
   const handleResetValues = (): void => {
-    console.log('todo add reset values function')
+    setRunTimeParametersOverrides(
+      runTimeParametersOverrides.map(param => {
+        return { ...param, value: param.default }
+      })
+    )
+    handleGoBack()
   }
 
   const modalProps = {
