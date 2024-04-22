@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react'
 import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
 import { Flex } from '../primitives'
 import { StyledText } from '../atoms/StyledText'
