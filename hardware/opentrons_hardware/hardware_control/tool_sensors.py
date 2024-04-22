@@ -107,9 +107,13 @@ def _build_pass_step(
         present_nodes=pipette_nodes,
         stop_condition=MoveStopCondition.sensor_report,
 <<<<<<< HEAD
+<<<<<<< HEAD
         sensor_to_use=sensor_to_use,
 =======
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+        sensor_to_use=sensor_to_use,
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
     )
     for node in pipette_nodes:
         move_group[node] = pipette_move[node]
@@ -120,14 +124,18 @@ async def run_sync_buffer_to_csv(
     messenger: CanMessenger,
     sensor_driver: SensorDriver,
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     pressure_sensor: PressureSensor,
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
     mount_speed: float,
     plunger_speed: float,
     threshold_pascals: float,
     head_node: NodeId,
     move_group: MoveGroupRunner,
+<<<<<<< HEAD
 <<<<<<< HEAD
     log_files: Dict[SensorId, str],
     tool: PipetteProbeTarget,
@@ -166,29 +174,44 @@ async def run_sync_buffer_to_csv(
         )
 =======
     log_file: str,
+=======
+    log_files: Dict[SensorId, str],
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
     tool: PipetteProbeTarget,
-    sensor_id: SensorId,
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Runs the sensor pass move group and creates a csv file with the results."""
     sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold_pascals]
-    sensor_capturer = LogListener(
-        mount=head_node,
-        data_file=log_file,
-        file_heading=pressure_output_file_heading,
-        sensor_metadata=sensor_metadata,
-    )
-    async with sensor_capturer:
-        print("starting move group runner")
-        positions = await move_group.run(can_messenger=messenger)
-        messenger.add_listener(sensor_capturer, None)
+    positions = await move_group.run(can_messenger=messenger)
+    for sensor_id in log_files.keys():
+        sensor_capturer = LogListener(
+            mount=head_node,
+            data_file=log_files[sensor_id],
+            file_heading=pressure_output_file_heading,
+            sensor_metadata=sensor_metadata,
+        )
+        async with sensor_capturer:
+            messenger.add_listener(sensor_capturer, None)
+            await messenger.send(
+                node_id=tool,
+                message=SendAccumulatedPressureDataRequest(
+                    payload=SendAccumulatedPressureDataPayload(
+                        sensor_id=SensorIdField(sensor_id)
+                    )
+                ),
+            )
+            await asyncio.sleep(10)
+            messenger.remove_listener(sensor_capturer)
         await messenger.send(
             node_id=tool,
-            message=SendAccumulatedPressureDataRequest(
-                payload=SendAccumulatedPressureDataPayload(
-                    sensor_id=SensorIdField(sensor_id)
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(SensorType.pressure),
+                    sensor_id=SensorIdField(sensor_id),
+                    binding=SensorOutputBindingField(SensorOutputBinding.none),
                 )
             ),
         )
+<<<<<<< HEAD
         await asyncio.sleep(10)
         messenger.remove_listener(sensor_capturer)
     await messenger.send(
@@ -202,6 +225,8 @@ async def run_sync_buffer_to_csv(
         ),
     )
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
     return positions
 
 
@@ -209,25 +234,34 @@ async def run_stream_output_to_csv(
     messenger: CanMessenger,
     sensor_driver: SensorDriver,
 <<<<<<< HEAD
+<<<<<<< HEAD
     pressure_sensors: Dict[SensorId, PressureSensor],
 =======
     pressure_sensor: PressureSensor,
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+    pressure_sensors: Dict[SensorId, PressureSensor],
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
     mount_speed: float,
     plunger_speed: float,
     threshold_pascals: float,
     head_node: NodeId,
     move_group: MoveGroupRunner,
 <<<<<<< HEAD
+<<<<<<< HEAD
     log_files: Dict[SensorId, str],
 =======
     log_file: str,
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+    log_files: Dict[SensorId, str],
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Runs the sensor pass move group and creates a csv file with the results."""
     sensor_metadata = [0, 0, mount_speed, plunger_speed, threshold_pascals]
     sensor_capturer = LogListener(
         mount=head_node,
+<<<<<<< HEAD
 <<<<<<< HEAD
         data_file=log_files[
             next(iter(log_files))
@@ -235,11 +269,19 @@ async def run_stream_output_to_csv(
 =======
         data_file=log_file,
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+        data_file=log_files[
+            next(iter(log_files))
+        ],  # hardcode to the first file, need to think more on this
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
         file_heading=pressure_output_file_heading,
         sensor_metadata=sensor_metadata,
     )
     binding = [SensorOutputBinding.sync, SensorOutputBinding.report]
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
     binding_field = SensorOutputBindingField.from_flags(binding)
     for sensor_id in pressure_sensors.keys():
         sensor_info = pressure_sensors[sensor_id].sensor
@@ -253,6 +295,7 @@ async def run_stream_output_to_csv(
                 )
             ),
         )
+<<<<<<< HEAD
 
     messenger.add_listener(sensor_capturer, None)
     async with sensor_capturer:
@@ -344,16 +387,99 @@ async def _run_with_binding(
         )
     return result
 =======
+=======
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
 
-    async with sensor_driver.bind_output(messenger, pressure_sensor, binding):
-        messenger.add_listener(sensor_capturer, None)
+    messenger.add_listener(sensor_capturer, None)
+    async with sensor_capturer:
+        positions = await move_group.run(can_messenger=messenger)
+    messenger.remove_listener(sensor_capturer)
 
-        async with sensor_capturer:
-            positions = await move_group.run(can_messenger=messenger)
-        messenger.remove_listener(sensor_capturer)
-
+    for sensor_id in pressure_sensors.keys():
+        sensor_info = pressure_sensors[sensor_id].sensor
+        await messenger.send(
+            node_id=sensor_info.node_id,
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(sensor_info.sensor_type),
+                    sensor_id=SensorIdField(sensor_info.sensor_id),
+                    binding=SensorOutputBindingField(SensorOutputBinding.none),
+                )
+            ),
+        )
     return positions
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+
+
+async def _setup_pressure_sensors(
+    messenger: CanMessenger,
+    sensor_id: SensorId,
+    tool: PipetteProbeTarget,
+    num_baseline_reads: int,
+    threshold_fixed_point: float,
+    sensor_driver: SensorDriver,
+    auto_zero_sensor: bool,
+) -> Dict[SensorId, PressureSensor]:
+    sensors: List[SensorId] = []
+    result: Dict[SensorId, PressureSensor] = {}
+    if sensor_id == SensorId.BOTH:
+        sensors.append(SensorId.S0)
+        sensors.append(SensorId.S1)
+    else:
+        sensors.append(sensor_id)
+
+    for sensor in sensors:
+        pressure_sensor = PressureSensor.build(
+            sensor_id=sensor_id,
+            node_id=tool,
+            stop_threshold=threshold_fixed_point,
+        )
+
+        if auto_zero_sensor:
+            pressure_baseline = await sensor_driver.get_baseline(
+                messenger, pressure_sensor, num_baseline_reads
+            )
+            LOG.debug(f"found baseline pressure: {pressure_baseline} pascals")
+
+        await sensor_driver.send_stop_threshold(messenger, pressure_sensor)
+        result[sensor] = pressure_sensor
+    return result
+
+
+async def _run_with_binding(
+    messenger: CanMessenger,
+    pressure_sensors: Dict[SensorId, PressureSensor],
+    sensor_runner: MoveGroupRunner,
+    binding: List[SensorOutputBinding],
+) -> Dict[NodeId, MotorPositionStatus]:
+    binding_field = SensorOutputBindingField.from_flags(binding)
+    for sensor_id in pressure_sensors.keys():
+        sensor_info = pressure_sensors[sensor_id].sensor
+        await messenger.send(
+            node_id=sensor_info.node_id,
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(sensor_info.sensor_type),
+                    sensor_id=SensorIdField(sensor_info.sensor_id),
+                    binding=binding_field,
+                )
+            ),
+        )
+
+    result = await sensor_runner.run(can_messenger=messenger)
+    for sensor_id in pressure_sensors.keys():
+        sensor_info = pressure_sensors[sensor_id].sensor
+        await messenger.send(
+            node_id=sensor_info.node_id,
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(sensor_info.sensor_type),
+                    sensor_id=SensorIdField(sensor_info.sensor_id),
+                    binding=SensorOutputBindingField(SensorOutputBinding.none),
+                )
+            ),
+        )
+    return result
 
 
 async def liquid_probe(
@@ -368,11 +494,15 @@ async def liquid_probe(
     sync_buffer_output: bool = False,
     can_bus_only_output: bool = False,
 <<<<<<< HEAD
+<<<<<<< HEAD
     data_files: Optional[Dict[SensorId, str]] = None,
 =======
     # output_option: OutputOptions,
     data_file: Optional[str] = None,
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+    data_files: Optional[Dict[SensorId, str]] = None,
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
     auto_zero_sensor: bool = True,
     num_baseline_reads: int = 10,
     sensor_id: SensorId = SensorId.S0,
@@ -392,6 +522,7 @@ async def liquid_probe(
     )
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     if auto_zero_sensor:
         pressure_baseline = await sensor_driver.get_baseline(
@@ -402,6 +533,8 @@ async def liquid_probe(
     await sensor_driver.send_stop_threshold(messenger, pressure_sensor)
 
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
     sensor_group = _build_pass_step(
         movers=[head_node, tool],
         distance={head_node: max_z_distance, tool: max_z_distance},
@@ -412,23 +545,31 @@ async def liquid_probe(
 
     sensor_runner = MoveGroupRunner(move_groups=[[sensor_group]])
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     log_file: str = "/var/pressure_sensor_data.csv" if not data_file else data_file
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
     if csv_output:
         return await run_stream_output_to_csv(
             messenger,
             sensor_driver,
 <<<<<<< HEAD
+<<<<<<< HEAD
             pressure_sensors,
 =======
             pressure_sensor,
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+            pressure_sensors,
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
             mount_speed,
             plunger_speed,
             threshold_pascals,
             head_node,
             sensor_runner,
+<<<<<<< HEAD
 <<<<<<< HEAD
             log_files,
         )
@@ -456,32 +597,29 @@ async def liquid_probe(
         )
 =======
             log_file,
+=======
+            log_files,
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
         )
     elif sync_buffer_output:
         return await run_sync_buffer_to_csv(
             messenger,
             sensor_driver,
-            pressure_sensor,
             mount_speed,
             plunger_speed,
             threshold_pascals,
             head_node,
             sensor_runner,
-            log_file,
-            tool=tool,
-            sensor_id=sensor_id,
+            log_files,
+            tool,
         )
     elif can_bus_only_output:
-        async with sensor_driver.bind_output(
-            messenger,
-            pressure_sensor,
-            [
-                SensorOutputBinding.sync,
-                SensorOutputBinding.report,
-            ],
-        ):
-            return await sensor_runner.run(can_messenger=messenger)
+        binding = [SensorOutputBinding.sync, SensorOutputBinding.report]
+        return await _run_with_binding(
+            messenger, pressure_sensors, sensor_runner, binding
+        )
     else:  # none
+<<<<<<< HEAD
         async with sensor_driver.bind_output(
             messenger,
             pressure_sensor,
@@ -491,6 +629,12 @@ async def liquid_probe(
         ):
             return await sensor_runner.run(can_messenger=messenger)
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+        binding = [SensorOutputBinding.sync]
+        return await _run_with_binding(
+            messenger, pressure_sensors, sensor_runner, binding
+        )
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
 
 
 async def check_overpressure(

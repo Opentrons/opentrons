@@ -2624,10 +2624,14 @@ class OT3API(
             probe_settings.sensor_threshold_pascals,
             probe_settings.output_option,
 <<<<<<< HEAD
+<<<<<<< HEAD
             probe_settings.data_files,
 =======
             probe_settings.data_file,
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+            probe_settings.data_files,
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
             probe_settings.auto_zero_sensor,
             probe_settings.num_baseline_reads,
             probe=probe if probe else InstrumentProbeType.PRIMARY,

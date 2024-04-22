@@ -25,9 +25,12 @@ from opentrons_hardware.firmware_bindings.constants import (
     MoveAckId,
 <<<<<<< HEAD
     MotorDriverErrorCode,
+<<<<<<< HEAD
 =======
     SensorId,
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
@@ -315,9 +318,13 @@ class MoveGroupRunner:
         elif step.move_type == MoveType.sensor:
             # stop_condition = step.stop_condition.value
 <<<<<<< HEAD
+<<<<<<< HEAD
             assert step.sensor_id is not None
 =======
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+            assert step.sensor_id is not None
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
             stop_condition = MoveStopCondition.sync_line
             sensor_move_payload = AddSensorLinearMoveBasePayload(
                 request_stop_condition=MoveStopConditionField(stop_condition),
@@ -339,10 +346,14 @@ class MoveGroupRunner:
                     int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
                 ),
 <<<<<<< HEAD
+<<<<<<< HEAD
                 sensor_id=SensorIdField(step.sensor_id),
 =======
                 sensor_id=SensorIdField(SensorId.S0),
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+                sensor_id=SensorIdField(step.sensor_id),
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
             )
             return AddSensorLinearMoveRequest(payload=sensor_move_payload)
         else:

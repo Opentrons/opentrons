@@ -194,6 +194,7 @@ async def test_liquid_probe(
         mode=SensorThresholdMode.absolute,
     )
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     mock_bind_output.assert_called_once()
     assert mock_bind_output.call_args_list[0][0][3] == [SensorOutputBinding.sync]
@@ -225,6 +226,8 @@ async def test_liquid_probe(
             SensorOutputBinding.sync,
         ]
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
 
 
 @pytest.mark.parametrize(

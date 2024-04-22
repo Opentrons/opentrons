@@ -821,10 +821,14 @@ async def test_liquid_probe(
             fake_settings_aspirate.sensor_threshold_pascals,
             fake_settings_aspirate.output_option,
 <<<<<<< HEAD
+<<<<<<< HEAD
             fake_settings_aspirate.data_files,
 =======
             fake_settings_aspirate.data_file,
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+            fake_settings_aspirate.data_files,
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
             fake_settings_aspirate.auto_zero_sensor,
             fake_settings_aspirate.num_baseline_reads,
             probe=InstrumentProbeType.PRIMARY,

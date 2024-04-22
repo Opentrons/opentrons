@@ -139,10 +139,14 @@ class LiquidProbeSettings:
     auto_zero_sensor: bool
     num_baseline_reads: int
 <<<<<<< HEAD
+<<<<<<< HEAD
     data_files: Optional[Dict[InstrumentProbeType, str]]
 =======
     data_file: Optional[str]
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+    data_files: Optional[Dict[InstrumentProbeType, str]]
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
 
 
 @dataclass(frozen=True)

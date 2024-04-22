@@ -176,7 +176,19 @@ def run(tip: int, run_args: RunArgs) -> None:
         lpc_offset = run_args.dial_indicator.read_stable()
         run_args.pipette._retract()
 
+<<<<<<< HEAD
     def _get_tip_offset() -> float:
+=======
+    def _get_baseline() -> float:
+        run_args.pipette.pick_up_tip(tips[0])
+        del tips[: run_args.pipette_channels]
+        liquid_height = _jog_to_find_liquid_height(
+            run_args.ctx, run_args.pipette, test_well
+        )
+        target_height = test_well.bottom(liquid_height).point.z
+
+        run_args.pipette._retract()
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
         tip_offset = 0.0
         if run_args.dial_indicator is not None:
             run_args.pipette.move_to(dial_well.top())

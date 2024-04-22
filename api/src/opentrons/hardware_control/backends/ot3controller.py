@@ -1358,10 +1358,14 @@ class OT3Controller(FlexBackend):
         threshold_pascals: float,
         output_option: OutputOptions = OutputOptions.can_bus_only,
 <<<<<<< HEAD
+<<<<<<< HEAD
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
 =======
         data_file: Optional[str] = None,
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -1383,6 +1387,9 @@ class OT3Controller(FlexBackend):
             output_option.value & OutputOptions.can_bus_only.value
         )
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
         data_files_transposed = (
             None
             if data_files is None
@@ -1391,8 +1398,11 @@ class OT3Controller(FlexBackend):
                 for probe in data_files.keys()
             }
         )
+<<<<<<< HEAD
 =======
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
         positions = await liquid_probe(
             messenger=self._messenger,
             tool=tool,
@@ -1405,10 +1415,14 @@ class OT3Controller(FlexBackend):
             sync_buffer_output=sync_buffer_output,
             can_bus_only_output=can_bus_only_output,
 <<<<<<< HEAD
+<<<<<<< HEAD
             data_files=data_files_transposed,
 =======
             data_file=data_file,
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+            data_files=data_files_transposed,
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
             auto_zero_sensor=auto_zero_sensor,
             num_baseline_reads=num_baseline_reads,
             sensor_id=sensor_id_for_instrument(probe),

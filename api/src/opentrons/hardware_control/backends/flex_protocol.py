@@ -148,10 +148,14 @@ class FlexBackend(Protocol):
         threshold_pascals: float,
         output_format: OutputOptions = OutputOptions.can_bus_only,
 <<<<<<< HEAD
+<<<<<<< HEAD
         data_files: Optional[Dict[InstrumentProbeType, str]] = None,
 =======
         data_file: Optional[str] = None,
 >>>>>>> 7995d78c39 (refactor(hardware): give options for sensor data output during probe (#14673))
+=======
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
+>>>>>>> b3b65dfc27 (feat(hardware-testing): enable multi sensor processing in liquid probe (#14883))
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
