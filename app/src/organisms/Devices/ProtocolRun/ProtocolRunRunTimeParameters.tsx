@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import {
+  RUN_ACTION_TYPE_PLAY,
   RUN_STATUS_STOPPED,
   RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
@@ -44,15 +45,22 @@ export function ProtocolRunRuntimeParameters({
   const isRunTerminal =
     // @ts-expect-error: expected that runStatus may not be a terminal status
     runStatus == null ? false : RUN_STATUSES_TERMINAL.includes(runStatus)
+  // we access runTimeParameters from the run record rather than the most recent analysis
+  // because the most recent analysis may not reflect the selected run (e.g. cloning a run
+  // from a historical protocol run from the device details page)
   const run = useNotifyRunQuery(runId).data
   const runTimeParameters =
     (isRunTerminal
       ? run?.data?.runTimeParameters
       : mostRecentAnalysis?.runTimeParameters) ?? []
-  const hasParameter = runTimeParameters.length > 0
-
-  const hasCustomValues = runTimeParameters.some(
+  const hasRunTimeParameters = runTimeParameters.length > 0
+  const hasCustomRunTimeParameterValues = runTimeParameters.some(
     parameter => parameter.value !== parameter.default
+  )
+
+  const runActions = run?.data.actions
+  const hasRunStarted = runActions?.some(
+    action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
 
   return (
@@ -70,13 +78,15 @@ export function ProtocolRunRuntimeParameters({
           <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('parameters')}
           </StyledText>
-          {hasParameter ? (
+          {hasRunTimeParameters ? (
             <StyledText as="label" color={COLORS.grey60}>
-              {hasCustomValues ? t('custom_values') : t('default_values')}
+              {hasCustomRunTimeParameterValues
+                ? t('custom_values')
+                : t('default_values')}
             </StyledText>
           ) : null}
         </Flex>
-        {hasParameter ? (
+        {hasRunTimeParameters ? (
           <Banner
             type="informing"
             width="100%"
@@ -91,11 +101,13 @@ export function ProtocolRunRuntimeParameters({
           </Banner>
         ) : null}
       </Flex>
-      {!hasParameter ? (
+      {!hasRunTimeParameters ? (
         <Flex padding={SPACING.spacing16}>
           <InfoScreen
             contentType={
-              runStatus === RUN_STATUS_STOPPED ? 'runNotStarted' : 'parameters'
+              !hasRunStarted && runStatus === RUN_STATUS_STOPPED
+                ? 'runNotStarted'
+                : 'parameters'
             }
           />
         </Flex>

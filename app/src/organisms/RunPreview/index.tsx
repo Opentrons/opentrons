@@ -48,9 +48,11 @@ export const RunPreviewComponent = (
   const runStatus = useRunStatus(runId)
   // @ts-expect-error: expected that runStatus may not be a terminal status
   const isRunTerminal = RUN_STATUSES_TERMINAL.includes(runStatus)
+  // we only ever want one request done for terminal runs because this is a heavy request
   const commandsFromQuery = useAllCommandsQuery(runId, null, {
     staleTime: Infinity,
     cacheTime: Infinity,
+    enabled: isRunTerminal,
   }).data?.data
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
