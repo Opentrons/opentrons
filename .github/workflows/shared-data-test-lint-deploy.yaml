@@ -237,7 +237,8 @@ jobs:
       - name: 'js deps'
         run: |
           npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache 
+          yarn config set cache-folder ./.yarn-cache
+          make setup-js 
       - name: 'build typescript'
         run: make build-ts
       - name: 'build library'
