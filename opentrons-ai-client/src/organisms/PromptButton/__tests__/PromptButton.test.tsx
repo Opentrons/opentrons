@@ -4,6 +4,7 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { setPromptContext } from '../PromptProvider'
+import { reagentTransfer } from '../../../assets/prompts'
 import { PromptButton } from '../index'
 
 const mockSetPrompt = vi.fn()
@@ -33,6 +34,6 @@ describe('PromptButton', () => {
     render(props)
     const button = screen.getByRole('button', { name: 'Reagent Transfer' })
     fireEvent.click(button)
-    expect(mockSetPrompt).toHaveBeenCalled()
+    expect(mockSetPrompt).toHaveBeenCalledWith(reagentTransfer)
   })
 })
