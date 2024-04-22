@@ -193,7 +193,7 @@ async def create_run_command(
             " the default was 30 seconds, not infinite."
         ),
     ),
-    failed_command_id: Optional[str] = Query(
+    failedCommandId: Optional[str] = Query(
         default=None,
         description=(
             "FIXIT command use only. Reference of the failed command id we are trying to fix."
@@ -211,7 +211,7 @@ async def create_run_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
-        failed_command_id: FIXIT command use only.
+        failedCommandId: FIXIT command use only.
             Reference of the failed command id we are trying to fix.
         protocol_engine: The run's `ProtocolEngine` on which the new
             command will be enqueued.
@@ -223,7 +223,7 @@ async def create_run_command(
     command_create = request_body.data.copy(update={"intent": command_intent})
     try:
         command = protocol_engine.add_command(
-            request=command_create, failed_command_id=failed_command_id
+            request=command_create, failed_command_id=failedCommandId
         )
 
     except pe_errors.SetupCommandNotAllowedError as e:

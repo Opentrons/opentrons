@@ -126,7 +126,7 @@ async def test_create_run_command(
         request_body=RequestModelWithCommandCreate(data=command_request),
         waitUntilComplete=False,
         protocol_engine=mock_protocol_engine,
-        failed_command_id=None,
+        failedCommandId=None,
     )
 
     assert result.content.data == command_once_added
@@ -157,7 +157,7 @@ async def test_create_command_with_failed_command_raises(
             waitUntilComplete=False,
             timeout=42,
             protocol_engine=mock_protocol_engine,
-            failed_command_id="123",
+            failedCommandId="123",
         )
 
 
@@ -213,7 +213,7 @@ async def test_create_run_command_blocking_completion(
         waitUntilComplete=True,
         timeout=999,
         protocol_engine=mock_protocol_engine,
-        failed_command_id=None,
+        failedCommandId=None,
     )
 
     assert result.content.data == command_once_completed
@@ -239,7 +239,7 @@ async def test_add_conflicting_setup_command(
             request_body=RequestModelWithCommandCreate(data=command_request),
             waitUntilComplete=False,
             protocol_engine=mock_protocol_engine,
-            failed_command_id=None,
+            failedCommandId=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -268,7 +268,7 @@ async def test_add_command_to_stopped_engine(
             request_body=RequestModelWithCommandCreate(data=command_request),
             waitUntilComplete=False,
             protocol_engine=mock_protocol_engine,
-            failed_command_id=None,
+            failedCommandId=None,
         )
 
     assert exc_info.value.status_code == 409

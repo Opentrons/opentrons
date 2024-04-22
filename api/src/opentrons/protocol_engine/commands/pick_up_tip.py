@@ -4,6 +4,7 @@ from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from ..errors import TipNotAttachedError
 from ..types import DeckPoint
 from .pipetting_common import (
     PipetteIdMixin,
@@ -82,6 +83,8 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, PickUpTipResu
             labware_id=labware_id,
             well_name=well_name,
         )
+
+        raise TipNotAttachedError()
 
         return PickUpTipResult(
             tipVolume=tip_geometry.volume,
