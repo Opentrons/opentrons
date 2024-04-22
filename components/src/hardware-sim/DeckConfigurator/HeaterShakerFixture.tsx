@@ -32,7 +32,7 @@ interface HeaterShakerFixtureProps {
   ) => void
 }
 
-const HEATER_SHAKER_MODULE_FIXTURE_DISPLAY_NAME = 'Heater Shaker Module'
+const HEATER_SHAKER_MODULE_FIXTURE_DISPLAY_NAME = 'Heater-Shaker'
 
 export function HeaterShakerFixture(
   props: HeaterShakerFixtureProps

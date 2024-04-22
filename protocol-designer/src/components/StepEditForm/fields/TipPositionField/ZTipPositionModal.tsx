@@ -67,12 +67,12 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
   } => {
     if (getIsTouchTipField(name)) {
       return {
-        maxMmFromBottom: utils.roundValue(wellDepthMm),
-        minMmFromBottom: utils.roundValue(wellDepthMm / 2),
+        maxMmFromBottom: utils.roundValue(wellDepthMm, 'up'),
+        minMmFromBottom: utils.roundValue(wellDepthMm / 2, 'up'),
       }
     }
     return {
-      maxMmFromBottom: utils.roundValue(wellDepthMm * 2),
+      maxMmFromBottom: utils.roundValue(wellDepthMm * 2, 'up'),
       minMmFromBottom: 0,
     }
   }
@@ -148,7 +148,7 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
   const handleIncrementDecrement = (delta: number): void => {
     const prevValue = value === null ? defaultMm : Number(value)
     setIsDefault(false)
-    handleChange(utils.roundValue(prevValue + delta))
+    handleChange(utils.roundValue(prevValue + delta, 'up'))
   }
 
   const makeHandleIncrement = (step: number): (() => void) => () => {

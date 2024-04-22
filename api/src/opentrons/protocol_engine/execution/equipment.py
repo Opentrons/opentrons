@@ -22,7 +22,6 @@ from opentrons.protocol_engine.state.module_substates import (
     TemperatureModuleId,
     ThermocyclerModuleId,
 )
-from ..actions import ActionDispatcher
 from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
@@ -99,7 +98,6 @@ class EquipmentHandler:
         self,
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
-        action_dispatcher: ActionDispatcher,
         labware_data_provider: Optional[LabwareDataProvider] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
         model_utils: Optional[ModelUtils] = None,
@@ -110,7 +108,6 @@ class EquipmentHandler:
         """Initialize an EquipmentHandler instance."""
         self._hardware_api = hardware_api
         self._state_store = state_store
-        self._action_dispatcher = action_dispatcher
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
         self._module_data_provider = module_data_provider or ModuleDataProvider()
         self._model_utils = model_utils or ModelUtils()

@@ -1,5 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import Markdown from 'react-markdown'
 import {
   BORDERS,
   COLORS,
@@ -10,12 +11,12 @@ import {
 } from '@opentrons/components'
 
 interface ChatDisplayProps {
-  text: string
+  content: string
   isUserInput: boolean
 }
 
 export function ChatDisplay({
-  text,
+  content,
   isUserInput,
 }: ChatDisplayProps): JSX.Element {
   const { t } = useTranslation('protocol_generator')
@@ -25,7 +26,6 @@ export function ChatDisplay({
       gridGap={SPACING.spacing12}
       paddingLeft={isUserInput ? SPACING.spacing40 : undefined}
       paddingRight={isUserInput ? undefined : SPACING.spacing40}
-      //   max-width="58.125rem"
     >
       <StyledText>{isUserInput ? t('you') : t('opentronsai')}</StyledText>
       {/* text should be markdown so this component will have a package or function to parse markdown */}
@@ -35,8 +35,11 @@ export function ChatDisplay({
         data-testid={`ChatDisplay_from_${isUserInput ? 'user' : 'backend'}`}
         borderRadius={BORDERS.borderRadius12}
         width="100%"
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing16}
       >
-        {text}
+        {/* ToDo (kk:04/19/2024) I will get feedback for additional styling  from the design team. */}
+        <Markdown>{content}</Markdown>
       </Flex>
     </Flex>
   )

@@ -600,8 +600,13 @@ def test_command_store_handles_finish_action_with_stopped() -> None:
     assert subject.state.run_result == RunResult.STOPPED
 
 
-@pytest.mark.parametrize("from_estop", [True, False])
-def test_command_store_handles_stop_action(from_estop: bool) -> None:
+@pytest.mark.parametrize(
+    ["from_estop", "expected_run_result"],
+    [(True, RunResult.FAILED), (False, RunResult.STOPPED)],
+)
+def test_command_store_handles_stop_action(
+    from_estop: bool, expected_run_result: RunResult
+) -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
     subject = CommandStore(is_door_open=False, config=_make_config())
 
@@ -615,7 +620,7 @@ def test_command_store_handles_stop_action(from_estop: bool) -> None:
     assert subject.state == CommandState(
         command_history=CommandHistory(),
         queue_status=QueueStatus.PAUSED,
-        run_result=RunResult.STOPPED,
+        run_result=expected_run_result,
         run_completed_at=None,
         is_door_blocking=False,
         run_error=None,

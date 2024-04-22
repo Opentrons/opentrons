@@ -24,6 +24,7 @@ import {
   TEMPERATURE_MODULE_MODELS,
   THERMOCYCLER_MODULE_MODELS,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -32,10 +33,24 @@ import { LEFT_SLOTS } from './constants'
 
 import type { DeckConfiguration, CreateCommand } from '@opentrons/shared-data'
 import type { ModuleCalibrationWizardStepProps } from './types'
+import type { AxiosError } from 'axios'
+import type { UseMutateFunction } from 'react-query'
+import type {
+  CreateMaintenanceRunData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 
 interface PlaceAdapterProps extends ModuleCalibrationWizardStepProps {
   deckConfig: DeckConfiguration
   setCreatedAdapterId: (adapterId: string) => void
+  createMaintenanceRun: UseMutateFunction<
+    MaintenanceRun,
+    AxiosError<any>,
+    CreateMaintenanceRunData,
+    unknown
+  >
+  isCreateLoading: boolean
+  createdMaintenanceRunId: string | null
 }
 
 export const BODY_STYLE = css`
@@ -58,11 +73,23 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
     setCreatedAdapterId,
     attachedPipette,
     isRobotMoving,
+    maintenanceRunId,
+    createMaintenanceRun,
+    isCreateLoading,
+    createdMaintenanceRunId,
   } = props
   const { t } = useTranslation('module_wizard_flows')
+  React.useEffect(() => {
+    if (createdMaintenanceRunId == null) {
+      createMaintenanceRun({})
+    }
+  }, [])
   const mount = attachedPipette.mount
   const cutoutId = deckConfig.find(
-    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
+    cc =>
+      cc.opentronsModuleSerialNumber === attachedModule.serialNumber &&
+      (attachedModule.moduleType !== THERMOCYCLER_MODULE_TYPE ||
+        cc.cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE)
   )?.cutoutId
   const slotName =
     cutoutId != null ? FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutId] : null
@@ -204,6 +231,7 @@ export const PlaceAdapter = (props: PlaceAdapterProps): JSX.Element | null => {
       bodyText={bodyText}
       proceedButtonText={t('confirm_placement')}
       proceed={handleOnClick}
+      proceedIsDisabled={isCreateLoading || maintenanceRunId == null}
       back={goBack}
     />
   )

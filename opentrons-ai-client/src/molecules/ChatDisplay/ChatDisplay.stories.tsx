@@ -21,12 +21,14 @@ const meta: Meta<typeof ChatDisplay> = {
 }
 export default meta
 type Story = StoryObj<typeof ChatDisplay>
+
 export const OpentronsAI: Story = {
   args: {
-    text: `
-    \`\`\`python
-from opentrons import protocol_api
+    content: `
+## sample output from OpentronsAI
 
+\`\`\`py
+from opentrons import protocol_api
 # Metadata
 metadata = {
     'protocolName': 'ThermoPrime Taq DNA Polymerase PCR Amplification',
@@ -46,13 +48,15 @@ def run(protocol: protocol_api.ProtocolContext):
     TC_SAMPLE_MASTERMIX_MIX_VOLUME = SAMPLE_VOL + MASTERMIX_VOL
     MASTERMIX_BLOCK_TEMP = 10  # degree C
     TEMP_DECK_WAIT_TIME = 50  # seconds
+\`\`\`
 `,
     isUserInput: false,
   },
 }
+
 export const User: Story = {
   args: {
-    text: `
+    content: `
     - Application: Reagent transfer
     - Robot: OT-2
     - API: 2.13

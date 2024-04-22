@@ -1,3 +1,4 @@
+import floor from 'lodash/floor'
 import round from 'lodash/round'
 import { getIsTouchTipField } from '../../../../form-types'
 import {
@@ -46,8 +47,20 @@ export function getDefaultMmFromBottom(args: {
   }
 }
 
-export const roundValue = (value: number | string | null): number => {
-  return value === null ? 0 : round(Number(value), DECIMALS_ALLOWED)
+export const roundValue = (
+  value: number | string | null,
+  direction: 'up' | 'down'
+): number => {
+  if (value === null) return 0
+
+  switch (direction) {
+    case 'up': {
+      return round(Number(value), DECIMALS_ALLOWED)
+    }
+    case 'down': {
+      return floor(Number(value), DECIMALS_ALLOWED)
+    }
+  }
 }
 
 const OUT_OF_BOUNDS: 'OUT_OF_BOUNDS' = 'OUT_OF_BOUNDS'

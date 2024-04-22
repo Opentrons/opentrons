@@ -269,10 +269,12 @@ export function DeviceDetailsDeckConfiguration({
                 flexDirection={DIRECTION_COLUMN}
               >
                 <DeckConfigurator
-                  readOnly={
+                  editableCutoutIds={
                     isRunRunning ||
                     isMaintenanceRunExisting ||
                     isEstopNotDisengaged
+                      ? []
+                      : deckConfig.map(({ cutoutId }) => cutoutId)
                   }
                   deckConfig={deckConfig}
                   handleClickAdd={handleClickAdd}
