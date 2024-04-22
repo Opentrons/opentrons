@@ -2,17 +2,13 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useForm, Controller } from 'react-hook-form'
 import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  BORDERS,
-  Btn,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
   Link,
   PrimaryButton,
   SPACING,
@@ -28,6 +24,7 @@ import {
 import { ToggleButton } from '../../../../../atoms/buttons'
 import { InputField } from '../../../../../atoms/InputField'
 import { MultiSlideout } from '../../../../../atoms/Slideout/MultiSlideout'
+import { FileUpload } from '../../../../../molecules/FileUpload'
 import { UploadInput } from '../../../../../molecules/UploadInput'
 import { restartRobot } from '../../../../../redux/robot-admin'
 
@@ -43,17 +40,6 @@ interface FactoryModeSlideoutProps {
 interface FormValues {
   passwordInput: string
 }
-
-const CLOSE_ICON_STYLE = css`
-  border-radius: 50%;
-
-  &:hover {
-    background: ${COLORS.black90}${COLORS.opacity20HexCode};
-  }
-  &:active {
-    background: ${COLORS.black90}${COLORS.opacity20HexCode}};
-  }
-`
 
 export function FactoryModeSlideout({
   isExpanded,
@@ -275,39 +261,14 @@ export function FactoryModeSlideout({
                   }
                 />
               ) : (
-                // TODO: extract to FileUpload component
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing4}
-                >
-                  <Flex
-                    alignItems={ALIGN_CENTER}
-                    backgroundColor={
-                      fileError == null ? COLORS.grey20 : COLORS.red30
-                    }
-                    borderRadius={BORDERS.borderRadius4}
-                    height={SPACING.spacing44}
-                    justifyContent={JUSTIFY_SPACE_BETWEEN}
-                    padding={SPACING.spacing8}
-                  >
-                    <StyledText as="p">{file.name}</StyledText>
-                    <Btn
-                      size="1.5rem"
-                      onClick={() => {
-                        setFile(null)
-                        setFileError(null)
-                      }}
-                      aria-label="remove_file"
-                    >
-                      <Icon name="close" css={CLOSE_ICON_STYLE} />
-                    </Btn>
-                  </Flex>
-                  {fileError != null ? (
-                    <StyledText as="label" color={COLORS.red50}>
-                      {fileError}
-                    </StyledText>
-                  ) : null}
-                </Flex>
+                <FileUpload
+                  file={file}
+                  fileError={fileError}
+                  handleClick={() => {
+                    setFile(null)
+                    setFileError(null)
+                  }}
+                />
               )}
             </Flex>
           ) : null}
