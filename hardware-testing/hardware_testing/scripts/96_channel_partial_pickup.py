@@ -24,7 +24,6 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     move_plunger_absolute_ot3,
     get_plunger_positions_ot3,
     update_pick_up_speed,
-    # update_drop_tip_speed,
     _get_pipette_from_mount,
 )
 
