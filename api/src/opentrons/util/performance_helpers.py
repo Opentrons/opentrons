@@ -33,7 +33,7 @@ def _handle_package_import() -> Type[SupportsTracking]:
         return StubbedTracker
 
 
-package_to_use = _handle_package_import()
+package_to_use: Type[SupportsTracking] = _handle_package_import()
 _robot_context_tracker: SupportsTracking | None = None
 
 
