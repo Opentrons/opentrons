@@ -61,7 +61,6 @@ export const roundValue = (
       return floor(Number(value), DECIMALS_ALLOWED)
     }
   }
-  return value === null ? 0 : round(Number(value), DECIMALS_ALLOWED)
 }
 
 const OUT_OF_BOUNDS: 'OUT_OF_BOUNDS' = 'OUT_OF_BOUNDS'
