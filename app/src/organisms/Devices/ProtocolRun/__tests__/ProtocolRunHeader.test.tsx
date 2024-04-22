@@ -814,7 +814,7 @@ describe('ProtocolRunHeader', () => {
 
     screen.getByText('Run completed.')
   })
-  it('clicking close on a terminal run banner closes the run context and dismisses the banner', async () => {
+  it('clicking close on a terminal run banner closes the run context', async () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID)
       .thenReturn({
@@ -827,9 +827,20 @@ describe('ProtocolRunHeader', () => {
 
     fireEvent.click(screen.getByTestId('Banner_close-button'))
     expect(mockCloseCurrentRun).toBeCalled()
-    await waitFor(() => {
-      expect(screen.queryByText('Run completed.')).not.toBeInTheDocument()
-    })
+  })
+
+  it('does not display the "run successful" banner if the successful run is not current', async () => {
+    when(vi.mocked(useNotifyRunQuery))
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: { data: { ...mockSucceededRun, current: false } },
+      } as UseQueryResult<OpentronsApiClient.Run>)
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID)
+      .thenReturn(RUN_STATUS_SUCCEEDED)
+    render()
+
+    expect(screen.queryByText('Run completed.')).not.toBeInTheDocument()
   })
 
   it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', async () => {

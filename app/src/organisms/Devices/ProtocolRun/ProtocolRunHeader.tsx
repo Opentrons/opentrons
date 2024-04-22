@@ -174,7 +174,6 @@ export function ProtocolRunHeader({
   const [pipettesWithTip, setPipettesWithTip] = React.useState<
     PipettesWithTip[]
   >([])
-  const [closeTerminalBanner, setCloseTerminalBanner] = React.useState(false)
   const isResetRunLoadingRef = React.useRef(false)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const highestPriorityError =
@@ -200,7 +199,7 @@ export function ProtocolRunHeader({
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })
-  let isDoorOpen = false
+  let isDoorOpen: boolean
   if (isFlex) {
     isDoorOpen = doorStatus?.data.status === 'open'
   } else if (!isFlex && Boolean(doorSafetySetting?.value)) {
@@ -248,7 +247,9 @@ export function ProtocolRunHeader({
     }
   }, [protocolData, isRobotViewable, history])
 
+  // Side effects dependent on the current run state.
   React.useEffect(() => {
+    // After a user-initiated stopped run, close the run current run automatically.
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent && runId != null) {
       trackProtocolRunEvent({
         name: ANALYTICS_PROTOCOL_RUN_FINISH,
@@ -259,12 +260,6 @@ export function ProtocolRunHeader({
       closeCurrentRun()
     }
   }, [runStatus, isRunCurrent, runId, closeCurrentRun])
-
-  React.useEffect(() => {
-    if (runStatus === RUN_STATUS_IDLE) {
-      setCloseTerminalBanner(false)
-    }
-  }, [runStatus])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
@@ -310,7 +305,6 @@ export function ProtocolRunHeader({
       properties: robotAnalyticsData ?? undefined,
     })
     closeCurrentRun()
-    setCloseTerminalBanner(true)
   }
 
   return (
@@ -375,7 +369,7 @@ export function ProtocolRunHeader({
         CANCELLABLE_STATUSES.includes(runStatus) ? (
           <Banner type="warning">{t('shared:close_robot_door')}</Banner>
         ) : null}
-        {mostRecentRunId === runId && !closeTerminalBanner ? (
+        {mostRecentRunId === runId ? (
           <TerminalRunBanner
             {...{
               runStatus,
@@ -385,6 +379,7 @@ export function ProtocolRunHeader({
               highestPriorityError,
             }}
             isResetRunLoading={isResetRunLoadingRef.current}
+            isRunCurrent={isRunCurrent}
           />
         ) : null}
         {mostRecentRunId === runId &&
@@ -479,7 +474,9 @@ export function ProtocolRunHeader({
               setShowDropTipWizard(false)
               setPipettesWithTip(prevPipettesWithTip => {
                 const pipettesWithTip = prevPipettesWithTip.slice(1) ?? []
-                if (pipettesWithTip.length === 0) closeCurrentRun()
+                if (pipettesWithTip.length === 0) {
+                  closeCurrentRun()
+                }
                 return pipettesWithTip
               })
             }}
@@ -570,6 +567,7 @@ interface ActionButtonProps {
   isResetRunLoadingRef: React.MutableRefObject<boolean>
 }
 
+// TODO(jh, 04-22-2024): Refactor switch cases into separate factories to increase readability and testability.
 function ActionButton(props: ActionButtonProps): JSX.Element {
   const {
     runId,
@@ -613,9 +611,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     robotName,
     runId
   )
-  const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
-    false
-  )
+  const [showIsShakingModal, setShowIsShakingModal] = React.useState(false)
   const isSetupComplete =
     isCalibrationComplete &&
     isModuleCalibrationComplete &&
@@ -804,12 +800,14 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   )
 }
 
+// TODO(jh 04-24-2024): Split TerminalRunBanner into a RunSuccessBanner and RunFailedBanner.
 interface TerminalRunProps {
   runStatus: RunStatus | null
   handleClearClick: () => void
   isClosingCurrentRun: boolean
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
   isResetRunLoading: boolean
+  isRunCurrent: boolean
   highestPriorityError?: RunError | null
 }
 function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
@@ -820,51 +818,64 @@ function TerminalRunBanner(props: TerminalRunProps): JSX.Element | null {
     setShowRunFailedModal,
     highestPriorityError,
     isResetRunLoading,
+    isRunCurrent,
   } = props
   const { t } = useTranslation('run_details')
 
-  const handleClick = (): void => {
+  const handleRunSuccessClick = (): void => {
+    handleClearClick()
+  }
+
+  const handleFailedRunClick = (): void => {
     handleClearClick()
     setShowRunFailedModal(true)
   }
 
-  if (
-    isResetRunLoading === false &&
-    (runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED)
-  ) {
+  const buildSuccessBanner = (): JSX.Element => {
     return (
-      <>
-        {runStatus === RUN_STATUS_SUCCEEDED ? (
-          <Banner
-            type="success"
-            onCloseClick={handleClearClick}
-            isCloseActionLoading={isClosingCurrentRun}
-          >
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              {t('run_completed')}
-            </Flex>
-          </Banner>
-        ) : (
-          <Banner type="error">
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              <StyledText>
-                {t('error_info', {
-                  errorType: highestPriorityError?.errorType,
-                  errorCode: highestPriorityError?.errorCode,
-                })}
-              </StyledText>
-
-              <LinkButton
-                onClick={handleClick}
-                textDecoration={TYPOGRAPHY.textDecorationUnderline}
-              >
-                {t('view_error')}
-              </LinkButton>
-            </Flex>
-          </Banner>
-        )}
-      </>
+      <Banner
+        type="success"
+        onCloseClick={handleRunSuccessClick}
+        isCloseActionLoading={isClosingCurrentRun}
+      >
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+          {t('run_completed')}
+        </Flex>
+      </Banner>
     )
   }
-  return null
+
+  const buildErrorBanner = (): JSX.Element => {
+    return (
+      <Banner type="error">
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+          <StyledText>
+            {t('error_info', {
+              errorType: highestPriorityError?.errorType,
+              errorCode: highestPriorityError?.errorCode,
+            })}
+          </StyledText>
+
+          <LinkButton
+            onClick={handleFailedRunClick}
+            textDecoration={TYPOGRAPHY.textDecorationUnderline}
+          >
+            {t('view_error')}
+          </LinkButton>
+        </Flex>
+      </Banner>
+    )
+  }
+
+  if (
+    runStatus === RUN_STATUS_SUCCEEDED &&
+    isRunCurrent &&
+    !isResetRunLoading
+  ) {
+    return buildSuccessBanner()
+  } else if (runStatus === RUN_STATUS_FAILED && !isResetRunLoading) {
+    return buildErrorBanner()
+  } else {
+    return null
+  }
 }
