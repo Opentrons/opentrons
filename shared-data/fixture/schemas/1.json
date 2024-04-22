@@ -33,12 +33,7 @@
     },
     "displayCategory": {
       "type": "string",
-      "enum": [
-        "slot",
-        "extensionSlot",
-        "trash",
-        "other"
-      ]
+      "enum": ["slot", "extensionSlot", "trash", "other"]
     },
     "safeString": {
       "description": "a string safe to use for loadName / namespace. Lowercase-only.",
@@ -118,9 +113,7 @@
       "type": "object",
       "description": "Internal describers for the fixture",
       "additionalProperties": false,
-      "required": [
-        "loadName"
-      ],
+      "required": ["loadName"],
       "properties": {
         "loadName": {
           "description": "Name used to reference a fixture definition",
