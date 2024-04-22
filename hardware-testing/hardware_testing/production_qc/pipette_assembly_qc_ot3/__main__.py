@@ -1527,6 +1527,10 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
     fixture = connect_to_fixture(
         test_config.simulate or test_config.skip_fixture, side=test_config.fixture_side
     )
+    
+    #connect to the pressure sensor
+    pressure_sensor = SealedPressureDriver()
+    pressure_sensor.init(9600)
 
     # create API instance, and get Pipette serial number
     api = await helpers_ot3.build_async_ot3_hardware_api(
