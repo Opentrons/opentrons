@@ -22,10 +22,10 @@ from hardware_testing.data.csv_report import (
 
 PRIMARY_SEALED_PRESSURE_FIXTURE_POS = Point(362.68, 148.83, 44.4)  # attached tip
 SECOND_SEALED_PRESSURE_FIXTURE_POS = Point(264.71, 212.81, 44.4)   # attached tip
-SET_PRESSURE_TARGET = 50 # read air pressure when the force pressure value is 300
+SET_PRESSURE_TARGET = 100 # read air pressure when the force pressure value is over 100
 REACHED_PRESSURE = 0
-
 USE_SEALED_FIXTURE = False
+
 SECONDS_BETWEEN_READINGS = 0.25
 NUM_PRESSURE_READINGS = 10
 TIP_VOLUME = 50
@@ -34,8 +34,8 @@ PRESSURE_READINGS = ["open-pa", "sealed-pa", "aspirate-pa", "dispense-pa"]
 
 THRESHOLDS = {
     "open-pa": (
-        -10,
-        10,
+        -25,
+        25,
     ),
     "sealed-pa": (
         -30,
@@ -108,9 +108,9 @@ async def calibrate_to_pressue_fixture(api: OT3API, sensor:SealedPressureDriver,
     """move to suitable height for readding air pressure"""
     global REACHED_PRESSURE
     await api.move_to(OT3Mount.LEFT, fixture_pos)
-    debug_target = input("Setting target pressure (default: 20g): ")
+    debug_target = input(f"Setting target pressure (default: {SET_PRESSURE_TARGET}g): ")
     if debug_target.strip() == "":
-        debug_target = "20"
+        debug_target = f"{SET_PRESSURE_TARGET}"
     while True:
         force_pressure = sensor.get_pressure()
         # step = -0.06 if abs(float(force_pressure)) > 0.1 else -0.1
