@@ -10,8 +10,6 @@ import {
 } from '../PromptProvider'
 
 const TestComponent = () => {
-  //   const prompt = React.useContext(promptContext)
-  //   const setPrompt = React.useContext(setPromptContext)
   const usePromptValue = (): string => React.useContext(promptContext)
   const prompt = usePromptValue()
 
