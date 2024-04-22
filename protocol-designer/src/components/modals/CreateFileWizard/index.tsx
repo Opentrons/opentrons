@@ -243,16 +243,14 @@ export function CreateFileWizard(): JSX.Element | null {
       })
 
       modules.forEach(moduleArgs => {
-        if (moduleArgs.slot != null) {
-          return dispatch(stepFormActions.createModule(moduleArgs))
-        } else {
-          return dispatch(
-            createModuleWithNoSlot({
-              model: moduleArgs.model,
-              type: moduleArgs.type,
-            })
-          )
-        }
+        return moduleArgs.slot != null
+          ? dispatch(stepFormActions.createModule(moduleArgs))
+          : dispatch(
+              createModuleWithNoSlot({
+                model: moduleArgs.model,
+                type: moduleArgs.type,
+              })
+            )
       })
 
       // add gripper

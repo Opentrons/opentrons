@@ -1,22 +1,25 @@
 import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
-import { SPAN7_8_10_11_SLOT } from '../constants'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  ModuleType,
   MAGNETIC_BLOCK_TYPE,
-  RobotType,
-  CutoutId,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
   FIXED_TRASH_ID,
+} from '@opentrons/shared-data'
+import { SPAN7_8_10_11_SLOT } from '../constants'
+import { getStagingAreaAddressableAreas } from '../utils'
+import { getSlotIsEmpty } from '../step-forms'
+import type {
+  ModuleType,
+  RobotType,
+  CutoutId,
   AddressableAreaName,
 } from '@opentrons/shared-data'
-import { getStagingAreaAddressableAreas } from '../utils'
-import { InitialDeckSetup, getSlotIsEmpty } from '../step-forms'
 import type { DropdownOption } from '@opentrons/components'
+import type { InitialDeckSetup } from '../step-forms'
 import type { DeckSlot } from '../types'
 
 export const SUPPORTED_MODULE_TYPES: ModuleType[] = [

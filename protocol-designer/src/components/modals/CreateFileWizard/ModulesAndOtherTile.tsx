@@ -219,7 +219,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
     <Flex flexWrap={WRAP} gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
       {FLEX_SUPPORTED_MODULE_MODELS.map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
-        const moduleOnDeck = moduleTypesOnDeck.includes(moduleType)
+        const isModuleOnDeck = moduleTypesOnDeck.includes(moduleType)
 
         const isDisabled = !getIsSlotAvailable(modules, additionalEquipment)
 
@@ -259,7 +259,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
             (moduleType !== TEMPERATURE_MODULE_TYPE && enableMoamFf) ||
             !enableMoamFf
           ) {
-            if (moduleOnDeck) {
+            if (isModuleOnDeck) {
               const updatedModules =
                 modules != null
                   ? Object.fromEntries(
@@ -286,13 +286,13 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
           <EquipmentOption
             robotType={FLEX_ROBOT_TYPE}
             key={moduleModel}
-            isSelected={moduleOnDeck}
+            isSelected={isModuleOnDeck}
             image={<ModuleDiagram type={moduleType} model={moduleModel} />}
             text={getModuleDisplayName(moduleModel)}
             disabled={
               moduleType === MAGNETIC_BLOCK_TYPE
                 ? false
-                : isDisabled && !moduleOnDeck
+                : isDisabled && !isModuleOnDeck
             }
             onClick={handleOnClick}
             multiples={

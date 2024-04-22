@@ -91,21 +91,18 @@ export const getIsSlotAvailable = (
 ): boolean => {
   const moduleLength = modules != null ? Object.keys(modules).length : 0
   const additionalEquipmentLength = additionalEquipment.length
-  const hasTC =
-    modules != null
-      ? Object.values(modules).some(
-          module => module.type === THERMOCYCLER_MODULE_TYPE
-        )
-      : false
+  const hasTC = Object.values(modules || {}).some(
+    module => module.type === THERMOCYCLER_MODULE_TYPE
+  )
 
   const filteredModuleLength = hasTC ? moduleLength + 1 : moduleLength
-  const hasWasteChute = additionalEquipment.find(equipment =>
+  const hasWasteChute = additionalEquipment.some(equipment =>
     equipment.includes('wasteChute')
   )
   const isStagingAreaInD3 = additionalEquipment
     .filter(equipment => equipment.includes('stagingArea'))
     .find(stagingArea => stagingArea.split('_')[1] === 'cutoutD3')
-  const hasGripper = additionalEquipment.find(equipment =>
+  const hasGripper = additionalEquipment.some(equipment =>
     equipment.includes('gripper')
   )
 
@@ -133,9 +130,10 @@ export const getTrashOptionDisabled = (
   props: TrashOptionDisabledProps
 ): boolean => {
   const { additionalEquipment, modules, trashType } = props
-  const isSlotAvailable = getIsSlotAvailable(modules, additionalEquipment)
-  const hasTrashBinAlready = additionalEquipment.includes(trashType)
-  return !isSlotAvailable && !hasTrashBinAlready
+  return (
+    !getIsSlotAvailable(modules, additionalEquipment) &&
+    !additionalEquipment.includes(trashType)
+  )
 }
 
 export const getTrashSlot = (values: FormState): string => {
