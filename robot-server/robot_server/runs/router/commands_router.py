@@ -56,11 +56,18 @@ class CommandNotFound(ErrorDetails):
     title: str = "Run Command Not Found"
 
 
+class SetupCommandNotAllowed(ErrorDetails):
+    """An error if a given run setup command is not allowed."""
+
+    id: Literal["SetupCommandNotAllowed"] = "SetupCommandNotAllowed"
+    title: str = "Setup Command Not Allowed"
+
+
 class CommandNotAllowed(ErrorDetails):
     """An error if a given run command is not allowed."""
 
     id: Literal["CommandNotAllowed"] = "CommandNotAllowed"
-    title: str = "Setup Command Not Allowed"
+    title: str = "Command Not Allowed"
 
 
 class CommandLinkMeta(BaseModel):
@@ -159,8 +166,9 @@ async def get_current_run_engine_from_url(
         status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {
-            "model": ErrorBody[Union[RunStopped, CommandNotAllowed]]
+            "model": ErrorBody[Union[RunStopped, SetupCommandNotAllowed]]
         },
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorBody[CommandNotAllowed]},
     },
 )
 async def create_run_command(
@@ -227,7 +235,7 @@ async def create_run_command(
         )
 
     except pe_errors.SetupCommandNotAllowedError as e:
-        raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT)
+        raise SetupCommandNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT)
     except pe_errors.RunStoppedError as e:
         raise RunStopped.from_exc(e).as_error(status.HTTP_409_CONFLICT)
     except pe_errors.CommandNotAllowedError as e:
