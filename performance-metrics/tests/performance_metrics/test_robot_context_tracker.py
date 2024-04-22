@@ -2,6 +2,7 @@
 
 import asyncio
 from pathlib import Path
+from performance_metrics.datashapes import RawContextData
 import pytest
 from performance_metrics.robot_context_tracker import RobotContextTracker
 from opentrons_shared_data.performance.dev_types import RobotContextState
@@ -47,7 +48,7 @@ def test_robot_context_tracker(robot_context_tracker: RobotContextTracker) -> No
 
     # Ensure storage is initially empty
     assert (
-        len(robot_context_tracker._storage) == 0
+        len(robot_context_tracker._store.data) == 0
     ), "Storage should be initially empty."
 
     starting_robot()
@@ -57,7 +58,7 @@ def test_robot_context_tracker(robot_context_tracker: RobotContextTracker) -> No
     shutting_down_robot()
 
     # Verify that all states were tracked
-    assert len(robot_context_tracker._storage) == 5, "All states should be tracked."
+    assert len(robot_context_tracker._store.data) == 5, "All states should be tracked."
 
     # Validate the sequence and accuracy of tracked states
     expected_states = [
@@ -69,7 +70,9 @@ def test_robot_context_tracker(robot_context_tracker: RobotContextTracker) -> No
     ]
     for i, state in enumerate(expected_states):
         assert (
-            RobotContextState.from_id(robot_context_tracker._storage[i].state.state_id)
+            RobotContextState.from_id(
+                robot_context_tracker._store.data[i].state.state_id
+            )
             == state
         ), f"State at index {i} should be {state}."
 
@@ -91,11 +94,11 @@ def test_multiple_operations_single_state(
     second_operation()
 
     assert (
-        len(robot_context_tracker._storage) == 2
+        len(robot_context_tracker._store.data) == 2
     ), "Both operations should be tracked."
     assert (
-        robot_context_tracker._storage[0].state
-        == robot_context_tracker._storage[1].state
+        robot_context_tracker._store.data[0].state
+        == robot_context_tracker._store.data[1].state
         == RobotContextState.RUNNING_PROTOCOL
     ), "Both operations should have the same state."
 
@@ -114,10 +117,10 @@ def test_exception_handling_in_tracked_function(
         error_prone_operation()
 
     assert (
-        len(robot_context_tracker._storage) == 1
+        len(robot_context_tracker._store.data) == 1
     ), "Failed operation should still be tracked."
     assert (
-        robot_context_tracker._storage[0].state == RobotContextState.SHUTTING_DOWN
+        robot_context_tracker._store.data[0].state == RobotContextState.SHUTTING_DOWN
     ), "State should be correctly logged despite the exception."
 
 
@@ -134,10 +137,11 @@ async def test_async_operation_tracking(
     await async_analyzing_operation()
 
     assert (
-        len(robot_context_tracker._storage) == 1
+        len(robot_context_tracker._store.data) == 1
     ), "Async operation should be tracked."
     assert (
-        robot_context_tracker._storage[0].state == RobotContextState.ANALYZING_PROTOCOL
+        robot_context_tracker._store.data[0].state
+        == RobotContextState.ANALYZING_PROTOCOL
     ), "State should be ANALYZING_PROTOCOL."
 
 
@@ -152,10 +156,9 @@ def test_sync_operation_timing_accuracy(
 
     running_operation()
 
-    duration_data = robot_context_tracker._storage[0]
-    measured_duration = duration_data.duration_end - duration_data.duration_start
+    duration_data = robot_context_tracker._store.data[0]
     assert (
-        abs(measured_duration - RUNNING_TIME * 1e9) < 1e7
+        abs(duration_data.duration - RUNNING_TIME * 1e9) < 1e7
     ), "Measured duration for sync operation should closely match the expected duration."
 
 
@@ -171,10 +174,9 @@ async def test_async_operation_timing_accuracy(
 
     await async_running_operation()
 
-    duration_data = robot_context_tracker._storage[0]
-    measured_duration = duration_data.duration_end - duration_data.duration_start
+    duration_data = robot_context_tracker._store.data[0]
     assert (
-        abs(measured_duration - RUNNING_TIME * 1e9) < 1e7
+        abs(duration_data.duration - RUNNING_TIME * 1e9) < 1e7
     ), "Measured duration for async operation should closely match the expected duration."
 
 
@@ -193,10 +195,10 @@ async def test_exception_in_async_operation(
         await async_error_prone_operation()
 
     assert (
-        len(robot_context_tracker._storage) == 1
+        len(robot_context_tracker._store.data) == 1
     ), "Failed async operation should still be tracked."
     assert (
-        robot_context_tracker._storage[0].state == RobotContextState.SHUTTING_DOWN
+        robot_context_tracker._store.data[0].state == RobotContextState.SHUTTING_DOWN
     ), "State should be SHUTTING_DOWN despite the exception."
 
 
@@ -217,11 +219,11 @@ async def test_concurrent_async_operations(
     await asyncio.gather(first_async_calibrating(), second_async_calibrating())
 
     assert (
-        len(robot_context_tracker._storage) == 2
+        len(robot_context_tracker._store.data) == 2
     ), "Both concurrent async operations should be tracked."
     assert all(
         data.state == RobotContextState.CALIBRATING
-        for data in robot_context_tracker._storage
+        for data in robot_context_tracker._store.data
     ), "All tracked operations should be in CALIBRATING state."
 
 
@@ -236,7 +238,7 @@ def test_no_tracking(tmp_path: Path) -> None:
     operation_without_tracking()
 
     assert (
-        len(robot_context_tracker._storage) == 0
+        len(robot_context_tracker._store.data) == 0
     ), "Operation should not be tracked when tracking is disabled."
 
 
@@ -262,11 +264,19 @@ async def test_storing_to_file(tmp_path: Path) -> None:
 
     robot_context_tracker.store()
 
-    with open(robot_context_tracker._storage_file_path, "r") as file:
+    with open(robot_context_tracker._store.metadata.data_file_location, "r") as file:
         lines = file.readlines()
-        assert (
-            len(lines) == 4
-        ), "All stored data + header should be written to the file."
+        assert len(lines) == 3, "All stored data should be written to the file."
+
+        split_lines: list[list[str]] = [line.strip().split(",") for line in lines]
+        assert all(
+            RawContextData.from_csv_row(line) for line in split_lines
+        ), "All lines should be valid RawContextData instances."
+
+    with open(robot_context_tracker._store.metadata.headers_file_location, "r") as file:
+        headers = file.readlines()
+        assert len(headers) == 1, "Header should be written to the headers file."
+        assert tuple(headers[0].strip().split(",")) == RawContextData.headers()
 
 
 @patch(
@@ -289,17 +299,11 @@ def test_using_non_linux_time_functions(tmp_path: Path) -> None:
     starting_robot()
     calibrating_robot()
 
-    storage = robot_context_tracker._storage
+    storage = robot_context_tracker._store.data
     assert all(
         data.func_start > 0 for data in storage
     ), "All function start times should be greater than 0."
     assert all(
-        data.duration_start > 0 for data in storage
-    ), "All duration start times should be greater than 0."
-    assert all(
-        data.duration_end > 0 for data in storage
-    ), "All duration end times should be greater than 0."
-    assert all(
-        data.duration_end > data.duration_start for data in storage
-    ), "Duration end times should be greater than duration start times."
+        data.duration > 0 for data in storage
+    ), "All duration times should be greater than 0."
     assert len(storage) == 2, "Both operations should be tracked."
