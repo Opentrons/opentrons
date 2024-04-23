@@ -14,12 +14,11 @@ import {
 import {
   useDeckConfigurationQuery,
   useModulesQuery,
-  useStopRunMutation,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../../i18n'
 import { mockHeaterShaker } from '../../../../../redux/modules/__fixtures__'
-import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
+import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { DeckConfiguration } from '@opentrons/shared-data'
@@ -54,8 +53,9 @@ describe('LocationConflictModal', () => {
       deckDef: ot3StandardDeckV5 as any,
       robotName: 'otie',
     }
-    vi.mocked(useStopRunMutation).mockReturnValue({ stopRun: vi.fn() } as any)
-    vi.mocked(useCurrentRunId).mockReturnValue('RUNID')
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      closeCurrentRun: vi.fn(),
+    } as any)
     vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
     vi.mocked(useDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],

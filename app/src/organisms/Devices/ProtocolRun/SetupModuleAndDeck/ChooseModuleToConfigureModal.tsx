@@ -5,7 +5,6 @@ import { useHistory } from 'react-router-dom'
 import {
   useDeckConfigurationQuery,
   useModulesQuery,
-  useStopRunMutation,
 } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
@@ -29,7 +28,7 @@ import { Modal } from '../../../../molecules/Modal'
 import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
 
 import { SmallButton } from '../../../../atoms/buttons'
-import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
+import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
 
 import type { ModuleModel, DeckDefinition } from '@opentrons/shared-data'
 
@@ -63,8 +62,7 @@ export const ChooseModuleToConfigureModal = (
   } = props
   const { t } = useTranslation(['protocol_setup', 'shared'])
   const history = useHistory()
-  const currentRunId = useCurrentRunId()
-  const { stopRun } = useStopRunMutation()
+  const { closeCurrentRun } = useCloseCurrentRun()
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   const deckConfig = useDeckConfigurationQuery()?.data ?? []
@@ -109,13 +107,13 @@ export const ChooseModuleToConfigureModal = (
     }
   )
   const handleCancelRun = (): void => {
-    if (currentRunId != null) stopRun(currentRunId)
+    closeCurrentRun()
   }
   const handleNavigateToDeviceDetails = (): void => {
     history.push(`/devices/${robotName}`)
   }
   const emptyState = (
-    <Flex>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
       <StyledText as="p">
         {t('there_are_no_unconfigured_modules', {
           module: getModuleDisplayName(requiredModuleModel),
@@ -136,7 +134,7 @@ export const ChooseModuleToConfigureModal = (
 
   const contents =
     fixtureOptions.length > 0 ? (
-      <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <StyledText as="p">{t('add_this_deck_hardware')}</StyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           {fixtureOptions}
