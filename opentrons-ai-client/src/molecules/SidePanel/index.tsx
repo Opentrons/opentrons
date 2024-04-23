@@ -26,7 +26,6 @@ export function SidePanel(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       backgroundColor={COLORS.black90}
       width="24.375rem"
-      height="64rem"
     >
       {/* logo */}
       <Flex>
