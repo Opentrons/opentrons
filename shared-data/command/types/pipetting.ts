@@ -282,6 +282,7 @@ interface WellLocationParam {
 
 interface VerifyTipPresenceParams extends PipetteIdentityParams {
   expectedState?: 'present' | 'absent'
+  followSingularSensor?: 'primary' | 'secondary'
 }
 
 interface BasicLiquidHandlingResult {
