@@ -285,11 +285,11 @@ def test_track_analysis(tmp_path: Path) -> None:
     protocol_source_file.write_text(protocol_source, encoding="utf-8")
     store = context_tracker._store  # type: ignore[attr-defined]
 
-    num_storage_entities_before_analysis = len(store.data)
+    num_storage_entities_before_analysis = len(store._data)
 
     _get_analysis_result([protocol_source_file])
 
-    assert len(store.data) == num_storage_entities_before_analysis + 1
+    assert len(store._data) == num_storage_entities_before_analysis + 1
 
     with open(store.metadata.data_file_location, "r") as f:
         stored_data = f.readlines()
