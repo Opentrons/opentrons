@@ -1,6 +1,6 @@
 """Type definitions for performance tracking."""
 from dataclasses import dataclass
-from typing import Literal, Protocol, Tuple, TypeVar, Callable, Any
+from typing import Protocol, Tuple, TypeVar, Callable, Any
 from pathlib import Path
 from enum import Enum
 
