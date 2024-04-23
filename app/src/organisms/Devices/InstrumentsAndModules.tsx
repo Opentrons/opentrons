@@ -33,6 +33,7 @@ import { PipetteCard } from './PipetteCard'
 import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'
 import { GripperCard } from '../GripperCard'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useModuleApiRequests } from '../ModuleCard/utils'
 
 import type {
   BadGripper,
@@ -62,6 +63,7 @@ export function InstrumentsAndModules({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal, isRunRunning } = useRunStatuses()
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
+  const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
 
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
@@ -218,6 +220,8 @@ export function InstrumentsAndModules({
                   attachPipetteRequired={attachPipetteRequired}
                   calibratePipetteRequired={calibratePipetteRequired}
                   updatePipetteFWRequired={updatePipetteFWRequired}
+                  latestRequestId={getLatestRequestId(module.serialNumber)}
+                  handleModuleApiRequests={handleModuleApiRequests}
                 />
               ))}
             </Flex>
@@ -267,6 +271,8 @@ export function InstrumentsAndModules({
                   attachPipetteRequired={attachPipetteRequired}
                   calibratePipetteRequired={calibratePipetteRequired}
                   updatePipetteFWRequired={updatePipetteFWRequired}
+                  latestRequestId={getLatestRequestId(module.serialNumber)}
+                  handleModuleApiRequests={handleModuleApiRequests}
                 />
               ))}
             </Flex>
