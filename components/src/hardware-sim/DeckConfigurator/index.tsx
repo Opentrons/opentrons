@@ -49,6 +49,7 @@ interface DeckConfiguratorProps {
   children?: React.ReactNode
   additionalStaticFixtures?: Array<{ location: CutoutId; label: string }>
   height?: string
+  selectedCutoutId?: CutoutId
 }
 
 export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
@@ -58,6 +59,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     handleClickRemove,
     additionalStaticFixtures,
     children,
+    selectedCutoutId,
     lightFill = COLORS.grey35,
     darkFill = COLORS.black90,
     editableCutoutIds = deckConfig.map(({ cutoutId }) => cutoutId),
@@ -107,7 +109,6 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
   return (
     <RobotCoordinateSpace
       height={height}
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
       {deckDef.locations.cutouts.map(cutout => (
@@ -131,6 +132,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
+          selected={cutoutId === selectedCutoutId}
         />
       ))}
       {emptyCutouts.map(({ cutoutId }) => (
@@ -150,6 +152,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
+          selected={cutoutId === selectedCutoutId}
         />
       ))}
       {wasteChuteStagingAreaFixtures.map(({ cutoutId, cutoutFixtureId }) => (
@@ -161,6 +164,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
+          selected={cutoutId === selectedCutoutId}
           hasStagingAreas
         />
       ))}
@@ -173,6 +177,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
+          selected={cutoutId === selectedCutoutId}
         />
       ))}
       {temperatureModuleFixtures.map(({ cutoutId, cutoutFixtureId }) => (
@@ -184,6 +189,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
+          selected={cutoutId === selectedCutoutId}
         />
       ))}
       {heaterShakerFixtures.map(({ cutoutId, cutoutFixtureId }) => (
@@ -195,6 +201,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
+          selected={cutoutId === selectedCutoutId}
         />
       ))}
       {magneticBlockFixtures.map(({ cutoutId, cutoutFixtureId }) => (
@@ -206,6 +213,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
+          selected={cutoutId === selectedCutoutId}
           hasStagingArea={
             cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
           }
@@ -220,6 +228,7 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           }
           fixtureLocation={cutoutId}
           cutoutFixtureId={cutoutFixtureId}
+          selected={cutoutId === selectedCutoutId}
         />
       ))}
       {additionalStaticFixtures?.map(staticFixture => (

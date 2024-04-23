@@ -17,6 +17,7 @@ import {
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   STAGING_AREA_FIXTURE_WIDTH,
+  CONFIG_STYLE_SELECTED,
 } from './constants'
 
 import type {
@@ -34,6 +35,7 @@ interface MagneticBlockFixtureProps {
     cutoutFixtureId: CutoutFixtureId
   ) => void
   hasStagingArea?: boolean
+  selected?: boolean
 }
 
 const MAGNETIC_BLOCK_FIXTURE_DISPLAY_NAME = 'Mag Block'
@@ -48,6 +50,7 @@ export function MagneticBlockFixture(
     handleClickRemove,
     cutoutFixtureId,
     hasStagingArea,
+    selected = false,
   } = props
 
   const standardSlotCutout = deckDefinition.locations.cutouts.find(
@@ -98,6 +101,7 @@ export function MagneticBlockFixture(
 
   const y = ySlotPosition + Y_ADJUSTMENT
 
+  const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
       width={width}
@@ -108,11 +112,7 @@ export function MagneticBlockFixture(
       foreignObjectProps={{ flex: '1' }}
     >
       <Btn
-        css={
-          handleClickRemove != null
-            ? CONFIG_STYLE_EDITABLE
-            : CONFIG_STYLE_READ_ONLY
-        }
+        css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null

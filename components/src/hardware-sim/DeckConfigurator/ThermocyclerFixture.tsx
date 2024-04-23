@@ -11,6 +11,7 @@ import {
   COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
   THERMOCYCLER_FIXTURE_HEIGHT,
+  CONFIG_STYLE_SELECTED,
 } from './constants'
 
 import type {
@@ -27,6 +28,7 @@ interface ThermocyclerFixtureProps {
     fixtureLocation: CutoutId,
     cutoutFixtureId: CutoutFixtureId
   ) => void
+  selected?: boolean
 }
 
 const THERMOCYCLER_FIXTURE_DISPLAY_NAME = 'Thermocycler'
@@ -39,6 +41,7 @@ export function ThermocyclerFixture(
     handleClickRemove,
     fixtureLocation,
     cutoutFixtureId,
+    selected = false,
   } = props
 
   const cutoutDef = deckDefinition.locations.cutouts.find(
@@ -54,6 +57,7 @@ export function ThermocyclerFixture(
   const x = xSlotPosition + COLUMN_1_X_ADJUSTMENT
   const y = ySlotPosition + Y_ADJUSTMENT
 
+  const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   return (
     <RobotCoordsForeignObject
       width={COLUMN_3_SINGLE_SLOT_FIXTURE_WIDTH}
@@ -64,11 +68,7 @@ export function ThermocyclerFixture(
       foreignObjectProps={{ flex: '1' }}
     >
       <Btn
-        css={
-          handleClickRemove != null
-            ? CONFIG_STYLE_EDITABLE
-            : CONFIG_STYLE_READ_ONLY
-        }
+        css={handleClickRemove != null ? editableStyle : CONFIG_STYLE_READ_ONLY}
         cursor={handleClickRemove != null ? 'pointer' : 'default'}
         onClick={
           handleClickRemove != null

@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { useHistory } from 'react-router-dom'
 import {
   useDeckConfigurationQuery,
   useModulesQuery,
 } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
-  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Icon,
+  PrimaryButton,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -20,14 +20,19 @@ import {
   getFixtureDisplayName,
   getCutoutFixturesForModuleModel,
   MAGNETIC_BLOCK_V1,
+  getModuleDisplayName,
 } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Modal } from '../../../../molecules/Modal'
-
-import type { ModuleModel, DeckDefinition } from '@opentrons/shared-data'
 import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
 
+import { SmallButton } from '../../../../atoms/buttons'
+import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
+
+import type { ModuleModel, DeckDefinition } from '@opentrons/shared-data'
+
+const EQUIPMENT_POLL_MS = 5000
 interface ModuleFixtureOption {
   moduleModel: ModuleModel
   usbPort?: number
@@ -39,6 +44,8 @@ interface ChooseModuleToConfigureModalProps {
   deckDef: DeckDefinition
   isOnDevice: boolean
   requiredModuleModel: ModuleModel
+  robotName: string
+  displaySlotName: string
 }
 
 export const ChooseModuleToConfigureModal = (
@@ -50,9 +57,14 @@ export const ChooseModuleToConfigureModal = (
     deckDef,
     requiredModuleModel,
     isOnDevice,
+    robotName,
+    displaySlotName,
   } = props
   const { t } = useTranslation(['protocol_setup', 'shared'])
-  const attachedModules = useModulesQuery().data?.data ?? []
+  const history = useHistory()
+  const { closeCurrentRun } = useCloseCurrentRun()
+  const attachedModules =
+    useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   const deckConfig = useDeckConfigurationQuery()?.data ?? []
   const unconfiguredModuleMatches =
     attachedModules.filter(
@@ -94,17 +106,52 @@ export const ChooseModuleToConfigureModal = (
       )
     }
   )
+  const handleCancelRun = (): void => {
+    closeCurrentRun()
+  }
+  const handleNavigateToDeviceDetails = (): void => {
+    history.push(`/devices/${robotName}`)
+  }
+  const emptyState = (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <StyledText as="p">
+        {t('there_are_no_unconfigured_modules', {
+          module: getModuleDisplayName(requiredModuleModel),
+        })}
+      </StyledText>
+      {isOnDevice ? (
+        <SmallButton
+          onClick={handleCancelRun}
+          buttonText={t('cancel_protocol_and_edit_deck_config')}
+        />
+      ) : (
+        <PrimaryButton onClick={handleNavigateToDeviceDetails}>
+          {t('update_deck_config')}
+        </PrimaryButton>
+      )}
+    </Flex>
+  )
+
+  const contents =
+    fixtureOptions.length > 0 ? (
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        <StyledText as="p">{t('add_this_deck_hardware')}</StyledText>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          {fixtureOptions}
+        </Flex>
+      </Flex>
+    ) : (
+      emptyState
+    )
 
   return createPortal(
     isOnDevice ? (
       <Modal
         onOutsideClick={onCloseClick}
         header={{
-          title: t('deck_conflict'),
+          title: t('add_to_slot', { slotName: displaySlotName }),
           hasExitIcon: true,
           onClick: onCloseClick,
-          iconName: 'ot-alert',
-          iconColor: COLORS.yellow50,
         }}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
@@ -114,7 +161,7 @@ export const ChooseModuleToConfigureModal = (
               paddingTop={SPACING.spacing8}
               gridGap={SPACING.spacing8}
             >
-              {fixtureOptions}
+              {contents}
             </Flex>
           </Flex>
         </Flex>
@@ -127,9 +174,8 @@ export const ChooseModuleToConfigureModal = (
             gridGap={SPACING.spacing10}
             alignItems={ALIGN_CENTER}
           >
-            <Icon name="ot-alert" size="1rem" color={COLORS.yellow50} />
             <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {t('deck_conflict')}
+              {t('add_to_slot', { slotName: displaySlotName })}
             </StyledText>
           </Flex>
         }
@@ -143,7 +189,7 @@ export const ChooseModuleToConfigureModal = (
               paddingTop={SPACING.spacing8}
               gridGap={SPACING.spacing8}
             >
-              {fixtureOptions}
+              {contents}
             </Flex>
           </Flex>
         </Flex>
