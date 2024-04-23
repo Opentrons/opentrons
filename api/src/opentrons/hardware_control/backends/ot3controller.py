@@ -1521,8 +1521,14 @@ class OT3Controller(FlexBackend):
     async def teardown_tip_detector(self, mount: OT3Mount) -> None:
         await self._tip_presence_manager.clear_detector(mount)
 
-    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
-        return await self.tip_presence_manager.get_tip_status(mount)
+    async def get_tip_status(
+        self,
+        mount: OT3Mount,
+        ht_operational_sensor: Optional[InstrumentProbeType] = None,
+    ) -> TipStateType:
+        return await self.tip_presence_manager.get_tip_status(
+            mount, ht_operational_sensor
+        )
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
         return self.tip_presence_manager.current_tip_state(mount)
