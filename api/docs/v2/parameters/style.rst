@@ -46,8 +46,8 @@ Punctuate descriptions as sentences, even if they aren't complete sentences. For
         - ❌ Volume that the pipette will aspirate
     * - Dilution factor
       - 
-        - ✅ How much to aspirate from each sample.
-        - ❌ Volume that the pipette will aspirate
+        - ✅ Each step uses this ratio of total liquid to original solution. Express the ratio as a decimal.
+        - ❌ total/diluent ratio for the process
 
 Not every parameter requires a description! For example, in a protocol that uses only one pipette, it would be difficult to explain a parameter named "Pipette type" without repeating yourself. In a protocol that offers parameters for two different pipettes, it may be useful to summarize what steps each pipette performs.
     
@@ -123,7 +123,7 @@ Number Choices
         - ✅ Low (10 µL), Medium (20 µL), High (50 µL)
         - ❌ Low volume, Medium volume, High volume
 
-**Use a range instead of choices when all values are acceptable.** It is faster and easier to enter a numeric value than to choose from a long list. For example, a "Number of columns" parameter that accepts any number 1 through 12 should specify a ``minimum`` and ``maximum``, rather than ``choices``. However, if the application requires that parameter to only accept even numbers, you need to specify choices (2, 4, 6, 8, 10, 12).
+**Use a range instead of choices when all values are acceptable.** It is faster and easier to enter a numeric value than to choose from a long list. For example, a "Number of columns" parameter that accepts any number 1 through 12 should specify a ``minimum`` and ``maximum``, rather than ``choices``. However, if the application requires that the parameter only accepts even numbers, you need to specify choices (2, 4, 6, 8, 10, 12).
 
 Strings
 -------
