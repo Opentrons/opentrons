@@ -2,7 +2,6 @@
 
 import asyncio
 from pathlib import Path
-from performance_metrics.datashapes import RawContextData
 import pytest
 from performance_metrics.robot_context_tracker import RobotContextTracker
 from opentrons_shared_data.performance.dev_types import RobotContextState
@@ -240,7 +239,7 @@ def test_no_tracking(tmp_path: Path) -> None:
     assert (
         len(robot_context_tracker._store._data) == 0
     ), "Operation should not be tracked when tracking is disabled."
-    
+
 
 @patch(
     "performance_metrics.robot_context_tracker._get_timing_function",
