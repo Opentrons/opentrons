@@ -24,10 +24,10 @@ Assuming Gen2 on Pipettes and modules; Include a suffix 1 if not.
 
 #### .py
 
-OT2_2.18_None_None_Overrides_BadTypesInRTP.py
-OT2_2.16_None_None_AnalysisError_TrashBinInStagingAreaCol4.py
-OT2_2.16_P1000_96_GRIPPER_HS_TM_TC_MB_DeckConfiguration1_NoFixtures.py
+OT2_S_v2_18_None_None_Overrides_BadTypesInRTP.py
+OT2_X_v2_16_None_None_TrashBinInStagingAreaCol4.py
+Flex_S_v2_15_P1000_96_GRIP_HS_TM_QuickZymoMagbeadRNAExtraction,
 
 #### .json
 
-OT2_5_2_6_P300M_P20S_MM_TM_TC1_PD40.json
+Flex_X_v8_P1000_96_HS_GRIP_TC_TM_GripperCollisionWithTips.json

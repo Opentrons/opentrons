@@ -68,34 +68,34 @@ pipenv run python -i locators.py
 - Only have 1 robot connected at once.
   - Build locators like you have more than 1 to future proof.
 
-## Analysis Test
-
-The analysis test `pipenv run pytest -k test_analyses` is driven by the comma delimited string variable `APP_ANALYSIS_TEST_PROTOCOLS` in `.env`
-This allows us to run one or many.
-
-### Adding protocols to the analysis test
-
-1. add the protocol file named according to the naming convention in the files/protocols appropriate folder
-1. add the protocol stem to `protocol_files.py`
-1. add the protocol data as a property to `protocols.py`
-1. run `make generate-protocols`
-
 ### Analyses Snapshot Test
+
+> The primary test in this module.
 
 The analyses snapshot test runs protocol analysis using `TARGET` branch or tag then compares them against snapshots found on `TEST_SOURCE` branch or tag.
 
 #### Protocol Files Location
 
-The set of protocols to analyze is defined inside of `app-testing/.env` file, under the `APP_ANALYSIS_TEST_PROTOCOLS` variable. These protocols must exist inside of `app-testing/files/protocols` folder.
+The set of protocols to analyze is defined inside of `app-testing/.env` file, under the `APP_ANALYSIS_TEST_PROTOCOLS` and `APP_ANALYSIS_TEST_PROTOCOLS_WITH_OVERRIDES` variables.
 
-- Protocol Designer protocols go in the `json` folder
-- Python protocols go in the `python` folder.
+#### Protocol Files with Overrides
+
+Sometimes we want to have a bunch of protocols that are just slightly different from each other. This is especially helpful with negative test cases. We can have a protocol that depending on the value of a variable does different things. You may then override the variable to test different scenarios.
+
+The best way to learn this is by example. Look at:
+
+- `app-testing/files/protocolsFlex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP.py`
+- `app-testing/automation/data/protocols_with_overrides.py`
+- `make generate-protocols`
+- see the protocols generated in `app-testing/files/generated_protocols/`
 
 #### Analysis Snapshots Location
 
-Analysis snapshots are located inside of `app-testing/tests/__snapshots__/analyses_snapshot_test` folder.
+Analysis snapshots are located inside of `app-testing/tests/__snapshots__/analyses_snapshot_test` folder. These are generated. If you want to update them, see below.
 
 #### Running Analysis Snapshot Tests Locally
+
+> Note: Passing `TARGET` can be done as below or in the `.env` file.
 
 To run analysis snapshot tests locally, you must first build the Docker image by running the following command:
 
@@ -135,6 +135,6 @@ Given the scenario that you want to see if the latest version of `chore_release-
 - If you want to compare against the previous release branch, then TEST_SOURCE is chore_release-v7.1.0.
 - If you want to compare your in-progress release branch against the previous release branch, then TEST_SOURCE is `<your-branch-name>`.
 
-run the Workflow Dispatch job
+##### Run the Workflow Dispatch job
 
 - `gh workflow run 'Analyses Snapshot Test' --ref chore_release-v7.2.0 -f TARGET=chore_release-v7.2.0 -f TEST_SOURCE=chore_release-v7.1.0`
