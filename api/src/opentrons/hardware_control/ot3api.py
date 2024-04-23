@@ -2072,7 +2072,7 @@ class OT3API(
     async def get_tip_presence_status(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        ht_operational_sensor: Optional[InstrumentProbeType] = None,
+        ht_follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> TipStateType:
         """
         Check tip presence status. If a high throughput pipette is present,
@@ -2086,8 +2086,7 @@ class OT3API(
                     and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
                 ):
                     await stack.enter_async_context(self._high_throughput_check_tip())
-                result = await self._backend.get_tip_status(
-                    real_mount, ht_operational_sensor
+                    real_mount, ht_follow_singular_sensor
                 )
             return result
 
@@ -2095,10 +2094,12 @@ class OT3API(
         self,
         mount: Union[top_types.Mount, OT3Mount],
         expected: TipStateType,
-        ht_operational_sensor: Optional[InstrumentProbeType] = None,
+        ht_follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         real_mount = OT3Mount.from_mount(mount)
-        status = await self.get_tip_presence_status(real_mount, ht_operational_sensor)
+        status = await self.get_tip_presence_status(
+            real_mount, ht_follow_singular_sensor
+        )
         if status != expected:
             raise FailedTipStateCheck(expected, status.value)
 

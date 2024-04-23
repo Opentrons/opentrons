@@ -1524,10 +1524,10 @@ class OT3Controller(FlexBackend):
     async def get_tip_status(
         self,
         mount: OT3Mount,
-        ht_operational_sensor: Optional[InstrumentProbeType] = None,
+        ht_follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> TipStateType:
         return await self.tip_presence_manager.get_tip_status(
-            mount, ht_operational_sensor
+            mount, ht_follow_singular_sensor
         )
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
