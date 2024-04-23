@@ -9,19 +9,26 @@ import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 
 interface InfoScreenProps {
   contentType: 'parameters' | 'moduleControls' | 'runNotStarted'
+  t?: any
 }
 
-export function InfoScreen({ contentType }: InfoScreenProps): JSX.Element {
+export function InfoScreen({ contentType, t }: InfoScreenProps): JSX.Element {
   let bodyText: string = ''
   switch (contentType) {
     case 'parameters':
-      bodyText = 'No parameters specified in this protocol'
+      bodyText =
+        t != null
+          ? t('no_parameters_specified_in_protocol')
+          : 'No parameters specified in this protocol'
       break
     case 'moduleControls':
-      bodyText = 'Connect modules to see controls'
+      bodyText =
+        t != null
+          ? t('connect_modules_for_controls')
+          : 'Connect modules to see controls'
       break
     case 'runNotStarted':
-      bodyText = 'Run was never started'
+      bodyText = t != null ? t('run_never_started') : 'Run was never started'
       break
     default:
       bodyText = contentType

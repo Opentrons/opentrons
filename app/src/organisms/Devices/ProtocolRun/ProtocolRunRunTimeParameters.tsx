@@ -64,6 +64,8 @@ export function ProtocolRunRuntimeParameters({
   const hasRunStarted = runActions?.some(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
+  const isRunCancelledWithoutStarting =
+    !hasRunStarted && runStatus === RUN_STATUS_STOPPED
 
   return (
     <>
@@ -107,10 +109,9 @@ export function ProtocolRunRuntimeParameters({
         <Flex padding={SPACING.spacing16}>
           <InfoScreen
             contentType={
-              !hasRunStarted && runStatus === RUN_STATUS_STOPPED
-                ? 'runNotStarted'
-                : 'parameters'
+              isRunCancelledWithoutStarting ? 'runNotStarted' : 'parameters'
             }
+            t={t}
           />
         </Flex>
       ) : (
