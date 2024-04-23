@@ -19,24 +19,6 @@ _should_track = ff.enable_performance_metrics(
     RobotTypeEnum.robot_literal_to_enum(robot_configs.load().model)
 )
 
-
-def _handle_package_import() -> Type[SupportsTracking]:
-    """Handle the import of the performance_metrics package.
-
-    If the package is not available, return a stubbed tracker.
-    """
-    try:
-        from performance_metrics import RobotContextTracker
-
-        return RobotContextTracker
-    except ImportError:
-        return StubbedTracker
-
-
-package_to_use = _handle_package_import()
-_robot_context_tracker: SupportsTracking | None = None
-
-
 class StubbedTracker(SupportsTracking):
     """A stubbed tracker that does nothing."""
 
@@ -57,6 +39,23 @@ class StubbedTracker(SupportsTracking):
         """Do nothing."""
         pass
 
+
+
+def _handle_package_import() -> Type[SupportsTracking]:
+    """Handle the import of the performance_metrics package.
+
+    If the package is not available, return a stubbed tracker.
+    """
+    try:
+        from performance_metrics import RobotContextTracker
+
+        return RobotContextTracker
+    except ImportError:
+        return StubbedTracker
+
+
+package_to_use = _handle_package_import()
+_robot_context_tracker: SupportsTracking | None = None
 
 def _get_robot_context_tracker() -> SupportsTracking:
     """Singleton for the robot context tracker."""
