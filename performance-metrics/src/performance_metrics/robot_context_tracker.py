@@ -85,7 +85,7 @@ class RobotContextTracker(SupportsTracking):
                     result = func(*args, **kwargs)
                 finally:
                     duration_end_time = perf_counter_ns()
-                    self._store.data.append(
+                    self._store.add(
                         RawContextData(
                             func_start=function_start_time,
                             duration=duration_end_time - duration_start_time,
