@@ -48,6 +48,7 @@ from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_engine.types import LabwareOffset
 
 API_LEVEL = "2.18"
+NUMBER_OF_RACKS = 2
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
@@ -292,7 +293,7 @@ class RunArgs:
                 trials = 240
             else:
                 trials = (
-                    args.trials * 8
+                    args.trials * NUMBER_OF_RACKS
                 )  # we want to specify trials in X per rack so multiply by 8
         elif args.trials == 0:
             trials = helpers.get_default_trials(args.increment, kind, args.channels)
@@ -340,7 +341,7 @@ class RunArgs:
                 name, scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
             )
             cavity_str = "unused"
-            if 1.0 in volumes_list:
+            if args.cavity:
                 cavity_str = helpers._get_cavity(_ctx.is_simulating())
             report = execute.build_gm_report(
                 test_volumes=volumes_list,
@@ -551,7 +552,7 @@ def _main(
             tip,
             all_channels=all_channels_same_time,
             cavity=run_args.cavity,
-            trials_per_rack=int(run_args.trials / 8),
+            trials_per_rack=int(run_args.trials / NUMBER_OF_RACKS),
         ),
         env_sensor=run_args.environment_sensor,
         recorder=run_args.recorder,
