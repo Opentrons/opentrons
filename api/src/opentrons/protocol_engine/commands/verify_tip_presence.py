@@ -23,7 +23,7 @@ class VerifyTipPresenceParams(PipetteIdMixin):
     expectedState: TipPresenceStatus = Field(
         ..., description="The expected tip presence status on the pipette."
     )
-    ht_follow_singular_sensor: Optional[InstrumentSensorId] = Field(
+    htFollowSingularSensor: Optional[InstrumentSensorId] = Field(
         default=None, description="The sensor id to follow if the other can be ignored."
     )
 
