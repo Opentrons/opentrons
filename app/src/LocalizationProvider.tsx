@@ -2,12 +2,9 @@ import * as React from 'react'
 import { I18nextProvider } from 'react-i18next'
 import reduce from 'lodash/reduce'
 
-import { useRobotSettingsQuery } from '@opentrons/react-api-client'
-
 import { resources } from './assets/localization'
+import { useIsOEMMode } from './resources/robot-settings/hooks'
 import { i18n, i18nCb, i18nConfig } from './i18n'
-
-import type { RobotSettingsField } from '@opentrons/api-client'
 
 export interface OnDeviceLocalizationProviderProps {
   children?: React.ReactNode
@@ -20,11 +17,7 @@ const ANONYMOUS_RESOURCE = 'anonymous'
 export function OnDeviceLocalizationProvider(
   props: OnDeviceLocalizationProviderProps
 ): JSX.Element | null {
-  const { settings } = useRobotSettingsQuery().data ?? {}
-  const oemModeSetting = (settings ?? []).find(
-    (setting: RobotSettingsField) => setting?.id === 'enableOEMMode'
-  )
-  const isOEMMode = oemModeSetting?.value ?? false
+  const isOEMMode = useIsOEMMode()
 
   // iterate through language resources, nested files, substitute anonymous file for branded file for OEM mode
   const anonResources = reduce(
