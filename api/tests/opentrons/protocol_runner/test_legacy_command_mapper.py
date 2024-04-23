@@ -579,6 +579,7 @@ def test_map_pause() -> None:
         "command.DISTRIBUTE",
         "command.TRANSFER",
         "command.RETURN_TIP",
+        "command.AIR_GAP",
     ],
 )
 def test_filter_higher_order_commands(command_type: str) -> None:
