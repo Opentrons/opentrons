@@ -5,7 +5,7 @@ import platform
 
 from functools import wraps, partial
 from time import perf_counter_ns
-from typing import Callable, TypeVar, cast
+from typing import Callable, TypeVar, cast, Literal, Final
 
 
 from typing_extensions import ParamSpec
@@ -46,7 +46,7 @@ timing_function = _get_timing_function()
 class RobotContextTracker(SupportsTracking):
     """Tracks and stores robot context and execution duration for different operations."""
 
-    METADATA_NAME = "robot_context_data"
+    METADATA_NAME: Final[Literal["robot_context_data"]] = "robot_context_data"
 
     def __init__(self, storage_location: Path, should_track: bool = False) -> None:
         """Initializes the RobotContextTracker with an empty storage list."""
