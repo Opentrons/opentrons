@@ -79,7 +79,11 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     const verifyCommands: CreateCommand[] = [
       {
         commandType: 'verifyTipPresence',
-        params: { pipetteId: pipetteId, expectedState: 'present', FollowSingularSensor: 'primary' },
+        params: {
+          pipetteId: pipetteId,
+          expectedState: 'present',
+          followSingularSensor: 'primary',
+        },
       },
     ]
     const homeCommands: CreateCommand[] = [

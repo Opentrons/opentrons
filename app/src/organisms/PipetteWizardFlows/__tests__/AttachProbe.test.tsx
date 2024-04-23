@@ -71,7 +71,7 @@ describe('AttachProbe', () => {
         [
           {
             commandType: 'verifyTipPresence',
-            params: { pipetteId: 'abc', expectedState: 'present' },
+            params: { pipetteId: 'abc', expectedState: 'present', followSingularSensor: 'primary'},
           },
         ],
         false
@@ -205,7 +205,7 @@ describe('AttachProbe', () => {
         [
           {
             commandType: 'verifyTipPresence',
-            params: { pipetteId: 'abc', expectedState: 'present' },
+            params: { pipetteId: 'abc', expectedState: 'present', followSingularSensor: 'primary'},
           },
         ],
         false
