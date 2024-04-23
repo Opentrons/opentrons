@@ -32,7 +32,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_AGAIN,
 } from '../../redux/analytics'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
-import { useDownloadRunLog, useTrackProtocolRunEvent } from './hooks'
+import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from './hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { Run } from '@opentrons/api-client'
@@ -132,6 +132,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
+  const robot = useRobot(robotName)
+  const robotSerialNumber =
+    robot?.health?.robot_serial ?? robot?.serverHealth?.serialNumber ?? null
 
   const handleResetClick: React.MouseEventHandler<HTMLButtonElement> = (
     e
@@ -142,7 +145,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     reset()
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-      properties: { sourceLocation: 'HistoricalProtocolRun' },
+      properties: {
+        sourceLocation: 'HistoricalProtocolRun',
+        robotSerialNumber,
+      },
     })
     trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
   }

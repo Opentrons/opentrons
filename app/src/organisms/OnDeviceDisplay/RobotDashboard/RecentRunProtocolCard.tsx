@@ -29,7 +29,10 @@ import {
 } from '@opentrons/api-client'
 
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons//constants'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
@@ -147,7 +150,7 @@ export function ProtocolWithLastRun({
     } else {
       cloneRun()
       trackEvent({
-        name: 'proceedToRun',
+        name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
         properties: { sourceLocation: 'RecentRunProtocolCard' },
       })
     }

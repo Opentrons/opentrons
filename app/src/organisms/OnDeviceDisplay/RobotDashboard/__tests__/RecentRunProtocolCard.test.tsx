@@ -20,7 +20,10 @@ import { i18n } from '../../../../i18n'
 import { Skeleton } from '../../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
 import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../../../redux/analytics'
 import { useCloneRun } from '../../../ProtocolUpload/hooks'
 import { useRerunnableStatusText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
@@ -250,7 +253,7 @@ describe('RecentRunProtocolCard', () => {
     expect(button).toHaveStyle(`background-color: ${COLORS.green40}`)
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'proceedToRun',
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'RecentRunProtocolCard' },
     })
     // TODO(BC, 08/30/23): reintroduce check for tracking when tracking is reintroduced lazily
