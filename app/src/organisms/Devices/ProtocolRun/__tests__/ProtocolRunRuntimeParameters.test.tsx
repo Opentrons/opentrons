@@ -1,8 +1,10 @@
 import * as React from 'react'
+import { UseQueryResult } from 'react-query'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 
+import { Run } from '@opentrons/api-client'
 import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
@@ -17,8 +19,6 @@ import type {
   CompletedProtocolAnalysis,
   RunTimeParameter,
 } from '@opentrons/shared-data'
-import { Run } from '@opentrons/api-client'
-import { UseQueryResult } from 'react-query'
 
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()

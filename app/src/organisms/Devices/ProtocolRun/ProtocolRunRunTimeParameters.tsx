@@ -28,10 +28,11 @@ import { Banner } from '../../../atoms/Banner'
 import { Divider } from '../../../atoms/structure'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-
-import type { RunTimeParameter } from '@opentrons/shared-data'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useNotifyRunQuery } from '../../../resources/runs'
+
+import type { RunTimeParameter } from '@opentrons/shared-data'
+import type { RunStatus } from '@opentrons/api-client'
 
 interface ProtocolRunRuntimeParametersProps {
   runId: string
@@ -43,8 +44,9 @@ export function ProtocolRunRuntimeParameters({
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const runStatus = useRunStatus(runId)
   const isRunTerminal =
-    // @ts-expect-error: expected that runStatus may not be a terminal status
-    runStatus == null ? false : RUN_STATUSES_TERMINAL.includes(runStatus)
+    runStatus == null
+      ? false
+      : (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
   // we access runTimeParameters from the run record rather than the most recent analysis
   // because the most recent analysis may not reflect the selected run (e.g. cloning a run
   // from a historical protocol run from the device details page)

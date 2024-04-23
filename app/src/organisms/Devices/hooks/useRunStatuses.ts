@@ -8,6 +8,8 @@ import {
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 
+import type { RunStatus } from '@opentrons/api-client'
+
 interface RunStatusesInfo {
   isRunStill: boolean
   isRunTerminal: boolean
@@ -27,8 +29,9 @@ export function useRunStatuses(): RunStatusesInfo {
     runStatus === RUN_STATUS_RUNNING ||
     runStatus === RUN_STATUS_AWAITING_RECOVERY
   const isRunTerminal =
-    // @ts-expect-error: runStatus expected to not necessarily be in RUN_STATUSES_TERMINAL
-    runStatus != null ? RUN_STATUSES_TERMINAL.includes(runStatus) : false
+    runStatus != null
+      ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
+      : false
   const isRunStill = isRunTerminal || isRunIdle
 
   return { isRunStill, isRunTerminal, isRunIdle, isRunRunning }

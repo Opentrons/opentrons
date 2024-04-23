@@ -28,6 +28,7 @@ import { NAV_BAR_WIDTH } from '../../App/constants'
 import { CommandIcon } from './CommandIcon'
 import { useRunStatus } from '../RunTimeControl/hooks'
 
+import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 
 const COLOR_FADE_MS = 500
@@ -46,8 +47,10 @@ export const RunPreviewComponent = (
   const { t } = useTranslation('run_details')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const runStatus = useRunStatus(runId)
-  // @ts-expect-error: expected that runStatus may not be a terminal status
-  const isRunTerminal = RUN_STATUSES_TERMINAL.includes(runStatus)
+  const isRunTerminal =
+    runStatus != null
+      ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
+      : false
   // we only ever want one request done for terminal runs because this is a heavy request
   const commandsFromQuery = useAllCommandsQuery(runId, null, {
     staleTime: Infinity,
