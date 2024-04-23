@@ -346,7 +346,7 @@ class OT3Simulator(FlexBackend):
         plunger_speed: float,
         threshold_pascals: float,
         output_format: OutputOptions = OutputOptions.can_bus_only,
-        data_file: Optional[str] = None,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -506,13 +506,20 @@ class OT3Simulator(FlexBackend):
                     ),
                     "id": None,
                 }
-        if found_model and expected_instr or found_model:
+        if found_model and init_instr["id"] is not None:
             # Instrument detected matches instrument expected (note:
             # "instrument detected" means passed as an argument to the
             # constructor of this class)
 
             # OR Instrument detected and no expected instrument specified
-            converted_name = pipette_load_name.convert_pipette_model(found_model)
+
+            found_model_version = ""
+            if found_model.find("flex") > -1:
+                found_model = found_model.replace("_flex", "")  # type: ignore
+                found_model_version = f"{init_instr['id'][4]}.{init_instr['id'][5]}"
+            converted_name = pipette_load_name.convert_pipette_model(
+                found_model, found_model_version
+            )
             return {
                 "config": load_pipette_data.load_definition(
                     converted_name.pipette_type,
@@ -773,7 +780,11 @@ class OT3Simulator(FlexBackend):
             for axis in self._present_axes
         }
 
-    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
+    async def get_tip_status(
+        self,
+        mount: OT3Mount,
+        ht_operational_sensor: Optional[InstrumentProbeType] = None,
+    ) -> TipStateType:
         return TipStateType(self._sim_tip_state[mount])
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
@@ -843,3 +854,8 @@ class OT3Simulator(FlexBackend):
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         return None
+
+    def _update_tip_state(self, mount: OT3Mount, status: bool) -> None:
+        """This is something we only use in the simulator.
+        It is required so that PE simulations using ot3api don't break."""
+        self._sim_tip_state[mount] = status

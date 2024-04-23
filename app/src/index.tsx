@@ -5,20 +5,18 @@ import { Provider } from 'react-redux'
 
 import { ConnectedRouter } from 'connected-react-router'
 
-import { I18nextProvider } from 'react-i18next'
 import { ApiClientProvider } from '@opentrons/react-api-client'
 
-import { i18n } from './i18n'
 import { createLogger } from './logger'
 
 import { uiInitialized } from './redux/shell'
 import { history } from './redux/reducer'
 import { store } from './redux/store'
 
-import '../src/atoms/SoftwareKeyboard/index.css'
-import '../src/atoms/SoftwareKeyboard/CustomKeyboard/index.css'
-import '../src/atoms/SoftwareKeyboard/NormalKeyboard/index.css'
-import '../src/atoms/SoftwareKeyboard/Numpad/index.css'
+import '../src/atoms/SoftwareKeyboard/AlphanumericKeyboard'
+import '../src/atoms/SoftwareKeyboard/FullKeyboard/index.css'
+import '../src/atoms/SoftwareKeyboard/IndividualKey/index.css'
+import '../src/atoms/SoftwareKeyboard/NumericalKeyboard/index.css'
 
 // component tree
 import { App } from './App'
@@ -38,9 +36,7 @@ root.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>
       <ApiClientProvider>
-        <I18nextProvider i18n={i18n}>
-          <App />
-        </I18nextProvider>
+        <App />
       </ApiClientProvider>
     </ConnectedRouter>
   </Provider>

@@ -8,6 +8,11 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_ONLY_FIXTURES,
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+  HEATERSHAKER_MODULE_V1_FIXTURE,
+  TEMPERATURE_MODULE_V2_FIXTURE,
+  MAGNETIC_BLOCK_V1_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
@@ -18,18 +23,32 @@ import { EmptyConfigFixture } from './EmptyConfigFixture'
 import { StagingAreaConfigFixture } from './StagingAreaConfigFixture'
 import { TrashBinConfigFixture } from './TrashBinConfigFixture'
 import { WasteChuteConfigFixture } from './WasteChuteConfigFixture'
+import { StaticFixture } from './StaticFixture'
 
-import type { CutoutId, DeckConfiguration } from '@opentrons/shared-data'
+import type {
+  CutoutFixtureId,
+  CutoutId,
+  DeckConfiguration,
+} from '@opentrons/shared-data'
+import { TemperatureModuleFixture } from './TemperatureModuleFixture'
+import { HeaterShakerFixture } from './HeaterShakerFixture'
+import { MagneticBlockFixture } from './MagneticBlockFixture'
+import { ThermocyclerFixture } from './ThermocyclerFixture'
 
 interface DeckConfiguratorProps {
   deckConfig: DeckConfiguration
   handleClickAdd: (cutoutId: CutoutId) => void
-  handleClickRemove: (cutoutId: CutoutId) => void
+  handleClickRemove: (
+    cutoutId: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ) => void
   lightFill?: string
   darkFill?: string
-  readOnly?: boolean
+  editableCutoutIds?: CutoutId[]
   showExpansion?: boolean
   children?: React.ReactNode
+  additionalStaticFixtures?: Array<{ location: CutoutId; label: string }>
+  height?: string
 }
 
 export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
@@ -37,56 +56,57 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
     deckConfig,
     handleClickAdd,
     handleClickRemove,
+    additionalStaticFixtures,
+    children,
     lightFill = COLORS.grey35,
     darkFill = COLORS.black90,
-    readOnly = false,
+    editableCutoutIds = deckConfig.map(({ cutoutId }) => cutoutId),
     showExpansion = true,
-    children,
+    height = '455px',
   } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  // restrict configuration to certain locations
-  const configurableFixtureLocations: CutoutId[] = [
-    'cutoutA1',
-    'cutoutB1',
-    'cutoutC1',
-    'cutoutD1',
-    'cutoutA3',
-    'cutoutB3',
-    'cutoutC3',
-    'cutoutD3',
-  ]
-  const configurableDeckConfig = deckConfig.filter(({ cutoutId }) =>
-    configurableFixtureLocations.includes(cutoutId)
-  )
-
-  const stagingAreaFixtures = configurableDeckConfig.filter(
+  const stagingAreaFixtures = deckConfig.filter(
     ({ cutoutFixtureId }) => cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
   )
-  const wasteChuteFixtures = configurableDeckConfig.filter(
+  const wasteChuteFixtures = deckConfig.filter(
     ({ cutoutFixtureId }) =>
       cutoutFixtureId != null &&
       WASTE_CHUTE_ONLY_FIXTURES.includes(cutoutFixtureId)
   )
-  const wasteChuteStagingAreaFixtures = configurableDeckConfig.filter(
+  const wasteChuteStagingAreaFixtures = deckConfig.filter(
     ({ cutoutFixtureId }) =>
       cutoutFixtureId != null &&
       WASTE_CHUTE_STAGING_AREA_FIXTURES.includes(cutoutFixtureId)
   )
-  const emptyFixtures = readOnly
-    ? []
-    : configurableDeckConfig.filter(
-        ({ cutoutFixtureId }) =>
-          cutoutFixtureId != null &&
-          SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
-      )
-  const trashBinFixtures = configurableDeckConfig.filter(
+  const emptyCutouts = deckConfig.filter(
+    ({ cutoutFixtureId, cutoutId }) =>
+      editableCutoutIds.includes(cutoutId) &&
+      cutoutFixtureId != null &&
+      SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+  )
+  const trashBinFixtures = deckConfig.filter(
     ({ cutoutFixtureId }) => cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+  )
+  const thermocyclerFixtures = deckConfig.filter(
+    ({ cutoutFixtureId }) => cutoutFixtureId === THERMOCYCLER_V2_FRONT_FIXTURE
+  )
+  const heaterShakerFixtures = deckConfig.filter(
+    ({ cutoutFixtureId }) => cutoutFixtureId === HEATERSHAKER_MODULE_V1_FIXTURE
+  )
+  const temperatureModuleFixtures = deckConfig.filter(
+    ({ cutoutFixtureId }) => cutoutFixtureId === TEMPERATURE_MODULE_V2_FIXTURE
+  )
+  const magneticBlockFixtures = deckConfig.filter(({ cutoutFixtureId }) =>
+    ([
+      MAGNETIC_BLOCK_V1_FIXTURE,
+      STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+    ] as CutoutFixtureId[]).includes(cutoutFixtureId)
   )
 
   return (
     <RobotCoordinateSpace
-      height="455px"
+      height={height}
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
     >
@@ -102,15 +122,18 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           />
         </g>
       ))}
-      {stagingAreaFixtures.map(({ cutoutId }) => (
+      {stagingAreaFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <StagingAreaConfigFixture
           key={cutoutId}
           deckDefinition={deckDef}
-          handleClickRemove={readOnly ? undefined : handleClickRemove}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
+          cutoutFixtureId={cutoutFixtureId}
         />
       ))}
-      {emptyFixtures.map(({ cutoutId }) => (
+      {emptyCutouts.map(({ cutoutId }) => (
         <EmptyConfigFixture
           key={cutoutId}
           deckDefinition={deckDef}
@@ -118,29 +141,93 @@ export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
           fixtureLocation={cutoutId}
         />
       ))}
-      {wasteChuteFixtures.map(({ cutoutId }) => (
+      {wasteChuteFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <WasteChuteConfigFixture
           key={cutoutId}
           deckDefinition={deckDef}
-          handleClickRemove={readOnly ? undefined : handleClickRemove}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
+          cutoutFixtureId={cutoutFixtureId}
         />
       ))}
-      {wasteChuteStagingAreaFixtures.map(({ cutoutId }) => (
+      {wasteChuteStagingAreaFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <WasteChuteConfigFixture
           key={cutoutId}
           deckDefinition={deckDef}
-          handleClickRemove={readOnly ? undefined : handleClickRemove}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
+          cutoutFixtureId={cutoutFixtureId}
           hasStagingAreas
         />
       ))}
-      {trashBinFixtures.map(({ cutoutId }) => (
+      {trashBinFixtures.map(({ cutoutId, cutoutFixtureId }) => (
         <TrashBinConfigFixture
           key={cutoutId}
           deckDefinition={deckDef}
-          handleClickRemove={readOnly ? undefined : handleClickRemove}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
           fixtureLocation={cutoutId}
+          cutoutFixtureId={cutoutFixtureId}
+        />
+      ))}
+      {temperatureModuleFixtures.map(({ cutoutId, cutoutFixtureId }) => (
+        <TemperatureModuleFixture
+          key={cutoutId}
+          deckDefinition={deckDef}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
+          fixtureLocation={cutoutId}
+          cutoutFixtureId={cutoutFixtureId}
+        />
+      ))}
+      {heaterShakerFixtures.map(({ cutoutId, cutoutFixtureId }) => (
+        <HeaterShakerFixture
+          key={cutoutId}
+          deckDefinition={deckDef}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
+          fixtureLocation={cutoutId}
+          cutoutFixtureId={cutoutFixtureId}
+        />
+      ))}
+      {magneticBlockFixtures.map(({ cutoutId, cutoutFixtureId }) => (
+        <MagneticBlockFixture
+          key={cutoutId}
+          deckDefinition={deckDef}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
+          fixtureLocation={cutoutId}
+          cutoutFixtureId={cutoutFixtureId}
+          hasStagingArea={
+            cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+          }
+        />
+      ))}
+      {thermocyclerFixtures.map(({ cutoutId, cutoutFixtureId }) => (
+        <ThermocyclerFixture
+          key={cutoutId}
+          deckDefinition={deckDef}
+          handleClickRemove={
+            editableCutoutIds.includes(cutoutId) ? handleClickRemove : undefined
+          }
+          fixtureLocation={cutoutId}
+          cutoutFixtureId={cutoutFixtureId}
+        />
+      ))}
+      {additionalStaticFixtures?.map(staticFixture => (
+        <StaticFixture
+          key={staticFixture.location}
+          deckDefinition={deckDef}
+          label={staticFixture.label}
+          fixtureLocation={staticFixture.location}
         />
       ))}
       <SlotLabels

@@ -12,6 +12,7 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_ACTION_TYPE_STOP,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
@@ -21,7 +22,6 @@ import {
   useRunCommands,
 } from '../ProtocolUpload/hooks'
 import { useNotifyRunQuery } from '../../resources/runs'
-import { useFeatureFlag } from '../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import type { UseQueryOptions } from 'react-query'
@@ -53,7 +53,8 @@ export function useRunControls(
 
   const { cloneRun, isLoading: isResetRunLoading } = useCloneRun(
     runId ?? null,
-    onCloneRunSuccess
+    onCloneRunSuccess,
+    true
   )
 
   return {
@@ -79,11 +80,7 @@ export function useRunStatus(
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
     enabled:
       lastRunStatus.current == null ||
-      !([
-        RUN_STATUS_FAILED,
-        RUN_STATUS_SUCCEEDED,
-        RUN_STATUS_STOP_REQUESTED,
-      ] as RunStatus[]).includes(lastRunStatus.current),
+      !(RUN_STATUSES_TERMINAL as RunStatus[]).includes(lastRunStatus.current),
     onSuccess: data => (lastRunStatus.current = data?.data?.status ?? null),
     ...options,
   })
@@ -188,11 +185,6 @@ export function useRunErrors(runId: string | null): RunData['errors'] {
 
 export function useProtocolHasRunTimeParameters(runId: string | null): boolean {
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const runTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
-
-  console.log(
-    'TODO: delete the feature flag logic',
-    mostRecentAnalysis?.runTimeParameters
-  )
-  return runTimeParametersFF
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  return runTimeParameters.length > 0
 }

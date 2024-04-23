@@ -43,7 +43,7 @@ describe('SetWifiCred', () => {
     // software keyboard
     screen.getByRole('button', { name: 'del' })
     screen.getByRole('button', { name: 'a' })
-    screen.getByRole('button', { name: 'SHIFT' })
+    screen.getByRole('button', { name: 'ABC' })
   })
 
   it('should display password', () => {

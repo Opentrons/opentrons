@@ -2,6 +2,7 @@ module.exports = {
   stories: [
     '../components/**/*.stories.@(js|jsx|ts|tsx)',
     '../app/**/*.stories.@(js|jsx|ts|tsx)',
+    '../opentrons-ai-client/**/*.stories.@(js|jsx|ts|tsx)',
   ],
 
   addons: [

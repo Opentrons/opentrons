@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
   BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -22,7 +23,6 @@ import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-clien
 
 import { getTopPortalEl } from '../../App/portal'
 import { Banner } from '../../atoms/Banner'
-import { Chip } from '../../atoms/Chip'
 import { ListItem } from '../../atoms/ListItem'
 import { SmallButton } from '../../atoms/buttons'
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -73,7 +73,7 @@ function TouchscreenModal({
   isEngaged,
   closeModal,
 }: EstopPressedModalProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'branded'])
   const [isResuming, setIsResuming] = React.useState<boolean>(false)
   const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
   const modalHeader: ModalHeaderBaseProps = {
@@ -94,7 +94,7 @@ function TouchscreenModal({
     <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
         <StyledText as="p" fontWeight>
-          {t('estop_pressed_description')}
+          {t('branded:estop_pressed_description')}
         </StyledText>
         <ListItem
           type={isEngaged ? 'error' : 'success'}
@@ -172,7 +172,7 @@ function DesktopModal({
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
         </Banner>
         <StyledText as="p" color={COLORS.grey60}>
-          {t('estop_pressed_description')}
+          {t('branded:estop_pressed_description')}
         </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <PrimaryButton

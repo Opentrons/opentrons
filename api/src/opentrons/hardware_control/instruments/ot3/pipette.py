@@ -25,12 +25,12 @@ from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     PythonException,
 )
-from ..instrument_abc import AbstractInstrument
-from ..instrument_helpers import (
+from opentrons_shared_data.pipette.ul_per_mm import (
     piecewise_volume_conversion,
     PIPETTING_FUNCTION_FALLBACK_VERSION,
     PIPETTING_FUNCTION_LATEST_VERSION,
 )
+from ..instrument_abc import AbstractInstrument
 from .instrument_calibration import (
     save_pipette_offset_calibration,
     load_pipette_offset,

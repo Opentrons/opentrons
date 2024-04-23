@@ -7,6 +7,7 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_IDLE,
   RUN_STATUS_STOP_REQUESTED,
+  RUN_STATUS_AWAITING_RECOVERY,
 } from '@opentrons/api-client'
 import {
   useAllCommandsQuery,
@@ -30,12 +31,14 @@ import { getLocalRobot } from '../../../redux/discovery'
 import { CancelingRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { RunPausedSplash } from '../../../organisms/OnDeviceDisplay/RunningProtocol/RunPausedSplash'
 import { OpenDoorAlertModal } from '../../../organisms/OpenDoorAlertModal'
 import { RunningProtocol } from '..'
 import {
   useNotifyLastRunCommandKey,
   useNotifyRunQuery,
 } from '../../../resources/runs'
+import { useFeatureFlag } from '../../../redux/config'
 
 import type { UseQueryResult } from 'react-query'
 import type { ProtocolAnalyses } from '@opentrons/api-client'
@@ -47,12 +50,15 @@ vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
+vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol/RunPausedSplash')
 vi.mock('../../../organisms/RunTimeControl/hooks')
 vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal')
 vi.mock('../../../organisms/OpenDoorAlertModal')
 vi.mock('../../../resources/runs')
+vi.mock('../../../redux/config')
+
 const RUN_ID = 'run_id'
 const ROBOT_NAME = 'otie'
 const PROTOCOL_ID = 'protocol_id'
@@ -85,6 +91,7 @@ describe('RunningProtocol', () => {
           data: {
             id: RUN_ID,
             protocolId: PROTOCOL_ID,
+            errors: [],
           },
         },
       } as any)
@@ -133,6 +140,9 @@ describe('RunningProtocol', () => {
     vi.mocked(useNotifyLastRunCommandKey).mockReturnValue({
       data: {},
     } as any)
+    when(vi.mocked(useFeatureFlag))
+      .calledWith('enableRunNotes')
+      .thenReturn(true)
   })
 
   afterEach(() => {
@@ -164,6 +174,14 @@ describe('RunningProtocol', () => {
       .thenReturn(RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(OpenDoorAlertModal)).toHaveBeenCalled()
+  })
+
+  it(`should display a Run Paused splash screen if the run status is "${RUN_STATUS_AWAITING_RECOVERY}"`, () => {
+    when(vi.mocked(useRunStatus))
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .thenReturn(RUN_STATUS_AWAITING_RECOVERY)
+    render(`/runs/${RUN_ID}/run`)
+    expect(vi.mocked(RunPausedSplash)).toHaveBeenCalled()
   })
 
   // ToDo (kj:04/04/2023) need to figure out the way to simulate swipe

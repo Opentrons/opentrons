@@ -54,7 +54,7 @@ export const migrateFile = (
     form => form.stepType === 'moveLiquid' || form.stepType === 'mix'
   )
 
-  const pipettingSavedStepsWithTipRack = pipettingSavedSteps.reduce(
+  const pipettingSavedStepsWithAdditionalFields = pipettingSavedSteps.reduce(
     (acc, item) => {
       const tipRackUri = tiprackAssignments[item.pipette]
       const tiprackLoadName =
@@ -67,8 +67,21 @@ export const migrateFile = (
       const tiprackIds = loadLabwareCommands
         .filter(command => command.params.loadName === tiprackLoadName)
         .map(command => command.params.labwareId)
-
-      acc[item.id] = { ...item, tipRack: tiprackIds[0] }
+      const xyKeys =
+        item.stepType === 'mix'
+          ? { mix_x_position: 0, mix_y_position: 0 }
+          : {
+              aspirate_x_position: 0,
+              aspirate_y_position: 0,
+              dispense_x_position: 0,
+              dispense_y_position: 0,
+            }
+      acc[item.id] = {
+        ...item,
+        blowout_z_offset: 0,
+        tipRack: tiprackIds[0],
+        ...xyKeys,
+      }
       return acc
     },
     {}
@@ -82,7 +95,7 @@ export const migrateFile = (
         ...designerApplication.data,
         savedStepForms: {
           ...designerApplication.data.savedStepForms,
-          ...pipettingSavedStepsWithTipRack,
+          ...pipettingSavedStepsWithAdditionalFields,
         },
         pipetteTiprackAssignments: newTiprackAssignments,
       },

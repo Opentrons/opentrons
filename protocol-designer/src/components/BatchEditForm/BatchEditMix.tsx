@@ -88,7 +88,10 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
                 tiprack={propsForFields.tipRack.value}
               />
               <TipPositionField
-                {...propsForFields.mix_mmFromBottom}
+                propsForFields={propsForFields}
+                zField="mix_mmFromBottom"
+                xField="mix_x_position"
+                yField="mix_y_position"
                 labwareId={getLabwareIdForPositioningField('mix_mmFromBottom')}
               />
               <WellOrderField
@@ -145,7 +148,8 @@ export const BatchEditMix = (props: BatchEditMixProps): JSX.Element => {
               className={styles.small_field}
             >
               <TipPositionField
-                {...propsForFields.mix_touchTip_mmFromBottom}
+                propsForFields={propsForFields}
+                zField="mix_touchTip_mmFromBottom"
                 labwareId={getLabwareIdForPositioningField(
                   'mix_touchTip_mmFromBottom'
                 )}

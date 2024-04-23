@@ -2,22 +2,26 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from typing import Dict, List, Optional
 from logging import getLogger
 from dataclasses import dataclass
 
 import sqlalchemy
 import anyio
+from pydantic import parse_raw_as
 
 from robot_server.persistence.database import sqlite_rowid
 from robot_server.persistence.tables import analysis_table
 from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
 
-from .analysis_models import CompletedAnalysis
+from .analysis_models import CompletedAnalysis, RunTimeParameterAnalysisData
 from .analysis_memcache import MemoryCache
 
 
 _log = getLogger(__name__)
+
+MAX_ANALYSES_TO_STORE = 5
 
 
 @dataclass
@@ -31,6 +35,7 @@ class CompletedAnalysisResource:
     protocol_id: str
     analyzer_version: str
     completed_analysis: CompletedAnalysis
+    run_time_parameter_values_and_defaults: Dict[str, RunTimeParameterAnalysisData]
 
     async def to_sql_values(self) -> Dict[str, object]:
         """Return this data as a dict that can be passed to a SQLALchemy insert.
@@ -46,18 +51,25 @@ class CompletedAnalysisResource:
         def serialize_completed_analysis() -> str:
             return pydantic_to_json(self.completed_analysis)
 
-        serialized_json = await anyio.to_thread.run_sync(
+        def serialize_rtp_dict() -> str:
+            return json.dumps(self.run_time_parameter_values_and_defaults)
+
+        serialized_analysis = await anyio.to_thread.run_sync(
             serialize_completed_analysis,
             # Cancellation may orphan the worker thread,
             # but that should be harmless in this case.
             cancellable=True,
         )
-
+        serialized_rtp_dict = await anyio.to_thread.run_sync(
+            serialize_rtp_dict,
+            cancellable=True,
+        )
         return {
             "id": self.id,
             "protocol_id": self.protocol_id,
             "analyzer_version": self.analyzer_version,
-            "completed_analysis": serialized_json,
+            "completed_analysis": serialized_analysis,
+            "run_time_parameter_values_and_defaults": serialized_rtp_dict,
         }
 
     @classmethod
@@ -94,12 +106,40 @@ class CompletedAnalysisResource:
             # but that should be harmless in this case.
             cancellable=True,
         )
-
+        rtp_values_and_defaults = await cls.get_run_time_parameter_values_and_defaults(
+            sql_row
+        )
         return cls(
             id=id,
             protocol_id=protocol_id,
             analyzer_version=analyzer_version,
             completed_analysis=completed_analysis,
+            run_time_parameter_values_and_defaults=rtp_values_and_defaults,
+        )
+
+    @classmethod
+    async def get_run_time_parameter_values_and_defaults(
+        cls, sql_row: sqlalchemy.engine.Row
+    ) -> Dict[str, RunTimeParameterAnalysisData]:
+        """Get the run-time parameters used in the analysis with their values & defaults."""
+
+        def parse_rtp_dict() -> Dict[str, RunTimeParameterAnalysisData]:
+            rtp_contents = sql_row.run_time_parameter_values_and_defaults
+            return (
+                parse_raw_as(
+                    Dict[str, RunTimeParameterAnalysisData],
+                    sql_row.run_time_parameter_values_and_defaults,
+                )
+                if rtp_contents
+                else {}
+            )
+
+        # In most cases, this parsing should be quite quick but theoretically
+        # there could be an unexpectedly large number of run time params.
+        # So we delegate the parsing of this to a cancellable thread as well.
+        return await anyio.to_thread.run_sync(
+            parse_rtp_dict,
+            cancellable=True,
         )
 
 
@@ -185,6 +225,40 @@ class CompletedAnalysisStore:
 
         return document
 
+    async def get_rtp_values_and_defaults_by_analysis_id(
+        self, analysis_id: str
+    ) -> Optional[Dict[str, RunTimeParameterAnalysisData]]:
+        """Return the dictionary of run time parameter values & defaults used in the given analysis.
+
+        If the analysis ID doesn't exist, return None.
+        These RTP values are not cached in memory by themselves since we don't anticipate
+        that fetching the values from the database to be a time-consuming operation.
+        """
+        async with self._memcache_lock:
+            try:
+                analysis = self._memcache.get(analysis_id)
+            except KeyError:
+                pass
+            else:
+                return analysis.run_time_parameter_values_and_defaults
+
+            statement = sqlalchemy.select(analysis_table).where(
+                analysis_table.c.id == analysis_id
+            )
+            with self._sql_engine.begin() as transaction:
+                try:
+                    result = transaction.execute(statement).one()
+                except sqlalchemy.exc.NoResultFound:
+                    # Since we just no-op when fetching non-existent analysis,
+                    # do the same for non-existent RTP data
+                    return None
+
+            rtp_values_and_defaults = await CompletedAnalysisResource.get_run_time_parameter_values_and_defaults(
+                result
+            )
+
+            return rtp_values_and_defaults
+
     async def get_by_protocol(
         self, protocol_id: str
     ) -> List[CompletedAnalysisResource]:
@@ -262,13 +336,34 @@ class CompletedAnalysisStore:
 
         return result_ids
 
-    async def add(self, completed_analysis_resource: CompletedAnalysisResource) -> None:
-        """Add a resource to the store."""
-        statement = analysis_table.insert().values(
+    async def make_room_and_add(
+        self, completed_analysis_resource: CompletedAnalysisResource
+    ) -> None:
+        """Make room and add a resource to the store.
+
+        Removes the oldest analyses in store if the number of analyses exceed
+        the max allowed, and then adds the new analysis.
+        """
+        analyses_ids = self.get_ids_by_protocol(completed_analysis_resource.protocol_id)
+
+        # Delete all analyses exceeding max number allowed,
+        # plus an additional one to create room for the new one.
+        # Most existing databases will not have multiple extra analyses per protocol
+        # but there would be some internally that added multiple analyses before
+        # we started capping the number of analyses.
+        analyses_to_delete = analyses_ids[: -MAX_ANALYSES_TO_STORE + 1]
+        for analysis_id in analyses_to_delete:
+            self._memcache.remove(analysis_id)
+        delete_statement = analysis_table.delete().where(
+            analysis_table.c.id.in_(analyses_to_delete)
+        )
+
+        insert_statement = analysis_table.insert().values(
             await completed_analysis_resource.to_sql_values()
         )
         with self._sql_engine.begin() as transaction:
-            transaction.execute(statement)
+            transaction.execute(delete_statement)
+            transaction.execute(insert_statement)
         self._memcache.insert(
             completed_analysis_resource.id, completed_analysis_resource
         )

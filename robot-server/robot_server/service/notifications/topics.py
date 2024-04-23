@@ -1,3 +1,4 @@
+"""Notification topics."""
 from enum import Enum
 
 

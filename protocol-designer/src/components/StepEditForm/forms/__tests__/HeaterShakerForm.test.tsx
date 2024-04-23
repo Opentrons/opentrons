@@ -31,7 +31,7 @@ vi.mock('../../fields', async importOriginal => {
 
 const render = (props: React.ComponentProps<typeof HeaterShakerForm>) => {
   return renderWithProviders(<HeaterShakerForm {...props} />, {
-    i18nInstance: i18n as any,
+    i18nInstance: i18n,
   })[0]
 }
 

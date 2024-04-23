@@ -18,8 +18,8 @@ import {
   POSITION_FIXED,
   POSITION_RELATIVE,
   SPACING,
-  TYPOGRAPHY,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
@@ -32,7 +32,7 @@ import {
 } from '../../redux/discovery'
 import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
 import { InputField } from '../../atoms/InputField'
-import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
+import { AlphanumericKeyboard } from '../../atoms/SoftwareKeyboard'
 import { SmallButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useIsUnboxingFlowOngoing } from '../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
@@ -121,7 +121,7 @@ export function NameRobot(): JSX.Element {
     defaultValues: {
       newRobotName: '',
     },
-    resolver: resolver,
+    resolver,
   })
 
   const newRobotName = watch('newRobotName')
@@ -295,10 +295,10 @@ export function NameRobot(): JSX.Element {
               control={control}
               name="newRobotName"
               render={({ field }) => (
-                <CustomKeyboard
+                <AlphanumericKeyboard
                   onChange={(input: string) => {
                     field.onChange(input)
-                    trigger('newRobotName')
+                    void trigger('newRobotName')
                   }}
                   keyboardRef={keyboardRef}
                 />

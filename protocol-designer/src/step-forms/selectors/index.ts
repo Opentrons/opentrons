@@ -406,7 +406,6 @@ export const getPipettesForInstrumentGroup: Selector<
         mount: pipetteOnDeck.mount,
         pipetteSpecs: pipetteSpec,
         description: _getPipetteDisplayName(pipetteOnDeck.name),
-        isDisabled: false,
         tiprackModels: tiprackDefs?.map((def: LabwareDefinition2) =>
           getLabwareDisplayName(def)
         ),
@@ -455,7 +454,10 @@ export const getModulesForEditModulesCard: Selector<
   reduce<InitialDeckSetup['modules'], ModulesForEditModulesCard>(
     initialDeckSetup.modules,
     (acc, moduleOnDeck: ModuleOnDeck, id) => {
-      acc[moduleOnDeck.type] = moduleOnDeck
+      if (!acc[moduleOnDeck.type]) {
+        acc[moduleOnDeck.type] = []
+      }
+      acc[moduleOnDeck.type]?.push(moduleOnDeck)
       return acc
     },
     {

@@ -6,6 +6,7 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import API
 from opentrons.hardware_control.types import EstopStateNotification, EstopState
@@ -20,12 +21,17 @@ from robot_server.maintenance_runs.maintenance_engine_store import (
     MaintenanceEngineStore,
     EngineConflictError,
     NoRunnerEnginePairError,
-    get_estop_listener,
+    handle_estop_event,
 )
 
 
+def mock_notify_publishers() -> None:
+    """A mock notify_publishers."""
+    return None
+
+
 @pytest.fixture
-def subject(decoy: Decoy) -> MaintenanceEngineStore:
+async def subject(decoy: Decoy) -> MaintenanceEngineStore:
     """Get a MaintenanceEngineStore test subject."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
@@ -42,7 +48,10 @@ def subject(decoy: Decoy) -> MaintenanceEngineStore:
 async def test_create_engine(subject: MaintenanceEngineStore) -> None:
     """It should create an engine for a run."""
     result = await subject.create(
-        run_id="run-id", labware_offsets=[], created_at=datetime(2023, 1, 1)
+        run_id="run-id",
+        labware_offsets=[],
+        created_at=datetime(2023, 1, 1),
+        notify_publishers=mock_notify_publishers,
     )
 
     assert subject.current_run_id == "run-id"
@@ -67,7 +76,10 @@ async def test_create_engine_uses_robot_and_deck_type(
     )
 
     await subject.create(
-        run_id="run-id", labware_offsets=[], created_at=datetime(2023, 4, 1)
+        run_id="run-id",
+        labware_offsets=[],
+        created_at=datetime(2023, 4, 1),
+        notify_publishers=mock_notify_publishers,
     )
 
     assert subject.engine.state_view.config.robot_type == robot_type
@@ -88,6 +100,7 @@ async def test_create_engine_with_labware_offsets(
         run_id="run-id",
         labware_offsets=[labware_offset],
         created_at=datetime(2023, 1, 1),
+        notify_publishers=mock_notify_publishers,
     )
 
     assert result.labwareOffsets == [
@@ -104,7 +117,10 @@ async def test_create_engine_with_labware_offsets(
 async def test_clear_engine(subject: MaintenanceEngineStore) -> None:
     """It should clear a stored engine entry."""
     await subject.create(
-        run_id="run-id", labware_offsets=[], created_at=datetime(2023, 5, 1)
+        run_id="run-id",
+        labware_offsets=[],
+        created_at=datetime(2023, 5, 1),
+        notify_publishers=mock_notify_publishers,
     )
     await subject.runner.run(deck_configuration=[])
     result = await subject.clear()
@@ -124,7 +140,10 @@ async def test_clear_engine_not_stopped_or_idle(
 ) -> None:
     """It should raise a conflict if the engine is not stopped."""
     await subject.create(
-        run_id="run-id", labware_offsets=[], created_at=datetime(2023, 6, 1)
+        run_id="run-id",
+        labware_offsets=[],
+        created_at=datetime(2023, 6, 1),
+        notify_publishers=mock_notify_publishers,
     )
     subject.runner.play()
 
@@ -135,7 +154,10 @@ async def test_clear_engine_not_stopped_or_idle(
 async def test_clear_idle_engine(subject: MaintenanceEngineStore) -> None:
     """It should successfully clear engine if idle (not started)."""
     await subject.create(
-        run_id="run-id", labware_offsets=[], created_at=datetime(2023, 7, 1)
+        run_id="run-id",
+        labware_offsets=[],
+        created_at=datetime(2023, 7, 1),
+        notify_publishers=mock_notify_publishers,
     )
     assert subject.engine is not None
     assert subject.runner is not None
@@ -155,22 +177,30 @@ async def test_estop_callback(
     """The callback should stop an active engine."""
     engine_store = decoy.mock(cls=MaintenanceEngineStore)
 
-    subject = get_estop_listener(engine_store=engine_store)
-
-    decoy.when(engine_store.current_run_id).then_return(None, "fake_run_id")
-
     disengage_event = EstopStateNotification(
         old_state=EstopState.PHYSICALLY_ENGAGED, new_state=EstopState.LOGICALLY_ENGAGED
     )
-
-    subject(disengage_event)
-
     engage_event = EstopStateNotification(
         old_state=EstopState.LOGICALLY_ENGAGED, new_state=EstopState.PHYSICALLY_ENGAGED
     )
 
-    subject(engage_event)
+    decoy.when(engine_store.current_run_id).then_return(None)
+    await handle_estop_event(engine_store, disengage_event)
+    decoy.verify(
+        engine_store.engine.estop(),
+        ignore_extra_args=True,
+        times=0,
+    )
+    decoy.verify(
+        await engine_store.engine.finish(),
+        ignore_extra_args=True,
+        times=0,
+    )
 
-    subject(engage_event)
-
-    decoy.verify(engine_store.engine.estop(maintenance_run=True), times=1)
+    decoy.when(engine_store.current_run_id).then_return("fake-run-id")
+    await handle_estop_event(engine_store, engage_event)
+    decoy.verify(
+        engine_store.engine.estop(),
+        await engine_store.engine.finish(error=matchers.IsA(EStopActivatedError)),
+        times=1,
+    )

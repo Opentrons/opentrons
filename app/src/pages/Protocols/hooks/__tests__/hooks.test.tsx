@@ -38,28 +38,28 @@ const mockRTPData = [
     displayName: 'Dry Run',
     variableName: 'DRYRUN',
     description: 'a dry run description',
-    type: 'boolean',
+    type: 'bool',
     default: false,
   },
   {
     displayName: 'Use Gripper',
     variableName: 'USE_GRIPPER',
     description: '',
-    type: 'boolean',
+    type: 'bool',
     default: true,
   },
   {
     displayName: 'Trash Tips',
     variableName: 'TIP_TRASH',
     description: 'throw tip in trash',
-    type: 'boolean',
+    type: 'bool',
     default: true,
   },
   {
     displayName: 'Deactivate Temperatures',
     variableName: 'DEACTIVATE_TEMP',
     description: 'deactivate temperature?',
-    type: 'boolean',
+    type: 'bool',
     default: true,
   },
   {
@@ -261,7 +261,7 @@ describe('useRequiredProtocolLabware', () => {
   })
 })
 
-describe('useMissingProtocolHardware', () => {
+describe.only('useMissingProtocolHardware', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
   beforeEach(() => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
@@ -343,14 +343,6 @@ describe('useMissingProtocolHardware', () => {
           connected: false,
           hasSlotConflict: true,
         },
-        {
-          hardwareType: 'fixture',
-          cutoutFixtureId: 'singleRightSlot',
-          location: {
-            cutout: 'cutoutD3',
-          },
-          hasSlotConflict: true,
-        },
       ],
       conflictedSlots: ['D3'],
     })
@@ -374,6 +366,21 @@ describe('useMissingProtocolHardware', () => {
       data: { data: [mockHeaterShaker] },
       isLoading: false,
     } as any)
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+      data: [
+        omitBy(
+          FLEX_SIMPLEST_DECK_CONFIG,
+          ({ cutoutId }) => cutoutId === 'cutoutD3'
+        ),
+        {
+          cutoutId: 'cutoutD3',
+          cutoutFixtureId: 'heaterShakerModuleV1',
+          opentronsModuleSerialNumber: mockHeaterShaker.serialNumber,
+        },
+      ],
+      isLoading: false,
+    } as any)
+
     const { result } = renderHook(
       () => useMissingProtocolHardware(PROTOCOL_ANALYSIS.id),
       { wrapper }
@@ -384,7 +391,7 @@ describe('useMissingProtocolHardware', () => {
       conflictedSlots: [],
     })
   })
-  it('should return conflicting slot when module location is configured with something other than single slot fixture', () => {
+  it('should return conflicting slot when module location is configured with something other than module fixture', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [
@@ -425,11 +432,10 @@ describe('useMissingProtocolHardware', () => {
     expect(result.current).toEqual({
       missingProtocolHardware: [
         {
-          hardwareType: 'fixture',
-          cutoutFixtureId: 'singleRightSlot',
-          location: {
-            cutout: 'cutoutD3',
-          },
+          hardwareType: 'module',
+          moduleModel: 'heaterShakerModuleV1',
+          slot: 'D3',
+          connected: false,
           hasSlotConflict: true,
         },
       ],

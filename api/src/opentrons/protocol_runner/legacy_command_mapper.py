@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, Location
-from opentrons.commands import types as legacy_command_types
+from opentrons.legacy_commands import types as legacy_command_types
 from opentrons.protocol_engine import (
     ProtocolEngineError,
     actions as pe_actions,
@@ -79,6 +79,7 @@ _HIGHER_ORDER_COMMAND_TYPES = {
     legacy_command_types.DISTRIBUTE,
     legacy_command_types.TRANSFER,
     legacy_command_types.RETURN_TIP,
+    legacy_command_types.AIR_GAP,
 }
 
 
@@ -265,6 +266,7 @@ class LegacyCommandMapper:
                 results.append(
                     pe_actions.FailCommandAction(
                         command_id=running_command.id,
+                        running_command=running_command,
                         error_id=ModelUtils.generate_id(),
                         failed_at=now,
                         error=LegacyContextCommandError(command_error),

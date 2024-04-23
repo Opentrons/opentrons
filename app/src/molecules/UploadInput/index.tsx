@@ -45,11 +45,19 @@ const StyledInput = styled.input`
 export interface UploadInputProps {
   onUpload: (file: File) => unknown
   onClick?: () => void
+  uploadButtonText?: string
   uploadText?: string | JSX.Element
   dragAndDropText?: string | JSX.Element
 }
 
 export function UploadInput(props: UploadInputProps): JSX.Element | null {
+  const {
+    dragAndDropText,
+    onClick,
+    onUpload,
+    uploadButtonText,
+    uploadText,
+  } = props
   const { t } = useTranslation('protocol_info')
 
   const fileInput = React.useRef<HTMLInputElement>(null)
@@ -60,7 +68,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const handleDrop: React.DragEventHandler<HTMLLabelElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    Array.from(e.dataTransfer.files).forEach(f => props.onUpload(f))
+    Array.from(e.dataTransfer.files).forEach(f => onUpload(f))
     setIsFileOverDropZone(false)
   }
   const handleDragEnter: React.DragEventHandler<HTMLLabelElement> = e => {
@@ -81,11 +89,11 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   }
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = _event => {
-    props.onClick != null ? props.onClick() : fileInput.current?.click()
+    onClick != null ? onClick() : fileInput.current?.click()
   }
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-    ;[...(event.target.files ?? [])].forEach(f => props.onUpload(f))
+    ;[...(event.target.files ?? [])].forEach(f => onUpload(f))
     if ('value' in event.currentTarget) event.currentTarget.value = ''
   }
 
@@ -97,18 +105,20 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       alignItems={ALIGN_CENTER}
       gridGap={SPACING.spacing24}
     >
-      <StyledText
-        as="p"
-        textAlign={TYPOGRAPHY.textAlignCenter}
-        marginTop={SPACING.spacing16}
-      >
-        {props.uploadText}
-      </StyledText>
+      {uploadText != null ? (
+        <StyledText
+          as="p"
+          textAlign={TYPOGRAPHY.textAlignCenter}
+          marginTop={SPACING.spacing16}
+        >
+          {uploadText}
+        </StyledText>
+      ) : null}
       <PrimaryButton
         onClick={handleClick}
         id="UploadInput_protocolUploadButton"
       >
-        {t('upload')}
+        {uploadButtonText ?? t('upload')}
       </PrimaryButton>
 
       <StyledLabel
@@ -127,7 +137,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           name="upload"
           marginBottom={SPACING.spacing24}
         />
-        {props.dragAndDropText}
+        {dragAndDropText}
         <StyledInput
           id="file_input"
           data-testid="file_input"

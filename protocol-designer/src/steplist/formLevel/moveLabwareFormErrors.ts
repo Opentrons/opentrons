@@ -1,8 +1,9 @@
-import { LabwareLocation } from '@opentrons/shared-data'
+import { getLabwareDefIsStandard } from '@opentrons/shared-data'
 import {
   COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE,
   COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER,
 } from '../../utils/labwareModuleCompatibility'
+import type { LabwareLocation } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LabwareEntity,
@@ -11,15 +12,18 @@ import type { ProfileFormError } from './profileErrors'
 
 type HydratedFormData = any
 
-//  TODO(Jr, 1/16/24): look into the use case of this util since the i18n strings
-//  previously listed in this util were not found in any json.
 const getMoveLabwareError = (
   labware: LabwareEntity,
   newLocation: LabwareLocation,
   invariantContext: InvariantContext
 ): string | null => {
   let errorString: string | null = null
-  if (labware == null || newLocation == null || newLocation === 'offDeck')
+  if (
+    labware == null ||
+    newLocation == null ||
+    newLocation === 'offDeck' ||
+    !getLabwareDefIsStandard(labware?.def)
+  )
     return null
   const selectedLabwareDefUri = labware?.labwareDefURI
   if ('moduleId' in newLocation) {

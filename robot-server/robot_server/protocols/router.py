@@ -4,8 +4,9 @@ import logging
 from textwrap import dedent
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
 
+from opentrons.protocol_engine.types import RunTimeParamValuesType
 from opentrons_shared_data.robot import user_facing_robot_type
 from typing_extensions import Literal
 
@@ -32,13 +33,14 @@ from robot_server.service.json_api import (
     SimpleEmptyBody,
     MultiBodyMeta,
     PydanticResponse,
+    RequestModel,
 )
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
 from .protocol_models import Protocol, ProtocolFile, Metadata
 from .protocol_analyzer import ProtocolAnalyzer
-from .analysis_store import AnalysisStore, AnalysisNotFoundError
-from .analysis_models import ProtocolAnalysis
+from .analysis_store import AnalysisStore, AnalysisNotFoundError, AnalysisIsPendingError
+from .analysis_models import ProtocolAnalysis, AnalysisRequest, AnalysisSummary
 from .protocol_store import (
     ProtocolStore,
     ProtocolResource,
@@ -72,6 +74,13 @@ class AnalysisNotFound(ErrorDetails):
 
     id: Literal["AnalysisNotFound"] = "AnalysisNotFound"
     title: str = "Protocol Analysis Not Found"
+
+
+class LastAnalysisPending(ErrorDetails):
+    """An error returned when the most recent analysis of a protocol is still pending."""
+
+    id: Literal["LastAnalysisPending"] = "LastAnalysisPending"
+    title: str = "Last Analysis Still Pending."
 
 
 class ProtocolFilesInvalid(ErrorDetails):
@@ -140,7 +149,9 @@ protocols_router = APIRouter()
         resource will be returned instead of creating duplicate ones.
 
         When a new protocol resource is created, an analysis is started for it.
-        See the `/protocols/{id}/analyses/` endpoints.
+        A new analysis is also started if the same protocol file is uploaded but with
+        a different set of run-time parameter values than the most recent request.
+        See the `/protocols/{id}/analyses/` endpoints for more details.
         """
     ),
     status_code=status.HTTP_201_CREATED,
@@ -150,6 +161,7 @@ protocols_router = APIRouter()
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": ErrorBody[Union[ProtocolFilesInvalid, ProtocolRobotTypeMismatch]]
         },
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
 )
 async def create_protocol(
@@ -214,7 +226,6 @@ async def create_protocol(
         # TODO(mm, 2024-02-07): Investigate whether the filename can actually be None.
         assert file.filename is not None
     buffered_files = await file_reader_writer.read(files=files)  # type: ignore[arg-type]
-
     if isinstance(run_time_parameter_values, str):
         # We have to do this isinstance check because if `runTimeParameterValues` is
         # not specified in the request, then it gets assigned a Form(None) value
@@ -223,36 +234,36 @@ async def create_protocol(
         #  so we can validate the data contents and return a better error response.
         parsed_rtp = json.loads(run_time_parameter_values)
     else:
-        parsed_rtp = None
+        parsed_rtp = {}
     content_hash = await file_hasher.hash(buffered_files)
     cached_protocol_id = protocol_store.get_id_by_hash(content_hash)
 
     if cached_protocol_id is not None:
-        # Protocol exists in database
         resource = protocol_store.get(protocol_id=cached_protocol_id)
-        if parsed_rtp:
-            # This protocol exists in database but needs to be re-analyzed with the
-            # passed-in RTP overrides
-            task_runner.run(
-                protocol_analyzer.analyze,
-                protocol_resource=resource,
-                analysis_id=analysis_id,
-                run_time_param_values=parsed_rtp,
-            )
-            analysis_store.add_pending(
+
+        try:
+            analysis_summaries, _ = await _start_new_analysis_if_necessary(
                 protocol_id=cached_protocol_id,
                 analysis_id=analysis_id,
+                rtp_values=parsed_rtp,
+                force_reanalyze=False,
+                protocol_store=protocol_store,
+                analysis_store=analysis_store,
+                protocol_analyzer=protocol_analyzer,
+                task_runner=task_runner,
             )
-        analyses = analysis_store.get_summaries_by_protocol(
-            protocol_id=cached_protocol_id
-        )
+        except AnalysisIsPendingError as error:
+            raise LastAnalysisPending(detail=str(error)).as_error(
+                status.HTTP_503_SERVICE_UNAVAILABLE
+            ) from error
+
         data = Protocol.construct(
             id=cached_protocol_id,
             createdAt=resource.created_at,
             protocolType=resource.source.config.protocol_type,
             robotType=resource.source.robot_type,
             metadata=Metadata.parse_obj(resource.source.metadata),
-            analysisSummaries=analyses,
+            analysisSummaries=analysis_summaries,
             key=resource.protocol_key,
             files=[
                 ProtocolFile(name=f.path.name, role=f.role)
@@ -329,6 +340,53 @@ async def create_protocol(
         content=SimpleBody.construct(data=data),
         status_code=status.HTTP_201_CREATED,
     )
+
+
+async def _start_new_analysis_if_necessary(
+    protocol_id: str,
+    analysis_id: str,
+    force_reanalyze: bool,
+    rtp_values: RunTimeParamValuesType,
+    protocol_store: ProtocolStore,
+    analysis_store: AnalysisStore,
+    protocol_analyzer: ProtocolAnalyzer,
+    task_runner: TaskRunner,
+) -> Tuple[List[AnalysisSummary], bool]:
+    """Check RTP values and start a new analysis if necessary.
+
+    Returns a tuple of the latest list of analysis summaries (including any newly
+    started analysis) and whether a new analysis was started.
+    """
+    resource = protocol_store.get(protocol_id=protocol_id)
+    analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocol_id)
+    started_new_analysis = False
+    if (
+        force_reanalyze
+        or
+        # Unexpected situations, like powering off the robot after a protocol upload
+        # but before the analysis is complete, can leave the protocol resource
+        # without an associated analysis.
+        len(analyses) == 0
+        or
+        # The most recent analysis was done using different RTP values
+        not await analysis_store.matching_rtp_values_in_analysis(
+            analysis_summary=analyses[-1], new_rtp_values=rtp_values
+        )
+    ):
+        task_runner.run(
+            protocol_analyzer.analyze,
+            protocol_resource=resource,
+            analysis_id=analysis_id,
+            run_time_param_values=rtp_values,
+        )
+        started_new_analysis = True
+        analyses.append(
+            analysis_store.add_pending(
+                protocol_id=protocol_id,
+                analysis_id=analysis_id,
+            )
+        )
+    return analyses, started_new_analysis
 
 
 @PydanticResponse.wrap_route(
@@ -490,6 +548,78 @@ async def delete_protocol_by_id(
     return await PydanticResponse.create(
         content=SimpleEmptyBody.construct(),
         status_code=status.HTTP_200_OK,
+    )
+
+
+@PydanticResponse.wrap_route(
+    protocols_router.post,
+    path="/protocols/{protocolId}/analyses",
+    summary="Analyze the protocol",
+    description=dedent(
+        """
+        Generate an analysis for the protocol, based on last analysis and current request data.
+        """
+    ),
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_200_OK: {"model": SimpleMultiBody[AnalysisSummary]},
+        status.HTTP_201_CREATED: {"model": SimpleMultiBody[AnalysisSummary]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
+    },
+)
+async def create_protocol_analysis(
+    protocolId: str,
+    request_body: Optional[RequestModel[AnalysisRequest]] = None,
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
+    analysis_store: AnalysisStore = Depends(get_analysis_store),
+    protocol_analyzer: ProtocolAnalyzer = Depends(get_protocol_analyzer),
+    task_runner: TaskRunner = Depends(get_task_runner),
+    analysis_id: str = Depends(get_unique_id, use_cache=False),
+) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:
+    """Start a new analysis for the given existing protocol.
+
+    Starts a new analysis for the protocol along with the provided run-time parameter
+    values (if any), and appends it to the existing analyses.
+
+    If the last analysis in the existing analyses used the same RTP values, then a new
+    analysis is not created.
+
+    If `forceAnalyze` is True, this will always start a new analysis.
+
+    Returns: List of analysis summaries available for the protocol, ordered as
+             most recently started analysis last.
+    """
+    if not protocol_store.has(protocolId):
+        raise ProtocolNotFound(detail=f"Protocol {protocolId} not found").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
+    try:
+        (
+            analysis_summaries,
+            started_new_analysis,
+        ) = await _start_new_analysis_if_necessary(
+            protocol_id=protocolId,
+            analysis_id=analysis_id,
+            rtp_values=request_body.data.runTimeParameterValues if request_body else {},
+            force_reanalyze=request_body.data.forceReAnalyze if request_body else False,
+            protocol_store=protocol_store,
+            analysis_store=analysis_store,
+            protocol_analyzer=protocol_analyzer,
+            task_runner=task_runner,
+        )
+    except AnalysisIsPendingError as error:
+        raise LastAnalysisPending(detail=str(error)).as_error(
+            status.HTTP_503_SERVICE_UNAVAILABLE
+        ) from error
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.construct(
+            data=analysis_summaries,
+            meta=MultiBodyMeta(cursor=0, totalLength=len(analysis_summaries)),
+        ),
+        status_code=status.HTTP_201_CREATED
+        if started_new_analysis
+        else status.HTTP_200_OK,
     )
 
 

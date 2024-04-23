@@ -35,6 +35,10 @@ export function mixUtil(args: {
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
   tipRack: string
+  aspirateXOffset: number
+  dispenseXOffset: number
+  aspirateYOffset: number
+  dispenseYOffset: number
   aspirateDelaySeconds?: number | null | undefined
   dispenseDelaySeconds?: number | null | undefined
 }): CurriedCommandCreator[] {
@@ -51,6 +55,10 @@ export function mixUtil(args: {
     aspirateDelaySeconds,
     dispenseDelaySeconds,
     tipRack,
+    aspirateXOffset,
+    aspirateYOffset,
+    dispenseXOffset,
+    dispenseYOffset,
   } = args
 
   const getDelayCommand = (seconds?: number | null): CurriedCommandCreator[] =>
@@ -76,6 +84,8 @@ export function mixUtil(args: {
         offsetFromBottomMm: aspirateOffsetFromBottomMm,
         flowRate: aspirateFlowRateUlSec,
         tipRack,
+        xOffset: aspirateXOffset,
+        yOffset: aspirateYOffset,
       }),
       ...getDelayCommand(aspirateDelaySeconds),
       curryCommandCreator(dispense, {
@@ -85,6 +95,8 @@ export function mixUtil(args: {
         well,
         offsetFromBottomMm: dispenseOffsetFromBottomMm,
         flowRate: dispenseFlowRateUlSec,
+        xOffset: dispenseXOffset,
+        yOffset: dispenseYOffset,
       }),
       ...getDelayCommand(dispenseDelaySeconds),
     ],
@@ -123,6 +135,10 @@ export const mix: CommandCreator<MixArgs> = (
     blowoutOffsetFromTopMm,
     dropTipLocation,
     tipRack,
+    aspirateXOffset,
+    aspirateYOffset,
+    dispenseXOffset,
+    dispenseYOffset,
   } = data
 
   const is96Channel =
@@ -257,6 +273,10 @@ export const mix: CommandCreator<MixArgs> = (
         aspirateDelaySeconds,
         dispenseDelaySeconds,
         tipRack,
+        aspirateXOffset,
+        aspirateYOffset,
+        dispenseXOffset,
+        dispenseYOffset,
       })
       return [
         ...configureNozzleLayoutCommand,

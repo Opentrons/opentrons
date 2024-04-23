@@ -106,7 +106,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
     info: updateInfo,
   } = updateState
   const releaseNotes = updateInfo?.releaseNotes
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'branded'])
   const history = useHistory()
   const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
   const availableAppUpdateVersion = useSelector(getAvailableShellUpdate) ?? ''
@@ -164,7 +164,10 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
         </LegacyModal>
       ) : null}
       {(downloading || downloaded) && error == null ? (
-        <LegacyModal title={t('opentrons_app_update')} css={LEGACY_MODAL_STYLE}>
+        <LegacyModal
+          title={t('branded:opentrons_app_update')}
+          css={LEGACY_MODAL_STYLE}
+        >
           <Flex
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_CENTER}
@@ -182,7 +185,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
       ) : null}
       {!downloading && !downloaded && error == null ? (
         <LegacyModal
-          title={t('opentrons_app_update_available')}
+          title={t('branded:opentrons_app_update_available')}
           onClose={() => closeModal(true)}
           closeOnOutsideClick={true}
           footer={appUpdateFooter}
@@ -191,7 +194,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>
-              {t('update_requires_restarting')}
+              {t('branded:update_requires_restarting_app')}
             </UpdateAppBanner>
             <ReleaseNotes source={releaseNotes} />
           </Flex>

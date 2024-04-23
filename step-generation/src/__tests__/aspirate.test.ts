@@ -67,6 +67,8 @@ describe('aspirate', () => {
         well: 'A1',
       } as AspDispAirgapParams),
       tipRack: 'tiprack1Id',
+      xOffset: 0,
+      yOffset: 0,
     }
     const result = aspirate(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
@@ -82,6 +84,8 @@ describe('aspirate', () => {
           wellLocation: {
             origin: 'bottom',
             offset: {
+              x: 0,
+              y: 0,
               z: 5,
             },
           },
@@ -106,6 +110,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tiprack1Id',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip
@@ -133,6 +139,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip
@@ -153,6 +161,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip
@@ -170,6 +180,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       initialRobotState
@@ -190,6 +202,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip
@@ -214,6 +228,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       initialRobotState
@@ -246,6 +262,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip
@@ -278,6 +296,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip
@@ -316,6 +336,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip
@@ -348,6 +370,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip
@@ -386,6 +410,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip
@@ -414,6 +440,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip
@@ -441,6 +469,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip
@@ -468,6 +498,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip
@@ -497,6 +529,8 @@ describe('aspirate', () => {
           well: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
+        xOffset: 0,
+        yOffset: 0,
       },
       invariantContext,
       robotStateWithTip

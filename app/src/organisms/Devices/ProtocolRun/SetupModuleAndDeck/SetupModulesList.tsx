@@ -27,11 +27,11 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
+  OT2_ROBOT_TYPE,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
 
-import { Banner } from '../../../../atoms/Banner'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { StatusLabel } from '../../../../atoms/StatusLabel'
 import { Tooltip } from '../../../../atoms/Tooltip'
@@ -48,7 +48,7 @@ import {
   useRunCalibrationStatus,
 } from '../../hooks'
 import { LocationConflictModal } from './LocationConflictModal'
-import { MultipleModulesModal } from './MultipleModulesModal'
+import { OT2MultipleModulesHelp } from './OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getModuleImage } from './utils'
 
@@ -70,7 +70,6 @@ interface SetupModulesListProps {
 
 export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const { robotName, runId } = props
-  const { t } = useTranslation('protocol_setup')
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     runId
   )
@@ -85,125 +84,53 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
 
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
 
-  const [
-    showMultipleModulesModal,
-    setShowMultipleModulesModal,
-  ] = React.useState<boolean>(false)
-
   const moduleModels = map(
     moduleRenderInfoForProtocolById,
     ({ moduleDef }) => moduleDef.model
   )
-
-  const hasADuplicateModule = new Set(moduleModels).size !== moduleModels.length
-
+  const showOT2MoamHelp =
+    robotModel === OT2_ROBOT_TYPE &&
+    new Set(moduleModels).size !== moduleModels.length
   return (
     <>
-      {showMultipleModulesModal ? (
-        <MultipleModulesModal
-          onCloseClick={() => setShowMultipleModulesModal(false)}
-        />
-      ) : null}
-      {hasADuplicateModule ? (
-        <Box marginTop={SPACING.spacing8}>
-          <Banner
-            iconMarginRight={SPACING.spacing16}
-            iconMarginLeft={SPACING.spacing8}
-            size={SPACING.spacing20}
-            type="informing"
-            onCloseClick={() => setShowMultipleModulesModal(true)}
-            closeButton={
-              <StyledText
-                as="p"
-                textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                marginRight={SPACING.spacing8}
-              >
-                {t('learn_more')}
-              </StyledText>
-            }
-          >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText css={TYPOGRAPHY.pSemiBold}>
-                {t('multiple_modules')}
-              </StyledText>
-              <StyledText as="p">{t('view_moam')}</StyledText>
-            </Flex>
-          </Banner>
-        </Box>
-      ) : null}
+      {showOT2MoamHelp ? <OT2MultipleModulesHelp /> : null}
       {remainingAttachedModules.length !== 0 &&
       missingModuleIds.length !== 0 ? (
         <UnMatchedModuleWarning />
       ) : null}
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginTop={SPACING.spacing16}
-        marginLeft={SPACING.spacing20}
-        marginBottom={SPACING.spacing4}
-      >
-        <StyledText
-          css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing8}
-          width="45%"
-        >
-          {t('module_name')}
-        </StyledText>
-        <StyledText
-          css={TYPOGRAPHY.labelSemiBold}
-          marginRight={SPACING.spacing16}
-          width="15%"
-        >
-          {t('location')}
-        </StyledText>
-        <StyledText
-          css={TYPOGRAPHY.labelSemiBold}
-          marginRight={SPACING.spacing16}
-          width="15%"
-        >
-          {t('status')}
-        </StyledText>
-      </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        width="100%"
-        overflowY="auto"
-        gridGap={SPACING.spacing4}
-        marginBottom={SPACING.spacing24}
-      >
-        {map(
-          moduleRenderInfoForProtocolById,
-          ({
-            moduleDef,
-            attachedModuleMatch,
-            slotName,
-            moduleId,
-            conflictedFixture,
-          }) => {
-            return (
-              <ModulesListItem
-                key={`SetupModulesList_${String(
-                  moduleDef.model
-                )}_slot_${slotName}`}
-                moduleModel={moduleDef.model}
-                displayName={moduleDef.displayName}
-                slotName={slotName}
-                attachedModuleMatch={attachedModuleMatch}
-                heaterShakerModuleFromProtocol={
-                  moduleRenderInfoForProtocolById[moduleId].moduleDef
-                    .moduleType === HEATERSHAKER_MODULE_TYPE
-                    ? moduleRenderInfoForProtocolById[moduleId]
-                    : null
-                }
-                isFlex={isFlex}
-                calibrationStatus={calibrationStatus}
-                conflictedFixture={conflictedFixture}
-                deckDef={deckDef}
-              />
-            )
-          }
-        )}
-      </Flex>
+
+      {map(
+        moduleRenderInfoForProtocolById,
+        ({
+          moduleDef,
+          attachedModuleMatch,
+          slotName,
+          moduleId,
+          conflictedFixture,
+        }) => {
+          return (
+            <ModulesListItem
+              key={`SetupModulesList_${String(
+                moduleDef.model
+              )}_slot_${slotName}`}
+              moduleModel={moduleDef.model}
+              displayName={moduleDef.displayName}
+              slotName={slotName}
+              attachedModuleMatch={attachedModuleMatch}
+              heaterShakerModuleFromProtocol={
+                moduleRenderInfoForProtocolById[moduleId].moduleDef
+                  .moduleType === HEATERSHAKER_MODULE_TYPE
+                  ? moduleRenderInfoForProtocolById[moduleId]
+                  : null
+              }
+              isFlex={isFlex}
+              calibrationStatus={calibrationStatus}
+              conflictedFixture={conflictedFixture}
+              deckDef={deckDef}
+            />
+          )
+        }
+      )}
     </>
   )
 }
@@ -358,13 +285,13 @@ export function ModulesListItem({
           onCloseClick={() => setShowLocationConflictModal(false)}
           cutoutId={cutoutIdForSlotName}
           requiredModule={moduleModel}
+          deckDef={deckDef}
         />
       ) : null}
       {showModuleWizard && attachedModuleMatch != null ? (
         <ModuleWizardFlows
           attachedModule={attachedModuleMatch}
           closeFlow={() => setShowModuleWizard(false)}
-          initialSlotName={slotName}
           isPrepCommandLoading={isCommandMutationLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
@@ -404,13 +331,26 @@ export function ModulesListItem({
               {subText}
             </Flex>
           </Flex>
-          <StyledText as="p" width="15%">
-            {getModuleType(moduleModel) === 'thermocyclerModuleType'
-              ? isFlex
-                ? TC_MODULE_LOCATION_OT3
-                : TC_MODULE_LOCATION_OT2
-              : slotName}
-          </StyledText>
+          <Flex
+            width="15%"
+            flexDirection={DIRECTION_COLUMN}
+            justifyContent={JUSTIFY_CENTER}
+          >
+            <StyledText as="p">
+              {getModuleType(moduleModel) === 'thermocyclerModuleType'
+                ? isFlex
+                  ? TC_MODULE_LOCATION_OT3
+                  : TC_MODULE_LOCATION_OT2
+                : slotName}
+            </StyledText>
+            {attachedModuleMatch?.usbPort.port != null ? (
+              <StyledText as="p">
+                {t('usb_port_number', {
+                  port: attachedModuleMatch.usbPort.port,
+                })}
+              </StyledText>
+            ) : null}
+          </Flex>
           <Flex
             width="15%"
             flexDirection={DIRECTION_COLUMN}

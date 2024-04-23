@@ -51,7 +51,6 @@ import type { SlideoutProps } from '../../atoms/Slideout'
 import type { UseCreateRun } from '../../organisms/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
-import { useFeatureFlag } from '../../redux/config'
 import type { DropdownOption } from '../../atoms/MenuList/DropdownMenu'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
@@ -112,7 +111,9 @@ interface ChooseRobotSlideoutProps
   isAnalysisError?: boolean
   isAnalysisStale?: boolean
   showIdleOnly?: boolean
-  multiSlideout?: { currentPage: number }
+  multiSlideout?: { currentPage: number } | null
+  setHasParamError?: (isError: boolean) => void
+  resetRunTimeParameters?: () => void
 }
 
 export function ChooseRobotSlideout(
@@ -135,12 +136,13 @@ export function ChooseRobotSlideout(
     setSelectedRobot,
     robotType,
     showIdleOnly = false,
-    multiSlideout,
+    multiSlideout = null,
     runTimeParametersOverrides,
     setRunTimeParametersOverrides,
+    setHasParamError,
+    resetRunTimeParameters,
   } = props
 
-  const enableRunTimeParametersFF = useFeatureFlag('enableRunTimeParameters')
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -184,18 +186,27 @@ export function ChooseRobotSlideout(
     {}
   )
 
+  const reducerAvailableRobots = healthyReachableRobots.filter(robot =>
+    showIdleOnly ? !robotBusyStatusByName[robot.name] : robot
+  )
   const reducerBusyCount = healthyReachableRobots.filter(
     robot => robotBusyStatusByName[robot.name]
   ).length
 
   // this useEffect sets the default selection to the first robot in the list. state is managed by the caller
   React.useEffect(() => {
-    if (selectedRobot == null && healthyReachableRobots.length > 0) {
-      setSelectedRobot(healthyReachableRobots[0])
-    } else if (healthyReachableRobots.length === 0) {
+    if (
+      (selectedRobot == null ||
+        !reducerAvailableRobots.some(
+          robot => robot.name === selectedRobot.name
+        )) &&
+      reducerAvailableRobots.length > 0
+    ) {
+      setSelectedRobot(reducerAvailableRobots[0])
+    } else if (reducerAvailableRobots.length === 0) {
       setSelectedRobot(null)
     }
-  }, [healthyReachableRobots, selectedRobot, setSelectedRobot])
+  }, [reducerAvailableRobots, selectedRobot, setSelectedRobot])
 
   const unavailableCount =
     unhealthyReachableRobots.length + unreachableRobots.length
@@ -330,6 +341,7 @@ export function ChooseRobotSlideout(
     </Flex>
   )
 
+  const errors: string[] = []
   const runTimeParameters =
     runTimeParametersOverrides?.map((runtimeParam, index) => {
       if ('choices' in runtimeParam) {
@@ -362,25 +374,50 @@ export function ChooseRobotSlideout(
               }
             }}
             title={runtimeParam.displayName}
-            caption={runtimeParam.description}
             width="100%"
             dropdownType="neutral"
+            tooltipText={runtimeParam.description}
           />
         )
       } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
         const value = runtimeParam.value as number
         const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
+        const error =
+          Number.isNaN(value) ||
+          value < runtimeParam.min ||
+          value > runtimeParam.max
+            ? t(`value_out_of_range`, {
+                min:
+                  runtimeParam.type === 'int'
+                    ? runtimeParam.min
+                    : runtimeParam.min.toFixed(1),
+                max:
+                  runtimeParam.type === 'int'
+                    ? runtimeParam.max
+                    : runtimeParam.max.toFixed(1),
+              })
+            : null
+        if (error != null) {
+          errors.push(error)
+        }
         return (
           <InputField
             key={runtimeParam.variableName}
             type="number"
             units={runtimeParam.suffix}
-            placeholder={value.toString()}
+            placeholder={runtimeParam.default.toString()}
             value={value}
             title={runtimeParam.displayName}
             tooltipText={runtimeParam.description}
-            caption={`${runtimeParam.min}-${runtimeParam.max}`}
+            caption={
+              runtimeParam.type === 'int'
+                ? `${runtimeParam.min}-${runtimeParam.max}`
+                : `${runtimeParam.min.toFixed(1)}-${runtimeParam.max.toFixed(
+                    1
+                  )}`
+            }
             id={id}
+            error={error}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
@@ -400,7 +437,7 @@ export function ChooseRobotSlideout(
             }}
           />
         )
-      } else if (runtimeParam.type === 'boolean') {
+      } else if (runtimeParam.type === 'bool') {
         return (
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -452,6 +489,10 @@ export function ChooseRobotSlideout(
       }
     }) ?? null
 
+  if (setHasParamError != null) {
+    setHasParamError(errors.length > 0)
+  }
+
   const isRestoreDefaultsLinkEnabled =
     runTimeParametersOverrides?.some(
       parameter => parameter.value !== parameter.default
@@ -468,15 +509,7 @@ export function ChooseRobotSlideout(
                 ? ENABLED_LINK_CSS
                 : DISABLED_LINK_CSS
             }
-            onClick={() => {
-              const clone = runTimeParametersOverrides.map(parameter => ({
-                ...parameter,
-                value: parameter.default,
-              }))
-              if (setRunTimeParametersOverrides != null) {
-                setRunTimeParametersOverrides(clone)
-              }
-            }}
+            onClick={() => resetRunTimeParameters?.()}
             paddingBottom={SPACING.spacing10}
             {...targetProps}
           >
@@ -494,7 +527,7 @@ export function ChooseRobotSlideout(
       </Flex>
     ) : null
 
-  return multiSlideout != null && enableRunTimeParametersFF ? (
+  return multiSlideout != null ? (
     <MultiSlideout
       isExpanded={isExpanded}
       onCloseClick={onCloseClick}

@@ -24,7 +24,7 @@ interface AlertsModalProps {
 export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false)
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'branded'])
   const { makeToast } = useToaster()
   const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
 
@@ -54,10 +54,14 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   // Only run this hook on app startup
   React.useEffect(() => {
     if (hasJustUpdated) {
-      makeToast(t('opentrons_app_successfully_updated'), SUCCESS_TOAST, {
-        closeButton: true,
-        disableTimeout: true,
-      })
+      makeToast(
+        t('branded:opentrons_app_successfully_updated'),
+        SUCCESS_TOAST,
+        {
+          closeButton: true,
+          disableTimeout: true,
+        }
+      )
       dispatch(toggleConfigValue('update.hasJustUpdated'))
     }
   }, [])
@@ -65,7 +69,7 @@ export function AlertsModal({ toastIdRef }: AlertsModalProps): JSX.Element {
   React.useEffect(() => {
     if (createAppUpdateAvailableToast) {
       toastIdRef.current = makeToast(
-        t('opentrons_app_update_available_variation'),
+        t('branded:opentrons_app_update_available_variation'),
         WARNING_TOAST,
         {
           closeButton: true,

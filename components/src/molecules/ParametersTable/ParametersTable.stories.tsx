@@ -1,15 +1,10 @@
-import * as React from 'react'
-import { ParametersTable } from '@opentrons/components'
-import type { Story, Meta } from '@storybook/react'
+import * as React from 'react-remove-scroll'
+import { Flex } from '../../primitives'
+import { SPACING } from '../../ui-style-constants'
+import { ParametersTable } from './index'
+
+import type { Meta, StoryObj } from '@storybook/react'
 import type { RunTimeParameter } from '@opentrons/shared-data'
-
-export default {
-  title: 'Library/Molecules/ParametersTable',
-} as Meta
-
-const Template: Story<React.ComponentProps<typeof ParametersTable>> = args => (
-  <ParametersTable {...args} />
-)
 
 const runTimeParameters: RunTimeParameter[] = [
   {
@@ -17,7 +12,7 @@ const runTimeParameters: RunTimeParameter[] = [
     displayName: 'Dry Run',
     variableName: 'DRYRUN',
     description: 'Is this a dry or wet run? Wet is true, dry is false',
-    type: 'boolean',
+    type: 'bool',
     default: false,
   },
   {
@@ -25,7 +20,7 @@ const runTimeParameters: RunTimeParameter[] = [
     displayName: 'Use Gripper',
     variableName: 'USE_GRIPPER',
     description: 'For using the gripper.',
-    type: 'boolean',
+    type: 'bool',
     default: true,
   },
   {
@@ -34,7 +29,7 @@ const runTimeParameters: RunTimeParameter[] = [
     variableName: 'TIP_TRASH',
     description:
       'to throw tip into the trash or to not throw tip into the trash',
-    type: 'boolean',
+    type: 'bool',
     default: true,
   },
   {
@@ -42,7 +37,7 @@ const runTimeParameters: RunTimeParameter[] = [
     displayName: 'Deactivate Temperatures',
     variableName: 'DEACTIVATE_TEMP',
     description: 'deactivate temperature on the module',
-    type: 'boolean',
+    type: 'bool',
     default: true,
   },
   {
@@ -153,7 +148,24 @@ const runTimeParameters: RunTimeParameter[] = [
     default: 'flex',
   },
 ]
-export const Default = Template.bind({})
-Default.args = {
-  runTimeParameters: runTimeParameters,
+
+const meta: Meta<typeof ParametersTable> = {
+  title: 'Library/Molecules/ParametersTable',
+  component: ParametersTable,
+  decorators: [
+    Story => (
+      <Flex padding={SPACING.spacing16}>
+        <Story />
+      </Flex>
+    ),
+  ],
+}
+export default meta
+
+type Story = StoryObj<typeof ParametersTable>
+
+export const DefaultParameterTable: Story = {
+  args: {
+    runTimeParameters: runTimeParameters,
+  },
 }

@@ -3936,5 +3936,59 @@
       "description": "",
       "displayColor": "#b925ff"
     }
-  ]
+  ],
+  "runTimeParameters": [
+    {
+      "type": "int",
+      "displayName": "number of samples",
+      "variableName": "num_samples",
+      "description": "How many samples do you want to run?",
+      "value": 96,
+      "min": 1,
+      "max": 96,
+      "default": 96
+    },
+    {
+      "type": "float",
+      "displayName": "samples volume",
+      "variableName": "vol_sample",
+      "description": "What sample volume are you using?",
+      "value": 10.0,
+      "min": 1,
+      "max": 20.0,
+      "default": 10.0
+    },
+    {
+      "displayName": "Additional mix for reagent 2?",
+      "variableName": "extra_mix",
+      "description": "When on, we do an extra mix for reagent 2.",
+      "type": "bool",
+      "default": false,
+      "value": false
+    },
+    {
+      "displayName": "Number of PCR Cycles",
+      "variableName": "real_mode",
+      "description": "Cycle map",
+      "type": "int",
+      "unit": "cycles",
+      "default": 15,
+      "value": 15,
+      "choices": [
+        {
+          "displayName": "1 & 10ng (15 cycles)",
+          "value": 15
+        },
+        {
+          "displayName": "100ng (15 cycles)",
+          "value": 15
+        },
+        {
+          "displayName": "1ug (10 cycles)",
+          "value": 10
+        }
+      ]
+    }
+  ],
+  "robotType": "OT-2 Standard"
 }

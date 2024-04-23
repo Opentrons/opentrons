@@ -190,11 +190,15 @@ export function CommandText(props: Props): JSX.Element | null {
               robotType
             )
           : ''
-      return t('move_to_well', {
-        well_name: wellName,
-        labware: getLabwareName(robotSideAnalysis, labwareId),
-        labware_location: displayLocation,
-      })
+      return (
+        <StyledText as="p" {...styleProps}>
+          {t('move_to_well', {
+            well_name: wellName,
+            labware: getLabwareName(robotSideAnalysis, labwareId),
+            labware_location: displayLocation,
+          })}
+        </StyledText>
+      )
     }
     case 'moveLabware': {
       return (

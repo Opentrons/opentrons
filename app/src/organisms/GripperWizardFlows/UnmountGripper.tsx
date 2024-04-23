@@ -51,7 +51,7 @@ export const UnmountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
   const { proceed, isRobotMoving, goBack, chainRunCommands } = props
-  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
   const isOnDevice = useSelector(getIsOnDevice)
   const [isPending, setIsPending] = React.useState<boolean>(false)
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
@@ -100,7 +100,7 @@ export const UnmountGripper = (
   return showGripperStillDetected ? (
     <SimpleWizardBody
       iconColor={COLORS.red50}
-      header={t('gripper_still_attached')}
+      header={t('branded:gripper_still_attached')}
       isSuccess={false}
     >
       <Flex
@@ -132,7 +132,7 @@ export const UnmountGripper = (
     </SimpleWizardBody>
   ) : (
     <GenericWizardTile
-      header={t('loosen_screws_and_detach')}
+      header={t('branded:loosen_screws_and_detach')}
       rightHandBody={
         <video
           css={css`

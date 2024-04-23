@@ -8,15 +8,15 @@ import {
   PrimaryButton,
   SPACING,
   StyledText,
+  VIEWPORT,
 } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
 import { Toast } from '.'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Toast',
   component: Toast,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof Toast>> = args => {

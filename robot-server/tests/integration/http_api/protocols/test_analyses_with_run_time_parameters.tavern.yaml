@@ -1,0 +1,201 @@
+test_name: Test the protocol analysis endpoints with run time parameters
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Upload a protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/basic_transfer_with_run_time_parameters.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: !anystr
+              status: pending
+
+  - name: Check that the analysis summary is present in /protocols/:id; retry until it says it's completed
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+    response:
+      status_code: 200
+      json:
+        data:
+          analyses: []
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+          id: !anything
+          protocolType: !anything
+          files: !anything
+          createdAt: !anything
+          robotType: !anything
+          metadata: !anything
+        links: !anything
+
+  - name: Check that the analysis data is present in /protocols/:id/analyses/:id
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
+    response:
+      strict:
+        - json:off
+      json:
+        data:
+          id: '{analysis_id}'
+          runTimeParameters:
+            - displayName: Sample count
+              variableName: sample_count
+              type: int
+              default: 6.0
+              min: 1.0
+              max: 12.0
+              value: 6.0
+              description: How many samples to process.
+            - displayName: Pipette volume
+              variableName: volume
+              type: float
+              default: 20.1
+              choices:
+                - displayName: Low Volume
+                  value: 10.23
+                - displayName: Medium Volume
+                  value: 20.1
+                - displayName: High Volume
+                  value: 50.5
+              value: 20.1
+              description: How many microliters to pipette of each sample.
+            - displayName: Dry Run
+              variableName: dry_run
+              type: bool
+              default: false
+              value: false
+              description: Skip aspirate and dispense steps.
+            - displayName: Pipette Name
+              variableName: pipette
+              type: str
+              choices:
+                - displayName: Single channel 50µL
+                  value: flex_1channel_50
+                - displayName: Eight Channel 50µL
+                  value: flex_8channel_50
+              default: flex_1channel_50
+              value: flex_1channel_50
+              description: What pipette to use during the protocol.
+          commands:
+            # Check for this command's presence as a smoke test that the analysis isn't empty.
+            - commandType: loadPipette
+
+  - name: Check that uploading same protocol with new run time parameter values re-triggers analysis
+    # This test must be executed after the analysis of the previous upload is completed.
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      data:
+        runTimeParameterValues: '{{"sample_count": 10, "volume": 10.23, "dry_run": true}}'
+      files:
+        files: 'tests/integration/protocols/basic_transfer_with_run_time_parameters.py'
+    response:
+      save:
+        json:
+          analysis_id2: data.analysisSummaries[1].id
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: '{protocol_id}'
+          analyses: [ ]
+          analysisSummaries:
+            - id: '{analysis_id}'
+              status: completed
+            - id: !anystr
+              status: pending
+
+  - name: Check that the new analysis uses run time parameter values from client; retry until analysis is completed
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id2}'
+    response:
+      strict:
+        - json:off
+      json:
+        data:
+          id: '{analysis_id2}'
+          runTimeParameters:
+            - displayName: Sample count
+              variableName: sample_count
+              type: int
+              default: 6.0
+              min: 1.0
+              max: 12.0
+              value: 10.0
+              description: How many samples to process.
+            - displayName: Pipette volume
+              variableName: volume
+              type: float
+              default: 20.1
+              choices:
+                - displayName: Low Volume
+                  value: 10.23
+                - displayName: Medium Volume
+                  value: 20.1
+                - displayName: High Volume
+                  value: 50.5
+              value: 10.23
+              description: How many microliters to pipette of each sample.
+            - displayName: Dry Run
+              variableName: dry_run
+              type: bool
+              default: false
+              value: true
+              description: Skip aspirate and dispense steps.
+            - displayName: Pipette Name
+              variableName: pipette
+              type: str
+              choices:
+                - displayName: Single channel 50µL
+                  value: flex_1channel_50
+                - displayName: Eight Channel 50µL
+                  value: flex_8channel_50
+              default: flex_1channel_50
+              value: flex_1channel_50
+              description: What pipette to use during the protocol.
+          commands:
+            # Check for this command's presence as a smoke test that the analysis isn't empty.
+            - commandType: loadPipette
+
+  - name: Check that a new analysis is started for the protocol because of new RTP values
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      method: POST
+      json:
+        data:
+          runTimeParameterValues:
+            sample_count: 2
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+          - id: '{analysis_id2}'
+            status: completed
+          - id: !anystr
+            status: pending

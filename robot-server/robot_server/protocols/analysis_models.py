@@ -2,10 +2,10 @@
 # TODO(mc, 2021-08-25): add modules to simulation result
 from enum import Enum
 
-from opentrons.protocol_engine.types import RunTimeParameter
+from opentrons.protocol_engine.types import RunTimeParameter, RunTimeParamValuesType
 from opentrons_shared_data.robot.dev_types import RobotType
 from pydantic import BaseModel, Field
-from typing import List, Optional, Union
+from typing import List, Optional, Union, NamedTuple
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
@@ -38,6 +38,18 @@ class AnalysisResult(str, Enum):
 
     OK = "ok"
     NOT_OK = "not-ok"
+
+
+class AnalysisRequest(BaseModel):
+    """Model for analysis request body."""
+
+    runTimeParameterValues: RunTimeParamValuesType = Field(
+        default={},
+        description="Key-value pairs of run-time parameters defined in a protocol.",
+    )
+    forceReAnalyze: bool = Field(
+        False, description="Whether to force start a new analysis."
+    )
 
 
 class AnalysisSummary(BaseModel):
@@ -148,6 +160,13 @@ class CompletedAnalysis(BaseModel):
             " but it won't have more than one element."
         ),
     )
+
+
+class RunTimeParameterAnalysisData(NamedTuple):
+    """Data from analysis of a run-time parameter."""
+
+    value: Union[float, bool, str]
+    default: Union[float, bool, str]
 
 
 ProtocolAnalysis = Union[PendingAnalysis, CompletedAnalysis]

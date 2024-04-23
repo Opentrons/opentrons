@@ -46,6 +46,9 @@ def subject(api_version: APIVersion) -> ParameterContext:
 
 def test_add_int(decoy: Decoy, subject: ParameterContext) -> None:
     """It should create and add an int parameter definition."""
+    subject._parameters["other_param"] = decoy.mock(
+        cls=mock_parameter_definition.ParameterDefinition
+    )
     param_def = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
     decoy.when(param_def.variable_name).then_return("my cool variable")
     decoy.when(
@@ -60,6 +63,7 @@ def test_add_int(decoy: Decoy, subject: ParameterContext) -> None:
             unit="foot candles",
         )
     ).then_return(param_def)
+
     subject.add_int(
         display_name="abc",
         variable_name="xyz",
@@ -70,25 +74,37 @@ def test_add_int(decoy: Decoy, subject: ParameterContext) -> None:
         description="blah blah blah",
         unit="foot candles",
     )
+
     assert param_def is subject._parameters["my cool variable"]
+    decoy.verify(mock_validation.validate_variable_name_unique("xyz", {"other_param"}))
 
 
 def test_add_float(decoy: Decoy, subject: ParameterContext) -> None:
     """It should create and add a float parameter definition."""
+    subject._parameters["other_param"] = decoy.mock(
+        cls=mock_parameter_definition.ParameterDefinition
+    )
     param_def = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
     decoy.when(param_def.variable_name).then_return("my cooler variable")
+    decoy.when(mock_validation.ensure_float_value(12.3)).then_return(3.21)
+    decoy.when(mock_validation.ensure_optional_float_value(4.5)).then_return(5.4)
+    decoy.when(mock_validation.ensure_optional_float_value(67.8)).then_return(87.6)
+    decoy.when(
+        mock_validation.ensure_float_choices([{"display_name": "foo", "value": 4.2}])
+    ).then_return([{"display_name": "bar", "value": 2.4}])
     decoy.when(
         mock_parameter_definition.create_float_parameter(
             display_name="abc",
             variable_name="xyz",
-            default=12.3,
-            minimum=4.5,
-            maximum=67.8,
-            choices=[{"display_name": "foo", "value": 4.2}],
+            default=3.21,
+            minimum=5.4,
+            maximum=87.6,
+            choices=[{"display_name": "bar", "value": 2.4}],
             description="blah blah blah",
             unit="lux",
         )
     ).then_return(param_def)
+
     subject.add_float(
         display_name="abc",
         variable_name="xyz",
@@ -99,11 +115,16 @@ def test_add_float(decoy: Decoy, subject: ParameterContext) -> None:
         description="blah blah blah",
         unit="lux",
     )
+
     assert param_def is subject._parameters["my cooler variable"]
+    decoy.verify(mock_validation.validate_variable_name_unique("xyz", {"other_param"}))
 
 
 def test_add_bool(decoy: Decoy, subject: ParameterContext) -> None:
     """It should create and add a boolean parameter definition."""
+    subject._parameters["other_param"] = decoy.mock(
+        cls=mock_parameter_definition.ParameterDefinition
+    )
     param_def = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
     decoy.when(param_def.variable_name).then_return("my coolest variable")
     decoy.when(
@@ -118,17 +139,23 @@ def test_add_bool(decoy: Decoy, subject: ParameterContext) -> None:
             description="lorem ipsum",
         )
     ).then_return(param_def)
+
     subject.add_bool(
         display_name="cba",
         variable_name="zxy",
         default=False,
         description="lorem ipsum",
     )
+
     assert param_def is subject._parameters["my coolest variable"]
+    decoy.verify(mock_validation.validate_variable_name_unique("zxy", {"other_param"}))
 
 
 def test_add_string(decoy: Decoy, subject: ParameterContext) -> None:
     """It should create and add a string parameter definition."""
+    subject._parameters["other_param"] = decoy.mock(
+        cls=mock_parameter_definition.ParameterDefinition
+    )
     param_def = decoy.mock(cls=mock_parameter_definition.ParameterDefinition)
     decoy.when(param_def.variable_name).then_return("my slightly less cool variable")
     decoy.when(
@@ -140,6 +167,7 @@ def test_add_string(decoy: Decoy, subject: ParameterContext) -> None:
             description="fee foo fum",
         )
     ).then_return(param_def)
+
     subject.add_str(
         display_name="jkl",
         variable_name="qwerty",
@@ -147,7 +175,11 @@ def test_add_string(decoy: Decoy, subject: ParameterContext) -> None:
         choices=[{"display_name": "bar", "value": "aaa"}],
         description="fee foo fum",
     )
+
     assert param_def is subject._parameters["my slightly less cool variable"]
+    decoy.verify(
+        mock_validation.validate_variable_name_unique("qwerty", {"other_param"})
+    )
 
 
 def test_set_parameters(decoy: Decoy, subject: ParameterContext) -> None:
@@ -193,5 +225,5 @@ def test_export_parameters_for_protocol(
     subject._parameters = {"foo": param_def_1, "bar": param_def_2}
 
     result = subject.export_parameters_for_protocol()
-    assert result.x == "a"  # type: ignore [attr-defined]
-    assert result.y == 1.23  # type: ignore [attr-defined]
+    assert result.x == "a"  # type: ignore[attr-defined]
+    assert result.y == 1.23  # type: ignore[attr-defined]

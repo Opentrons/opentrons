@@ -6,7 +6,9 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.commands.protocol_commands import comment as make_legacy_comment_command
+from opentrons.legacy_commands.protocol_commands import (
+    comment as make_legacy_comment_command,
+)
 from opentrons.types import MountType
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 
@@ -293,6 +295,29 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
 
         return cast(commands.PickUpTipResult, result)
+
+    def pick_up_tip_wait_for_recovery(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+    ) -> commands.PickUpTip:
+        """Execute a PickUpTip, wait for any error recovery, and return it.
+
+        Note that the returned command will not necessarily have a `result`.
+        """
+        request = commands.PickUpTipCreate(
+            params=commands.PickUpTipParams(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+            )
+        )
+        command = self._transport.execute_command_wait_for_recovery(request=request)
+
+        return cast(commands.PickUpTip, command)
 
     def drop_tip(
         self,

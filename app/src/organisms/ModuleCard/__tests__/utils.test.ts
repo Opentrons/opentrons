@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { renderHook, act } from '@testing-library/react'
 
 import {
   mockHeaterShaker,
@@ -9,7 +10,10 @@ import {
   mockThermocycler,
   mockThermocyclerGen2,
 } from '../../../redux/modules/__fixtures__'
-import { getModuleCardImage } from '../utils'
+import { getModuleCardImage, useModuleApiRequests } from '../utils'
+import { useDispatchApiRequest } from '../../../redux/robot-api'
+
+vi.mock('../../../redux/robot-api')
 
 const mockThermocyclerGen2ClosedLid = {
   id: 'thermocycler_id2',
@@ -81,5 +85,31 @@ describe('getModuleCardImage', () => {
     expect(result).toEqual(
       '/app/src/assets/images/thermocycler_gen_2_closed.png'
     )
+  })
+})
+
+const updateModuleAction = { meta: { requestId: '12345' } }
+const MOCK_ROBOT_NAME = 'MOCK_ROBOT'
+const MOCK_SERIAL_NUMBER = '1234'
+const mockDispatchApiRequest = () => updateModuleAction
+
+describe('useModuleApiRequests', () => {
+  beforeEach(() => {
+    vi.mocked(useDispatchApiRequest).mockReturnValue([
+      mockDispatchApiRequest,
+    ] as any)
+  })
+
+  it('should dispatch an API request and update requestIdsBySerial on handleModuleApiRequests', () => {
+    const { result } = renderHook(() => useModuleApiRequests())
+
+    act(() => {
+      result.current[1](MOCK_ROBOT_NAME, MOCK_SERIAL_NUMBER)
+    })
+
+    expect(result.current[0](MOCK_SERIAL_NUMBER)).toEqual(
+      updateModuleAction.meta.requestId
+    )
+    expect(result.current[0]('NON_EXISTENT_SERIAL')).toBeNull()
   })
 })

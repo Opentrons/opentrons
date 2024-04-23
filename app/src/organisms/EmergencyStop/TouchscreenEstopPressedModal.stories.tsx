@@ -3,7 +3,8 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-import { touchScreenViewport } from '../../DesignTokens/constants'
+import { VIEWPORT } from '@opentrons/components'
+
 import { configReducer } from '../../redux/config/reducer'
 import { EstopPressedModal } from '.'
 
@@ -13,7 +14,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Organisms/EstopPressedModal',
   component: EstopPressedModal,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const dummyConfig = {

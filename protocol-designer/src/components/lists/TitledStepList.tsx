@@ -110,7 +110,12 @@ export function TitledStepList(props: Props): JSX.Element {
           </div>
         )}
         {iconName && (
-          <Icon {...iconProps} className={iconClass} name={iconName} />
+          <Icon
+            {...iconProps}
+            data-testid={`TitledStepList_icon_${iconName}`}
+            className={iconClass}
+            name={iconName}
+          />
         )}
         <h3 className={styles.title}>{props.title}</h3>
         {collapsible && (

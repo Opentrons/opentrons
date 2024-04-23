@@ -33,7 +33,7 @@ per-file-ignores =
     src/opentrons/simulate.py:ANN,D
     src/opentrons/types.py:ANN,D
     src/opentrons/calibration_storage/*:ANN,D
-    src/opentrons/commands/*:D
+    src/opentrons/legacy_commands/*:D
     src/opentrons/config/*:ANN,D
     src/opentrons/drivers/*:ANN,D
     src/opentrons/hardware_control/*:ANN,D
@@ -51,7 +51,7 @@ per-file-ignores =
     tests/opentrons/test_types.py:ANN,D
     tests/opentrons/conftest.py:ANN,D
     tests/opentrons/calibration_storage/*:ANN,D
-    tests/opentrons/commands/*:ANN,D
+    tests/opentrons/legacy_commands/*:ANN,D
     tests/opentrons/config/*:ANN,D
     tests/opentrons/data/*:ANN,D
     tests/opentrons/drivers/*:ANN,D

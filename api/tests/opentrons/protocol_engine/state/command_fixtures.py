@@ -24,6 +24,7 @@ def create_queued_command(
     command_id: str = "command-id",
     command_key: str = "command-key",
     command_type: str = "command-type",
+    intent: cmd.CommandIntent = cmd.CommandIntent.PROTOCOL,
     params: Optional[BaseModel] = None,
 ) -> cmd.Command:
     """Given command data, build a pending command model."""
@@ -36,6 +37,7 @@ def create_queued_command(
             createdAt=datetime(year=2021, month=1, day=1),
             status=cmd.CommandStatus.QUEUED,
             params=params or BaseModel(),
+            intent=intent,
         ),
     )
 

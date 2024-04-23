@@ -56,11 +56,18 @@ class CommandNotFound(ErrorDetails):
     title: str = "Run Command Not Found"
 
 
+class SetupCommandNotAllowed(ErrorDetails):
+    """An error if a given run setup command is not allowed."""
+
+    id: Literal["SetupCommandNotAllowed"] = "SetupCommandNotAllowed"
+    title: str = "Setup Command Not Allowed"
+
+
 class CommandNotAllowed(ErrorDetails):
     """An error if a given run command is not allowed."""
 
     id: Literal["CommandNotAllowed"] = "CommandNotAllowed"
-    title: str = "Setup Command Not Allowed"
+    title: str = "Command Not Allowed"
 
 
 class CommandLinkMeta(BaseModel):
@@ -128,6 +135,7 @@ async def get_current_run_engine_from_url(
 
         - Setup commands (`data.source == "setup"`)
         - Protocol commands (`data.source == "protocol"`)
+        - Fixit commands (`data.source == "fixit"`)
 
         Setup commands may be enqueued before the run has been started.
         You could use setup commands to prepare a module or
@@ -137,6 +145,11 @@ async def get_current_run_engine_from_url(
         You can create a protocol purely over HTTP using protocol commands.
         If you are running a protocol from a file(s), then you will likely
         not need to enqueue protocol commands using this endpoint.
+
+        Fixit commands may be enqueued while the run is `awaiting-recovery` state.
+        These commands are intended to fix a failed command.
+        They will be executed right after the failed command
+        and only if the run is in a `awaiting-recovery` state.
 
         Once enqueued, setup commands will execute immediately with priority,
         while protocol commands will wait until a `play` action is issued.
@@ -153,8 +166,9 @@ async def get_current_run_engine_from_url(
         status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {
-            "model": ErrorBody[Union[RunStopped, CommandNotAllowed]]
+            "model": ErrorBody[Union[RunStopped, SetupCommandNotAllowed]]
         },
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorBody[CommandNotAllowed]},
     },
 )
 async def create_run_command(
@@ -187,6 +201,12 @@ async def create_run_command(
             " the default was 30 seconds, not infinite."
         ),
     ),
+    failedCommandId: Optional[str] = Query(
+        default=None,
+        description=(
+            "FIXIT command use only. Reference of the failed command id we are trying to fix."
+        ),
+    ),
     protocol_engine: ProtocolEngine = Depends(get_current_run_engine_from_url),
     check_estop: bool = Depends(require_estop_in_good_state),
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
@@ -199,6 +219,8 @@ async def create_run_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
+        failedCommandId: FIXIT command use only.
+            Reference of the failed command id we are trying to fix.
         protocol_engine: The run's `ProtocolEngine` on which the new
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
@@ -207,14 +229,17 @@ async def create_run_command(
     # behavior is to pass through `command_intent` without overriding it
     command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
     command_create = request_body.data.copy(update={"intent": command_intent})
-
     try:
-        command = protocol_engine.add_command(command_create)
+        command = protocol_engine.add_command(
+            request=command_create, failed_command_id=failedCommandId
+        )
 
     except pe_errors.SetupCommandNotAllowedError as e:
-        raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT)
+        raise SetupCommandNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT)
     except pe_errors.RunStoppedError as e:
         raise RunStopped.from_exc(e).as_error(status.HTTP_409_CONFLICT)
+    except pe_errors.CommandNotAllowedError as e:
+        raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
 
     if waitUntilComplete:
         timeout_sec = None if timeout is None else timeout / 1000.0

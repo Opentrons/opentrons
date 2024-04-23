@@ -131,7 +131,7 @@ describe('useProtocolAnalysisErrors hook', () => {
         protocolText: 'hashedString',
         protocolType: '',
         robotType: 'OT-2 Standard',
-        robotSerialNumber: '',
+        robotSerialNumber: 'mock-serial',
       },
       runTime: '1:00:00',
     })
@@ -160,7 +160,7 @@ describe('useProtocolAnalysisErrors hook', () => {
         protocolText: 'hashedString',
         protocolType: 'json',
         robotType: 'OT-2 Standard',
-        robotSerialNumber: '',
+        robotSerialNumber: 'mock-serial',
       },
       runTime: '1:00:00',
     })

@@ -155,7 +155,7 @@ export function UpdateRobotModal({
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>
-          {t('update_requires_restarting')}
+          {t('update_requires_restarting_robot')}
         </UpdateAppBanner>
         <ReleaseNotes source={releaseNotes} />
       </Flex>

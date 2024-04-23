@@ -30,11 +30,13 @@ import {
   getModuleDisplayName,
   getModuleType,
   FLEX_ROBOT_TYPE,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import gripperImage from '../../../images/flex_gripper.png'
 import wasteChuteImage from '../../../images/waste_chute.png'
 import trashBinImage from '../../../images/flex_trash_bin.png'
+import { getEnableMoam } from '../../../feature-flags/selectors'
 import { uuid } from '../../../utils'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { CrashInfoBox, ModuleDiagram } from '../../modules'
@@ -42,13 +44,15 @@ import { ModuleFields } from '../FilePipettesModal/ModuleFields'
 import { GoBack } from './GoBack'
 import {
   getCrashableModuleSelected,
-  getLastCheckedEquipment,
-  getTrashBinOptionDisabled,
+  getIsSlotAvailable,
+  getTrashOptionDisabled,
 } from './utils'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
 import type { AdditionalEquipment, WizardTileProps } from './types'
+
+const MAX_TEMPERATURE_MODULES = 7
 
 export const DEFAULT_SLOT_MAP: { [moduleModel in ModuleModel]?: string } = {
   [THERMOCYCLER_MODULE_V2]: 'B1',
@@ -186,14 +190,11 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
 
 function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const { watch, setValue } = props
+  const enableMoamFf = useSelector(getEnableMoam)
   const modules = watch('modules')
   const additionalEquipment = watch('additionalEquipment')
   const moduleTypesOnDeck =
     modules != null ? Object.values(modules).map(module => module.type) : []
-  const trashBinDisabled = getTrashBinOptionDisabled({
-    additionalEquipment,
-    moduleTypesOnDeck,
-  })
 
   const handleSetEquipmentOption = (equipment: AdditionalEquipment): void => {
     if (additionalEquipment.includes(equipment)) {
@@ -202,6 +203,11 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
       setValue('additionalEquipment', [...additionalEquipment, equipment])
     }
   }
+  const trashBinDisabled = getTrashOptionDisabled({
+    additionalEquipment,
+    modules,
+    trashType: 'trashBin',
+  })
 
   React.useEffect(() => {
     if (trashBinDisabled) {
@@ -213,43 +219,100 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
     <Flex flexWrap={WRAP} gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
       {FLEX_SUPPORTED_MODULE_MODELS.map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
-        const moduleOnDeck = moduleTypesOnDeck.includes(moduleType)
+        const isModuleOnDeck = moduleTypesOnDeck.includes(moduleType)
+
+        const isDisabled = !getIsSlotAvailable(modules, additionalEquipment)
+
+        const handleMultiplesClick = (num: number): void => {
+          const temperatureModules =
+            modules != null
+              ? Object.entries(modules).filter(
+                  ([key, module]) => module.type === TEMPERATURE_MODULE_TYPE
+                )
+              : []
+
+          if (num > temperatureModules.length) {
+            for (let i = 0; i < num - temperatureModules.length; i++) {
+              setValue('modules', {
+                ...modules,
+                [uuid()]: {
+                  model: moduleModel,
+                  type: moduleType,
+                  slot: null,
+                },
+              })
+            }
+          } else if (num < temperatureModules.length) {
+            const modulesToRemove = temperatureModules.length - num
+            for (let i = 0; i < modulesToRemove; i++) {
+              const lastTempKey =
+                temperatureModules[temperatureModules.length - 1 - i][0]
+              //  @ts-expect-error: TS can't determine modules's type correctly
+              const { [lastTempKey]: omit, ...rest } = modules
+              setValue('modules', rest)
+            }
+          }
+        }
+
+        const handleOnClick = (): void => {
+          if (
+            (moduleType !== TEMPERATURE_MODULE_TYPE && enableMoamFf) ||
+            !enableMoamFf
+          ) {
+            if (isModuleOnDeck) {
+              const updatedModules =
+                modules != null
+                  ? Object.fromEntries(
+                      Object.entries(modules).filter(
+                        ([key, value]) => value.type !== moduleType
+                      )
+                    )
+                  : {}
+              setValue('modules', updatedModules)
+            } else {
+              setValue('modules', {
+                ...modules,
+                [uuid()]: {
+                  model: moduleModel,
+                  type: moduleType,
+                  slot: DEFAULT_SLOT_MAP[moduleModel],
+                },
+              })
+            }
+          }
+        }
+
         return (
           <EquipmentOption
             robotType={FLEX_ROBOT_TYPE}
             key={moduleModel}
-            isSelected={moduleOnDeck}
+            isSelected={isModuleOnDeck}
             image={<ModuleDiagram type={moduleType} model={moduleModel} />}
             text={getModuleDisplayName(moduleModel)}
             disabled={
-              getLastCheckedEquipment({
-                additionalEquipment,
-                moduleTypesOnDeck,
-              }) === moduleType
+              moduleType === MAGNETIC_BLOCK_TYPE
+                ? false
+                : isDisabled && !isModuleOnDeck
             }
-            onClick={() => {
-              if (moduleOnDeck) {
-                const updatedModulesByType =
-                  modules != null
-                    ? Object.fromEntries(
-                        Object.entries(modules).filter(
-                          ([key, value]) => value.type !== moduleType
-                        )
-                      )
-                    : {}
-                setValue('modules', updatedModulesByType)
-              } else {
-                setValue('modules', {
-                  ...modules,
-                  [uuid()]: {
-                    model: moduleModel,
-                    type: moduleType,
-                    slot: DEFAULT_SLOT_MAP[moduleModel] ?? '',
-                  },
-                })
-              }
-            }}
-            showCheckbox
+            onClick={handleOnClick}
+            multiples={
+              moduleType === TEMPERATURE_MODULE_TYPE && enableMoamFf
+                ? {
+                    maxItems: MAX_TEMPERATURE_MODULES,
+                    setValue: handleMultiplesClick,
+                    numItems:
+                      modules != null
+                        ? Object.values(modules).filter(
+                            module => module.type === TEMPERATURE_MODULE_TYPE
+                          ).length
+                        : 0,
+                    isDisabled: isDisabled ?? false,
+                  }
+                : undefined
+            }
+            showCheckbox={
+              enableMoamFf ? moduleType !== TEMPERATURE_MODULE_TYPE : true
+            }
           />
         )
       })}
@@ -271,6 +334,11 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         robotType={FLEX_ROBOT_TYPE}
         onClick={() => handleSetEquipmentOption('wasteChute')}
         isSelected={additionalEquipment.includes('wasteChute')}
+        disabled={getTrashOptionDisabled({
+          additionalEquipment,
+          modules,
+          trashType: 'wasteChute',
+        })}
         image={
           <AdditionalItemImage
             src={wasteChuteImage}

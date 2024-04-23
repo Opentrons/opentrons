@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
 from opentrons.protocol_engine.commands import Command
+from opentrons.protocol_engine.types import RunTimeParameter
 
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
@@ -25,9 +26,13 @@ from robot_server.persistence.tables import (
     run_command_table,
     action_table,
 )
-from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
+from robot_server.persistence.pydantic import (
+    json_to_pydantic,
+    pydantic_to_json,
+    json_to_pydantic_list,
+    pydantic_list_to_json,
+)
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
-from robot_server.service.notifications import RunsPublisher
 
 from .action_models import RunAction, RunActionType
 from .run_models import RunNotFoundError
@@ -94,17 +99,16 @@ class RunStore:
     def __init__(
         self,
         sql_engine: sqlalchemy.engine.Engine,
-        runs_publisher: RunsPublisher,
     ) -> None:
         """Initialize a RunStore with sql engine and notification client."""
         self._sql_engine = sql_engine
-        self._runs_publisher = runs_publisher
 
     def update_run_state(
         self,
         run_id: str,
         summary: StateSummary,
         commands: List[Command],
+        run_time_parameters: List[RunTimeParameter],
     ) -> RunResource:
         """Update the run's state summary and commands list.
 
@@ -112,6 +116,7 @@ class RunStore:
             run_id: The run to update
             summary: The run's equipment and status summary.
             commands: The run's commands.
+            run_time_parameters: The run's run time parameters, if any.
 
         Returns:
             The run resource.
@@ -127,6 +132,7 @@ class RunStore:
                     run_id=run_id,
                     state_summary=summary,
                     engine_status=summary.status,
+                    run_time_parameters=run_time_parameters,
                 )
             )
         )
@@ -166,7 +172,6 @@ class RunStore:
             action_rows = transaction.execute(select_actions).all()
 
         self._clear_caches()
-        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
         maybe_run_resource = _convert_row_to_run(row=run_row, action_rows=action_rows)
         if not maybe_run_resource.ok:
             raise maybe_run_resource.error
@@ -192,7 +197,6 @@ class RunStore:
             transaction.execute(insert)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
 
     def insert(
         self,
@@ -235,7 +239,6 @@ class RunStore:
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
         return run
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
@@ -352,6 +355,33 @@ class RunStore:
                 )
             )
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
+    def get_run_time_parameters(self, run_id: str) -> List[RunTimeParameter]:
+        """Get the archived run time parameters.
+
+        This is a list of the run's parameter definitions (if any),
+        including the values used in the run itself, along with the default value,
+        constraints and associated names and descriptions.
+        """
+        select_run_data = sqlalchemy.select(run_table.c.run_time_parameters).where(
+            run_table.c.id == run_id
+        )
+
+        with self._sql_engine.begin() as transaction:
+            row = transaction.execute(select_run_data).one()
+
+        try:
+            return (
+                json_to_pydantic_list(RunTimeParameter, row.run_time_parameters)  # type: ignore[arg-type]
+                if row.run_time_parameters is not None
+                else []
+            )
+        except ValidationError:
+            log.warning(
+                f"Error retrieving run time parameters for {run_id}", exc_info=True
+            )
+            return []
+
     def get_commands_slice(
         self,
         run_id: str,
@@ -467,7 +497,6 @@ class RunStore:
             raise RunNotFoundError(run_id)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs_advise_unsubscribe(run_id=run_id)
 
     def _run_exists(
         self, run_id: str, connection: sqlalchemy.engine.Connection
@@ -483,6 +512,7 @@ class RunStore:
         self.get_all.cache_clear()
         self.get_state_summary.cache_clear()
         self.get_command.cache_clear()
+        self.get_run_time_parameters.cache_clear()
 
 
 # The columns that must be present in a row passed to _convert_row_to_run().
@@ -559,9 +589,11 @@ def _convert_state_to_sql_values(
     run_id: str,
     state_summary: StateSummary,
     engine_status: str,
+    run_time_parameters: List[RunTimeParameter],
 ) -> Dict[str, object]:
     return {
         "state_summary": pydantic_to_json(state_summary),
         "engine_status": engine_status,
         "_updated_at": utc_now(),
+        "run_time_parameters": pydantic_list_to_json(run_time_parameters),
     }

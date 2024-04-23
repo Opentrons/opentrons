@@ -187,6 +187,11 @@ describe('createPresavedStepForm', () => {
       stepDetails: '',
       stepName: 'transfer',
       volume: null,
+      aspirate_x_position: 0,
+      aspirate_y_position: 0,
+      dispense_x_position: 0,
+      dispense_y_position: 0,
+      blowout_z_offset: 0,
     })
   })
   describe('mix step', () => {
@@ -210,6 +215,9 @@ describe('createPresavedStepForm', () => {
         mix_wellOrder_first: 't2b',
         mix_wellOrder_second: 'l2r',
         blowout_checkbox: false,
+        mix_x_position: 0,
+        mix_y_position: 0,
+        blowout_z_offset: 0,
         blowout_location: null,
         changeTip: 'always',
         stepDetails: '',
