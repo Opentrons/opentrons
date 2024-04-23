@@ -57,6 +57,7 @@ import {
   // ANALYTICS_PROTOCOL_RUN_CANCEL,
   ANALYTICS_PROTOCOL_RUN_AGAIN,
   ANALYTICS_PROTOCOL_RUN_FINISH,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../redux/analytics'
 import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
@@ -124,6 +125,10 @@ export function RunSummary(): JSX.Element {
   const [showRunAgainSpinner, setShowRunAgainSpinner] = React.useState<boolean>(
     false
   )
+  const robotSerialNumber =
+    localRobot?.health?.robot_serial ??
+    localRobot?.serverHealth?.serialNumber ??
+    null
 
   let headerText = t('run_complete_splash')
   if (runStatus === RUN_STATUS_FAILED) {
@@ -167,8 +172,8 @@ export function RunSummary(): JSX.Element {
         setShowRunAgainSpinner(true)
         reset()
         trackEvent({
-          name: 'proceedToRun',
-          properties: { sourceLocation: 'RunSummary' },
+          name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+          properties: { sourceLocation: 'RunSummary', robotSerialNumber },
         })
         trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
       }

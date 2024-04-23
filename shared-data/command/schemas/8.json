@@ -339,7 +339,7 @@
     "CommandIntent": {
       "title": "CommandIntent",
       "description": "Run intent for a given command.\n\nProps:\n    PROTOCOL: the command is part of the protocol run itself.\n    SETUP: the command is part of the setup phase of a run.",
-      "enum": ["protocol", "setup"],
+      "enum": ["protocol", "setup", "fixit"],
       "type": "string"
     },
     "AspirateCreate": {

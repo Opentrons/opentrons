@@ -38,6 +38,11 @@ export interface RobotSettingsField {
 
 export type RobotSettings = RobotSettingsField[]
 
+export interface UpdateRobotSettingRequest {
+  id: string
+  value: boolean | null
+}
+
 export interface RobotSettingsResponse {
   settings: RobotSettings
   links?: { restart?: string }
