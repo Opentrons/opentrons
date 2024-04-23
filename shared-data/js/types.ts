@@ -284,7 +284,7 @@ export interface CutoutFixture {
   height: number
 }
 
-type AreaType =
+export type AreaType =
   | 'slot'
   | 'movableTrash'
   | 'wasteChute'
