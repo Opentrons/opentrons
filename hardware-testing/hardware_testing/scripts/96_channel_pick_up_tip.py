@@ -280,9 +280,8 @@ async def calibrate_tiprack(api, home_position, mount):
                         tiprack_loc[Axis.by_mount(mount)])
     initial_press_dist = await api.encoder_current_position_ot3(mount, cp)
     print(f'Initial Press Position: {initial_press_dist[Axis.by_mount(mount)]}')
-    press_dist = await api.pick_up_tip(
+    enc = await api.pick_up_tip(
         mount, tip_length=(tip_length[args.tip_size]-tip_overlap))
-    print(f'Press Position:{press_dist[Axis.by_mount(mount)]}')
     return tiprack_loc
 
 async def _main() -> None:
@@ -372,7 +371,7 @@ async def _main() -> None:
     # Calibrate to tiprack
     if args.calibrate:
         print("Calibrate Tiprack")
-        pickup_loc, droptip_loc = await calibrate_tiprack(hw_api, home_position, mount)
+        pickup_loc = await calibrate_tiprack(hw_api, home_position, mount)
         deck_slot['deck_slot'][args.tiprack_slot][Axis.X.name] = pickup_loc.x
         deck_slot['deck_slot'][args.tiprack_slot][Axis.Y.name] = pickup_loc.y
         deck_slot['deck_slot'][args.tiprack_slot]['Z'] = pickup_loc.z
@@ -438,6 +437,7 @@ async def _main() -> None:
             drop_tip_location =  Point(30 , 60 , 110.5)
             await move_to_point(hw_api, mount, drop_tip_location, cp)
             await hw_api.drop_tip(mount)
+            input("Press Enter")
             # m_current = float(input("motor_current in amps: "))
             # pick_up_speed = float(input("pick up tip speed in mm/s: "))
             # await update_pick_up_current(hw_api, mount, m_current)
@@ -447,11 +447,10 @@ async def _main() -> None:
             await move_to_point(hw_api, mount, pickup_loc, cp)
             initial_press_dist = await hw_api.encoder_current_position_ot3(mount, cp)
             print(f'inital press position: {initial_press_dist[Axis.by_mount(mount)]}')
-            press_dist = await hw_api.pick_up_tip(mount,
+            enc = await hw_api.pick_up_tip(mount,
                                     tip_length=(tip_length[args.tip_size]-tip_overlap),
                                     presses = 1,
                                     increment = 0)
-            print(f'Press Position: {press_dist[Axis.by_mount(mount)]}')
 
     except KeyboardInterrupt:
         await hw_api.disengage_axes([Axis.X, Axis.Y])

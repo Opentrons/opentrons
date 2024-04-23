@@ -2172,6 +2172,7 @@ class OT3API(
                     realmount, top_types.Point(z=spec.z_distance_to_tiprack)
                 )
             await self._tip_motor_action(realmount, spec.tip_action_moves)
+            press_dist = 0
         else:
             spec = self._pipette_handler.plan_lt_pick_up_tip(
                 realmount,
