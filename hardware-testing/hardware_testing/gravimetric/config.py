@@ -8,6 +8,9 @@ from opentrons.protocol_api.labware import Well
 from opentrons.hardware_control.types import InstrumentProbeType
 
 
+CAVITY_1uL_COMMAND_VOL = 0.7
+
+
 class ConfigType(Enum):
     """Substitute for Literal which isn't available until 3.8.0."""
 
@@ -315,6 +318,7 @@ QC_TEST_MIN_REQUIREMENTS: Dict[
     1: {
         50: {  # P50
             50: {
+                CAVITY_1uL_COMMAND_VOL: (5.0, 4.0),
                 1.0: (5.0, 4.0),
                 10.0: (1.0, 0.5),
                 50.0: (1, 0.4),
