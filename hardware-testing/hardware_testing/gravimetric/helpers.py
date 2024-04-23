@@ -43,7 +43,8 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_api.core.engine import deck_conflict as DeckConflit
 
-CAVITY_1uL_COMMAND_VOL = 0.7
+
+from .config import CAVITY_1uL_COMMAND_VOL
 
 
 def _add_fake_simulate(
