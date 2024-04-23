@@ -8,7 +8,7 @@ from typing_extensions import Literal
 from .pipetting_common import PipetteIdMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
-from ..types import TipPresenceStatus
+from ..types import TipPresenceStatus, InstrumentSensorId
 
 if TYPE_CHECKING:
     from ..execution import TipHandler
@@ -22,6 +22,9 @@ class VerifyTipPresenceParams(PipetteIdMixin):
 
     expectedState: TipPresenceStatus = Field(
         ..., description="The expected tip presence status on the pipette."
+    )
+    ht_follow_singular_sensor: Optional[InstrumentSensorId] = Field(
+        default=None, description="The sensor id to follow if the other can be ignored."
     )
 
 
@@ -47,10 +50,18 @@ class VerifyTipPresenceImplementation(
         """Verify if tip presence is as expected for the requested pipette."""
         pipette_id = params.pipetteId
         expected_state = params.expectedState
+        ht_follow_singular_sensor = (
+            InstrumentSensorId.to_instrument_probe_type(
+                params.ht_follow_singular_sensor
+            )
+            if params.ht_follow_singular_sensor
+            else None
+        )
 
         await self._tip_handler.verify_tip_presence(
             pipette_id=pipette_id,
             expected=expected_state,
+            ht_follow_singular_sensor=ht_follow_singular_sensor,
         )
 
         return VerifyTipPresenceResult()
