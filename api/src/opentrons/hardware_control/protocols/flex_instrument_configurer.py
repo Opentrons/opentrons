@@ -1,5 +1,5 @@
 """Flex-specific extensions to instrument configuration."""
-from typing import Union
+from typing import Union, Optional
 from typing_extensions import Protocol
 
 from .types import MountArgType
@@ -9,6 +9,7 @@ from opentrons.hardware_control.dev_types import (
 )
 from opentrons.hardware_control.types import (
     TipStateType,
+    InstrumentProbeType,
 )
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     PipetteOffsetSummary,
@@ -42,7 +43,10 @@ class FlexInstrumentConfigurer(Protocol[MountArgType]):
         ...
 
     async def verify_tip_presence(
-        self, mount: MountArgType, expected: TipStateType
+        self,
+        mount: MountArgType,
+        expected: TipStateType,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         """Check tip presence status and raise if it does not match `expected`."""
         ...
