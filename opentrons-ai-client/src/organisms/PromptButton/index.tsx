@@ -34,10 +34,14 @@ export function PromptButton({ buttonText }: PromptButtonProps): JSX.Element {
     React.useContext(setPromptContext)
   const setPrompt = usePromptSetValue()
 
-  const handleClick = useCallback(() => {
-    const { prompt } = PROMPT_BY_NAME[buttonText]
-    setPrompt(prompt)
-  }, [setPrompt, buttonText])
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      const { prompt } = PROMPT_BY_NAME[buttonText]
+      setPrompt(prompt)
+      event.currentTarget.blur()
+    },
+    [setPrompt, buttonText]
+  )
 
   return <PromptBtn onClick={handleClick}>{buttonText}</PromptBtn>
 }
