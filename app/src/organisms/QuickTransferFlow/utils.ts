@@ -1,7 +1,15 @@
+import { makeWellSetHelpers } from '@opentrons/shared-data'
+import { getAllDefinitions } from '../../pages/Labware/helpers/definitions'
+import type {
+  LabwareDefinition2,
+  PipetteV2Specs,
+  WellSetHelpers,
+} from '@opentrons/shared-data'
 import type {
   QuickTransferSetupState,
   QuickTransferWizardAction,
 } from './types'
+import { LabwareFilter } from '../../pages/Labware/types'
 
 export function quickTransferReducer(
   state: QuickTransferSetupState,
@@ -71,5 +79,39 @@ export function quickTransferReducer(
         volume: action.volume,
       }
     }
+  }
+}
+
+export function getCompatibleLabwareByCategory(
+  pipetteSpecs: PipetteV2Specs | undefined,
+  category: LabwareFilter
+): LabwareDefinition2[] | undefined {
+  const allLabwareDefinitions = getAllDefinitions()
+  const wellSetHelpers: WellSetHelpers = makeWellSetHelpers()
+  const { canPipetteUseLabware } = wellSetHelpers
+  if (pipetteSpecs == null) return undefined
+  const compatibleLabwareDefinitions = allLabwareDefinitions.filter(def =>
+    canPipetteUseLabware(pipetteSpecs, def)
+  )
+
+  if (category === 'all') {
+    return compatibleLabwareDefinitions.filter(
+      def =>
+        def.metadata.displayCategory === 'reservoir' ||
+        def.metadata.displayCategory === 'tubeRack' ||
+        def.metadata.displayCategory === 'wellPlate'
+    )
+  } else if (category === 'reservoir') {
+    return compatibleLabwareDefinitions.filter(
+      def => def.metadata.displayCategory === 'reservoir'
+    )
+  } else if (category === 'tubeRack') {
+    return compatibleLabwareDefinitions.filter(
+      def => def.metadata.displayCategory === 'tubeRack'
+    )
+  } else if (category === 'wellPlate') {
+    return compatibleLabwareDefinitions.filter(
+      def => def.metadata.displayCategory === 'wellPlate'
+    )
   }
 }
