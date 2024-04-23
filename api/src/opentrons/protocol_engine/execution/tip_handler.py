@@ -77,7 +77,7 @@ class TipHandler(TypingProtocol):
         self,
         pipette_id: str,
         expected: TipPresenceStatus,
-        follow_singular_sensor: Optional[InstrumentProbeType] = None,
+        ht_follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         """Verify the expected tip presence status."""
 
@@ -243,7 +243,7 @@ class HardwareTipHandler(TipHandler):
         self,
         pipette_id: str,
         expected: TipPresenceStatus,
-        follow_singular_sensor: Optional[InstrumentProbeType] = None,
+        ht_follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         """Verify the expecterd tip presence status of the pipette.
 
@@ -254,7 +254,7 @@ class HardwareTipHandler(TipHandler):
             ot3api = ensure_ot3_hardware(hardware_api=self._hardware_api)
             hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
             await ot3api.verify_tip_presence(
-                hw_mount, expected.to_hw_state(), follow_singular_sensor
+                hw_mount, expected.to_hw_state(), ht_follow_singular_sensor
             )
         except HardwareNotSupportedError:
             # Tip presence sensing is not supported on the OT2
@@ -343,7 +343,7 @@ class VirtualTipHandler(TipHandler):
         self,
         pipette_id: str,
         expected: TipPresenceStatus,
-        follow_singular_sensor: Optional[InstrumentProbeType] = None,
+        ht_follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         """Verify tip presence.
 
