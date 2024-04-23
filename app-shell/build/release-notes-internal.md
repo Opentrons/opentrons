@@ -1,6 +1,14 @@
 For more details about this release, please see the full [technical changelog][].
 [technical change log]: https://github.com/Opentrons/opentrons/releases
 
+## Internal Release 1.5.0-alpha.0
+
+This internal release is from the `edge` branch to contain rapid dev on new features for 7.3.0. This release is for internal testing purposes and if used may require a factory reset of the robot to return to a stable version.
+
+<https://github.com/Opentrons/opentrons/compare/ot3@1.4.0-alpha.1...ot3@1.5.0-alpha.0>
+
+---
+
 ## Internal Release 1.4.0-alpha.1
 
 This internal release is from the `edge` branch to contain rapid dev on new features for 7.3.0. This release is for internal testing purposes and if used may require a factory reset of the robot to return to a stable version.
