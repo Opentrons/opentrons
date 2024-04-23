@@ -12,7 +12,7 @@ from typing_extensions import ParamSpec
 from performance_metrics.datashapes import (
     RawContextData,
 )
-from performance_metrics.data_store import MetricsStore
+from performance_metrics.metrics_store import MetricsStore
 from opentrons_shared_data.performance.dev_types import (
     RobotContextState,
     SupportsTracking,

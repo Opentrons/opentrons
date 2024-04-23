@@ -1,4 +1,4 @@
-"""Tests for the data store."""
+"""Tests for the metrics store."""
 
 from pathlib import Path
 from time import sleep

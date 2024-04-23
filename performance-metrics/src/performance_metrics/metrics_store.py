@@ -12,7 +12,7 @@ class MetricsStore(typing.Generic[T]):
     """Dataclass to store data for tracking robot context."""
 
     def __init__(self, metadata: StorageMetadata) -> None:
-        """Initialize the storage engine."""
+        """Initialize the metrics store."""
         self.metadata = metadata
         self._data: typing.List[T] = []
 
