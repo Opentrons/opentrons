@@ -6,49 +6,58 @@ const FLEX_GRID = [
   ['C1', 'C2', 'C3'],
   ['D1', 'D2', 'D3'],
 ]
+
 const LETTER_TO_ROW_MAP: Record<string, number> = {
-  A: 1,
-  B: 2,
-  C: 3,
-  D: 4,
+  A: 0,
+  B: 1,
+  C: 2,
+  D: 3,
 }
+
+let COLS = 3 // Initial number of columns in each row
 const ROWS = 4
-const COLS = 4
+
 const DIRECTIONS = [
-  [-1, -1],
-  [-1, 0],
-  [-1, 1], // NW, N, NE
-  [0, -1],
-  [0, 1], // W, E
-  [1, -1],
-  [1, 0],
-  [1, 1], // SW, S, SE
+  [-1, -1], // NW
+  [-1, 0], // N
+  [-1, 1], // NE
+  [0, -1], // W
+  [0, 1], // E
+  [1, -1], // SW
+  [1, 0], // S
+  [1, 1], // SE
 ]
 
-//  get all surrounding slots for a Flex
 export const getFlexSurroundingSlots = (
   slot: DeckSlotId,
   stagingAreaSlots: DeckSlotId[]
 ): DeckSlotId[] => {
-  //  account for staging area slots
-  for (let i = 0; i < FLEX_GRID.length; i++) {
-    FLEX_GRID[i].push(stagingAreaSlots[i])
+  // Handle staging area slots
+  if (stagingAreaSlots.length > 0) {
+    stagingAreaSlots.forEach((stagingSlot, index) => {
+      if (stagingSlot) {
+        FLEX_GRID[index].push(stagingSlot)
+      }
+    })
+    COLS = Math.max(COLS, FLEX_GRID[0].length) // Update COLS to the maximum row length
   }
 
-  const col = parseInt(slot.charAt(1)) - 1
   const letter = slot.charAt(0)
+  const col = parseInt(slot.charAt(1)) - 1 // Convert the column to a 0-based index
   const row = LETTER_TO_ROW_MAP[letter]
 
-  const surroungingSlots = []
+  const surroundingSlots: DeckSlotId[] = []
 
-  for (let [dRow, dCol] of DIRECTIONS) {
+  // Iterate through both directions
+  DIRECTIONS.forEach(([dRow, dCol]) => {
     const newRow = row + dRow
     const newCol = col + dCol
 
     if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS) {
-      surroungingSlots.push(FLEX_GRID[newRow][newCol])
+      surroundingSlots.push(FLEX_GRID[newRow][newCol])
     }
-  }
+  })
 
-  return surroungingSlots
+  // Filter out any undefined values from the staging area slots that are not added
+  return surroundingSlots.filter(slot => slot !== undefined)
 }
