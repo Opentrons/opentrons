@@ -6,7 +6,6 @@ from typing import Any, Optional
 from pydantic import Field
 
 from automation.data.protocol import GENERATED_PROTOCOLS_FOLDER, OVERRIDE_MONIKER, Protocol
-from automation.data.protocol_files import names
 
 
 class ProtocolWithOverrides(Protocol):
@@ -25,11 +24,11 @@ class ProtocolWithOverrides(Protocol):
         protocols: list[Protocol] = []
         for override in self.overrides:
             # Create the new file name with the override appended before the extension
-            new_file_stem: names = f"{self.file_stem}{OVERRIDE_MONIKER}{override}"  # type: ignore
+            new_file_stem: str = f"{self.file_stem}{OVERRIDE_MONIKER}{override}"  # type: ignore
             new_file_name = f"{new_file_stem}.{self.file_extension}"
             # Create the full path for the new file
             # all generated files live at files/protocols/$GENERATED_PROTOCOLS_FOLDER
-            new_file_path = Path(self.file_path.parent.parent.parent, GENERATED_PROTOCOLS_FOLDER, new_file_name)
+            new_file_path = Path(self.file_path.parent.parent, GENERATED_PROTOCOLS_FOLDER, new_file_name)
             # Prepare the override string to prepend
             override_string = f'{self.override_variable_name} = "{override}"\n'
             # Write the new file with the override string prepended
@@ -39,7 +38,6 @@ class ProtocolWithOverrides(Protocol):
             protocol = Protocol(
                 file_stem=new_file_stem,
                 file_extension=self.file_extension,
-                protocol_name=self.protocol_name,
                 robot=self.robot,
                 app_error=self.app_error,
                 robot_error=self.robot_error,
@@ -53,7 +51,6 @@ class ProtocolWithOverrides(Protocol):
                 expected_test_reason=self.expected_test_reason,
                 from_override=True,
                 override_value=override,
-                category=self.category,
             )
             protocols.append(protocol)
         self.protocols = protocols

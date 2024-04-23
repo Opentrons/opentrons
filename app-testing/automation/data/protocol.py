@@ -7,8 +7,6 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
-from automation.data.protocol_category import ProtocolCategory
-from automation.data.protocol_files import names
 from automation.resources.robot_data import module_types
 
 GENERATED_PROTOCOLS_FOLDER = "generated_protocols"
@@ -18,9 +16,8 @@ OVERRIDE_MONIKER = "_Override_"
 class Protocol(BaseModel):
     """Model to describe a protocol used in a test."""
 
-    file_stem: names = Field(description="file name not including extension")
+    file_stem: str = Field(description="file name not including extension")
     file_extension: Literal["json", "py"] = Field(description="file extension of the protocol")
-    protocol_name: str = Field(description="the protocol name which will appear in the protocol name field in the app")
     robot: Literal["OT2", "Flex"] = Field(description="the robot type which will appear in the robot field in the app")
     app_error: bool = Field(description="will analysis with the app raise an error")
     robot_error: bool = Field(description="will analysis with the robot raise an error")
@@ -35,7 +32,6 @@ class Protocol(BaseModel):
     override_variable_name: Optional[str] = Field(description="The variable name to override", default=None)
     override_value: Optional[str] = Field(description="The value of the override", default=None)
     from_override: bool = Field(description="Is this protocol generated from an override", default=False)
-    category: ProtocolCategory = Field(description="The category of the protocol to map to the folder structure")
 
     @property
     def file_path(self) -> Path:
@@ -52,7 +48,6 @@ class Protocol(BaseModel):
             Path(__file__).resolve().parent.parent.parent,
             os.getenv("FILES_FOLDER", "files"),
             "protocols",
-            self.category.folder_path,
             f"{self.file_stem}.{self.file_extension}",
         )
 
