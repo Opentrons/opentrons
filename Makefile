@@ -214,10 +214,11 @@ lint-py: $(PYTHON_LINT_TARGETS)
 %-py-lint:
 	$(MAKE) -C $* lint
 
-.PHONY: lint-js
 lint-js:
-	yarn eslint --quiet=$(quiet) ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
-	yarn prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+	@pids=""; \
+	yarn eslint --quiet=$(quiet) --ignore-pattern "node_modules/" --cache ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)" & pids="$$pids $$!"; \
+	yarn prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB) & pids="$$pids $$!"; \
+	for pid in $$pids; do wait $$pid; done
 
 .PHONY: lint-json
 lint-json:
