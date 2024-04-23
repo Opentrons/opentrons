@@ -11,7 +11,6 @@ import {
   DIRECTION_ROW,
   DISPLAY_FLEX,
   Flex,
-  FLEX_AUTO,
   Icon,
   JUSTIFY_CENTER,
   SPACING,
