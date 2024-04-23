@@ -78,7 +78,7 @@ const CONTAINER_STYLE = css`
   border-radius: ${BORDERS.borderRadius4};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  max-height: '21.25rem';
+  max-height: 21.25rem;
 
   &:focus-within {
     border: 1px ${BORDERS.styleSolid}${COLORS.blue50};

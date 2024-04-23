@@ -6,7 +6,7 @@ import { ChatContainer } from './organisms/ChatContainer'
 
 export function App(): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_ROW} height="100vh">
+    <Flex flexDirection={DIRECTION_ROW}>
       <SidePanel />
       <ChatContainer />
     </Flex>
