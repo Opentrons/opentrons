@@ -172,8 +172,6 @@ class CommandHistory:
             CommandEntry(index=prev_entry.index, command=command),
         )
 
-        if not self.get_running_command() is None:
-            breakpoint()
         assert self.get_running_command() is None
         self._set_running_command_id(command.id)
 

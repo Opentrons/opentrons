@@ -413,8 +413,6 @@ class PipetteHandlerProvider(Generic[MountType]):
             instr.reset_nozzle_configuration()
 
     async def add_tip(self, mount: MountType, tip_length: float) -> None:
-        # breakpoint()
-        self._ihp_log.warning("attach tip")
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]
@@ -430,7 +428,6 @@ class PipetteHandlerProvider(Generic[MountType]):
             )
 
     async def remove_tip(self, mount: MountType) -> None:
-        self._ihp_log.warning("detach tip")
         instr = self._attached_instruments[mount]
         attached = self.attached_instruments
         instr_dict = attached[mount]
