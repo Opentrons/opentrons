@@ -1,5 +1,6 @@
 """Performance helpers for tracking robot context."""
 
+import functools
 from pathlib import Path
 from opentrons_shared_data.performance.dev_types import (
     SupportsTracking,
@@ -18,6 +19,7 @@ from opentrons.config import (
 _should_track = ff.enable_performance_metrics(
     RobotTypeEnum.robot_literal_to_enum(robot_configs.load().model)
 )
+STORE_EACH = _should_track
 
 
 class StubbedTracker(SupportsTracking):
@@ -70,7 +72,21 @@ def _get_robot_context_tracker() -> SupportsTracking:
 
 
 def track_analysis(func: F) -> F:
-    """Track the analysis of a protocol."""
-    return _get_robot_context_tracker().track(RobotContextState.ANALYZING_PROTOCOL)(
-        func
-    )
+    """Track the analysis of a protocol and optionally store each run."""
+    # This will probably not stick around very long but it gives me
+    # the ability to test this on a robot
+
+    # Typing a decorator that wraps a decorator with args, nope
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):  # type: ignore # noqa: ANN002, ANN003, ANN201
+        tracker = _get_robot_context_tracker()
+        tracked_func = tracker.track(RobotContextState.ANALYZING_PROTOCOL)(func)
+
+        result = tracked_func(*args, **kwargs)
+
+        if STORE_EACH:
+            tracker.store()
+
+        return result
+
+    return wrapper  # type: ignore
