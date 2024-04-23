@@ -43,6 +43,8 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_api.core.engine import deck_conflict as DeckConflit
 
+CAVITY_1uL_COMMAND_VOL = 0.7
+
 
 def _add_fake_simulate(
     ctx: protocol_api.ProtocolContext, is_simulating: bool
@@ -391,7 +393,7 @@ def _get_volumes(
             pipette_channels, pipette_volume, tip_volume, mode=mode
         )
     elif cavity:
-        test_volumes = [1.0]
+        test_volumes = [CAVITY_1uL_COMMAND_VOL]
     elif user_volumes:
         if ctx.is_simulating():
             rand_vols = [round(random() * tip_volume, 1) for _ in range(randint(1, 3))]
