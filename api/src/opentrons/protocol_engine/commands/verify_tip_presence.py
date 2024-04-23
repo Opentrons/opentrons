@@ -51,10 +51,8 @@ class VerifyTipPresenceImplementation(
         pipette_id = params.pipetteId
         expected_state = params.expectedState
         ht_follow_singular_sensor = (
-            InstrumentSensorId.to_instrument_probe_type(
-                params.ht_follow_singular_sensor
-            )
-            if params.ht_follow_singular_sensor
+            InstrumentSensorId.to_instrument_probe_type(params.htFollowSingularSensor)
+            if params.htFollowSingularSensor
             else None
         )
 

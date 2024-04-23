@@ -2086,6 +2086,7 @@ class OT3API(
                     and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
                 ):
                     await stack.enter_async_context(self._high_throughput_check_tip())
+                result = await self._backend.get_tip_status(
                     real_mount, ht_follow_singular_sensor
                 )
             return result
