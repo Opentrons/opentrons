@@ -16,7 +16,7 @@ from performance_metrics.metrics_store import MetricsStore
 from opentrons_shared_data.performance.dev_types import (
     RobotContextState,
     SupportsTracking,
-    StorageMetadata,
+    MetricsMetadata,
 )
 
 P = ParamSpec("P")
@@ -51,7 +51,7 @@ class RobotContextTracker(SupportsTracking):
     def __init__(self, storage_location: Path, should_track: bool = False) -> None:
         """Initializes the RobotContextTracker with an empty storage list."""
         self._store = MetricsStore[RawContextData](
-            StorageMetadata(
+            MetricsMetadata(
                 name=self.METADATA_NAME,
                 storage_dir=storage_location,
                 headers=RawContextData.headers(),

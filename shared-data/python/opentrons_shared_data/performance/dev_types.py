@@ -57,8 +57,8 @@ class RobotContextState(Enum):
 
 
 @dataclass(frozen=True)
-class StorageMetadata:
-    """Dataclass to store information about the storage."""
+class MetricsMetadata:
+    """Dataclass to store metadata about the metrics."""
 
     name: str
     storage_dir: Path
