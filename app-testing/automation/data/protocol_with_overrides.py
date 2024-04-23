@@ -24,7 +24,7 @@ class ProtocolWithOverrides(Protocol):
         protocols: list[Protocol] = []
         for override in self.overrides:
             # Create the new file name with the override appended before the extension
-            new_file_stem: str = f"{self.file_stem}{OVERRIDE_MONIKER}{override}"  # type: ignore
+            new_file_stem: str = f"{self.file_stem}{OVERRIDE_MONIKER}{override}"
             new_file_name = f"{new_file_stem}.{self.file_extension}"
             # Create the full path for the new file
             # all generated files live at files/protocols/$GENERATED_PROTOCOLS_FOLDER
