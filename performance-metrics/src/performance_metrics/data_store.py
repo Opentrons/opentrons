@@ -14,7 +14,11 @@ class MetricsStore(typing.Generic[T]):
     def __init__(self, metadata: StorageMetadata) -> None:
         """Initialize the storage engine."""
         self.metadata = metadata
-        self.data: typing.List[T] = []
+        self._data: typing.List[T] = []
+
+    def add(self, context_data: T) -> None:
+        """Add data to the store."""
+        self._data.append(context_data)
 
     def setup(self) -> None:
         """Set up the data store."""
@@ -25,8 +29,8 @@ class MetricsStore(typing.Generic[T]):
 
     def store(self) -> None:
         """Clear the stored data and write it to the storage file."""
-        stored_data = self.data.copy()
-        self.data.clear()
+        stored_data = self._data.copy()
+        self._data.clear()
         rows_to_write = [context_data.csv_row() for context_data in stored_data]
         with open(self.metadata.data_file_location, "a") as storage_file:
             writer = csv.writer(storage_file)
