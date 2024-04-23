@@ -46,7 +46,7 @@ class FlexInstrumentConfigurer(Protocol[MountArgType]):
         self,
         mount: MountArgType,
         expected: TipStateType,
-        ht_follow_singular_sensor: Optional[InstrumentProbeType] = None,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         """Check tip presence status and raise if it does not match `expected`."""
         ...

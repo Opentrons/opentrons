@@ -783,7 +783,7 @@ class OT3Simulator(FlexBackend):
     async def get_tip_status(
         self,
         mount: OT3Mount,
-        ht_follow_singular_sensor: Optional[InstrumentProbeType] = None,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> TipStateType:
         return TipStateType(self._sim_tip_state[mount])
 

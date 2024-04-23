@@ -2600,7 +2600,7 @@
             }
           ]
         },
-        "htFollowSingularSensor":  {
+        "FollowSingularSensor":  {
           "description": "Which high throughput sensor to use, if we're indifferent to the other.",
           "allOf": [
             {
