@@ -62,7 +62,6 @@ class StorageMetadata:
 
     name: str
     storage_dir: Path
-    storage_format: Literal["csv"]
     headers: Tuple[str, ...]
 
     @property

@@ -54,7 +54,6 @@ class RobotContextTracker(SupportsTracking):
             StorageMetadata(
                 name=self.METADATA_NAME,
                 storage_dir=storage_location,
-                storage_format="csv",
                 headers=RawContextData.headers(),
             )
         )
