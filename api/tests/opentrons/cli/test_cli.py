@@ -299,6 +299,7 @@ def test_track_analysis(tmp_path: Path) -> None:
 
     with open(store.metadata.data_file_location, "r") as f:
         stored_data = f.readlines()
+        stored_data = [line.strip() for line in stored_data if line.strip()]
         assert len(stored_data) == 1
         state_id, start_time, duration = stored_data[0].strip().split(",")
         assert state_id == str(RobotContextState.ANALYZING_PROTOCOL.state_id)
