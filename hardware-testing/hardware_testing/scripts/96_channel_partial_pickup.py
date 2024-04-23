@@ -399,11 +399,11 @@ async def _main() -> None:
         await update_pick_up_speed(hw_api, mount, pick_up_speed, args.nozzles)
         if (args.measure_nozzles):
             cp = CriticalPoint.NOZZLE
-            home_w_tip = await hw_api.current_position_ot3(mount, cp)
+            home_wo_tip = await hw_api.current_position_ot3(mount, cp)
             initial_dial_loc = Point(
                                 deck_slot['deck_slot'][args.dial_slot]['X'],
                                 deck_slot['deck_slot'][args.dial_slot]['Y'],
-                                home_w_tip[Axis.by_mount(mount)]
+                                home_wo_tip[Axis.by_mount(mount)]
             )
             print("Move Nozzle to Dial Indicator")
             await move_to_point(hw_api, mount, initial_dial_loc, cp)
