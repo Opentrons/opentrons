@@ -2,7 +2,7 @@
 
 import csv
 import typing
-from opentrons_shared_data.performance.dev_types import StorageMetadata
+from opentrons_shared_data.performance.dev_types import MetricsMetadata
 from performance_metrics.datashapes import SupportsCSVStorage
 
 T = typing.TypeVar("T", bound=SupportsCSVStorage)
@@ -11,7 +11,7 @@ T = typing.TypeVar("T", bound=SupportsCSVStorage)
 class MetricsStore(typing.Generic[T]):
     """Dataclass to store data for tracking robot context."""
 
-    def __init__(self, metadata: StorageMetadata) -> None:
+    def __init__(self, metadata: MetricsMetadata) -> None:
         """Initialize the metrics store."""
         self.metadata = metadata
         self._data: typing.List[T] = []
