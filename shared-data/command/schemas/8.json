@@ -2599,6 +2599,14 @@
               "$ref": "#/definitions/TipPresenceStatus"
             }
           ]
+        },
+        "htFollowSingularSensor":  {
+          "description": "Which high throughput sensor to use, if we're indifferent to the other.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/TipPresenceStatus"
+            }
+          ]
         }
       },
       "required": ["pipetteId", "expectedState"]
