@@ -104,6 +104,9 @@ export function SendProtocolToFlexSlideout(
       disableTimeout: true,
     })
 
+    console.log('srcFileObjects', srcFileObjects)
+    console.log('customLabwareFiles', customLabwareFiles)
+
     createProtocolAsync({
       files: [...srcFileObjects, ...customLabwareFiles],
       protocolKey,

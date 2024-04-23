@@ -24,6 +24,7 @@ export function appShellRequestor<Data>(
   config: AxiosRequestConfig
 ): ResponsePromise<Data> {
   const { data } = config
+  // TODO
   // special case: protocol files and form data cannot be sent through invoke. proxy by protocolKey and handle in app-shell
   const formDataProxy =
     data instanceof FormData

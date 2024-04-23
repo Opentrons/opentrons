@@ -97,6 +97,7 @@ async function usbListener(
     const formData = new FormData()
     const { protocolKey } = data.formDataProxy
 
+    // TODO
     const srcFilePaths: string[] = await getProtocolSrcFilePaths(protocolKey)
 
     // create readable stream from file
