@@ -86,6 +86,9 @@ export function PromptGuide(): JSX.Element {
           span: <StyledText css={BODY_TEXT_STYLE} />,
         }}
       />
+      <StyledText css={BODY_TEXT_STYLE}>
+        {t('simulator_description')}
+      </StyledText>
     </Flex>
   )
 }

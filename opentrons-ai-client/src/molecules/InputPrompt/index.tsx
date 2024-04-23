@@ -16,7 +16,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
+import { promptContext } from '../../organisms/PromptButton/PromptProvider'
 import type { SubmitHandler } from 'react-hook-form'
 
 // ToDo (kk:04/19/2024) Note this interface will be used by prompt buttons in SidePanel
@@ -28,11 +28,13 @@ interface InputType {
 
 export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const { register, handleSubmit, watch } = useForm<InputType>({
+  const { register, handleSubmit, watch, setValue } = useForm<InputType>({
     defaultValues: {
       userPrompt: '',
     },
   })
+  const usePromptValue = (): string => React.useContext(promptContext)
+  const promptFromButton = usePromptValue()
   const userPrompt = watch('userPrompt') ?? ''
 
   const onSubmit: SubmitHandler<InputType> = async data => {
@@ -40,6 +42,15 @@ export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
     const { userPrompt } = data
     console.log('user prompt', userPrompt)
   }
+
+  const calcTextAreaHeight = (): number => {
+    const rowsNum = userPrompt.split('\n').length
+    return rowsNum
+  }
+
+  React.useEffect(() => {
+    if (promptFromButton !== '') setValue('userPrompt', promptFromButton)
+  }, [promptFromButton, setValue])
 
   return (
     <StyledForm id="User_Prompt" onSubmit={() => handleSubmit(onSubmit)}>
@@ -51,9 +62,10 @@ export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
         borderRadius={BORDERS.borderRadius4}
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
+        maxHeight="21.25rem"
       >
         <StyledTextarea
-          rows={1}
+          rows={calcTextAreaHeight()}
           placeholder={t('type_your_prompt')}
           {...register('userPrompt')}
         />
@@ -70,6 +82,8 @@ const StyledForm = styled.form`
 const StyledTextarea = styled.textarea`
   resize: none;
   min-height: 3.75rem;
+  max-height: 17.25rem;
+  overflow-y: auto;
   background-color: ${COLORS.white};
   border: none;
   outline: none;
