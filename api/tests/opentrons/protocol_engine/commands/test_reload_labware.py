@@ -8,7 +8,6 @@ from opentrons.types import DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine.errors import (
-    LabwareIsNotAllowedInLocationError,
     LabwareNotLoadedError,
 )
 
