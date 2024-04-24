@@ -45,3 +45,10 @@ export const ANALYTICS_ODD_APP_ERROR = 'oddError'
 export const ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR =
   'notificationPortBlockError'
 export const ANALYTICS_DESKTOP_APP_ERROR = 'desktopAppError'
+
+export const ANALYTICS_ROBOT_UPDATE_VIEW = 'robotUpdateView'
+export const ANALYTICS_ROBOT_UPDATE_CHANGE_LOG_VIEW = 'robotUpdateChangeLogView'
+export const ANALYTICS_ROBOT_UPDATE_IGNORE = 'robotUpdateIgnore'
+export const ANALYTICS_ROBOT_UPDATE_INITIATE = 'robotUpdateInitiate'
+export const ANALYTICS_ROBOT_UPDATE_ERROR = 'robotUpdateError'
+export const ANALYTICS_ROBOT_UPDATE_COMPLETE = 'robotUpdateComplete'

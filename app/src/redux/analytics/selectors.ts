@@ -31,6 +31,8 @@ export function getBuildrootAnalyticsData(
     robotName === null
       ? getRobotUpdateRobot(state)
       : getViewableRobots(state).find(r => r.name === robotName) ?? null
+  const robotSerialNumber =
+    robot?.health?.robot_serial ?? robot?.serverHealth?.serialNumber ?? null
 
   if (updateVersion === null || robot === null) return null
 
@@ -42,6 +44,7 @@ export function getBuildrootAnalyticsData(
     currentSystem,
     updateVersion,
     error: session != null && 'error' in session ? session.error : null,
+    robotSerialNumber,
   }
 }
 
