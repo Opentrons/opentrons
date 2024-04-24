@@ -130,19 +130,11 @@ class SyncClient:
     def reload_labware(
         self,
         labware_id: str,
-        load_name: str,
-        namespace: str,
-        version: int,
-        display_name: Optional[str] = None,
     ) -> commands.ReloadLabwareResult:
         """Execute a ReloadLabware command and return the result."""
         request = commands.ReloadLabwareCreate(
             params=commands.ReloadLabwareParams(
                 labwareId=labware_id,
-                loadName=load_name,
-                namespace=namespace,
-                version=version,
-                displayName=display_name,
             )
         )
         result = self._transport.execute_command(request=request)

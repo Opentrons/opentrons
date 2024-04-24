@@ -3,10 +3,6 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Optional, List, Union
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-
 from .abstract_store import HasState, HandlesActions
 from ..actions import (
     Action,
@@ -17,7 +13,6 @@ from ..actions import (
 from ..commands import (
     Command,
     LoadLabwareResult,
-    ReloadLabwareResult,
     PickUpTip,
     PickUpTipResult,
     DropTipResult,
@@ -28,6 +23,8 @@ from ..commands.configuring_common import (
     PipetteNozzleLayoutResultMixin,
 )
 from ..error_recovery_policy import ErrorRecoveryType
+
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 
 class TipRackWellState(Enum):
@@ -103,16 +100,6 @@ class TipStore(HasState[TipState], HandlesActions):
                     well_name
                 ] = TipRackWellState.CLEAN
 
-    def _add_new_tiprack(self, labware_id: str, definition: LabwareDefinition) -> None:
-        self._state.tips_by_labware_id[labware_id] = {
-            well_name: TipRackWellState.CLEAN
-            for column in definition.ordering
-            for well_name in column
-        }
-        self._state.column_by_labware_id[labware_id] = [
-            column for column in definition.ordering
-        ]
-
     def _handle_succeeded_command(self, command: Command) -> None:
         if (
             isinstance(command.result, LoadLabwareResult)
@@ -120,7 +107,14 @@ class TipStore(HasState[TipState], HandlesActions):
         ):
             labware_id = command.result.labwareId
             definition = command.result.definition
-            self._add_new_tiprack(labware_id, definition)
+            self._state.tips_by_labware_id[labware_id] = {
+                well_name: TipRackWellState.CLEAN
+                for column in definition.ordering
+                for well_name in column
+            }
+            self._state.column_by_labware_id[labware_id] = [
+                column for column in definition.ordering
+            ]
 
         elif isinstance(command.result, PickUpTipResult):
             labware_id = command.params.labwareId
@@ -135,21 +129,6 @@ class TipStore(HasState[TipState], HandlesActions):
         elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
             pipette_id = command.params.pipetteId
             self._state.length_by_pipette_id.pop(pipette_id, None)
-
-        elif isinstance(command.result, ReloadLabwareResult):
-            if (
-                command.result.definition.parameters.isTiprack
-                and command.result.labwareId not in self._state.tips_by_labware_id
-            ):
-                self._add_new_tiprack(
-                    command.result.labwareId, command.result.definition
-                )
-            elif (
-                not command.result.definition.parameters.isTiprack
-                and command.result.labwareId in self._state.tips_by_labware_id
-            ):
-                self._state.tips_by_labware_id.pop(command.result.labwareId)
-                self._state.column_by_labware_id.pop(command.result.labwareId)
 
     def _handle_failed_command(
         self,

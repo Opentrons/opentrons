@@ -136,7 +136,6 @@ def test_handles_load_labware(
 def test_handles_reload_labware(
     subject: LabwareStore,
     well_plate_def: LabwareDefinition,
-    flex_50uL_tiprack: LabwareDefinition,
 ) -> None:
     """It should override labware data in the state."""
     load_labware = create_load_labware_command(
@@ -150,12 +149,14 @@ def test_handles_reload_labware(
     subject.handle_action(
         SucceedCommandAction(private_result=None, command=load_labware)
     )
-    assert subject.state.labware_by_id[
-        "test-labware-id"
-    ].definitionUri == uri_from_details(
+    expected_definition_uri = uri_from_details(
         load_name=well_plate_def.parameters.loadName,
         namespace=well_plate_def.namespace,
         version=well_plate_def.version,
+    )
+    assert (
+        subject.state.labware_by_id["test-labware-id"].definitionUri
+        == expected_definition_uri
     )
 
     offset_request = LabwareOffsetCreate(
@@ -172,32 +173,22 @@ def test_handles_reload_labware(
     )
     reload_labware = create_reload_labware_command(
         labware_id="test-labware-id",
-        definition=flex_50uL_tiprack,
         offset_id="offset-id",
-        display_name="display-name-2",
     )
     subject.handle_action(
         SucceedCommandAction(private_result=None, command=reload_labware)
     )
 
-    expected_definition_uri = uri_from_details(
-        load_name=flex_50uL_tiprack.parameters.loadName,
-        namespace=flex_50uL_tiprack.namespace,
-        version=flex_50uL_tiprack.version,
-    )
-
     expected_labware_data = LoadedLabware(
         id="test-labware-id",
-        loadName=flex_50uL_tiprack.parameters.loadName,
+        loadName=well_plate_def.parameters.loadName,
         definitionUri=expected_definition_uri,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A1),
         offsetId="offset-id",
-        displayName="display-name-2",
+        displayName="display-name",
     )
     assert subject.state.labware_by_id["test-labware-id"] == expected_labware_data
-    assert (
-        subject.state.definitions_by_uri[expected_definition_uri] == flex_50uL_tiprack
-    )
+    assert subject.state.definitions_by_uri[expected_definition_uri] == well_plate_def
 
 
 def test_handles_add_labware_definition(

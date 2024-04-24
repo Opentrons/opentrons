@@ -60,7 +60,6 @@ class LoadedLabwareData:
 class ReloadedLabwareData:
     """The result of a reload labware procedure."""
 
-    definition: LabwareDefinition
     location: LabwareLocation
     offsetId: Optional[str]
 
@@ -180,47 +179,25 @@ class EquipmentHandler:
             labware_id=labware_id, definition=definition, offsetId=offset_id
         )
 
-    async def reload_labware(
-        self, labware_id: str, load_name: str, namespace: str, version: int
-    ) -> ReloadedLabwareData:
+    async def reload_labware(self, labware_id: str) -> ReloadedLabwareData:
         """Reload an already-loaded labware. This cannot change the labware location.
 
         Args:
             labware_id: The ID of the already-loaded labware.
-            load_name: The labware's load name.
-            namespace: The labware's namespace.
-            version: The labware's version.
 
         Raises:
             LabwareNotLoadedError: If `labware_id` does not reference a loaded labware.
 
         """
-        definition_uri = uri_from_details(
-            load_name=load_name,
-            namespace=namespace,
-            version=version,
-        )
+
         location = self._state_store.labware.get_location(labware_id)
-
-        try:
-            # Try to use existing definition in state.
-            definition = self._state_store.labware.get_definition_by_uri(definition_uri)
-        except LabwareDefinitionDoesNotExistError:
-            definition = await self._labware_data_provider.get_labware_definition(
-                load_name=load_name,
-                namespace=namespace,
-                version=version,
-            )
-
-        # Allow propagation of ModuleNotLoadedError.
+        definition_uri = self._state_store.labware.get_definition_uri(labware_id)
         offset_id = self.find_applicable_labware_offset_id(
             labware_definition_uri=definition_uri,
             labware_location=location,
         )
 
-        return ReloadedLabwareData(
-            definition=definition, location=location, offsetId=offset_id
-        )
+        return ReloadedLabwareData(location=location, offsetId=offset_id)
 
     async def load_pipette(
         self,

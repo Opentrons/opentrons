@@ -1420,29 +1420,9 @@
           "title": "Labwareid",
           "description": "The already-loaded labware instance to update.",
           "type": "string"
-        },
-        "loadName": {
-          "title": "Loadname",
-          "description": "Name used to reference a labware definition.",
-          "type": "string"
-        },
-        "namespace": {
-          "title": "Namespace",
-          "description": "The namespace the labware definition belongs to.",
-          "type": "string"
-        },
-        "version": {
-          "title": "Version",
-          "description": "The labware definition version.",
-          "type": "integer"
-        },
-        "displayName": {
-          "title": "Displayname",
-          "description": "An optional user-specified display name or label for this labware.",
-          "type": "string"
         }
       },
-      "required": ["labwareId", "loadName", "namespace", "version"]
+      "required": ["labwareId"]
     },
     "ReloadLabwareCreate": {
       "title": "ReloadLabwareCreate",

@@ -29,23 +29,6 @@ class ReloadLabwareParams(BaseModel):
     labwareId: str = Field(
         ..., description="The already-loaded labware instance to update."
     )
-    loadName: str = Field(
-        ...,
-        description="Name used to reference a labware definition.",
-    )
-    namespace: str = Field(
-        ...,
-        description="The namespace the labware definition belongs to.",
-    )
-    version: int = Field(
-        ...,
-        description="The labware definition version.",
-    )
-    displayName: Optional[str] = Field(
-        None,
-        description="An optional user-specified display name "
-        "or label for this labware.",
-    )
 
 
 class ReloadLabwareResult(BaseModel):
@@ -54,10 +37,6 @@ class ReloadLabwareResult(BaseModel):
     labwareId: str = Field(
         ...,
         description="An ID to reference this labware in subsequent commands. Same as the one in the parameters.",
-    )
-    definition: LabwareDefinition = Field(
-        ...,
-        description="The full definition data for this labware.",
     )
     offsetId: Optional[str] = Field(
         # Default `None` instead of `...` so this field shows up as non-required in
@@ -89,33 +68,10 @@ class ReloadLabwareImplementation(
         """Reload the definition and calibration data for a specific labware."""
         reloaded_labware = await self._equipment.reload_labware(
             labware_id=params.labwareId,
-            load_name=params.loadName,
-            namespace=params.namespace,
-            version=params.version,
         )
-
-        # note: this check must be kept because somebody might specify the trash loadName
-        if (
-            labware_validation.is_flex_trash(params.loadName)
-            and isinstance(reloaded_labware.location, DeckSlotLocation)
-            and self._state_view.geometry.get_slot_column(
-                reloaded_labware.location.slotName
-            )
-            != 3
-        ):
-            raise LabwareIsNotAllowedInLocationError(
-                f"{params.loadName} is not allowed in slot {reloaded_labware.location.slotName}"
-            )
-
-        if isinstance(reloaded_labware.location, OnLabwareLocation):
-            self._state_view.labware.raise_if_labware_cannot_be_stacked(
-                top_labware_definition=reloaded_labware.definition,
-                bottom_labware_id=reloaded_labware.location.labwareId,
-            )
 
         return ReloadLabwareResult(
             labwareId=params.labwareId,
-            definition=reloaded_labware.definition,
             offsetId=reloaded_labware.offsetId,
         )
 

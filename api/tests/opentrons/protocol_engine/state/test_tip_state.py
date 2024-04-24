@@ -36,9 +36,9 @@ def subject() -> TipStore:
     return TipStore()
 
 
-def _default_labware_def(
-    parameters: Optional[LabwareParameters] = None,
-) -> LabwareDefinition:
+@pytest.fixture
+def labware_definition() -> LabwareDefinition:
+    """Get a labware definition value object."""
     return LabwareDefinition.construct(  # type: ignore[call-arg]
         ordering=[
             ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
@@ -54,20 +54,8 @@ def _default_labware_def(
             ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
             ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
         ],
-        parameters=parameters or _tip_rack_parameters,
+        parameters=_tip_rack_parameters,
     )
-
-
-@pytest.fixture
-def labware_definition() -> LabwareDefinition:
-    """Get a labware definition value object."""
-    return _default_labware_def()
-
-
-@pytest.fixture
-def reload_labware_definition() -> LabwareDefinition:
-    """Get a labware definition for reloading."""
-    return _default_labware_def()
 
 
 @pytest.fixture
@@ -77,18 +65,6 @@ def load_labware_command(labware_definition: LabwareDefinition) -> commands.Load
         result=commands.LoadLabwareResult.construct(
             labwareId="cool-labware",
             definition=labware_definition,
-        )
-    )
-
-
-@pytest.fixture
-def reload_labware_command(
-    reload_labware_definition: LabwareDefinition,
-) -> commands.ReloadLabware:
-    """Get a reload labware command."""
-    return commands.ReloadLabware.construct(  # type: ignore[call-arg]
-        result=commands.ReloadLabwareResult.construct(
-            labwareId="cool-labware", definition=reload_labware_definition
         )
     )
 
@@ -1159,157 +1135,3 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
     _assert_and_pickup("B1", map)
     map = _reconfigure_nozzle_layout("A1", "A1", "A1")
     _assert_and_pickup("B2", map)
-
-
-def test_reload_tiprack_does_not_alter_tip_state(
-    subject: TipStore,
-    load_labware_command: commands.LoadLabware,
-    pick_up_tip_command: commands.PickUpTip,
-    reload_labware_command: commands.ReloadLabware,
-    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
-) -> None:
-    """Reloading a tiprack is not the same as resetting the tips."""
-    subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=load_labware_command)
-    )
-    load_pipette_command = commands.LoadPipette.construct(  # type: ignore[call-arg]
-        result=commands.LoadPipetteResult(pipetteId="pipette-id")
-    )
-    load_pipette_private_result = commands.LoadPipettePrivateResult(
-        pipette_id="pipette-id",
-        serial_number="pipette-serial",
-        config=LoadedStaticPipetteData(
-            channels=1,
-            max_volume=15,
-            min_volume=3,
-            model="gen a",
-            display_name="display name",
-            flow_rates=FlowRates(
-                default_aspirate={},
-                default_dispense={},
-                default_blow_out={},
-            ),
-            tip_configuration_lookup_table={15: supported_tip_fixture},
-            nominal_tip_overlap={},
-            nozzle_offset_z=1.23,
-            home_position=4.56,
-            nozzle_map=get_default_nozzle_map(PipetteNameType.P300_SINGLE_GEN2),
-            back_left_corner_offset=Point(x=1, y=2, z=3),
-            front_right_corner_offset=Point(x=4, y=5, z=6),
-        ),
-    )
-
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            private_result=load_pipette_private_result, command=load_pipette_command
-        )
-    )
-
-    subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=pick_up_tip_command)
-    )
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            private_result=None, command=reload_labware_command
-        )
-    )
-    result = TipView(subject.state).get_next_tip(
-        labware_id="cool-labware",
-        num_tips=1,
-        starting_tip_name=None,
-        nozzle_map=None,
-    )
-
-    assert result == "B1"
-
-
-@pytest.mark.parametrize(
-    "labware_definition",
-    [
-        _default_labware_def(
-            parameters=LabwareParameters.construct(isTiprack=False)  # type: ignore[call-arg]
-        )
-    ],
-)
-def test_reload_to_tiprack_loads(
-    subject: TipStore,
-    load_labware_command: commands.LoadLabware,
-    reload_labware_command: commands.ReloadLabware,
-) -> None:
-    """If you have a loaded non-tiprack and reload with a tiprack, state should appear."""
-    subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=load_labware_command)
-    )
-    assert load_labware_command.result
-    assert (
-        TipView(subject.state).get_next_tip(
-            labware_id=load_labware_command.result.labwareId,
-            num_tips=1,
-            starting_tip_name=None,
-            nozzle_map=None,
-        )
-        is None
-    )
-
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            private_result=None, command=reload_labware_command
-        )
-    )
-    result = TipView(subject.state).get_next_tip(
-        labware_id="cool-labware",
-        num_tips=1,
-        starting_tip_name=None,
-        nozzle_map=None,
-    )
-
-    assert result == "A1"
-
-
-@pytest.mark.parametrize(
-    "reload_labware_definition",
-    [
-        _default_labware_def(
-            parameters=LabwareParameters.construct(isTiprack=False)  # type: ignore[call-arg]
-        )
-    ],
-)
-def test_reload_to_non_tiprack_unloads(
-    subject: TipStore,
-    load_labware_command: commands.LoadLabware,
-    reload_labware_command: commands.ReloadLabware,
-) -> None:
-    """If you have a loaded tiprack and reload with a non-tiprack def, state should go away."""
-    subject.handle_action(
-        actions.SucceedCommandAction(private_result=None, command=load_labware_command)
-    )
-    result = TipView(subject.state).get_next_tip(
-        labware_id="cool-labware",
-        num_tips=1,
-        starting_tip_name=None,
-        nozzle_map=None,
-    )
-    assert result == "A1"
-
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            private_result=None, command=reload_labware_command
-        )
-    )
-    result = TipView(subject.state).get_next_tip(
-        labware_id="cool-labware",
-        num_tips=1,
-        starting_tip_name=None,
-        nozzle_map=None,
-    )
-    assert load_labware_command.result
-
-    assert (
-        TipView(subject.state).get_next_tip(
-            labware_id=load_labware_command.result.labwareId,
-            num_tips=1,
-            starting_tip_name=None,
-            nozzle_map=None,
-        )
-        is None
-    )
