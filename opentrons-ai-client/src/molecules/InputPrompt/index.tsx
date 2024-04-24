@@ -82,7 +82,6 @@ const CONTAINER_STYLE = css`
 
   &:focus-within {
     border: 1px ${BORDERS.styleSolid}${COLORS.blue50};
-    box-shadow: 0px 0px 10px 0px ${COLORS.blue50};
   }
 `
 
