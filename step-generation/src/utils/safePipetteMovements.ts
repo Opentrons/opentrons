@@ -343,21 +343,6 @@ export const getIsSafePipetteMovement = (
     return false
   } else {
     const labwareSlot = labwareState[labwareId].slot
-    //  labware on deck
-    let deckSlot: DeckSlotId = labwareSlot
-    if (modules[labwareSlot] != null) {
-      //  labware on module
-      deckSlot = modules[labwareSlot].slot
-    } else if (labwareState[labwareSlot] != null) {
-      const adapterSlot = labwareState[labwareSlot].slot
-      if (modules[adapterSlot] != null) {
-        //  labware on adapter on module
-        deckSlot = modules[adapterSlot].slot
-      } else {
-        //  labware on adapter on deck
-        deckSlot = adapterSlot
-      }
-    }
     const pipetteBoundsAtWellLocation = getPipetteBoundsAtSpecifiedMoveToPosition(
       pipetteEntity,
       tipLength,
