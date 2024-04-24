@@ -200,6 +200,7 @@ async def get_subsystem_updates(
             subsystem=handle.process_details.subsystem,
             updateStatus=handle.cached_state,
             createdAt=handle.process_details.created_at,
+            internal=handle.process_details.internal,
         )
         for handle in handles
     ]
@@ -242,6 +243,7 @@ async def get_subsystem_update(
                 updateStatus=progress.state,
                 updateProgress=progress.progress,
                 updateError=_error_str(progress.error),
+                internal=handle.process_details.internal,
             )
         )
     )
@@ -271,6 +273,7 @@ async def get_update_processes(
             subsystem=update.process_details.subsystem,
             updateStatus=update.cached_state,
             createdAt=update.process_details.created_at,
+            internal=update.process_details.internal,
         )
         for update in update_manager.all_update_processes()
     ]
@@ -306,6 +309,7 @@ async def get_update_process(
                 updateStatus=progress.state,
                 updateProgress=progress.progress,
                 updateError=_error_str(progress.error),
+                internal=handle.process_details.internal,
             )
         )
     )
@@ -340,6 +344,7 @@ async def begin_subsystem_update(
             update_process_id,
             subsystem,
             created_at,
+            internal=False,
         )
     except _SubsystemNotFound as e:
         raise SubsystemNotPresent(
@@ -373,6 +378,7 @@ async def begin_subsystem_update(
                 updateStatus=progress.state,
                 updateProgress=progress.progress,
                 updateError=_error_str(progress.error),
+                internal=summary.process_details.internal,
             )
         ),
         status_code=status.HTTP_201_CREATED,

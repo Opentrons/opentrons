@@ -126,6 +126,10 @@ class UpdateProgressData(BaseModel):
         ...,
         description="If the process failed, this will contain a string description of the reason.",
     )
+    internal: bool = Field(
+        ..., description="Whether this update was started internally or not."
+    )
+
 
 
 class UpdateProgressSummary(BaseModel):
@@ -138,4 +142,7 @@ class UpdateProgressSummary(BaseModel):
     )
     updateStatus: UpdateState = Field(
         ..., description="Whether an update is queued, in progress or completed"
+    )
+    internal: bool = Field(
+        ..., description="Whether this update was started internally or not."
     )

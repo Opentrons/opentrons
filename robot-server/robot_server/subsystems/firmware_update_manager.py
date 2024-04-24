@@ -35,6 +35,7 @@ class ProcessDetails:
     created_at: datetime
     subsystem: SubSystem
     update_id: str
+    internal: bool
 
 
 @dataclass
@@ -131,6 +132,7 @@ class _UpdateProcess:
     _created_at: datetime
     _update_id: str
     _complete_callback: Callable[[], Awaitable[None]]
+    _internal: bool
 
     def __init__(
         self,
@@ -139,6 +141,7 @@ class _UpdateProcess:
         created_at: datetime,
         update_id: str,
         complete_callback: Callable[[], Awaitable[None]],
+        internal: bool = True,
     ) -> None:
         """Build an _UpdateProcess. Should only be done by the manager."""
         self._status_queue = Queue()
@@ -149,6 +152,7 @@ class _UpdateProcess:
         self._created_at = created_at
         self._update_id = update_id
         self._complete_callback = complete_callback
+        self._internal = internal
 
     @property
     def status_cache(self) -> UpdateProgress:
@@ -176,6 +180,11 @@ class _UpdateProcess:
     def update_id(self) -> str:
         """The ID of the update task."""
         return self._update_id
+
+    @property
+    def internal(self) -> bool:
+        """Whether this update was started internally or by the client."""
+        return self._internal
 
     async def _update_task(self) -> None:
         last_progress = 0
@@ -252,6 +261,7 @@ class UpdateProcessHandle:
             update_proc.created_at,
             SubSystem.from_hw(update_proc.subsystem),
             update_proc.update_id,
+            update_proc.internal,
         )
 
     async def get_progress(self) -> UpdateProgress:
@@ -322,7 +332,7 @@ class FirmwareUpdateManager:
                 raise UpdateIdNotFound() from e
 
     async def _emplace(
-        self, update_id: str, subsystem: SubSystem, creation_time: datetime
+            self, update_id: str, subsystem: SubSystem, creation_time: datetime, internal: bool
     ) -> _UpdateProcess:
         hw_subsystem = subsystem.to_hw()
 
@@ -346,8 +356,8 @@ class FirmwareUpdateManager:
                     log.exception(f"Double pop for update on {subsystem}")
 
         self._all_updates_by_id[update_id] = _UpdateProcess(
-            self._hardware_handle, hw_subsystem, creation_time, update_id, _complete
-        )
+            self._hardware_handle, hw_subsystem, creation_time, update_id, _complete,
+            internal)
         self._running_updates_by_subsystem[hw_subsystem] = self._all_updates_by_id[
             update_id
         ]
@@ -403,6 +413,7 @@ class FirmwareUpdateManager:
         update_id: str,
         subsystem: SubSystem,
         created_at: datetime,
+        internal: bool = False,
     ) -> UpdateProcessHandle:
         """Try to begin an update process, checking preconditions, and return a handle if successful.
 
@@ -412,6 +423,6 @@ class FirmwareUpdateManager:
         handle).
         """
         async with self._management_lock:
-            process = await self._emplace(update_id, subsystem, created_at)
+            process = await self._emplace(update_id, subsystem, created_at, internal)
             await process.provide_latest_progress()
         return process.get_handle()

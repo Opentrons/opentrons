@@ -418,7 +418,7 @@ async def _do_updates(
 ) -> None:
     update_handles = [
         await update_manager.start_update_process(
-            str(uuid4()), SubSystem.from_hw(subsystem), utc_now()
+            str(uuid4()), SubSystem.from_hw(subsystem), utc_now(), internal=True,
         )
         for subsystem, subsystem_state in hardware.attached_subsystems.items()
         if not subsystem_state.ok or subsystem_state.fw_update_needed
