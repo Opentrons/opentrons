@@ -2,18 +2,18 @@ import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
 import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'
 import type { FormError } from './errors'
+
 /*******************
  ** Warning Messages **
  ********************/
 
 export type FormWarningType =
-  | 'ASPIRATE_TIP_POSITIONED_LOW_IN_TUBE'
   | 'BELOW_MIN_AIR_GAP_VOLUME'
   | 'BELOW_MIN_DISPOSAL_VOLUME'
   | 'BELOW_PIPETTE_MINIMUM_VOLUME'
-  | 'DISPENSE_TIP_POSITIONED_LOW_IN_TUBE'
   | 'OVER_MAX_WELL_VOLUME'
   | 'MIX_TIP_POSITIONED_LOW_IN_TUBE'
+  | 'TIP_POSITIONED_LOW_IN_TUBE'
 
 export type FormWarning = FormError & {
   type: FormWarningType
@@ -59,18 +59,11 @@ const belowMinDisposalVolumeWarning = (min: number): FormWarning => ({
   dependentFields: ['disposalVolume_volume', 'pipette'],
 })
 
-const aspirateTipPositionedLowInTube = (): FormWarning => ({
-  type: 'ASPIRATE_TIP_POSITIONED_LOW_IN_TUBE',
+const tipPositionedLowInTube = (): FormWarning => ({
+  type: 'TIP_POSITIONED_LOW_IN_TUBE',
   title:
-    'The default aspirate height is 1mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
-  dependentFields: ['aspirate_labware'],
-})
-
-const dispenseTipPositionedLowInTube = (): FormWarning => ({
-  type: 'DISPENSE_TIP_POSITIONED_LOW_IN_TUBE',
-  title:
-    'The default dispense height is 0.5mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
-  dependentFields: ['dispense_labware'],
+    'A tuberack has an aspirate and dispense default height at 1mm and 0.5mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
+  dependentFields: ['aspirate_labware', 'dispense_labware'],
 })
 
 const mixTipPositionedLowInTube = (): FormWarning => ({
@@ -88,34 +81,38 @@ export type WarningChecker = (val: unknown) => FormWarning | null
 // TODO: real HydratedFormData type
 export type HydratedFormData = any
 
-export const aspirateTipPositionInTube = (
+export const tipPositionInTube = (
   fields: HydratedFormData
 ): FormWarning | null => {
-  const { aspirate_labware, aspirate_mmFromBottom } = fields
-  let isTubeRack: boolean = false
+  const {
+    aspirate_labware,
+    aspirate_mmFromBottom,
+    dispense_labware,
+    dispense_mmFromBottom,
+  } = fields
+  let isAspirateTubeRack: boolean = false
+  let isDispenseTubeRack: boolean = false
   if (aspirate_labware != null) {
-    isTubeRack = aspirate_labware.def.metadata.displayCategory === 'tubeRack'
+    isAspirateTubeRack =
+      aspirate_labware.def.metadata.displayCategory === 'tubeRack'
   }
-  return isTubeRack && aspirate_mmFromBottom === null
-    ? aspirateTipPositionedLowInTube()
-    : null
-}
-export const dispenseTipPositionInTube = (
-  fields: HydratedFormData
-): FormWarning | null => {
-  const { dispense_labware, dispense_mmFromBottom } = fields
-  let isTubeRack: boolean = false
   if (dispense_labware != null) {
-    isTubeRack =
+    isDispenseTubeRack =
       // checking that the dispense labware is a labware and not a trash/waste chute
       'def' in dispense_labware
         ? dispense_labware.def.metadata.displayCategory === 'tubeRack'
         : false
   }
-  return isTubeRack && dispense_mmFromBottom === null
-    ? dispenseTipPositionedLowInTube()
-    : null
+
+  if (isAspirateTubeRack && aspirate_mmFromBottom === null) {
+    return tipPositionedLowInTube()
+  } else if (isDispenseTubeRack && dispense_mmFromBottom === null) {
+    return tipPositionedLowInTube()
+  } else {
+    return null
+  }
 }
+
 export const mixTipPositionInTube = (
   fields: HydratedFormData
 ): FormWarning | null => {

@@ -29,9 +29,8 @@ import {
   minDisposalVolume,
   minAspirateAirGapVolume,
   minDispenseAirGapVolume,
-  aspirateTipPositionInTube,
-  dispenseTipPositionInTube,
   mixTipPositionInTube,
+  tipPositionInTube,
 } from './warnings'
 
 import { HydratedFormdata, StepType } from '../../form-types'
@@ -75,8 +74,7 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       minDisposalVolume,
       minAspirateAirGapVolume,
       minDispenseAirGapVolume,
-      aspirateTipPositionInTube,
-      dispenseTipPositionInTube
+      tipPositionInTube
     ),
   },
   magnet: {
