@@ -104,13 +104,10 @@ def get_all_run_logs(storage_directory: str) -> None:
     ip_address_list = ip_file["ip_address_list"]
     runs_from_storage = read_robot_logs.get_run_ids_from_google_drive(google_drive)
     for ip in ip_address_list:
-        try:
-            runs = get_run_ids_from_robot(ip)
-            runs_to_save = read_robot_logs.get_unseen_run_ids(runs, runs_from_storage)
-            save_runs(runs_to_save, ip, storage_directory)
-            google_drive.upload_missing_files(storage_directory)
-        except Exception:
-            print(f"ERROR: Failed to read IP address: {ip}.")
+        runs = get_run_ids_from_robot(ip)
+        runs_to_save = read_robot_logs.get_unseen_run_ids(runs, runs_from_storage)
+        save_runs(runs_to_save, ip, storage_directory)
+        google_drive.upload_missing_files(storage_directory)
 
 
 if __name__ == "__main__":

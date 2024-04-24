@@ -12,6 +12,7 @@ from typing import List, Dict, Any, Tuple, Set
 import time as t
 import json
 import requests
+import sys
 
 
 def lpc_data(file_results: Dict[str, Any], protocol_info: Dict) -> List[Dict[str, Any]]:
@@ -72,7 +73,7 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     hs_home_count: float = 0.0
     hs_speed: float = 0.0
     hs_rotations: Dict[str, float] = dict()
-    hs_temps: Dict[str, float] = dict()
+    hs_temps: Dict[float, float] = dict()
     temp_time = None
     shake_time = None
     deactivate_time = None
@@ -266,7 +267,7 @@ def create_abr_data_sheet(
     file_name_csv = file_name + ".csv"
     sheet_location = os.path.join(storage_directory, file_name_csv)
     if os.path.exists(sheet_location):
-        print(f"File {sheet_location} located. Not overwriting.")
+        return sheet_location
     else:
         with open(sheet_location, "w") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=headers)
@@ -380,7 +381,6 @@ def get_run_ids_from_storage(storage_directory: str) -> Set[str]:
 def get_unseen_run_ids(runs: Set[str], runs_from_storage: Set[str]) -> Set[str]:
     """Subtracts runs from storage from current runs being read."""
     runs_to_save = runs - runs_from_storage
-    print(f"There are {str(len(runs_to_save))} new run(s) to save.")
     return runs_to_save
 
 
@@ -418,7 +418,7 @@ def write_to_sheets(
         google_sheet.write_header(headers)
         google_sheet.update_row_index()
         google_sheet.write_to_row(row_list)
-        t.sleep(5)  # Sleep added to avoid API error.
+        t.sleep(5)
 
 
 def get_calibration_offsets(
@@ -427,9 +427,14 @@ def get_calibration_offsets(
     """Connect to robot via ip and get calibration data."""
     calibration = dict()
     # Robot Information [Name, Software Version]
-    response = requests.get(
-        f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
-    )
+    try:
+        response = requests.get(
+            f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+        )
+        print(f"Connected to {ip}")
+    except Exception:
+        print(f"ERROR: Failed to read IP address: {ip}")
+        sys.exit()
     health_data = response.json()
     robot_name = health_data.get("name", "")
     api_version = health_data.get("api_version", "")

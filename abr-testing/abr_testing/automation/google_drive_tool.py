@@ -4,6 +4,7 @@ from typing import Set, Any, Optional
 import webbrowser
 import mimetypes
 from oauth2client.service_account import ServiceAccountCredentials  # type: ignore[import]
+import googleapiclient  # type: ignore[import]
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
@@ -58,7 +59,6 @@ class google_drive:
                 break
             if not file_names:
                 print("No folders or files found in Google Drive.")
-        print(f"{len(file_names)} item(s) in Google Drive")
         return file_names
 
     def delete_files(self, file_or_folder_id: str) -> None:
@@ -98,18 +98,22 @@ class google_drive:
             file for file in os.listdir(storage_directory) if file.endswith(".json")
         )
         missing_files = local_files_json - set(google_drive_files_json)
-        print(f"Missing files: {len(missing_files)}")
         # Upload missing files.
         uploaded_files = []
         for file in missing_files:
             file_path = os.path.join(storage_directory, file)
             uploaded_file_id = google_drive.upload_file(self, file_path)
-            self.share_permissions(uploaded_file_id)
             uploaded_files.append(
                 {"name": os.path.basename(file_path), "id": uploaded_file_id}
             )
+            try:
+                self.share_permissions(uploaded_file_id)
+            except googleapiclient.errors.HttpError:
+                continue
+
         # Fetch the updated file list after all files are uploaded
         files = google_drive.list_folder(self)
+
         file_names = [file for file in files]
         for uploaded_file in uploaded_files:
             this_name = uploaded_file["name"]
@@ -121,6 +125,7 @@ class google_drive:
                 print(
                     f"File '{this_name}' was not found in the list of files after uploading."
                 )
+        print(f"{len(files)} item(s) in Google Drive")
 
     def open_folder(self) -> Optional[str]:
         """Open folder in web browser."""
