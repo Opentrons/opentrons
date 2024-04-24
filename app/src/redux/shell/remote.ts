@@ -1,6 +1,5 @@
 // access main process remote modules via attachments to `global`
 import type { AxiosRequestConfig, AxiosResponse } from 'axios'
-import type { ResponsePromise } from '@opentrons/api-client'
 import type { Remote, NotifyTopic, NotifyResponseData } from './types'
 
 const emptyRemote: Remote = {} as any

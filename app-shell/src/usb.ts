@@ -1,8 +1,6 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import axios, { AxiosRequestConfig } from 'axios'
 import FormData from 'form-data'
-import fs from 'fs'
-import path from 'path'
 
 import {
   fetchSerialPortList,
@@ -12,7 +10,6 @@ import {
 } from '@opentrons/usb-bridge/node-client'
 
 import { createLogger } from './log'
-import { getProtocolSrcFilePaths } from './protocol-storage'
 import { usbRequestsStart, usbRequestsStop } from './config/actions'
 import {
   SYSTEM_INFO_INITIALIZED,
