@@ -11,7 +11,6 @@ export function createProtocol(
   runTimeParameterValues?: RunTimeParameterCreateData
 ): ResponsePromise<Protocol> {
   const formData = new FormData()
-  // TODO
   files.forEach(file => {
     formData.append('files', file, file.name)
   })
