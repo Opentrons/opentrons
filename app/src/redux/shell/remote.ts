@@ -1,5 +1,5 @@
 // access main process remote modules via attachments to `global`
-import type { AxiosRequestConfig } from 'axios'
+import type { AxiosRequestConfig, AxiosResponse } from 'axios'
 import type { ResponsePromise } from '@opentrons/api-client'
 import type { Remote, NotifyTopic, NotifyResponseData } from './types'
 
@@ -20,31 +20,55 @@ export const remote: Remote = new Proxy(emptyRemote, {
   },
 })
 
-interface StructuredCloneableFormDataEntry {
-  name: string
-  value: string | Blob | File
-}
+type StructuredCloneableFormDataEntry =
+  | {
+      type: 'string'
+      name: string
+      value: string
+    }
+  | {
+      type: 'file'
+      name: string
+      value: ArrayBuffer
+      filename: string
+    }
 
 type StructuredCloneableFormData = StructuredCloneableFormDataEntry[]
 
-function proxyFormData(formData: FormData): StructuredCloneableFormData {
-  return [...formData.entries()].map(([name, value]) => {
-    return { name, value }
-  })
+async function proxyFormData(
+  formData: FormData
+): Promise<StructuredCloneableFormData> {
+  const result: StructuredCloneableFormData = []
+  for (const [name, value] of formData.entries()) {
+    if (value instanceof File) {
+      result.push({
+        type: 'file',
+        name,
+        value: await value.arrayBuffer(),
+        filename: value.name,
+      })
+    } else {
+      result.push({ type: 'string', name, value })
+    }
+  }
+
+  return result
 }
 
-export function appShellRequestor<Data>(
+export async function appShellRequestor<Data>(
   config: AxiosRequestConfig
-): ResponsePromise<Data> {
+): Promise<AxiosResponse<Data>> {
   const { data } = config
   // Special case: FormData objects can't be sent through invoke().
   // Convert it to a structured-cloneable object so it can be.
   // app-shell will convert it back.
   const formDataProxy =
-    data instanceof FormData ? { proxiedFormData: proxyFormData(data) } : data
+    data instanceof FormData
+      ? { proxiedFormData: await proxyFormData(data) }
+      : data
   const configProxy = { ...config, data: formDataProxy }
 
-  return remote.ipcRenderer.invoke('usb:request', configProxy)
+  return await remote.ipcRenderer.invoke('usb:request', configProxy)
 }
 
 interface CallbackStore {

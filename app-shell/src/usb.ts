@@ -84,10 +84,18 @@ function isUsbDeviceOt3(device: UsbDevice): boolean {
   )
 }
 
-interface StructuredCloneableFormDataEntry {
-  name: string
-  value: string | Blob | File
-}
+type StructuredCloneableFormDataEntry =
+  | {
+      type: 'string'
+      name: string
+      value: string
+    }
+  | {
+      type: 'file'
+      name: string
+      value: ArrayBuffer
+      filename: string
+    }
 
 type StructuredCloneableFormData = StructuredCloneableFormDataEntry[]
 
@@ -96,7 +104,9 @@ function reconstructFormData(
 ): FormData {
   const result = new FormData()
   structuredCloneableFormData.forEach(entry => {
-    result.append(entry.name, entry.value)
+    entry.type === 'file'
+      ? result.append(entry.name, Buffer.from(entry.value), entry.filename)
+      : result.append(entry.name, entry.value)
   })
   return result
 }
