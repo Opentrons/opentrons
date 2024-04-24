@@ -135,7 +135,7 @@ def get_major_version_from_pipette_name(
 
 
 def version_from_generation(pipette_name_list: List[str]) -> PipetteVersionType:
-    """Convert pipetteName to a pipette version string.
+    """Convert pipetteName to a py:obj:PipetteVersionType
 
     Given the pipette_name_list, cycle through each definition file path
     and find the latest version (major and minor version combined) that
@@ -143,10 +143,10 @@ def version_from_generation(pipette_name_list: List[str]) -> PipetteVersionType:
 
     Args:
         pipette_name_list (List[str]): A list of strings from the separated
-        by underscores, representing the pipette name.
+        by `_` py:data:PipetteName.
 
     Returns:
-        str: A string representing the combined major and highest minor version found.
+        PipetteVersionType: A pipette version object.
     """
     major_version_from_pipette_name = get_major_version_from_pipette_name(
         pipette_name_list
