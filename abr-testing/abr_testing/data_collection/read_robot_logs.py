@@ -87,17 +87,21 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
         # Home count
         elif commandType == "heaterShaker/deactivateShaker":
             hs_home_count += 1
+            shake_deactivate_time = datetime.strptime(
+                command.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+            )
+            if shake_time is not None and shake_deactivate_time > shake_time:
+                shake_duration = (shake_deactivate_time - shake_time).total_seconds()
+                hs_rotations[hs_speed] = hs_rotations.get(hs_speed, 0.0) + (
+                    (hs_speed * shake_duration) / 60
+                )
+        elif commandType == "heaterShaker/deactivateHeater":
             deactivate_time = datetime.strptime(
                 command.get("startedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
             )
             if temp_time is not None and deactivate_time > temp_time:
                 temp_duration = (deactivate_time - temp_time).total_seconds()
                 hs_temps[hs_temp] = hs_temps.get(hs_temp, 0.0) + temp_duration
-            if shake_time is not None and deactivate_time > shake_time:
-                shake_duration = (deactivate_time - shake_time).total_seconds()
-                hs_rotations[hs_speed] = hs_rotations.get(hs_speed, 0.0) + (
-                    (hs_speed * shake_duration) / 60
-                )
         # of Rotations
         elif commandType == "heaterShaker/setAndWaitForShakeSpeed":
             hs_speed = command["params"]["rpm"]
@@ -111,6 +115,13 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
             temp_time = datetime.strptime(
                 command.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
             )
+    if temp_time is not None and deactivate_time is None:
+        # If heater shaker module is not deactivated, protocol completedAt time stamp used.
+        protocol_end = datetime.strptime(
+            file_results.get("completedAt", ""), "%Y-%m-%dT%H:%M:%S.%f%z"
+        )
+        temp_duration = (protocol_end - temp_time).total_seconds()
+        hs_temps[hs_temp] = hs_temps.get(hs_temp, 0.0) + temp_duration
     hs_latch_sets = hs_latch_count / 2  # one set of open/close
     hs_total_rotations = sum(hs_rotations.values())
     hs_total_temp_time = sum(hs_temps.values())
