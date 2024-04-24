@@ -134,24 +134,9 @@ Keep in mind that ``set_offset()`` commands will override any labware offsets se
 Labware Offset Behavior
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The effects of ``set_offset()`` vary depending on the API level of your protocol.
+How the API applies labware offsets varies depending on the API level of your protocol. This section describes the latest behavior. For details on how offsets work in earlier API versions, see the API reference entry for :py:meth:`.set_offset`.
 
-.. list-table::
-    :header-rows: 1
-    
-    * - API version 
-      - Offset behavior
-    * - 2.12–2.13
-      - Offsets only apply to the exact :py:class:`.Labware` instance.
-    * - 2.14–2.17
-      - ``set_offset()`` is not available, and the API raises an error.
-    * - 2.18 and newer
-      - 
-        - Offsets apply to any labware of the same type, in the same on-deck location. 
-        - Offsets can't be set on labware that is currently off-deck.
-        - Offsets do not follow a labware instance when using :py:meth:`.move_labware`.
-
-For example, in the latest API version, if you use ``set_offset()`` on a tip rack, use all the tips, and replace the rack with a fresh one of the same type in the same location, the offsets will apply to the fresh tip rack::
+In the latest API version, offsets apply to labware type–location combinations. For example,  if you use ``set_offset()`` on a tip rack, use all the tips, and replace the rack with a fresh one of the same type in the same location, the offsets will apply to the fresh tip rack::
 
     tiprack = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul", location="D3"
