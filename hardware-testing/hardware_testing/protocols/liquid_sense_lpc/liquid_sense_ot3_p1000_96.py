@@ -8,9 +8,9 @@ SLOT_SCALE = 4
 SLOT_DIAL = 5
 SLOTS_TIPRACK = {
     # TODO: add slot 12 when tipracks are disposable
-    50: [2, 3, 6, 7, 8, 9, 10, 11],
-    200: [2, 3, 6, 7, 8, 9, 10, 11],  # NOTE: ignored during calibration
-    1000: [2, 3, 6, 7, 8, 9, 10, 11],  # NOTE: ignored during calibration
+    50: [1, 2, 3, 6, 7, 8, 9, 10, 11],
+    200: [1, 2, 3, 6, 7, 8, 9, 10, 11],  # NOTE: ignored during calibration
+    1000: [1, 2, 3, 6, 7, 8, 9, 10, 11],  # NOTE: ignored during calibration
 }
 
 LABWARE_ON_SCALE = "nest_1_reservoir_195ml"

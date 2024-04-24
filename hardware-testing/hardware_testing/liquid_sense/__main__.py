@@ -159,7 +159,10 @@ class RunArgs:
         pipette_tag = helpers._get_tag_from_pipette(pipette, False, False)
 
         if args.trials == 0:
-            trials = 10
+            if args.channels < 96:
+                trials = 10
+            else:
+                trials = 7
         else:
             trials = args.trials
 
