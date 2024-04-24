@@ -33,7 +33,7 @@ def test_get_virtual_pipette_static_config(
     )
 
     assert result == LoadedStaticPipetteData(
-        model="p20_single_v2.0",
+        model="p20_single_v2.2",
         display_name="P20 Single-Channel GEN2",
         min_volume=1,
         max_volume=20.0,
@@ -69,7 +69,7 @@ def test_configure_virtual_pipette_for_volume(
         PipetteNameType.P50_SINGLE_FLEX.value, "my-pipette"
     )
     assert result1 == LoadedStaticPipetteData(
-        model="p50_single_v3.0",
+        model="p50_single_v3.5",
         display_name="Flex 1-Channel 50 μL",
         min_volume=5,
         max_volume=50.0,
@@ -77,9 +77,9 @@ def test_configure_virtual_pipette_for_volume(
         nozzle_offset_z=-259.15,
         home_position=230.15,
         flow_rates=FlowRates(
-            default_blow_out={"2.14": 4.0},
-            default_aspirate={"2.14": 8.0},
-            default_dispense={"2.14": 8.0},
+            default_blow_out={"2.14": 57},
+            default_aspirate={"2.14": 35},
+            default_dispense={"2.14": 57},
         ),
         tip_configuration_lookup_table=result1.tip_configuration_lookup_table,
         nominal_tip_overlap=result1.nominal_tip_overlap,
@@ -94,7 +94,7 @@ def test_configure_virtual_pipette_for_volume(
         PipetteNameType.P50_SINGLE_FLEX.value, "my-pipette"
     )
     assert result2 == LoadedStaticPipetteData(
-        model="p50_single_v3.0",
+        model="p50_single_v3.5",
         display_name="Flex 1-Channel 50 μL",
         min_volume=1,
         max_volume=30,
@@ -102,9 +102,9 @@ def test_configure_virtual_pipette_for_volume(
         nozzle_offset_z=-259.15,
         home_position=230.15,
         flow_rates=FlowRates(
-            default_blow_out={"2.14": 4.0},
-            default_aspirate={"2.14": 8.0},
-            default_dispense={"2.14": 8.0},
+            default_blow_out={"2.14": 26.7},
+            default_aspirate={"2.14": 26.7},
+            default_dispense={"2.14": 26.7},
         ),
         tip_configuration_lookup_table=result2.tip_configuration_lookup_table,
         nominal_tip_overlap=result2.nominal_tip_overlap,
