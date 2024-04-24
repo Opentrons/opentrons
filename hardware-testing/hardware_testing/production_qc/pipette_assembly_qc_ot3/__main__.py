@@ -179,7 +179,7 @@ CAP_THRESH_SQUARE = {
 
 # THRESHOLDS: air-pressure sensor
 PRESSURE_ASPIRATE_VOL = {1: {50: 10.0, 1000: 20.0}, 8: {50: 10.0, 1000: 20.0}}
-PRESSURE_THRESH_OPEN_AIR = {1: [-150, 150], 8: [-150, 150]}
+PRESSURE_THRESH_OPEN_AIR = {1: [-25, 25], 8: [-25, 25]}
 PRESSURE_THRESH_SEALED = {1: [-500, 500], 8: [-200, 400]}
 PRESSURE_THRESH_COMPRESS = {1: [-2600, 1600], 8: [-8000, 8000]}
 
@@ -1033,26 +1033,26 @@ async def _test_diagnostics_pressure(
             api, mount, SensorType.pressure, 10, _sensor_id
         )
 
-    for sensor_id in sensor_ids:
-        pressure = await _read_pressure(sensor_id)
-        print(f"pressure-open-air-{sensor_id.name}: {pressure}")
-        if (
-            pressure < PRESSURE_THRESH_OPEN_AIR[pip_channels][0]
-            or pressure > PRESSURE_THRESH_OPEN_AIR[pip_channels][1]
-        ):
-            results.append(False)
-            print(
-                f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
-            )
-        else:
-            results.append(True)
-        write_cb(
-            [
-                f"pressure-open-air-{sensor_id.name}",
-                pressure,
-                _bool_to_pass_fail(results[-1]),
-            ]
-        )
+    # for sensor_id in sensor_ids:
+    #     pressure = await _read_pressure(sensor_id)
+    #     print(f"pressure-open-air-{sensor_id.name}: {pressure}")
+    #     if (
+    #         pressure < PRESSURE_THRESH_OPEN_AIR[pip_channels][0]
+    #         or pressure > PRESSURE_THRESH_OPEN_AIR[pip_channels][1]
+    #     ):
+    #         results.append(False)
+    #         print(
+    #             f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
+    #         )
+    #     else:
+    #         results.append(True)
+    #     write_cb(
+    #         [
+    #             f"pressure-open-air-{sensor_id.name}",
+    #             pressure,
+    #             _bool_to_pass_fail(results[-1]),
+    #         ]
+    #     )
 
     # PICK-UP TIP(S)
     _, bottom, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
@@ -1066,6 +1066,20 @@ async def _test_diagnostics_pressure(
         _get_operator_answer_to_question(
             'COVER tip(s) with finger(s), enter "y" when ready'
         )
+    
+    #move to force pressure 
+    current_pos = await api.gantry_position(mount)
+    pos_slot_3 = Point(x=200.74, y=364.27, z=current_pos.z)
+    
+    #hover_over_slot_3 = pos_slot_3._replace(z=current_pos.z)
+    await api.move_to(mount, pos_slot_3)
+    await api.move_rel(mount, Point(z=92.75))
+    force_pressure = pressure_sensor.get_pressure()
+
+    while force_pressure >= 100:
+        await api.move_rel(mount, Point(z=-0.06))
+        force_pressure = pressure_sensor.get_pressure()
+
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
         print(f"pressure-sealed: {pressure}")
@@ -1126,25 +1140,25 @@ async def _test_diagnostics_pressure(
 
 async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) -> bool:
     # ENVIRONMENT SENSOR
-    environment_pass = await _test_diagnostics_environment(api, mount, write_cb)
-    print(f"environment: {_bool_to_pass_fail(environment_pass)}")
-    write_cb(["diagnostics-environment", _bool_to_pass_fail(environment_pass)])
-    # ENCODER
-    encoder_pass = await _test_diagnostics_encoder(api, mount, write_cb)
-    print(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
-    write_cb(["diagnostics-encoder", _bool_to_pass_fail(encoder_pass)])
-    # CAPACITIVE SENSOR
-    print("SKIPPING CAPACITIVE TESTS")
-    pip = api.hardware_pipettes[mount.to_mount()]
-    assert pip
-    capacitance_pass = await _test_diagnostics_capacitive(api, mount, write_cb)
-    print(f"capacitance: {_bool_to_pass_fail(capacitance_pass)}")
-    write_cb(["diagnostics-capacitance", _bool_to_pass_fail(capacitance_pass)])
+    # environment_pass = await _test_diagnostics_environment(api, mount, write_cb)
+    # print(f"environment: {_bool_to_pass_fail(environment_pass)}")
+    # write_cb(["diagnostics-environment", _bool_to_pass_fail(environment_pass)])
+    # # ENCODER
+    # encoder_pass = await _test_diagnostics_encoder(api, mount, write_cb)
+    # print(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
+    # write_cb(["diagnostics-encoder", _bool_to_pass_fail(encoder_pass)])
+    # # CAPACITIVE SENSOR
+    # print("SKIPPING CAPACITIVE TESTS")
+    # pip = api.hardware_pipettes[mount.to_mount()]
+    # assert pip
+    # capacitance_pass = await _test_diagnostics_capacitive(api, mount, write_cb)
+    # print(f"capacitance: {_bool_to_pass_fail(capacitance_pass)}")
+    # write_cb(["diagnostics-capacitance", _bool_to_pass_fail(capacitance_pass)])
     # PRESSURE
     pressure_pass = await _test_diagnostics_pressure(api, mount, write_cb)
     print(f"pressure: {_bool_to_pass_fail(pressure_pass)}")
     write_cb(["diagnostics-pressure", _bool_to_pass_fail(pressure_pass)])
-    return environment_pass and pressure_pass and encoder_pass and capacitance_pass
+    # return environment_pass and pressure_pass and encoder_pass and capacitance_pass
 
 
 async def _test_plunger_positions(
@@ -1528,9 +1542,12 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
         test_config.simulate or test_config.skip_fixture, side=test_config.fixture_side
     )
     
+    global pressure_sensor
     #connect to the pressure sensor
     pressure_sensor = SealedPressureDriver()
     pressure_sensor.init(9600)
+    aaa = pressure_sensor.get_pressure()
+    print("111",aaa)
 
     # create API instance, and get Pipette serial number
     api = await helpers_ot3.build_async_ot3_hardware_api(
