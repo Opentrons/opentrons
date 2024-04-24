@@ -80,7 +80,6 @@ class RunArgs:
     pipette: InstrumentContext
     pipette_tag: str
     git_description: str
-    robot_serial: str
     recorder: GravimetricRecorder
     pipette_volume: int
     pipette_channels: int
@@ -140,7 +139,6 @@ class RunArgs:
     def build_run_args(cls, args: argparse.Namespace) -> "RunArgs":
         """Build."""
         _ctx = RunArgs._get_protocol_context(args)
-        robot_serial = helpers._get_robot_serial(_ctx.is_simulating())
         run_id, start_time = create_run_id_and_start_time()
         environment_sensor = asair_sensor.BuildAsairSensor(
             _ctx.is_simulating() or args.ignore_env
@@ -195,7 +193,6 @@ class RunArgs:
         # go ahead and store the meta data now
         store_serial_numbers(
             report,
-            robot_serial,
             pipette_tag,
             scale.read_serial_number(),
             environment_sensor.get_serial(),
@@ -220,7 +217,6 @@ class RunArgs:
             pipette=pipette,
             pipette_tag=pipette_tag,
             git_description=git_description,
-            robot_serial=robot_serial,
             recorder=recorder,
             pipette_volume=args.pipette,
             pipette_channels=args.channels,

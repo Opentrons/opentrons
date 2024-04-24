@@ -41,7 +41,6 @@ def build_serial_number_section() -> CSVSection:
     return CSVSection(
         title="SERIAL-NUMBERS",
         lines=[
-            CSVLine("robot", [str]),
             CSVLine("git_description", [str]),
             CSVLine("pipette", [str]),
             CSVLine("scale", [str]),
@@ -116,14 +115,12 @@ def build_results_section(tips: List[int]) -> CSVSection:
 
 def store_serial_numbers(
     report: CSVReport,
-    robot: str,
     pipette: str,
     scale: str,
     environment: str,
     git_description: str,
 ) -> None:
     """Report serial numbers."""
-    report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "git_description", [git_description])
     report("SERIAL-NUMBERS", "pipette", [pipette])
     report("SERIAL-NUMBERS", "scale", [scale])
