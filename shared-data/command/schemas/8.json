@@ -1426,7 +1426,7 @@
     },
     "ReloadLabwareCreate": {
       "title": "ReloadLabwareCreate",
-      "description": "Load labware command creation request.",
+      "description": "Reload labware command creation request.",
       "type": "object",
       "properties": {
         "commandType": {
