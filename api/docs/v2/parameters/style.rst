@@ -33,6 +33,7 @@ Punctuate descriptions as sentences, even if they aren't complete sentences. For
 
 .. list-table::
     :header-rows: 1
+    :widths: 1 3
 
     * - Parameter name
       - Parameter description
