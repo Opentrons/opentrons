@@ -84,11 +84,11 @@
       },
       "tip_position": { "label": "tip position" },
       "flow_rate": {
-        "label": "Flow Rate",
-        "range": "between {{min}} and {{max}}",
+        "default_text": "The default {{displayName}} flow rate is optimal for handling aqueous liquids",
         "error_decimals": "A max of {{decimals}} decimal places is allowed",
         "error_out_of_bounds": "accepted range is {{min}} to {{max}}",
-        "default_text": "The default {{displayName}} flow rate is optimal for handling aqueous liquids"
+        "label": "Flow Rate",
+        "range": "between {{min}} and {{max}}"
       },
       "volume": { "label": "volume per well" },
       "well_order": {
