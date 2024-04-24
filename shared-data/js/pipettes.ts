@@ -139,7 +139,7 @@ const getChannelsFromString = (
     }
   }
 }
-const getVersionFromGen = (gen: Gen): number | null => {
+const getVersionFromGen = (gen: Gen): number => {
   switch (gen) {
     case 'gen1': {
       return 1
@@ -152,7 +152,7 @@ const getVersionFromGen = (gen: Gen): number | null => {
       return 3
     }
     default: {
-      return null
+      return 0
     }
   }
 }
@@ -200,7 +200,7 @@ export const getPipetteSpecsV2 = (
   const nameSplit = name.split('_')
   const pipetteModel = nameSplit[0] // ex: p300
   const channels = getChannelsFromString(nameSplit[1] as PipChannelString) //  ex: single -> single_channel
-  const gen = getVersionFromGen(nameSplit[2] as Gen)
+  const pipetteGen = getVersionFromGen(nameSplit[2] as Gen)
   let version: string = ''
   let majorVersion: number
   //  the first 2 conditions are to accommodate version from the pipetteName
@@ -211,8 +211,8 @@ export const getPipetteSpecsV2 = (
     } else {
       majorVersion = 1
     }
-  } else if (gen != null) {
-    majorVersion = gen //  ex: gen1 -> 1
+  } else if (pipetteGen !== 0) {
+    majorVersion = pipetteGen //  ex: gen1 -> 1
     //  the 'else' is to accommodate the exact version if PipetteModel was added
   } else {
     const versionNumber = nameSplit[2].split('v')[1]

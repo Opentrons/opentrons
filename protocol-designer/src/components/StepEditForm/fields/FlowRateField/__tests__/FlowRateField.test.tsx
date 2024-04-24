@@ -54,9 +54,9 @@ describe('FlowRateField', () => {
   it('renders the flowRateInput and clicking on it opens the modal with all the text', () => {
     render(props)
     screen.getByText('Flow Rate')
-    fireEvent.click(screen.getByRole('textbox', { name: '' }))
+    fireEvent.click(screen.getByRole('textbox'))
     screen.getByText(
-      'Our default aspirate speed is optimal for a mockPipDisplayName aspirating liquids with a viscosity similar to water'
+      'The default mockPipDisplayName flow rate is optimal for handling aqueous liquids'
     )
     screen.getByText('aspirate speed')
     screen.getByText('160 μL/s (default)')
