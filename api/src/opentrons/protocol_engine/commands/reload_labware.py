@@ -56,7 +56,7 @@ class ReloadLabwareResult(BaseModel):
 class ReloadLabwareImplementation(
     AbstractCommandImpl[ReloadLabwareParams, ReloadLabwareResult]
 ):
-    """Load labware command implementation."""
+    """Reload labware command implementation."""
 
     def __init__(
         self, equipment: EquipmentHandler, state_view: StateView, **kwargs: object
@@ -77,7 +77,7 @@ class ReloadLabwareImplementation(
 
 
 class ReloadLabware(BaseCommand[ReloadLabwareParams, ReloadLabwareResult]):
-    """Load labware command resource model."""
+    """Reload labware command resource model."""
 
     commandType: ReloadLabwareCommandType = "reloadLabware"
     params: ReloadLabwareParams
@@ -87,7 +87,7 @@ class ReloadLabware(BaseCommand[ReloadLabwareParams, ReloadLabwareResult]):
 
 
 class ReloadLabwareCreate(BaseCommandCreate[ReloadLabwareParams]):
-    """Load labware command creation request."""
+    """Reload labware command creation request."""
 
     commandType: ReloadLabwareCommandType = "reloadLabware"
     params: ReloadLabwareParams
