@@ -90,7 +90,6 @@ export const getNumSlotsAvailable = (
   modules: FormState['modules'],
   additionalEquipment: FormState['additionalEquipment']
 ): number => {
-  const moduleLength = modules != null ? Object.keys(modules).length : 0
   const additionalEquipmentLength = additionalEquipment.length
   const hasTC = Object.values(modules || {}).some(
     module => module.type === THERMOCYCLER_MODULE_TYPE
@@ -98,7 +97,7 @@ export const getNumSlotsAvailable = (
   const hasMagneticBlock = Object.values(modules || {}).some(
     module => module.type === MAGNETIC_BLOCK_TYPE
   )
-  let filteredModuleLength = moduleLength
+  let filteredModuleLength = modules != null ? Object.keys(modules).length : 0
   if (hasTC) {
     filteredModuleLength = filteredModuleLength + 1
   }
