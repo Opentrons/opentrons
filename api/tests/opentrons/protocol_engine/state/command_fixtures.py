@@ -579,3 +579,27 @@ def create_prepare_to_aspirate_command(pipette_id: str) -> cmd.PrepareToAspirate
         params=params,
         result=result,
     )
+
+
+def create_reload_labware_command(
+    labware_id: str,
+    offset_id: Optional[str],
+) -> cmd.ReloadLabware:
+    """Create a completed ReloadLabware command."""
+    params = cmd.ReloadLabwareParams(
+        labwareId=labware_id,
+    )
+
+    result = cmd.ReloadLabwareResult(
+        labwareId=labware_id,
+        offsetId=offset_id,
+    )
+
+    return cmd.ReloadLabware(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
