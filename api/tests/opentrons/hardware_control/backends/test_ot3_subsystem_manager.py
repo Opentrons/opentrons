@@ -227,10 +227,10 @@ class ToolDetectionController:
             else default_name
         )
         return tools.types.PipetteInformation(
-            pipette_name,
-            pipette_name.value,
             pipette_name.name,
             f"dummyserial{pipette_name.name}",
+            pipette_name,
+            pipette_name.value,
         )
 
     def _auto_tool_summary(
