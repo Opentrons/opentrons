@@ -135,12 +135,7 @@ The API will raise errors for potential labware crashes when using a column nozz
     - Simulate your protocol and compare the run preview to your expectations of where the pipette will travel.
     - Perform a dry run with only tip racks on the deck. Have the Emergency Stop Pendant handy in case you see an impending crash.
 
-For column pickup, Opentrons recommends using the nozzles in column 12 of the pipette.
-
-Using Column 12
----------------
-
-The examples in this section use a 96-channel pipette configured to pick up tips with column 12::
+For column pickup, Opentrons recommends using the nozzles in column 12 of the pipette::
 
     pipette.configure_nozzle_layout(
         style=COLUMN,
@@ -164,26 +159,10 @@ You would get a similar error trying to aspirate from or dispense into a well pl
 
     When using column 12 for partial tip pickup and pipetting, generally organize your deck with the shortest labware on the left side of the deck, and the tallest labware on the right side.
 
-Using Column 1
---------------
+If your application can't accommodate a deck layout that works well with column 12, you can configure the 96-channel pipette to pick up tips with column 1, but this is not recommended. Column 1 pickup has several drawbacks:
 
-If your application can't accommodate a deck layout that works well with column 12, you can configure the 96-channel pipette to pick up tips with column 1::
+- Tip pickup force may be incorrect, leading to poor tip fit and loss of positional accuracy.
+- Automatic tip tracking is not available
+- The rightmost columns in labware in column 3 may be inaccessible, if they are beyond the movement limit of the pipette (within 29 mm of the right edge of the slot).
 
-    pipette.configure_nozzle_layout(
-        style=COLUMN,
-        start="A1",
-    )
-
-The major drawback of this configuration, compared to using column 12, is that tip tracking is not available with column 1. You must always specify a ``location`` parameter for :py:meth:`.pick_up_tip`. This *requires careful tip tracking* so you don't place the pipette over more than a single column of unused tips at once. You can write some additional code to manage valid tip pickup locations, like this::
-
-    tip_rack = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "C1")
-    pipette.configure_nozzle_layout(style=COLUMN, start="A1")
-    row_a = tip_rack.rows()[0]
-    pipette.pick_up_tip(row_a.pop())  # pick up A12-H12
-    pipette.drop_tip()
-    pipette.pick_up_tip(row_a.pop())  # pick up A11-H11
-    pipette.drop_tip()
-
-This code first constructs a list of all the wells in row A of the tip rack. Then, when picking up a tip, instead of referencing one of those wells directly, the ``location`` is set to ``row_a.pop()``. This uses the `built-in pop method <https://docs.python.org/3/tutorial/datastructures.html#more-on-lists>`_ to get the last item from the list and remove it from the list. If you keep using this approach to pick up tips, you'll get an error once the tip rack is empty — not from the API, but from Python itself, since you're trying to ``pop`` an item from an empty list.
-
-Additionally, you can't access the rightmost columns in labware in column 3, since they are beyond the movement limit of the pipette. The exact number of inaccessible columns varies by labware type. Any well that is within 29 mm of the right edge of the slot may be inaccessible in a column 1 configuration. Call ``configure_nozzle_layout()`` again to switch to a column 12 layout if you need to pipette in that area.
+For these reasons, use column 12 whenever possible.

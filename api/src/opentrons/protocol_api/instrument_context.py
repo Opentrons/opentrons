@@ -1947,11 +1947,14 @@ class InstrumentContext(publisher.CommandPublisher):
             should be of the same format used when identifying wells by name.
             Required unless setting ``style=ALL``.
 
-            .. note::
-                When using the ``COLUMN`` layout, the only fully supported value is
-                ``start="A12"``. You can use ``start="A1"``, but this will disable tip
-                tracking and you will have to specify the ``location`` every time you
-                call :py:meth:`.pick_up_tip`, such that the pipette picks up columns of
+            .. warning::
+                Specifying ``COLUMN`` layout and ``start="A1"`` is not fully supported.
+                Tip pickup force may be incorrect, leading to poor tip fit and loss of
+                positional accuracy.
+
+                Additionally, ``start="A1"`` disables automatic tip tracking,
+                so you must specify the ``location`` every time you call
+                :py:meth:`.pick_up_tip`, ensuring that the pipette picks up columns of
                 tips *from right to left* on the tip rack.
 
         :type start: str or ``None``
