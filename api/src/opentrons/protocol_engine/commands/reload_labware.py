@@ -4,15 +4,6 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from ..resources import labware_validation
-
-from ..errors import LabwareIsNotAllowedInLocationError
-from ..types import (
-    OnLabwareLocation,
-    DeckSlotLocation,
-)
-
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:

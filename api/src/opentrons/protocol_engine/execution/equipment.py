@@ -189,7 +189,6 @@ class EquipmentHandler:
             LabwareNotLoadedError: If `labware_id` does not reference a loaded labware.
 
         """
-
         location = self._state_store.labware.get_location(labware_id)
         definition_uri = self._state_store.labware.get_definition_uri(labware_id)
         offset_id = self.find_applicable_labware_offset_id(
