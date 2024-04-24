@@ -10,6 +10,7 @@ import {
 import type {
   AddressableArea,
   CoordinateTuple,
+  DeckSlotId,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
@@ -23,6 +24,7 @@ import type {
 const A12_column_front_left_bound = { x: -11.03, y: 2 }
 const A12_column_back_right_bound = { x: 526.77, y: 506.2 }
 const PRIMARY_NOZZLE = 'A12'
+const NOZZLE_CONFIGURATION = 'COLUMN'
 const FLEX_TC_LID_COLLISION_ZONE = {
   back_left: { x: -43.25, y: 454.9, z: 211.91 },
   front_right: { x: 128.75, y: 402, z: 211.91 },
@@ -51,43 +53,39 @@ interface Point {
 
 //  check if nozzle(s) are inbounds
 const getIsWithinPipetteExtents = (
-  pipetteEntity: PipetteEntity,
   location: Point,
   nozzleConfiguration: NozzleConfigurationStyle,
   primaryNozzle: string
 ): boolean => {
-  const channels = pipetteEntity.spec.channels
-  switch (channels) {
-    case 96: {
-      if (nozzleConfiguration === 'COLUMN' && primaryNozzle === 'A12') {
-        return (
-          A12_column_front_left_bound.x <= location.x &&
-          location.x <= A12_column_back_right_bound.x &&
-          A12_column_front_left_bound.y <= location.y &&
-          location.y <= A12_column_back_right_bound.y
-        )
-      }
-      break
-    }
-    case 8:
-    case 1:
-      //  TODO(jr, 4/22/24): update this to support 8-channel partial tip
-      //  and eventually all pipettes
-      return true
+  if (nozzleConfiguration === 'COLUMN' && primaryNozzle === 'A12') {
+    const isWithinBounds =
+      A12_column_front_left_bound.x <= location.x &&
+      location.x <= A12_column_back_right_bound.x &&
+      A12_column_front_left_bound.y <= location.y &&
+      location.y <= A12_column_back_right_bound.y
+
+    return isWithinBounds
+  } else {
+    // TODO: Handle other configurations such as 8-channel partial tip, and eventually all pipettes.
+    return true
   }
 }
 
 //  return pipette bounds at a sepcific position
 const getPipetteBoundsAtSpecifiedMoveToPosition = (
-  primaryNozzle: string,
   pipetteEntity: PipetteEntity,
   tipLength: number,
   destinationPosition: Point
 ): Point[] => {
-  const primaryNozzleOffset = pipetteEntity.spec.nozzleMap[primaryNozzle]
+  //  ask sanniti about how to get primary nozzle? is it
+  const primaryNozzleOffset =
+    pipetteEntity.spec.nozzleMap != null
+      ? pipetteEntity.spec.nozzleMap.A1
+      : pipetteEntity.spec.nozzleOffset
   const primaryNozzlePosition = {
     x: destinationPosition.x,
-    y: destinationPosition.y + tipLength,
+    y: destinationPosition.y,
+    z: (destinationPosition.z ?? 0) + tipLength,
   }
   const pipetteBoundsOffsets = pipetteEntity.spec.pipetteBoundingBoxOffsets
   const backLeftBound = {
@@ -99,7 +97,10 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
       primaryNozzlePosition.y -
       primaryNozzleOffset[1] +
       pipetteBoundsOffsets.backLeftCorner[1],
-    z: primaryNozzleOffset[2] + pipetteBoundsOffsets.backLeftCorner[2],
+    z:
+      primaryNozzlePosition.z -
+      primaryNozzleOffset[2] +
+      pipetteBoundsOffsets.backLeftCorner[2],
   }
   const frontRightBound = {
     x:
@@ -110,11 +111,14 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
       primaryNozzlePosition.y -
       primaryNozzleOffset[1] +
       pipetteBoundsOffsets.frontRightCorner[1],
-    z: primaryNozzleOffset[2] + pipetteBoundsOffsets.frontRightCorner[2],
+    z:
+      primaryNozzlePosition.z -
+      primaryNozzleOffset[2] +
+      pipetteBoundsOffsets.frontRightCorner[2],
   }
 
   const backRightBound: Point = {
-    x: backLeftBound.x,
+    x: frontRightBound.x,
     y: backLeftBound.y,
     z: frontRightBound.z,
   }
@@ -128,7 +132,7 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
 }
 
 //  return whether the two provided rectangles are overlapping in the 2d space.
-const hasOverlappingRectangles = (
+const getHasOverlappingRectangles = (
   rectangle1: Point[],
   rectangle2: Point[]
 ): boolean => {
@@ -154,6 +158,7 @@ const hasOverlappingRectangles = (
   const overlappingInY =
     Math.abs(Math.max(...yCoordinates) - Math.min(...yCoordinates)) <
     yLengthRect1 + yLengthRect2
+
   return overlappingInX && overlappingInY
 }
 
@@ -207,7 +212,7 @@ const getHighestZInSlot = (
 }
 
 //  check if the slot overlaps with the pipette position
-const slotHasPotentialCollidingObject = (
+const getSlotHasPotentialCollidingObject = (
   pipetteBounds: Point[],
   slotInfo: SlotInfo[],
   robotState: RobotState,
@@ -224,31 +229,28 @@ const slotHasPotentialCollidingObject = (
     }
 
     const backLeftCoords = {
-      x: slotBounds.xDimension,
-      y: slotBounds.yDimension,
-      z: slotBounds.zDimension,
+      x: slotPosition[0],
+      y: slotBounds.yDimension + slotPosition[1],
+      z: slotPosition[2],
     }
     const frontRightCoords = {
-      x: slotPosition[0],
+      x: slotPosition[0] + slotBounds.xDimension,
       y: slotPosition[1],
       z: slotPosition[2],
     }
-
     // Check for overlapping rectangles and pipette z-coordinate if slot overlaps with pipette bounds
     if (
-      hasOverlappingRectangles(
+      getHasOverlappingRectangles(
         [pipetteBounds[0], pipetteBounds[1]],
         [backLeftCoords, frontRightCoords]
       ) &&
       pipetteBounds[0].z != null
     ) {
-      console.log('hit here')
       const highestZInSlot = getHighestZInSlot(
         robotState,
         invariantContext,
         labwareId
       )
-      console.log('highestZInSlot', highestZInSlot, pipetteBounds)
       return highestZInSlot >= pipetteBounds[0]?.z
     }
   }
@@ -257,18 +259,15 @@ const slotHasPotentialCollidingObject = (
 
 const getWillCollideWithThermocyclerLid = (
   pipetteBounds: Point[],
-  slotInfos: SlotInfo[],
   moduleEntities: ModuleEntities
 ): boolean => {
-  const slotIds = slotInfos.map(slot => slot.addressableArea?.id)
   if (
-    slotIds.includes('A1') &&
     Object.values(moduleEntities).find(
       module => module.type === THERMOCYCLER_MODULE_TYPE
     )
   ) {
     return (
-      hasOverlappingRectangles(
+      getHasOverlappingRectangles(
         [FLEX_TC_LID_BACK_LEFT_PT, FLEX_TC_LID_FRONT_RIGHT_PT],
         [pipetteBounds[0], pipetteBounds[1]]
       ) && pipetteBounds[0].x <= FLEX_TC_LID_BACK_LEFT_PT.z
@@ -282,13 +281,18 @@ const getWellPosition = (
   labwareEntity: LabwareEntity,
   wellLocationOffset: Point
 ): Point => {
-  const wellDimensions = labwareEntity.def.dimensions
+  const { dimensions: wellDimensions, cornerOffsetFromSlot } = labwareEntity.def
 
   //  getting location from the bottom of the well since PD
   return {
-    x: wellLocationOffset.x + wellDimensions.xDimension,
-    y: wellLocationOffset.y + wellDimensions.yDimension,
-    z: (wellLocationOffset.z ?? 0) + wellDimensions.zDimension,
+    x:
+      cornerOffsetFromSlot.x + wellLocationOffset.x + wellDimensions.xDimension,
+    y:
+      cornerOffsetFromSlot.y + wellLocationOffset.y + wellDimensions.yDimension,
+    z:
+      cornerOffsetFromSlot.z +
+      (wellLocationOffset.z ?? 0) +
+      wellDimensions.zDimension,
   }
 }
 
@@ -309,7 +313,6 @@ export const getIsSafePipetteMovement = (
     moduleEntities,
   } = invariantContext
   const { labware: labwareState, tipState, modules } = robotState
-  const nozzleConfiguration = 'COLUMN'
 
   //  early exit if labwareId is a trashBin or wasteChute
   if (labwareEntities[labwareId] == null) {
@@ -330,31 +333,33 @@ export const getIsSafePipetteMovement = (
   )
 
   const isWithinPipetteExtents = getIsWithinPipetteExtents(
-    pipetteEntity,
     wellLocationPoint,
-    nozzleConfiguration,
     //  TODO(jr, 4/22/24): PD only supports A12 as a primary nozzle for now
+    //  and only for 96-channel column pick up
+    NOZZLE_CONFIGURATION,
     PRIMARY_NOZZLE
   )
   if (!isWithinPipetteExtents) {
     return false
   } else {
     const labwareSlot = labwareState[labwareId].slot
-    let deckSlot = labwareSlot
+    //  labware on deck
+    let deckSlot: DeckSlotId = labwareSlot
     if (modules[labwareSlot] != null) {
+      //  labware on module
       deckSlot = modules[labwareSlot].slot
     } else if (labwareState[labwareSlot] != null) {
       const adapterSlot = labwareState[labwareSlot].slot
-      const adapterInModuleSlot =
-        modules[adapterSlot] != null ? modules[adapterSlot].slot : null
-      if (adapterInModuleSlot != null) {
-        deckSlot = adapterInModuleSlot
+      if (modules[adapterSlot] != null) {
+        //  labware on adapter on module
+        deckSlot = modules[adapterSlot].slot
       } else {
+        //  labware on adapter on deck
+        // eslint-disable-next-line no-unused-vars
         deckSlot = adapterSlot
       }
     }
     const pipetteBoundsAtWellLocation = getPipetteBoundsAtSpecifiedMoveToPosition(
-      PRIMARY_NOZZLE,
       pipetteEntity,
       tipLength,
       wellLocationOffset
@@ -371,14 +376,12 @@ export const getIsSafePipetteMovement = (
         position,
       }
     })
-
     return (
       !getWillCollideWithThermocyclerLid(
         pipetteBoundsAtWellLocation,
-        slotInfos,
         moduleEntities
       ) &&
-      !slotHasPotentialCollidingObject(
+      !getSlotHasPotentialCollidingObject(
         pipetteBoundsAtWellLocation,
         slotInfos,
         robotState,

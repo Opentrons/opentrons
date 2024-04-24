@@ -7,6 +7,7 @@ import {
   fixture96Plate,
   fixtureP100096V2Specs,
   fixtureTiprack1000ul,
+  fixtureTiprackAdapter,
 } from '@opentrons/shared-data'
 import { InvariantContext, RobotState } from '../types'
 
@@ -14,6 +15,8 @@ const mockLabwareId = 'labwareId'
 const mockPipId = 'pip'
 const mockTiprackId = 'tiprackId'
 const mockModule = 'moduleId'
+const mockLabware2 = 'labwareId2'
+const mockAdapter = 'adapterId'
 const mockInvariantProperties: InvariantContext = {
   pipetteEntities: {
     pip: {
@@ -34,6 +37,16 @@ const mockInvariantProperties: InvariantContext = {
       id: mockTiprackId,
       labwareDefURI: 'mockTipUri',
       def: fixtureTiprack1000ul as LabwareDefinition2,
+    },
+    [mockAdapter]: {
+      id: mockAdapter,
+      labwareDefURI: 'mockAdapterUri',
+      def: fixtureTiprackAdapter as LabwareDefinition2,
+    },
+    [mockLabware2]: {
+      id: mockLabware2,
+      labwareDefURI: 'mockDefUri',
+      def: fixture96Plate as LabwareDefinition2,
     },
   },
   moduleEntities: {},
@@ -87,7 +100,7 @@ describe('getIsSafePipetteMovement', () => {
     )
     expect(result).toEqual(false)
   })
-  it('returns false when slot has a module near it', () => {
+  it('returns true when there are no collisions and a module near it', () => {
     mockRobotState.modules = {
       [mockModule]: { slot: 'D1', moduleState: {} as any },
     }
@@ -106,18 +119,49 @@ describe('getIsSafePipetteMovement', () => {
       mockTiprackId,
       { x: -1, y: 5, z: 20 }
     )
+    expect(result).toEqual(true)
+  })
+  it('returns false when there is a tip that collides', () => {
+    mockRobotState.tipState.tipracks = { mockTiprackId: { A1: true } }
+    const result = getIsSafePipetteMovement(
+      mockRobotState,
+      mockInvariantProperties,
+      mockPipId,
+      mockLabwareId,
+      mockTiprackId,
+      { x: -1, y: 5, z: 0 }
+    )
     expect(result).toEqual(false)
   })
-  //    todo(jr, 4/23/24): add more test cases, test thermocycler collision, collision with tip attached
-  //   it.only('returns true when there are no collisions!', () => {
-  //     const result = getIsSafePipetteMovement(
-  //       mockRobotState,
-  //       mockInvariantProperties,
-  //       mockPipId,
-  //       mockLabwareId,
-  //       mockTiprackId,
-  //       { x: 0, y: 0, z: 0 }
-  //     )
-  //     expect(result).toEqual(true)
-  //   })
+  it('returns false when there is a tall module nearby in a diagonal slot with adapter and labware', () => {
+    mockRobotState.modules = {
+      [mockModule]: { slot: 'C1', moduleState: {} as any },
+    }
+    mockRobotState.labware = {
+      [mockLabwareId]: { slot: 'D2' },
+      [mockAdapter]: {
+        slot: mockModule,
+      },
+      [mockLabware2]: {
+        slot: mockAdapter,
+      },
+    }
+    mockInvariantProperties.moduleEntities = {
+      [mockModule]: {
+        id: mockModule,
+        type: TEMPERATURE_MODULE_TYPE,
+        model: TEMPERATURE_MODULE_V2,
+      },
+    }
+    const result = getIsSafePipetteMovement(
+      mockRobotState,
+      mockInvariantProperties,
+      mockPipId,
+      mockLabwareId,
+      mockTiprackId,
+      { x: 0, y: 0, z: 0 }
+    )
+    expect(result).toEqual(false)
+  })
+  //    todo(jr, 4/23/24): add more test cases, test thermocycler collision - i'll do this in a follow up
 })
