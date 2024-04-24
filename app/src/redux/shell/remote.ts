@@ -34,6 +34,9 @@ type StructuredCloneableFormDataEntry =
 
 type StructuredCloneableFormData = StructuredCloneableFormDataEntry[]
 
+// FormData and File objects can't be sent through invoke().
+// This converts them into simpler objects that can be.
+// app-shell will convert them back.
 async function proxyFormData(
   formData: FormData
 ): Promise<StructuredCloneableFormData> {
@@ -43,6 +46,8 @@ async function proxyFormData(
       result.push({
         type: 'file',
         name,
+        // todo(mm, 2024-04-24): Send just the (full) filename instead of the file
+        // contents, to avoid the IPC message ballooning into several MB.
         value: await value.arrayBuffer(),
         filename: value.name,
       })
@@ -58,9 +63,6 @@ export async function appShellRequestor<Data>(
   config: AxiosRequestConfig
 ): Promise<AxiosResponse<Data>> {
   const { data } = config
-  // Special case: FormData objects can't be sent through invoke().
-  // Convert it to a structured-cloneable object so it can be.
-  // app-shell will convert it back.
   const formDataProxy =
     data instanceof FormData
       ? { proxiedFormData: await proxyFormData(data) }
