@@ -75,6 +75,7 @@ def hs_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     hs_temps: Dict[str, float] = dict()
     temp_time = None
     shake_time = None
+    deactivate_time = None
     for command in commandData:
         commandType = command["commandType"]
         # Heatershaker
