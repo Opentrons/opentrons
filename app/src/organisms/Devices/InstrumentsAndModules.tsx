@@ -25,10 +25,7 @@ import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationW
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import { useIsFlex, useIsRobotViewable, useRunStatuses } from './hooks'
-import {
-  getIs96ChannelPipetteAttached,
-  getShowPipetteCalibrationWarning,
-} from './utils'
+import { getShowPipetteCalibrationWarning } from './utils'
 import { PipetteCard } from './PipetteCard'
 import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'
 import { GripperCard } from '../GripperCard'
