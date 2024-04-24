@@ -77,7 +77,6 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   tipLength: number,
   destinationPosition: Point
 ): Point[] => {
-  //  ask sanniti about how to get primary nozzle? is it
   const primaryNozzleOffset =
     pipetteEntity.spec.nozzleMap != null
       ? pipetteEntity.spec.nozzleMap.A1
@@ -283,7 +282,8 @@ const getWellPosition = (
 ): Point => {
   const { dimensions: wellDimensions, cornerOffsetFromSlot } = labwareEntity.def
 
-  //  getting location from the bottom of the well since PD
+  //  getting location from the bottom of the well since PD only supports aspirate/dispense from bottom
+  //  note: api includes calibration data here which PD does not have knowledge of at the moment
   return {
     x:
       cornerOffsetFromSlot.x + wellLocationOffset.x + wellDimensions.xDimension,
@@ -355,7 +355,6 @@ export const getIsSafePipetteMovement = (
         deckSlot = modules[adapterSlot].slot
       } else {
         //  labware on adapter on deck
-        // eslint-disable-next-line no-unused-vars
         deckSlot = adapterSlot
       }
     }
