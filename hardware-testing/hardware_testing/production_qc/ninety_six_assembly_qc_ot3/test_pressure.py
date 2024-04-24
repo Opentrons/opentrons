@@ -132,9 +132,11 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     home_pos = await api.gantry_position(OT3Mount.LEFT)
     await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
-    # init driver
-    pressure_sensor = SealedPressureDriver()
-    pressure_sensor.init(9600)
+
+    if USE_SEALED_FIXTURE:
+        # init driver
+        pressure_sensor = SealedPressureDriver()
+        pressure_sensor.init(9600)
     
     for probe in InstrumentProbeType:
         sensor_id = sensor_id_for_instrument(probe)
