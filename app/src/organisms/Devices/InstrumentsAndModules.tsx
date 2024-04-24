@@ -99,9 +99,8 @@ export function InstrumentsAndModules({
         !i.ok &&
         i.subsystem === 'pipette_right'
     ) ?? null
-  const is96ChannelAttached = getIs96ChannelPipetteAttached(
-    attachedPipettes?.left ?? null
-  )
+  const is96ChannelAttached = attachedLeftPipette?.data.channels === 96
+
   const attachPipetteRequired =
     attachedLeftPipette == null && attachedRightPipette == null
   const calibratePipetteRequired =
