@@ -1,4 +1,5 @@
 import {
+  MAGNETIC_BLOCK_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
@@ -85,17 +86,26 @@ export const getUnoccupiedStagingAreaSlots = (
 
 const TOTAL_MODULE_SLOTS = 8
 
-export const getIsSlotAvailable = (
+export const getNumSlotsAvailable = (
   modules: FormState['modules'],
   additionalEquipment: FormState['additionalEquipment']
-): boolean => {
+): number => {
   const moduleLength = modules != null ? Object.keys(modules).length : 0
   const additionalEquipmentLength = additionalEquipment.length
   const hasTC = Object.values(modules || {}).some(
     module => module.type === THERMOCYCLER_MODULE_TYPE
   )
+  const hasMagneticBlock = Object.values(modules || {}).some(
+    module => module.type === MAGNETIC_BLOCK_TYPE
+  )
+  let filteredModuleLength = moduleLength
+  if (hasTC) {
+    filteredModuleLength = filteredModuleLength + 1
+  }
+  if (hasMagneticBlock) {
+    filteredModuleLength = filteredModuleLength - 1
+  }
 
-  const filteredModuleLength = hasTC ? moduleLength + 1 : moduleLength
   const hasWasteChute = additionalEquipment.some(equipment =>
     equipment.includes('wasteChute')
   )
@@ -113,10 +123,9 @@ export const getIsSlotAvailable = (
   if (hasGripper) {
     filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
   }
-
   return (
-    filteredModuleLength + filteredAdditionalEquipmentLength <
-    TOTAL_MODULE_SLOTS
+    TOTAL_MODULE_SLOTS -
+    (filteredModuleLength + filteredAdditionalEquipmentLength)
   )
 }
 
@@ -130,10 +139,9 @@ export const getTrashOptionDisabled = (
   props: TrashOptionDisabledProps
 ): boolean => {
   const { additionalEquipment, modules, trashType } = props
-  return (
-    !getIsSlotAvailable(modules, additionalEquipment) &&
-    !additionalEquipment.includes(trashType)
-  )
+  const hasNoSlotsAvailable =
+    getNumSlotsAvailable(modules, additionalEquipment) === 0
+  return hasNoSlotsAvailable && !additionalEquipment.includes(trashType)
 }
 
 export const getTrashSlot = (values: FormState): string => {
