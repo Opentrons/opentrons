@@ -383,7 +383,9 @@ class FlexBackend(Protocol):
     def subsystems(self) -> Dict[SubSystem, SubSystemState]:
         ...
 
-    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
+    async def get_tip_status(
+        self, mount: OT3Mount, ht_operation_sensor: Optional[InstrumentProbeType] = None
+    ) -> TipStateType:
         ...
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:

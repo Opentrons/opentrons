@@ -15,6 +15,7 @@ import {
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_AWAITING_RECOVERY,
+  RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
 import {
   useModulesQuery,
@@ -128,11 +129,6 @@ const CANCELLABLE_STATUSES = [
   RUN_STATUS_IDLE,
   RUN_STATUS_AWAITING_RECOVERY,
 ]
-const RUN_OVER_STATUSES: RunStatus[] = [
-  RUN_STATUS_FAILED,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-]
 
 interface ProtocolRunHeaderProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
@@ -214,7 +210,11 @@ export function ProtocolRunHeader({
       if (runStatus === RUN_STATUS_IDLE) {
         setShowDropTipBanner(true)
         setPipettesWithTip([])
-      } else if (runStatus != null && RUN_OVER_STATUSES.includes(runStatus)) {
+      } else if (
+        runStatus != null &&
+        // @ts-expect-error runStatus expected to possibly not be terminal
+        RUN_STATUSES_TERMINAL.includes(runStatus)
+      ) {
         getPipettesWithTipAttached({
           host,
           runId,

@@ -58,7 +58,7 @@
   "firmware_update_needed": "Instrument firmware update needed. Start the update on the robot's touchscreen.",
   "firmware_update_available": "Firmware update available.",
   "firmware_update_failed": "Failed to update module firmware",
-  "firmware_update_installation_successful": "Installation successful",
+  "firmware_updated_successfully": "Firmware updated successfully",
   "firmware_update_occurring": "Firmware update in progress...",
   "fixture": "Fixture",
   "have_not_run_description": "After you run some protocols, they will appear here.",

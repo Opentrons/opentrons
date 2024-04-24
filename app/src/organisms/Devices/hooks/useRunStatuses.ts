@@ -1,14 +1,14 @@
 import {
+  RUN_STATUSES_TERMINAL,
   RUN_STATUS_AWAITING_RECOVERY,
-  RUN_STATUS_FAILED,
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSED,
   RUN_STATUS_RUNNING,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
+
+import type { RunStatus } from '@opentrons/api-client'
 
 interface RunStatusesInfo {
   isRunStill: boolean
@@ -29,9 +29,9 @@ export function useRunStatuses(): RunStatusesInfo {
     runStatus === RUN_STATUS_RUNNING ||
     runStatus === RUN_STATUS_AWAITING_RECOVERY
   const isRunTerminal =
-    runStatus === RUN_STATUS_SUCCEEDED ||
-    runStatus === RUN_STATUS_STOPPED ||
-    runStatus === RUN_STATUS_FAILED
+    runStatus != null
+      ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
+      : false
   const isRunStill = isRunTerminal || isRunIdle
 
   return { isRunStill, isRunTerminal, isRunIdle, isRunRunning }

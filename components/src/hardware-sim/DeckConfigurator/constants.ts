@@ -58,3 +58,24 @@ export const CONFIG_STYLE_EDITABLE = css`
     }
   }
 `
+
+export const CONFIG_STYLE_SELECTED = css`
+  ${CONFIG_STYLE_EDITABLE}
+  background-color: ${COLORS.blue50};
+
+  &:active {
+    background-color: ${COLORS.blue60};
+  }
+
+  &:hover {
+    background-color: ${COLORS.blue55};
+  }
+
+  &:focus-visible {
+    border: 3px solid ${COLORS.yellow50};
+    background-color: ${COLORS.blue55};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      background-color: ${COLORS.blue60};
+    }
+  }
+`
