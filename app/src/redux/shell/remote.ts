@@ -20,16 +20,28 @@ export const remote: Remote = new Proxy(emptyRemote, {
   },
 })
 
+interface StructuredCloneableFormDataEntry {
+  name: string
+  value: string | Blob | File
+}
+
+type StructuredCloneableFormData = StructuredCloneableFormDataEntry[]
+
+function proxyFormData(formData: FormData): StructuredCloneableFormData {
+  return [...formData.entries()].map(([name, value]) => {
+    return { name, value }
+  })
+}
+
 export function appShellRequestor<Data>(
   config: AxiosRequestConfig
 ): ResponsePromise<Data> {
   const { data } = config
-  // TODO
-  // special case: protocol files and form data cannot be sent through invoke. proxy by protocolKey and handle in app-shell
+  // Special case: FormData objects can't be sent through invoke().
+  // Convert it to a structured-cloneable object so it can be.
+  // app-shell will convert it back.
   const formDataProxy =
-    data instanceof FormData
-      ? { formDataProxy: { protocolKey: data.get('key') } }
-      : data
+    data instanceof FormData ? { proxiedFormData: proxyFormData(data) } : data
   const configProxy = { ...config, data: formDataProxy }
 
   return remote.ipcRenderer.invoke('usb:request', configProxy)

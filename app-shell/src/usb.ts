@@ -83,6 +83,24 @@ function isUsbDeviceOt3(device: UsbDevice): boolean {
     device.vendorId === parseInt(DEFAULT_VENDOR_ID, 16)
   )
 }
+
+interface StructuredCloneableFormDataEntry {
+  name: string
+  value: string | Blob | File
+}
+
+type StructuredCloneableFormData = StructuredCloneableFormDataEntry[]
+
+function reconstructFormData(
+  structuredCloneableFormData: StructuredCloneableFormData
+): FormData {
+  const result = new FormData()
+  structuredCloneableFormData.forEach(entry => {
+    result.append(entry.name, entry.value)
+  })
+  return result
+}
+
 async function usbListener(
   _event: IpcMainInvokeEvent,
   config: AxiosRequestConfig
@@ -92,22 +110,9 @@ async function usbListener(
   let formHeaders = {}
 
   // check for formDataProxy
-  if (data?.formDataProxy != null) {
+  if (data?.proxiedFormData != null) {
     // reconstruct FormData
-    const formData = new FormData()
-    const { protocolKey } = data.formDataProxy
-
-    // TODO
-    const srcFilePaths: string[] = await getProtocolSrcFilePaths(protocolKey)
-
-    // create readable stream from file
-    srcFilePaths.forEach(srcFilePath => {
-      const readStream = fs.createReadStream(srcFilePath)
-      formData.append('files', readStream, path.basename(srcFilePath))
-    })
-
-    formData.append('key', protocolKey)
-
+    const formData = reconstructFormData(data.proxiedFormData)
     formHeaders = formData.getHeaders()
     data = formData
   }
