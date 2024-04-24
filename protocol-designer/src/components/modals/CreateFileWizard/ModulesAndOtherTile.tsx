@@ -253,32 +253,33 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
             }
           }
         }
+        const tempNumItems =
+          modules != null
+            ? Object.values(modules).filter(
+                module => module.type === TEMPERATURE_MODULE_TYPE
+              ).length
+            : 0
 
         const handleOnClick = (): void => {
-          if (
-            (moduleType !== TEMPERATURE_MODULE_TYPE && enableMoamFf) ||
-            !enableMoamFf
-          ) {
-            if (isModuleOnDeck) {
-              const updatedModules =
-                modules != null
-                  ? Object.fromEntries(
-                      Object.entries(modules).filter(
-                        ([key, value]) => value.type !== moduleType
-                      )
+          if (isModuleOnDeck) {
+            const updatedModules =
+              modules != null
+                ? Object.fromEntries(
+                    Object.entries(modules).filter(
+                      ([key, value]) => value.type !== moduleType
                     )
-                  : {}
-              setValue('modules', updatedModules)
-            } else {
-              setValue('modules', {
-                ...modules,
-                [uuid()]: {
-                  model: moduleModel,
-                  type: moduleType,
-                  slot: DEFAULT_SLOT_MAP[moduleModel],
-                },
-              })
-            }
+                  )
+                : {}
+            setValue('modules', updatedModules)
+          } else {
+            setValue('modules', {
+              ...modules,
+              [uuid()]: {
+                model: moduleModel,
+                type: moduleType,
+                slot: DEFAULT_SLOT_MAP[moduleModel],
+              },
+            })
           }
         }
 
@@ -295,23 +296,16 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
                 : isDisabled && !isModuleOnDeck
             }
             onClick={handleOnClick}
+            showCheckbox
             multiples={
               moduleType === TEMPERATURE_MODULE_TYPE && enableMoamFf
                 ? {
                     maxItems: MAX_TEMPERATURE_MODULES,
                     setValue: handleMultiplesClick,
-                    numItems:
-                      modules != null
-                        ? Object.values(modules).filter(
-                            module => module.type === TEMPERATURE_MODULE_TYPE
-                          ).length
-                        : 0,
+                    numItems: tempNumItems,
                     isDisabled: isDisabled ?? false,
                   }
                 : undefined
-            }
-            showCheckbox={
-              enableMoamFf ? moduleType !== TEMPERATURE_MODULE_TYPE : true
             }
           />
         )

@@ -81,9 +81,8 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
 
     &:hover {
-      background-color: ${multiples ? COLORS.white : COLORS.grey10};
-      border: 1px ${BORDERS.styleSolid}
-        ${multiples ? COLORS.grey30 : COLORS.grey35};
+      background-color: ${COLORS.grey10};
+      border: 1px ${BORDERS.styleSolid} ${COLORS.grey35};
     }
 
     &:focus {
@@ -135,66 +134,50 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     )
   } else if (showCheckbox && disabled) {
     iconInfo = <Flex width="1.5rem" />
-  } else if (multiples != null) {
+  }
+
+  // else if (multiples != null) {
+
+  //   iconInfo = (
+  //     <Flex
+  //       flexDirection={DIRECTION_COLUMN}
+  //       gridGap={SPACING.spacing4}
+  //       width="1.5rem"
+  //       alignItems={ALIGN_CENTER}
+  //     >
+
+  //         <Icon css={upArrowStyle} size="0.75rem" name="ot-arrow-up" />
+  //       </Flex>
+
+  //         <Icon
+  //           css={downArrowStyle}
+  //           size={SPACING.spacing12}
+  //           name="ot-arrow-down"
+  //         />
+  //       </Flex>
+  //       {isDisabled || numMultiples === 7 ? (
+  //         <Tooltip {...tempTooltipProps}>
+  //           {t('not_enough_space_for_temp')}
+  //         </Tooltip>
+  //       ) : null}
+  //     </Flex>
+  //   )
+  // }
+
+  let upArrowStyle = ARROW_STYLE
+  let downArrowStyle = ARROW_STYLE
+  if (multiples != null) {
     const { numItems, maxItems, isDisabled } = multiples
-    let upArrowStyle = ARROW_STYLE
     if (isDisabled || numItems === maxItems) {
       upArrowStyle = ARROW_STYLE_DISABLED
     } else if (numItems > 0) {
       upArrowStyle = ARROW_STYLE_ACTIVE
     }
-    let downArrowStyle = ARROW_STYLE
     if (numItems === 0) {
       downArrowStyle = ARROW_STYLE_DISABLED
     } else if (numItems > 0) {
       downArrowStyle = ARROW_STYLE_ACTIVE
     }
-
-    iconInfo = (
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
-        width="1.5rem"
-        alignItems={ALIGN_CENTER}
-      >
-        <Flex
-          {...tempTargetProps}
-          data-testid="EquipmentOption_upArrow"
-          onClick={
-            numMultiples === 7
-              ? undefined
-              : () => {
-                  multiples.setValue(numMultiples + 1)
-                  setNumMultiples(prevNumMultiples => prevNumMultiples + 1)
-                }
-          }
-        >
-          <Icon css={upArrowStyle} size="0.75rem" name="ot-arrow-up" />
-        </Flex>
-        <Flex
-          data-testid="EquipmentOption_downArrow"
-          onClick={
-            numMultiples === 0
-              ? undefined
-              : () => {
-                  multiples.setValue(numMultiples - 1)
-                  setNumMultiples(prevNumMultiples => prevNumMultiples - 1)
-                }
-          }
-        >
-          <Icon
-            css={downArrowStyle}
-            size={SPACING.spacing12}
-            name="ot-arrow-down"
-          />
-        </Flex>
-        {isDisabled || numMultiples === 7 ? (
-          <Tooltip {...tempTooltipProps}>
-            {t('not_enough_space_for_temp')}
-          </Tooltip>
-        ) : null}
-      </Flex>
-    )
   }
 
   return (
@@ -210,7 +193,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
             : BORDERS.lineBorder
         }
         borderRadius={BORDERS.borderRadius8}
-        cursor={disabled || multiples != null ? 'auto' : 'pointer'}
+        cursor={disabled ? 'auto' : 'pointer'}
         backgroundColor={disabled ? COLORS.grey30 : COLORS.transparent}
         onClick={disabled ? undefined : onClick}
         {...styleProps}
@@ -247,8 +230,48 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
                 fontSize={TYPOGRAPHY.fontSizeP}
                 gridGap={SPACING.spacing4}
               >
+                <Flex
+                  {...tempTargetProps}
+                  zIndex={1000}
+                  data-testid="EquipmentOption_upArrow"
+                  onClick={
+                    numMultiples === 7
+                      ? undefined
+                      : () => {
+                          multiples.setValue(numMultiples + 1)
+                          setNumMultiples(
+                            prevNumMultiples => prevNumMultiples + 1
+                          )
+                        }
+                  }
+                >
+                  <Icon
+                    css={downArrowStyle}
+                    size={SPACING.spacing12}
+                    name="plus"
+                  />
+                </Flex>
                 <Text>{t('shared:amount')}</Text>
                 <Text>{multiples.numItems}</Text>
+                <Flex
+                  data-testid="EquipmentOption_downArrow"
+                  onClick={
+                    numMultiples === 0
+                      ? undefined
+                      : () => {
+                          multiples.setValue(numMultiples - 1)
+                          setNumMultiples(
+                            prevNumMultiples => prevNumMultiples - 1
+                          )
+                        }
+                  }
+                >
+                  <Icon
+                    css={downArrowStyle}
+                    size={SPACING.spacing12}
+                    name="minus"
+                  />
+                </Flex>
               </Flex>
             </>
           ) : null}
