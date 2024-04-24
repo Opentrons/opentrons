@@ -69,6 +69,7 @@ describe('SetupFixtureList', () => {
   beforeEach(() => {
     props = {
       deckConfigCompatibility: mockDeckConfigCompatibility,
+      robotName: 'otie',
     }
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
@@ -100,6 +101,7 @@ describe('SetupFixtureList', () => {
   it('should render the headers and a fixture with conflicted status', () => {
     props = {
       deckConfigCompatibility: mockConflictDeckConfigCompatibility,
+      robotName: 'otie',
     }
     render(props)
     screen.getByText('Location conflict')
@@ -110,6 +112,7 @@ describe('SetupFixtureList', () => {
   it('should render the headers and a fixture with not configured status and button', () => {
     props = {
       deckConfigCompatibility: mockNotConfiguredDeckConfigCompatibility,
+      robotName: 'otie',
     }
     render(props)
     screen.getByText('Not configured')

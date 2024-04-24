@@ -59,8 +59,6 @@ import type {
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
-// type CutoutContents = Omit<CutoutConfig, 'cutoutId'>
-
 interface AddFixtureModalProps {
   cutoutId: CutoutId
   setShowAddFixtureModal: (showAddFixtureModal: boolean) => void

@@ -7,8 +7,12 @@ import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import {
   useCreateLiveCommandMutation,
   useModulesQuery,
+  useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
-import { ot3StandardDeckV5 as ot3StandardDeckDef } from '@opentrons/shared-data'
+import {
+  HEATERSHAKER_MODULE_V1_FIXTURE,
+  ot3StandardDeckV5 as ot3StandardDeckDef,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -33,6 +37,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     ...actual,
     useCreateLiveCommandMutation: vi.fn(),
     useModulesQuery: vi.fn(),
+    useDeckConfigurationQuery: vi.fn(),
   }
 })
 
@@ -75,6 +80,16 @@ describe('ProtocolSetupLabware', () => {
     } as any)
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
+    } as any)
+    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+      data: [
+        {
+          cutoutId: 'cutoutB1',
+          cutoutFixtureId: HEATERSHAKER_MODULE_V1_FIXTURE,
+          opentronsModuleSerialNumber:
+            mockUseModulesQueryClosed.data.data[0].serialNumber,
+        },
+      ],
     } as any)
   })
   afterEach(() => {

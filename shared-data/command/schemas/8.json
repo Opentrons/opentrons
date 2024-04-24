@@ -2582,6 +2582,12 @@
       "enum": ["present", "absent", "unknown"],
       "type": "string"
     },
+    "InstrumentSensorId": {
+      "title": "InstrumentSensorId",
+      "description": "Primary and secondary sensor ids.",
+      "enum": ["primary", "secondary", "both"],
+      "type": "string"
+    },
     "VerifyTipPresenceParams": {
       "title": "VerifyTipPresenceParams",
       "description": "Payload required for a VerifyTipPresence command.",
@@ -2597,6 +2603,14 @@
           "allOf": [
             {
               "$ref": "#/definitions/TipPresenceStatus"
+            }
+          ]
+        },
+        "followSingularSensor": {
+          "description": "The sensor id to follow if the other can be ignored.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/InstrumentSensorId"
             }
           ]
         }
