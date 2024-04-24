@@ -339,7 +339,7 @@
     "CommandIntent": {
       "title": "CommandIntent",
       "description": "Run intent for a given command.\n\nProps:\n    PROTOCOL: the command is part of the protocol run itself.\n    SETUP: the command is part of the setup phase of a run.",
-      "enum": ["protocol", "setup"],
+      "enum": ["protocol", "setup", "fixit"],
       "type": "string"
     },
     "AspirateCreate": {
@@ -2582,6 +2582,12 @@
       "enum": ["present", "absent", "unknown"],
       "type": "string"
     },
+    "InstrumentSensorId": {
+      "title": "InstrumentSensorId",
+      "description": "Primary and secondary sensor ids.",
+      "enum": ["primary", "secondary", "both"],
+      "type": "string"
+    },
     "VerifyTipPresenceParams": {
       "title": "VerifyTipPresenceParams",
       "description": "Payload required for a VerifyTipPresence command.",
@@ -2597,6 +2603,14 @@
           "allOf": [
             {
               "$ref": "#/definitions/TipPresenceStatus"
+            }
+          ]
+        },
+        "followSingularSensor": {
+          "description": "The sensor id to follow if the other can be ignored.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/InstrumentSensorId"
             }
           ]
         }

@@ -79,6 +79,7 @@ _HIGHER_ORDER_COMMAND_TYPES = {
     legacy_command_types.DISTRIBUTE,
     legacy_command_types.TRANSFER,
     legacy_command_types.RETURN_TIP,
+    legacy_command_types.AIR_GAP,
 }
 
 

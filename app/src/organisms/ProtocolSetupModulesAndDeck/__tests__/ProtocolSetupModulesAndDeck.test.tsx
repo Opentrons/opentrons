@@ -107,7 +107,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
       .calledWith(mockRobotSideAnalysis, flexDeckDef)
       .thenReturn([])
     when(vi.mocked(getAttachedProtocolModuleMatches))
-      .calledWith([], [])
+      .calledWith([], [], [])
       .thenReturn([])
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], [])
@@ -148,7 +148,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
       },
     ])
     render()
-    screen.getByText('Module')
+    screen.getByText('Deck hardware')
     screen.getByText('Location')
     screen.getByText('Status')
     screen.getByText('Setup Instructions')
@@ -313,7 +313,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
     vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([
       {
         ...mockProtocolModuleInfo[0],
-        attachedModuleMatch: calibratedMockApiHeaterShaker,
+        attachedModuleMatch: undefined,
         slotName: 'D3',
       },
     ])

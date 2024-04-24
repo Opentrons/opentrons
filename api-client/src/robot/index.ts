@@ -4,6 +4,7 @@ export { acknowledgeEstopDisengage } from './acknowledgeEstopDisengage'
 export { getLights } from './getLights'
 export { setLights } from './setLights'
 export { getRobotSettings } from './getRobotSettings'
+export { updateRobotSetting } from './updateRobotSetting'
 
 export type {
   DoorStatus,
@@ -15,4 +16,5 @@ export type {
   RobotSettingsField,
   RobotSettingsResponse,
   SetLightsData,
+  UpdateRobotSettingRequest,
 } from './types'

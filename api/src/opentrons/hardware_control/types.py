@@ -624,6 +624,7 @@ class GripperJawState(enum.Enum):
 class InstrumentProbeType(enum.Enum):
     PRIMARY = enum.auto()
     SECONDARY = enum.auto()
+    BOTH = enum.auto()
 
 
 class GripperProbe(enum.Enum):

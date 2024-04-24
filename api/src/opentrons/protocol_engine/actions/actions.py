@@ -116,6 +116,7 @@ class QueueCommandAction:
     created_at: datetime
     request: CommandCreate
     request_hash: Optional[str]
+    failed_command_id: Optional[str] = None
 
 
 @dataclass(frozen=True)
