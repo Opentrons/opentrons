@@ -1105,7 +1105,7 @@ class GeometryView:
                 slotName=parent_location.slotName, moduleModel=None, definitionUri=None
             )
         elif isinstance(parent_location, ModuleLocation):
-            module_model = self._modules.get_connected_model(parent_location.moduleId)
+            module_model = self._modules.get_requested_model(parent_location.moduleId)
             module_location = self._modules.get_location(parent_location.moduleId)
             return LabwareOffsetLocation(
                 slotName=module_location.slotName,
@@ -1123,7 +1123,7 @@ class GeometryView:
                     definitionUri=parent_uri,
                 )
             elif isinstance(non_labware_parent_location, ModuleLocation):
-                module_model = self._modules.get_connected_model(
+                module_model = self._modules.get_requested_model(
                     non_labware_parent_location.moduleId
                 )
                 module_location = self._modules.get_location(

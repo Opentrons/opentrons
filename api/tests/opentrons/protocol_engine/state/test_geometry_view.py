@@ -2484,7 +2484,7 @@ def test_get_offset_location_module(
     assert offset_location is not None
     assert offset_location.slotName == DeckSlotName.SLOT_A3
     assert offset_location.definitionUri is None
-    assert offset_location.moduleModel == ModuleModel.TEMPERATURE_MODULE_V2
+    assert offset_location.moduleModel == ModuleModel.TEMPERATURE_MODULE_V1
 
 
 @pytest.mark.parametrize("use_mocks", [False])
@@ -2566,7 +2566,7 @@ def test_get_offset_location_module_with_adapter(
     assert offset_location.definitionUri == labware_view.get_uri_from_definition(
         nice_adapter_definition
     )
-    assert offset_location.moduleModel == ModuleModel.TEMPERATURE_MODULE_V2
+    assert offset_location.moduleModel == ModuleModel.TEMPERATURE_MODULE_V1
 
 
 @pytest.mark.parametrize("use_mocks", [False])
