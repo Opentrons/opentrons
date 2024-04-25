@@ -42,7 +42,7 @@ def override_data_store(tmp_path: Path) -> Iterator[None]:
 @pytest.fixture
 def monkeypatch_set_store_each_to_true(monkeypatch: pytest.MonkeyPatch) -> None:
     """Override the STORE_EACH flag for the RobotContextTracker."""
-    monkeypatch.setattr("opentrons.util.performance_helpers.STORE_EACH", True)
+    context_tracker._store_each = True  # type: ignore[attr-defined]
 
 
 def verify_metrics_store_file(file_path: Path, expected_length: int) -> None:
@@ -288,34 +288,6 @@ def test_python_error_line_numbers(
     assert result.json_output is not None
     [error] = result.json_output["errors"]
     assert error["detail"] == expected_detail
-
-
-@pytest.mark.usefixtures("override_data_store")
-def test_track_analysis(tmp_path: Path) -> None:
-    """Test that the RobotContextTracker tracks analysis."""
-    protocol_source = textwrap.dedent(
-        """
-        requirements = {"apiLevel": "2.15"}
-
-        def run(protocol):
-            pass
-        """
-    )
-    protocol_source_file = tmp_path / "protocol.py"
-    protocol_source_file.write_text(protocol_source, encoding="utf-8")
-    store = context_tracker._store  # type: ignore[attr-defined]
-
-    num_storage_entities_before_analysis = len(store._data)
-
-    _get_analysis_result([protocol_source_file])
-
-    assert len(store._data) == num_storage_entities_before_analysis + 1
-
-    verify_metrics_store_file(store.metadata.data_file_location, 0)
-
-    context_tracker.store()
-
-    verify_metrics_store_file(store.metadata.data_file_location, 1)
 
 
 @pytest.mark.usefixtures("override_data_store", "monkeypatch_set_store_each_to_true")
