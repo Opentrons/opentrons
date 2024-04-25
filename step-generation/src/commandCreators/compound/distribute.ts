@@ -16,7 +16,7 @@ import {
   blowoutUtil,
   wasteChuteCommandsUtil,
   getDispenseAirGapLocation,
-  getIsTallLabwareWestOf96Channel,
+  getIsSafePipetteMovement,
   getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import {
@@ -53,6 +53,26 @@ export const distribute: CommandCreator<DistributeArgs> = (
     * 'once': get a new tip at the beginning of the distribute step, and use it throughout
     * 'never': reuse the tip from the last step
   */
+
+  // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
+  // to the action of aspiration of dispensing in a given command, they are actually values bound
+  // to a given labware associated with a command (e.g. Source, Destination). For this reason we
+  // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
+  // when we decide to rename these fields/args... probably all the way up to the UI level.
+  const {
+    aspirateDelay,
+    aspirateFlowRateUlSec,
+    aspirateOffsetFromBottomMm,
+    dispenseDelay,
+    dispenseFlowRateUlSec,
+    dispenseOffsetFromBottomMm,
+    blowoutLocation,
+    aspirateXOffset,
+    aspirateYOffset,
+    dispenseXOffset,
+    dispenseYOffset,
+  } = args
+
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
   const actionName = 'distribute'
   const errors: CommandCreatorError[] = []
@@ -91,67 +111,38 @@ export const distribute: CommandCreator<DistributeArgs> = (
   if (
     is96Channel &&
     args.nozzles === COLUMN &&
-    getIsTallLabwareWestOf96Channel(
+    !getIsSafePipetteMovement(
       prevRobotState,
       invariantContext,
-      args.sourceLabware,
       args.pipette,
-      args.tipRack
+      args.sourceLabware,
+      args.tipRack,
+      { x: aspirateXOffset, y: aspirateYOffset }
     )
   ) {
-    errors.push(
-      errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
-        source: 'aspirate',
-        labware:
-          invariantContext.labwareEntities[args.sourceLabware].def.metadata
-            .displayName,
-      })
-    )
+    errors.push(errorCreators.possiblePipetteCollision())
   }
 
   if (
     is96Channel &&
     args.nozzles === COLUMN &&
-    getIsTallLabwareWestOf96Channel(
+    !getIsSafePipetteMovement(
       prevRobotState,
       invariantContext,
-      args.destLabware,
       args.pipette,
-      args.tipRack
+      args.destLabware,
+      args.tipRack,
+      { x: dispenseXOffset, y: dispenseYOffset }
     )
   ) {
-    errors.push(
-      errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
-        source: 'dispense',
-        labware:
-          invariantContext.labwareEntities[args.destLabware].def.metadata
-            .displayName,
-      })
-    )
+    errors.push(errorCreators.possiblePipetteCollision())
   }
 
   if (errors.length > 0)
     return {
       errors,
     }
-  // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
-  // to the action of aspiration of dispensing in a given command, they are actually values bound
-  // to a given labware associated with a command (e.g. Source, Destination). For this reason we
-  // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
-  // when we decide to rename these fields/args... probably all the way up to the UI level.
-  const {
-    aspirateDelay,
-    aspirateFlowRateUlSec,
-    aspirateOffsetFromBottomMm,
-    dispenseDelay,
-    dispenseFlowRateUlSec,
-    dispenseOffsetFromBottomMm,
-    blowoutLocation,
-    aspirateXOffset,
-    aspirateYOffset,
-    dispenseXOffset,
-    dispenseYOffset,
-  } = args
+
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
   // TODO error on negative args.disposalVolume?
