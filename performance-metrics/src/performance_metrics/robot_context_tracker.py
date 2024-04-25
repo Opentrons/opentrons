@@ -1,5 +1,6 @@
 """Module for tracking robot context and execution duration for different operations."""
 
+import inspect
 from pathlib import Path
 import platform
 
@@ -77,19 +78,42 @@ class RobotContextTracker(SupportsTracking):
             if not self._should_track:
                 return func
 
-            @wraps(func)
-            def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-                function_start_time = timing_function()
-                duration_start_time = perf_counter_ns()
-                try:
-                    result = func(*args, **kwargs)
-                finally:
-                    duration_end_time = perf_counter_ns()
-                    self._store.add(
-                        RawContextData(
-                            func_start=function_start_time,
-                            duration=duration_end_time - duration_start_time,
-                            state=state,
+            if inspect.iscoroutinefunction(func):
+                @wraps(func)
+                async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+                    function_start_time = timing_function()
+                    duration_start_time = perf_counter_ns()
+                    try:
+                        result = await func(*args, **kwargs)
+                    finally:
+                        duration_end_time = perf_counter_ns()
+
+                        self._store.add(
+                            RawContextData(
+                                func_start=function_start_time,
+                                duration=duration_end_time - duration_start_time,
+                                state=state,
+                            )
+                        )
+
+                        if self._store_each:
+                            self.store()
+
+                    return result
+            else:
+                @wraps(func)
+                def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+                    function_start_time = timing_function()
+                    duration_start_time = perf_counter_ns()
+                    try:
+                        result = func(*args, **kwargs)
+                    finally:
+                        duration_end_time = perf_counter_ns()
+                        self._store.add(
+                            RawContextData(
+                                func_start=function_start_time,
+                                duration=duration_end_time - duration_start_time,
+                                state=state,
                             )
                         )
 
