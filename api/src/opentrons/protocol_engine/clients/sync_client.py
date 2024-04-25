@@ -127,6 +127,19 @@ class SyncClient:
 
         return cast(commands.LoadLabwareResult, result)
 
+    def reload_labware(
+        self,
+        labware_id: str,
+    ) -> commands.ReloadLabwareResult:
+        """Execute a ReloadLabware command and return the result."""
+        request = commands.ReloadLabwareCreate(
+            params=commands.ReloadLabwareParams(
+                labwareId=labware_id,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.ReloadLabwareResult, result)
+
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
