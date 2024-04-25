@@ -17,6 +17,7 @@ import {
   USB_DEVICE_REMOVED,
 } from './constants'
 
+import type { StructuredCloneableFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 import type { Action, Dispatch } from './types'
@@ -80,21 +81,6 @@ function isUsbDeviceOt3(device: UsbDevice): boolean {
     device.vendorId === parseInt(DEFAULT_VENDOR_ID, 16)
   )
 }
-
-type StructuredCloneableFormDataEntry =
-  | {
-      type: 'string'
-      name: string
-      value: string
-    }
-  | {
-      type: 'file'
-      name: string
-      value: ArrayBuffer
-      filename: string
-    }
-
-type StructuredCloneableFormData = StructuredCloneableFormDataEntry[]
 
 function reconstructFormData(
   structuredCloneableFormData: StructuredCloneableFormData

@@ -1,6 +1,11 @@
 // access main process remote modules via attachments to `global`
 import type { AxiosRequestConfig, AxiosResponse } from 'axios'
-import type { Remote, NotifyTopic, NotifyResponseData } from './types'
+import type {
+  Remote,
+  NotifyTopic,
+  NotifyResponseData,
+  StructuredCloneableFormData,
+} from './types'
 
 const emptyRemote: Remote = {} as any
 
@@ -18,21 +23,6 @@ export const remote: Remote = new Proxy(emptyRemote, {
     return (global as any).APP_SHELL_REMOTE[propName] as Remote
   },
 })
-
-type StructuredCloneableFormDataEntry =
-  | {
-      type: 'string'
-      name: string
-      value: string
-    }
-  | {
-      type: 'file'
-      name: string
-      value: ArrayBuffer
-      filename: string
-    }
-
-type StructuredCloneableFormData = StructuredCloneableFormDataEntry[]
 
 // FormData and File objects can't be sent through invoke().
 // This converts them into simpler objects that can be.
