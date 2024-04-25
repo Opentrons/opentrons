@@ -1,6 +1,8 @@
 """Protocol run control and management."""
 import asyncio
-from typing import List, NamedTuple, Optional, Union
+from dataclasses import dataclass
+from typing import List, NamedTuple, Optional, Union, Dict
+from collections import OrderedDict
 
 from abc import ABC, abstractmethod
 
@@ -36,6 +38,7 @@ from .legacy_wrappers import (
     LegacyExecutor,
     LegacyLoadInfo,
 )
+from ..ordered_set import OrderedSet
 from ..protocol_engine.errors import ProtocolCommandFailedError
 from ..protocol_engine.types import (
     PostRunHardwareState,
@@ -43,6 +46,14 @@ from ..protocol_engine.types import (
     RunTimeParameter,
     RunTimeParamValuesType,
 )
+
+
+@dataclass(frozen=True)
+class CommandEntry:
+    """A command entry in state, including its index in the list."""
+
+    command: Command
+    index: int
 
 
 class RunResult(NamedTuple):
@@ -65,9 +76,29 @@ class AbstractRunner(ABC):
     you will need a new Runner to do another run.
     """
 
+    _all_command_ids: List[str]
+    """All command IDs, in insertion order."""
+
+    _commands_by_id: Dict[str, CommandEntry]
+    """All command resources, in insertion order, mapped by their unique IDs."""
+
+    _queued_command_ids: OrderedSet[str]
+    """The IDs of queued commands, in FIFO order"""
+
+    _queued_setup_command_ids: OrderedSet[str]
+    """The IDs of queued setup commands, in FIFO order"""
+
+    _queued_fixit_command_ids: OrderedSet[str]
+    """The IDs of queued fixit commands, in FIFO order"""
+
     def __init__(self, protocol_engine: ProtocolEngine) -> None:
         self._protocol_engine = protocol_engine
         self._broker = LegacyBroker()
+        self._all_command_ids = []
+        self._queued_command_ids = OrderedSet()
+        self._queued_setup_command_ids = OrderedSet()
+        self._queued_fixit_command_ids = OrderedSet()
+        self._commands_by_id = OrderedDict()
 
     # TODO(mm, 2023-10-03): `LegacyBroker` is specific to Python protocols and JSON protocols ≤v5.
     # We'll need to extend this in order to report progress from newer JSON protocols.
