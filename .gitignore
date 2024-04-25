@@ -160,3 +160,4 @@ opentrons-robot-app.tar.gz
 # asdf versions file
 .tool-versions
 mock_dir
+.eslintcache
