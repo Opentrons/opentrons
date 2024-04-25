@@ -721,7 +721,7 @@ def _migrate33to34(previous: SettingsMap) -> SettingsMap:
 
     - Removes disableFastProtocolUpload
     """
-    removals = ["disableFastProtocolUploads"]
+    removals = ["disableFastProtocolUpload"]
     newmap = {k: v for k, v in previous.items() if k not in removals}
     return newmap
 
