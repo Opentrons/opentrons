@@ -43,6 +43,12 @@ pre, tt, code {
     font-family: "Roboto Mono", "Consolas", "Lucida Console", monospace;
 }
 
+/* classes for API Reference docstring signatures */
+.sig, .sig-name, code.descname, .sig-prename, .optional, .sig-paren {
+    font-size: 1em;
+    font-family: "Roboto Mono", "Consolas", "Lucida Console", monospace;
+}
+
 div.body h1 {
     margin-top: 0;
     margin-bottom: 0;
