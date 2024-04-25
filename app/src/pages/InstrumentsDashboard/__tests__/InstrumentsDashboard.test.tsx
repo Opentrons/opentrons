@@ -14,7 +14,7 @@ import { InstrumentDetail } from '../../../pages/InstrumentDetail'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 
 const mockGripperData = {
-  instrumentModel: 'gripper_v1',
+  instrumentModel: 'gripperV1',
   instrumentType: 'gripper',
   mount: 'extension',
   serialNumber: 'ghi789',
