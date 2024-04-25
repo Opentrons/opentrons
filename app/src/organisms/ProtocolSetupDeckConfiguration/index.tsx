@@ -54,7 +54,7 @@ export function ProtocolSetupDeckConfiguration({
   ] = React.useState<boolean>(false)
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
+  const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
 
   const simplestDeckConfig = getSimplestDeckConfigForProtocol(
     mostRecentAnalysis

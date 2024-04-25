@@ -83,9 +83,10 @@ export const useRequiredProtocolHardwareFromAnalysis = (
 
   const robotType = FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
-  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
-    refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
-  })
+  const deckConfig =
+    useNotifyDeckConfigurationQuery({
+      refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+    })?.data ?? []
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
     analysis
