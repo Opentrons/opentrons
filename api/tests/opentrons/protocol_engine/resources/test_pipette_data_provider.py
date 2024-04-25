@@ -162,19 +162,19 @@ def test_load_virtual_pipette_nozzle_layout(
     assert result.configuration.value == "FULL"
 
     subject_instance.configure_virtual_pipette_nozzle_layout(
-        "my-96-pipette", "p1000_96_v3.5", "A1", "A12", "A1"
+        "my-96-pipette", "p1000_96_v3.6", "A1", "A12", "A1"
     )
     result = subject_instance.get_nozzle_layout_for_pipette("my-96-pipette")
     assert result.configuration.value == "ROW"
 
     subject_instance.configure_virtual_pipette_nozzle_layout(
-        "my-96-pipette", "p1000_96_v3.5", "A1", "A1"
+        "my-96-pipette", "p1000_96_v3.6", "A1", "A1"
     )
     result = subject_instance.get_nozzle_layout_for_pipette("my-96-pipette")
     assert result.configuration.value == "SINGLE"
 
     subject_instance.configure_virtual_pipette_nozzle_layout(
-        "my-96-pipette", "p1000_96_v3.5", "A1", "H1"
+        "my-96-pipette", "p1000_96_v3.6", "A1", "H1"
     )
     result = subject_instance.get_nozzle_layout_for_pipette("my-96-pipette")
     assert result.configuration.value == "COLUMN"
