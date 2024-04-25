@@ -51,6 +51,14 @@ export const parseProtocolRunAnalyticsData = (
         .join(','),
       protocolAuthor: protocolAuthor !== '' ? protocolAuthor : '',
       protocolText: protocolText !== '' ? protocolText : '',
+      protocolHasRunTimeParameters:
+        protocolAnalysis?.runTimeParameters != null
+          ? protocolAnalysis?.runTimeParameters?.length > 0
+          : false,
+      protocolHasRunTimeParameterCustomValues:
+        protocolAnalysis?.runTimeParameters?.some(
+          param => param.value !== param.default
+        ) ?? false,
       robotType:
         protocolAnalysis?.robotType != null
           ? protocolAnalysis?.robotType

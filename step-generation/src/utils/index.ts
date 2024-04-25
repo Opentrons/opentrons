@@ -20,6 +20,6 @@ export * from './commandCreatorArgsGetters'
 export * from './heaterShakerCollision'
 export * from './misc'
 export * from './movableTrashCommandsUtil'
-export * from './ninetySixChannelCollision'
+export * from './safePipetteMovements'
 export * from './wasteChuteCommandsUtil'
 export const uuid: () => string = uuidv4

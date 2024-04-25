@@ -7,7 +7,7 @@ import {
   curryCommandCreator,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
-  getIsTallLabwareWestOf96Channel,
+  getIsSafePipetteMovement,
   getLabwareSlot,
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
@@ -160,23 +160,18 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   if (
     channels === 96 &&
     nozzles === COLUMN &&
-    getIsTallLabwareWestOf96Channel(
+    !getIsSafePipetteMovement(
       prevRobotState,
       invariantContext,
       nextTiprack.tiprackId,
       pipette,
-      tipRack
+      tipRack,
+      //  we don't adjust the offset when moving to the tiprack
+      { x: 0, y: 0 }
     )
   ) {
     return {
-      errors: [
-        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
-          source: 'tiprack',
-          labware:
-            invariantContext.labwareEntities[nextTiprack.tiprackId].def.metadata
-              .displayName,
-        }),
-      ],
+      errors: [errorCreators.possiblePipetteCollision()],
     }
   }
 

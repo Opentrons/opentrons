@@ -31,6 +31,7 @@ from ..commands import (
     Command,
     LoadLabwareResult,
     MoveLabwareResult,
+    ReloadLabwareResult,
 )
 from ..types import (
     DeckSlotLocation,
@@ -187,17 +188,26 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             )
 
             self._state.definitions_by_uri[definition_uri] = command.result.definition
+            if isinstance(command.result, LoadLabwareResult):
+                location = command.params.location
+            else:
+                location = self._state.labware_by_id[command.result.labwareId].location
 
             self._state.labware_by_id[
                 command.result.labwareId
             ] = LoadedLabware.construct(
                 id=command.result.labwareId,
-                location=command.params.location,
+                location=location,
                 loadName=command.result.definition.parameters.loadName,
                 definitionUri=definition_uri,
                 offsetId=command.result.offsetId,
                 displayName=command.params.displayName,
             )
+
+        elif isinstance(command.result, ReloadLabwareResult):
+            labware_id = command.params.labwareId
+            new_offset_id = command.result.offsetId
+            self._state.labware_by_id[labware_id].offsetId = new_offset_id
 
         elif isinstance(command.result, MoveLabwareResult):
             labware_id = command.params.labwareId
