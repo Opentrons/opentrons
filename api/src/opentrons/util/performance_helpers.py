@@ -1,6 +1,7 @@
 """Performance helpers for tracking robot context."""
 
 import functools
+import logging
 from pathlib import Path
 from opentrons_shared_data.performance.dev_types import (
     SupportsTracking,
@@ -10,17 +11,14 @@ from opentrons_shared_data.performance.dev_types import (
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from typing import Callable, Type
 from opentrons.config import (
-    feature_flags as ff,
     get_performance_metrics_data_dir,
-    robot_configs,
 )
 
+log = logging.getLogger(__name__)
 
-_should_track = ff.enable_performance_metrics(
-    RobotTypeEnum.robot_literal_to_enum(robot_configs.load().model)
-)
+
+_should_track = True 
 STORE_EACH = _should_track
-
 
 class StubbedTracker(SupportsTracking):
     """A stubbed tracker that does nothing."""
@@ -50,7 +48,6 @@ def _handle_package_import() -> Type[SupportsTracking]:
     """
     try:
         from performance_metrics import RobotContextTracker
-
         return RobotContextTracker
     except ImportError:
         return StubbedTracker
@@ -63,8 +60,8 @@ _robot_context_tracker: SupportsTracking | None = None
 def _get_robot_context_tracker() -> SupportsTracking:
     """Singleton for the robot context tracker."""
     global _robot_context_tracker
+    log.error(f"Using performance metrics: {_should_track}")
     if _robot_context_tracker is None:
-        # TODO: replace with path lookup and should_store lookup
         _robot_context_tracker = package_to_use(
             get_performance_metrics_data_dir(), _should_track
         )
@@ -79,6 +76,7 @@ def track_analysis(func: F) -> F:
     # Typing a decorator that wraps a decorator with args, nope
     @functools.wraps(func)
     def wrapper(*args, **kwargs):  # type: ignore # noqa: ANN002, ANN003, ANN201
+        log.error("Tracking analysis")
         tracker = _get_robot_context_tracker()
         tracked_func = tracker.track(RobotContextState.ANALYZING_PROTOCOL)(func)
 
