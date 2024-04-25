@@ -1,6 +1,6 @@
-import os
 import re
-from typing import List, Optional, Union, cast, Literal
+from functools import lru_cache
+from typing import List, Optional, Union, cast, Literal, Tuple
 from opentrons_shared_data import get_shared_data_root
 from .dev_types import PipetteModel, PipetteName
 
@@ -109,32 +109,33 @@ def version_from_string(version: str) -> PipetteVersionType:
     return PipetteVersionType(major, minor)
 
 
-def get_channel_from_pipette_name(pipette_name_list: List[str]) -> str:
-    if "single" in pipette_name_list:
+def get_channel_from_pipette_name(pipette_name_tuple: Tuple[str, ...]) -> str:
+    if "single" in pipette_name_tuple:
         return "single_channel"
-    elif "96" in pipette_name_list:
+    elif "96" in pipette_name_tuple:
         return "ninety_six_channel"
     else:
         return "eight_channel"
 
 
 def get_major_version_from_pipette_name(
-    pipette_name_list: List[str],
+    pipette_name_tuple: Tuple[str, ...],
 ) -> Literal[1, 2, 3]:
     #   special-casing for 96-channel to return version 3
     if (
-        "flex" in pipette_name_list
-        or "gen3" in pipette_name_list
-        or "96" in pipette_name_list
+        "flex" in pipette_name_tuple
+        or "gen3" in pipette_name_tuple
+        or "96" in pipette_name_tuple
     ):
         return 3
-    elif "gen2" in pipette_name_list:
+    elif "gen2" in pipette_name_tuple:
         return 2
     else:
         return 1
 
 
-def version_from_generation(pipette_name_list: List[str]) -> PipetteVersionType:
+@lru_cache(4)
+def version_from_generation(pipette_name_tuple: Tuple[str, ...]) -> PipetteVersionType:
     """Convert pipetteName to a py:obj:PipetteVersionType
 
     Given the pipette_name_list, cycle through each definition file path
@@ -149,43 +150,35 @@ def version_from_generation(pipette_name_list: List[str]) -> PipetteVersionType:
         PipetteVersionType: A pipette version object.
     """
     major_version_from_pipette_name = get_major_version_from_pipette_name(
-        pipette_name_list
+        pipette_name_tuple
     )
-    model_from_pipette_name = pipette_name_list[0]
-    channel_from_pipette_name = get_channel_from_pipette_name(pipette_name_list)
+    model_from_pipette_name = pipette_name_tuple[0]
+    channel_from_pipette_name = get_channel_from_pipette_name(pipette_name_tuple)
 
     paths_to_validate = (
         get_shared_data_root() / "pipette" / "definitions" / "2" / "general"
     )
+    version_paths = (
+        paths_to_validate / channel_from_pipette_name / model_from_pipette_name
+    )
 
     highest_minor_version: Literal[0, 1, 2, 3, 4, 5, 6] = 0
 
-    for channel_dir in os.listdir(paths_to_validate):
-        if channel_dir != channel_from_pipette_name:
-            continue
+    for version_file in version_paths.iterdir():
+        version_list = version_file.stem.split("_")
+        major_version = version_list[0]
+        minor_version = version_list[1]
 
-        for model_dir in os.listdir(paths_to_validate / channel_dir):
-            if model_dir != model_from_pipette_name:
-                continue
+        # Check if the major version matches the expected major version
+        if major_version == str(major_version_from_pipette_name):
+            minor_version_int = int(minor_version)
+            minor_version_lit: PipetteModelMinorVersionType = cast(
+                PipetteModelMinorVersionType, minor_version_int
+            )
 
-            for version_file in os.listdir(paths_to_validate / channel_dir / model_dir):
-                version_list = version_file.split(".json")[0].split("_")
-                major_version = version_list[0]
-                minor_version = version_list[1]
-
-                # Check if the major version matches the expected major version
-                if major_version == str(major_version_from_pipette_name):
-                    minor_version_int = int(minor_version)
-                    minor_version_lit: PipetteModelMinorVersionType = cast(
-                        PipetteModelMinorVersionType, minor_version_int
-                    )
-
-                    # Update the highest minor version if this version is higher
-                    if highest_minor_version < minor_version_lit:
-                        highest_minor_version = minor_version_lit
-
-    if highest_minor_version == 0:
-        return PipetteVersionType(major_version_from_pipette_name, 0)
+            # Update the highest minor version if this version is higher
+            if highest_minor_version < minor_version_lit:
+                highest_minor_version = minor_version_lit
 
     return PipetteVersionType(major_version_from_pipette_name, highest_minor_version)
 
@@ -256,7 +249,12 @@ def convert_pipette_name(
     if provided_version:
         version = version_from_string(provided_version)
     else:
-        version = version_from_generation(split_pipette_name)
+        pipette_name_tuple: Tuple[str, str, str] = (
+            split_pipette_name[0],
+            split_pipette_name[1],
+            split_pipette_name[2] if len(split_pipette_name) > 2 else "",
+        )
+        version = version_from_generation(pipette_name_tuple)
 
     pipette_type = PipetteModelType[split_pipette_name[0]]
 
