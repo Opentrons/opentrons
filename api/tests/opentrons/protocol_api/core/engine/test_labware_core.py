@@ -19,9 +19,15 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons.types import DeckSlotName, Point
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError
+from opentrons.protocol_engine.types import (
+    LabwareOffsetCreate,
+    LabwareOffsetLocation,
+    LabwareOffsetVector,
+)
 
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import LabwareCore, WellCore
+from opentrons.calibration_storage.helpers import uri_from_details
 
 
 @pytest.fixture
@@ -36,11 +42,9 @@ def mock_engine_client(
 ) -> EngineClient:
     """Get a mock ProtocolEngine synchronous client."""
     engine_client = decoy.mock(cls=EngineClient)
-
     decoy.when(engine_client.state.labware.get_definition("cool-labware")).then_return(
         labware_definition
     )
-
     return engine_client
 
 
@@ -67,9 +71,87 @@ def test_get_load_params(subject: LabwareCore) -> None:
     assert subject.load_name == "world"
 
 
-def test_set_calibration(subject: LabwareCore) -> None:
-    """It should raise if you attempt to set calibration."""
-    with pytest.raises(NotImplementedError):
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            namespace="hello",
+            version=42,
+            parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
+            ordering=[],
+            metadata=LabwareDefinitionMetadata.construct(displayName="what a cool labware"),  # type: ignore[call-arg]
+        )
+    ],
+)
+def test_set_calibration_succeeds_in_ok_location(
+    decoy: Decoy,
+    subject: LabwareCore,
+    mock_engine_client: EngineClient,
+    labware_definition: LabwareDefinition,
+) -> None:
+    """It should pass along an AddLabwareOffset if possible."""
+    decoy.when(
+        mock_engine_client.state.labware.get_definition_uri("cool-labware")
+    ).then_return(
+        uri_from_details(
+            load_name=labware_definition.parameters.loadName,
+            namespace=labware_definition.namespace,
+            version=labware_definition.version,
+        )
+    )
+    decoy.when(
+        mock_engine_client.state.labware.get_display_name("cool-labware")
+    ).then_return("what a cool labware")
+    location = LabwareOffsetLocation(slotName=DeckSlotName.SLOT_C2)
+    decoy.when(
+        mock_engine_client.state.geometry.get_offset_location("cool-labware")
+    ).then_return(location)
+    subject.set_calibration(Point(1, 2, 3))
+    decoy.verify(
+        mock_engine_client.add_labware_offset(
+            LabwareOffsetCreate(
+                definitionUri="hello/world/42",
+                location=location,
+                vector=LabwareOffsetVector(x=1, y=2, z=3),
+            )
+        ),
+        mock_engine_client.reload_labware(
+            labware_id="cool-labware",
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition.construct(  # type: ignore[call-arg]
+            namespace="hello",
+            version=42,
+            parameters=LabwareDefinitionParameters.construct(loadName="world"),  # type: ignore[call-arg]
+            ordering=[],
+        )
+    ],
+)
+def test_set_calibration_fails_in_bad_location(
+    decoy: Decoy,
+    subject: LabwareCore,
+    mock_engine_client: EngineClient,
+    labware_definition: LabwareDefinition,
+) -> None:
+    """It should raise if you attempt to set calibration when the labware is not on deck."""
+    decoy.when(
+        mock_engine_client.state.labware.get_definition_uri("cool-labware")
+    ).then_return(
+        uri_from_details(
+            load_name=labware_definition.parameters.loadName,
+            namespace=labware_definition.namespace,
+            version=labware_definition.version,
+        )
+    )
+    decoy.when(
+        mock_engine_client.state.geometry.get_offset_location("cool-labware")
+    ).then_return(None)
+    with pytest.raises(LabwareNotOnDeckError):
         subject.set_calibration(Point(1, 2, 3))
 
 

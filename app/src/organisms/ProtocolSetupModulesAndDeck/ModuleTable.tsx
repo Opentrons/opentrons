@@ -14,7 +14,6 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   getCutoutFixturesForModuleModel,
   getCutoutIdsFromModuleSlotName,
@@ -34,6 +33,7 @@ import { ModuleWizardFlows } from '../../organisms/ModuleWizardFlows'
 import { useToaster } from '../../organisms/ToasterOven'
 import { getLocalRobot } from '../../redux/discovery'
 import { useChainLiveCommands } from '../../resources/runs'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
@@ -57,7 +57,7 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
     setPrepCommandErrorMessage,
   ] = React.useState<string>('')
 
-  const { data: deckConfig } = useDeckConfigurationQuery({
+  const { data: deckConfig } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
   })
   const localRobot = useSelector(getLocalRobot)

@@ -78,7 +78,7 @@ import { getLabwareSetupItemGroups } from '../Protocols/utils'
 import { getLocalRobot, getRobotSerialNumber } from '../../redux/discovery'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-  ANALYTICS_PROTOCOL_RUN_START,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../redux/config'
@@ -492,7 +492,7 @@ function PrepareToRun({
         if (isReadyToRun) {
           play()
           trackProtocolRunEvent({
-            name: ANALYTICS_PROTOCOL_RUN_START,
+            name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
             properties: robotAnalyticsData != null ? robotAnalyticsData : {},
           })
         } else {

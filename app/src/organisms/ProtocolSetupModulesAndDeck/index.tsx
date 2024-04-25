@@ -30,10 +30,10 @@ import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { FixtureTable } from './FixtureTable'
 import { ModuleTable } from './ModuleTable'
 import { ModulesAndDeckMapViewModal } from './ModulesAndDeckMapViewModal'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
@@ -68,7 +68,7 @@ export function ProtocolSetupModulesAndDeck({
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const { data: deckConfig = [] } = useDeckConfigurationQuery({
+  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_POLL_MS,
   })
   const attachedModules =

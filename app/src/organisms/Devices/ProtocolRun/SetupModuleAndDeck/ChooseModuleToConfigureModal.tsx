@@ -2,10 +2,7 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
-import {
-  useDeckConfigurationQuery,
-  useModulesQuery,
-} from '@opentrons/react-api-client'
+import { useModulesQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
@@ -26,7 +23,7 @@ import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Modal } from '../../../../molecules/Modal'
 import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
-
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 import { SmallButton } from '../../../../atoms/buttons'
 import { useCloseCurrentRun } from '../../../ProtocolUpload/hooks'
 
@@ -65,7 +62,7 @@ export const ChooseModuleToConfigureModal = (
   const { closeCurrentRun } = useCloseCurrentRun()
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
-  const deckConfig = useDeckConfigurationQuery()?.data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
   const unconfiguredModuleMatches =
     attachedModules.filter(
       attachedMod =>

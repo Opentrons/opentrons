@@ -141,6 +141,7 @@ export type NotifyTopic =
   | 'robot-server/runs/current_command'
   | 'robot-server/runs'
   | `robot-server/runs/${string}`
+  | 'robot-server/deck_configuration'
 
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'
@@ -164,3 +165,18 @@ export type ShellAction =
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
   | NotifySubscribeAction
+
+export type IPCSafeFormDataEntry =
+  | {
+      type: 'string'
+      name: string
+      value: string
+    }
+  | {
+      type: 'file'
+      name: string
+      value: ArrayBuffer
+      filename: string
+    }
+
+export type IPCSafeFormData = IPCSafeFormDataEntry[]
