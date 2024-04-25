@@ -88,18 +88,18 @@ export function DeckConfigurationEditor(): JSX.Element {
       deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
         ?.fixtureGroup ?? {}
 
-    let newDeckConfig = currentDeckConfig
+    let newDeckConfig = deckConfig
     if (cutoutId in fixtureGroup) {
       const groupMap =
         fixtureGroup[cutoutId]?.find(group =>
           Object.entries(group).every(([cId, cfId]) =>
-            currentDeckConfig.find(
+            deckConfig.find(
               config =>
                 config.cutoutId === cId && config.cutoutFixtureId === cfId
             )
           )
         ) ?? {}
-      newDeckConfig = currentDeckConfig.map(cutoutConfig =>
+      newDeckConfig = deckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId in groupMap
           ? {
               ...cutoutConfig,
@@ -109,7 +109,7 @@ export function DeckConfigurationEditor(): JSX.Element {
           : cutoutConfig
       )
     } else {
-      newDeckConfig = currentDeckConfig.map(cutoutConfig =>
+      newDeckConfig = deckConfig.map(cutoutConfig =>
         cutoutConfig.cutoutId === cutoutId
           ? {
               ...cutoutConfig,
@@ -119,7 +119,7 @@ export function DeckConfigurationEditor(): JSX.Element {
           : cutoutConfig
       )
     }
-    setCurrentDeckConfig(newDeckConfig)
+    updateDeckConfiguration(newDeckConfig)
   }
 
   const handleClickConfirm = (): void => {
