@@ -334,7 +334,7 @@ def _run_trial(
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
     # update the vials volumes, using the last-known weight
-    if _PREV_TRIAL_GRAMS is not None:
+    if _PREV_TRIAL_GRAMS is not None and trial.cfg.jog:
         _evaporation_loss_ul = abs(
             calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_init)
         )
@@ -697,6 +697,11 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                             location=next_tip_location,
                         )
                         resources.pipette._retract()  # retract to top of gantry
+                    if not cfg.jog:
+                        _liquid_height = _get_liquid_height(resources, cfg, well)
+                        liquid_tracker.set_start_volume_from_liquid_height(
+                            well, _liquid_height, name="Water"
+                        )
                     (
                         actual_aspirate,
                         aspirate_data,

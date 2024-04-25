@@ -94,7 +94,7 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
             50: {
                 "max_z_distance": 20,
                 "min_z_distance": 5,
-                "mount_speed": 11,
+                "mount_speed": 5,
                 "plunger_speed": 21,
                 "sensor_threshold_pascals": 150,
             },
@@ -197,7 +197,7 @@ def _get_liquid_probe_settings(
         plunger_speed=lqid_cfg["plunger_speed"],
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
         expected_liquid_height=110,
-        output_option=OutputOptions.sync_only,
+        output_option=OutputOptions.stream_to_csv,
         aspirate_while_sensing=False,
         auto_zero_sensor=True,
         num_baseline_reads=10,
