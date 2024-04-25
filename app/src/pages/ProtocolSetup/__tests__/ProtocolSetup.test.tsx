@@ -35,7 +35,7 @@ import {
   useTrackProtocolRunEvent,
 } from '../../../organisms/Devices/hooks'
 import { getLocalRobot } from '../../../redux/discovery'
-import { ANALYTICS_PROTOCOL_RUN_START } from '../../../redux/analytics'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
@@ -419,7 +419,7 @@ describe('ProtocolSetup', () => {
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
     expect(mockTrackProtocolRunEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_START,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
       properties: {},
     })
   })
