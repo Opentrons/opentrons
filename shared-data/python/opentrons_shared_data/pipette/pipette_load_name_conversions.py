@@ -162,7 +162,7 @@ def version_from_generation(pipette_name_tuple: Tuple[str, ...]) -> PipetteVersi
         paths_to_validate / channel_from_pipette_name / model_from_pipette_name
     )
 
-    highest_minor_version: Literal[0, 1, 2, 3, 4, 5, 6] = 0
+    highest_minor_version: PipetteModelMinorVersionType = 0
 
     for version_file in version_paths.iterdir():
         version_list = version_file.stem.split("_")
