@@ -2,6 +2,7 @@
 import gspread  # type: ignore[import]
 import socket
 import httplib2
+import time as t
 from datetime import datetime
 from oauth2client.service_account import ServiceAccountCredentials  # type: ignore[import]
 from typing import Dict, List, Any, Set, Tuple
@@ -71,6 +72,10 @@ class google_sheet:
             print("UNABLE TO CONNECT TO SERVER!!, CHECK CONNECTION")
         except Exception as error:
             print(error.__traceback__)
+        except gspread.exceptions.APIError:
+            print("Write quotes exceeded. Waiting 30 sec before writing.")
+            t.sleep(30)
+            self.worksheet.insert_row(data, index=self.row_index)
 
     def delete_row(self, row_index: int) -> None:
         """Delete Row from google sheet."""
@@ -94,7 +99,7 @@ class google_sheet:
     def get_index_row(self) -> int:
         """Check for the next available row to write too."""
         row_index = len(self.get_column(1))
-        print("Row Index: ", row_index)
+        print(f"Row Index: {row_index} recorded on google sheet.")
         return row_index
 
     def update_row_index(self) -> None:
