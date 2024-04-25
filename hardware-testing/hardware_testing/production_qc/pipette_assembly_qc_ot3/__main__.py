@@ -1073,10 +1073,12 @@ async def _test_diagnostics_pressure(
     
     #hover_over_slot_3 = pos_slot_3._replace(z=current_pos.z)
     await api.move_to(mount, pos_slot_3)
-    await api.move_rel(mount, Point(z=92.75))
+
+    pos_slot_4 = Point(x=200.74, y=364.27, z=93.01)
+    await api.move_to(mount, pos_slot_4)
     force_pressure = pressure_sensor.get_pressure()
 
-    while force_pressure >= 100:
+    while force_pressure <= 200:
         await api.move_rel(mount, Point(z=-0.06))
         force_pressure = pressure_sensor.get_pressure()
 
