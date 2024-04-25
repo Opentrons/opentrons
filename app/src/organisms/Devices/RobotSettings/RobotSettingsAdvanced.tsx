@@ -229,12 +229,16 @@ export function RobotSettingsAdvanced({
         />
         {isFlex ? null : (
           <>
-            <Divider marginY={SPACING.spacing16} />
-            <UseOlderProtocol
-              settings={findSettings('disableFastProtocolUpload')}
-              robotName={robotName}
-              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
-            />
+            {findSettings('disableFastProtocolUpload') != null ? (
+              <>
+                <Divider marginY={SPACING.spacing16} />
+                <UseOlderProtocol
+                  settings={findSettings('disableFastProtocolUpload')}
+                  robotName={robotName}
+                  isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+                />
+              </>
+            ) : null}
             <Divider marginY={SPACING.spacing16} />
             <LegacySettings
               settings={findSettings('deckCalibrationDots')}

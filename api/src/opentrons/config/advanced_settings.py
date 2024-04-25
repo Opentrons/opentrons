@@ -160,19 +160,6 @@ settings = [
         default_true_on_robot_types=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
-        _id="disableFastProtocolUpload",
-        title="Use older protocol analysis method",
-        description=(
-            "Use an older, slower method of analyzing uploaded protocols. "
-            "This changes how the OT-2 validates your protocol during the upload "
-            "step, but does not affect how your protocol actually runs. "
-            "Opentrons Support might ask you to change this setting if you encounter "
-            "problems with the newer, faster protocol analysis method."
-        ),
-        restart_required=False,
-        robot_type=[RobotTypeEnum.OT2, RobotTypeEnum.FLEX],
-    ),
-    SettingDefinition(
         _id="enableOT3HardwareController",
         title="Enable experimental OT-3 hardware controller",
         description=(
@@ -729,6 +716,16 @@ def _migrate32to33(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate33to34(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 34 of the feature flags file.
+
+    - Removes disableFastProtocolUpload
+    """
+    removals = ["disableFastProtocolUploads"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -763,6 +760,7 @@ _MIGRATIONS = [
     _migrate30to31,
     _migrate31to32,
     _migrate32to33,
+    _migrate33to34,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
