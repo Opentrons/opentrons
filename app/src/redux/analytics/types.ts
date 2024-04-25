@@ -41,6 +41,7 @@ export interface BuildrootAnalyticsData {
   currentSystem: string
   updateVersion: string
   error: string | null
+  robotSerialNumber: string | null
 }
 
 export interface PipetteOffsetCalibrationAnalyticsData {

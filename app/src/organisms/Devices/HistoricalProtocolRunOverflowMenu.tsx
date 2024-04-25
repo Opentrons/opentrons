@@ -29,7 +29,7 @@ import { useRunControls } from '../../organisms/RunTimeControl/hooks'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-  ANALYTICS_PROTOCOL_RUN_AGAIN,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../redux/analytics'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { useDownloadRunLog, useTrackProtocolRunEvent, useRobot } from './hooks'
@@ -150,7 +150,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         robotSerialNumber,
       },
     })
-    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+    trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
   }
 
   const handleDeleteClick: React.MouseEventHandler<HTMLButtonElement> = e => {
