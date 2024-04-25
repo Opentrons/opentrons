@@ -173,7 +173,7 @@ def _get_liquid_probe_settings(
         plunger_speed=lqid_cfg["plunger_speed"],
         plunger_impulse_time=0.2,
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
-        output_option=OutputOptions.sync_only,
+        output_option=OutputOptions.sync_buffer_to_csv,
         aspirate_while_sensing=False,
         data_files={InstrumentProbeType.PRIMARY: "/data/testing_data/pressure.csv"},
     )

@@ -48,7 +48,7 @@ from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_engine.types import LabwareOffset
 
 API_LEVEL = "2.18"
-NUMBER_OF_RACKS = 2
+NUMBER_OF_RACKS = 1
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
