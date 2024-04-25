@@ -33,6 +33,7 @@ import type { Dispatch } from '../../../../../redux/types'
 
 interface FactoryModeSlideoutProps {
   isExpanded: boolean
+  isRobotBusy: boolean
   onCloseClick: () => void
   robotName: string
 }
@@ -43,6 +44,7 @@ interface FormValues {
 
 export function FactoryModeSlideout({
   isExpanded,
+  isRobotBusy,
   onCloseClick,
   robotName,
 }: FactoryModeSlideoutProps): JSX.Element {
@@ -160,7 +162,8 @@ export function FactoryModeSlideout({
               disabled={
                 (toggleValue && file == null) ||
                 isUploading ||
-                fileError != null
+                fileError != null ||
+                isRobotBusy
               }
               onClick={handleCompleteClick}
               width="100%"
