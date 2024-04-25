@@ -526,19 +526,35 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                 onClick={() => handleSelectProtocol(storedProtocol)}
               >
                 <Box display="grid" gridTemplateColumns="1fr 3fr">
-                  <Box
-                    marginY={SPACING.spacingAuto}
-                    backgroundColor={isSelected ? COLORS.white : 'inherit'}
-                    marginRight={SPACING.spacing16}
-                    height="4.25rem"
-                    width="4.75rem"
-                  >
-                    {!missingAnalysisData ? (
+                  {!missingAnalysisData ? (
+                    <Box
+                      marginY={SPACING.spacingAuto}
+                      backgroundColor={isSelected ? COLORS.white : 'inherit'}
+                      marginRight={SPACING.spacing16}
+                      height="4.25rem"
+                      width="4.75rem"
+                    >
                       <ProtocolDeck
                         protocolAnalysis={storedProtocol.mostRecentAnalysis}
                       />
-                    ) : null}
-                  </Box>
+                    </Box>
+                  ) : (
+                    <Flex
+                      height="4.25rem"
+                      width="4.75rem"
+                      marginRight={SPACING.spacing16}
+                      backgroundColor={COLORS.grey30}
+                      borderRadius={SPACING.spacing8}
+                      alignItems={ALIGN_CENTER}
+                      justifyContent={JUSTIFY_CENTER}
+                    >
+                      <Icon
+                        name="ot-close"
+                        color={COLORS.grey40}
+                        size="2.25rem"
+                      />
+                    </Flex>
+                  )}
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}

@@ -52,6 +52,8 @@ import {
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
 import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
+import { ALIGN_CENTER } from '@opentrons/components'
+import { JUSTIFY_CENTER } from '@opentrons/components'
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
@@ -184,8 +186,28 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 size={SIZE_3}
               />
             ),
-            error: <Box size="6rem" backgroundColor={COLORS.grey30} />,
-            stale: <Box size="6rem" backgroundColor={COLORS.grey30} />,
+            error: (
+              <Flex
+                size="6rem"
+                backgroundColor={COLORS.grey30}
+                borderRadius={SPACING.spacing8}
+                alignItems={ALIGN_CENTER}
+                justifyContent={JUSTIFY_CENTER}
+              >
+                <Icon name="ot-close" color={COLORS.grey40} size="2.75rem" />
+              </Flex>
+            ),
+            stale: (
+              <Flex
+                size="6rem"
+                backgroundColor={COLORS.grey30}
+                borderRadius={SPACING.spacing8}
+                alignItems={ALIGN_CENTER}
+                justifyContent={JUSTIFY_CENTER}
+              >
+                <Icon name="ot-close" color={COLORS.grey40} size="2.75rem" />
+              </Flex>
+            ),
             complete:
               mostRecentAnalysis != null ? (
                 <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
