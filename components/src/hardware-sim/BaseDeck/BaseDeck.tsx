@@ -16,6 +16,7 @@ import {
   WASTE_CHUTE_STAGING_AREA_FIXTURES,
   HEATERSHAKER_MODULE_V1,
   MODULE_FIXTURES_BY_MODEL,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
@@ -114,7 +115,10 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
   )
   const stagingAreaFixtures = deckConfig.filter(
     fixture =>
-      fixture.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE &&
+      (
+        fixture.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE ||
+        fixture.cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+      ) &&
       STAGING_AREA_CUTOUTS.includes(fixture.cutoutId)
   )
   const trashBinFixtures = deckConfig.filter(
@@ -260,7 +264,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                     wellFill={nestedLabwareWellFill}
                     shouldRotateAdapterOrientation={
                       inferModuleOrientationFromXCoordinate(slotPosition[0]) ===
-                        'left' && moduleModel === HEATERSHAKER_MODULE_V1
+                      'left' && moduleModel === HEATERSHAKER_MODULE_V1
                     }
                   />
                 ) : null}
@@ -282,7 +286,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               !('slotName' in labwareLocation) ||
               // for legacy protocols that list fixed trash as a labware, do not render
               definition.parameters.loadName ===
-                'opentrons_1_trash_3200ml_fixed'
+              'opentrons_1_trash_3200ml_fixed'
             ) {
               return null
             }
