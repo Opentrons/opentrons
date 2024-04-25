@@ -48,7 +48,10 @@ export const ANALYTICS_DESKTOP_APP_ERROR = 'desktopAppError'
 
 export const ANALYTICS_ROBOT_UPDATE_VIEW = 'robotUpdateView'
 export const ANALYTICS_ROBOT_UPDATE_CHANGE_LOG_VIEW = 'robotUpdateChangeLogView'
-export const ANALYTICS_ROBOT_UPDATE_IGNORE = 'robotUpdateIgnore'
-export const ANALYTICS_ROBOT_UPDATE_INITIATE = 'robotUpdateInitiate'
-export const ANALYTICS_ROBOT_UPDATE_ERROR = 'robotUpdateError'
-export const ANALYTICS_ROBOT_UPDATE_COMPLETE = 'robotUpdateComplete'
+
+export const ANALYTICS_STATE_ROBOT_UPDATE = {
+  IGNORE: 'robotUpdateIgnore',
+  INITIATE: 'robotUpdateInitiate',
+  ERROR: 'robotUpdateError',
+  COMPLETE: 'robotUpdateComplete',
+} as const

@@ -44,7 +44,7 @@ export function makeEvent(
     case RobotUpdate.ROBOTUPDATE_UPDATE_IGNORED: {
       const data = getBuildrootAnalyticsData(state, action.meta.robotName)
       return Promise.resolve({
-        name: Constants.ANALYTICS_ROBOT_UPDATE_IGNORE,
+        name: Constants.ANALYTICS_STATE_ROBOT_UPDATE.IGNORE,
         properties: { ...data },
       })
     }
@@ -52,7 +52,7 @@ export function makeEvent(
     case RobotUpdate.ROBOTUPDATE_START_UPDATE: {
       const data = getBuildrootAnalyticsData(state)
       return Promise.resolve({
-        name: Constants.ANALYTICS_ROBOT_UPDATE_INITIATE,
+        name: Constants.ANALYTICS_STATE_ROBOT_UPDATE.INITIATE,
         properties: { ...data },
       })
     }
@@ -60,7 +60,7 @@ export function makeEvent(
     case RobotUpdate.ROBOTUPDATE_UNEXPECTED_ERROR: {
       const data = getBuildrootAnalyticsData(state)
       return Promise.resolve({
-        name: Constants.ANALYTICS_ROBOT_UPDATE_ERROR,
+        name: Constants.ANALYTICS_STATE_ROBOT_UPDATE.ERROR,
         properties: { ...data },
       })
     }
@@ -69,7 +69,7 @@ export function makeEvent(
       if (action.payload !== 'finished') return Promise.resolve(null)
       const data = getBuildrootAnalyticsData(state)
       return Promise.resolve({
-        name: Constants.ANALYTICS_ROBOT_UPDATE_COMPLETE,
+        name: Constants.ANALYTICS_STATE_ROBOT_UPDATE.COMPLETE,
         properties: { ...data },
       })
     }
