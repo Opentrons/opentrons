@@ -13,6 +13,7 @@ import {
   getGripperDisplayName,
 } from '@opentrons/shared-data'
 import {
+  ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
   Box,
@@ -20,6 +21,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
+  JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
   ModuleIcon,
   OVERFLOW_WRAP_ANYWHERE,
@@ -52,8 +54,6 @@ import {
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
 import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
-import { ALIGN_CENTER } from '@opentrons/components'
-import { JUSTIFY_CENTER } from '@opentrons/components'
 
 interface ProtocolCardProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
