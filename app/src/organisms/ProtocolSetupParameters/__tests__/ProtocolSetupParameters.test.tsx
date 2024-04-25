@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when } from 'vitest-when'
 import { it, describe, beforeEach, vi, expect } from 'vitest'
-import { act, fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import {
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
