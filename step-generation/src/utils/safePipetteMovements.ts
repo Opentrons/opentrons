@@ -10,7 +10,6 @@ import {
 import type {
   AddressableArea,
   CoordinateTuple,
-  DeckSlotId,
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
@@ -312,7 +311,7 @@ export const getIsSafePipetteMovement = (
     additionalEquipmentEntities,
     moduleEntities,
   } = invariantContext
-  const { labware: labwareState, tipState, modules } = robotState
+  const { labware: labwareState, tipState } = robotState
 
   //  early exit if labwareId is a trashBin or wasteChute
   if (labwareEntities[labwareId] == null) {
