@@ -85,7 +85,7 @@ async def on_startup() -> None:
     initialize_logging()
     initialize_task_runner(app_state=app.state)
     fbl_init(app_state=app.state)
-    start_initializing_hardware(
+    await start_initializing_hardware(
         app_state=app.state,
         callbacks=[
             # Flex light control:

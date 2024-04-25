@@ -90,12 +90,10 @@ class _ExcPassthrough(BaseException):
         self.payload = payload
 
 
-def start_initializing_hardware(
+async def start_initializing_hardware(
     app_state: AppState, callbacks: Iterable[PostInitCallback]
 ) -> None:
     """Initialize the hardware API singleton, attaching it to global state.
-
-    Returns immediately while the hardware API initializes in the background.
 
     Any defined callbacks will be called after the hardware API is initialized, but
     before the post-init tasks are executed.
@@ -107,6 +105,7 @@ def start_initializing_hardware(
             _initialize_hardware_api(app_state, callbacks)
         )
         _init_task_accessor.set_on(app_state, initialize_task)
+        await initialize_task
 
 
 async def clean_up_hardware(app_state: AppState) -> None:
