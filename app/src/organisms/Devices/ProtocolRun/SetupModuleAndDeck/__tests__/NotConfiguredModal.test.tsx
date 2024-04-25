@@ -3,17 +3,17 @@ import { fireEvent } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
-import {
-  useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
+
 import { i18n } from '../../../../../i18n'
 import { NotConfiguredModal } from '../NotConfiguredModal'
+import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../../resources/deck_configuration')
 
 const render = (props: React.ComponentProps<typeof NotConfiguredModal>) => {
   return renderWithProviders(<NotConfiguredModal {...props} />, {
@@ -33,7 +33,7 @@ describe('NotConfiguredModal', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdate,
     } as any)
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
   })

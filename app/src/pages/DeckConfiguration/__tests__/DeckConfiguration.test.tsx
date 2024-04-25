@@ -1,23 +1,21 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { vi, it, describe, expect, beforeEach } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
 
 import { DeckConfigurator } from '@opentrons/components'
 import { renderWithProviders } from '../../../__testing-utils__'
 
-import {
-  useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { DeckFixtureSetupInstructionsModal } from '../../../organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
 import { DeckConfigurationEditor } from '..'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type { DeckConfiguration } from '@opentrons/shared-data'
-import { fireEvent, screen } from '@testing-library/react'
 import type * as Components from '@opentrons/components'
 import type * as ReactRouterDom from 'react-router-dom'
 
@@ -52,6 +50,7 @@ vi.mock(
 vi.mock(
   '../../../organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 )
+vi.mock('../../../resources/deck_configuration')
 
 const render = () => {
   return renderWithProviders(
@@ -66,7 +65,7 @@ const render = () => {
 
 describe('DeckConfigurationEditor', () => {
   beforeEach(() => {
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: mockDeckConfig,
     } as UseQueryResult<DeckConfiguration>)
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({

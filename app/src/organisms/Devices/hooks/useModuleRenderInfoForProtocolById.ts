@@ -6,12 +6,12 @@ import {
   getDeckDefFromRobotType,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useAttachedModules } from './useAttachedModules'
 import { useStoredProtocolAnalysis } from './useStoredProtocolAnalysis'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type { CutoutConfig } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -33,7 +33,7 @@ export function useModuleRenderInfoForProtocolById(
   pollModules?: boolean
 ): ModuleRenderInfoById {
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { data: deckConfig = [] } = useDeckConfigurationQuery({
+  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
     refetchInterval: REFETCH_INTERVAL_5000_MS,
   })
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
