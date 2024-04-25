@@ -147,54 +147,70 @@ async def move_for_tip_motor(messenger: CanMessenger, node, position,xy,args) ->
         print("MOVETIPMOTOR=Fail")
 async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> None:
     step_size = [0.1, 0.5, 1,5,10, 20, 50]
-    step_length_index = 4
+    step_length_index = 5
     step = step_size[step_length_index]
     pos = 0
     speed = 10
     res = {node: (0,0,0)}
+    res2 = {node: (0,0,0)}
     current = args.current
     await set_pipette_current(messenger,current,node)
-    try:
-        if xy == "downward":
-            pos = pos + step
-            position['pipette'] = pos
-            res = await move_to(messenger, node, step, speed)
-            time.sleep(0.1)
-            res2 = await move_to(messenger, node, step, speed)
-        elif xy == "up":
-            pos = pos - step
-            position['pipette'] = pos
-            res = await move_to(messenger, node, step, -speed)
-            time.sleep(0.1)
-            res2 = await move_to(messenger, node, step, -speed)
-        mores1 = res[node][0]
-        encoder1 =res[node][1]
-        mores2 = res2[node][0]
-        encoder2 =res2[node][1]
-        diff = float(encoder2) - float(encoder1)
-        print("diff",diff)
+    mores1 = 0
+    encoder1 =0
+    mores2 = 0
+    encoder2 = 0m
+    if xy == "downward":
+        pos = pos + step
+        position['pipette'] = pos
         try:
-            if abs(diff) > 0:
-                if xy == "downward":
-                    print("MOVEDOWN=Pass")
-                elif xy == "up":
-                    print("MOVEUP=Pass")
-            else:
-                if xy == "downward":
-                    print("MOVEDOWN=Failed")
-                elif xy == "up":
-                    print("MOVEUP=Failed")
-                
-        except:
+            res = await move_to(messenger, node, step, speed)
+        except Exception as err:
+            pass
+        time.sleep(0.1)
+        try:
+            res2 = await move_to(messenger, node, step, speed)
+        except Exception as err:
+            pass
+    elif xy == "up":
+        pos = pos - step
+        position['pipette'] = pos
+        try:
+            res = await move_to(messenger, node, step, -speed)
+        except Exception as err:
+            pass
+        time.sleep(0.1)
+        try:
+            res2 = await move_to(messenger, node, step, -speed)
+        except Exception as err:
+            pass
+    mores1 = res[node][0]
+    encoder1 =res[node][1]
+    mores2 = res2[node][0]
+    encoder2 =res2[node][1]
+    diff = float(encoder2) - float(encoder1)
+    print("diff",diff)
+    try:
+        if abs(diff) > 0:
+            if xy == "downward":
+                print("MOVEDOWN=Pass")
+            elif xy == "up":
+                print("MOVEUP=Pass")
+        else:   
             if xy == "downward":
                 print("MOVEDOWN=Failed")
             elif xy == "up":
                 print("MOVEUP=Failed")
+            
     except Exception as err:
         if xy == "downward":
             print("MOVEDOWN=Failed")
         elif xy == "up":
             print("MOVEUP=Failed")
+    # except Exception as err:
+    #     if xy == "downward":
+    #         print("MOVEDOWN=Failed")
+    #     elif xy == "up":
+    #         print("MOVEUP=Failed")
 
 
 
