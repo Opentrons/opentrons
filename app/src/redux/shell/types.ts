@@ -165,7 +165,7 @@ export type ShellAction =
   | RobotMassStorageDeviceRemoved
   | NotifySubscribeAction
 
-export type StructuredCloneableFormDataEntry =
+export type IPCSafeFormDataEntry =
   | {
       type: 'string'
       name: string
@@ -178,4 +178,4 @@ export type StructuredCloneableFormDataEntry =
       filename: string
     }
 
-export type StructuredCloneableFormData = StructuredCloneableFormDataEntry[]
+export type IPCSafeFormData = IPCSafeFormDataEntry[]

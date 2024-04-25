@@ -17,7 +17,7 @@ import {
   USB_DEVICE_REMOVED,
 } from './constants'
 
-import type { StructuredCloneableFormData } from '@opentrons/app/src/redux/shell/types'
+import type { IPCSafeFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
 import type { PortInfo } from '@opentrons/usb-bridge/node-client'
 import type { Action, Dispatch } from './types'
@@ -82,11 +82,9 @@ function isUsbDeviceOt3(device: UsbDevice): boolean {
   )
 }
 
-function reconstructFormData(
-  structuredCloneableFormData: StructuredCloneableFormData
-): FormData {
+function reconstructFormData(ipcSafeFormData: IPCSafeFormData): FormData {
   const result = new FormData()
-  structuredCloneableFormData.forEach(entry => {
+  ipcSafeFormData.forEach(entry => {
     entry.type === 'file'
       ? result.append(entry.name, Buffer.from(entry.value), entry.filename)
       : result.append(entry.name, entry.value)

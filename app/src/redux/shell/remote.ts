@@ -4,7 +4,7 @@ import type {
   Remote,
   NotifyTopic,
   NotifyResponseData,
-  StructuredCloneableFormData,
+  IPCSafeFormData,
 } from './types'
 
 const emptyRemote: Remote = {} as any
@@ -27,10 +27,8 @@ export const remote: Remote = new Proxy(emptyRemote, {
 // FormData and File objects can't be sent through invoke().
 // This converts them into simpler objects that can be.
 // app-shell will convert them back.
-async function proxyFormData(
-  formData: FormData
-): Promise<StructuredCloneableFormData> {
-  const result: StructuredCloneableFormData = []
+async function proxyFormData(formData: FormData): Promise<IPCSafeFormData> {
+  const result: IPCSafeFormData = []
   for (const [name, value] of formData.entries()) {
     if (value instanceof File) {
       result.push({
