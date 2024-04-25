@@ -16,7 +16,7 @@ This is 1.5.0, an internal release for the Robot Stack.  the primary purpose of 
 
 1. If you have the Opentrons internal release app installed and are on the stable channel you should receive an update prompt.
 
-![Image of what the stable app channel looks like](https://thelinktodojosh.com)
+![image](https://github.com/Opentrons/opentrons/assets/502770/d7b45e27-b020-4f5f-b289-f673af30df52)
 
 1. If you don’t have the Internal release app installed, download the executable for your operating system @Josh McVey Put the link here.
 2. Install the app - 1.5.0
@@ -37,14 +37,14 @@ This is 1.5.0, an internal release for the Robot Stack.  the primary purpose of 
   - Go ahead and clear the error
   - Remove the support bracket
   - Home the gantry
-  - Enter into attach flow 
+  - Enter into attach flow
 - If you interact with the gantry while a gripper is attached and you are not in a detach/attach flow it is possible the gripper may fall.
   - Always be in an attach/detach flow when interacting with the gantry.
 - Flex out of date protocol on the desktop app will show a white deckmap
   - Most protocols will get the protocol analysis out of date banner
     - Just hit re-analyze protocol
 
-![Image of ](https://thelinktodojosh.com)
+![image](https://github.com/Opentrons/opentrons/assets/502770/41569e6b-aa68-4262-8dfb-fee222d17a5e)
 
 ---
 
