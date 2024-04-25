@@ -12,18 +12,20 @@ from opentrons_shared_data.robot.dev_types import RobotTypeEnum
 from typing import Callable, Type
 from opentrons.config import (
     get_performance_metrics_data_dir,
+    robot_configs,
 )
 
-log = logging.getLogger(__name__)
 
 
-_should_track = True 
+_should_track = ff.enable_performance_metrics(
+    RobotTypeEnum.robot_literal_to_enum(robot_configs.load().model)
+)
 STORE_EACH = _should_track
 
 class StubbedTracker(SupportsTracking):
     """A stubbed tracker that does nothing."""
 
-    def __init__(self, storage_location: Path, should_track: bool) -> None:
+    def __init__(self, storage_location: Path, should_track: bool, store_each: bool) -> None:
         """Initialize the stubbed tracker."""
         pass
 
@@ -60,10 +62,9 @@ _robot_context_tracker: SupportsTracking | None = None
 def _get_robot_context_tracker() -> SupportsTracking:
     """Singleton for the robot context tracker."""
     global _robot_context_tracker
-    log.error(f"Using performance metrics: {_should_track}")
     if _robot_context_tracker is None:
         _robot_context_tracker = package_to_use(
-            get_performance_metrics_data_dir(), _should_track
+            get_performance_metrics_data_dir(), _should_track, STORE_EACH
         )
     return _robot_context_tracker
 
@@ -76,14 +77,10 @@ def track_analysis(func: F) -> F:
     # Typing a decorator that wraps a decorator with args, nope
     @functools.wraps(func)
     def wrapper(*args, **kwargs):  # type: ignore # noqa: ANN002, ANN003, ANN201
-        log.error("Tracking analysis")
         tracker = _get_robot_context_tracker()
         tracked_func = tracker.track(RobotContextState.ANALYZING_PROTOCOL)(func)
 
         result = tracked_func(*args, **kwargs)
-
-        if STORE_EACH:
-            tracker.store()
 
         return result
 
