@@ -4,7 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { i18n } from '../../../localization'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { MultipleModuleRow } from '../MultipleModuleRow'
+import { MultipleModulesRow } from '../MultipleModulesRow'
 import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
@@ -15,8 +15,8 @@ import type { ModuleOnDeck } from '../../../step-forms'
 
 vi.mock('../../../step-forms/actions')
 vi.mock('../FlexSlotMap')
-const render = (props: React.ComponentProps<typeof MultipleModuleRow>) => {
-  return renderWithProviders(<MultipleModuleRow {...props} />, {
+const render = (props: React.ComponentProps<typeof MultipleModulesRow>) => {
+  return renderWithProviders(<MultipleModulesRow {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
@@ -37,7 +37,7 @@ const mockTemp2: ModuleOnDeck = {
 }
 
 describe('MultipleModuleRow', () => {
-  let props: React.ComponentProps<typeof MultipleModuleRow>
+  let props: React.ComponentProps<typeof MultipleModulesRow>
   beforeEach(() => {
     props = {
       moduleType: TEMPERATURE_MODULE_TYPE,

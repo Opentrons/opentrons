@@ -37,6 +37,9 @@ describe('PromptGuide', () => {
       'What if you don’t provide all of those pieces of information?'
     )
     screen.getByText('OpentronsAI asks you to provide it!')
+    screen.getByText(
+      'Once OpentronsAI has written your protocol, type "simulate" in the prompt box to try it out.'
+    )
   })
   it('should have the right url', () => {
     render()

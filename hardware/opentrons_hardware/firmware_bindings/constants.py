@@ -338,6 +338,8 @@ class SensorId(int, Enum):
 
     S0 = 0x0
     S1 = 0x1
+    UNUSED = 0x2
+    BOTH = 0x3
 
 
 @unique

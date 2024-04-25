@@ -17,11 +17,6 @@ export const isNumeric = (str: string): boolean => {
  * ]
  * console.log(orderRuntimeParameterRangeOptions(numChoices) // 16,20
  *
- * const strChoices = [
- *   { displayName: 'Single channel 50µL', value: 'flex_1channel_50' },
- *   { displayName: 'Eight Channel 50µL', value: 'flex_8channel_50' },
- * ]
- * console.log(orderRuntimeParameterRangeOptions(strChoices) // Eight Channel 50µL, Single channel 50µL
  */
 export const orderRuntimeParameterRangeOptions = (
   choices: Choice[]
@@ -41,6 +36,6 @@ export const orderRuntimeParameterRangeOptions = (
       })
       .join(', ')
   } else {
-    return displayNames.sort().join(', ')
+    return displayNames.join(', ')
   }
 }

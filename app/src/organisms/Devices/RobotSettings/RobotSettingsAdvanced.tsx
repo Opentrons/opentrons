@@ -140,6 +140,7 @@ export function RobotSettingsAdvanced({
         {showFactoryModeSlideout && (
           <FactoryModeSlideout
             isExpanded={showFactoryModeSlideout}
+            isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             onCloseClick={() => setShowFactoryModeSlideout(false)}
             robotName={robotName}
           />

@@ -71,7 +71,7 @@ async def test_clean_up_current_run(
     """It should publish to appropriate topics at the end of a run."""
     await runs_publisher.initialize("1234", AsyncMock(), AsyncMock())
 
-    await runs_publisher.clean_up_current_run()
+    await runs_publisher.clean_up_run(run_id="1234")
 
     notification_client.publish_advise_refetch_async.assert_any_await(topic=Topics.RUNS)
     notification_client.publish_advise_refetch_async.assert_any_await(

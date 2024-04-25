@@ -4,6 +4,7 @@ import type {
   LoadedPipette,
   ModuleModel,
   RunTimeCommand,
+  RunTimeParameter,
 } from '@opentrons/shared-data'
 import type { ResourceLink, ErrorDetails } from '../types'
 export * from './commands/types'
@@ -47,7 +48,7 @@ export interface LegacyGoodRunData {
   modules: LoadedModule[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
-  runTimeParameterValues?: RunTimeParameterCreateData
+  runTimeParameters: RunTimeParameter[]
 }
 
 export interface KnownGoodRunData extends LegacyGoodRunData {

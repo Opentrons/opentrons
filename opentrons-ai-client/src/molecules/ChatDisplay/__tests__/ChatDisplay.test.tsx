@@ -15,7 +15,7 @@ describe('ChatDisplay', () => {
 
   beforeEach(() => {
     props = {
-      text: 'mock text from the backend',
+      content: 'mock text from the backend',
       isUserInput: false,
     }
   })
@@ -29,7 +29,7 @@ describe('ChatDisplay', () => {
   })
   it('should display input from use and label', () => {
     props = {
-      text: 'mock text from user input',
+      content: 'mock text from user input',
       isUserInput: true,
     }
     render(props)

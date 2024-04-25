@@ -164,3 +164,18 @@ export type ShellAction =
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
   | NotifySubscribeAction
+
+export type IPCSafeFormDataEntry =
+  | {
+      type: 'string'
+      name: string
+      value: string
+    }
+  | {
+      type: 'file'
+      name: string
+      value: ArrayBuffer
+      filename: string
+    }
+
+export type IPCSafeFormData = IPCSafeFormDataEntry[]

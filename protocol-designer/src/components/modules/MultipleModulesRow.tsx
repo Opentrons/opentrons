@@ -25,7 +25,9 @@ interface MultipleModulesRowProps {
   moduleOnDeck?: ModuleOnDeck[]
 }
 
-export function MultipleModuleRow(props: MultipleModulesRowProps): JSX.Element {
+export function MultipleModulesRow(
+  props: MultipleModulesRowProps
+): JSX.Element {
   const {
     moduleOnDeck,
     openEditModuleModal,

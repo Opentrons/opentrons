@@ -55,6 +55,7 @@ class CommandIntent(str, Enum):
 
     PROTOCOL = "protocol"
     SETUP = "setup"
+    FIXIT = "fixit"
 
 
 class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
@@ -157,6 +158,12 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
         description=(
             "Information not critical to the execution of the command derived from either"
             " the command's execution or the command's generation."
+        ),
+    )
+    failedCommandId: Optional[str] = Field(
+        None,
+        description=(
+            "FIXIT command use only. Reference of the failed command id we are trying to fix."
         ),
     )
 

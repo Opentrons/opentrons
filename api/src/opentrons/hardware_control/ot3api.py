@@ -1521,14 +1521,8 @@ class OT3API(
         # G, Q should be handled in the backend through `self._home()`
         assert axis not in [Axis.G, Axis.Q]
 
-        # TODO(CM): This is a temporary fix in response to the right mount causing
-        # errors while trying to home on startup or attachment. We should remove this
-        # when we fix this issue in the firmware.
-        enable_right_mount_on_startup = (
-            self._gantry_load == GantryLoad.HIGH_THROUGHPUT and axis == Axis.Z_R
-        )
         encoder_ok = self._backend.check_encoder_status([axis])
-        if encoder_ok or enable_right_mount_on_startup:
+        if encoder_ok:
             # enable motor (if needed) and update estimation
             await self._enable_before_update_estimation(axis)
 
@@ -2078,6 +2072,7 @@ class OT3API(
     async def get_tip_presence_status(
         self,
         mount: Union[top_types.Mount, OT3Mount],
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> TipStateType:
         """
         Check tip presence status. If a high throughput pipette is present,
@@ -2091,14 +2086,19 @@ class OT3API(
                     and self._gantry_load == GantryLoad.HIGH_THROUGHPUT
                 ):
                     await stack.enter_async_context(self._high_throughput_check_tip())
-                result = await self._backend.get_tip_status(real_mount)
+                result = await self._backend.get_tip_status(
+                    real_mount, follow_singular_sensor
+                )
             return result
 
     async def verify_tip_presence(
-        self, mount: Union[top_types.Mount, OT3Mount], expected: TipStateType
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        expected: TipStateType,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         real_mount = OT3Mount.from_mount(mount)
-        status = await self.get_tip_presence_status(real_mount)
+        status = await self.get_tip_presence_status(real_mount, follow_singular_sensor)
         if status != expected:
             raise FailedTipStateCheck(expected, status.value)
 
@@ -2601,7 +2601,7 @@ class OT3API(
             (probe_settings.plunger_speed * plunger_direction),
             probe_settings.sensor_threshold_pascals,
             probe_settings.output_option,
-            probe_settings.data_file,
+            probe_settings.data_files,
             probe_settings.auto_zero_sensor,
             probe_settings.num_baseline_reads,
             probe=probe if probe else InstrumentProbeType.PRIMARY,
