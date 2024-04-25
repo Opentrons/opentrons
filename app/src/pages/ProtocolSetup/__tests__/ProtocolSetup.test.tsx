@@ -297,7 +297,7 @@ describe('ProtocolSetup', () => {
     render(`/runs/${RUN_ID}/setup/`)
     screen.getByText('Prepare to run')
     screen.getByText('Instruments')
-    screen.getByText('Modules & deck')
+    screen.getByText('Deck hardware')
     screen.getByText('Labware')
     screen.getByText('Labware Position Check')
     screen.getByText('Liquids')
@@ -327,7 +327,7 @@ describe('ProtocolSetup', () => {
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     render(`/runs/${RUN_ID}/setup/`)
-    fireEvent.click(screen.getByText('Modules & deck'))
+    fireEvent.click(screen.getByText('Deck hardware'))
     expect(vi.mocked(ProtocolSetupModulesAndDeck)).toHaveBeenCalled()
   })
 

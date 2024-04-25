@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
+import { MemoryRouter } from 'react-router-dom'
 import { screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
@@ -16,14 +17,16 @@ import {
 } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../../i18n'
-import { LocationConflictModal } from '../LocationConflictModal'
 import { mockHeaterShaker } from '../../../../../redux/modules/__fixtures__'
+import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
+import { LocationConflictModal } from '../LocationConflictModal'
 import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
 
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../../../resources/deck_configuration')
+vi.mock('../../../../ProtocolUpload/hooks')
 
 const mockFixture = {
   cutoutId: 'cutoutB3',
@@ -31,9 +34,14 @@ const mockFixture = {
 }
 
 const render = (props: React.ComponentProps<typeof LocationConflictModal>) => {
-  return renderWithProviders(<LocationConflictModal {...props} />, {
-    i18nInstance: i18n,
-  })[0]
+  return renderWithProviders(
+    <MemoryRouter>
+      <LocationConflictModal {...props} />
+    </MemoryRouter>,
+    {
+      i18nInstance: i18n,
+    }
+  )[0]
 }
 
 describe('LocationConflictModal', () => {
@@ -45,7 +53,11 @@ describe('LocationConflictModal', () => {
       cutoutId: 'cutoutB3',
       requiredFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
       deckDef: ot3StandardDeckV5 as any,
+      robotName: 'otie',
     }
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      closeCurrentRun: vi.fn(),
+    } as any)
     vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
@@ -79,6 +91,7 @@ describe('LocationConflictModal', () => {
       cutoutId: 'cutoutB3',
       requiredModule: 'heaterShakerModuleV1',
       deckDef: ot3StandardDeckV5 as any,
+      robotName: 'otie',
     }
     render(props)
     screen.getByText('Protocol specifies')
@@ -105,6 +118,7 @@ describe('LocationConflictModal', () => {
       requiredFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
       missingLabwareDisplayName: 'a tiprack',
       deckDef: ot3StandardDeckV5 as any,
+      robotName: 'otie',
     }
     render(props)
     screen.getByText('Deck location conflict')

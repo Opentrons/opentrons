@@ -47,6 +47,7 @@ interface LocationConflictModalProps {
   onCloseClick: () => void
   cutoutId: CutoutId
   deckDef: DeckDefinition
+  robotName: string
   missingLabwareDisplayName?: string | null
   requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
@@ -59,6 +60,7 @@ export const LocationConflictModal = (
   const {
     onCloseClick,
     cutoutId,
+    robotName,
     missingLabwareDisplayName,
     requiredFixtureId,
     requiredModule,
@@ -152,7 +154,11 @@ export const LocationConflictModal = (
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
   }
 
-  if (showModuleSelect && requiredModule) {
+  const displaySlotName = isThermocycler
+    ? 'A1 + B1'
+    : getCutoutDisplayName(cutoutId)
+
+  if (showModuleSelect && requiredModule != null) {
     return createPortal(
       <ChooseModuleToConfigureModal
         handleConfigureModule={handleConfigureModule}
@@ -160,10 +166,13 @@ export const LocationConflictModal = (
         onCloseClick={onCloseClick}
         isOnDevice={isOnDevice}
         deckDef={deckDef}
+        robotName={robotName}
+        displaySlotName={displaySlotName}
       />,
       getTopPortalEl()
     )
   }
+
   return createPortal(
     isOnDevice ? (
       <Modal
@@ -199,11 +208,7 @@ export const LocationConflictModal = (
               fontWeight={TYPOGRAPHY.fontWeightBold}
               paddingBottom={SPACING.spacing8}
             >
-              {t('slot_location', {
-                slotName: isThermocycler
-                  ? 'A1 + B1'
-                  : getCutoutDisplayName(cutoutId),
-              })}
+              {t('slot_location', { slotName: displaySlotName })}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -302,11 +307,7 @@ export const LocationConflictModal = (
               fontSize={TYPOGRAPHY.fontSizeH4}
               fontWeight={TYPOGRAPHY.fontWeightBold}
             >
-              {t('slot_location', {
-                slotName: isThermocycler
-                  ? 'A1 + B1'
-                  : getCutoutDisplayName(cutoutId),
-              })}
+              {t('slot_location', { slotName: displaySlotName })}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_COLUMN}

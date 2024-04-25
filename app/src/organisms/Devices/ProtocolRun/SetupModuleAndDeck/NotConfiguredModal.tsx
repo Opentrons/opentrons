@@ -55,7 +55,7 @@ export const NotConfiguredModal = (
       width="27.75rem"
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p">{t('add_fixture_to_deck')}</StyledText>
+        <StyledText as="p">{t('add_this_deck_hardware')}</StyledText>
         <Flex paddingTop={SPACING.spacing16} flexDirection={DIRECTION_COLUMN}>
           <Flex
             padding={`${SPACING.spacing8} ${SPACING.spacing16}`}

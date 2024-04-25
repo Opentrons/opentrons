@@ -15,7 +15,10 @@ import { i18n } from '../../../i18n'
 import { LocationConflictModal } from '../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
 import { FixtureTable } from '../FixtureTable'
+import { getLocalRobot } from '../../../redux/discovery'
+import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
 
+vi.mock('../../../redux/discovery')
 vi.mock('../../../resources/deck_configuration/hooks')
 vi.mock(
   '../../../organisms/Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
@@ -41,6 +44,7 @@ describe('FixtureTable', () => {
       setCutoutId: mockSetCutoutId,
       setProvidedFixtureOptions: mockSetProvidedFixtureOptions,
     }
+    vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
@@ -58,13 +62,6 @@ describe('FixtureTable', () => {
   })
   afterEach(() => {
     vi.clearAllMocks()
-  })
-
-  it('should render table header and contents', () => {
-    render(props)
-    screen.getByText('Fixture')
-    screen.getByText('Location')
-    screen.getByText('Status')
   })
 
   it('should render the current status - configured', () => {

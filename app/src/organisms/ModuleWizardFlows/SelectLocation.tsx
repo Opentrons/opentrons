@@ -174,6 +174,13 @@ export const SelectLocation = (
           handleClickAdd={handleAddFixture}
           handleClickRemove={handleRemoveFixture}
           editableCutoutIds={editableCutoutIds}
+          selectedCutoutId={
+            deckConfig.find(
+              ({ cutoutId, opentronsModuleSerialNumber }) =>
+                Object.keys(configuredFixtureIdByCutoutId).includes(cutoutId) &&
+                attachedModule.serialNumber === opentronsModuleSerialNumber
+            )?.cutoutId
+          }
           height="250px"
         />
       }

@@ -5,6 +5,7 @@ import os
 import json
 import gspread  # type: ignore[import]
 import sys
+import time as t
 from abr_testing.data_collection import read_robot_logs
 from abr_testing.automation import google_drive_tool, google_sheets_tool
 
@@ -18,16 +19,20 @@ def check_for_duplicates(
     headers: List[str],
 ) -> Union[List[str], None]:
     """Check google sheet for duplicates."""
+    t.sleep(5)
     serials = google_sheet.get_column(col_1)
     modify_dates = google_sheet.get_column(col_2)
-    # check for complete calibration.
-    if len(row[-1]) > 0:
-        for serial, modify_date in zip(serials, modify_dates):
-            if row[col_1 - 1] == serial and row[col_2 - 1] == modify_date:
-                print(f"Skipped row for instrument {serial}. Already on Google Sheet.")
-                return None
-        read_robot_logs.write_to_sheets(sheet_location, google_sheet, row, headers)
-        print(f"Writing calibration for: {serial}")
+    # Check for calibration time stamp.
+    if row[-1] is not None:
+        if len(row[-1]) > 0:
+            for serial, modify_date in zip(serials, modify_dates):
+                if row[col_1 - 1] == serial and row[col_2 - 1] == modify_date:
+                    print(
+                        f"Skipped row for instrument {serial}. Already on Google Sheet."
+                    )
+                    return None
+            read_robot_logs.write_to_sheets(sheet_location, google_sheet, row, headers)
+            print(f"Writing calibration for: {row[7]}")
     return row
 
 
@@ -206,15 +211,10 @@ if __name__ == "__main__":
     if ip_or_all == "ALL":
         ip_address_list = ip_file["ip_address_list"]
         for ip in ip_address_list:
-            print(ip)
-            try:
-                saved_file_path, calibration = read_robot_logs.get_calibration_offsets(
-                    ip, storage_directory
-                )
-                upload_calibration_offsets(calibration, storage_directory)
-            except Exception:
-                print(f"ERROR: Failed to read IP address: {ip}")
-                continue
+            saved_file_path, calibration = read_robot_logs.get_calibration_offsets(
+                ip, storage_directory
+            )
+            upload_calibration_offsets(calibration, storage_directory)
     else:
         saved_file_path, calibration = read_robot_logs.get_calibration_offsets(
             ip_or_all, storage_directory

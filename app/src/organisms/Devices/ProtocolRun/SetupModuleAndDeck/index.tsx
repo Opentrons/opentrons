@@ -121,6 +121,7 @@ export const SetupModuleAndDeck = ({
               {requiredDeckConfigCompatibility.length > 0 ? (
                 <SetupFixtureList
                   deckConfigCompatibility={requiredDeckConfigCompatibility}
+                  robotName={robotName}
                 />
               ) : null}
             </Flex>

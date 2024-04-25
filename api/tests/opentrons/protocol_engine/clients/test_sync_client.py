@@ -161,6 +161,30 @@ def test_load_labware(
     assert result == expected_result
 
 
+def test_reload_labware(
+    decoy: Decoy,
+    transport: ChildThreadTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a reload labware command."""
+    expected_request = commands.ReloadLabwareCreate(
+        params=commands.ReloadLabwareParams(
+            labwareId="some-labware-id",
+        )
+    )
+
+    expected_result = commands.ReloadLabwareResult(
+        labwareId="some-labware-id", offsetId=None
+    )
+    decoy.when(transport.execute_command(request=expected_request)).then_return(
+        expected_result
+    )
+    result = subject.reload_labware(
+        labware_id="some-labware-id",
+    )
+    assert result == expected_result
+
+
 def test_load_module(
     decoy: Decoy,
     transport: ChildThreadTransport,
