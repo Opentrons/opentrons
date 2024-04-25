@@ -90,9 +90,12 @@ export function getCompatibleLabwareByCategory(
   const wellSetHelpers: WellSetHelpers = makeWellSetHelpers()
   const { canPipetteUseLabware } = wellSetHelpers
   if (pipetteSpecs == null) return undefined
-  const compatibleLabwareDefinitions = allLabwareDefinitions.filter(def =>
-    canPipetteUseLabware(pipetteSpecs, def)
-  )
+  let compatibleLabwareDefinitions = allLabwareDefinitions
+  if (pipetteSpecs.channels !== 1) {
+    compatibleLabwareDefinitions = allLabwareDefinitions.filter(def =>
+      canPipetteUseLabware(pipetteSpecs.channels, def)
+    )
+  }
 
   if (category === 'all') {
     return compatibleLabwareDefinitions.filter(
