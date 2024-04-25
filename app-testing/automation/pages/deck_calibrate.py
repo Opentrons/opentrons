@@ -1,4 +1,5 @@
 """Model for the screens of deck calibration."""
+
 from enum import Enum
 from typing import Optional
 

@@ -1,29 +1,16 @@
 """Smoke Test v3.0 """
+
 # https://opentrons.atlassian.net/projects/RQA?selectedItem=com.atlassian.plugins.atlassian-connect-plugin:com.kanoah.test-manager__main-project-page#!/testCase/QB-T497
 from opentrons import protocol_api
 
 metadata = {
-    "protocolName": "🛠️ 2.17 Smoke Test V3 🪄",
+    "protocolName": "🛠️ 2.13 Smoke Test V3 🪄",
     "author": "Opentrons Engineering <engineering@opentrons.com>",
     "source": "Software Testing Team",
     "description": ("Description of the protocol that is longish \n has \n returns and \n emoji 😊 ⬆️ "),
 }
 
-requirements = {"robotType": "OT-2", "apiLevel": "2.17"}
-
-
-#########################
-#### LOOK AT THIS #######
-#########################
-
-# This protocol is exactly the same as 2.16 Smoke Test V3
-# The only difference is the API version in the metadata
-# There were no new positive test cases for 2.17
-# The negative test cases are captured in the 2.17 dispense changes protcol
-
-#########################
-#### LOOK AT THIS #######
-#########################
+requirements = {"robotType": "OT-2", "apiLevel": "2.13"}
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
@@ -77,19 +64,18 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     thermocycler_module = ctx.load_module("thermocycler module gen2")
 
     # module labware
-    temp_adapter = temperature_module.load_adapter("opentrons_96_well_aluminum_block")
-    temp_plate = temp_adapter.load_labware(
-        "nest_96_wellplate_100ul_pcr_full_skirt",
+    temp_plate = temperature_module.load_labware(
+        "opentrons_96_aluminumblock_nest_wellplate_100ul",
         label="Temperature-Controlled plate",
     )
-    hs_plate = hs_module.load_labware(name="nest_96_wellplate_100ul_pcr_full_skirt", adapter="opentrons_96_pcr_adapter")
+    hs_plate = hs_module.load_labware("opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt")
     tc_plate = thermocycler_module.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
 
-    # A 2.14 difference, no params specified, still should find it.
     custom_labware = ctx.load_labware(
         "cpx_4_tuberack_100ul",
         custom_lw_position,
-        label="4 custom tubes",
+        "4 tubes",
+        "custom_beta",
     )
 
     # create plates and pattern list
@@ -116,156 +102,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         logo_destination_plate.wells_by_name()["E5"],
     ]
 
-    # >= 2.14 define_liquid and load_liquid
-    water = ctx.define_liquid(
-        name="water", description="H₂O", display_color="#42AB2D"
-    )  # subscript 2 https://www.compart.com/en/unicode/U+2082
-
-    acetone = ctx.define_liquid(
-        name="acetone", description="C₃H₆O", display_color="#38588a"
-    )  # subscript 3 https://www.compart.com/en/unicode/U+2083
-    # subscript 6 https://www.compart.com/en/unicode/U+2086
-
-    dye_container.wells_by_name()["A1"].load_liquid(liquid=water, volume=4000)
-    dye_container.wells_by_name()["A2"].load_liquid(liquid=water, volume=2000)
-    dye_container.wells_by_name()["A5"].load_liquid(liquid=acetone, volume=555.55555)
-
-    # 2 different liquids in the same well
-    dye_container.wells_by_name()["A8"].load_liquid(liquid=water, volume=900.00)
-    dye_container.wells_by_name()["A8"].load_liquid(liquid=acetone, volume=1001.11)
-
     hs_module.close_labware_latch()
 
-    pipette_right.pick_up_tip()
-
-    ##################################
-    # Manual Deck State Modification #
-    ##################################
-
-    # -------------------------- #
-    # Added in API version: 2.15 #
-    # -------------------------- #
-
-    # Putting steps for this at beginning of protocol so you can do the manual stuff
-    # then walk away to let the rest of the protocol execute
-
-    # The test flow is as follows:
-    #   1. Remove the existing PCR plate from slot 2
-    #   2. Move the reservoir from slot 3 to slot 2
-    #   3. Pickup P20 tip, move pipette to reservoir A1 in slot 2
-    #   4. Pause and ask user to validate that the tip is in the middle of reservoir A1 in slot 2
-    #   5. Move the reservoir back to slot 3 from slot 2
-    #   6. Move pipette to reservoir A1 in slot 3
-    #   7. Pause and ask user to validate that the tip is in the middle of reservoir A1 in slot 3
-    #   8. Move custom labware from slot 6 to slot 2
-    #   9. Move pipette to well A1 in slot 2
-    #   10. Pause and ask user to validate that the tip is in the middle of well A1 in slot 2
-    #   11. Move the custom labware back to slot 6 from slot 2
-    #   12. Move pipette to well A1 in slot 6
-    #   13. Pause and ask user to validate that the tip is in the middle of well A1 in slot 6
-    #   14. Move the offdeck PCR plate back to slot 2
-    #   15. Move pipette to well A1 in slot 2
-    #   16. Pause and ask user to validate that the tip is in the middle of well A1 in slot 2
-
-    # In effect, nothing will actually change to the protocol,
-    # but we will be able to test that the UI responds appropriately.
-
-    # Note:
-    #   logo_destination_plate is a nest_96_wellplate_100ul_pcr_full_skirt - starting position is slot 2
-    #   dye_container is a nest_12_reservoir_15ml - starting position is slot 3
-
-    # Step 1
-    ctx.move_labware(
-        labware=logo_destination_plate,
-        new_location=protocol_api.OFF_DECK,
-    )
-
-    # Step 2
-    ctx.move_labware(labware=dye_container, new_location="2")
-
-    # Step 3
-    pipette_right.move_to(location=dye_container.wells_by_name()["A1"].top())
-
-    # Step 4
-    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 2?")
-
-    # Step 5
-    ctx.move_labware(labware=dye_container, new_location="3")
-
-    # Step 6
-    pipette_right.move_to(location=dye_container.wells_by_name()["A1"].top())
-
-    # Step 7
-    ctx.pause("Is the pipette tip in the middle of reservoir A1 in slot 3?")
-
-    # Step 8
-    ctx.move_labware(labware=custom_labware, new_location="2")
-
-    # Step 9
-    pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top())
-
-    # Step 10
-    ctx.pause("Is the pipette tip in the middle of custom labware A1 in slot 2?")
-
-    # Step 11
-    ctx.move_labware(labware=custom_labware, new_location="6")
-
-    # Step 12
-    pipette_right.move_to(location=custom_labware.wells_by_name()["A1"].top())
-
-    # Step 13
-    ctx.pause("Is the pipette tip in the middle of custom labware A1 in slot 6?")
-
-    # Step 14
-    ctx.move_labware(labware=logo_destination_plate, new_location="2")
-
-    # Step 15
-    pipette_right.move_to(location=logo_destination_plate.wells_by_name()["A1"].top())
-
-    # Step 16
-    ctx.pause("Is the pipette tip in the middle of well A1 in slot 2?")
-
-    #######################
-    # prepare_to_aspirate #
-    #######################
-
-    # -------------------------- #
-    # Added in API version: 2.16 #
-    # -------------------------- #
-
-    pipette_right.prepare_to_aspirate()
-    pipette_right.move_to(dye_container.wells_by_name()["A1"].bottom(z=2))
-    ctx.pause(
-        "Testing prepare_to_aspirate - watch pipette until next pause.\n The pipette should only move up out of the well after it has aspirated."
-    )
-    pipette_right.aspirate(10, dye_container.wells_by_name()["A1"].bottom(z=2))
-    ctx.pause("Did the pipette move up out of the well, only once, after aspirating?")
-    pipette_right.dispense(10, dye_container.wells_by_name()["A1"].bottom(z=2))
-
-    #########################################
-    # protocol_context.fixed_trash property #
-    #########################################
-
-    # ---------------------------- #
-    # Changed in API version: 2.16 #
-    # ---------------------------- #
-
-    pipette_right.move_to(ctx.fixed_trash)
-    ctx.pause("Is the pipette over the trash? Pipette will home after this pause.")
-    ctx.home()
-
-    ###############################################
-    # instrument_context.trash_container property #
-    ###############################################
-
-    # ---------------------------- #
-    # Changed in API version: 2.16 #
-    # ---------------------------- #
-
-    pipette_right.move_to(pipette_right.trash_container)
-    ctx.pause("Is the pipette over the trash?")
-
     # Distribute dye
+    pipette_right.pick_up_tip()
     pipette_right.distribute(
         volume=18,
         source=dye_source,
@@ -321,7 +161,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     # touch tip
     # pipette ends in the middle of the well as of 6.3.0 in all touch_tip
     pipette_right.touch_tip(location=logo_destination_plate.wells_by_name()["H1"])
-    ctx.pause("Is the pipette tip in the middle of the well?")
     pipette_right.return_tip()
 
     # Play with the modules
@@ -341,6 +180,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     thermocycler_module.open_lid()
 
     hs_module.deactivate_shaker()
+
+    ctx.pause("This is a pause")
 
     # dispense to modules
 
