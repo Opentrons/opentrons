@@ -21,7 +21,7 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     StateSummary,
     Command,
-    commands as pe_commands,
+    commands as pe_commands, CommandIntent,
 )
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.util.broker import Broker
@@ -157,6 +157,25 @@ class AbstractRunner(ABC):
         run_time_param_values: Optional[RunTimeParamValuesType] = None,
     ) -> RunResult:
         """Run a given protocol to completion."""
+
+    def set_command_queued(self, command: Command) -> None:
+        """Validate and mark a command as queued in the command history."""
+        assert command.status == CommandStatus.QUEUED
+        assert not self.has(command.id)
+
+        next_index = self.length()
+        updated_command = CommandEntry(
+            index=next_index,
+            command=command,
+        )
+        self._add(command.id, updated_command)
+
+        if command.intent == CommandIntent.SETUP:
+            self._add_to_setup_queue(command.id)
+        elif command.intent == CommandIntent.FIXIT:
+            self._add_to_fixit_queue(command.id)
+        else:
+            self._add_to_queue(command.id)
 
 
 class PythonAndLegacyRunner(AbstractRunner):
