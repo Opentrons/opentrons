@@ -25,10 +25,7 @@ import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationW
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import { useIsFlex, useIsRobotViewable, useRunStatuses } from './hooks'
-import {
-  getIs96ChannelPipetteAttached,
-  getShowPipetteCalibrationWarning,
-} from './utils'
+import { getShowPipetteCalibrationWarning } from './utils'
 import { PipetteCard } from './PipetteCard'
 import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'
 import { GripperCard } from '../GripperCard'
@@ -99,9 +96,8 @@ export function InstrumentsAndModules({
         !i.ok &&
         i.subsystem === 'pipette_right'
     ) ?? null
-  const is96ChannelAttached = getIs96ChannelPipetteAttached(
-    attachedPipettes?.left ?? null
-  )
+  const is96ChannelAttached = attachedLeftPipette?.data.channels === 96
+
   const attachPipetteRequired =
     attachedLeftPipette == null && attachedRightPipette == null
   const calibratePipetteRequired =

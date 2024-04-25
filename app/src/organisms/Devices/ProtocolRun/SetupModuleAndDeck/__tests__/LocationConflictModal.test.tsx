@@ -12,18 +12,20 @@ import {
   ot3StandardDeckV5,
 } from '@opentrons/shared-data'
 import {
-  useDeckConfigurationQuery,
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
+
 import { i18n } from '../../../../../i18n'
 import { mockHeaterShaker } from '../../../../../redux/modules/__fixtures__'
 import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
+import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
 
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../../resources/deck_configuration')
 vi.mock('../../../../ProtocolUpload/hooks')
 
 const mockFixture = {
@@ -57,7 +59,7 @@ describe('LocationConflictModal', () => {
       closeCurrentRun: vi.fn(),
     } as any)
     vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<DeckConfiguration>)
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
@@ -102,7 +104,7 @@ describe('LocationConflictModal', () => {
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render the modal information for a single slot fixture conflict', () => {
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutB1',

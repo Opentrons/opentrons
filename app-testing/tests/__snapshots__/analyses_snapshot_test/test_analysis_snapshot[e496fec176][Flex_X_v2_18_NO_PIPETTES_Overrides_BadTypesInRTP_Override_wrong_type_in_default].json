@@ -1,0 +1,18 @@
+{
+  "commands": [],
+  "config": {},
+  "errors": [
+    {
+      "analysis_execution_time": null,
+      "command_exit_code": 2,
+      "command_output": "Usage: python -m opentrons.cli analyze [OPTIONS] FILES...\nTry 'python -m opentrons.cli analyze --help' for help.\n\nError: Invalid value for 'FILES...': Path '/var/lib/ot/protocols/generated_protocols/Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP_Override_wrong_type_in_default.py' does not exist.\n"
+    }
+  ],
+  "files": [],
+  "labware": [],
+  "liquids": [],
+  "metadata": [],
+  "modules": [],
+  "pipettes": [],
+  "runTimeParameters": []
+}

@@ -1,6 +1,9 @@
 import re
-from typing import List, Optional, Union, cast
+from functools import lru_cache
+from typing import List, Optional, Union, cast, Literal, Tuple
+from opentrons_shared_data import get_shared_data_root
 from .dev_types import PipetteModel, PipetteName
+
 from .types import (
     PipetteChannelType,
     PipetteModelType,
@@ -106,26 +109,78 @@ def version_from_string(version: str) -> PipetteVersionType:
     return PipetteVersionType(major, minor)
 
 
-def version_from_generation(pipette_name_list: List[str]) -> PipetteVersionType:
-    """Convert a string generation name to a py:obj:PipetteVersionType.
+def get_channel_from_pipette_name(pipette_name_tuple: Tuple[str, ...]) -> str:
+    if "single" in pipette_name_tuple:
+        return "single_channel"
+    elif "96" in pipette_name_tuple:
+        return "ninety_six_channel"
+    else:
+        return "eight_channel"
 
-    Pipette generations are strings in the format of "gen1" or "gen2", and
-    usually associated withe :py:data:PipetteName.
+
+def get_major_version_from_pipette_name(
+    pipette_name_tuple: Tuple[str, ...],
+) -> Literal[1, 2, 3]:
+    #   special-casing for 96-channel to return version 3
+    if (
+        "flex" in pipette_name_tuple
+        or "gen3" in pipette_name_tuple
+        or "96" in pipette_name_tuple
+    ):
+        return 3
+    elif "gen2" in pipette_name_tuple:
+        return 2
+    else:
+        return 1
+
+
+@lru_cache(4)
+def version_from_generation(pipette_name_tuple: Tuple[str, ...]) -> PipetteVersionType:
+    """Convert pipetteName to a py:obj:PipetteVersionType
+
+    Given the pipette_name_tuple, cycle through each definition file path
+    and find the latest version (major and minor version combined) that
+    exists and return that version.
 
     Args:
-        pipette_name_list (List[str]): A list of strings from the separated by `_`
-        py:data:PipetteName.
+        pipette_name_tuple (Tuple[str, ...]): A tuple of strings from the separated
+        by `_` py:data:PipetteName.
 
     Returns:
         PipetteVersionType: A pipette version object.
-
     """
-    if "flex" in pipette_name_list or "gen3" in pipette_name_list:
-        return PipetteVersionType(3, 0)
-    elif "gen2" in pipette_name_list:
-        return PipetteVersionType(2, 0)
-    else:
-        return PipetteVersionType(1, 0)
+    major_version_from_pipette_name = get_major_version_from_pipette_name(
+        pipette_name_tuple
+    )
+    model_from_pipette_name = pipette_name_tuple[0]
+    channel_from_pipette_name = get_channel_from_pipette_name(pipette_name_tuple)
+
+    paths_to_validate = (
+        get_shared_data_root() / "pipette" / "definitions" / "2" / "general"
+    )
+    version_paths = (
+        paths_to_validate / channel_from_pipette_name / model_from_pipette_name
+    )
+
+    highest_minor_version: PipetteModelMinorVersionType = 0
+
+    for version_file in version_paths.iterdir():
+        version_list = version_file.stem.split("_")
+        major_version = version_list[0]
+        minor_version = version_list[1]
+
+        # Check if the major version matches the expected major version
+        if major_version == str(major_version_from_pipette_name):
+            minor_version_int = int(minor_version)
+            minor_version_lit: PipetteModelMinorVersionType = cast(
+                PipetteModelMinorVersionType, minor_version_int
+            )
+
+            # Update the highest minor version if this version is higher
+            if highest_minor_version < minor_version_lit:
+                highest_minor_version = minor_version_lit
+
+    return PipetteVersionType(major_version_from_pipette_name, highest_minor_version)
 
 
 def generation_from_string(pipette_name_list: List[str]) -> PipetteGenerationType:
@@ -194,7 +249,12 @@ def convert_pipette_name(
     if provided_version:
         version = version_from_string(provided_version)
     else:
-        version = version_from_generation(split_pipette_name)
+        pipette_name_tuple: Tuple[str, str, str] = (
+            split_pipette_name[0],
+            split_pipette_name[1],
+            split_pipette_name[2] if len(split_pipette_name) > 2 else "",
+        )
+        version = version_from_generation(pipette_name_tuple)
 
     pipette_type = PipetteModelType[split_pipette_name[0]]
 

@@ -1,4 +1,5 @@
 """Model for the App page that displays info and settings for the app."""
+
 import time
 from typing import List, Optional
 
