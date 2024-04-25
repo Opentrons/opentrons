@@ -17,6 +17,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { promptContext } from '../../organisms/PromptButton/PromptProvider'
+import { useFetch } from '../../resources/hooks'
+
 import type { SubmitHandler } from 'react-hook-form'
 
 // ToDo (kk:04/19/2024) Note this interface will be used by prompt buttons in SidePanel
@@ -26,26 +28,39 @@ interface InputType {
   userPrompt: string
 }
 
+const url = 'https://mockgpt.wiremockapi.cloud/v1/chat/completions'
+
 export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const { register, handleSubmit, watch, setValue } = useForm<InputType>({
-    defaultValues: {
-      userPrompt: '',
-    },
-  })
+  const { data: responseData, loading, error } = useFetch(url)
+
+  const { register, handleSubmit, watch, setValue, event } = useForm<InputType>(
+    {
+      defaultValues: {
+        userPrompt: '',
+      },
+    }
+  )
   const usePromptValue = (): string => React.useContext(promptContext)
   const promptFromButton = usePromptValue()
   const userPrompt = watch('userPrompt') ?? ''
 
-  const onSubmit: SubmitHandler<InputType> = async data => {
+  const onSubmit: SubmitHandler<InputType> = async (data, event) => {
     // ToDo (kk: 04/19/2024) call api
+    event?.preventDefault()
     const { userPrompt } = data
     console.log('user prompt', userPrompt)
+    console.log('data', responseData)
   }
 
   const calcTextAreaHeight = (): number => {
     const rowsNum = userPrompt.split('\n').length
     return rowsNum
+  }
+
+  const handleClick = (): void => {
+    console.log('clicked')
+    // call api function
   }
 
   React.useEffect(() => {
@@ -69,7 +84,11 @@ export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
           placeholder={t('type_your_prompt')}
           {...register('userPrompt')}
         />
-        <PlayButton disabled={userPrompt.length === 0} />
+        <SendButton
+          disabled={userPrompt.length === 0}
+          isLoading={loading}
+          handleClick={handleClick}
+        />
       </Flex>
     </StyledForm>
   )
@@ -100,17 +119,17 @@ const StyledTextarea = styled.textarea`
   }
 `
 
-interface PlayButtonProps {
-  onPlay?: () => void
+interface SendButtonProps {
+  handleClick: () => void
   disabled?: boolean
   isLoading?: boolean
 }
 
-function PlayButton({
-  onPlay,
+function SendButton({
+  handleClick,
   disabled = false,
   isLoading = false,
-}: PlayButtonProps): JSX.Element {
+}: SendButtonProps): JSX.Element {
   const playButtonStyle = css`
     -webkit-tap-highlight-color: transparent;
     &:focus {
@@ -147,10 +166,10 @@ function PlayButton({
       width="4.25rem"
       height="3.75rem"
       disabled={disabled || isLoading}
-      onClick={onPlay}
+      onClick={handleClick}
       aria-label="play"
       css={playButtonStyle}
-      type="submit"
+      // type="submit"
     >
       <Icon
         color={disabled ? COLORS.grey50 : COLORS.white}
