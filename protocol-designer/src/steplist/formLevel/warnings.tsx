@@ -104,9 +104,10 @@ export const tipPositionInTube = (
         : false
   }
 
-  if (isAspirateTubeRack && aspirate_mmFromBottom === null) {
-    return tipPositionedLowInTube()
-  } else if (isDispenseTubeRack && dispense_mmFromBottom === null) {
+  if (
+    (isAspirateTubeRack && aspirate_mmFromBottom === null) ||
+    (isDispenseTubeRack && dispense_mmFromBottom === null)
+  ) {
     return tipPositionedLowInTube()
   } else {
     return null
