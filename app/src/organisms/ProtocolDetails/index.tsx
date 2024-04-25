@@ -43,7 +43,9 @@ import {
   parseInitialLoadedLabwareByAdapter,
 } from '@opentrons/api-client'
 import {
+  MAGNETIC_BLOCK_TYPE,
   getGripperDisplayName,
+  getModuleType,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
@@ -189,7 +191,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
   )
 }
 
-interface ProtocolDetailsProps extends StoredProtocolData {}
+interface ProtocolDetailsProps extends StoredProtocolData { }
 
 export function ProtocolDetails(
   props: ProtocolDetailsProps
@@ -236,7 +238,10 @@ export function ProtocolDetails(
 
   const requiredModuleDetails =
     mostRecentAnalysis?.commands != null
-      ? map(parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands))
+      ? map(parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands)).filter(loadedModule => (
+        // filter out magnetic block which is already handled by the required fixture details
+        getModuleType(loadedModule.params.model) !== MAGNETIC_BLOCK_TYPE
+      ))
       : []
 
   const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
@@ -248,24 +253,24 @@ export function ProtocolDetails(
   const requiredLabwareDetails =
     mostRecentAnalysis != null
       ? map({
-          ...parseInitialLoadedLabwareByModuleId(
-            mostRecentAnalysis.commands != null
-              ? mostRecentAnalysis.commands
-              : []
-          ),
-          ...parseInitialLoadedLabwareBySlot(
-            mostRecentAnalysis.commands != null
-              ? mostRecentAnalysis.commands
-              : []
-          ),
-          ...parseInitialLoadedLabwareByAdapter(
-            mostRecentAnalysis.commands != null
-              ? mostRecentAnalysis.commands
-              : []
-          ),
-        }).filter(
-          labware => labware.result?.definition?.parameters?.format !== 'trash'
-        )
+        ...parseInitialLoadedLabwareByModuleId(
+          mostRecentAnalysis.commands != null
+            ? mostRecentAnalysis.commands
+            : []
+        ),
+        ...parseInitialLoadedLabwareBySlot(
+          mostRecentAnalysis.commands != null
+            ? mostRecentAnalysis.commands
+            : []
+        ),
+        ...parseInitialLoadedLabwareByAdapter(
+          mostRecentAnalysis.commands != null
+            ? mostRecentAnalysis.commands
+            : []
+        ),
+      }).filter(
+        labware => labware.result?.definition?.parameters?.format !== 'trash'
+      )
       : []
 
   const protocolDisplayName = getProtocolDisplayName(
@@ -371,14 +376,14 @@ export function ProtocolDetails(
     <>
       {showDeckViewModal
         ? createPortal(
-            <LegacyModal
-              title={t('deck_view')}
-              onClose={() => setShowDeckViewModal(false)}
-            >
-              {deckMap}
-            </LegacyModal>,
-            getTopPortalEl()
-          )
+          <LegacyModal
+            title={t('deck_view')}
+            onClose={() => setShowDeckViewModal(false)}
+          >
+            {deckMap}
+          </LegacyModal>,
+          getTopPortalEl()
+        )
         : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -412,8 +417,8 @@ export function ProtocolDetails(
               width="100%"
             >
               {analysisStatus !== 'loading' &&
-              mostRecentAnalysis != null &&
-              mostRecentAnalysis.errors.length > 0 ? (
+                mostRecentAnalysis != null &&
+                mostRecentAnalysis.errors.length > 0 ? (
                 <ProtocolAnalysisFailure
                   protocolKey={protocolKey}
                   errors={mostRecentAnalysis.errors.map(e => e.detail)}
@@ -657,11 +662,9 @@ export function ProtocolDetails(
               <Box
                 backgroundColor={COLORS.white}
                 // remove left upper corner border radius when first tab is active
-                borderRadius={`${
-                  currentTab === 'robot_config' ? '0' : BORDERS.borderRadius4
-                } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
-                  BORDERS.borderRadius4
-                }`}
+                borderRadius={`${currentTab === 'robot_config' ? '0' : BORDERS.borderRadius4
+                  } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${BORDERS.borderRadius4
+                  }`}
                 padding={SPACING.spacing16}
               >
                 {contentsByTabName[currentTab]}

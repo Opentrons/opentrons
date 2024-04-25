@@ -2,6 +2,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_FLEX_START,
   BORDERS,
   Box,
   Btn,
@@ -49,9 +50,11 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
   return (
     <>
       {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
-        return cutoutConfigAndCompatibility.requiredAddressableAreas.some(raa =>
+        // filter out all fixtures that only provide module addressable areas (e.g. everything but StagingAreaWithMagBlockV1)
+        // as they're handled in the Modules Table 
+        return cutoutConfigAndCompatibility.requiredAddressableAreas.every(raa =>
           FLEX_MODULE_ADDRESSABLE_AREAS.includes(raa)
-        ) ? null : ( // don't list modules here, they're covered by SetupModuleList
+        ) ? null : (
           <FixtureListItem
             key={cutoutConfigAndCompatibility.cutoutId}
             deckDef={deckDef}
@@ -174,7 +177,7 @@ export function FixtureListItem({
                 }
               />
             ) : null}
-            <Flex flexDirection={DIRECTION_COLUMN}>
+            <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_START}>
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}

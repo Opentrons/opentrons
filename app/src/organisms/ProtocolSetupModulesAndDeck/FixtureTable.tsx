@@ -82,11 +82,14 @@ export function FixtureTable({
         ? 1
         : -1
   )
+        console.log('SDC', sortedDeckConfigCompatibility)
 
   return sortedDeckConfigCompatibility.length > 0 ? (
     <>
       {sortedDeckConfigCompatibility.map((fixtureCompatibility, index) => {
-        return fixtureCompatibility.requiredAddressableAreas.some(raa =>
+        // filter out all fixtures that only provide module addressable areas (e.g. everything but StagingAreaWithMagBlockV1)
+        // as they're handled in the Modules Table 
+        return fixtureCompatibility.requiredAddressableAreas.every(raa =>
           FLEX_MODULE_ADDRESSABLE_AREAS.includes(raa)
         ) ? null : (
           <FixtureTableItem

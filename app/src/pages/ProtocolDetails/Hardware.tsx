@@ -21,6 +21,8 @@ import {
   getModuleType,
   getPipetteNameSpecs,
   getFixtureDisplayName,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import { useRequiredProtocolHardware } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'
@@ -83,7 +85,13 @@ const getHardwareName = (protocolHardware: ProtocolHardware): string => {
   } else if (protocolHardware.hardwareType === 'module') {
     return getModuleDisplayName(protocolHardware.moduleModel)
   } else {
-    return getFixtureDisplayName(protocolHardware.cutoutFixtureId)
+    let displayFixtureId = protocolHardware.cutoutFixtureId
+    // Only show staging area as a requirement for the staging area with mag block fixture,
+    // as mag block requirement is handled as a part of modules, we don't want to list it twice
+    if (protocolHardware.cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE) {
+      displayFixtureId = STAGING_AREA_RIGHT_SLOT_FIXTURE
+    }
+    return getFixtureDisplayName(displayFixtureId)
   }
 }
 

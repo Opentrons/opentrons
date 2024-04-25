@@ -19,6 +19,8 @@ import {
   getModuleDisplayName,
   getModuleType,
   getPipetteNameSpecs,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_BLOCK_FIXTURES,
   SINGLE_SLOT_FIXTURES,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -176,9 +178,24 @@ export const RobotConfigurationDetails = (
             <RobotConfigurationDetailsItem
               label={getCutoutDisplayName(fixture.cutoutId)}
               item={
-                <StyledText as="p">
-                  {getFixtureDisplayName(fixture.cutoutFixtureId)}
-                </StyledText>
+                <>
+                  {MAGNETIC_BLOCK_FIXTURES.includes(fixture.cutoutFixtureId)
+                    ? (
+                      <ModuleIcon
+                        key={index}
+                        moduleType={MAGNETIC_BLOCK_TYPE}
+                        marginRight={SPACING.spacing4}
+                        alignSelf={ALIGN_CENTER}
+                        color={COLORS.grey50}
+                        height={SIZE_1}
+                        minWidth={SIZE_1}
+                        minHeight={SIZE_1}
+                      />
+                    ) : null}
+                  <StyledText as="p">
+                    {getFixtureDisplayName(fixture.cutoutFixtureId)}
+                  </StyledText>
+                </>
               }
             />
           </React.Fragment>

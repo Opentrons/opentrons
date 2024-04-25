@@ -1,7 +1,9 @@
 import {
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  FLEX_MODULE_ADDRESSABLE_AREAS,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
+  MAGNETIC_BLOCK_ADDRESSABLE_AREAS,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
@@ -48,7 +50,9 @@ export function getAddressableAreaFromConfig(
   } else if (
     // if no, check if provides a movable trash
     providedAddressableAreas.some(aa =>
-      MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(aa)
+      MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(aa) 
+      || FLEX_MODULE_ADDRESSABLE_AREAS.includes(aa)
+    // if no, check if provides a movable trash
     )
   ) {
     addressableAreaFromConfig = providedAddressableAreas[0]
@@ -57,7 +61,8 @@ export function getAddressableAreaFromConfig(
     providedAddressableAreas.some(aa =>
       WASTE_CHUTE_ADDRESSABLE_AREAS.includes(aa)
     )
-  ) {
+  )
+   {
     // match number of channels to provided waste chute addressable area
     if (
       pipetteChannels === 1 &&
