@@ -20,7 +20,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  useDeckConfigurationQuery,
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
@@ -43,6 +42,7 @@ import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstruction
 import { AddFixtureModal } from './AddFixtureModal'
 import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 
@@ -74,8 +74,9 @@ export function DeviceDetailsDeckConfiguration({
 
   const { data: modulesData } = useModulesQuery()
   const deckConfig =
-    useDeckConfigurationQuery({ refetchInterval: DECK_CONFIG_REFETCH_INTERVAL })
-      .data ?? []
+    useNotifyDeckConfigurationQuery({
+      refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+    }).data ?? []
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { isRunRunning } = useRunStatuses()

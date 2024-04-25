@@ -1,10 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import {
-  useDeckConfigurationQuery,
-  useModulesQuery,
-} from '@opentrons/react-api-client'
+import { useModulesQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -24,6 +21,7 @@ import {
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Modal } from '../../../../molecules/Modal'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
 import type { ModuleModel, DeckDefinition } from '@opentrons/shared-data'
 import { FixtureOption } from '../../../DeviceDetailsDeckConfiguration/AddFixtureModal'
@@ -53,7 +51,7 @@ export const ChooseModuleToConfigureModal = (
   } = props
   const { t } = useTranslation(['protocol_setup', 'shared'])
   const attachedModules = useModulesQuery().data?.data ?? []
-  const deckConfig = useDeckConfigurationQuery()?.data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
   const unconfiguredModuleMatches =
     attachedModules.filter(
       attachedMod =>

@@ -1,10 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -30,10 +27,12 @@ import {
   getCutoutFixturesForModuleModel,
   getFixtureIdByCutoutIdFromModuleSlotName,
 } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { Modal } from '../../../../molecules/Modal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
 import type {
   CutoutConfig,
@@ -69,7 +68,7 @@ export const LocationConflictModal = (
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
 
   const [showModuleSelect, setShowModuleSelect] = React.useState(false)
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckConfigurationAtLocationFixtureId = deckConfig.find(
     (deckFixture: CutoutConfig) => deckFixture.cutoutId === cutoutId

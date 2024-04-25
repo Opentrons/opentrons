@@ -16,7 +16,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  useDeckConfigurationQuery,
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
@@ -49,6 +48,7 @@ import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { TertiaryButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LegacyModal } from '../../molecules/LegacyModal'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration/'
 
 import type {
   CutoutConfig,
@@ -85,7 +85,7 @@ export function AddFixtureModal({
   const { t } = useTranslation(['device_details', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { data: modulesData } = useModulesQuery()
-  const deckConfig = useDeckConfigurationQuery()?.data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
   const unconfiguredMods =
     modulesData?.data.filter(
       attachedMod =>

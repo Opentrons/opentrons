@@ -5,7 +5,6 @@ import { vi, it, expect, describe, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
 import { MemoryRouter } from 'react-router-dom'
 
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -36,13 +35,14 @@ import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { FixtureTable } from '../FixtureTable'
 import { ModulesAndDeckMapViewModal } from '../ModulesAndDeckMapViewModal'
 import { ProtocolSetupModulesAndDeck } from '..'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
 
-vi.mock('@opentrons/react-api-client')
 vi.mock('../../../resources/runs')
 vi.mock('../../../redux/discovery')
 vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../resources/deck_configuration')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
@@ -119,7 +119,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
     when(vi.mocked(useRunCalibrationStatus))
@@ -307,7 +307,7 @@ describe('ProtocolSetupModulesAndDeck', () => {
   })
 
   it('should render mock Fixture table and module location conflict', () => {
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<DeckConfiguration>)
     vi.mocked(getAttachedProtocolModuleMatches).mockReturnValue([

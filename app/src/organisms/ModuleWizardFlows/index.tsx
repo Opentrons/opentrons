@@ -5,7 +5,6 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   useDeleteMaintenanceRunMutation,
   useCurrentMaintenanceRun,
-  useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 import { COLORS, StyledText } from '@opentrons/components'
 import {
@@ -37,6 +36,7 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type {
@@ -75,7 +75,7 @@ export const ModuleWizardFlows = (
 
   const moduleCalibrationSteps = getModuleCalibrationSteps()
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const moduleCutoutConfig = deckConfig.find(
     cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
   )

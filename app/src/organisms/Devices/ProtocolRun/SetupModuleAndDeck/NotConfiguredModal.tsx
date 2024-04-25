@@ -1,10 +1,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import {
-  useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -20,6 +17,7 @@ import { getFixtureDisplayName } from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../../atoms/buttons/TertiaryButton'
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 
@@ -35,7 +33,7 @@ export const NotConfiguredModal = (
   const { onCloseClick, cutoutId, requiredFixtureId } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
-  const deckConfig = useDeckConfigurationQuery()?.data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
 
   const handleUpdateDeck = (): void => {
     const newDeckConfig = deckConfig.map(fixture =>

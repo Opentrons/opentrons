@@ -141,6 +141,7 @@ export type NotifyTopic =
   | 'robot-server/runs/current_command'
   | 'robot-server/runs'
   | `robot-server/runs/${string}`
+  | 'robot-server/deck_configuration'
 
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'

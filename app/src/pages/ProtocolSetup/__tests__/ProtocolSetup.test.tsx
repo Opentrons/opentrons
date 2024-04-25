@@ -11,7 +11,6 @@ import {
   useProtocolQuery,
   useDoorQuery,
   useModulesQuery,
-  useDeckConfigurationQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -57,6 +56,7 @@ import { useFeatureFlag } from '../../../redux/config'
 import { ViewOnlyParameters } from '../../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { mockRunTimeParameterData } from '../../ProtocolDetails/fixtures'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -114,6 +114,7 @@ vi.mock('../ConfirmAttachedModal')
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../resources/deck_configuration/hooks')
 vi.mock('../../../resources/runs')
+vi.mock('../../../resources/deck_configuration')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -273,7 +274,7 @@ describe('ProtocolSetup', () => {
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<SharedData.DeckConfiguration>)
     when(vi.mocked(useToaster))
