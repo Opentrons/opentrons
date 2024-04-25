@@ -1928,12 +1928,12 @@ class InstrumentContext(publisher.CommandPublisher):
             should be of the same format used when identifying wells by name.
             Required unless setting ``style=ALL``.
 
-            .. note::
-                When using the ``COLUMN`` layout, the only fully supported value is
-                ``start="A12"``. You can use ``start="A1"``, but this will disable tip
-                tracking and you will have to specify the ``location`` every time you
-                call :py:meth:`.pick_up_tip`, such that the pipette picks up columns of
-                tips *from right to left* on the tip rack.
+            .. note:
+                When configuring for the ``COLUMN`` layout in versions <= 7.3 it is
+                recommended to perform Labware Position Check on the labware that will be
+                interacted with in a partial configuration. Failure to do so may result
+                in a tip overlap of up to 0.5mm and the raising of Overpressure errors
+                in certain edge cases.
 
         :type start: str or ``None``
         :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of
@@ -1947,6 +1947,20 @@ class InstrumentContext(publisher.CommandPublisher):
         #       :param front_right: The nozzle at the front left of the layout. Only used for
         #           NozzleLayout.QUADRANT configurations.
         #       :type front_right: str or ``None``
+        #
+        #       NOTE: Disabled layouts error case can be removed once desired map configurations
+        #       have appropriate data regarding tip-type to map current values added to the
+        #       pipette definitions.
+        disabled_layouts = [
+            NozzleLayout.ROW,
+            NozzleLayout.SINGLE,
+            NozzleLayout.QUADRANT,
+        ]
+        if style in disabled_layouts:
+            raise ValueError(
+                f"Nozzle layout configuration of style {style.value} is currently unsupported."
+            )
+
         if style != NozzleLayout.ALL:
             if start is None:
                 raise ValueError(
