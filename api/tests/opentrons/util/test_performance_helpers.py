@@ -10,7 +10,7 @@ from opentrons.util.performance_helpers import (
 
 def test_return_function_unchanged() -> None:
     """Test that the function is returned unchanged when using StubbedTracker."""
-    tracker = StubbedTracker(Path("/path/to/storage"), True)
+    tracker = StubbedTracker(Path("/path/to/storage"), True, store_each=True)
 
     def func_to_track() -> None:
         pass

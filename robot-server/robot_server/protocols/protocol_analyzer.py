@@ -25,7 +25,7 @@ class ProtocolAnalyzer:
     ) -> None:
         """Initialize the analyzer and its dependencies."""
         self._analysis_store = analysis_store
-    
+
     @track_analysis
     async def analyze(
         self,

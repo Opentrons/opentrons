@@ -146,7 +146,6 @@ async def initialize() -> ThreadManagedHardware:
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
     log.info(f"Logging Level: {robot_conf.log_level}")
-    log.info(f"Performance Metrics Feature Flag: {ff.enable_performance_metrics(robot_conf.model)}")
     log.info(f"API server version: {version}")
     log.info(f"Robot Name: {name()}")
 

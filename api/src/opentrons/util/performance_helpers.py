@@ -1,7 +1,6 @@
 """Performance helpers for tracking robot context."""
 
 import functools
-import logging
 from pathlib import Path
 from opentrons_shared_data.performance.dev_types import (
     SupportsTracking,
@@ -13,8 +12,8 @@ from typing import Callable, Type
 from opentrons.config import (
     get_performance_metrics_data_dir,
     robot_configs,
+    feature_flags as ff,
 )
-
 
 
 _should_track = ff.enable_performance_metrics(
@@ -22,10 +21,13 @@ _should_track = ff.enable_performance_metrics(
 )
 STORE_EACH = _should_track
 
+
 class StubbedTracker(SupportsTracking):
     """A stubbed tracker that does nothing."""
 
-    def __init__(self, storage_location: Path, should_track: bool, store_each: bool) -> None:
+    def __init__(
+        self, storage_location: Path, should_track: bool, store_each: bool
+    ) -> None:
         """Initialize the stubbed tracker."""
         pass
 
@@ -50,6 +52,7 @@ def _handle_package_import() -> Type[SupportsTracking]:
     """
     try:
         from performance_metrics import RobotContextTracker
+
         return RobotContextTracker
     except ImportError:
         return StubbedTracker

@@ -66,10 +66,6 @@ def _host_config(level_value: int) -> Dict[str, Any]:
                 "level": logging.DEBUG,
                 "propagate": False,
             },
-            "opentrons.util.performance_helpers":{
-                "handlers": ["debug", "api"],
-                "level": level_value,
-            },
             "__main__": {"handlers": ["api"], "level": level_value},
         },
     }

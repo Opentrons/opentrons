@@ -1,3 +1,5 @@
+"""Shared fixtures and functions for performance metrics tests."""
+
 from pathlib import Path
 
 

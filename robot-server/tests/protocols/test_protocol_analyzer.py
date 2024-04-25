@@ -40,6 +40,7 @@ context_tracker = _get_robot_context_tracker()
 # Ignore the type error for the next line, as we're setting a private attribute for testing purposes
 context_tracker._should_track = True  # type: ignore[attr-defined]
 
+
 @pytest.fixture
 def override_data_store(tmp_path: Path) -> Iterator[None]:
     """Override the data store metadata for the RobotContextTracker."""
@@ -56,6 +57,7 @@ def override_data_store(tmp_path: Path) -> Iterator[None]:
 def monkeypatch_set_store_each_to_true(monkeypatch: pytest.MonkeyPatch) -> None:
     """Override the STORE_EACH flag for the RobotContextTracker."""
     context_tracker._store_each = True  # type: ignore[attr-defined]
+
 
 def verify_metrics_store_file(file_path: Path, expected_length: int) -> None:
     """Verify that the metrics store file contains the expected number of lines."""
@@ -110,6 +112,7 @@ def subject(
     return ProtocolAnalyzer(
         analysis_store=analysis_store,
     )
+
 
 @pytest.mark.usefixtures("override_data_store", "monkeypatch_set_store_each_to_true")
 async def test_analyze(

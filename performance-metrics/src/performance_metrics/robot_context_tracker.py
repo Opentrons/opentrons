@@ -49,7 +49,9 @@ class RobotContextTracker(SupportsTracking):
 
     METADATA_NAME: Final[Literal["robot_context_data"]] = "robot_context_data"
 
-    def __init__(self, storage_location: Path, should_track: bool, store_each: bool) -> None:
+    def __init__(
+        self, storage_location: Path, should_track: bool, store_each: bool
+    ) -> None:
         """Initializes the RobotContextTracker with an empty storage list."""
         self._store = MetricsStore[RawContextData](
             MetricsMetadata(
@@ -79,6 +81,7 @@ class RobotContextTracker(SupportsTracking):
                 return func
 
             if inspect.iscoroutinefunction(func):
+
                 @wraps(func)
                 async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
                     function_start_time = timing_function()
@@ -99,8 +102,10 @@ class RobotContextTracker(SupportsTracking):
                         if self._store_each:
                             self.store()
 
-                    return result
+                    return result  # type: ignore
+
             else:
+
                 @wraps(func)
                 def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
                     function_start_time = timing_function()
@@ -122,7 +127,7 @@ class RobotContextTracker(SupportsTracking):
 
                     return result
 
-            return wrapper
+            return wrapper  # type: ignore
 
         return inner_decorator
 
