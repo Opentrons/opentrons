@@ -23,7 +23,6 @@ import {
   UpdateRobotSoftware,
   UsageSettings,
   UseOlderAspirateBehavior,
-  UseOlderProtocol,
 } from '../AdvancedTab'
 import { RobotSettingsAdvanced } from '../RobotSettingsAdvanced'
 
