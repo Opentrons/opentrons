@@ -428,7 +428,7 @@ class RunStore:
                 )
                 .order_by(run_command_table.c.index_in_run)
             )
-
+            # select_all_cmds_as_doc = sqlalchemy.select(sqlalchemy.func.json_array_elements)
             slice_result = transaction.execute(select_slice).all()
 
         sliced_commands: List[Command] = [
@@ -441,6 +441,19 @@ class RunStore:
             total_length=count_result,
             commands=sliced_commands,
         )
+
+    def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
+        """Get all commands of the run as a list of strings of json command objects."""
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            select_commands = (
+                sqlalchemy.select(run_command_table.c.command)
+                .where(run_command_table.c.run_id == run_id)
+                .order_by(run_command_table.c.index_in_run)
+            )
+            commands_result = transaction.scalars(select_commands).all()
+        return commands_result
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_command(self, run_id: str, command_id: str) -> Command:

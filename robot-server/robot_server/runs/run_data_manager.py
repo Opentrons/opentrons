@@ -387,6 +387,10 @@ class RunDataManager:
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
 
+    def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
+        """Get all commands of a run in a stringified json doc."""
+        return self._run_store.get_all_commands_as_preserialized_list(run_id)
+
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         if run_id == self._engine_store.current_run_id:
             return self._engine_store.engine.state_view.get_summary()

@@ -6,6 +6,7 @@ from typing_extensions import Final, Literal
 
 from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
+
 from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine import (
@@ -21,6 +22,7 @@ from robot_server.service.json_api import (
     MultiBody,
     MultiBodyMeta,
     PydanticResponse,
+    SimpleMultiBody,
 )
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 
@@ -348,6 +350,44 @@ async def get_run_commands(
     return await PydanticResponse.create(
         content=MultiBody.construct(data=data, meta=meta, links=links),
         status_code=status.HTTP_200_OK,
+    )
+
+
+@PydanticResponse.wrap_route(
+    commands_router.get,
+    path="/runs/{runId}/commandsAsPreSerializedList",
+    summary="Get all commands as a list of pre-serialized commands",
+    description=(
+        "Get all commands of a run as a list of pre-serialized commands."
+        "**Warning:** This endpoint is experimental. We may change or remove it without warning."
+        "\n\n"
+        " This is a faster alternative to fetching *all* commands using `GET /runs/{runId}/commands`"
+        " For large protocols (10k+ commands), the above endpoint can take minutes to respond,"
+        " whereas this one should only take a few seconds."
+    ),
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+    },
+)
+async def get_run_commands_as_pre_serialized_list(
+    runId: str,
+    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+) -> PydanticResponse[SimpleMultiBody[str]]:
+    """Get all commands in a run as a list of pre-serialized (string encoded) commands.
+
+    Arguments:
+        runId: Requested run ID, from the URL
+        run_data_manager: Run data retrieval interface.
+    """
+    try:
+        commands = run_data_manager.get_all_commands_as_preserialized_list(runId)
+    except RunNotFoundError as e:
+        raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
+
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.construct(
+            data=commands, meta=MultiBodyMeta(cursor=0, totalLength=len(commands))
+        )
     )
 
 
