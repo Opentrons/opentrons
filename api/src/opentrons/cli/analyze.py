@@ -110,7 +110,7 @@ def analyze(
 
     try:
         with _capture_logs(log_output, log_level):
-            return run(_analyze, files, outputs, check)
+            sys.exit(run(_analyze, files, outputs, check))
     except click.ClickException:
         raise
     except Exception as e:
