@@ -2,7 +2,7 @@ For more details about this release, please see the full [technical change log]:
 
 # Internal Release 1.5.0
 
-## ## Before making any changes to the robot, reset the run history. Robot Settings > Advanced > Choose reset settings > Clear protocol run history
+## Before making any changes to the robot, reset the run history. Robot Settings > Advanced > Choose reset settings > Clear protocol run history
 
 This is 1.5.0, an internal release for the Robot Stack.  the primary purpose of the release is to allow science and design to have the earliest stable release possible, given known bugs and workarounds, as we continue to develop features for 7.3.0.
 
