@@ -158,7 +158,7 @@ async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> Non
     mores1 = 0
     encoder1 =0
     mores2 = 0
-    encoder2 = 0m
+    encoder2 = 0
     if xy == "downward":
         pos = pos + step
         position['pipette'] = pos
