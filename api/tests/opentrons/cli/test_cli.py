@@ -53,7 +53,7 @@ class _AnalysisCLIResult:
 
 
 def _get_analysis_result(
-    protocol_files: List[Path], output_type: str
+    protocol_files: List[Path], output_type: str, check: bool = False
 ) -> _AnalysisCLIResult:
     """Run `protocol_files` as a single protocol through the analysis CLI.
 
@@ -66,14 +66,15 @@ def _get_analysis_result(
     with tempfile.TemporaryDirectory() as temp_dir:
         analysis_output_file = Path(temp_dir) / "analysis_output.json"
         runner = CliRunner()
-        result = runner.invoke(
-            analyze,
-            [
-                output_type,
-                str(analysis_output_file),
-                *[str(p.resolve()) for p in protocol_files],
-            ],
-        )
+        args = [
+            output_type,
+            str(analysis_output_file),
+            *[str(p.resolve()) for p in protocol_files],
+        ]
+        if check:
+            args.append("--check")
+
+        result = runner.invoke(analyze, args)
         if analysis_output_file.exists():
             json_output = json.loads(analysis_output_file.read_bytes())
         else:
@@ -216,6 +217,7 @@ def test_strict_metatada_requirements_validation(tmp_path: Path, output: str) ->
 
 
 @pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+@pytest.mark.parametrize("check", [True, False])
 @pytest.mark.parametrize(
     ("python_protocol_source", "expected_detail"),
     [
@@ -264,15 +266,22 @@ def test_strict_metatada_requirements_validation(tmp_path: Path, output: str) ->
     ],
 )
 def test_python_error_line_numbers(
-    tmp_path: Path, python_protocol_source: str, expected_detail: str, output: str
+    tmp_path: Path,
+    python_protocol_source: str,
+    expected_detail: str,
+    output: str,
+    check: bool,
 ) -> None:
     """Test that error messages from Python protocols have line numbers."""
     protocol_source_file = tmp_path / "protocol.py"
     protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
 
-    result = _get_analysis_result([protocol_source_file], output)
+    result = _get_analysis_result([protocol_source_file], output, check)
 
-    assert result.exit_code == 0
+    if check:
+        assert result.exit_code != 0
+    else:
+        assert result.exit_code == 0
     assert result.json_output is not None
     [error] = result.json_output["errors"]
     assert error["detail"] == expected_detail

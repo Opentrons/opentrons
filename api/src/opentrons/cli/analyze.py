@@ -31,6 +31,7 @@ from opentrons.protocol_reader import (
     ProtocolType,
     JsonProtocolConfig,
     ProtocolFilesInvalidError,
+    ProtocolSource,
 )
 from opentrons.protocol_runner import create_simulating_runner, RunResult
 from opentrons.protocol_engine import (
@@ -198,11 +199,18 @@ def _get_return_code(analysis: RunResult) -> int:
 
 
 @track_analysis
+async def _do_analyze(protocol_source: ProtocolSource) -> RunResult:
+
+    runner = await create_simulating_runner(
+        robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
+    )
+    return await runner.run(deck_configuration=[], protocol_source=protocol_source)
+
+
 async def _analyze(
     files_and_dirs: Sequence[Path], outputs: Sequence[_Output], check: bool
 ) -> int:
     input_files = _get_input_files(files_and_dirs)
-
     try:
         protocol_source = await ProtocolReader().read_saved(
             files=input_files,
@@ -211,11 +219,7 @@ async def _analyze(
     except ProtocolFilesInvalidError as error:
         raise click.ClickException(str(error))
 
-    runner = await create_simulating_runner(
-        robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
-    )
-    analysis = await runner.run(deck_configuration=[], protocol_source=protocol_source)
-
+    analysis = await _do_analyze(protocol_source)
     return_code = _get_return_code(analysis)
 
     if not outputs:
