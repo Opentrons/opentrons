@@ -1,24 +1,32 @@
-For more details about this release, please see the full [technical changelog][].
-[technical change log]: https://github.com/Opentrons/opentrons/releases
+For more details about this release, please see the full [technical change log]: https://github.com/Opentrons/opentrons/releases
 
 # Internal Release 1.5.0
 
-This is 1.5.0, an internal release for the Robot Stack.  the primary purpose of the release is to allow science and design to test, given known bugs and workarounds, as we continue to develop features for 7.3.0.
+The primary purpose of the release is to allow science and design to test, given known bugs and work arounds, as we continue to develop features for 7.3.0.
 
-<https://github.com/Opentrons/opentrons/compare/ot3@v1.2.0...ot3@v1.5.0>
-
-## Before making any changes to the app and robot, reset the run history using the 7.2.2 app on the robot you will upgrade to the internal release
+## ## Before making any changes to the robot, reset the run history. Robot Settings > Advanced > Choose reset settings > Clear protocol run history
 
 ## Known Bugs and work arounds
 
-Do not use the USB connection to the robot. Please use the desktop app via WiFi and/or ODD<br>
-There are multiple firmware updates that will run and you may encounter the ODD stuck on the update gripper modal. Do Not Click! Firmware will update automatically.<br>
-Deck maps during module calibration may not render correctly.<br>
-Modules and fixtures may not be removed via deckmap on ODD.<br>
-Run again may not work on first click in the desktop app.<br>
-96channel detach flow will fail on confirmation of step 1. You will receive an stall detection error. Go ahead and clear the error. Remove the support bracket. Home the gantry. Enter into attach flow for the right pipete so the right pipette interface can again be used.<br>
-If you interact with the gantry while a gripper is attached and you are not in a detach/attach flow it is possible the gripper may fall. Always be in an attach/detach flow when interacting with the gantry.<br>
-"out of date protocol" on the desktop app will show a white deckmap. Most protocols will get the "protocol analysis out of date" banner. Click re-analyze protocol.
+### Do not use the USB connection to the robot. Please use the desktop app via WiFi and/or ODD
+
+### There are multiple firmware updates that will run and you may encounter the ODD stuck on the update gripper modal. Do Not Click! Firmware will update automatically
+
+### Viewing a protocol's run record after the run completes may not show all the steps. Download the run record to view all steps
+
+### Deck maps during module calibration may not render correctly
+
+### Modules and fixtures may not be removed via deckmap on ODD
+
+### Run again may not work on first click in the desktop app
+
+### 96channel detach flow will fail on confirmation of step 1. You will receive an stall detection error. Go ahead and clear the error. Remove the support bracket. Home the gantry. Enter into attach flow for the right pipette so the right pipette interface can again be used
+
+### If you interact with the gantry while a gripper is attached and you are not in a detach/attach flow it is possible the gripper may fall. Always be in an attach/detach flow when interacting with the gantry
+
+### "out of date protocol" on the desktop app will show a white deckmap. Most protocols will get the "protocol analysis out of date" banner. Click re-analyze protocol
+
+<https://github.com/Opentrons/opentrons/compare/ot3@v1.2.0...ot3@v1.5.0>
 
 ---
 
