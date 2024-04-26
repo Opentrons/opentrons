@@ -76,25 +76,13 @@ push-no-restart: wheel
 push: push-no-restart
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
-.PHONY: enable-ff-on-robot
-enable-ff-on-robot:
-	@echo "Enabling performance metrics on robot"
-	curl \
-	  -X POST\
-	  -H "opentrons-version: *" \
-	  -H "Content-Type: application/json" \
-	  -d '{"id": "enablePerformanceMetrics", "value": true}' \
-	  http://$(host):31950/settings >> /dev/null
+.PHONY: push-no-restart-ot3
+push-no-restart-ot3: sdist
+	$(call push-python-sdist,$(host),$(ssh_key),$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","performance_metrics",,,$(version_file))
 
-.PHONY: disable-ff-on-robot
-disable-ff-on-robot:
-	@echo "Disabling performance metrics on robot"
-	curl \
-	  -X POST\
-	  -H "opentrons-version: *" \
-	  -H "Content-Type: application/json" \
-	  -d '{"id": "enablePerformanceMetrics", "value": false}' \
-	  http://$(host):31950/settings | jq
+.PHONY: push-ot3
+push-ot3: push-no-restart-ot3
+	$(call restart-server,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: set-debug-log-level
 set-debug-log-level:
@@ -106,13 +94,28 @@ set-debug-log-level:
 	  -d '{"log_level": "debug"}' \
 	  http://$(host):31950/settings/log_level/local | jq
 
+.PHONY: add-performance-metrics-ff
+add-performance-metrics-ff:
+	@echo "Adding performance metrics feature flag to robot"
+	ssh -i $(ssh_key) $(ssh_opts) root@$(host) "touch /data/robot.env && \
+		grep -q 'OT_API_FF_enablePerformanceMetrics' /data/robot.env && \
+		sed -i 's/OT_API_FF_enablePerformanceMetrics=false/OT_API_FF_enablePerformanceMetrics=true/' /data/robot.env || \
+		echo 'OT_API_FF_enablePerformanceMetrics=true' \
+		>> /data/robot.env"
+
+
 .PHONY: get-logs
 get-logs:
 	@echo "Creating logs directory"
 	mkdir -p .logs
 
 	@echo "Getting logs from robot"
-	ssh -i $(ssh_key) $(ssh_opts) root@$(host) "journalctl --no-pager --boot --catalog --unit opentrons-robot-server.service" > .logs/robot-server.log
+	ssh -i $(ssh_key) $(ssh_opts) root@$(host) "journalctl \
+		--no-pager \
+		--boot \
+		--catalog \
+		--unit opentrons-robot-server.service" \
+		> .logs/robot-server.log
 
 
 .PHONY: test
