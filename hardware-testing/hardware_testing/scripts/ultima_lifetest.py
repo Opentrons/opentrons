@@ -485,8 +485,8 @@ async def _main(is_simulating: bool, trials: int, flow: float,
         total_cycles = 0
         cycles_per_trial = 100
         blow_inc = 10
-        # cycles_per_trial = 3
-        # blow_inc = 5
+        # cycles_per_trial = 2
+        # blow_inc = 2
         for t in range(trials):
             await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
                 api,
@@ -513,7 +513,7 @@ async def _main(is_simulating: bool, trials: int, flow: float,
             if t%blow_inc == 0:
                 print("Blow Out")
                 speed = flow * FLOW_TO_SPEED
-                await twin_z_move(api, temp_reservoir_a1_nominal + Point(z=DISPENSE_OFFSET)) #move Z up
+                await twin_z_move(api, temp_reservoir_a1_nominal + Point(z=DISPENSE_OFFSET+5)) #move Z up
                 await move_twin_plunger_absolute_ot3(api, pip_blow,
                                                      motor_current=MOTOR_CURRENT,
                                                      speed=70) #blow out
