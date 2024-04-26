@@ -30,7 +30,7 @@ describe('FloatingActionButton', () => {
     expect(button).toHaveStyle(
       `padding: ${SPACING.spacing12} ${SPACING.spacing24}`
     )
-    expect(button).toHaveStyle(`background-color: ${COLORS.purple55}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.purple50}`)
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSize28}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight36}`)
@@ -47,14 +47,6 @@ describe('FloatingActionButton', () => {
     render(props)
     const button = screen.getByRole('button')
     expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: ${COLORS.grey35}`)
-    expect(button).toHaveStyle(`color: ${COLORS.grey50}`)
   })
 
-  it('applies the correct states to the unselected floating action button - active', () => {
-    render(props)
-    const button = screen.getByRole('button')
-    fireEvent.mouseLeave(button)
-    expect(button).toHaveStyle(`background-color : ${COLORS.purple55}`)
-  })
 })

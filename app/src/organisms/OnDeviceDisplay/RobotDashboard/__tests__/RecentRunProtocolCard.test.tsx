@@ -247,7 +247,7 @@ describe('RecentRunProtocolCard', () => {
   it('when tapping a card, mock functions is called and loading state is activated', () => {
     render(props)
     const button = screen.getByLabelText('RecentRunProtocolCard')
-    expect(button).toHaveStyle(`background-color: ${COLORS.green40}`)
+    expect(button).toHaveStyle(`background-color: ${COLORS.green35}`)
     fireEvent.click(button)
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'proceedToRun',
