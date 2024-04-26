@@ -21,7 +21,9 @@ from opentrons.protocol_engine import (
     ProtocolEngine,
     StateSummary,
     Command,
-    commands as pe_commands, CommandIntent,
+    commands as pe_commands,
+    CommandIntent,
+    CommandStatus,
 )
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.util.broker import Broker
@@ -161,9 +163,9 @@ class AbstractRunner(ABC):
     def set_command_queued(self, command: Command) -> None:
         """Validate and mark a command as queued in the command history."""
         assert command.status == CommandStatus.QUEUED
-        assert not self.has(command.id)
+        assert command.id not in self._commands_by_id
 
-        next_index = self.length()
+        next_index = len(self._commands_by_id)
         updated_command = CommandEntry(
             index=next_index,
             command=command,
@@ -176,6 +178,24 @@ class AbstractRunner(ABC):
             self._add_to_fixit_queue(command.id)
         else:
             self._add_to_queue(command.id)
+
+    def _add(self, command_id: str, command_entry: CommandEntry) -> None:
+        """Create or update a command entry."""
+        if command_id not in self._commands_by_id:
+            self._all_command_ids.append(command_id)
+        self._commands_by_id[command_id] = command_entry
+
+    def _add_to_queue(self, command_id: str) -> None:
+        """Add new ID to the queued."""
+        self._queued_command_ids.add(command_id)
+
+    def _add_to_setup_queue(self, command_id: str) -> None:
+        """Add a new ID to the queued setup."""
+        self._queued_setup_command_ids.add(command_id)
+
+    def _add_to_fixit_queue(self, command_id: str) -> None:
+        """Add a new ID to the queued fixit."""
+        self._queued_fixit_command_ids.add(command_id)
 
 
 class PythonAndLegacyRunner(AbstractRunner):
