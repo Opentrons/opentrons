@@ -25,10 +25,6 @@ For greater convenience, also import the individual layout constants that you pl
 
 Then when you call ``configure_nozzle_layout`` later in your protocol, you can set ``style=COLUMN``. 
 
-It is important to note that for versions <= 7.3, when configuring for COLUMN layout, there may be a noticeable tip overlap offset that will need to be accounted for through Labware Position Check.
-
-Along that same line of logic, it would be advisable to determine a configuration to be used for a specific labware, and only interact with that labware when in said configuration.
-
 Here is the start of a protocol that performs both imports, loads a 96-channel pipette, and sets it to pick up a single column of tips.
 
 .. code-block:: python

@@ -1928,13 +1928,6 @@ class InstrumentContext(publisher.CommandPublisher):
             should be of the same format used when identifying wells by name.
             Required unless setting ``style=ALL``.
 
-            .. note:
-                When configuring for the ``COLUMN`` layout in versions <= 7.3 it is
-                recommended to perform Labware Position Check on the labware that will be
-                interacted with in a partial configuration. Failure to do so may result
-                in a tip overlap of up to 0.5mm and the raising of Overpressure errors
-                in certain edge cases.
-
         :type start: str or ``None``
         :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of
             :py:meth:`.load_instrument`. If not specified, the new configuration resets
