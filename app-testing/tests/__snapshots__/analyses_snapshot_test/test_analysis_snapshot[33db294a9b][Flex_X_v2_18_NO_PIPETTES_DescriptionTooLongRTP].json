@@ -1,0 +1,75 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "custom",
+      "notes": [],
+      "params": {
+        "legacyCommandText": "variable dilutions has value 1",
+        "legacyCommandType": "command.COMMENT"
+      },
+      "result": {},
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      18
+    ],
+    "protocolType": "python"
+  },
+  "errors": [],
+  "files": [
+    {
+      "name": "Flex_X_v2_18_NO_PIPETTES_DescriptionTooLongRTP.py",
+      "role": "main"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "protocolName": "Description too long"
+  },
+  "modules": [],
+  "pipettes": [],
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": [
+    {
+      "default": 1.0,
+      "description": "This is a description that is longer than 30 characters.",
+      "displayName": "display name",
+      "max": 3.0,
+      "min": 1.0,
+      "type": "int",
+      "value": 1.0,
+      "variableName": "dilutions"
+    }
+  ]
+}
