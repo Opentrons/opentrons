@@ -4,7 +4,7 @@ For more details about this release, please see the full [technical change log]:
 
 The primary purpose of the release is to allow science and design to test, given known bugs and work arounds, as we continue to develop features for 7.3.0.
 
-## ## Before making any changes to the robot, reset the run history. Robot Settings > Advanced > Choose reset settings > Clear protocol run history
+## Before making any changes to the robot, reset the run history. Robot Settings > Advanced > Choose reset settings > Clear protocol run history
 
 ## Known Bugs and work arounds
 
