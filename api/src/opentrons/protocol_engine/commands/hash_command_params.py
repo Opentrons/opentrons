@@ -28,7 +28,7 @@ def hash_protocol_command_params(
         The command hash, if the command is a protocol command.
         `None` if the command is a setup command.
     """
-    if create.intent == CommandIntent.SETUP:
+    if create.intent in [CommandIntent.SETUP, CommandIntent.FIXIT]:
         return None
     # We avoid Python's built-in hash() function because it's not stable across
     # runs of the Python interpreter. (Jira RSS-215.)
