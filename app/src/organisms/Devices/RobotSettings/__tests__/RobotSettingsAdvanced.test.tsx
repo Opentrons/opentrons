@@ -210,17 +210,6 @@ describe('RobotSettings Advanced tab', () => {
     ).toBeNull()
   })
 
-  it('should render UseOlderProtocol section for OT-2', () => {
-    render()
-    screen.getByText('Mock UseOlderProtocol Section')
-  })
-
-  it('should not render UseOlderProtocol section for Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
-    render()
-    expect(screen.queryByText('Mock UseOlderProtocol Section')).toBeNull()
-  })
-
   it('should not render EnableStatusLight section for OT-2', () => {
     render()
     expect(screen.queryByText('mock EnableStatusLight')).not.toBeInTheDocument()
