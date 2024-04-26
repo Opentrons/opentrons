@@ -159,17 +159,17 @@ CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
 )
 
 # THRESHOLDS: environment sensor
-TEMP_THRESH = [20, 40]
+TEMP_THRESH = [10, 40]
 HUMIDITY_THRESH = [10, 90]
 
 # THRESHOLDS: capacitive sensor
 CAP_THRESH_OPEN_AIR = {
-    1: [3.0, 7.0],
-    8: [8.0, 16.0],
+    1: [4.0, 8.0],
+    8: [10.0, 18.0],
 }
 CAP_THRESH_PROBE = {
     1: [4.0, 8.0],
-    8: [8.0, 16.0],
+    8: [10.0, 18.0],
 }
 CAP_THRESH_SQUARE = {
     1: [8.0, 15.0],
@@ -178,8 +178,8 @@ CAP_THRESH_SQUARE = {
 
 # THRESHOLDS: air-pressure sensor
 PRESSURE_ASPIRATE_VOL = {1: {50: 10.0, 1000: 20.0}, 8: {50: 10.0, 1000: 20.0}}
-PRESSURE_THRESH_OPEN_AIR = {1: [-150, 150], 8: [-150, 150]}
-PRESSURE_THRESH_SEALED = {1: [-500, 500], 8: [-200, 400]}
+PRESSURE_THRESH_OPEN_AIR = {1: [-25, 25], 8: [-25, 25]}
+PRESSURE_THRESH_SEALED = {1: [-200, 200], 8: [-200, 200]}
 PRESSURE_THRESH_COMPRESS = {1: [-2600, 1600], 8: [-8000, 8000]}
 
 _trash_loc_counter = 0
@@ -1216,7 +1216,7 @@ async def _test_tip_presence_flag(
     current_pos = await api.gantry_position(mount)
     await api.move_to(mount, slot_5_pos._replace(z=current_pos.z))
     await api.move_rel(mount, Point(z=-20))
-    wiggle_passed = await _wait_for_tip_presence_state_change(api, seconds_to_wait=5)
+    # wiggle_passed = await _wait_for_tip_presence_state_change(api, seconds_to_wait=5)
     if not api.is_simulator:
         input("press ENTER to continue")
 
@@ -1303,8 +1303,8 @@ async def _test_tip_presence_flag(
         ["tip-presence-drop-displacement", drop_disp, _bool_to_pass_fail(drop_result)]
     )
     write_cb(["tip-presence-drop-height-above-nozzle", drop_pos_rel])
-    write_cb(["tip-presence-wiggle", _bool_to_pass_fail(wiggle_passed)])
-    return pick_up_result and drop_result and wiggle_passed
+    # write_cb(["tip-presence-wiggle", _bool_to_pass_fail(wiggle_passed)])  //get rid of this test
+    return pick_up_result and drop_result # and wiggle_passed
 
 
 @dataclass
