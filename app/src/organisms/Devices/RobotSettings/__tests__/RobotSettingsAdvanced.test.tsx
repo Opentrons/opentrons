@@ -52,7 +52,6 @@ vi.mock('../AdvancedTab/Troubleshooting')
 vi.mock('../AdvancedTab/UpdateRobotSoftware')
 vi.mock('../AdvancedTab/UsageSettings')
 vi.mock('../AdvancedTab/UseOlderAspirateBehavior')
-vi.mock('../AdvancedTab/UseOlderProtocol')
 
 const mockUpdateRobotStatus = vi.fn()
 
@@ -108,9 +107,6 @@ describe('RobotSettings Advanced tab', () => {
     )
     vi.mocked(UseOlderAspirateBehavior).mockReturnValue(
       <div>Mock UseOlderAspirateBehavior Section</div>
-    )
-    vi.mocked(UseOlderProtocol).mockReturnValue(
-      <div>Mock UseOlderProtocol Section</div>
     )
     when(useIsFlex).calledWith('otie').thenReturn(false)
     vi.mocked(EnableStatusLight).mockReturnValue(
