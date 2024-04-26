@@ -11,7 +11,7 @@ This is 1.5.0, an internal release for the Robot Stack.  the primary purpose of 
 
 ## Known Bugs and work arounds
 
-Please use the desktop app via WiFi and/or ODD<br>
+Do not use the USB connection to the robot. Please use the desktop app via WiFi and/or ODD<br>
 There are multiple firmware updates that will run and you may encounter the ODD stuck on the update gripper modal. Do Not Click! Firmware will update automatically.<br>
 Deck maps during module calibration may not render correctly.<br>
 Modules and fixtures may not be removed via deckmap on ODD.<br>
