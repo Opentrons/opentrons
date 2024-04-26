@@ -1,7 +1,6 @@
 """Get ramp rates of modules."""
 from abr_testing.automation import google_sheets_tool
 from abr_testing.data_collection import read_robot_logs
-import gspread  # type: ignore[import]
 import argparse
 import os
 import sys
@@ -79,14 +78,9 @@ if __name__ == "__main__":
         print(f"Add credentials.json file to: {storage_directory}.")
         sys.exit()
     # CONNECT TO GOOGLE SHEET
-    try:
-        google_sheet = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 1
-        )
-        print(f"Connected to google sheet: {google_sheet_name}")
-    except gspread.exceptions.APIError:
-        print("ERROR: Check google sheet name. Check credentials file.")
-        sys.exit()
+    google_sheet = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 1
+    )
     run_ids_on_sheet = google_sheet.get_column(2)
     runs_and_robots = {}
     for filename in os.listdir(storage_directory):
