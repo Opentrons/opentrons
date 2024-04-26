@@ -3,7 +3,6 @@ from typing import Dict, Any, List, Union
 import argparse
 import os
 import json
-import gspread  # type: ignore[import]
 import sys
 import time as t
 from abr_testing.data_collection import read_robot_logs
@@ -175,32 +174,17 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"Add credentials.json file to: {storage_directory}.")
         sys.exit()
-    try:
-        google_drive = google_drive_tool.google_drive(
-            credentials_path, folder_name, email
-        )
-        # Upload calibration logs to google drive.
-        print("Connected to google drive.")
-    except json.decoder.JSONDecodeError:
-        print(
-            "Credential file is damaged. Get from https://console.cloud.google.com/apis/credentials"
-        )
-        sys.exit()
+    google_drive = google_drive_tool.google_drive(credentials_path, folder_name, email)
     # Connect to google sheet
-    try:
-        google_sheet_instruments = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 0
-        )
-        google_sheet_modules = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 1
-        )
-        google_sheet_deck = google_sheets_tool.google_sheet(
-            credentials_path, google_sheet_name, 2
-        )
-        print(f"Connected to google sheet: {google_sheet_name}")
-    except gspread.exceptions.APIError:
-        print("ERROR: Check google sheet name. Check credentials file.")
-        sys.exit()
+    google_sheet_instruments = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 0
+    )
+    google_sheet_modules = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 1
+    )
+    google_sheet_deck = google_sheets_tool.google_sheet(
+        credentials_path, google_sheet_name, 2
+    )
     ip_json_file = os.path.join(storage_directory, "IPs.json")
     try:
         ip_file = json.load(open(ip_json_file))
