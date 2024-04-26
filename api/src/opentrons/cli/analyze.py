@@ -64,12 +64,12 @@ class _Output:
 )
 @click.option(
     "--json-output",
-    help="Return analysis results as machine-readable JSON.",
+    help="Return analysis results as machine-readable JSON. Specify --json-output=- to use stdout, but be aware that Python protocols may contain print() which will make the output JSON invalid.",
     type=click.File(mode="wb"),
 )
 @click.option(
     "--human-json-output",
-    help="Return analysis results as JSON, formatted for human eyes.",
+    help="Return analysis results as JSON, formatted for human eyes. Specify --human-json-output=- to use stdout, but be aware that Python protocols may contain print() which will make the output JSON invalid.",
     type=click.File(mode="wb"),
 )
 @click.option(
