@@ -1,6 +1,6 @@
 """Type definitions for performance tracking."""
-
-from typing import Protocol, TypeVar, Callable, Any
+from dataclasses import dataclass
+from typing import Protocol, Tuple, TypeVar, Callable, Any
 from pathlib import Path
 from enum import Enum
 
@@ -54,3 +54,24 @@ class RobotContextState(Enum):
             if state.state_id == state_id:
                 return state
         raise ValueError(f"Invalid state id: {state_id}")
+
+
+@dataclass(frozen=True)
+class MetricsMetadata:
+    """Dataclass to store metadata about the metrics."""
+
+    name: str
+    storage_dir: Path
+    headers: Tuple[str, ...]
+
+    @property
+    def data_file_location(self) -> Path:
+        """The location of the data file."""
+        return self.storage_dir / self.name
+
+    @property
+    def headers_file_location(self) -> Path:
+        """The location of the header file."""
+        return self.data_file_location.with_stem(
+            self.data_file_location.stem + "_headers"
+        )

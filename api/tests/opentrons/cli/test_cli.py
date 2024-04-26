@@ -5,12 +5,15 @@ import json
 import tempfile
 import textwrap
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Dict, Iterator, List, Optional
 from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
+from opentrons_shared_data.performance.dev_types import (
+    RobotContextState,
+)
 from opentrons.util.performance_helpers import _get_robot_context_tracker
 
 
@@ -22,6 +25,18 @@ context_tracker = _get_robot_context_tracker()
 context_tracker._should_track = True  # type: ignore[attr-defined]
 
 from opentrons.cli.analyze import analyze  # noqa: E402
+
+
+@pytest.fixture
+def override_data_store(tmp_path: Path) -> Iterator[None]:
+    """Override the data store metadata for the RobotContextTracker."""
+    old_store = context_tracker._store  # type: ignore[attr-defined]
+    old_metadata = old_store.metadata
+    new_metadata = replace(old_metadata, storage_dir=tmp_path)
+    context_tracker._store = old_store.__class__(metadata=new_metadata)  # type: ignore[attr-defined]
+    context_tracker._store.setup()  # type: ignore[attr-defined]
+    yield
+    context_tracker._store = old_store  # type: ignore[attr-defined]
 
 
 def _list_fixtures(version: int) -> Iterator[Path]:
@@ -255,6 +270,7 @@ def test_python_error_line_numbers(
     assert error["detail"] == expected_detail
 
 
+@pytest.mark.usefixtures("override_data_store")
 def test_track_analysis(tmp_path: Path) -> None:
     """Test that the RobotContextTracker tracks analysis."""
     protocol_source = textwrap.dedent(
@@ -265,12 +281,27 @@ def test_track_analysis(tmp_path: Path) -> None:
             pass
         """
     )
-
     protocol_source_file = tmp_path / "protocol.py"
     protocol_source_file.write_text(protocol_source, encoding="utf-8")
+    store = context_tracker._store  # type: ignore[attr-defined]
 
-    before_analysis = len(context_tracker._storage)  # type: ignore[attr-defined]
+    num_storage_entities_before_analysis = len(store._data)
 
     _get_analysis_result([protocol_source_file])
 
-    assert len(context_tracker._storage) == before_analysis + 1  # type: ignore[attr-defined]
+    assert len(store._data) == num_storage_entities_before_analysis + 1
+
+    with open(store.metadata.data_file_location, "r") as f:
+        stored_data = f.readlines()
+        assert len(stored_data) == 0
+
+    context_tracker.store()
+
+    with open(store.metadata.data_file_location, "r") as f:
+        stored_data = f.readlines()
+        stored_data = [line.strip() for line in stored_data if line.strip()]
+        assert len(stored_data) == 1
+        state_id, start_time, duration = stored_data[0].strip().split(",")
+        assert state_id == str(RobotContextState.ANALYZING_PROTOCOL.state_id)
+        assert start_time.isdigit()
+        assert duration.isdigit()
