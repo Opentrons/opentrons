@@ -434,7 +434,9 @@ def _load_pipette(
     # NOTE: 8ch QC testing means testing 1 channel at a time,
     #       so we need to decrease the pick-up current to work with 1 tip.
     if pipette.channels == 8 and not increment and not photometric:
-        pipette.configure_nozzle_layout(NozzleLayout.SINGLE, "A1")
+        pipette._core.configure_nozzle_layout(
+            style=NozzleLayout.SINGLE, primary_nozzle="A1", front_right_nozzle="A1"
+        )
         # override deck conflict checking cause we specially lay out our tipracks
         DeckConflit.check_safe_for_pipette_movement = (
             _override_check_safe_for_pipette_movement
