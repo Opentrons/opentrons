@@ -201,6 +201,7 @@ def process_csv_directory(  # noqa: C901
                             pressure_row.append(f"{pressure_results[tip][trial][i][1]}")
                         else:
                             pressure_row.append("")
+                            pressure_row.append("")
                         pressure_row.append(
                             f"{results_settings[tip][trial][0] * time - tip_offsets[tip][trial]}"
                         )
