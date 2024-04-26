@@ -16,7 +16,6 @@ import {
 import {
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
-  useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
@@ -50,6 +49,7 @@ import {
   useDropTipErrorComponents,
   useWizardExitHeader,
 } from './utils'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { PipetteData } from '@opentrons/api-client'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
@@ -82,7 +82,7 @@ export function DropTipWizard(props: MaintenanceRunManagerProps): JSX.Element {
   } = useChainMaintenanceCommands()
   const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
 
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = React.useState<
     string | null

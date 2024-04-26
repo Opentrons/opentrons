@@ -20,6 +20,16 @@ from opentrons.util.performance_helpers import _get_robot_context_tracker
 # Enable tracking for the RobotContextTracker
 # This must come before the import of the analyze CLI
 context_tracker = _get_robot_context_tracker()
+@pytest.mark.usefixtures("override_data_store")
+def test_track_analysis(tmp_path: Path) -> None:
+    """Test that the RobotContextTracker tracks analysis."""
+…        requirements = {"apiLevel": "2.15"}
+
+        def run(protocol):
+            pass
+        """
+    )
+    protocol_source_file = tmp_path / "protocol.py"
 
 # Ignore the type error for the next line, as we're setting a private attribute for testing purposes
 context_tracker._should_track = True  # type: ignore[attr-defined]

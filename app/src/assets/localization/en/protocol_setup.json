@@ -255,7 +255,6 @@
   "tip_length_cal_description": "This measures the Z distance between the bottom of the tip and the pipette’s nozzle. If you redo the tip length calibration for the tip you used to calibrate a pipette, you will also have to redo that Pipette Offset Calibration.",
   "tip_length_cal_title": "Tip Length Calibration",
   "tip_length_calibration": "tip length calibration",
-  "total_vol": "total volume",
   "update_deck": "Update deck",
   "update_deck_config": "Update deck configuration",
   "updated": "Updated",

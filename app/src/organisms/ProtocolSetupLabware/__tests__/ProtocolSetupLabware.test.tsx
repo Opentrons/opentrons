@@ -7,7 +7,6 @@ import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 import {
   useCreateLiveCommandMutation,
   useModulesQuery,
-  useDeckConfigurationQuery,
 } from '@opentrons/react-api-client'
 import {
   HEATERSHAKER_MODULE_V1_FIXTURE,
@@ -28,6 +27,7 @@ import {
   mockUseModulesQueryOpening,
   mockUseModulesQueryUnknown,
 } from '../__fixtures__'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type * as ReactApiClient from '@opentrons/react-api-client'
 
@@ -37,7 +37,6 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     ...actual,
     useCreateLiveCommandMutation: vi.fn(),
     useModulesQuery: vi.fn(),
-    useDeckConfigurationQuery: vi.fn(),
   }
 })
 
@@ -45,6 +44,7 @@ vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
 vi.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
+vi.mock('../../../resources/deck_configuration')
 
 const RUN_ID = "otie's run"
 const mockSetSetupScreen = vi.fn()
@@ -81,7 +81,7 @@ describe('ProtocolSetupLabware', () => {
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutB1',

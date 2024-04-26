@@ -1,5 +1,6 @@
 import {
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+  FLEX_MODULE_ADDRESSABLE_AREAS,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
@@ -46,9 +47,11 @@ export function getAddressableAreaFromConfig(
   if (providedAddressableAreas.includes(addressableArea)) {
     addressableAreaFromConfig = addressableArea
   } else if (
-    // if no, check if provides a movable trash
-    providedAddressableAreas.some(aa =>
-      MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(aa)
+    // if no, check if provides a movable trash or module fixture
+    providedAddressableAreas.some(
+      aa =>
+        MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(aa) ||
+        FLEX_MODULE_ADDRESSABLE_AREAS.includes(aa)
     )
   ) {
     addressableAreaFromConfig = providedAddressableAreas[0]
