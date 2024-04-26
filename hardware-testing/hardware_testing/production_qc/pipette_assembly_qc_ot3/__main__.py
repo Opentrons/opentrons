@@ -1033,26 +1033,26 @@ async def _test_diagnostics_pressure(
             api, mount, SensorType.pressure, 10, _sensor_id
         )
 
-    # for sensor_id in sensor_ids:
-    #     pressure = await _read_pressure(sensor_id)
-    #     print(f"pressure-open-air-{sensor_id.name}: {pressure}")
-    #     if (
-    #         pressure < PRESSURE_THRESH_OPEN_AIR[pip_channels][0]
-    #         or pressure > PRESSURE_THRESH_OPEN_AIR[pip_channels][1]
-    #     ):
-    #         results.append(False)
-    #         print(
-    #             f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
-    #         )
-    #     else:
-    #         results.append(True)
-    #     write_cb(
-    #         [
-    #             f"pressure-open-air-{sensor_id.name}",
-    #             pressure,
-    #             _bool_to_pass_fail(results[-1]),
-    #         ]
-    #     )
+    for sensor_id in sensor_ids:
+        pressure = await _read_pressure(sensor_id)
+        print(f"pressure-open-air-{sensor_id.name}: {pressure}")
+        if (
+            pressure < PRESSURE_THRESH_OPEN_AIR[pip_channels][0]
+            or pressure > PRESSURE_THRESH_OPEN_AIR[pip_channels][1]
+        ):
+            results.append(False)
+            print(
+                f"FAIL: open-air {sensor_id.name} pressure ({pressure}) is not correct"
+            )
+        else:
+            results.append(True)
+        write_cb(
+            [
+                f"pressure-open-air-{sensor_id.name}",
+                pressure,
+                _bool_to_pass_fail(results[-1]),
+            ]
+        )
 
     # PICK-UP TIP(S)
     _, bottom, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
@@ -1062,10 +1062,10 @@ async def _test_diagnostics_pressure(
     await api.retract(mount)
 
     # SEALED PRESSURE
-    if not api.is_simulator:
-        _get_operator_answer_to_question(
-            'COVER tip(s) with finger(s), enter "y" when ready'
-        )
+    # if not api.is_simulator:
+    #     _get_operator_answer_to_question(
+    #         'COVER tip(s) with finger(s), enter "y" when ready'
+    #     )
     
     #move to force pressure 
     current_pos = await api.gantry_position(mount)
@@ -1074,13 +1074,37 @@ async def _test_diagnostics_pressure(
     #hover_over_slot_3 = pos_slot_3._replace(z=current_pos.z)
     await api.move_to(mount, pos_slot_3)
 
-    pos_slot_4 = Point(x=200.74, y=364.27, z=93.01)
-    await api.move_to(mount, pos_slot_4)
-    force_pressure = pressure_sensor.get_pressure()
+    pos_slot_4 = Point(x=200.74, y=364.27, z=80.01)
+    #await api.move_to(mount, pos_slot_4)
+    await api.move_rel(mount, Point(z=-158))
 
-    while force_pressure <= 200:
-        await api.move_rel(mount, Point(z=-0.06))
+    for sensor_id in sensor_ids:
+        pressure = await _read_pressure(sensor_id)
+        print(f"pressure-sealed-pickuptips: {pressure}")
+        if (
+            pressure < PRESSURE_THRESH_SEALED[pip_channels][0]
+            or pressure > PRESSURE_THRESH_SEALED[pip_channels][1]
+        ):
+            results.append(False)
+            print(f"FAIL: sealed pickuptips {sensor_id.name} pressure ({pressure}) is not correct")
+        else:
+            results.append(True)
+        write_cb(
+            [
+                f"pressure-sealed-pickuptips-{sensor_id.name}",
+                pressure,
+                _bool_to_pass_fail(results[-1]),
+            ]
+        )
+
+
+
+    force_pressure = pressure_sensor.get_pressure()
+    print(f"force pressure: {force_pressure}")
+    while force_pressure <= 250:
+        await api.move_rel(mount, Point(z=-0.08))
         force_pressure = pressure_sensor.get_pressure()
+        print(f"force pressure: {force_pressure}")
 
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
@@ -1100,6 +1124,10 @@ async def _test_diagnostics_pressure(
                 _bool_to_pass_fail(results[-1]),
             ]
         )
+        
+
+    
+    
 
     # COMPRESSED
     pip = api.hardware_pipettes[mount.to_mount()]
@@ -1130,8 +1158,8 @@ async def _test_diagnostics_pressure(
             ]
         )
 
-    if not api.is_simulator:
-        _get_operator_answer_to_question('REMOVE your finger, enter "y" when ready')
+    # if not api.is_simulator:
+    #     _get_operator_answer_to_question('REMOVE your finger, enter "y" when ready')
     print("moving plunger back down to BOTTOM position")
     await api.dispense(mount)
     await api.prepare_for_aspirate(mount)
