@@ -2,6 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import { useForm } from 'react-hook-form'
+import { useAtom } from 'jotai'
 
 import {
   ALIGN_CENTER,
@@ -16,59 +17,81 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { promptContext } from '../../organisms/PromptButton/PromptProvider'
 import { useFetch } from '../../resources/hooks'
+import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
 
-import type { SubmitHandler } from 'react-hook-form'
-
-// ToDo (kk:04/19/2024) Note this interface will be used by prompt buttons in SidePanel
-// interface InputPromptProps {}
+import type { ChatData } from '../../resources/types'
 
 interface InputType {
   userPrompt: string
 }
 
-const url = 'https://mockgpt.wiremockapi.cloud/v1/chat/completions'
-
-export function InputPrompt(/* props: InputPromptProps */): JSX.Element {
+export function InputPrompt(): JSX.Element {
   const { t } = useTranslation('protocol_generator')
-  const { data: responseData, loading, error } = useFetch(url)
-
-  const { register, handleSubmit, watch, setValue, event } = useForm<InputType>(
-    {
-      defaultValues: {
-        userPrompt: '',
-      },
-    }
-  )
-  const usePromptValue = (): string => React.useContext(promptContext)
-  const promptFromButton = usePromptValue()
+  const { register, watch, setValue, reset } = useForm<InputType>({
+    defaultValues: {
+      userPrompt: '',
+    },
+  })
+  const [preparedPrompt] = useAtom(preparedPromptAtom)
+  const [, setChatData] = useAtom(chatDataAtom)
+  const [submitted, setSubmitted] = React.useState(false)
   const userPrompt = watch('userPrompt') ?? ''
 
-  const onSubmit: SubmitHandler<InputType> = async (data, event) => {
-    // ToDo (kk: 04/19/2024) call api
-    event?.preventDefault()
-    const { userPrompt } = data
-    console.log('user prompt', userPrompt)
-    console.log('data', responseData)
-  }
-
+  const { data: responseData, loading, error, fetchData } = useFetch(userPrompt)
   const calcTextAreaHeight = (): number => {
     const rowsNum = userPrompt.split('\n').length
     return rowsNum
   }
 
+  // const handleClick = (): void => {
+  //   const userInput: ChatData = {
+  //     role: 'user',
+  //     content: userPrompt,
+  //   }
+  //   console.log('userInput', userInput)
+  //   setChatData([...chatData, userInput])
+
+  //   console.log('before fetch', chatData)
+  //   void fetchData(userPrompt)
+  //   const { role, content } = responseData.choices[0].message
+  //   const assistantResponse: ChatData = {
+  //     role,
+  //     content,
+  //   }
+  //   setChatData([...chatData, assistantResponse])
+  //   reset()
+  // }
+
   const handleClick = (): void => {
-    console.log('clicked')
-    // call api function
+    const userInput: ChatData = {
+      role: 'user',
+      content: userPrompt,
+    }
+    setChatData(chatData => [...chatData, userInput])
+    void fetchData(userPrompt)
+    setSubmitted(true)
+    reset()
   }
 
   React.useEffect(() => {
-    if (promptFromButton !== '') setValue('userPrompt', promptFromButton)
-  }, [promptFromButton, setValue])
+    if (preparedPrompt !== '') setValue('userPrompt', preparedPrompt as string)
+  }, [preparedPrompt, setValue])
+
+  React.useEffect(() => {
+    if (submitted && responseData && !loading) {
+      const { role, content } = responseData.choices[0].message
+      const assistantResponse: ChatData = {
+        role,
+        content,
+      }
+      setChatData(chatData => [...chatData, assistantResponse])
+      setSubmitted(false)
+    }
+  }, [responseData, loading, submitted])
 
   return (
-    <StyledForm id="User_Prompt" onSubmit={() => handleSubmit(onSubmit)}>
+    <StyledForm id="User_Prompt">
       <Flex
         padding={SPACING.spacing40}
         gridGap={SPACING.spacing40}
