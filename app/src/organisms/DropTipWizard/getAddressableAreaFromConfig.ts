@@ -48,9 +48,10 @@ export function getAddressableAreaFromConfig(
     addressableAreaFromConfig = addressableArea
   } else if (
     // if no, check if provides a movable trash or module fixture
-    providedAddressableAreas.some(aa =>
-      MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(aa) 
-      || FLEX_MODULE_ADDRESSABLE_AREAS.includes(aa)
+    providedAddressableAreas.some(
+      aa =>
+        MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(aa) ||
+        FLEX_MODULE_ADDRESSABLE_AREAS.includes(aa)
     )
   ) {
     addressableAreaFromConfig = providedAddressableAreas[0]
@@ -59,8 +60,7 @@ export function getAddressableAreaFromConfig(
     providedAddressableAreas.some(aa =>
       WASTE_CHUTE_ADDRESSABLE_AREAS.includes(aa)
     )
-  )
-   {
+  ) {
     // match number of channels to provided waste chute addressable area
     if (
       pipetteChannels === 1 &&
