@@ -26,8 +26,6 @@ import { InputField } from '../../../../../atoms/InputField'
 import { MultiSlideout } from '../../../../../atoms/Slideout/MultiSlideout'
 import { FileUpload } from '../../../../../molecules/FileUpload'
 import { UploadInput } from '../../../../../molecules/UploadInput'
-import { useRobot } from '../../../../../organisms/Devices/hooks'
-import { getRobotSerialNumber } from '../../../../../redux/discovery'
 import { restartRobot } from '../../../../../redux/robot-admin'
 
 import type { FieldError, Resolver } from 'react-hook-form'
@@ -39,6 +37,7 @@ interface FactoryModeSlideoutProps {
   isRobotBusy: boolean
   onCloseClick: () => void
   robotName: string
+  sn: string | null
 }
 
 interface FormValues {
@@ -50,6 +49,7 @@ export function FactoryModeSlideout({
   isRobotBusy,
   onCloseClick,
   robotName,
+  sn,
 }: FactoryModeSlideoutProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
 
@@ -61,8 +61,6 @@ export function FactoryModeSlideout({
   )
   const isOEMMode = oemModeSetting?.value ?? null
 
-  const robot = useRobot(robotName)
-  const sn = robot?.status != null ? getRobotSerialNumber(robot) : null
   const last = sn?.substring(sn.length - 4)
 
   const [currentStep, setCurrentStep] = React.useState<number>(1)
@@ -99,7 +97,7 @@ export function FactoryModeSlideout({
   ): Record<string, FieldError> => {
     const factoryModeInput = data.factoryModeInput
     let errorMessage: string | undefined
-    if (factoryModeInput.length > 0 && factoryModeInput !== last) {
+    if (factoryModeInput !== last) {
       errorMessage = t('invalid_password')
     }
 
