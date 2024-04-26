@@ -68,8 +68,8 @@ def test_repeated_commands() -> None:
 
 
 @pytest.mark.parametrize("command_intent", [CommandIntent.SETUP, CommandIntent.FIXIT])
-def test_setup_command(command_intent: CommandIntent) -> None:
-    """Setup commands should always hash to None."""
+def test_setup_and_fixit_command(command_intent: CommandIntent) -> None:
+    """Setup and fixit commands should always skip hashing."""
     setup_command = commands.WaitForDurationCreate(
         params=commands.WaitForDurationParams(seconds=123),
         intent=command_intent,
