@@ -1,6 +1,34 @@
-For more details about this release, please see the full [technical change log][]. 
+For more details about this release, please see the full [technical change log][].
 
 [technical change log]: https://github.com/Opentrons/opentrons/releases
+
+# Internal Release 1.5.0
+
+This is 1.5.0, an internal release for the Robot Stack.  the primary purpose of the release is to allow science and design to have the earliest stable release possible, given known bugs and workarounds, as we continue to develop features for 7.3.0.
+
+<https://github.com/Opentrons/opentrons/compare/ot3@v1.2.0...ot3@v1.5.0>
+
+---
+
+## Internal Release 1.5.0-alpha.3
+
+This internal release is from the `edge` branch to contain rapid dev on new features for 7.3.0. This release is for internal testing purposes and if used may require a factory reset of the robot to return to a stable version.
+
+This release is to address live run command display issues.
+
+<https://github.com/Opentrons/opentrons/compare/ot3@1.5.0-alpha.2...ot3@1.5.0-alpha.3>
+
+---
+
+## Internal Release 1.5.0-alpha.2
+
+This internal release is from the `edge` branch to contain rapid dev on new features for 7.3.0. This release is for internal testing purposes and if used may require a factory reset of the robot to return to a stable version.
+
+- This release was to address bugs in the update and downgrade flows for the app and robot.
+
+<https://github.com/Opentrons/opentrons/compare/ot3@1.5.0-alpha.1...ot3@1.5.0-alpha.2>
+
+---
 
 ## Internal Release 1.5.0-alpha.1
 
