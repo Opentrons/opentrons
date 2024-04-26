@@ -39,12 +39,6 @@ def override_data_store(tmp_path: Path) -> Iterator[None]:
     context_tracker._store = old_store  # type: ignore[attr-defined]
 
 
-@pytest.fixture
-def monkeypatch_set_store_each_to_true(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Override the STORE_EACH flag for the RobotContextTracker."""
-    monkeypatch.setattr(context_tracker, "_store_each", True)
-
-
 def verify_metrics_store_file(file_path: Path, expected_length: int) -> None:
     """Verify that the metrics store file contains the expected number of lines."""
     with open(file_path, "r") as f:
@@ -290,9 +284,9 @@ def test_python_error_line_numbers(
     assert error["detail"] == expected_detail
 
 
-@pytest.mark.usefixtures("override_data_store", "monkeypatch_set_store_each_to_true")
-def test_track_analysis_with_store_each_run(tmp_path: Path) -> None:
-    """Test that the RobotContextTracker tracks analysis and stores each run."""
+@pytest.mark.usefixtures("override_data_store")
+def test_track_analysis_with_store(tmp_path: Path) -> None:
+    """Test that the RobotContextTracker tracks analysis and stores each execution."""
     protocol_source = textwrap.dedent(
         """
         requirements = {"apiLevel": "2.15"}

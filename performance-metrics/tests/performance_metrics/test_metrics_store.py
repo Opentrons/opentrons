@@ -17,9 +17,7 @@ SHUTTING_DOWN_TIME = 0.005
 
 async def test_storing_to_file(tmp_path: Path) -> None:
     """Tests storing the tracked data to a file."""
-    robot_context_tracker = RobotContextTracker(
-        tmp_path, should_track=True, store_each=False
-    )
+    robot_context_tracker = RobotContextTracker(tmp_path, should_track=True)
 
     @robot_context_tracker.track(state=RobotContextState.STARTING_UP)
     def starting_robot() -> None:

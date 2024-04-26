@@ -7,7 +7,6 @@ from performance_metrics.robot_context_tracker import RobotContextTracker
 from opentrons_shared_data.performance.dev_types import RobotContextState
 from time import sleep, time_ns
 from unittest.mock import patch
-from conftest import verify_metrics_store_file
 
 # Corrected times in seconds
 STARTING_TIME = 0.001
@@ -20,9 +19,7 @@ SHUTTING_DOWN_TIME = 0.005
 @pytest.fixture
 def robot_context_tracker(tmp_path: Path) -> RobotContextTracker:
     """Fixture to provide a fresh instance of RobotContextTracker for each test."""
-    return RobotContextTracker(
-        storage_location=tmp_path, should_track=True, store_each=False
-    )
+    return RobotContextTracker(storage_location=tmp_path, should_track=True)
 
 
 def test_robot_context_tracker(robot_context_tracker: RobotContextTracker) -> None:
@@ -231,9 +228,7 @@ async def test_concurrent_async_operations(
 
 def test_no_tracking(tmp_path: Path) -> None:
     """Tests that operations are not tracked when tracking is disabled."""
-    robot_context_tracker = RobotContextTracker(
-        tmp_path, should_track=False, store_each=False
-    )
+    robot_context_tracker = RobotContextTracker(tmp_path, should_track=False)
 
     @robot_context_tracker.track(state=RobotContextState.STARTING_UP)
     def operation_without_tracking() -> None:
@@ -253,9 +248,7 @@ def test_no_tracking(tmp_path: Path) -> None:
 def test_using_non_linux_time_functions(tmp_path: Path) -> None:
     """Tests tracking operations using non-Linux time functions."""
     file_path = tmp_path / "test_file.csv"
-    robot_context_tracker = RobotContextTracker(
-        file_path, should_track=True, store_each=False
-    )
+    robot_context_tracker = RobotContextTracker(file_path, should_track=True)
 
     @robot_context_tracker.track(state=RobotContextState.STARTING_UP)
     def starting_robot() -> None:
@@ -276,39 +269,3 @@ def test_using_non_linux_time_functions(tmp_path: Path) -> None:
         data.duration > 0 for data in storage
     ), "All duration times should be greater than 0."
     assert len(storage) == 2, "Both operations should be tracked."
-
-
-def test_store_each(tmp_path: Path) -> None:
-    """Tests storing data after each operation when store_each is enabled."""
-    robot_context_tracker = RobotContextTracker(
-        tmp_path, should_track=True, store_each=True
-    )
-
-    @robot_context_tracker.track(state=RobotContextState.STARTING_UP)
-    def starting_robot() -> None:
-        sleep(STARTING_TIME)
-
-    @robot_context_tracker.track(state=RobotContextState.CALIBRATING)
-    def calibrating_robot() -> None:
-        sleep(CALIBRATING_TIME)
-
-    starting_robot()
-
-    assert len(robot_context_tracker._store._data) == 0, (
-        "Operation should automatically stored when store_each is enabled."
-        "So _data should be cleared after every track"
-    )
-    verify_metrics_store_file(
-        robot_context_tracker._store.metadata.data_file_location, 1
-    )
-
-    calibrating_robot()
-
-    assert len(robot_context_tracker._store._data) == 0, (
-        "Operation should automatically stored when store_each is enabled."
-        "So _data should be cleared after every track"
-    )
-
-    verify_metrics_store_file(
-        robot_context_tracker._store.metadata.data_file_location, 2
-    )

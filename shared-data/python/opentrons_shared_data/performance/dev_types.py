@@ -11,7 +11,7 @@ class SupportsTracking(Protocol):
     """Protocol for classes that support tracking of robot context."""
 
     def __init__(
-        self, storage_location: Path, should_track: bool, store_each: bool
+        self, storage_location: Path, should_track: bool
     ) -> None:
         """Initialize the tracker."""
         ...

@@ -1,5 +1,6 @@
 """Performance helpers for tracking robot context."""
 
+import asyncio
 import functools
 from pathlib import Path
 from opentrons_shared_data.performance.dev_types import (
@@ -19,14 +20,12 @@ from opentrons.config import (
 _should_track = ff.enable_performance_metrics(
     RobotTypeEnum.robot_literal_to_enum(robot_configs.load().model)
 )
-STORE_EACH = _should_track
-
 
 class StubbedTracker(SupportsTracking):
     """A stubbed tracker that does nothing."""
 
     def __init__(
-        self, storage_location: Path, should_track: bool, store_each: bool
+        self, storage_location: Path, should_track: bool
     ) -> None:
         """Initialize the stubbed tracker."""
         pass
@@ -67,7 +66,7 @@ def _get_robot_context_tracker() -> SupportsTracking:
     global _robot_context_tracker
     if _robot_context_tracker is None:
         _robot_context_tracker = package_to_use(
-            get_performance_metrics_data_dir(), _should_track, STORE_EACH
+            get_performance_metrics_data_dir(), _should_track
         )
     return _robot_context_tracker
 
@@ -79,12 +78,12 @@ def track_analysis(func: F) -> F:
 
     # Typing a decorator that wraps a decorator with args, nope
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):  # type: ignore # noqa: ANN002, ANN003, ANN201
-        tracker = _get_robot_context_tracker()
-        tracked_func = tracker.track(RobotContextState.ANALYZING_PROTOCOL)(func)
+    async def wrapper(*args, **kwargs):  # type: ignore # noqa: ANN002, ANN003, ANN201
+        tracker: SupportsTracking = _get_robot_context_tracker()
 
-        result = tracked_func(*args, **kwargs)
-
-        return result
+        try:
+            return await tracker.track(func, RobotContextState.ANALYZING_PROTOCOL, *args, **kwargs)
+        finally:
+            tracker.store()
 
     return wrapper  # type: ignore
