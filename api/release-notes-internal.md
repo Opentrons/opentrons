@@ -10,6 +10,16 @@ This is 1.5.0, an internal release for the Robot Stack.  the primary purpose of 
 
 ---
 
+## Internal Release 1.5.0-alpha.3
+
+This internal release is from the `edge` branch to contain rapid dev on new features for 7.3.0. This release is for internal testing purposes and if used may require a factory reset of the robot to return to a stable version.
+
+This release is to address live run command display issues.
+
+<https://github.com/Opentrons/opentrons/compare/ot3@1.5.0-alpha.2...ot3@1.5.0-alpha.3>
+
+---
+
 ## Internal Release 1.5.0-alpha.2
 
 This internal release is from the `edge` branch to contain rapid dev on new features for 7.3.0. This release is for internal testing purposes and if used may require a factory reset of the robot to return to a stable version.
