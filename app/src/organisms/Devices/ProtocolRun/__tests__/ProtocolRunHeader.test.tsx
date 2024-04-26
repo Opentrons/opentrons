@@ -59,11 +59,7 @@ import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-  ANALYTICS_PROTOCOL_RUN_AGAIN,
-  ANALYTICS_PROTOCOL_RUN_FINISH,
-  ANALYTICS_PROTOCOL_RUN_PAUSE,
-  ANALYTICS_PROTOCOL_RUN_START,
-  ANALYTICS_PROTOCOL_RUN_RESUME,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../../../redux/analytics'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { getRobotUpdateDisplayInfo } from '../../../../redux/robot-update'
@@ -427,7 +423,7 @@ describe('ProtocolRunHeader', () => {
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_START,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
       properties: {},
     })
   })
@@ -445,7 +441,7 @@ describe('ProtocolRunHeader', () => {
     expect(mockCloseCurrentRun).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_FINISH,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
       properties: {},
     })
   })
@@ -526,7 +522,7 @@ describe('ProtocolRunHeader', () => {
     screen.getByText('Protocol end')
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_PAUSE,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.PAUSE,
     })
   })
 
@@ -564,7 +560,7 @@ describe('ProtocolRunHeader', () => {
     screen.getByText('Paused')
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_RESUME,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
       properties: {},
     })
   })
@@ -649,7 +645,7 @@ describe('ProtocolRunHeader', () => {
     screen.getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN,
     })
   })
 
@@ -676,7 +672,7 @@ describe('ProtocolRunHeader', () => {
     screen.getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN,
     })
   })
 
@@ -710,7 +706,7 @@ describe('ProtocolRunHeader', () => {
       },
     })
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN,
     })
   })
 

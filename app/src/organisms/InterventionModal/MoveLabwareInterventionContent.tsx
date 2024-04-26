@@ -35,6 +35,7 @@ import {
   getModuleType,
   getOccludedSlotCountForModule,
 } from '@opentrons/shared-data'
+
 import {
   getRunLabwareRenderInfo,
   getRunModuleRenderInfo,
@@ -47,8 +48,9 @@ import {
   getLoadedLabware,
   getLoadedModule,
 } from '../CommandText/utils/accessors'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+
 import type { RunData } from '@opentrons/api-client'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -119,7 +121,7 @@ export function MoveLabwareInterventionContent({
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
   const deckDef = getDeckDefFromRobotType(robotType)
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const moduleRenderInfo = getRunModuleRenderInfo(
     run,

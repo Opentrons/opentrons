@@ -28,7 +28,7 @@ export function makeEvent(
     case RobotUpdate.ROBOTUPDATE_SET_UPDATE_SEEN: {
       const data = getBuildrootAnalyticsData(state, action.meta.robotName)
       return Promise.resolve({
-        name: 'robotUpdateView',
+        name: Constants.ANALYTICS_ROBOT_UPDATE_VIEW,
         properties: { ...data },
       })
     }
@@ -36,7 +36,7 @@ export function makeEvent(
     case RobotUpdate.ROBOTUPDATE_CHANGELOG_SEEN: {
       const data = getBuildrootAnalyticsData(state, action.meta.robotName)
       return Promise.resolve({
-        name: 'robotUpdateChangeLogView',
+        name: Constants.ANALYTICS_ROBOT_UPDATE_CHANGE_LOG_VIEW,
         properties: { ...data },
       })
     }
@@ -44,7 +44,7 @@ export function makeEvent(
     case RobotUpdate.ROBOTUPDATE_UPDATE_IGNORED: {
       const data = getBuildrootAnalyticsData(state, action.meta.robotName)
       return Promise.resolve({
-        name: 'robotUpdateIgnore',
+        name: Constants.ANALYTICS_STATE_ROBOT_UPDATE.IGNORE,
         properties: { ...data },
       })
     }
@@ -52,7 +52,7 @@ export function makeEvent(
     case RobotUpdate.ROBOTUPDATE_START_UPDATE: {
       const data = getBuildrootAnalyticsData(state)
       return Promise.resolve({
-        name: 'robotUpdateInitiate',
+        name: Constants.ANALYTICS_STATE_ROBOT_UPDATE.INITIATE,
         properties: { ...data },
       })
     }
@@ -60,7 +60,7 @@ export function makeEvent(
     case RobotUpdate.ROBOTUPDATE_UNEXPECTED_ERROR: {
       const data = getBuildrootAnalyticsData(state)
       return Promise.resolve({
-        name: 'robotUpdateError',
+        name: Constants.ANALYTICS_STATE_ROBOT_UPDATE.ERROR,
         properties: { ...data },
       })
     }
@@ -69,7 +69,7 @@ export function makeEvent(
       if (action.payload !== 'finished') return Promise.resolve(null)
       const data = getBuildrootAnalyticsData(state)
       return Promise.resolve({
-        name: 'robotUpdateComplete',
+        name: Constants.ANALYTICS_STATE_ROBOT_UPDATE.COMPLETE,
         properties: { ...data },
       })
     }

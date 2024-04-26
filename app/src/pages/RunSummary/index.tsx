@@ -54,9 +54,7 @@ import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
 import { RunTimer } from '../../organisms/Devices/ProtocolRun/RunTimer'
 import {
   useTrackEvent,
-  // ANALYTICS_PROTOCOL_RUN_CANCEL,
-  ANALYTICS_PROTOCOL_RUN_AGAIN,
-  ANALYTICS_PROTOCOL_RUN_FINISH,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../redux/analytics'
 import { getLocalRobot } from '../../redux/discovery'
@@ -175,7 +173,7 @@ export function RunSummary(): JSX.Element {
           name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
           properties: { sourceLocation: 'RunSummary', robotSerialNumber },
         })
-        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
       }
     }
   }
@@ -186,7 +184,7 @@ export function RunSummary(): JSX.Element {
 
   const handleClickSplash = (): void => {
     trackProtocolRunEvent({
-      name: ANALYTICS_PROTOCOL_RUN_FINISH,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
       properties: robotAnalyticsData ?? undefined,
     })
     setShowSplash(false)

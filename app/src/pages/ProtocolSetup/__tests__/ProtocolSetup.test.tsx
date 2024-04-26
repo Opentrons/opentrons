@@ -11,7 +11,6 @@ import {
   useProtocolQuery,
   useDoorQuery,
   useModulesQuery,
-  useDeckConfigurationQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -35,7 +34,7 @@ import {
   useTrackProtocolRunEvent,
 } from '../../../organisms/Devices/hooks'
 import { getLocalRobot } from '../../../redux/discovery'
-import { ANALYTICS_PROTOCOL_RUN_START } from '../../../redux/analytics'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
@@ -57,6 +56,7 @@ import { useFeatureFlag } from '../../../redux/config'
 import { ViewOnlyParameters } from '../../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { mockRunTimeParameterData } from '../../ProtocolDetails/fixtures'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -114,6 +114,7 @@ vi.mock('../ConfirmAttachedModal')
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../resources/deck_configuration/hooks')
 vi.mock('../../../resources/runs')
+vi.mock('../../../resources/deck_configuration')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -273,7 +274,7 @@ describe('ProtocolSetup', () => {
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<SharedData.DeckConfiguration>)
     when(vi.mocked(useToaster))
@@ -419,7 +420,7 @@ describe('ProtocolSetup', () => {
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
     expect(mockTrackProtocolRunEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_START,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
       properties: {},
     })
   })

@@ -62,11 +62,7 @@ import { Banner } from '../../../atoms/Banner'
 import {
   useTrackEvent,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
-  ANALYTICS_PROTOCOL_RUN_AGAIN,
-  ANALYTICS_PROTOCOL_RUN_FINISH,
-  ANALYTICS_PROTOCOL_RUN_PAUSE,
-  ANALYTICS_PROTOCOL_RUN_START,
-  ANALYTICS_PROTOCOL_RUN_RESUME,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { Tooltip } from '../../../atoms/Tooltip'
@@ -252,7 +248,7 @@ export function ProtocolRunHeader({
     // After a user-initiated stopped run, close the run current run automatically.
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent && runId != null) {
       trackProtocolRunEvent({
-        name: ANALYTICS_PROTOCOL_RUN_FINISH,
+        name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
         properties: {
           ...robotAnalyticsData,
         },
@@ -301,7 +297,7 @@ export function ProtocolRunHeader({
 
   const handleClearClick = (): void => {
     trackProtocolRunEvent({
-      name: ANALYTICS_PROTOCOL_RUN_FINISH,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
       properties: robotAnalyticsData ?? undefined,
     })
     closeCurrentRun()
@@ -701,7 +697,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
     buttonText = t('pause_run')
     handleButtonClick = (): void => {
       pause()
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_PAUSE })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.PAUSE })
     }
   } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
     buttonIconName = 'ot-spinner'
@@ -725,8 +721,8 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         trackProtocolRunEvent({
           name:
             runStatus === RUN_STATUS_IDLE
-              ? ANALYTICS_PROTOCOL_RUN_START
-              : ANALYTICS_PROTOCOL_RUN_RESUME,
+              ? ANALYTICS_PROTOCOL_RUN_ACTION.START
+              : ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
           properties:
             runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
               ? robotAnalyticsData
@@ -744,7 +740,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
         properties: { sourceLocation: 'RunRecordDetail', robotSerialNumber },
       })
       trackProtocolRunEvent({
-        name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+        name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN,
       })
     }
   }

@@ -1,6 +1,5 @@
 import last from 'lodash/last'
 import {
-  useDeckConfigurationQuery,
   useInstrumentsQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -19,6 +18,7 @@ import {
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type {
   CompletedProtocolAnalysis,
@@ -83,9 +83,10 @@ export const useRequiredProtocolHardwareFromAnalysis = (
 
   const robotType = FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
-  const { data: deckConfig = [] } = useDeckConfigurationQuery({
-    refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
-  })
+  const deckConfig =
+    useNotifyDeckConfigurationQuery({
+      refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+    })?.data ?? []
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
     analysis

@@ -66,7 +66,7 @@ describe('TipPositionModal', () => {
     render(props)
     screen.getByText('warning')
     screen.getByText(
-      'The X and/or Y position value is close to edge of the well and might collide with it'
+      'One or more position offset values are close to the edge of the well and might collide with it'
     )
   })
   it('renders the alert if the x/y position values are too close to the max/min for y value', () => {
@@ -74,7 +74,7 @@ describe('TipPositionModal', () => {
     render(props)
     screen.getByText('warning')
     screen.getByText(
-      'The X and/or Y position value is close to edge of the well and might collide with it'
+      'One or more position offset values are close to the edge of the well and might collide with it'
     )
   })
   it('renders the custom options, captions, and visual', () => {

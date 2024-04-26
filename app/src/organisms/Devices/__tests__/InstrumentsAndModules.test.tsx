@@ -21,10 +21,7 @@ import { GripperCard } from '../../GripperCard'
 import { PipetteCard } from '../PipetteCard'
 import { FlexPipetteCard } from '../PipetteCard/FlexPipetteCard'
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
-import {
-  getIs96ChannelPipetteAttached,
-  getShowPipetteCalibrationWarning,
-} from '../utils'
+import { getShowPipetteCalibrationWarning } from '../utils'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 import type * as Components from '@opentrons/components'
 
@@ -65,7 +62,6 @@ describe('InstrumentsAndModules', () => {
       isRunStill: true,
       isRunTerminal: false,
     })
-    vi.mocked(getIs96ChannelPipetteAttached).mockReturnValue(false)
     vi.mocked(getShowPipetteCalibrationWarning).mockReturnValue(false)
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: { data: [] },
@@ -129,7 +125,20 @@ describe('InstrumentsAndModules', () => {
   })
   it('renders 1 pipette card when a 96 channel is attached', () => {
     when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(getIs96ChannelPipetteAttached).mockReturnValue(true)
+    vi.mocked(useInstrumentsQuery).mockReturnValue({
+      data: {
+        data: [
+          {
+            ok: true,
+            instrumentType: 'pipette',
+            mount: 'left',
+            data: {
+              channels: 96,
+            },
+          },
+        ],
+      },
+    } as any)
     vi.mocked(useIsRobotViewable).mockReturnValue(true)
     render()
     expect(vi.mocked(FlexPipetteCard)).toHaveBeenCalledTimes(1)

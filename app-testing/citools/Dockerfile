@@ -13,6 +13,7 @@ ARG OPENTRONS_VERSION=edge
 WORKDIR /opentrons
 
 # Clone the Opentrons repository at the specified commit or tag
+ARG CACHEBUST=1
 RUN git clone --branch $OPENTRONS_VERSION --depth 1 https://github.com/Opentrons/opentrons .
 
 # Install packages from local directories

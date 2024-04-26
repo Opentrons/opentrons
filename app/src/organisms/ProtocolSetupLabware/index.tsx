@@ -34,7 +34,6 @@ import {
 import { parseInitialLoadedLabwareByAdapter } from '@opentrons/api-client'
 import {
   useCreateLiveCommandMutation,
-  useDeckConfigurationQuery,
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
@@ -51,6 +50,8 @@ import {
   getNestedLabwareInfo,
   NestedLabwareInfo,
 } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
+import { LabwareMapViewModal } from './LabwareMapViewModal'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -63,7 +64,6 @@ import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
-import { LabwareMapViewModal } from './LabwareMapViewModal'
 
 const MODULE_REFETCH_INTERVAL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
@@ -99,7 +99,7 @@ export function ProtocolSetupLabware({
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const { data: deckConfig = [] } = useDeckConfigurationQuery({
+  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_POLL_MS,
   })
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(

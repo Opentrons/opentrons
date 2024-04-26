@@ -20,9 +20,9 @@ export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
         <Markdown
           components={{
             div: undefined,
-            ul: undefined,
+            ul: UnnumberedListText,
             h2: HeaderText,
-            li: ParagraphText,
+            li: ListItemText,
             p: ParagraphText,
             a: ExternalLink,
           }}
@@ -46,4 +46,12 @@ function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
 
 function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
   return <StyledText {...props} as="h3" />
+}
+
+function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
+  return <StyledText {...props} as="li" />
+}
+
+function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
+  return <StyledText {...props} as="ul" />
 }
