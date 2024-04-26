@@ -24,6 +24,8 @@ from opentrons.protocol_engine import (
     commands as pe_commands,
     CommandIntent,
     CommandStatus,
+    CommandCreate,
+    slot_standardization,
 )
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.util.broker import Broker
@@ -41,7 +43,9 @@ from .legacy_wrappers import (
     LegacyLoadInfo,
 )
 from ..ordered_set import OrderedSet
+from ..protocol_engine.commands import hash_protocol_command_params
 from ..protocol_engine.errors import ProtocolCommandFailedError
+from ..protocol_engine.resources import model_utils
 from ..protocol_engine.types import (
     PostRunHardwareState,
     DeckConfigurationType,
@@ -426,6 +430,72 @@ class JsonRunner(AbstractRunner):
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
+    def add_command(self, request: CommandCreate) -> Command:
+        """Add a command to the queue.
+
+        Arguments:
+            request: The command type and payload data used to construct
+                the command in state.
+
+        Returns:
+            The full, newly queued command.
+
+        Raises:
+            SetupCommandNotAllowed: the request specified a setup command,
+                but the engine was not idle or paused.
+            RunStoppedError: the run has been stopped, so no new commands
+                may be added.
+            CommandNotAllowedError: the request specified a failed command id
+                with a non fixit command.
+        """
+        # request = slot_standardization.standardize_command(
+        #     request, self.state_view.config.robot_type
+        # )
+
+        command_id = model_utils.generate_id()
+        if request.intent in (
+            CommandIntent.SETUP,
+            CommandIntent.FIXIT,
+        ):
+            request_hash = None
+        else:
+            request_hash = hash_protocol_command_params(
+                create=request,
+                last_hash=self._state_store.commands.get_latest_protocol_command_hash(),
+            )
+
+        command_created_at = model_utils.get_timestamp()
+
+        command = self.validate_action_allowed(
+            request=request,
+            request_hash=request_hash,
+            command_id=command_id,
+            created_at=command_created_at,
+        )
+        # TODO(mc, 2021-06-22): mypy has trouble with this automatic
+        # request > command mapping, figure out how to type precisely
+        # (or wait for a future mypy version that can figure it out).
+        # For now, unit tests cover mapping every request type
+        queued_command = request._CommandCls.construct(
+            id=command.command_id,
+            key=(
+                command.key
+                if command.key is not None
+                else (request_hash or command.command_id)
+            ),
+            createdAt=command_created_at,
+            params=command.params,  # type: ignore[arg-type]
+            intent=command.intent,
+            status=CommandStatus.QUEUED,
+        )
+
+        self.set_command_queued(queued_command)
+
+        if request_hash is not None:
+            self._protocol_engine.set_latest_protocol_command_hash(request_hash)
+
+        return command
+
     async def _add_command_and_execute(self) -> None:
         for command in self._queued_commands:
             result = await self._protocol_engine.add_and_execute_command(command)
@@ -434,6 +504,8 @@ class JsonRunner(AbstractRunner):
                     original_error=result.error,
                     message=f"{result.error.errorType}: {result.error.detail}",
                 )
+            elif result and result.error is None:
+                self.set_command_queued(result)
 
 
 class LiveRunner(AbstractRunner):
