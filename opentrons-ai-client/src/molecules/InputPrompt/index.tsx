@@ -1,22 +1,20 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import { useForm } from 'react-hook-form'
 import { useAtom } from 'jotai'
 
 import {
   ALIGN_CENTER,
   BORDERS,
-  Btn,
   COLORS,
   DIRECTION_ROW,
-  DISPLAY_FLEX,
   Flex,
-  Icon,
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { SendButton } from '../../atoms/SendButton'
 import { useFetch } from '../../resources/hooks'
 import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
 
@@ -141,65 +139,3 @@ const StyledTextarea = styled.textarea`
     transform: translateY(-50%);
   }
 `
-
-interface SendButtonProps {
-  handleClick: () => void
-  disabled?: boolean
-  isLoading?: boolean
-}
-
-function SendButton({
-  handleClick,
-  disabled = false,
-  isLoading = false,
-}: SendButtonProps): JSX.Element {
-  const playButtonStyle = css`
-    -webkit-tap-highlight-color: transparent;
-    &:focus {
-      background-color: ${COLORS.blue60};
-      color: ${COLORS.white};
-    }
-
-    &:hover {
-      background-color: ${COLORS.blue50};
-      color: ${COLORS.white};
-    }
-
-    &:focus-visible {
-      background-color: ${COLORS.blue50};
-    }
-
-    &:active {
-      background-color: ${COLORS.blue60};
-      color: ${COLORS.white};
-    }
-
-    &:disabled {
-      background-color: ${COLORS.grey35};
-      color: ${COLORS.grey50};
-    }
-  `
-  return (
-    <Btn
-      alignItems={ALIGN_CENTER}
-      backgroundColor={disabled ? COLORS.grey35 : COLORS.blue50}
-      borderRadius={BORDERS.borderRadiusFull}
-      display={DISPLAY_FLEX}
-      justifyContent={JUSTIFY_CENTER}
-      width="4.25rem"
-      height="3.75rem"
-      disabled={disabled || isLoading}
-      onClick={handleClick}
-      aria-label="play"
-      css={playButtonStyle}
-      // type="submit"
-    >
-      <Icon
-        color={disabled ? COLORS.grey50 : COLORS.white}
-        name={isLoading ? 'ot-spinner' : 'send'}
-        spin={isLoading}
-        size="2rem"
-      />
-    </Btn>
-  )
-}
