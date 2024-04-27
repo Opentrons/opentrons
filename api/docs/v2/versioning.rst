@@ -155,10 +155,6 @@ This version introduces new features for Flex and adds and improves methods for 
   - :py:obj:`.ProtocolContext.fixed_trash` and :py:obj:`.InstrumentContext.trash_container` now return :py:class:`.TrashBin` objects instead of :py:class:`.Labware` objects.
   - Flex will no longer automatically drop tips in the trash at the end of a protocol. You can add a :py:meth:`.drop_tip()` command to your protocol or use the Opentrons App to drop the tips.
 
-- Known limitations
-
-  - Using ``configure_nozzle_layout()`` with ``COLUMN`` layout and ``start="A1"`` is not fully supported and may lead to unreliable pipetting behavior.
-
 Version 2.15
 ------------
 

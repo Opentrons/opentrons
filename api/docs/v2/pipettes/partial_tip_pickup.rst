@@ -23,7 +23,7 @@ For greater convenience, also import the individual layout constants that you pl
 
     from opentrons.protocol_api import COLUMN, ALL
 
-Then when you call ``configure_nozzle_layout`` later in your protocol, you can set ``style=COLUMN``. 
+Then when you call ``configure_nozzle_layout`` later in your protocol, you can set ``style=COLUMN``.
 
 Here is the start of a protocol that performs both imports, loads a 96-channel pipette, and sets it to pick up a single column of tips.
 
@@ -106,6 +106,10 @@ When switching between full and partial pickup, you may want to organize your ti
     partial_tip_racks = [tips_1, tips_2]
     full_tip_racks = [tips_3, tips_4]
 
+.. Tip::
+
+    It's also good practice to keep separate lists of tip racks when using multiple partial tip pickup configurations (i.e., using both column 1 and column 12 in the same protocol). This improves positional accuracy when picking up tips. Additionally, use Labware Position Check in the Opentrons App to ensure that the partial configuration is well-aligned to the rack.
+
 Now, when you configure the nozzle layout, you can reference the appropriate list as the value of ``tip_racks``::
 
     pipette.configure_nozzle_layout(
@@ -120,7 +124,7 @@ Now, when you configure the nozzle layout, you can reference the appropriate lis
         tip_racks=full_tip_racks
     )
     pipette.pick_up_tip()  # picks up full rack in C1
-    
+
 This keeps tip tracking consistent across each type of pickup. And it reduces the risk of errors due to the incorrect presence or absence of a tip rack adapter.
 
 
@@ -159,10 +163,13 @@ You would get a similar error trying to aspirate from or dispense into a well pl
 
     When using column 12 for partial tip pickup and pipetting, generally organize your deck with the shortest labware on the left side of the deck, and the tallest labware on the right side.
 
-If your application can't accommodate a deck layout that works well with column 12, you can configure the 96-channel pipette to pick up tips with column 1, but this is not recommended. Column 1 pickup has several drawbacks:
+If your application can't accommodate a deck layout that works well with column 12, you can configure the 96-channel pipette to pick up tips with column 1::
 
-- Tip pickup force may be incorrect, leading to poor tip fit and loss of positional accuracy.
-- Automatic tip tracking is not available
-- The rightmost columns in labware in column 3 may be inaccessible, if they are beyond the movement limit of the pipette (within 29 mm of the right edge of the slot).
+    pipette.configure_nozzle_layout(
+        style=COLUMN,
+        start="A1",
+    )
 
-For these reasons, use column 12 whenever possible.
+.. note::
+
+    When using a column 1 layout, the pipette can't reach the rightmost portion of labware in slots A3–D3. Any well that is within 29 mm of the right edge of the slot may be inaccessible. Use a column 12 layout if you need to pipette in that area.
