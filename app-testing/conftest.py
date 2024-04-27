@@ -1,4 +1,5 @@
 """Pytest setup."""
+
 import os
 from typing import Generator, List, Optional
 
@@ -30,21 +31,6 @@ else:
     raise AssertionError("No .env or example.env file found.")
 
 
-def pytest_collection_modifyitems(items):  # type: ignore # noqa: ANN201,ANN001
-    """Order tests."""
-    # When running all tests calibrate the robot first.
-    # Most other tests require this.
-    MODULE_ORDER = ["tests.calibrate_test"]
-    module_mapping = {item: item.module.__name__ for item in items}
-    sorted_items = items.copy()
-    # Iteratively move tests of each module to the end of the test queue
-    for module in MODULE_ORDER:
-        sorted_items = [it for it in sorted_items if module_mapping[it] == module] + [
-            it for it in sorted_items if module_mapping[it] != module
-        ]
-    items[:] = sorted_items
-
-
 def _chrome_options() -> Options:
     """Chrome options for setup."""
     options = Options()
@@ -52,14 +38,14 @@ def _chrome_options() -> Options:
     assert executable_path is not None, "EXECUTABLE_PATH environment variable must be set"
     _console.print(f"EXECUTABLE_PATH is {executable_path}", style="white on blue")
     options.binary_location = executable_path
-    options.add_argument("whitelisted-ips=''")  # type: ignore
-    options.add_argument("disable-xss-auditor")  # type: ignore
-    options.add_argument("disable-web-security")  # type: ignore
-    options.add_argument("allow-running-insecure-content")  # type: ignore
-    options.add_argument("no-sandbox")  # type: ignore
-    options.add_argument("disable-setuid-sandbox")  # type: ignore
-    options.add_argument("disable-popup-blocking")  # type: ignore
-    options.add_argument("allow-elevated-browser")  # type: ignore
+    options.add_argument("whitelisted-ips=''")
+    options.add_argument("disable-xss-auditor")
+    options.add_argument("disable-web-security")
+    options.add_argument("allow-running-insecure-content")
+    options.add_argument("no-sandbox")
+    options.add_argument("disable-setuid-sandbox")
+    options.add_argument("disable-popup-blocking")
+    options.add_argument("allow-elevated-browser")
     return options
 
 

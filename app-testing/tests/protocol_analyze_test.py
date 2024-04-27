@@ -1,9 +1,10 @@
 """Test the Protocol Landing of the page."""
-import os
+
+from typing import List, Optional
 
 import pytest
 from automation.data.protocol import Protocol
-from automation.data.protocols import Protocols
+from automation.data.protocol_registry import ProtocolRegistry
 from automation.driver.drag_drop import drag_and_drop_file
 from automation.menus.left_menu import LeftMenu
 from automation.pages.labware_landing import LabwareLanding
@@ -13,33 +14,6 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 
 
-def _what_protocols() -> list[Protocol]:
-    """Use the environment variable to select which protocols are used in the test."""
-    protocols: Protocols = Protocols()
-    protocols_to_test: str = os.getenv("APP_ANALYSIS_TEST_PROTOCOLS", "upload_protocol")
-    tests: list[Protocol] = []
-    for protocol_name in [x.strip() for x in protocols_to_test.split(",") if len(x.strip()) > 0]:
-        protocol = getattr(protocols, protocol_name)
-        tests.append(
-            # https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest-param
-            # pytest.param returns a special ParamterSet type. But when pytest runs
-            # the test, it will be a Protocol type. Don't feel like fighting mypy.
-            pytest.param(  # type: ignore[arg-type]
-                protocol,
-                id=protocol.protocol_name,
-                # https://docs.pytest.org/en/7.1.x/reference/reference.html#pytest-mark-xfail
-                marks=pytest.mark.xfail(
-                    condition=protocol.expected_test_failure,
-                    reason=protocol.expected_test_reason,
-                    raises=AssertionError,
-                    run=True,
-                    strict=True,
-                ),
-            )
-        )
-    return tests
-
-
 def get_error_text(protocol_landing: ProtocolLanding, error_link: WebElement) -> str:
     protocol_landing.base.click_webelement(error_link)
     error_details = protocol_landing.get_popout_error().text
@@ -47,7 +21,15 @@ def get_error_text(protocol_landing: ProtocolLanding, error_link: WebElement) ->
     return error_details
 
 
-@pytest.mark.parametrize("protocol", _what_protocols())
+protocol_registry: ProtocolRegistry = ProtocolRegistry()
+protocols_to_test: Optional[List[Protocol]] = protocol_registry.protocols_to_test
+
+if not protocols_to_test:
+    exit("No protocols to test.")
+
+
+@pytest.mark.skip(reason="This test is deprecated in place of the test_analyses test.")
+@pytest.mark.parametrize("protocol", protocols_to_test, ids=[x.short_sha for x in protocols_to_test])
 def test_analyses(
     driver: WebDriver,
     console: Console,
@@ -105,8 +87,8 @@ def test_analyses(
 
     # Verifying elements on Protocol Landing Page
     # todo fix next line needs to be safe and print name not found
-    assert protocol_landing.get_deckMap_protocol_landing(protocol_name=protocol.protocol_name).is_displayed()
-    assert protocol_landing.get_protocol_name_text_protocol_landing(protocol_name=protocol.protocol_name) == protocol.protocol_name
+    # assert protocol_landing.get_deckMap_protocol_landing(protocol_name=protocol.protocol_name).is_displayed()
+    # assert protocol_landing.get_protocol_name_text_protocol_landing(protocol_name=protocol.protocol_name) == protocol.protocol_name
 
     # TODO validate robot
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useForm } from 'react-hook-form'
 import { useAtom } from 'jotai'
 
@@ -90,16 +90,7 @@ export function InputPrompt(): JSX.Element {
 
   return (
     <StyledForm id="User_Prompt">
-      <Flex
-        padding={SPACING.spacing40}
-        gridGap={SPACING.spacing40}
-        flexDirection={DIRECTION_ROW}
-        backgroundColor={COLORS.white}
-        borderRadius={BORDERS.borderRadius4}
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-        maxHeight="21.25rem"
-      >
+      <Flex css={CONTAINER_STYLE}>
         <StyledTextarea
           rows={calcTextAreaHeight()}
           placeholder={t('type_your_prompt')}
@@ -119,6 +110,21 @@ const StyledForm = styled.form`
   width: 100%;
 `
 
+const CONTAINER_STYLE = css`
+  padding: ${SPACING.spacing40};
+  grid-gap: ${SPACING.spacing40};
+  flex-direction: ${DIRECTION_ROW};
+  background-color: ${COLORS.white};
+  border-radius: ${BORDERS.borderRadius4};
+  justify-content: ${JUSTIFY_CENTER};
+  align-items: ${ALIGN_CENTER};
+  max-height: 21.25rem;
+
+  &:focus-within {
+    border: 1px ${BORDERS.styleSolid}${COLORS.blue50};
+  }
+`
+
 const StyledTextarea = styled.textarea`
   resize: none;
   min-height: 3.75rem;
@@ -133,6 +139,7 @@ const StyledTextarea = styled.textarea`
   width: 100%;
   font-size: ${TYPOGRAPHY.fontSize20};
   line-height: ${TYPOGRAPHY.lineHeight24};
+
   ::placeholder {
     position: absolute;
     top: 50%;

@@ -109,6 +109,7 @@ package-deps: clean lib deps
 package dist-posix dist-osx dist-linux dist-win: export NODE_ENV := production
 package dist-posix dist-osx dist-linux dist-win: export BUILD_ID := $(build_id)
 package dist-posix dist-osx dist-linux dist-win: export NO_PYTHON := $(if $(no_python_bundle),true,false)
+package dist-posix dist-osx dist-linux dist-win: export USE_HARD_LINKS := false
 
 .PHONY: package
 package: package-deps

@@ -31,6 +31,7 @@ import {
   getModuleType,
   FLEX_ROBOT_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import gripperImage from '../../../images/flex_gripper.png'
@@ -44,7 +45,7 @@ import { ModuleFields } from '../FilePipettesModal/ModuleFields'
 import { GoBack } from './GoBack'
 import {
   getCrashableModuleSelected,
-  getIsSlotAvailable,
+  getNumSlotsAvailable,
   getTrashOptionDisabled,
 } from './utils'
 import { EquipmentOption } from './EquipmentOption'
@@ -221,7 +222,12 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         const moduleType = getModuleType(moduleModel)
         const isModuleOnDeck = moduleTypesOnDeck.includes(moduleType)
 
-        const isDisabled = !getIsSlotAvailable(modules, additionalEquipment)
+        let isDisabled =
+          getNumSlotsAvailable(modules, additionalEquipment) === 0
+        //  special-casing TC since it takes up 2 slots
+        if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+          isDisabled = getNumSlotsAvailable(modules, additionalEquipment) === 1
+        }
 
         const handleMultiplesClick = (num: number): void => {
           const temperatureModules =

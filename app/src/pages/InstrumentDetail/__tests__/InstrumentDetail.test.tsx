@@ -4,30 +4,24 @@ import { useParams } from 'react-router-dom'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { renderWithProviders } from '../../../__testing-utils__'
-import {
-  getPipetteModelSpecs,
-  getGripperDisplayName,
-} from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
 import { InstrumentDetail } from '../../../pages/InstrumentDetail'
+import {
+  useGripperDisplayName,
+  usePipetteModelSpecs,
+} from '../../../resources/instruments/hooks'
+import { useIsOEMMode } from '../../../resources/robot-settings/hooks'
 
 import type { Instruments } from '@opentrons/api-client'
-import type * as SharedData from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof SharedData>()
-  return {
-    ...actual,
-    getPipetteModelSpecs: vi.fn(),
-    getGripperDisplayName: vi.fn(),
-  }
-})
 vi.mock('react-router-dom', () => ({
   useParams: vi.fn(),
   useHistory: vi.fn(),
 }))
+vi.mock('../../../resources/instruments/hooks')
+vi.mock('../../../resources/robot-settings/hooks')
 
 const render = () => {
   return renderWithProviders(<InstrumentDetail />, {
@@ -97,11 +91,12 @@ describe('InstrumentDetail', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: mockInstrumentsQuery,
     } as any)
-    vi.mocked(getPipetteModelSpecs).mockReturnValue({
+    vi.mocked(usePipetteModelSpecs).mockReturnValue({
       displayName: 'mockPipette',
     } as any)
-    vi.mocked(getGripperDisplayName).mockReturnValue('mockGripper')
+    vi.mocked(useGripperDisplayName).mockReturnValue('mockGripper')
     vi.mocked(useParams).mockReturnValue({ mount: 'left' })
+    vi.mocked(useIsOEMMode).mockReturnValue(false)
   })
 
   afterEach(() => {

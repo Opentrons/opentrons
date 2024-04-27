@@ -57,6 +57,14 @@ class LoadedLabwareData:
 
 
 @dataclass(frozen=True)
+class ReloadedLabwareData:
+    """The result of a reload labware procedure."""
+
+    location: LabwareLocation
+    offsetId: Optional[str]
+
+
+@dataclass(frozen=True)
 class LoadedPipetteData:
     """The result of a load pipette procedure."""
 
@@ -170,6 +178,25 @@ class EquipmentHandler:
         return LoadedLabwareData(
             labware_id=labware_id, definition=definition, offsetId=offset_id
         )
+
+    async def reload_labware(self, labware_id: str) -> ReloadedLabwareData:
+        """Reload an already-loaded labware. This cannot change the labware location.
+
+        Args:
+            labware_id: The ID of the already-loaded labware.
+
+        Raises:
+            LabwareNotLoadedError: If `labware_id` does not reference a loaded labware.
+
+        """
+        location = self._state_store.labware.get_location(labware_id)
+        definition_uri = self._state_store.labware.get_definition_uri(labware_id)
+        offset_id = self.find_applicable_labware_offset_id(
+            labware_definition_uri=definition_uri,
+            labware_location=location,
+        )
+
+        return ReloadedLabwareData(location=location, offsetId=offset_id)
 
     async def load_pipette(
         self,

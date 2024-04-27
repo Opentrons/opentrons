@@ -2,7 +2,14 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
-import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -23,11 +30,13 @@ import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { FixtureTable } from './FixtureTable'
 import { ModuleTable } from './ModuleTable'
 import { ModulesAndDeckMapViewModal } from './ModulesAndDeckMapViewModal'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { CutoutId, CutoutFixtureId } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 
 const ATTACHED_MODULE_POLL_MS = 5000
+const DECK_CONFIG_POLL_MS = 5000
 
 interface ProtocolSetupModulesAndDeckProps {
   runId: string
@@ -59,7 +68,9 @@ export function ProtocolSetupModulesAndDeck({
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-
+  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
+    refetchInterval: DECK_CONFIG_POLL_MS,
+  })
   const attachedModules =
     useAttachedModules({
       refetchInterval: ATTACHED_MODULE_POLL_MS,
@@ -72,7 +83,8 @@ export function ProtocolSetupModulesAndDeck({
 
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
     attachedModules,
-    protocolModulesInfo
+    protocolModulesInfo,
+    deckConfig
   )
 
   const hasModules = attachedProtocolModuleMatches.length > 0
@@ -105,7 +117,7 @@ export function ProtocolSetupModulesAndDeck({
         getTopPortalEl()
       )}
       <ChildNavigation
-        header={t('modules_and_deck')}
+        header={t('deck_hardware')}
         onClickBack={() => setSetupScreen('prepare to run')}
         buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
         buttonType="tertiaryLowLight"
@@ -116,7 +128,7 @@ export function ProtocolSetupModulesAndDeck({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
-        marginTop="7.75rem"
+        marginTop="5.5rem"
         marginBottom={SPACING.spacing80}
       >
         {isModuleMismatch && !clearModuleMismatchBanner ? (
@@ -131,20 +143,36 @@ export function ProtocolSetupModulesAndDeck({
           />
         ) : null}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-          {hasModules ? (
-            <ModuleTable
-              attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-              deckDef={deckDef}
-              runId={runId}
+          <Flex
+            color={COLORS.grey60}
+            fontSize={TYPOGRAPHY.fontSize22}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            gridGap={SPACING.spacing24}
+            lineHeight={TYPOGRAPHY.lineHeight28}
+            paddingX={SPACING.spacing24}
+          >
+            <StyledText flex="3.5 0 0">
+              {i18n.format(t('deck_hardware'), 'titleCase')}
+            </StyledText>
+            <StyledText flex="2 0 0">{t('location')}</StyledText>
+            <StyledText flex="4 0 0"> {t('status')}</StyledText>
+          </Flex>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            {hasModules ? (
+              <ModuleTable
+                attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+                deckDef={deckDef}
+                runId={runId}
+              />
+            ) : null}
+            <FixtureTable
+              robotType={FLEX_ROBOT_TYPE}
+              mostRecentAnalysis={mostRecentAnalysis}
+              setSetupScreen={setSetupScreen}
+              setCutoutId={setCutoutId}
+              setProvidedFixtureOptions={setProvidedFixtureOptions}
             />
-          ) : null}
-          <FixtureTable
-            robotType={FLEX_ROBOT_TYPE}
-            mostRecentAnalysis={mostRecentAnalysis}
-            setSetupScreen={setSetupScreen}
-            setCutoutId={setCutoutId}
-            setProvidedFixtureOptions={setProvidedFixtureOptions}
-          />
+          </Flex>
         </Flex>
       </Flex>
       <FloatingActionButton onClick={() => setShowDeckMapModal(true)} />

@@ -215,9 +215,16 @@ lint-py: $(PYTHON_LINT_TARGETS)
 	$(MAKE) -C $* lint
 
 .PHONY: lint-js
-lint-js:
-	yarn eslint --quiet=$(quiet) ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+lint-js: lint-js-eslint lint-js-prettier
+
+.PHONY: lint-js-eslint
+lint-js-eslint:
+	yarn eslint --quiet=$(quiet) --ignore-pattern "node_modules/" --cache ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+
+.PHONY: lint-js-prettier
+lint-js-prettier:
 	yarn prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+
 
 .PHONY: lint-json
 lint-json:

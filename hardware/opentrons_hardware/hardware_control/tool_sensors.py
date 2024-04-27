@@ -234,7 +234,7 @@ async def _setup_pressure_sensors(
 
     for sensor in sensors:
         pressure_sensor = PressureSensor.build(
-            sensor_id=sensor_id,
+            sensor_id=sensor,
             node_id=tool,
             stop_threshold=threshold_fixed_point,
         )

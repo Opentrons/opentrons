@@ -269,7 +269,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                       liquidId,
                       labware.labwareId,
                       labwareByLiquidId
-                    )}{' '}
+                    ).toFixed(1)}{' '}
                     {MICRO_LITERS}
                   </StyledText>
                 </Flex>
@@ -337,7 +337,7 @@ export const LiquidsListItemDetails = (
         marginLeft={SIZE_AUTO}
       >
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-          {getTotalVolumePerLiquidId(liquidId, labwareByLiquidId)}{' '}
+          {getTotalVolumePerLiquidId(liquidId, labwareByLiquidId).toFixed(1)}{' '}
           {MICRO_LITERS}
         </StyledText>
       </Flex>

@@ -1,5 +1,4 @@
 import { getInitialAndMovedLabwareInSlots } from '@opentrons/components'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getAddressableAreasInProtocol,
@@ -18,6 +17,8 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 
+import { useNotifyDeckConfigurationQuery } from './useNotifyDeckConfigurationQuery'
+
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
 export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
@@ -30,8 +31,9 @@ export function useDeckConfigurationCompatibility(
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 ): CutoutConfigAndCompatibility[] {
   const deckConfig =
-    useDeckConfigurationQuery({ refetchInterval: DECK_CONFIG_REFETCH_INTERVAL })
-      .data ?? []
+    useNotifyDeckConfigurationQuery({
+      refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+    }).data ?? []
   if (robotType !== FLEX_ROBOT_TYPE) return []
   const deckDef = getDeckDefFromRobotType(robotType)
   const allAddressableAreas =

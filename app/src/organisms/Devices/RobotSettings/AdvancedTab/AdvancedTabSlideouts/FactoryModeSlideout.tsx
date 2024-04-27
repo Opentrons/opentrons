@@ -28,23 +28,28 @@ import { FileUpload } from '../../../../../molecules/FileUpload'
 import { UploadInput } from '../../../../../molecules/UploadInput'
 import { restartRobot } from '../../../../../redux/robot-admin'
 
+import type { FieldError, Resolver } from 'react-hook-form'
 import type { RobotSettingsField } from '@opentrons/api-client'
 import type { Dispatch } from '../../../../../redux/types'
 
 interface FactoryModeSlideoutProps {
   isExpanded: boolean
+  isRobotBusy: boolean
   onCloseClick: () => void
   robotName: string
+  sn: string | null
 }
 
 interface FormValues {
-  passwordInput: string
+  factoryModeInput: string
 }
 
 export function FactoryModeSlideout({
   isExpanded,
+  isRobotBusy,
   onCloseClick,
   robotName,
+  sn,
 }: FactoryModeSlideoutProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
 
@@ -55,6 +60,8 @@ export function FactoryModeSlideout({
     (setting: RobotSettingsField) => setting?.id === 'enableOEMMode'
   )
   const isOEMMode = oemModeSetting?.value ?? null
+
+  const last = sn?.substring(sn.length - 4)
 
   const [currentStep, setCurrentStep] = React.useState<number>(1)
   const [toggleValue, setToggleValue] = React.useState<boolean>(false)
@@ -84,22 +91,54 @@ export function FactoryModeSlideout({
     },
   })
 
+  const validate = (
+    data: FormValues,
+    errors: Record<string, FieldError>
+  ): Record<string, FieldError> => {
+    const factoryModeInput = data.factoryModeInput
+    let errorMessage: string | undefined
+    if (factoryModeInput !== last) {
+      errorMessage = t('invalid_password')
+    }
+
+    const updatedErrors =
+      errorMessage != null
+        ? {
+            ...errors,
+            factoryModeInput: {
+              type: 'error',
+              message: errorMessage,
+            },
+          }
+        : errors
+    return updatedErrors
+  }
+
+  const resolver: Resolver<FormValues> = values => {
+    let errors = {}
+    errors = validate(values, errors)
+    return { values, errors }
+  }
+
   const {
-    handleSubmit,
+    clearErrors,
     control,
     formState: { errors },
-    trigger,
+    handleSubmit,
   } = useForm({
     defaultValues: {
-      passwordInput: '',
+      factoryModeInput: '',
     },
+    mode: 'onSubmit',
+    resolver,
+    reValidateMode: 'onSubmit',
   })
-  const onSubmit = (data: FormValues): void => {
+
+  const onSubmit = (): void => {
     setCurrentStep(2)
   }
 
   const handleSubmitFactoryPassword = (): void => {
-    // TODO: validation and errors: PLAT-281
     void handleSubmit(onSubmit)()
   }
 
@@ -151,7 +190,11 @@ export function FactoryModeSlideout({
       footer={
         <>
           {currentStep === 1 ? (
-            <PrimaryButton onClick={handleSubmitFactoryPassword} width="100%">
+            <PrimaryButton
+              disabled={errors.factoryModeInput != null}
+              onClick={handleSubmitFactoryPassword}
+              width="100%"
+            >
               {t('shared:next')}
             </PrimaryButton>
           ) : null}
@@ -160,7 +203,8 @@ export function FactoryModeSlideout({
               disabled={
                 (toggleValue && file == null) ||
                 isUploading ||
-                fileError != null
+                fileError != null ||
+                isRobotBusy
               }
               onClick={handleCompleteClick}
               width="100%"
@@ -179,15 +223,15 @@ export function FactoryModeSlideout({
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Controller
             control={control}
-            name="passwordInput"
+            name="factoryModeInput"
             render={({ field, fieldState }) => (
               <InputField
-                id="passwordInput"
-                name="passwordInput"
+                id="factoryModeInput"
+                name="factoryModeInput"
                 type="text"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   field.onChange(e)
-                  trigger('passwordInput')
+                  clearErrors()
                 }}
                 value={field.value}
                 error={fieldState.error?.message && ' '}
@@ -196,13 +240,13 @@ export function FactoryModeSlideout({
               />
             )}
           />
-          {errors.passwordInput != null ? (
+          {errors.factoryModeInput != null ? (
             <StyledText
               as="label"
               color={COLORS.red50}
               marginTop={SPACING.spacing4}
             >
-              {errors.passwordInput.message}
+              {errors.factoryModeInput.message}
             </StyledText>
           ) : null}
         </Flex>

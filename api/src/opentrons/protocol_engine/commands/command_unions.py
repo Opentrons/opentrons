@@ -100,6 +100,14 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
+from .reload_labware import (
+    ReloadLabware,
+    ReloadLabwareParams,
+    ReloadLabwareCreate,
+    ReloadLabwareResult,
+    ReloadLabwareCommandType,
+)
+
 from .load_liquid import (
     LoadLiquid,
     LoadLiquidParams,
@@ -304,6 +312,7 @@ Command = Annotated[
         Home,
         RetractAxis,
         LoadLabware,
+        ReloadLabware,
         LoadLiquid,
         LoadModule,
         LoadPipette,
@@ -368,6 +377,7 @@ CommandParams = Union[
     HomeParams,
     RetractAxisParams,
     LoadLabwareParams,
+    ReloadLabwareParams,
     LoadLiquidParams,
     LoadModuleParams,
     LoadPipetteParams,
@@ -431,6 +441,7 @@ CommandType = Union[
     HomeCommandType,
     RetractAxisCommandType,
     LoadLabwareCommandType,
+    ReloadLabwareCommandType,
     LoadLiquidCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
@@ -494,6 +505,7 @@ CommandCreate = Annotated[
         HomeCreate,
         RetractAxisCreate,
         LoadLabwareCreate,
+        ReloadLabwareCreate,
         LoadLiquidCreate,
         LoadModuleCreate,
         LoadPipetteCreate,
@@ -558,6 +570,7 @@ CommandResult = Union[
     HomeResult,
     RetractAxisResult,
     LoadLabwareResult,
+    ReloadLabwareResult,
     LoadLiquidResult,
     LoadModuleResult,
     LoadPipetteResult,
