@@ -42,7 +42,7 @@ THRESHOLDS = {
         30,
     ),
     "aspirate-pa": (
-        -600,
+        -700,
         -400,
     ),
     "dispense-pa": (
