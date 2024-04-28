@@ -463,7 +463,7 @@ class JsonRunner(AbstractRunner):
         else:
             request_hash = hash_protocol_command_params(
                 create=request,
-                last_hash=self._protocol_engine.commands.get_latest_protocol_command_hash(),
+                last_hash=self._protocol_engine.state_view.commands.get_latest_protocol_command_hash(),
             )
 
         command_created_at = model_utils.get_timestamp()
@@ -503,7 +503,7 @@ class JsonRunner(AbstractRunner):
         self.set_command_queued(queued_command)
 
         if queue_command.request_hash is not None:
-            self._protocol_engine._state_store.commands.state.latest_protocol_command_hash(
+            self._protocol_engine._state_store.commands.state.latest_protocol_command_hash = (
                 queue_command.request.key
             )
 
