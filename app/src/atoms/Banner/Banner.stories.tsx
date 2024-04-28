@@ -1,37 +1,41 @@
 import * as React from 'react'
-import { TYPOGRAPHY } from '@opentrons/components'
-import { StyledText } from '../text'
+import { StyledText, TYPOGRAPHY } from '@opentrons/components'
 import { Banner } from './index'
-import type { Story, Meta } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof Banner> = {
   title: 'App/Atoms/Banner',
   component: Banner,
-} as Meta
-
-const Template: Story<React.ComponentProps<typeof Banner>> = args => (
-  <Banner {...args} />
-)
-
-export const Primary = Template.bind({})
-Primary.args = {
-  title: 'title',
-  type: 'success',
 }
-export const OverriddenIcon = Template.bind({})
-OverriddenIcon.args = {
-  type: 'warning',
-  title: 'Alert with overridden icon',
-  icon: { name: 'ot-hot-to-touch' },
+
+export default meta
+
+type Story = StoryObj<typeof Banner>
+
+export const Primary: Story = {
+  args: {
+    children: 'Banner component',
+    type: 'success',
+  },
 }
-export const OverriddenExitIcon = Template.bind({})
-OverriddenExitIcon.args = {
-  type: 'informing',
-  title: 'Alert with overriden exit icon',
-  onCloseClick: () => console.log('close'),
-  closeButton: (
-    <StyledText as="p" textDecoration={TYPOGRAPHY.textDecorationUnderline}>
-      {'Exit'}
-    </StyledText>
-  ),
+
+export const OverriddenIcon: Story = {
+  args: {
+    type: 'warning',
+    children: 'Banner component',
+    icon: { name: 'ot-hot-to-touch' },
+  },
+}
+
+export const OverriddenExitIcon: Story = {
+  args: {
+    type: 'informing',
+    children: 'Banner component',
+    onCloseClick: () => console.log('close'),
+    closeButton: (
+      <StyledText as="p" textDecoration={TYPOGRAPHY.textDecorationUnderline}>
+        {'Exit'}
+      </StyledText>
+    ),
+  },
 }

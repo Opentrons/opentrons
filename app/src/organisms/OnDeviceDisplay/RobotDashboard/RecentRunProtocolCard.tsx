@@ -3,41 +3,46 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
+import last from 'lodash/last'
 
 import {
   BORDERS,
   COLORS,
+  Chip,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   OVERFLOW_WRAP_BREAK_WORD,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useProtocolQuery } from '@opentrons/react-api-client'
+import {
+  useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
-  Run,
-  RunData,
-  RunStatus,
 } from '@opentrons/api-client'
 
-import { StyledText } from '../../../atoms/text'
-import { Chip } from '../../../atoms/Chip'
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons//constants'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
-import { useHardwareStatusText } from './hooks'
+import { useRerunnableStatusText } from './hooks'
 import {
   useRobotInitializationStatus,
   INIT_STATUS,
 } from '../../../resources/health/hooks'
 
+import type { Run, RunData, RunStatus } from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 interface RecentRunProtocolCardProps {
@@ -77,8 +82,10 @@ export function ProtocolWithLastRun({
     conflictedSlots,
   } = useMissingProtocolHardware(protocolData.id)
   const history = useHistory()
-  const isReadyToBeReRun = missingProtocolHardware.length === 0
-  const chipText = useHardwareStatusText(
+  const isOk = 'ok' in runData ? !(runData?.ok === false) : true
+  const isReadyToBeReRun = isOk && missingProtocolHardware.length === 0
+  const chipText = useRerunnableStatusText(
+    isOk,
     missingProtocolHardware,
     conflictedSlots
   )
@@ -95,6 +102,14 @@ export function ProtocolWithLastRun({
 
   const protocolName =
     protocolData.metadata.protocolName ?? protocolData.files[0].name
+
+  const protocolId = protocolData.id
+
+  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
+  )
 
   const PROTOCOL_CARD_STYLE = css`
     flex: 1 0 0;
@@ -123,13 +138,22 @@ export function ProtocolWithLastRun({
     height: max-content;
   `
 
+  const hasRunTimeParameters =
+    analysis?.runTimeParameters != null
+      ? analysis?.runTimeParameters.length > 0
+      : false
+
   const handleCardClick = (): void => {
     setShowSpinner(true)
-    cloneRun()
-    trackEvent({
-      name: 'proceedToRun',
-      properties: { sourceLocation: 'RecentRunProtocolCard' },
-    })
+    if (hasRunTimeParameters) {
+      history.push(`/protocols/${protocolId}`)
+    } else {
+      cloneRun()
+      trackEvent({
+        name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+        properties: { sourceLocation: 'RecentRunProtocolCard' },
+      })
+    }
     // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
     // trackProtocolRunEvent({ name: 'runAgain' })
   }
@@ -162,7 +186,13 @@ export function ProtocolWithLastRun({
       flexDirection={DIRECTION_COLUMN}
       padding={SPACING.spacing24}
       gridGap={SPACING.spacing24}
-      backgroundColor={isReadyToBeReRun ? COLORS.green35 : COLORS.yellow35}
+      backgroundColor={
+        isOk
+          ? isReadyToBeReRun
+            ? COLORS.green35
+            : COLORS.yellow35
+          : COLORS.red35
+      }
       width="25.8125rem"
       height="24.5rem"
       borderRadius={BORDERS.borderRadius16}
@@ -171,7 +201,7 @@ export function ProtocolWithLastRun({
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Chip
           paddingLeft="0"
-          type={isReadyToBeReRun ? 'success' : 'warning'}
+          type={isOk ? (isReadyToBeReRun ? 'success' : 'warning') : 'error'}
           background={false}
           text={i18n.format(chipText, 'capitalize')}
         />

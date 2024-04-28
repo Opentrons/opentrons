@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import last from 'lodash/last'
 import { useHistory } from 'react-router-dom'
 
 import {
@@ -13,9 +12,9 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  IconProps,
   ModuleIcon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useHoverTooltip,
   useOnClickOutside,
@@ -31,9 +30,7 @@ import {
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
-import { updateModule } from '../../redux/modules'
 import {
-  useDispatchApiRequest,
   getRequestById,
   PENDING,
   FAILURE,
@@ -46,7 +43,6 @@ import { UpdateBanner } from '../../molecules/UpdateBanner'
 import { SUCCESS_TOAST } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
-import { StyledText } from '../../atoms/text'
 import { useChainLiveCommands } from '../../resources/runs'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { useIsFlex } from '../../organisms/Devices/hooks'
@@ -71,6 +67,7 @@ import { ErrorInfo } from './ErrorInfo'
 import { ModuleSetupModal } from './ModuleSetupModal'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
 
+import type { IconProps } from '@opentrons/components'
 import type {
   AttachedModule,
   HeaterShakerModule,
@@ -85,6 +82,8 @@ interface ModuleCardProps {
   attachPipetteRequired: boolean
   calibratePipetteRequired: boolean
   updatePipetteFWRequired: boolean
+  latestRequestId: string | null
+  handleModuleApiRequests: (robotName: string, serialNumber: string) => void
   runId?: string
   slotName?: string
 }
@@ -100,6 +99,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     attachPipetteRequired,
     calibratePipetteRequired,
     updatePipetteFWRequired,
+    latestRequestId,
+    handleModuleApiRequests,
   } = props
   const dispatch = useDispatch<Dispatch>()
   const {
@@ -115,13 +116,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [hasSecondary, setHasSecondary] = React.useState(false)
   const [showAboutModule, setShowAboutModule] = React.useState(false)
   const [showTestShake, setShowTestShake] = React.useState(false)
-  const [showHSWizard, setShowHSWizard] = React.useState<boolean>(false)
-  const [showFWBanner, setShowFWBanner] = React.useState<boolean>(true)
-  const [showCalModal, setShowCalModal] = React.useState<boolean>(false)
+  const [showHSWizard, setShowHSWizard] = React.useState(false)
+  const [showFWBanner, setShowFWBanner] = React.useState(true)
+  const [showCalModal, setShowCalModal] = React.useState(false)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
   const history = useHistory()
-  const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
   const runStatus = useCurrentRunStatus({
     onSettled: data => {
       if (data == null) {
@@ -138,10 +138,24 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     (!attachPipetteRequired ?? false) &&
     (!calibratePipetteRequired ?? false) &&
     (!updatePipetteFWRequired ?? false)
-  const latestRequestId = last(requestIds)
+
   const latestRequest = useSelector<State, RequestState | null>(state =>
-    latestRequestId ? getRequestById(state, latestRequestId) : null
+    latestRequestId != null ? getRequestById(state, latestRequestId) : null
   )
+
+  const hasUpdated =
+    !module.hasAvailableUpdate && latestRequest?.status === SUCCESS
+  const [showFirmwareToast, setShowFirmwareToast] = React.useState(hasUpdated)
+  const { makeToast } = useToaster()
+  if (showFirmwareToast) {
+    makeToast(t('firmware_updated_successfully'), SUCCESS_TOAST)
+    setShowFirmwareToast(false)
+  }
+
+  const handleFirmwareUpdateClick = (): void => {
+    robotName && handleModuleApiRequests(robotName, module.serialNumber)
+  }
+
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const handleCloseErrorModal = (): void => {
@@ -149,18 +163,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       dispatch(dismissRequest(latestRequestId))
     }
   }
-
-  const handleFirmwareUpdateClick = (): void => {
-    robotName &&
-      dispatchApiRequest(updateModule(robotName, module.serialNumber))
-  }
-
-  const { makeToast } = useToaster()
-  React.useEffect(() => {
-    if (!module.hasAvailableUpdate && latestRequest?.status === SUCCESS) {
-      makeToast(t('firmware_update_installation_successful'), SUCCESS_TOAST)
-    }
-  }, [module.hasAvailableUpdate, latestRequest?.status, makeToast, t])
 
   const isPending = latestRequest?.status === PENDING
   const hotToTouch: IconProps = { name: 'ot-hot-to-touch' }

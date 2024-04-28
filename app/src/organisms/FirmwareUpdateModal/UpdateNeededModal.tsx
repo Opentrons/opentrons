@@ -2,7 +2,13 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation, Trans } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
-import { COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 import {
   useInstrumentsQuery,
   useSubsystemUpdateQuery,
@@ -11,7 +17,6 @@ import {
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { getTopPortalEl } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateResultsModal } from './UpdateResultsModal'

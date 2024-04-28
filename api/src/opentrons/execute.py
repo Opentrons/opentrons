@@ -28,7 +28,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons import protocol_api, __version__, should_use_ot3
 
-from opentrons.commands import types as command_types
+from opentrons.legacy_commands import types as command_types
 
 from opentrons.hardware_control import (
     API as OT2API,
@@ -333,7 +333,7 @@ def execute(  # noqa: C901
               'text': string_command_text,
               # The rest of this struct is
               # command-dependent; see
-              # opentrons.commands.commands.
+              # opentrons.legacy_commands.commands.
              }
           }
 
@@ -600,7 +600,9 @@ def _run_file_non_pe(
 
     context.home()
     try:
-        execute_apiv2.run_protocol(protocol, context)
+        # TODO (spp, 2024-03-18): use true run-time param overrides once enabled
+        #  for cli protocol simulation/ execution
+        execute_apiv2.run_protocol(protocol, context, run_time_param_overrides=None)
     finally:
         context.cleanup()
 

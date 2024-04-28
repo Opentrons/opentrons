@@ -2,24 +2,24 @@ import * as React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
-import { css } from 'styled-components'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  Btn,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  POSITION_FIXED,
-  JUSTIFY_CENTER,
-  POSITION_RELATIVE,
-  POSITION_ABSOLUTE,
-  COLORS,
-  TYPOGRAPHY,
+  Flex,
   Icon,
-  Btn,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
+  POSITION_FIXED,
+  POSITION_RELATIVE,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 
@@ -31,9 +31,8 @@ import {
   getLocalRobot,
 } from '../../redux/discovery'
 import { useTrackEvent, ANALYTICS_RENAME_ROBOT } from '../../redux/analytics'
-import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
-import { CustomKeyboard } from '../../atoms/SoftwareKeyboard'
+import { AlphanumericKeyboard } from '../../atoms/SoftwareKeyboard'
 import { SmallButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useIsUnboxingFlowOngoing } from '../../organisms/RobotSettingsDashboard/NetworkSettings/hooks'
@@ -41,14 +40,6 @@ import { ConfirmRobotName } from '../../organisms/OnDeviceDisplay/NameRobot/Conf
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../redux/types'
-
-const INPUT_FIELD_ODD_STYLE = css`
-  padding-top: ${SPACING.spacing32};
-  padding-bottom: ${SPACING.spacing32};
-  font-size: 2.5rem;
-  line-height: 3.25rem;
-  text-align: center;
-`
 
 interface FormValues {
   newRobotName: string
@@ -130,7 +121,7 @@ export function NameRobot(): JSX.Element {
     defaultValues: {
       newRobotName: '',
     },
-    resolver: resolver,
+    resolver,
   })
 
   const newRobotName = watch('newRobotName')
@@ -273,10 +264,10 @@ export function NameRobot(): JSX.Element {
                     id="newRobotName"
                     name="newRobotName"
                     type="text"
-                    readOnly
                     value={field.value}
                     error={fieldState.error?.message && ''}
-                    css={INPUT_FIELD_ODD_STYLE}
+                    textAlign={TYPOGRAPHY.textAlignCenter}
+                    onBlur={e => e.target.focus()}
                   />
                 )}
               />
@@ -304,10 +295,10 @@ export function NameRobot(): JSX.Element {
               control={control}
               name="newRobotName"
               render={({ field }) => (
-                <CustomKeyboard
+                <AlphanumericKeyboard
                   onChange={(input: string) => {
                     field.onChange(input)
-                    trigger('newRobotName')
+                    void trigger('newRobotName')
                   }}
                   keyboardRef={keyboardRef}
                 />

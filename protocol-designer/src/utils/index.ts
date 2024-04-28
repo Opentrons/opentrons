@@ -11,12 +11,15 @@ import {
   CutoutFixtureId,
   RobotType,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
+  SupportedTip,
+  LOW_VOLUME_PIPETTES,
 } from '@opentrons/shared-data'
 import { BoundingRect, GenericRect } from '../collision-types'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntities,
   PipetteEntities,
+  PipetteEntity,
 } from '@opentrons/step-generation'
 import type { WellGroup } from '@opentrons/components'
 
@@ -193,4 +196,53 @@ export const getCutoutIdByAddressableArea = (
     )
   }
   return cutoutId
+}
+
+export function getMatchingTipLiquidSpecs(
+  pipetteEntity: PipetteEntity,
+  volume: number,
+  tiprack: string
+): SupportedTip {
+  const matchingLabwareDef = Object.values(
+    pipetteEntity.tiprackLabwareDef
+  ).find(def => tiprack.includes(def.parameters.loadName))
+
+  console.assert(
+    matchingLabwareDef,
+    `expected to find a matching labware def with tiprack ${tiprack} but could not`
+  )
+
+  const tipLength = matchingLabwareDef?.parameters.tipLength ?? 0
+
+  if (tipLength === 0) {
+    console.error(
+      `expected to find a tiplength with tiprack ${
+        matchingLabwareDef?.metadata.displayName ?? 'unknown displayName'
+      } but could not`
+    )
+  }
+
+  const isLowVolumePipette = LOW_VOLUME_PIPETTES.includes(pipetteEntity.name)
+  const isUsingLowVolume = volume < 5
+  const liquidType =
+    isLowVolumePipette && isUsingLowVolume ? 'lowVolumeDefault' : 'default'
+  const liquidSupportedTips = Object.values(
+    pipetteEntity.spec.liquids[liquidType].supportedTips
+  )
+
+  //  find the supported tip liquid specs that either exactly match
+  //  tipLength or are closest, this accounts for custom tipracks
+  const matchingTipLiquidSpecs = liquidSupportedTips.sort((tipA, tipB) => {
+    const differenceA = Math.abs(tipA.defaultTipLength - tipLength)
+    const differenceB = Math.abs(tipB.defaultTipLength - tipLength)
+    return differenceA - differenceB
+  })[0]
+  console.assert(
+    matchingTipLiquidSpecs,
+    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
+      matchingLabwareDef?.metadata.displayName ?? 'unknown displayname'
+    }`
+  )
+
+  return matchingTipLiquidSpecs
 }

@@ -6,20 +6,20 @@ import { NavLink, Redirect, useParams } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
 import {
-  Box,
-  Flex,
-  useHoverTooltip,
-  DIRECTION_COLUMN,
-  POSITION_RELATIVE,
-  OVERFLOW_SCROLL,
-  SIZE_6,
   BORDERS,
+  Box,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  OVERFLOW_SCROLL,
+  POSITION_RELATIVE,
+  SIZE_6,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useModuleRenderInfoForProtocolById,
@@ -32,6 +32,7 @@ import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/Protoc
 import { RunPreview } from '../../../organisms/RunPreview'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
+import { ProtocolRunRuntimeParameters } from '../../../organisms/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { OPENTRONS_USB } from '../../../redux/discovery'
 import { fetchProtocols } from '../../../redux/protocol-storage'
@@ -178,6 +179,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
   const listRef = React.useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = React.useState<number | null>(null)
+
   React.useEffect(() => {
     if (jumpedIndex != null) {
       setTimeout(() => setJumpedIndex(null), JUMPED_STEP_HIGHLIGHT_DELAY_MS)
@@ -201,6 +203,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
         runId={runId}
       />
     ),
+    'runtime-parameters': <ProtocolRunRuntimeParameters runId={runId} />,
     'module-controls': (
       <ProtocolRunModuleControls robotName={robotName} runId={runId} />
     ),
@@ -232,17 +235,14 @@ function PageContents(props: PageContentsProps): JSX.Element {
       />
       <Flex gridGap={SPACING.spacing8} marginBottom={SPACING.spacing12}>
         <SetupTab robotName={robotName} runId={runId} />
+        <ParametersTab robotName={robotName} runId={runId} />
         <ModuleControlsTab robotName={robotName} runId={runId} />
         <RunPreviewTab robotName={robotName} runId={runId} />
       </Flex>
       <Box
         backgroundColor={COLORS.white}
         // remove left upper corner border radius when first tab is active
-        borderRadius={`${
-          protocolRunDetailsTab === 'setup' ? '0' : BORDERS.borderRadius4
-        } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
-          BORDERS.borderRadius4
-        }`}
+        borderRadius={BORDERS.borderRadius8}
       >
         {protocolRunDetailsContent}
       </Box>
@@ -275,6 +275,34 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
       />
       {currentRunId !== runId ? (
         // redirect to run preview if not current run
+        <Redirect
+          to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
+        />
+      ) : null}
+    </>
+  )
+}
+
+interface ParametersTabProps {
+  robotName: string
+  runId: string
+}
+
+const ParametersTab = (props: ParametersTabProps): JSX.Element | null => {
+  const { robotName, runId } = props
+  const { t } = useTranslation('run_details')
+  const disabled = false
+  const tabDisabledReason = ''
+
+  return (
+    <>
+      <RoundTab
+        disabled={disabled}
+        tabDisabledReason={tabDisabledReason}
+        to={`/devices/${robotName}/protocol-runs/${runId}/runtime-parameters`}
+        tabName={t('parameters')}
+      />
+      {disabled ? (
         <Redirect
           to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
         />

@@ -11,11 +11,11 @@ import {
   Flex,
   OVERFLOW_AUTO,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal'
 
@@ -33,7 +33,7 @@ export function RunFailedModal({
   setShowRunFailedModal,
   errors,
 }: RunFailedModalProps): JSX.Element | null {
-  const { t, i18n } = useTranslation(['run_details', 'shared'])
+  const { t, i18n } = useTranslation(['run_details', 'shared', 'branded'])
   const history = useHistory()
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
@@ -90,7 +90,7 @@ export function RunFailedModal({
             gridGap={SPACING.spacing8}
             maxHeight="11rem"
             backgroundColor={COLORS.grey35}
-            borderRadius={BORDERS.borderRadius12}
+            borderRadius={BORDERS.borderRadius8}
             padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
           >
             <Flex flexDirection={DIRECTION_COLUMN} css={SCROLL_BAR_STYLE}>
@@ -106,7 +106,7 @@ export function RunFailedModal({
               word-break: break-word;
             `}
           >
-            {t('contact_information')}
+            {t('branded:contact_information')}
           </StyledText>
         </Flex>
         <SmallButton

@@ -12,10 +12,10 @@ import {
   Link,
   SPACING_AUTO,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { TertiaryButton } from '../../atoms/buttons'
 import { getPathToPythonOverride, resetConfigValue } from '../../redux/config'
 import {
@@ -30,7 +30,7 @@ import {
 import type { Dispatch } from '../../redux/types'
 
 export function OverridePathToPython(): JSX.Element {
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'branded'])
   const pathToPythonInterpreter = useSelector(getPathToPythonOverride)
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()
@@ -54,7 +54,7 @@ export function OverridePathToPython(): JSX.Element {
           {t('override_path_to_python')}
         </StyledText>
         <StyledText as="p" paddingBottom={SPACING.spacing8}>
-          {t('opentrons_app_will_use_interpreter')}
+          {t('branded:opentrons_app_will_use_interpreter')}
         </StyledText>
         <StyledText
           as="h6"

@@ -1,16 +1,17 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import {
   COLORS,
-  Flex,
-  SPACING,
-  JUSTIFY_CENTER,
   DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  InfoScreen,
+  SPACING,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
 import { ModuleCard } from '../../ModuleCard'
 import { useModuleRenderInfoForProtocolById } from '../hooks'
+import { useModuleApiRequests } from '../../ModuleCard/utils'
+
 import type { BadPipette, PipetteData } from '@opentrons/api-client'
 
 interface PipetteStatus {
@@ -73,13 +74,12 @@ export const ProtocolRunModuleControls = ({
   robotName,
   runId,
 }: ProtocolRunModuleControlsProps): JSX.Element => {
-  const { t } = useTranslation('protocol_details')
-
   const {
     attachPipetteRequired,
     calibratePipetteRequired,
     updatePipetteFWRequired,
   } = usePipetteIsReady()
+  const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
 
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     runId,
@@ -97,18 +97,15 @@ export const ProtocolRunModuleControls = ({
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 
   return attachedModules.length === 0 ? (
-    <Flex justifyContent={JUSTIFY_CENTER}>
-      <StyledText as="p" color={COLORS.grey50} marginY={SPACING.spacing16}>
-        {t('connect_modules_to_see_controls')}
-      </StyledText>
+    <Flex
+      justifyContent={JUSTIFY_CENTER}
+      padding={SPACING.spacing16}
+      backgroundColor={COLORS.white}
+    >
+      <InfoScreen contentType="moduleControls" />
     </Flex>
   ) : (
-    <Flex
-      gridGap={SPACING.spacing8}
-      paddingTop={SPACING.spacing16}
-      paddingBottom={SPACING.spacing8}
-      paddingX={SPACING.spacing16}
-    >
+    <Flex gridGap={SPACING.spacing8} padding={SPACING.spacing16}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         flex="50%"
@@ -126,6 +123,10 @@ export const ProtocolRunModuleControls = ({
               attachPipetteRequired={attachPipetteRequired}
               calibratePipetteRequired={calibratePipetteRequired}
               updatePipetteFWRequired={updatePipetteFWRequired}
+              latestRequestId={getLatestRequestId(
+                module.attachedModuleMatch.serialNumber
+              )}
+              handleModuleApiRequests={handleModuleApiRequests}
             />
           ) : null
         )}
@@ -147,6 +148,10 @@ export const ProtocolRunModuleControls = ({
               attachPipetteRequired={attachPipetteRequired}
               calibratePipetteRequired={calibratePipetteRequired}
               updatePipetteFWRequired={updatePipetteFWRequired}
+              latestRequestId={getLatestRequestId(
+                module.attachedModuleMatch.serialNumber
+              )}
+              handleModuleApiRequests={handleModuleApiRequests}
             />
           ) : null
         )}

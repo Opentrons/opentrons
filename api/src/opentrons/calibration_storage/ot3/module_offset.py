@@ -108,7 +108,8 @@ def get_module_offset(
         return None
     except (json.JSONDecodeError, ValidationError):
         log.warning(
-            f"Malformed calibrations for {module_id} on slot {slot}. Please factory reset your calibrations."
+            f"Malformed calibrations for {module_id} on slot {slot}. Please factory reset your calibrations.",
+            exc_info=True,
         )
         return None
 
@@ -130,7 +131,8 @@ def load_all_module_offsets() -> List[v1.ModuleOffsetModel]:
             )
         except (json.JSONDecodeError, ValidationError):
             log.warning(
-                f"Malformed module calibrations for {file}. Please factory reset your calibrations."
+                f"Malformed module calibrations for {file}. Please factory reset your calibrations.",
+                exc_info=True,
             )
             continue
     return calibrations

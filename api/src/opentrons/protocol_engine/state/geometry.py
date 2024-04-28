@@ -42,6 +42,7 @@ from ..types import (
     AddressableAreaLocation,
     AddressableOffsetVector,
     StagingSlotLocation,
+    LabwareOffsetLocation,
 )
 from .config import Config
 from .labware import LabwareView
@@ -166,6 +167,7 @@ class GeometryView:
             except LabwareNotLoadedOnModuleError:
                 return self._modules.get_module_highest_z(
                     module_id=module_id,
+                    addressable_areas=self._addressable_areas,
                 )
             else:
                 return self.get_highest_z_of_labware_stack(labware_id)
@@ -246,7 +248,9 @@ class GeometryView:
             return LabwareOffsetVector(x=0, y=0, z=0)
         elif isinstance(labware_location, ModuleLocation):
             module_id = labware_location.moduleId
-            module_offset = self._modules.get_nominal_module_offset(module_id=module_id)
+            module_offset = self._modules.get_nominal_module_offset(
+                module_id=module_id, addressable_areas=self._addressable_areas
+            )
             module_model = self._modules.get_connected_model(module_id)
             stacking_overlap = self._labware.get_module_overlap_offsets(
                 labware_id, module_model
@@ -1087,3 +1091,48 @@ class GeometryView:
         return slot_based_offset or self._labware.get_labware_gripper_offsets(
             labware_id=labware_id, slot_name=None
         )
+
+    def get_offset_location(self, labware_id: str) -> Optional[LabwareOffsetLocation]:
+        """Provide the LabwareOffsetLocation specifying the current position of the labware.
+
+        If the labware is in a location that cannot be specified by a LabwareOffsetLocation
+        (for instance, OFF_DECK) then return None.
+        """
+        parent_location = self._labware.get_location(labware_id)
+
+        if isinstance(parent_location, DeckSlotLocation):
+            return LabwareOffsetLocation(
+                slotName=parent_location.slotName, moduleModel=None, definitionUri=None
+            )
+        elif isinstance(parent_location, ModuleLocation):
+            module_model = self._modules.get_requested_model(parent_location.moduleId)
+            module_location = self._modules.get_location(parent_location.moduleId)
+            return LabwareOffsetLocation(
+                slotName=module_location.slotName,
+                moduleModel=module_model,
+                definitionUri=None,
+            )
+        elif isinstance(parent_location, OnLabwareLocation):
+            non_labware_parent_location = self._labware.get_parent_location(labware_id)
+
+            parent_uri = self._labware.get_definition_uri(parent_location.labwareId)
+            if isinstance(non_labware_parent_location, DeckSlotLocation):
+                return LabwareOffsetLocation(
+                    slotName=non_labware_parent_location.slotName,
+                    moduleModel=None,
+                    definitionUri=parent_uri,
+                )
+            elif isinstance(non_labware_parent_location, ModuleLocation):
+                module_model = self._modules.get_requested_model(
+                    non_labware_parent_location.moduleId
+                )
+                module_location = self._modules.get_location(
+                    non_labware_parent_location.moduleId
+                )
+                return LabwareOffsetLocation(
+                    slotName=module_location.slotName,
+                    moduleModel=module_model,
+                    definitionUri=parent_uri,
+                )
+
+        return None

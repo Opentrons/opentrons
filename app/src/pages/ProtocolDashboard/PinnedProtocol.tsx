@@ -16,9 +16,9 @@ import {
   SPACING,
   TYPOGRAPHY,
   useLongPress,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { LongPressModal } from './LongPressModal'
 import { formatTimeWithUtcLabel } from '../../resources/runs'
 

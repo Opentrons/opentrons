@@ -2,19 +2,19 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
+  ALIGN_CENTER,
+  BORDERS,
   Box,
   Btn,
+  COLORS,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  COLORS,
-  SPACING,
   RESPONSIVENESS,
-  BORDERS,
-  ALIGN_CENTER,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 
 interface WizardHeaderProps {
@@ -46,8 +46,8 @@ const EXIT_BUTTON_STYLE = css`
   }
 `
 const BOX_STYLE = css`
-  background-color: ${COLORS.white} @media
-    ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+  background-color: ${COLORS.white};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-radius: ${BORDERS.borderRadius16};
   }
 `

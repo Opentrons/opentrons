@@ -212,7 +212,8 @@ describe('SetupLiquidsMap', () => {
     when(vi.mocked(getAttachedProtocolModuleMatches))
       .calledWith(
         mockFetchModulesSuccessActionPayloadModules,
-        mockProtocolModuleInfo
+        mockProtocolModuleInfo,
+        []
       )
       .thenReturn([
         {
@@ -299,7 +300,8 @@ describe('SetupLiquidsMap', () => {
     when(vi.mocked(getAttachedProtocolModuleMatches))
       .calledWith(
         mockFetchModulesSuccessActionPayloadModules,
-        mockProtocolModuleInfo
+        mockProtocolModuleInfo,
+        []
       )
       .thenReturn([
         {

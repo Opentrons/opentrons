@@ -4,24 +4,25 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  DIRECTION_COLUMN,
+  Chip,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_MODULE_ADDRESSABLE_AREAS,
   getCutoutDisplayName,
+  getDeckDefFromRobotType,
   getFixtureDisplayName,
   getSimplestDeckConfigForProtocol,
   SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Chip } from '../../atoms/Chip'
-import { StyledText } from '../../atoms/text'
 import { useDeckConfigurationCompatibility } from '../../resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '../../resources/deck_configuration/utils'
 import { LocationConflictModal } from '../Devices/ProtocolRun/SetupModuleAndDeck/LocationConflictModal'
@@ -30,10 +31,13 @@ import type {
   CompletedProtocolAnalysis,
   CutoutFixtureId,
   CutoutId,
+  DeckDefinition,
   RobotType,
 } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { CutoutConfigAndCompatibility } from '../../resources/deck_configuration/hooks'
+import { useSelector } from 'react-redux'
+import { getLocalRobot } from '../../redux/discovery'
 
 interface FixtureTableProps {
   robotType: RobotType
@@ -43,6 +47,11 @@ interface FixtureTableProps {
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
 }
 
+/**
+ * Table of all "non-module" fixtures e.g. staging slot, waste chute, trash bin...
+ * @param props
+ * @returns JSX.Element
+ */
 export function FixtureTable({
   robotType,
   mostRecentAnalysis,
@@ -50,8 +59,6 @@ export function FixtureTable({
   setCutoutId,
   setProvidedFixtureOptions,
 }: FixtureTableProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_setup')
-
   const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
     mostRecentAnalysis
   )
@@ -59,6 +66,9 @@ export function FixtureTable({
     robotType,
     mostRecentAnalysis
   )
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name != null ? localRobot.name : ''
 
   const requiredDeckConfigCompatibility = getRequiredDeckConfig(
     deckConfigCompatibility
@@ -74,21 +84,11 @@ export function FixtureTable({
   )
 
   return sortedDeckConfigCompatibility.length > 0 ? (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-      <Flex
-        color={COLORS.grey60}
-        fontSize={TYPOGRAPHY.fontSize22}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        gridGap={SPACING.spacing24}
-        lineHeight={TYPOGRAPHY.lineHeight28}
-        paddingX={SPACING.spacing24}
-      >
-        <StyledText flex="3.5 0 0">{t('fixture')}</StyledText>
-        <StyledText flex="2 0 0">{t('location')}</StyledText>
-        <StyledText flex="4 0 0"> {t('status')}</StyledText>
-      </Flex>
+    <>
       {sortedDeckConfigCompatibility.map((fixtureCompatibility, index) => {
-        return (
+        return fixtureCompatibility.requiredAddressableAreas.some(raa =>
+          FLEX_MODULE_ADDRESSABLE_AREAS.includes(raa)
+        ) ? null : (
           <FixtureTableItem
             key={`FixtureTableItem_${index}`}
             {...fixtureCompatibility}
@@ -96,10 +96,12 @@ export function FixtureTable({
             setSetupScreen={setSetupScreen}
             setCutoutId={setCutoutId}
             setProvidedFixtureOptions={setProvidedFixtureOptions}
+            deckDef={deckDef}
+            robotName={robotName}
           />
         )
       })}
-    </Flex>
+    </>
   ) : null
 }
 
@@ -108,6 +110,8 @@ interface FixtureTableItemProps extends CutoutConfigAndCompatibility {
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
   setCutoutId: (cutoutId: CutoutId) => void
   setProvidedFixtureOptions: (providedFixtureOptions: CutoutFixtureId[]) => void
+  deckDef: DeckDefinition
+  robotName: string
 }
 
 function FixtureTableItem({
@@ -119,6 +123,8 @@ function FixtureTableItem({
   setSetupScreen,
   setCutoutId,
   setProvidedFixtureOptions,
+  deckDef,
+  robotName,
 }: FixtureTableItemProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
 
@@ -183,6 +189,8 @@ function FixtureTableItem({
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
           isOnDevice={true}
           missingLabwareDisplayName={missingLabwareDisplayName}
+          deckDef={deckDef}
+          robotName={robotName}
         />
       ) : null}
       <Flex
@@ -191,7 +199,7 @@ function FixtureTableItem({
         backgroundColor={
           isCurrentFixtureCompatible ? COLORS.green35 : COLORS.yellow35
         }
-        borderRadius={BORDERS.borderRadius12}
+        borderRadius={BORDERS.borderRadius8}
         gridGap={SPACING.spacing24}
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
         marginBottom={lastItem ? SPACING.spacing68 : 'none'}

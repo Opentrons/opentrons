@@ -2,21 +2,21 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  Btn,
   COLORS,
   Flex,
-  Btn,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_FLEX_END,
-  ALIGN_CENTER,
-  SPACING,
-  TYPOGRAPHY,
-  RESPONSIVENESS,
   PrimaryButton,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import { getIsOnDevice } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -51,7 +51,7 @@ export const UnmountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
   const { proceed, isRobotMoving, goBack, chainRunCommands } = props
-  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
   const isOnDevice = useSelector(getIsOnDevice)
   const [isPending, setIsPending] = React.useState<boolean>(false)
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
@@ -100,7 +100,7 @@ export const UnmountGripper = (
   return showGripperStillDetected ? (
     <SimpleWizardBody
       iconColor={COLORS.red50}
-      header={t('gripper_still_attached')}
+      header={t('branded:gripper_still_attached')}
       isSuccess={false}
     >
       <Flex
@@ -132,7 +132,7 @@ export const UnmountGripper = (
     </SimpleWizardBody>
   ) : (
     <GenericWizardTile
-      header={t('loosen_screws_and_detach')}
+      header={t('branded:loosen_screws_and_detach')}
       rightHandBody={
         <video
           css={css`

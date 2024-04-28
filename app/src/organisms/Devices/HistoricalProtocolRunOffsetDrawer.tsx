@@ -2,13 +2,15 @@ import * as React from 'react'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
+  BORDERS,
   Box,
-  SPACING,
   COLORS,
-  TYPOGRAPHY,
-  JUSTIFY_FLEX_START,
   DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_FLEX_START,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getLabwareDefURI,
@@ -16,7 +18,6 @@ import {
   getLoadedLabwareDefinitionsByUri,
   getModuleDisplayName,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useDeckCalibrationData } from './hooks'
@@ -85,6 +86,7 @@ export function HistoricalProtocolRunOffsetDrawer(
       backgroundColor={COLORS.grey20}
       width="100%"
       padding={`${SPACING.spacing16} ${SPACING.spacing8} ${SPACING.spacing16} ${SPACING.spacing48}`}
+      borderRadius={BORDERS.borderRadius4}
     >
       {isOutOfDate ? (
         <Banner type="warning" marginTop={SPACING.spacing8}>
@@ -145,6 +147,7 @@ export function HistoricalProtocolRunOffsetDrawer(
             padding={SPACING.spacing8}
             backgroundColor={COLORS.white}
             marginY={SPACING.spacing8}
+            borderRadius={BORDERS.borderRadius4}
           >
             <StyledText width="23.5%" as="label">
               {t('slot', { slotName: offset.location.slotName })}

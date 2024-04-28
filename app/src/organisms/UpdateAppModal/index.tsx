@@ -6,15 +6,16 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  SPACING,
   Flex,
+  JUSTIFY_SPACE_AROUND,
+  JUSTIFY_SPACE_BETWEEN,
   NewPrimaryBtn,
   NewSecondaryBtn,
-  BORDERS,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_SPACE_AROUND,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import {
@@ -32,7 +33,6 @@ import { ProgressBar } from '../../atoms/ProgressBar'
 import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
 import type { Dispatch } from '../../redux/types'
-import { StyledText } from '../../atoms/text'
 
 interface PlaceHolderErrorProps {
   errorMessage?: string
@@ -66,7 +66,7 @@ const FOOTER_BUTTON_STYLE = css`
   text-transform: lowercase;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
-  border-radius: ${BORDERS.borderRadius4};
+  border-radius: ${BORDERS.borderRadius8};
   margin-top: ${SPACING.spacing16};
   margin-bottom: ${SPACING.spacing16};
 
@@ -79,7 +79,7 @@ const UpdateAppBanner = styled(Banner)`
 `
 const UPDATE_PROGRESS_BAR_STYLE = css`
   margin-top: ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadius12};
+  border-radius: ${BORDERS.borderRadius8};
   background: ${COLORS.grey30};
   width: 17.12rem;
 `
@@ -106,7 +106,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
     info: updateInfo,
   } = updateState
   const releaseNotes = updateInfo?.releaseNotes
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'branded'])
   const history = useHistory()
   const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
   const availableAppUpdateVersion = useSelector(getAvailableShellUpdate) ?? ''
@@ -164,7 +164,10 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
         </LegacyModal>
       ) : null}
       {(downloading || downloaded) && error == null ? (
-        <LegacyModal title={t('opentrons_app_update')} css={LEGACY_MODAL_STYLE}>
+        <LegacyModal
+          title={t('branded:opentrons_app_update')}
+          css={LEGACY_MODAL_STYLE}
+        >
           <Flex
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_CENTER}
@@ -182,7 +185,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
       ) : null}
       {!downloading && !downloaded && error == null ? (
         <LegacyModal
-          title={t('opentrons_app_update_available')}
+          title={t('branded:opentrons_app_update_available')}
           onClose={() => closeModal(true)}
           closeOnOutsideClick={true}
           footer={appUpdateFooter}
@@ -191,7 +194,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>
-              {t('update_requires_restarting')}
+              {t('branded:update_requires_restarting_app')}
             </UpdateAppBanner>
             <ReleaseNotes source={releaseNotes} />
           </Flex>

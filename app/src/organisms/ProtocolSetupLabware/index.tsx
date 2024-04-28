@@ -19,6 +19,7 @@ import {
   LocationIcon,
   MODULE_ICON_NAME_BY_TYPE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -37,7 +38,6 @@ import {
 } from '@opentrons/react-api-client'
 
 import { FloatingActionButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { getTopPortalEl } from '../../App/portal'
 import { Modal } from '../../molecules/Modal'
@@ -50,6 +50,8 @@ import {
   getNestedLabwareInfo,
   NestedLabwareInfo,
 } from '../Devices/ProtocolRun/SetupLabware/getNestedLabwareInfo'
+import { LabwareMapViewModal } from './LabwareMapViewModal'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -62,9 +64,9 @@ import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModulesAndDeck/utils'
-import { LabwareMapViewModal } from './LabwareMapViewModal'
 
-const MODULE_REFETCH_INTERVAL = 5000
+const MODULE_REFETCH_INTERVAL_MS = 5000
+const DECK_CONFIG_POLL_MS = 5000
 
 const LabwareThumbnail = styled.svg`
   transform: scale(1, -1);
@@ -97,20 +99,25 @@ export function ProtocolSetupLabware({
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
+    refetchInterval: DECK_CONFIG_POLL_MS,
+  })
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
     mostRecentAnalysis?.commands ?? []
   )
   const moduleQuery = useModulesQuery({
-    refetchInterval: MODULE_REFETCH_INTERVAL,
+    refetchInterval: MODULE_REFETCH_INTERVAL_MS,
   })
   const attachedModules = moduleQuery?.data?.data ?? []
   const protocolModulesInfo =
     mostRecentAnalysis != null
       ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
       : []
+
   const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
     attachedModules,
-    protocolModulesInfo
+    protocolModulesInfo,
+    deckConfig
   )
   const initialLoadedLabwareByAdapter = parseInitialLoadedLabwareByAdapter(
     mostRecentAnalysis?.commands ?? []
@@ -414,7 +421,7 @@ function LabwareLatch({
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.blue35}
-      borderRadius={BORDERS.borderRadius12}
+      borderRadius={BORDERS.borderRadius16}
       css={labwareLatchStyles}
       color={isLatchLoading ? COLORS.grey60 : COLORS.black90}
       height="6.5rem"
@@ -547,7 +554,7 @@ function RowLabware({
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.grey35}
-      borderRadius={BORDERS.borderRadius12}
+      borderRadius={BORDERS.borderRadius8}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       gridGap={SPACING.spacing32}
     >

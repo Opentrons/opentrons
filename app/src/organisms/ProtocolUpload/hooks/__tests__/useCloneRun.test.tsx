@@ -4,7 +4,11 @@ import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { describe, it, beforeEach, afterEach, vi, expect } from 'vitest'
 
-import { useHost, useCreateRunMutation } from '@opentrons/react-api-client'
+import {
+  useHost,
+  useCreateRunMutation,
+  useCreateProtocolAnalysisMutation,
+} from '@opentrons/react-api-client'
 
 import { useCloneRun } from '../useCloneRun'
 import { useNotifyRunQuery } from '../../../../resources/runs'
@@ -30,12 +34,16 @@ describe('useCloneRun hook', () => {
             id: RUN_ID,
             protocolId: 'protocolId',
             labwareOffsets: 'someOffset',
+            runTimeParameters: [],
           },
         },
       } as any)
     when(vi.mocked(useCreateRunMutation))
       .calledWith(expect.anything())
       .thenReturn({ createRun: vi.fn() } as any)
+    vi.mocked(useCreateProtocolAnalysisMutation).mockReturnValue({
+      createProtocolAnalysis: vi.fn(),
+    } as any)
 
     const queryClient = new QueryClient()
     const clientProvider: React.FunctionComponent<{
@@ -60,6 +68,7 @@ describe('useCloneRun hook', () => {
     expect(mockCreateRun).toHaveBeenCalledWith({
       protocolId: 'protocolId',
       labwareOffsets: 'someOffset',
+      runTimeParameterValues: {},
     })
   })
 })

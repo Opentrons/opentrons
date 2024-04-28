@@ -25,7 +25,7 @@ from typing import (
     Union,
     Mapping,
 )
-from opentrons.config.types import OT3Config, GantryLoad
+from opentrons.config.types import OT3Config, GantryLoad, OutputOptions
 from opentrons.config import gripper_config
 from .ot3utils import (
     axis_convert,
@@ -86,6 +86,7 @@ from opentrons_hardware.hardware_control.motor_enable_disable import (
     set_disable_motor,
     set_enable_tip_motor,
     set_disable_tip_motor,
+    get_motor_enabled,
 )
 from opentrons_hardware.hardware_control.motor_position_status import (
     get_motor_position,
@@ -259,6 +260,7 @@ class OT3Controller(FlexBackend):
     _encoder_position: Dict[NodeId, float]
     _motor_status: Dict[NodeId, MotorStatus]
     _subsystem_manager: SubsystemManager
+    _engaged_axes: OT3AxisMap[bool]
 
     @classmethod
     async def build(
@@ -334,6 +336,7 @@ class OT3Controller(FlexBackend):
         self._gear_motor_position: Dict[NodeId, float] = {}
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
+        self._engaged_axes = {}
         self._check_updates = check_updates
         self._initialized = False
         self._status_bar = status_bar.StatusBar(messenger=self._usb_messenger)
@@ -1157,37 +1160,58 @@ class OT3Controller(FlexBackend):
     def axis_bounds(self) -> OT3AxisMap[Tuple[float, float]]:
         """Get the axis bounds."""
         # TODO (AL, 2021-11-18): The bounds need to be defined
-        phony_bounds = (0, 500)
         return {
-            Axis.Z_L: phony_bounds,
-            Axis.Z_R: phony_bounds,
-            Axis.P_L: phony_bounds,
-            Axis.P_R: phony_bounds,
-            Axis.X: phony_bounds,
-            Axis.Y: phony_bounds,
-            Axis.Z_G: phony_bounds,
-            Axis.Q: phony_bounds,
+            Axis.Z_L: (0, 300),
+            Axis.Z_R: (0, 300),
+            Axis.P_L: (0, 200),
+            Axis.P_R: (0, 200),
+            Axis.X: (0, 550),
+            Axis.Y: (0, 550),
+            Axis.Z_G: (0, 300),
+            Axis.Q: (0, 200),
         }
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
-        return {}
+        return self._engaged_axes
+
+    async def update_engaged_axes(self) -> None:
+        """Update engaged axes."""
+        motor_nodes = self._motor_nodes()
+        results = await get_motor_enabled(self._messenger, motor_nodes)
+        for node, status in results.items():
+            self._engaged_axes[node_to_axis(node)] = status
+
+    async def is_motor_engaged(self, axis: Axis) -> bool:
+        node = axis_to_node(axis)
+        result = await get_motor_enabled(self._messenger, {node})
+        engaged = result[node]
+        self._engaged_axes.update({axis: engaged})
+        return engaged
 
     async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
         if Axis.Q in axes:
             await set_disable_tip_motor(self._messenger, {axis_to_node(Axis.Q)})
-        nodes = {axis_to_node(ax) for ax in axes if ax is not Axis.Q}
-        if len(nodes) > 0:
-            await set_disable_motor(self._messenger, nodes)
+            self._engaged_axes[Axis.Q] = False
+            axes = [ax for ax in axes if ax is not Axis.Q]
+
+        if len(axes) > 0:
+            await set_disable_motor(self._messenger, {axis_to_node(ax) for ax in axes})
+        for ax in axes:
+            self._engaged_axes[ax] = False
 
     async def engage_axes(self, axes: List[Axis]) -> None:
         """Engage axes."""
         if Axis.Q in axes:
             await set_enable_tip_motor(self._messenger, {axis_to_node(Axis.Q)})
-        nodes = {axis_to_node(ax) for ax in axes if ax is not Axis.Q}
-        if len(nodes) > 0:
-            await set_enable_motor(self._messenger, nodes)
+            self._engaged_axes[Axis.Q] = True
+            axes = [ax for ax in axes if ax is not Axis.Q]
+
+        if len(axes) > 0:
+            await set_enable_motor(self._messenger, {axis_to_node(ax) for ax in axes})
+        for ax in axes:
+            self._engaged_axes[ax] = True
 
     @requires_update
     async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
@@ -1326,25 +1350,51 @@ class OT3Controller(FlexBackend):
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        log_pressure: bool = True,
+        output_option: OutputOptions = OutputOptions.can_bus_only,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
     ) -> float:
+        if output_option == OutputOptions.sync_buffer_to_csv:
+            assert (
+                self._subsystem_manager.device_info[
+                    SubSystem.of_mount(mount)
+                ].revision.tertiary
+                == "1"
+            )
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
+        csv_output = bool(output_option.value & OutputOptions.stream_to_csv.value)
+        sync_buffer_output = bool(
+            output_option.value & OutputOptions.sync_buffer_to_csv.value
+        )
+        can_bus_only_output = bool(
+            output_option.value & OutputOptions.can_bus_only.value
+        )
+        data_files_transposed = (
+            None
+            if data_files is None
+            else {
+                sensor_id_for_instrument(probe): data_files[probe]
+                for probe in data_files.keys()
+            }
+        )
         positions = await liquid_probe(
-            self._messenger,
-            tool,
-            head_node,
-            max_z_distance,
-            plunger_speed,
-            mount_speed,
-            threshold_pascals,
-            log_pressure,
-            auto_zero_sensor,
-            num_baseline_reads,
-            sensor_id_for_instrument(probe),
+            messenger=self._messenger,
+            tool=tool,
+            head_node=head_node,
+            max_z_distance=max_z_distance,
+            plunger_speed=plunger_speed,
+            mount_speed=mount_speed,
+            threshold_pascals=threshold_pascals,
+            csv_output=csv_output,
+            sync_buffer_output=sync_buffer_output,
+            can_bus_only_output=can_bus_only_output,
+            data_files=data_files_transposed,
+            auto_zero_sensor=auto_zero_sensor,
+            num_baseline_reads=num_baseline_reads,
+            sensor_id=sensor_id_for_instrument(probe),
         )
         for node, point in positions.items():
             self._position.update({node: point.motor_position})
@@ -1471,8 +1521,14 @@ class OT3Controller(FlexBackend):
     async def teardown_tip_detector(self, mount: OT3Mount) -> None:
         await self._tip_presence_manager.clear_detector(mount)
 
-    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
-        return await self.tip_presence_manager.get_tip_status(mount)
+    async def get_tip_status(
+        self,
+        mount: OT3Mount,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
+    ) -> TipStateType:
+        return await self.tip_presence_manager.get_tip_status(
+            mount, follow_singular_sensor
+        )
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
         return self.tip_presence_manager.current_tip_state(mount)
@@ -1605,3 +1661,8 @@ class OT3Controller(FlexBackend):
             if res
             else None
         )
+
+    def _update_tip_state(self, mount: OT3Mount, status: bool) -> None:
+        """This is something we only use in the simulator.
+        It is required so that PE simulations using ot3api don't break."""
+        pass

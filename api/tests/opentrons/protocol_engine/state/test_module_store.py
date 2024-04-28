@@ -1,8 +1,9 @@
 """Module state store tests."""
-from typing import List
+from typing import List, Set, cast, Dict, Optional
 
 import pytest
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import-untyped]
 
 from opentrons.types import DeckSlotName
@@ -18,6 +19,9 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     HeaterShakerLatchStatus,
     DeckType,
+    AddressableArea,
+    DeckConfigurationType,
+    PotentialCutoutFixture,
 )
 
 from opentrons.protocol_engine.state.modules import (
@@ -37,6 +41,11 @@ from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleSubState,
     ModuleSubStateType,
 )
+
+from opentrons.protocol_engine.state.addressable_areas import (
+    AddressableAreaView,
+    AddressableAreaState,
+)
 from opentrons.protocol_engine.state.config import Config
 from opentrons.hardware_control.modules.types import LiveData
 
@@ -48,9 +57,35 @@ _OT2_STANDARD_CONFIG = Config(
 )
 
 
+def get_addressable_area_view(
+    loaded_addressable_areas_by_name: Optional[Dict[str, AddressableArea]] = None,
+    potential_cutout_fixtures_by_cutout_id: Optional[
+        Dict[str, Set[PotentialCutoutFixture]]
+    ] = None,
+    deck_definition: Optional[DeckDefinitionV5] = None,
+    deck_configuration: Optional[DeckConfigurationType] = None,
+    robot_type: RobotType = "OT-3 Standard",
+    use_simulated_deck_config: bool = False,
+) -> AddressableAreaView:
+    """Get a labware view test subject."""
+    state = AddressableAreaState(
+        loaded_addressable_areas_by_name=loaded_addressable_areas_by_name or {},
+        potential_cutout_fixtures_by_cutout_id=potential_cutout_fixtures_by_cutout_id
+        or {},
+        deck_definition=deck_definition or cast(DeckDefinitionV5, {"otId": "fake"}),
+        deck_configuration=deck_configuration or [],
+        robot_type=robot_type,
+        use_simulated_deck_config=use_simulated_deck_config,
+    )
+
+    return AddressableAreaView(state=state)
+
+
 def test_initial_state() -> None:
     """It should initialize the module state."""
-    subject = ModuleStore(config=_OT2_STANDARD_CONFIG)
+    subject = ModuleStore(
+        config=_OT2_STANDARD_CONFIG,
+    )
 
     assert subject.state == ModuleState(
         deck_type=DeckType.OT2_STANDARD,
@@ -142,7 +177,7 @@ def test_load_module(
     expected_substate: ModuleSubStateType,
 ) -> None:
     """It should handle a successful LoadModule command."""
-    action = actions.UpdateCommandAction(
+    action = actions.SucceedCommandAction(
         private_result=None,
         command=commands.LoadModule.construct(  # type: ignore[call-arg]
             params=commands.LoadModuleParams(
@@ -158,7 +193,9 @@ def test_load_module(
         ),
     )
 
-    subject = ModuleStore(config=_OT2_STANDARD_CONFIG)
+    subject = ModuleStore(
+        config=_OT2_STANDARD_CONFIG,
+    )
     subject.handle_action(action)
 
     assert subject.state == ModuleState(
@@ -202,7 +239,7 @@ def test_load_thermocycler_in_thermocycler_slot(
     thermocycler_v2_def: ModuleDefinition,
 ) -> None:
     """It should update additional slots for thermocycler module."""
-    action = actions.UpdateCommandAction(
+    action = actions.SucceedCommandAction(
         private_result=None,
         command=commands.LoadModule.construct(  # type: ignore[call-arg]
             params=commands.LoadModuleParams(
@@ -223,7 +260,7 @@ def test_load_thermocycler_in_thermocycler_slot(
             use_simulated_deck_config=False,
             robot_type=robot_type,
             deck_type=deck_type,
-        )
+        ),
     )
     subject.handle_action(action)
 
@@ -302,7 +339,9 @@ def test_add_module_action(
         module_live_data=live_data,
     )
 
-    subject = ModuleStore(_OT2_STANDARD_CONFIG)
+    subject = ModuleStore(
+        config=_OT2_STANDARD_CONFIG,
+    )
     subject.handle_action(action)
 
     assert subject.state == ModuleState(
@@ -343,13 +382,15 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
         params=hs_commands.DeactivateHeaterParams(moduleId="module-id"),
         result=hs_commands.DeactivateHeaterResult(),
     )
-    subject = ModuleStore(_OT2_STANDARD_CONFIG)
+    subject = ModuleStore(
+        config=_OT2_STANDARD_CONFIG,
+    )
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
+        actions.SucceedCommandAction(private_result=None, command=load_module_cmd)
     )
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=set_temp_cmd)
+        actions.SucceedCommandAction(private_result=None, command=set_temp_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -360,7 +401,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=deactivate_cmd)
+        actions.SucceedCommandAction(private_result=None, command=deactivate_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -394,13 +435,15 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
         params=hs_commands.DeactivateShakerParams(moduleId="module-id"),
         result=hs_commands.DeactivateShakerResult(),
     )
-    subject = ModuleStore(_OT2_STANDARD_CONFIG)
+    subject = ModuleStore(
+        config=_OT2_STANDARD_CONFIG,
+    )
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
+        actions.SucceedCommandAction(private_result=None, command=load_module_cmd)
     )
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=set_shake_cmd)
+        actions.SucceedCommandAction(private_result=None, command=set_shake_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -411,7 +454,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=deactivate_cmd)
+        actions.SucceedCommandAction(private_result=None, command=deactivate_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -447,10 +490,12 @@ def test_handle_hs_labware_latch_commands(
         params=hs_commands.OpenLabwareLatchParams(moduleId="module-id"),
         result=hs_commands.OpenLabwareLatchResult(pipetteRetracted=False),
     )
-    subject = ModuleStore(_OT2_STANDARD_CONFIG)
+    subject = ModuleStore(
+        config=_OT2_STANDARD_CONFIG,
+    )
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
+        actions.SucceedCommandAction(private_result=None, command=load_module_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -462,7 +507,7 @@ def test_handle_hs_labware_latch_commands(
     }
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=close_latch_cmd)
+        actions.SucceedCommandAction(private_result=None, command=close_latch_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -473,7 +518,7 @@ def test_handle_hs_labware_latch_commands(
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=open_latch_cmd)
+        actions.SucceedCommandAction(private_result=None, command=open_latch_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
@@ -511,13 +556,15 @@ def test_handle_tempdeck_temperature_commands(
         params=temp_commands.DeactivateTemperatureParams(moduleId="module-id"),
         result=temp_commands.DeactivateTemperatureResult(),
     )
-    subject = ModuleStore(_OT2_STANDARD_CONFIG)
+    subject = ModuleStore(
+        config=_OT2_STANDARD_CONFIG,
+    )
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
+        actions.SucceedCommandAction(private_result=None, command=load_module_cmd)
     )
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=set_temp_cmd)
+        actions.SucceedCommandAction(private_result=None, command=set_temp_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": TemperatureModuleSubState(
@@ -525,7 +572,7 @@ def test_handle_tempdeck_temperature_commands(
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=deactivate_cmd)
+        actions.SucceedCommandAction(private_result=None, command=deactivate_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": TemperatureModuleSubState(
@@ -570,13 +617,15 @@ def test_handle_thermocycler_temperature_commands(
         params=tc_commands.DeactivateLidParams(moduleId="module-id"),
         result=tc_commands.DeactivateLidResult(),
     )
-    subject = ModuleStore(_OT2_STANDARD_CONFIG)
+    subject = ModuleStore(
+        config=_OT2_STANDARD_CONFIG,
+    )
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
+        actions.SucceedCommandAction(private_result=None, command=load_module_cmd)
     )
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=set_block_temp_cmd)
+        actions.SucceedCommandAction(private_result=None, command=set_block_temp_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
@@ -587,7 +636,7 @@ def test_handle_thermocycler_temperature_commands(
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=set_lid_temp_cmd)
+        actions.SucceedCommandAction(private_result=None, command=set_lid_temp_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
@@ -598,7 +647,7 @@ def test_handle_thermocycler_temperature_commands(
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=deactivate_lid_cmd)
+        actions.SucceedCommandAction(private_result=None, command=deactivate_lid_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
@@ -609,7 +658,7 @@ def test_handle_thermocycler_temperature_commands(
         )
     }
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=deactivate_block_cmd)
+        actions.SucceedCommandAction(private_result=None, command=deactivate_block_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
@@ -652,14 +701,14 @@ def test_handle_thermocycler_lid_commands(
             use_simulated_deck_config=False,
             robot_type="OT-3 Standard",
             deck_type=DeckType.OT3_STANDARD,
-        )
+        ),
     )
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=load_module_cmd)
+        actions.SucceedCommandAction(private_result=None, command=load_module_cmd)
     )
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=open_lid_cmd)
+        actions.SucceedCommandAction(private_result=None, command=open_lid_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
@@ -671,7 +720,7 @@ def test_handle_thermocycler_lid_commands(
     }
 
     subject.handle_action(
-        actions.UpdateCommandAction(private_result=None, command=close_lid_cmd)
+        actions.SucceedCommandAction(private_result=None, command=close_lid_cmd)
     )
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(

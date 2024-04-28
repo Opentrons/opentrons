@@ -3,22 +3,23 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Flex,
   ALIGN_CENTER,
-  Icon,
-  SPACING,
-  COLORS,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
   BORDERS,
   Box,
-  MoveLabwareOnDeck,
-  Module,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_NONE,
+  Flex,
+  Icon,
   LabwareRender,
   LocationIcon,
-  DISPLAY_NONE,
+  Module,
+  MoveLabwareOnDeck,
   RESPONSIVENESS,
+  SPACING,
+  StyledText,
   TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
@@ -34,6 +35,7 @@ import {
   getModuleType,
   getOccludedSlotCountForModule,
 } from '@opentrons/shared-data'
+
 import {
   getRunLabwareRenderInfo,
   getRunModuleRenderInfo,
@@ -41,14 +43,14 @@ import {
   getModuleModelFromRunData,
   getModuleDisplayLocationFromRunData,
 } from './utils'
-import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import {
   getLoadedLabware,
   getLoadedModule,
 } from '../CommandText/utils/accessors'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+
 import type { RunData } from '@opentrons/api-client'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 const LABWARE_DESCRIPTION_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
@@ -58,7 +60,7 @@ const LABWARE_DESCRIPTION_STYLE = css`
   border-radius: ${BORDERS.borderRadius4};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     background-color: ${COLORS.grey35};
-    border-radius: ${BORDERS.borderRadius12};
+    border-radius: ${BORDERS.borderRadius8};
   }
 `
 
@@ -119,7 +121,7 @@ export function MoveLabwareInterventionContent({
   const analysisCommands = analysis?.commands ?? []
   const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
   const deckDef = getDeckDefFromRobotType(robotType)
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const moduleRenderInfo = getRunModuleRenderInfo(
     run,

@@ -5,17 +5,17 @@ import { Trans, useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 
 import {
-  SPACING,
-  Icon,
-  Flex,
   Box,
-  DIRECTION_COLUMN,
   COLORS,
-  TYPOGRAPHY,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
   SIZE_1,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
@@ -53,7 +53,7 @@ export function AvailableRobotOption(
     registerRobotBusyStatus,
   } = props
   const { ip, local, name: robotName } = robot ?? {}
-  const { t } = useTranslation('protocol_list')
+  const { t } = useTranslation(['protocol_list', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
@@ -160,7 +160,7 @@ export function AvailableRobotOption(
         >
           <Trans
             t={t}
-            i18nKey="a_robot_software_update_is_available"
+            i18nKey="branded:a_robot_software_update_is_available"
             components={{
               robotLink: <NavLink to={`/devices/${robotName}`} />,
             }}

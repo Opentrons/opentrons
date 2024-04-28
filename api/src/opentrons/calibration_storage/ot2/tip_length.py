@@ -37,28 +37,43 @@ def _convert_tip_length_model_to_dict(
 def tip_lengths_for_pipette(
     pipette_id: str,
 ) -> typing.Dict[LabwareUri, v1.TipLengthModel]:
-    tip_lengths = {}
     try:
         tip_length_filepath = config.get_tip_length_cal_path() / f"{pipette_id}.json"
         all_tip_lengths_for_pipette = io.read_cal_file(tip_length_filepath)
-        for tiprack_identifier, data in all_tip_lengths_for_pipette.items():
-            # We normally key these calibrations by their tip rack URI,
-            # but older software had them keyed by their tip rack hash.
-            # Migrate from the old format, if necessary.
-            if "/" not in tiprack_identifier:
-                data["definitionHash"] = tiprack_identifier
-                tiprack_identifier = data.pop("uri")
-            try:
-                tip_lengths[LabwareUri(tiprack_identifier)] = v1.TipLengthModel(**data)
-            except (json.JSONDecodeError, ValidationError):
-                log.warning(
-                    f"Tip length calibration is malformed for {tiprack_identifier} on {pipette_id}"
-                )
-                pass
-        return tip_lengths
     except FileNotFoundError:
         log.debug(f"Tip length calibrations not found for {pipette_id}")
-        return tip_lengths
+        return {}
+    except json.JSONDecodeError:
+        log.warning(
+            f"Tip length calibration is malformed for {pipette_id}", exc_info=True
+        )
+        return {}
+
+    tip_lengths: typing.Dict[LabwareUri, v1.TipLengthModel] = {}
+
+    for tiprack_identifier, data in all_tip_lengths_for_pipette.items():
+        # We normally key these calibrations by their tip rack URI,
+        # but older software had them keyed by their tip rack hash.
+        # Migrate from the old format, if necessary.
+        tiprack_identifier_is_uri = "/" in tiprack_identifier
+        if not tiprack_identifier_is_uri:
+            data["definitionHash"] = tiprack_identifier
+            uri = data.pop("uri", None)
+            if uri is None:
+                # We don't have a way to migrate old records without a URI,
+                # so skip over them.
+                continue
+            else:
+                tiprack_identifier = uri
+
+        try:
+            tip_lengths[LabwareUri(tiprack_identifier)] = v1.TipLengthModel(**data)
+        except ValidationError:
+            log.warning(
+                f"Tip length calibration is malformed for {tiprack_identifier} on {pipette_id}",
+                exc_info=True,
+            )
+    return tip_lengths
 
 
 def load_tip_length_calibration(

@@ -1,6 +1,5 @@
 import last from 'lodash/last'
 import {
-  useDeckConfigurationQuery,
   useInstrumentsQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -9,14 +8,17 @@ import {
 import {
   FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
-  SINGLE_SLOT_FIXTURES,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
-  RunTimeParameters,
+  RunTimeParameter,
+  getCutoutFixtureIdsForModuleModel,
+  getCutoutFixturesForModuleModel,
+  FLEX_MODULE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type {
   CompletedProtocolAnalysis,
@@ -28,9 +30,8 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../utils'
-import type { AttachedModule } from '@opentrons/api-client'
 
-interface ProtocolPipette {
+export interface ProtocolPipette {
   hardwareType: 'pipette'
   pipetteName: PipetteName
   mount: 'left' | 'right'
@@ -82,9 +83,10 @@ export const useRequiredProtocolHardwareFromAnalysis = (
 
   const robotType = FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
-  const { data: deckConfig = [] } = useDeckConfigurationQuery({
-    refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
-  })
+  const deckConfig =
+    useNotifyDeckConfigurationQuery({
+      refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+    })?.data ?? []
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
     analysis
@@ -105,29 +107,38 @@ export const useRequiredProtocolHardwareFromAnalysis = (
       ]
     : []
 
-  const handleModuleConnectionCheckFor = (
-    attachedModules: AttachedModule[],
-    model: ModuleModel
-  ): boolean => {
-    const ASSUME_ALWAYS_CONNECTED_MODULES = ['magneticBlockV1']
-
-    return !ASSUME_ALWAYS_CONNECTED_MODULES.includes(model)
-      ? attachedModules.some(m => m.moduleModel === model)
-      : true
-  }
-
   const requiredModules: ProtocolModule[] = analysis.modules.map(
     ({ location, model }) => {
+      const cutoutIdForSlotName = getCutoutIdForSlotName(
+        location.slotName,
+        deckDef
+      )
+      const moduleFixtures = getCutoutFixturesForModuleModel(model, deckDef)
+
+      const configuredModuleSerialNumber =
+        deckConfig.find(
+          ({ cutoutId, cutoutFixtureId }) =>
+            cutoutId === cutoutIdForSlotName &&
+            moduleFixtures.map(mf => mf.id).includes(cutoutFixtureId)
+        )?.opentronsModuleSerialNumber ?? null
+      const isConnected = moduleFixtures.every(
+        mf => mf.expectOpentronsModuleSerialNumber
+      )
+        ? attachedModules.some(
+            m =>
+              m.moduleModel === model &&
+              m.serialNumber === configuredModuleSerialNumber
+          )
+        : true
       return {
         hardwareType: 'module',
         moduleModel: model,
         slot: location.slotName,
-        connected: handleModuleConnectionCheckFor(attachedModules, model),
+        connected: isConnected,
         hasSlotConflict: deckConfig.some(
           ({ cutoutId, cutoutFixtureId }) =>
             cutoutId === getCutoutIdForSlotName(location.slotName, deckDef) &&
-            cutoutFixtureId != null &&
-            !SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+            cutoutFixtureId !== getCutoutFixtureIdsForModuleModel(model)[0]
         ),
       }
     }
@@ -161,16 +172,22 @@ export const useRequiredProtocolHardwareFromAnalysis = (
     }
   )
 
-  const requiredFixtures = requiredDeckConfigCompatibility.map(
-    ({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
+  const requiredFixtures = requiredDeckConfigCompatibility
+    // filter out all module fixtures as they're handled in the requiredModules section via hardwareType === 'module'
+    .filter(
+      ({ requiredAddressableAreas }) =>
+        !FLEX_MODULE_ADDRESSABLE_AREAS.some(modAA =>
+          requiredAddressableAreas.includes(modAA)
+        )
+    )
+    .map(({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
       hardwareType: 'fixture' as const,
       cutoutFixtureId: compatibleCutoutFixtureIds[0],
       location: { cutout: cutoutId },
       hasSlotConflict:
         cutoutFixtureId != null &&
         !compatibleCutoutFixtureIds.includes(cutoutFixtureId),
-    })
-  )
+    }))
 
   return {
     requiredProtocolHardware: [
@@ -192,7 +209,7 @@ export const useRequiredProtocolHardwareFromAnalysis = (
 
 export const useRunTimeParameters = (
   protocolId: string
-): RunTimeParameters[] => {
+): RunTimeParameter[] => {
   const { data: protocolData } = useProtocolQuery(protocolId)
   const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
@@ -200,88 +217,7 @@ export const useRunTimeParameters = (
     { enabled: protocolData != null }
   )
 
-  const mockData: RunTimeParameters[] = [
-    {
-      displayName: 'Dry Run',
-      variableName: 'DRYRUN',
-      description: 'Is this a dry or wet run? Wet is true, dry is false',
-      type: 'boolean',
-      default: false,
-    },
-    {
-      displayName: 'Use Gripper',
-      variableName: 'USE_GRIPPER',
-      description: 'For using the gripper.',
-      type: 'boolean',
-      default: true,
-    },
-    {
-      displayName: 'Trash Tips',
-      variableName: 'TIP_TRASH',
-      description:
-        'to throw tip into the trash or to not throw tip into the trash',
-      type: 'boolean',
-      default: true,
-    },
-    {
-      displayName: 'Deactivate Temperatures',
-      variableName: 'DEACTIVATE_TEMP',
-      description: 'deactivate temperature on the module',
-      type: 'boolean',
-      default: true,
-    },
-    {
-      displayName: 'Columns of Samples',
-      variableName: 'COLUMNS',
-      description: 'How many columns do you want?',
-      type: 'int',
-      min: 1,
-      max: 14,
-      default: 4,
-    },
-    {
-      displayName: 'PCR Cycles',
-      variableName: 'PCR_CYCLES',
-      description: 'number of PCR cycles on a thermocycler',
-      type: 'int',
-      min: 1,
-      max: 10,
-      default: 6,
-    },
-    {
-      displayName: 'EtoH Volume',
-      variableName: 'ETOH_VOLUME',
-      description: '70% ethanol volume',
-      type: 'float',
-      suffix: 'mL',
-      min: 1.5,
-      max: 10.0,
-      default: 6.5,
-    },
-    {
-      displayName: 'Default Module Offsets',
-      variableName: 'DEFAULT_OFFSETS',
-      description: 'default module offsets for temp, H-S, and none',
-      type: 'str',
-      choices: [
-        {
-          displayName: 'no offsets',
-          value: 'none',
-        },
-        {
-          displayName: 'temp offset',
-          value: '1',
-        },
-        {
-          displayName: 'heater-shaker offset',
-          value: '2',
-        },
-      ],
-      default: 'none',
-    },
-  ]
-  //  TODO(jr, 3/14/24): remove the mockData
-  return analysis?.runTimeParameters ?? mockData
+  return analysis?.runTimeParameters ?? []
 }
 
 /**
@@ -359,9 +295,16 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
       ),
       ...deckConfigCompatibility
         .filter(
-          ({ cutoutFixtureId, compatibleCutoutFixtureIds }) =>
+          ({
+            cutoutFixtureId,
+            compatibleCutoutFixtureIds,
+            requiredAddressableAreas,
+          }) =>
             cutoutFixtureId != null &&
-            !compatibleCutoutFixtureIds.some(id => id === cutoutFixtureId)
+            !compatibleCutoutFixtureIds.some(id => id === cutoutFixtureId) &&
+            !FLEX_MODULE_ADDRESSABLE_AREAS.some(modAA =>
+              requiredAddressableAreas.includes(modAA)
+            ) // modules are already included via requiredProtocolHardware
         )
         .map(({ compatibleCutoutFixtureIds, cutoutId }) => ({
           hardwareType: 'fixture' as const,

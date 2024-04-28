@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_96_wellplate_200ul_flat",
         "location": {
@@ -1155,6 +1157,7 @@
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "opentrons_96_tiprack_20ul",
         "location": {
@@ -2300,6 +2303,7 @@
     },
     {
       "commandType": "loadPipette",
+      "notes": [],
       "params": {
         "mount": "right",
         "pipetteName": "p20_single_gen2"
@@ -2309,6 +2313,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -2334,6 +2339,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Moving to A1 of NEST 96 Well Plate 200 µL Flat on 1",
         "legacyCommandType": "command.MOVE_TO"
@@ -2343,6 +2349,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 13.333333333333334,
@@ -2368,6 +2375,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 13.333333333333334,
@@ -2393,6 +2401,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 13.333333333333334,
@@ -2418,6 +2427,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 13.333333333333334,
@@ -2443,6 +2453,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 13.333333333333334,
@@ -2468,6 +2479,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 13.333333333333334,
@@ -2493,6 +2505,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 13.333333333333334,
@@ -2518,6 +2531,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 13.333333333333334,
@@ -2543,6 +2557,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 13.333333333333334,
@@ -2568,6 +2583,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "volume": 13.333333333333334,
@@ -2593,6 +2609,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 3.78,
         "volume": 13.333333333333334,
@@ -2618,6 +2635,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 3.78,
         "volume": 13.333333333333334,
@@ -2643,6 +2661,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 3.78,
         "volume": 13.333333333333334,
@@ -2668,6 +2687,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 3.78,
         "volume": 13.333333333333334,
@@ -2693,6 +2713,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -2718,6 +2739,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -2743,6 +2765,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -2768,6 +2791,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -2793,6 +2817,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -2818,6 +2843,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -2827,6 +2853,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -2852,6 +2879,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -2877,6 +2905,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Touching tip",
         "legacyCommandType": "command.TOUCH_TIP"
@@ -2886,6 +2915,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -2911,6 +2941,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -2936,6 +2967,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -2961,6 +2993,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -2984,6 +3017,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -3009,6 +3043,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -3034,6 +3069,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -3057,6 +3093,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -3082,6 +3119,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -3107,6 +3145,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 3.78,
         "wellLocation": {
@@ -3130,6 +3169,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -3153,6 +3193,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -3178,6 +3219,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Moving to A1 of NEST 96 Well Plate 200 µL Flat on 1",
         "legacyCommandType": "command.MOVE_TO"
@@ -3187,6 +3229,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 4.444444444444445,
@@ -3211,16 +3254,8 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Air gap",
-        "legacyCommandType": "command.AIR_GAP"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 6.666666666666667,
@@ -3246,6 +3281,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 5.0 seconds",
         "legacyCommandType": "command.DELAY"
@@ -3255,6 +3291,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -3280,6 +3317,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 4.444444444444445,
@@ -3304,16 +3342,8 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Air gap",
-        "legacyCommandType": "command.AIR_GAP"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 6.666666666666667,
@@ -3339,6 +3369,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 5.0 seconds",
         "legacyCommandType": "command.DELAY"
@@ -3348,6 +3379,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -3373,6 +3405,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 4.444444444444445,
@@ -3397,16 +3430,8 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Air gap",
-        "legacyCommandType": "command.AIR_GAP"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 6.666666666666667,
@@ -3432,6 +3457,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 5.0 seconds",
         "legacyCommandType": "command.DELAY"
@@ -3441,6 +3467,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333334,
@@ -3466,6 +3493,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -3490,16 +3518,8 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Air gap",
-        "legacyCommandType": "command.AIR_GAP"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 2.5,
@@ -3525,6 +3545,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -3549,16 +3570,8 @@
       "status": "succeeded"
     },
     {
-      "commandType": "custom",
-      "params": {
-        "legacyCommandText": "Air gap",
-        "legacyCommandType": "command.AIR_GAP"
-      },
-      "result": {},
-      "status": "succeeded"
-    },
-    {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 2.5,
@@ -3584,6 +3597,7 @@
     },
     {
       "commandType": "custom",
+      "notes": [],
       "params": {
         "legacyCommandText": "Delaying for 0 minutes and 5.0 seconds",
         "legacyCommandType": "command.DELAY"
@@ -3593,6 +3607,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -3616,6 +3631,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -3639,6 +3655,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -3664,6 +3681,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -3689,6 +3707,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -3714,6 +3733,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -3739,6 +3759,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -3764,6 +3785,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -3789,6 +3811,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -3814,6 +3837,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -3839,6 +3863,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -3864,6 +3889,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 13.333333333333332,
@@ -3889,6 +3915,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -3912,6 +3939,7 @@
     },
     {
       "commandType": "pickUpTip",
+      "notes": [],
       "params": {
         "wellLocation": {
           "offset": {
@@ -3937,6 +3965,7 @@
     },
     {
       "commandType": "aspirate",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 14.333333333333332,
@@ -3962,6 +3991,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -3987,6 +4017,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -4012,6 +4043,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -4037,6 +4069,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -4062,6 +4095,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -4087,6 +4121,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -4112,6 +4147,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -4137,6 +4173,7 @@
     },
     {
       "commandType": "dispense",
+      "notes": [],
       "params": {
         "flowRate": 15.12,
         "volume": 1.6666666666666667,
@@ -4162,6 +4199,7 @@
     },
     {
       "commandType": "blowout",
+      "notes": [],
       "params": {
         "flowRate": 7.56,
         "wellLocation": {
@@ -4185,6 +4223,7 @@
     },
     {
       "commandType": "dropTip",
+      "notes": [],
       "params": {
         "alternateDropLocation": false,
         "wellLocation": {
@@ -4278,5 +4317,6 @@
       "pipetteName": "p20_single_gen2"
     }
   ],
-  "robotType": "OT-2 Standard"
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": []
 }

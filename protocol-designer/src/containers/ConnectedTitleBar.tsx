@@ -109,10 +109,9 @@ export const ConnectedTitleBar = (): JSX.Element => {
           getLabwareDisplayName(labwareEntity.def).replace('µL', 'uL')
         backButtonLabel = 'Deck'
       }
-
+      title = title || fileName || ''
       if (selectedTerminalId === START_TERMINAL_ITEM_ID) {
         subtitle = START_TERMINAL_TITLE
-        title = title || fileName || ''
       } else if (selectedTerminalId === END_TERMINAL_ITEM_ID) {
         subtitle = END_TERMINAL_TITLE
         if (drilledDownLabwareId) {

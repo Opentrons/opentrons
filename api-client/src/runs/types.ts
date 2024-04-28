@@ -4,8 +4,9 @@ import type {
   LoadedPipette,
   ModuleModel,
   RunTimeCommand,
+  RunTimeParameter,
 } from '@opentrons/shared-data'
-import type { ResourceLink } from '../types'
+import type { ResourceLink, ErrorDetails } from '../types'
 export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const
@@ -33,7 +34,7 @@ export type RunStatus =
   | typeof RUN_STATUS_BLOCKED_BY_OPEN_DOOR
   | typeof RUN_STATUS_AWAITING_RECOVERY
 
-export interface RunData {
+export interface LegacyGoodRunData {
   id: string
   createdAt: string
   completedAt?: string
@@ -47,7 +48,21 @@ export interface RunData {
   modules: LoadedModule[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
+  runTimeParameters: RunTimeParameter[]
 }
+
+export interface KnownGoodRunData extends LegacyGoodRunData {
+  ok: true
+}
+
+export interface KnownInvalidRunData extends LegacyGoodRunData {
+  ok: false
+  dataError: ErrorDetails
+}
+
+export type GoodRunData = KnownGoodRunData | LegacyGoodRunData
+
+export type RunData = GoodRunData | KnownInvalidRunData
 
 export interface VectorOffset {
   x: number
@@ -82,11 +97,14 @@ export interface Runs {
 export const RUN_ACTION_TYPE_PLAY: 'play' = 'play'
 export const RUN_ACTION_TYPE_PAUSE: 'pause' = 'pause'
 export const RUN_ACTION_TYPE_STOP: 'stop' = 'stop'
+export const RUN_ACTION_TYPE_RESUME_FROM_RECOVERY: 'resume-from-recovery' =
+  'resume-from-recovery'
 
 export type RunActionType =
   | typeof RUN_ACTION_TYPE_PLAY
   | typeof RUN_ACTION_TYPE_PAUSE
   | typeof RUN_ACTION_TYPE_STOP
+  | typeof RUN_ACTION_TYPE_RESUME_FROM_RECOVERY
 
 export interface RunAction {
   id: string
@@ -107,6 +125,10 @@ export interface LabwareOffsetCreateData {
   definitionUri: string
   location: LabwareOffsetLocation
   vector: VectorOffset
+}
+
+export interface RunTimeParameterCreateData {
+  [key: string]: string | boolean | number
 }
 
 export interface CommandData {

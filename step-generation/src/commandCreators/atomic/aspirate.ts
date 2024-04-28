@@ -17,8 +17,13 @@ import type { CreateCommand } from '@opentrons/shared-data'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
+export interface ExtendedAspirateParams extends AspirateParams {
+  xOffset: number
+  yOffset: number
+  tipRack: string
+}
 /** Aspirate with given args. Requires tip. */
-export const aspirate: CommandCreator<AspirateParams> = (
+export const aspirate: CommandCreator<ExtendedAspirateParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -31,6 +36,9 @@ export const aspirate: CommandCreator<AspirateParams> = (
     offsetFromBottomMm,
     flowRate,
     isAirGap,
+    tipRack,
+    xOffset,
+    yOffset,
   } = args
   const actionName = 'aspirate'
   const errors: CommandCreatorError[] = []
@@ -154,19 +162,26 @@ export const aspirate: CommandCreator<AspirateParams> = (
       )
     }
   }
-  if (errors.length === 0 && pipetteSpec && pipetteSpec.maxVolume < volume) {
+  if (
+    errors.length === 0 &&
+    pipetteSpec &&
+    pipetteSpec.liquids.default.maxVolume < volume
+  ) {
     errors.push(
       errorCreators.pipetteVolumeExceeded({
         actionName,
         volume,
-        maxVolume: pipetteSpec.maxVolume,
+        maxVolume: pipetteSpec.liquids.default.maxVolume,
       })
     )
   }
 
   if (errors.length === 0 && pipetteSpec) {
-    const tipMaxVolume = getPipetteWithTipMaxVol(pipette, invariantContext)
-
+    const tipMaxVolume = getPipetteWithTipMaxVol(
+      pipette,
+      invariantContext,
+      tipRack
+    )
     if (tipMaxVolume < volume) {
       errors.push(
         errorCreators.tipVolumeExceeded({
@@ -197,6 +212,8 @@ export const aspirate: CommandCreator<AspirateParams> = (
           origin: 'bottom',
           offset: {
             z: offsetFromBottomMm,
+            x: xOffset,
+            y: yOffset,
           },
         },
         flowRate,

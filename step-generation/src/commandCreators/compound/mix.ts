@@ -5,7 +5,7 @@ import {
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
-  getIsTallLabwareWestOf96Channel,
+  getIsSafePipetteMovement,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import {
@@ -34,6 +34,11 @@ export function mixUtil(args: {
   dispenseOffsetFromBottomMm: number
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
+  tipRack: string
+  aspirateXOffset: number
+  dispenseXOffset: number
+  aspirateYOffset: number
+  dispenseYOffset: number
   aspirateDelaySeconds?: number | null | undefined
   dispenseDelaySeconds?: number | null | undefined
 }): CurriedCommandCreator[] {
@@ -49,6 +54,11 @@ export function mixUtil(args: {
     dispenseFlowRateUlSec,
     aspirateDelaySeconds,
     dispenseDelaySeconds,
+    tipRack,
+    aspirateXOffset,
+    aspirateYOffset,
+    dispenseXOffset,
+    dispenseYOffset,
   } = args
 
   const getDelayCommand = (seconds?: number | null): CurriedCommandCreator[] =>
@@ -73,6 +83,9 @@ export function mixUtil(args: {
         well,
         offsetFromBottomMm: aspirateOffsetFromBottomMm,
         flowRate: aspirateFlowRateUlSec,
+        tipRack,
+        xOffset: aspirateXOffset,
+        yOffset: aspirateYOffset,
       }),
       ...getDelayCommand(aspirateDelaySeconds),
       curryCommandCreator(dispense, {
@@ -82,6 +95,8 @@ export function mixUtil(args: {
         well,
         offsetFromBottomMm: dispenseOffsetFromBottomMm,
         flowRate: dispenseFlowRateUlSec,
+        xOffset: dispenseXOffset,
+        yOffset: dispenseYOffset,
       }),
       ...getDelayCommand(dispenseDelaySeconds),
     ],
@@ -119,6 +134,11 @@ export const mix: CommandCreator<MixArgs> = (
     blowoutFlowRateUlSec,
     blowoutOffsetFromTopMm,
     dropTipLocation,
+    tipRack,
+    aspirateXOffset,
+    aspirateYOffset,
+    dispenseXOffset,
+    dispenseYOffset,
   } = data
 
   const is96Channel =
@@ -158,24 +178,29 @@ export const mix: CommandCreator<MixArgs> = (
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
-  if (
-    is96Channel &&
-    data.nozzles === COLUMN &&
-    getIsTallLabwareWestOf96Channel(
+  console.log(invariantContext.pipetteEntities[pipette])
+
+  if (is96Channel && data.nozzles === COLUMN) {
+    const isAspirateSafePipetteMovement = getIsSafePipetteMovement(
       prevRobotState,
       invariantContext,
+      pipette,
       labware,
-      pipette
+      tipRack,
+      { x: aspirateXOffset, y: aspirateYOffset }
     )
-  ) {
-    return {
-      errors: [
-        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
-          source: 'mix',
-          labware:
-            invariantContext.labwareEntities[labware].def.metadata.displayName,
-        }),
-      ],
+    const isDispenseSafePipetteMovement = getIsSafePipetteMovement(
+      prevRobotState,
+      invariantContext,
+      pipette,
+      labware,
+      tipRack,
+      { x: dispenseXOffset, y: dispenseYOffset }
+    )
+    if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
+      return {
+        errors: [errorCreators.possiblePipetteCollision()],
+      }
     }
   }
   const stateNozzles = prevRobotState.pipettes[pipette].nozzles
@@ -212,6 +237,7 @@ export const mix: CommandCreator<MixArgs> = (
             pipette,
             dropTipLocation,
             nozzles: data.nozzles ?? undefined,
+            tipRack,
           }),
         ]
       }
@@ -250,6 +276,11 @@ export const mix: CommandCreator<MixArgs> = (
         dispenseFlowRateUlSec,
         aspirateDelaySeconds,
         dispenseDelaySeconds,
+        tipRack,
+        aspirateXOffset,
+        aspirateYOffset,
+        dispenseXOffset,
+        dispenseYOffset,
       })
       return [
         ...configureNozzleLayoutCommand,

@@ -7,16 +7,14 @@ import { useHost } from '@opentrons/react-api-client'
 import { useNotifyService } from '../useNotifyService'
 import { appShellListener } from '../../redux/shell/remote'
 import { useTrackEvent } from '../../redux/analytics'
-import {
-  notifySubscribeAction,
-  notifyUnsubscribeAction,
-} from '../../redux/shell'
+import { notifySubscribeAction } from '../../redux/shell'
 import { useIsFlex } from '../../organisms/Devices/hooks/useIsFlex'
 
 import type { Mock } from 'vitest'
 import type { HostConfig } from '@opentrons/api-client'
 import type { QueryOptionsWithPolling } from '../useNotifyService'
 
+vi.unmock('../useNotifyService')
 vi.mock('react-redux')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../redux/analytics')
@@ -44,6 +42,7 @@ describe('useNotifyService', () => {
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
     vi.mocked(useIsFlex).mockReturnValue(true)
+    vi.mocked(appShellListener).mockClear()
   })
 
   afterEach(() => {
@@ -55,7 +54,7 @@ describe('useNotifyService', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
@@ -63,31 +62,14 @@ describe('useNotifyService', () => {
     expect(mockDispatch).toHaveBeenCalledWith(
       notifySubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
     )
-    expect(mockDispatch).not.toHaveBeenCalledWith(
-      notifyUnsubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
-    )
     expect(appShellListener).toHaveBeenCalled()
-  })
-
-  it('should trigger an unsubscribe action on dismount', () => {
-    const { unmount } = renderHook(() =>
-      useNotifyService({
-        topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
-        options: MOCK_OPTIONS,
-      } as any)
-    )
-    unmount()
-    expect(mockDispatch).toHaveBeenCalledWith(
-      notifyUnsubscribeAction(MOCK_HOST_CONFIG.hostname, MOCK_TOPIC)
-    )
   })
 
   it('should not subscribe to notifications if forceHttpPolling is true', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: { ...MOCK_OPTIONS, forceHttpPolling: true },
       } as any)
     )
@@ -100,7 +82,7 @@ describe('useNotifyService', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: { ...MOCK_OPTIONS, enabled: false },
       } as any)
     )
@@ -113,7 +95,7 @@ describe('useNotifyService', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: { ...MOCK_OPTIONS, staleTime: Infinity },
       } as any)
     )
@@ -130,7 +112,7 @@ describe('useNotifyService', () => {
     renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
@@ -138,15 +120,16 @@ describe('useNotifyService', () => {
   })
 
   it('should return set HTTP refetch to always and fire an analytics reporting event if the connection was refused', () => {
-    vi.mocked(appShellListener).mockImplementation(
-      (_: any, __: any, mockCb: any) => {
-        mockCb('ECONNREFUSED')
-      }
-    )
+    vi.mocked(appShellListener).mockImplementation(function ({
+      callback,
+    }): any {
+      // eslint-disable-next-line n/no-callback-literal
+      callback('ECONNREFUSED')
+    })
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
@@ -156,15 +139,16 @@ describe('useNotifyService', () => {
   })
 
   it('should trigger a single HTTP refetch if the refetch flag was returned', () => {
-    vi.mocked(appShellListener).mockImplementation(
-      (_: any, __: any, mockCb: any) => {
-        mockCb({ refetchUsingHTTP: true })
-      }
-    )
+    vi.mocked(appShellListener).mockImplementation(function ({
+      callback,
+    }): any {
+      // eslint-disable-next-line n/no-callback-literal
+      callback({ refetch: true })
+    })
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
@@ -173,19 +157,48 @@ describe('useNotifyService', () => {
   })
 
   it('should trigger a single HTTP refetch if the unsubscribe flag was returned', () => {
-    vi.mocked(appShellListener).mockImplementation(
-      (_: any, __: any, mockCb: any) => {
-        mockCb({ unsubscribe: true })
-      }
-    )
+    vi.mocked(appShellListener).mockImplementation(function ({
+      callback,
+    }): any {
+      // eslint-disable-next-line n/no-callback-literal
+      callback({ unsubscribe: true })
+    })
     const { rerender } = renderHook(() =>
       useNotifyService({
         topic: MOCK_TOPIC,
-        setRefetchUsingHTTP: mockHTTPRefetch,
+        setRefetch: mockHTTPRefetch,
         options: MOCK_OPTIONS,
       } as any)
     )
     rerender()
     expect(mockHTTPRefetch).toHaveBeenCalledWith('once')
+  })
+
+  it('should clean up the listener on dismount', () => {
+    const { unmount } = renderHook(() =>
+      useNotifyService({
+        topic: MOCK_TOPIC,
+        setRefetch: mockHTTPRefetch,
+        options: MOCK_OPTIONS,
+      })
+    )
+    unmount()
+    expect(appShellListener).toHaveBeenCalled()
+  })
+
+  it('should still clean up the listener if the hostname changes to null after subscribing', () => {
+    const { unmount, rerender } = renderHook(() =>
+      useNotifyService({
+        hostOverride: MOCK_HOST_CONFIG,
+        topic: MOCK_TOPIC,
+        setRefetch: mockHTTPRefetch,
+        options: MOCK_OPTIONS,
+      })
+    )
+    rerender({ hostOverride: null })
+    unmount()
+    expect(appShellListener).toHaveBeenCalledWith(
+      expect.objectContaining({ hostname: MOCK_HOST_CONFIG.hostname })
+    )
   })
 })

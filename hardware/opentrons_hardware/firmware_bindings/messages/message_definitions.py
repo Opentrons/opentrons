@@ -157,6 +157,17 @@ class GetStatusResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class GearStatusResponse(BaseMessage):  # noqa: D101
+    payload: payloads.GetStatusResponsePayload
+    payload_type: Type[
+        payloads.GetStatusResponsePayload
+    ] = payloads.GetStatusResponsePayload
+    message_id: Literal[
+        MessageId.get_gear_status_response
+    ] = MessageId.get_gear_status_response
+
+
+@dataclass
 class MoveRequest(BaseMessage):  # noqa: D101
     payload: payloads.MoveRequestPayload
     payload_type: Type[payloads.MoveRequestPayload] = payloads.MoveRequestPayload
@@ -191,6 +202,19 @@ class AddLinearMoveRequest(BaseMessage):  # noqa: D101
         payloads.AddLinearMoveRequestPayload
     ] = payloads.AddLinearMoveRequestPayload
     message_id: Literal[MessageId.add_move_request] = MessageId.add_move_request
+
+
+@dataclass
+class AddSensorLinearMoveRequest(BaseMessage):
+    """Sensor Linear Move Request."""
+
+    payload: payloads.AddSensorLinearMoveBasePayload
+    payload_type: Type[
+        payloads.AddSensorLinearMoveBasePayload
+    ] = payloads.AddSensorLinearMoveBasePayload
+    message_id: Literal[
+        MessageId.add_sensor_move_request
+    ] = MessageId.add_sensor_move_request
 
 
 @dataclass
@@ -332,6 +356,26 @@ class ReadMotorDriverResponse(BaseMessage):  # noqa: D101
     message_id: Literal[
         MessageId.read_motor_driver_register_response
     ] = MessageId.read_motor_driver_register_response
+
+
+@dataclass
+class ReadMotorDriverErrorStatusRequest(BaseMessage):  # noqa: D101
+    payload: payloads.EmptyPayload
+    payload_type: Type[payloads.EmptyPayload] = payloads.EmptyPayload
+    message_id: Literal[
+        MessageId.read_motor_driver_error_status_request
+    ] = MessageId.read_motor_driver_error_status_request
+
+
+@dataclass
+class ReadMotorDriverErrorStatusResponse(BaseMessage):  # noqa: D101
+    payload: payloads.ReadMotorDriverErrorStatusResponsePayload
+    payload_type: Type[
+        payloads.ReadMotorDriverErrorStatusResponsePayload
+    ] = payloads.ReadMotorDriverErrorStatusResponsePayload
+    message_id: Literal[
+        MessageId.read_motor_driver_error_status_response
+    ] = MessageId.read_motor_driver_error_status_response
 
 
 @dataclass
@@ -977,3 +1021,16 @@ class GetHepaUVStateResponse(BaseMessage):
     message_id: Literal[
         MessageId.get_hepa_uv_state_response
     ] = MessageId.get_hepa_uv_state_response
+
+
+@dataclass
+class SendAccumulatedPressureDataRequest(BaseMessage):
+    """Send all the saved sensor data."""
+
+    payload: payloads.SendAccumulatedPressureDataPayload
+    payload_type: Type[
+        payloads.SendAccumulatedPressureDataPayload
+    ] = payloads.SendAccumulatedPressureDataPayload
+    message_id: Literal[
+        MessageId.send_accumulated_pressure_data
+    ] = MessageId.send_accumulated_pressure_data

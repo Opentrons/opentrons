@@ -1,20 +1,19 @@
 import * as React from 'react'
 import {
-  Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  IconProps,
-  Flex,
-  DIRECTION_ROW,
   ALIGN_CENTER,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
   BORDERS,
   Btn,
+  COLORS,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../text'
 
-import type { StyleProps } from '@opentrons/components'
+import type { IconProps, StyleProps } from '@opentrons/components'
 
 type InlineNotificationType = 'alert' | 'error' | 'neutral' | 'success'
 
@@ -94,7 +93,7 @@ export function InlineNotification(
           >
             {fullHeading}
           </span>
-          {message && fullmessage}
+          {message != null && fullmessage}
         </StyledText>
       </Flex>
       {onCloseClick && (

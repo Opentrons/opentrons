@@ -2,38 +2,35 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import {
-  useAllPipetteOffsetCalibrationsQuery,
   useModulesQuery,
   usePipettesQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
 import {
-  Flex,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
   SIZE_3,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { PipetteRecalibrationWarning } from './PipetteCard/PipetteRecalibrationWarning'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
 import { useIsFlex, useIsRobotViewable, useRunStatuses } from './hooks'
-import {
-  getIs96ChannelPipetteAttached,
-  getOffsetCalibrationForMount,
-  getShowPipetteCalibrationWarning,
-} from './utils'
+import { getShowPipetteCalibrationWarning } from './utils'
 import { PipetteCard } from './PipetteCard'
+import { FlexPipetteCard } from './PipetteCard/FlexPipetteCard'
 import { GripperCard } from '../GripperCard'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useModuleApiRequests } from '../ModuleCard/utils'
 
 import type {
   BadGripper,
@@ -43,7 +40,6 @@ import type {
 } from '@opentrons/api-client'
 
 const EQUIPMENT_POLL_MS = 5000
-const FETCH_PIPETTE_CAL_POLL = 30000
 interface InstrumentsAndModulesProps {
   robotName: string
 }
@@ -52,20 +48,23 @@ export function InstrumentsAndModules({
   robotName,
 }: InstrumentsAndModulesProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
+  const isFlex = useIsFlex(robotName)
   const attachedPipettes = usePipettesQuery(
     {},
     {
       refetchInterval: EQUIPMENT_POLL_MS,
+      enabled: !isFlex,
     }
   )?.data ?? { left: undefined, right: undefined }
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
   const { isRunTerminal, isRunRunning } = useRunStatuses()
-  const isFlex = useIsFlex(robotName)
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
+  const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
 
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
+    enabled: isFlex,
   })
 
   const attachedGripper =
@@ -97,9 +96,8 @@ export function InstrumentsAndModules({
         !i.ok &&
         i.subsystem === 'pipette_right'
     ) ?? null
-  const is96ChannelAttached = getIs96ChannelPipetteAttached(
-    attachedPipettes?.left ?? null
-  )
+  const is96ChannelAttached = attachedLeftPipette?.data.channels === 96
+
   const attachPipetteRequired =
     attachedLeftPipette == null && attachedRightPipette == null
   const calibratePipetteRequired =
@@ -119,26 +117,6 @@ export function InstrumentsAndModules({
     : Math.ceil(attachedModules?.length / 2)
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
   const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
-
-  // The following pipetteOffset related code has been lifted out of the PipetteCard component
-  // to eliminate duplicated useInterval calls to `calibration/pipette_offset` coming from each card.
-  // Instead we now capture all offset calibration data here, and pass the appropriate calibration
-  // data to the associated card via props
-  const pipetteOffsetCalibrations =
-    useAllPipetteOffsetCalibrationsQuery({
-      refetchInterval: FETCH_PIPETTE_CAL_POLL,
-      enabled: !isFlex,
-    })?.data?.data ?? []
-  const leftMountOffsetCalibration = getOffsetCalibrationForMount(
-    pipetteOffsetCalibrations,
-    attachedPipettes,
-    LEFT
-  )
-  const rightMountOffsetCalibration = getOffsetCalibrationForMount(
-    pipetteOffsetCalibrations,
-    attachedPipettes,
-    RIGHT
-  )
 
   return (
     <Flex
@@ -186,37 +164,46 @@ export function InstrumentsAndModules({
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing8}
             >
-              <PipetteCard
-                pipetteId={attachedPipettes.left?.id}
-                pipetteModelSpecs={
-                  attachedPipettes.left?.model != null
-                    ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
-                    : null
-                }
-                isPipetteCalibrated={
-                  isFlex && attachedLeftPipette?.ok
-                    ? attachedLeftPipette?.data?.calibratedOffset
-                        ?.last_modified != null
-                    : leftMountOffsetCalibration != null
-                }
-                mount={LEFT}
-                robotName={robotName}
-                pipetteIs96Channel={is96ChannelAttached}
-                pipetteIsBad={badLeftPipette != null}
-                isRunActive={currentRunId != null && isRunRunning}
-                isEstopNotDisengaged={isEstopNotDisengaged}
-              />
-              {isFlex && (
-                <GripperCard
-                  attachedGripper={attachedGripper}
-                  isCalibrated={
-                    attachedGripper?.ok === true &&
-                    attachedGripper?.data?.calibratedOffset?.last_modified !=
-                      null
+              {!isFlex ? (
+                <PipetteCard
+                  pipetteId={attachedPipettes.left?.id}
+                  pipetteModelSpecs={
+                    attachedPipettes.left?.model != null
+                      ? getPipetteModelSpecs(attachedPipettes.left?.model) ??
+                        null
+                      : null
                   }
+                  mount={LEFT}
+                  robotName={robotName}
                   isRunActive={currentRunId != null && isRunRunning}
                   isEstopNotDisengaged={isEstopNotDisengaged}
                 />
+              ) : (
+                <>
+                  <FlexPipetteCard
+                    attachedPipette={attachedLeftPipette}
+                    pipetteModelSpecs={
+                      attachedLeftPipette?.instrumentModel != null
+                        ? getPipetteModelSpecs(
+                            attachedLeftPipette.instrumentModel
+                          ) ?? null
+                        : null
+                    }
+                    mount={LEFT}
+                    isRunActive={currentRunId != null && isRunRunning}
+                    isEstopNotDisengaged={isEstopNotDisengaged}
+                  />
+                  <GripperCard
+                    attachedGripper={attachedGripper}
+                    isCalibrated={
+                      attachedGripper?.ok === true &&
+                      attachedGripper?.data?.calibratedOffset?.last_modified !=
+                        null
+                    }
+                    isRunActive={currentRunId != null && isRunRunning}
+                    isEstopNotDisengaged={isEstopNotDisengaged}
+                  />
+                </>
               )}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard
@@ -229,6 +216,8 @@ export function InstrumentsAndModules({
                   attachPipetteRequired={attachPipetteRequired}
                   calibratePipetteRequired={calibratePipetteRequired}
                   updatePipetteFWRequired={updatePipetteFWRequired}
+                  latestRequestId={getLatestRequestId(module.serialNumber)}
+                  handleModuleApiRequests={handleModuleApiRequests}
                 />
               ))}
             </Flex>
@@ -237,7 +226,7 @@ export function InstrumentsAndModules({
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing8}
             >
-              {!Boolean(is96ChannelAttached) && (
+              {!isFlex ? (
                 <PipetteCard
                   pipetteId={attachedPipettes.right?.id}
                   pipetteModelSpecs={
@@ -246,20 +235,27 @@ export function InstrumentsAndModules({
                         null
                       : null
                   }
-                  isPipetteCalibrated={
-                    isFlex && attachedRightPipette?.ok
-                      ? attachedRightPipette?.data?.calibratedOffset
-                          ?.last_modified != null
-                      : rightMountOffsetCalibration != null
-                  }
                   mount={RIGHT}
                   robotName={robotName}
-                  pipetteIs96Channel={false}
-                  pipetteIsBad={badRightPipette != null}
                   isRunActive={currentRunId != null && isRunRunning}
                   isEstopNotDisengaged={isEstopNotDisengaged}
                 />
-              )}
+              ) : null}
+              {isFlex && !is96ChannelAttached ? (
+                <FlexPipetteCard
+                  attachedPipette={attachedRightPipette}
+                  pipetteModelSpecs={
+                    attachedRightPipette?.instrumentModel != null
+                      ? getPipetteModelSpecs(
+                          attachedRightPipette.instrumentModel
+                        ) ?? null
+                      : null
+                  }
+                  mount={RIGHT}
+                  isRunActive={currentRunId != null && isRunRunning}
+                  isEstopNotDisengaged={isEstopNotDisengaged}
+                />
+              ) : null}
               {rightColumnModules.map((module, index) => (
                 <ModuleCard
                   key={`moduleCard_${String(module.moduleType)}_${String(
@@ -271,6 +267,8 @@ export function InstrumentsAndModules({
                   attachPipetteRequired={attachPipetteRequired}
                   calibratePipetteRequired={calibratePipetteRequired}
                   updatePipetteFWRequired={updatePipetteFWRequired}
+                  latestRequestId={getLatestRequestId(module.serialNumber)}
+                  handleModuleApiRequests={handleModuleApiRequests}
                 />
               ))}
             </Flex>

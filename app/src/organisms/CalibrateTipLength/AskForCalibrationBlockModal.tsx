@@ -2,17 +2,18 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  Flex,
-  Link,
-  SPACING,
   ALIGN_CENTER,
+  CheckboxField,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
+  Link,
   PrimaryButton,
   SecondaryButton,
-  CheckboxField,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
 
@@ -22,7 +23,6 @@ import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getTopPortalEl } from '../../App/portal'
 import { setUseTrashSurfaceForTipCal } from '../../redux/calibration'
-import { StyledText } from '../../atoms/text'
 
 import type { Dispatch } from '../../redux/types'
 
@@ -40,7 +40,7 @@ interface Props {
 }
 
 export function AskForCalibrationBlockModal(props: Props): JSX.Element {
-  const { t } = useTranslation(['robot_calibration', 'shared'])
+  const { t } = useTranslation(['robot_calibration', 'shared', 'branded'])
   const [rememberPreference, setRememberPreference] = React.useState<boolean>(
     true
   )
@@ -77,7 +77,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
 
             <Trans
               t={t}
-              i18nKey="calibration_block_description"
+              i18nKey="branded:calibration_block_description"
               components={{
                 block: <StyledText as="p" marginBottom={SPACING.spacing8} />,
                 supportLink: (

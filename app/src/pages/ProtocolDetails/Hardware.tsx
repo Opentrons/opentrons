@@ -9,23 +9,26 @@ import {
   LocationIcon,
   ModuleIcon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
 import {
-  GRIPPER_V1,
   getCutoutDisplayName,
-  getGripperDisplayName,
   getModuleDisplayName,
   getModuleType,
-  getPipetteNameSpecs,
   getFixtureDisplayName,
+  GRIPPER_V1_2,
 } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
+
+import {
+  useGripperDisplayName,
+  usePipetteNameSpecs,
+} from '../../resources/instruments/hooks'
 import { useRequiredProtocolHardware } from '../Protocols/hooks'
 import { EmptySection } from './EmptySection'
 
-import type { ProtocolHardware } from '../Protocols/hooks'
+import type { ProtocolHardware, ProtocolPipette } from '../Protocols/hooks'
 import type { TFunction } from 'i18next'
 
 const Table = styled('table')`
@@ -51,12 +54,12 @@ const TableDatum = styled('td')`
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
-    border-top-left-radius: ${BORDERS.borderRadius16};
-    border-bottom-left-radius: ${BORDERS.borderRadius16};
+    border-top-left-radius: ${BORDERS.borderRadius8};
+    border-bottom-left-radius: ${BORDERS.borderRadius8};
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.borderRadius16};
-    border-bottom-right-radius: ${BORDERS.borderRadius16};
+    border-top-right-radius: ${BORDERS.borderRadius8};
+    border-bottom-right-radius: ${BORDERS.borderRadius8};
   }
 `
 
@@ -75,16 +78,72 @@ const getHardwareLocation = (
   }
 }
 
-const getHardwareName = (protocolHardware: ProtocolHardware): string => {
+// convert to anon
+
+const useHardwareName = (protocolHardware: ProtocolHardware): string => {
+  const gripperDisplayName = useGripperDisplayName(GRIPPER_V1_2)
+
+  const pipetteDisplayName =
+    usePipetteNameSpecs((protocolHardware as ProtocolPipette).pipetteName)
+      ?.displayName ?? ''
+
   if (protocolHardware.hardwareType === 'gripper') {
-    return getGripperDisplayName(GRIPPER_V1)
+    return gripperDisplayName
   } else if (protocolHardware.hardwareType === 'pipette') {
-    return getPipetteNameSpecs(protocolHardware.pipetteName)?.displayName ?? ''
+    return pipetteDisplayName
   } else if (protocolHardware.hardwareType === 'module') {
     return getModuleDisplayName(protocolHardware.moduleModel)
   } else {
     return getFixtureDisplayName(protocolHardware.cutoutFixtureId)
   }
+}
+
+function HardwareItem({
+  hardware,
+}: {
+  hardware: ProtocolHardware
+}): JSX.Element {
+  const { t, i18n } = useTranslation('protocol_details')
+
+  const hardwareName = useHardwareName(hardware)
+
+  let location: JSX.Element = (
+    <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      {i18n.format(getHardwareLocation(hardware, t), 'titleCase')}
+    </StyledText>
+  )
+  if (hardware.hardwareType === 'module') {
+    location = <LocationIcon slotName={hardware.slot} />
+  } else if (hardware.hardwareType === 'fixture') {
+    location = (
+      <LocationIcon slotName={getCutoutDisplayName(hardware.location.cutout)} />
+    )
+  }
+  return (
+    <TableRow>
+      <TableDatum>
+        <Flex paddingLeft={SPACING.spacing24}>{location}</Flex>
+      </TableDatum>
+      <TableDatum>
+        <Flex paddingLeft={SPACING.spacing24}>
+          {hardware.hardwareType === 'module' && (
+            <Flex
+              alignItems={ALIGN_CENTER}
+              height="2rem"
+              paddingBottom={SPACING.spacing4}
+              paddingRight={SPACING.spacing8}
+            >
+              <ModuleIcon
+                moduleType={getModuleType(hardware.moduleModel)}
+                size="1.75rem"
+              />
+            </Flex>
+          )}
+          <StyledText as="p">{hardwareName}</StyledText>
+        </Flex>
+      </TableDatum>
+    </TableRow>
+  )
 }
 
 export const Hardware = (props: { protocolId: string }): JSX.Element => {
@@ -123,45 +182,7 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
       </thead>
       <tbody>
         {requiredProtocolHardware.map((hardware, id) => {
-          let location: JSX.Element = (
-            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {i18n.format(getHardwareLocation(hardware, t), 'titleCase')}
-            </StyledText>
-          )
-          if (hardware.hardwareType === 'module') {
-            location = <LocationIcon slotName={hardware.slot} />
-          } else if (hardware.hardwareType === 'fixture') {
-            location = (
-              <LocationIcon
-                slotName={getCutoutDisplayName(hardware.location.cutout)}
-              />
-            )
-          }
-          return (
-            <TableRow key={id}>
-              <TableDatum>
-                <Flex paddingLeft={SPACING.spacing24}>{location}</Flex>
-              </TableDatum>
-              <TableDatum>
-                <Flex paddingLeft={SPACING.spacing24}>
-                  {hardware.hardwareType === 'module' && (
-                    <Flex
-                      alignItems={ALIGN_CENTER}
-                      height="2rem"
-                      paddingBottom={SPACING.spacing4}
-                      paddingRight={SPACING.spacing8}
-                    >
-                      <ModuleIcon
-                        moduleType={getModuleType(hardware.moduleModel)}
-                        size="1.75rem"
-                      />
-                    </Flex>
-                  )}
-                  <StyledText as="p">{getHardwareName(hardware)}</StyledText>
-                </Flex>
-              </TableDatum>
-            </TableRow>
-          )
+          return <HardwareItem key={id} hardware={hardware} />
         })}
       </tbody>
     </Table>

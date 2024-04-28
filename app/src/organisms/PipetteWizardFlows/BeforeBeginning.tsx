@@ -1,7 +1,13 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { UseMutateFunction } from 'react-query'
-import { COLORS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import {
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
@@ -11,8 +17,6 @@ import {
   getPipetteNameSpecs,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -28,6 +32,8 @@ import {
   BODY_STYLE,
 } from './constants'
 import { getIsGantryEmpty } from './utils'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+
 import type { AxiosError } from 'axios'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
@@ -79,7 +85,7 @@ export const BeforeBeginning = (
     isGantryEmpty &&
     selectedPipette === NINETY_SIX_CHANNEL &&
     flowType === FLOWS.ATTACH
-  const deckConfig = useDeckConfigurationQuery().data
+  const deckConfig = useNotifyDeckConfigurationQuery().data
   const isWasteChuteOnDeck =
     deckConfig?.find(fixture => fixture.cutoutId === WASTE_CHUTE_CUTOUT) ??
     false

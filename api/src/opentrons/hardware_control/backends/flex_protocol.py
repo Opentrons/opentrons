@@ -15,7 +15,7 @@ from typing import (
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
-from opentrons.config.types import GantryLoad
+from opentrons.config.types import GantryLoad, OutputOptions
 from opentrons.hardware_control.types import (
     BoardRevision,
     Axis,
@@ -146,7 +146,8 @@ class FlexBackend(Protocol):
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        log_pressure: bool = True,
+        output_format: OutputOptions = OutputOptions.can_bus_only,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -309,6 +310,14 @@ class FlexBackend(Protocol):
         """Get engaged axes."""
         ...
 
+    async def update_engaged_axes(self) -> None:
+        """Update engaged axes."""
+        ...
+
+    async def is_motor_engaged(self, axis: Axis) -> bool:
+        """Check if axis is enabled."""
+        ...
+
     async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
         ...
@@ -374,7 +383,9 @@ class FlexBackend(Protocol):
     def subsystems(self) -> Dict[SubSystem, SubSystemState]:
         ...
 
-    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
+    async def get_tip_status(
+        self, mount: OT3Mount, ht_operation_sensor: Optional[InstrumentProbeType] = None
+    ) -> TipStateType:
         ...
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:

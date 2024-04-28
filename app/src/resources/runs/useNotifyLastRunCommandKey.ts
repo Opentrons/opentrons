@@ -13,24 +13,18 @@ export function useNotifyLastRunCommandKey(
   runId: string,
   options: QueryOptionsWithPolling<CommandsData, Error> = {}
 ): string | null {
-  const [
-    refetchUsingHTTP,
-    setRefetchUsingHTTP,
-  ] = React.useState<HTTPRefetchFrequency>(null)
+  const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
 
   useNotifyService({
     topic: 'robot-server/runs/current_command',
-    setRefetchUsingHTTP,
+    setRefetch,
     options,
   })
 
   const httpResponse = useLastRunCommandKey(runId, {
     ...options,
-    enabled: options?.enabled !== false && refetchUsingHTTP != null,
-    onSettled:
-      refetchUsingHTTP === 'once'
-        ? () => setRefetchUsingHTTP(null)
-        : () => null,
+    enabled: options?.enabled !== false && refetch != null,
+    onSettled: refetch === 'once' ? () => setRefetch(null) : () => null,
   })
 
   return httpResponse

@@ -7,9 +7,9 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
   SPACING,
+  StyledText,
+  VIEWPORT,
 } from '@opentrons/components'
-import { StyledText } from '../text'
-import { touchScreenViewport } from '../../DesignTokens/constants'
 
 import { Snackbar } from './index'
 import type { Story, Meta } from '@storybook/react'
@@ -17,7 +17,7 @@ import type { Story, Meta } from '@storybook/react'
 export default {
   title: 'ODD/Atoms/Snackbar',
   component: Snackbar,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const DefaultTemplate: Story<React.ComponentProps<typeof Snackbar>> = args => {

@@ -15,6 +15,8 @@ from opentrons.calibration_storage import types as calibration_storage_types
 
 from opentrons.protocol_engine.types import DeckType
 
+from robot_server.service.notifications import DeckConfigurationPublisher
+
 from . import defaults
 from . import models
 from opentrons.protocol_engine.types import DeckConfigurationType
@@ -22,7 +24,12 @@ from opentrons.protocol_engine.types import DeckConfigurationType
 
 # TODO(mm, 2023-11-17): Add unit tests for DeckConfigurationStore.
 class DeckConfigurationStore:  # noqa: D101
-    def __init__(self, deck_type: DeckType, path: Path) -> None:
+    def __init__(
+        self,
+        deck_type: DeckType,
+        path: Path,
+        deck_configuration_publisher: DeckConfigurationPublisher,
+    ) -> None:
         """A persistent store of the robot's deck configuration.
 
         Params:
@@ -37,6 +44,7 @@ class DeckConfigurationStore:  # noqa: D101
 
         self._deck_type = deck_type
         self._path = anyio.Path(path)
+        self._deck_configuration_publisher = deck_configuration_publisher
 
         # opentrons.calibration_storage is not generally safe for concurrent access.
         self._lock = asyncio.Lock()
@@ -54,12 +62,16 @@ class DeckConfigurationStore:  # noqa: D101
                 path=self._path,
                 cutout_fixture_placements=[
                     calibration_storage_types.CutoutFixturePlacement(
-                        cutout_fixture_id=e.cutoutFixtureId, cutout_id=e.cutoutId
+                        cutout_fixture_id=e.cutoutFixtureId,
+                        cutout_id=e.cutoutId,
+                        opentrons_module_serial_number=e.opentronsModuleSerialNumber,
                     )
                     for e in request.cutoutFixtures
                 ],
                 last_modified_at=last_modified_at,
             )
+            await self._deck_configuration_publisher.publish_deck_configuration()
+
             return await self._get_assuming_locked()
 
     async def get(self) -> models.DeckConfigurationResponse:
@@ -71,7 +83,8 @@ class DeckConfigurationStore:  # noqa: D101
         """Get the robot's current deck configuration in an expected typing."""
         to_convert = await self.get()
         converted = [
-            (item.cutoutId, item.cutoutFixtureId) for item in to_convert.cutoutFixtures
+            (item.cutoutId, item.cutoutFixtureId, item.opentronsModuleSerialNumber)
+            for item in to_convert.cutoutFixtures
         ]
         return converted
 
@@ -79,6 +92,7 @@ class DeckConfigurationStore:  # noqa: D101
         """Delete the robot's current deck configuration, resetting it to the default."""
         async with self._lock:
             await self._path.unlink(missing_ok=True)
+            await self._deck_configuration_publisher.publish_deck_configuration()
 
     async def _get_assuming_locked(self) -> models.DeckConfigurationResponse:
         from_storage = await _read(self._path)
@@ -102,6 +116,7 @@ class DeckConfigurationStore:  # noqa: D101
                 models.CutoutFixture.construct(
                     cutoutFixtureId=e.cutout_fixture_id,
                     cutoutId=e.cutout_id,
+                    opentronsModuleSerialNumber=e.opentrons_module_serial_number,
                 )
                 for e in cutout_fixtures_from_storage
             ]

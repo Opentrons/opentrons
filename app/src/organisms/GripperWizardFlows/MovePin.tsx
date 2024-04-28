@@ -1,9 +1,14 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { EXTENSION } from '@opentrons/shared-data'
-import { COLORS, TYPOGRAPHY, SPACING, Flex } from '@opentrons/components'
+import {
+  COLORS,
+  TYPOGRAPHY,
+  SPACING,
+  Flex,
+  StyledText,
+} from '@opentrons/components'
 import { css } from 'styled-components'
-import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'

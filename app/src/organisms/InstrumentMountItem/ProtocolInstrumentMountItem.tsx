@@ -14,8 +14,6 @@ import {
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import {
-  getGripperDisplayName,
-  getPipetteNameSpecs,
   NINETY_SIX_CHANNEL,
   PipetteName,
   SINGLE_MOUNT_PIPETTES,
@@ -23,6 +21,10 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
+import {
+  useGripperDisplayName,
+  usePipetteNameSpecs,
+} from '../../resources/instruments/hooks'
 import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'
@@ -37,7 +39,7 @@ export const MountItem = styled.div<{ isReady: boolean }>`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadius12};
+  border-radius: ${BORDERS.borderRadius8};
   background-color: ${({ isReady }) =>
     isReady ? COLORS.green35 : COLORS.yellow35};
   &:active {
@@ -97,6 +99,11 @@ export function ProtocolInstrumentMountItem(
     attachedInstrument != null &&
     attachedInstrument.ok &&
     attachedInstrument?.data?.calibratedOffset?.last_modified != null
+
+  const gripperDisplayName = useGripperDisplayName(speccedName as GripperModel)
+  const pipetteDisplayName = usePipetteNameSpecs(speccedName as PipetteName)
+    ?.displayName
+
   return (
     <>
       <MountItem isReady={isAttachedWithCal}>
@@ -117,9 +124,7 @@ export function ProtocolInstrumentMountItem(
               )}
             </MountLabel>
             <SpeccedInstrumentName>
-              {mount === 'extension'
-                ? getGripperDisplayName(speccedName as GripperModel)
-                : getPipetteNameSpecs(speccedName as PipetteName)?.displayName}
+              {mount === 'extension' ? gripperDisplayName : pipetteDisplayName}
             </SpeccedInstrumentName>
           </Flex>
 

@@ -18,7 +18,7 @@ import {
   airGapHelper,
   dispenseLocationHelper,
   moveHelper,
-  getIsTallLabwareWestOf96Channel,
+  getIsSafePipetteMovement,
   getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import {
@@ -56,6 +56,31 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     * 'once': get a new tip at the beginning of the consolidate step, and use it throughout
     * 'never': reuse the tip from the last step
   */
+
+  // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
+  // to the action of aspiration of dispensing in a given command, they are actually values bound
+  // to a given labware associated with a command (e.g. Source, Destination). For this reason we
+  // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
+  // when we decide to rename these fields/args... probably all the way up to the UI level.
+  const {
+    aspirateDelay,
+    aspirateFlowRateUlSec,
+    aspirateOffsetFromBottomMm,
+    blowoutFlowRateUlSec,
+    blowoutOffsetFromTopMm,
+    dispenseAirGapVolume,
+    dispenseDelay,
+    dispenseFlowRateUlSec,
+    dispenseOffsetFromBottomMm,
+    mixFirstAspirate,
+    mixInDestination,
+    dropTipLocation,
+    aspirateXOffset,
+    aspirateYOffset,
+    dispenseXOffset,
+    dispenseYOffset,
+  } = args
+
   const actionName = 'consolidate'
   const pipetteData = prevRobotState.pipettes[args.pipette]
   const is96Channel =
@@ -91,69 +116,40 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   if (
     is96Channel &&
     args.nozzles === COLUMN &&
-    getIsTallLabwareWestOf96Channel(
+    !getIsSafePipetteMovement(
       prevRobotState,
       invariantContext,
+      args.pipette,
       args.sourceLabware,
-      args.pipette
+      args.tipRack,
+      { x: aspirateXOffset, y: aspirateYOffset }
     )
   ) {
     return {
-      errors: [
-        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
-          source: 'aspirate',
-          labware:
-            invariantContext.labwareEntities[args.sourceLabware].def.metadata
-              .displayName,
-        }),
-      ],
+      errors: [errorCreators.possiblePipetteCollision()],
     }
   }
 
   if (
     is96Channel &&
     args.nozzles === COLUMN &&
-    getIsTallLabwareWestOf96Channel(
+    !getIsSafePipetteMovement(
       prevRobotState,
       invariantContext,
+      args.pipette,
       args.destLabware,
-      args.pipette
+      args.tipRack,
+      { x: dispenseXOffset, y: dispenseYOffset }
     )
   ) {
     return {
-      errors: [
-        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
-          source: 'dispense',
-          labware:
-            invariantContext.labwareEntities[args.destLabware].def.metadata
-              .displayName,
-        }),
-      ],
+      errors: [errorCreators.possiblePipetteCollision()],
     }
   }
 
-  // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
-  // to the action of aspiration of dispensing in a given command, they are actually values bound
-  // to a given labware associated with a command (e.g. Source, Destination). For this reason we
-  // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
-  // when we decide to rename these fields/args... probably all the way up to the UI level.
-  const {
-    aspirateDelay,
-    aspirateFlowRateUlSec,
-    aspirateOffsetFromBottomMm,
-    blowoutFlowRateUlSec,
-    blowoutOffsetFromTopMm,
-    dispenseAirGapVolume,
-    dispenseDelay,
-    dispenseFlowRateUlSec,
-    dispenseOffsetFromBottomMm,
-    mixFirstAspirate,
-    mixInDestination,
-    dropTipLocation,
-  } = args
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const maxWellsPerChunk = Math.floor(
-    getPipetteWithTipMaxVol(args.pipette, invariantContext) /
+    getPipetteWithTipMaxVol(args.pipette, invariantContext, args.tipRack) /
       (args.volume + aspirateAirGapVolume)
   )
   const sourceLabwareDef =
@@ -217,6 +213,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   flowRate: aspirateFlowRateUlSec,
                   offsetFromBottomMm: airGapOffsetSourceWell,
                   isAirGap: true,
+                  tipRack: args.tipRack,
+                  xOffset: 0,
+                  yOffset: 0,
                 }),
                 ...(aspirateDelay != null
                   ? [
@@ -273,6 +272,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               well: sourceWell,
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
+              tipRack: args.tipRack,
+              xOffset: aspirateXOffset,
+              yOffset: aspirateYOffset,
             }),
             ...delayAfterAspirateCommands,
             ...touchTipAfterAspirateCommand,
@@ -290,6 +292,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           curryCommandCreator(replaceTip, {
             pipette: args.pipette,
             dropTipLocation,
+            tipRack: args.tipRack,
           }),
         ]
       }
@@ -320,6 +323,11 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               dispenseFlowRateUlSec,
               aspirateDelaySeconds: aspirateDelay?.seconds,
               dispenseDelaySeconds: dispenseDelay?.seconds,
+              tipRack: args.tipRack,
+              aspirateXOffset,
+              aspirateYOffset,
+              dispenseXOffset,
+              dispenseYOffset,
             })
           : []
       const preWetTipCommands = args.preWetTip // Pre-wet tip is equivalent to a single mix, with volume equal to the consolidate volume.
@@ -335,6 +343,11 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             dispenseFlowRateUlSec,
             aspirateDelaySeconds: aspirateDelay?.seconds,
             dispenseDelaySeconds: dispenseDelay?.seconds,
+            tipRack: args.tipRack,
+            aspirateXOffset,
+            aspirateYOffset,
+            dispenseXOffset,
+            dispenseYOffset,
           })
         : []
       //  can not mix in a waste chute
@@ -352,6 +365,11 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               dispenseFlowRateUlSec,
               aspirateDelaySeconds: aspirateDelay?.seconds,
               dispenseDelaySeconds: dispenseDelay?.seconds,
+              tipRack: args.tipRack,
+              aspirateXOffset,
+              aspirateYOffset,
+              dispenseXOffset,
+              dispenseYOffset,
             })
           : []
 
@@ -377,6 +395,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           well: destinationWell ?? undefined,
           flowRate: dispenseFlowRateUlSec,
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
+          xOffset: dispenseXOffset,
+          yOffset: dispenseYOffset,
         }),
       ]
 
@@ -423,6 +443,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 destWell: destinationWell,
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
+                tipRack: args.tipRack,
               }),
               ...(aspirateDelay != null
                 ? [
@@ -487,8 +508,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ...dispenseCommands,
         ...delayAfterDispenseCommands,
         ...mixAfterCommands,
-        ...touchTipAfterDispenseCommands,
         ...blowoutCommand,
+        ...touchTipAfterDispenseCommands,
         ...airGapAfterDispenseCommands,
         ...dropTipAfterDispenseAirGap,
       ]

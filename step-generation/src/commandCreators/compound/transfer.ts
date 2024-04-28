@@ -18,7 +18,7 @@ import {
   getTrashOrLabware,
   dispenseLocationHelper,
   moveHelper,
-  getIsTallLabwareWestOf96Channel,
+  getIsSafePipetteMovement,
   getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import {
@@ -62,6 +62,27 @@ export const transfer: CommandCreator<TransferArgs> = (
     * 'perDest': change tip each time you encounter a new destination well (including the first one)
     NOTE: In some situations, different changeTip options have equivalent outcomes. That's OK.
   */
+
+  // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
+  // to the action of aspiration of dispensing in a given command, they are actually values bound
+  // to a given labware associated with a command (e.g. Source, Destination). For this reason we
+  // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
+  // when we decide to rename these fields/args... probably all the way up to the UI level.
+  const {
+    aspirateDelay,
+    dispenseDelay,
+    aspirateFlowRateUlSec,
+    aspirateOffsetFromBottomMm,
+    blowoutFlowRateUlSec,
+    blowoutOffsetFromTopMm,
+    dispenseFlowRateUlSec,
+    dispenseOffsetFromBottomMm,
+    tipRack,
+    aspirateXOffset,
+    aspirateYOffset,
+    dispenseXOffset,
+    dispenseYOffset,
+  } = args
 
   const trashOrLabware = getTrashOrLabware(
     invariantContext.labwareEntities,
@@ -130,41 +151,31 @@ export const transfer: CommandCreator<TransferArgs> = (
   if (
     is96Channel &&
     args.nozzles === COLUMN &&
-    getIsTallLabwareWestOf96Channel(
+    !getIsSafePipetteMovement(
       prevRobotState,
       invariantContext,
+      args.pipette,
       args.sourceLabware,
-      args.pipette
+      args.tipRack,
+      { x: aspirateXOffset, y: aspirateYOffset, z: aspirateOffsetFromBottomMm }
     )
   ) {
-    errors.push(
-      errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
-        source: 'aspirate',
-        labware:
-          invariantContext.labwareEntities[args.sourceLabware].def.metadata
-            .displayName,
-      })
-    )
+    errors.push(errorCreators.possiblePipetteCollision())
   }
 
   if (
     is96Channel &&
     args.nozzles === COLUMN &&
-    getIsTallLabwareWestOf96Channel(
+    !getIsSafePipetteMovement(
       prevRobotState,
       invariantContext,
+      args.pipette,
       args.destLabware,
-      args.pipette
+      args.tipRack,
+      { x: dispenseXOffset, y: dispenseYOffset, z: dispenseOffsetFromBottomMm }
     )
   ) {
-    errors.push(
-      errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
-        source: 'dispense',
-        labware:
-          invariantContext.labwareEntities[args.destLabware].def.metadata
-            .displayName,
-      })
-    )
+    errors.push(errorCreators.possiblePipetteCollision())
   }
 
   if (errors.length > 0)
@@ -188,27 +199,16 @@ export const transfer: CommandCreator<TransferArgs> = (
     pipetteSpec.channels
   )
 
-  // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
-  // to the action of aspiration of dispensing in a given command, they are actually values bound
-  // to a given labware associated with a command (e.g. Source, Destination). For this reason we
-  // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
-  // when we decide to rename these fields/args... probably all the way up to the UI level.
-  const {
-    aspirateDelay,
-    dispenseDelay,
-    aspirateFlowRateUlSec,
-    aspirateOffsetFromBottomMm,
-    blowoutFlowRateUlSec,
-    blowoutOffsetFromTopMm,
-    dispenseFlowRateUlSec,
-    dispenseOffsetFromBottomMm,
-  } = args
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
   const effectiveTransferVol =
-    getPipetteWithTipMaxVol(args.pipette, invariantContext) -
+    getPipetteWithTipMaxVol(args.pipette, invariantContext, tipRack) -
     aspirateAirGapVolume
-  const pipetteMinVol = pipetteSpec.minVolume
+  const liquidMinVolumes = Object.values(pipetteSpec.liquids).map(
+    liquid => liquid.minVolume
+  )
+  //  account for minVolume for lowVolume pipettes
+  const pipetteMinVol = Math.min(...liquidMinVolumes)
   const chunksPerSubTransfer = Math.ceil(args.volume / effectiveTransferVol)
   const lastSubTransferVol =
     args.volume - (chunksPerSubTransfer - 1) * effectiveTransferVol
@@ -303,6 +303,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   pipette: args.pipette,
                   nozzles: args.nozzles ?? undefined,
                   dropTipLocation: args.dropTipLocation,
+                  tipRack: args.tipRack,
                 }),
               ]
             : []
@@ -320,6 +321,11 @@ export const transfer: CommandCreator<TransferArgs> = (
                   dispenseFlowRateUlSec,
                   aspirateDelaySeconds: aspirateDelay?.seconds,
                   dispenseDelaySeconds: dispenseDelay?.seconds,
+                  tipRack,
+                  aspirateXOffset,
+                  aspirateYOffset,
+                  dispenseXOffset,
+                  dispenseYOffset,
                 })
               : []
           const mixBeforeAspirateCommands =
@@ -336,6 +342,11 @@ export const transfer: CommandCreator<TransferArgs> = (
                   dispenseFlowRateUlSec,
                   aspirateDelaySeconds: aspirateDelay?.seconds,
                   dispenseDelaySeconds: dispenseDelay?.seconds,
+                  tipRack,
+                  aspirateXOffset,
+                  aspirateYOffset,
+                  dispenseXOffset,
+                  dispenseYOffset,
                 })
               : []
           const delayAfterAspirateCommands =
@@ -399,6 +410,11 @@ export const transfer: CommandCreator<TransferArgs> = (
                   dispenseFlowRateUlSec,
                   aspirateDelaySeconds: aspirateDelay?.seconds,
                   dispenseDelaySeconds: dispenseDelay?.seconds,
+                  tipRack,
+                  aspirateXOffset,
+                  aspirateYOffset,
+                  dispenseXOffset,
+                  dispenseYOffset,
                 })
               : []
 
@@ -413,6 +429,9 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetSourceWell,
                     isAirGap: true,
+                    tipRack,
+                    xOffset: 0,
+                    yOffset: 0,
                   }),
                   ...(aspirateDelay != null
                     ? [
@@ -433,6 +452,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                     flowRate: dispenseFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
                     isAirGap: true,
+                    xOffset: 0,
+                    yOffset: 0,
                   }),
                   ...(dispenseDelay != null
                     ? [
@@ -473,6 +494,9 @@ export const transfer: CommandCreator<TransferArgs> = (
               well: sourceWell,
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
+              tipRack,
+              xOffset: aspirateXOffset,
+              yOffset: aspirateYOffset,
             }),
           ]
           const dispenseCommand = [
@@ -483,6 +507,8 @@ export const transfer: CommandCreator<TransferArgs> = (
               well: destinationWell ?? undefined,
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
+              xOffset: dispenseXOffset,
+              yOffset: dispenseYOffset,
             }),
           ]
 
@@ -531,6 +557,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     destWell: destinationWell,
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
+                    tipRack,
                   }),
                   ...(aspirateDelay != null
                     ? [
@@ -588,8 +615,8 @@ export const transfer: CommandCreator<TransferArgs> = (
             ...dispenseCommand,
             ...delayAfterDispenseCommands,
             ...mixInDestinationCommands,
-            ...touchTipAfterDispenseCommands,
             ...blowoutCommand,
+            ...touchTipAfterDispenseCommands,
             ...airGapAfterDispenseCommands,
             ...dropTipAfterDispenseAirGap,
           ]

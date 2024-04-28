@@ -2,22 +2,22 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import {
-  Flex,
-  SPACING,
   COLORS,
   DIRECTION_COLUMN,
+  Flex,
   JUSTIFY_CENTER,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { MediumButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 
 import screenImage from '../../assets/images/on-device-display/welcome_background.png'
 
 const IMAGE_ALT = 'Welcome screen background image'
 
 export function Welcome(): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const history = useHistory()
 
   return (
@@ -30,7 +30,7 @@ export function Welcome(): JSX.Element {
       <img alt={IMAGE_ALT} src={screenImage} width="904px" height="189px" />
       <Flex justifyContent={JUSTIFY_CENTER}>
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
-          {t('welcome_title')}
+          {t('branded:welcome_title')}
         </StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER}>

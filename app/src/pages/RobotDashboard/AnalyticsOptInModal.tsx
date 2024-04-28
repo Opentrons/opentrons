@@ -3,15 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  Flex,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { updateConfigValue } from '../../redux/config'
 import { getLocalRobot } from '../../redux/discovery'
@@ -28,7 +28,7 @@ interface AnalyticsOptInModalProps {
 export function AnalyticsOptInModal({
   setShowAnalyticsOptInModal,
 }: AnalyticsOptInModalProps): JSX.Element {
-  const { t } = useTranslation(['app_settings', 'shared'])
+  const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
 
   const localRobot = useSelector(getLocalRobot)
@@ -57,7 +57,7 @@ export function AnalyticsOptInModal({
   }
 
   return (
-    <Modal modalSize="medium" header={{ title: t('want_to_help_out') }}>
+    <Modal modalSize="medium" header={{ title: t('branded:want_to_help_out') }}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex
           flexDirection={DIRECTION_COLUMN}

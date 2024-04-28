@@ -59,12 +59,17 @@ describe('getDefaultsForStepType', () => {
         aspirate_delay_checkbox: false,
         aspirate_delay_mmFromBottom: null,
         aspirate_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
-
+        aspirate_x_position: 0,
+        aspirate_y_position: 0,
         dispense_airGap_checkbox: false,
         dispense_airGap_volume: null,
         dispense_delay_checkbox: false,
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_delay_mmFromBottom: null,
+        tipRack: null,
+        dispense_x_position: 0,
+        dispense_y_position: 0,
+        blowout_z_offset: 0,
       })
     })
   })
@@ -92,6 +97,10 @@ describe('getDefaultsForStepType', () => {
         wells: [],
         aspirate_flowRate: null,
         dispense_flowRate: null,
+        tipRack: null,
+        mix_x_position: 0,
+        mix_y_position: 0,
+        blowout_z_offset: 0,
       })
     })
   })

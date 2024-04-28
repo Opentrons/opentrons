@@ -38,6 +38,7 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         initialRobotState
@@ -50,6 +51,7 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         merge({}, initialRobotState, {
@@ -83,6 +85,7 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         initialTestRobotState
@@ -107,6 +110,7 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         initialTestRobotState
@@ -132,6 +136,7 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         initialTestRobotState
@@ -170,6 +175,7 @@ describe('replaceTip', () => {
         {
           pipette: p300SingleId,
           dropTipLocation: 'wasteChuteId',
+          tipRack: tiprack1Id,
         },
         invariantContext,
         initialTestRobotState
@@ -188,6 +194,7 @@ describe('replaceTip', () => {
         {
           pipette: p300MultiId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         initialRobotState
@@ -214,6 +221,7 @@ describe('replaceTip', () => {
         {
           pipette: p300MultiId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         robotStateWithTipA1Missing
@@ -239,6 +247,7 @@ describe('replaceTip', () => {
         {
           pipette: p300MultiId,
           dropTipLocation: FIXED_TRASH_ID,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         robotStateWithTipsOnMulti
@@ -283,6 +292,7 @@ describe('replaceTip', () => {
         {
           pipette: p100096Id,
           dropTipLocation: 'wasteChuteId',
+          tipRack: tiprack5Id,
           nozzles: COLUMN,
         },
         invariantContext,

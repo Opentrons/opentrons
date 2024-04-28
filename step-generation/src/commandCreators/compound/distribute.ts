@@ -16,7 +16,7 @@ import {
   blowoutUtil,
   wasteChuteCommandsUtil,
   getDispenseAirGapLocation,
-  getIsTallLabwareWestOf96Channel,
+  getIsSafePipetteMovement,
   getWasteChuteAddressableAreaNamePip,
 } from '../../utils'
 import {
@@ -53,6 +53,26 @@ export const distribute: CommandCreator<DistributeArgs> = (
     * 'once': get a new tip at the beginning of the distribute step, and use it throughout
     * 'never': reuse the tip from the last step
   */
+
+  // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
+  // to the action of aspiration of dispensing in a given command, they are actually values bound
+  // to a given labware associated with a command (e.g. Source, Destination). For this reason we
+  // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
+  // when we decide to rename these fields/args... probably all the way up to the UI level.
+  const {
+    aspirateDelay,
+    aspirateFlowRateUlSec,
+    aspirateOffsetFromBottomMm,
+    dispenseDelay,
+    dispenseFlowRateUlSec,
+    dispenseOffsetFromBottomMm,
+    blowoutLocation,
+    aspirateXOffset,
+    aspirateYOffset,
+    dispenseXOffset,
+    dispenseYOffset,
+  } = args
+
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
   const actionName = 'distribute'
   const errors: CommandCreatorError[] = []
@@ -91,68 +111,45 @@ export const distribute: CommandCreator<DistributeArgs> = (
   if (
     is96Channel &&
     args.nozzles === COLUMN &&
-    getIsTallLabwareWestOf96Channel(
+    !getIsSafePipetteMovement(
       prevRobotState,
       invariantContext,
+      args.pipette,
       args.sourceLabware,
-      args.pipette
+      args.tipRack,
+      { x: aspirateXOffset, y: aspirateYOffset }
     )
   ) {
-    errors.push(
-      errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
-        source: 'aspirate',
-        labware:
-          invariantContext.labwareEntities[args.sourceLabware].def.metadata
-            .displayName,
-      })
-    )
+    errors.push(errorCreators.possiblePipetteCollision())
   }
 
   if (
     is96Channel &&
     args.nozzles === COLUMN &&
-    getIsTallLabwareWestOf96Channel(
+    !getIsSafePipetteMovement(
       prevRobotState,
       invariantContext,
+      args.pipette,
       args.destLabware,
-      args.pipette
+      args.tipRack,
+      { x: dispenseXOffset, y: dispenseYOffset }
     )
   ) {
-    errors.push(
-      errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
-        source: 'dispense',
-        labware:
-          invariantContext.labwareEntities[args.destLabware].def.metadata
-            .displayName,
-      })
-    )
+    errors.push(errorCreators.possiblePipetteCollision())
   }
 
   if (errors.length > 0)
     return {
       errors,
     }
-  // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
-  // to the action of aspiration of dispensing in a given command, they are actually values bound
-  // to a given labware associated with a command (e.g. Source, Destination). For this reason we
-  // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
-  // when we decide to rename these fields/args... probably all the way up to the UI level.
-  const {
-    aspirateDelay,
-    aspirateFlowRateUlSec,
-    aspirateOffsetFromBottomMm,
-    dispenseDelay,
-    dispenseFlowRateUlSec,
-    dispenseOffsetFromBottomMm,
-    blowoutLocation,
-  } = args
+
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
   // TODO error on negative args.disposalVolume?
   const disposalVolume =
     args.disposalVolume && args.disposalVolume > 0 ? args.disposalVolume : 0
   const maxVolume =
-    getPipetteWithTipMaxVol(args.pipette, invariantContext) -
+    getPipetteWithTipMaxVol(args.pipette, invariantContext, args.tipRack) -
     aspirateAirGapVolume
   const maxWellsPerChunk = Math.floor(
     (maxVolume - disposalVolume) / args.volume
@@ -209,6 +206,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetSourceWell,
               isAirGap: true,
+              xOffset: 0,
+              yOffset: 0,
+              tipRack: args.tipRack,
             }),
             ...(aspirateDelay != null
               ? [
@@ -229,6 +229,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: airGapOffsetDestWell,
               isAirGap: true,
+              xOffset: 0,
+              yOffset: 0,
             }),
             ...(dispenseDelay != null
               ? [
@@ -287,6 +289,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               well: destWell,
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
+              xOffset: dispenseXOffset,
+              yOffset: dispenseYOffset,
             }),
             ...delayAfterDispenseCommands,
             ...touchTipAfterDispenseCommand,
@@ -304,6 +308,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           curryCommandCreator(replaceTip, {
             pipette: args.pipette,
             dropTipLocation: args.dropTipLocation,
+            tipRack: args.tipRack,
           }),
         ]
       }
@@ -332,6 +337,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
                 isAirGap: true,
+                tipRack: args.tipRack,
+                xOffset: 0,
+                yOffset: 0,
               }),
               ...(aspirateDelay != null
                 ? [
@@ -433,6 +441,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
               dispenseFlowRateUlSec,
               aspirateDelaySeconds: aspirateDelay?.seconds,
               dispenseDelaySeconds: dispenseDelay?.seconds,
+              tipRack: args.tipRack,
+              aspirateXOffset,
+              aspirateYOffset,
+              dispenseXOffset,
+              dispenseYOffset,
             })
           : []
 
@@ -471,6 +484,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
           well: args.sourceWell,
           flowRate: aspirateFlowRateUlSec,
           offsetFromBottomMm: aspirateOffsetFromBottomMm,
+          tipRack: args.tipRack,
+          xOffset: aspirateXOffset,
+          yOffset: aspirateYOffset,
         }),
         ...delayAfterAspirateCommands,
         ...touchTipAfterAspirateCommand,

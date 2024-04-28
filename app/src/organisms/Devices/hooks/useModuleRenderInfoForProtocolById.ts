@@ -1,19 +1,17 @@
 import {
   checkModuleCompatibility,
   FLEX_ROBOT_TYPE,
-  getCutoutIdForSlotName,
+  getCutoutFixturesForModuleModel,
+  getCutoutIdsFromModuleSlotName,
   getDeckDefFromRobotType,
-  MAGNETIC_BLOCK_TYPE,
-  SINGLE_SLOT_FIXTURES,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  THERMOCYCLER_MODULE_TYPE,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 import { getProtocolModulesInfo } from '../ProtocolRun/utils/getProtocolModulesInfo'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useAttachedModules } from './useAttachedModules'
 import { useStoredProtocolAnalysis } from './useStoredProtocolAnalysis'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type { CutoutConfig } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../redux/modules/types'
@@ -35,7 +33,7 @@ export function useModuleRenderInfoForProtocolById(
   pollModules?: boolean
 ): ModuleRenderInfoById {
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { data: deckConfig } = useDeckConfigurationQuery({
+  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
     refetchInterval: REFETCH_INTERVAL_5000_MS,
   })
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -45,50 +43,57 @@ export function useModuleRenderInfoForProtocolById(
   })
   if (protocolAnalysis == null) return {}
 
-  const deckDef = getDeckDefFromRobotType(
-    protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
-  )
+  const assumedRobotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
+  const deckDef = getDeckDefFromRobotType(assumedRobotType)
 
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
 
   const protocolModulesInfoInLoadOrder = protocolModulesInfo.sort(
     (modA, modB) => modA.protocolLoadOrder - modB.protocolLoadOrder
   )
+
+  const robotSupportsModuleConfig = assumedRobotType !== OT2_ROBOT_TYPE
   let matchedAmod: AttachedModule[] = []
   const allModuleRenderInfo = protocolModulesInfoInLoadOrder.map(
     protocolMod => {
+      const moduleFixtures = getCutoutFixturesForModuleModel(
+        protocolMod.moduleDef.model,
+        deckDef
+      )
+      const moduleCutoutIds = getCutoutIdsFromModuleSlotName(
+        protocolMod.slotName,
+        moduleFixtures,
+        deckDef
+      )
       const compatibleAttachedModule =
         attachedModules.find(
           attachedMod =>
+            // first check module model compatibility
             checkModuleCompatibility(
               attachedMod.moduleModel,
               protocolMod.moduleDef.model
-            ) && !matchedAmod.find(m => m === attachedMod)
+            ) &&
+            // then check that the module hasn't already been matched
+            !matchedAmod.some(
+              m => m.serialNumber === attachedMod.serialNumber
+            ) &&
+            // then if robotType supports configurable modules check the deck config has a
+            // a module with the expected serial number in the expected location
+            (!robotSupportsModuleConfig ||
+              deckConfig.some(
+                ({ cutoutId, opentronsModuleSerialNumber }) =>
+                  attachedMod.serialNumber === opentronsModuleSerialNumber &&
+                  moduleCutoutIds.includes(cutoutId)
+              ))
         ) ?? null
-
-      const cutoutIdForSlotName = getCutoutIdForSlotName(
-        protocolMod.slotName,
-        deckDef
-      )
-
-      const isMagneticBlockModule =
-        protocolMod.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE
-
-      const isThermocycler =
-        protocolMod.moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
 
       const conflictedFixture =
         deckConfig?.find(
-          fixture =>
-            (fixture.cutoutId === cutoutIdForSlotName ||
-              // special-case A1 for the thermocycler to require a single slot fixture
-              (isThermocycler && fixture.cutoutId === 'cutoutA1')) &&
-            fixture.cutoutFixtureId != null &&
-            // do not generate a conflict for single slot fixtures, because modules are not yet fixtures
-            !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId) &&
-            // special case the magnetic module because unlike other modules it sits in a slot that can also be provided by a staging area fixture
-            (!isMagneticBlockModule ||
-              fixture.cutoutFixtureId !== STAGING_AREA_RIGHT_SLOT_FIXTURE)
+          ({ cutoutId, cutoutFixtureId }) =>
+            moduleCutoutIds.includes(cutoutId) &&
+            !moduleFixtures.some(({ id }) => cutoutFixtureId === id) &&
+            // if robotType supports module config, don't treat module fixture as conflict
+            (!robotSupportsModuleConfig || compatibleAttachedModule == null)
         ) ?? null
 
       if (compatibleAttachedModule !== null) {

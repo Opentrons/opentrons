@@ -4,25 +4,25 @@ import startCase from 'lodash/startCase'
 import { css } from 'styled-components'
 
 import {
-  Box,
-  Flex,
-  Link,
-  SPACING,
-  COLORS,
-  BORDERS,
-  TYPOGRAPHY,
-  POSITION_ABSOLUTE,
-  DIRECTION_COLUMN,
-  SecondaryButton,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
-  Icon,
   ALIGN_FLEX_END,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  Link,
+  POSITION_ABSOLUTE,
+  SecondaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ERROR_TOAST, SUCCESS_TOAST } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import {
@@ -72,7 +72,6 @@ const SORT_BY_BUTTON_STYLE = css`
   &:active,
   &:focus {
     background-color: ${COLORS.grey40};
-  }
   }
 `
 
@@ -142,18 +141,14 @@ export function Labware(): JSX.Element {
           alignItems={ALIGN_FLEX_END}
           paddingBottom={SPACING.spacing24}
         >
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-              {t('category')}
-            </StyledText>
-            <DropdownMenu
-              filterOptions={FILTER_OPTIONS}
-              currentOption={{ value: filterBy, name: startCase(filterBy) }}
-              onClick={value => {
-                setFilterBy(value as LabwareFilter)
-              }}
-            />
-          </Flex>
+          <DropdownMenu
+            filterOptions={FILTER_OPTIONS}
+            currentOption={{ value: filterBy, name: startCase(filterBy) }}
+            onClick={value => {
+              setFilterBy(value as LabwareFilter)
+            }}
+            title={t('category')}
+          />
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <StyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.grey50}>
               {t('shared:sort_by')}
@@ -161,7 +156,7 @@ export function Labware(): JSX.Element {
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              borderRadius={BORDERS.borderRadius4}
+              borderRadius={BORDERS.borderRadius8}
               marginLeft={SPACING.spacing8}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}

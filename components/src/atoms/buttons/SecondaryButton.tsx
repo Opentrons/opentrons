@@ -18,7 +18,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   color: ${props => (props.isDangerous ? COLORS.red50 : COLORS.blue50)};
   border: ${BORDERS.lineBorder};
   border-color: ${props => (props.isDangerous ? COLORS.red50 : 'initial')};
-  border-radius: ${BORDERS.borderRadius4};
+  border-radius: ${BORDERS.borderRadius8};
   padding: ${SPACING.spacing8} ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   background-color: ${COLORS.transparent};

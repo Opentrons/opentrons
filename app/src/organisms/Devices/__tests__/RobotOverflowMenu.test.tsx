@@ -20,6 +20,7 @@ vi.mock('../../../redux/robot-update/selectors')
 vi.mock('../../ProtocolUpload/hooks')
 vi.mock('../../ChooseProtocolSlideout')
 vi.mock('../hooks')
+vi.mock('../../../resources/devices/hooks/useIsEstopNotDisengaged')
 
 const render = (props: React.ComponentProps<typeof RobotOverflowMenu>) => {
   return renderWithProviders(
@@ -85,19 +86,13 @@ describe('RobotOverflowMenu', () => {
     expect(run).toBeDisabled()
   })
 
-  it('should only render robot settings when e-stop is pressed or disconnected', () => {
+  it('disables the run a protocol menu item if robot is busy', () => {
     vi.mocked(useCurrentRunId).mockReturnValue(null)
-    vi.mocked(getRobotUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'upgrade',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
-
     vi.mocked(useIsRobotBusy).mockReturnValue(true)
     render(props)
     const btn = screen.getByLabelText('RobotOverflowMenu_button')
     fireEvent.click(btn)
-    expect(screen.queryByText('Run a protocol')).not.toBeInTheDocument()
-    screen.getByText('Robot settings')
+    const run = screen.getByText('Run a protocol')
+    expect(run).toBeDisabled()
   })
 })

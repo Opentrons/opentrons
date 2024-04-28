@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 import math
 import pytest
 
-from opentrons.commands import types
+from opentrons.legacy_commands import types
 from opentrons.protocol_api import InstrumentContext
 from opentrons.protocols.duration.estimator import (
     DurationEstimator,

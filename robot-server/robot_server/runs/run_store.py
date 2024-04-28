@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Literal, Union
 
 import sqlalchemy
 from pydantic import ValidationError
@@ -12,6 +12,13 @@ from pydantic import ValidationError
 from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
 from opentrons.protocol_engine.commands import Command
+from opentrons.protocol_engine.types import RunTimeParameter
+
+from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
+    PythonException,
+    InvalidStoredData,
+)
 
 from robot_server.persistence.database import sqlite_rowid
 from robot_server.persistence.tables import (
@@ -19,9 +26,13 @@ from robot_server.persistence.tables import (
     run_command_table,
     action_table,
 )
-from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
+from robot_server.persistence.pydantic import (
+    json_to_pydantic,
+    pydantic_to_json,
+    json_to_pydantic_list,
+    pydantic_list_to_json,
+)
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
-from robot_server.service.notifications import RunsPublisher
 
 from .action_models import RunAction, RunActionType
 from .run_models import RunNotFoundError
@@ -39,10 +50,39 @@ class RunResource:
     location, such as a ProtocolEngine instance.
     """
 
+    ok: Literal[True]
     run_id: str
     protocol_id: Optional[str]
     created_at: datetime
     actions: List[RunAction]
+
+
+@dataclass(frozen=True)
+class BadRunResource:
+    """A representation for an action in the run store that cannot be loaded.
+
+    This will get created, for instance, when loading a run made in a future
+    version with an action that does not exist in the current version. This should
+    never happen in released versions, but it does sometimes during development,
+    and without handling like this it would cause any list-all request to fail.
+
+    The ok field is a union discriminator. Other elements will be filled in as they
+    can be with whatever data was recoverable and should not be relied upon.
+    """
+
+    ok: Literal[False]
+    run_id: str
+    protocol_id: Optional[str]
+    created_at: datetime
+    actions: List[RunAction]
+    error: EnumeratedError
+
+
+@dataclass(frozen=True)
+class BadStateSummary:
+    """A representation for a state summary that could not be loaded."""
+
+    dataError: EnumeratedError
 
 
 class CommandNotFoundError(ValueError):
@@ -59,17 +99,16 @@ class RunStore:
     def __init__(
         self,
         sql_engine: sqlalchemy.engine.Engine,
-        runs_publisher: RunsPublisher,
     ) -> None:
         """Initialize a RunStore with sql engine and notification client."""
         self._sql_engine = sql_engine
-        self._runs_publisher = runs_publisher
 
     def update_run_state(
         self,
         run_id: str,
         summary: StateSummary,
         commands: List[Command],
+        run_time_parameters: List[RunTimeParameter],
     ) -> RunResource:
         """Update the run's state summary and commands list.
 
@@ -77,6 +116,7 @@ class RunStore:
             run_id: The run to update
             summary: The run's equipment and status summary.
             commands: The run's commands.
+            run_time_parameters: The run's run time parameters, if any.
 
         Returns:
             The run resource.
@@ -92,6 +132,7 @@ class RunStore:
                     run_id=run_id,
                     state_summary=summary,
                     engine_status=summary.status,
+                    run_time_parameters=run_time_parameters,
                 )
             )
         )
@@ -131,8 +172,10 @@ class RunStore:
             action_rows = transaction.execute(select_actions).all()
 
         self._clear_caches()
-        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
-        return _convert_row_to_run(row=run_row, action_rows=action_rows)
+        maybe_run_resource = _convert_row_to_run(row=run_row, action_rows=action_rows)
+        if not maybe_run_resource.ok:
+            raise maybe_run_resource.error
+        return maybe_run_resource
 
     def insert_action(self, run_id: str, action: RunAction) -> None:
         """Insert a run action into the store.
@@ -154,7 +197,6 @@ class RunStore:
             transaction.execute(insert)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
 
     def insert(
         self,
@@ -177,6 +219,7 @@ class RunStore:
                 found in the store.
         """
         run = RunResource(
+            ok=True,
             run_id=run_id,
             created_at=created_at,
             protocol_id=protocol_id,
@@ -196,7 +239,6 @@ class RunStore:
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs_advise_refetch(run_id=run_id)
         return run
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
@@ -206,7 +248,7 @@ class RunStore:
             return self._run_exists(run_id, transaction)
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
-    def get(self, run_id: str) -> RunResource:
+    def get(self, run_id: str) -> Union[RunResource, BadRunResource]:
         """Get a specific run entry by its identifier.
 
         Args:
@@ -238,7 +280,9 @@ class RunStore:
         return _convert_row_to_run(run_row, action_rows)
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
-    def get_all(self, length: Optional[int] = None) -> List[RunResource]:
+    def get_all(
+        self, length: Optional[int] = None
+    ) -> List[Union[RunResource, BadRunResource]]:
         """Get all known run resources.
 
         Results are ordered from oldest to newest.
@@ -278,7 +322,7 @@ class RunStore:
         ]
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
-    def get_state_summary(self, run_id: str) -> Optional[StateSummary]:
+    def get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         """Get the archived run state summary.
 
         This is a summary of run's ProtocolEngine state,
@@ -296,11 +340,47 @@ class RunStore:
             return (
                 json_to_pydantic(StateSummary, row.state_summary)
                 if row.state_summary is not None
-                else None
+                else BadStateSummary(
+                    dataError=InvalidStoredData(
+                        message="There was no engine state data for this run."
+                    )
+                )
             )
         except ValidationError as e:
-            log.warning(f"Error retrieving state summary for {run_id}: {e}")
-            return None
+            log.warning(f"Error retrieving state summary for {run_id}", exc_info=True)
+            return BadStateSummary(
+                dataError=InvalidStoredData(
+                    message="Could not load stored StateSummary",
+                    wrapping=[PythonException(e)],
+                )
+            )
+
+    @lru_cache(maxsize=_CACHE_ENTRIES)
+    def get_run_time_parameters(self, run_id: str) -> List[RunTimeParameter]:
+        """Get the archived run time parameters.
+
+        This is a list of the run's parameter definitions (if any),
+        including the values used in the run itself, along with the default value,
+        constraints and associated names and descriptions.
+        """
+        select_run_data = sqlalchemy.select(run_table.c.run_time_parameters).where(
+            run_table.c.id == run_id
+        )
+
+        with self._sql_engine.begin() as transaction:
+            row = transaction.execute(select_run_data).one()
+
+        try:
+            return (
+                json_to_pydantic_list(RunTimeParameter, row.run_time_parameters)  # type: ignore[arg-type]
+                if row.run_time_parameters is not None
+                else []
+            )
+        except ValidationError:
+            log.warning(
+                f"Error retrieving run time parameters for {run_id}", exc_info=True
+            )
+            return []
 
     def get_commands_slice(
         self,
@@ -417,7 +497,6 @@ class RunStore:
             raise RunNotFoundError(run_id)
 
         self._clear_caches()
-        self._runs_publisher.publish_runs_advise_unsubscribe(run_id=run_id)
 
     def _run_exists(
         self, run_id: str, connection: sqlalchemy.engine.Connection
@@ -433,6 +512,7 @@ class RunStore:
         self.get_all.cache_clear()
         self.get_state_summary.cache_clear()
         self.get_command.cache_clear()
+        self.get_run_time_parameters.cache_clear()
 
 
 # The columns that must be present in a row passed to _convert_row_to_run().
@@ -442,28 +522,49 @@ _run_columns = [run_table.c.id, run_table.c.protocol_id, run_table.c.created_at]
 def _convert_row_to_run(
     row: sqlalchemy.engine.Row,
     action_rows: List[sqlalchemy.engine.Row],
-) -> RunResource:
+) -> Union[RunResource, BadRunResource]:
     run_id = row.id
     protocol_id = row.protocol_id
     created_at = row.created_at
-
+    # Checking the fundamental data types here are not covered by the error handling
+    # because if they fire, the only thing we can do to address the issue is immediately
+    # delete the row while we still have a handle on it from sql - we won't have any
+    # other way to delete it. It's also unclear how it could happen without the table schema
+    # changing out from under us.
     assert isinstance(run_id, str), f"Run ID {run_id} is not a string"
     assert protocol_id is None or isinstance(
         protocol_id, str
     ), f"Protocol ID {protocol_id} is not a string or None"
-
-    return RunResource(
-        run_id=run_id,
-        created_at=created_at,
-        protocol_id=protocol_id,
-        actions=[
+    try:
+        actions = [
             RunAction(
                 id=action_row.id,
                 createdAt=action_row.created_at,
                 actionType=RunActionType(action_row.action_type),
             )
             for action_row in action_rows
-        ],
+        ]
+    except Exception as be:
+        log.warning("Error reading actions for run ID {run_id}:", exc_info=True)
+        return BadRunResource(
+            ok=False,
+            run_id=run_id,
+            created_at=created_at,
+            protocol_id=protocol_id,
+            actions=[],
+            error=InvalidStoredData(
+                message="This run has invalid or unknown actions. It has likely been saved in a future version of software.",
+                detail={"kind": "bad-actions"},
+                wrapping=[PythonException(be)],
+            ),
+        )
+
+    return RunResource(
+        ok=True,
+        run_id=run_id,
+        created_at=created_at,
+        protocol_id=protocol_id,
+        actions=actions,
     )
 
 
@@ -488,9 +589,11 @@ def _convert_state_to_sql_values(
     run_id: str,
     state_summary: StateSummary,
     engine_status: str,
+    run_time_parameters: List[RunTimeParameter],
 ) -> Dict[str, object]:
     return {
         "state_summary": pydantic_to_json(state_summary),
         "engine_status": engine_status,
         "_updated_at": utc_now(),
+        "run_time_parameters": pydantic_list_to_json(run_time_parameters),
     }

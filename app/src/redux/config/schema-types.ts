@@ -9,8 +9,8 @@ export type DiscoveryCandidates = string[]
 
 export type DevInternalFlag =
   | 'protocolStats'
-  | 'enableRunTimeParameters'
   | 'enableRunNotes'
+  | 'enableQuickTransfer'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 

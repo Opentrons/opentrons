@@ -50,7 +50,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
 )
 from opentrons_hardware.sensors.scheduler import SensorScheduler
-from opentrons_hardware.sensors.sensor_driver import LogListener, SensorDriver
+from opentrons_hardware.sensors.sensor_driver import SensorDriver
 from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_hardware.sensors.sensor_types import SensorInformation
 from opentrons_hardware.sensors.utils import SensorThresholdInformation
@@ -180,7 +180,9 @@ async def test_liquid_probe(
         mount_speed=10,
         plunger_speed=8,
         threshold_pascals=threshold_pascals,
-        log_pressure=False,
+        csv_output=False,
+        sync_buffer_output=False,
+        can_bus_only_output=False,
         auto_zero_sensor=True,
         num_baseline_reads=8,
         sensor_id=SensorId.S0,
@@ -191,34 +193,6 @@ async def test_liquid_probe(
         data=SensorDataType.build(threshold_pascals * 65536, sensor_info.sensor_type),
         mode=SensorThresholdMode.absolute,
     )
-    mock_bind_output.assert_called_once()
-    assert mock_bind_output.call_args_list[0][0][3] == [SensorOutputBinding.sync]
-
-    with patch(
-        "opentrons_hardware.hardware_control.tool_sensors", LogListener
-    ) as mock_log:
-
-        mock_log.__aenter__ = AsyncMock(return_value=mock_log)  # type: ignore
-        mock_log.__aexit__ = AsyncMock(return_value=None)  # type: ignore
-
-        await liquid_probe(
-            messenger=mock_messenger,
-            tool=target_node,
-            head_node=motor_node,
-            max_z_distance=40,
-            mount_speed=10,
-            plunger_speed=8,
-            threshold_pascals=threshold_pascals,
-            log_pressure=True,
-            auto_zero_sensor=True,
-            num_baseline_reads=8,
-            sensor_id=SensorId.S0,
-        )
-        mock_bind_output.assert_called()
-        assert mock_bind_output.call_args_list[1][0][3] == [
-            SensorOutputBinding.sync,
-            SensorOutputBinding.report,
-        ]
 
 
 @pytest.mark.parametrize(

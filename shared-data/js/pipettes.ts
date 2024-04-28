@@ -60,7 +60,7 @@ export function getPipetteNameSpecs(
 // NOTE: this should NEVER be used in PD, which is model-agnostic
 export function getPipetteModelSpecs(
   model: PipetteModel
-): PipetteModelSpecs | null | undefined {
+): PipetteModelSpecs | null {
   const modelSpecificFields = pipetteModelSpecs.config[model]
   const modelFields =
     modelSpecificFields &&
@@ -118,6 +118,7 @@ export const getIncompatiblePipetteNames = (
 }
 
 export * from '../pipette/fixtures/name'
+export * from '../pipette/fixtures/index'
 
 const getChannelsFromString = (
   pipChannelString: PipChannelString
@@ -138,24 +139,51 @@ const getChannelsFromString = (
     }
   }
 }
-const getVersionFromGen = (gen: Gen): string | null => {
+const getVersionFromGen = (gen: Gen): number => {
   switch (gen) {
     case 'gen1': {
-      return '1_0'
+      return 1
     }
     case 'gen2': {
-      return '2_0'
+      return 2
     }
     case 'gen3':
     case 'flex': {
-      return '3_0'
+      return 3
     }
     default: {
-      return null
+      return 0
     }
   }
 }
-
+const getHighestVersion = (
+  wholeVersion: string,
+  path: string,
+  pipetteModel: string,
+  channels: Channels | null,
+  majorVersion: number,
+  highestVersion: string
+): string => {
+  const versionComponents = wholeVersion.split('_')
+  const majorPathVersion = parseInt(versionComponents[0])
+  const minorPathVersion = parseInt(versionComponents[1])
+  const highestVersionComponents = highestVersion.split('_')
+  const minorHighestVersion = parseInt(highestVersionComponents[1])
+  if (majorPathVersion === majorVersion) {
+    //  Compare the version number with the current highest version
+    //  and make sure the given model, channels, and major/minor versions
+    //  are found in the path
+    if (
+      minorPathVersion > minorHighestVersion &&
+      path.includes(`${majorPathVersion}_${minorPathVersion}`) &&
+      path.includes(pipetteModel) &&
+      path.includes(channels ?? '')
+    ) {
+      highestVersion = `${majorPathVersion}_${minorPathVersion}`
+    }
+  }
+  return highestVersion
+}
 const V2_DEFINITION_TYPES = ['general', 'geometry']
 
 /* takes in pipetteName such as 'p300_single' or 'p300_single_gen1' 
@@ -165,17 +193,26 @@ model, and version in order to return the correct pipette schema v2 json files.
 export const getPipetteSpecsV2 = (
   name: PipetteName | PipetteModel
 ): PipetteV2Specs | null => {
+  if (name == null) {
+    return null
+  }
+
   const nameSplit = name.split('_')
   const pipetteModel = nameSplit[0] // ex: p300
   const channels = getChannelsFromString(nameSplit[1] as PipChannelString) //  ex: single -> single_channel
-  const gen = getVersionFromGen(nameSplit[2] as Gen)
-
-  let version: string
+  const pipetteGen = getVersionFromGen(nameSplit[2] as Gen)
+  let version: string = ''
+  let majorVersion: number
   //  the first 2 conditions are to accommodate version from the pipetteName
   if (nameSplit.length === 2) {
-    version = '1_0'
-  } else if (gen != null) {
-    version = gen //  ex: gen1 -> 1_0
+    // special-casing 96-channel
+    if (channels === 'ninety_six_channel') {
+      majorVersion = 3
+    } else {
+      majorVersion = 1
+    }
+  } else if (pipetteGen !== 0) {
+    majorVersion = pipetteGen //  ex: gen1 -> 1
     //  the 'else' is to accommodate the exact version if PipetteModel was added
   } else {
     const versionNumber = nameSplit[2].split('v')[1]
@@ -185,13 +222,23 @@ export const getPipetteSpecsV2 = (
       version = `${versionNumber}_0` //  ex: 1 -> 1_0
     }
   }
-
+  let highestVersion: string = '0_0'
   const generalGeometricMatchingJsons = Object.entries(generalGeometric).reduce(
     (genericGeometricModules: GeneralGeometricModules[], [path, module]) => {
+      const wholeVersion = path.split('/')[7]
+      highestVersion = getHighestVersion(
+        wholeVersion,
+        path,
+        pipetteModel,
+        channels,
+        majorVersion,
+        highestVersion
+      )
       V2_DEFINITION_TYPES.forEach(type => {
         if (
-          `../pipette/definitions/2/${type}/${channels}/${pipetteModel}/${version}.json` ===
-          path
+          `../pipette/definitions/2/${type}/${channels}/${pipetteModel}/${
+            version === '' ? highestVersion : version
+          }.json` === path
         ) {
           genericGeometricModules.push(module.default)
         }
@@ -214,8 +261,9 @@ export const getPipetteSpecsV2 = (
       liquidTypes.push(type)
     }
     if (
-      `../pipette/definitions/2/liquid/${channels}/${pipetteModel}/${type}/${version}.json` ===
-      path
+      `../pipette/definitions/2/liquid/${channels}/${pipetteModel}/${type}/${
+        version === '' ? highestVersion : version
+      }.json` === path
     ) {
       const index = liquidTypes.indexOf(type)
       const newKeyName = index !== -1 ? liquidTypes[index] : path

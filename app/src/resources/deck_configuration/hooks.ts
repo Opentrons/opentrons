@@ -1,5 +1,4 @@
 import { getInitialAndMovedLabwareInSlots } from '@opentrons/components'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
   getAddressableAreasInProtocol,
@@ -7,12 +6,8 @@ import {
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
   getLabwareDisplayName,
-  SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_SLOT_FIXTURES,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-
-import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 import type {
   CompletedProtocolAnalysis,
@@ -21,6 +16,8 @@ import type {
   ProtocolAnalysisOutput,
   RobotType,
 } from '@opentrons/shared-data'
+
+import { useNotifyDeckConfigurationQuery } from './useNotifyDeckConfigurationQuery'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 
@@ -34,8 +31,9 @@ export function useDeckConfigurationCompatibility(
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
 ): CutoutConfigAndCompatibility[] {
   const deckConfig =
-    useDeckConfigurationQuery({ refetchInterval: DECK_CONFIG_REFETCH_INTERVAL })
-      .data ?? []
+    useNotifyDeckConfigurationQuery({
+      refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+    }).data ?? []
   if (robotType !== FLEX_ROBOT_TYPE) return []
   const deckDef = getDeckDefFromRobotType(robotType)
   const allAddressableAreas =
@@ -46,17 +44,6 @@ export function useDeckConfigurationCompatibility(
     protocolAnalysis != null
       ? getInitialAndMovedLabwareInSlots(protocolAnalysis)
       : []
-
-  const protocolModulesInfo =
-    protocolAnalysis != null
-      ? getProtocolModulesInfo(protocolAnalysis, deckDef)
-      : []
-
-  const hasThermocycler =
-    protocolModulesInfo.find(
-      protocolMod =>
-        protocolMod.moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
-    ) != null
 
   return deckConfig.reduce<CutoutConfigAndCompatibility[]>(
     (acc, { cutoutId, cutoutFixtureId }) => {
@@ -69,7 +56,6 @@ export function useDeckConfigurationCompatibility(
           getCutoutIdForAddressableArea(aa, fixturesThatMountToCutoutId) ===
           cutoutId
       )
-
       const compatibleCutoutFixtureIds = fixturesThatMountToCutoutId
         .filter(cf =>
           requiredAddressableAreasForCutoutId.every(aa =>
@@ -106,11 +92,7 @@ export function useDeckConfigurationCompatibility(
           cutoutId,
           cutoutFixtureId,
           requiredAddressableAreas: requiredAddressableAreasForCutoutId,
-          // Thermocycler requires an "empty" (single slot) fixture in A1 that is not referenced directly in protocol
-          compatibleCutoutFixtureIds:
-            hasThermocycler && cutoutId === 'cutoutA1'
-              ? [SINGLE_LEFT_SLOT_FIXTURE]
-              : compatibleCutoutFixtureIds,
+          compatibleCutoutFixtureIds,
           missingLabwareDisplayName,
         },
       ]

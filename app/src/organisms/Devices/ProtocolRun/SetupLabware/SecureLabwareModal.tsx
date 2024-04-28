@@ -3,17 +3,17 @@ import { createPortal } from 'react-dom'
 import snakeCase from 'lodash/snakeCase'
 import { Trans, useTranslation } from 'react-i18next'
 import {
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
-  DIRECTION_ROW,
-  SPACING,
-  PrimaryButton,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '../../../../App/portal'
-import { StyledText } from '../../../../atoms/text'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
 import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
 import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
@@ -29,7 +29,7 @@ interface SecureLabwareModalProps {
 export const SecureLabwareModal = (
   props: SecureLabwareModalProps
 ): JSX.Element => {
-  const { t } = useTranslation(['protocol_setup', 'shared'])
+  const { t } = useTranslation(['protocol_setup', 'shared', 'branded'])
   const moduleName = getModuleName(props.type)
   return createPortal(
     <LegacyModal
@@ -48,7 +48,9 @@ export const SecureLabwareModal = (
             <Flex flexDirection={DIRECTION_COLUMN}>
               <Trans
                 t={t}
-                i18nKey={`secure_labware_explanation_${snakeCase(moduleName)}`}
+                i18nKey={`branded:secure_labware_explanation_${snakeCase(
+                  moduleName
+                )}`}
                 components={{
                   block: (
                     <StyledText
@@ -74,7 +76,7 @@ export const SecureLabwareModal = (
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <StyledText as="p" marginRight="3.625rem">
-              {t(`secure_labware_explanation_${snakeCase(moduleName)}`)}
+              {t(`branded:secure_labware_explanation_${snakeCase(moduleName)}`)}
             </StyledText>
             <img
               src={secureTCLatchImage}

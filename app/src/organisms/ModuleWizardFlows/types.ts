@@ -24,7 +24,6 @@ export interface ModuleCalibrationWizardStepProps {
   attachedPipette: PipetteInformation
   errorMessage: string | null
   setErrorMessage: (message: string | null) => void
-  slotName: string
   isOnDevice: boolean | null
 }
 

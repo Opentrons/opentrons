@@ -6,30 +6,25 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  DIRECTION_COLUMN,
+  Chip,
   Flex,
-  Icon,
   JUSTIFY_SPACE_BETWEEN,
   LocationIcon,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import {
-  getCutoutIdForSlotName,
+  getCutoutFixturesForModuleModel,
+  getCutoutIdsFromModuleSlotName,
   getModuleDisplayName,
   getModuleType,
-  MAGNETIC_BLOCK_TYPE,
   NON_CONNECTING_MODULE_TYPES,
-  SINGLE_SLOT_FIXTURES,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Chip } from '../../atoms/Chip'
-import { StyledText } from '../../atoms/text'
 import { getModulePrepCommands } from '../../organisms/Devices/getModulePrepCommands'
 import { getModuleTooHot } from '../../organisms/Devices/getModuleTooHot'
 import { useRunCalibrationStatus } from '../../organisms/Devices/hooks'
@@ -38,12 +33,12 @@ import { ModuleWizardFlows } from '../../organisms/ModuleWizardFlows'
 import { useToaster } from '../../organisms/ToasterOven'
 import { getLocalRobot } from '../../redux/discovery'
 import { useChainLiveCommands } from '../../resources/runs'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type { CommandData } from '@opentrons/api-client'
 import type { CutoutConfig, DeckDefinition } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '../../organisms/Devices/getModulePrepCommands'
 import type { ProtocolCalibrationStatus } from '../../organisms/Devices/hooks'
-import type { ProtocolModuleInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import type { AttachedProtocolModuleMatch } from './utils'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
@@ -51,28 +46,18 @@ const DECK_CONFIG_REFETCH_INTERVAL = 5000
 interface ModuleTableProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]
   deckDef: DeckDefinition
-  protocolModulesInfo: ProtocolModuleInfo[]
   runId: string
-  setShowMultipleModulesModal: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function ModuleTable(props: ModuleTableProps): JSX.Element {
-  const {
-    attachedProtocolModuleMatches,
-    deckDef,
-    protocolModulesInfo,
-    runId,
-    setShowMultipleModulesModal,
-  } = props
-
-  const { t } = useTranslation('protocol_setup')
+  const { attachedProtocolModuleMatches, deckDef, runId } = props
 
   const [
     prepCommandErrorMessage,
     setPrepCommandErrorMessage,
   ] = React.useState<string>('')
 
-  const { data: deckConfig } = useDeckConfigurationQuery({
+  const { data: deckConfig } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
   })
   const localRobot = useSelector(getLocalRobot)
@@ -81,71 +66,40 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
   const { chainLiveCommands, isCommandMutationLoading } = useChainLiveCommands()
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-      <Flex
-        color={COLORS.grey60}
-        fontSize={TYPOGRAPHY.fontSize22}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        gridGap={SPACING.spacing24}
-        lineHeight={TYPOGRAPHY.lineHeight28}
-        paddingX={SPACING.spacing24}
-      >
-        <StyledText flex="3.5 0 0">{t('module')}</StyledText>
-        <StyledText flex="2 0 0">{t('location')}</StyledText>
-        <StyledText flex="4 0 0"> {t('status')}</StyledText>
-      </Flex>
+    <>
       {attachedProtocolModuleMatches.map(module => {
-        // check for duplicate module model in list of modules for protocol
-        const isDuplicateModuleModel = protocolModulesInfo
-          // filter out current module
-          .filter(otherModule => otherModule.moduleId !== module.moduleId)
-          // check for existence of another module of same model
-          .some(
-            otherModule =>
-              otherModule.moduleDef.model === module.moduleDef.model
-          )
-
-        const cutoutIdForSlotName = getCutoutIdForSlotName(
-          module.slotName,
+        const moduleFixtures = getCutoutFixturesForModuleModel(
+          module.moduleDef.model,
           deckDef
         )
-
-        const isMagneticBlockModule =
-          module.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE
-
-        const isThermocycler =
-          module.moduleDef.moduleType === THERMOCYCLER_MODULE_TYPE
-
+        const moduleCutoutIds = getCutoutIdsFromModuleSlotName(
+          module.slotName,
+          moduleFixtures,
+          deckDef
+        )
         const conflictedFixture =
           deckConfig?.find(
-            fixture =>
-              (fixture.cutoutId === cutoutIdForSlotName ||
-                // special-case A1 for the thermocycler to require a single slot fixture
-                (fixture.cutoutId === 'cutoutA1' && isThermocycler)) &&
-              fixture.cutoutFixtureId != null &&
-              // do not generate a conflict for single slot fixtures, because modules are not yet fixtures
-              !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId) &&
-              // special case the magnetic module because unlike other modules it sits in a slot that can also be provided by a staging area fixture
-              (!isMagneticBlockModule ||
-                fixture.cutoutFixtureId !== STAGING_AREA_RIGHT_SLOT_FIXTURE)
+            ({ cutoutId, cutoutFixtureId }) =>
+              moduleCutoutIds.includes(cutoutId) &&
+              !moduleFixtures.some(({ id }) => cutoutFixtureId === id) &&
+              module.attachedModuleMatch == null
           ) ?? null
-
         return (
           <ModuleTableItem
             key={module.moduleId}
             module={module}
-            isDuplicateModuleModel={isDuplicateModuleModel}
-            setShowMultipleModulesModal={setShowMultipleModulesModal}
             calibrationStatus={calibrationStatus}
             chainLiveCommands={chainLiveCommands}
             isLoading={isCommandMutationLoading}
             prepCommandErrorMessage={prepCommandErrorMessage}
             setPrepCommandErrorMessage={setPrepCommandErrorMessage}
             conflictedFixture={conflictedFixture}
+            deckDef={deckDef}
+            robotName={robotName}
           />
         )
       })}
-    </Flex>
+    </>
   )
 }
 
@@ -156,24 +110,24 @@ interface ModuleTableItemProps {
     continuePastCommandFailure: boolean
   ) => Promise<CommandData[]>
   conflictedFixture: CutoutConfig | null
-  isDuplicateModuleModel: boolean
   isLoading: boolean
   module: AttachedProtocolModuleMatch
   prepCommandErrorMessage: string
   setPrepCommandErrorMessage: React.Dispatch<React.SetStateAction<string>>
-  setShowMultipleModulesModal: React.Dispatch<React.SetStateAction<boolean>>
+  deckDef: DeckDefinition
+  robotName: string
 }
 
 function ModuleTableItem({
-  isDuplicateModuleModel,
   module,
-  setShowMultipleModulesModal,
   calibrationStatus,
   chainLiveCommands,
   isLoading,
   prepCommandErrorMessage,
   setPrepCommandErrorMessage,
   conflictedFixture,
+  deckDef,
+  robotName,
 }: ModuleTableItemProps): JSX.Element {
   const { i18n, t } = useTranslation(['protocol_setup', 'module_wizard_flows'])
 
@@ -216,7 +170,6 @@ function ModuleTableItem({
         background={false}
         iconName="connection-status"
       />
-      {isDuplicateModuleModel ? <Icon name="information" size="2rem" /> : null}
     </>
   )
   if (conflictedFixture != null) {
@@ -231,7 +184,9 @@ function ModuleTableItem({
         <SmallButton
           buttonCategory="rounded"
           buttonText={t('resolve')}
-          onClick={() => setShowLocationConflictModal(true)}
+          onClick={() => {
+            setShowLocationConflictModal(true)
+          }}
         />
       </>
     )
@@ -246,17 +201,12 @@ function ModuleTableItem({
     module.attachedModuleMatch?.moduleOffset?.last_modified != null
   ) {
     moduleStatus = (
-      <>
-        <Chip
-          text={t('module_connected')}
-          type="success"
-          background={false}
-          iconName="connection-status"
-        />
-        {isDuplicateModuleModel ? (
-          <Icon name="information" size="2rem" />
-        ) : null}
-      </>
+      <Chip
+        text={t('module_connected')}
+        type="success"
+        background={false}
+        iconName="connection-status"
+      />
     )
   } else if (
     isModuleReady &&
@@ -285,8 +235,9 @@ function ModuleTableItem({
       {showModuleWizard && module.attachedModuleMatch != null ? (
         <ModuleWizardFlows
           attachedModule={module.attachedModuleMatch}
-          closeFlow={() => setShowModuleWizard(false)}
-          initialSlotName={module.slotName}
+          closeFlow={() => {
+            setShowModuleWizard(false)
+          }}
           isPrepCommandLoading={isLoading}
           prepCommandErrorMessage={
             prepCommandErrorMessage === '' ? undefined : prepCommandErrorMessage
@@ -295,10 +246,14 @@ function ModuleTableItem({
       ) : null}
       {showLocationConflictModal && conflictedFixture != null ? (
         <LocationConflictModal
-          onCloseClick={() => setShowLocationConflictModal(false)}
+          onCloseClick={() => {
+            setShowLocationConflictModal(false)
+          }}
           cutoutId={conflictedFixture.cutoutId}
           requiredModule={module.moduleDef.model}
+          deckDef={deckDef}
           isOnDevice={true}
+          robotName={robotName}
         />
       ) : null}
       <Flex
@@ -312,13 +267,10 @@ function ModuleTableItem({
             ? COLORS.grey35
             : COLORS.yellow35
         }
-        borderRadius={BORDERS.borderRadius12}
-        cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
+        borderRadius={BORDERS.borderRadius8}
+        cursor="inherit"
         gridGap={SPACING.spacing24}
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-        onClick={() =>
-          isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
-        }
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

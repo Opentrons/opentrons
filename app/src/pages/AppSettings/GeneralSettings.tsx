@@ -16,6 +16,7 @@ import {
   Link,
   SPACING_AUTO,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useMountEffect,
 } from '@opentrons/components'
@@ -23,7 +24,6 @@ import {
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import {
   CURRENT_VERSION,
@@ -54,7 +54,7 @@ const GITHUB_LINK =
 const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
 
 export function GeneralSettings(): JSX.Element {
-  const { t } = useTranslation(['app_settings', 'shared'])
+  const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()
   const [
@@ -113,7 +113,7 @@ export function GeneralSettings(): JSX.Element {
               type="warning"
               onCloseClick={() => setShowUpdateBanner(false)}
             >
-              {t('opentrons_app_update_available_variation')}
+              {t('branded:opentrons_app_update_available_variation')}
               <Link
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 role="button"
@@ -201,7 +201,7 @@ export function GeneralSettings(): JSX.Element {
                 href={SOFTWARE_SYNC_URL}
                 id="GeneralSettings_appAndRobotSync"
               >
-                {t('versions_sync')}
+                {t('branded:versions_sync')}
               </ExternalLink>
             </Flex>
           </Box>
@@ -218,7 +218,7 @@ export function GeneralSettings(): JSX.Element {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <StyledText as="p">{t('receive_alert')}</StyledText>
+          <StyledText as="p">{t('branded:receive_alert')}</StyledText>
           <ToggleButton
             label={ENABLE_APP_UPDATE_NOTIFICATIONS}
             marginRight={SPACING.spacing16}

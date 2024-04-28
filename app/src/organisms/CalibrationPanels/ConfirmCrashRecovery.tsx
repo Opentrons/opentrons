@@ -2,17 +2,17 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
+  AlertPrimaryButton,
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_SPACE_BETWEEN,
   Link,
   SPACING,
-  DIRECTION_COLUMN,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_FLEX_END,
-  AlertPrimaryButton,
+  StyledText,
   TYPOGRAPHY,
-  ALIGN_CENTER,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 
 export interface ConfirmCrashRecoveryProps {
   back: () => unknown

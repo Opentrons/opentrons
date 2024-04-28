@@ -14,9 +14,9 @@ import {
   Flex,
   Icon,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { RobotSetupHeader } from '../../organisms/RobotSetupHeader'
 import { DisplaySearchNetwork } from './DisplaySearchNetwork'

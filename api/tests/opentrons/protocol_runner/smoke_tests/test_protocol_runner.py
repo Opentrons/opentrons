@@ -43,7 +43,11 @@ async def test_runner_with_python(
         robot_type="OT-2 Standard",
         protocol_config=protocol_source.config,
     )
-    result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
+    result = await subject.run(
+        deck_configuration=[],
+        protocol_source=protocol_source,
+        run_time_param_values=None,
+    )
     commands_result = result.commands
     pipettes_result = result.state_summary.pipettes
     labware_result = result.state_summary.labware
@@ -92,6 +96,7 @@ async def test_runner_with_python(
             labwareId=labware_id_captor.value,
             wellName="A1",
         ),
+        notes=[],
         result=commands.PickUpTipResult(
             tipVolume=300.0,
             tipLength=51.83,
@@ -153,6 +158,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
             labwareId="labware-id",
             wellName="A1",
         ),
+        notes=[],
         result=commands.PickUpTipResult(
             tipVolume=300.0,
             tipLength=51.83,
@@ -176,7 +182,11 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
         robot_type="OT-2 Standard",
         protocol_config=protocol_source.config,
     )
-    result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
+    result = await subject.run(
+        deck_configuration=[],
+        protocol_source=protocol_source,
+        run_time_param_values=None,
+    )
 
     commands_result = result.commands
     pipettes_result = result.state_summary.pipettes
@@ -216,6 +226,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
             labwareId=labware_id_captor.value,
             wellName="A1",
         ),
+        notes=[],
         result=commands.PickUpTipResult(
             tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),
@@ -235,7 +246,11 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
     subject = await create_simulating_runner(
         robot_type="OT-2 Standard", protocol_config=protocol_source.config
     )
-    result = await subject.run(deck_configuration=[], protocol_source=protocol_source)
+    result = await subject.run(
+        deck_configuration=[],
+        protocol_source=protocol_source,
+        run_time_param_values=None,
+    )
 
     commands_result = result.commands
     pipettes_result = result.state_summary.pipettes
@@ -276,6 +291,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
             labwareId=labware_id_captor.value,
             wellName="A1",
         ),
+        notes=[],
         result=commands.PickUpTipResult(
             tipVolume=300.0, tipLength=51.83, position=DeckPoint(x=0, y=0, z=0)
         ),

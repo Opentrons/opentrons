@@ -17,7 +17,7 @@ from typing import (
     Mapping,
 )
 
-from opentrons.config.types import OT3Config, GantryLoad
+from opentrons.config.types import OT3Config, GantryLoad, OutputOptions
 from opentrons.config import gripper_config
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
@@ -64,6 +64,7 @@ from opentrons.util.async_helpers import ensure_yield
 from .types import HWStopCondition
 from .flex_protocol import FlexBackend
 
+
 log = logging.getLogger(__name__)
 
 AXIS_TO_SUBSYSTEM = {
@@ -97,12 +98,13 @@ class OT3Simulator(FlexBackend):
     _position: Dict[Axis, float]
     _encoder_position: Dict[Axis, float]
     _motor_status: Dict[Axis, MotorStatus]
+    _engaged_axes: Dict[Axis, bool]
 
     @classmethod
     async def build(
         cls,
         attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
-        attached_modules: List[str],
+        attached_modules: Dict[str, List[str]],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
@@ -128,7 +130,7 @@ class OT3Simulator(FlexBackend):
     def __init__(
         self,
         attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]],
-        attached_modules: List[str],
+        attached_modules: Dict[str, List[str]],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
         strict_attached_instruments: bool = True,
@@ -148,6 +150,7 @@ class OT3Simulator(FlexBackend):
         self._initialized = False
         self._lights = {"button": False, "rails": False}
         self._gear_motor_position: Dict[Axis, float] = {}
+        self._engaged_axes: Dict[Axis, bool] = {}
         self._feature_flags = feature_flags or HardwareFeatureFlags()
 
         def _sanitize_attached_instrument(
@@ -342,7 +345,8 @@ class OT3Simulator(FlexBackend):
         mount_speed: float,
         plunger_speed: float,
         threshold_pascals: float,
-        log_pressure: bool = True,
+        output_format: OutputOptions = OutputOptions.can_bus_only,
+        data_files: Optional[Dict[InstrumentProbeType, str]] = None,
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         probe: InstrumentProbeType = InstrumentProbeType.PRIMARY,
@@ -374,6 +378,8 @@ class OT3Simulator(FlexBackend):
         Returns:
             None
         """
+        for ax in origin:
+            self._engaged_axes[ax] = True
         self._position.update(target)
         self._encoder_position.update(target)
 
@@ -396,6 +402,7 @@ class OT3Simulator(FlexBackend):
         for h in homed:
             self._position[h] = self._get_home_position()[h]
             self._motor_status[h] = MotorStatus(True, True)
+            self._engaged_axes[h] = True
         return axis_pad(self._position, 0.0)
 
     @ensure_yield
@@ -499,13 +506,20 @@ class OT3Simulator(FlexBackend):
                     ),
                     "id": None,
                 }
-        if found_model and expected_instr or found_model:
+        if found_model and init_instr["id"] is not None:
             # Instrument detected matches instrument expected (note:
             # "instrument detected" means passed as an argument to the
             # constructor of this class)
 
             # OR Instrument detected and no expected instrument specified
-            converted_name = pipette_load_name.convert_pipette_model(found_model)
+
+            found_model_version = ""
+            if found_model.find("flex") > -1:
+                found_model = found_model.replace("_flex", "")  # type: ignore
+                found_model_version = f"{init_instr['id'][4]}.{init_instr['id'][5]}"
+            converted_name = pipette_load_name.convert_pipette_model(
+                found_model, found_model_version
+            )
             return {
                 "config": load_pipette_data.load_definition(
                     converted_name.pipette_type,
@@ -590,10 +604,16 @@ class OT3Simulator(FlexBackend):
 
     @ensure_yield
     async def watch(self, loop: asyncio.AbstractEventLoop) -> None:
-        new_mods_at_ports = [
-            modules.ModuleAtPort(port=f"/dev/ot_module_sim_{mod}{str(idx)}", name=mod)
-            for idx, mod in enumerate(self._stubbed_attached_modules)
-        ]
+        new_mods_at_ports = []
+        for mod, serials in self._stubbed_attached_modules.items():
+            for serial in serials:
+                new_mods_at_ports.append(
+                    modules.SimulatingModuleAtPort(
+                        port=f"/dev/ot_module_sim_{mod}{str(serial)}",
+                        name=mod,
+                        serial_number=serial,
+                    )
+                )
         await self.module_controls.register_modules(new_mods_at_ports=new_mods_at_ports)
 
     @property
@@ -643,16 +663,29 @@ class OT3Simulator(FlexBackend):
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
-        return {}
+        return self._engaged_axes
+
+    async def update_engaged_axes(self) -> None:
+        """Update engaged axes."""
+        return None
+
+    async def is_motor_engaged(self, axis: Axis) -> bool:
+        if axis not in self._engaged_axes.keys():
+            return False
+        return self._engaged_axes[axis]
 
     @ensure_yield
     async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
+        for ax in axes:
+            self._engaged_axes.update({ax: False})
         return None
 
     @ensure_yield
     async def engage_axes(self, axes: List[Axis]) -> None:
         """Engage axes."""
+        for ax in axes:
+            self._engaged_axes.update({ax: True})
         return None
 
     @ensure_yield
@@ -747,7 +780,11 @@ class OT3Simulator(FlexBackend):
             for axis in self._present_axes
         }
 
-    async def get_tip_status(self, mount: OT3Mount) -> TipStateType:
+    async def get_tip_status(
+        self,
+        mount: OT3Mount,
+        follow_singular_sensor: Optional[InstrumentProbeType] = None,
+    ) -> TipStateType:
         return TipStateType(self._sim_tip_state[mount])
 
     def current_tip_state(self, mount: OT3Mount) -> Optional[bool]:
@@ -817,3 +854,8 @@ class OT3Simulator(FlexBackend):
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         return None
+
+    def _update_tip_state(self, mount: OT3Mount, status: bool) -> None:
+        """This is something we only use in the simulator.
+        It is required so that PE simulations using ot3api don't break."""
+        self._sim_tip_state[mount] = status

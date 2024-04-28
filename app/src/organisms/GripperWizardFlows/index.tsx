@@ -19,6 +19,7 @@ import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
 import {
@@ -115,31 +116,30 @@ export function GripperWizardFlows(
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
   const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
-    onSuccess: () => closeFlow(),
-    onError: () => closeFlow(),
-  })
+  const handleClose = (): void => {
+    if (props?.onComplete != null) props.onComplete()
+    if (maintenanceRunData != null) {
+      deleteMaintenanceRun(maintenanceRunData?.data.id)
+    }
+    closeFlow()
+  }
+
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({})
 
   const handleCleanUpAndClose = (): void => {
-    setIsExiting(true)
-    if (maintenanceRunData?.data.id == null) {
-      closeFlow()
-    } else {
+    if (maintenanceRunData?.data.id == null) handleClose()
+    else {
       chainRunCommands(
         maintenanceRunData?.data.id,
         [{ commandType: 'home' as const, params: {} }],
-        true
+        false
       )
         .then(() => {
-          deleteMaintenanceRun(maintenanceRunData?.data.id)
-          setIsExiting(false)
-          props.onComplete?.()
+          handleClose()
         })
         .catch(error => {
-          console.error(error.message)
-          deleteMaintenanceRun(maintenanceRunData?.data.id)
-          setIsExiting(false)
-          props.onComplete?.()
+          setIsExiting(true)
+          setErrorMessage(error.message)
         })
     }
   }
@@ -156,6 +156,7 @@ export function GripperWizardFlows(
         isChainCommandMutationLoading || isCommandLoading || isExiting
       }
       handleCleanUpAndClose={handleCleanUpAndClose}
+      handleClose={handleClose}
       chainRunCommands={chainRunCommands}
       createRunCommand={createMaintenanceCommand}
       errorMessage={errorMessage}
@@ -182,6 +183,7 @@ interface GripperWizardProps {
   setErrorMessage: (message: string | null) => void
   errorMessage: string | null
   handleCleanUpAndClose: () => void
+  handleClose: () => void
   chainRunCommands: ReturnType<
     typeof useChainMaintenanceCommands
   >['chainRunCommands']
@@ -198,6 +200,7 @@ export const GripperWizard = (
     maintenanceRunId,
     createMaintenanceRun,
     handleCleanUpAndClose,
+    handleClose,
     chainRunCommands,
     attachedGripper,
     isCreateLoading,
@@ -273,6 +276,16 @@ export const GripperWizard = (
         handleExit={confirmExit}
         flowType={flowType}
         isRobotMoving={isRobotMoving}
+      />
+    )
+  } else if (isExiting && errorMessage != null) {
+    onExit = handleClose
+    modalContent = (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('shared:error_encountered')}
+        subHeader={errorMessage}
       />
     )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
@@ -357,7 +370,7 @@ export const GripperWizard = (
         top="16px"
         border={BORDERS.lineBorder}
         boxShadow={BORDERS.shadowSmall}
-        borderRadius={BORDERS.borderRadius16}
+        borderRadius={BORDERS.borderRadius8}
         position={POSITION_ABSOLUTE}
         backgroundColor={COLORS.white}
       >

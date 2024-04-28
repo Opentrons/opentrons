@@ -2,21 +2,20 @@ import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  useDeleteMaintenanceRunMutation,
-  useCurrentMaintenanceRun,
-  useDeckConfigurationQuery,
-} from '@opentrons/react-api-client'
-import { COLORS } from '@opentrons/components'
+import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
+import { COLORS, StyledText } from '@opentrons/components'
 import {
   getModuleType,
   getModuleDisplayName,
   FLEX_CUTOUT_BY_SLOT_ID,
   SINGLE_SLOT_FIXTURES,
+  getFixtureIdByCutoutIdFromModuleSlotName,
+  getCutoutFixturesForModuleModel,
+  getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
-import { StyledText } from '../../atoms/text'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { useAttachedPipettesFromInstrumentsQuery } from '../../organisms/Devices/hooks'
@@ -34,6 +33,8 @@ import { PlaceAdapter } from './PlaceAdapter'
 import { SelectLocation } from './SelectLocation'
 import { Success } from './Success'
 import { DetachProbe } from './DetachProbe'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
+import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
 
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type {
@@ -46,7 +47,6 @@ interface ModuleWizardFlowsProps {
   attachedModule: AttachedModule
   closeFlow: () => void
   isPrepCommandLoading: boolean
-  initialSlotName?: string
   onComplete?: () => void
   prepCommandErrorMessage?: string
 }
@@ -58,7 +58,6 @@ export const ModuleWizardFlows = (
 ): JSX.Element | null => {
   const {
     attachedModule,
-    initialSlotName,
     isPrepCommandLoading,
     closeFlow,
     onComplete,
@@ -73,12 +72,25 @@ export const ModuleWizardFlows = (
       : attachedPipettes.right
 
   const moduleCalibrationSteps = getModuleCalibrationSteps()
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
+  const moduleCutoutConfig = deckConfig.find(
+    cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
+  )
+  // mapping of cutoutId's occupied by the target module and their cutoutFixtureId's per cutout
+  const fixtureIdByCutoutId =
+    moduleCutoutConfig != null
+      ? getFixtureIdByCutoutIdFromModuleSlotName(
+          moduleCutoutConfig.cutoutId.replace('cutout', ''),
+          getCutoutFixturesForModuleModel(attachedModule.moduleModel, deckDef),
+          deckDef
+        )
+      : {}
   const occupiedCutouts = deckConfig.filter(
-    (fixture: CutoutConfig) =>
+    (cutoutConfig: CutoutConfig) =>
       !SINGLE_SLOT_FIXTURES.includes(
-        fixture.cutoutFixtureId as SingleSlotCutoutFixtureId
-      )
+        cutoutConfig.cutoutFixtureId as SingleSlotCutoutFixtureId
+      ) && !Object.keys(fixtureIdByCutoutId).includes(cutoutConfig.cutoutId)
   )
   const availableSlotNames =
     FLEX_SLOT_NAMES_BY_MOD_TYPE[
@@ -91,9 +103,6 @@ export const ModuleWizardFlows = (
         )
     ) ?? []
 
-  const [slotName, setSlotName] = React.useState(
-    initialSlotName != null ? initialSlotName : availableSlotNames?.[0] ?? null
-  )
   const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(0)
   const totalStepCount = moduleCalibrationSteps.length - 1
   const currentStep = moduleCalibrationSteps?.[currentStepIndex]
@@ -116,7 +125,7 @@ export const ModuleWizardFlows = (
     setMonitorMaintenanceRunForDeletion,
   ] = React.useState<boolean>(false)
 
-  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+  const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })
@@ -248,7 +257,6 @@ export const ModuleWizardFlows = (
     errorMessage,
     isOnDevice,
     attachedModule,
-    slotName,
     isExiting,
   }
 
@@ -277,7 +285,7 @@ export const ModuleWizardFlows = (
           ) : (
             <Trans
               t={t}
-              i18nKey={'module_calibration_failed'}
+              i18nKey={'branded:module_calibration_failed'}
               values={{ error: errorMessage }}
               components={{
                 block: <StyledText as="p" />,
@@ -290,23 +298,16 @@ export const ModuleWizardFlows = (
   } else if (isExiting) {
     modalContent = <InProgressModal description={t('stand_back_exiting')} />
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
-    modalContent = (
-      <BeforeBeginning
-        {...currentStep}
-        {...calibrateBaseProps}
-        createMaintenanceRun={createTargetedMaintenanceRun}
-        isCreateLoading={isCreateLoading}
-        createdMaintenanceRunId={createdMaintenanceRunId}
-      />
-    )
+    modalContent = <BeforeBeginning {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.SELECT_LOCATION) {
     modalContent = (
       <SelectLocation
         {...currentStep}
         {...calibrateBaseProps}
         availableSlotNames={availableSlotNames}
-        setSlotName={setSlotName}
+        deckConfig={deckConfig}
         occupiedCutouts={occupiedCutouts}
+        configuredFixtureIdByCutoutId={fixtureIdByCutoutId}
       />
     )
   } else if (currentStep.section === SECTIONS.PLACE_ADAPTER) {
@@ -314,7 +315,11 @@ export const ModuleWizardFlows = (
       <PlaceAdapter
         {...currentStep}
         {...calibrateBaseProps}
+        deckConfig={deckConfig}
         setCreatedAdapterId={setCreatedAdapterId}
+        createMaintenanceRun={createTargetedMaintenanceRun}
+        isCreateLoading={isCreateLoading}
+        createdMaintenanceRunId={createdMaintenanceRunId}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
@@ -322,7 +327,9 @@ export const ModuleWizardFlows = (
       <AttachProbe
         {...currentStep}
         {...calibrateBaseProps}
+        deckConfig={deckConfig}
         adapterId={createdAdapterId}
+        fixtureIdByCutoutId={fixtureIdByCutoutId}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {

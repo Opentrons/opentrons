@@ -22,11 +22,12 @@ import type {
 
 const CONFIG_VERSION_LATEST = 21 // update this after each config version bump
 
+const PKG_VERSION: string = _PKG_VERSION_
 export const DEFAULTS_V12: ConfigV12 = {
   version: 12,
   devtools: false,
   reinstallDevtools: false,
-  update: { channel: _PKG_VERSION_.includes('beta') ? 'beta' : 'latest' },
+  update: { channel: PKG_VERSION.includes('beta') ? 'beta' : 'latest' },
   log: { level: { file: 'debug', console: 'info' } },
   ui: {
     width: 1024,

@@ -10,7 +10,10 @@ from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, StagingSlotName
-from opentrons.hardware_control.types import TipStateType as HwTipStateType
+from opentrons.hardware_control.types import (
+    TipStateType as HwTipStateType,
+    InstrumentProbeType,
+)
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
@@ -714,6 +717,10 @@ class AreaType(Enum):
     MOVABLE_TRASH = "movableTrash"
     FIXED_TRASH = "fixedTrash"
     WASTE_CHUTE = "wasteChute"
+    THERMOCYCLER = "thermocycler"
+    HEATER_SHAKER = "heaterShaker"
+    TEMPERATURE = "temperatureModule"
+    MAGNETICBLOCK = "magneticBlock"
 
 
 @dataclass(frozen=True)
@@ -820,7 +827,26 @@ NozzleLayoutConfigurationType = Union[
 ]
 
 # TODO make the below some sort of better type
-DeckConfigurationType = List[Tuple[str, str]]  # cutout_id, cutout_fixture_id
+# TODO This should instead contain a proper cutout fixture type
+DeckConfigurationType = List[
+    Tuple[str, str, Optional[str]]
+]  # cutout_id, cutout_fixture_id, opentrons_module_serial_number
+
+
+class InstrumentSensorId(str, Enum):
+    """Primary and secondary sensor ids."""
+
+    PRIMARY = "primary"
+    SECONDARY = "secondary"
+    BOTH = "both"
+
+    def to_instrument_probe_type(self) -> InstrumentProbeType:
+        """Convert to InstrumentProbeType."""
+        return {
+            InstrumentSensorId.PRIMARY: InstrumentProbeType.PRIMARY,
+            InstrumentSensorId.SECONDARY: InstrumentProbeType.SECONDARY,
+            InstrumentSensorId.BOTH: InstrumentProbeType.BOTH,
+        }[self]
 
 
 class TipPresenceStatus(str, Enum):
@@ -847,43 +873,54 @@ class TipPresenceStatus(str, Enum):
         }[state]
 
 
+# TODO (spp, 2024-04-02): move all RTP types to runner
 class RTPBase(BaseModel):
     """Parameters defined in a protocol."""
 
     displayName: str = Field(..., description="Display string for the parameter.")
     variableName: str = Field(..., description="Python variable name of the parameter.")
-    description: str = Field(..., description="Detailed description of the parameter.")
+    description: Optional[str] = Field(
+        None, description="Detailed description of the parameter."
+    )
     suffix: Optional[str] = Field(
         None,
         description="Units (like mL, mm/sec, etc) or a custom suffix for the parameter.",
     )
 
 
-class IntParameter(RTPBase):
+class NumberParameter(RTPBase):
     """An integer parameter defined in a protocol."""
 
-    min: int = Field(
-        ..., description="Minimum value that the integer param is allowed to have."
+    type: Literal["int", "float"] = Field(
+        ..., description="String specifying whether the number is an int or float type."
     )
-    max: int = Field(
-        ..., description="Maximum value that the integer param is allowed to have."
+    min: float = Field(
+        ..., description="Minimum value that the number param is allowed to have."
     )
-    default: int = Field(
+    max: float = Field(
+        ..., description="Maximum value that the number param is allowed to have."
+    )
+    value: float = Field(
+        ...,
+        description="The value assigned to the parameter; if not supplied by the client, will be assigned the default value.",
+    )
+    default: float = Field(
         ...,
         description="Default value of the parameter, to be used when there is no client-specified value.",
     )
 
 
-class FloatParameter(RTPBase):
-    """A float parameter defined in a protocol."""
+class BooleanParameter(RTPBase):
+    """A boolean parameter defined in a protocol."""
 
-    min: float = Field(
-        ..., description="Minimum value that the float param is allowed to have."
+    type: Literal["bool"] = Field(
+        default="bool", description="String specifying the type of this parameter"
     )
-    max: float = Field(
-        ..., description="Maximum value that the float param is allowed to have."
+    value: bool = Field(
+        ...,
+        description="The value assigned to the parameter; if not supplied by the client, will be assigned the default value.",
     )
-    default: float = Field(
+    default: bool = Field(
         ...,
         description="Default value of the parameter, to be used when there is no client-specified value.",
     )
@@ -893,19 +930,33 @@ class EnumChoice(BaseModel):
     """Components of choices used in RTP Enum Parameters."""
 
     displayName: str = Field(..., description="Display string for the param's choice.")
-    value: str = Field(..., description="Enum value of the param's choice.")
+    value: Union[float, str] = Field(
+        ..., description="Enum value of the param's choice."
+    )
 
 
 class EnumParameter(RTPBase):
     """A string enum defined in a protocol."""
 
+    type: Literal["int", "float", "str"] = Field(
+        ...,
+        description="String specifying whether the parameter is an int or float or string type.",
+    )
     choices: List[EnumChoice] = Field(
         ..., description="List of valid choices for this parameter."
     )
-    default: str = Field(
+    value: Union[float, str] = Field(
+        ...,
+        description="The value assigned to the parameter; if not supplied by the client, will be assigned the default value.",
+    )
+    default: Union[float, str] = Field(
         ...,
         description="Default value of the parameter, to be used when there is no client-specified value.",
     )
 
 
-RunTimeParameter = Union[IntParameter, FloatParameter, EnumParameter]
+RunTimeParameter = Union[NumberParameter, EnumParameter, BooleanParameter]
+
+RunTimeParamValuesType = Dict[
+    str, Union[float, bool, str]
+]  # update value types as more RTP types are added

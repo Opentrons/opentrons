@@ -5,7 +5,10 @@ from decoy import Decoy, matchers
 from datetime import datetime
 from typing import Callable
 
-from opentrons.commands.types import CommandMessage as LegacyCommand, PauseMessage
+from opentrons.legacy_commands.types import (
+    CommandMessage as LegacyCommand,
+    PauseMessage,
+)
 from opentrons.protocol_engine import (
     StateView,
     actions as pe_actions,
@@ -160,7 +163,9 @@ async def test_command_broker_messages(
 
     decoy.when(
         mock_legacy_command_mapper.map_command(command=legacy_command)
-    ).then_return([pe_actions.UpdateCommandAction(engine_command, private_result=None)])
+    ).then_return(
+        [pe_actions.SucceedCommandAction(engine_command, private_result=None)]
+    )
 
     await to_thread.run_sync(handler, legacy_command)
 
@@ -168,7 +173,7 @@ async def test_command_broker_messages(
 
     decoy.verify(
         mock_action_dispatcher.dispatch(
-            pe_actions.UpdateCommandAction(engine_command, private_result=None)
+            pe_actions.SucceedCommandAction(engine_command, private_result=None)
         )
     )
 
@@ -217,7 +222,9 @@ async def test_equipment_broker_messages(
 
     decoy.when(
         mock_legacy_command_mapper.map_equipment_load(load_info=load_info)
-    ).then_return((engine_command, None))
+    ).then_return(
+        [pe_actions.SucceedCommandAction(command=engine_command, private_result=None)]
+    )
 
     await to_thread.run_sync(handler, load_info)
 
@@ -225,6 +232,6 @@ async def test_equipment_broker_messages(
 
     decoy.verify(
         mock_action_dispatcher.dispatch(
-            pe_actions.UpdateCommandAction(command=engine_command, private_result=None)
+            pe_actions.SucceedCommandAction(command=engine_command, private_result=None)
         ),
     )

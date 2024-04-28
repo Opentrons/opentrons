@@ -11,7 +11,6 @@ import {
   useProtocolQuery,
   useDoorQuery,
   useModulesQuery,
-  useDeckConfigurationQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -20,7 +19,7 @@ import {
   getDeckDefFromRobotType,
   FLEX_ROBOT_TYPE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  flexDeckDefV4,
+  flexDeckDefV5,
 } from '@opentrons/shared-data'
 
 import { i18n } from '../../../i18n'
@@ -35,7 +34,7 @@ import {
   useTrackProtocolRunEvent,
 } from '../../../organisms/Devices/hooks'
 import { getLocalRobot } from '../../../redux/discovery'
-import { ANALYTICS_PROTOCOL_RUN_START } from '../../../redux/analytics'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupModulesAndDeck } from '../../../organisms/ProtocolSetupModulesAndDeck'
@@ -44,6 +43,7 @@ import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchL
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import { mockProtocolModuleInfo } from '../../../organisms/ProtocolSetupInstruments/__fixtures__'
 import {
+  useProtocolHasRunTimeParameters,
   useRunControls,
   useRunStatus,
 } from '../../../organisms/RunTimeControl/hooks'
@@ -52,7 +52,11 @@ import { useDeckConfigurationCompatibility } from '../../../resources/deck_confi
 import { ConfirmAttachedModal } from '../../../pages/ProtocolSetup/ConfirmAttachedModal'
 import { ProtocolSetup } from '../../../pages/ProtocolSetup'
 import { useNotifyRunQuery } from '../../../resources/runs'
+import { useFeatureFlag } from '../../../redux/config'
+import { ViewOnlyParameters } from '../../../organisms/ProtocolSetupParameters/ViewOnlyParameters'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import { mockRunTimeParameterData } from '../../ProtocolDetails/fixtures'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -93,6 +97,8 @@ vi.mock('react-router-dom', async importOriginal => {
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
 vi.mock('../../../organisms/Devices/hooks')
+vi.mock('../../../redux/config')
+vi.mock('../../../organisms/ProtocolSetupParameters/ViewOnlyParameters')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
@@ -108,6 +114,7 @@ vi.mock('../ConfirmAttachedModal')
 vi.mock('../../../organisms/ToasterOven')
 vi.mock('../../../resources/deck_configuration/hooks')
 vi.mock('../../../resources/runs')
+vi.mock('../../../resources/deck_configuration')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -188,6 +195,7 @@ describe('ProtocolSetup', () => {
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
     mockHistoryPush = vi.fn()
+    vi.mocked(useFeatureFlag).mockReturnValue(false)
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })
@@ -222,14 +230,14 @@ describe('ProtocolSetup', () => {
       .calledWith(RUN_ID)
       .thenReturn(CREATED_AT)
     when(vi.mocked(getProtocolModulesInfo))
-      .calledWith(mockEmptyAnalysis, flexDeckDefV4 as any)
+      .calledWith(mockEmptyAnalysis, flexDeckDefV5 as any)
       .thenReturn([])
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], [])
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     when(vi.mocked(getDeckDefFromRobotType))
       .calledWith('OT-3 Standard')
-      .thenReturn(flexDeckDefV4 as any)
+      .thenReturn(flexDeckDefV5 as any)
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { staleTime: Infinity })
       .thenReturn({
@@ -266,7 +274,7 @@ describe('ProtocolSetup', () => {
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<SharedData.DeckConfiguration>)
     when(vi.mocked(useToaster))
@@ -275,6 +283,7 @@ describe('ProtocolSetup', () => {
         makeSnackbar: MOCK_MAKE_SNACKBAR,
       } as unknown) as any)
     vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([])
+    vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(false)
     when(vi.mocked(useTrackProtocolRunEvent))
       .calledWith(RUN_ID, ROBOT_NAME)
       .thenReturn({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
@@ -288,7 +297,7 @@ describe('ProtocolSetup', () => {
     render(`/runs/${RUN_ID}/setup/`)
     screen.getByText('Prepare to run')
     screen.getByText('Instruments')
-    screen.getByText('Modules & deck')
+    screen.getByText('Deck hardware')
     screen.getByText('Labware')
     screen.getByText('Labware Position Check')
     screen.getByText('Liquids')
@@ -312,13 +321,13 @@ describe('ProtocolSetup', () => {
       data: mockRobotSideAnalysis,
     } as any)
     when(vi.mocked(getProtocolModulesInfo))
-      .calledWith(mockRobotSideAnalysis, flexDeckDefV4 as any)
+      .calledWith(mockRobotSideAnalysis, flexDeckDefV5 as any)
       .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getUnmatchedModulesForProtocol))
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     render(`/runs/${RUN_ID}/setup/`)
-    fireEvent.click(screen.getByText('Modules & deck'))
+    fireEvent.click(screen.getByText('Deck hardware'))
     expect(vi.mocked(ProtocolSetupModulesAndDeck)).toHaveBeenCalled()
   })
 
@@ -329,7 +338,7 @@ describe('ProtocolSetup', () => {
     when(vi.mocked(getProtocolModulesInfo))
       .calledWith(
         { ...mockRobotSideAnalysis, liquids: mockLiquids },
-        flexDeckDefV4 as any
+        flexDeckDefV5 as any
       )
       .thenReturn(mockProtocolModuleInfo)
     when(vi.mocked(getUnmatchedModulesForProtocol))
@@ -339,6 +348,32 @@ describe('ProtocolSetup', () => {
     screen.getByText('1 initial liquid')
     fireEvent.click(screen.getByText('Liquids'))
     expect(vi.mocked(ProtocolSetupLiquids)).toHaveBeenCalled()
+  })
+
+  it('should launch view only parameters screen when click parameters', () => {
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
+    vi.mocked(useProtocolHasRunTimeParameters).mockReturnValue(true)
+    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
+      data: {
+        ...mockRobotSideAnalysis,
+        runTimeParameters: mockRunTimeParameterData,
+      },
+    } as any)
+    when(vi.mocked(getProtocolModulesInfo))
+      .calledWith(
+        {
+          ...mockRobotSideAnalysis,
+          runTimeParameters: mockRunTimeParameterData,
+        },
+        flexDeckDefV5 as any
+      )
+      .thenReturn(mockProtocolModuleInfo)
+    when(vi.mocked(getUnmatchedModulesForProtocol))
+      .calledWith([], mockProtocolModuleInfo)
+      .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
+    render(`/runs/${RUN_ID}/setup/`)
+    fireEvent.click(screen.getByText('Parameters'))
+    expect(vi.mocked(ViewOnlyParameters)).toHaveBeenCalled()
   })
 
   it('should launch LPC when clicked', () => {
@@ -385,7 +420,7 @@ describe('ProtocolSetup', () => {
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
     expect(mockTrackProtocolRunEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_START,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
       properties: {},
     })
   })

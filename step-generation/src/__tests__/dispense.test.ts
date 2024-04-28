@@ -1,6 +1,6 @@
 import { when } from 'vitest-when'
 import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import {
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerLatchOpen,
@@ -20,18 +20,17 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { dispense } from '../commandCreators/atomic/dispense'
-import { InvariantContext, RobotState } from '../types'
-import type {
-  AspDispAirgapParams as V3AspDispAirgapParams,
-  DispenseParams,
-} from '@opentrons/shared-data/protocol/types/schemaV3'
+import {
+  ExtendedDispenseParams,
+  dispense,
+} from '../commandCreators/atomic/dispense'
+import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../utils/thermocyclerPipetteCollision')
 vi.mock('../utils/heaterShakerCollision')
 
 const FLEX_PIPETTE = 'p1000_single_flex'
-const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
+const FlexPipetteNameSpecs = getPipetteSpecsV2(FLEX_PIPETTE)
 
 describe('dispense', () => {
   let initialRobotState: RobotState
@@ -46,7 +45,7 @@ describe('dispense', () => {
     vi.resetAllMocks()
   })
   describe('tip tracking & commands:', () => {
-    let params: V3AspDispAirgapParams
+    let params: ExtendedDispenseParams
     beforeEach(() => {
       params = {
         pipette: DEFAULT_PIPETTE,
@@ -55,6 +54,8 @@ describe('dispense', () => {
         well: 'A1',
         offsetFromBottomMm: 5,
         flowRate: 6,
+        xOffset: 0,
+        yOffset: 0,
       }
     })
     it('dispense normally (with tip)', () => {
@@ -71,6 +72,8 @@ describe('dispense', () => {
             wellLocation: {
               origin: 'bottom',
               offset: {
+                x: 0,
+                y: 0,
                 z: 5,
               },
             },
@@ -99,7 +102,9 @@ describe('dispense', () => {
           volume: 50,
           labware: SOURCE_LABWARE,
           well: 'A1',
-        } as DispenseParams,
+          xOffset: 0,
+          yOffset: 0,
+        },
         invariantContext,
         initialRobotState
       )

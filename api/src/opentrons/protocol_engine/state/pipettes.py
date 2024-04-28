@@ -56,7 +56,7 @@ from ..commands.configuring_common import (
 from ..actions import (
     Action,
     SetPipetteMovementSpeedAction,
-    UpdateCommandAction,
+    SucceedCommandAction,
 )
 from .abstract_store import HasState, HandlesActions
 
@@ -150,7 +150,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, UpdateCommandAction):
+        if isinstance(action, SucceedCommandAction):
             self._handle_command(action.command, action.private_result)
         elif isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed

@@ -29,6 +29,8 @@ import {
   minDisposalVolume,
   minAspirateAirGapVolume,
   minDispenseAirGapVolume,
+  mixTipPositionInTube,
+  tipPositionInTube,
 } from './warnings'
 
 import { HydratedFormdata, StepType } from '../../form-types'
@@ -52,7 +54,10 @@ interface FormHelpers {
 const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
   mix: {
     getErrors: composeErrors(incompatibleLabware, volumeTooHigh),
-    getWarnings: composeWarnings(belowPipetteMinimumVolume),
+    getWarnings: composeWarnings(
+      belowPipetteMinimumVolume,
+      mixTipPositionInTube
+    ),
   },
   pause: {
     getErrors: composeErrors(pauseForTimeOrUntilTold),
@@ -68,7 +73,8 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       maxDispenseWellVolume,
       minDisposalVolume,
       minAspirateAirGapVolume,
-      minDispenseAirGapVolume
+      minDispenseAirGapVolume,
+      tipPositionInTube
     ),
   },
   magnet: {

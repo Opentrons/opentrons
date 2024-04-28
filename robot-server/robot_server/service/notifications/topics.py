@@ -1,3 +1,4 @@
+"""Notification topics."""
 from enum import Enum
 
 
@@ -13,3 +14,4 @@ class Topics(str, Enum):
     MAINTENANCE_RUNS_CURRENT_RUN = f"{_TOPIC_BASE}/maintenance_runs/current_run"
     RUNS_CURRENT_COMMAND = f"{_TOPIC_BASE}/runs/current_command"
     RUNS = f"{_TOPIC_BASE}/runs"
+    DECK_CONFIGURATION = f"{_TOPIC_BASE}/deck_configuration"

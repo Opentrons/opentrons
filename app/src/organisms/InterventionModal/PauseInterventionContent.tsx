@@ -12,9 +12,9 @@ import {
   SPACING,
   TYPOGRAPHY,
   useInterval,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { EMPTY_TIMESTAMP } from '../Devices/constants'
 import { formatInterval } from '../RunTimeControl/utils'
 import { InterventionCommandMessage } from './InterventionCommandMessage'
@@ -54,7 +54,7 @@ const PAUSE_HEADER_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     align-self: ${ALIGN_CENTER};
     background-color: ${COLORS.grey35};
-    border-radius: ${BORDERS.borderRadius12};
+    border-radius: ${BORDERS.borderRadius8};
     grid-gap: ${SPACING.spacing32};
     padding: ${SPACING.spacing24};
     min-width: 36.5rem;

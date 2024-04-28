@@ -12,6 +12,7 @@ import {
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { useIsOEMMode } from '../../../resources/robot-settings/hooks'
 import { mockRecentAnalysis } from '../__fixtures__'
 import { ProtocolSetupInstruments } from '..'
 
@@ -19,6 +20,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock(
   '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
+vi.mock('../../../resources/robot-settings/hooks')
 
 const mockGripperData = {
   instrumentModel: 'gripper_v1',
@@ -71,6 +73,7 @@ describe('ProtocolSetupInstruments', () => {
         data: [mockLeftPipetteData, mockRightPipetteData, mockGripperData],
       },
     } as any)
+    vi.mocked(useIsOEMMode).mockReturnValue(false)
   })
   afterEach(() => {
     vi.resetAllMocks()

@@ -16,10 +16,10 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   RobotWorkSpace,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
@@ -30,7 +30,7 @@ export interface LabwareCardProps {
 }
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
-  const { t } = useTranslation('labware_landing')
+  const { t } = useTranslation(['labware_landing', 'branded'])
   const { definition, modified, filename } = props.labware
   const apiName = definition.parameters.loadName
   const displayName = definition?.metadata.displayName
@@ -100,7 +100,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                   id="LabwareCard_opentronsDef"
                   marginLeft={SPACING.spacing4}
                 >
-                  {t('opentrons_def')}
+                  {t('branded:opentrons_def')}
                 </StyledText>
               </Flex>
             )}

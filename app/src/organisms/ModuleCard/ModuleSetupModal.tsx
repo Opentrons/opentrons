@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
-import { StyledText } from '../../atoms/text'
 import code from '../../assets/images/module_instruction_code.png'
 import {
   ALIGN_FLEX_END,
-  Flex,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
-  PrimaryButton,
-  Icon,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   Link,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { getTopPortalEl } from '../../App/portal'
@@ -26,7 +26,7 @@ interface ModuleSetupModalProps {
 
 export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
   const { moduleDisplayName } = props
-  const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
+  const { t, i18n } = useTranslation(['protocol_setup', 'shared', 'branded'])
 
   return createPortal(
     <LegacyModal
@@ -42,7 +42,7 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
             width="50%"
           >
             <StyledText as="p" marginBottom={SPACING.spacing16}>
-              {t('modal_instructions')}
+              {t('branded:modal_instructions')}
             </StyledText>
             <Link
               external

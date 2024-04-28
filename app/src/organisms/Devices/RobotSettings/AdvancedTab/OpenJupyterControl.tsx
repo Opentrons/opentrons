@@ -6,13 +6,13 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   useTrackEvent,
   ANALYTICS_JUPYTER_OPEN,
 } from '../../../../redux/analytics'
-import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 

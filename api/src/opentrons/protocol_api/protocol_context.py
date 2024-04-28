@@ -20,9 +20,13 @@ from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, Staging
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import MagneticBlockModel
-from opentrons.commands import protocol_commands as cmds, types as cmd_types
-from opentrons.commands.helpers import stringify_labware_movement_command
-from opentrons.commands.publisher import CommandPublisher, publish, publish_context
+from opentrons.legacy_commands import protocol_commands as cmds, types as cmd_types
+from opentrons.legacy_commands.helpers import stringify_labware_movement_command
+from opentrons.legacy_commands.publisher import (
+    CommandPublisher,
+    publish,
+    publish_context,
+)
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.deck_type import (
     NoTrashDefinedError,
@@ -64,6 +68,7 @@ from .module_contexts import (
     MagneticBlockContext,
     ModuleContext,
 )
+from ._parameters import Parameters
 
 
 logger = logging.getLogger(__name__)
@@ -167,6 +172,7 @@ class ProtocolContext(CommandPublisher):
             self._core.load_ot2_fixed_trash_bin()
 
         self._commands: List[str] = []
+        self._params: Parameters = Parameters()
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
 
@@ -214,6 +220,11 @@ class ProtocolContext(CommandPublisher):
         representing the contents of the files.
         """
         return self._bundled_data
+
+    @property
+    @requires_version(2, 18)
+    def params(self) -> Parameters:
+        return self._params
 
     def cleanup(self) -> None:
         """Finalize and clean up the protocol context."""

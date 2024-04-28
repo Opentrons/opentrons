@@ -2,13 +2,13 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  SPACING,
-  TYPOGRAPHY,
   Btn,
   DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { getRobotUpdateDisplayInfo } from '../../redux/robot-update'
 import { handleUpdateBuildroot } from '../Devices/RobotSettings/UpdateBuildroot'
@@ -25,7 +25,7 @@ export function UpdateRobotBanner(
   props: UpdateRobotBannerProps
 ): JSX.Element | null {
   const { robot, ...styleProps } = props
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'branded'])
 
   const { autoUpdateAction } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robot?.name)
@@ -40,7 +40,7 @@ export function UpdateRobotBanner(
     >
       <Banner type="error" {...styleProps}>
         <StyledText as="p" marginRight={SPACING.spacing4}>
-          {t('robot_software_update_required')}
+          {t('branded:robot_software_update_required')}
         </StyledText>
         <Btn
           onClick={() => handleUpdateBuildroot(robot)}

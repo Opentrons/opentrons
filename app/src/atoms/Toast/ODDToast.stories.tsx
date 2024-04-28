@@ -1,22 +1,22 @@
 import * as React from 'react'
 import {
-  Flex,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_CENTER,
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
+  StyledText,
+  VIEWPORT,
 } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
-import { StyledText } from '../text'
 import { Toast } from '.'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Atoms/Toast',
   component: Toast,
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof Toast>> = args => {

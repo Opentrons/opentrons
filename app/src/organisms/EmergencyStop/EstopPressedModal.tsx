@@ -4,6 +4,8 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
+  BORDERS,
+  Chip,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -13,6 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -20,10 +23,8 @@ import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-clien
 
 import { getTopPortalEl } from '../../App/portal'
 import { Banner } from '../../atoms/Banner'
-import { Chip } from '../../atoms/Chip'
 import { ListItem } from '../../atoms/ListItem'
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
@@ -72,7 +73,7 @@ function TouchscreenModal({
   isEngaged,
   closeModal,
 }: EstopPressedModalProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'branded'])
   const [isResuming, setIsResuming] = React.useState<boolean>(false)
   const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
   const modalHeader: ModalHeaderBaseProps = {
@@ -93,13 +94,14 @@ function TouchscreenModal({
     <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
         <StyledText as="p" fontWeight>
-          {t('estop_pressed_description')}
+          {t('branded:estop_pressed_description')}
         </StyledText>
         <ListItem
           type={isEngaged ? 'error' : 'success'}
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_CENTER}
+          borderRadius={BORDERS.borderRadius8}
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('estop')}
@@ -170,7 +172,7 @@ function DesktopModal({
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
         </Banner>
         <StyledText as="p" color={COLORS.grey60}>
-          {t('estop_pressed_description')}
+          {t('branded:estop_pressed_description')}
         </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <PrimaryButton

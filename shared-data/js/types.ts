@@ -270,11 +270,17 @@ export interface DeckCalibrationPoint {
   displayName: string
 }
 
+export type CutoutFixtureGroup = {
+  [cutoutId in CutoutId]?: Array<{ [cutoutId in CutoutId]?: CutoutFixtureId }>
+}
+
 export interface CutoutFixture {
   id: CutoutFixtureId
   mayMountTo: CutoutId[]
   displayName: string
   providesAddressableAreas: Record<CutoutId, AddressableAreaName[]>
+  expectOpentronsModuleSerialNumber: boolean
+  fixtureGroup: CutoutFixtureGroup
   height: number
 }
 
@@ -400,11 +406,11 @@ export interface PipetteV2GeneralSpecs {
   displayCategory: PipetteDisplayCategory
   pickUpTipConfigurations: {
     pressFit: {
-      speedByTipCount: Record<number, string>
+      speedByTipCount: Record<string, number>
       presses: number
       increment: number
-      distanceByTipCount: Record<number, string>
-      currentByTipCount: Record<number, string>
+      distanceByTipCount: Record<string, number>
+      currentByTipCount: Record<string, number>
     }
   }
   dropTipConfigurations: {
@@ -435,7 +441,7 @@ export interface PipetteV2GeneralSpecs {
     partialTipSupported: boolean
     availableConfigurations: number[] | null
   }
-  channels: number
+  channels: PipetteChannels
   shaftDiameter: number
   shaftULperMM: number
   backCompatNames: string[]
@@ -463,36 +469,34 @@ export interface PipetteV2GeometrySpecs {
   nozzleMap: Record<string, number[]>
 }
 
-type TipData = [number, number, number]
-interface SupportedTips {
-  [tipType: string]: {
-    aspirate: {
-      default: {
-        1: TipData
-      }
-    }
-    defaultAspirateFlowRate: {
-      default: number
-      valuesByApiLevel: Record<string, number>
-    }
-    defaultBlowOutFlowRate: {
-      default: number
-      valuesByApiLevel: Record<string, number>
-    }
-    defaultDispenseFlowRate: {
-      default: number
-      valuesByApiLevel: Record<string, number>
-    }
-    defaultFlowAcceleration: number
-    defaultPushOutVolume: number
-    defaultReturnTipHeight: number
-    defaultTipLength: number
-    dispense: {
-      default: {
-        1: TipData
-      }
-    }
+export interface SupportedTip {
+  aspirate: {
+    default: Record<string, number[][]>
   }
+  defaultAspirateFlowRate: {
+    default: number
+    valuesByApiLevel: Record<string, number>
+  }
+  defaultBlowOutFlowRate: {
+    default: number
+    valuesByApiLevel: Record<string, number>
+  }
+  defaultDispenseFlowRate: {
+    default: number
+    valuesByApiLevel: Record<string, number>
+  }
+  defaultPushOutVolume: number
+  defaultTipLength: number
+  dispense: {
+    default: Record<string, number[][]>
+  }
+  defaultReturnTipHeight?: number
+  defaultFlowAcceleration?: number
+  uiMaxFlowRate?: number
+}
+
+export interface SupportedTips {
+  [tipType: string]: SupportedTip
 }
 
 export interface PipetteV2LiquidSpecs {
@@ -593,38 +597,49 @@ export interface AnalysisError {
   createdAt: string
 }
 
-interface IntParameter {
+export interface NumberParameter extends BaseRunTimeParameter {
+  type: NumberParameterType
   min: number
   max: number
   default: number
 }
 
-interface Choice {
+export interface Choice {
   displayName: string
-  value: unknown
+  value: number | boolean | string
 }
 
-interface ChoiceParameter {
+interface ChoiceParameter extends BaseRunTimeParameter {
+  type: RunTimeParameterType
   choices: Choice[]
-  default: string
+  default: number | boolean | string
 }
 
-interface BooleanParameter {
+interface BooleanParameter extends BaseRunTimeParameter {
+  type: BooleanParameterType
   default: boolean
 }
 
-type RunTimeParameterTypes = 'int' | 'float' | 'str' | 'boolean'
+type NumberParameterType = 'int' | 'float'
+type BooleanParameterType = 'bool'
+type StringParameterType = 'str'
+type RunTimeParameterType =
+  | NumberParameter
+  | BooleanParameterType
+  | StringParameterType
 
-type RunTimeParameter = IntParameter | ChoiceParameter | BooleanParameter
-interface BaseRunTimeParameters {
+interface BaseRunTimeParameter {
   displayName: string
   variableName: string
   description: string
-  type: RunTimeParameterTypes
+  value: number | boolean | string
   suffix?: string
 }
 
-export type RunTimeParameters = BaseRunTimeParameters & RunTimeParameter
+export type RunTimeParameter =
+  | BooleanParameter
+  | ChoiceParameter
+  | NumberParameter
 
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
@@ -638,7 +653,7 @@ export interface CompletedProtocolAnalysis {
   commands: RunTimeCommand[]
   errors: AnalysisError[]
   robotType?: RobotType | null
-  runTimeParameters?: RunTimeParameters[]
+  runTimeParameters?: RunTimeParameter[]
 }
 
 export interface ResourceFile {
@@ -714,7 +729,8 @@ export type StatusBarAnimations = StatusBarAnimation[]
 
 export interface CutoutConfig {
   cutoutId: CutoutId
-  cutoutFixtureId: CutoutFixtureId | null
+  cutoutFixtureId: CutoutFixtureId
+  opentronsModuleSerialNumber?: string
 }
 
 export type DeckConfiguration = CutoutConfig[]

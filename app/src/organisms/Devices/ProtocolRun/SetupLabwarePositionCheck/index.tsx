@@ -1,17 +1,19 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  SPACING,
-  JUSTIFY_CENTER,
-  DIRECTION_COLUMN,
   ALIGN_CENTER,
-  TYPOGRAPHY,
-  TOOLTIP_LEFT,
-  useHoverTooltip,
-  SecondaryButton,
-  PrimaryButton,
+  BORDERS,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_CENTER,
+  PrimaryButton,
+  SecondaryButton,
+  SPACING,
+  StyledText,
+  TOOLTIP_LEFT,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -24,7 +26,6 @@ import {
 } from '../../hooks'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
 import { useLaunchLPC } from '../../../LabwarePositionCheck/useLaunchLPC'
-import { StyledText } from '../../../../atoms/text'
 import { getLatestCurrentOffsets } from './utils'
 import { useNotifyRunQuery } from '../../../../resources/runs'
 
@@ -104,6 +105,7 @@ export function SetupLabwarePositionCheck(
           backgroundColor={COLORS.grey10}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
+          borderRadius={BORDERS.borderRadius8}
         >
           <StyledText as="p">
             {i18n.format(t('no_labware_offset_data'), 'capitalize')}

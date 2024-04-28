@@ -46,7 +46,7 @@ export const FOOTER_BUTTON_STYLE = css`
   text-transform: lowercase;
   padding-left: ${SPACING.spacing16};
   padding-right: ${SPACING.spacing16};
-  border-radius: ${BORDERS.borderRadius4};
+  border-radius: ${BORDERS.borderRadius8};
   margin-top: ${SPACING.spacing16};
   margin-bottom: ${SPACING.spacing16};
 
@@ -155,7 +155,7 @@ export function UpdateRobotModal({
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>
-          {t('update_requires_restarting')}
+          {t('update_requires_restarting_robot')}
         </UpdateAppBanner>
         <ReleaseNotes source={releaseNotes} />
       </Flex>

@@ -19,6 +19,7 @@ import {
   OVERFLOW_WRAP_BREAK_WORD,
   SIZE_2,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
@@ -28,7 +29,6 @@ import {
 } from '@opentrons/react-api-client'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { LongPressModal } from './LongPressModal'
@@ -60,7 +60,7 @@ export function ProtocolCard(props: {
     showFailedAnalysisModal,
     setShowFailedAnalysisModal,
   ] = React.useState<boolean>(false)
-  const { t, i18n } = useTranslation('protocol_info')
+  const { t, i18n } = useTranslation(['protocol_info', 'branded'])
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
   const longpress = useLongPress()
   const queryClient = useQueryClient()
@@ -264,7 +264,9 @@ export function ProtocolCard(props: {
                   }}
                 />
 
-                <StyledText as="p">{t('delete_protocol_from_app')}</StyledText>
+                <StyledText as="p">
+                  {t('branded:delete_protocol_from_app')}
+                </StyledText>
               </Flex>
               <SmallButton
                 onClick={handleDeleteProtocol}

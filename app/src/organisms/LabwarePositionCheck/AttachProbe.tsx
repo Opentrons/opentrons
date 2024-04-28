@@ -1,13 +1,17 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import {
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
   getPipetteNameSpecs,
   CreateCommand,
 } from '@opentrons/shared-data'
 import { css } from 'styled-components'
-import { StyledText } from '../../atoms/text'
 import { ProbeNotAttached } from '../PipetteWizardFlows/ProbeNotAttached'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import attachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
@@ -92,7 +96,11 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     const verifyCommands: CreateCommand[] = [
       {
         commandType: 'verifyTipPresence',
-        params: { pipetteId: pipetteId, expectedState: 'present' },
+        params: {
+          pipetteId: pipetteId,
+          expectedState: 'present',
+          followSingularSensor: 'primary',
+        },
       },
     ]
     const homeCommands: CreateCommand[] = [

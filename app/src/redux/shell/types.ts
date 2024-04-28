@@ -6,21 +6,21 @@ export interface Remote {
   ipcRenderer: {
     invoke: (channel: string, ...args: unknown[]) => Promise<any>
     send: (channel: string, ...args: unknown[]) => void
-    on: (
-      channel: string,
-      listener: (
-        event: IpcMainEvent,
-        hostname: string,
-        topic: NotifyTopic,
-        message: NotifyResponseData | NotifyNetworkError,
-        ...args: unknown[]
-      ) => void
-    ) => void
+    on: (channel: string, listener: IpcListener) => void
+    off: (channel: string, listener: IpcListener) => void
   }
 }
 
+export type IpcListener = (
+  event: IpcMainEvent,
+  hostname: string,
+  topic: NotifyTopic,
+  message: NotifyResponseData | NotifyNetworkError,
+  ...args: unknown[]
+) => void
+
 export interface NotifyRefetchData {
-  refetchUsingHTTP: boolean
+  refetch: boolean
 }
 
 export interface NotifyUnsubscribeData {
@@ -141,20 +141,10 @@ export type NotifyTopic =
   | 'robot-server/runs/current_command'
   | 'robot-server/runs'
   | `robot-server/runs/${string}`
-
-export type NotifyAction = 'subscribe' | 'unsubscribe'
+  | 'robot-server/deck_configuration'
 
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'
-  payload: {
-    hostname: string
-    topic: NotifyTopic
-  }
-  meta: { shell: true }
-}
-
-export interface NotifyUnsubscribeAction {
-  type: 'shell:NOTIFY_UNSUBSCRIBE'
   payload: {
     hostname: string
     topic: NotifyTopic
@@ -175,4 +165,18 @@ export type ShellAction =
   | RobotMassStorageDeviceEnumerated
   | RobotMassStorageDeviceRemoved
   | NotifySubscribeAction
-  | NotifyUnsubscribeAction
+
+export type IPCSafeFormDataEntry =
+  | {
+      type: 'string'
+      name: string
+      value: string
+    }
+  | {
+      type: 'file'
+      name: string
+      value: ArrayBuffer
+      filename: string
+    }
+
+export type IPCSafeFormData = IPCSafeFormDataEntry[]

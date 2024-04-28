@@ -3,19 +3,19 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Icon,
-  Flex,
-  SPACING,
-  COLORS,
-  BORDERS,
-  DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 
@@ -57,7 +57,7 @@ export function EmergencyStop(): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
           backgroundColor={isEstopConnected ? COLORS.green35 : COLORS.grey35}
-          borderRadius={BORDERS.borderRadius12}
+          borderRadius={BORDERS.borderRadius8}
           alignItems={ALIGN_CENTER}
         >
           <Flex

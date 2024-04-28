@@ -16,10 +16,11 @@ import {
   Link,
   SIZE_4,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  useDeckConfigurationQuery,
+  useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
 import {
@@ -29,17 +30,21 @@ import {
   SINGLE_SLOT_FIXTURES,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_SLOT_FIXTURE,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_LEFT_CUTOUTS,
+  getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
 import { useNotifyCurrentMaintenanceRun } from '../../resources/maintenance_runs'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 import { AddFixtureModal } from './AddFixtureModal'
 import { useIsRobotViewable, useRunStatuses } from '../Devices/hooks'
 import { useIsEstopNotDisengaged } from '../../resources/devices/hooks/useIsEstopNotDisengaged'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
-import type { CutoutId } from '@opentrons/shared-data'
+import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const RUN_REFETCH_INTERVAL = 5000
@@ -48,10 +53,14 @@ interface DeviceDetailsDeckConfigurationProps {
   robotName: string
 }
 
+function getDisplayLocationForCutoutIds(cutouts: CutoutId[]): string {
+  return cutouts.map(cutoutId => getCutoutDisplayName(cutoutId)).join(' + ')
+}
+
 export function DeviceDetailsDeckConfiguration({
   robotName,
 }: DeviceDetailsDeckConfigurationProps): JSX.Element | null {
-  const { t } = useTranslation('device_details')
+  const { t, i18n } = useTranslation('device_details')
   const [
     showSetupInstructionsModal,
     setShowSetupInstructionsModal,
@@ -63,9 +72,12 @@ export function DeviceDetailsDeckConfiguration({
     null
   )
 
+  const { data: modulesData } = useModulesQuery()
   const deckConfig =
-    useDeckConfigurationQuery({ refetchInterval: DECK_CONFIG_REFETCH_INTERVAL })
-      .data ?? []
+    useNotifyDeckConfigurationQuery({
+      refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+    }).data ?? []
+  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const { isRunRunning } = useRunStatuses()
   const { data: maintenanceRunData } = useNotifyCurrentMaintenanceRun({
@@ -80,26 +92,109 @@ export function DeviceDetailsDeckConfiguration({
     setShowAddFixtureModal(true)
   }
 
-  const handleClickRemove = (cutoutId: CutoutId): void => {
-    const isRightCutout = SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
-    const singleSlotFixture = isRightCutout
-      ? SINGLE_RIGHT_SLOT_FIXTURE
-      : SINGLE_LEFT_SLOT_FIXTURE
+  const handleClickRemove = (
+    cutoutId: CutoutId,
+    cutoutFixtureId: CutoutFixtureId
+  ): void => {
+    let replacementFixtureId: CutoutFixtureId = SINGLE_CENTER_SLOT_FIXTURE
+    if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
+      replacementFixtureId = SINGLE_RIGHT_SLOT_FIXTURE
+    } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
+      replacementFixtureId = SINGLE_LEFT_SLOT_FIXTURE
+    }
 
-    const newDeckConfig = deckConfig.map(fixture =>
-      fixture.cutoutId === cutoutId
-        ? { ...fixture, cutoutFixtureId: singleSlotFixture }
-        : fixture
-    )
+    const fixtureGroup =
+      deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
+        ?.fixtureGroup ?? {}
 
+    let newDeckConfig = deckConfig
+    if (cutoutId in fixtureGroup) {
+      const groupMap =
+        fixtureGroup[cutoutId]?.find(group =>
+          Object.entries(group).every(([cId, cfId]) =>
+            deckConfig.find(
+              config =>
+                config.cutoutId === cId && config.cutoutFixtureId === cfId
+            )
+          )
+        ) ?? {}
+      newDeckConfig = deckConfig.map(cutoutConfig =>
+        cutoutConfig.cutoutId in groupMap
+          ? {
+              ...cutoutConfig,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
+          : cutoutConfig
+      )
+    } else {
+      newDeckConfig = deckConfig.map(cutoutConfig =>
+        cutoutConfig.cutoutId === cutoutId
+          ? {
+              ...cutoutConfig,
+              cutoutFixtureId: replacementFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
+          : cutoutConfig
+      )
+    }
     updateDeckConfiguration(newDeckConfig)
   }
 
   // do not show standard slot in fixture display list
-  const fixtureDisplayList = deckConfig.filter(
-    fixture =>
-      fixture.cutoutFixtureId != null &&
-      !SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId)
+  const { displayList: fixtureDisplayList } = deckConfig.reduce<{
+    displayList: Array<{ displayLocation: string; displayName: string }>
+    groupedCutoutIds: CutoutId[]
+  }>(
+    (acc, { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber }) => {
+      if (
+        cutoutFixtureId == null ||
+        SINGLE_SLOT_FIXTURES.includes(cutoutFixtureId)
+      ) {
+        return acc
+      }
+      const displayName = getFixtureDisplayName(
+        cutoutFixtureId,
+        modulesData?.data.find(
+          m => m.serialNumber === opentronsModuleSerialNumber
+        )?.usbPort.port
+      )
+      const fixtureGroup =
+        deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
+          ?.fixtureGroup ?? {}
+      if (cutoutId in fixtureGroup) {
+        const groupMap =
+          fixtureGroup[cutoutId]?.find(group =>
+            Object.entries(group).every(([cId, cfId]) =>
+              deckConfig.find(
+                config =>
+                  config.cutoutId === cId && config.cutoutFixtureId === cfId
+              )
+            )
+          ) ?? {}
+        const groupedCutoutIds = Object.keys(groupMap) as CutoutId[]
+        const displayLocation = getDisplayLocationForCutoutIds(groupedCutoutIds)
+        if (acc.groupedCutoutIds.includes(cutoutId)) {
+          return acc // only list grouped fixtures once
+        } else {
+          return {
+            displayList: [...acc.displayList, { displayLocation, displayName }],
+            groupedCutoutIds: [...acc.groupedCutoutIds, ...groupedCutoutIds],
+          }
+        }
+      }
+      return {
+        ...acc,
+        displayList: [
+          ...acc.displayList,
+          {
+            displayLocation: getDisplayLocationForCutoutIds([cutoutId]),
+            displayName,
+          },
+        ],
+      }
+    },
+    { displayList: [], groupedCutoutIds: [] }
   )
 
   return (
@@ -118,7 +213,7 @@ export function DeviceDetailsDeckConfiguration({
       <Flex
         alignItems={ALIGN_FLEX_START}
         backgroundColor={COLORS.white}
-        borderRadius={BORDERS.borderRadius4}
+        borderRadius={BORDERS.borderRadius8}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
         width="100%"
@@ -132,11 +227,7 @@ export function DeviceDetailsDeckConfiguration({
           width="100%"
           borderBottom={BORDERS.lineBorder}
         >
-          <StyledText
-            as="h3"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            id="DeckConfiguration_title"
-          >
+          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {`${robotName} ${t('deck_configuration')}`}
           </StyledText>
           <Link
@@ -174,17 +265,17 @@ export function DeviceDetailsDeckConfiguration({
             ) : null}
             <Flex css={DECK_CONFIG_SECTION_STYLE}>
               <Flex
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 marginLeft={`-${SPACING.spacing32}`}
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 marginTop={`-${SPACING.spacing6}`}
                 flexDirection={DIRECTION_COLUMN}
               >
                 <DeckConfigurator
-                  readOnly={
+                  editableCutoutIds={
                     isRunRunning ||
                     isMaintenanceRunExisting ||
                     isEstopNotDisengaged
+                      ? []
+                      : deckConfig.map(({ cutoutId }) => cutoutId)
                   }
                   deckConfig={deckConfig}
                   handleClickAdd={handleClickAdd}
@@ -197,29 +288,28 @@ export function DeviceDetailsDeckConfiguration({
                 width="32rem"
               >
                 <Flex
-                  gridGap={SPACING.spacing32}
                   paddingLeft={SPACING.spacing8}
+                  gridGap={SPACING.spacing8}
                   css={TYPOGRAPHY.labelSemiBold}
                 >
-                  <StyledText>{t('location')}</StyledText>
-                  <StyledText>{t('fixture')}</StyledText>
+                  <StyledText flex="1 0 30px">{t('location')}</StyledText>
+                  <StyledText flex="9 1 0">
+                    {i18n.format(t('deck_hardware'), 'capitalize')}
+                  </StyledText>
                 </Flex>
                 {fixtureDisplayList.length > 0 ? (
-                  fixtureDisplayList.map(fixture => (
+                  fixtureDisplayList.map(({ displayLocation, displayName }) => (
                     <Flex
-                      key={fixture.cutoutId}
+                      key={displayLocation}
                       backgroundColor={COLORS.grey20}
-                      gridGap={SPACING.spacing60}
+                      borderRadius={BORDERS.borderRadius4}
+                      gridGap={SPACING.spacing8}
                       padding={SPACING.spacing8}
                       width="100%"
                       css={TYPOGRAPHY.labelRegular}
                     >
-                      <StyledText>
-                        {getCutoutDisplayName(fixture.cutoutId)}
-                      </StyledText>
-                      <StyledText>
-                        {getFixtureDisplayName(fixture.cutoutFixtureId)}
-                      </StyledText>
+                      <StyledText flex="1 0 30px">{displayLocation}</StyledText>
+                      <StyledText flex="9 1 0">{displayName}</StyledText>
                     </Flex>
                   ))
                 ) : (
@@ -247,11 +337,7 @@ export function DeviceDetailsDeckConfiguration({
             paddingBottom={SPACING.spacing24}
             width="100%"
           >
-            <StyledText
-              as="p"
-              color={COLORS.grey40}
-              id="InstrumentsAndModules_offline"
-            >
+            <StyledText as="p" color={COLORS.grey40}>
               {t('offline_deck_configuration')}
             </StyledText>
           </Flex>

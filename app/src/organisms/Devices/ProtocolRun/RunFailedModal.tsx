@@ -16,10 +16,10 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { LegacyModal } from '../../../molecules/LegacyModal'
 import { useDownloadRunLog } from '../hooks'
 
@@ -51,7 +51,7 @@ export function RunFailedModal({
   setShowRunFailedModal,
   highestPriorityError,
 }: RunFailedModalProps): JSX.Element | null {
-  const { i18n, t } = useTranslation(['run_details', 'shared'])
+  const { i18n, t } = useTranslation(['run_details', 'shared', 'branded'])
   const modalProps: LegacyModalProps = {
     type: 'error',
     title: t('run_failed_modal_title'),
@@ -89,7 +89,7 @@ export function RunFailedModal({
           </StyledText>
         </Flex>
         <StyledText as="p">
-          {t('run_failed_modal_description_desktop')}
+          {t('branded:run_failed_modal_description_desktop')}
         </StyledText>
         <Flex
           marginTop={SPACING.spacing32}
@@ -119,7 +119,7 @@ const ERROR_MESSAGE_STYLE = css`
   margin-bottom: ${SPACING.spacing16};
   padding: ${`${SPACING.spacing8} ${SPACING.spacing12}`};
   background-color: ${COLORS.grey30};
-  border-radius: ${BORDERS.borderRadius4};
+  border-radius: ${BORDERS.borderRadius8};
   overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
 
   ::-webkit-scrollbar-thumb {

@@ -8,6 +8,7 @@ import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   ALIGN_STRETCH,
+  BORDERS,
   Btn,
   COLORS,
   DIRECTION_COLUMN,
@@ -53,9 +54,8 @@ import { EMPTY_TIMESTAMP } from '../../organisms/Devices/constants'
 import { RunTimer } from '../../organisms/Devices/ProtocolRun/RunTimer'
 import {
   useTrackEvent,
-  // ANALYTICS_PROTOCOL_RUN_CANCEL,
-  ANALYTICS_PROTOCOL_RUN_AGAIN,
-  ANALYTICS_PROTOCOL_RUN_FINISH,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
 } from '../../redux/analytics'
 import { getLocalRobot } from '../../redux/discovery'
 import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
@@ -109,7 +109,7 @@ export function RunSummary(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
-  const { reset } = useRunControls(runId)
+  const { reset, isResetRunLoading } = useRunControls(runId)
   const trackEvent = useTrackEvent()
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
@@ -123,6 +123,10 @@ export function RunSummary(): JSX.Element {
   const [showRunAgainSpinner, setShowRunAgainSpinner] = React.useState<boolean>(
     false
   )
+  const robotSerialNumber =
+    localRobot?.health?.robot_serial ??
+    localRobot?.serverHealth?.serialNumber ??
+    null
 
   let headerText = t('run_complete_splash')
   if (runStatus === RUN_STATUS_FAILED) {
@@ -162,13 +166,15 @@ export function RunSummary(): JSX.Element {
         setPipettesWithTip
       ).catch(e => console.log(`Error launching Tip Attachment Modal: ${e}`))
     } else {
-      setShowRunAgainSpinner(true)
-      reset()
-      trackEvent({
-        name: 'proceedToRun',
-        properties: { sourceLocation: 'RunSummary' },
-      })
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_AGAIN })
+      if (!isResetRunLoading) {
+        setShowRunAgainSpinner(true)
+        reset()
+        trackEvent({
+          name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+          properties: { sourceLocation: 'RunSummary', robotSerialNumber },
+        })
+        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+      }
     }
   }
 
@@ -178,7 +184,7 @@ export function RunSummary(): JSX.Element {
 
   const handleClickSplash = (): void => {
     trackProtocolRunEvent({
-      name: ANALYTICS_PROTOCOL_RUN_FINISH,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
       properties: robotAnalyticsData ?? undefined,
     })
     setShowSplash(false)
@@ -390,6 +396,7 @@ const SplashFrame = styled(Flex)`
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
   grid-gap: ${SPACING.spacing40};
+  border-radius: ${BORDERS.borderRadius8};
 `
 
 const ProtocolName = styled.h4`
@@ -414,7 +421,7 @@ const SummaryDatum = styled.div`
   grid-gap: ${SPACING.spacing4};
   height: 44px;
   background: #d6d6d6;
-  border-radius: 4px;
+  border-radius: ${BORDERS.borderRadius4};
   color: ${COLORS.grey60};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};

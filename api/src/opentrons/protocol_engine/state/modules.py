@@ -46,6 +46,7 @@ from ..types import (
     DeckType,
     LabwareMovementOffsetData,
 )
+from .addressable_areas import AddressableAreaView
 from .. import errors
 from ..commands import (
     Command,
@@ -54,7 +55,7 @@ from ..commands import (
     temperature_module,
     thermocycler,
 )
-from ..actions import Action, UpdateCommandAction, AddModuleAction
+from ..actions import Action, SucceedCommandAction, AddModuleAction
 from .abstract_store import HasState, HandlesActions
 from .module_substates import (
     MagneticModuleSubState,
@@ -195,7 +196,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
-        if isinstance(action, UpdateCommandAction):
+        if isinstance(action, SucceedCommandAction):
             self._handle_command(action.command)
 
         elif isinstance(action, AddModuleAction):
@@ -210,11 +211,12 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
     def _handle_command(self, command: Command) -> None:
         if isinstance(command.result, LoadModuleResult):
+            slot_name = command.params.location.slotName
             self._add_module_substate(
                 module_id=command.result.moduleId,
                 serial_number=command.result.serialNumber,
                 definition=command.result.definition,
-                slot_name=command.params.location.slotName,
+                slot_name=slot_name,
                 requested_model=command.params.model,
                 module_live_data=None,
             )
@@ -707,35 +709,70 @@ class ModuleView(HasState[ModuleState]):
     def get_nominal_module_offset(
         self,
         module_id: str,
+        addressable_areas: AddressableAreaView,
     ) -> LabwareOffsetVector:
         """Get the module's nominal offset vector computed with slot transform."""
-        definition = self.get_definition(module_id)
-        slot = self.get_location(module_id).slotName.id
+        if (
+            self.state.deck_type == DeckType.OT2_STANDARD
+            or self.state.deck_type == DeckType.OT2_SHORT_TRASH
+        ):
+            definition = self.get_definition(module_id)
+            slot = self.get_location(module_id).slotName.id
 
-        pre_transform: NDArray[npdouble] = array(
-            (
-                definition.labwareOffset.x,
-                definition.labwareOffset.y,
-                definition.labwareOffset.z,
-                1,
+            pre_transform: NDArray[npdouble] = array(
+                (
+                    definition.labwareOffset.x,
+                    definition.labwareOffset.y,
+                    definition.labwareOffset.z,
+                    1,
+                )
             )
-        )
-        xforms_ser = definition.slotTransforms.get(
-            str(self._state.deck_type.value), {}
-        ).get(
-            slot,
-            {"labwareOffset": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]},
-        )
-        xforms_ser_offset = xforms_ser["labwareOffset"]
+            xforms_ser = definition.slotTransforms.get(
+                str(self._state.deck_type.value), {}
+            ).get(
+                slot,
+                {
+                    "labwareOffset": [
+                        [1, 0, 0, 0],
+                        [0, 1, 0, 0],
+                        [0, 0, 1, 0],
+                        [0, 0, 0, 1],
+                    ]
+                },
+            )
+            xforms_ser_offset = xforms_ser["labwareOffset"]
 
-        # Apply the slot transform, if any
-        xform: NDArray[npdouble] = array(xforms_ser_offset)
-        xformed = dot(xform, pre_transform)
-        return LabwareOffsetVector(
-            x=xformed[0],
-            y=xformed[1],
-            z=xformed[2],
-        )
+            # Apply the slot transform, if any
+            xform: NDArray[npdouble] = array(xforms_ser_offset)
+            xformed = dot(xform, pre_transform)
+            return LabwareOffsetVector(
+                x=xformed[0],
+                y=xformed[1],
+                z=xformed[2],
+            )
+        else:
+            module = self.get(module_id)
+            if isinstance(module.location, DeckSlotLocation):
+                location = module.location.slotName
+            elif module.model == ModuleModel.THERMOCYCLER_MODULE_V2:
+                location = DeckSlotName.SLOT_B1
+            else:
+                raise ValueError(
+                    "Module location invalid for nominal module offset calculation."
+                )
+            module_addressable_area = self.ensure_and_convert_module_fixture_location(
+                location, self.state.deck_type, module.model
+            )
+            module_addressable_area_position = (
+                addressable_areas.get_addressable_area_offsets_from_cutout(
+                    module_addressable_area
+                )
+            )
+            return LabwareOffsetVector(
+                x=module_addressable_area_position.x,
+                y=module_addressable_area_position.y,
+                z=module_addressable_area_position.z,
+            )
 
     def get_module_calibration_offset(
         self, module_id: str
@@ -755,7 +792,9 @@ class ModuleView(HasState[ModuleState]):
         """Get the height of module parts above module labware base."""
         return self.get_dimensions(module_id).overLabwareHeight
 
-    def get_module_highest_z(self, module_id: str) -> float:
+    def get_module_highest_z(
+        self, module_id: str, addressable_areas: AddressableAreaView
+    ) -> float:
         """Get the highest z point of the module, as placed on the robot.
 
         The highest Z of a module, unlike the bare overall height, depends on
@@ -781,7 +820,7 @@ class ModuleView(HasState[ModuleState]):
         z_difference = module_height - default_lw_offset_point
 
         nominal_transformed_lw_offset_z = self.get_nominal_module_offset(
-            module_id=module_id
+            module_id=module_id, addressable_areas=addressable_areas
         ).z
         calibration_offset = self.get_module_calibration_offset(module_id)
         return (
@@ -943,11 +982,12 @@ class ModuleView(HasState[ModuleState]):
 
         return neighbor_slot in self._state.slot_by_module_id.values()
 
-    def select_hardware_module_to_load(
+    def select_hardware_module_to_load(  # noqa: C901
         self,
         model: ModuleModel,
         location: DeckSlotLocation,
         attached_modules: Sequence[HardwareModule],
+        expected_serial_number: Optional[str] = None,
     ) -> HardwareModule:
         """Get the next matching hardware module for the given model and location.
 
@@ -963,6 +1003,8 @@ class ModuleView(HasState[ModuleState]):
             location: The location the module will be assigned to.
             attached_modules: All attached modules as reported by the HardwareAPI,
                 in the order in which they should be used.
+            expected_serial_number: An optional variable containing the serial number
+                expected of the module identified.
 
         Raises:
             ModuleNotAttachedError: A not-yet-assigned module matching the requested
@@ -976,7 +1018,6 @@ class ModuleView(HasState[ModuleState]):
             if slot == location.slotName:
                 existing_mod_in_slot = self._state.hardware_by_module_id.get(mod_id)
                 break
-
         if existing_mod_in_slot:
             existing_def = existing_mod_in_slot.definition
 
@@ -992,7 +1033,11 @@ class ModuleView(HasState[ModuleState]):
         for m in attached_modules:
             if m not in self._state.hardware_by_module_id.values():
                 if model == m.definition.model or model in m.definition.compatibleWith:
-                    return m
+                    if expected_serial_number is not None:
+                        if m.serial_number == expected_serial_number:
+                            return m
+                    else:
+                        return m
 
         raise errors.ModuleNotAttachedError(f"No available {model.value} found.")
 
@@ -1063,3 +1108,92 @@ class ModuleView(HasState[ModuleState]):
             return True
         else:
             return False
+
+    def ensure_and_convert_module_fixture_location(
+        self,
+        deck_slot: DeckSlotName,
+        deck_type: DeckType,
+        model: ModuleModel,
+    ) -> str:
+        """Ensure module fixture load location is valid.
+
+        Also, convert the deck slot to a valid module fixture addressable area.
+        """
+        if deck_type == DeckType.OT2_STANDARD or deck_type == DeckType.OT2_SHORT_TRASH:
+            raise ValueError(
+                f"Invalid Deck Type: {deck_type.name} - Does not support modules as fixtures."
+            )
+
+        if model == ModuleModel.MAGNETIC_BLOCK_V1:
+            valid_slots = [
+                slot
+                for slot in [
+                    "A1",
+                    "B1",
+                    "C1",
+                    "D1",
+                    "A2",
+                    "B2",
+                    "C2",
+                    "D2",
+                    "A3",
+                    "B3",
+                    "C3",
+                    "D3",
+                ]
+            ]
+            addressable_areas = [
+                "magneticBlockV1A1",
+                "magneticBlockV1B1",
+                "magneticBlockV1C1",
+                "magneticBlockV1D1",
+                "magneticBlockV1A2",
+                "magneticBlockV1B2",
+                "magneticBlockV1C2",
+                "magneticBlockV1D2",
+                "magneticBlockV1A3",
+                "magneticBlockV1B3",
+                "magneticBlockV1C3",
+                "magneticBlockV1D3",
+            ]
+
+        elif model == ModuleModel.HEATER_SHAKER_MODULE_V1:
+            valid_slots = [
+                slot for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
+            ]
+            addressable_areas = [
+                "heaterShakerV1A1",
+                "heaterShakerV1B1",
+                "heaterShakerV1C1",
+                "heaterShakerV1D1",
+                "heaterShakerV1A3",
+                "heaterShakerV1B3",
+                "heaterShakerV1C3",
+                "heaterShakerV1D3",
+            ]
+        elif model == ModuleModel.TEMPERATURE_MODULE_V2:
+            valid_slots = [
+                slot for slot in ["A1", "B1", "C1", "D1", "A3", "B3", "C3", "D3"]
+            ]
+            addressable_areas = [
+                "temperatureModuleV2A1",
+                "temperatureModuleV2B1",
+                "temperatureModuleV2C1",
+                "temperatureModuleV2D1",
+                "temperatureModuleV2A3",
+                "temperatureModuleV2B3",
+                "temperatureModuleV2C3",
+                "temperatureModuleV2D3",
+            ]
+        elif model == ModuleModel.THERMOCYCLER_MODULE_V2:
+            return "thermocyclerModuleV2"
+        else:
+            raise ValueError(
+                f"Unknown module {model.name} has no addressable areas to provide."
+            )
+
+        map_addressable_area = {
+            slot: addressable_area
+            for slot, addressable_area in zip(valid_slots, addressable_areas)
+        }
+        return map_addressable_area[deck_slot.value]

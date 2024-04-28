@@ -7,17 +7,17 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
-  Flex,
-  SPACING,
-  Btn,
-  JUSTIFY_FLEX_END,
-  TYPOGRAPHY,
   ALIGN_START,
-  PrimaryButton,
+  Btn,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  JUSTIFY_FLEX_END,
+  PrimaryButton,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { getTopPortalEl } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -29,7 +29,7 @@ interface ErrorInfoProps {
 }
 export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
   const { attachedModule } = props
-  const { t } = useTranslation(['device_details', 'shared'])
+  const { t } = useTranslation(['device_details', 'shared', 'branded'])
   const [showErrorDetails, setShowErrorDetails] = React.useState(false)
 
   let isError: boolean = false
@@ -92,7 +92,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
                   <StyledText as="p">{errorDetails}</StyledText>
                 ) : null}
                 <StyledText as="p" marginBottom={SPACING.spacing16}>
-                  {t('module_error_contact_support')}
+                  {t('branded:module_error_contact_support')}
                 </StyledText>
               </Flex>
               <Flex justifyContent={JUSTIFY_FLEX_END}>

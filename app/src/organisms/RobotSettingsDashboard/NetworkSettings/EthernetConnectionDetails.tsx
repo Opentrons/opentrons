@@ -4,17 +4,17 @@ import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
-  Flex,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  COLORS,
+  StyledText,
   TYPOGRAPHY,
-  BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import { getNetworkInterfaces } from '../../../redux/networking'
 import { getLocalRobot } from '../../../redux/discovery'
@@ -25,7 +25,7 @@ const STRETCH_LIST_STYLE = css`
   width: 100%;
   padding: ${SPACING.spacing16};
   background-color: ${COLORS.grey35};
-  border-radius: ${BORDERS.borderRadius12};
+  border-radius: ${BORDERS.borderRadius8};
 `
 
 interface EthernetConnectionDetailsProps {

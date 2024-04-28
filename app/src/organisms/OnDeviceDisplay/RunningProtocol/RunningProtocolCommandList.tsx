@@ -16,20 +16,16 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { StyledText } from '../../../atoms/text'
 import { CommandText } from '../../CommandText'
 import { CommandIcon } from '../../RunPreview/CommandIcon'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
-import {
-  ANALYTICS_PROTOCOL_RUN_START,
-  ANALYTICS_PROTOCOL_RUN_RESUME,
-  ANALYTICS_PROTOCOL_RUN_PAUSE,
-} from '../../../redux/analytics'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../../redux/analytics'
 
 import type {
   CompletedProtocolAnalysis,
@@ -119,14 +115,14 @@ export function RunningProtocolCommandList({
   const onTogglePlayPause = (): void => {
     if (runStatus === RUN_STATUS_RUNNING) {
       pauseRun()
-      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_PAUSE })
+      trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.PAUSE })
     } else {
       playRun()
       trackProtocolRunEvent({
         name:
           runStatus === RUN_STATUS_IDLE
-            ? ANALYTICS_PROTOCOL_RUN_START
-            : ANALYTICS_PROTOCOL_RUN_RESUME,
+            ? ANALYTICS_PROTOCOL_RUN_ACTION.START
+            : ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
         properties:
           runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
             ? robotAnalyticsData

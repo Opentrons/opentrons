@@ -3,15 +3,15 @@ import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   ALIGN_CENTER,
+  Box,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  Box,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/buttons'
 import { updateSetting } from '../../../../redux/robot-settings'
 
@@ -28,7 +28,7 @@ export function UseOlderProtocol({
   robotName,
   isRobotBusy,
 }: UseOlderProtocolProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const value = settings?.value ? settings.value : false
   const id = settings?.id ? settings.id : 'disableFastProtocolUpload'
@@ -54,7 +54,7 @@ export function UseOlderProtocol({
           {t('use_older_protocol_analysis_method')}
         </StyledText>
         <StyledText as="p">
-          {t('use_older_protocol_analysis_method_description')}
+          {t('branded:use_older_protocol_analysis_method_description')}
         </StyledText>
       </Box>
       <ToggleButton

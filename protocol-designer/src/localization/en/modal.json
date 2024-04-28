@@ -42,6 +42,14 @@
     "deckConfigAnd96Channel": {
       "body1": "Introducing the {{pd}} 8.0 with deck configuration and 96-channel pipette support!",
       "body2": "All protocols now require {{app}} version <strong> 7.1+ </strong> to run."
+    },
+    "customParamsAndMultiTipAndModule": {
+      "body1": "Introducing {{pd}} 8.1. Starting today, you will be able to:",
+      "body2": "Customize blowout speed and height.",
+      "body3": "Adjust horizontal position within a well when aspirating, dispensing, or mixing.",
+      "body4": "Assign up to three types of tip racks to a single pipette.",
+      "body5": "Add multiple Temperature Modules to the deck (Flex only).",
+      "body6": "All protocols require {{app}} version <strong>7.3.0 or later</strong> to run."
     }
   },
   "labware_selection": {
@@ -61,7 +69,16 @@
   },
   "tip_position": {
     "title": "Tip Positioning",
+    "caption": "between {{min}} and {{max}}",
+    "warning": "One or more position offset values are close to the edge of the well and might collide with it",
+    "radio_button": {
+      "default": "{{defaultMmFromBottom}} mm from the bottom center (default)",
+      "blowout": "0 mm from the top center (default)",
+      "mix": "Aspirate 1mm, Dispense 0.5mm from the bottom center (default)",
+      "custom": "Custom"
+    },
     "body": {
+      "blowout_z_offset": "Change from where in the well the robot emits blowout",
       "aspirate_mmFromBottom": "Change from where in the well the robot aspirates",
       "dispense_mmFromBottom": "Change from where in the well the robot dispenses",
       "mix_mmFromBottom": "Change from where in the well the robot aspirates and dispenses during the mix",
@@ -71,9 +88,14 @@
       "aspirate_delay_mmFromBottom": "Change from where in the well the robot delays after aspirating",
       "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing"
     },
+    "field_titles": {
+      "z_position": "Z position",
+      "x_position": "X position",
+      "y_position": "Y position"
+    },
     "errors": {
       "TOO_MANY_DECIMALS": "a max of 1 decimal place is allowed",
-      "OUT_OF_BOUNDS": "accepted range is {{minMmFromBottom}} to {{maxMmFromBottom}}"
+      "OUT_OF_BOUNDS": "accepted range is {{minMm}} to {{maxMm}}"
     },
     "field_label": "Distance from bottom of well"
   },
@@ -155,7 +177,7 @@
     "closeUnsavedStepForm": {
       "title": "Unsaved step form",
       "body": "You have not saved this step form. If you navigate away without saving, this step will be deleted.",
-      "confirm_button": "delete step"
+      "confirm_button": "discard step"
     },
     "closeBatchEditForm": {
       "title": "Unsaved changes to multiple steps",

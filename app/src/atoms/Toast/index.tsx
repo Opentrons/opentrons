@@ -1,30 +1,29 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  DefaultTheme,
-  FlattenSimpleInterpolation,
-  ThemedCssFunction,
-  css,
-} from 'styled-components'
+import { css } from 'styled-components'
 
 import {
-  Btn,
-  Flex,
-  Icon,
-  Link,
   ALIGN_CENTER,
   BORDERS,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
   SPACING,
+  StyledText,
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../text'
-
+import type {
+  DefaultTheme,
+  FlattenSimpleInterpolation,
+  ThemedCssFunction,
+} from 'styled-components'
 import type { IconName, IconProps, StyleProps } from '@opentrons/components'
 
 export const SUCCESS_TOAST: 'success' = 'success'

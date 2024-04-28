@@ -49,10 +49,14 @@
       "title": "Missing labware",
       "body": "Your module has no labware on it. We recommend you add labware before proceeding."
     },
-    "export_v8_protocol_7_1": {
+    "multiple_modules_without_labware": {
+      "title": "Missing labware",
+      "body": "One or more module has no labware on it. We recommend you add labware before proceeding"
+    },
+    "export_v8_1_protocol_7_3": {
       "title": "Robot and app update may be required",
       "body1": "This protocol can only run on app and robot server version",
-      "body2": "7.1 or higher",
+      "body2": "7.3.0 or higher",
       "body3": ". Please ensure your robot is updated to the correct version."
     },
     "change_magnet_module_model": {
@@ -95,6 +99,10 @@
       "INSUFFICIENT_TIPS": {
         "title": "Not enough tips to complete action",
         "body": "Add another tip rack to an empty slot in "
+      },
+      "NO_TIP_SELECTED": {
+        "title": "No tip rack was selected to complete action",
+        "body": "Add a tip rack in the step"
       },
       "NO_TIP_ON_PIPETTE": {
         "title": "No tip on pipette at the start of step",
@@ -210,6 +218,11 @@
   "export": "Export",
   "import": "Import",
   "module_placement": {
+    "SLOTS_OCCUPIED": {
+      "title": "Cannot place module",
+      "single": "Slot {{slotName}} is occupied",
+      "multi": "Multiple slots are occupied"
+    },
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",
       "body": "Slot {{selectedSlot}} is occupied. Navigate to the design tab and remove the labware or remove the additional item to continue."
@@ -252,12 +265,12 @@
     },
     "unused_module": {
       "heading": "Unused module",
-      "body1": "The {{modulesDetails}} specified in your protocol are not currently used in any step. In order to run this protocol you will need to power up and connect the module to your robot.",
+      "body1": "The {{modulesDetails}} specified in your protocol in Slot {{slotName}} is not currently used in any step. In order to run this protocol you will need to power up and connect the module to your robot.",
       "body2": "If you don't intend to use the module, please consider removing it from your protocol."
     },
     "unused_modules": {
       "heading": "Unused modules",
-      "body1": "The {{modulesDetails}} specified in your protocol are not currently used in any step. In order to run this protocol you will need to power up and connect the modules to your robot.",
+      "body1": "One or more modules specified in your protocol in Slot(s) {{slotName}} are not currently used in any step. In order to run this protocol you will need to power up and connect the modules to your robot.",
       "body2": "If you don't intend to use these modules, please consider removing them from your protocol."
     },
     "unused_gripper": {

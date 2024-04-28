@@ -10,9 +10,9 @@ import {
   COLORS,
   BORDERS,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
 import { RenderResult } from './RenderResult'
 
 export const RESULT_SUMMARY_STYLE = css`

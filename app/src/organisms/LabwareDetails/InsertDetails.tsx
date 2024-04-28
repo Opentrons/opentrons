@@ -1,7 +1,12 @@
 import * as React from 'react'
-import { Box, SPACING, BORDERS, TYPOGRAPHY } from '@opentrons/components'
+import {
+  BORDERS,
+  Box,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
-import { StyledText } from '../../atoms/text'
 import { getWellLabel } from './helpers/labels'
 import { WellProperties } from './WellProperties'
 import { WellDimensions } from './WellDimensions'

@@ -10,7 +10,7 @@ import { useTrackProtocolRunEvent } from '../useTrackProtocolRunEvent'
 import { useProtocolRunAnalyticsData } from '../useProtocolRunAnalyticsData'
 import {
   useTrackEvent,
-  ANALYTICS_PROTOCOL_RUN_START,
+  ANALYTICS_PROTOCOL_RUN_ACTION,
 } from '../../../../redux/analytics'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import { useRobot } from '../useRobot'
@@ -85,12 +85,12 @@ describe('useTrackProtocolRunEvent hook', () => {
     )
     await waitFor(() =>
       result.current.trackProtocolRunEvent({
-        name: ANALYTICS_PROTOCOL_RUN_START,
+        name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
         properties: {},
       })
     )
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_START,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
       properties: PROTOCOL_PROPERTIES,
     })
   })
@@ -112,12 +112,12 @@ describe('useTrackProtocolRunEvent hook', () => {
     )
     await waitFor(() =>
       result.current.trackProtocolRunEvent({
-        name: ANALYTICS_PROTOCOL_RUN_START,
+        name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
         properties: {},
       })
     )
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_PROTOCOL_RUN_START,
+      name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
       properties: {},
     })
   })

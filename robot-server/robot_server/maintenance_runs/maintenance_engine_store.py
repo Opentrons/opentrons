@@ -1,7 +1,10 @@
 """In-memory storage of ProtocolEngine instances."""
+import asyncio
+import logging
 from datetime import datetime
-from typing import List, NamedTuple, Optional
+from typing import List, NamedTuple, Optional, Callable
 
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons_shared_data.robot.dev_types import RobotTypeEnum
@@ -27,6 +30,9 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.types import DeckConfigurationType
 
 
+_log = logging.getLogger(__name__)
+
+
 class EngineConflictError(RuntimeError):
     """An error raised if an active engine is already initialized.
 
@@ -48,18 +54,47 @@ class RunnerEnginePair(NamedTuple):
     engine: ProtocolEngine
 
 
-def get_estop_listener(engine_store: "MaintenanceEngineStore") -> HardwareEventHandler:
-    """Create a callback for estop events."""
+async def handle_estop_event(
+    engine_store: "MaintenanceEngineStore", event: HardwareEvent
+) -> None:
+    """Handle an E-stop event from the hardware API.
 
-    def _callback(event: HardwareEvent) -> None:
+    This is meant to run in the engine's thread and asyncio event loop.
+
+    This is a public function for unit-testing purposes, but it's an implementation
+    detail of the store.
+    """
+    try:
         if isinstance(event, EstopStateNotification):
             if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
                 return
             if engine_store.current_run_id is None:
                 return
-            engine_store.engine.estop(maintenance_run=True)
+            # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
+            # runner layer.
+            engine_store.engine.estop()
+            await engine_store.engine.finish(error=EStopActivatedError())
+    except Exception:
+        # This is a background task kicked off by a hardware event,
+        # so there's no one to propagate this exception to.
+        _log.exception("Exception handling E-stop event.")
 
-    return _callback
+
+def _get_estop_listener(engine_store: "MaintenanceEngineStore") -> HardwareEventHandler:
+    """Create a callback for estop events.
+
+    The returned callback is meant to run in the hardware API's thread.
+    """
+    engine_loop = asyncio.get_running_loop()
+
+    def run_handler_in_engine_thread_from_hardware_thread(
+        event: HardwareEvent,
+    ) -> None:
+        asyncio.run_coroutine_threadsafe(
+            handle_estop_event(engine_store, event), engine_loop
+        )
+
+    return run_handler_in_engine_thread_from_hardware_thread
 
 
 class MaintenanceEngineStore:
@@ -83,15 +118,7 @@ class MaintenanceEngineStore:
         self._robot_type = robot_type
         self._deck_type = deck_type
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
-        hardware_api.register_callback(get_estop_listener(self))
-
-    def _estop_listener(self, event: HardwareEvent) -> None:
-        if isinstance(event, EstopStateNotification):
-            if event.new_state is not EstopState.PHYSICALLY_ENGAGED:
-                return
-            if self._runner_engine_pair is None:
-                return
-            self._runner_engine_pair.engine.estop(maintenance_run=True)
+        hardware_api.register_callback(_get_estop_listener(self))
 
     @property
     def engine(self) -> ProtocolEngine:
@@ -127,6 +154,7 @@ class MaintenanceEngineStore:
         run_id: str,
         created_at: datetime,
         labware_offsets: List[LabwareOffsetCreate],
+        notify_publishers: Callable[[], None],
         deck_configuration: Optional[DeckConfigurationType] = [],
     ) -> StateSummary:
         """Create and store a ProtocolRunner and ProtocolEngine for a given Run.
@@ -135,6 +163,7 @@ class MaintenanceEngineStore:
             run_id: The run resource the engine is assigned to.
             created_at: Run creation datetime
             labware_offsets: Labware offsets to create the engine with.
+            notify_publishers: Utilized by the engine to notify publishers of state changes.
 
         Returns:
             The initial equipment and status summary of the engine.
@@ -154,6 +183,7 @@ class MaintenanceEngineStore:
                 ),
             ),
             deck_configuration=deck_configuration,
+            notify_publishers=notify_publishers,
         )
 
         # Using LiveRunner as the runner to allow for future refactor of maintenance runs
@@ -197,4 +227,4 @@ class MaintenanceEngineStore:
         commands = state_view.commands.get_all()
         self._runner_engine_pair = None
 
-        return RunResult(state_summary=run_data, commands=commands)
+        return RunResult(state_summary=run_data, commands=commands, parameters=[])

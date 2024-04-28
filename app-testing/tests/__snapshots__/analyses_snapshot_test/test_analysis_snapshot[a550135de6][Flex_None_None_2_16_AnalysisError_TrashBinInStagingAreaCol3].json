@@ -2,12 +2,14 @@
   "commands": [
     {
       "commandType": "home",
+      "notes": [],
       "params": {},
       "result": {},
       "status": "succeeded"
     },
     {
       "commandType": "loadLabware",
+      "notes": [],
       "params": {
         "loadName": "nest_1_reservoir_290ml",
         "location": {
@@ -159,5 +161,6 @@
   },
   "modules": [],
   "pipettes": [],
-  "robotType": "OT-3 Standard"
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
 }

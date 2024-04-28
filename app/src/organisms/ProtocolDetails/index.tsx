@@ -32,6 +32,7 @@ import {
   SIZE_1,
   SIZE_5,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -48,7 +49,6 @@ import {
 
 import { getTopPortalEl } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import {
   useTrackEvent,
@@ -72,6 +72,7 @@ import { ProtocolStats } from './ProtocolStats'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
 import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
+import { ProtocolParameters } from './ProtocolParameters'
 
 import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -198,9 +199,11 @@ export function ProtocolDetails(
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const enableProtocolStats = useFeatureFlag('protocolStats')
+  const runTimeParameters = mostRecentAnalysis?.runTimeParameters ?? []
+  const hasRunTimeParameters = runTimeParameters.length > 0
   const [currentTab, setCurrentTab] = React.useState<
-    'robot_config' | 'labware' | 'liquids' | 'stats'
-  >('robot_config')
+    'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
+  >(hasRunTimeParameters ? 'parameters' : 'robot_config')
   const [
     showChooseRobotToRunProtocolSlideout,
     setShowChooseRobotToRunProtocolSlideout,
@@ -214,6 +217,7 @@ export function ProtocolDetails(
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
+
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
   if (analysisStatus === 'stale') {
@@ -327,6 +331,7 @@ export function ProtocolDetails(
     stats: enableProtocolStats ? (
       <ProtocolStats analysis={mostRecentAnalysis} />
     ) : null,
+    parameters: <ProtocolParameters runTimeParameters={runTimeParameters} />,
   }
 
   const deckMap = <ProtocolDeck protocolAnalysis={mostRecentAnalysis} />
@@ -587,10 +592,25 @@ export function ProtocolDetails(
               gridGap={SPACING.spacing8}
             >
               <Flex gridGap={SPACING.spacing8}>
+                {mostRecentAnalysis != null && (
+                  <RoundTab
+                    data-testid="ProtocolDetails_parameters"
+                    isCurrent={currentTab === 'parameters'}
+                    onClick={() => {
+                      setCurrentTab('parameters')
+                    }}
+                  >
+                    <StyledText>
+                      {i18n.format(t('parameters'), 'capitalize')}
+                    </StyledText>
+                  </RoundTab>
+                )}
                 <RoundTab
                   data-testid="ProtocolDetails_robotConfig"
                   isCurrent={currentTab === 'robot_config'}
-                  onClick={() => setCurrentTab('robot_config')}
+                  onClick={() => {
+                    setCurrentTab('robot_config')
+                  }}
                 >
                   <StyledText>
                     {i18n.format(t('hardware'), 'capitalize')}
@@ -599,7 +619,9 @@ export function ProtocolDetails(
                 <RoundTab
                   data-testid="ProtocolDetails_labware"
                   isCurrent={currentTab === 'labware'}
-                  onClick={() => setCurrentTab('labware')}
+                  onClick={() => {
+                    setCurrentTab('labware')
+                  }}
                 >
                   <StyledText>
                     {i18n.format(t('labware'), 'capitalize')}
@@ -609,7 +631,9 @@ export function ProtocolDetails(
                   <RoundTab
                     data-testid="ProtocolDetails_liquids"
                     isCurrent={currentTab === 'liquids'}
-                    onClick={() => setCurrentTab('liquids')}
+                    onClick={() => {
+                      setCurrentTab('liquids')
+                    }}
                   >
                     <StyledText>
                       {i18n.format(t('liquids'), 'capitalize')}
@@ -620,7 +644,9 @@ export function ProtocolDetails(
                   <RoundTab
                     data-testid="ProtocolDetails_stats"
                     isCurrent={currentTab === 'stats'}
-                    onClick={() => setCurrentTab('stats')}
+                    onClick={() => {
+                      setCurrentTab('stats')
+                    }}
                   >
                     <StyledText>
                       {i18n.format(t('stats'), 'capitalize')}
@@ -636,7 +662,7 @@ export function ProtocolDetails(
                 } ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} ${
                   BORDERS.borderRadius4
                 }`}
-                padding={`${SPACING.spacing16} ${SPACING.spacing16} 0 ${SPACING.spacing16}`}
+                padding={SPACING.spacing16}
               >
                 {contentsByTabName[currentTab]}
               </Box>

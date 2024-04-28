@@ -1,51 +1,53 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { Trans, useTranslation } from 'react-i18next'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
-  useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
-import {
-  Flex,
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_END,
+  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SecondaryButton,
-  Icon,
-  DIRECTION_ROW,
-  COLORS,
-  JUSTIFY_END,
-  ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  BORDERS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getCutoutDisplayName,
   getFixtureDisplayName,
   getModuleDisplayName,
-  SINGLE_RIGHT_CUTOUTS,
-  SINGLE_LEFT_SLOT_FIXTURE,
-  SINGLE_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
+  getCutoutFixturesForModuleModel,
+  getFixtureIdByCutoutIdFromModuleSlotName,
 } from '@opentrons/shared-data'
+
 import { getTopPortalEl } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
-import { StyledText } from '../../../../atoms/text'
 import { Modal } from '../../../../molecules/Modal'
 import { SmallButton } from '../../../../atoms/buttons/SmallButton'
+import { useNotifyDeckConfigurationQuery } from '../../../../resources/deck_configuration'
 
 import type {
   CutoutConfig,
   CutoutId,
   CutoutFixtureId,
   ModuleModel,
+  DeckDefinition,
 } from '@opentrons/shared-data'
+import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
 
 interface LocationConflictModalProps {
   onCloseClick: () => void
   cutoutId: CutoutId
+  deckDef: DeckDefinition
+  robotName: string
   missingLabwareDisplayName?: string | null
   requiredFixtureId?: CutoutFixtureId
   requiredModule?: ModuleModel
@@ -58,13 +60,17 @@ export const LocationConflictModal = (
   const {
     onCloseClick,
     cutoutId,
+    robotName,
     missingLabwareDisplayName,
     requiredFixtureId,
     requiredModule,
+    deckDef,
     isOnDevice = false,
   } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
-  const deckConfig = useDeckConfigurationQuery().data ?? []
+
+  const [showModuleSelect, setShowModuleSelect] = React.useState(false)
+  const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckConfigurationAtLocationFixtureId = deckConfig.find(
     (deckFixture: CutoutConfig) => deckFixture.cutoutId === cutoutId
@@ -89,39 +95,54 @@ export const LocationConflictModal = (
       ? getFixtureDisplayName(deckConfigurationAtA1)
       : currentFixtureDisplayName
 
-  const handleUpdateDeck = (): void => {
-    if (requiredFixtureId != null) {
-      const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
-        fixture.cutoutId === cutoutId
-          ? { ...fixture, cutoutFixtureId: requiredFixtureId }
-          : fixture
+  const handleConfigureModule = (moduleSerialNumber?: string): void => {
+    if (requiredModule != null) {
+      const slotName = cutoutId.replace('cutout', '')
+      const moduleFixtures = getCutoutFixturesForModuleModel(
+        requiredModule,
+        deckDef
+      )
+      const moduleFixtureIdByCutoutId = getFixtureIdByCutoutIdFromModuleSlotName(
+        slotName,
+        moduleFixtures,
+        deckDef
       )
 
-      updateDeckConfiguration(newRequiredFixtureDeckConfig)
-    } else {
-      const isRightCutout = SINGLE_RIGHT_CUTOUTS.includes(cutoutId)
-      const singleSlotFixture = isRightCutout
-        ? SINGLE_RIGHT_SLOT_FIXTURE
-        : SINGLE_LEFT_SLOT_FIXTURE
-
-      const newSingleSlotDeckConfig = deckConfig.map(fixture =>
-        fixture.cutoutId === cutoutId
-          ? { ...fixture, cutoutFixtureId: singleSlotFixture }
-          : fixture
-      )
-
-      // add A1 and B1 single slot config for thermocycler
-      const newThermocyclerDeckConfig = isThermocycler
-        ? newSingleSlotDeckConfig.map(fixture =>
-            fixture.cutoutId === 'cutoutA1' || fixture.cutoutId === 'cutoutB1'
-              ? { ...fixture, cutoutFixtureId: SINGLE_LEFT_SLOT_FIXTURE }
-              : fixture
-          )
-        : newSingleSlotDeckConfig
-
-      updateDeckConfiguration(newThermocyclerDeckConfig)
+      const newDeckConfig = deckConfig.map(existingCutoutConfig => {
+        const replacementCutoutFixtureId =
+          moduleFixtureIdByCutoutId[existingCutoutConfig.cutoutId]
+        return existingCutoutConfig.cutoutId in moduleFixtureIdByCutoutId &&
+          replacementCutoutFixtureId != null
+          ? {
+              ...existingCutoutConfig,
+              cutoutFixtureId: replacementCutoutFixtureId,
+              opentronsModuleSerialNumber: moduleSerialNumber,
+            }
+          : existingCutoutConfig
+      })
+      updateDeckConfiguration(newDeckConfig)
     }
     onCloseClick()
+  }
+
+  const handleUpdateDeck = (): void => {
+    if (requiredModule != null) {
+      setShowModuleSelect(true)
+    } else if (requiredFixtureId != null) {
+      const newRequiredFixtureDeckConfig = deckConfig.map(fixture =>
+        fixture.cutoutId === cutoutId
+          ? {
+              ...fixture,
+              cutoutFixtureId: requiredFixtureId,
+              opentronsModuleSerialNumber: undefined,
+            }
+          : fixture
+      )
+      updateDeckConfiguration(newRequiredFixtureDeckConfig)
+      onCloseClick()
+    } else {
+      onCloseClick()
+    }
   }
 
   let protocolSpecifiesDisplayName = ''
@@ -131,6 +152,25 @@ export const LocationConflictModal = (
     protocolSpecifiesDisplayName = getFixtureDisplayName(requiredFixtureId)
   } else if (requiredModule != null) {
     protocolSpecifiesDisplayName = getModuleDisplayName(requiredModule)
+  }
+
+  const displaySlotName = isThermocycler
+    ? 'A1 + B1'
+    : getCutoutDisplayName(cutoutId)
+
+  if (showModuleSelect && requiredModule != null) {
+    return createPortal(
+      <ChooseModuleToConfigureModal
+        handleConfigureModule={handleConfigureModule}
+        requiredModuleModel={requiredModule}
+        onCloseClick={onCloseClick}
+        isOnDevice={isOnDevice}
+        deckDef={deckDef}
+        robotName={robotName}
+        displaySlotName={displaySlotName}
+      />,
+      getTopPortalEl()
+    )
   }
 
   return createPortal(
@@ -168,11 +208,7 @@ export const LocationConflictModal = (
               fontWeight={TYPOGRAPHY.fontWeightBold}
               paddingBottom={SPACING.spacing8}
             >
-              {t('slot_location', {
-                slotName: isThermocycler
-                  ? 'A1 + B1'
-                  : getCutoutDisplayName(cutoutId),
-              })}
+              {t('slot_location', { slotName: displaySlotName })}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -185,7 +221,7 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 alignItems={ALIGN_CENTER}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                borderRadius={BORDERS.borderRadius12}
+                borderRadius={BORDERS.borderRadius4}
               >
                 <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                   {t('protocol_specifies')}
@@ -201,7 +237,7 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 alignItems={ALIGN_CENTER}
-                borderRadius={BORDERS.borderRadius12}
+                borderRadius={BORDERS.borderRadius4}
               >
                 <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                   {t('currently_configured')}
@@ -271,11 +307,7 @@ export const LocationConflictModal = (
               fontSize={TYPOGRAPHY.fontSizeH4}
               fontWeight={TYPOGRAPHY.fontWeightBold}
             >
-              {t('slot_location', {
-                slotName: isThermocycler
-                  ? 'A1 + B1'
-                  : getCutoutDisplayName(cutoutId),
-              })}
+              {t('slot_location', { slotName: displaySlotName })}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -288,6 +320,7 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
                 alignItems={ALIGN_CENTER}
+                borderRadius={BORDERS.borderRadius4}
               >
                 <StyledText as="label" width={SPACING.spacing120}>
                   {t('protocol_specifies')}
@@ -302,6 +335,7 @@ export const LocationConflictModal = (
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing20}
                 alignItems={ALIGN_CENTER}
+                borderRadius={BORDERS.borderRadius4}
               >
                 <StyledText as="label" width={SPACING.spacing120}>
                   {t('currently_configured')}

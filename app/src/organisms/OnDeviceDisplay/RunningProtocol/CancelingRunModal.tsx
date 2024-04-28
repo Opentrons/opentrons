@@ -10,10 +10,10 @@ import {
   Icon,
   JUSTIFY_CENTER,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { Modal } from '../../../molecules/Modal'
-import { StyledText } from '../../../atoms/text'
 
 export function CancelingRunModal(): JSX.Element {
   const { t, i18n } = useTranslation('run_details')

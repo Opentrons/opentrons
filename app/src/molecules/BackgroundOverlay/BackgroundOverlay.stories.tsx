@@ -1,13 +1,16 @@
 import * as React from 'react'
-import { Flex, PrimaryButton } from '@opentrons/components'
-import { touchScreenViewport } from '../../DesignTokens/constants'
-import { StyledText } from '../../atoms/text'
+import {
+  Flex,
+  PrimaryButton,
+  StyledText,
+  VIEWPORT,
+} from '@opentrons/components'
 import { BackgroundOverlay } from './index'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'ODD/Molecules/BackgroundOverlay',
-  parameters: touchScreenViewport,
+  parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<

@@ -17,7 +17,9 @@ import {
   VolumeField,
   WellOrderField,
   WellSelectionField,
+  BlowoutZOffsetField,
 } from '../fields'
+import { TiprackField } from '../fields/TiprackField'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
@@ -50,6 +52,10 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
+        <TiprackField
+          {...propsForFields.tipRack}
+          pipetteId={propsForFields.pipette.value}
+        />
         {is96Channel ? (
           <Configure96ChannelField {...propsForFields.nozzles} />
         ) : null}
@@ -111,9 +117,14 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                 {...propsForFields.aspirate_flowRate}
                 pipetteId={formData.pipette}
                 flowRateType="aspirate"
+                volume={propsForFields.volume?.value ?? 0}
+                tiprack={propsForFields.tipRack.value}
               />
               <TipPositionField
-                {...propsForFields.mix_mmFromBottom}
+                propsForFields={propsForFields}
+                zField="mix_mmFromBottom"
+                xField="mix_x_position"
+                yField="mix_y_position"
                 labwareId={
                   formData[
                     getLabwareFieldForPositioningField('mix_mmFromBottom')
@@ -155,6 +166,8 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                 {...propsForFields.dispense_flowRate}
                 pipetteId={formData.pipette}
                 flowRateType="dispense"
+                volume={propsForFields.volume?.value ?? 0}
+                tiprack={propsForFields.tipRack.value}
               />
             </div>
             <div className={styles.checkbox_column}>
@@ -176,7 +189,8 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                 label={t('form:step_edit_form.field.touchTip.label')}
               >
                 <TipPositionField
-                  {...propsForFields.mix_touchTip_mmFromBottom}
+                  propsForFields={propsForFields}
+                  zField="mix_touchTip_mmFromBottom"
                   labwareId={
                     formData[
                       getLabwareFieldForPositioningField(
@@ -198,6 +212,11 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                   options={getBlowoutLocationOptionsForForm({
                     stepType: formData.stepType,
                   })}
+                />
+                <BlowoutZOffsetField
+                  {...propsForFields.blowout_z_offset}
+                  destLabwareId={propsForFields.labware.value}
+                  blowoutLabwareId={propsForFields.blowout_location.value}
                 />
               </CheckboxRowField>
             </div>

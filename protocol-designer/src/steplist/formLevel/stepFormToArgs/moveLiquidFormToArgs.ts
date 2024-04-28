@@ -15,6 +15,7 @@ import type {
   TransferArgs,
   InnerMixArgs,
 } from '@opentrons/step-generation'
+import { getMatchingTipLiquidSpecs } from '../../../utils'
 type MoveLiquidFields = HydratedMoveLiquidFormData['fields']
 
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
@@ -66,7 +67,6 @@ export const moveLiquidFormToArgs = (
     `moveLiquidFormToArgs called with stepType ${hydratedFormData.stepType}, expected "moveLiquid"`
   )
   const fields = hydratedFormData.fields
-  const pipetteSpec = fields.pipette.spec
   const pipetteId = fields.pipette.id
   const {
     volume,
@@ -76,7 +76,13 @@ export const moveLiquidFormToArgs = (
     dispense_wells: destWellsUnordered,
     dropTip_location: dropTipLocation,
     path,
+    tipRack,
     nozzles,
+    aspirate_x_position,
+    dispense_x_position,
+    aspirate_y_position,
+    dispense_y_position,
+    blowout_z_offset,
   } = fields
   let sourceWells = getOrderedWells(
     fields.aspirate_wells,
@@ -160,7 +166,10 @@ export const moveLiquidFormToArgs = (
   )
   const blowoutLocation =
     (fields.blowout_checkbox && fields.blowout_location) || null
-  const blowoutOffsetFromTopMm = DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+  const blowoutOffsetFromTopMm =
+    blowoutLocation != null
+      ? blowout_z_offset ?? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+      : DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
   const aspirateAirGapVolume = getAirGapData(
     fields,
     'aspirate_airGap_checkbox',
@@ -171,21 +180,30 @@ export const moveLiquidFormToArgs = (
     'dispense_airGap_checkbox',
     'dispense_airGap_volume'
   )
+  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
+    fields.pipette,
+    fields.volume,
+    tipRack
+  )
   const commonFields = {
     pipette: pipetteId,
     volume,
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
+    tipRack: tipRack,
     aspirateFlowRateUlSec:
-      fields.aspirate_flowRate || pipetteSpec.defaultAspirateFlowRate.value,
+      fields.aspirate_flowRate ||
+      matchingTipLiquidSpecs.defaultAspirateFlowRate.default,
     dispenseFlowRateUlSec:
-      fields.dispense_flowRate || pipetteSpec.defaultDispenseFlowRate.value,
+      fields.dispense_flowRate ||
+      matchingTipLiquidSpecs.defaultDispenseFlowRate.default,
     aspirateOffsetFromBottomMm:
       fields.aspirate_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
     dispenseOffsetFromBottomMm:
       fields.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     blowoutFlowRateUlSec:
-      fields.dispense_flowRate || pipetteSpec.defaultBlowOutFlowRate.value,
+      fields.dispense_flowRate ||
+      matchingTipLiquidSpecs.defaultBlowOutFlowRate.default,
     blowoutOffsetFromTopMm,
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),
@@ -201,6 +219,10 @@ export const moveLiquidFormToArgs = (
     name: hydratedFormData.stepName,
     dropTipLocation,
     nozzles,
+    aspirateXOffset: aspirate_x_position ?? 0,
+    aspirateYOffset: aspirate_y_position ?? 0,
+    dispenseXOffset: dispense_x_position ?? 0,
+    dispenseYOffset: dispense_y_position ?? 0,
   }
   console.assert(
     sourceWellsUnordered.length > 0,

@@ -4,12 +4,12 @@ import { useHistory } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   PrimaryButton,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import {
@@ -23,7 +23,6 @@ import {
   ANALYTICS_RENAME_ROBOT,
 } from '../../../../../redux/analytics'
 import { Slideout } from '../../../../../atoms/Slideout'
-import { StyledText } from '../../../../../atoms/text'
 import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
 import { useIsFlex } from '../../../hooks'
@@ -185,13 +184,6 @@ export function RenameRobotSlideout({
         <StyledText as="p" marginBottom={SPACING.spacing16}>
           {t('rename_robot_input_limitation_detail')}
         </StyledText>
-        <StyledText
-          as="label"
-          css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing8}
-        >
-          {t('robot_name')}
-        </StyledText>
         <Controller
           control={control}
           name="newRobotName"
@@ -208,6 +200,7 @@ export function RenameRobotSlideout({
               value={field.value}
               error={fieldState.error?.message && ' '}
               onBlur={field.onBlur}
+              title={t('robot_name')}
             />
           )}
         />

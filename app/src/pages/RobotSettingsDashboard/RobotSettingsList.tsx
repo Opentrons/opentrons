@@ -4,20 +4,21 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import {
-  Flex,
-  DIRECTION_COLUMN,
-  SPACING,
+  ALIGN_CENTER,
+  ALIGN_FLEX_START,
+  BORDERS,
   Btn,
   COLORS,
-  BORDERS,
-  DISPLAY_FLEX,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  TYPOGRAPHY,
+  DISPLAY_FLEX,
+  Flex,
   Icon,
-  ALIGN_FLEX_START,
   JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getLocalRobot, getRobotApiVersion } from '../../redux/discovery'
@@ -31,7 +32,6 @@ import {
   toggleDevtools,
   toggleHistoricOffsets,
 } from '../../redux/config'
-import { StyledText } from '../../atoms/text'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { getRobotSettings, updateSetting } from '../../redux/robot-settings'
 import { UNREACHABLE } from '../../redux/discovery/constants'
@@ -50,7 +50,11 @@ interface RobotSettingsListProps {
 
 export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const { setCurrentOption } = props
-  const { t, i18n } = useTranslation(['device_settings', 'app_settings'])
+  const { t, i18n } = useTranslation([
+    'device_settings',
+    'app_settings',
+    'branded',
+  ])
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -144,7 +148,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         <RobotSettingButton
           settingName={t('app_settings:privacy')}
           dataTestId="RobotSettingButton_privacy"
-          settingInfo={t('app_settings:choose_what_data_to_share')}
+          settingInfo={t('branded:choose_what_data_to_share')}
           onClick={() => setCurrentOption('Privacy')}
           iconName="privacy"
         />

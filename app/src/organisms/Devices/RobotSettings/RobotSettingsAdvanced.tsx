@@ -3,22 +3,23 @@ import { createPortal } from 'react-dom'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
-  Box,
-  SPACING,
-  Flex,
   ALIGN_CENTER,
+  Box,
+  Flex,
   JUSTIFY_SPACE_BETWEEN,
+  SPACING,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { Divider } from '../../../atoms/structure'
-import { StyledText } from '../../../atoms/text'
 import { ToggleButton } from '../../../atoms/buttons'
 import { useIsFlex, useIsRobotBusy, useRobot } from '../hooks'
 import {
   DeviceReset,
   DisplayRobotName,
   EnableStatusLight,
+  FactoryMode,
   GantryHoming,
   LegacySettings,
   OpenJupyterControl,
@@ -39,8 +40,9 @@ import {
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
 import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
+import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryModeSlideout'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
-import { UNREACHABLE } from '../../../redux/discovery'
+import { getRobotSerialNumber, UNREACHABLE } from '../../../redux/discovery'
 import { getTopPortalEl } from '../../../App/portal'
 import { useIsEstopNotDisengaged } from '../../../resources/devices/hooks/useIsEstopNotDisengaged'
 
@@ -72,6 +74,10 @@ export function RobotSettingsAdvanced({
     showDeviceResetModal,
     setShowDeviceResetModal,
   ] = React.useState<boolean>(false)
+  const [
+    showFactoryModeSlideout,
+    setShowFactoryModeSlideout,
+  ] = React.useState<boolean>(false)
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
@@ -83,6 +89,7 @@ export function RobotSettingsAdvanced({
     getRobotSettings(state, robotName)
   )
   const reachable = robot?.status !== UNREACHABLE
+  const sn = robot?.status != null ? getRobotSerialNumber(robot) : null
 
   const [isRobotReachable, setIsRobotReachable] = React.useState<boolean>(
     reachable
@@ -129,6 +136,15 @@ export function RobotSettingsAdvanced({
             isExpanded={showRenameRobotSlideout}
             onCloseClick={() => setShowRenameRobotSlideout(false)}
             robotName={robotName}
+          />
+        )}
+        {showFactoryModeSlideout && (
+          <FactoryModeSlideout
+            isExpanded={showFactoryModeSlideout}
+            isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+            onCloseClick={() => setShowFactoryModeSlideout(false)}
+            robotName={robotName}
+            sn={sn}
           />
         )}
         {showDeviceResetSlideout && (
@@ -195,6 +211,16 @@ export function RobotSettingsAdvanced({
           isRobotBusy={isRobotBusy || isEstopNotDisengaged}
           onUpdateStart={() => handleUpdateBuildroot(robot)}
         />
+        {isFlex ? (
+          <>
+            <Divider marginY={SPACING.spacing16} />
+            <FactoryMode
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+              setShowFactoryModeSlideout={setShowFactoryModeSlideout}
+              sn={sn}
+            />
+          </>
+        ) : null}
         <Troubleshooting
           robotName={robotName}
           isEstopNotDisengaged={isEstopNotDisengaged}

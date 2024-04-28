@@ -5,15 +5,12 @@ import {
   Flex,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
+  BORDERS,
   COLORS,
   SPACING,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import {
-  isFlexPipette,
-  PipetteModelSpecs,
-  PipetteName,
-} from '@opentrons/shared-data'
+import { PipetteModelSpecs } from '@opentrons/shared-data'
 
 import { MenuItem } from '../../../atoms/MenuList/MenuItem'
 import { Divider } from '../../../atoms/structure'
@@ -27,10 +24,8 @@ interface PipetteOverflowMenuProps {
   mount: Mount
   handleChangePipette: () => void
   handleDropTip: () => void
-  handleCalibrate: () => void
   handleAboutSlideout: () => void
   handleSettingsSlideout: () => void
-  isPipetteCalibrated: boolean
   isRunActive: boolean
 }
 
@@ -44,25 +39,20 @@ export const PipetteOverflowMenu = (
     pipetteSettings,
     handleChangePipette,
     handleDropTip,
-    handleCalibrate,
     handleAboutSlideout,
     handleSettingsSlideout,
-    isPipetteCalibrated,
     isRunActive,
   } = props
 
-  const pipetteName =
-    pipetteSpecs?.name != null ? pipetteSpecs.name : t('empty')
   const pipetteDisplayName =
     pipetteSpecs?.displayName != null ? pipetteSpecs.displayName : t('empty')
-  const isFlexPipetteAttached = isFlexPipette(pipetteName as PipetteName)
 
   return (
     <Flex position={POSITION_RELATIVE}>
       <Flex
         whiteSpace="nowrap"
         zIndex={10}
-        borderRadius="4px 4px 0px 0px"
+        borderRadius={BORDERS.borderRadius8}
         boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
         position={POSITION_ABSOLUTE}
         backgroundColor={COLORS.white}
@@ -79,18 +69,6 @@ export const PipetteOverflowMenu = (
           </MenuItem>
         ) : (
           <>
-            {isFlexPipetteAttached ? (
-              <MenuItem
-                onClick={() => handleCalibrate()}
-                disabled={isRunActive}
-              >
-                {t(
-                  isPipetteCalibrated
-                    ? 'recalibrate_pipette'
-                    : 'calibrate_pipette'
-                )}
-              </MenuItem>
-            ) : null}
             <MenuItem
               onClick={() => handleChangePipette()}
               disabled={isRunActive}
@@ -104,7 +82,7 @@ export const PipetteOverflowMenu = (
               {i18n.format(t('drop_tips'), 'capitalize')}
             </MenuItem>
             <Divider marginY="0" />
-            {!isFlexPipetteAttached && pipetteSettings != null ? (
+            {pipetteSettings != null ? (
               <MenuItem
                 key={`${pipetteDisplayName}_${mount}_view_settings`}
                 onClick={() => handleSettingsSlideout()}

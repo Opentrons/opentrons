@@ -11,6 +11,7 @@ import {
   TextField,
   TipPositionField,
   WellOrderField,
+  BlowoutZOffsetField,
 } from '../../fields'
 import { MixFields } from '../../fields/MixFields'
 import {
@@ -37,6 +38,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
 export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
   const { className, formData, prefix, propsForFields } = props
   const { t } = useTranslation(['form', 'application'])
+
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -90,9 +92,14 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           {...propsForFields[addFieldNamePrefix('flowRate')]}
           pipetteId={formData.pipette}
           flowRateType={prefix}
+          volume={propsForFields.volume?.value ?? 0}
+          tiprack={propsForFields.tipRack.value}
         />
         <TipPositionField
-          {...propsForFields[addFieldNamePrefix('mmFromBottom')]}
+          propsForFields={propsForFields}
+          zField={`${prefix}_mmFromBottom`}
+          xField={`${prefix}_x_position`}
+          yField={`${prefix}_y_position`}
           labwareId={
             formData[
               getLabwareFieldForPositioningField(
@@ -144,7 +151,8 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
           className={styles.small_field}
         >
           <TipPositionField
-            {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}
+            propsForFields={propsForFields}
+            zField={`${prefix}_touchTip_mmFromBottom`}
             labwareId={
               formData[
                 getLabwareFieldForPositioningField(
@@ -168,6 +176,12 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
                 path: formData.path,
                 stepType: formData.stepType,
               })}
+            />
+            <BlowoutZOffsetField
+              {...propsForFields.blowout_z_offset}
+              sourceLabwareId={propsForFields.aspirate_labware.value}
+              destLabwareId={propsForFields.dispense_labware.value}
+              blowoutLabwareId={propsForFields.blowout_location.value}
             />
           </CheckboxRowField>
         )}

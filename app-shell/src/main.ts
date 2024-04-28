@@ -19,7 +19,7 @@ import { registerProtocolStorage } from './protocol-storage'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import { registerUsb } from './usb'
 import { createUsbDeviceMonitor } from './system-info/usb-devices'
-import { registerNotify, closeAllNotifyConnections } from './notify'
+import { registerNotify, closeAllNotifyConnections } from './notifications'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'

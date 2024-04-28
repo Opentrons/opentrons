@@ -12,6 +12,8 @@ from opentrons_shared_data.pipette.pipette_definition import (
 )
 from opentrons_shared_data.errors import ErrorCodes, GeneralError, PythonException
 
+MAXIMUM_NOZZLE_COUNT = 24
+
 
 def _nozzle_names_by_row(rows: List[PipetteRowDefinition]) -> Iterator[str]:
     for row in rows:
@@ -266,6 +268,17 @@ class NozzleMap:
         map_store = OrderedDict(
             (nozzle, physical_nozzles[nozzle]) for nozzle in chain(*rows.values())
         )
+
+        if (
+            NozzleConfigurationType.determine_nozzle_configuration(
+                physical_rows, rows, physical_columns, columns
+            )
+            != NozzleConfigurationType.FULL
+        ):
+            if len(rows) * len(columns) > MAXIMUM_NOZZLE_COUNT:
+                raise IncompatibleNozzleConfiguration(
+                    f"Partial Nozzle Layouts may not be configured to contain more than {MAXIMUM_NOZZLE_COUNT} channels."
+                )
 
         return cls(
             starting_nozzle=starting_nozzle,

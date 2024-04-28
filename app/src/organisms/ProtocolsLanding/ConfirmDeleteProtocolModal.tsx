@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Flex,
+  AlertPrimaryButton,
+  ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
+  Flex,
   JUSTIFY_FLEX_END,
-  AlertPrimaryButton,
   Link,
-  ALIGN_CENTER,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { StyledText } from '../../atoms/text'
 
 interface ConfirmDeleteProtocolModalProps {
   cancelDeleteProtocol: React.MouseEventHandler<HTMLAnchorElement> | undefined

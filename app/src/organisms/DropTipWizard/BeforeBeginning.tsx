@@ -3,51 +3,41 @@ import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  SPACING,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  DIRECTION_ROW,
-  COLORS,
-  BORDERS,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
-  RESPONSIVENESS,
-  JUSTIFY_FLEX_START,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
   DISPLAY_INLINE_BLOCK,
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_END,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
-  JUSTIFY_FLEX_END,
-  JUSTIFY_SPACE_AROUND,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../atoms/text'
 import { SmallButton, MediumButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-// import { NeedHelpLink } from '../CalibrationPanels'
 
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
-
-// TODO: get help link article URL
-// const NEED_HELP_URL = ''
 
 interface BeforeBeginningProps {
   setShouldDispenseLiquid: (shouldDispenseLiquid: boolean) => void
   createdMaintenanceRunId: string | null
   isOnDevice: boolean
-  isRobotMoving: boolean
 }
 
 export const BeforeBeginning = (
   props: BeforeBeginningProps
 ): JSX.Element | null => {
-  const {
-    setShouldDispenseLiquid,
-    createdMaintenanceRunId,
-    isOnDevice,
-    isRobotMoving,
-  } = props
+  const { setShouldDispenseLiquid, createdMaintenanceRunId, isOnDevice } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<
     'liquid_and_tips' | 'only_tips' | null
@@ -57,16 +47,8 @@ export const BeforeBeginning = (
     setShouldDispenseLiquid(flowType === 'liquid_and_tips')
   }
 
-  if (isRobotMoving || createdMaintenanceRunId == null) {
-    return (
-      <InProgressModal
-        description={
-          createdMaintenanceRunId == null
-            ? t('getting_ready')
-            : t('stand_back_exiting')
-        }
-      />
-    )
+  if (createdMaintenanceRunId == null) {
+    return <InProgressModal description={t('getting_ready')} />
   }
 
   if (isOnDevice) {
@@ -187,7 +169,7 @@ export const BeforeBeginning = (
 const UNSELECTED_OPTIONS_STYLE = css`
   background-color: ${COLORS.white};
   border: 1px solid ${COLORS.grey30};
-  border-radius: ${BORDERS.borderRadius4};
+  border-radius: ${BORDERS.borderRadius8};
   height: 12.5625rem;
   width: 14.5625rem;
   cursor: pointer;

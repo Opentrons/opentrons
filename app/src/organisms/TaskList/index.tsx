@@ -1,9 +1,6 @@
 import * as React from 'react'
 
 import {
-  Flex,
-  Icon,
-  Link,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
@@ -11,15 +8,18 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   FLEX_NONE,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'
@@ -223,7 +223,7 @@ function SubTask({
           ? BORDERS.activeLineBorder
           : `1px solid ${COLORS.grey30}`
       }
-      borderRadius={BORDERS.borderRadius4}
+      borderRadius={BORDERS.borderRadius8}
       gridGap={SPACING.spacing24}
       width="100%"
     >
@@ -366,7 +366,7 @@ function Task({
         border={
           isActiveTask && !isTaskOpen ? BORDERS.activeLineBorder : undefined
         }
-        borderRadius={BORDERS.borderRadius4}
+        borderRadius={BORDERS.borderRadius8}
         width="100%"
       >
         <Flex

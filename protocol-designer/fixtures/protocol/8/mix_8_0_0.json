@@ -6,16 +6,16 @@
     "author": "",
     "description": "A test for 5.0.0 -> 5.1.0 migration",
     "created": 1600714068238,
-    "lastModified": 1701367385250,
+    "lastModified": 1711742569351,
     "category": null,
     "subcategory": null,
     "tags": []
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "8.0.0",
+    "version": "8.1.0",
     "data": {
-      "_internalAppBuildDate": "Thu, 30 Nov 2023 17:58:01 GMT",
+      "_internalAppBuildDate": "Fri, 29 Mar 2024 20:00:04 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 0.5,
@@ -23,7 +23,7 @@
         "blowout_mmFromTop": 0
       },
       "pipetteTiprackAssignments": {
-        "pipetteId": "opentrons/opentrons_96_tiprack_10ul/1"
+        "pipetteId": ["opentrons/opentrons_96_tiprack_10ul/1"]
       },
       "dismissedWarnings": { "form": {}, "timeline": {} },
       "ingredients": {},
@@ -58,6 +58,7 @@
           "labware": null,
           "mix_wellOrder_first": "t2b",
           "mix_wellOrder_second": "l2r",
+          "blowout_z_offset": 0,
           "blowout_checkbox": false,
           "blowout_location": "5ba7047d-d3e2-4845-9eaa-1974af796ead:trashBin",
           "mix_mmFromBottom": 0.5,
@@ -73,11 +74,14 @@
           "mix_touchTip_checkbox": false,
           "mix_touchTip_mmFromBottom": null,
           "dropTip_location": "5ba7047d-d3e2-4845-9eaa-1974af796ead:trashBin",
+          "nozzles": null,
+          "tipRack": "f1c677c0-fc3a-11ea-8809-e959e7d61d96:opentrons/opentrons_96_tiprack_10ul/1",
+          "mix_x_position": 0,
+          "mix_y_position": 0,
           "id": "fc4dc7c0-fc3a-11ea-8809-e959e7d61d96",
           "stepType": "mix",
           "stepName": "mix",
-          "stepDetails": "",
-          "nozzles": null
+          "stepDetails": ""
         }
       },
       "orderedStepIds": [
@@ -2124,7 +2128,7 @@
   "commandSchemaId": "opentronsCommandSchemaV8",
   "commands": [
     {
-      "key": "b96482a6-a37b-4ac1-85ff-3ef2ee57c6c2",
+      "key": "3004b46c-2b41-4453-8ddc-1629ec3b5249",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p20_single_gen2",
@@ -2133,7 +2137,7 @@
       }
     },
     {
-      "key": "08850284-1d56-49b4-b767-2ec3dfe91651",
+      "key": "c318feee-5ec6-40a0-9ecc-554e67b30ce1",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons OT-2 96 Tip Rack 10 µL",
@@ -2145,7 +2149,7 @@
       }
     },
     {
-      "key": "e4e31066-e009-40ef-b828-bbfde7f720f8",
+      "key": "3350dee6-aa60-4569-a801-0dfeb5baf8ed",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Bio-Rad 96 Well Plate 200 µL PCR",
@@ -2158,7 +2162,7 @@
     },
     {
       "commandType": "waitForDuration",
-      "key": "7bdcb695-b181-4843-8323-890a8208a8ad",
+      "key": "797e70f3-5310-48c2-ba06-12adb92a7b4e",
       "params": { "seconds": 3723, "message": "" }
     }
   ],

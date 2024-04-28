@@ -6,7 +6,7 @@ from decoy import Decoy
 from typing import Dict, Set, Optional, cast
 
 from opentrons_shared_data.robot.dev_types import RobotType
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 from opentrons.types import Point, DeckSlotName
 
 from opentrons.protocol_engine.errors import (
@@ -47,7 +47,7 @@ def get_addressable_area_view(
     potential_cutout_fixtures_by_cutout_id: Optional[
         Dict[str, Set[PotentialCutoutFixture]]
     ] = None,
-    deck_definition: Optional[DeckDefinitionV4] = None,
+    deck_definition: Optional[DeckDefinitionV5] = None,
     deck_configuration: Optional[DeckConfigurationType] = None,
     robot_type: RobotType = "OT-3 Standard",
     use_simulated_deck_config: bool = False,
@@ -57,7 +57,7 @@ def get_addressable_area_view(
         loaded_addressable_areas_by_name=loaded_addressable_areas_by_name or {},
         potential_cutout_fixtures_by_cutout_id=potential_cutout_fixtures_by_cutout_id
         or {},
-        deck_definition=deck_definition or cast(DeckDefinitionV4, {"otId": "fake"}),
+        deck_definition=deck_definition or cast(DeckDefinitionV5, {"otId": "fake"}),
         deck_configuration=deck_configuration or [],
         robot_type=robot_type,
         use_simulated_deck_config=use_simulated_deck_config,
@@ -79,8 +79,8 @@ def test_get_all_cutout_fixtures_non_simulated_deck_config() -> None:
     """It should return the cutout fixtures from the deck config, if it's not simulated."""
     subject = get_addressable_area_view(
         deck_configuration=[
-            ("cutout-id-1", "cutout-fixture-id-1"),
-            ("cutout-id-2", "cutout-fixture-id-2"),
+            ("cutout-id-1", "cutout-fixture-id-1", None),
+            ("cutout-id-2", "cutout-fixture-id-2", None),
         ],
         use_simulated_deck_config=False,
     )
@@ -309,6 +309,8 @@ def test_get_fixture_height(decoy: Decoy) -> None:
             "height": 10,
             # These values don't matter:
             "id": "id",
+            "expectOpentronsModuleSerialNumber": False,
+            "fixtureGroup": {},
             "mayMountTo": [],
             "displayName": "",
             "providesAddressableAreas": {},
@@ -324,6 +326,8 @@ def test_get_fixture_height(decoy: Decoy) -> None:
             "height": 9000.1,
             # These values don't matter:
             "id": "id",
+            "expectOpentronsModuleSerialNumber": False,
+            "fixtureGroup": {},
             "mayMountTo": [],
             "displayName": "",
             "providesAddressableAreas": {},

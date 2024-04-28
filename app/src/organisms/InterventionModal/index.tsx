@@ -3,30 +3,30 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  Box,
-  Flex,
-  COLORS,
-  SPACING,
-  POSITION_FIXED,
-  POSITION_ABSOLUTE,
   ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  POSITION_RELATIVE,
-  OVERFLOW_AUTO,
-  POSITION_STICKY,
-  BORDERS,
-  DISPLAY_FLEX,
-  DIRECTION_COLUMN,
   ALIGN_FLEX_START,
+  BORDERS,
+  Box,
+  COLORS,
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
+  Flex,
   Icon,
-  PrimaryButton,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  TYPOGRAPHY,
   Link,
+  OVERFLOW_AUTO,
+  POSITION_ABSOLUTE,
+  POSITION_FIXED,
+  POSITION_RELATIVE,
+  POSITION_STICKY,
+  PrimaryButton,
+  SPACING,
+  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
 import { PauseInterventionContent } from './PauseInterventionContent'
@@ -59,7 +59,7 @@ const MODAL_STYLE = {
   maxHeight: '100%',
   width: '47rem',
   border: `6px ${BORDERS.styleSolid} ${COLORS.blue50}`,
-  borderRadius: BORDERS.borderRadius4,
+  borderRadius: BORDERS.borderRadius8,
   boxShadow: BORDERS.smallDropShadow,
 } as const
 
@@ -78,10 +78,8 @@ const CONTENT_STYLE = {
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
   gridGap: SPACING.spacing24,
-  padding: `${SPACING.spacing32}`,
-  borderRadius: `0px 0px ${String(BORDERS.borderRadius4)} ${String(
-    BORDERS.borderRadius4
-  )}`,
+  padding: SPACING.spacing32,
+  borderRadius: BORDERS.borderRadius8,
 } as const
 
 const FOOTER_STYLE = {
@@ -158,7 +156,7 @@ export function InterventionModal({
   // reimplement when design system shares a modal component between desktop/ODD
   return isOnDevice ? (
     <Modal
-      border={`8px ${BORDERS.styleSolid} ${COLORS.blue50}`}
+      border={`${BORDERS.borderRadius8} ${BORDERS.styleSolid} ${COLORS.blue50}`}
       modalSize="large"
       header={{
         backgroundColor: COLORS.blue50,
