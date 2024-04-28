@@ -43,6 +43,7 @@ from .legacy_wrappers import (
     LegacyLoadInfo,
 )
 from ..ordered_set import OrderedSet
+from ..protocol_engine.actions import QueueCommandAction
 from ..protocol_engine.commands import hash_protocol_command_params
 from ..protocol_engine.errors import ProtocolCommandFailedError
 from ..protocol_engine.resources import model_utils
@@ -430,6 +431,7 @@ class JsonRunner(AbstractRunner):
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
+    # todo(tamar): should this be async? probably?
     def add_command(self, request: CommandCreate) -> Command:
         """Add a command to the queue.
 
@@ -461,40 +463,51 @@ class JsonRunner(AbstractRunner):
         else:
             request_hash = hash_protocol_command_params(
                 create=request,
-                last_hash=self._state_store.commands.get_latest_protocol_command_hash(),
+                last_hash=self._protocol_engine.commands.get_latest_protocol_command_hash(),
             )
 
         command_created_at = model_utils.get_timestamp()
 
-        command = self.validate_action_allowed(
+        queue_command = self.validate_action_allowed(
             request=request,
             request_hash=request_hash,
             command_id=command_id,
             created_at=command_created_at,
         )
+
+        # self._create_command_queue(queue_command)
+
+        return queue_command
+
+    # todo(tamar): change to QueueCommand, should this be async
+    def _create_command_queue(
+        self, queue_command: QueueCommandAction
+    ) -> QueueCommandAction:
         # TODO(mc, 2021-06-22): mypy has trouble with this automatic
         # request > command mapping, figure out how to type precisely
         # (or wait for a future mypy version that can figure it out).
         # For now, unit tests cover mapping every request type
-        queued_command = request._CommandCls.construct(
-            id=command.command_id,
+        queued_command = queue_command.request._CommandCls.construct(
+            id=queue_command.command_id,
             key=(
-                command.key
-                if command.key is not None
-                else (request_hash or command.command_id)
+                queue_command.request.key
+                if queue_command.request.key is not None
+                else (queue_command.request_hash or queue_command.command_id)
             ),
-            createdAt=command_created_at,
-            params=command.params,  # type: ignore[arg-type]
-            intent=command.intent,
+            createdAt=queue_command.created_at,
+            params=queue_command.request.params,  # type: ignore[arg-type]
+            intent=queue_command.request.intent,
             status=CommandStatus.QUEUED,
         )
 
         self.set_command_queued(queued_command)
 
-        if request_hash is not None:
-            self._protocol_engine.set_latest_protocol_command_hash(request_hash)
+        if queue_command.request_hash is not None:
+            self._protocol_engine._state_store.commands.state.latest_protocol_command_hash(
+                queue_command.request.key
+            )
 
-        return command
+        return queue_command
 
     async def _add_command_and_execute(self) -> None:
         for command in self._queued_commands:
