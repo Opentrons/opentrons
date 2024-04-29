@@ -263,7 +263,7 @@ async def test_cache_instruments_sim(sim_and_instr):
         {types.Mount.LEFT: "p10_single", types.Mount.RIGHT: "p300_single_gen2"}
     )
     attached = sim.attached_instruments
-    assert attached[types.Mount.LEFT]["model"] == "p10_single_v1"
+    assert attached[types.Mount.LEFT]["model"] == "p10_single_v1.5"
     assert attached[types.Mount.LEFT]["name"] == "p10_single"
 
     steps_mm_calls = [mock.call({"B": 768}), mock.call({"C": 3200})]
@@ -291,7 +291,7 @@ async def test_cache_instruments_sim(sim_and_instr):
     # If we use prefixes, that should work too
     await sim.cache_instruments({types.Mount.RIGHT: "p300_single"})
     attached = sim.attached_instruments
-    assert attached[types.Mount.RIGHT]["model"] == "p300_single_v1"
+    assert attached[types.Mount.RIGHT]["model"] == "p300_single_v1.5"
     assert attached[types.Mount.RIGHT]["name"] == "p300_single"
     # If we specify instruments at init time, we should get them without
     # passing an expectation

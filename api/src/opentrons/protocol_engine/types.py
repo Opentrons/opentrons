@@ -10,7 +10,10 @@ from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, StagingSlotName
-from opentrons.hardware_control.types import TipStateType as HwTipStateType
+from opentrons.hardware_control.types import (
+    TipStateType as HwTipStateType,
+    InstrumentProbeType,
+)
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
 )
@@ -828,6 +831,22 @@ NozzleLayoutConfigurationType = Union[
 DeckConfigurationType = List[
     Tuple[str, str, Optional[str]]
 ]  # cutout_id, cutout_fixture_id, opentrons_module_serial_number
+
+
+class InstrumentSensorId(str, Enum):
+    """Primary and secondary sensor ids."""
+
+    PRIMARY = "primary"
+    SECONDARY = "secondary"
+    BOTH = "both"
+
+    def to_instrument_probe_type(self) -> InstrumentProbeType:
+        """Convert to InstrumentProbeType."""
+        return {
+            InstrumentSensorId.PRIMARY: InstrumentProbeType.PRIMARY,
+            InstrumentSensorId.SECONDARY: InstrumentProbeType.SECONDARY,
+            InstrumentSensorId.BOTH: InstrumentProbeType.BOTH,
+        }[self]
 
 
 class TipPresenceStatus(str, Enum):

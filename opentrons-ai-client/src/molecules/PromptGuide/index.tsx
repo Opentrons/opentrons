@@ -24,7 +24,6 @@ export function PromptGuide(): JSX.Element {
       backgroundColor={COLORS.grey30}
       borderRadius={BORDERS.borderRadius12}
       gridGap={SPACING.spacing32}
-      width="58.125rem"
     >
       <StyledText css={HEADER_TEXT_STYLE}>
         {t('what_typeof_protocol')}
@@ -87,6 +86,9 @@ export function PromptGuide(): JSX.Element {
           span: <StyledText css={BODY_TEXT_STYLE} />,
         }}
       />
+      <StyledText css={BODY_TEXT_STYLE}>
+        {t('simulator_description')}
+      </StyledText>
     </Flex>
   )
 }

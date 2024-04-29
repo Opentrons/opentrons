@@ -142,7 +142,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
 
     cy.contains(
-      'Our default aspirate speed is optimal for a P1000 Single-Channel GEN2 aspirating liquids with a viscosity similar to water'
+      'The default P1000 Single-Channel GEN2 flow rate is optimal for handling aqueous liquids'
     )
     cy.get('input[name="aspirate_flowRate_customFlowRate"]').type('100')
     cy.get('button').contains('Done').click()
@@ -161,7 +161,7 @@ describe('Advanced Settings for Transfer Form', () => {
     // Batch editing the Flowrate value
     cy.get('input[name="aspirate_flowRate"]').click({ force: true })
     cy.contains(
-      'Our default aspirate speed is optimal for a P1000 Single-Channel GEN2 aspirating liquids with a viscosity similar to water'
+      'The default P1000 Single-Channel GEN2 flow rate is optimal for handling aqueous liquids'
     )
     cy.get('input[name="aspirate_flowRate_customFlowRate"]').type('100')
     cy.get('button').contains('Done').click()

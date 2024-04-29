@@ -13,16 +13,14 @@ import {
   FLEX_ROBOT_TYPE,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
-import {
-  useDeckConfigurationQuery,
-  useUpdateDeckConfigurationMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 
 import { ChildNavigation } from '../ChildNavigation'
 import { AddFixtureModal } from '../DeviceDetailsDeckConfiguration/AddFixtureModal'
 import { DeckConfigurationDiscardChangesModal } from '../DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getTopPortalEl } from '../../App/portal'
+import { useNotifyDeckConfigurationQuery } from '../../resources/deck_configuration'
 
 import type {
   CutoutFixtureId,
@@ -56,7 +54,7 @@ export function ProtocolSetupDeckConfiguration({
   ] = React.useState<boolean>(false)
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { data: deckConfig = [] } = useDeckConfigurationQuery()
+  const deckConfig = useNotifyDeckConfigurationQuery()?.data ?? []
 
   const simplestDeckConfig = getSimplestDeckConfigForProtocol(
     mostRecentAnalysis

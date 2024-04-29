@@ -38,6 +38,8 @@ from ..errors import (
     ErrorOccurrence,
     RobotDoorOpenError,
     SetupCommandNotAllowedError,
+    FixitCommandNotAllowedError,
+    ResumeFromRecoveryNotAllowedError,
     PauseNotAllowedError,
     UnexpectedProtocolError,
     ProtocolCommandFailedError,
@@ -184,8 +186,8 @@ class CommandState:
     finish_error: Optional[ErrorOccurrence]
     """The error that happened during the post-run finish steps (homing & dropping tips), if any."""
 
-    latest_command_hash: Optional[str]
-    """The latest hash value received in a QueueCommandAction.
+    latest_protocol_command_hash: Optional[str]
+    """The latest PROTOCOL command hash value received in a QueueCommandAction.
 
     This value can be used to generate future hashes.
     """
@@ -219,7 +221,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             recovery_target_command_id=None,
             run_completed_at=None,
             run_started_at=None,
-            latest_command_hash=None,
+            latest_protocol_command_hash=None,
             stopped_by_estop=False,
         )
 
@@ -241,12 +243,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 params=action.request.params,  # type: ignore[arg-type]
                 intent=action.request.intent,
                 status=CommandStatus.QUEUED,
+                failedCommandId=action.failed_command_id,
             )
 
             self._state.command_history.set_command_queued(queued_command)
 
             if action.request_hash is not None:
-                self._state.latest_command_hash = action.request_hash
+                self._state.latest_protocol_command_hash = action.request_hash
 
         elif isinstance(action, RunCommandAction):
             prev_entry = self._state.command_history.get(action.command_id)
@@ -321,6 +324,20 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.command_history.clear_queue()
                 else:
                     assert_never(action.type)
+            elif prev_entry.command.intent == CommandIntent.FIXIT:
+                other_command_ids_to_fail = (
+                    self._state.command_history.get_fixit_queue_ids()
+                )
+                for command_id in other_command_ids_to_fail:
+                    # TODO(mc, 2022-06-06): add new "cancelled" status or similar
+                    self._update_to_failed(
+                        command_id=command_id,
+                        failed_at=action.failed_at,
+                        error_occurrence=None,
+                        error_recovery_type=None,
+                        notes=None,
+                    )
+                self._state.command_history.clear_fixit_queue()
             else:
                 assert_never(prev_entry.command.intent)
 
@@ -339,6 +356,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.queue_status = QueueStatus.PAUSED
 
         elif isinstance(action, ResumeFromRecoveryAction):
+            self._state.command_history.clear_fixit_queue()
             self._state.queue_status = QueueStatus.RUNNING
             self._state.recovery_target_command_id = None
 
@@ -606,9 +624,18 @@ class CommandView(HasState[CommandState]):
         if self._state.run_result:
             raise RunStoppedError("Engine was stopped")
 
+        # if queue is in recovery mode, return the next fixit command
+        next_fixit_cmd = self._state.command_history.get_fixit_queue_ids().head(None)
+        if next_fixit_cmd and self._state.queue_status == QueueStatus.AWAITING_RECOVERY:
+            return next_fixit_cmd
+
         # if there is a setup command queued, prioritize it
         next_setup_cmd = self._state.command_history.get_setup_queue_ids().head(None)
-        if self._state.queue_status != QueueStatus.PAUSED and next_setup_cmd:
+        if (
+            self._state.queue_status
+            not in [QueueStatus.PAUSED, QueueStatus.AWAITING_RECOVERY]
+            and next_setup_cmd
+        ):
             return next_setup_cmd
 
         # if the queue is running, return the next protocol command
@@ -816,12 +843,28 @@ class CommandView(HasState[CommandState]):
                 raise SetupCommandNotAllowedError(
                     "Setup commands are not allowed after run has started."
                 )
+            elif action.request.intent == CommandIntent.FIXIT:
+                if self._state.queue_status != QueueStatus.AWAITING_RECOVERY:
+                    raise FixitCommandNotAllowedError(
+                        "Fixit commands are not allowed when the run is not in a recoverable state."
+                    )
+                else:
+                    return action
             else:
                 return action
 
         elif isinstance(action, ResumeFromRecoveryAction):
             if self.get_status() != EngineStatus.AWAITING_RECOVERY:
-                raise NotImplementedError()
+                raise ResumeFromRecoveryNotAllowedError(
+                    "Cannot resume from recovery if the run is not in recovery mode."
+                )
+            elif (
+                self.get_status() == EngineStatus.AWAITING_RECOVERY
+                and len(self._state.command_history.get_fixit_queue_ids()) > 0
+            ):
+                raise ResumeFromRecoveryNotAllowedError(
+                    "Cannot resume from recovery while there are fixit commands in the queue."
+                )
             else:
                 return action
 
@@ -873,6 +916,6 @@ class CommandView(HasState[CommandState]):
         # SETUP and we're currently a setup command?
         return EngineStatus.IDLE
 
-    def get_latest_command_hash(self) -> Optional[str]:
+    def get_latest_protocol_command_hash(self) -> Optional[str]:
         """Get the command hash of the last queued command, if any."""
-        return self._state.latest_command_hash
+        return self._state.latest_protocol_command_hash

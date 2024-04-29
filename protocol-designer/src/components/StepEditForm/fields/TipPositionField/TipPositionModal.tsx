@@ -234,6 +234,7 @@ export const TipPositionModal = (
     yValue != null &&
     (parseInt(yValue) > PERCENT_RANGE_TO_SHOW_WARNING * yMaxWidth ||
       parseInt(yValue) < PERCENT_RANGE_TO_SHOW_WARNING * yMinWidth)
+  const isZValueAtBottom = zValue != null && zValue === '0'
 
   const TipPositionInputField = !isDefault ? (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -315,7 +316,8 @@ export const TipPositionModal = (
         <p>{t(`tip_position.body.${zSpec?.name}`)}</p>
       </div>
 
-      {(isXValueNearEdge || isYValueNearEdge) && !isDefault ? (
+      {(isXValueNearEdge || isYValueNearEdge || isZValueAtBottom) &&
+      !isDefault ? (
         <Flex marginTop={SPACING.spacing8}>
           <PDAlert
             alertType="warning"

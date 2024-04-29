@@ -17,7 +17,7 @@ from opentrons_shared_data.errors import (
     EnumeratedError,
 )
 
-from .errors import ProtocolCommandFailedError, ErrorOccurrence
+from .errors import ProtocolCommandFailedError, ErrorOccurrence, CommandNotAllowedError
 from .errors.exceptions import EStopActivatedError
 from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
@@ -176,7 +176,9 @@ class ProtocolEngine:
         )
         self._action_dispatcher.dispatch(action)
 
-    def add_command(self, request: commands.CommandCreate) -> commands.Command:
+    def add_command(
+        self, request: commands.CommandCreate, failed_command_id: Optional[str] = None
+    ) -> commands.Command:
         """Add a command to the `ProtocolEngine`'s queue.
 
         Arguments:
@@ -191,16 +193,29 @@ class ProtocolEngine:
                 but the engine was not idle or paused.
             RunStoppedError: the run has been stopped, so no new commands
                 may be added.
+            CommandNotAllowedError: the request specified a failed command id
+                with a non fixit command.
         """
         request = slot_standardization.standardize_command(
             request, self.state_view.config.robot_type
         )
 
+        if failed_command_id and request.intent != commands.CommandIntent.FIXIT:
+            raise CommandNotAllowedError(
+                "failed command id should be supplied with a FIXIT command."
+            )
+
         command_id = self._model_utils.generate_id()
-        request_hash = commands.hash_command_params(
-            create=request,
-            last_hash=self._state_store.commands.get_latest_command_hash(),
-        )
+        if request.intent in (
+            commands.CommandIntent.SETUP,
+            commands.CommandIntent.FIXIT,
+        ):
+            request_hash = None
+        else:
+            request_hash = commands.hash_protocol_command_params(
+                create=request,
+                last_hash=self._state_store.commands.get_latest_protocol_command_hash(),
+            )
 
         action = self.state_view.commands.validate_action_allowed(
             QueueCommandAction(
@@ -208,6 +223,7 @@ class ProtocolEngine:
                 request_hash=request_hash,
                 command_id=command_id,
                 created_at=self._model_utils.get_timestamp(),
+                failed_command_id=failed_command_id,
             )
         )
         self._action_dispatcher.dispatch(action)

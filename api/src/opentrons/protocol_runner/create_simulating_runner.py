@@ -1,6 +1,5 @@
 """Simulating AbstractRunner factory."""
 
-from opentrons.config import feature_flags
 from opentrons.hardware_control import API as OT2API, HardwareControlAPI
 from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
@@ -58,7 +57,7 @@ async def create_simulating_runner(
             use_virtual_modules=True,
             use_virtual_gripper=True,
             use_simulated_deck_config=True,
-            use_virtual_pipettes=(not feature_flags.disable_fast_protocol_upload()),
+            use_virtual_pipettes=True,
         ),
         load_fixed_trash=should_load_fixed_trash(protocol_config),
     )

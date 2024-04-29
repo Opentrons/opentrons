@@ -1,6 +1,5 @@
 import last from 'lodash/last'
 import {
-  useDeckConfigurationQuery,
   useInstrumentsQuery,
   useModulesQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -19,6 +18,7 @@ import {
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
 import { useDeckConfigurationCompatibility } from '../../../resources/deck_configuration/hooks'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type {
   CompletedProtocolAnalysis,
@@ -31,7 +31,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../utils'
 
-interface ProtocolPipette {
+export interface ProtocolPipette {
   hardwareType: 'pipette'
   pipetteName: PipetteName
   mount: 'left' | 'right'
@@ -83,9 +83,10 @@ export const useRequiredProtocolHardwareFromAnalysis = (
 
   const robotType = FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
-  const { data: deckConfig = [] } = useDeckConfigurationQuery({
-    refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
-  })
+  const deckConfig =
+    useNotifyDeckConfigurationQuery({
+      refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
+    })?.data ?? []
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
     analysis

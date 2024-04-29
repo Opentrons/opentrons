@@ -65,7 +65,6 @@
   "update_requires_restarting_app": "Updating requires restarting the Opentrons App.",
   "update_robot_software_description": "Bypass the Opentrons App auto-update process and update the robot software manually.",
   "update_robot_software_link": "Launch Opentrons software update page",
-  "use_older_protocol_analysis_method_description": "Use an older, slower method of analyzing uploaded protocols. This changes how the OT-2 validates your protocol during the upload step, but does not affect how your protocol actually runs. Opentrons Support might ask you to change this setting if you encounter problems with the newer, faster protocol analysis method.",
   "versions_sync": "Learn more about keeping the Opentrons App and robot software in sync",
   "want_to_help_out": "Want to help out Opentrons?",
   "welcome_title": "Welcome to your Opentrons Flex!",

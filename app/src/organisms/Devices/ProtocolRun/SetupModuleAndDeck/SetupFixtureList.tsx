@@ -35,14 +35,16 @@ import type { CutoutConfigAndCompatibility } from '../../../../resources/deck_co
 
 interface SetupFixtureListProps {
   deckConfigCompatibility: CutoutConfigAndCompatibility[]
+  robotName: string
 }
+
 /**
  * List items of all "non-module" fixtures e.g. staging slot, waste chute, trash bin...
  * @param props
  * @returns JSX.Element
  */
 export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
-  const { deckConfigCompatibility } = props
+  const { deckConfigCompatibility, robotName } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   return (
     <>
@@ -53,6 +55,7 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
           <FixtureListItem
             key={cutoutConfigAndCompatibility.cutoutId}
             deckDef={deckDef}
+            robotName={robotName}
             {...cutoutConfigAndCompatibility}
           />
         )
@@ -63,6 +66,7 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
 
 interface FixtureListItemProps extends CutoutConfigAndCompatibility {
   deckDef: DeckDefinition
+  robotName: string
 }
 
 export function FixtureListItem({
@@ -71,6 +75,7 @@ export function FixtureListItem({
   compatibleCutoutFixtureIds,
   missingLabwareDisplayName,
   deckDef,
+  robotName,
 }: FixtureListItemProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
@@ -135,6 +140,7 @@ export function FixtureListItem({
           deckDef={deckDef}
           missingLabwareDisplayName={missingLabwareDisplayName}
           requiredFixtureId={compatibleCutoutFixtureIds[0]}
+          robotName={robotName}
         />
       ) : null}
       {showSetupInstructionsModal ? (

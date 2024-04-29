@@ -24,6 +24,7 @@ def create_queued_command(
     command_id: str = "command-id",
     command_key: str = "command-key",
     command_type: str = "command-type",
+    intent: cmd.CommandIntent = cmd.CommandIntent.PROTOCOL,
     params: Optional[BaseModel] = None,
 ) -> cmd.Command:
     """Given command data, build a pending command model."""
@@ -36,6 +37,7 @@ def create_queued_command(
             createdAt=datetime(year=2021, month=1, day=1),
             status=cmd.CommandStatus.QUEUED,
             params=params or BaseModel(),
+            intent=intent,
         ),
     )
 
@@ -574,6 +576,30 @@ def create_prepare_to_aspirate_command(pipette_id: str) -> cmd.PrepareToAspirate
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime(year=2023, month=10, day=24),
+        params=params,
+        result=result,
+    )
+
+
+def create_reload_labware_command(
+    labware_id: str,
+    offset_id: Optional[str],
+) -> cmd.ReloadLabware:
+    """Create a completed ReloadLabware command."""
+    params = cmd.ReloadLabwareParams(
+        labwareId=labware_id,
+    )
+
+    result = cmd.ReloadLabwareResult(
+        labwareId=labware_id,
+        offsetId=offset_id,
+    )
+
+    return cmd.ReloadLabware(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
         params=params,
         result=result,
     )

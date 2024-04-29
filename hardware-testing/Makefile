@@ -257,9 +257,11 @@ scp $(ssh_helper_ot3) $(4) root@$(1):/tmp/
 ssh $(ssh_helper_ot3) root@$(1) \
 "function cleanup () { (rm -rf /tmp/$(4) || true) && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
-(unzip -o /tmp/$(4) -d /usr/lib/firmware || cleanup) &&\
+(unzip -o /tmp/$(5) -d /usr/lib/firmware || cleanup) &&\
 python3 -m json.tool /usr/lib/firmware/opentrons-firmware.json &&\
-cleanup"
+cleanup &&\
+echo "Restarting robot server" &&\
+systemctl restart opentrons-robot-server"
 endef
 
 .PHONY: sync-sw-ot3
@@ -284,7 +286,7 @@ remove-patches-fixture:
 
 .PHONY: sync-fw-ot3
 sync-fw-ot3:
-	$(call push-and-update-fw,$(host),$(ssh_key),$(ssh_opts),$(zip))
+	$(call push-and-update-fw,$(host),$(ssh_key),$(ssh_opts),$(zip),$(notdir $(zip)))
 
 .PHONY: sync-ot3
 sync-ot3: sync-sw-ot3 sync-fw-ot3

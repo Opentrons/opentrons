@@ -5,8 +5,7 @@ import {
   belowPipetteMinimumVolume,
   minDisposalVolume,
   maxDispenseWellVolume,
-  aspirateTipPositionInTube,
-  dispenseTipPositionInTube,
+  tipPositionInTube,
   mixTipPositionInTube,
 } from '../warnings'
 import type { LabwareEntity } from '@opentrons/step-generation'
@@ -294,26 +293,20 @@ describe('Max dispense well volume', () => {
         dispense_mmFromBottom: null,
       }
     })
-    it('renders the errors for all 3', () => {
-      expect(aspirateTipPositionInTube(fields)?.type).toBe(
-        'ASPIRATE_TIP_POSITIONED_LOW_IN_TUBE'
-      )
-      expect(dispenseTipPositionInTube(fields)?.type).toBe(
-        'DISPENSE_TIP_POSITIONED_LOW_IN_TUBE'
-      )
+    it('renders the errors for all 2', () => {
+      expect(tipPositionInTube(fields)?.type).toBe('TIP_POSITIONED_LOW_IN_TUBE')
       expect(mixTipPositionInTube(fields)?.type).toBe(
         'MIX_TIP_POSITIONED_LOW_IN_TUBE'
       )
     })
-    it('renders null for all 3 when the number has been adjusted', () => {
+    it('renders null for both when the number has been adjusted', () => {
       fields.aspirate_mmFromBottom = 3
       fields.dispense_mmFromBottom = 3
       fields.mix_mmFromBottom = 3
-      expect(aspirateTipPositionInTube(fields)).toBe(null)
-      expect(dispenseTipPositionInTube(fields)).toBe(null)
+      expect(tipPositionInTube(fields)).toBe(null)
       expect(mixTipPositionInTube(fields)).toBe(null)
     })
-    it('renders null for all 3 when the labware is not a tube rack', () => {
+    it('renders null for both when the labware is not a tube rack', () => {
       fields.aspirate_labware = {
         def: fixture96Plate as LabwareDefinition2,
         id: 'mockId',
@@ -329,8 +322,7 @@ describe('Max dispense well volume', () => {
         id: 'mockId',
         labwareDefURI: 'mockURI',
       }
-      expect(aspirateTipPositionInTube(fields)).toBe(null)
-      expect(dispenseTipPositionInTube(fields)).toBe(null)
+      expect(tipPositionInTube(fields)).toBe(null)
       expect(mixTipPositionInTube(fields)).toBe(null)
     })
   })

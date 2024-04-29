@@ -24,7 +24,7 @@ import { getModalPortalEl } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { useTrackProtocolRunEvent, useIsFlex } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
-import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../redux/analytics'
+import { ANALYTICS_PROTOCOL_RUN_ACTION } from '../../redux/analytics'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
@@ -53,7 +53,7 @@ export function ConfirmCancelModal(
     setIsCanceling(true)
     stopRun(runId, {
       onSuccess: () => {
-        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
+        trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       },
       onError: () => {
         setIsCanceling(false)

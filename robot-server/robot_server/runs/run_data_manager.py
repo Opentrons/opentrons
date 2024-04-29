@@ -284,7 +284,8 @@ class RunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
-            await self._runs_publisher.clean_up_current_run()
+
+        await self._runs_publisher.clean_up_run(run_id=run_id)
 
         self._run_store.remove(run_id=run_id)
 

@@ -78,7 +78,7 @@ export const getUpdateChannelOptions = (state: State): SelectOption[] => {
 
 export const getIsOnDevice: (state: State) => boolean = createSelector(
   getConfig,
-  config => config?.isOnDevice ?? false
+  config => !!(config?.isOnDevice ?? false)
 )
 
 export const getProtocolsDesktopSortKey: (

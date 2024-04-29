@@ -5,7 +5,6 @@ import { describe, it, vi, beforeEach, expect, afterEach } from 'vitest'
 
 import { BaseDeck } from '@opentrons/components'
 import {
-  useDeckConfigurationQuery,
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
@@ -14,6 +13,7 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupDeckConfiguration } from '..'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 import type { UseQueryResult } from 'react-query'
 import type {
@@ -25,6 +25,7 @@ import { Modules } from '@opentrons/api-client'
 vi.mock('@opentrons/components/src/hardware-sim/BaseDeck/index')
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+vi.mock('../../../resources/deck_configuration')
 
 const mockSetSetupScreen = vi.fn()
 const mockUpdateDeckConfiguration = vi.fn()
@@ -71,7 +72,7 @@ describe('ProtocolSetupDeckConfiguration', () => {
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
     } as any)
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
       data: [],
     } as unknown) as UseQueryResult<DeckConfiguration>)
     vi.mocked(useModulesQuery).mockReturnValue(({

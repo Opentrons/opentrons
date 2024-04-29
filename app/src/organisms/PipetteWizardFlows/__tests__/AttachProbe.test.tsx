@@ -2,7 +2,6 @@ import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 
-import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 
 import {
@@ -18,13 +17,14 @@ import {
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { AttachProbe } from '../AttachProbe'
+import { useNotifyDeckConfigurationQuery } from '../../../resources/deck_configuration'
 
 const render = (props: React.ComponentProps<typeof AttachProbe>) => {
   return renderWithProviders(<AttachProbe {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-vi.mock('@opentrons/react-api-client')
+vi.mock('../../../resources/deck_configuration')
 
 describe('AttachProbe', () => {
   let props: React.ComponentProps<typeof AttachProbe>
@@ -47,7 +47,7 @@ describe('AttachProbe', () => {
       selectedPipette: SINGLE_MOUNT_PIPETTES,
       isOnDevice: false,
     }
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutD3',
@@ -71,7 +71,11 @@ describe('AttachProbe', () => {
         [
           {
             commandType: 'verifyTipPresence',
-            params: { pipetteId: 'abc', expectedState: 'present' },
+            params: {
+              pipetteId: 'abc',
+              expectedState: 'present',
+              followSingularSensor: 'primary',
+            },
           },
         ],
         false
@@ -205,7 +209,11 @@ describe('AttachProbe', () => {
         [
           {
             commandType: 'verifyTipPresence',
-            params: { pipetteId: 'abc', expectedState: 'present' },
+            params: {
+              pipetteId: 'abc',
+              expectedState: 'present',
+              followSingularSensor: 'primary',
+            },
           },
         ],
         false

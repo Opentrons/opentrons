@@ -1,4 +1,5 @@
 """Test the Protocol Landing of the page."""
+
 import time
 from pathlib import Path
 from typing import Dict

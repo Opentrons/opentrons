@@ -8,7 +8,7 @@ import {
   getUnoccupiedStagingAreaSlots,
   getTrashSlot,
   getTrashOptionDisabled,
-  getIsSlotAvailable,
+  getNumSlotsAvailable,
 } from '../utils'
 import { STANDARD_EMPTY_SLOTS } from '../StagingAreaTile'
 import type { FormPipettesByMount } from '../../../../step-forms'
@@ -53,12 +53,12 @@ describe('getUnoccupiedStagingAreaSlots', () => {
     ])
   })
 })
-describe('getIsSlotAvailable', () => {
-  it('should return true when there are no modules or additional equipment', () => {
-    const result = getIsSlotAvailable(null, [])
-    expect(result).toBe(true)
+describe('getNumSlotsAvailable', () => {
+  it('should return 8 when there are no modules or additional equipment', () => {
+    const result = getNumSlotsAvailable(null, [])
+    expect(result).toBe(8)
   })
-  it('should return false when there is a TC and 7 modules', () => {
+  it('should return 0 when there is a TC and 7 modules', () => {
     const mockModules = {
       0: {
         model: 'heaterShakerModuleV1',
@@ -96,10 +96,10 @@ describe('getIsSlotAvailable', () => {
         slot: 'C3',
       },
     } as any
-    const result = getIsSlotAvailable(mockModules, [])
-    expect(result).toBe(false)
+    const result = getNumSlotsAvailable(mockModules, [])
+    expect(result).toBe(0)
   })
-  it('should return true when there are 9 additional equipment and 1 is a waste chute on the staging area and one is a gripper', () => {
+  it('should return 1 when there are 9 additional equipment and 1 is a waste chute on the staging area and one is a gripper', () => {
     const mockAdditionalEquipment: AdditionalEquipment[] = [
       'trashBin',
       'stagingArea_cutoutA3',
@@ -111,8 +111,19 @@ describe('getIsSlotAvailable', () => {
       'gripper',
       'trashBin',
     ]
-    const result = getIsSlotAvailable(null, mockAdditionalEquipment)
-    expect(result).toBe(true)
+    const result = getNumSlotsAvailable(null, mockAdditionalEquipment)
+    expect(result).toBe(1)
+  })
+  it('should return 8 even when there is a magnetic block', () => {
+    const mockModules = {
+      0: {
+        model: 'magneticBlockV1',
+        type: 'magneticBlockType',
+        slot: 'B2',
+      },
+    } as any
+    const result = getNumSlotsAvailable(mockModules, [])
+    expect(result).toBe(8)
   })
 })
 describe('getTrashSlot', () => {

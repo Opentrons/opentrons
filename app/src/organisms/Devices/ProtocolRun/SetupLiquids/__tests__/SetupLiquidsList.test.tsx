@@ -100,7 +100,7 @@ describe('SetupLiquidsList', () => {
 
   it('renders the total volume of the liquid, sample display name, and description', () => {
     render(props)
-    screen.getAllByText(nestedTextMatcher('400 µL'))
+    screen.getAllByText(nestedTextMatcher('400.0 µL'))
     screen.getByText('mock liquid 1')
     screen.getByText('mock sample')
     screen.getByText('mock liquid 2')
@@ -118,7 +118,7 @@ describe('SetupLiquidsList', () => {
     screen.getByText('Location')
     screen.getByText('Labware name')
     screen.getByText('Volume')
-    screen.getAllByText(nestedTextMatcher('200 µL'))
+    screen.getAllByText(nestedTextMatcher('200.0 µL'))
     screen.getByText('4')
     screen.getByText('mock labware name')
   })
