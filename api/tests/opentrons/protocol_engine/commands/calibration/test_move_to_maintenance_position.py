@@ -45,6 +45,7 @@ def subject(
         ),
     ],
 )
+@pytest.mark.parametrize("calibrate_mount", [MountType.LEFT, MountType.RIGHT])
 async def test_calibration_move_to_location_implementation(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
@@ -52,23 +53,18 @@ async def test_calibration_move_to_location_implementation(
     ot3_hardware_api: OT3API,
     maintenance_position: MaintenancePosition,
     verify_axes: Mapping[Axis, float],
+    calibrate_mount: MountType,
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
-        mount=MountType.LEFT, maintenancePosition=maintenance_position
+        mount=calibrate_mount, maintenancePosition=maintenance_position
     )
 
     decoy.when(
         await ot3_hardware_api.gantry_position(
             Mount.LEFT, critical_point=CriticalPoint.MOUNT
         )
-    ).then_return(Point(x=1, y=2, z=3))
-
-    decoy.when(
-        ot3_hardware_api.get_instrument_max_height(
-            Mount.LEFT, critical_point=CriticalPoint.MOUNT
-        )
-    ).then_return(250)
+    ).then_return(Point(x=1, y=2, z=250))
 
     decoy.when(ot3_hardware_api.get_instrument_max_height(Mount.LEFT)).then_return(300)
 
@@ -76,14 +72,13 @@ async def test_calibration_move_to_location_implementation(
     assert result == MoveToMaintenancePositionResult()
 
     decoy.verify(
-        await ot3_hardware_api.move_to(
-            mount=Mount.LEFT,
-            abs_position=Point(x=1, y=2, z=250),
-            critical_point=CriticalPoint.MOUNT,
-        ),
+        await ot3_hardware_api.prepare_for_mount_movement(Mount.LEFT),
         times=1,
     )
-
+    decoy.verify(
+        await ot3_hardware_api.retract(Mount.LEFT),
+        times=1,
+    )
     decoy.verify(
         await ot3_hardware_api.move_to(
             mount=Mount.LEFT,
@@ -92,21 +87,18 @@ async def test_calibration_move_to_location_implementation(
         ),
         times=1,
     )
-
     decoy.verify(
         await ot3_hardware_api.move_axes(
             position=verify_axes,
         ),
         times=1,
     )
-
-    if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
-        decoy.verify(
-            await ot3_hardware_api.disengage_axes(
-                list(verify_axes.keys()),
-            ),
-            times=1,
-        )
+    decoy.verify(
+        await ot3_hardware_api.disengage_axes(
+            list(verify_axes.keys()),
+        ),
+        times=1,
+    )
 
 
 @pytest.mark.ot3_only
@@ -118,35 +110,26 @@ async def test_calibration_move_to_location_implementation_for_gripper(
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
-        mount=MountType.LEFT, maintenancePosition=MaintenancePosition.ATTACH_INSTRUMENT
+        mount=MountType.EXTENSION, maintenancePosition=MaintenancePosition.ATTACH_INSTRUMENT
     )
 
     decoy.when(
         await ot3_hardware_api.gantry_position(
             Mount.LEFT, critical_point=CriticalPoint.MOUNT
         )
-    ).then_return(Point(x=1, y=2, z=3))
-
-    decoy.when(
-        ot3_hardware_api.get_instrument_max_height(
-            Mount.LEFT, critical_point=CriticalPoint.MOUNT
-        )
-    ).then_return(250)
-
+    ).then_return(Point(x=1, y=2, z=250))
     decoy.when(ot3_hardware_api.get_instrument_max_height(Mount.LEFT)).then_return(300)
 
     result = await subject.execute(params=params)
     assert result == MoveToMaintenancePositionResult()
-
     decoy.verify(
-        await ot3_hardware_api.move_to(
-            mount=Mount.LEFT,
-            abs_position=Point(x=1, y=2, z=250),
-            critical_point=CriticalPoint.MOUNT,
-        ),
+        await ot3_hardware_api.prepare_for_mount_movement(Mount.LEFT),
         times=1,
     )
-
+    decoy.verify(
+        await ot3_hardware_api.retract(Mount.LEFT),
+        times=1,
+    )
     decoy.verify(
         await ot3_hardware_api.move_to(
             mount=Mount.LEFT,
