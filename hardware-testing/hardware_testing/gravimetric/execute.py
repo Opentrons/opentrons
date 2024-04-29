@@ -54,6 +54,8 @@ import glob
 from opentrons.hardware_control.types import StatusBarState
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 
+from .__main__ import NUMBER_OF_RACKS
+
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
 _PREV_TRIAL_GRAMS: Optional[MeasurementData] = None
@@ -741,6 +743,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                         asp_with_evap,
                         disp_with_evap,
                         liquid_tracker.get_liquid_height(well),
+                        average_aspirate_evaporation_ul,
+                        average_dispense_evaporation_ul,
                     )
                     ui.print_info("dropping tip")
                     if not cfg.same_tip:
@@ -751,6 +755,42 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                             _minimum_z_height(cfg),
                             _get_channel_offset(cfg, run_trial.channel),
                         )
+                    if (
+                        cfg.cavity
+                        and trial_count < cfg.trials
+                        and (trial_count) % (cfg.trials / NUMBER_OF_RACKS) == 0
+                    ):
+                        next_tip = _next_tip_for_channel(
+                            cfg, resources, channel, total_tips
+                        )
+                        next_tip_location = next_tip.top().move(channel_offset)
+                        if not cfg.same_tip:
+                            _pick_up_tip(
+                                resources.ctx,
+                                resources.pipette,
+                                cfg,
+                                location=next_tip_location,
+                            )
+                        resources.pipette._retract()  # retract to top of gantry
+                        (
+                            average_aspirate_evaporation_ul,
+                            average_dispense_evaporation_ul,
+                        ) = _calculate_evaporation(
+                            cfg,
+                            resources,
+                            recorder,
+                            liquid_tracker,
+                            resources.test_report,
+                            labware_on_scale,
+                        )
+                        ui.print_info("dropping tip")
+                        if not cfg.same_tip:
+                            _drop_tip(
+                                resources.pipette,
+                                return_tip=False,
+                                minimum_z_height=_minimum_z_height(cfg),
+                                offset=_get_channel_offset(cfg, 0),
+                            )  # always trash calibration tips
 
                 ui.print_header(f"{volume} uL channel {channel + 1} CALCULATIONS")
                 aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(
