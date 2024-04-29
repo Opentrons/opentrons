@@ -131,7 +131,7 @@ def _unused_tips_for_racks(
                     rack_wells.append(rack[wellname])
         print(f" rack max {rack_max}")
         wells.extend(rack_wells[0:rack_max])
-        rack_max = trials_per_rack
+        # rack_max = trials_per_rack
     return wells
 
 
