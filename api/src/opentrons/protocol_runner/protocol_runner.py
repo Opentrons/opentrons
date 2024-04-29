@@ -570,10 +570,10 @@ AnyRunner = Union[PythonAndLegacyRunner, JsonRunner, LiveRunner]
 
 
 def create_protocol_runner(
-    protocol_config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]],
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareControlAPI,
     task_queue: Optional[TaskQueue] = None,
+    protocol_config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]] = None,
     json_file_reader: Optional[JsonFileReader] = None,
     json_translator: Optional[JsonTranslator] = None,
     legacy_file_reader: Optional[LegacyFileReader] = None,
