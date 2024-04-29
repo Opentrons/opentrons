@@ -48,7 +48,7 @@ from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_engine.types import LabwareOffset
 
 API_LEVEL = "2.18"
-NUMBER_OF_RACKS = 1
+NUMBER_OF_RACKS = 8
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
@@ -430,6 +430,7 @@ def build_gravimetric_cfg(
         same_tip=same_tip,
         ignore_fail=ignore_fail,
         mode=mode,
+        cavity=run_args.cavity,
     )
 
 

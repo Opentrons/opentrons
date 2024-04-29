@@ -51,6 +51,7 @@ class GravimetricConfig(VolumetricConfig):
     scale_delay: int
     isolate_channels: List[int]
     isolate_volumes: List[float]
+    cavity: bool
 
 
 @dataclass
