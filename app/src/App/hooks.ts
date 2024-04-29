@@ -144,6 +144,8 @@ export function useCurrentRunRoute(): string | null {
     enabled: currentRunId != null,
   })
 
+  console.log('currentRunId')
+
   const runStatus = runRecord?.data.status
   const runActions = runRecord?.data.actions
   if (runRecord == null || runStatus == null || runActions == null) return null

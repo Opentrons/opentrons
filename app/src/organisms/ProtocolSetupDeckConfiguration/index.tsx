@@ -7,12 +7,9 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  ModuleOnDeck,
   SPACING,
 } from '@opentrons/components'
 import {
-  FLEX_CUTOUT_BY_SLOT_ID,
-  FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_ROBOT_TYPE,
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   MAGNETIC_BLOCK_V1_FIXTURE,
@@ -35,6 +32,7 @@ import type {
   DeckConfiguration,
   ModuleModel,
 } from '@opentrons/shared-data'
+import type { ModuleOnDeck } from '@opentrons/components'
 import type { SetupScreens } from '../../pages/ProtocolSetup'
 
 interface ProtocolSetupDeckConfigurationProps {
@@ -78,35 +76,46 @@ export function ProtocolSetupDeckConfiguration({
       : config
   )
 
-  console.log('simplestDeckConfig', simplestDeckConfig)
-  console.log('targetDeckConfig', targetDeckConfig)
-  console.log('mergedDeckConfig', mergedDeckConfig)
   const [
     currentDeckConfig,
     setCurrentDeckConfig,
   ] = React.useState<DeckConfiguration>(mergedDeckConfig)
-  const modulesOnDeck = currentDeckConfig.reduce<ModuleOnDeck[]>((acc, cutoutConfig) => {
-    const matchingFixtureIdsAndModel = Object.entries(MODULE_FIXTURES_BY_MODEL).find(([_moduleModel, moduleFixtureIds]) => moduleFixtureIds.includes(cutoutConfig.cutoutFixtureId))
-    if (matchingFixtureIdsAndModel != null){
-      const [matchingModel] = matchingFixtureIdsAndModel
-      return [
-        ...acc,
-        {
-          moduleModel: matchingModel as ModuleModel,
-          moduleLocation: { slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutConfig.cutoutId] },
-        }  
-      ]
-    } else if (cutoutConfig.cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE) {
-      return [
-        ...acc,
-        {
-          moduleModel: MAGNETIC_BLOCK_V1_FIXTURE,
-          moduleLocation: { slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutConfig.cutoutId] },
-        }  
-      ]
-    }
-    return acc
-  }, [])
+  const modulesOnDeck = currentDeckConfig.reduce<ModuleOnDeck[]>(
+    (acc, cutoutConfig) => {
+      const matchingFixtureIdsAndModel = Object.entries(
+        MODULE_FIXTURES_BY_MODEL
+      ).find(([_moduleModel, moduleFixtureIds]) =>
+        moduleFixtureIds.includes(cutoutConfig.cutoutFixtureId)
+      )
+      if (matchingFixtureIdsAndModel != null) {
+        const [matchingModel] = matchingFixtureIdsAndModel
+        return [
+          ...acc,
+          {
+            moduleModel: matchingModel as ModuleModel,
+            moduleLocation: {
+              slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutConfig.cutoutId],
+            },
+          },
+        ]
+      } else if (
+        cutoutConfig.cutoutFixtureId ===
+        STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+      ) {
+        return [
+          ...acc,
+          {
+            moduleModel: MAGNETIC_BLOCK_V1_FIXTURE,
+            moduleLocation: {
+              slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutConfig.cutoutId],
+            },
+          },
+        ]
+      }
+      return acc
+    },
+    []
+  )
 
   const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const handleClickConfirm = (): void => {

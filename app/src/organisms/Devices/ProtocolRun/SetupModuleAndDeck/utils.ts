@@ -65,8 +65,10 @@ export function getFixtureImage(cutoutFixtureId: CutoutFixtureId): string {
     return temperatureModule
   } else if (cutoutFixtureId === MAGNETIC_BLOCK_V1_FIXTURE) {
     return magneticBlockGen1
-  } else if (cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE) {
-    return stagingAreaMagneticBlockGen1 
+  } else if (
+    cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+  ) {
+    return stagingAreaMagneticBlockGen1
   } else {
     return 'Error: unknown fixture'
   }

@@ -17,7 +17,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_ROBOT_TYPE,
   FLEX_USB_MODULE_ADDRESSABLE_AREAS,
   SINGLE_SLOT_FIXTURES,
@@ -51,11 +50,11 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
   return (
     <>
       {deckConfigCompatibility.map(cutoutConfigAndCompatibility => {
-        // filter out all fixtures that only provide usb module addressable areas 
+        // filter out all fixtures that only provide usb module addressable areas
         // (i.e. everything but MagBlockV1 and StagingAreaWithMagBlockV1)
-        // as they're handled in the Modules Table 
-        return cutoutConfigAndCompatibility.requiredAddressableAreas.every(raa =>
-          FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
+        // as they're handled in the Modules Table
+        return cutoutConfigAndCompatibility.requiredAddressableAreas.every(
+          raa => FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(raa)
         ) ? null : (
           <FixtureListItem
             key={cutoutConfigAndCompatibility.cutoutId}
@@ -179,7 +178,10 @@ export function FixtureListItem({
                 }
               />
             ) : null}
-            <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_START}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              alignItems={ALIGN_FLEX_START}
+            >
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
                 marginLeft={SPACING.spacing20}

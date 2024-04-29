@@ -68,7 +68,9 @@ export type ProtocolHardware =
   | ProtocolFixture
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
-const USB_MODULE_ADDRESSABLE_AREAS = FLEX_MODULE_ADDRESSABLE_AREAS.filter(aa => !MAGNETIC_BLOCK_ADDRESSABLE_AREAS.includes(aa))
+const USB_MODULE_ADDRESSABLE_AREAS = FLEX_MODULE_ADDRESSABLE_AREAS.filter(
+  aa => !MAGNETIC_BLOCK_ADDRESSABLE_AREAS.includes(aa)
+)
 
 export const useRequiredProtocolHardwareFromAnalysis = (
   analysis: CompletedProtocolAnalysis | null
@@ -102,17 +104,18 @@ export const useRequiredProtocolHardwareFromAnalysis = (
 
   const requiredGripper: ProtocolGripper[] = getProtocolUsesGripper(analysis)
     ? [
-      {
-        hardwareType: 'gripper',
-        connected:
-          attachedInstruments.some(i => i.instrumentType === 'gripper') ??
-          false,
-      },
-    ]
+        {
+          hardwareType: 'gripper',
+          connected:
+            attachedInstruments.some(i => i.instrumentType === 'gripper') ??
+            false,
+        },
+      ]
     : []
 
-  const requiredModules: ProtocolModule[] = analysis.modules.filter(m => getModuleType(m.model) !== MAGNETIC_MODULE_TYPE).map(
-    ({ location, model }) => {
+  const requiredModules: ProtocolModule[] = analysis.modules
+    .filter(m => getModuleType(m.model) !== MAGNETIC_MODULE_TYPE)
+    .map(({ location, model }) => {
       const cutoutIdForSlotName = getCutoutIdForSlotName(
         location.slotName,
         deckDef
@@ -129,10 +132,10 @@ export const useRequiredProtocolHardwareFromAnalysis = (
         mf => mf.expectOpentronsModuleSerialNumber
       )
         ? attachedModules.some(
-          m =>
-            m.moduleModel === model &&
-            m.serialNumber === configuredModuleSerialNumber
-        )
+            m =>
+              m.moduleModel === model &&
+              m.serialNumber === configuredModuleSerialNumber
+          )
         : true
       return {
         hardwareType: 'module',
@@ -145,8 +148,7 @@ export const useRequiredProtocolHardwareFromAnalysis = (
             cutoutFixtureId !== getCutoutFixtureIdsForModuleModel(model)[0]
         ),
       }
-    }
-  )
+    })
 
   const requiredPipettes: ProtocolPipette[] = analysis.pipettes.map(
     ({ mount, pipetteName }) => ({
@@ -177,7 +179,7 @@ export const useRequiredProtocolHardwareFromAnalysis = (
   )
 
   const requiredFixtures = requiredDeckConfigCompatibility
-    // filter out all fixtures that only provide usb module addressable areas 
+    // filter out all fixtures that only provide usb module addressable areas
     // as they're handled in the requiredModules section via hardwareType === 'module'
     .filter(
       ({ requiredAddressableAreas }) =>

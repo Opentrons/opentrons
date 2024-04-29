@@ -61,8 +61,7 @@ export function getAddressableAreaFromConfig(
     providedAddressableAreas.some(aa =>
       WASTE_CHUTE_ADDRESSABLE_AREAS.includes(aa)
     )
-  )
-   {
+  ) {
     // match number of channels to provided waste chute addressable area
     if (
       pipetteChannels === 1 &&
