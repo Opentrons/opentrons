@@ -25,7 +25,6 @@ def a_row(draw: st.DrawFn) -> Row:
             col1=a_slot(),
             col2=a_slot(),
             col3=a_slot(),
-            col4=st.one_of(st.just(None), a_slot()),
         )
     )
 
