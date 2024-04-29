@@ -432,7 +432,7 @@ class JsonRunner(AbstractRunner):
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
     # todo(tamar): should this be async? probably?
-    def add_command(self, request: CommandCreate) -> Command:
+    def _prepare_add_command_to_queue(self, request: CommandCreate) -> Command:
         """Add a command to the queue.
 
         Arguments:
@@ -480,7 +480,7 @@ class JsonRunner(AbstractRunner):
         return queue_command
 
     # todo(tamar): change to QueueCommand, should this be async
-    def _create_command_queue(
+    def _create_and_add_command_queue(
         self, queue_command: QueueCommandAction
     ) -> QueueCommandAction:
         # TODO(mc, 2021-06-22): mypy has trouble with this automatic
@@ -511,6 +511,10 @@ class JsonRunner(AbstractRunner):
 
     async def _add_command_and_execute(self) -> None:
         for command in self._queued_commands:
+            command_queue = self._prepare_add_command_to_queue(command)
+            self._create_and_add_command_queue(command_queue)
+            # TODO(Tamar): should_add_execute_command change to only wait_for_command?
+            # should the whole command state move over? get_next_t0_execute
             result = await self._protocol_engine.add_and_execute_command(command)
             if result and result.error:
                 raise ProtocolCommandFailedError(

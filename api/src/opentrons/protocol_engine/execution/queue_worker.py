@@ -10,7 +10,7 @@ from .command_executor import CommandExecutor
 
 log = getLogger(__name__)
 
-
+# TODO(Tamar): should this move to runner level and start when we play?
 class QueueWorker:
     """Handle and track execution of commands queued in ProtocolEngine state."""
 
