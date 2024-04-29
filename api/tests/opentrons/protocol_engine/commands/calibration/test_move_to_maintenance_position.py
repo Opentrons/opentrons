@@ -1,6 +1,6 @@
 """Test for Calibration Set Up Position Implementation."""
 from __future__ import annotations
-from typing import TYPE_CHECKING, Mapping
+from typing import TYPE_CHECKING
 
 import pytest
 from decoy import Decoy
