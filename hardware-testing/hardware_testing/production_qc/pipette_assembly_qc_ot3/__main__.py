@@ -179,7 +179,7 @@ CAP_THRESH_SQUARE = {
 # THRESHOLDS: air-pressure sensor
 PRESSURE_ASPIRATE_VOL = {1: {50: 10.0, 1000: 20.0}, 8: {50: 10.0, 1000: 20.0}}
 PRESSURE_THRESH_OPEN_AIR = {1: [-25, 25], 8: [-25, 25]}
-PRESSURE_THRESH_SEALED = {1: [-200, 200], 8: [-200, 200]}
+PRESSURE_THRESH_SEALED = {1: [-100, 100], 8: [-100, 100]}
 PRESSURE_THRESH_COMPRESS = {1: [-2600, 1600], 8: [-8000, 8000]}
 
 _trash_loc_counter = 0
@@ -237,11 +237,12 @@ def _get_ideal_labware_locations(
     reservoir_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_reservoir, "nest_1_reservoir_195ml"
     )
-    plate_loc_ideal = helpers_ot3.get_theoretical_a1_position(
-        test_config.slot_plate, "corning_96_wellplate_360ul_flat"
-    )
+    plate_loc_ideal = Point(x=226.49, y=44.9, z=93.5)
+    # plate_loc_ideal = helpers_ot3.get_theoretical_a1_position(
+    #     test_config.slot_plate, "corning_96_wellplate_360ul_flat"
+    # )
     # NOTE: we are using well H6 (not A1)
-    plate_loc_ideal += Point(x=9 * 5, y=9 * -7)
+    #plate_loc_ideal += Point(x=9 * 5, y=9 * -7)
     # trash
     trash_loc_ideal = helpers_ot3.get_slot_calibration_square_position_ot3(
         test_config.slot_trash
@@ -285,6 +286,7 @@ async def _move_to_or_calibrate(
     if not actual:
         assert expected
         safe_expected = expected + Point(z=SAFE_HEIGHT_CALIBRATE)
+        #print("safe_expected",safe_expected)
         safe_height = max(safe_expected.z, current_pos.z) + SAFE_HEIGHT_TRAVEL
         await helpers_ot3.move_to_arched_ot3(
             api, mount, safe_expected, safe_height=safe_height
@@ -374,6 +376,11 @@ async def _move_to_reservoir_liquid(api: OT3API, mount: OT3Mount) -> None:
 async def _move_to_plate_liquid(
     api: OT3API, mount: OT3Mount, probe: InstrumentProbeType
 ) -> None:
+    #print("IDEALplate_primary",IDEAL_LABWARE_LOCATIONS.plate_primary)
+    #print("plate_primary",CALIBRATED_LABWARE_LOCATIONS.plate_primary)
+
+    #IDEAL_LABWARE_LOCATIONS.plate_primary = Point(x=226.49, y=44.9, z=97.51)
+    #print("IDEALplate_primary",IDEAL_LABWARE_LOCATIONS.plate_primary)
     if probe == InstrumentProbeType.PRIMARY:
         CALIBRATED_LABWARE_LOCATIONS.plate_primary = await _move_to_or_calibrate(
             api,
@@ -1686,6 +1693,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
             probes = [InstrumentProbeType.PRIMARY]
             if pipette_channels > 1:
                 probes.append(InstrumentProbeType.SECONDARY)
+            #print("probe",probes)
             test_passed = True
             for tip_vol in tip_vols:
                 # force the operator to re-calibrate the liquid for each tip-type
@@ -1693,6 +1701,7 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                 CALIBRATED_LABWARE_LOCATIONS.plate_secondary = None
                 await _pick_up_tip_for_tip_volume(api, mount, tip_vol)
                 for probe in probes:
+                    #print("jiaozhun")
                     await _move_to_plate_liquid(api, mount, probe=probe)
                 await _drop_tip_in_trash(api, mount)
                 probes_data = await _test_liquid_probe(
