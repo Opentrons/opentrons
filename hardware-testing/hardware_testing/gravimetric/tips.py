@@ -110,6 +110,7 @@ def _unused_tips_for_racks(
     pipette_mount: str,
     racks: List[Labware],
     cavity: bool = False,
+    cavity_num_racks: int = 0,
     trials_per_rack: int = 0,
 ) -> List[Well]:
     wells: List[Well] = []
@@ -118,7 +119,8 @@ def _unused_tips_for_racks(
     if cavity:
         rack_max = trials_per_rack + 1
         # 31 for the first rack so we can grab a tip for the blanks
-    for rack in racks:
+    assert len(racks) >= cavity_num_racks
+    for rack in racks[:cavity_num_racks]:
         rack_wells: List[Well] = []
         for col in range(1, 13):
             for row in rows:
@@ -140,13 +142,14 @@ def get_unused_tips(
     tip_volume: int,
     pipette_mount: str,
     cavity: bool = False,
+    cavity_num_racks: int = 0,
     trials_per_rack: int = 0,
 ) -> List[Well]:
     """Use the labware's tip tracker to get a list of all unused tips for a given tip volume."""
     racks = [
         r for r in _get_racks(ctx).values() if r.wells()[0].max_volume == tip_volume
     ]
-    return _unused_tips_for_racks(ctx, pipette_mount, racks, cavity, trials_per_rack)
+    return _unused_tips_for_racks(ctx, pipette_mount, racks, cavity, cavity_num_racks, trials_per_rack)
 
 
 def get_tips_for_single(
@@ -154,10 +157,11 @@ def get_tips_for_single(
     tip_volume: int,
     pipette_mount: str,
     cavity: bool,
+    cavity_num_racks: int,
     trials_per_rack: int = 0,
 ) -> List[Well]:
     """Get tips for single channel."""
-    return get_unused_tips(ctx, tip_volume, pipette_mount, cavity, trials_per_rack)
+    return get_unused_tips(ctx, tip_volume, pipette_mount, cavity, cavity_num_racks, trials_per_rack)
 
 
 def get_tips_for_individual_channel_on_multi(
@@ -207,13 +211,14 @@ def get_tips(
     tip_volume: int,
     all_channels: bool = True,
     cavity: bool = False,
+    cavity_num_racks: int = 0,
     trials_per_rack: int = 0,
 ) -> Dict[int, List[Well]]:
     """Get tips."""
     if pipette.channels == 1:
         return {
             0: get_tips_for_single(
-                ctx, tip_volume, pipette.mount, cavity, trials_per_rack
+                ctx, tip_volume, pipette.mount, cavity, cavity_num_racks, trials_per_rack
             )
         }
     elif pipette.channels == 8:

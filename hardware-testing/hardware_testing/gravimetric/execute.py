@@ -54,8 +54,6 @@ import glob
 from opentrons.hardware_control.types import StatusBarState
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 
-from .__main__ import NUMBER_OF_RACKS
-
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
 _PREV_TRIAL_GRAMS: Optional[MeasurementData] = None
@@ -506,17 +504,21 @@ def _calculate_evaporation(
         resources.env_sensor,
     )
     ui.print_info(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
-    resources.pipette._retract()
-    for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
-        ui.print_info(
-            f"wait for scale to stabilize "
-            f"({i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE})"
-        )
-        if not resources.ctx.is_simulating():
-            sleep(1)
     actual_asp_list_evap: List[float] = []
     actual_disp_list_evap: List[float] = []
+    centered_over_vial = False
     for b_trial in blank_trials[resources.test_volumes[-1]][0]:
+        if not centered_over_vial:
+            centered_over_vial = True
+            resources.pipette.move_to(b_trial.well.top(50).move(b_trial.channel_offset))
+            resources.pipette._retract()
+            for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
+                ui.print_info(
+                    f"wait for scale to stabilize "
+                    f"({i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE})"
+                )
+                if not resources.ctx.is_simulating():
+                    sleep(1)
         ui.print_header(f"BLANK {b_trial.trial + 1}/{config.NUM_BLANK_TRIALS}")
         evap_aspirate, _, evap_dispense, _ = _run_trial(b_trial)
         ui.print_info(
@@ -758,7 +760,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     if (
                         cfg.cavity
                         and trial_count < cfg.trials
-                        and (trial_count) % (cfg.trials / NUMBER_OF_RACKS) == 0
+                        and (trial_count) % (cfg.trials / cfg.cavity_num_racks) == 0
                     ):
                         next_tip = _next_tip_for_channel(
                             cfg, resources, channel, total_tips
@@ -787,7 +789,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                         if not cfg.same_tip:
                             _drop_tip(
                                 resources.pipette,
-                                return_tip=False,
+                                return_tip=cfg.return_tip,
                                 minimum_z_height=_minimum_z_height(cfg),
                                 offset=_get_channel_offset(cfg, 0),
                             )  # always trash calibration tips

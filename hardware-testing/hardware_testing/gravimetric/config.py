@@ -52,6 +52,7 @@ class GravimetricConfig(VolumetricConfig):
     isolate_channels: List[int]
     isolate_volumes: List[float]
     cavity: bool
+    cavity_num_racks: int
 
 
 @dataclass

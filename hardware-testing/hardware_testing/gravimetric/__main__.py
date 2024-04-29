@@ -48,7 +48,6 @@ from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_engine.types import LabwareOffset
 
 API_LEVEL = "2.18"
-NUMBER_OF_RACKS = 8
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
@@ -151,6 +150,7 @@ class RunArgs:
     protocol_cfg: Any
     test_report: report.CSVReport
     cavity: bool
+    cavity_num_racks: int
 
     @classmethod
     def _get_protocol_context(cls, args: argparse.Namespace) -> ProtocolContext:
@@ -293,7 +293,7 @@ class RunArgs:
                 trials = 240
             else:
                 trials = (
-                    args.trials * NUMBER_OF_RACKS
+                    args.trials * args.cavity_num_racks
                 )  # we want to specify trials in X per rack so multiply by 8
         elif args.trials == 0:
             trials = helpers.get_default_trials(args.increment, kind, args.channels)
@@ -382,6 +382,7 @@ class RunArgs:
             protocol_cfg=protocol_cfg,
             test_report=report,
             cavity=args.cavity,
+            cavity_num_racks=args.cavity_num_racks,
         )
 
 
@@ -431,6 +432,7 @@ def build_gravimetric_cfg(
         ignore_fail=ignore_fail,
         mode=mode,
         cavity=run_args.cavity,
+        cavity_num_racks=run_args.cavity_num_racks,
     )
 
 
@@ -553,7 +555,8 @@ def _main(
             tip,
             all_channels=all_channels_same_time,
             cavity=run_args.cavity,
-            trials_per_rack=int(run_args.trials / NUMBER_OF_RACKS),
+            cavity_num_racks=run_args.cavity_num_racks,
+            trials_per_rack=int(run_args.trials / run_args.cavity_num_racks),
         ),
         env_sensor=run_args.environment_sensor,
         recorder=run_args.recorder,
@@ -591,6 +594,7 @@ if __name__ == "__main__":
     parser.add_argument("--same-tip", action="store_true")
     parser.add_argument("--ignore-fail", action="store_true")
     parser.add_argument("--cavity", action="store_true")
+    parser.add_argument("--cavity-num-racks", type=int, default=8)
     parser.add_argument("--photoplate-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument("--dye-well-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument(
