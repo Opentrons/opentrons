@@ -1121,17 +1121,17 @@ def test_next_tip_automatic_tip_tracking_with_partial_configurations(
         )
         return configure_nozzle_private_result.nozzle_map
 
-    map = _reconfigure_nozzle_layout("A1", "A1", "H10")
-    _assert_and_pickup("A3", map)
+    map = _reconfigure_nozzle_layout("A1", "A1", "H3")
+    _assert_and_pickup("A10", map)
     map = _reconfigure_nozzle_layout("A1", "A1", "F2")
-    _assert_and_pickup("C1", map)
+    _assert_and_pickup("C8", map)
 
     # Configure to single tip pickups
     map = _reconfigure_nozzle_layout("H12", "H12", "H12")
     _assert_and_pickup("A1", map)
     map = _reconfigure_nozzle_layout("H1", "H1", "H1")
-    _assert_and_pickup("A2", map)
+    _assert_and_pickup("A9", map)
     map = _reconfigure_nozzle_layout("A12", "A12", "A12")
-    _assert_and_pickup("B1", map)
+    _assert_and_pickup("H1", map)
     map = _reconfigure_nozzle_layout("A1", "A1", "A1")
-    _assert_and_pickup("B2", map)
+    _assert_and_pickup("B9", map)
