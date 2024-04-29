@@ -331,9 +331,7 @@ def _reload_gripper(
                     new_config,
                     cal_offset,
                     attached_instr._gripper_id,
-                    attached_instr._jaw_max_offset
-                    if attached_instr.has_jaw_width_calibration
-                    else None,
+                    attached_instr._jaw_max_offset,
                 ),
                 False,
             )

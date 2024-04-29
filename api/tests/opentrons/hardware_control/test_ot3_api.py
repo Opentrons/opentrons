@@ -1957,3 +1957,18 @@ async def test_stop_only_home_necessary_axes(
     await ot3_hardware.stop(home_after=True)
     if jaw_state == GripperJawState.GRIPPING:
         mock_home.assert_called_once_with(skip=[Axis.G])
+
+
+async def test_gripper_max_offset_persists_after_reset(
+    ot3_hardware: ThreadManager[OT3API],
+) -> None:
+    gripper_config = gc.load(GripperModel.v1)
+    instr_data = AttachedGripper(config=gripper_config, id="test")
+    await ot3_hardware.cache_gripper(instr_data)
+    ot3_hardware._gripper_handler.get_gripper()._jaw_max_offset = 10
+
+    await ot3_hardware.reset()
+    reset_gripper = ot3_hardware._gripper_handler.get_gripper()
+    assert reset_gripper._config == gripper_config
+    assert reset_gripper._gripper_id == "test"
+    assert reset_gripper._jaw_max_offset == 10
