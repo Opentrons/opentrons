@@ -64,9 +64,7 @@ export const RunPreviewComponent = (
     }
   ).data?.data
   const parsedCommandsFromQuery =
-    commandsFromQuery == null
-      ? robotSideAnalysis?.commands
-      : commandsFromQuery.map(command => JSON.parse(command))
+    commandsFromQuery == null ? robotSideAnalysis?.commands : commandsFromQuery
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
