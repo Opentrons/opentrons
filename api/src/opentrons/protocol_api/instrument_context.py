@@ -1955,6 +1955,10 @@ class InstrumentContext(publisher.CommandPublisher):
             should be of the same format used when identifying wells by name.
             Required unless setting ``style=ALL``.
 
+            .. note::
+                If possible, don't use both ``start="A1"`` and ``start="A12"`` to pick up
+                tips *from the same rack*. Doing so can affect positional accuracy.
+
         :type start: str or ``None``
         :param tip_racks: Behaves the same as setting the ``tip_racks`` parameter of
             :py:meth:`.load_instrument`. If not specified, the new configuration resets
