@@ -7,7 +7,7 @@ from opentrons.config.types import LiquidProbeSettings, OutputOptions
 from opentrons.protocol_api.labware import Well
 
 
-CAVITY_1uL_COMMAND_VOL = 1.0
+CAVITY_1uL_COMMAND_VOL = 0.9
 
 
 class ConfigType(Enum):
