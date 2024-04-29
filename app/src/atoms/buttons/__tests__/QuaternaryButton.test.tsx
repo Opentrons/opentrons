@@ -1,8 +1,7 @@
 import * as React from 'react'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { screen, fireEvent, waitFor, prettyDOM } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { screen } from '@testing-library/react'
 import { COLORS, SPACING, TYPOGRAPHY, BORDERS } from '@opentrons/components'
 import { renderWithProviders } from '../../../__testing-utils__'
 

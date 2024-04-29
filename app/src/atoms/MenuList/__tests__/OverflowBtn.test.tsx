@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { vi, it, expect, describe } from 'vitest'
-import { fireEvent, waitFor, screen, prettyDOM } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '../../../__testing-utils__'
