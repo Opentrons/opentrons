@@ -31,7 +31,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../utils'
 
-interface ProtocolPipette {
+export interface ProtocolPipette {
   hardwareType: 'pipette'
   pipetteName: PipetteName
   mount: 'left' | 'right'

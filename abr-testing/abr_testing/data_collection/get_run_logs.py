@@ -139,14 +139,5 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"Add credentials.json file to: {storage_directory}.")
         sys.exit()
-    try:
-        google_drive = google_drive_tool.google_drive(
-            credentials_path, folder_name, email
-        )
-        print("Connected to google drive.")
-    except json.decoder.JSONDecodeError:
-        print(
-            "Credential file is damaged. Get from https://console.cloud.google.com/apis/credentials"
-        )
-        sys.exit()
+    google_drive = google_drive_tool.google_drive(credentials_path, folder_name, email)
     get_all_run_logs(storage_directory)

@@ -299,11 +299,10 @@ def get_error_info(file_results: Dict[str, Any]) -> Tuple[int, str, str, str, st
             # Instrument Error
             error_instrument = run_command_error["error"]["errorInfo"]["node"]
         except KeyError:
-            # Module Error
+            # Module
             error_instrument = run_command_error["error"]["errorInfo"].get("port", "")
     else:
         error_type = file_results["errors"][0]["errorType"]
-        print(error_type)
         error_code = file_results["errors"][0]["errorCode"]
         error_instrument = file_results["errors"][0]["detail"]
     for error in error_levels:
