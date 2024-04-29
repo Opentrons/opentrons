@@ -54,19 +54,19 @@ export const RunPreviewComponent = (
       ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
       : false
   // we only ever want one request done for terminal runs because this is a heavy request
-  const commandsFromQuery =
-    useAllCommandsAsPreSerializedList(
-      runId,
-      { cursor: 0, pageLength: MAX_COMMANDS },
-      {
-        staleTime: Infinity,
-        cacheTime: Infinity,
-        enabled: isRunTerminal,
-      }
-    ).data?.data ?? []
-  const parsedCommandsFromQuery = commandsFromQuery.map(command =>
-    JSON.parse(command)
-  )
+  const commandsFromQuery = useAllCommandsAsPreSerializedList(
+    runId,
+    { cursor: 0, pageLength: MAX_COMMANDS },
+    {
+      staleTime: Infinity,
+      cacheTime: Infinity,
+      enabled: isRunTerminal,
+    }
+  ).data?.data
+  const parsedCommandsFromQuery =
+    commandsFromQuery == null
+      ? robotSideAnalysis?.commands
+      : commandsFromQuery.map(command => JSON.parse(command))
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
