@@ -8,7 +8,7 @@ from opentrons.protocol_api.labware import Well
 from opentrons.hardware_control.types import InstrumentProbeType
 
 
-CAVITY_1uL_COMMAND_VOL = 1.0
+CAVITY_1uL_COMMAND_VOL = 0.9
 
 
 class ConfigType(Enum):
