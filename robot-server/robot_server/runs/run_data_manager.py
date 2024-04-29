@@ -112,6 +112,10 @@ class RunNotCurrentError(ValueError):
     """Error raised when a requested run is not the current run."""
 
 
+class PreSerializedCommandsNotAvailableError(LookupError):
+    """Error raised when a run's commands are not available as pre-serialized list of commands."""
+
+
 class RunDataManager:
     """Collaborator to manage current and historical run data.
 
@@ -388,7 +392,14 @@ class RunDataManager:
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
 
     def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
-        """Get all commands of a run in a stringified json doc."""
+        """Get all commands of a run in a serialized json list."""
+        if (
+            run_id == self._engine_store.current_run_id
+            and not self._engine_store.engine.state_view.commands.get_is_terminal()
+        ):
+            raise PreSerializedCommandsNotAvailableError(
+                "Pre-serialized commands are only available after a run has ended."
+            )
         return self._run_store.get_all_commands_as_preserialized_list(run_id)
 
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:

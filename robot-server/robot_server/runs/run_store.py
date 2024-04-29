@@ -428,7 +428,6 @@ class RunStore:
                 )
                 .order_by(run_command_table.c.index_in_run)
             )
-            # select_all_cmds_as_doc = sqlalchemy.select(sqlalchemy.func.json_array_elements)
             slice_result = transaction.execute(select_slice).all()
 
         sliced_commands: List[Command] = [
