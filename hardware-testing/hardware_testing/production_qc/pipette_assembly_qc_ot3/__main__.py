@@ -237,7 +237,7 @@ def _get_ideal_labware_locations(
     reservoir_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_reservoir, "nest_1_reservoir_195ml"
     )
-    plate_loc_ideal = Point(x=226.49, y=44.9, z=93.5)
+    plate_loc_ideal = Point(x=226.49, y=44.9, z=95)
     # plate_loc_ideal = helpers_ot3.get_theoretical_a1_position(
     #     test_config.slot_plate, "corning_96_wellplate_360ul_flat"
     # )
