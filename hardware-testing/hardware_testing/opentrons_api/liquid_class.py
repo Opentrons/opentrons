@@ -130,7 +130,7 @@ class LiquidClassPipette(InstrumentContext):
         ):
             return True
 
-    def _retract_from_location(
+    def _retract_from_well(
         self,
         liquid: Liquid,
         location: Union[Location, Well],
@@ -141,9 +141,9 @@ class LiquidClassPipette(InstrumentContext):
         self.move_to(liquid.retract.height.in_well(location), speed=speed)
         self.delay(seconds=liquid.retract.delay if liquid.retract.delay else 0)
         if not self.current_volume and liquid.retract.blow_out:
-            self._blow_out(liquid=liquid)
+            self.Blow_out(liquid=liquid)
         if touch_tip:
-            self._touch_tip(liquid=liquid)
+            self.Touch_tip(liquid=liquid)
         self.prepare_to_aspirate()
         if liquid.retract.air_gap is not None:
             self.air_gap(liquid.retract.air_gap)
@@ -162,7 +162,7 @@ class LiquidClassPipette(InstrumentContext):
         self.move_to(liquid.submerge.height.in_well(location), speed=speed)
         self.delay(seconds=liquid.submerge.delay if liquid.submerge.delay else 0)
 
-    def _aspirate(
+    def Aspirate(
         self,
         volume: Optional[float] = None,
         location: Optional[Union[Location, Well]] = None,
@@ -178,7 +178,7 @@ class LiquidClassPipette(InstrumentContext):
                     self.flow_rate.aspirate = liquid.aspirate.flow_rate
                 if liquid.aspirate.delay is not None:
                     delay = liquid.aspirate.delay
-            self._move_to(location, liquid=liquid)
+            self.Move_to(location, liquid=liquid)
             self.aspirate(volume, None, rate)  # in-place
             if delay:
                 self.delay(seconds=delay)
@@ -186,7 +186,7 @@ class LiquidClassPipette(InstrumentContext):
             self.aspirate(volume, location, rate)
         return self
 
-    def _dispense(
+    def Dispense(
         self,
         volume: Optional[float] = None,
         location: Optional[Union[Location, Well, TrashBin, WasteChute]] = None,
@@ -205,7 +205,7 @@ class LiquidClassPipette(InstrumentContext):
                     push_out = liquid.dispense.push_out
                 if liquid.dispense.delay is not None:
                     delay = liquid.dispense.delay
-            self._move_to(location, liquid=liquid)
+            self.Move_to(location, liquid=liquid)
             self.dispense(volume, None, rate, push_out=push_out)  # in-place
             if delay:
                 self.delay(seconds=delay)
@@ -213,17 +213,19 @@ class LiquidClassPipette(InstrumentContext):
             self.dispense(volume, location, rate)
         return self
 
-    def _blow_out(
+    def Blow_out(
         self,
         location: Optional[Union[Location, Well, TrashBin, WasteChute]] = None,
         liquid: Optional[Liquid] = None,
     ) -> "LiquidClassPipette":
-        if liquid and liquid.dispense and liquid.dispense.flow_rate:
-            self.flow_rate.blow_out = liquid.dispense.flow_rate
+        if liquid:
+            if liquid.dispense and liquid.dispense.flow_rate:
+                self.flow_rate.blow_out = liquid.dispense.flow_rate
+            self.Move_to(location, liquid=liquid)
         self.blow_out(location)
         return self
 
-    def _move_to(
+    def Move_to(
         self,
         location: Union[Location, TrashBin, WasteChute],
         speed: Optional[float] = None,
@@ -232,14 +234,14 @@ class LiquidClassPipette(InstrumentContext):
     ) -> "LiquidClassPipette":
         if liquid:
             if self._need_to_retract(location):
-                self._retract_from_location(liquid, self._last_well, speed=speed)
+                self._retract_from_well(liquid, self._last_well, speed=speed)
             if self._need_to_submerge(location):
                 self._submerge_into_well(liquid, location, speed=speed)
         else:
             self.move_to(location, speed=speed, **kwargs)
         return self
 
-    def _touch_tip(
+    def Touch_tip(
         self,
         location: Optional[Well] = None,
         radius: float = 1.0,
