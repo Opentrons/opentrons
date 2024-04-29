@@ -33,6 +33,8 @@ import type { RobotType } from '@opentrons/shared-data'
 
 const COLOR_FADE_MS = 500
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
+// arbitrary large number of commands
+const MAX_COMMANDS = 100000
 
 interface RunPreviewProps {
   runId: string
@@ -52,11 +54,18 @@ export const RunPreviewComponent = (
       ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
       : false
   // we only ever want one request done for terminal runs because this is a heavy request
-  const commandsFromQuery = useAllCommandsQuery(runId, null, {
-    staleTime: Infinity,
-    cacheTime: Infinity,
-    enabled: isRunTerminal,
-  }).data?.data
+  const commandsFromQuery = useAllCommandsQuery(
+    runId,
+    {
+      cursor: 0,
+      pageLength: MAX_COMMANDS,
+    },
+    {
+      staleTime: Infinity,
+      cacheTime: Infinity,
+      enabled: isRunTerminal,
+    }
+  ).data?.data
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
