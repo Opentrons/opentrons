@@ -93,6 +93,7 @@ export function ChooseProtocolSlideoutComponent(
   ] = React.useState<RunTimeParameter[]>([])
   const [currentPage, setCurrentPage] = React.useState<number>(1)
   const [hasParamError, setHasParamError] = React.useState<boolean>(false)
+  const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     setRunTimeParametersOverrides(
@@ -228,8 +229,9 @@ export function ChooseProtocolSlideoutComponent(
       } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
         const value = runtimeParam.value as number
         const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
+        console.log()
         const error =
-          Number.isNaN(value) ||
+          (Number.isNaN(value) && !isInputFocused) ||
           value < runtimeParam.min ||
           value > runtimeParam.max
             ? t(`protocol_details:value_out_of_range`, {
@@ -258,6 +260,8 @@ export function ChooseProtocolSlideoutComponent(
             caption={`${runtimeParam.min}-${runtimeParam.max}`}
             id={id}
             error={error}
+            onBlur={() => setIsInputFocused(false)}
+            onFocus={() => setIsInputFocused(true)}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {

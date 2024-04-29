@@ -146,6 +146,7 @@ export function ChooseRobotSlideout(
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
 
   const unhealthyReachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
@@ -383,7 +384,7 @@ export function ChooseRobotSlideout(
         const value = runtimeParam.value as number
         const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
         const error =
-          Number.isNaN(value) ||
+          (Number.isNaN(value) && !isInputFocused) ||
           value < runtimeParam.min ||
           value > runtimeParam.max
             ? t(`value_out_of_range`, {
@@ -418,6 +419,8 @@ export function ChooseRobotSlideout(
             }
             id={id}
             error={error}
+            onBlur={() => setIsInputFocused(false)}
+            onFocus={() => setIsInputFocused(true)}
             onChange={e => {
               const clone = runTimeParametersOverrides.map((parameter, i) => {
                 if (i === index) {
