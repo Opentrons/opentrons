@@ -33,7 +33,7 @@ from opentrons_shared_data.gripper import (
     Geometry,
 )
 
-RECONFIG_KEYS = {"quirks"}
+RECONFIG_KEYS = {"quirks", "grip_force_profile"}
 
 MAX_ACCEPTABLE_JAW_DISPLACEMENT: Final = 20
 
@@ -326,12 +326,13 @@ def _reload_gripper(
                 changed.add(k)
         if changed.intersection(RECONFIG_KEYS):
             # Something has changed that requires reconfig
+            # we shoud recalibrate the jaw as well
             return (
                 Gripper(
                     new_config,
                     cal_offset,
                     attached_instr._gripper_id,
-                    attached_instr._jaw_max_offset,
+                    None,
                 ),
                 False,
             )
