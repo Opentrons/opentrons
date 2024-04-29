@@ -33,27 +33,38 @@ def subject(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "maintenance_position, verify_axes",
+    "calibrate_moumt, maintenance_position, verify_axes",
     [
         (
+            MountType.LEFT,
             MaintenancePosition.ATTACH_INSTRUMENT,
             {Axis.Z_L: 400},
         ),
         (
+            MountType.RIGHT,
+            MaintenancePosition.ATTACH_INSTRUMENT,
+            {Axis.Z_R: 400},
+        ),
+        (
+            MountType.LEFT,
+            MaintenancePosition.ATTACH_PLATE,
+            {Axis.Z_L: 90, Axis.Z_R: 105},
+        ),
+        (
+            MountType.RIGHT,
             MaintenancePosition.ATTACH_PLATE,
             {Axis.Z_L: 90, Axis.Z_R: 105},
         ),
     ],
 )
-@pytest.mark.parametrize("calibrate_mount", [MountType.LEFT, MountType.RIGHT])
 async def test_calibration_move_to_location_implementation(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
     state_view: StateView,
     ot3_hardware_api: OT3API,
+    calibrate_mount: MountType,
     maintenance_position: MaintenancePosition,
     verify_axes: Mapping[Axis, float],
-    calibrate_mount: MountType,
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
