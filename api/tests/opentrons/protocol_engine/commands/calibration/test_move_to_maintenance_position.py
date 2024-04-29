@@ -82,33 +82,22 @@ async def test_calibration_move_to_location_implementation(
     result = await subject.execute(params=params)
     assert result == MoveToMaintenancePositionResult()
 
+
     decoy.verify(
         await ot3_hardware_api.prepare_for_mount_movement(Mount.LEFT),
-        times=1,
-    )
-    decoy.verify(
         await ot3_hardware_api.retract(Mount.LEFT),
-        times=1,
-    )
-    decoy.verify(
         await ot3_hardware_api.move_to(
             mount=Mount.LEFT,
             abs_position=Point(x=0, y=110, z=250),
             critical_point=CriticalPoint.MOUNT,
         ),
-        times=1,
-    )
-    decoy.verify(
+        await ot3_hardware_api.prepare_for_mount_movement(calibrate_mount.to_hw_mount()),
         await ot3_hardware_api.move_axes(
             position=verify_axes,
         ),
-        times=1,
-    )
-    decoy.verify(
         await ot3_hardware_api.disengage_axes(
             list(verify_axes.keys()),
         ),
-        times=1,
     )
 
 
