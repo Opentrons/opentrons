@@ -33,7 +33,7 @@ def subject(
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
-    "calibrate_moumt, maintenance_position, verify_axes",
+    "calibrate_mount, maintenance_position, verify_axes",
     [
         (
             MountType.LEFT,
