@@ -643,7 +643,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         if not cfg.same_tip:
             _drop_tip(
                 resources.pipette,
-                return_tip=False,
+                return_tip=cfg.return_tip,
                 minimum_z_height=_minimum_z_height(cfg),
                 offset=_get_channel_offset(cfg, 0),
             )  # always trash calibration tips
