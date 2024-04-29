@@ -24,12 +24,10 @@ context('Well Plates', () => {
       cy.get('*[class^="_option_label"]').contains('Well Plate').click()
       cy.get('button').contains('start creating labware').click({ force: true })
     })
-
-    it('does not have a preview image', () => {
+    it('creates a wellplate', () => {
       cy.contains('Add missing info to see labware preview').should('exist')
-    })
 
-    it('tests regularity', () => {
+      // Verify regularity
       cy.get("input[name='homogeneousWells'][value='false']").check({
         force: true,
       })
@@ -42,9 +40,8 @@ context('Well Plates', () => {
       cy.contains(
         'Your labware is not compatible with the Labware Creator'
       ).should('not.exist')
-    })
 
-    it('tests footprint', () => {
+      // Verify footprint
       cy.get("input[name='footprintXDimension']").type('150').blur()
       cy.contains(
         'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
@@ -61,9 +58,8 @@ context('Well Plates', () => {
       cy.contains(
         'Your labware is too large to fit in a single slot properly. Please fill out this form to request a custom labware definition.'
       ).should('not.exist')
-    })
 
-    it('tests height', () => {
+      // Verify height
       cy.get("input[name='labwareZDimension']").type('150').blur()
       cy.contains('This labware may be too tall').should('exist')
       cy.get("input[name='labwareZDimension']").clear().type('200').blur()
@@ -75,175 +71,154 @@ context('Well Plates', () => {
       cy.contains(
         'Your labware is not compatible with the Labware Creator'
       ).should('not.exist')
-    })
 
-    describe('Grid tests', () => {
-      it('tests number of rows', () => {
-        cy.get("input[name='gridRows']").focus().blur()
-        cy.contains('Number of rows is a required field').should('exist')
-        cy.get("input[name='gridRows']").type('8').blur()
-        cy.contains('Number of rows is a required field').should('not.exist')
+      // Verify number of rows
+      cy.get("input[name='gridRows']").focus().blur()
+      cy.contains('Number of rows is a required field').should('exist')
+      cy.get("input[name='gridRows']").type('8').blur()
+      cy.contains('Number of rows is a required field').should('not.exist')
+
+      // Verify rows are evenly spaced
+      cy.get("input[name='regularRowSpacing'][value='false']").check({
+        force: true,
+      })
+      cy.contains(
+        'Your labware is not compatible with the Labware Creator'
+      ).should('exist')
+      cy.get("input[name='regularRowSpacing'][value='true']").check({
+        force: true,
       })
 
-      it('tests are all of your rows evenly spaced', () => {
-        cy.get("input[name='regularRowSpacing'][value='false']").check({
-          force: true,
-        })
-        cy.contains(
-          'Your labware is not compatible with the Labware Creator'
-        ).should('exist')
-        cy.get("input[name='regularRowSpacing'][value='true']").check({
-          force: true,
-        })
-      })
+      // Verify number of columns
+      cy.get("input[name='gridColumns']").focus().blur()
+      cy.contains('Number of columns is a required field').should('exist')
+      cy.get("input[name='gridColumns']").type('10').blur()
+      cy.contains('Number of columns is a required field').should('not.exist')
 
-      it('tests number of columns', () => {
-        cy.get("input[name='gridColumns']").focus().blur()
-        cy.contains('Number of columns is a required field').should('exist')
-        cy.get("input[name='gridColumns']").type('10').blur()
-        cy.contains('Number of columns is a required field').should('not.exist')
+      // Verify columns are evenly spaced
+      cy.get("input[name='regularColumnSpacing'][value='false']").check({
+        force: true,
       })
-
-      it('tests are all of your columns evenly spaced', () => {
-        cy.get("input[name='regularColumnSpacing'][value='false']").check({
-          force: true,
-        })
-        cy.contains(
-          'Your labware is not compatible with the Labware Creator'
-        ).should('exist')
-        cy.get("input[name='regularColumnSpacing'][value='true']").check({
-          force: true,
-        })
-        cy.contains(
-          'Your labware is not compatible with the Labware Creator'
-        ).should('not.exist')
+      cy.contains(
+        'Your labware is not compatible with the Labware Creator'
+      ).should('exist')
+      cy.get("input[name='regularColumnSpacing'][value='true']").check({
+        force: true,
       })
-    })
+      cy.contains(
+        'Your labware is not compatible with the Labware Creator'
+      ).should('not.exist')
 
-    it('tests volume', () => {
+      // Verify volume
       cy.get("input[name='wellVolume']").focus().blur()
       cy.contains('Volume is a required field').should('exist')
       cy.get("input[name='wellVolume']").type('100').blur()
       cy.contains('Volume is a required field').should('not.exist')
-    })
 
-    describe('Well shape tests', () => {
-      it('tests circular wells', () => {
-        cy.get("input[name='wellShape'][value='circular']").check({
-          force: true,
-        })
-        cy.get("input[name='wellDiameter']").should('exist')
-        cy.get("input[name='wellXDimension']").should('not.exist')
-        cy.get("input[name='wellYDimension']").should('not.exist')
-        cy.get("input[name='wellDiameter']").focus().blur()
-        cy.contains('Diameter is a required field').should('exist')
-        cy.get("input[name='wellDiameter']").type('10').blur()
-        cy.contains('Diameter is a required field').should('not.exist')
+      // verify circular wells
+      cy.get("input[name='wellShape'][value='circular']").check({
+        force: true,
       })
+      cy.get("input[name='wellDiameter']").should('exist')
+      cy.get("input[name='wellXDimension']").should('not.exist')
+      cy.get("input[name='wellYDimension']").should('not.exist')
+      cy.get("input[name='wellDiameter']").focus().blur()
+      cy.contains('Diameter is a required field').should('exist')
+      cy.get("input[name='wellDiameter']").type('10').blur()
+      cy.contains('Diameter is a required field').should('not.exist')
 
-      it('tests rectangular wells', () => {
-        cy.get("input[name='wellShape'][value='rectangular']").check({
-          force: true,
-        })
-        cy.get("input[name='wellDiameter']").should('not.exist')
-        cy.get("input[name='wellXDimension']").should('exist')
-        cy.get("input[name='wellYDimension']").should('exist')
-        cy.get("input[name='wellXDimension']").focus().blur()
-        cy.contains('Well X is a required field').should('exist')
-        cy.get("input[name='wellXDimension']").type('8').blur()
-        cy.contains('Well X is a required field').should('not.exist')
-        cy.get("input[name='wellYDimension']").focus().blur()
-        cy.contains('Well Y is a required field').should('exist')
-        cy.get("input[name='wellYDimension']").type('8').blur()
-        cy.contains('Well Y is a required field').should('not.exist')
+      // verify rectangular wells
+      cy.get("input[name='wellShape'][value='rectangular']").check({
+        force: true,
       })
+      cy.get("input[name='wellDiameter']").should('not.exist')
+      cy.get("input[name='wellXDimension']").should('exist')
+      cy.get("input[name='wellYDimension']").should('exist')
+      cy.get("input[name='wellXDimension']").focus().blur()
+      cy.contains('Well X is a required field').should('exist')
+      cy.get("input[name='wellXDimension']").type('8').blur()
+      cy.contains('Well X is a required field').should('not.exist')
+      cy.get("input[name='wellYDimension']").focus().blur()
+      cy.contains('Well Y is a required field').should('exist')
+      cy.get("input[name='wellYDimension']").type('8').blur()
+      cy.contains('Well Y is a required field').should('not.exist')
 
-      it('tests well bottom shape and depth', () => {
-        cy.get("input[name='wellBottomShape'][value='flat']").check({
-          force: true,
-        })
-        cy.get("img[src*='_flat.']").should('exist')
-        cy.get("img[src*='_round.']").should('not.exist')
-        cy.get("img[src*='_v.']").should('not.exist')
-        cy.get("input[name='wellBottomShape'][value='u']").check({
-          force: true,
-        })
-        cy.get("img[src*='_flat.']").should('not.exist')
-        cy.get("img[src*='_round.']").should('exist')
-        cy.get("img[src*='_v.']").should('not.exist')
-        cy.get("input[name='wellBottomShape'][value='v']").check({
-          force: true,
-        })
-        cy.get("img[src*='_flat.']").should('not.exist')
-        cy.get("img[src*='_round.']").should('not.exist')
-        cy.get("img[src*='_v.']").should('exist')
-        cy.get("input[name='wellDepth']").focus().blur()
-        cy.contains('Depth is a required field').should('exist')
-        cy.get("input[name='wellDepth']").type('10').blur()
-        cy.contains('Depth is a required field').should('not.exist')
+      // Verify well bottom shape and depth
+      cy.get("input[name='wellBottomShape'][value='flat']").check({
+        force: true,
       })
-
-      it('tests well spacing', () => {
-        cy.get("input[name='gridSpacingX']").focus().blur()
-        cy.contains('X Spacing (Xs) is a required field').should('exist')
-        cy.get("input[name='gridSpacingX']").type('12').blur()
-        cy.contains('X Spacing (Xs) is a required field').should('not.exist')
-        cy.get("input[name='gridSpacingY']").focus().blur()
-        cy.contains('Y Spacing (Ys) is a required field').should('exist')
-        cy.get("input[name='gridSpacingY']").type('10').blur()
-        cy.contains('Y Spacing (Ys) is a required field').should('not.exist')
+      cy.get("img[src*='_flat.']").should('exist')
+      cy.get("img[src*='_round.']").should('not.exist')
+      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get("input[name='wellBottomShape'][value='u']").check({
+        force: true,
       })
-
-      it('tests grid offset', () => {
-        cy.get("input[name='gridOffsetX']").focus().blur()
-        cy.contains('X Offset (Xo) is a required field').should('exist')
-        cy.get("input[name='gridOffsetX']").type('10').blur()
-        cy.contains('X Offset (Xo) is a required field').should('not.exist')
-        cy.get("input[name='gridOffsetY']").focus().blur()
-        cy.contains('Y Offset (Yo) is a required field').should('exist')
-        cy.get("input[name='gridOffsetY']").type('8').blur()
-        cy.contains('Y Offset (Yo) is a required field').should('not.exist')
+      cy.get("img[src*='_flat.']").should('not.exist')
+      cy.get("img[src*='_round.']").should('exist')
+      cy.get("img[src*='_v.']").should('not.exist')
+      cy.get("input[name='wellBottomShape'][value='v']").check({
+        force: true,
       })
+      cy.get("img[src*='_flat.']").should('not.exist')
+      cy.get("img[src*='_round.']").should('not.exist')
+      cy.get("img[src*='_v.']").should('exist')
+      cy.get("input[name='wellDepth']").focus().blur()
+      cy.contains('Depth is a required field').should('exist')
+      cy.get("input[name='wellDepth']").type('10').blur()
+      cy.contains('Depth is a required field').should('not.exist')
 
-      it('should have a preview image and no footprint errors', () => {
-        cy.contains('Add missing info to see labware preview').should(
-          'not.exist'
-        )
-        cy.contains(
-          'Please double-check well size, Y Spacing, and Y Offset.'
-        ).should('not.exist')
-      })
+      // Verify well spacing
+      cy.get("input[name='gridSpacingX']").focus().blur()
+      cy.contains('X Spacing (Xs) is a required field').should('exist')
+      cy.get("input[name='gridSpacingX']").type('12').blur()
+      cy.contains('X Spacing (Xs) is a required field').should('not.exist')
+      cy.get("input[name='gridSpacingY']").focus().blur()
+      cy.contains('Y Spacing (Ys) is a required field').should('exist')
+      cy.get("input[name='gridSpacingY']").type('10').blur()
+      cy.contains('Y Spacing (Ys) is a required field').should('not.exist')
 
-      it('should export a file', () => {
-        // Try with missing fields
-        cy.get('button[class*="_export_button_"]').click({ force: true })
-        cy.contains(
-          'Please resolve all invalid fields in order to export the labware definition'
-        ).should('exist')
-        cy.contains('close').click({ force: true })
+      // Verify grid offset
+      cy.get("input[name='gridOffsetX']").focus().blur()
+      cy.contains('X Offset (Xo) is a required field').should('exist')
+      cy.get("input[name='gridOffsetX']").type('10').blur()
+      cy.contains('X Offset (Xo) is a required field').should('not.exist')
+      cy.get("input[name='gridOffsetY']").focus().blur()
+      cy.contains('Y Offset (Yo) is a required field').should('exist')
+      cy.get("input[name='gridOffsetY']").type('8').blur()
+      cy.contains('Y Offset (Yo) is a required field').should('not.exist')
 
-        // Brand info
-        cy.contains('Brand is a required field').should('exist')
-        cy.get("input[name='brand']").type('TestPro')
-        cy.contains('Brand is a required field').should('not.exist')
-        cy.get("input[name='brandId']").type('001')
+      cy.contains('Add missing info to see labware preview').should('not.exist')
+      cy.contains(
+        'Please double-check well size, Y Spacing, and Y Offset.'
+      ).should('not.exist')
 
-        // File info
-        cy.get("input[placeholder='TestPro 80 Well Plate 100 µL']").should(
-          'exist'
-        )
-        cy.get("input[placeholder='testpro_80_wellplate_100ul']").should(
-          'exist'
-        )
+      // Verify file export
+      // Try with missing fields
+      cy.get('button[class*="_export_button_"]').click({ force: true })
+      cy.contains(
+        'Please resolve all invalid fields in order to export the labware definition'
+      ).should('exist')
+      cy.contains('close').click({ force: true })
 
-        // All fields present
-        cy.get('button[class*="_export_button_"]').click({ force: true })
-        cy.contains(
-          'Please resolve all invalid fields in order to export the labware definition'
-        ).should('not.exist')
+      // Brand info
+      cy.contains('Brand is a required field').should('exist')
+      cy.get("input[name='brand']").type('TestPro')
+      cy.contains('Brand is a required field').should('not.exist')
+      cy.get("input[name='brandId']").type('001')
 
-        // TODO IMMEDIATELY match against fixture ??? Is this not happening?
-      })
+      // File info
+      cy.get("input[placeholder='TestPro 80 Well Plate 100 µL']").should(
+        'exist'
+      )
+      cy.get("input[placeholder='testpro_80_wellplate_100ul']").should('exist')
+
+      // All fields present
+      cy.get('button[class*="_export_button_"]').click({ force: true })
+      cy.contains(
+        'Please resolve all invalid fields in order to export the labware definition'
+      ).should('not.exist')
+
+      // TODO IMMEDIATELY match against fixture ??? Is this not happening?
     })
   })
 })
