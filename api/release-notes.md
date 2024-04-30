@@ -21,10 +21,14 @@ Welcome to the v7.3.0 release of the Opentrons robot software!
 - Flex no longer shows unnecessary pipette calibration warnings.
 - Python protocols can once again set labware offsets outside of Labware Position Check.
 
+### Changed Features
+
+- Calling `GET /runs/{id}/commands` for a JSON protocol no longer returns a full list of queued commands. Use protocol analysis to get a full list of commands.
+
 ### Bug Fixes
 
 - Fixed an edge case where capitalizing part of a labware load name could cause unexpected behavior or collisions.
-- Fixed user-installed Python packages (`pip install ...`) on the OT-2 not being found by `import` statements.
+- Fixed Python packages installed  on the OT-2 with `pip` not being found by `import` statements.
 
 ---
 
