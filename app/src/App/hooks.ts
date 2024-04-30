@@ -129,7 +129,6 @@ export function useCurrentRunRoute(): string | null {
     { pageLength: 1 },
     { refetchInterval: CURRENT_RUN_POLL }
   )
-  console.log('ALL RUNS', allRuns)
   const currentRunLink = allRuns?.links?.current ?? null
   const currentRun =
     currentRunLink != null &&
@@ -139,7 +138,7 @@ export function useCurrentRunRoute(): string | null {
           run => run.id === currentRunLink.href.replace('/runs/', '')
         ) // trim link path down to only runId
       : null
-  const currentRunId = currentRun?.id ?? null
+const currentRunId = currentRun?.id ?? null
   const { data: runRecord } = useNotifyRunQuery(currentRunId, {
     staleTime: Infinity,
     enabled: currentRunId != null,
