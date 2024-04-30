@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
-const url = 'https://mockgpt.wiremockapi.cloud/v1/chat/completions'
+// const url = 'https://mockgpt.wiremockapi.cloud/v1/chat/completions'
+const url = 'http://localhost:8000/streaming/ask'
 
 interface FetchResult {
   data: any
@@ -15,6 +16,8 @@ export const useFetch = (prompt: string): FetchResult => {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
 
+  console.log('called')
+
   const fetchData = async (prompt: string): Promise<void> => {
     if (prompt !== '') {
       setLoading(true)
@@ -24,7 +27,7 @@ export const useFetch = (prompt: string): FetchResult => {
             Accept: 'application/json',
             'Content-Type': 'application/json;charset=UTF-8',
           },
-          data: {
+          query: {
             prompt,
           },
         })

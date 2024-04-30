@@ -1,4 +1,5 @@
 import React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import Markdown from 'react-markdown'
 import {
@@ -39,8 +40,51 @@ export function ChatDisplay({ chat }: ChatDisplayProps): JSX.Element {
         gridGap={SPACING.spacing16}
       >
         {/* ToDo (kk:04/19/2024) I will get feedback for additional styling  from the design team. */}
-        <Markdown>{content}</Markdown>
+        <Markdown
+          components={{
+            div: undefined,
+            ul: UnnumberedListText,
+            h2: HeaderText,
+            li: ListItemText,
+            p: ParagraphText,
+            a: ExternalLink,
+            code: CodeText,
+          }}
+        >
+          {content}
+        </Markdown>
       </Flex>
     </Flex>
   )
+}
+
+function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
+  return <a {...props} target="_blank" rel="noopener noreferrer" />
+}
+
+function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
+  return <StyledText {...props} as="p" />
+}
+
+function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
+  return <StyledText {...props} as="h3" />
+}
+
+function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
+  return <StyledText {...props} as="li" />
+}
+
+function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
+  return <StyledText {...props} as="ul" />
+}
+
+const CODE_TEXT_STYLE = css`
+  padding: ${SPACING.spacing16};
+  font-family: monospace;
+  color: ${COLORS.white};
+  background-color: ${COLORS.black90};
+`
+
+function CodeText(props: JSX.IntrinsicAttributes): JSX.Element {
+  return <StyledText {...props} as="p" css={CODE_TEXT_STYLE} />
 }

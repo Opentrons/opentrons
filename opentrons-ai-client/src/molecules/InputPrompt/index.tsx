@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import { useForm } from 'react-hook-form'
 import { useAtom } from 'jotai'
+import axios from 'axios'
 
 import {
   ALIGN_CENTER,
@@ -15,10 +16,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
-import { useFetch } from '../../resources/hooks'
+// import { useFetch } from '../../resources/hooks'
 import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
 
 import type { ChatData } from '../../resources/types'
+
+const url = 'http://localhost:8000/streaming/ask'
 
 interface InputType {
   userPrompt: string
@@ -34,40 +37,58 @@ export function InputPrompt(): JSX.Element {
   const [preparedPrompt] = useAtom(preparedPromptAtom)
   const [, setChatData] = useAtom(chatDataAtom)
   const [submitted, setSubmitted] = React.useState(false)
+
+  const [data, setData] = React.useState<any>(null)
+  const [loading, setLoading] = React.useState<boolean>(false)
+  const [error, setError] = React.useState<string>('')
+
   const userPrompt = watch('userPrompt') ?? ''
 
-  const { data: responseData, loading, error, fetchData } = useFetch(userPrompt)
+  // const { data: responseData, loading, error } = useFetch(userPrompt)
   const calcTextAreaHeight = (): number => {
     const rowsNum = userPrompt.split('\n').length
     return rowsNum
   }
 
-  // const handleClick = (): void => {
-  //   const userInput: ChatData = {
-  //     role: 'user',
-  //     content: userPrompt,
-  //   }
-  //   console.log('userInput', userInput)
-  //   setChatData([...chatData, userInput])
-
-  //   console.log('before fetch', chatData)
-  //   void fetchData(userPrompt)
-  //   const { role, content } = responseData.choices[0].message
-  //   const assistantResponse: ChatData = {
-  //     role,
-  //     content,
-  //   }
-  //   setChatData([...chatData, assistantResponse])
-  //   reset()
-  // }
+  const fetchData = async (prompt: string): Promise<void> => {
+    if (prompt !== '') {
+      setLoading(true)
+      try {
+        const response = await axios.post(url, {
+          // headers: {
+          //   Accept: 'application/json',
+          //   'Content-Type': 'application/json;charset=UTF-8',
+          // },
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          query: prompt,
+        })
+        console.log('response', response)
+        setData(response.data)
+      } catch (err) {
+        setError('Error fetching data from the API.')
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
 
   const handleClick = (): void => {
+    // const userInput: ChatData = {
+    //   role: 'user',
+    //   content: userPrompt,
+    // }
+    // setChatData(chatData => [...chatData, userInput])
+    // void fetchData(userPrompt)
+    // setSubmitted(true)
+    // reset()
     const userInput: ChatData = {
       role: 'user',
       content: userPrompt,
     }
     setChatData(chatData => [...chatData, userInput])
-    void fetchData(userPrompt)
+    void fetchData(userPrompt) // Call fetchData here
     setSubmitted(true)
     reset()
   }
@@ -77,8 +98,8 @@ export function InputPrompt(): JSX.Element {
   }, [preparedPrompt, setValue])
 
   React.useEffect(() => {
-    if (submitted && responseData && !loading) {
-      const { role, content } = responseData.choices[0].message
+    if (submitted && data && !loading) {
+      const { role, content } = data.data
       const assistantResponse: ChatData = {
         role,
         content,
@@ -86,7 +107,7 @@ export function InputPrompt(): JSX.Element {
       setChatData(chatData => [...chatData, assistantResponse])
       setSubmitted(false)
     }
-  }, [responseData, loading, submitted])
+  }, [data, loading, submitted])
 
   return (
     <StyledForm id="User_Prompt">
