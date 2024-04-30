@@ -74,7 +74,7 @@ class RunsPublisher:
         await self._publish_runs_advise_refetch_async(run_id=run_id)
         engine_state_summary = self._run_hooks.get_state_summary(self._run_hooks.run_id)
         if (
-            engine_state_summary is not None
+            isinstance(engine_state_summary, StateSummary)
             and engine_state_summary.completedAt is not None
         ):
             await self.publish_pre_serialized_commands_notification(run_id=run_id)
@@ -101,9 +101,16 @@ class RunsPublisher:
 
     async def _publish_runs_advise_unsubscribe_async(self, run_id: str) -> None:
         """Publish an unsubscribe flag for relevant runs topics."""
-        await self._client.publish_advise_unsubscribe_async(
-            topic=f"{Topics.RUNS}/{run_id}"
-        )
+        if self._run_hooks is not None:
+            await self._client.publish_advise_unsubscribe_async(
+                topic=f"{Topics.RUNS}/{run_id}"
+            )
+            await self._client.publish_advise_unsubscribe_async(
+                topic=Topics.RUNS_CURRENT_COMMAND
+            )
+            await self._client.publish_advise_unsubscribe_async(
+                topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+            )
 
     async def publish_pre_serialized_commands_notification(self, run_id: str) -> None:
         """Publishes notification for GET /runs/:runId/commandsAsPreSerializedList."""

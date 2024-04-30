@@ -4,7 +4,7 @@ from datetime import datetime
 from unittest.mock import MagicMock, AsyncMock
 
 from robot_server.service.notifications import RunsPublisher, Topics
-from opentrons.protocol_engine import CurrentCommand, EngineStatus
+from opentrons.protocol_engine import CurrentCommand, EngineStatus, StateSummary
 
 
 def mock_curent_command(command_id: str) -> CurrentCommand:
@@ -14,6 +14,19 @@ def mock_curent_command(command_id: str) -> CurrentCommand:
         command_key="1",
         index=0,
         created_at=datetime(year=2021, month=1, day=1),
+    )
+
+
+def mock_state_summary(run_id: str) -> StateSummary:
+    return StateSummary.construct(
+        status=EngineStatus.FAILED,
+        errors=[],
+        labware=[],
+        pipettes=[],
+        modules=[],
+        labwareOffsets=[],
+        startedAt=None,
+        completedAt=datetime(year=2021, month=1, day=1),
     )
 
 
@@ -64,6 +77,25 @@ async def test_initialize(
     )
 
 
+async def test_initialize_publisher_on_completed_runs(
+    runs_publisher: RunsPublisher, notification_client: AsyncMock
+) -> None:
+    """It should initialize the publisher w/ parameters & callbacks and notify for pre-serialized commands."""
+    run_id = "1234"
+    get_current_command = AsyncMock()
+
+    await runs_publisher.initialize(run_id, get_current_command, mock_state_summary)
+
+    assert runs_publisher._engine_state_slice
+    notification_client.publish_advise_refetch_async.assert_any_await(topic=Topics.RUNS)
+    notification_client.publish_advise_refetch_async.assert_any_await(
+        topic=f"{Topics.RUNS}/1234"
+    )
+    notification_client.publish_advise_refetch_async.assert_any_await(
+        topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/1234"
+    )
+
+
 @pytest.mark.asyncio
 async def test_clean_up_current_run(
     runs_publisher: RunsPublisher, notification_client: AsyncMock
@@ -79,6 +111,12 @@ async def test_clean_up_current_run(
     )
     notification_client.publish_advise_unsubscribe_async.assert_any_await(
         topic=f"{Topics.RUNS}/1234"
+    )
+    notification_client.publish_advise_unsubscribe_async.assert_any_await(
+        topic=Topics.RUNS_CURRENT_COMMAND
+    )
+    notification_client.publish_advise_unsubscribe_async.assert_any_await(
+        topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/1234"
     )
 
 
@@ -142,4 +180,25 @@ async def test_handle_engine_status_change(
     notification_client.publish_advise_refetch_async.assert_any_await(topic=Topics.RUNS)
     notification_client.publish_advise_refetch_async.assert_any_await(
         topic=f"{Topics.RUNS}/1234"
+    )
+
+
+async def test_publish_pre_serialized_commannds_notif(
+    runs_publisher: RunsPublisher, notification_client: AsyncMock
+) -> None:
+    """It should send out a notification for pre serialized commands."""
+    await runs_publisher.initialize(
+        "1234", lambda _: mock_curent_command("command1"), AsyncMock()
+    )
+
+    assert runs_publisher._run_hooks
+    assert runs_publisher._engine_state_slice
+    assert notification_client.publish_advise_refetch_async.call_count == 2
+
+    await runs_publisher.publish_pre_serialized_commands_notification(run_id="1234")
+
+    assert notification_client.publish_advise_refetch_async.call_count == 3
+
+    notification_client.publish_advise_refetch_async.assert_any_await(
+        topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/1234"
     )
