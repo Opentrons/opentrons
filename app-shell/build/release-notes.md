@@ -30,6 +30,10 @@ Modules in Deck Configuration
 
 - Lists of robots are now sorted alphabetically.
 
+### Removals
+
+- Removed the "Use older protocol analysis method" advanced setting for OT-2. If you need this type of analysis, use `opentrons_simulate` on the command line.
+
 ### Bug Fixes
 
 - All run log steps now appear in the same font size.

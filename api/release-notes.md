@@ -17,7 +17,6 @@ Welcome to the v7.3.0 release of the Opentrons robot software!
 ### Improved Features
 
 - Automatic tip tracking is now available for all nozzle configurations.
-- It's now possible to use more than two of the same type of module.
 - Flex no longer shows unnecessary pipette calibration warnings.
 - Python protocols can once again set labware offsets outside of Labware Position Check.
 
