@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 FLOAT_THRESHOLD = 0.001  # TODO: re-evaluate this value based on system limitations
 
-MINIMUM_DISPLACEMENT = 0.05
+MINIMUM_DISPLACEMENT = 0.01  # NOTE: (sigler) DO NOT MERGE!!!!!!!
 
 # Minimum vector component of 0.1%
 MINIMUM_VECTOR_COMPONENT = np.float64(0.001)
