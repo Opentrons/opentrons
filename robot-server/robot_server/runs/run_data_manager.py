@@ -294,10 +294,16 @@ class RunDataManager:
         self._run_store.remove(run_id=run_id)
 
     async def update(self, run_id: str, current: Optional[bool]) -> Union[Run, BadRun]:
-        """Get and potentially archive a run.
+        """Get and potentially archive the current run.
 
         Args:
             run_id: The run to get and maybe archive.
+            current: Whether to mark the run as current or not.
+                     If `current` set to False, then the run is 'un-current'ed by
+                     stopping the run, saving the final run data to the run store,
+                     and clearing the engine and runner.
+                     If 'current' is True or not specified, we simply fetch the run's
+                     data from memory and database.
 
         Returns:
             The updated run.
@@ -323,6 +329,9 @@ class RunDataManager:
                 summary=state_summary,
                 commands=commands,
                 run_time_parameters=parameters,
+            )
+            await self._runs_publisher.publish_pre_serialized_commands_notification(
+                run_id
             )
         else:
             state_summary = self._engine_store.engine.state_view.get_summary()

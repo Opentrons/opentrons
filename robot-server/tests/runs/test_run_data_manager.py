@@ -587,6 +587,7 @@ async def test_update_current(
     run_command: commands.Command,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
+    mock_runs_publisher: RunsPublisher,
     subject: RunDataManager,
 ) -> None:
     """It should persist the current run and clear the engine on current=false."""
@@ -611,6 +612,10 @@ async def test_update_current(
 
     result = await subject.update(run_id=run_id, current=False)
 
+    decoy.verify(
+        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+        times=1,
+    )
     assert result == Run(
         current=False,
         id=run_resource.run_id,
@@ -637,6 +642,7 @@ async def test_update_current_noop(
     run_command: commands.Command,
     mock_engine_store: EngineStore,
     mock_run_store: RunStore,
+    mock_runs_publisher: RunsPublisher,
     subject: RunDataManager,
     current: Optional[bool],
 ) -> None:
@@ -661,6 +667,7 @@ async def test_update_current_noop(
             commands=matchers.Anything(),
             run_time_parameters=matchers.Anything(),
         ),
+        await mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
         times=0,
     )
 

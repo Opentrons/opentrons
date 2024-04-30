@@ -72,6 +72,12 @@ class RunsPublisher:
         self._engine_state_slice = EngineStateSlice()
 
         await self._publish_runs_advise_refetch_async(run_id=run_id)
+        engine_state_summary = self._run_hooks.get_state_summary(self._run_hooks.run_id)
+        if (
+            engine_state_summary is not None
+            and engine_state_summary.completedAt is not None
+        ):
+            await self.publish_pre_serialized_commands_notification(run_id=run_id)
 
     async def clean_up_run(self, run_id: str) -> None:
         """Publish final refetch and unsubscribe flags for the given run."""
@@ -98,6 +104,13 @@ class RunsPublisher:
         await self._client.publish_advise_unsubscribe_async(
             topic=f"{Topics.RUNS}/{run_id}"
         )
+
+    async def publish_pre_serialized_commands_notification(self, run_id: str) -> None:
+        """Publishes notification for GET /runs/:runId/commandsAsPreSerializedList."""
+        if self._run_hooks is not None:
+            await self._client.publish_advise_refetch_async(
+                topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/{run_id}"
+            )
 
     async def _handle_current_command_change(self) -> None:
         """Publish a refetch flag if the current command has changed."""
