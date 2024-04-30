@@ -431,7 +431,7 @@ class JsonRunner(AbstractRunner):
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
-    # todo(tamar): should this be async? probably?
+    # todo(tamar): should this be async?
     def _prepare_add_command_to_queue(self, request: CommandCreate) -> Command:
         """Add a command to the queue.
 
