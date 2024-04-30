@@ -2,6 +2,7 @@ import {
   HEATERSHAKER_MODULE_V1_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
@@ -16,6 +17,7 @@ import thermoModuleGen1 from '../../../../assets/images/thermocycler_closed.png'
 import heaterShakerModule from '../../../../assets/images/heater_shaker_module_transparent.png'
 import thermoModuleGen2 from '../../../../assets/images/thermocycler_gen_2_closed.png'
 import magneticBlockGen1 from '../../../../assets/images/magnetic_block_gen_1.png'
+import stagingAreaMagneticBlockGen1 from '../../../../assets/images/staging_area_magnetic_block_gen_1.png'
 import trashBin from '../../../../assets/images/flex_trash_bin.png'
 import stagingArea from '../../../../assets/images/staging_area_slot.png'
 import wasteChute from '../../../../assets/images/waste_chute.png'
@@ -63,6 +65,10 @@ export function getFixtureImage(cutoutFixtureId: CutoutFixtureId): string {
     return temperatureModule
   } else if (cutoutFixtureId === MAGNETIC_BLOCK_V1_FIXTURE) {
     return magneticBlockGen1
+  } else if (
+    cutoutFixtureId === STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
+  ) {
+    return stagingAreaMagneticBlockGen1
   } else {
     return 'Error: unknown fixture'
   }

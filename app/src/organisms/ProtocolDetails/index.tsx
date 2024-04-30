@@ -43,7 +43,9 @@ import {
   parseInitialLoadedLabwareByAdapter,
 } from '@opentrons/api-client'
 import {
+  MAGNETIC_BLOCK_TYPE,
   getGripperDisplayName,
+  getModuleType,
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
@@ -236,7 +238,13 @@ export function ProtocolDetails(
 
   const requiredModuleDetails =
     mostRecentAnalysis?.commands != null
-      ? map(parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands))
+      ? map(
+          parseInitialLoadedModulesBySlot(mostRecentAnalysis.commands)
+        ).filter(
+          loadedModule =>
+            // filter out magnetic block which is already handled by the required fixture details
+            getModuleType(loadedModule.params.model) !== MAGNETIC_BLOCK_TYPE
+        )
       : []
 
   const requiredFixtureDetails = getSimplestDeckConfigForProtocol(
