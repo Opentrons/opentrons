@@ -742,3 +742,39 @@ class Protocols:
         app_error=False,
         robot_error=False,
     )
+
+    # https://library.opentrons.com/p/immunoprecipitation-by-dynabeads-on-flex-reagents-in-15-ml-tubes
+    Flex_S_v2_15_P1000S_8_HS_MB_TM_Dynabeads: Protocol = Protocol(
+        file_stem="Flex_S_v2_15_P1000S_8_HS_MB_TM_Dynabeads",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    # https://library.opentrons.com/p/Zymo_Magbead_DNA_Flex_Multi-Cells
+    Flex_S_v2_16_P1000Eight_HS_MB_TM_Zymo: Protocol = Protocol(
+        file_stem="Flex_S_v2_16_P1000Eight_HS_MB_TM_Zymo",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    # https://library.opentrons.com/p/RNA-Seq-RiboZero-pt1
+    Flex_S_v2_15_P1000Eight_HS_MB_TM_RNASeqRiboZero: Protocol = Protocol(
+        file_stem="Flex_S_v2_15_P1000Eight_HS_MB_TM_RNASeqRiboZero",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
+
+    # https://library.opentrons.com/p/ribornaseq-part2
+    Flex_S_v2_15_P1000Eight_HS_MB_TM_RNASeqRiboZero2: Protocol = Protocol(
+        file_stem="Flex_S_v2_15_P1000Eight_HS_MB_TM_RNASeqRiboZero2",
+        file_extension="py",
+        robot="Flex",
+        app_error=False,
+        robot_error=False,
+    )
