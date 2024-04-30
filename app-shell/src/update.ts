@@ -12,14 +12,11 @@ const autoUpdater = updater.autoUpdater
 autoUpdater.logger = createLogger('update')
 autoUpdater.autoDownload = false
 
-const log = createLogger('app-shell-update')
-
 export const CURRENT_VERSION: string = autoUpdater.currentVersion.version
 
 export function registerUpdate(
   dispatch: Dispatch
 ): (action: Action) => unknown {
-  log.info(`Registered update handler, version=${CURRENT_VERSION}`)
   return function handleAction(action: Action) {
     switch (action.type) {
       case UI_INITIALIZED:
