@@ -10,13 +10,12 @@ import {
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
-  RunTimeParameter,
   getCutoutFixtureIdsForModuleModel,
   getCutoutFixturesForModuleModel,
   FLEX_MODULE_ADDRESSABLE_AREAS,
-  MAGNETIC_BLOCK_ADDRESSABLE_AREAS,
   getModuleType,
   MAGNETIC_MODULE_TYPE,
+  FLEX_USB_MODULE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 import { getLabwareSetupItemGroups } from '../utils'
 import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
@@ -31,6 +30,7 @@ import type {
   PipetteName,
   ProtocolAnalysisOutput,
   RobotType,
+  RunTimeParameter,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../utils'
 
@@ -68,9 +68,6 @@ export type ProtocolHardware =
   | ProtocolFixture
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
-const USB_MODULE_ADDRESSABLE_AREAS = FLEX_MODULE_ADDRESSABLE_AREAS.filter(
-  aa => !MAGNETIC_BLOCK_ADDRESSABLE_AREAS.includes(aa)
-)
 
 export const useRequiredProtocolHardwareFromAnalysis = (
   analysis: CompletedProtocolAnalysis | null
@@ -184,7 +181,7 @@ export const useRequiredProtocolHardwareFromAnalysis = (
     .filter(
       ({ requiredAddressableAreas }) =>
         !requiredAddressableAreas.every(modAA =>
-          USB_MODULE_ADDRESSABLE_AREAS.includes(modAA)
+          FLEX_USB_MODULE_ADDRESSABLE_AREAS.includes(modAA)
         )
     )
     .map(({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({

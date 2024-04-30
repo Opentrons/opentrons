@@ -96,16 +96,7 @@ const useHardwareName = (protocolHardware: ProtocolHardware): string => {
   } else if (protocolHardware.hardwareType === 'module') {
     return getModuleDisplayName(protocolHardware.moduleModel)
   } else {
-    let displayFixtureId = protocolHardware.cutoutFixtureId
-    // Only show staging area as a requirement for the staging area with mag block fixture,
-    // as mag block requirement is handled as a part of modules, we don't want to list it twice
-    if (
-      protocolHardware.cutoutFixtureId ===
-      STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE
-    ) {
-      displayFixtureId = STAGING_AREA_RIGHT_SLOT_FIXTURE
-    }
-    return getFixtureDisplayName(displayFixtureId)
+    return getFixtureDisplayName(protocolHardware.cutoutFixtureId)
   }
 }
 
