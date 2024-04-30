@@ -132,13 +132,13 @@ export function useCurrentRunRoute(): string | null {
   const currentRunLink = allRuns?.links?.current ?? null
   const currentRun =
     currentRunLink != null &&
-    typeof currentRunLink !== 'string' &&
-    'href' in currentRunLink
+      typeof currentRunLink !== 'string' &&
+      'href' in currentRunLink
       ? allRuns?.data.find(
-          run => run.id === currentRunLink.href.replace('/runs/', '')
-        ) // trim link path down to only runId
+        run => run.id === currentRunLink.href.replace('/runs/', '')
+      ) // trim link path down to only runId
       : null
-const currentRunId = currentRun?.id ?? null
+  const currentRunId = currentRun?.id ?? null
   const { data: runRecord } = useNotifyRunQuery(currentRunId, {
     staleTime: Infinity,
     enabled: currentRunId != null,
