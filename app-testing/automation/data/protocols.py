@@ -21,15 +21,6 @@ class Protocols:
         robot_error=False,
     )
 
-    OT2_S_v6_P20S_P300M_HS_HSCollision: Protocol = Protocol(
-        file_stem="OT2_S_v6_P20S_P300M_HS_HSCollision",
-        file_extension="json",
-        robot="OT2",
-        app_error=False,
-        robot_error=False,
-        description="""This protocol gives an error in PD.8-Channel pipette cannot access labware8-Channel pipettes cannot access labware or tip racks to the left or right of a Heater-Shaker GEN1 module. Move labware to a different slot to access it with an 8-Channel pipette.If you export it anyway there are NOT analysis errors in the app side analysis.TODO on if there are robot side analysis errors but do not expect them?""",  # noqa: E501
-    )
-
     OT2_S_v6_P20S_P300M_TransferReTransferLiquid: Protocol = Protocol(
         file_stem="OT2_S_v6_P20S_P300M_TransferReTransferLiquid",
         file_extension="json",
