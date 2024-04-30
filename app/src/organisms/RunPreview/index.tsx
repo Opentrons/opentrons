@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
 
 import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
-import { useNotifyAllCommandsAsPreSerializedList } from '../../resources/runs'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -21,7 +20,10 @@ import {
 } from '@opentrons/components'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyLastRunCommandKey } from '../../resources/runs'
+import {
+  useNotifyAllCommandsAsPreSerializedList,
+  useNotifyLastRunCommandKey,
+} from '../../resources/runs'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
