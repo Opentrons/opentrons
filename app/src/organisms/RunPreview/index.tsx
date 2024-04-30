@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
 
 import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
-import { useAllCommandsAsPreSerializedList } from '@opentrons/react-api-client'
+import { useNotifyAllCommandsAsPreSerializedList } from '../../resources/runs'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -54,7 +54,7 @@ export const RunPreviewComponent = (
       ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
       : false
   // we only ever want one request done for terminal runs because this is a heavy request
-  const commandsFromQuery = useAllCommandsAsPreSerializedList(
+  const commandsFromQuery = useNotifyAllCommandsAsPreSerializedList(
     runId,
     { cursor: 0, pageLength: MAX_COMMANDS },
     {
@@ -63,7 +63,7 @@ export const RunPreviewComponent = (
       enabled: isRunTerminal,
     }
   ).data?.data
-  const parsedCommandsFromQuery =
+  const nullCheckedCommandsFromQuery =
     commandsFromQuery == null ? robotSideAnalysis?.commands : commandsFromQuery
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
@@ -75,7 +75,9 @@ export const RunPreviewComponent = (
   ] = React.useState<boolean>(true)
   if (robotSideAnalysis == null) return null
   const commands =
-    (isRunTerminal ? parsedCommandsFromQuery : robotSideAnalysis.commands) ?? []
+    (isRunTerminal
+      ? nullCheckedCommandsFromQuery
+      : robotSideAnalysis.commands) ?? []
   const currentRunCommandIndex = commands.findIndex(
     c => c.key === currentRunCommandKey
   )
