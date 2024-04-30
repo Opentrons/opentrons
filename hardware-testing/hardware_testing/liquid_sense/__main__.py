@@ -314,6 +314,7 @@ if __name__ == "__main__":
                 f"{data_dir}/{run_args.name}/{run_args.run_id}",
                 run_args.tip_volumes,
                 run_args.trials,
+                make_graph=True,
             )
         run_args.ctx.cleanup()
         if not args.simulate:
