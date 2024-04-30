@@ -20,7 +20,7 @@ export function useNotifyAllCommandsAsPreSerializedList(
   const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
 
   useNotifyService<CommandsData, AxiosError>({
-    topic: `robot-server/runs/${runId}/pre_serialized_commands`,
+    topic: `robot-server/runs/pre_serialized_commands/${runId}`,
     setRefetch,
     options,
   })
