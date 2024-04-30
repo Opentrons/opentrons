@@ -99,6 +99,7 @@ function Input(props: InputFieldProps): JSX.Element {
     size = 'small',
     title,
     tooltipText,
+    tabIndex = 0,
     ...inputProps
   } = props
   const hasError = props.error != null
@@ -268,6 +269,7 @@ function Input(props: InputFieldProps): JSX.Element {
       ) : null}
       <Flex width="100%" flexDirection={DIRECTION_COLUMN} css={OUTER_CSS}>
         <Flex
+          tabIndex={tabIndex}
           css={INPUT_FIELD}
           alignItems={ALIGN_CENTER}
           onClick={() => {
