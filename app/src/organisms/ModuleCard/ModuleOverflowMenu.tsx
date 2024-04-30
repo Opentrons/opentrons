@@ -69,6 +69,9 @@ export const ModuleOverflowMenu = (
     isDisabled = true
   }
 
+  const isHeatingOrCooling =
+    module.data.status === 'heating' || module.data.status === 'cooling'
+
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
     module,
     handleAboutClick,
@@ -78,6 +81,18 @@ export const ModuleOverflowMenu = (
     isDisabled,
     isIncompatibleWithOT3
   )
+
+  const isCalibrateDisabled = !isPipetteReady || isTooHot || isHeatingOrCooling
+  let calibrateDisabledReason
+  if (!isPipetteReady) {
+    calibrateDisabledReason = t('calibrate_pipette')
+  } else if (isTooHot) {
+    calibrateDisabledReason = t('module_too_hot')
+  } else if (isHeatingOrCooling) {
+    calibrateDisabledReason = t('module_heating_or_cooling')
+  } else {
+    calibrateDisabledReason = null
+  }
 
   return (
     <Flex position={POSITION_RELATIVE}>
@@ -89,7 +104,7 @@ export const ModuleOverflowMenu = (
           <>
             <MenuItem
               onClick={handleCalibrateClick}
-              disabled={!isPipetteReady || isTooHot}
+              disabled={isCalibrateDisabled}
               {...targetProps}
             >
               {i18n.format(
@@ -99,9 +114,9 @@ export const ModuleOverflowMenu = (
                 'capitalize'
               )}
             </MenuItem>
-            {!isPipetteReady || isTooHot ? (
+            {isCalibrateDisabled ? (
               <Tooltip tooltipProps={tooltipProps}>
-                {t(!isPipetteReady ? 'calibrate_pipette' : 'module_too_hot')}
+                {calibrateDisabledReason}
               </Tooltip>
             ) : null}
           </>
