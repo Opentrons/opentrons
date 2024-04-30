@@ -539,21 +539,13 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                       />
                     </Box>
                   ) : (
-                    <Flex
+                    <Box
                       height="4.25rem"
                       width="4.75rem"
                       marginRight={SPACING.spacing16}
                       backgroundColor={COLORS.grey30}
                       borderRadius={SPACING.spacing8}
-                      alignItems={ALIGN_CENTER}
-                      justifyContent={JUSTIFY_CENTER}
-                    >
-                      <Icon
-                        name="ot-close"
-                        color={COLORS.grey40}
-                        size="2.25rem"
-                      />
-                    </Flex>
+                    />
                   )}
                   <StyledText
                     as="p"

@@ -187,26 +187,18 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               />
             ),
             error: (
-              <Flex
+              <Box
                 size="6rem"
                 backgroundColor={COLORS.grey30}
                 borderRadius={SPACING.spacing8}
-                alignItems={ALIGN_CENTER}
-                justifyContent={JUSTIFY_CENTER}
-              >
-                <Icon name="ot-close" color={COLORS.grey40} size="2.75rem" />
-              </Flex>
+              />
             ),
             stale: (
-              <Flex
+              <Box
                 size="6rem"
                 backgroundColor={COLORS.grey30}
                 borderRadius={SPACING.spacing8}
-                alignItems={ALIGN_CENTER}
-                justifyContent={JUSTIFY_CENTER}
-              >
-                <Icon name="ot-close" color={COLORS.grey40} size="2.75rem" />
-              </Flex>
+              />
             ),
             complete:
               mostRecentAnalysis != null ? (
