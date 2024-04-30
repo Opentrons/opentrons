@@ -577,22 +577,39 @@ class Labware:
         """Set the labware's position offset.
 
         The offset is an x, y, z vector in deck coordinates
-        (see :ref:`protocol-api-deck-coords`) that the motion system
-        will add to any movement targeting this labware instance.
+        (see :ref:`protocol-api-deck-coords`).
 
-        The offset *will not apply* to any other labware instances,
-        even if those labware are of the same type.
+        How the motion system applies the offset depends on the API level of the protocol.
 
-        This method is *only* for use with mechanisms like
-        :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
-        to adjust labware offsets. (See :ref:`advanced-control`.)
+        .. list-table::
+            :header-rows: 1
 
-        .. warning::
+            * - API level
+              - Offset behavior
+            * - 2.12–2.13
+              - Offsets only apply to the exact :py:class:`.Labware` instance.
+            * - 2.14–2.17
+              - ``set_offset()`` is not available, and the API raises an error.
+            * - 2.18 and newer
+              -
+                - Offsets apply to any labware of the same type, in the same on-deck location.
+                - Offsets can't be set on labware that is currently off-deck.
+                - Offsets do not follow a labware instance when using :py:meth:`.move_labware`.
 
-            If you're uploading a protocol via the Opentrons App, don't use this method,
-            because it will produce undefined behavior.
-            Instead, use Labware Position Check in the app or on the touchscreen.
+        .. note::
 
+            Setting offsets with this method will override any labware offsets set
+            by running Labware Position Check in the Opentrons App.
+
+            This method is designed for use with mechanisms like
+            :obj:`opentrons.execute.get_protocol_api`, which lack an interactive way
+            to adjust labware offsets. (See :ref:`advanced-control`.)
+
+        .. versionchanged:: 2.14
+            Temporarily removed.
+
+        .. versionchanged:: 2.18
+            Restored, and now applies to labware type–location pairs.
         """
         if (
             self._api_version >= ENGINE_CORE_API_VERSION
