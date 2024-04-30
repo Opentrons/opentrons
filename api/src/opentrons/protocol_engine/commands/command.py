@@ -31,14 +31,11 @@ if TYPE_CHECKING:
     from ..state import StateView
 
 
-CommandParamsT = TypeVar("CommandParamsT", bound=BaseModel)
-CommandParamsT_contra = TypeVar(
-    "CommandParamsT_contra", bound=BaseModel, contravariant=True
-)
-CommandResultT = TypeVar("CommandResultT", bound=BaseModel)
-CommandResultT_co = TypeVar("CommandResultT_co", bound=BaseModel, covariant=True)
-CommandPrivateResultT = TypeVar("CommandPrivateResultT")
-CommandPrivateResultT_co = TypeVar("CommandPrivateResultT_co", covariant=True)
+_ParamsT = TypeVar("_ParamsT", bound=BaseModel)
+_ParamsT_contra = TypeVar("_ParamsT_contra", bound=BaseModel, contravariant=True)
+_ResultT = TypeVar("_ResultT", bound=BaseModel)
+_ResultT_co = TypeVar("_ResultT_co", bound=BaseModel, covariant=True)
+_PrivateResultT_co = TypeVar("_PrivateResultT_co", covariant=True)
 
 
 class CommandStatus(str, Enum):
@@ -63,7 +60,7 @@ class CommandIntent(str, Enum):
     FIXIT = "fixit"
 
 
-class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
+class BaseCommandCreate(GenericModel, Generic[_ParamsT]):
     """Base class for command creation requests.
 
     You shouldn't use this class directly; instead, use or define
@@ -77,7 +74,7 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
             "execution behavior"
         ),
     )
-    params: CommandParamsT = Field(..., description="Command execution data payload")
+    params: _ParamsT = Field(..., description="Command execution data payload")
     intent: Optional[CommandIntent] = Field(
         None,
         description=(
@@ -102,7 +99,7 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
     )
 
 
-class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
+class BaseCommand(GenericModel, Generic[_ParamsT, _ResultT]):
     """Base command model.
 
     You shouldn't use this class directly; instead, use or define
@@ -132,8 +129,8 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
         ),
     )
     status: CommandStatus = Field(..., description="Command execution status")
-    params: CommandParamsT = Field(..., description="Command execution data payload")
-    result: Optional[CommandResultT] = Field(
+    params: _ParamsT = Field(..., description="Command execution data payload")
+    result: Optional[_ResultT] = Field(
         None,
         description="Command execution result data, if succeeded",
     )
@@ -173,16 +170,14 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
     )
 
     _ImplementationCls: Union[
-        Type[AbstractCommandImpl[CommandParamsT, CommandResultT]],
-        Type[
-            AbstractCommandWithPrivateResultImpl[CommandParamsT, CommandResultT, object]
-        ],
+        Type[AbstractCommandImpl[_ParamsT, _ResultT]],
+        Type[AbstractCommandWithPrivateResultImpl[_ParamsT, _ResultT, object]],
     ]
 
 
 class AbstractCommandImpl(
     ABC,
-    Generic[CommandParamsT_contra, CommandResultT_co],
+    Generic[_ParamsT_contra, _ResultT_co],
 ):
     """Abstract command creation and execution implementation.
 
@@ -216,14 +211,14 @@ class AbstractCommandImpl(
         pass
 
     @abstractmethod
-    async def execute(self, params: CommandParamsT_contra) -> CommandResultT_co:
+    async def execute(self, params: _ParamsT_contra) -> _ResultT_co:
         """Execute the command, mapping data from execution into a response model."""
         ...
 
 
 class AbstractCommandWithPrivateResultImpl(
     ABC,
-    Generic[CommandParamsT_contra, CommandResultT_co, CommandPrivateResultT_co],
+    Generic[_ParamsT_contra, _ResultT_co, _PrivateResultT_co],
 ):
     """Abstract command creation and execution implementation if the command has private results.
 
@@ -259,7 +254,7 @@ class AbstractCommandWithPrivateResultImpl(
 
     @abstractmethod
     async def execute(
-        self, params: CommandParamsT_contra
-    ) -> Tuple[CommandResultT_co, CommandPrivateResultT_co]:
+        self, params: _ParamsT_contra
+    ) -> Tuple[_ResultT_co, _PrivateResultT_co]:
         """Execute the command, mapping data from execution into a response model."""
         ...
