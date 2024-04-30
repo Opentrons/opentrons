@@ -13,6 +13,8 @@ from typing import (
     TypeVar,
     Tuple,
     List,
+    Type,
+    Union,
 )
 
 from pydantic import BaseModel, Field
@@ -30,10 +32,13 @@ if TYPE_CHECKING:
 
 
 CommandParamsT = TypeVar("CommandParamsT", bound=BaseModel)
-
+CommandParamsT_contra = TypeVar(
+    "CommandParamsT_contra", bound=BaseModel, contravariant=True
+)
 CommandResultT = TypeVar("CommandResultT", bound=BaseModel)
-
+CommandResultT_co = TypeVar("CommandResultT_co", bound=BaseModel, covariant=True)
 CommandPrivateResultT = TypeVar("CommandPrivateResultT")
+CommandPrivateResultT_co = TypeVar("CommandPrivateResultT_co", covariant=True)
 
 
 class CommandStatus(str, Enum):
@@ -167,10 +172,17 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
         ),
     )
 
+    _ImplementationCls: Union[
+        Type[AbstractCommandImpl[CommandParamsT, CommandResultT]],
+        Type[
+            AbstractCommandWithPrivateResultImpl[CommandParamsT, CommandResultT, object]
+        ],
+    ]
+
 
 class AbstractCommandImpl(
     ABC,
-    Generic[CommandParamsT, CommandResultT],
+    Generic[CommandParamsT_contra, CommandResultT_co],
 ):
     """Abstract command creation and execution implementation.
 
@@ -204,14 +216,14 @@ class AbstractCommandImpl(
         pass
 
     @abstractmethod
-    async def execute(self, params: CommandParamsT) -> CommandResultT:
+    async def execute(self, params: CommandParamsT_contra) -> CommandResultT_co:
         """Execute the command, mapping data from execution into a response model."""
         ...
 
 
 class AbstractCommandWithPrivateResultImpl(
     ABC,
-    Generic[CommandParamsT, CommandResultT, CommandPrivateResultT],
+    Generic[CommandParamsT_contra, CommandResultT_co, CommandPrivateResultT_co],
 ):
     """Abstract command creation and execution implementation if the command has private results.
 
@@ -247,7 +259,7 @@ class AbstractCommandWithPrivateResultImpl(
 
     @abstractmethod
     async def execute(
-        self, params: CommandParamsT
-    ) -> Tuple[CommandResultT, CommandPrivateResultT]:
+        self, params: CommandParamsT_contra
+    ) -> Tuple[CommandResultT_co, CommandPrivateResultT_co]:
         """Execute the command, mapping data from execution into a response model."""
         ...
