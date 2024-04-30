@@ -46,7 +46,6 @@ export function getSimplestDeckConfigForProtocol(
     protocolAnalysis != null
       ? getAddressableAreasInProtocol(protocolAnalysis, deckDef)
       : []
-  console.log('AA', addressableAreas)
   const simplestDeckConfig = addressableAreas.reduce<
     CutoutConfigProtocolSpec[]
   >((acc, addressableArea) => {

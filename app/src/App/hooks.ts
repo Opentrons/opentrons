@@ -129,6 +129,7 @@ export function useCurrentRunRoute(): string | null {
     { pageLength: 1 },
     { refetchInterval: CURRENT_RUN_POLL }
   )
+  console.log('ALL RUNS', allRuns)
   const currentRunLink = allRuns?.links?.current ?? null
   const currentRun =
     currentRunLink != null &&
@@ -143,8 +144,6 @@ export function useCurrentRunRoute(): string | null {
     staleTime: Infinity,
     enabled: currentRunId != null,
   })
-
-  console.log('currentRunId')
 
   const runStatus = runRecord?.data.status
   const runActions = runRecord?.data.actions
