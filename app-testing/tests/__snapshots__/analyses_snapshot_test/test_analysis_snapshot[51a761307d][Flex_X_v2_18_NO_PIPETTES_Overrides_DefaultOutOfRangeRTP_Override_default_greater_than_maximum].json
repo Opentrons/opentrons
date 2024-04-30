@@ -4,8 +4,8 @@
   "errors": [
     {
       "analysis_execution_time": null,
-      "command_exit_code": 1,
-      "command_output": "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.10/runpy.py\", line 187, in _run_module_as_main\n    mod_name, mod_spec, code = _get_module_details(mod_name, _Error)\n  File \"/usr/local/lib/python3.10/runpy.py\", line 146, in _get_module_details\n    return _get_module_details(pkg_main_name, error)\n  File \"/usr/local/lib/python3.10/runpy.py\", line 110, in _get_module_details\n    __import__(pkg_name)\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/cli/__init__.py\", line 9, in <module>\n    from .analyze import analyze\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/cli/analyze.py\", line 31, in <module>\n    from opentrons.util.performance_helpers import track_analysis\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/util/performance_helpers.py\", line 4, in <module>\n    from opentrons_shared_data.performance.dev_types import (\nModuleNotFoundError: No module named 'opentrons_shared_data.performance'\n"
+      "command_exit_code": 2,
+      "command_output": "/root/.opentrons/robot_settings.json not found. Loading defaults\nUsage: python -m opentrons.cli analyze [OPTIONS] FILES...\nTry 'python -m opentrons.cli analyze --help' for help.\n\nError: Invalid value for 'FILES...': Path '/var/lib/ot/protocols/generated_protocols/Flex_X_v2_18_NO_PIPETTES_Overrides_DefaultOutOfRangeRTP_Override_default_greater_than_maximum.py' does not exist.\n"
     }
   ],
   "files": [],
