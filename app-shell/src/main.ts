@@ -4,7 +4,6 @@ import electronDebug from 'electron-debug'
 import dns from 'dns'
 import contextMenu from 'electron-context-menu'
 import * as electronDevtoolsInstaller from 'electron-devtools-installer'
-import { webusb } from 'usb'
 
 import { createUi, registerReloadUi } from './ui'
 import { initializeMenu } from './menu'
@@ -18,7 +17,6 @@ import { registerSystemInfo } from './system-info'
 import { registerProtocolStorage } from './protocol-storage'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import { registerUsb } from './usb'
-import { createUsbDeviceMonitor } from './system-info/usb-devices'
 import { registerNotify, closeAllNotifyConnections } from './notifications'
 
 import type { BrowserWindow } from 'electron'
@@ -57,8 +55,6 @@ if (config.devtools) app.once('ready', installDevtools)
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
-  webusb.removeEventListener('connect', () => createUsbDeviceMonitor())
-  webusb.removeEventListener('disconnect', () => createUsbDeviceMonitor())
   app.quit()
   closeAllNotifyConnections()
     .then(() => {
@@ -77,8 +73,6 @@ function startUp(): void {
     log.error('Uncaught Promise rejection: ', { reason })
   )
 
-  webusb.addEventListener('connect', () => createUsbDeviceMonitor())
-  webusb.addEventListener('disconnect', () => createUsbDeviceMonitor())
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 
