@@ -14,7 +14,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_USB_MODULE_ADDRESSABLE_AREAS,
   getCutoutDisplayName,
   getDeckDefFromRobotType,

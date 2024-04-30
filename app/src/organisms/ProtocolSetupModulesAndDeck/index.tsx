@@ -151,7 +151,7 @@ export function ProtocolSetupModulesAndDeck({
             message={t('module_mismatch_body')}
           />
         ) : null}
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <Flex
             color={COLORS.grey60}
             fontSize={TYPOGRAPHY.fontSize22}
