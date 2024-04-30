@@ -24,6 +24,7 @@ Welcome to the v7.3.0 release of the Opentrons robot software!
 ### Bug Fixes
 
 - Fixed an edge case where capitalizing part of a labware load name could cause unexpected behavior or collisions.
+- Fixed user-installed Python packages (`pip install ...`) on the OT-2 not being found by `import` statements.
 
 ---
 

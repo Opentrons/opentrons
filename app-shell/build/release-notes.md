@@ -33,6 +33,7 @@ Modules in Deck Configuration
 ### Bug Fixes
 
 - All run log steps now appear in the same font size.
+- Fixed Python protocols not having custom labware definitions available to them when they're uploaded to a Flex over a USB connection.
 
 ---
 
