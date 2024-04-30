@@ -12,7 +12,7 @@ from .thermocycler_module_substate import (
     ThermocyclerModuleId,
 )
 from .magnetic_block_substate import MagneticBlockSubState, MagneticBlockId
-
+from .absorbance_reader_substate import AbsorbanceReaderSubState, AbsorbanceReaderId
 
 ModuleSubStateType = Union[
     HeaterShakerModuleSubState,
@@ -20,6 +20,7 @@ ModuleSubStateType = Union[
     TemperatureModuleSubState,
     ThermocyclerModuleSubState,
     MagneticBlockSubState,
+    AbsorbanceReaderSubState,
 ]
 
 __all__ = [
@@ -33,6 +34,8 @@ __all__ = [
     "ThermocyclerModuleId",
     "MagneticBlockSubState",
     "MagneticBlockId",
+    "AbsorbanceReaderSubState",
+    "AbsorbanceReaderId",
     # Union of all module substates
     "ModuleSubStateType",
 ]
