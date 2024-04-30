@@ -183,8 +183,8 @@ export const useRequiredProtocolHardwareFromAnalysis = (
     // as they're handled in the requiredModules section via hardwareType === 'module'
     .filter(
       ({ requiredAddressableAreas }) =>
-        !USB_MODULE_ADDRESSABLE_AREAS.every(modAA =>
-          requiredAddressableAreas.includes(modAA)
+        !requiredAddressableAreas.every(modAA =>
+          USB_MODULE_ADDRESSABLE_AREAS.includes(modAA)
         )
     )
     .map(({ cutoutFixtureId, cutoutId, compatibleCutoutFixtureIds }) => ({
@@ -293,7 +293,6 @@ const useMissingProtocolHardwareFromRequiredProtocolHardware = (
     robotType,
     protocolAnalysis
   )
-
   // determine missing or conflicted hardware
   return {
     missingProtocolHardware: [
