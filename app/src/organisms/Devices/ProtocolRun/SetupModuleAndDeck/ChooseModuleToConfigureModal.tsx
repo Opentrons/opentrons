@@ -194,8 +194,13 @@ interface NoUnconfiguredModulesProps {
   robotName: string
 }
 function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
-  const { moduleDisplayName, displaySlotName, isOnDevice, robotName } = props
-  const configuredModuleMatches = ['feer']
+  const {
+    moduleDisplayName,
+    configuredModuleMatches,
+    displaySlotName,
+    isOnDevice,
+    robotName,
+  } = props
   const { t } = useTranslation('protocol_setup')
   const history = useHistory()
   const { closeCurrentRun } = useCloseCurrentRun()

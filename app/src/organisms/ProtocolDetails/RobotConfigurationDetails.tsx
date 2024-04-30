@@ -23,6 +23,7 @@ import {
   MAGNETIC_BLOCK_FIXTURES,
   SINGLE_SLOT_FIXTURES,
   THERMOCYCLER_MODULE_TYPE,
+  FLEX_USB_MODULE_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
@@ -97,10 +98,11 @@ export const RobotConfigurationDetails = (
       emptyText
     )
 
-  // filter out single slot fixtures
+  // filter out single slot fixtures as they're implicit
+  // also filter out usb module fixtures as they're handled by required modules
   const nonStandardRequiredFixtureDetails = requiredFixtureDetails.filter(
     fixture =>
-      !SINGLE_SLOT_FIXTURES.includes(
+      ![...SINGLE_SLOT_FIXTURES, ...FLEX_USB_MODULE_FIXTURES].includes(
         fixture.cutoutFixtureId as SingleSlotCutoutFixtureId
       )
   )

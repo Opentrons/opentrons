@@ -18,8 +18,6 @@ import {
   getModuleDisplayName,
   getModuleType,
   getFixtureDisplayName,
-  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
   GRIPPER_V1_2,
 } from '@opentrons/shared-data'
 
