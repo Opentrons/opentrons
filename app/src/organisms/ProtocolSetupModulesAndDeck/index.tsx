@@ -137,7 +137,7 @@ export function ProtocolSetupModulesAndDeck({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
-        marginTop="5.5rem"
+        marginTop="5.75rem"
         marginBottom={SPACING.spacing80}
       >
         {isModuleMismatch && !clearModuleMismatchBanner ? (
