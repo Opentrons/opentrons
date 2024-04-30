@@ -13,7 +13,6 @@ import {
   getGripperDisplayName,
 } from '@opentrons/shared-data'
 import {
-  ALIGN_CENTER,
   ALIGN_FLEX_START,
   BORDERS,
   Box,
@@ -21,7 +20,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
   ModuleIcon,
   OVERFLOW_WRAP_ANYWHERE,
