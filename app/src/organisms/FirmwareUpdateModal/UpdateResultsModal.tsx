@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -14,8 +13,9 @@ import {
 } from '@opentrons/components'
 import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
+import { usePipetteModelSpecs } from '../../resources/instruments/hooks'
 
-import type { InstrumentData } from '@opentrons/api-client'
+import type { InstrumentData, PipetteData } from '@opentrons/api-client'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface UpdateResultsModalProps {
@@ -36,12 +36,16 @@ export function UpdateResultsModal(
     iconName: 'ot-alert',
     iconColor: COLORS.red50,
   }
+
+  const pipetteDisplayName = usePipetteModelSpecs(
+    (instrument as PipetteData)?.instrumentModel
+  )?.displayName
+
   let instrumentName = 'instrument'
   if (instrument?.ok) {
     instrumentName =
       instrument?.instrumentType === 'pipette'
-        ? getPipetteModelSpecs(instrument.instrumentModel)?.displayName ??
-          'pipette'
+        ? pipetteDisplayName ?? 'pipette'
         : 'Flex Gripper'
   }
   return (
