@@ -72,9 +72,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
     requiredPipette != null &&
     requiredPipette.pipetteName === attachedPipettes[mount]?.instrumentName
 
-  const requiredPipDisplayName = usePipetteNameSpecs(
-    requiredPipette?.pipetteName as PipetteName
-  )
+  const requiredPipDisplayName =
+    usePipetteNameSpecs(requiredPipette?.pipetteName as PipetteName)
+      ?.displayName ?? null
 
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
   let header: string = 'unknown results screen'
