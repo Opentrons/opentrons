@@ -1,5 +1,6 @@
 """Router for /system/register endpoint."""
 
+import re
 import os
 import filetype  # type: ignore[import-untyped]
 from fastapi import (
@@ -14,6 +15,10 @@ from fastapi import (
 
 from .models import EnableOEMMode
 from ...settings import SystemServerSettings, get_settings, save_settings
+
+
+# regex to sanitize the filename
+FILENAME_REGEX = re.compile(r'[^a-zA-Z0-9.]')
 
 
 oem_mode_router = APIRouter()
@@ -78,7 +83,7 @@ async def upload_splash_image(
 
     # Get the file info
     file_info = filetype.guess(file.file)
-    if file_info is None:
+    if file_info is None or not file.filename:
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
             detail="Unable to determine file type",
@@ -115,8 +120,11 @@ async def upload_splash_image(
         if settings.oem_mode_splash_custom:
             os.unlink(settings.oem_mode_splash_custom)
 
+        # sanitize the filename
+        filename = FILENAME_REGEX.sub("_", file.filename)
+
         # file is valid, save to final location
-        filepath = f"{settings.persistence_directory}/{file.filename}"
+        filepath = f"{settings.persistence_directory}/{filename}"
         with open(filepath, "wb+") as f:
             f.write(file.file.read())
 
