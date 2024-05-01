@@ -83,12 +83,6 @@ class AbstractRunner(ABC):
     you will need a new Runner to do another run.
     """
 
-    _all_command_ids: List[str]
-    """All command IDs, in insertion order."""
-
-    _commands_by_id: Dict[str, CommandEntry]
-    """All command resources, in insertion order, mapped by their unique IDs."""
-
     _queued_command_ids: OrderedSet[str]
     """The IDs of queued commands, in FIFO order"""
 
@@ -101,11 +95,9 @@ class AbstractRunner(ABC):
     def __init__(self, protocol_engine: ProtocolEngine) -> None:
         self._protocol_engine = protocol_engine
         self._broker = LegacyBroker()
-        self._all_command_ids = []
         self._queued_command_ids = OrderedSet()
         self._queued_setup_command_ids = OrderedSet()
         self._queued_fixit_command_ids = OrderedSet()
-        self._commands_by_id = OrderedDict()
 
     # TODO(mm, 2023-10-03): `LegacyBroker` is specific to Python protocols and JSON protocols ≤v5.
     # We'll need to extend this in order to report progress from newer JSON protocols.
@@ -431,54 +423,6 @@ class JsonRunner(AbstractRunner):
         commands = self._protocol_engine.state_view.commands.get_all()
         return RunResult(commands=commands, state_summary=run_data, parameters=[])
 
-    # todo(tamar): should this be async?
-    def _prepare_add_command_to_queue(self, request: CommandCreate) -> Command:
-        """Add a command to the queue.
-
-        Arguments:
-            request: The command type and payload data used to construct
-                the command in state.
-
-        Returns:
-            The full, newly queued command.
-
-        Raises:
-            SetupCommandNotAllowed: the request specified a setup command,
-                but the engine was not idle or paused.
-            RunStoppedError: the run has been stopped, so no new commands
-                may be added.
-            CommandNotAllowedError: the request specified a failed command id
-                with a non fixit command.
-        """
-        # request = slot_standardization.standardize_command(
-        #     request, self.state_view.config.robot_type
-        # )
-
-        command_id = model_utils.generate_id()
-        if request.intent in (
-            CommandIntent.SETUP,
-            CommandIntent.FIXIT,
-        ):
-            request_hash = None
-        else:
-            request_hash = hash_protocol_command_params(
-                create=request,
-                last_hash=self._protocol_engine.state_view.commands.get_latest_protocol_command_hash(),
-            )
-
-        command_created_at = model_utils.get_timestamp()
-
-        queue_command = self.validate_action_allowed(
-            request=request,
-            request_hash=request_hash,
-            command_id=command_id,
-            created_at=command_created_at,
-        )
-
-        # self._create_command_queue(queue_command)
-
-        return queue_command
-
     # todo(tamar): change to QueueCommand, should this be async
     def _create_and_add_command_queue(
         self, queue_command: QueueCommandAction
@@ -511,7 +455,7 @@ class JsonRunner(AbstractRunner):
 
     async def _add_command_and_execute(self) -> None:
         for command in self._queued_commands:
-            command_queue = self._prepare_add_command_to_queue(command)
+            command_queue = self._create_and_add_command_queue(command)
             self._create_and_add_command_queue(command_queue)
             # TODO(Tamar): should_add_execute_command change to only wait_for_command?
             # should the whole command state move over? get_next_t0_execute

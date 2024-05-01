@@ -2,7 +2,13 @@ from typing import Optional, Union
 
 from .protocol_runner import create_protocol_runner, AnyRunner
 from ..hardware_control import HardwareControlAPI
-from ..protocol_engine import ProtocolEngine, Command, CommandCreate, CommandIntent, slot_standardization
+from ..protocol_engine import (
+    ProtocolEngine,
+    Command,
+    CommandCreate,
+    CommandIntent,
+    slot_standardization,
+)
 from ..protocol_engine.commands import hash_command_params
 from ..protocol_engine.errors import CommandNotAllowedError
 from ..protocol_engine.types import PostRunHardwareState
@@ -72,28 +78,6 @@ class RunOrchestrator:
             raise CommandNotAllowedError(
                 "failed command id should be supplied with a FIXIT command."
             )
-
-        request = slot_standardization.standardize_command(
-            request, self.state_view.config.robot_type
-        )
-        # create a method create_command_id in PE
-        command_id = self._protocol_engine._model_utils.generate_id()
-        if request.intent in (
-            CommandIntent.SETUP,
-            CommandIntent.FIXIT,
-        ):
-            request_hash = None
-        else:
-            request_hash = hash_command_params.hash_protocol_command_params(
-                create=request,
-                last_hash=self._state_store.commands.get_latest_protocol_command_hash(),
-            )
-
-        command_created_at = self._protocol_engine._model_utils.get_timestamp()
-
-        command_to_queue = CommandQueue(
-
-        )
 
         # pass the failed_command_id somewhere
         if request.intent == CommandIntent.SETUP:
