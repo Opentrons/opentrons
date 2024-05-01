@@ -41,12 +41,12 @@ class PossibleSlotContents(enum.Enum):
     def __str__(self) -> str:
         """Return a string representation of the slot content."""
         return f"{self.name.replace('_', ' ')}"
-    
+
     @classmethod
     def all(cls) -> typing.List["PossibleSlotContents"]:
         """Return all possible slot contents."""
         return list(cls)
-    
+
     @property
     def modules(self) -> typing.List["PossibleSlotContents"]:
         """Return the modules."""
@@ -56,9 +56,9 @@ class PossibleSlotContents(enum.Enum):
             PossibleSlotContents.TEMPERATURE_MODULE,
             PossibleSlotContents.HEATER_SHAKER_MODULE,
         ]
-    
+
     @property
-    def staging_areas (self) -> typing.List["PossibleSlotContents"]:
+    def staging_areas(self) -> typing.List["PossibleSlotContents"]:
         """Return the staging areas."""
         return [
             PossibleSlotContents.STAGING_AREA,
@@ -66,7 +66,7 @@ class PossibleSlotContents(enum.Enum):
             PossibleSlotContents.STAGING_AREA_WITH_WASTE_CHUTE_NO_COVER,
             PossibleSlotContents.STAGING_AREA_WITH_MAGNETIC_BLOCK,
         ]
-    
+
     @property
     def waste_chutes(self) -> typing.List["PossibleSlotContents"]:
         """Return the waste chutes."""
@@ -77,21 +77,25 @@ class PossibleSlotContents(enum.Enum):
             PossibleSlotContents.STAGING_AREA_WITH_WASTE_CHUTE_NO_COVER,
         ]
 
+    def is_one_of(self, contents: typing.List["PossibleSlotContents"]) -> bool:
+        """Return True if the slot contains one of the contents."""
+        return any([self is content for content in contents])
+
     def is_a_module(self) -> bool:
         """Return True if the slot contains a module."""
-        return any([self is module for module in self.modules])
-    
+        return self.is_one_of(self.modules)
+
     def is_module_or_trash_bin(self) -> bool:
         """Return True if the slot contains a module or trash bin."""
-        return self.is_a_module() or self is PossibleSlotContents.TRASH_BIN
+        return self.is_one_of(self.modules + [PossibleSlotContents.TRASH_BIN])
 
     def is_a_staging_area(self) -> bool:
         """Return True if the slot contains a staging area."""
-        return any([self is staging_area for staging_area in self.staging_areas])
+        return self.is_one_of(self.staging_areas)
 
     def is_a_waste_chute(self) -> bool:
         """Return True if the slot contains a waste chute."""
-        return any([self is waste_chute for waste_chute in self.waste_chutes])
+        return self.is_one_of(self.waste_chutes)
 
 
 @dataclasses.dataclass
@@ -148,7 +152,7 @@ class Row:
     def __len__(self) -> int:
         """Return the number of slots in the row."""
         return len(self.slots)
-    
+
     def update_slot(self, slot: Slot) -> None:
         """Update the slot in the row."""
         setattr(self, f"col{slot.col}", slot)
@@ -176,7 +180,7 @@ class Column:
 
     def slot_by_row(self, name: RowName) -> Slot:
         """Return the slot by name."""
-        return getattr(self, f"{name}")
+        return getattr(self, f"{name}")  # type: ignore
 
     def number_of(self, contents: PossibleSlotContents) -> int:
         """Return the number of slots with the contents."""
@@ -235,7 +239,7 @@ class DeckConfiguration:
             for slot in self.slots
             for other_slot in other.slots
         )
-    
+
     @classmethod
     def from_cols(cls, col1: Column, col2: Column, col3: Column) -> "DeckConfiguration":
         """Create a deck configuration from columns."""
@@ -245,7 +249,7 @@ class DeckConfiguration:
             c=Row("c", col1.c, col2.c, col3.c),
             d=Row("d", col1.d, col2.d, col3.d),
         )
-    
+
     @property
     def rows(self) -> typing.List[Row]:
         """Return the rows of the deck."""
