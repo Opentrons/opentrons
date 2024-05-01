@@ -122,10 +122,10 @@ def a_column(
     )
 
 
-def _above_or_below_is_module_or_trash(col: Column, hs_slot: Slot) -> bool:
-    """Return True if the deck has a module above or below the heater shaker."""
-    above = col.slot_above(hs_slot)
-    below = col.slot_below(hs_slot)
+def _above_or_below_is_module_or_trash(col: Column, slot: Slot) -> bool:
+    """Return True if the deck has a module above or below the specified slot."""
+    above = col.slot_above(slot)
+    below = col.slot_below(slot)
 
     return (above is not None and above.contents.is_module_or_trash_bin()) or (
         below is not None and below.contents.is_module_or_trash_bin()
