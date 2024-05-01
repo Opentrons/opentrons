@@ -12,13 +12,14 @@ from fastapi import (
     File,
     HTTPException,
 )
+from pathlib import Path
 
 from .models import EnableOEMMode
 from ...settings import SystemServerSettings, get_settings, save_settings
 
 
 # regex to sanitize the filename
-FILENAME_REGEX = re.compile(r'[^a-zA-Z0-9.]')
+FILENAME_REGEX = re.compile(r"[^a-zA-Z0-9-.]")
 
 
 oem_mode_router = APIRouter()
@@ -121,7 +122,8 @@ async def upload_splash_image(
             os.unlink(settings.oem_mode_splash_custom)
 
         # sanitize the filename
-        filename = FILENAME_REGEX.sub("_", file.filename)
+        sanatized_filename = FILENAME_REGEX.sub("_", file.filename)
+        filename = f"{Path(sanatized_filename).stem}.{content_type}"
 
         # file is valid, save to final location
         filepath = f"{settings.persistence_directory}/{filename}"
