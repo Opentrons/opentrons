@@ -8291,7 +8291,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8302,7 +8302,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 466.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8399,7 +8399,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8410,7 +8410,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 402.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8507,7 +8507,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8518,7 +8518,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 466.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8615,7 +8615,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8626,7 +8626,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 402.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8723,7 +8723,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8734,7 +8734,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 466.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8831,7 +8831,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8842,7 +8842,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 402.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -8939,7 +8939,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -8950,7 +8950,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 466.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -9047,7 +9047,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9058,7 +9058,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 402.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -9155,7 +9155,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9166,7 +9166,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 466.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -9263,7 +9263,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9274,7 +9274,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 402.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -9371,7 +9371,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9382,7 +9382,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 466.25,
           "y": 257.0,
           "z": 40.0
         }
@@ -9479,7 +9479,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9490,7 +9490,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 402.25,
           "y": 257.0,
           "z": 40.0
         }
