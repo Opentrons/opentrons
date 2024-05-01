@@ -2714,6 +2714,7 @@
             "class": "AttributeError",
             "name": "pair_with",
             "obj": "P300 Single-Channel GEN2 on left mount",
+<<<<<<< HEAD
 <<<<<<< HEAD:app-testing/tests/__snapshots__/analyses_snapshot_test/test_analysis_snapshot[d6026e11c5][OT2_X_v2_7_P300S_TwinningError].json
 <<<<<<< HEAD:app-testing/tests/__snapshots__/analyses_snapshot_test/test_analysis_snapshot[d6026e11c5][OT2_X_v2_7_P300S_TwinningError].json
             "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_X_v2_7_P300S_TwinningError.py\", line 23, in run\n"
@@ -2723,6 +2724,9 @@
 =======
             "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_P300S_Twinning_Error.py\", line 23, in run\n"
 >>>>>>> f4443ad9d0 (fix(app-testing): snapshot failure capture (#14756)):app-testing/tests/__snapshots__/analyses_snapshot_test/test_analysis_snapshot[78960c4c8e][OT2_P300S_Twinning_Error].json
+=======
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_X_v2_7_P300S_TwinningError.py\", line 23, in run\n"
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           },
           "errorType": "PythonException",
           "wrappedErrors": []

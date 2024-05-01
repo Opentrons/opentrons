@@ -9496,7 +9496,11 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
+<<<<<<< HEAD
         "alternateDropLocation": true,
+=======
+        "alternateDropLocation": false,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9507,7 +9511,11 @@
       },
       "result": {
         "position": {
+<<<<<<< HEAD
           "x": 466.25,
+=======
+          "x": 434.25,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           "y": 257.0,
           "z": 40.0
         }
@@ -9629,7 +9637,11 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
+<<<<<<< HEAD
         "alternateDropLocation": true,
+=======
+        "alternateDropLocation": false,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9640,7 +9652,11 @@
       },
       "result": {
         "position": {
+<<<<<<< HEAD
           "x": 402.25,
+=======
+          "x": 434.25,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           "y": 257.0,
           "z": 40.0
         }
@@ -9762,7 +9778,11 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
+<<<<<<< HEAD
         "alternateDropLocation": true,
+=======
+        "alternateDropLocation": false,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9773,7 +9793,11 @@
       },
       "result": {
         "position": {
+<<<<<<< HEAD
           "x": 466.25,
+=======
+          "x": 434.25,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           "y": 257.0,
           "z": 40.0
         }
@@ -9895,7 +9919,11 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
+<<<<<<< HEAD
         "alternateDropLocation": true,
+=======
+        "alternateDropLocation": false,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -9906,7 +9934,11 @@
       },
       "result": {
         "position": {
+<<<<<<< HEAD
           "x": 402.25,
+=======
+          "x": 434.25,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           "y": 257.0,
           "z": 40.0
         }
@@ -10028,7 +10060,11 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
+<<<<<<< HEAD
         "alternateDropLocation": true,
+=======
+        "alternateDropLocation": false,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -10039,7 +10075,11 @@
       },
       "result": {
         "position": {
+<<<<<<< HEAD
           "x": 466.25,
+=======
+          "x": 434.25,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           "y": 257.0,
           "z": 40.0
         }
@@ -10161,7 +10201,11 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
+<<<<<<< HEAD
         "alternateDropLocation": true,
+=======
+        "alternateDropLocation": false,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -10172,7 +10216,11 @@
       },
       "result": {
         "position": {
+<<<<<<< HEAD
           "x": 402.25,
+=======
+          "x": 434.25,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           "y": 257.0,
           "z": 40.0
         }
@@ -10294,7 +10342,11 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
+<<<<<<< HEAD
         "alternateDropLocation": true,
+=======
+        "alternateDropLocation": false,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -10305,7 +10357,11 @@
       },
       "result": {
         "position": {
+<<<<<<< HEAD
           "x": 466.25,
+=======
+          "x": 434.25,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           "y": 257.0,
           "z": 40.0
         }
@@ -10427,7 +10483,11 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
+<<<<<<< HEAD
         "alternateDropLocation": true,
+=======
+        "alternateDropLocation": false,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -10438,7 +10498,11 @@
       },
       "result": {
         "position": {
+<<<<<<< HEAD
           "x": 402.25,
+=======
+          "x": 434.25,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           "y": 257.0,
           "z": 40.0
         }
@@ -10560,7 +10624,11 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
+<<<<<<< HEAD
         "alternateDropLocation": true,
+=======
+        "alternateDropLocation": false,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -10571,7 +10639,11 @@
       },
       "result": {
         "position": {
+<<<<<<< HEAD
           "x": 466.25,
+=======
+          "x": 434.25,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           "y": 257.0,
           "z": 40.0
         }
@@ -10693,7 +10765,11 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
+<<<<<<< HEAD
         "alternateDropLocation": true,
+=======
+        "alternateDropLocation": false,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -10704,7 +10780,11 @@
       },
       "result": {
         "position": {
+<<<<<<< HEAD
           "x": 402.25,
+=======
+          "x": 434.25,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           "y": 257.0,
           "z": 40.0
         }
@@ -10826,7 +10906,11 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
+<<<<<<< HEAD
         "alternateDropLocation": true,
+=======
+        "alternateDropLocation": false,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -10837,7 +10921,11 @@
       },
       "result": {
         "position": {
+<<<<<<< HEAD
           "x": 466.25,
+=======
+          "x": 434.25,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           "y": 257.0,
           "z": 40.0
         }
@@ -10959,7 +11047,11 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashB3",
+<<<<<<< HEAD
         "alternateDropLocation": true,
+=======
+        "alternateDropLocation": false,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -10970,7 +11062,11 @@
       },
       "result": {
         "position": {
+<<<<<<< HEAD
           "x": 402.25,
+=======
+          "x": 434.25,
+>>>>>>> 929e01421e (fix(test): snapshot renaming (#15038))
           "y": 257.0,
           "z": 40.0
         }
