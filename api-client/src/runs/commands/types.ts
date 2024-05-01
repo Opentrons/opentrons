@@ -34,6 +34,12 @@ export interface CommandsData {
   links: CommandsLinks
 }
 
+export interface CommandsAsPreSerializedListData {
+  data: string[]
+  meta: GetCommandsParams & { totalLength: number }
+  links: CommandsLinks
+}
+
 export interface CreateCommandParams {
   waitUntilComplete?: boolean
   timeout?: number

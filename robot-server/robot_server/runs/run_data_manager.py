@@ -112,6 +112,10 @@ class RunNotCurrentError(ValueError):
     """Error raised when a requested run is not the current run."""
 
 
+class PreSerializedCommandsNotAvailableError(LookupError):
+    """Error raised when a run's commands are not available as pre-serialized list of commands."""
+
+
 class RunDataManager:
     """Collaborator to manage current and historical run data.
 
@@ -290,10 +294,16 @@ class RunDataManager:
         self._run_store.remove(run_id=run_id)
 
     async def update(self, run_id: str, current: Optional[bool]) -> Union[Run, BadRun]:
-        """Get and potentially archive a run.
+        """Get and potentially archive the current run.
 
         Args:
             run_id: The run to get and maybe archive.
+            current: Whether to mark the run as current or not.
+                     If `current` set to False, then the run is 'un-current'ed by
+                     stopping the run, saving the final run data to the run store,
+                     and clearing the engine and runner.
+                     If 'current' is True or not specified, we simply fetch the run's
+                     data from memory and database.
 
         Returns:
             The updated run.
@@ -319,6 +329,9 @@ class RunDataManager:
                 summary=state_summary,
                 commands=commands,
                 run_time_parameters=parameters,
+            )
+            await self._runs_publisher.publish_pre_serialized_commands_notification(
+                run_id
             )
         else:
             state_summary = self._engine_store.engine.state_view.get_summary()
@@ -386,6 +399,17 @@ class RunDataManager:
             )
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
+
+    def get_all_commands_as_preserialized_list(self, run_id: str) -> List[str]:
+        """Get all commands of a run in a serialized json list."""
+        if (
+            run_id == self._engine_store.current_run_id
+            and not self._engine_store.engine.state_view.commands.get_is_terminal()
+        ):
+            raise PreSerializedCommandsNotAvailableError(
+                "Pre-serialized commands are only available after a run has ended."
+            )
+        return self._run_store.get_all_commands_as_preserialized_list(run_id)
 
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         if run_id == self._engine_store.current_run_id:

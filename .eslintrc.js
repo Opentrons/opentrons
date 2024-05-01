@@ -52,6 +52,7 @@ module.exports = {
               'useLastRunCommandKey',
               'useCurrentMaintenanceRun',
               'useDeckConfigurationQuery',
+              'useAllCommandsAsPreSerializedList',
             ],
             message:
               'The HTTP hook is deprecated. Utilize the equivalent notification wrapper (useNotifyX) instead.',

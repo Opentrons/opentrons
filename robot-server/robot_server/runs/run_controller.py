@@ -13,6 +13,8 @@ from .action_models import RunAction, RunActionType
 
 from opentrons.protocol_engine.types import DeckConfigurationType
 
+from robot_server.service.notifications import RunsPublisher
+
 log = logging.getLogger(__name__)
 
 
@@ -21,7 +23,7 @@ class RunActionNotAllowedError(RoboticsInteractionError):
 
 
 class RunController:
-    """An interface to manage the side-effects of requested run actions."""
+    """An interface to manage the side effects of requested run actions."""
 
     def __init__(
         self,
@@ -29,11 +31,13 @@ class RunController:
         task_runner: TaskRunner,
         engine_store: EngineStore,
         run_store: RunStore,
+        runs_publisher: RunsPublisher,
     ) -> None:
         self._run_id = run_id
         self._task_runner = task_runner
         self._engine_store = engine_store
         self._run_store = run_store
+        self._runs_publisher = runs_publisher
 
     def create_action(
         self,
@@ -107,4 +111,7 @@ class RunController:
             summary=result.state_summary,
             commands=result.commands,
             run_time_parameters=result.parameters,
+        )
+        await self._runs_publisher.publish_pre_serialized_commands_notification(
+            self._run_id
         )
