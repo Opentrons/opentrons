@@ -89,17 +89,17 @@ Returning Tips
 Tips used in a dry run should be reusable — for another dry run, if nothing else. It doesn't make sense to dispose of them in a trash container, unless you specifically need to test movement to the trash. You can choose whether to use :py:meth:`.drop_tip` or :py:meth:`.return_tip` based on the value of ``protocol.params.dry_run``. If the protocol doesn't have too many tip drop actions, you can use an ``if`` statement each time::
 
     if protocol.params.dry_run == True:
-        pipette.drop_tip()
-    else:
         pipette.return_tip()
+    else:
+        pipette.drop_tip()
 
 However, repeating this block every time you handle tips could significantly clutter your code. Instead, you could define it as a function::
 
     def return_or_drop(pipette):
         if protocol.params.dry_run == True:
-            pipette.drop_tip()
-        else:
             pipette.return_tip()
+        else:
+            pipette.drop_tip()
 
 Then call that function throughout your protocol::
 
