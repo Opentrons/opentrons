@@ -1,4 +1,5 @@
 import { POST, request } from '../request'
+import { sanitizeFileName } from './utils'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 
@@ -6,8 +7,9 @@ export function createSplash(
   config: HostConfig,
   file: File
 ): ResponsePromise<void> {
-  // sanitize file name to ensure no spaces
-  const renamedFile = new File([file], file.name.replace(' ', '_'), {
+  // sanitize file name to ensure no spaces or special characters
+  const newFileName = sanitizeFileName(file.name)
+  const renamedFile = new File([file], newFileName, {
     type: 'image/png',
   })
 
