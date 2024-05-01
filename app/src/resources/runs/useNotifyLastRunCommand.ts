@@ -1,18 +1,18 @@
 import * as React from 'react'
 
 import { useNotifyService } from '../useNotifyService'
-import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
+import { useLastRunCommand } from '../../organisms/Devices/hooks/useLastRunCommand'
 
-import type { CommandsData } from '@opentrons/api-client'
+import type { CommandsData, RunCommandSummary } from '@opentrons/api-client'
 import type {
   QueryOptionsWithPolling,
   HTTPRefetchFrequency,
 } from '../useNotifyService'
 
-export function useNotifyLastRunCommandKey(
+export function useNotifyLastRunCommand(
   runId: string,
   options: QueryOptionsWithPolling<CommandsData, Error> = {}
-): string | null {
+): RunCommandSummary | null {
   const [refetch, setRefetch] = React.useState<HTTPRefetchFrequency>(null)
 
   useNotifyService({
@@ -21,7 +21,7 @@ export function useNotifyLastRunCommandKey(
     options,
   })
 
-  const httpResponse = useLastRunCommandKey(runId, {
+  const httpResponse = useLastRunCommand(runId, {
     ...options,
     enabled: options?.enabled !== false && refetch != null,
     onSettled: refetch === 'once' ? () => setRefetch(null) : () => null,

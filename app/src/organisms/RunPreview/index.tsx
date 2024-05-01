@@ -21,8 +21,8 @@ import {
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
+  useNotifyLastRunCommand,
   useNotifyAllCommandsAsPreSerializedList,
-  useNotifyLastRunCommandKey,
 } from '../../resources/runs'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
@@ -68,9 +68,9 @@ export const RunPreviewComponent = (
   const nullCheckedCommandsFromQuery =
     commandsFromQuery == null ? robotSideAnalysis?.commands : commandsFromQuery
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
-  const currentRunCommandKey = useNotifyLastRunCommandKey(runId, {
+  const currentRunCommandKey = useNotifyLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
-  })
+  })?.key
   const [
     isCurrentCommandVisible,
     setIsCurrentCommandVisible,
