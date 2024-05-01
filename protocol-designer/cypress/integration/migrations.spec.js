@@ -105,7 +105,9 @@ describe('Protocol fixtures migrate and match snapshots', () => {
         if (migrationModal) {
           if (migrationModal === 'v8.1') {
             cy.get('div')
-              .contains('The default dispense height is now 1mm from the bottom of the well')
+              .contains(
+                'The default dispense height is now 1mm from the bottom of the well'
+              )
               .should('exist')
             cy.get('button').contains('ok', { matchCase: false }).click()
           } else if (migrationModal === 'newLabwareDefs') {
