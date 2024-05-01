@@ -214,11 +214,11 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
                   })}
                 />
                 <FlowRateField
-                 {...propsForFields.blowout_flowRate}
-                 pipetteId={formData.pipette}
-                 flowRateType="blowout"
-                 volume={propsForFields.volume?.value ?? 0}
-                 tiprack={propsForFields.tipRack.value}
+                  {...propsForFields.blowout_flowRate}
+                  pipetteId={formData.pipette}
+                  flowRateType="blowout"
+                  volume={propsForFields.volume?.value ?? 0}
+                  tiprack={propsForFields.tipRack.value}
                 />
                 <BlowoutZOffsetField
                   {...propsForFields.blowout_z_offset}
