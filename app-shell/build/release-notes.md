@@ -19,6 +19,7 @@ Runtime Parameters
 - Available runtime parameters are shown on the protocol details screen.
 - Both the Opentrons App and touchscreen let you enter new parameter values during run setup.
 - The app highlights changed parameter values so you can confirm them before starting the run.
+- The run preview (before the run) and run log (after the run) reflect changes to steps based on your chosen parameter values.
 
 Modules in Deck Configuration
 
