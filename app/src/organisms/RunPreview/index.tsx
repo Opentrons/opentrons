@@ -23,7 +23,7 @@ import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostR
 import {
   useNotifyLastRunCommand,
   useNotifyAllCommandsAsPreSerializedList,
- } from '../../resources/runs'
+} from '../../resources/runs'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
