@@ -638,6 +638,41 @@ def test_command_store_handles_stop_action(
     assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
 
 
+def test_command_store_handles_stop_action_when_awaiting_recovery() -> None:
+    """It should mark the engine as non-gracefully stopped on StopAction."""
+    subject = CommandStore(is_door_open=False, config=_make_config())
+
+    subject.handle_action(
+        PlayAction(
+            requested_at=datetime(year=2021, month=1, day=1), deck_configuration=[]
+        )
+    )
+
+    subject.state.queue_status = QueueStatus.AWAITING_RECOVERY
+
+    subject.handle_action(StopAction())
+
+    assert subject.state == CommandState(
+        command_history=CommandHistory(),
+        queue_status=QueueStatus.PAUSED,
+        run_result=RunResult.STOPPED,
+        run_completed_at=None,
+        is_door_blocking=False,
+        run_error=None,
+        finish_error=None,
+        failed_command=None,
+        command_error_recovery_types={},
+        recovery_target_command_id=None,
+        run_started_at=datetime(year=2021, month=1, day=1),
+        latest_protocol_command_hash=None,
+        stopped_by_estop=False,
+    )
+    assert subject.state.command_history.get_running_command() is None
+    assert subject.state.command_history.get_all_ids() == []
+    assert subject.state.command_history.get_queue_ids() == OrderedSet()
+    assert subject.state.command_history.get_setup_queue_ids() == OrderedSet()
+
+
 def test_command_store_cannot_restart_after_should_stop() -> None:
     """It should reject a play action after finish."""
     subject = CommandStore(is_door_open=False, config=_make_config())
