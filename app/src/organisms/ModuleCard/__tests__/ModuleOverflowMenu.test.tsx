@@ -19,7 +19,7 @@ import {
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 
-import type { HeaterShakerStatus } from '@opentrons/api-client'
+import type { TemperatureStatus } from '@opentrons/api-client'
 
 vi.mock('../../Devices/hooks')
 vi.mock('../../RunTimeControl/hooks')
@@ -543,7 +543,7 @@ describe('ModuleOverflowMenu', () => {
       ...mockHeaterShaker,
       data: {
         ...mockHeaterShaker.data,
-        status: 'heating' as HeaterShakerStatus,
+        temperatureStatus: 'heating' as TemperatureStatus,
       },
     }
     props = {

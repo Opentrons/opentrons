@@ -3,7 +3,12 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
 
-import { MODULE_MODELS_OT2_ONLY } from '@opentrons/shared-data'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  MODULE_MODELS_OT2_ONLY,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { MenuList } from '../../atoms/MenuList'
 import { Tooltip } from '../../atoms/Tooltip'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
@@ -69,8 +74,22 @@ export const ModuleOverflowMenu = (
     isDisabled = true
   }
 
-  const isHeatingOrCooling =
-    module.data.status === 'heating' || module.data.status === 'cooling'
+  let isHeatingOrCooling
+  switch (module.moduleType) {
+    case TEMPERATURE_MODULE_TYPE:
+      isHeatingOrCooling = module.data.status !== 'idle'
+      break
+    case HEATERSHAKER_MODULE_TYPE:
+      isHeatingOrCooling = module.data.temperatureStatus !== 'idle'
+      break
+    case THERMOCYCLER_MODULE_TYPE:
+      isHeatingOrCooling =
+        module.data.lidTemperatureStatus !== 'idle' ||
+        module.data.status !== 'idle'
+      break
+    default:
+      isHeatingOrCooling = false
+  }
 
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
     module,
