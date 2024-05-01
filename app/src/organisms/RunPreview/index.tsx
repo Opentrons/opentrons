@@ -24,7 +24,6 @@ import {
   useNotifyLastRunCommand,
   useNotifyAllCommandsAsPreSerializedList,
  } from '../../resources/runs'
->>>>>>> edge
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
