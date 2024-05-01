@@ -15,9 +15,11 @@ if TYPE_CHECKING:
         DeckSchemaVersion3,
         DeckDefinitionV4,
         DeckSchemaVersion4,
+        DeckDefinitionV5,
+        DeckSchemaVersion5,
     )
 
-DEFAULT_DECK_DEFINITION_VERSION: Final = 4
+DEFAULT_DECK_DEFINITION_VERSION: Final = 5
 
 
 class Offset(NamedTuple):
@@ -36,6 +38,11 @@ CALIBRATION_SQUARE_EDGES: Dict[str, Offset] = {
     "top": Offset(y=CALIBRATION_SQUARE_SIZE * 0.5),
     "bottom": Offset(y=-CALIBRATION_SQUARE_SIZE * 0.5),
 }
+
+
+@overload
+def load(name: str, version: "DeckSchemaVersion5") -> "DeckDefinitionV5":
+    ...
 
 
 @overload

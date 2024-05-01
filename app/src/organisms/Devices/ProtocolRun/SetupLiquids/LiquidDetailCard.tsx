@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import {
@@ -74,7 +73,6 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   } = props
   const trackEvent = useTrackEvent()
   const isOnDevice = useSelector(getIsOnDevice)
-  const { t } = useTranslation('protocol_setup')
 
   const ACTIVE_STYLE = css`
     background-color: ${isOnDevice ? COLORS.blue30 : COLORS.blue10};
@@ -147,8 +145,10 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
             lineHeight={TYPOGRAPHY.lineHeight28}
             color={COLORS.black90}
           >
-            {Object.values(volumeByWell).reduce((prev, curr) => prev + curr, 0)}{' '}
-            {MICRO_LITERS} {t('total_vol')}
+            {Object.values(volumeByWell)
+              .reduce((prev, curr) => prev + curr, 0)
+              .toFixed(1)}{' '}
+            {MICRO_LITERS}
           </StyledText>
         </Flex>
       </Flex>
@@ -240,8 +240,10 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
             fontSize={TYPOGRAPHY.fontSizeH4}
             lineHeight={TYPOGRAPHY.lineHeight20}
           >
-            {Object.values(volumeByWell).reduce((prev, curr) => prev + curr, 0)}{' '}
-            {MICRO_LITERS} {t('total_vol')}
+            {Object.values(volumeByWell)
+              .reduce((prev, curr) => prev + curr, 0)
+              .toFixed(1)}{' '}
+            {MICRO_LITERS}
           </StyledText>
         </Flex>
       </Flex>
@@ -272,7 +274,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                   {well.wellName}
                 </StyledText>
                 <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-                  {well.volume} {MICRO_LITERS}
+                  {well.volume.toFixed(1)} {MICRO_LITERS}
                 </StyledText>
               </Flex>
             )

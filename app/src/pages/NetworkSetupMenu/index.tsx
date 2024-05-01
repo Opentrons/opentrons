@@ -34,13 +34,13 @@ const NetworkSetupOptions = [
   {
     title: 'usb',
     iconName: 'usb' as IconName,
-    description: 'connection_description_usb',
+    description: 'branded:connection_description_usb',
     destinationPath: '/network-setup/usb',
   },
 ]
 
 export function NetworkSetupMenu(): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'branded'])
 
   return (
     <>
@@ -73,7 +73,7 @@ export function NetworkSetupMenu(): JSX.Element {
             color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}
           >
-            {t('network_setup_menu_description')}
+            {t('branded:network_setup_menu_description')}
           </StyledText>
         </Flex>
         <Flex

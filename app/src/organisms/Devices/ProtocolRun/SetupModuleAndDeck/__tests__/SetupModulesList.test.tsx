@@ -3,12 +3,11 @@ import { when } from 'vitest-when'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { renderWithProviders } from '../../../../../__testing-utils__'
-import { STAGING_AREA_RIGHT_SLOT_FIXTURE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
   mockHeaterShaker,
-  mockMagneticBlock,
 } from '../../../../../redux/modules/__fixtures__/index'
 import {
   mockMagneticModuleGen2,
@@ -20,16 +19,17 @@ import { ModuleWizardFlows } from '../../../../ModuleWizardFlows'
 import {
   useIsFlex,
   useModuleRenderInfoForProtocolById,
-  useRunHasStarted,
   useUnmatchedModulesForProtocol,
   useRunCalibrationStatus,
+  useRobot,
 } from '../../../hooks'
-import { MultipleModulesModal } from '../MultipleModulesModal'
+import { OT2MultipleModulesHelp } from '../OT2MultipleModulesHelp'
 import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import { SetupModulesList } from '../SetupModulesList'
 import { LocationConflictModal } from '../LocationConflictModal'
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import type { DiscoveredRobot } from '../../../../../redux/discovery/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('../../../hooks')
@@ -37,7 +37,7 @@ vi.mock('../LocationConflictModal')
 vi.mock('../UnMatchedModuleWarning')
 vi.mock('../../../../ModuleCard/ModuleSetupModal')
 vi.mock('../../../../ModuleWizardFlows')
-vi.mock('../MultipleModulesModal')
+vi.mock('../OT2MultipleModulesHelp')
 vi.mock('../../../../../resources/runs')
 vi.mock('../../../../../redux/config')
 
@@ -92,6 +92,9 @@ describe('SetupModulesList', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
     }
+    when(vi.mocked(useRobot))
+      .calledWith(ROBOT_NAME)
+      .thenReturn({ robotModel: FLEX_ROBOT_TYPE } as DiscoveredRobot)
     mockChainLiveCommands = vi.fn()
     mockChainLiveCommands.mockResolvedValue(null)
     vi.mocked(ModuleSetupModal).mockReturnValue(<div>mockModuleSetupModal</div>)
@@ -116,15 +119,6 @@ describe('SetupModulesList', () => {
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
-  })
-
-  it('should render the list view headers', () => {
-    when(useRunHasStarted).calledWith(RUN_ID).thenReturn(false)
-    when(useModuleRenderInfoForProtocolById).calledWith(RUN_ID).thenReturn({})
-    render(props)
-    screen.getByText('Module')
-    screen.getByText('Location')
-    screen.getByText('Status')
   })
 
   it('should render a magnetic module that is connected', () => {
@@ -301,8 +295,13 @@ describe('SetupModulesList', () => {
     screen.getByText('Connected')
   })
 
-  it('should render the MoaM component when Moam is attached', () => {
-    vi.mocked(MultipleModulesModal).mockReturnValue(<div>mock Moam modal</div>)
+  it('should render the MoaM component when Moam is attached and robot is OT2', () => {
+    when(vi.mocked(useRobot))
+      .calledWith(ROBOT_NAME)
+      .thenReturn({ robotModel: OT2_ROBOT_TYPE } as DiscoveredRobot)
+    vi.mocked(OT2MultipleModulesHelp).mockReturnValue(
+      <div>mock Moam modal</div>
+    )
     when(useUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
@@ -355,8 +354,6 @@ describe('SetupModulesList', () => {
         },
       })
     render(props)
-    const help = screen.getByTestId('Banner_close-button')
-    fireEvent.click(help)
     screen.getByText('mock Moam modal')
   })
   it('should render the module unmatching banner', () => {
@@ -408,37 +405,5 @@ describe('SetupModulesList', () => {
     const moduleSetup = screen.getByText('View setup instructions')
     fireEvent.click(moduleSetup)
     screen.getByText('mockModuleSetupModal')
-  })
-  it('should render a magnetic block with a conflicted fixture', () => {
-    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
-    vi.mocked(useModuleRenderInfoForProtocolById).mockReturnValue({
-      [mockMagneticBlock.id]: {
-        moduleId: mockMagneticBlock.id,
-        x: MOCK_MAGNETIC_MODULE_COORDS[0],
-        y: MOCK_MAGNETIC_MODULE_COORDS[1],
-        z: MOCK_MAGNETIC_MODULE_COORDS[2],
-        moduleDef: {
-          id: 'magneticBlock_id',
-          model: mockMagneticBlock.moduleModel,
-          moduleType: mockMagneticBlock.moduleType,
-          displayName: mockMagneticBlock.displayName,
-        },
-        nestedLabwareDef: null,
-        nestedLabwareId: null,
-        protocolLoadOrder: 0,
-        slotName: 'B3',
-        attachedModuleMatch: null,
-        conflictedFixture: {
-          cutoutId: 'cutoutB3',
-          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
-        },
-      },
-    } as any)
-    render(props)
-    screen.getByText('No USB connection required')
-    screen.getByText('Location conflict')
-    screen.getByText('Magnetic Block GEN1')
-    fireEvent.click(screen.getByRole('button', { name: 'Resolve' }))
-    screen.getByText('mock location conflict modal')
   })
 })

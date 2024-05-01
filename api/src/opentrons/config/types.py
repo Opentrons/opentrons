@@ -2,7 +2,7 @@ from enum import Enum
 from dataclasses import dataclass, asdict, fields
 from typing import Dict, Tuple, TypeVar, Generic, List, cast, Optional
 from typing_extensions import TypedDict, Literal
-from opentrons.hardware_control.types import OT3AxisKind
+from opentrons.hardware_control.types import OT3AxisKind, InstrumentProbeType
 
 
 class AxisDict(TypedDict):
@@ -139,7 +139,7 @@ class LiquidProbeSettings:
     aspirate_while_sensing: bool
     auto_zero_sensor: bool
     num_baseline_reads: int
-    data_file: Optional[str]
+    data_files: Optional[Dict[InstrumentProbeType, str]]
 
 
 @dataclass(frozen=True)

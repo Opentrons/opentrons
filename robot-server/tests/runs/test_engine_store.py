@@ -1,12 +1,12 @@
 """Tests for the EngineStore interface."""
 from datetime import datetime
-from pathlib import Path
 import pytest
 from decoy import Decoy, matchers
 
 from opentrons_shared_data import get_shared_data_root
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI, API
 from opentrons.hardware_control.types import EstopStateNotification, EstopState
@@ -23,7 +23,7 @@ from robot_server.runs.engine_store import (
     EngineStore,
     EngineConflictError,
     NoRunnerEnginePairError,
-    get_estop_listener,
+    handle_estop_event,
 )
 
 
@@ -33,7 +33,7 @@ def mock_notify_publishers() -> None:
 
 
 @pytest.fixture
-def subject(decoy: Decoy, hardware_api: HardwareControlAPI) -> EngineStore:
+async def subject(decoy: Decoy, hardware_api: HardwareControlAPI) -> EngineStore:
     """Get a EngineStore test subject."""
     return EngineStore(
         hardware_api=hardware_api,
@@ -45,7 +45,7 @@ def subject(decoy: Decoy, hardware_api: HardwareControlAPI) -> EngineStore:
 
 
 @pytest.fixture
-async def json_protocol_source(tmp_path: Path) -> ProtocolSource:
+async def json_protocol_source() -> ProtocolSource:
     """Get a protocol source fixture."""
     simple_protocol = (
         get_shared_data_root() / "protocol" / "fixtures" / "6" / "simpleV6.json"
@@ -70,7 +70,6 @@ async def test_create_engine(subject: EngineStore) -> None:
 
 
 async def test_create_engine_with_protocol(
-    decoy: Decoy,
     subject: EngineStore,
     json_protocol_source: ProtocolSource,
 ) -> None:
@@ -311,22 +310,30 @@ async def test_estop_callback(
     """The callback should stop an active engine."""
     engine_store = decoy.mock(cls=EngineStore)
 
-    subject = get_estop_listener(engine_store=engine_store)
-
-    decoy.when(engine_store.current_run_id).then_return(None, "fake_run_id")
-
     disengage_event = EstopStateNotification(
         old_state=EstopState.PHYSICALLY_ENGAGED, new_state=EstopState.LOGICALLY_ENGAGED
     )
-
-    subject(disengage_event)
-
     engage_event = EstopStateNotification(
         old_state=EstopState.LOGICALLY_ENGAGED, new_state=EstopState.PHYSICALLY_ENGAGED
     )
 
-    subject(engage_event)
+    decoy.when(engine_store.current_run_id).then_return(None)
+    await handle_estop_event(engine_store, disengage_event)
+    decoy.verify(
+        engine_store.engine.estop(),
+        ignore_extra_args=True,
+        times=0,
+    )
+    decoy.verify(
+        await engine_store.engine.finish(),
+        ignore_extra_args=True,
+        times=0,
+    )
 
-    subject(engage_event)
-
-    decoy.verify(engine_store.engine.estop(maintenance_run=False), times=1)
+    decoy.when(engine_store.current_run_id).then_return("fake-run-id")
+    await handle_estop_event(engine_store, engage_event)
+    decoy.verify(
+        engine_store.engine.estop(),
+        await engine_store.engine.finish(error=matchers.IsA(EStopActivatedError)),
+        times=1,
+    )

@@ -32,6 +32,7 @@ export const mockPausedRun: RunData = {
   pipettes: [],
   labware: [],
   modules: [],
+  runTimeParameters: [],
 }
 
 export const mockRunningRun: RunData = {
@@ -61,6 +62,7 @@ export const mockRunningRun: RunData = {
   pipettes: [],
   labware: [],
   modules: [],
+  runTimeParameters: [],
 }
 
 export const mockRunResponse: Run = {

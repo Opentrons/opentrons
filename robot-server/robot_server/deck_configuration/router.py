@@ -7,7 +7,7 @@ from typing import Union
 import fastapi
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
-from opentrons_shared_data.deck.dev_types import DeckDefinitionV4
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV5
 
 from robot_server.errors.error_responses import ErrorBody
 from robot_server.hardware import get_deck_definition
@@ -64,7 +64,7 @@ async def put_deck_configuration(  # noqa: D103
     request_body: RequestModel[models.DeckConfigurationRequest],
     store: DeckConfigurationStore = fastapi.Depends(get_deck_configuration_store),
     now: datetime = fastapi.Depends(get_current_time),
-    deck_definition: DeckDefinitionV4 = fastapi.Depends(get_deck_definition),
+    deck_definition: DeckDefinitionV5 = fastapi.Depends(get_deck_definition),
 ) -> PydanticResponse[
     Union[
         SimpleBody[models.DeckConfigurationResponse],

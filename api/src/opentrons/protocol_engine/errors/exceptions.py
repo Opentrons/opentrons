@@ -505,6 +505,32 @@ class MustHomeError(ProtocolEngineError):
         super().__init__(ErrorCodes.POSITION_UNKNOWN, message, details, wrapping)
 
 
+class CommandNotAllowedError(ProtocolEngineError):
+    """Raised when adding a command with bad data."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CommandNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class FixitCommandNotAllowedError(ProtocolEngineError):
+    """Raised when adding a fixit command to a non-recoverable engine."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a SetupCommandNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class SetupCommandNotAllowedError(ProtocolEngineError):
     """Raised when adding a setup command to a non-idle/non-paused engine."""
 
@@ -515,6 +541,19 @@ class SetupCommandNotAllowedError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a SetupCommandNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class ResumeFromRecoveryNotAllowedError(ProtocolEngineError):
+    """Raised when attempting to resume a run from recovery that has a fixit command in the queue."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ResumeFromRecoveryNotAllowedError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -951,16 +990,18 @@ class InvalidAxisForRobotType(ProtocolEngineError):
 
 
 class EStopActivatedError(ProtocolEngineError):
-    """Raised when an operation's required pipette tip is not attached."""
+    """Represents an E-stop event."""
 
     def __init__(
         self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an EStopActivatedError."""
-        super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, details, wrapping)
+        super().__init__(
+            code=ErrorCodes.E_STOP_ACTIVATED,
+            message="E-stop activated.",
+            wrapping=wrapping,
+        )
 
 
 class NotSupportedOnRobotType(ProtocolEngineError):

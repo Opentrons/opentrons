@@ -544,6 +544,7 @@ def sensor_node_for_pipette(mount: OT3Mount) -> PipetteProbeTarget:
 _instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {
     InstrumentProbeType.PRIMARY: SensorId.S0,
     InstrumentProbeType.SECONDARY: SensorId.S1,
+    InstrumentProbeType.BOTH: SensorId.BOTH,
 }
 
 

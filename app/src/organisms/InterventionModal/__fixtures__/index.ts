@@ -188,6 +188,7 @@ export const mockRunData: RunData = {
   pipettes: [],
   labware: [mockLabwareOnModule, mockLabwareOnSlot, mockLabwareOffDeck],
   modules: [mockModule],
+  runTimeParameters: [],
 }
 
 export const mockLabwareRenderInfo = [

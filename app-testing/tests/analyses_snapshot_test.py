@@ -1,15 +1,18 @@
 import json
 import os
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Optional
 
 import pytest
 from automation.data.protocol import Protocol
-from automation.data.protocols import Protocols
+from automation.data.protocol_registry import ProtocolRegistry
 from citools.generate_analyses import ANALYSIS_SUFFIX, generate_analyses_from_test
+from rich.console import Console
 from syrupy.extensions.json import JSONSnapshotExtension
 from syrupy.filters import props
 from syrupy.types import SerializableData
+
+console = Console()
 
 # not included in the snapshot
 exclude = props(
@@ -38,19 +41,11 @@ def snapshot_json(snapshot_exclude: SerializableData) -> SerializableData:
     return snapshot_exclude.with_defaults(extension_class=JSONSnapshotExtension)
 
 
-def what_protocols() -> List[Protocol]:
-    protocols: Protocols = Protocols()
-    protocols_to_test: str = os.getenv("APP_ANALYSIS_TEST_PROTOCOLS", "upload_protocol")
-    tests: list[(Protocol)] = []
-    for protocol_name in [x.strip() for x in protocols_to_test.split(",")]:
-        tests.append((getattr(protocols, protocol_name)))
-    return tests
-
-
 @pytest.fixture(scope="session")
 def analyze_protocols() -> None:
     """Use the environment variable to select which protocols are used in the test."""
-    tests = what_protocols()
+    protocol_registry: ProtocolRegistry = ProtocolRegistry()
+    tests = protocol_registry.protocols_to_test
     # Generate target analyses
     if not tests:
         exit("No protocols to test.")
@@ -86,16 +81,17 @@ def sort_all_lists(d: Any, sort_key: str | None = None) -> Any:
         return d
 
 
-# Read in what protocols to test from the environment variable
-# APP_ANALYSIS_TEST_PROTOCOLS
-# Generate all the analyses for the target version of the Opentrons repository
-# Compare the analyses to the snapshots
+protocol_registry: ProtocolRegistry = ProtocolRegistry()
+protocols_to_test: Optional[List[Protocol]] = protocol_registry.protocols_to_test
+
+if not protocols_to_test:
+    exit("No protocols to test.")
 
 
 @pytest.mark.parametrize(
     "protocol",
-    what_protocols(),
-    ids=[x.short_sha for x in what_protocols()],
+    protocols_to_test,
+    ids=[x.short_sha for x in protocols_to_test],
 )
 def test_analysis_snapshot(analyze_protocols: None, snapshot_json: SerializableData, protocol: Protocol) -> None:
     target = os.getenv("TARGET")
@@ -104,13 +100,14 @@ def test_analysis_snapshot(analyze_protocols: None, snapshot_json: SerializableD
     analysis = Path(
         Path(__file__).parent.parent,
         "analysis_results",
-        f"{protocol.file_name}_{target}_{ANALYSIS_SUFFIX}",
+        f"{protocol.file_stem}_{target}_{ANALYSIS_SUFFIX}",
     )
+    console.print(f"Analysis file: {analysis}")
     if analysis.exists():
         with open(analysis, "r") as f:
             data = json.load(f)
-            print(f"Test name: {protocol.file_name}")
+            print(f"Test name: {protocol.file_stem}")
             data = sort_all_lists(data, sort_key="name")
-        assert snapshot_json(name=protocol.file_name) == data
+        assert snapshot_json(name=protocol.file_stem) == data
     else:
         raise AssertionError(f"Analysis file not found: {analysis}")

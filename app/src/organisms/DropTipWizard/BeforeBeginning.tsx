@@ -24,30 +24,20 @@ import {
 
 import { SmallButton, MediumButton } from '../../atoms/buttons'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-// import { NeedHelpLink } from '../CalibrationPanels'
 
 import blowoutVideo from '../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
 import droptipVideo from '../../assets/videos/droptip-wizard/Drop-tip.webm'
-
-// TODO: get help link article URL
-// const NEED_HELP_URL = ''
 
 interface BeforeBeginningProps {
   setShouldDispenseLiquid: (shouldDispenseLiquid: boolean) => void
   createdMaintenanceRunId: string | null
   isOnDevice: boolean
-  isRobotMoving: boolean
 }
 
 export const BeforeBeginning = (
   props: BeforeBeginningProps
 ): JSX.Element | null => {
-  const {
-    setShouldDispenseLiquid,
-    createdMaintenanceRunId,
-    isOnDevice,
-    isRobotMoving,
-  } = props
+  const { setShouldDispenseLiquid, createdMaintenanceRunId, isOnDevice } = props
   const { i18n, t } = useTranslation(['drop_tip_wizard', 'shared'])
   const [flowType, setFlowType] = React.useState<
     'liquid_and_tips' | 'only_tips' | null
@@ -57,16 +47,8 @@ export const BeforeBeginning = (
     setShouldDispenseLiquid(flowType === 'liquid_and_tips')
   }
 
-  if (isRobotMoving || createdMaintenanceRunId == null) {
-    return (
-      <InProgressModal
-        description={
-          createdMaintenanceRunId == null
-            ? t('getting_ready')
-            : t('stand_back_exiting')
-        }
-      />
-    )
+  if (createdMaintenanceRunId == null) {
+    return <InProgressModal description={t('getting_ready')} />
   }
 
   if (isOnDevice) {

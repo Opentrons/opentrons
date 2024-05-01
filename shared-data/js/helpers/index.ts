@@ -1,8 +1,8 @@
 import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
-import standardOt2DeckDef from '../../deck/definitions/4/ot2_standard.json'
-import standardFlexDeckDef from '../../deck/definitions/4/ot3_standard.json'
+import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
+import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import type {
   DeckDefinition,
   LabwareDefinition2,
@@ -27,6 +27,7 @@ export * from './getLoadedLabwareDefinitionsByUri'
 export * from './getOccludedSlotCountForModule'
 export * from './labwareInference'
 export * from './getAddressableAreasInProtocol'
+export * from './getFlexSurroundingSlots'
 export * from './getSimplestFlexDeckConfig'
 export * from './formatRunTimeParameterDefaultValue'
 export * from './formatRunTimeParameterValue'

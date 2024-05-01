@@ -33,7 +33,7 @@ export function RunFailedModal({
   setShowRunFailedModal,
   errors,
 }: RunFailedModalProps): JSX.Element | null {
-  const { t, i18n } = useTranslation(['run_details', 'shared'])
+  const { t, i18n } = useTranslation(['run_details', 'shared', 'branded'])
   const history = useHistory()
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
@@ -106,7 +106,7 @@ export function RunFailedModal({
               word-break: break-word;
             `}
           >
-            {t('contact_information')}
+            {t('branded:contact_information')}
           </StyledText>
         </Flex>
         <SmallButton

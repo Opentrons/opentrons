@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { FlowRateInput, FlowRateInputProps } from './FlowRateInput'
+import { FlowRateInput } from './FlowRateInput'
 import { useSelector } from 'react-redux'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { FieldProps } from '../../types'
 import { getMatchingTipLiquidSpecs } from '../../../../utils'
+import type { FieldProps } from '../../types'
+import type { FlowRateInputProps } from './FlowRateInput'
 
-interface OP extends FieldProps {
+interface FlowRateFieldProps extends FieldProps {
   flowRateType: FlowRateInputProps['flowRateType']
   volume: unknown
   tiprack: unknown
@@ -14,14 +15,14 @@ interface OP extends FieldProps {
   label?: FlowRateInputProps['label']
 }
 
-// Add a key to force re-constructing component when values change
-export function FlowRateField(props: OP): JSX.Element {
+export function FlowRateField(props: FlowRateFieldProps): JSX.Element {
   const {
     pipetteId,
     flowRateType,
     value,
     volume,
     tiprack,
+    name,
     ...passThruProps
   } = props
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
@@ -43,18 +44,18 @@ export function FlowRateField(props: OP): JSX.Element {
         matchingTipLiquidSpecs?.defaultDispenseFlowRate.default ?? 0
     }
   }
-
   return (
     <FlowRateInput
       {...passThruProps}
+      name={name}
       value={value}
       flowRateType={flowRateType}
       pipetteDisplayName={pipetteDisplayName}
       key={innerKey}
       defaultFlowRate={defaultFlowRate}
       minFlowRate={0}
-      //  TODO(jr, 3/21/24): update max flow rate to real value instead of volume
-      maxFlowRate={pipette ? pipette.spec.liquids.default.maxVolume : Infinity}
+      //  if uiMaxFlowRate does not exist then there is no maxFlowRate
+      maxFlowRate={matchingTipLiquidSpecs?.uiMaxFlowRate ?? Infinity}
     />
   )
 }

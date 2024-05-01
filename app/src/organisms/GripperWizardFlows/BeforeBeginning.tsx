@@ -73,7 +73,7 @@ export const BeforeBeginning = (
     setErrorMessage,
     createdMaintenanceRunId,
   } = props
-  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
   React.useEffect(() => {
     if (createdMaintenanceRunId == null) {
       createMaintenanceRun({})
@@ -108,7 +108,7 @@ export const BeforeBeginning = (
       displayName: t('hex_screwdriver'),
       subtitle: t('provided_with_robot_use_right_size'),
     },
-    [GRIPPER_LOADNAME]: { displayName: t('gripper') },
+    [GRIPPER_LOADNAME]: { displayName: t('branded:gripper') },
   }
 
   const { bodyI18nKey, equipmentLoadNames } = INFO_BY_FLOW_TYPE[flowType]

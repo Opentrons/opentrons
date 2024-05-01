@@ -1,6 +1,6 @@
 """Equipment command side-effect logic."""
 from dataclasses import dataclass
-from typing import Optional, overload
+from typing import Optional, overload, Union
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
@@ -22,7 +22,6 @@ from opentrons.protocol_engine.state.module_substates import (
     TemperatureModuleId,
     ThermocyclerModuleId,
 )
-from ..actions import ActionDispatcher
 from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
@@ -44,6 +43,7 @@ from ..types import (
     LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
+    AddressableAreaLocation,
 )
 
 
@@ -53,6 +53,14 @@ class LoadedLabwareData:
 
     labware_id: str
     definition: LabwareDefinition
+    offsetId: Optional[str]
+
+
+@dataclass(frozen=True)
+class ReloadedLabwareData:
+    """The result of a reload labware procedure."""
+
+    location: LabwareLocation
     offsetId: Optional[str]
 
 
@@ -98,7 +106,6 @@ class EquipmentHandler:
         self,
         hardware_api: HardwareControlAPI,
         state_store: StateStore,
-        action_dispatcher: ActionDispatcher,
         labware_data_provider: Optional[LabwareDataProvider] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
         model_utils: Optional[ModelUtils] = None,
@@ -109,7 +116,6 @@ class EquipmentHandler:
         """Initialize an EquipmentHandler instance."""
         self._hardware_api = hardware_api
         self._state_store = state_store
-        self._action_dispatcher = action_dispatcher
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
         self._module_data_provider = module_data_provider or ModuleDataProvider()
         self._model_utils = model_utils or ModelUtils()
@@ -172,6 +178,25 @@ class EquipmentHandler:
         return LoadedLabwareData(
             labware_id=labware_id, definition=definition, offsetId=offset_id
         )
+
+    async def reload_labware(self, labware_id: str) -> ReloadedLabwareData:
+        """Reload an already-loaded labware. This cannot change the labware location.
+
+        Args:
+            labware_id: The ID of the already-loaded labware.
+
+        Raises:
+            LabwareNotLoadedError: If `labware_id` does not reference a loaded labware.
+
+        """
+        location = self._state_store.labware.get_location(labware_id)
+        definition_uri = self._state_store.labware.get_definition_uri(labware_id)
+        offset_id = self.find_applicable_labware_offset_id(
+            labware_definition_uri=definition_uri,
+            labware_location=location,
+        )
+
+        return ReloadedLabwareData(location=location, offsetId=offset_id)
 
     async def load_pipette(
         self,
@@ -252,7 +277,7 @@ class EquipmentHandler:
     async def load_magnetic_block(
         self,
         model: ModuleModel,
-        location: DeckSlotLocation,
+        location: Union[DeckSlotLocation, AddressableAreaLocation],
         module_id: Optional[str],
     ) -> LoadedModuleData:
         """Ensure the required magnetic block is attached.
@@ -317,10 +342,14 @@ class EquipmentHandler:
                 for hw_mod in self._hardware_api.attached_modules
             ]
 
+            serial_number_at_locaiton = self._state_store.geometry._addressable_areas.get_fixture_serial_from_deck_configuration_by_deck_slot(
+                location.slotName
+            )
             attached_module = self._state_store.modules.select_hardware_module_to_load(
                 model=model,
                 location=location,
                 attached_modules=attached_modules,
+                expected_serial_number=serial_number_at_locaiton,
             )
 
         else:

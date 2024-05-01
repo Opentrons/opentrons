@@ -69,7 +69,7 @@ export function useLabwareFailure(): {
   labwareFailureMessage: string | null
   clearLabwareFailure: () => unknown
 } {
-  const { t } = useTranslation('labware_landing')
+  const { t } = useTranslation(['labware_landing', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const labwareFailure = useSelector(getAddLabwareFailure)
 
@@ -82,7 +82,7 @@ export function useLabwareFailure(): {
     } else if (failedFile?.type === 'DUPLICATE_LABWARE_FILE') {
       errorMessage = t('duplicate_labware_def')
     } else if (failedFile?.type === 'OPENTRONS_LABWARE_FILE') {
-      errorMessage = t('opentrons_labware_def')
+      errorMessage = t('branded:opentrons_labware_def')
     }
     labwareFailureMessage =
       failedFile != null

@@ -39,6 +39,7 @@ from .exceptions import (
     MustHomeError,
     RunStoppedError,
     SetupCommandNotAllowedError,
+    FixitCommandNotAllowedError,
     ModuleNotAttachedError,
     ModuleAlreadyPresentError,
     WrongModuleTypeError,
@@ -55,6 +56,7 @@ from .exceptions import (
     InvalidHoldTimeError,
     CannotPerformModuleAction,
     PauseNotAllowedError,
+    ResumeFromRecoveryNotAllowedError,
     GripperNotAttachedError,
     CannotPerformGripperAction,
     HardwareNotSupportedError,
@@ -65,6 +67,7 @@ from .exceptions import (
     LocationIsStagingSlotError,
     InvalidAxisForRobotType,
     NotSupportedOnRobotType,
+    CommandNotAllowedError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -109,6 +112,7 @@ __all__ = [
     "MustHomeError",
     "RunStoppedError",
     "SetupCommandNotAllowedError",
+    "FixitCommandNotAllowedError",
     "ModuleNotAttachedError",
     "ModuleAlreadyPresentError",
     "WrongModuleTypeError",
@@ -124,6 +128,7 @@ __all__ = [
     "InvalidBlockVolumeError",
     "InvalidHoldTimeError",
     "CannotPerformModuleAction",
+    "ResumeFromRecoveryNotAllowedError",
     "PauseNotAllowedError",
     "ProtocolCommandFailedError",
     "GripperNotAttachedError",
@@ -138,5 +143,5 @@ __all__ = [
     "NotSupportedOnRobotType",
     # error occurrence models
     "ErrorOccurrence",
-    "FailedGripperPickupError",
+    "CommandNotAllowedError",
 ]

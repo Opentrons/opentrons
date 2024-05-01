@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { formatDistance } from 'date-fns'
+import last from 'lodash/last'
 
 import {
   BORDERS,
@@ -17,18 +18,21 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useProtocolQuery } from '@opentrons/react-api-client'
+import {
+  useProtocolAnalysisAsDocumentQuery,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
-  Run,
-  RunData,
-  RunStatus,
 } from '@opentrons/api-client'
 
 import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons//constants'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../../redux/analytics'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
@@ -38,6 +42,7 @@ import {
   INIT_STATUS,
 } from '../../../resources/health/hooks'
 
+import type { Run, RunData, RunStatus } from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 interface RecentRunProtocolCardProps {
@@ -98,6 +103,14 @@ export function ProtocolWithLastRun({
   const protocolName =
     protocolData.metadata.protocolName ?? protocolData.files[0].name
 
+  const protocolId = protocolData.id
+
+  const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
+    protocolId,
+    last(protocolData?.analysisSummaries)?.id ?? null,
+    { enabled: protocolData != null }
+  )
+
   const PROTOCOL_CARD_STYLE = css`
     flex: 1 0 0;
     &:active {
@@ -125,13 +138,22 @@ export function ProtocolWithLastRun({
     height: max-content;
   `
 
+  const hasRunTimeParameters =
+    analysis?.runTimeParameters != null
+      ? analysis?.runTimeParameters.length > 0
+      : false
+
   const handleCardClick = (): void => {
     setShowSpinner(true)
-    cloneRun()
-    trackEvent({
-      name: 'proceedToRun',
-      properties: { sourceLocation: 'RecentRunProtocolCard' },
-    })
+    if (hasRunTimeParameters) {
+      history.push(`/protocols/${protocolId}`)
+    } else {
+      cloneRun()
+      trackEvent({
+        name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+        properties: { sourceLocation: 'RecentRunProtocolCard' },
+      })
+    }
     // TODO(BC, 08/29/23): reintroduce this analytics event when we refactor the hook to fetch data lazily (performance concern)
     // trackProtocolRunEvent({ name: 'runAgain' })
   }

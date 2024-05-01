@@ -6,12 +6,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   Link,
-  PrimaryButton,
   SPACING,
   StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
+import { PromptButton } from '../../organisms/PromptButton'
 import LOGO_PATH from '../../assets/images/opentrons_logo.svg'
 
 const IMAGE_ALT = 'Opentrons logo'
@@ -25,7 +25,6 @@ export function SidePanel(): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       backgroundColor={COLORS.black90}
       width="24.375rem"
-      height="64rem"
     >
       {/* logo */}
       <Flex>
@@ -47,11 +46,10 @@ export function SidePanel(): JSX.Element {
         </StyledText>
 
         <Flex gridGap={SPACING.spacing16} flexWrap={WRAP}>
-          {/* ToDo(kk:04/11/2024) add a button component */}
-          <PromptButton>{t('reagent_transfer')}</PromptButton>
-          <PromptButton>{t('reagent_transfer_flex')}</PromptButton>
-          <PromptButton>{t('prc')}</PromptButton>
-          <PromptButton>{t('prc_flex')}</PromptButton>
+          <PromptButton buttonText={t('reagent_transfer')} />
+          <PromptButton buttonText={t('reagent_transfer_flex')} />
+          <PromptButton buttonText={t('pcr')} />
+          <PromptButton buttonText={t('pcr_flex')} />
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -87,11 +85,6 @@ const BUTTON_GUIDE_TEXT_STYLE = css`
   line-height: ${TYPOGRAPHY.lineHeight24};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   color: ${COLORS.white};
-`
-
-const PromptButton = styled(PrimaryButton)`
-  border-radius: 2rem;
-  white-space: nowrap;
 `
 
 const FeedbackLink = styled(Link)`

@@ -5,7 +5,7 @@ import {
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
-  getIsTallLabwareWestOf96Channel,
+  getIsSafePipetteMovement,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import {
@@ -178,25 +178,29 @@ export const mix: CommandCreator<MixArgs> = (
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
-  if (
-    is96Channel &&
-    data.nozzles === COLUMN &&
-    getIsTallLabwareWestOf96Channel(
+  console.log(invariantContext.pipetteEntities[pipette])
+
+  if (is96Channel && data.nozzles === COLUMN) {
+    const isAspirateSafePipetteMovement = getIsSafePipetteMovement(
       prevRobotState,
       invariantContext,
-      labware,
       pipette,
-      tipRack
+      labware,
+      tipRack,
+      { x: aspirateXOffset, y: aspirateYOffset }
     )
-  ) {
-    return {
-      errors: [
-        errorCreators.tallLabwareWestOf96ChannelPipetteLabware({
-          source: 'mix',
-          labware:
-            invariantContext.labwareEntities[labware].def.metadata.displayName,
-        }),
-      ],
+    const isDispenseSafePipetteMovement = getIsSafePipetteMovement(
+      prevRobotState,
+      invariantContext,
+      pipette,
+      labware,
+      tipRack,
+      { x: dispenseXOffset, y: dispenseYOffset }
+    )
+    if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
+      return {
+        errors: [errorCreators.possiblePipetteCollision()],
+      }
     }
   }
   const stateNozzles = prevRobotState.pipettes[pipette].nozzles

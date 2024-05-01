@@ -5,6 +5,7 @@ and mock in an isolated unit test environment.
 """
 from datetime import datetime
 from pathlib import Path
+from textwrap import dedent
 from typing import List
 
 import pytest
@@ -753,3 +754,46 @@ async def test_zero_volume_dispense_commands(
         labwareId=load_well_plate.result.labwareId,
         wellName="D7",
     )
+
+
+async def test_air_gap(tmp_path: Path) -> None:
+    """An `air_gap()` should be mapped to an `aspirate`.
+
+    This covers RQA-2621.
+    """
+    path = tmp_path / "protocol.py"
+    path.write_text(
+        dedent(
+            """\
+            metadata = {"apiLevel": "2.13"}
+            def run(protocol):
+                    # Prep:
+                    tip_rack = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
+                    well_plate = protocol.load_labware("biorad_96_wellplate_200ul_pcr", 2)
+                    pipette = protocol.load_instrument("p300_single_gen2", mount="left", tip_racks=[tip_rack])
+                    pipette.pick_up_tip()
+
+                    # Test:
+                    pipette.move_to(well_plate["A1"].top())
+                    pipette.air_gap(100)
+            """
+        )
+    )
+    result_commands = await simulate_and_get_commands(path)
+    [
+        initial_home,
+        load_tip_rack,
+        load_well_plate,
+        load_pipette,
+        pick_up_tip,
+        move_to_well,
+        air_gap_aspirate,
+    ] = result_commands
+    assert isinstance(initial_home, commands.Home)
+    assert isinstance(load_tip_rack, commands.LoadLabware)
+    assert isinstance(load_well_plate, commands.LoadLabware)
+    assert isinstance(load_pipette, commands.LoadPipette)
+    assert isinstance(pick_up_tip, commands.PickUpTip)
+    # TODO(mm, 2024-04-23): This commands.Custom looks wrong. This should be a commands.MoveToWell.
+    assert isinstance(move_to_well, commands.Custom)
+    assert isinstance(air_gap_aspirate, commands.Aspirate)

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { UseQueryResult } from 'react-query'
+import { MemoryRouter } from 'react-router-dom'
 import { screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { describe, it, beforeEach, vi, afterEach, expect } from 'vitest'
@@ -8,17 +9,24 @@ import {
   SINGLE_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
+  ot3StandardDeckV5,
 } from '@opentrons/shared-data'
 import {
-  useDeckConfigurationQuery,
+  useModulesQuery,
   useUpdateDeckConfigurationMutation,
 } from '@opentrons/react-api-client'
+
 import { i18n } from '../../../../../i18n'
+import { mockHeaterShaker } from '../../../../../redux/modules/__fixtures__'
+import { useCloseCurrentRun } from '../../../../ProtocolUpload/hooks'
 import { LocationConflictModal } from '../LocationConflictModal'
+import { useNotifyDeckConfigurationQuery } from '../../../../../resources/deck_configuration'
 
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('../../../../../resources/deck_configuration')
+vi.mock('../../../../ProtocolUpload/hooks')
 
 const mockFixture = {
   cutoutId: 'cutoutB3',
@@ -26,9 +34,14 @@ const mockFixture = {
 }
 
 const render = (props: React.ComponentProps<typeof LocationConflictModal>) => {
-  return renderWithProviders(<LocationConflictModal {...props} />, {
-    i18nInstance: i18n,
-  })[0]
+  return renderWithProviders(
+    <MemoryRouter>
+      <LocationConflictModal {...props} />
+    </MemoryRouter>,
+    {
+      i18nInstance: i18n,
+    }
+  )[0]
 }
 
 describe('LocationConflictModal', () => {
@@ -39,8 +52,14 @@ describe('LocationConflictModal', () => {
       onCloseClick: vi.fn(),
       cutoutId: 'cutoutB3',
       requiredFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+      deckDef: ot3StandardDeckV5 as any,
+      robotName: 'otie',
     }
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      closeCurrentRun: vi.fn(),
+    } as any)
+    vi.mocked(useModulesQuery).mockReturnValue({ data: { data: [] } } as any)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [mockFixture],
     } as UseQueryResult<DeckConfiguration>)
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
@@ -64,22 +83,28 @@ describe('LocationConflictModal', () => {
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render the modal information for a module fixture conflict', () => {
+    vi.mocked(useModulesQuery).mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+    } as any)
     props = {
       onCloseClick: vi.fn(),
       cutoutId: 'cutoutB3',
       requiredModule: 'heaterShakerModuleV1',
+      deckDef: ot3StandardDeckV5 as any,
+      robotName: 'otie',
     }
     render(props)
     screen.getByText('Protocol specifies')
     screen.getByText('Currently configured')
-    screen.getByText('Heater-Shaker Module GEN1')
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.onCloseClick).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Update deck' }))
+    screen.getByText('Heater-Shaker Module GEN1 in USB-1')
+    fireEvent.click(screen.getByRole('button', { name: 'add' }))
     expect(mockUpdate).toHaveBeenCalled()
   })
   it('should render the modal information for a single slot fixture conflict', () => {
-    vi.mocked(useDeckConfigurationQuery).mockReturnValue({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         {
           cutoutId: 'cutoutB1',
@@ -92,6 +117,8 @@ describe('LocationConflictModal', () => {
       cutoutId: 'cutoutB1',
       requiredFixtureId: SINGLE_RIGHT_SLOT_FIXTURE,
       missingLabwareDisplayName: 'a tiprack',
+      deckDef: ot3StandardDeckV5 as any,
+      robotName: 'otie',
     }
     render(props)
     screen.getByText('Deck location conflict')

@@ -454,7 +454,10 @@ export const getModulesForEditModulesCard: Selector<
   reduce<InitialDeckSetup['modules'], ModulesForEditModulesCard>(
     initialDeckSetup.modules,
     (acc, moduleOnDeck: ModuleOnDeck, id) => {
-      acc[moduleOnDeck.type] = moduleOnDeck
+      if (!acc[moduleOnDeck.type]) {
+        acc[moduleOnDeck.type] = []
+      }
+      acc[moduleOnDeck.type]?.push(moduleOnDeck)
       return acc
     },
     {

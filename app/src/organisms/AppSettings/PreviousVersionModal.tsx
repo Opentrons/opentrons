@@ -24,26 +24,26 @@ interface PreviousVersionModalProps {
 export function PreviousVersionModal(
   props: PreviousVersionModalProps
 ): JSX.Element {
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation(['app_settings', 'branded'])
 
   return (
     <LegacyModal onClose={props.closeModal} title={t('how_to_restore')}>
       <Box>
         <StyledText as="p" paddingBottom={SPACING.spacing8}>
-          {t('restore_description')}
+          {t('branded:restore_description')}
         </StyledText>
         <ExternalLink
           href={UNINSTALL_APP_URL}
           id="PreviousVersionModal_uninstallingAppLink"
         >
-          {t('learn_uninstalling')}
+          {t('branded:learn_uninstalling')}
         </ExternalLink>
         <Box marginY={SPACING.spacing8} />
         <ExternalLink
           href={PREVIOUS_RELEASES_URL}
           id="PreviousVersionModal_previousReleases"
         >
-          {t('previous_releases')}
+          {t('branded:previous_releases')}
         </ExternalLink>
       </Box>
       <Flex justifyContent={JUSTIFY_FLEX_END}>

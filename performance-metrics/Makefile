@@ -26,3 +26,7 @@ clean:
 wheel:
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	rm -rf build
+
+.PHONY: test
+test:
+	$(pytest) tests
