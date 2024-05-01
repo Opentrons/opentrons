@@ -229,7 +229,6 @@ export function ChooseProtocolSlideoutComponent(
       } else if (runtimeParam.type === 'int' || runtimeParam.type === 'float') {
         const value = runtimeParam.value as number
         const id = `InputField_${runtimeParam.variableName}_${index.toString()}`
-        console.log()
         const error =
           (Number.isNaN(value) && !isInputFocused) ||
           value < runtimeParam.min ||
