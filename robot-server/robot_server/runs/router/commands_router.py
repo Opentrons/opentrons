@@ -365,6 +365,9 @@ async def get_run_commands(
     )
 
 
+# TODO (spp, 2024-05-01): explore alternatives to returning commands as list of strings.
+#                Options: 1. JSON Lines
+#                         2. Simple de-serialized commands list w/o pydantic model conversion
 @PydanticResponse.wrap_route(
     commands_router.get,
     path="/runs/{runId}/commandsAsPreSerializedList",
