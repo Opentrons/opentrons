@@ -556,6 +556,25 @@ describe('ModuleOverflowMenu', () => {
     expect(calibrate).toBeDisabled()
   })
 
+  it('renders a disabled calibrate button if module temperature status errors', () => {
+    vi.mocked(useIsFlex).mockReturnValue(true)
+    const mockHeatingModule = {
+      ...mockHeaterShaker,
+      data: {
+        ...mockHeaterShaker.data,
+        temperatureStatus: 'error' as TemperatureStatus,
+      },
+    }
+    props = {
+      ...props,
+      module: mockHeatingModule,
+    }
+    render(props)
+
+    const calibrate = screen.getByRole('button', { name: 'Calibrate' })
+    expect(calibrate).toBeDisabled()
+  })
+
   it('a mock function should be called when clicking Calibrate if pipette is ready', () => {
     vi.mocked(useIsFlex).mockReturnValue(true)
     props = {
