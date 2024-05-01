@@ -1,27 +1,41 @@
 """Tests to ensure that the deck configuration is generated correctly."""
 
-import pytest
 from hypothesis import given, settings, HealthCheck
 from test_data_generation.deck_configuration.datashapes import DeckConfiguration
-from test_data_generation.deck_configuration.strategies import an_invalid_deck
+from test_data_generation.deck_configuration.strategies import (
+    a_deck_configuration_with_a_module_or_trash_slot_above_or_below_a_heater_shaker,
+    a_deck_configuration_with_invalid_fixture_in_col_2,
+)
 
-unique_values = set()
-
-
-@pytest.fixture
-def print_unique_values():
-    yield
-    print("\n\nNUMBER OF UNIQUE EXAMPLES: ", len(unique_values))
+NUM_EXAMPLES = 100
 
 
-@given(deck=an_invalid_deck())
+@given(
+    deck_config=a_deck_configuration_with_a_module_or_trash_slot_above_or_below_a_heater_shaker()
+)
 @settings(
-    max_examples=100,
+    max_examples=NUM_EXAMPLES,
     suppress_health_check=[HealthCheck.filter_too_much, HealthCheck.too_slow],
 )
-@pytest.mark.usefixtures("print_unique_values")
-def test_invalid_deck(deck: DeckConfiguration) -> None:
-    """Test that a invalid deck is generated."""
-    global unique_values
-    unique_values.add(deck)
-    print(deck)
+def test_above_below_heater_shaker(deck_config: DeckConfiguration) -> None:
+    """I hypothesize, that every deck configuration with a non-labware slot fixture above or below a heater-shaker is invalid."""
+    print(deck_config)
+
+    # TODO: create protocol and run analysis
+
+    # protocol = create_protocol(deck)
+    # with pytest.assertRaises as e:
+    #     analyze(protocol)
+    # assert e.exception == "Some statement about the deck configuration being invalid because of the labware above or below the Heater-Shaker"
+
+
+@given(deck_config=a_deck_configuration_with_invalid_fixture_in_col_2())
+@settings(
+    max_examples=NUM_EXAMPLES,
+    suppress_health_check=[HealthCheck.filter_too_much, HealthCheck.too_slow],
+)
+def test_invalid_fixture_in_col_2(deck_config: DeckConfiguration) -> None:
+    """I hypothesize, that every deck configuration that contains at least one, Heater-Shaker, Trash Bin, or Temperature module, in column 2 is invalid."""
+    print(deck_config)
+
+    # TODO: Same as above

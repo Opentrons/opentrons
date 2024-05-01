@@ -1,27 +1,40 @@
 """Test data generation for deck configuration tests."""
-from hypothesis import strategies as st, target
+from typing import List
+from hypothesis import assume, strategies as st
 from test_data_generation.deck_configuration.datashapes import (
+    Column,
     DeckConfiguration,
     Row,
     Slot,
     PossibleSlotContents as PSC,
 )
-from test_data_generation.deck_configuration.targets import (
-    num_invalid_conditions_met,
-    num_non_empty_slots,
+
+from test_data_generation.deck_configuration.deck_evaluation import (
+    above_or_below_is_module_or_trash,
 )
 
 
 @st.composite
-def a_slot(draw: st.DrawFn, row: str, col: str) -> Slot:
+def a_slot(
+    draw: st.DrawFn,
+    row: str,
+    col: str,
+    content_options: List[PSC] = PSC.all(),
+) -> Slot:
     """Generate a slot with a random content.
 
     Any fixture that has it's location implicitly defined is captured here by the
     filtering logic.
     """
     no_thermocycler = [
-        content for content in PSC if content is not PSC.THERMOCYCLER_MODULE
+        content for content in content_options if content is not PSC.THERMOCYCLER_MODULE
     ]
+    no_waste_chute_or_staging_area = [
+        content
+        for content in content_options
+        if not content.is_a_waste_chute() and not content.is_a_staging_area()
+    ]
+
     no_waste_chute_or_thermocycler = [
         content for content in no_thermocycler if not content.is_a_waste_chute()
     ]
@@ -29,12 +42,6 @@ def a_slot(draw: st.DrawFn, row: str, col: str) -> Slot:
         content
         for content in no_waste_chute_or_thermocycler
         if not content.is_a_staging_area()
-    ]
-
-    no_waste_chute_or_staging_area = [
-        content
-        for content in PSC
-        if not content.is_a_waste_chute() and not content.is_a_staging_area()
     ]
 
     if col == "1" and (row == "A" or row == "B"):
@@ -79,50 +86,109 @@ def a_slot(draw: st.DrawFn, row: str, col: str) -> Slot:
 
 
 @st.composite
-def a_row(draw: st.DrawFn, row: str) -> Row:
+def a_row(
+    draw: st.DrawFn,
+    row: str,
+    content_options: List[PSC] = PSC.all(),
+) -> Row:
     """Generate a row with random slots."""
     return draw(
         st.builds(
             Row,
             row=st.just(row),
-            col1=a_slot(row=row, col="1"),
-            col2=a_slot(row=row, col="2"),
-            col3=a_slot(row=row, col="3"),
+            col1=a_slot(row=row, col="1", content_options=content_options),
+            col2=a_slot(row=row, col="2", content_options=content_options),
+            col3=a_slot(row=row, col="3", content_options=content_options),
         )
     )
 
 
 @st.composite
-def a_deck_configuration(draw: st.DrawFn) -> DeckConfiguration:
-    """Generate a deck with random rows."""
-    row_a_contents = draw(a_row("A"))
-    row_b_contents = draw(a_row("B"))
-
-    deck = draw(
+def a_column(
+    draw: st.DrawFn,
+    col: str,
+    content_options: List[PSC] = PSC.all(),
+) -> Column:
+    """Generate a column with random slots."""
+    return draw(
         st.builds(
-            DeckConfiguration,
-            a=st.just(row_a_contents),
-            b=st.just(row_b_contents),
-            c=a_row("C"),
-            d=a_row("D"),
+            Column,
+            col=st.just(col),
+            a=a_slot(row="a", col=col, content_options=content_options),
+            b=a_slot(row="b", col=col, content_options=content_options),
+            c=a_slot(row="c", col=col, content_options=content_options),
+            d=a_slot(row="d", col=col, content_options=content_options),
         )
     )
-    # https://hypothesis.readthedocs.io/en/latest/details.html#targeted-example-generation
-    target(
-        observation=num_non_empty_slots(deck),
-        label="Maximize number of slots not empty.",
+
+
+def _above_or_below_is_module_or_trash(col: Column, hs_slot: Slot) -> bool:
+    """Return True if the deck has a module above or below the heater shaker."""
+    above = col.slot_above(hs_slot)
+    below = col.slot_below(hs_slot)
+
+    return (above is not None and above.contents.is_module_or_trash_bin()) or (
+        below is not None and below.contents.is_module_or_trash_bin()
     )
+
+
+
+@st.composite
+def a_deck_configuration_with_a_module_or_trash_slot_above_or_below_a_heater_shaker(
+    draw: st.DrawFn,
+) -> DeckConfiguration:
+    """Generate a deck with a module or trash bin fixture above or below a heater shaker."""
+    deck = draw(
+        st.builds(
+            DeckConfiguration.from_cols,
+            col1=a_column("1"),
+            col2=a_column(
+                "2", content_options=[PSC.LABWARE_SLOT, PSC.MAGNETIC_BLOCK_MODULE]
+            ),
+            col3=a_column("3"),
+        )
+    )
+    column = deck.column_by_number(draw(st.sampled_from(["1", "3"])))
+
+    assume(column.number_of(PSC.HEATER_SHAKER_MODULE) in [1, 2])
+    for slot in column.slots:
+        if slot.contents is PSC.HEATER_SHAKER_MODULE:
+            assume(_above_or_below_is_module_or_trash(column, slot))
+    deck.override_with_column(column)
+
     return deck
 
 
 @st.composite
-def an_invalid_deck(draw: st.DrawFn) -> DeckConfiguration:
-    """Generate an invalid deck."""
-    deck = draw(a_deck_configuration())
+def a_deck_configuration_with_invalid_fixture_in_col_2(
+    draw: st.DrawFn,
+) -> DeckConfiguration:
+    """Generate a deck with an invalid fixture in column 2."""
+    POSSIBLE_FIXTURES = [
+        PSC.LABWARE_SLOT,
+        PSC.TEMPERATURE_MODULE,
+        PSC.HEATER_SHAKER_MODULE,
+        PSC.TRASH_BIN,
+        PSC.MAGNETIC_BLOCK_MODULE,
+    ]
+    INVALID_FIXTURES = [
+        PSC.HEATER_SHAKER_MODULE,
+        PSC.TRASH_BIN,
+        PSC.TEMPERATURE_MODULE,
+    ]
+    column2 = draw(a_column("2", content_options=POSSIBLE_FIXTURES))
+    num_invalid_fixtures = len(
+        [True for slot in column2.slots if slot.contents.is_one_of(INVALID_FIXTURES)]
+    )
+    assume(num_invalid_fixtures > 0)
 
-    target(
-        observation=num_invalid_conditions_met(deck),
-        label="Maximize number of invalid conditions met.",
+    deck = draw(
+        st.builds(
+            DeckConfiguration.from_cols,
+            col1=a_column("1"),
+            col2=st.just(column2),
+            col3=a_column("3"),
+        )
     )
 
     return deck
