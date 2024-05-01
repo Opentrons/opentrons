@@ -4016,7 +4016,7 @@
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4070,7 +4070,7 @@
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4124,7 +4124,7 @@
         "wellName": "B1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4178,7 +4178,7 @@
         "wellName": "B1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4232,7 +4232,7 @@
         "wellName": "C1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4286,7 +4286,7 @@
         "wellName": "C1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4340,7 +4340,7 @@
         "wellName": "D1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4394,7 +4394,7 @@
         "wellName": "D1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4448,7 +4448,7 @@
         "wellName": "E1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4502,7 +4502,7 @@
         "wellName": "E1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4556,7 +4556,7 @@
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4610,7 +4610,7 @@
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4664,7 +4664,7 @@
         "wellName": "G1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4718,7 +4718,7 @@
         "wellName": "G1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4772,7 +4772,7 @@
         "wellName": "H1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4826,7 +4826,7 @@
         "wellName": "H1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 478
       }
@@ -4888,7 +4888,7 @@
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 57
       }
@@ -4918,7 +4918,7 @@
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 1, "x": 0, "y": 0 }
+          "offset": { "z": 0.5, "x": 0, "y": 0 }
         },
         "flowRate": 57
       }
