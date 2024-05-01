@@ -1,6 +1,9 @@
+import { getDefaultBlowoutFlowRate } from './utils/getDefaultBlowoutFlowRate'
 import type {
+  LoadPipetteCreateCommand,
   LoadLabwareCreateCommand,
   ProtocolFile,
+  PipetteName,
 } from '@opentrons/shared-data'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
@@ -47,6 +50,10 @@ export const migrateFile = (
     (command): command is LoadLabwareCreateCommand =>
       command.commandType === 'loadLabware'
   )
+  const loadPipetteCommands = commands.filter(
+    (command): command is LoadPipetteCreateCommand =>
+      command.commandType === 'loadPipette'
+  )
 
   const savedStepForms = designerApplication.data
     ?.savedStepForms as DesignerApplicationData['savedStepForms']
@@ -64,9 +71,12 @@ export const migrateFile = (
           `expected to find tiprack definition with labwareDefintionURI ${tipRackUri} but could not`
         )
       }
-      const tiprackIds = loadLabwareCommands
-        .filter(command => command.params.loadName === tiprackLoadName)
-        .map(command => command.params.labwareId)
+      const tiprackLoadCommands = loadLabwareCommands.filter(
+        command => command.params.loadName === tiprackLoadName
+      )
+      const tiprackIds = tiprackLoadCommands.map(
+        command => command.params.labwareId
+      )
       const xyKeys =
         item.stepType === 'mix'
           ? { mix_x_position: 0, mix_y_position: 0 }
@@ -76,8 +86,40 @@ export const migrateFile = (
               dispense_x_position: 0,
               dispense_y_position: 0,
             }
+      const matchingTiprackCommand = tiprackLoadCommands.find(
+        command => command.params.labwareId === item.tipRack
+      )
+
+      if (matchingTiprackCommand == null) {
+        console.error(
+          `expected to find a tiprack loadname from tiprack ${item.tiprack} but could not `
+        )
+      }
+      const matchingTiprackURI =
+        matchingTiprackCommand != null
+          ? `${matchingTiprackCommand.params.namespace}/${matchingTiprackCommand.params.loadName}/${matchingTiprackCommand.params.version}`
+          : null
+      const tipLength =
+        matchingTiprackURI != null
+          ? labwareDefinitions[matchingTiprackURI].parameters.tipLength ?? 0
+          : 0
+      const pipetteName = loadPipetteCommands.find(
+        pipette => pipette.params.pipetteId === item.pipette
+      )?.params.pipetteName
+      const defaultBlowOutFlowRate = getDefaultBlowoutFlowRate(
+        pipetteName as PipetteName,
+        item.volume,
+        tipLength
+      )
+
+      let blowoutFlowRate: number | null = defaultBlowOutFlowRate
+      if (item.blowout_checkbox === false) {
+        blowoutFlowRate = null
+      }
+
       acc[item.id] = {
         ...item,
+        blowout_flowRate: blowoutFlowRate,
         blowout_z_offset: 0,
         tipRack: tiprackIds[0],
         ...xyKeys,

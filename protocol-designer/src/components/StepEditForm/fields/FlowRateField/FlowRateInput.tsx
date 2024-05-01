@@ -7,19 +7,23 @@ import {
   FormGroup,
   RadioGroup,
   InputField,
+  Flex,
+  useHoverTooltip,
+  Tooltip,
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../../../portals/MainPageModalPortal'
+import type { FieldProps } from '../../types'
+
 import modalStyles from '../../../modals/modal.module.css'
 import stepFormStyles from '../../StepEditForm.module.css'
 import styles from './FlowRateInput.module.css'
-import type { FieldProps } from '../../types'
 
 const DECIMALS_ALLOWED = 1
 
 /** When flow rate is falsey (including 0), it means 'use default' */
 export interface FlowRateInputProps extends FieldProps {
   defaultFlowRate?: number | null
-  flowRateType: 'aspirate' | 'dispense'
+  flowRateType: 'aspirate' | 'dispense' | 'blowout'
   label?: string | null
   minFlowRate: number
   maxFlowRate: number
@@ -46,7 +50,9 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     minFlowRate,
     name,
     pipetteDisplayName,
+    tooltipContent,
   } = props
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const { t } = useTranslation(['form', 'application', 'shared'])
   const DEFAULT_LABEL = t('step_edit_form.field.flow_rate.label')
 
@@ -206,21 +212,37 @@ export const FlowRateInput = (props: FlowRateInputProps): JSX.Element => {
     )
 
   return (
-    <React.Fragment>
-      <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
-        <InputField
-          className={className || stepFormStyles.small_field}
-          disabled={disabled}
-          isIndeterminate={isIndeterminate}
-          name={name}
-          onClick={openModal}
-          readOnly
-          units={t('application:units.microliterPerSec')}
-          value={props.value ? String(props.value) : 'default'}
-        />
-      </FormGroup>
+    <>
+      {flowRateType === 'blowout' ? (
+        <Flex {...targetProps}>
+          <InputField
+            className={className || stepFormStyles.small_field}
+            disabled={disabled}
+            isIndeterminate={isIndeterminate}
+            name={name}
+            onClick={openModal}
+            readOnly
+            units={t('application:units.microliterPerSec')}
+            value={props.value ? String(props.value) : 'default'}
+          />
+          <Tooltip {...tooltipProps}>{tooltipContent}</Tooltip>
+        </Flex>
+      ) : (
+        <FormGroup label={label || DEFAULT_LABEL} disabled={disabled}>
+          <InputField
+            className={className || stepFormStyles.small_field}
+            disabled={disabled}
+            isIndeterminate={isIndeterminate}
+            name={name}
+            onClick={openModal}
+            readOnly
+            units={t('application:units.microliterPerSec')}
+            value={props.value ? String(props.value) : 'default'}
+          />
+        </FormGroup>
+      )}
 
       {showModal && FlowRateModal}
-    </React.Fragment>
+    </>
   )
 }
