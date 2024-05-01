@@ -27,8 +27,8 @@ const enumerateMassStorage = (path: string): Promise<string[]> =>
     .then(entries =>
       entries.length === 0
         ? new Promise<void>(resolve =>
-          setTimeout(resolve, MOUNT_ENUMERATION_DELAY_MS)
-        )
+            setTimeout(resolve, MOUNT_ENUMERATION_DELAY_MS)
+          )
         : new Promise<void>(resolve => resolve())
     )
     .then(() => fsPromises.readdir(path, { withFileTypes: true }))
@@ -38,8 +38,8 @@ const enumerateMassStorage = (path: string): Promise<string[]> =>
           entry.isDirectory() && !isWeirdDirectoryAndShouldSkip(entry.name)
             ? enumerateMassStorage(join(path, entry.name))
             : new Promise<string[]>(resolve =>
-              resolve([join(path, entry.name)])
-            )
+                resolve([join(path, entry.name)])
+              )
         )
       )
     )
@@ -90,49 +90,40 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
         prevDirs = present.filter((entry): entry is string => entry !== null)
       })
 
-
-  const mediaWatcherCreator = (): fs.FSWatcher | null => {
-    try {
-      return fs.watch(
-        FLEX_USB_MOUNT_DIR,
-        { persistent: true },
-        (event, fileName) => {
-          if (!!!fileName) {
-            rescan(dispatch)
+  const mediaWatcher = fs.watch(
+    FLEX_USB_MOUNT_DIR,
+    { persistent: true },
+    (event, fileName) => {
+      if (!!!fileName) {
+        rescan(dispatch)
+        return
+      }
+      if (!fileName.match(FLEX_USB_MOUNT_FILTER)) {
+        return
+      }
+      const fullPath = join(FLEX_USB_MOUNT_DIR, fileName)
+      fsPromises
+        .stat(fullPath)
+        .then(info => {
+          if (!info.isDirectory) {
             return
           }
-          if (!fileName.match(FLEX_USB_MOUNT_FILTER)) {
+          if (prevDirs.includes(fullPath)) {
             return
           }
-          const fullPath = join(FLEX_USB_MOUNT_DIR, fileName)
-          fsPromises
-            .stat(fullPath)
-            .then(info => {
-              if (!info.isDirectory) {
-                return
-              }
-              if (prevDirs.includes(fullPath)) {
-                return
-              }
-              console.log(`New mass storage device ${fileName} detected`)
-              prevDirs.push(fullPath)
-              return handleNewlyPresent(fullPath)
-            })
-            .catch(() => {
-              if (prevDirs.includes(fullPath)) {
-                console.log(`Mass storage device at ${fileName} removed`)
-                prevDirs = prevDirs.filter(entry => entry !== fullPath)
-                dispatch(robotMassStorageDeviceRemoved(fullPath))
-              }
-            })
-        }
-      )
-    } catch {
-      return null
+          console.log(`New mass storage device ${fileName} detected`)
+          prevDirs.push(fullPath)
+          return handleNewlyPresent(fullPath)
+        })
+        .catch(() => {
+          if (prevDirs.includes(fullPath)) {
+            console.log(`Mass storage device at ${fileName} removed`)
+            prevDirs = prevDirs.filter(entry => entry !== fullPath)
+            dispatch(robotMassStorageDeviceRemoved(fullPath))
+          }
+        })
     }
-  }
-
-  const mediaWatcher = mediaWatcherCreator()
+  )
 
   const devWatcher = fs.watch(
     FLEX_USB_DEVICE_DIR,
@@ -151,7 +142,7 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
           )
           // we don't care if this fails because it's racing the system removing
           // the mount dir in the common case
-          fsPromises.unlink(mountPath).catch(() => { })
+          fsPromises.unlink(mountPath).catch(() => {})
         }
       })
     }
@@ -159,7 +150,7 @@ export function watchForMassStorage(dispatch: Dispatch): () => void {
 
   rescan(dispatch)
   return () => {
-    mediaWatcher != null && mediaWatcher.close()
+    mediaWatcher.close()
     devWatcher.close()
   }
 }
