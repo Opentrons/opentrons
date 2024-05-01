@@ -140,9 +140,10 @@ export function CurrentRunningProtocolCommand({
   updateLastAnimatedCommand,
 }: CurrentRunningProtocolCommandProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const currentCommand = robotSideAnalysis?.commands.find(
-    (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
-  ) ?? lastRunCommand
+  const currentCommand =
+    robotSideAnalysis?.commands.find(
+      (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
+    ) ?? lastRunCommand
 
   let shouldAnimate = true
   if (currentCommand?.key != null) {

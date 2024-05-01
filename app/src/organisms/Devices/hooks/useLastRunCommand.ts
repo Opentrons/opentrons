@@ -47,4 +47,3 @@ export function useLastRunCommand(
     ? commandsData?.data?.[0] ?? null
     : null
 }
-
