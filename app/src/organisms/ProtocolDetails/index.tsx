@@ -599,7 +599,7 @@ export function ProtocolDetails(
               marginLeft={SPACING.spacing16}
               gridGap={SPACING.spacing8}
             >
-              <Flex gridGap={SPACING.spacing8}>
+              <Flex gridGap={SPACING.spacing4}>
                 {mostRecentAnalysis != null && (
                   <RoundTab
                     data-testid="ProtocolDetails_parameters"
