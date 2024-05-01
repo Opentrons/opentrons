@@ -1,0 +1,531 @@
+{
+  "commands": [
+    {
+      "commandType": "home",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadModule",
+      "notes": [],
+      "params": {
+        "location": {
+          "slotName": "9"
+        },
+        "model": "heaterShakerModuleV1"
+      },
+      "result": {
+        "definition": {
+          "calibrationPoint": {
+            "x": 12.0,
+            "y": 8.75,
+            "z": 68.275
+          },
+          "compatibleWith": [],
+          "dimensions": {
+            "bareOverallHeight": 82.0,
+            "overLabwareHeight": 0.0
+          },
+          "displayName": "Heater-Shaker Module GEN1",
+          "gripperOffsets": {
+            "default": {
+              "dropOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 1.0
+              },
+              "pickUpOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              }
+            }
+          },
+          "labwareOffset": {
+            "x": -0.125,
+            "y": 1.125,
+            "z": 68.275
+          },
+          "model": "heaterShakerModuleV1",
+          "moduleType": "heaterShakerModuleType",
+          "otSharedSchema": "module/schemas/2",
+          "quirks": [],
+          "slotTransforms": {
+            "ot2_short_trash": {
+              "3": {
+                "labwareOffset": [
+                  [
+                    -1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              "6": {
+                "labwareOffset": [
+                  [
+                    -1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              "9": {
+                "labwareOffset": [
+                  [
+                    -1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "ot2_standard": {
+              "3": {
+                "labwareOffset": [
+                  [
+                    -1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              "6": {
+                "labwareOffset": [
+                  [
+                    -1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              },
+              "9": {
+                "labwareOffset": [
+                  [
+                    -1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    -1,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            },
+            "ot3_standard": {
+              "A1": {
+                "labwareOffset": [
+                  [
+                    -49.325,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1.125,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.125,
+                    1
+                  ]
+                ]
+              },
+              "A3": {
+                "labwareOffset": [
+                  [
+                    -49.325,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1.125,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.125,
+                    1
+                  ]
+                ]
+              },
+              "B1": {
+                "labwareOffset": [
+                  [
+                    -49.325,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1.125,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.125,
+                    1
+                  ]
+                ]
+              },
+              "B3": {
+                "labwareOffset": [
+                  [
+                    -49.325,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1.125,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.125,
+                    1
+                  ]
+                ]
+              },
+              "C1": {
+                "labwareOffset": [
+                  [
+                    -49.325,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1.125,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.125,
+                    1
+                  ]
+                ]
+              },
+              "C3": {
+                "labwareOffset": [
+                  [
+                    -49.325,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1.125,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.125,
+                    1
+                  ]
+                ]
+              },
+              "D1": {
+                "labwareOffset": [
+                  [
+                    -49.325,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1.125,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.125,
+                    1
+                  ]
+                ]
+              },
+              "D3": {
+                "labwareOffset": [
+                  [
+                    -49.325,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -1.125,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0.125,
+                    1
+                  ]
+                ]
+              }
+            }
+          }
+        },
+        "model": "heaterShakerModuleV1"
+      },
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      16
+    ],
+    "protocolType": "python"
+  },
+  "errors": [
+    {
+      "detail": "DeckConflictError [line 11]: trash bin in slot 12 prevents heaterShakerModuleV1 from using slot 9.",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "wrappedErrors": [
+        {
+          "detail": "opentrons.motion_planning.deck_conflict.DeckConflictError: trash bin in slot 12 prevents heaterShakerModuleV1 from using slot 9.",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "('trash bin in slot 12 prevents heaterShakerModuleV1 from using slot 9.',)",
+            "class": "DeckConflictError",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line 124, in run_python\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line 1, in <module>\n\n  File \"OT2_X_v2_16_None_None_HS_HeaterShakerConflictWithTrashBin2.py\", line 11, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line 383, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/protocol_context.py\", line 814, in load_module\n    module_core = self._core.load_module(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/protocol.py\", line 423, in load_module\n    deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/core/engine/deck_conflict.py\", line 203, in check\n    wrapped_deck_conflict.check(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/motion_planning/deck_conflict.py\", line 210, in check\n    raise DeckConflictError(\n"
+          },
+          "errorType": "PythonException",
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "name": "OT2_X_v2_16_None_None_HS_HeaterShakerConflictWithTrashBin2.py",
+      "role": "main"
+    },
+    {
+      "name": "cpx_4_tuberack_100ul.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_1000ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_200ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "opentrons_ot3_96_tiprack_50ul_rss.json",
+      "role": "labware"
+    },
+    {
+      "name": "sample_labware.json",
+      "role": "labware"
+    }
+  ],
+  "labware": [],
+  "liquids": [],
+  "metadata": {
+    "protocolName": "Heater-shaker conflict OT-2"
+  },
+  "modules": [
+    {
+      "location": {
+        "slotName": "9"
+      },
+      "model": "heaterShakerModuleV1"
+    }
+  ],
+  "pipettes": [],
+  "robotType": "OT-2 Standard",
+  "runTimeParameters": []
+}

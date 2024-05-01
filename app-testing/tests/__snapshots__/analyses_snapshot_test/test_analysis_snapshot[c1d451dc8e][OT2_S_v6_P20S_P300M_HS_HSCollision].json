@@ -1,0 +1,18 @@
+{
+  "commands": [],
+  "config": {},
+  "errors": [
+    {
+      "analysis_execution_time": null,
+      "command_exit_code": 2,
+      "command_output": "/root/.opentrons/robot_settings.json not found. Loading defaults\nUsage: python -m opentrons.cli analyze [OPTIONS] FILES...\nTry 'python -m opentrons.cli analyze --help' for help.\n\nError: Invalid value for 'FILES...': Path '/var/lib/ot/protocols/OT2_S_v6_P20S_P300M_HS_HSCollision.json' does not exist.\n"
+    }
+  ],
+  "files": [],
+  "labware": [],
+  "liquids": [],
+  "metadata": [],
+  "modules": [],
+  "pipettes": [],
+  "runTimeParameters": []
+}
