@@ -72,12 +72,6 @@ class RunsPublisher:
         self._engine_state_slice = EngineStateSlice()
 
         await self._publish_runs_advise_refetch_async(run_id=run_id)
-        engine_state_summary = self._run_hooks.get_state_summary(self._run_hooks.run_id)
-        if (
-            isinstance(engine_state_summary, StateSummary)
-            and engine_state_summary.completedAt is not None
-        ):
-            await self.publish_pre_serialized_commands_notification(run_id=run_id)
 
     async def clean_up_run(self, run_id: str) -> None:
         """Publish final refetch and unsubscribe flags for the given run."""

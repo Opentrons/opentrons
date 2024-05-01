@@ -77,25 +77,6 @@ async def test_initialize(
     )
 
 
-async def test_initialize_publisher_on_completed_runs(
-    runs_publisher: RunsPublisher, notification_client: AsyncMock
-) -> None:
-    """It should initialize the publisher w/ parameters & callbacks and notify for pre-serialized commands."""
-    run_id = "1234"
-    get_current_command = AsyncMock()
-
-    await runs_publisher.initialize(run_id, get_current_command, mock_state_summary)
-
-    assert runs_publisher._engine_state_slice
-    notification_client.publish_advise_refetch_async.assert_any_await(topic=Topics.RUNS)
-    notification_client.publish_advise_refetch_async.assert_any_await(
-        topic=f"{Topics.RUNS}/1234"
-    )
-    notification_client.publish_advise_refetch_async.assert_any_await(
-        topic=f"{Topics.RUNS_PRE_SERIALIZED_COMMANDS}/1234"
-    )
-
-
 @pytest.mark.asyncio
 async def test_clean_up_current_run(
     runs_publisher: RunsPublisher, notification_client: AsyncMock
