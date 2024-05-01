@@ -1261,7 +1261,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashC3",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -1272,7 +1272,7 @@
       },
       "result": {
         "position": {
-          "x": 434.25,
+          "x": 466.25,
           "y": 150.0,
           "z": 40.0
         }
