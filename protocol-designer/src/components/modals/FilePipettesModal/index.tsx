@@ -23,6 +23,8 @@ import {
   PipetteName,
   OT2_ROBOT_TYPE,
   getPipetteSpecsV2,
+  FLEX_ROBOT_TYPE,
+  RobotType,
 } from '@opentrons/shared-data'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
 import { PipetteFields } from './PipetteFields'
@@ -47,8 +49,17 @@ import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { getCrashableModuleSelected } from '../CreateFileWizard/utils'
 
 import type { DeckSlot, ThunkDispatch } from '../../../types'
-import type { NormalizedPipette } from '@opentrons/step-generation'
+import type {
+  LabwareEntities,
+  NormalizedPipette,
+} from '@opentrons/step-generation'
 import type { StepIdType } from '../../../form-types'
+import { getLabwareEntities } from '../../../step-forms/selectors'
+import {
+  createContainer,
+  deleteContainer,
+} from '../../../labware-ingred/actions'
+import { adapter96ChannelDefUri } from '../CreateFileWizard'
 
 export type PipetteFieldsData = Omit<
   PipetteOnDeck,
@@ -124,6 +135,7 @@ const validationSchema: any = Yup.object().shape({
 })
 
 const makeUpdatePipettes = (
+  labwareEntities: LabwareEntities,
   prevPipettes: { [pipetteId: string]: PipetteOnDeck },
   orderedStepIds: StepIdType[],
   dispatch: ThunkDispatch<any>,
@@ -157,6 +169,38 @@ const makeUpdatePipettes = (
         const newId = uuid()
         nextPipettes[newId] = { ...newPipette, id: newId }
       }
+    }
+  })
+  const newTiprackUris = new Set(
+    newPipetteArray.flatMap(pipette => pipette.tiprackDefURI)
+  )
+  const previousTiprackLabwares = Object.values(labwareEntities).filter(
+    labware => labware.def.parameters.isTiprack
+  )
+
+  const previousTiprackUris = new Set(
+    previousTiprackLabwares.map(labware => labware.labwareDefURI)
+  )
+
+  // Find tipracks to delete (old tipracks not in new pipettes)
+  previousTiprackLabwares
+    .filter(labware => !newTiprackUris.has(labware.labwareDefURI))
+    .forEach(labware => dispatch(deleteContainer({ labwareId: labware.id })))
+
+  // Create new tipracks that are not in previous tiprackURIs
+  newTiprackUris.forEach(tiprackDefUri => {
+    if (!previousTiprackUris.has(tiprackDefUri)) {
+      const adapterUnderLabwareDefURI = newPipetteArray.some(
+        pip => pip.name === 'p1000_96'
+      )
+        ? adapter96ChannelDefUri
+        : undefined
+      dispatch(
+        createContainer({
+          labwareDefURI: tiprackDefUri,
+          adapterUnderLabwareDefURI,
+        })
+      )
     }
   })
 
@@ -275,6 +319,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
   const { t } = useTranslation(['modal', 'button', 'form'])
   const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
+  const labwareEntities = useSelector(getLabwareEntities)
   const initialPipettes = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
@@ -295,6 +340,7 @@ export const FilePipettesModal = (props: Props): JSX.Element => {
     modules: ModuleCreationArgs[]
     pipettes: PipetteFieldsData[]
   }) => void = makeUpdatePipettes(
+    labwareEntities,
     prevPipettes,
     orderedStepIds,
     dispatch,
