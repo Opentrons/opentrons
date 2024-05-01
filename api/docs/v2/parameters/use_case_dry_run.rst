@@ -10,7 +10,7 @@ When testing out a new protocol, it's common to perform a dry run to watch your 
 
 The code examples will show how this single value can control:
 
-- Skipping module actions and long pauses.
+- Skipping module actions and long delays.
 - Reducing mix repetitions to save time.
 - Returning tips (that never touched any liquid) to their racks.
 
@@ -27,7 +27,7 @@ First, we need to set up the dry run parameter. We want to set up a simple yes/n
             variable_name="dry_run",
             display_name="Dry Run",
             description=(
-                "Skip pauses,"
+                "Skip delays,"
                 " shorten mix steps,"
                 " and return tips to their racks."
             ),
@@ -38,17 +38,17 @@ This parameter is set to ``False`` by default, assuming that most runs will be l
 
 Additionally, since "dry run" can have different meanings in different contexts, it's important to include a ``description`` that indicates exactly what the parameter will control — in this case, three things. The following sections will show how to accomplish each of those when the dry run parameter is set to ``True``.
 
-Skipping Pauses
+Skipping Delays
 ===============
 
-Many protocols have built-in pauses, either for a module to work or to let a reaction happen passively. Lengthy pauses just get in the way when verifying a protocol with a dry run. So wherever the protocol calls for a pause, we can check the value of ``protocol.params.dry_run`` and make the protocol behave accordingly.
+Many protocols have built-in delays, either for a module to work or to let a reaction happen passively. Lengthy delays just get in the way when verifying a protocol with a dry run. So wherever the protocol calls for a delay, we can check the value of ``protocol.params.dry_run`` and make the protocol behave accordingly.
 
-To start, let's consider a simple :py:meth:`.pause` command. We can wrap it in an ``if`` statement such that the pause will only execute when the run is *not* a dry run::
+To start, let's consider a simple :py:meth:`.delay` command. We can wrap it in an ``if`` statement such that the delay will only execute when the run is *not* a dry run::
 
     if protocol.params.dry_run == False:
-        protocol.pause(minutes=5)
+        protocol.delay(minutes=5)
 
-You can extend this approach to more complex situations, like module interactions. For example, in a protocol that moves a plate to the Thermocycler for an incubation, you'll want to perform all the movement steps — opening and closing the module lid, and moving the plate to and from the block — but skip the heating and cooling time. The simplest way to do this is, like in the pause example above, to wrap each skippable command::
+You can extend this approach to more complex situations, like module interactions. For example, in a protocol that moves a plate to the Thermocycler for an incubation, you'll want to perform all the movement steps — opening and closing the module lid, and moving the plate to and from the block — but skip the heating and cooling time. The simplest way to do this is, like in the delay example above, to wrap each skippable command::
 
     protocol.move_labware(labware=plate, new_location=tc_mod, use_gripper=True)
     if protocol.params.dry_run == False:
@@ -68,7 +68,7 @@ You can extend this approach to more complex situations, like module interaction
 Shortening Mix Steps
 ====================
 
-Similar to pauses, mix steps can take a long time because they are inherently repetitive actions. Mixing ten times takes ten times as long as mixing once! To save time, set a mix repetitions variable based on the value of ``protocol.params.dry_run`` and pass that to :py:meth:`.mix`::
+Similar to delays, mix steps can take a long time because they are inherently repetitive actions. Mixing ten times takes ten times as long as mixing once! To save time, set a mix repetitions variable based on the value of ``protocol.params.dry_run`` and pass that to :py:meth:`.mix`::
 
     if protocol.params.dry_run == True:
         mix_reps = 1
@@ -121,7 +121,7 @@ The API has methods to handle both of these situations. To continue using the sa
             labware=tips_1, new_location=chute, use_gripper=True
         )
         protocol.move_labware(
-            labware=tips_2, new_location=D3, use_gripper=True
+            labware=tips_2, new_location="C3", use_gripper=True
         )
 
 You can modify this code for similar cases. You may be moving tip racks by hand, rather than with the gripper. Or you could even mix the two, moving the used (but full) rack off-deck by hand — instead of dropping it down the chute, spilling all the tips — and have the gripper move a new rack into place. Ultimately, it's up to you to fine-tune your dry run behavior, and communicate it to your protocol's users with your parameter descriptions.
