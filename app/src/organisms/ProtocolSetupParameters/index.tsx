@@ -151,6 +151,7 @@ export function ProtocolSetupParameters({
         secondaryButtonProps={{
           buttonType: 'tertiaryLowLight',
           buttonText: t('restore_defaults'),
+          disabled: isLoading || startSetup,
           onClick: () => showResetValuesModal(true),
         }}
       />

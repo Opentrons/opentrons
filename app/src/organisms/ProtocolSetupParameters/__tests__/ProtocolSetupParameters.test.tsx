@@ -55,6 +55,7 @@ describe('ProtocolSetupParameters', () => {
       .calledWith(expect.anything())
       .thenReturn({ createRun: mockCreateRun } as any)
   })
+
   it('renders the parameters labels and mock data', () => {
     render(props)
     screen.getByText('Parameters')
@@ -63,27 +64,39 @@ describe('ProtocolSetupParameters', () => {
     screen.getByText('Dry Run')
     screen.getByText('a dry run description')
   })
+
   it('renders the ChooseEnum component when a str param is selected', () => {
     render(props)
     fireEvent.click(screen.getByText('Default Module Offsets'))
     screen.getByText('mock ChooseEnum')
   })
+
   it('renders the other setting when boolean param is selected', () => {
     render(props)
     expect(screen.getAllByText('On')).toHaveLength(2)
     fireEvent.click(screen.getByText('Dry Run'))
     expect(screen.getAllByText('On')).toHaveLength(3)
   })
+
   it('renders the back icon and calls useHistory', () => {
     render(props)
     fireEvent.click(screen.getAllByRole('button')[0])
     expect(mockGoBack).toHaveBeenCalled()
   })
+
   it('renders the confirm values button and clicking on it creates a run', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm values' }))
     expect(mockCreateRun).toHaveBeenCalled()
   })
+
+  it('should restore default values button is disabled when tapping confirm values button', async () => {
+    render(props)
+    const resetButton = screen.getByTestId('ChildNavigation_Secondary_Button')
+    fireEvent.click(screen.getByText('Confirm values'))
+    expect(resetButton).toBeDisabled()
+  })
+
   it('renders the reset values modal', () => {
     render(props)
     fireEvent.click(
