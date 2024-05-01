@@ -83,7 +83,10 @@ export function ChildNavigation({
       {onClickButton != null && buttonText != null ? (
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
           {secondaryButtonProps != null ? (
-            <SmallButton {...secondaryButtonProps} />
+            <SmallButton
+              data-testid="ChildNavigation_Secondary_Button"
+              {...secondaryButtonProps}
+            />
           ) : null}
 
           <SmallButton

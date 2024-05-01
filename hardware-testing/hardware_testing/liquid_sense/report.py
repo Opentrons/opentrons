@@ -41,7 +41,6 @@ def build_serial_number_section() -> CSVSection:
     return CSVSection(
         title="SERIAL-NUMBERS",
         lines=[
-            CSVLine("robot", [str]),
             CSVLine("git_description", [str]),
             CSVLine("pipette", [str]),
             CSVLine("scale", [str]),
@@ -71,7 +70,7 @@ def build_config_section() -> CSVSection:
 def build_trials_section(trials: int, tips: List[int]) -> CSVSection:
     """Build section."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = [
-        CSVLine("trial_number", [str, str, str, str, str, str, str, str])
+        CSVLine("trial_number", [str, str, str, str, str, str, str, str, str])
     ]
     lines.extend(
         [
@@ -86,7 +85,7 @@ def build_trials_section(trials: int, tips: List[int]) -> CSVSection:
         [
             CSVLine(
                 f"trial-{t + 1}-{tip}ul",
-                [float, float, float, float, float, float, float, float],
+                [float, float, float, float, float, float, float, float, float],
             )
             for tip in tips
             for t in range(trials)
@@ -116,14 +115,12 @@ def build_results_section(tips: List[int]) -> CSVSection:
 
 def store_serial_numbers(
     report: CSVReport,
-    robot: str,
     pipette: str,
     scale: str,
     environment: str,
     git_description: str,
 ) -> None:
     """Report serial numbers."""
-    report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "git_description", [git_description])
     report("SERIAL-NUMBERS", "pipette", [pipette])
     report("SERIAL-NUMBERS", "scale", [scale])
@@ -195,6 +192,7 @@ def store_trial(
     z_travel: float,
     plunger_travel: float,
     tip_length_offset: float,
+    target_height: float,
 ) -> None:
     """Report Trial."""
     report(
@@ -209,6 +207,7 @@ def store_trial(
             plunger_travel,
             tip_length_offset,
             height + tip_length_offset,
+            target_height,
         ],
     )
 
@@ -258,6 +257,7 @@ def build_ls_report(
             "plunger_travel",
             "tip_length_offset",
             "adjusted_height",
+            "target_height",
         ],
     )
     return report

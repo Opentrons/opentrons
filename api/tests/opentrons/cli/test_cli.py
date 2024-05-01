@@ -52,7 +52,9 @@ class _AnalysisCLIResult:
     stdout_stderr: str
 
 
-def _get_analysis_result(protocol_files: List[Path]) -> _AnalysisCLIResult:
+def _get_analysis_result(
+    protocol_files: List[Path], output_type: str, check: bool = False
+) -> _AnalysisCLIResult:
     """Run `protocol_files` as a single protocol through the analysis CLI.
 
     Returns:
@@ -64,14 +66,15 @@ def _get_analysis_result(protocol_files: List[Path]) -> _AnalysisCLIResult:
     with tempfile.TemporaryDirectory() as temp_dir:
         analysis_output_file = Path(temp_dir) / "analysis_output.json"
         runner = CliRunner()
-        result = runner.invoke(
-            analyze,
-            [
-                "--json-output",
-                str(analysis_output_file),
-                *[str(p.resolve()) for p in protocol_files],
-            ],
-        )
+        args = [
+            output_type,
+            str(analysis_output_file),
+            *[str(p.resolve()) for p in protocol_files],
+        ]
+        if check:
+            args.append("--check")
+
+        result = runner.invoke(analyze, args)
         if analysis_output_file.exists():
             json_output = json.loads(analysis_output_file.read_bytes())
         else:
@@ -83,12 +86,14 @@ def _get_analysis_result(protocol_files: List[Path]) -> _AnalysisCLIResult:
         )
 
 
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
 @pytest.mark.parametrize("fixture_path", _list_fixtures(6))
 def test_analyze(
     fixture_path: Path,
+    output: str,
 ) -> None:
     """Should return with no errors and a non-empty output."""
-    result = _get_analysis_result([fixture_path])
+    result = _get_analysis_result([fixture_path], output)
 
     assert result.exit_code == 0
 
@@ -124,6 +129,7 @@ def _get_deck_definition_test_source(api_level: str, robot_type: str) -> str:
     )
 
 
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
 @pytest.mark.parametrize(
     ("api_level", "robot_type", "expected_point"),
     [
@@ -145,6 +151,7 @@ def test_analysis_deck_definition(
     robot_type: str,
     expected_point: str,
     tmp_path: Path,
+    output: str,
 ) -> None:
     """Test that the analysis uses the appropriate deck definition for the protocol's robot type.
 
@@ -161,7 +168,7 @@ def test_analysis_deck_definition(
         encoding="utf-8",
     )
 
-    result = _get_analysis_result([protocol_source_file])
+    result = _get_analysis_result([protocol_source_file], output)
 
     assert result.exit_code == 0
 
@@ -177,7 +184,8 @@ def test_analysis_deck_definition(
 
 # TODO(mm, 2023-08-12): We can remove this test when we remove special handling for these
 # protocols. https://opentrons.atlassian.net/browse/RSS-306
-def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_strict_metatada_requirements_validation(tmp_path: Path, output: str) -> None:
     """It should apply strict validation to the metadata and requirements dicts.
 
     It should reject protocols with questionable metadata and requirements dicts,
@@ -198,7 +206,7 @@ def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
     protocol_source_file = tmp_path / "protocol.py"
     protocol_source_file.write_text(protocol_source, encoding="utf-8")
 
-    result = _get_analysis_result([protocol_source_file])
+    result = _get_analysis_result([protocol_source_file], output)
 
     assert result.exit_code != 0
 
@@ -208,6 +216,8 @@ def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
     assert expected_message in result.stdout_stderr
 
 
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+@pytest.mark.parametrize("check", [True, False])
 @pytest.mark.parametrize(
     ("python_protocol_source", "expected_detail"),
     [
@@ -256,22 +266,30 @@ def test_strict_metatada_requirements_validation(tmp_path: Path) -> None:
     ],
 )
 def test_python_error_line_numbers(
-    tmp_path: Path, python_protocol_source: str, expected_detail: str
+    tmp_path: Path,
+    python_protocol_source: str,
+    expected_detail: str,
+    output: str,
+    check: bool,
 ) -> None:
     """Test that error messages from Python protocols have line numbers."""
     protocol_source_file = tmp_path / "protocol.py"
     protocol_source_file.write_text(python_protocol_source, encoding="utf-8")
 
-    result = _get_analysis_result([protocol_source_file])
+    result = _get_analysis_result([protocol_source_file], output, check)
 
-    assert result.exit_code == 0
+    if check:
+        assert result.exit_code != 0
+    else:
+        assert result.exit_code == 0
     assert result.json_output is not None
     [error] = result.json_output["errors"]
     assert error["detail"] == expected_detail
 
 
 @pytest.mark.usefixtures("override_data_store")
-def test_track_analysis(tmp_path: Path) -> None:
+@pytest.mark.parametrize("output", ["--json-output", "--human-json-output"])
+def test_track_analysis(tmp_path: Path, output: str) -> None:
     """Test that the RobotContextTracker tracks analysis."""
     protocol_source = textwrap.dedent(
         """
@@ -287,7 +305,7 @@ def test_track_analysis(tmp_path: Path) -> None:
 
     num_storage_entities_before_analysis = len(store._data)
 
-    _get_analysis_result([protocol_source_file])
+    _get_analysis_result([protocol_source_file], output)
 
     assert len(store._data) == num_storage_entities_before_analysis + 1
 

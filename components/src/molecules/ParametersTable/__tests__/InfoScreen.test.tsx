@@ -34,6 +34,24 @@ describe('InfoScreen', () => {
     screen.getByText('Connect modules to see controls')
   })
 
+  it('should render text and icon with proper color - run not started', () => {
+    props = {
+      contentType: 'runNotStarted',
+    }
+    render(props)
+    screen.getByLabelText('alert')
+    screen.getByText('Run was never started')
+  })
+
+  it('should render text and icon with proper color - labware', () => {
+    props = {
+      contentType: 'labware',
+    }
+    render(props)
+    screen.getByLabelText('alert')
+    screen.getByText('No labware specified in this protocol')
+  })
+
   it('should have proper styles', () => {
     render(props)
     expect(screen.getByTestId('InfoScreen_parameters')).toHaveStyle(

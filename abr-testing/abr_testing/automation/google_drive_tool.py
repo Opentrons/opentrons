@@ -1,12 +1,16 @@
 """Google Drive Tool."""
 import os
-from typing import Set, Any, Optional
+import io
+import json
+import sys
+from typing import Set, Any, Optional, List, Dict
 import webbrowser
 import mimetypes
 from oauth2client.service_account import ServiceAccountCredentials  # type: ignore[import]
 import googleapiclient  # type: ignore[import]
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaIoBaseDownload
 
 """Google Drive Tool.
 
@@ -19,13 +23,17 @@ class google_drive:
 
     def __init__(self, credentials: Any, folder_name: str, email: str) -> None:
         """Connects to google drive via credentials file."""
-        self.scope = ["https://www.googleapis.com/auth/drive"]
-        self.credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            credentials, self.scope
-        )
-        self.drive_service = build("drive", "v3", credentials=self.credentials)
-        self.parent_folder = folder_name
-        self.email = email
+        try:
+            self.scope = ["https://www.googleapis.com/auth/drive"]
+            self.credentials = ServiceAccountCredentials.from_json_keyfile_name(
+                credentials, self.scope
+            )
+            self.drive_service = build("drive", "v3", credentials=self.credentials)
+            self.parent_folder = folder_name
+            self.email = email
+        except json.decoder.JSONDecodeError:
+            print("Error! Get file: https://console.cloud.google.com/apis/credentials")
+            sys.exit()
 
     def list_folder(self, delete: Any = False) -> Set[str]:
         """List folders and files in Google Drive."""
@@ -88,7 +96,7 @@ class google_drive:
 
     def upload_missing_files(self, storage_directory: str) -> None:
         """Upload missing files to Google Drive."""
-        # Read Google Drive .json files.
+        # Read .json files.
         google_drive_files = self.list_folder()
         google_drive_files_json = [
             file for file in google_drive_files if file.endswith(".json")
@@ -111,7 +119,7 @@ class google_drive:
             except googleapiclient.errors.HttpError:
                 continue
 
-        # Fetch the updated file list after all files are uploaded
+        # Fetch the updated file list after all are uploaded
         files = google_drive.list_folder(self)
 
         file_names = [file for file in files]
@@ -122,9 +130,7 @@ class google_drive:
                     f"File '{this_name}' was successfully uploaded with ID: {uploaded_file['id']}"
                 )
             else:
-                print(
-                    f"File '{this_name}' was not found in the list of files after uploading."
-                )
+                print(f"File '{this_name}' was not found after uploading.")
         print(f"{len(files)} item(s) in Google Drive")
 
     def open_folder(self) -> Optional[str]:
@@ -154,3 +160,32 @@ class google_drive:
         self.drive_service.permissions().create(
             fileId=file_id, body=new_permission, transferOwnership=False  # type: ignore
         ).execute()
+
+    def download_files(
+        self, files_to_download: List[Dict[str, Any]], save_directory: str
+    ) -> None:
+        """Download files to a specified directory."""
+        for file in files_to_download:
+            id = file["id"]
+            file_name = file["name"]
+            file_path = os.path.join(save_directory, file_name)
+            request = self.drive_service.files().get_media(fileId=id)  # type: ignore[attr-defined]
+            fh = io.FileIO(file_path, "wb")
+            downloader = MediaIoBaseDownload(fh, request)
+            done = False
+            while done is False:
+                status, done = downloader.next_chunk()
+                print(f"Downloading {file_name}... {int(status.progress() * 100)}%")
+
+    def search_folder(self, search_strings: List[str], folder_id: str) -> List[Any]:
+        """Search folder for files containing string from list."""
+        files_found = []
+        for search_string in search_strings:
+            query = f"'{folder_id}' in parents and name contains '{search_string}'"
+            response = (
+                self.drive_service.files()
+                .list(q=query, fields="files(id,name)")
+                .execute()
+            )
+            files_found.extend(response.get("files", []))
+        return files_found

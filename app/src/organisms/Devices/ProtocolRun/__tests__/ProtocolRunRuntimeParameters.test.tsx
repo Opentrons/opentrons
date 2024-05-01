@@ -169,7 +169,7 @@ describe('ProtocolRunRuntimeParameters', () => {
         runTimeParameters: [] as RunTimeParameter[],
       } as CompletedProtocolAnalysis)
     render(props)
-    screen.getByText('Parameters')
+    expect(screen.queryByText('Parameters')).not.toBeInTheDocument()
     expect(screen.queryByText('Default values')).not.toBeInTheDocument()
     screen.getByText('mock InfoScreen')
   })
