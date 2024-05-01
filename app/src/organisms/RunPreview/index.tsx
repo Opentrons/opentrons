@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
 
 import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
-import { useAllCommandsQuery } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -21,7 +20,11 @@ import {
 } from '@opentrons/components'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { useNotifyLastRunCommand } from '../../resources/runs'
+import {
+  useNotifyLastRunCommand,
+  useNotifyAllCommandsAsPreSerializedList,
+ } from '../../resources/runs'
+>>>>>>> edge
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
 import { NAV_BAR_WIDTH } from '../../App/constants'
@@ -33,6 +36,8 @@ import type { RobotType } from '@opentrons/shared-data'
 
 const COLOR_FADE_MS = 500
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
+// arbitrary large number of commands
+const MAX_COMMANDS = 100000
 
 interface RunPreviewProps {
   runId: string
@@ -52,11 +57,17 @@ export const RunPreviewComponent = (
       ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
       : false
   // we only ever want one request done for terminal runs because this is a heavy request
-  const commandsFromQuery = useAllCommandsQuery(runId, null, {
-    staleTime: Infinity,
-    cacheTime: Infinity,
-    enabled: isRunTerminal,
-  }).data?.data
+  const commandsFromQuery = useNotifyAllCommandsAsPreSerializedList(
+    runId,
+    { cursor: 0, pageLength: MAX_COMMANDS },
+    {
+      staleTime: Infinity,
+      cacheTime: Infinity,
+      enabled: isRunTerminal,
+    }
+  ).data?.data
+  const nullCheckedCommandsFromQuery =
+    commandsFromQuery == null ? robotSideAnalysis?.commands : commandsFromQuery
   const viewPortRef = React.useRef<HTMLDivElement | null>(null)
   const currentRunCommandKey = useNotifyLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
@@ -67,7 +78,9 @@ export const RunPreviewComponent = (
   ] = React.useState<boolean>(true)
   if (robotSideAnalysis == null) return null
   const commands =
-    (isRunTerminal ? commandsFromQuery : robotSideAnalysis.commands) ?? []
+    (isRunTerminal
+      ? nullCheckedCommandsFromQuery
+      : robotSideAnalysis.commands) ?? []
   const currentRunCommandIndex = commands.findIndex(
     c => c.key === currentRunCommandKey
   )

@@ -12402,7 +12402,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashC1",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -12413,7 +12413,7 @@
       },
       "result": {
         "position": {
-          "x": 22.25,
+          "x": 54.25,
           "y": 150.0,
           "z": 40.0
         }
@@ -12661,7 +12661,7 @@
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashD1",
-        "alternateDropLocation": false,
+        "alternateDropLocation": true,
         "forceDirect": false,
         "ignoreTipConfiguration": true,
         "offset": {
@@ -12672,7 +12672,7 @@
       },
       "result": {
         "position": {
-          "x": 22.25,
+          "x": 54.25,
           "y": 43.0,
           "z": 40.0
         }

@@ -362,6 +362,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
         elif isinstance(action, StopAction):
             if not self._state.run_result:
+                if self._state.queue_status == QueueStatus.AWAITING_RECOVERY:
+                    self._state.recovery_target_command_id = None
+
                 self._state.queue_status = QueueStatus.PAUSED
                 if action.from_estop:
                     self._state.stopped_by_estop = True
