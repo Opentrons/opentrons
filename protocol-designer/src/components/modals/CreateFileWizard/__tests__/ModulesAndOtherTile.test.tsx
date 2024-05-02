@@ -5,10 +5,7 @@ import { fireEvent, screen, cleanup } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../localization'
-import {
-  getDisableModuleRestrictions,
-  getEnableMoam,
-} from '../../../../feature-flags/selectors'
+import { getDisableModuleRestrictions } from '../../../../feature-flags/selectors'
 import { CrashInfoBox } from '../../../modules'
 import { ModuleFields } from '../../FilePipettesModal/ModuleFields'
 import { ModulesAndOtherTile } from '../ModulesAndOtherTile'
@@ -62,9 +59,12 @@ describe('ModulesAndOtherTile', () => {
       ...mockWizardTileProps,
     } as WizardTileProps
 <<<<<<< HEAD
+<<<<<<< HEAD
     vi.mocked(getEnableMoam).mockReturnValue(true)
 =======
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+>>>>>>> 9f9c742fec (feat(protocol-designer): remove MoaM feature flag (#15061))
     vi.mocked(CrashInfoBox).mockReturnValue(<div> mock CrashInfoBox</div>)
     vi.mocked(EquipmentOption).mockReturnValue(<div>mock EquipmentOption</div>)
     vi.mocked(getDisableModuleRestrictions).mockReturnValue(false)

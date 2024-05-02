@@ -37,7 +37,6 @@ import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import gripperImage from '../../../images/flex_gripper.png'
 import wasteChuteImage from '../../../images/waste_chute.png'
 import trashBinImage from '../../../images/flex_trash_bin.png'
-import { getEnableMoam } from '../../../feature-flags/selectors'
 import { uuid } from '../../../utils'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { CrashInfoBox, ModuleDiagram } from '../../modules'
@@ -191,7 +190,6 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
 
 function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const { watch, setValue } = props
-  const enableMoamFf = useSelector(getEnableMoam)
   const modules = watch('modules')
   const additionalEquipment = watch('additionalEquipment')
   const moduleTypesOnDeck =
@@ -261,10 +259,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
         }
 
         const handleOnClick = (): void => {
-          if (
-            (moduleType !== TEMPERATURE_MODULE_TYPE && enableMoamFf) ||
-            !enableMoamFf
-          ) {
+          if (moduleType !== TEMPERATURE_MODULE_TYPE) {
             if (isModuleOnDeck) {
               const updatedModules =
                 modules != null
@@ -302,7 +297,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
             }
             onClick={handleOnClick}
             multiples={
-              moduleType === TEMPERATURE_MODULE_TYPE && enableMoamFf
+              moduleType === TEMPERATURE_MODULE_TYPE
                 ? {
                     maxItems: MAX_TEMPERATURE_MODULES,
                     setValue: handleMultiplesClick,
@@ -316,9 +311,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
                   }
                 : undefined
             }
-            showCheckbox={
-              enableMoamFf ? moduleType !== TEMPERATURE_MODULE_TYPE : true
-            }
+            showCheckbox={moduleType !== TEMPERATURE_MODULE_TYPE}
           />
         )
       })}

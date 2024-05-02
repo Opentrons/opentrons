@@ -16,7 +16,10 @@ import { EditModules } from '../EditModules'
 import { EditModulesModal } from '../modals/EditModulesModal'
 import { renderWithProviders } from '../../__testing-utils__'
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { getEnableMoam } from '../../feature-flags/selectors'
+=======
+>>>>>>> 9f9c742fec (feat(protocol-designer): remove MoaM feature flag (#15061))
 import { getRobotType } from '../../file-data/selectors'
 import { EditMultipleModulesModal } from '../modals/EditModulesModal/EditMultipleModulesModal'
 
@@ -35,7 +38,6 @@ vi.mock('../modals/EditModulesModal/EditMultipleModulesModal')
 vi.mock('../modals/EditModulesModal')
 vi.mock('../../tutorial/selectors')
 vi.mock('../../file-data/selectors')
-vi.mock('../../feature-flags/selectors')
 const render = (props: React.ComponentProps<typeof EditModules>) => {
   return renderWithProviders(<EditModules {...props} />, {
     i18nInstance: i18n,
@@ -79,10 +81,13 @@ describe('EditModules', () => {
     )
     vi.mocked(getDismissedHints).mockReturnValue([hintKey])
     vi.mocked(getRobotType).mockReturnValue(OT2_ROBOT_TYPE)
+<<<<<<< HEAD
     vi.mocked(getEnableMoam).mockReturnValue(true)
 =======
     vi.mocked(getDismissedHints).mockReturnValue([hintKey])
 >>>>>>> 9359adf484 (chore(monorepo): migrate frontend bundling from webpack to vite (#14405))
+=======
+>>>>>>> 9f9c742fec (feat(protocol-designer): remove MoaM feature flag (#15061))
   })
 
   it('renders the edit modules modal for single modules', () => {
