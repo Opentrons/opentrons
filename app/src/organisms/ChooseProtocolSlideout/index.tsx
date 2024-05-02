@@ -26,7 +26,7 @@ import {
   SecondaryButton,
   StyledText,
   TYPOGRAPHY,
-  useHoverTooltip,
+  useTooltip,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -63,6 +63,8 @@ export const CARD_OUTLINE_BORDER_STYLE = css`
   }
 `
 
+const TOOLTIP_DELAY_MS = 2000
+
 const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]
 }
@@ -78,7 +80,11 @@ export function ChooseProtocolSlideoutComponent(
   const { t } = useTranslation(['device_details', 'shared'])
   const history = useHistory()
   const logger = useLogger(new URL('', import.meta.url).pathname)
-  const [targetProps, tooltipProps] = useHoverTooltip()
+  const [targetProps, tooltipProps] = useTooltip()
+  const [
+    showRestoreValuesTooltip,
+    setShowRestoreValuesTooltip,
+  ] = React.useState<boolean>(false)
 
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
@@ -351,16 +357,35 @@ export function ChooseProtocolSlideoutComponent(
           css={
             isRestoreDefaultsLinkEnabled ? ENABLED_LINK_CSS : DISABLED_LINK_CSS
           }
-          onClick={resetRunTimeParameters}
+          onClick={() => {
+            if (isRestoreDefaultsLinkEnabled) {
+              resetRunTimeParameters?.()
+            } else {
+              setShowRestoreValuesTooltip(true)
+              setTimeout(
+                () => setShowRestoreValuesTooltip(false),
+                TOOLTIP_DELAY_MS
+              )
+            }
+          }}
+          paddingBottom={SPACING.spacing10}
           {...targetProps}
         >
           {t('protocol_details:restore_defaults')}
         </LinkComponent>
-        {!isRestoreDefaultsLinkEnabled && (
-          <Tooltip tooltipProps={tooltipProps}>
-            {t('protocol_details:no_custom_values')}
-          </Tooltip>
-        )}
+        <Tooltip
+          tooltipProps={{
+            ...tooltipProps,
+            visible: showRestoreValuesTooltip,
+          }}
+          css={css`
+            &:hover {
+              cursor: auto;
+            }
+          `}
+        >
+          {t('protocol_details:no_custom_values')}
+        </Tooltip>{' '}
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         {runTimeParametersInputs}
