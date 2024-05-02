@@ -61,7 +61,7 @@ twine_repository_url ?= $(pypi_test_upload_url)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'src/**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
 clean_sdist_cmd = $(clean_cmd) dist/*.tar.gz
 clean_all_cmd = $(clean_cmd) dist
