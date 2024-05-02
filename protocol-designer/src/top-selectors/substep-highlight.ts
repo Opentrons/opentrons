@@ -202,13 +202,19 @@ function _getSelectedWellsForSubstep(
 
   // source + dest steps
 
-  // @ts-expect-error(sa, 2021-6-22): `sourceLabware` is missing in `MixArgs`
-  if (stepArgs.sourceLabware && stepArgs.sourceLabware === labwareId) {
+  if (
+    'sourceLabware' in stepArgs &&
+    stepArgs.sourceLabware &&
+    stepArgs.sourceLabware === labwareId
+  ) {
     wells.push(...getWells('source'))
   }
 
-  // @ts-expect-error(sa, 2021-6-22): property `destLabware` is missing in `MixArgs`
-  if (stepArgs.destLabware && stepArgs.destLabware === labwareId) {
+  if (
+    'destLabware' in stepArgs &&
+    stepArgs.destLabware &&
+    stepArgs.destLabware === labwareId
+  ) {
     wells.push(...getWells('dest'))
   }
 
