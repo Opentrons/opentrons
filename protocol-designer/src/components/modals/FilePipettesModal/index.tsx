@@ -190,7 +190,7 @@ const makeUpdatePipettes = (
   newTiprackUris.forEach(tiprackDefUri => {
     if (!previousTiprackUris.has(tiprackDefUri)) {
       const adapterUnderLabwareDefURI = newPipetteArray.some(
-        pip => pip.name === 'p1000_96'
+        pipette => pipette.name === 'p1000_96'
       )
         ? adapter96ChannelDefUri
         : undefined
