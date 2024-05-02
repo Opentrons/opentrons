@@ -18,12 +18,12 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useRunQuery } from '@opentrons/react-api-client'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
   useNotifyLastRunCommand,
   useNotifyAllCommandsAsPreSerializedList,
+  useNotifyRunQuery,
 } from '../../resources/runs'
 import { CommandText } from '../CommandText'
 import { Divider } from '../../atoms/structure'
@@ -52,7 +52,7 @@ export const RunPreviewComponent = (
   const { t } = useTranslation('run_details')
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const runStatus = useRunStatus(runId)
-  const { data: runRecord } = useRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
   const isRunTerminal =
     runStatus != null
       ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
