@@ -10,6 +10,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons import protocol_reader
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ParameterContext
+from opentrons.protocol_api.core.legacy.load_info import LoadInfo
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -34,7 +35,6 @@ from .legacy_wrappers import (
     LegacyFileReader,
     LegacyContextCreator,
     LegacyExecutor,
-    LegacyLoadInfo,
 )
 from ..protocol_engine.errors import ProtocolCommandFailedError
 from ..protocol_engine.types import (
@@ -192,7 +192,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
-            equipment_broker = Broker[LegacyLoadInfo]()
+            equipment_broker = Broker[LoadInfo]()
             self._protocol_engine.add_plugin(
                 LegacyContextPlugin(
                     broker=self._broker, equipment_broker=equipment_broker

@@ -8,15 +8,20 @@ from pathlib import Path
 from typing import List, cast, Optional, Union, Type
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.dev_types import (
+    LabwareDefinition as LabwareDefinitionTypedDict,
+)
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSchemaV7
 from opentrons_shared_data.protocol.dev_types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import PythonParseMode
+from opentrons.protocols.types import PythonProtocol, JsonProtocol
 from opentrons.util.broker import Broker
 
 from opentrons import protocol_reader
@@ -46,10 +51,6 @@ from opentrons.protocol_runner.legacy_wrappers import (
     LegacyFileReader,
     LegacyContextCreator,
     LegacyExecutor,
-    LegacyPythonProtocol,
-    LegacyJsonProtocol,
-    LegacyProtocolContext,
-    LegacyLabwareDefinition,
 )
 
 
@@ -541,9 +542,9 @@ async def test_load_legacy_python(
         content_hash="abc123",
     )
 
-    extra_labware = {"definition-uri": cast(LegacyLabwareDefinition, {})}
+    extra_labware = {"definition-uri": cast(LabwareDefinitionTypedDict, {})}
 
-    legacy_protocol = LegacyPythonProtocol(
+    legacy_protocol = PythonProtocol(
         text="",
         contents="",
         filename="protocol.py",
@@ -556,7 +557,7 @@ async def test_load_legacy_python(
         extra_labware=extra_labware,
     )
 
-    legacy_context = decoy.mock(cls=LegacyProtocolContext)
+    legacy_context = decoy.mock(cls=ProtocolContext)
 
     decoy.when(
         await protocol_reader.extract_labware_definitions(legacy_protocol_source)
@@ -627,7 +628,7 @@ async def test_load_python_with_pe_papi_core(
         content_hash="abc123",
     )
 
-    legacy_protocol = LegacyPythonProtocol(
+    legacy_protocol = PythonProtocol(
         text="",
         contents="",
         filename="protocol.py",
@@ -640,7 +641,7 @@ async def test_load_python_with_pe_papi_core(
         extra_labware=None,
     )
 
-    legacy_context = decoy.mock(cls=LegacyProtocolContext)
+    legacy_context = decoy.mock(cls=ProtocolContext)
 
     decoy.when(
         await protocol_reader.extract_labware_definitions(legacy_protocol_source)
@@ -691,7 +692,7 @@ async def test_load_legacy_json(
         content_hash="abc123",
     )
 
-    legacy_protocol = LegacyJsonProtocol(
+    legacy_protocol = JsonProtocol(
         text="{}",
         contents=cast(LegacyJsonProtocolDict, {}),
         filename="protocol.json",
@@ -701,7 +702,7 @@ async def test_load_legacy_json(
         metadata={"protocolName": "A Very Impressive Protocol"},
     )
 
-    legacy_context = decoy.mock(cls=LegacyProtocolContext)
+    legacy_context = decoy.mock(cls=ProtocolContext)
 
     decoy.when(
         await protocol_reader.extract_labware_definitions(legacy_protocol_source)

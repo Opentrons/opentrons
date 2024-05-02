@@ -7,7 +7,13 @@ import pytest
 from decoy import matchers, Decoy
 
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.legacy_commands.types import CommentMessage, PauseMessage, CommandMessage
+from opentrons.protocol_api.core.legacy.load_info import (
+    LabwareLoadInfo,
+    InstrumentLoadInfo,
+    ModuleLoadInfo,
+)
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
@@ -28,12 +34,6 @@ from opentrons.protocol_runner.legacy_command_mapper import (
     LegacyContextCommandError,
     LegacyCommandMapper,
     LegacyCommandParams,
-)
-from opentrons.protocol_runner.legacy_wrappers import (
-    LegacyInstrumentLoadInfo,
-    LegacyLabwareLoadInfo,
-    LegacyModuleLoadInfo,
-    LegacyTemperatureModuleModel,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
@@ -270,7 +270,7 @@ def test_command_stack() -> None:
 
 def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
     """It should correctly map a labware load."""
-    input = LegacyLabwareLoadInfo(
+    input = LabwareLoadInfo(
         labware_definition=minimal_labware_def,
         labware_namespace="some_namespace",
         labware_load_name="some_load_name",
@@ -334,7 +334,7 @@ def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
 def test_map_instrument_load(decoy: Decoy) -> None:
     """It should correctly map an instrument load."""
     pipette_dict = cast(PipetteDict, {"pipette_id": "fizzbuzz"})
-    input = LegacyInstrumentLoadInfo(
+    input = InstrumentLoadInfo(
         instrument_load_name="p1000_single_gen2",
         mount=Mount.LEFT,
         pipette_dict=pipette_dict,
@@ -395,9 +395,9 @@ def test_map_module_load(
 ) -> None:
     """It should correctly map a module load."""
     test_definition = ModuleDefinition.parse_obj(minimal_module_def)
-    input = LegacyModuleLoadInfo(
-        requested_model=LegacyTemperatureModuleModel.TEMPERATURE_V1,
-        loaded_model=LegacyTemperatureModuleModel.TEMPERATURE_V2,
+    input = ModuleLoadInfo(
+        requested_model=TemperatureModuleModel.TEMPERATURE_V1,
+        loaded_model=TemperatureModuleModel.TEMPERATURE_V2,
         deck_slot=DeckSlotName.SLOT_1,
         configuration="conf",
         module_serial="module-serial",
@@ -454,7 +454,7 @@ def test_map_module_load(
 
 def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None:
     """It should correctly map a labware load on module."""
-    load_input = LegacyLabwareLoadInfo(
+    load_input = LabwareLoadInfo(
         labware_definition=minimal_labware_def,
         labware_namespace="some_namespace",
         labware_load_name="some_load_name",
