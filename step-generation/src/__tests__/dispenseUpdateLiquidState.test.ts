@@ -8,7 +8,12 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import produce from 'immer'
 import { createEmptyLiquidState, createTipLiquidState } from '../utils'
-import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from '../fixtures'
+import {
+  makeContext,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+  getInitialRobotStateStandard,
+} from '../fixtures'
 
 import {
   dispenseUpdateLiquidState,
@@ -33,6 +38,10 @@ beforeEach(() => {
     useFullVolume: false,
     labwareId: SOURCE_LABWARE,
     wellName: 'A1',
+    robotStateAndWarnings: {
+      robotState: getInitialRobotStateStandard(invariantContext),
+      warnings: [],
+    },
   }
 })
 
@@ -396,6 +405,10 @@ describe('...8-channel pipette', () => {
             useFullVolume: false,
             volume: 150,
             wellName: 'A1',
+            robotStateAndWarnings: {
+              robotState: getInitialRobotStateStandard(invariantContext),
+              warnings: [],
+            },
           },
           initialLiquidState
         )

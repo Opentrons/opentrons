@@ -1,4 +1,3 @@
-import assert from 'assert'
 import range from 'lodash/range'
 import isEmpty from 'lodash/isEmpty'
 import uniq from 'lodash/uniq'
@@ -32,7 +31,7 @@ export function forAspirate(
     params.wellName
   )
 
-  assert(
+  console.assert(
     // @ts-expect-error (sa, 2021-05-03): this assert is unnecessary
     uniq(wellsForTips).length === allWellsShared ? 1 : wellsForTips.length,
     `expected all wells to be shared, or no wells to be shared. Got: ${JSON.stringify(
