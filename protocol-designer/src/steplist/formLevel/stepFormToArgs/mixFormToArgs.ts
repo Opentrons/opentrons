@@ -70,7 +70,7 @@ export const mixFormToArgs = (
     : null
   // Blowout settings
   const blowoutFlowRateUlSec =
-    hydratedFormData.dispense_flowRate ??
+    hydratedFormData.blowout_flowRate ??
     matchingTipLiquidSpecs?.defaultBlowOutFlowRate.default
 
   const blowoutOffsetFromTopMm = blowoutLocation

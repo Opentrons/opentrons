@@ -52,6 +52,7 @@ describe('getDefaultsForStepType', () => {
 
         blowout_checkbox: false,
         blowout_location: null,
+        blowout_flowRate: null,
         preWetTip: false,
 
         aspirate_airGap_checkbox: false,
@@ -87,6 +88,7 @@ describe('getDefaultsForStepType', () => {
         mix_wellOrder_second: DEFAULT_WELL_ORDER_SECOND_OPTION,
         blowout_checkbox: false,
         blowout_location: null,
+        blowout_flowRate: null,
         mix_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
         mix_touchTip_mmFromBottom: null,
         mix_touchTip_checkbox: false,

@@ -63,6 +63,16 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       migrationModal: null,
       unusedPipettes: false,
     },
+    {
+      title:
+        'new advanced settings with multi temp => reimported, should not migrate and stay at 8.1.x, schema 8',
+      importFixture:
+        '../../fixtures/protocol/8/newAdvancedSettingsAndMultiTemp.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/8/newAdvancedSettingsAndMultiTemp.json',
+      migrationModal: null,
+      unusedPipettes: false,
+    },
   ]
 
   testCases.forEach(
