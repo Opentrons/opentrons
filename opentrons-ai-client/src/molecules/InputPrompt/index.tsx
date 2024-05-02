@@ -20,6 +20,7 @@ import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
 
 import type { ChatData } from '../../resources/types'
 
+// ToDo (kk:05/02/2024) This url is temporary
 const url = 'http://localhost:8000/streaming/ask'
 
 interface InputType {
@@ -94,6 +95,9 @@ export function InputPrompt(): JSX.Element {
       setSubmitted(false)
     }
   }, [data, loading, submitted])
+
+  // ToDo (kk:05/02/2024) This is also temp. Asking the design about error.
+  console.error('error', error)
 
   return (
     <StyledForm id="User_Prompt">

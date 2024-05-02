@@ -80,13 +80,13 @@ export function ChatDisplay({ chat }: ChatDisplayProps): JSX.Element {
 //   return <StyledText {...props} as="ul" />
 // }
 
-const CODE_TEXT_STYLE = css`
-  padding: ${SPACING.spacing16};
-  font-family: monospace;
-  color: ${COLORS.white};
-  background-color: ${COLORS.black90};
-`
+// const CODE_TEXT_STYLE = css`
+//   padding: ${SPACING.spacing16};
+//   font-family: monospace;
+//   color: ${COLORS.white};
+//   background-color: ${COLORS.black90};
+// `
 
-function CodeText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="p" css={CODE_TEXT_STYLE} />
-}
+// function CodeText(props: JSX.IntrinsicAttributes): JSX.Element {
+//   return <StyledText {...props} as="p" css={CODE_TEXT_STYLE} />
+// }
