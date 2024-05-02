@@ -700,11 +700,6 @@ def run(
                             location=next_tip_location,
                         )
                         resources.pipette._retract()  # retract to top of gantry
-                    if not cfg.jog:
-                        _liquid_height = _get_liquid_height(resources, cfg, well)
-                        liquid_tracker.set_start_volume_from_liquid_height(
-                            well, _liquid_height, name="Water"
-                        )
                     (
                         actual_aspirate,
                         aspirate_data,
@@ -771,6 +766,11 @@ def run(
                                 resources.pipette,
                                 cfg,
                                 location=next_tip_location,
+                            )
+                        if not cfg.jog:
+                            _liquid_height = _get_liquid_height(resources, cfg, well)
+                            liquid_tracker.set_start_volume_from_liquid_height(
+                                well, _liquid_height, name="Water"
                             )
                         resources.pipette._retract()  # retract to top of gantry
                         (
