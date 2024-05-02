@@ -500,7 +500,7 @@ export function ChooseRobotSlideout(
 
   const pageTwoBody =
     runTimeParametersOverrides != null ? (
-      <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
         <Flex justifyContent={JUSTIFY_END}>
           <Link
             textAlign={TYPOGRAPHY.textAlignRight}
@@ -510,7 +510,6 @@ export function ChooseRobotSlideout(
                 : DISABLED_LINK_CSS
             }
             onClick={() => resetRunTimeParameters?.()}
-            paddingBottom={SPACING.spacing10}
             {...targetProps}
           >
             {t('restore_defaults')}

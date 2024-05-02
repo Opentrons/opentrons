@@ -341,7 +341,7 @@ export function ChooseProtocolSlideoutComponent(
   }
 
   const pageTwoBody = (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
       <Flex justifyContent={JUSTIFY_END}>
         <LinkComponent
           textAlign={TYPOGRAPHY.textAlignRight}
@@ -349,7 +349,6 @@ export function ChooseProtocolSlideoutComponent(
             isRestoreDefaultsLinkEnabled ? ENABLED_LINK_CSS : DISABLED_LINK_CSS
           }
           onClick={resetRunTimeParameters}
-          paddingBottom={SPACING.spacing10}
           {...targetProps}
         >
           {t('protocol_details:restore_defaults')}
