@@ -23,7 +23,7 @@ from opentrons.protocol_api import (
     create_protocol_context,
 )
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
-from opentrons.protocol_api.core.legacy.load_info import LoadInfo as LegacyLoadInfo
+from opentrons.protocol_api.core.legacy.load_info import LoadInfo
 
 from opentrons.protocols.parse import PythonParseMode, parse
 from opentrons.protocols.execution.execute import run_protocol
@@ -44,7 +44,7 @@ LEGACY_PYTHON_API_VERSION_CUTOFF = ENGINE_CORE_API_VERSION
 LEGACY_JSON_SCHEMA_VERSION_CUTOFF = 6
 
 
-class LegacyFileReader:
+class PythonProtocolFileReader:
     """Interface to read Protocol API v2 protocols prior to execution."""
 
     @staticmethod
@@ -81,7 +81,7 @@ class LegacyFileReader:
         )
 
 
-class LegacyContextCreator:
+class ProtocolContextCreator:
     """Interface to construct Protocol API v2 contexts."""
 
     _USE_SIMULATING_CORE = False
@@ -106,7 +106,7 @@ class LegacyContextCreator:
         self,
         protocol: Protocol,
         broker: Optional[LegacyBroker],
-        equipment_broker: Optional[Broker[LegacyLoadInfo]],
+        equipment_broker: Optional[Broker[LoadInfo]],
     ) -> ProtocolContext:
         """Create a Protocol API v2 context."""
         extra_labware = (
@@ -131,7 +131,7 @@ class LegacyContextCreator:
         )
 
 
-class LegacySimulatingContextCreator(LegacyContextCreator):
+class SimulatingContextCreator(ProtocolContextCreator):
     """Interface to construct PAPIv2 contexts using simulating implementations.
 
     Avoids some calls to the hardware API for performance.
@@ -141,7 +141,7 @@ class LegacySimulatingContextCreator(LegacyContextCreator):
     _USE_SIMULATING_CORE = True
 
 
-class LegacyExecutor:
+class PythonProtocolExecutor:
     """Interface to execute Protocol API v2 protocols in a child thread."""
 
     @staticmethod

@@ -65,7 +65,7 @@ class LegacyContextCommandError(ProtocolEngineError):
             )
 
 
-_LEGACY_TO_PE_MODULE: Dict[HardwareModuleModel, pe_types.ModuleModel] = {
+_HARDWARE_TO_PE_MODULE: Dict[HardwareModuleModel, pe_types.ModuleModel] = {
     MagneticModuleModel.MAGNETIC_V1: pe_types.ModuleModel.MAGNETIC_MODULE_V1,
     MagneticModuleModel.MAGNETIC_V2: pe_types.ModuleModel.MAGNETIC_MODULE_V2,
     TemperatureModuleModel.TEMPERATURE_V1: pe_types.ModuleModel.TEMPERATURE_MODULE_V1,
@@ -727,8 +727,8 @@ class LegacyCommandMapper:
         count = self._command_count["LOAD_MODULE"]
         command_id = f"commands.LOAD_MODULE-{count}"
         module_id = f"module-{count}"
-        requested_model = _LEGACY_TO_PE_MODULE[module_load_info.requested_model]
-        loaded_model = _LEGACY_TO_PE_MODULE[module_load_info.loaded_model]
+        requested_model = _HARDWARE_TO_PE_MODULE[module_load_info.requested_model]
+        loaded_model = _HARDWARE_TO_PE_MODULE[module_load_info.loaded_model]
 
         # This will fetch a V2 definition only. PAPI < v2.3 use V1 definitions.
         # When running a < v2.3 protocol, there will be a mismatch of definitions used
