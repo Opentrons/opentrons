@@ -17,10 +17,10 @@ from opentrons.legacy_commands import types as legacy_command_types
 from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_api.core.legacy.deck import FIXED_TRASH_ID
 from opentrons.protocol_api.core.legacy.load_info import (
-    LoadInfo,
-    LabwareLoadInfo,
-    InstrumentLoadInfo,
-    ModuleLoadInfo,
+    LoadInfo as LegacyLoadInfo,
+    LabwareLoadInfo as LegacyLabwareLoadInfo,
+    InstrumentLoadInfo as LegacyInstrumentLoadInfo,
+    ModuleLoadInfo as LegacyModuleLoadInfo,
 )
 from opentrons.protocol_engine import (
     ProtocolEngineError,
@@ -283,13 +283,13 @@ class LegacyCommandMapper:
 
         return results
 
-    def map_equipment_load(self, load_info: LoadInfo) -> List[pe_actions.Action]:
+    def map_equipment_load(self, load_info: LegacyLoadInfo) -> List[pe_actions.Action]:
         """Map a labware, instrument (pipette), or module load to a PE command."""
-        if isinstance(load_info, LabwareLoadInfo):
+        if isinstance(load_info, LegacyLabwareLoadInfo):
             return self._map_labware_load(load_info)
-        elif isinstance(load_info, InstrumentLoadInfo):
+        elif isinstance(load_info, LegacyInstrumentLoadInfo):
             return self._map_instrument_load(load_info)
-        elif isinstance(load_info, ModuleLoadInfo):
+        elif isinstance(load_info, LegacyModuleLoadInfo):
             return self._map_module_load(load_info)
 
     def _build_initial_command(
@@ -592,7 +592,7 @@ class LegacyCommandMapper:
             return custom_create, custom_running
 
     def _map_labware_load(
-        self, labware_load_info: LabwareLoadInfo
+        self, labware_load_info: LegacyLabwareLoadInfo
     ) -> List[pe_actions.Action]:
         """Map a legacy labware load to a ProtocolEngine command."""
         now = ModelUtils.get_timestamp()
@@ -660,7 +660,7 @@ class LegacyCommandMapper:
 
     def _map_instrument_load(
         self,
-        instrument_load_info: InstrumentLoadInfo,
+        instrument_load_info: LegacyInstrumentLoadInfo,
     ) -> List[pe_actions.Action]:
         """Map a legacy instrument (pipette) load to a ProtocolEngine command.
 
@@ -719,7 +719,7 @@ class LegacyCommandMapper:
         return [queue_action, run_action, succeed_action]
 
     def _map_module_load(
-        self, module_load_info: ModuleLoadInfo
+        self, module_load_info: LegacyModuleLoadInfo
     ) -> List[pe_actions.Action]:
         """Map a legacy module load to a Protocol Engine command."""
         now = ModelUtils.get_timestamp()

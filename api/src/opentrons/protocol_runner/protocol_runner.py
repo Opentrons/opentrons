@@ -32,7 +32,7 @@ from .legacy_context_plugin import LegacyContextPlugin
 from .python_protocol_wrappers import (
     LEGACY_PYTHON_API_VERSION_CUTOFF,
     LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
-    PythonProtocolFileReader,
+    PythonAndLegacyFileReader,
     ProtocolContextCreator,
     PythonProtocolExecutor,
 )
@@ -136,7 +136,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         protocol_engine: ProtocolEngine,
         hardware_api: HardwareControlAPI,
         task_queue: Optional[TaskQueue] = None,
-        python_protocol_file_reader: Optional[PythonProtocolFileReader] = None,
+        python_and_legacy_file_reader: Optional[PythonAndLegacyFileReader] = None,
         protocol_context_creator: Optional[ProtocolContextCreator] = None,
         python_protocol_executor: Optional[PythonProtocolExecutor] = None,
         post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
@@ -146,7 +146,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         super().__init__(protocol_engine)
         self._hardware_api = hardware_api
         self._protocol_file_reader = (
-            python_protocol_file_reader or PythonProtocolFileReader()
+            python_and_legacy_file_reader or PythonAndLegacyFileReader()
         )
         self._protocol_context_creator = (
             protocol_context_creator
@@ -422,7 +422,7 @@ def create_protocol_runner(
     task_queue: Optional[TaskQueue] = None,
     json_file_reader: Optional[JsonFileReader] = None,
     json_translator: Optional[JsonTranslator] = None,
-    python_protocol_file_reader: Optional[PythonProtocolFileReader] = None,
+    python_and_legacy_file_reader: Optional[PythonAndLegacyFileReader] = None,
     protocol_context_creator: Optional[ProtocolContextCreator] = None,
     python_protocol_executor: Optional[PythonProtocolExecutor] = None,
     post_run_hardware_state: PostRunHardwareState = PostRunHardwareState.HOME_AND_STAY_ENGAGED,
@@ -448,7 +448,7 @@ def create_protocol_runner(
                 protocol_engine=protocol_engine,
                 hardware_api=hardware_api,
                 task_queue=task_queue,
-                python_protocol_file_reader=python_protocol_file_reader,
+                python_and_legacy_file_reader=python_and_legacy_file_reader,
                 protocol_context_creator=protocol_context_creator,
                 python_protocol_executor=python_protocol_executor,
                 post_run_hardware_state=post_run_hardware_state,

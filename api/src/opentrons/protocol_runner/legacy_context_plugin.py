@@ -122,7 +122,7 @@ class LegacyContextPlugin(AbstractPlugin):
         pass
 
     def _handle_legacy_command(self, command: LegacyCommand) -> None:
-        """Handle a command reported by the APIv2 protocol.
+        """Handle a command reported by the legacy APIv2 protocol.
 
         Used as a broker callback, so this will run in the APIv2 protocol's thread.
         """
@@ -130,7 +130,7 @@ class LegacyContextPlugin(AbstractPlugin):
         self._actions_to_dispatch.put(pe_actions)
 
     def _handle_equipment_loaded(self, load_info: LoadInfo) -> None:
-        """Handle an equipment load reported by the APIv2 protocol.
+        """Handle an equipment load reported by the legacy APIv2 protocol.
 
         Used as a broker callback, so this will run in the APIv2 protocol's thread.
         """

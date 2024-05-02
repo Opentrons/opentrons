@@ -48,7 +48,7 @@ from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocol_runner.json_translator import JsonTranslator
 from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
 from opentrons.protocol_runner.python_protocol_wrappers import (
-    PythonProtocolFileReader,
+    PythonAndLegacyFileReader,
     ProtocolContextCreator,
     PythonProtocolExecutor,
 )
@@ -85,9 +85,9 @@ def json_translator(decoy: Decoy) -> JsonTranslator:
 
 
 @pytest.fixture
-def python_protocol_file_reader(decoy: Decoy) -> PythonProtocolFileReader:
-    """Get a mocked out PythonProtocolFileReader dependency."""
-    return decoy.mock(cls=PythonProtocolFileReader)
+def python_and_legacy_file_reader(decoy: Decoy) -> PythonAndLegacyFileReader:
+    """Get a mocked out PythonAndLegacyFileReader dependency."""
+    return decoy.mock(cls=PythonAndLegacyFileReader)
 
 
 @pytest.fixture
@@ -137,7 +137,7 @@ def python_runner_subject(
     protocol_engine: ProtocolEngine,
     hardware_api: HardwareAPI,
     task_queue: TaskQueue,
-    python_protocol_file_reader: PythonProtocolFileReader,
+    python_and_legacy_file_reader: PythonAndLegacyFileReader,
     protocol_context_creator: ProtocolContextCreator,
     python_protocol_executor: PythonProtocolExecutor,
 ) -> PythonAndLegacyRunner:
@@ -146,7 +146,7 @@ def python_runner_subject(
         protocol_engine=protocol_engine,
         hardware_api=hardware_api,
         task_queue=task_queue,
-        python_protocol_file_reader=python_protocol_file_reader,
+        python_and_legacy_file_reader=python_and_legacy_file_reader,
         protocol_context_creator=protocol_context_creator,
         python_protocol_executor=python_protocol_executor,
     )
@@ -183,7 +183,7 @@ def test_create_protocol_runner(
     task_queue: TaskQueue,
     json_file_reader: JsonFileReader,
     json_translator: JsonTranslator,
-    python_protocol_file_reader: PythonProtocolFileReader,
+    python_and_legacy_file_reader: PythonAndLegacyFileReader,
     protocol_context_creator: ProtocolContextCreator,
     python_protocol_executor: PythonProtocolExecutor,
     config: Optional[Union[JsonProtocolConfig, PythonProtocolConfig]],
@@ -522,7 +522,7 @@ async def test_load_json_runner(
 
 async def test_load_legacy_python(
     decoy: Decoy,
-    python_protocol_file_reader: PythonProtocolFileReader,
+    python_and_legacy_file_reader: PythonAndLegacyFileReader,
     protocol_context_creator: ProtocolContextCreator,
     python_protocol_executor: PythonProtocolExecutor,
     task_queue: TaskQueue,
@@ -563,7 +563,7 @@ async def test_load_legacy_python(
         await protocol_reader.extract_labware_definitions(legacy_protocol_source)
     ).then_return([labware_definition])
     decoy.when(
-        python_protocol_file_reader.read(
+        python_and_legacy_file_reader.read(
             protocol_source=legacy_protocol_source,
             labware_definitions=[labware_definition],
             python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
@@ -612,7 +612,7 @@ async def test_load_legacy_python(
 
 async def test_load_python_with_pe_papi_core(
     decoy: Decoy,
-    python_protocol_file_reader: PythonProtocolFileReader,
+    python_and_legacy_file_reader: PythonAndLegacyFileReader,
     protocol_context_creator: ProtocolContextCreator,
     protocol_engine: ProtocolEngine,
     python_runner_subject: PythonAndLegacyRunner,
@@ -647,7 +647,7 @@ async def test_load_python_with_pe_papi_core(
         await protocol_reader.extract_labware_definitions(protocol_source)
     ).then_return([])
     decoy.when(
-        python_protocol_file_reader.read(
+        python_and_legacy_file_reader.read(
             protocol_source=protocol_source,
             labware_definitions=[],
             python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
@@ -672,7 +672,7 @@ async def test_load_python_with_pe_papi_core(
 
 async def test_load_legacy_json(
     decoy: Decoy,
-    python_protocol_file_reader: PythonProtocolFileReader,
+    python_and_legacy_file_reader: PythonAndLegacyFileReader,
     protocol_context_creator: ProtocolContextCreator,
     python_protocol_executor: PythonProtocolExecutor,
     task_queue: TaskQueue,
@@ -708,7 +708,7 @@ async def test_load_legacy_json(
         await protocol_reader.extract_labware_definitions(legacy_protocol_source)
     ).then_return([labware_definition])
     decoy.when(
-        python_protocol_file_reader.read(
+        python_and_legacy_file_reader.read(
             protocol_source=legacy_protocol_source,
             labware_definitions=[labware_definition],
             python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,

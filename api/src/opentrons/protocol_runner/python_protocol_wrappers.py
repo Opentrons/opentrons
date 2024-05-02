@@ -44,7 +44,7 @@ LEGACY_PYTHON_API_VERSION_CUTOFF = ENGINE_CORE_API_VERSION
 LEGACY_JSON_SCHEMA_VERSION_CUTOFF = 6
 
 
-class PythonProtocolFileReader:
+class PythonAndLegacyFileReader:
     """Interface to read Protocol API v2 protocols prior to execution."""
 
     @staticmethod
