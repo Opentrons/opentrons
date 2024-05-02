@@ -184,7 +184,7 @@ if __name__ == "__main__":
         print(f"Add .json file with robot IPs to: {storage_directory}.")
         sys.exit()
     ip_or_all = input("IP Address or ALL: ")
-    
+
     if ip_or_all == "ALL":
         ip_address_list = ip_file["ip_address_list"]
         for ip in ip_address_list:
