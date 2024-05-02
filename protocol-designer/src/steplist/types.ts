@@ -48,6 +48,7 @@ export interface SourceDestData {
   postIngreds: WellIngredientVolumeData
 }
 export interface SubstepTimelineFrame {
+  isAirGap?: boolean
   substepIndex?: number
   activeTips: TipLocation | null | undefined
   source?: SourceDestData
