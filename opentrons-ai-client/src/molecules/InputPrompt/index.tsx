@@ -16,7 +16,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SendButton } from '../../atoms/SendButton'
-// import { useFetch } from '../../resources/hooks'
 import { preparedPromptAtom, chatDataAtom } from '../../resources/atoms'
 
 import type { ChatData } from '../../resources/types'
@@ -44,7 +43,6 @@ export function InputPrompt(): JSX.Element {
 
   const userPrompt = watch('userPrompt') ?? ''
 
-  // const { data: responseData, loading, error } = useFetch(userPrompt)
   const calcTextAreaHeight = (): number => {
     const rowsNum = userPrompt.split('\n').length
     return rowsNum
@@ -55,10 +53,6 @@ export function InputPrompt(): JSX.Element {
       setLoading(true)
       try {
         const response = await axios.post(url, {
-          // headers: {
-          //   Accept: 'application/json',
-          //   'Content-Type': 'application/json;charset=UTF-8',
-          // },
           headers: {
             'Content-Type': 'application/json',
           },
@@ -75,20 +69,12 @@ export function InputPrompt(): JSX.Element {
   }
 
   const handleClick = (): void => {
-    // const userInput: ChatData = {
-    //   role: 'user',
-    //   content: userPrompt,
-    // }
-    // setChatData(chatData => [...chatData, userInput])
-    // void fetchData(userPrompt)
-    // setSubmitted(true)
-    // reset()
     const userInput: ChatData = {
       role: 'user',
       content: userPrompt,
     }
     setChatData(chatData => [...chatData, userInput])
-    void fetchData(userPrompt) // Call fetchData here
+    void fetchData(userPrompt)
     setSubmitted(true)
     reset()
   }
