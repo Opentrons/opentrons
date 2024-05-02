@@ -10,9 +10,9 @@ Runtime Parameters
     parameters/choosing
     parameters/defining
     parameters/using_values
-    parameters/style
     parameters/use_case_sample_count
     parameters/use_case_dry_run
+    parameters/style
 
 Runtime parameters let you define user-customizable variables in your Python protocols. This gives you greater flexibility and puts extra control in the hands of the technician running the protocol — without forcing them to switch between lots of protocol files or write code themselves.
 
