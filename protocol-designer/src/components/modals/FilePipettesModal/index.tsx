@@ -23,14 +23,7 @@ import {
   PipetteName,
   OT2_ROBOT_TYPE,
   getPipetteSpecsV2,
-  FLEX_ROBOT_TYPE,
-  RobotType,
 } from '@opentrons/shared-data'
-import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
-import { PipetteFields } from './PipetteFields'
-import { CrashInfoBox } from '../../modules'
-import styles from './FilePipettesModal.module.css'
-import modalStyles from '../modal.module.css'
 import {
   actions as stepFormActions,
   selectors as stepFormSelectors,
@@ -44,22 +37,28 @@ import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { NewProtocolFields } from '../../../load-file'
 import { getRobotType } from '../../../file-data/selectors'
 import { uuid } from '../../../utils'
-import { actions as steplistActions } from '../../../steplist'
-import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { getCrashableModuleSelected } from '../CreateFileWizard/utils'
-
-import type { DeckSlot, ThunkDispatch } from '../../../types'
-import type {
-  LabwareEntities,
-  NormalizedPipette,
-} from '@opentrons/step-generation'
-import type { StepIdType } from '../../../form-types'
 import { getLabwareEntities } from '../../../step-forms/selectors'
 import {
   createContainer,
   deleteContainer,
 } from '../../../labware-ingred/actions'
+import { actions as steplistActions } from '../../../steplist'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
+import { CrashInfoBox } from '../../modules'
+import { getCrashableModuleSelected } from '../CreateFileWizard/utils'
 import { adapter96ChannelDefUri } from '../CreateFileWizard'
+import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
+import { PipetteFields } from './PipetteFields'
+
+import type {
+  LabwareEntities,
+  NormalizedPipette,
+} from '@opentrons/step-generation'
+import type { DeckSlot, ThunkDispatch } from '../../../types'
+import type { StepIdType } from '../../../form-types'
+
+import styles from './FilePipettesModal.module.css'
+import modalStyles from '../modal.module.css'
 
 export type PipetteFieldsData = Omit<
   PipetteOnDeck,
