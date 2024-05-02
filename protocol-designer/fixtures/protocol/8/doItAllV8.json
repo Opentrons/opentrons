@@ -18,7 +18,7 @@
       "_internalAppBuildDate": "Wed, 01 May 2024 13:32:34 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
-        "dispense_mmFromBottom": 0.5,
+        "dispense_mmFromBottom": 1,
         "touchTip_mmFromTop": -1,
         "blowout_mmFromTop": 0
       },
@@ -3582,7 +3582,7 @@
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 0.5, "x": 0, "y": 0 }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 716
       }
@@ -3635,7 +3635,7 @@
         "wellName": "B1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 0.5, "x": 0, "y": 0 }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 716
       }
@@ -3688,7 +3688,7 @@
         "wellName": "C1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 0.5, "x": 0, "y": 0 }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 716
       }
@@ -3741,7 +3741,7 @@
         "wellName": "D1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 0.5, "x": 0, "y": 0 }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 716
       }
@@ -3794,7 +3794,7 @@
         "wellName": "E1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 0.5, "x": 0, "y": 0 }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 716
       }
@@ -3847,7 +3847,7 @@
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 0.5, "x": 0, "y": 0 }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 716
       }
@@ -3900,7 +3900,7 @@
         "wellName": "G1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 0.5, "x": 0, "y": 0 }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 716
       }
@@ -3953,7 +3953,7 @@
         "wellName": "H1",
         "wellLocation": {
           "origin": "bottom",
-          "offset": { "z": 0.5, "x": 0, "y": 0 }
+          "offset": { "z": 1, "x": 0, "y": 0 }
         },
         "flowRate": 716
       }
