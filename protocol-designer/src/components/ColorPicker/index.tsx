@@ -11,6 +11,7 @@ interface ColorPickerProps {
 }
 
 export function ColorPicker(props: ColorPickerProps): JSX.Element {
+  const { value, onChange } = props
   const [showColorPicker, setShowColorPicker] = React.useState<boolean>(false)
 
   return (
@@ -27,7 +28,7 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
           <div
             className={styles.color}
             style={{
-              backgroundColor: props.value,
+              backgroundColor: value,
             }}
           />
         </div>
@@ -39,9 +40,9 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
             />
             <TwitterPicker
               colors={DEFAULT_LIQUID_COLORS}
-              color={props.value}
+              color={value}
               onChange={(color, event) => {
-                props.onChange(color.hex)
+                onChange(color.hex)
               }}
             />
           </div>
