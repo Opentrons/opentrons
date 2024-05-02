@@ -39,7 +39,7 @@ export function SelectDestLabware(
     'wellPlate',
     'reservoir',
   ]
-  if (state.pipette.channels === 1) {
+  if (state.pipette?.channels === 1) {
     labwareDisplayCategoryFilters.push('tubeRack')
   }
   const [selectedCategory, setSelectedCategory] = React.useState<LabwareFilter>(

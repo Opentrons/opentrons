@@ -5,6 +5,8 @@
   "left_mount": "Left Mount",
   "both_mounts": "Left + Right Mount",
   "dispense_volume": "Dispense volume per well (µL)",
+  "exit_quick_transfer": "Exit quick transfer?",
+  "lose_all_progress": "You will lose all progress on this quick transfer.",
   "right_mount": "Right Mount",
   "reservoir": "Reservoirs",
   "select_attached_pipette": "Select attached pipette",
