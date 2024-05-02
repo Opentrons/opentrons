@@ -1,5 +1,6 @@
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
+import { COLUMN } from '@opentrons/shared-data'
 import {
   splitLiquid,
   mergeLiquid,
@@ -13,7 +14,7 @@ import type {
   SourceAndDest,
   RobotStateAndWarnings,
 } from '../types'
-import { COLUMN } from '@opentrons/shared-data'
+
 type LiquidState = RobotState['liquidState']
 export interface DispenseUpdateLiquidStateArgs {
   invariantContext: InvariantContext
