@@ -155,6 +155,7 @@ def create_csv_test_report(
     trials: int,
     name: str,
     run_id: str,
+    cavity_racks: int = 1
 ) -> CSVReport:
     """Create CSV test report."""
     env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
@@ -169,7 +170,7 @@ def create_csv_test_report(
             0,  # channel (hardcoded to 1)
             trial,
         )
-        for trial in range(config.NUM_BLANK_TRIALS)
+        for trial in range(config.NUM_BLANK_TRIALS*cavity_racks)
     ]
     for vol in volumes:
         meas_vols += [
@@ -282,7 +283,7 @@ def create_csv_test_report(
                     for volume, channel, trial in meas_vols
                     for measurement in MeasurementType
                     for i in meas_info
-                    if volume is not None or trial < config.NUM_BLANK_TRIALS
+                    if volume is not None or trial < (config.NUM_BLANK_TRIALS*cavity_racks)
                 ],
             ),
             CSVSection(
