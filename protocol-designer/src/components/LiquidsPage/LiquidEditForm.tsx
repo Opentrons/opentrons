@@ -26,14 +26,14 @@ import type { ColorResult } from 'react-color'
 import type { LiquidGroup } from '../../labware-ingred/types'
 
 interface LiquidEditFormProps {
-  name: string | null | undefined
-  description: string | null | undefined
   serialize: boolean
   canDelete: boolean
   deleteLiquidGroup: () => void
   cancelForm: () => void
   saveForm: (liquidGroup: LiquidGroup) => void
   displayColor?: string
+  name?: string | null
+  description?: string | null
 }
 
 interface LiquidEditFormValues {
@@ -107,6 +107,7 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
   })
   const name = watch('name')
   const description = watch('description')
+  const color = watch('displayColor')
 
   const handleLiquidEdits = (values: LiquidEditFormValues): void => {
     saveForm({
@@ -163,9 +164,10 @@ export function LiquidEditForm(props: LiquidEditFormProps): JSX.Element {
                 control={control}
                 render={({ field }) => (
                   <ColorPicker
-                    value={field.value}
+                    value={color}
                     onChange={(color: ColorResult['hex']) => {
                       setValue('displayColor', color)
+                      field.onChange(color)
                     }}
                   />
                 )}
