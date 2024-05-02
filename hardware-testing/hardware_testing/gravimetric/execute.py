@@ -54,7 +54,6 @@ import glob
 from opentrons.hardware_control.types import StatusBarState
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
 
-from .__main__ import NUMBER_OF_RACKS
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -565,7 +564,9 @@ def _get_liquid_height(
     return _liquid_height
 
 
-def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noqa: C901
+def run(
+    cfg: config.GravimetricConfig, resources: TestResources, number_of_racks: int
+) -> None:  # noqa: C901
     """Run."""
     global _PREV_TRIAL_GRAMS
     global _MEASUREMENTS
@@ -758,7 +759,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                     if (
                         cfg.cavity
                         and trial_count < cfg.trials
-                        and (trial_count) % (cfg.trials / NUMBER_OF_RACKS) == 0
+                        and (trial_count) % (cfg.trials / number_of_racks) == 0
                     ):
                         next_tip = _next_tip_for_channel(
                             cfg, resources, channel, total_tips

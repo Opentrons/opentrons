@@ -48,7 +48,6 @@ from opentrons.protocol_api import InstrumentContext
 from opentrons.protocol_engine.types import LabwareOffset
 
 API_LEVEL = "2.18"
-NUMBER_OF_RACKS = 8
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
@@ -293,7 +292,7 @@ class RunArgs:
                 trials = 240
             else:
                 trials = (
-                    args.trials * NUMBER_OF_RACKS
+                    args.trials * args.cavity_racks
                 )  # we want to specify trials in X per rack so multiply by 8
         elif args.trials == 0:
             trials = helpers.get_default_trials(args.increment, kind, args.channels)
@@ -553,7 +552,7 @@ def _main(
             tip,
             all_channels=all_channels_same_time,
             cavity=run_args.cavity,
-            trials_per_rack=int(run_args.trials / NUMBER_OF_RACKS),
+            trials_per_rack=int(run_args.trials / args.cavity_racks),
         ),
         env_sensor=run_args.environment_sensor,
         recorder=run_args.recorder,
@@ -563,7 +562,7 @@ def _main(
     if args.photometric:
         execute_photometric.run(cfg_pm, test_resources)
     else:
-        execute.run(cfg_gm, test_resources)
+        execute.run(cfg_gm, test_resources, args.cavity_racks)
 
 
 if __name__ == "__main__":
@@ -585,6 +584,7 @@ if __name__ == "__main__":
     parser.add_argument("--touch-tip", action="store_true")
     parser.add_argument("--refill", action="store_true")
     parser.add_argument("--isolate-channels", nargs="+", type=int, default=None)
+    parser.add_argument("--cavity-racks", nargs="+", type=int, default=8)
     parser.add_argument("--isolate-volumes", nargs="+", type=float, default=None)
     parser.add_argument("--extra", action="store_true")
     parser.add_argument("--jog", action="store_true")
