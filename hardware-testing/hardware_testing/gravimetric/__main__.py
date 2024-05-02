@@ -291,7 +291,7 @@ class RunArgs:
             if args.trials == 0:
                 trials = 240
             else:
-                trials = (
+                trials = int(
                     args.trials * args.cavity_racks
                 )  # we want to specify trials in X per rack so multiply by 8
         elif args.trials == 0:
@@ -584,7 +584,7 @@ if __name__ == "__main__":
     parser.add_argument("--touch-tip", action="store_true")
     parser.add_argument("--refill", action="store_true")
     parser.add_argument("--isolate-channels", nargs="+", type=int, default=None)
-    parser.add_argument("--cavity-racks", nargs="+", type=int, default=8)
+    parser.add_argument("--cavity-racks", type=int, default=8)
     parser.add_argument("--isolate-volumes", nargs="+", type=float, default=None)
     parser.add_argument("--extra", action="store_true")
     parser.add_argument("--jog", action="store_true")

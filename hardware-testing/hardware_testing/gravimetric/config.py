@@ -8,7 +8,7 @@ from opentrons.protocol_api.labware import Well
 from opentrons.hardware_control.types import InstrumentProbeType
 
 
-CAVITY_1uL_COMMAND_VOL = 0.9
+CAVITY_1uL_COMMAND_VOL = 0.7
 
 
 class ConfigType(Enum):
@@ -93,7 +93,7 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
     50: {
         1: {
             50: {
-                "max_z_distance": 20,
+                "max_z_distance": 16,
                 "min_z_distance": 5,
                 "mount_speed": 5,
                 "plunger_speed": 21,
@@ -198,7 +198,7 @@ def _get_liquid_probe_settings(
         plunger_speed=lqid_cfg["plunger_speed"],
         sensor_threshold_pascals=lqid_cfg["sensor_threshold_pascals"],
         expected_liquid_height=110,
-        output_option=OutputOptions.stream_to_csv,
+        output_option=OutputOptions.sync_buffer_to_csv,
         aspirate_while_sensing=False,
         auto_zero_sensor=True,
         num_baseline_reads=10,
