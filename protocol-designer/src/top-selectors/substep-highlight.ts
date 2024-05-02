@@ -204,7 +204,7 @@ function _getSelectedWellsForSubstep(
 
   if (
     'sourceLabware' in stepArgs &&
-    stepArgs.sourceLabware &&
+    stepArgs.sourceLabware != null &&
     stepArgs.sourceLabware === labwareId
   ) {
     wells.push(...getWells('source'))
@@ -212,7 +212,7 @@ function _getSelectedWellsForSubstep(
 
   if (
     'destLabware' in stepArgs &&
-    stepArgs.destLabware &&
+    stepArgs.destLabware != null &&
     stepArgs.destLabware === labwareId
   ) {
     wells.push(...getWells('dest'))
