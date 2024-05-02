@@ -1,6 +1,5 @@
 """Protocol run control and management."""
 import asyncio
-from dataclasses import dataclass
 from typing import List, NamedTuple, Optional, Union
 
 from abc import ABC, abstractmethod
@@ -40,10 +39,7 @@ from .legacy_wrappers import (
     LegacyLoadInfo,
 )
 from ..ordered_set import OrderedSet
-from ..protocol_engine.actions import QueueCommandAction
-from ..protocol_engine.commands import hash_protocol_command_params
 from ..protocol_engine.errors import ProtocolCommandFailedError
-from ..protocol_engine.resources import model_utils
 from ..protocol_engine.types import (
     PostRunHardwareState,
     DeckConfigurationType,
@@ -72,21 +68,21 @@ class AbstractRunner(ABC):
     you will need a new Runner to do another run.
     """
 
-    _queued_protocol_commands: OrderedSet[CommandCreate]
+    _queued_protocol_commands: List[CommandCreate]
     """The IDs of queued commands, in FIFO order"""
 
-    _queued_setup_commands: OrderedSet[CommandCreate]
+    _queued_setup_commands: List[CommandCreate]
     """The IDs of queued setup commands, in FIFO order"""
 
-    _queued_fixit_commands: OrderedSet[CommandCreate]
+    _queued_fixit_commands: List[CommandCreate]
     """The IDs of queued fixit commands, in FIFO order"""
 
     def __init__(self, protocol_engine: ProtocolEngine) -> None:
         self._protocol_engine = protocol_engine
         self._broker = LegacyBroker()
-        self._queued_protocol_commands = OrderedSet()
-        self._queued_setup_commands = OrderedSet()
-        self._queued_fixit_commands = OrderedSet()
+        self._queued_protocol_commands = []
+        self._queued_setup_commands = []
+        self._queued_fixit_commands = []
 
     # TODO(mm, 2023-10-03): `LegacyBroker` is specific to Python protocols and JSON protocols ≤v5.
     # We'll need to extend this in order to report progress from newer JSON protocols.
@@ -394,7 +390,7 @@ class JsonRunner(AbstractRunner):
 
     def _add_to_queue(self, command: CommandCreate) -> None:
         """Add new ID to the queued."""
-        self._queued_protocol_commands.add(command)
+        self._queued_protocol_commands.append(command)
 
 
 class LiveRunner(AbstractRunner):
@@ -446,11 +442,11 @@ class LiveRunner(AbstractRunner):
 
     def _add_to_setup_queue(self, command: CommandCreate) -> None:
         """Add a new ID to the queued setup."""
-        self._queued_setup_commands.add(command)
+        self._queued_setup_commands.append(command)
 
     def _add_to_fixit_queue(self, command: CommandCreate) -> None:
         """Add a new ID to the queued fixit."""
-        self._queued_fixit_commands.add(command)
+        self._queued_fixit_commands.append(command)
 
 
 AnyRunner = Union[PythonAndLegacyRunner, JsonRunner, LiveRunner]

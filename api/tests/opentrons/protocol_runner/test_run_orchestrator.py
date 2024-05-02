@@ -47,6 +47,11 @@ def mock_hardware_api(decoy: Decoy) -> HardwareAPI:
 
 
 @pytest.fixture
+def config() -> JsonProtocolConfig:
+    """Get an API version to apply to the interface."""
+    return JsonProtocolConfig(schema_version=7)
+
+@pytest.fixture
 @pytest.mark.parametrize(
     "config",
     [
@@ -79,11 +84,11 @@ def subject(
             pe_commands.CommandIntent.FIXIT,
         ),
         (
-            lazy_fixture("mock_json_runner"),
+            lazy_fixture("mock_protocol_json_runner"),
             pe_commands.CommandIntent.PROTOCOL,
         ),
         (
-            lazy_fixture("mock_python_runner"),
+            lazy_fixture("mock_protocol_python_runner"),
             pe_commands.CommandIntent.PROTOCOL,
         ),
     ],
@@ -96,6 +101,7 @@ def test_add_command(
 ) -> None:
     """Should verify calls to set_command_queued."""
     command_to_queue = pe_commands.HomeCreate.construct(
+        intent=command_intent,
         params=pe_commands.HomeParams.construct()
     )
     subject.add_command(command_to_queue)
