@@ -34,7 +34,6 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
   const handleClickNext = (): void => {
     // the button will be disabled if this values is null
     if (selectedTipRack != null) {
-      console.log('submitting tip rack')
       dispatch({
         type: 'SELECT_TIP_RACK',
         tipRack: selectedTipRack,
