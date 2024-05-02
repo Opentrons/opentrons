@@ -39,8 +39,8 @@ export function ChatDisplay({ chat }: ChatDisplayProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing16}
       >
-        {/* ToDo (kk:04/19/2024) I will get feedback for additional styling  from the design team. */}
-        <Markdown
+        {/* ToDo (kk:05/02/2024) This part is waiting for Mel's design */}
+        {/* <Markdown
           components={{
             div: undefined,
             ul: UnnumberedListText,
@@ -52,31 +52,33 @@ export function ChatDisplay({ chat }: ChatDisplayProps): JSX.Element {
           }}
         >
           {content}
-        </Markdown>
+        </Markdown> */}
+        <Markdown>{content}</Markdown>
       </Flex>
     </Flex>
   )
 }
 
-function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <a {...props} target="_blank" rel="noopener noreferrer" />
-}
+// ToDo (kk:05/02/2024) This part is waiting for Mel's design
+// function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
+//   return <a {...props} target="_blank" rel="noopener noreferrer" />
+// }
 
-function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="p" />
-}
+// function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
+//   return <StyledText {...props} as="p" />
+// }
 
-function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="h3" />
-}
+// function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
+//   return <StyledText {...props} as="h3" />
+// }
 
-function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="li" />
-}
+// function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
+//   return <StyledText {...props} as="li" />
+// }
 
-function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
-  return <StyledText {...props} as="ul" />
-}
+// function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
+//   return <StyledText {...props} as="ul" />
+// }
 
 const CODE_TEXT_STYLE = css`
   padding: ${SPACING.spacing16};
