@@ -89,6 +89,7 @@ def build_gravimetric_trials(
     liquid_tracker: LiquidTracker,
     blank: bool,
     env_sensor: asair_sensor.AsairSensorBase,
+    cavity_num: int = 0,
 ) -> Dict[float, Dict[int, List[GravimetricTrial]]]:
     """Build a list of all the trials that will be run."""
     trial_list: Dict[float, Dict[int, List[GravimetricTrial]]] = {}
@@ -98,7 +99,10 @@ def build_gravimetric_trials(
         num_channels_per_transfer = cfg.pipette_channels
     if blank:
         trial_list[test_volumes[-1]] = {0: []}
-        for trial in range(config.NUM_BLANK_TRIALS):
+        for trial in range(
+            cavity_num * config.NUM_BLANK_TRIALS,
+            (cavity_num + 1) * config.NUM_BLANK_TRIALS,
+        ):
             trial_list[test_volumes[-1]][0].append(
                 GravimetricTrial(
                     ctx=ctx,

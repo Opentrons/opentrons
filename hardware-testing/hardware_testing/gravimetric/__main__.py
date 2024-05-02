@@ -358,6 +358,7 @@ class RunArgs:
                 trials=trials,
                 fw_version=workarounds.get_sync_hw_api(_ctx).fw_version,
                 cavity=cavity_str,
+                cavity_racks=args.cavity_racks,
             )
 
         return RunArgs(

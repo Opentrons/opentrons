@@ -335,7 +335,7 @@ def _run_trial(
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
     # update the vials volumes, using the last-known weight
-    if _PREV_TRIAL_GRAMS is not None and trial.cfg.jog:
+    if _PREV_TRIAL_GRAMS is not None:
         _evaporation_loss_ul = abs(
             calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_init)
         )
@@ -423,11 +423,12 @@ def build_gm_report(
     trials: int,
     fw_version: str,
     cavity: str,
+    cavity_racks: int = 1,
 ) -> report.CSVReport:
     """Build a CSVReport formated for gravimetric tests."""
     ui.print_header("CREATE TEST-REPORT")
     test_report = report.create_csv_test_report(
-        test_volumes, pipette_channels, increment, trials, name, run_id=run_id
+        test_volumes, pipette_channels, increment, trials, name, run_id=run_id, cavity_racks=cavity_racks
     )
     test_report.set_tag(pipette_tag)
     test_report.set_operator(operator_name)
@@ -489,6 +490,7 @@ def _calculate_evaporation(
     liquid_tracker: LiquidTracker,
     test_report: report.CSVReport,
     labware_on_scale: Labware,
+    cavity_num: int = 0,
 ) -> Tuple[float, float]:
     ui.print_title("MEASURE EVAPORATION")
     blank_trials = build_gravimetric_trials(
@@ -503,6 +505,7 @@ def _calculate_evaporation(
         liquid_tracker,
         True,
         resources.env_sensor,
+        cavity_num,
     )
     ui.print_info(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
     resources.pipette._retract()
@@ -783,6 +786,7 @@ def run(
                             liquid_tracker,
                             resources.test_report,
                             labware_on_scale,
+                            cavity_num=int((trial_count) / (cfg.trials / number_of_racks)),
                         )
                         ui.print_info("dropping tip")
                         if not cfg.same_tip:
