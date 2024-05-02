@@ -10,7 +10,6 @@ import {
 } from '../step-forms'
 import { moveDeckItem } from '../labware-ingred/actions/actions'
 import { getRobotType } from '../file-data/selectors'
-import { getEnableMoam } from '../feature-flags/selectors'
 import { EditMultipleModulesModal } from './modals/EditModulesModal/EditMultipleModulesModal'
 import { useBlockingHint } from './Hints/useBlockingHint'
 import { MagneticModuleWarningModalContent } from './modals/EditModulesModal/MagneticModuleWarningModalContent'
@@ -35,11 +34,8 @@ export const EditModules = (props: EditModulesProps): JSX.Element => {
   const { moduleId, moduleType } = moduleToEdit
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const robotType = useSelector(getRobotType)
-  const moamFf = useSelector(getEnableMoam)
   const showMultipleModuleModal =
-    robotType === FLEX_ROBOT_TYPE &&
-    moduleType === TEMPERATURE_MODULE_TYPE &&
-    moamFf
+    robotType === FLEX_ROBOT_TYPE && moduleType === TEMPERATURE_MODULE_TYPE
 
   const moduleOnDeck = moduleId ? _initialDeckSetup.modules[moduleId] : null
   const [
