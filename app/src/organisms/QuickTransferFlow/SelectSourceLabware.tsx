@@ -31,7 +31,7 @@ interface SelectSourceLabwareProps {
 
 export function SelectSourceLabware(
   props: SelectSourceLabwareProps
-): JSX.Element {
+): JSX.Element | null {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const labwareDisplayCategoryFilters: LabwareFilter[] = [
@@ -45,8 +45,10 @@ export function SelectSourceLabware(
   const [selectedCategory, setSelectedCategory] = React.useState<LabwareFilter>(
     'all'
   )
+  if (state.pipette == null) return null
+
   const compatibleLabwareDefinitions = getCompatibleLabwareByCategory(
-    state.pipette,
+    state.pipette.channels,
     selectedCategory
   )
 

@@ -29,7 +29,9 @@ interface SelectDestLabwareProps {
   dispatch: React.Dispatch<QuickTransferWizardAction>
 }
 
-export function SelectDestLabware(props: SelectDestLabwareProps): JSX.Element {
+export function SelectDestLabware(
+  props: SelectDestLabwareProps
+): JSX.Element | null {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const labwareDisplayCategoryFilters: LabwareFilter[] = [
@@ -43,8 +45,9 @@ export function SelectDestLabware(props: SelectDestLabwareProps): JSX.Element {
   const [selectedCategory, setSelectedCategory] = React.useState<LabwareFilter>(
     'all'
   )
+  if (state.pipette == null) return null
   const compatibleLabwareDefinitions = getCompatibleLabwareByCategory(
-    state.pipette,
+    state.pipette.channels,
     selectedCategory
   )
 

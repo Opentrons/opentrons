@@ -54,7 +54,19 @@ describe('SelectSourceLabware', () => {
   })
 
   it('selects labware by default if there is one in state, button will be enabled', () => {
-    render({ ...props, state: { source: { def: 'definition' } as any } })
+    render({
+      ...props,
+      state: {
+        pipette: {
+          channels: 1,
+        } as any,
+        source: {
+          metadata: {
+            displayName: 'source display name',
+          },
+        } as any,
+      },
+    })
     const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(continueBtn).toBeEnabled()
     fireEvent.click(continueBtn)

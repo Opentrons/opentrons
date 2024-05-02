@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { getVolumeLimits } from '../utils'
+import { getVolumeLimits, generateCompatibleLabwareForPipette } from '../utils'
+import {
+  SINGLE_CHANNEL_COMPATIBLE_LABWARE,
+  EIGHT_CHANNEL_COMPATIBLE_LABWARE,
+  NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE,
+} from '../constants'
 
 import type { QuickTransferSetupState } from '../types'
 
@@ -76,5 +81,28 @@ describe('getVolumeLimits', () => {
     // should equal lesser of pipette max, tip capacity, volume of all
     // selected destination wells and 1 / 2 volume of source well
     expect(result.max).toEqual(75)
+  })
+})
+
+// if one of these fails, it is likely that a new definition has been added
+// and you need to regenerate the lists stored at ../constants
+describe('generateCompatibleLabwareForPipette', () => {
+  it('generates the list for single channel pipettes', () => {
+    const compatibleLabwareUris = generateCompatibleLabwareForPipette({
+      channels: 1,
+    } as any)
+    expect(compatibleLabwareUris).toEqual(SINGLE_CHANNEL_COMPATIBLE_LABWARE)
+  })
+  it('generates the list for eight channel pipettes', () => {
+    const compatibleLabwareUris = generateCompatibleLabwareForPipette({
+      channels: 8,
+    } as any)
+    expect(compatibleLabwareUris).toEqual(EIGHT_CHANNEL_COMPATIBLE_LABWARE)
+  })
+  it('generates the list for 96 channel pipettes', () => {
+    const compatibleLabwareUris = generateCompatibleLabwareForPipette({
+      channels: 96,
+    } as any)
+    expect(compatibleLabwareUris).toEqual(NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE)
   })
 })

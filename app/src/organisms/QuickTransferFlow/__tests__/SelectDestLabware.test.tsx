@@ -54,7 +54,19 @@ describe('SelectDestLabware', () => {
   })
 
   it('selects labware by default if there is one in state, button will be enabled', () => {
-    render({ ...props, state: { destination: { def: 'definition' } as any } })
+    render({
+      ...props,
+      state: {
+        pipette: {
+          channels: 1,
+        } as any,
+        destination: {
+          metadata: {
+            displayName: 'destination labware name',
+          },
+        } as any,
+      },
+    })
     const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(continueBtn).toBeEnabled()
     fireEvent.click(continueBtn)
@@ -79,6 +91,7 @@ describe('SelectDestLabware', () => {
     render({
       ...props,
       state: {
+        pipette: { channels: 8 } as any,
         source: { metadata: { displayName: 'source labware name' } } as any,
       },
     })
@@ -90,6 +103,7 @@ describe('SelectDestLabware', () => {
     render({
       ...props,
       state: {
+        pipette: { channels: 8 } as any,
         source: { metadata: { displayName: 'source labware name' } } as any,
       },
     })

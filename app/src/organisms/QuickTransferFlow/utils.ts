@@ -1,5 +1,15 @@
-import { makeWellSetHelpers } from '@opentrons/shared-data'
-import { getAllDefinitions } from '../../pages/Labware/helpers/definitions'
+import {
+  makeWellSetHelpers,
+  getLabwareDefURI,
+  getAllDefinitions,
+} from '@opentrons/shared-data'
+import { getAllDefinitions as getAllLatestDefValues } from '../../pages/Labware/helpers/definitions'
+import {
+  SINGLE_CHANNEL_COMPATIBLE_LABWARE,
+  EIGHT_CHANNEL_COMPATIBLE_LABWARE,
+  NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE,
+} from './constants'
+
 import type {
   LabwareDefinition2,
   PipetteV2Specs,
@@ -9,7 +19,7 @@ import type {
   QuickTransferSetupState,
   QuickTransferWizardAction,
 } from './types'
-import { LabwareFilter } from '../../pages/Labware/types'
+import type { LabwareFilter } from '../../pages/Labware/types'
 
 export function quickTransferReducer(
   state: QuickTransferSetupState,
@@ -83,19 +93,22 @@ export function quickTransferReducer(
 }
 
 export function getCompatibleLabwareByCategory(
-  pipetteSpecs: PipetteV2Specs | undefined,
+  pipetteChannels: 1 | 8 | 96,
   category: LabwareFilter
 ): LabwareDefinition2[] | undefined {
   const allLabwareDefinitions = getAllDefinitions()
-  const wellSetHelpers: WellSetHelpers = makeWellSetHelpers()
-  const { canPipetteUseLabware } = wellSetHelpers
-  if (pipetteSpecs == null) return undefined
-  let compatibleLabwareDefinitions = allLabwareDefinitions
-  if (pipetteSpecs.channels !== 1) {
-    compatibleLabwareDefinitions = allLabwareDefinitions.filter(def =>
-      canPipetteUseLabware(pipetteSpecs.channels, def)
-    )
+  let compatibleLabwareUris: string[] = SINGLE_CHANNEL_COMPATIBLE_LABWARE
+  if (pipetteChannels === 8) {
+    compatibleLabwareUris = EIGHT_CHANNEL_COMPATIBLE_LABWARE
+  } else if (pipetteChannels === 96) {
+    compatibleLabwareUris = NINETY_SIX_CHANNEL_COMPATIBLE_LABWARE
   }
+
+  const compatibleLabwareDefinitions = compatibleLabwareUris.reduce<
+    LabwareDefinition2[]
+  >((acc, defUri) => {
+    return [...acc, allLabwareDefinitions[defUri]]
+  }, [])
 
   if (category === 'all') {
     return compatibleLabwareDefinitions.filter(
@@ -186,4 +199,29 @@ export function getVolumeLimits(
   }
 
   return { min: minPipetteVolume, max: maxVolume }
+}
+
+export function generateCompatibleLabwareForPipette(
+  pipetteSpecs: PipetteV2Specs
+): string[] {
+  const allLabwareDefinitions = getAllLatestDefValues()
+  const wellSetHelpers: WellSetHelpers = makeWellSetHelpers()
+  const { canPipetteUseLabware } = wellSetHelpers
+
+  const compatibleDefUriList = allLabwareDefinitions.reduce<string[]>(
+    (acc, definition) => {
+      if (pipetteSpecs.channels == 1) {
+        return [...acc, getLabwareDefURI(definition)]
+      } else {
+        const isCompatible = canPipetteUseLabware(pipetteSpecs, definition)
+        return isCompatible ? [...acc, getLabwareDefURI(definition)] : acc
+      }
+    },
+    []
+  )
+
+  // console.log(JSON.stringify(compatibleDefUriList))
+  // to update this list, uncomment the above log statement and
+  // paste the result into the const in ./constants.ts
+  return compatibleDefUriList
 }
