@@ -56,6 +56,7 @@ import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningPr
 import { RunPausedSplash } from '../../organisms/OnDeviceDisplay/RunningProtocol/RunPausedSplash'
 import { getLocalRobot } from '../../redux/discovery'
 import { OpenDoorAlertModal } from '../../organisms/OpenDoorAlertModal'
+import { ErrorRecoveryFlows } from '../../organisms/ErrorRecoveryFlows'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -106,6 +107,7 @@ export function RunningProtocol(): JSX.Element {
     refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
   })
   const [enableSplash, setEnableSplash] = React.useState(true)
+  const [showErrorRecovery, setShowErrorRecovery] = React.useState(false)
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data.protocolId ?? null
@@ -166,13 +168,21 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [lastRunCommand, interventionModalCommandKey])
 
+  const handleCompleteRecovery = (): void => {
+    setShowErrorRecovery(false)
+    setEnableSplash(false)
+  }
+
   return (
     <>
+      {showErrorRecovery ? (
+        <ErrorRecoveryFlows onComplete={handleCompleteRecovery} />
+      ) : null}
       {enableSplash &&
       runStatus === RUN_STATUS_AWAITING_RECOVERY &&
       enableRunNotes ? (
         <RunPausedSplash
-          onClose={() => setEnableSplash(false)}
+          onClick={() => setShowErrorRecovery(true)}
           errorType={errorType}
           protocolName={protocolName}
         />
