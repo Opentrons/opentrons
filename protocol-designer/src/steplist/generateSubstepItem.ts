@@ -321,12 +321,10 @@ function transferLikeSubsteps(args: {
       1,
       null
     )
-    console.log('substepRows', substepRows)
     const mergedRows: StepItemSourceDestRow[] = mergeSubstepRowsSingleChannel({
       substepRows,
       showDispenseVol,
     })
-    console.log('mergedRows', mergedRows)
     return {
       substepType: 'sourceDest',
       multichannel: false,
