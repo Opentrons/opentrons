@@ -1021,11 +1021,6 @@ class InstrumentContext(publisher.CommandPublisher):
         If no location is passed (e.g. ``pipette.drop_tip()``), the pipette will drop
         the attached tip into its :py:attr:`trash_container`.
 
-        Starting with API version 2.15, if the trash container is the default fixed
-        trash, the API will instruct the pipette to drop tips in different locations
-        within the trash container. Varying the tip drop location helps prevent tips
-        from piling up in a single location.
-
         The location in which to drop the tip can be manually specified with the
         ``location`` argument. The ``location`` argument can be specified in several
         ways:
@@ -1043,6 +1038,15 @@ class InstrumentContext(publisher.CommandPublisher):
             - As a :py:class:`.WasteChute`. This uses a default location relative to
               the ``WasteChute`` object. For example,
               ``pipette.drop_tip(location=waste_chute)``.
+
+        Starting with API version 2.15, if ``location`` is a trash container or not
+        specified, the API will instruct the pipette to drop tips in different locations
+        within the trash container. Varying the tip drop location helps prevent tips
+        from piling up in a single location.
+
+        Starting with API version 2.18, the API will only vary the tip drop location if
+        ``location`` is not specified. A trash container ``location`` behaves the same
+        as that trash container's ``.top()``, which is a fixed position.
 
         :param location:
             Where to drop the tip.
