@@ -6,7 +6,7 @@
     "author": "",
     "description": "A test for 5.0.0 -> 5.1.0 migration",
     "created": 1600714068238,
-    "lastModified": 1711742569351,
+    "lastModified": 1714570500165,
     "category": null,
     "subcategory": null,
     "tags": []
@@ -15,7 +15,7 @@
     "name": "opentrons/protocol-designer",
     "version": "8.1.0",
     "data": {
-      "_internalAppBuildDate": "Fri, 29 Mar 2024 20:00:04 GMT",
+      "_internalAppBuildDate": "Wed, 01 May 2024 13:32:34 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 0.5,
@@ -58,7 +58,6 @@
           "labware": null,
           "mix_wellOrder_first": "t2b",
           "mix_wellOrder_second": "l2r",
-          "blowout_z_offset": 0,
           "blowout_checkbox": false,
           "blowout_location": "5ba7047d-d3e2-4845-9eaa-1974af796ead:trashBin",
           "mix_mmFromBottom": 0.5,
@@ -78,6 +77,8 @@
           "tipRack": "f1c677c0-fc3a-11ea-8809-e959e7d61d96:opentrons/opentrons_96_tiprack_10ul/1",
           "mix_x_position": 0,
           "mix_y_position": 0,
+          "blowout_z_offset": 0,
+          "blowout_flowRate": null,
           "id": "fc4dc7c0-fc3a-11ea-8809-e959e7d61d96",
           "stepType": "mix",
           "stepName": "mix",
@@ -2128,7 +2129,7 @@
   "commandSchemaId": "opentronsCommandSchemaV8",
   "commands": [
     {
-      "key": "3004b46c-2b41-4453-8ddc-1629ec3b5249",
+      "key": "d66aa1db-df76-492d-ab2c-533b982522aa",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p20_single_gen2",
@@ -2137,7 +2138,7 @@
       }
     },
     {
-      "key": "c318feee-5ec6-40a0-9ecc-554e67b30ce1",
+      "key": "78921c11-0ed3-49c6-b4c3-08fd71b68917",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons OT-2 96 Tip Rack 10 µL",
@@ -2149,7 +2150,7 @@
       }
     },
     {
-      "key": "3350dee6-aa60-4569-a801-0dfeb5baf8ed",
+      "key": "f9f07c5b-a0dd-4c3c-8479-15a63ae0642e",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Bio-Rad 96 Well Plate 200 µL PCR",
@@ -2162,7 +2163,7 @@
     },
     {
       "commandType": "waitForDuration",
-      "key": "797e70f3-5310-48c2-ba06-12adb92a7b4e",
+      "key": "72be26a3-bb77-455d-bc32-f100e1a84a0b",
       "params": { "seconds": 3723, "message": "" }
     }
   ],

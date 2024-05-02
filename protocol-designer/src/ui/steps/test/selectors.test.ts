@@ -418,7 +418,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
-
+        blowout_flowRate: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         aspirate_labware: {
           value: 'aspirate_labware_id',
           isIndeterminate: false,
@@ -642,6 +645,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           dispense_wellOrder_first: 'b2t',
           dispense_wellOrder_second: 'r2l',
           dispense_mix_checkbox: false,
+          blowout_flowRate: null,
           // same thing here with mix times or mix volumes
           dispense_delay_checkbox: false,
           // same thing here for delay seconds and mm from bottom
@@ -669,6 +673,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
         },
         tipRack: {
           isIndeterminate: false,
+        },
+        blowout_flowRate: {
+          isIndeterminate: true,
         },
         aspirate_flowRate: {
           isIndeterminate: true,
@@ -862,6 +869,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
       ).toEqual({
         volume: { value: '100', isIndeterminate: false },
         tipRack: { isIndeterminate: false },
+        blowout_flowRate: {
+          isIndeterminate: false,
+        },
         times: { value: null, isIndeterminate: false },
         changeTip: { value: 'always', isIndeterminate: false },
         labware: { value: 'some_labware_id', isIndeterminate: false },
@@ -940,6 +950,9 @@ describe('_getSavedMultiSelectFieldValues', () => {
         )
       ).toEqual({
         tipRack: { isIndeterminate: false },
+        blowout_flowRate: {
+          isIndeterminate: false,
+        },
         volume: { isIndeterminate: true },
         times: { isIndeterminate: true },
         changeTip: { isIndeterminate: true },

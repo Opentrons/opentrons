@@ -177,6 +177,13 @@ export const SourceDestFields = (props: SourceDestFieldsProps): JSX.Element => {
                 stepType: formData.stepType,
               })}
             />
+            <FlowRateField
+              {...propsForFields.blowout_flowRate}
+              pipetteId={formData.pipette}
+              flowRateType="blowout"
+              volume={propsForFields.volume?.value ?? 0}
+              tiprack={propsForFields.tipRack.value}
+            />
             <BlowoutZOffsetField
               {...propsForFields.blowout_z_offset}
               sourceLabwareId={propsForFields.aspirate_labware.value}
